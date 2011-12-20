@@ -1,0 +1,133 @@
+<?php
+
+class CM_File {
+	private $_path;
+
+	/**
+	 * Creates file object
+	 *
+	 * @param string|CM_File $file Path to file
+	 */
+	public function __construct($file) {
+		if ($file instanceof CM_File) {
+			$file = $file->getPath();
+		}
+		if (!is_file($file)) {
+			throw new CM_Exception_Invalid('File path `' . $file . '` does not exist or is not a file.');
+		}
+		$this->_path = $file;
+	}
+
+	/**
+	 * @return string File path
+	 */
+	public function getPath() {
+		return $this->_path;
+	}
+
+	/**
+	 * @return string File name
+	 */
+	public function getFileName() {
+		return pathinfo($this->getPath(), PATHINFO_BASENAME);
+	}
+
+	/**
+	 * @return int File size in bytes
+	 * @throws CM_Exception
+	 */
+	public function getSize() {
+		$size = filesize($this->getPath());
+		if (false === $size) {
+			throw new CM_Exception('Cannot detect filesize of `' . $this->getPath() . '`');
+		}
+		return $size;
+	}
+
+	/**
+	 * @return string File mime type
+	 * @throws CM_Exception
+	 */
+	public function getType() {
+		$info = new finfo(FILEINFO_MIME);
+		$infoFile = $info->file($this->getPath());
+		if (false === $infoFile) {
+			throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
+		}
+		$mime = explode(';', $infoFile);
+		return $mime[0];
+	}
+
+	/**
+	 * @return string File extension
+	 */
+	public function getExtension() {
+		return strtolower(pathinfo($this->getFileName(), PATHINFO_EXTENSION));
+	}
+
+	/**
+	 * @return string MD5-hash of file contents
+	 * @throws CM_Exception
+	 */
+	public function getHash() {
+		$md5 = md5_file($this->getPath());
+		if (false === $md5) {
+			throw new CM_Exception('Cannot detect md5-sum of `' . $this->getPath() . '`');
+		}
+		return $md5;
+	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception
+	 */
+	public function read() {
+		@$contents = file_get_contents($this->getPath());
+		if ($contents === false) {
+			throw new CM_Exception('Cannot read contents of `' . $this->getPath() . '`.');
+		}
+		return $contents;
+	}
+
+	/**
+	 * @param string $path New file path
+	 * @throws CM_Exception
+	 */
+	public function copy($path) {
+		$path = (string) $path;
+		if (!copy($this->getPath(), $path)) {
+			throw new CM_Exception('Cannot copy `' . $this->getPath() . '` to `' . $path . '`.');
+		}
+	}
+
+	/**
+	 * @param string $path
+	 * @throws CM_Exception
+	 */
+	public function move($path) {
+		$path = (string) $path;
+		if (!rename($this->getPath(), $path)) {
+			throw new CM_Exception('Cannot move `' . $this->getPath() . '` to `' . $path . '`.');
+		}
+		$this->_path = $path;
+	}
+	
+	/**
+	 * @throws CM_Exception
+	 */
+	public function delete() {
+		if (!is_file($this->getPath())) {
+			return;
+		}
+		if (false === unlink($this->getPath())) {
+			throw new CM_Exception('Cannot delete `' . $this->getPath() . '`..');
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public function __toString() {
+		return $this->read();
+	}
+}

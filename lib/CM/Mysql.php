@@ -1,0 +1,550 @@
+<?php
+
+class CM_Mysql {
+	const STMT_INSERT = 'INSERT';
+	const STMT_INSERT_IGNORE = 'INSERT IGNORE';
+	const STMT_INSERT_DELAYED = 'INSERT DELAYED';
+	const STMT_REPLACE = 'REPLACE';
+	const STMT_REPLACE_DELAYED = 'REPLACE DELAYED';
+
+	protected static $link_id;
+	protected static $link_id_read;
+
+	/**
+	 * Open a connection to a MySQL server.
+	 */
+	public static function connect($readOnly = false) {
+		$user = Config::get()->db->user;
+		$pass = Config::get()->db->pass;
+		$server = Config::get()->db->server;
+		$link = &self::$link_id;
+		if ($readOnly) {
+			$link = &self::$link_id_read;
+			$servers_read = Config::get()->db->servers_read;
+			if (!empty($servers_read)) {
+				$server = $servers_read[array_rand($servers_read)];
+			}
+		}
+
+		if (!($link = @mysql_connect($server[0] . ':' . $server[1], $user, $pass))) {
+			throw new CM_Exception('Database connection failed');
+		}
+
+		if (!mysql_select_db(self::_getDbName(), $link)) {
+			throw new CM_Exception('Cannot select database ' . self::_getDbName());
+		}
+
+		if (!mysql_set_charset('utf8', $link)) {
+			throw new CM_Exception('Cannot set database charset to utf-8');
+		}
+
+		return $link;
+	}
+
+	protected static function _getLink($readOnly = false) {
+		if ($readOnly) {
+			return self::$link_id_read ? self::$link_id_read : self::connect($readOnly);
+		} else {
+			return self::$link_id ? self::$link_id : self::connect($readOnly);
+		}
+	}
+
+	private static function _getDbName() {
+		if (IS_TEST) {
+			return Config::get()->db->name . '_test';
+		}
+		return Config::get()->db->name;
+	}
+
+	/**
+	 * Compile query placeholder.
+	 *
+	 * @param array $query_tpl
+	 * @return string
+	 */
+	public static function compile_placeholder($query_tpl) {
+		// Replace TBL_* constants
+		$query_tpl = preg_replace_callback('/(TBL_.+?)\b/', function ($matches) {
+			return '`' . constant($matches[1]) . '`';
+		}, $query_tpl);
+
+		$compiled = array();
+		$i = 0; // placeholders counter
+		$p = 0; // current position
+		$prev_p = 0; // previous position
+
+		while (false !== ($p = strpos($query_tpl, '?', $p))) {
+			$compiled[] = substr($query_tpl, $prev_p, $p - $prev_p);
+
+			$type_char = $char = $query_tpl{$p - 1};
+
+			switch ($type_char) {
+				case '"':
+				case "'":
+				case '`':
+					$type = $type_char; // string
+					break;
+				default:
+					$type = ''; // integer
+					break;
+			}
+
+			$next_char = isset($query_tpl{$p + 1}) ? $query_tpl{$p + 1} : null;
+			if ($next_char === '@') { // array list
+				$compiled[] = array($i++, $type, '@');
+				$prev_p = ($p = $p + 2);
+			} else {
+				$compiled[] = array($i++, $type);
+				$prev_p = ($p = $p + 1);
+			}
+		}
+
+		$tail_length = (strlen($query_tpl) - $prev_p);
+		if ($tail_length) {
+			$compiled[] = substr($query_tpl, -$tail_length);
+		}
+
+		return $compiled;
+	}
+
+	/**
+	 * Generates a query string for execution.
+	 *
+	 * @param string $query_tpl
+	 * @param mixed $arg1
+	 * @param mixed $arg2
+	 * @param mixed $arg3...
+	 * @return string
+	 */
+	public static function placeholder() {
+		$arguments = func_get_args();
+		$c_query = array_shift($arguments);
+		if (!is_array($c_query)) {
+			$c_query = self::compile_placeholder($c_query);
+		}
+
+		$query = '';
+
+		foreach ($c_query as $piece) {
+			if (!is_array($piece)) {
+				$query .= $piece;
+				continue;
+			}
+
+			list($index, $type) = $piece;
+
+			if (isset($piece[2])) {
+				// array value
+				$array = $arguments[$index];
+
+				switch ($type) {
+					case '"':
+					case "'":
+					case '`':
+						foreach ($array as &$var) {
+							$var = mysql_real_escape_string($var, self::_getLink());
+						}
+						$query .= implode("$type,$type", $array);
+						break;
+					default:
+						$query .= implode(",", array_map('intval', $array));
+						break;
+				}
+			} else {
+				// scalar value
+				$var = $arguments[$index];
+
+				switch ($type) {
+					case '"':
+					case "'":
+					case '`':
+						$query .= mysql_real_escape_string($var, self::_getLink());
+						break;
+					default:
+						$query .= round($var, 0);
+						break;
+				}
+			}
+		}
+
+		return $query;
+	}
+
+	/**
+	 * Sends query to a database server.
+	 *
+	 * @param string $query
+	 * @param booleab $readOnly
+	 * @throws CM_Exception
+	 * @return CM_MysqlResult
+	 */
+	public static function query($query, $readOnly = false) {
+		$readOnly ? CM_Debug::get()->incStats('mysql-read', $query) : CM_Debug::get()->incStats('mysql', $query);
+
+		$link = self::_getLink($readOnly);
+		$result = mysql_query($query, $link);
+		if ($result === false) {
+			throw new CM_Exception('Mysql error `' . mysql_errno($link) . '` with message `' . mysql_error($link) . '` (query: `' . $query . '`)');
+		} elseif (is_bool($result)) {
+			return true;
+		} else {
+			return new CM_MysqlResult($result);
+		}
+	}
+
+	/**
+	 * Compile and execute a query.
+	 *
+	 * @param string $query Can contain ?, @? as placeholders
+	 * @param mixed $arg1
+	 * @param mixed $arg2...
+	 * @return CM_MysqlResult|int Either a CM_MysqlResult, last insert id or affected rows.
+	 */
+	public static function exec() {
+		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
+		$result = self::query($query);
+		if ($result instanceof CM_MysqlResult) {
+			return $result;
+		} elseif ($insertId = self::insert_id()) {
+			return $insertId;
+		} else {
+			return self::affected_rows();
+		}
+	}
+
+	/**
+	 * Compile and execute a read-only SELECT query.
+	 * This might return somewhat stale data
+	 *
+	 * @param string $query Can contain ?, @? as placeholders
+	 * @param mixed $arg1
+	 * @param mixed $arg2...
+	 * @return CM_MysqlResult
+	 */
+	public static function execRead() {
+		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
+		return self::query($query, true);
+	}
+
+	/**
+	 * Select fields from a table
+	 *
+	 * @param string $table
+	 * @param string|array $attrs Column-name OR Column-names array
+	 * @param string|array $where Associative array field=>value OR string
+	 * @param string $order
+	 */
+	public static function select($table, $attrs, $where = null, $order = null) {
+		$attrs = (array) $attrs;
+		foreach ($attrs as &$attr) {
+			if ($attr == '*') {
+				$attr = '*';
+			} else {
+				$attr = self::placeholder("`?`", $attr);
+			}
+		}
+		$query = 'SELECT ' . implode(',', $attrs) . ' FROM `' . $table . '` ' . self::_queryWhere($where);
+		if ($order) {
+			$query .= ' ORDER BY ' . $order;
+		}
+		return self::query($query);
+	}
+
+	/**
+	 * Select COUNT(*) from a table
+	 *
+	 * @param string $table
+	 * @param string|array $where Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function count($table, $where = null) {
+		$query = 'SELECT COUNT(*) FROM `' . $table . '` ' . self::_queryWhere($where);
+		return (int) self::query($query)->fetchOne();
+	}
+
+	/**
+	 * Insert one/multiple rows
+	 *
+	 * @param string $table
+	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array $onDuplicateKey OPTIONAL
+	 * @param string $statement
+	 * @return int Insert Id
+	 */
+	public static function insert($table, $attr, $value = null, array $onDuplicateKey = null, $statement = self::STMT_INSERT) {
+		if ($value === null && is_array($attr)) {
+			$value = array_values($attr);
+			$attr = array_keys($attr);
+		}
+		$values = (array) $value;
+		$attrs = (array) $attr;
+		if (!is_array(reset($values))) {
+			if (count($attrs) == 1) {
+				foreach ($values as &$value) {
+					$value = array($value);
+				}
+			} else {
+				$values = array($values);
+			}
+		}
+		$attrsEscaped = array();
+		foreach ($attrs as $attr) {
+			$attrsEscaped[] = self::placeholder("`?`", $attr);
+		}
+		$rowsEscaped = array();
+		foreach ($values as &$value) {
+			$row = (array) $value;
+			if (count($row) != count($attrs)) {
+				throw new CM_Exception('Row size does not match number of fields');
+			}
+			$rowEscaped = array();
+			foreach ($row as $value) {
+				if ($value === null) {
+					$rowEscaped[] = 'NULL';
+				} else {
+					$rowEscaped[] = self::placeholder("'?'", $value);
+				}
+			}
+			$rowsEscaped[] = '(' . implode(',', $rowEscaped) . ')';
+		}
+
+		$query = $statement . ' INTO `' . $table . '` (' . implode(',', $attrsEscaped) . ') VALUES ' . implode(',', $rowsEscaped);
+		if ($onDuplicateKey) {
+			$valuesEscaped = array();
+			foreach ($onDuplicateKey as $attr => $value) {
+				if ($value === null) {
+					$valuesEscaped[] = self::placeholder("`?`=NULL", $attr);
+				} else {
+					$valuesEscaped[] = self::placeholder("`?`='?'", $attr, $value);
+				}
+			}
+			$query .= ' ON DUPLICATE KEY UPDATE ' . implode(',', $valuesEscaped);
+		}
+		self::query($query);
+		return self::insert_id();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return int Insert Id
+	 */
+	public static function insertIgnore($table, $attr, $value = null) {
+		return self::insert($table, $attr, $value, null, self::STMT_INSERT_IGNORE);
+	}
+
+	/**
+	 * @param string $table
+	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return int Insert Id
+	 */
+	public static function insertDelayed($table, $attr, $value = null) {
+		if (self::_delayedEnabled()) {
+			return self::insert($table, $attr, $value, null, self::STMT_INSERT_DELAYED);
+		} else {
+			return self::insert($table, $attr, $value, null, self::STMT_INSERT);
+		}
+	}
+
+	/**
+	 * @param string $table
+	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return int Insert Id
+	 */
+	public static function replace($table, $attr, $value = null) {
+		return self::insert($table, $attr, $value, null, self::STMT_REPLACE);
+	}
+
+	/**
+	 * @param string $table
+	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return int Insert Id
+	 */
+	public static function replaceDelayed($table, $attr, $value = null) {
+		if (self::_delayedEnabled()) {
+			return self::insert($table, $attr, $value, null, self::STMT_REPLACE_DELAYED);
+		} else {
+			return self::insert($table, $attr, $value, null, self::STMT_REPLACE);
+		}
+	}
+
+	/**
+	 * @param string $table
+	 * @param array $values Associative array field=>value
+	 * @param array $where Associative array field=>value OR string
+	 * @return int Affected rows
+	 */
+	public static function update($table, array $values, $where = null) {
+		if (empty($values)) {
+			return 0;
+		}
+		$valuesEscaped = array();
+		foreach ($values as $attr => $value) {
+			if ($value === null) {
+				$valuesEscaped[] = self::placeholder("`?`=NULL", $attr);
+			} else {
+				$valuesEscaped[] = self::placeholder("`?`='?'", $attr, $value);
+			}
+		}
+		$query = 'UPDATE `' . $table . '` SET ' . implode(',', $valuesEscaped) . ' ' . self::_queryWhere($where);
+		self::query($query);
+		return self::affected_rows();
+	}
+
+	/**
+	 * @param string $table
+	 * @param array $where Associative array field=>value OR string
+	 * @return int Affected rows
+	 */
+	public static function delete($table, $where) {
+		$query = 'DELETE FROM `' . $table . '` ' . self::_queryWhere($where);
+		self::query($query);
+		return self::affected_rows();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $column OPTIONAL
+	 * @param string $index OPTIONAL
+	 * @return bool
+	 */
+	public static function exists($table, $column = null, $index = null) {
+		$exists = (bool) CM_Mysql::exec("SHOW TABLES LIKE '?'", $table)->numRows();
+		if ($exists && $column) {
+			$exists = (bool) CM_Mysql::exec("SHOW COLUMNS FROM `?` LIKE '?'", $table, $column)->numRows();
+		}
+		if ($exists && $index) {
+			$exists = (bool) CM_Mysql::exec("SHOW INDEX FROM `?` WHERE key_name = '?'", $table, $index, $index)->numRows();
+		}
+		return $exists;
+	}
+
+	/**
+	 * @param mixed $where Associative array field=>value OR string
+	 * @return string WHERE-query
+	 */
+	private static function _queryWhere($where) {
+		if (empty($where)) {
+			return '';
+		}
+		if (is_array($where)) {
+			$valuesEscaped = array();
+			foreach ($where as $attr => $value) {
+				if ($value === null) {
+					$valuesEscaped[] = self::placeholder("`?` IS NULL", $attr);
+				} else {
+					$valuesEscaped[] = self::placeholder("`?`='?'", $attr, $value);
+				}
+			}
+			$where = implode(' AND ', $valuesEscaped);
+		}
+		return 'WHERE ' . $where;
+	}
+
+	/**
+	 * Get number of affected rows in previous MySQL operation.
+	 *
+	 * @return integer the number of affected rows on success, and -1 if the last query failed.
+	 */
+	public static function affected_rows() {
+		return mysql_affected_rows(self::_getLink());
+	}
+
+	/**
+	 * Get the last insert query autoincrement id.
+	 *
+	 * @return string
+	 */
+	public static function insert_id() {
+		return mysql_insert_id(self::_getLink());
+	}
+
+	/**
+	 * Returns column info object
+	 *
+	 * @param string $table
+	 * @param string $column
+	 * @return CM_MysqlColumn
+	 */
+	public static function describe($table, $column = null) {
+		if ($column) {
+			$result = self::query("DESCRIBE `$table` `$column`");
+			return $result->fetchObject("CM_MysqlColumn");
+		}
+
+		$result = self::query("DESCRIBE `$table`");
+		$columns = array();
+		while ($column = $result->fetchObject("CM_MysqlColumn")) {
+			$columns[$column->name()] = $column;
+		}
+		return $columns;
+	}
+
+	/**
+	 * Return a random id-guess for an id-column
+	 * This id might not exist, but is within existing id-bounds
+	 *
+	 * @param string $table
+	 * @param string $column
+	 * @param string $where OPTIONAL
+	 * @return int
+	 */
+	public static function getRandIdGuess($table, $column, $where = '1') {
+		$idBounds = CM_Mysql::exec("SELECT MIN(`?`) AS min, MAX(`?`) AS max FROM `?` WHERE $where", $column, $column, $table)->fetchAssoc();
+		return rand($idBounds['min'], $idBounds['max']);
+	}
+
+	/**
+	 * Return an existing random id for a table
+	 * If '$where' filters many rows out this might not find an id
+	 *
+	 * @param string $table
+	 * @param string $column
+	 * @param string $where OPTIONAL
+	 * @return int
+	 */
+	public static function getRandId($table, $column, $where = '1') {
+		$idGuess = self::getRandIdGuess($table, $column, $where);
+		$query = "SELECT `$column`
+					FROM `$table`
+					WHERE $where
+						AND `$column` <= $idGuess
+					ORDER BY `$column` DESC
+					LIMIT 1";
+		$id = CM_Mysql::query($query)->fetchOne();
+
+		if (!$id) {
+			// Method above did not find an id => get any id
+			$id = CM_Mysql::exec("SELECT `$column` FROM `$table` WHERE $where LIMIT 1")->fetchOne();
+		}
+
+		if (!$id) {
+			throw new CM_Exception('Cannot find random id');
+		}
+
+		return $id;
+	}
+
+	public static function getColumns($table) {
+		$query = self::placeholder('SHOW COLUMNS FROM `?`', $table);
+		$result = CM_Mysql::query($query);
+
+		$columns = array();
+		if ($result->numRows() > 0) {
+			while ($col = $result->fetchAssoc()) {
+				$columns[] = $col['Field'];
+			}
+		}
+		return $columns;
+	}
+
+	private static function _delayedEnabled () {
+		return !IS_TEST;
+	}
+
+}

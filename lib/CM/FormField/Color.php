@@ -1,0 +1,16 @@
+<?php
+
+class CM_FormField_Color extends CM_FormField_Abstract {
+
+	public function __construct($name = 'color') {
+		parent::__construct($name);
+	}
+
+	public function validate($userInput) {
+		if (!preg_match('/^#[abcdef\d]{6}$/i', $userInput)) {
+			throw new CM_FormFieldValidationException('Invalid color');
+		}
+		return (string) $userInput;
+	}
+
+}
