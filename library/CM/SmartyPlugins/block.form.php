@@ -14,13 +14,9 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$html = '<form id="' . $form->frontend_data['auto_id'] . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
 
 		/** @var CM_FormField_Abstract $field */
-		foreach ($form->getFields() as $fieldName => $field) {
+		foreach ($form->getFields() as $field) {
 			if ($field instanceof CM_FormField_Hidden) {
-				$field->render(array(), $form);
-
-				$html .= '<div id="' . $form->frontend_data['auto_id'] . '-' . $field->getName() . '">';
-				$html .= $render->render($field);
-				$html .= '</div>';
+				$html .= $render->render($field, array('form' => $form));
 			}
 		}
 

@@ -5,7 +5,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	$render = $template->smarty->getTemplateVars('render');
 	/** @var CM_Model_User $viewer */
 	$viewer = $template->smarty->getTemplateVars('viewer');
-	$requestHandler = $render->getRequestHandler();
+	$request = $render->getRequestHandler()->getRequest();
 
 	$userId = $viewer ? $viewer->getId() : 0;
 	$name = $params['name'];
@@ -14,7 +14,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	if (($menu = CM_Cache_Runtime::get($cacheKey)) === false) {
 		$menuArr = include $render->getLayoutPath('menu.php', true);
 		if (isset($menuArr[$name])) {
-			$menu = new CM_Menu($menuArr[$name], $requestHandler->getRequest());
+			$menu = new CM_Menu($menuArr[$name], $request);
 		} else {
 			$menu = null;
 		}
