@@ -2,11 +2,11 @@
 
 function smarty_function_user_activity(array $params, Smarty_Internal_Template $template) {
 	$force_display = isset($params['force_display']);
-	/** @var SK_User $user  */
+	/** @var CM_Model_User $user  */
 	$user = $params['user'];
 
 	if ($user->getVisible()) {
-		/** @var SK_User $viewer  */
+		/** @var CM_Model_User $viewer  */
 		return '<span class="online">Online</span>';
 	}
 
