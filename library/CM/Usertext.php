@@ -221,14 +221,4 @@ class CM_Usertext extends CM_Class_Abstract {
 	public static function getSplitChar() {
 		return html_entity_decode('&#8203;', ENT_COMPAT, 'UTF-8');
 	}
-
-	/**
-	 * @param string $text
-	 * @return CM_Usertext
-	 */
-	public static function factory($text) {
-		$className = self::_getClassName();
-		return new $className($text);
-	}
-
 }

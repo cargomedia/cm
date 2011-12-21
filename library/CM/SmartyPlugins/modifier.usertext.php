@@ -22,7 +22,7 @@ function smarty_modifier_usertext($text, $mode = null, $lengthMax = null) {
 		$lengthMax = $mode;
 		$mode = null;
 	}
-	$userText = CM_Usertext::factory($text);
+	$userText = new CM_Usertext($text);
 
 	switch ($mode) {
 		case 'format':
