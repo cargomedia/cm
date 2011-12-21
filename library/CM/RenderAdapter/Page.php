@@ -19,7 +19,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 			$js->onloadHeaderJs('sk.viewer = ' . CM_Params::encode($viewer->getProfile(), true));
 		}
 
-		$js->onloadJs('sk.component()._ready();');
+		$js->onloadReadyJs('sk.component()._ready();');
 
 		$js->registerLanguageValue('%interface.ok');
 		$js->registerLanguageValue('%interface.cancel');
