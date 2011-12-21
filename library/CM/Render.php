@@ -48,7 +48,7 @@ class CM_Render {
 			$this->_requestHandler = $requestHandler;
 			$this->_site = $requestHandler->getSite();
 		} else {
-			$this->_site = new SK_Site_FB();
+			$this->_site = CM_Site_Abstract::factory();
 		}
 
 		// Language global vars

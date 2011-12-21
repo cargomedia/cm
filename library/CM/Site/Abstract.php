@@ -74,10 +74,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	* @throws CM_Exception
 	*/
 	public static function factory($type = null) {
-		// Currently needed as forms etc. do not have a site yet
-		if (!$type) {
-			$type = 1;
-		}
 		$class = self::_getClassName($type);
 		return new $class();
 	}

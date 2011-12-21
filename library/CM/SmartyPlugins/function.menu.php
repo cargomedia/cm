@@ -7,7 +7,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 
 	$user = $requestHandler->getViewer();
 	$userId = $user ? $user->getId() : 0;
-	$render = $requestHandler->getRender();
 	$name = $params['name'];
 
 	$cacheKey = CM_CacheConst::Menu . '_name:' . $name . '_siteId:' . $render->getSite()->getId() . '_userId:' . $userId;
