@@ -202,7 +202,7 @@ bindStream: function(callback) {
 /**
  * @param int actionTypes
  * @param int entityType
- * @param function callback fn(SK_Action_Abstract action, SK_Entity_Abstract entity, array data)
+ * @param function callback fn(CM_Action_Abstract action, CM_Model_Entity_Abstract entity, array data)
  */
 bindAction: function(actionType, entityType, callback) {
 	sk.action.bind(actionType, entityType, callback);
