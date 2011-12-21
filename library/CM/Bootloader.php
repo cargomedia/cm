@@ -8,9 +8,7 @@ class CM_Bootloader {
 	}
 
 	public function session() {
-		if (!IS_CRON && !IS_TEST) {
-			CM_Session::getInstance()->start();
-		}
+		CM_Session::getInstance()->start();
 	}
 
 	public function autoloader() {
