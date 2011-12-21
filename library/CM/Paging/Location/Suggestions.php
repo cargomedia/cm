@@ -8,7 +8,7 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
 	 * @param CM_Location $location OPTIONAL
 	 */
 	function __construct($term, $minLevel, CM_Location $location = null) {
-		$query = new SK_SearchQuery_Location();
+		$query = new CM_SearchQuery_Location();
 		$query->filterLevel((int) $minLevel);
 		$query->filterNamePrefix($term);
 		$query->sortLevel();

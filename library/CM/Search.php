@@ -1,7 +1,6 @@
 <?php
 
 class CM_Search {
-	const INDEX_USER = 'user';
 	const INDEX_LOCATION = 'location';
 
 	/**
