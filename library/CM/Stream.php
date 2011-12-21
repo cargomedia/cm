@@ -60,16 +60,16 @@ class CM_Stream {
 
 	/**
 	 * @param CM_Model_User $recipient
-	 * @param SK_Action_Abstract $action
-	 * @param SK_Entity_Abstract $entity
-	 * @param array $data OPTIONAL
+	 * @param CM_Action_Abstract $action
+	 * @param CM_Model_Entity_Abstract $entity
+	 * @param array|null $data
 	 */
-	public static function publishAction(CM_Model_User $recipient, SK_Action_Abstract $action, SK_Entity_Abstract $entity, array $data = null) {
+	public static function publishAction(CM_Model_User $recipient, CM_Action_Abstract $action, CM_Model_Entity_Abstract $entity, array $data = null) {
 		if (!is_array($data)) {
 			$data = array();
 		}
 		self::publishUser($recipient,
-				array('namespace' => 'SK_Action_Abstract', 'data' => array('action' => $action, 'entity' => $entity, 'data' => $data)));
+				array('namespace' => 'CM_Action_Abstract', 'data' => array('action' => $action, 'entity' => $entity, 'data' => $data)));
 	}
 
 	/**
