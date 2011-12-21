@@ -2,10 +2,6 @@
 
 class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 
-	public function __construct($request, $siteId = null) {
-		parent::__construct($request, $siteId);
-	}
-
 	/**
 	 * @return string html code of page
 	 */
@@ -13,7 +9,6 @@ class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 
 		try {
 			$this->_setRequest($this->getSite()->rewrite($this->_request));
-
 			$page = CM_Page_Abstract::factory($this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);
