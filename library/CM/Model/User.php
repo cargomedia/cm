@@ -74,12 +74,12 @@ class CM_Model_User extends CM_Model_Abstract {
 		return $this->_getAsset('CM_ModelAsset_User_Preferences');
 	}
 
+	/**
+	 * @return CM_Site_Abstract
+	 */
 	public function getSite() {
-		$site = (int) $this->_get('site');
-		if (!$site) {
-			$site = CM_Site_Abstract::factory()->getType();
-		}
-		return $site;
+		$siteType = (int) $this->_get('site');
+		return CM_Site_Abstract::factory($siteType);
 	}
 
 	/**
