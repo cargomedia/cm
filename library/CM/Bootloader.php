@@ -2,8 +2,81 @@
 
 class CM_Bootloader {
 
+	public function defaults() {
+		date_default_timezone_set(Config::get()->time_zone);
+		mb_internal_encoding('UTF-8');
+	}
+
+	public function session() {
+		if (!IS_CRON && !IS_TEST) {
+			CM_Session::getInstance()->start();
+		}
+	}
+
 	public function autoloader() {
-		spl_autoload_register(array(__CLASS__, '_cmAutoload'));
+		spl_autoload_register(function($className) {
+			$filename = str_replace('_', '/', $className) . '.php';
+			foreach (array(DIR_ROOT . 'internals/', DIR_ROOT . 'library/') as $dir) {
+				if (is_file($dir . $filename)) {
+					require_once $dir . $filename;
+					return;
+				}
+			}
+		});
+	}
+
+	public function exceptionHandler() {
+		set_exception_handler(function(Exception $exception) {
+			$showError = DEBUG_MODE || IS_CRON || IS_TEST;
+
+			if (!IS_CRON) {
+				header('HTTP/1.1 500 Internal Server Error');
+			}
+
+			$class = get_class($exception);
+			$code = $exception->getCode();
+			if ($exception instanceof CM_Exception) {
+				$msg = $exception->getMessagePublic();
+			} else {
+				$msg = 'Internal server error';
+			}
+
+			if ($showError) {
+				$msg = $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
+				$msg .= 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
+				$msg .= '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
+			}
+
+			$logMsg = $class . ' (' . $code . '): ' . $exception->getMessage() . PHP_EOL;
+			$logMsg .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
+			$logMsg .= $exception->getTraceAsString() . PHP_EOL;
+
+			$log = new CM_Paging_Log_Error();
+			$log->add($logMsg);
+			echo $msg;
+			exit(1);
+		});
+	}
+
+	public function errorHandler() {
+		error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE);
+		set_error_handler(function($errno, $errstr, $errfile, $errline) {
+			if (!(error_reporting() & $errno)) {
+				// This error code is not included in error_reporting
+				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
+				if (!$atSign && DEBUG_MODE) {
+					$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+						E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+						E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
+						E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+						E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+					$errstr = $errorCodes[$errno] . ': ' . $errstr;
+					CM_Debug::get()->addError($errfile, $errline, $errstr);
+				}
+				return true;
+			}
+			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+		});
 	}
 
 	public function constants() {
@@ -192,113 +265,17 @@ class CM_Bootloader {
 		define('TBL_SK_STATUS', 'sk_status');
 	}
 
-	public function defaults() {
-		date_default_timezone_set(Config::get()->time_zone);
-		mb_internal_encoding('UTF-8');
-	}
-
-	public function exceptionHandler() {
-		set_exception_handler(array(__CLASS__, '_exceptionHandler'));
-	}
-
-	public function errorHandler() {
-		error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE);
-		set_error_handler(array(__CLASS__, '_errorHandler'));
-	}
-
-	public function session() {
-		if (!IS_CRON && !IS_TEST) {
-			CM_Session::getInstance()->start();
-		}
-	}
-
 	/**
-	 * @param array $items
+	 * @param string[] $functions
 	 * @throws Exception
 	 */
-	public static function load(array $items) {
-		foreach ($items as $function) {
-			$object = new static();
-
-			if (!method_exists($object, $function)) {
-				throw new Exception('Not existing function ' . $function);
+	public static function load(array $functions) {
+		foreach ($functions as $function) {
+			$instance = new static();
+			if (!method_exists($instance, $function)) {
+				throw new Exception('Non existent bootload function `' . $function . '`');
 			}
-
-			$object->$function();
+			$instance->$function();
 		}
-	}
-
-	/**
-	 * @param string $className
-	 */
-	protected function _cmAutoload($className) {
-		$filename = str_replace('_', '/', $className) . '.php';
-		foreach (array(DIR_ROOT . 'internals/', DIR_ROOT . 'library/') as $dir) {
-			if (is_file($dir . $filename)) {
-				require_once $dir . $filename;
-				return;
-			}
-		}
-	}
-
-	/**
-	 * @param Exception $exception
-	 */
-	public function _exceptionHandler(Exception $exception) {
-		$showError = DEBUG_MODE || IS_CRON || IS_TEST;
-
-		if (!IS_CRON) {
-			header('HTTP/1.1 500 Internal Server Error');
-		}
-
-		$class = get_class($exception);
-		$code = $exception->getCode();
-		if ($exception instanceof CM_Exception) {
-			$msg = $exception->getMessagePublic();
-		} else {
-			$msg = 'Internal server error';
-		}
-
-		if ($showError) {
-			$msg = "$class ($code): <b>" . $exception->getMessage() . "</b><br/>\n";
-			$msg .= "Thrown in: <b>" . $exception->getFile() . "</b> on line <b>" . $exception->getLine() . "</b>:<br/>\n";
-			$msg .= "<div style='margin: 2px 6px;'>" . nl2br($exception->getTraceAsString()) . "</div>\n";
-		}
-
-		$logMsg = $class . ': ' . $exception->getMessage() . "\n";
-		$logMsg .= "## " . $exception->getFile() . '(' . $exception->getLine() . ")\n";
-		$logMsg .= $exception->getTraceAsString() . "\n";
-
-		$log = new CM_Paging_Log_Error();
-		$log->add($logMsg);
-		echo $msg;
-		exit(1);
-	}
-
-	/**
-	 * @param $errno
-	 * @param $errstr
-	 * @param $errfile
-	 * @param $errline
-	 * @return bool
-	 * @throws ErrorException
-	 */
-	public function _errorHandler($errno, $errstr, $errfile, $errline) {
-		if (!(error_reporting() & $errno)) {
-			// This error code is not included in error_reporting
-			$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-			if (!$atSign && DEBUG_MODE) {
-				$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-					E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-					E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-					E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-					E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
-				$errstr = $errorCodes[$errno] . ': ' . $errstr;
-				CM_Debug::get()->addError($errfile, $errline, $errstr);
-			}
-			return true;
-		}
-		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-		return true;
 	}
 }
