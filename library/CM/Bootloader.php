@@ -132,11 +132,6 @@ class CM_Bootloader {
 		define('TBL_LANG_SECTION', 'lang_section');
 		define('TBL_LANG_VALUE', 'lang_value');
 
-		define('TBL_SK_FRIEND', 'sk_friend');
-		define('TBL_SK_FRIEND_REQUEST', 'sk_friendRequest');
-		define('TBL_SK_USER_BLOCKED', 'sk_user_blocked');
-		define('TBL_SK_USER_BOOKMARKED', 'sk_user_bookmarked');
-
 		define('TBL_COOKIES_LOGIN', 'cookies_login');
 
 		define('TBL_PROFILE_FIELD_KEY', 'profile_field_key');
@@ -173,7 +168,6 @@ class CM_Bootloader {
 		define('TBL_ADMIN', 'admin');
 		define('TBL_LINK_ADMIN_DOCUMENT', 'link_admin_document');
 
-		define('TBL_SK_USER_INVITATIONCODE', 'sk_user_invitationCode');
 
 		define('TBL_BLOCK_IP', 'block_ip');
 
@@ -197,7 +191,6 @@ class CM_Bootloader {
 
 		define('TBL_PHOTO_VIEW', 'profile_photo_view');
 
-		define('TBL_SK_USER_PROFILEVIEWHISTORY', 'sk_user_profileViewHistory');
 
 		define('TBL_BADWORD', 'badword');
 		define('TBL_CM_SMILEY', 'cm_smiley');
@@ -235,8 +228,6 @@ class CM_Bootloader {
 
 		define('TBL_REPORT', 'report');
 
-		define('TBL_REPUTATION_PROFILE', 'reputation_' . SK_Entity_Profile::TYPE);
-
 		define('TBL_EMAIL_QUEUE', 'email_queue');
 		define('TBL_MAILING', 'mailing');
 
@@ -246,8 +237,7 @@ class CM_Bootloader {
 		define('TBL_SVM', 'svm');
 		define('TBL_SVM_TRAINING', 'svm_training');
 
-		define('TBL_SK_PAYMENTTRANSACTION', 'sk_paymentTransaction');
-		define('TBL_SK_PAYMENTTRANSACTIONGROUP', 'sk_paymentTransactionGroup');
+
 		define('TBL_TRANSACTION_SERVICEBUNDLE', 'transaction_serviceBundle');
 
 		define('TBL_CM_LOG', 'cm_log');
@@ -255,8 +245,6 @@ class CM_Bootloader {
 		define('TBL_SERVICEBUNDLE', 'serviceBundle');
 		define('TBL_SERVICEBUNDLE_SERVICE', 'serviceBundle_service');
 		define('TBL_SERVICE', 'service');
-
-		define('TBL_SK_STATUS', 'sk_status');
 	}
 
 	/**
