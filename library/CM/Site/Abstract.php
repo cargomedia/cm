@@ -49,8 +49,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 
 		if (substr($path, 0, 10) == '/userfiles') {
 			// Do not try to load files from /userfiles (happens when there's no nginx, i.e. in development)
-			$this->setHeaderNotfound();
-			$this->sendHeaders();
+			throw new CM_Exception_Nonexistent();
 			exit();
 		}
 		return $request;

@@ -49,7 +49,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$html .= '</div>';
 
 		$this->getRender()->getJs()->registerComponent($component, $parentComponentId);
-
 		$this->getRender()->popStack('components');
 
 		return $html;
