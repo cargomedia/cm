@@ -2,9 +2,8 @@
 
 class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 
-	public function __construct($request) {
-		$site = SK_Site_Abstract::urlFactory($request->getPath());
-		parent::__construct($request, $site->getId());
+	public function __construct($request, $siteId = null) {
+		parent::__construct($request, $siteId);
 	}
 
 	/**
