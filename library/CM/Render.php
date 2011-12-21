@@ -108,7 +108,7 @@ class CM_Render {
 				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
 			}
 
-			SK_Tracking::getInstance()->setPageview();
+			CM_Tracking::getInstance()->setPageview();
 		}
 
 		return self::$_smarty;

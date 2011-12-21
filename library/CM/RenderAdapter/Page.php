@@ -37,7 +37,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$htmlHead = $js->renderScripts();
 		
 		$this->getLayout()->assign('html_head', $htmlHead);
-		$this->getLayout()->assign('tracking', SK_Tracking::getInstance()->getHtml());
+		$this->getLayout()->assign('tracking', CM_Tracking::getInstance()->getHtml());
 		$this->getLayout()->assign('splittesting', SK_Splittesting::getInstance()->getHtml());
 		$this->getLayout()->assign('body', $body);
 		

@@ -99,7 +99,7 @@ class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstr
 				$success['errors'] = $this->errors;
 			}
 	
-			if ($trackingJs = SK_Tracking::getInstance()->getJs()) {
+			if ($trackingJs = CM_Tracking::getInstance()->getJs()) {
 				$this->exec($trackingJs);
 			}
 			if ($splittestingJs = SK_Splittesting::getInstance()->getJs()) {
