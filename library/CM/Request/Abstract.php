@@ -110,8 +110,7 @@ abstract class CM_Request_Abstract {
 		if (!$ip) {
 			return false;
 		}
-
-		$blockedIps = new SK_Paging_Ip_Blocked();
+		$blockedIps = new CM_Paging_Ip_Blocked();
 		return $blockedIps->contains($ip);
 	}
 

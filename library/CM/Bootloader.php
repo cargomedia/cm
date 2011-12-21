@@ -124,6 +124,16 @@ class CM_Bootloader {
 	}
 
 	public function constantsTbl() {
+		define('TBL_CM_SMILEY', 'cm_smiley');
+		define('TBL_CM_USER', 'cm_user');
+		define('TBL_CM_USER_ONLINE', 'cm_user_online');
+		define('TBL_CM_USER_PREFERENCE', 'cm_user_preference');
+		define('TBL_CM_USER_PREFERENCEDEFAULT', 'cm_user_preferenceDefault');
+		define('TBL_CM_USERAGENT', 'cm_useragent');
+		define('TBL_CM_LOG', 'cm_log');
+		define('TBL_CM_IPBLOCKED', 'cm_ipBlocked');
+
+
 		define('TBL_CONFIG', 'config');
 		define('TBL_CONFIG_SECTION', 'config_section');
 
@@ -136,11 +146,6 @@ class CM_Bootloader {
 
 		define('TBL_PROFILE_FIELD_KEY', 'profile_field_key');
 		define('TBL_PROFILE_FIELD_VALUE', 'profile_field_value');
-
-		define('TBL_CM_USER', 'cm_user');
-		define('TBL_CM_USER_ONLINE', 'cm_user_online');
-		define('TBL_CM_USER_PREFERENCE', 'cm_user_preference');
-		define('TBL_CM_USER_PREFERENCEDEFAULT', 'cm_user_preferenceDefault');
 
 		define('TBL_PROFILE_FIELD', 'profile_field');
 
@@ -158,7 +163,6 @@ class CM_Bootloader {
 		define('TBL_PROFILE_EMAIL_VERIFY_CODE', 'profile_email_verification_code');
 
 		define('TBL_PROFILE', 'profile');
-		define('TBL_CM_USERAGENT', 'cm_useragent');
 		define('TBL_PROFILE_PHOTO', 'profile_photo');
 		define('TBL_PROFILE_VIDEO', 'profile_video');
 		define('TBL_PROFILE_VIDEO_RATE', 'profile_video_rate');
@@ -167,9 +171,6 @@ class CM_Bootloader {
 
 		define('TBL_ADMIN', 'admin');
 		define('TBL_LINK_ADMIN_DOCUMENT', 'link_admin_document');
-
-
-		define('TBL_BLOCK_IP', 'block_ip');
 
 		define('TBL_CAPTCHA', 'tmp_captcha');
 
@@ -193,7 +194,6 @@ class CM_Bootloader {
 
 
 		define('TBL_BADWORD', 'badword');
-		define('TBL_CM_SMILEY', 'cm_smiley');
 
 		define('TBL_VIRTUAL_GIFT_TPL', 'virtual_gift_template');
 
@@ -239,8 +239,6 @@ class CM_Bootloader {
 
 
 		define('TBL_TRANSACTION_SERVICEBUNDLE', 'transaction_serviceBundle');
-
-		define('TBL_CM_LOG', 'cm_log');
 
 		define('TBL_SERVICEBUNDLE', 'serviceBundle');
 		define('TBL_SERVICEBUNDLE_SERVICE', 'serviceBundle_service');
