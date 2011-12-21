@@ -42,7 +42,7 @@ abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
 	/**
 	 * @return mixed|null Internal value
 	 */
-	protected function _getValue() {
+	public function getValue() {
 		return $this->_value;
 	}
 
@@ -86,13 +86,7 @@ abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
 	 * @param CM_Form_Abstract  $form
 	 */
 	public function render(array $params, CM_Form_Abstract $form) {
-		$this->setTplParam('this', $this);
-		$this->setTplParam('id', $form->getTagAutoId($this->getName() . '-input'));
-		$this->setTplParam('name', $this->getName());
-		$this->setTplParam('value', $this->_getValue());
-		$this->setTplParam('options', $this->getOptions());
-		$this->setTplParam('params', $params);
-		$this->setTplParam('form', $form);
+
 	}
 
 	/**

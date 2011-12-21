@@ -40,12 +40,10 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 	}
 
 	public function render(array $params, CM_Form_Abstract $form) {
-		$params['class'] = isset($params['class']) ? (string) $params['class'] : null;
-		if ($this->_getValue()) {
-			$params['prePopulate'] = array_map(array('static', '_getSuggestion'), $this->_getValue());
+		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
+		if ($this->getValue()) {
+			$this->setTplParam('prePopulate', array_map(array('static', '_getSuggestion'), $this->getValue()));
 		}
-
-		return parent::render($params, $form);
 	}
 
 	/**

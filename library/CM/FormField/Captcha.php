@@ -8,8 +8,7 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
 	}
 	
 	public function render(array $params, CM_Form_Abstract $form) {
-		$params['imageId'] = self::rpc_createNumber();
-		return parent::render($params, $form);
+		$this->setTplParam('imageId', self::rpc_createNumber());
 	}
 
 	public function validate($userInput) {
@@ -34,5 +33,4 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
 	public static function rpc_createNumber() {
 		return CM_Captcha::create()->getId();
 	}
-
 }

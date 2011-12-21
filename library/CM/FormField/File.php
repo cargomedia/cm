@@ -59,9 +59,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	public function render(array $params, CM_Form_Abstract $form) {
-		$params['label'] = isset($params['label']) ? (string) $params['label'] : 'Upload File';
-		$params['labelDropArea'] = isset($params['labelDropArea']) ? (string) $params['labelDropArea'] : 'Drop files here to upload';
-
-		return parent::render($params, $form);
+		$this->setTplParam('label', isset($params['label']) ? (string) $params['label'] : 'Upload File');
+		$this->setTplParam('labelDropArea', isset($params['labelDropArea']) ? (string) $params['labelDropArea'] : 'Drop files here to upload');
 	}
 }

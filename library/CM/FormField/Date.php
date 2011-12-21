@@ -16,21 +16,14 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	}
 	
 	public function render(array $params, CM_Form_Abstract $form) {	
-		$params['class'] = isset($params['class']) ? $params['class'] : null;
+		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 
-		$value = $this->_getValue();
-		$yy = $value ? $value->format('Y') : null;
-		$mm = $value ? $value->format('m') : null;
-		$dd = $value ? $value->format('d') : null;
-		
-		$params['yy'] = $yy;
-		$params['mm'] = $mm;
-		$params['dd'] = $dd;
-		
-		$params['minYear'] = $this->_range['min'];
-		$params['maxYear'] = $this->_range['max'];
-		
-		return parent::render($params, $form);
+		$value = $this->getValue();
+		$this->setTplParam('yy', $value ? $value->format('Y') : null);
+		$this->setTplParam('mm', $value ? $value->format('m') : null);
+		$this->setTplParam('dd', $value ? $value->format('d') : null);
+
+		$this->setTplParam('minYear', $this->_range['min']);
+		$this->setTplParam('maxYear', $this->_range['max']);
 	}
-
 }

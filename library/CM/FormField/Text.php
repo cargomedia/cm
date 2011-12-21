@@ -19,9 +19,8 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 	}
 
 	public function render(array $params, CM_Form_Abstract $form) {
-		$params['tabindex'] = isset($params['tabindex']) ? $params['tabindex'] : null;
-		$params['class'] = isset($params['class']) ? $params['class'] : null;
-		$params['placeholder'] = isset($params['placeholder']) ? $params['placeholder'] : null;
-		return parent::render($params, $form);
+		$this->setTplParam('tabindex', isset($params['tabindex']) ? $params['tabindex'] : null);
+		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
+		$this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
 	}
 }

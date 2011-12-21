@@ -9,8 +9,8 @@ class CM_FormField_Distance extends CM_FormField_Integer {
 	/**
 	 * @return int External Value
 	 */
-	protected function _getValue() {
-		return parent::_getValue() / 1609;
+	public function getValue() {
+		return parent::getValue() / 1609;
 	}
 	
 }

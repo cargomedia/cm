@@ -20,13 +20,6 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		parent::__construct($name);
 	}
 
-	/**
-	 * @return string[]
-	 */
-	public function getValue() {
-		return $this->_getValue() ? : array();
-	}
-
 	public function setColumnSize($cssSize) {
 		$this->_columnSize = $cssSize;
 	}
@@ -41,13 +34,10 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 	}
 
 	public function render(array $params, CM_Form_Abstract $form) {
-		$params['class'] = isset($params['class']) ? $params['class'] : null;
+		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 		$labelsection = isset($params['labelsection']) ? $params['labelsection'] : '%forms._fields.' . $this->getName() . '.values';
-		$params['labelsForValuesSet'] = $this->_getLabelsForValuesSet($labelsection);
-		$colSize = isset($params['col_size']) ? $params['col_size'] : $this->_columnSize;
-		$params['colSize'] = isset($colSize) ? $colSize : null;
-		
-		return parent::render($params, $form);
+		$this->setTplParam('labelsForValuesSet', $this->_getLabelsForValuesSet($labelsection));
+		$this->setTplParam('colSize', isset($params['col_size']) ? $params['col_size'] : $this->_columnSize);
 	}
 
 	private function _getValuesSet() {
