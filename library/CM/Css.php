@@ -1,7 +1,7 @@
 <?php
 
 class CM_Css {
-	const SELECTORS_REGEX = '[*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~]+';
+	const SELECTORS_REGEX = '[*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~\(\)]+';
 	const PROPERTY_REGEX = '[a-z\-]+';
 	const VALUE_REGEX = '[^;]+';
 	const SPLIT_SELECTORS_REGEX = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
@@ -57,6 +57,7 @@ class CM_Css {
 	 */
 	private function _parseCssString($css, array $presets = null, $prefix = null) {
 		$css = preg_replace('~/\*.+\*/~sU', PHP_EOL, $css);
+
 		preg_match_all('~(' . self::SELECTORS_REGEX . ')?\s*\{([^\}]+)\}~isU', $css, $matches, PREG_SET_ORDER);
 		$output = array();
 		foreach ($matches as $match) {
