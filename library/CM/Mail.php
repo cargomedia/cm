@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mail {
+class CM_Mail extends CM_Renderable_Abstract {
 
 	/**
 	 * @var CM_Model_User
@@ -22,10 +22,6 @@ class CM_Mail {
 	 * @var string
 	 */
 	private $_senderName;
-	/**
-	 * @var array
-	 */
-	private $_variables;
 	/**
 	 * @var string
 	 */
@@ -56,25 +52,13 @@ class CM_Mail {
 	private $_demoMode = false;
 
 	/**
-	 * @var Smarty
-	 */
-	private static $_layout;
-	/**
-	 * @var CM_TreeNode
-	 */
-	private static $_section;
-
-	/**
-	 * @param mixed $recipient CM_Model_User OR string
-	 * @param string $template
+	 * @param mixed   $recipient CM_Model_User OR string
+	 * @param string  $template
 	 * @param boolean $delayed
 	 */
 	public function __construct($recipient, $template = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
 		$config = CM_Config::section('site')->Section('official');
-		if (!self::$_section) {
-			self::$_section = CM_Language::section('mail_template');
-		}
 		if ($template) {
 			if (!file_exists($this->_getTplPath($template))) {
 				throw new CM_Exception_Invalid('Invalid template specified');
@@ -87,46 +71,46 @@ class CM_Mail {
 		} elseif ($recipient instanceof CM_Model_User) {
 			$this->_recipient = $recipient;
 			$this->_recipientAddress = $this->_recipient->getEmail();
-			$this->_variables['recipient'] = $recipient;
+			parent::setTplParam('recipient', $recipient);
 		} else {
 			throw new CM_Exception_Invalid('No Recipient defined.');
 		}
-		$this->_variables['siteName'] = $config->site_name;
-		$this->_variables['siteEmailMain'] = $config->site_email_main;
-		$this->_variables['siteEmailBilling'] = $config->site_email_billing;
-		$this->_variables['siteEmailSupport'] = $config->site_email_support;
-		$this->_variables['siteUrl'] = SITE_URL;
-		$this->_variables['siteContactLink'] = SITE_URL . 'about/contact';
+		parent::setTplParam('siteName', $config->site_name);
+		parent::setTplParam('siteUrl', SITE_URL);
 		$this->_senderAddress = $config->no_reply_email;
 		$this->_senderName = $config->site_name;
-		if (!self::$_layout) {
-			self::$_layout = CM_Render::getInstance()->getLayout();
-		}
 	}
 
 	/**
-	 * @param string $template Name (without .tpl)
-	 * @return string Tpl path
+	 * @return boolean
 	 */
-	private function _getTplPath($template) {
-		return CM_Render::getInstance()->getLayoutPath('mail/' . $template . '.tpl', true);
-	}
-
-	public static function getTemplates() {
-		$section = CM_Language::section('mail_template');
-		$keys = array_keys($section->getLeaves());
-		return str_replace('_subject', '', $keys);
+	public function getDemoMode() {
+		return $this->_demoMode;
 	}
 
 	/**
-	 * @param string $key
-	 * @param string $value
+	 * @param boolean $state
 	 */
-	public function assign($key, $value = null) {
-		if (!$this->_template) {
-			throw new CM_Exception_Invalid("Can't assign variables when there is no template specified!");
-		}
-		$this->_variables[$key] = $value;
+	public function setDemoMode($state = true) {
+		$this->_demoMode = (boolean) $state;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getHtml() {
+		return $this->_htmlBody;
+	}
+
+	/**
+	 * @param string $html
+	 */
+	public function setHtml($html) {
+		$this->_htmlBody = $html;
+	}
+
+	public function getHtmlLayoutTplPath() {
+		return $this->_getTplPath('layout', 'html');
 	}
 
 	/**
@@ -144,10 +128,35 @@ class CM_Mail {
 	}
 
 	/**
+	 * @return string|null
+	 */
+	public function getSubject() {
+		return $this->_subject;
+	}
+
+	/**
 	 * @param string $subject
 	 */
 	public function setSubject($subject) {
 		$this->_subject = $subject;
+	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getSubjectTplPath() {
+		if ($this->hasTemplate()) {
+			return $this->_getTplPath($this->_template, 'subject');
+		}
+		throw new CM_Exception_Invalid('Mail has no template');
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getText() {
+		return $this->_textBody;
 	}
 
 	/**
@@ -158,10 +167,32 @@ class CM_Mail {
 	}
 
 	/**
-	 * @param string $html
+	 * @return string
 	 */
-	public function setHtml($html) {
-		$this->_htmlBody = $html;
+	public function getTextLayoutTplPath() {
+		return $this->_getTplPath('layout', 'text');
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function setTplParam($key, $value = null) {
+		if (!$this->_template) {
+			throw new CM_Exception_Invalid("Can't assign variables when there is no template specified!");
+		}
+		parent::setTplParam($key, $value);
+	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getTplPath() {
+		if ($this->hasTemplate()) {
+			return $this->_getTplPath($this->_template);
+		}
+		throw new CM_Exception_Invalid('Mail has no template');
 	}
 
 	/**
@@ -172,17 +203,24 @@ class CM_Mail {
 	}
 
 	/**
-	 * @param boolean $state
+	 * @return boolean
 	 */
-	public function setDemoMode($state = true) {
-		$this->_demoMode = $state;
+	public function getRenderLayout() {
+		return $this->_renderLayout;
 	}
 
 	/**
 	 * @param boolean $state OPTIONAL
 	 */
 	public function setRenderLayout($state = true) {
-		$this->_renderLayout = $state;
+		$this->_renderLayout = (boolean) $state;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function hasTemplate() {
+		return (boolean) $this->_template;
 	}
 
 	/**
@@ -195,7 +233,7 @@ class CM_Mail {
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
-		list($subject, $html, $text) = $this->render();
+		list($subject, $html, $text) = CM_Render::getInstance()->render($this);
 		if ($this->_delayed) {
 			$this->_queue($text, $html);
 		} else {
@@ -205,65 +243,36 @@ class CM_Mail {
 	}
 
 	/**
-	 * @return array ($subject, $html, $text)
+	 * @param string $template Name (without .tpl)
+	 * @param string $tplName  OPTIONAL
+	 * @return string Tpl path
 	 */
-	public function render() {
-		if ($this->_renderLayout || $this->_template) {
-			foreach ($this->_variables as $key => $value) {
-				self::$_layout->assign($key, $value);
-			}
-			self::$_layout->assign('subject', $this->_getSubject());
-		}
-		$html = $this->_getHtml();
-		if ($this->_renderLayout) {
-			self::$_layout->assign('body', $html);
-			$html = self::$_layout->fetch($this->_getTplPath('layout/html'));
-		}
-		$text = $this->_getText();
-		if ($this->_renderLayout) {
-			self::$_layout->assign('body', $text);
-			$text = self::$_layout->fetch($this->_getTplPath('layout/text'));
-		}
-		return array($this->_getSubject(), $html, $text);
+	private function _getTplPath($template, $tplName = 'default') {
+		return CM_Render::getInstance()->getLayoutPath('mail' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR . $tplName . '.tpl', true);
 	}
 
-	private function _getText() {
-		if (!$this->_textBody) {
-			if ($html = $this->_getHtml()) {
-				$text = preg_replace('!\n!', ' ', $html);
-				$text = preg_replace(array('!<br\s*/?>!', '!<a .*?href="(.*?)".*?>(.*?)</a>!', '!</?p>!'), array("\n", '$2 ($1)', "\n"), $text);
-				$text = preg_replace('!(\n)\s+!', "\n", $text);
-				$this->_textBody = trim(strip_tags($text));
-			} else {
-				throw new CM_Exception_Invalid('No body or template defined.');
-			}
-		}
-		return $this->_textBody;
+	/**
+	 * @return int
+	 */
+	public static function getQueueSize() {
+		return CM_Mysql::count(TBL_EMAIL_QUEUE);
 	}
 
-	private function _getHtml() {
-		if (!$this->_htmlBody && $this->_template) {
-			$tplPath = $this->_getTplPath($this->_template);
-			if ($this->_demoMode) {
-				$this->_htmlBody = file_get_contents($tplPath);
-			} else {
-				$this->_htmlBody = self::$_layout->fetch($tplPath);
-			}
+	/**
+	 * @param int $limit
+	 */
+	public static function processQueue($limit) {
+		$result = CM_Mysql::execRead("SELECT * FROM TBL_EMAIL_QUEUE ORDER BY `createStamp` LIMIT ?", (int) $limit);
+		while ($row = $result->fetchAssoc()) {
+			self::_send($row['subject'], $row['text'], $row['senderAddress'], $row['recipientAddress'], $row['senderName'], $row['html']);
+			CM_Mysql::delete(TBL_EMAIL_QUEUE, array('id' => $row['id']));
 		}
-		return $this->_htmlBody;
 	}
 
-	private function _getSubject() {
-		if (!$this->_subject) {
-			if (!$this->_template) {
-				throw new CM_Exception_Invalid('No subject or template defined');
-			}
-			if (!(self::$_section->hasLeaf($this->_template . '_subject'))) {
-				throw new CM_Exception_Invalid('Subject for template `' . $this->_template . '` does not exist.');
-			}
-			$this->_subject = self::$_section->text($this->_template . '_subject', $this->_variables);
-		}
-		return $this->_subject;
+	private function _queue($text, $html) {
+		CM_Mysql::insert(TBL_EMAIL_QUEUE, array('subject' => $this->_subject, 'text' => $text, 'html' => $html,
+			'senderAddress' => $this->_senderAddress, 'recipientAddress' => $this->_recipientAddress, 'senderName' => $this->_senderName,
+			'createStamp' => time()));
 	}
 
 	private static function _log($subject, $text, $senderAddress, $recipientAddress) {
@@ -294,28 +303,5 @@ class CM_Mail {
 			} catch (phpmailerException $e) {
 			}
 		}
-	}
-
-	private function _queue($text, $html) {
-		CM_Mysql::insert(TBL_EMAIL_QUEUE,
-				array('subject' => $this->_subject, 'text' => $text, 'html' => $html, 'senderAddress' => $this->_senderAddress,
-						'recipientAddress' => $this->_recipientAddress, 'senderName' => $this->_senderName, 'createStamp' => time()));
-	}
-
-	/**
-	 * @param int $limit
-	 */
-	public static function processQueue($limit) {
-		$result = CM_Mysql::execRead("SELECT * FROM TBL_EMAIL_QUEUE ORDER BY `createStamp` LIMIT ?", (int) $limit);
-		while ($row = $result->fetchAssoc()) {
-			self::_send($row['subject'], $row['text'], $row['senderAddress'], $row['recipientAddress'], $row['senderName'], $row['html']);
-			CM_Mysql::delete(TBL_EMAIL_QUEUE, array('id' => $row['id']));
-		}
-	}
-	/**
-	 * @return int
-	 */
-	public static function getQueueSize() {
-		return CM_Mysql::count(TBL_EMAIL_QUEUE);
 	}
 }

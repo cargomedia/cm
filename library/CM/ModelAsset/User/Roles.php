@@ -114,7 +114,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 			$user->getRoles()->delete($row['role']);
 			$msg = new CM_Mail($user, 'membership_expired');
 			try {
-				$msg->assign('membershipType', CM_Language::section('internals.role')->text('role_' . $row['role']));
+				$msg->setTplParam('membershipType', CM_Language::section('internals.role')->text('role_' . $row['role']));
 			} catch (CM_TreeException $ex) {
 			}
 			$msg->send();

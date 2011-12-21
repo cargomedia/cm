@@ -166,7 +166,7 @@ class CM_Render {
 	 * @throws CM_Exception
 	 */
 	public function render(CM_Renderable_Abstract $object, array $params = array()) {
-		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)_\w+$/', get_class($object), $matches)) {
+		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($object), $matches)) {
 			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($object) . "`");
 		}
 
