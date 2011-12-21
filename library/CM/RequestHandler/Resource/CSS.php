@@ -22,11 +22,9 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 				$content .= new CM_Css($file->read(), $this->getRender(), $presets);
 			}
 
-			$namespaces = self::getSite()->getNamespaces();
-
 			$components = array();
-			foreach ($namespaces as $namespace) {
-				$components = array_merge($components, CM_Util::rglob('*.php', DIR_INTERNALS . $namespace . '/Component/'));
+			foreach (self::getSite()->getNamespaces() as $namespace) {
+				$components = array_merge($components, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
 			}
 
 			$classes = $this->_getClasses($components);

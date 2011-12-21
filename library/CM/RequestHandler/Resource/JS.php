@@ -9,20 +9,16 @@ class CM_RequestHandler_Resource_JS extends CM_RequestHandler_Resource_Abstract 
 		if ($this->_getFilename() == 'internal.js') {
 			$content = new CM_File(DIR_PUBLIC . 'static/js/interface.js') . ';' . PHP_EOL;
 
-			$namespaces = self::getSite()->getNamespaces();
-
 			$componentJs = array();
 			$formFieldJs = array();
 			$formJs = array();
 			$renderableJs = array();
 
-			foreach ($namespaces as $namespace) {
-				foreach (array(DIR_INTERNALS, DIR_LIBRARY) as $dir) {
-					$renderableJs = array_merge($renderableJs, CM_Util::rglob('*.php', $dir . $namespace . '/Renderable/'));
-					$componentJs = array_merge($componentJs, CM_Util::rglob('*.php', $dir . $namespace . '/Component/'));
-					$formFieldJs = array_merge($formFieldJs, CM_Util::rglob('*.php', $dir . $namespace . '/FormField/'));
-					$formJs = array_merge($formJs, CM_Util::rglob('*.php', $dir . $namespace . '/Form/'));
-				}
+			foreach (self::getSite()->getNamespaces() as $namespace) {
+				$renderableJs = array_merge($renderableJs, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Renderable/'));
+				$componentJs = array_merge($componentJs, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
+				$formFieldJs = array_merge($formFieldJs, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/FormField/'));
+				$formJs = array_merge($formJs, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Form/'));
 			}
 
 			$classes = array_merge($renderableJs, $componentJs, $formFieldJs, $formJs);
