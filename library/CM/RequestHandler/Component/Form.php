@@ -102,11 +102,9 @@ class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstr
 			if ($trackingJs = CM_Tracking::getInstance()->getJs()) {
 				$this->exec($trackingJs);
 			}
-			if ($splittestingJs = SK_Splittesting::getInstance()->getJs()) {
-				$this->exec($splittestingJs);
-			}
-	
-			CM_Frontend::concat_js($this->getRender()->getJs()->getJs(), $this->_jsCode);
+
+			$this->exec($this->getRender()->getJs()->getJs());
+
 			if (!empty($this->_jsCode)) {
 				$success['exec'] = $this->_jsCode;
 			}
