@@ -34,7 +34,7 @@ class CM_SessionHandler {
 	}
 	
 	public function read($id) {
-		$cacheKey = CacheConst::Session . '_id:' . $id;
+		$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 		if ((list($this->_data, $this->_expires) = CM_Cache::get($cacheKey)) === false) {
 			$row = CM_Mysql::exec("SELECT `data`, `expires` FROM TBL_SESSION WHERE `sessionId` = '?' AND `expires` > ?", $id, time())
 					->fetchAssoc();
@@ -55,7 +55,7 @@ class CM_SessionHandler {
 
 		if ($changed || $expiresSoon) {
 			CM_Mysql::replace(TBL_SESSION, array('sessionId' => $id, 'data' => $data, 'expires' => time() + $lifetime));
-			$cacheKey = CacheConst::Session . '_id:' . $id;
+			$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 			CM_Cache::delete($cacheKey);
 		}
 		return true;
@@ -63,7 +63,7 @@ class CM_SessionHandler {
 	
 	public function destroy($id) {
 		CM_Mysql::delete(TBL_SESSION, array('sessionId' => $id));
-		$cacheKey = CacheConst::Session . '_id:' . $id;
+		$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 		CM_Cache::delete($cacheKey);
 		return true;
 	}

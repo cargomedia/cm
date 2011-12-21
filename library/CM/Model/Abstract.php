@@ -180,7 +180,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return string
 	 */
 	final private function _getCacheKey() {
-		return CacheConst::Model . '_class:' . get_class($this) . '_id:' . serialize($this->_getId());
+		return CM_CacheConst::Model . '_class:' . get_class($this) . '_id:' . serialize($this->_getId());
 	}
 
 	/**

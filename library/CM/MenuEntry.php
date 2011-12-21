@@ -120,7 +120,7 @@ class CM_MenuEntry {
 		$viewerId = $viewer ? $viewer->getId() : 0;
 		$className = $this->getPageName();
 
-		$cacheKey = CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
+		$cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
 
 		if (($page = CM_Cache_Runtime::get($cacheKey)) === false) {
 			$page = new $className($this->_menu->getRequest());

@@ -8,7 +8,7 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 
 		if ($this->_getFilename() == 'library.css') {
 			$content = '';
-			foreach (rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
+			foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 				$content .= new CM_File($path);
 			}
 		} elseif ($this->_getFilename() == 'sk.css') {
@@ -17,7 +17,7 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 
 			$themePath = $this->getRender()->getThemeDir(true);
 
-			foreach (rglob('*.css', $themePath . 'css/') as $path) {
+			foreach (CM_Util::rglob('*.css', $themePath . 'css/') as $path) {
 				$file = new CM_File($path);
 				$content .= new CM_Css($file->read(), $this->getRender(), $presets);
 			}
@@ -26,7 +26,7 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 
 			$components = array();
 			foreach ($namespaces as $namespace) {
-				$components = array_merge($components, rglob('*.php', DIR_INTERNALS . $namespace . '/Component/'));
+				$components = array_merge($components, CM_Util::rglob('*.php', DIR_INTERNALS . $namespace . '/Component/'));
 			}
 
 			$classes = $this->_getClasses($components);
@@ -38,7 +38,7 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 
 				$basePath = $this->getRender()->getThemeDir(true, null, $matches[1]);
 
-				foreach (rglob('*.style', $basePath . 'Component/' . $matches[2]) as $path) {
+				foreach (CM_Util::rglob('*.style', $basePath . 'Component/' . $matches[2]) as $path) {
 
 					if (preg_match('~' . $themePath . '(Component/(.+?)/(.+)\.style)~', $path, $match)) {
 						$prefix = '.' . $class['name'];

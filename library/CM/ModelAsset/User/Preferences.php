@@ -75,7 +75,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	 * @return array of arrays
 	 */
 	public static function getDefaults() {
-		$cacheKey = CacheConst::User_Asset_Preferences_Defaults;
+		$cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
 		if (($defaults = CM_CacheLocal::get($cacheKey)) === false) {
 			$defaults = array();
 			$rows = CM_Mysql::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue', 'configurable'))->fetchAll();

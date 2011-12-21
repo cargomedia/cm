@@ -64,7 +64,7 @@ abstract class CM_UserText_Abstract {
 	}
 
 	private function _getEmoticonData() {
-		$cacheKey = CacheConst::Usertext_Emoticons;
+		$cacheKey = CM_CacheConst::Usertext_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'tags' => array(), 'htmls' => array());
 			foreach (new CM_Paging_Smiley_All() as $smiley) {
@@ -91,7 +91,7 @@ abstract class CM_UserText_Abstract {
 	}
 
 	private function _censor($text) {
-		$cacheKey = CacheConst::Usertext_Badwords;
+		$cacheKey = CM_CacheConst::Usertext_Badwords;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwords = array('search' => array(), 'replace' => CM_Language::text('txt.badword_replacement'));
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {

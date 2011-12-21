@@ -45,7 +45,7 @@ class CM_TreeNode_Config extends CM_TreeNode_Abstract {
 	 * @return array
 	 */
 	public function getConfigsList() {
-		$cacheKey = CacheConst::Configs_Section . '_configsList_section:' . $this->getId();
+		$cacheKey = CM_CacheConst::Configs_Section . '_configsList_section:' . $this->getId();
 		$configs_list = CM_Cache::get($cacheKey);
 		if ($configs_list === false) {
 			$configs_list = array();
@@ -71,7 +71,7 @@ class CM_TreeNode_Config extends CM_TreeNode_Abstract {
 	 * @return object of stdClass
 	 */
 	public function getSectionInfo() {
-		$cacheKey = CacheConst::Configs_Section . '_info_section:' . $this->getId();
+		$cacheKey = CM_CacheConst::Configs_Section . '_info_section:' . $this->getId();
 		$result = CM_Cache::get($cacheKey);
 		if ($result === false) {
 			$query = CM_Mysql::placeholder('SELECT `section`,`label`,`parent_section_id`,`config_section_id`

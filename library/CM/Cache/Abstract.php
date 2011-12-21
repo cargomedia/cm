@@ -190,11 +190,11 @@ abstract class CM_Cache_Abstract {
 	 * @return boolean
 	 */
 	protected final function _deleteTag($tag) {
-		return static ::delete(CacheConst::Tag_Version . '_tag:' . $tag);
+		return static ::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
 	}
 
 	private final function _getTagVersion($tag) {
-		$cacheKey = CacheConst::Tag_Version . '_tag:' . $tag;
+		$cacheKey = CM_CacheConst::Tag_Version . '_tag:' . $tag;
 		if (($tagVersion = static ::get($cacheKey)) === false) {
 			$tagVersion = md5(rand() . uniqid());
 			static ::set($cacheKey, $tagVersion);

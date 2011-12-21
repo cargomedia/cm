@@ -263,7 +263,7 @@ class CM_Params extends CM_Class_Abstract {
 		if ($json) {
 			$value = json_encode($value);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_encode value `' . var_line($value) . '`.');
+				throw new CM_Exception_Invalid('Cannot json_encode value `' . CM_Util::var_line($value) . '`.');
 			}
 		}
 		return $value;
@@ -278,7 +278,7 @@ class CM_Params extends CM_Class_Abstract {
 		if ($json) {
 			$value = json_decode($value, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . var_line($value) . '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . CM_Util::var_line($value) . '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {

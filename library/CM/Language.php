@@ -10,7 +10,7 @@ class CM_Language {
 	public static function getTree($lang_id) {
 		$lang_id = (int) $lang_id;
 
-		$cacheKey = CacheConst::Language_Tree . '_langId:' . $lang_id;
+		$cacheKey = CM_CacheConst::Language_Tree . '_langId:' . $lang_id;
 		$tree = CM_CacheLocal::get($cacheKey);
 		if ($tree === false) {
 			$tree = new CM_Tree_Language('CM_TreeNode_Language', array('lang' => $lang_id));

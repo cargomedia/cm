@@ -5,7 +5,7 @@ class CM_Config {
 	 * @return CM_Tree_Config;
 	 */
 	public static function getTree() {
-		$cacheKey = CacheConst::Config_Tree;
+		$cacheKey = CM_CacheConst::Config_Tree;
 		$tree = CM_Cache::get($cacheKey);
 		if ($tree === false) {
 			$tree = new CM_Tree_Config('CM_TreeNode_Config');
@@ -27,12 +27,12 @@ class CM_Config {
 
 	public static function cleanCache($section_id, $key) {
 		self::clearCache();
-		CM_Cache::delete(CacheConst::Configs_Section . '_configValues_section:' . $section_id . '_key:' . $key);
-		CM_Cache::delete(CacheConst::Configs_Section . '_configsList_section:' . $section_id);
-		CM_Cache::delete(CacheConst::Configs_Section . '_info_section:' . $section_id);
+		CM_Cache::delete(CM_CacheConst::Configs_Section . '_configValues_section:' . $section_id . '_key:' . $key);
+		CM_Cache::delete(CM_CacheConst::Configs_Section . '_configsList_section:' . $section_id);
+		CM_Cache::delete(CM_CacheConst::Configs_Section . '_info_section:' . $section_id);
 	}
 	
 	public static function clearCache() {
-		CM_Cache::delete(CacheConst::Config_Tree);
+		CM_Cache::delete(CM_CacheConst::Config_Tree);
 	}
 }

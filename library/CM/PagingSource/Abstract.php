@@ -29,33 +29,33 @@ abstract class CM_PagingSource_Abstract {
 	 */
 	public function clearCache() {
 		if ($this->_cacheLifetime) {
-			$tag = CM_Cache::key(CacheConst::PagingSource, $this->_cacheKeyBase());
+			$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
 			CM_Cache::deleteTag($tag);
 		}
 	}
 
 	protected function _cacheSet($key, $value) {
 		if ($this->_cacheLocalLifetime) {
-			$key = CM_Cache::key(CacheConst::PagingSource, array($this->_cacheKeyBase(), $key));
+			$key = CM_Cache::key(CM_CacheConst::PagingSource, array($this->_cacheKeyBase(), $key));
 			CM_CacheLocal::set($key, $value, $this->_cacheLocalLifetime);
 		}
 		if ($this->_cacheLifetime) {
-			$tag = CM_Cache::key(CacheConst::PagingSource, $this->_cacheKeyBase());
-			$key = CM_Cache::key(CacheConst::PagingSource, $key);
+			$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+			$key = CM_Cache::key(CM_CacheConst::PagingSource, $key);
 			CM_Cache::setTagged($tag, $key, $value, $this->_cacheLifetime);
 		}
 	}
 
 	protected function _cacheGet($key) {
 		if ($this->_cacheLocalLifetime) {
-			$key = CM_Cache::key(CacheConst::PagingSource, array($this->_cacheKeyBase(), $key));
+			$key = CM_Cache::key(CM_CacheConst::PagingSource, array($this->_cacheKeyBase(), $key));
 			if (($result = CM_CacheLocal::get($key)) !== false) {
 				return $result;
 			}
 		}
 		if ($this->_cacheLifetime) {
-			$tag = CM_Cache::key(CacheConst::PagingSource, $this->_cacheKeyBase());
-			$key = CM_Cache::key(CacheConst::PagingSource, $key);
+			$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+			$key = CM_Cache::key(CM_CacheConst::PagingSource, $key);
 			if (($result = CM_Cache::getTagged($tag, $key)) !== false) {
 				return $result;
 			}

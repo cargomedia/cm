@@ -16,7 +16,7 @@ class CM_Location implements CM_ArrayConvertible {
 	public function __construct($level, $id) {
 		$this->_level = (int) $level;
 		$this->_id = (int) $id;
-		$cacheKey = CacheConst::Location . '_level:' . $this->getLevel() . '_id:' . $this->getId();
+		$cacheKey = CM_CacheConst::Location . '_level:' . $this->getLevel() . '_id:' . $this->getId();
 		if (($this->_fields = CM_CacheLocal::get($cacheKey)) === false) {
 			switch ($this->getLevel()) {
 				case self::LEVEL_ZIP:
@@ -163,7 +163,7 @@ class CM_Location implements CM_ArrayConvertible {
 	 * @return CM_Location|null
 	 */
 	public static function findByIp($ip) {
-		$cacheKey = CacheConst::Location_ByIp . '_ip:' . $ip;
+		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
 		if ((list($level, $id) = CM_CacheLocal::get($cacheKey)) === false) {
 			$level = $id = null;
 			if ($id = self::_getLocationIdByIp(TBL_LOCATION_CITY_IP, 'cityId', $ip)) {

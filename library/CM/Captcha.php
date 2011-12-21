@@ -74,7 +74,7 @@ class CM_Captcha {
 			throw new CM_Exception('Could not create captcha image');
 		}
 
-		$fonts = rglob('*.ttf', $this->_fontDir);
+		$fonts = CM_Util::rglob('*.ttf', $this->_fontDir);
 		if (!count($fonts)) {
 			throw new CM_Exception('Couldnt load any fonts');
 		}

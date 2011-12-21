@@ -21,7 +21,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		$this->_layout = $this->getRender()->getLayout();
 		$query = $this->_request->getQuery();
 		if (!isset($query['component'])) {
-			throw new CM_Exception_Invalid('Component param not set (query: `' . var_line($query) . '`)');
+			throw new CM_Exception_Invalid('Component param not set (query: `' . CM_Util::var_line($query) . '`)');
 		}
 		if (!is_array($query['component'])) {
 			throw new CM_Exception_Invalid('Component param is not an array');
