@@ -47,14 +47,6 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_User
-	 */
-	public function updateLatestactivity() {
-		CM_Mysql::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
-		return $this->_change();
-	}
-
-	/**
 	 * @return boolean
 	 */
 	public function getOnline() {
@@ -80,6 +72,14 @@ class CM_Model_User extends CM_Model_Abstract {
 	 */
 	public function getPreferences() {
 		return $this->_getAsset('CM_ModelAsset_User_Preferences');
+	}
+
+	public function getSite() {
+		$site = (int) $this->_get('site');
+		if (!$site) {
+			$site = CM_Site_Abstract::factory()->getType();
+		}
+		return $site;
 	}
 
 	/**
@@ -137,6 +137,14 @@ class CM_Model_User extends CM_Model_Abstract {
 	 */
 	public function getDisplayName() {
 		return 'user' . $this->getId();
+	}
+
+	/**
+	 * @return CM_Model_User
+	 */
+	public function updateLatestactivity() {
+		CM_Mysql::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+		return $this->_change();
 	}
 
 	protected function _loadAssets() {

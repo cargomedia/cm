@@ -69,11 +69,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 	
 	/**
-	* @param int $type
+	* @param int $type|null
 	* @return CM_Site_Abstract
 	* @throws CM_Exception
 	*/
-	public static function factory($type) {
+	public static function factory($type = null) {
 		// Currently needed as forms etc. do not have a site yet
 		if (!$type) {
 			$type = 1;

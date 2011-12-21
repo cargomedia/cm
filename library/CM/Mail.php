@@ -52,9 +52,9 @@ class CM_Mail extends CM_Renderable_Abstract {
 	private $_demoMode = false;
 
 	/**
-	 * @param mixed   $recipient CM_Model_User OR string
-	 * @param string  $template
-	 * @param boolean $delayed
+	 * @param CM_Model_User|string $recipient
+	 * @param string               $template
+	 * @param boolean              $delayed
 	 */
 	public function __construct($recipient, $template = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
