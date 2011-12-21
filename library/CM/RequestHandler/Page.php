@@ -11,26 +11,10 @@ class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 	 * @return string html code of page
 	 */
 	public function process() {
-		$path = $this->_request->getPath();
-
-		if (substr($path, 0, 10) == '/userfiles') {
-			// Do not try to load files from /userfiles (happens when there's no nginx, i.e. in development)
-			$this->setHeaderNotfound();
-			$this->sendHeaders();
-			exit();
-		}
 
 		try {
-			if (substr($path, 0, 3) == '/p/') {
-				// Profile page routing
-				$username = substr($path, 3);
-				if (!$profile = SK_Entity_Profile::findUsername($username)) {
-					throw new CM_Exception_Nonexistent();
-				}
-				// @todo: Query params get lost
-				$this->_setRequest(new CM_Request_Get(
-					'/profile?profile=' . $profile->getId(), $this->getRequest()->getHeaders()));
-			}
+			$this->_setRequest($this->getSite()->rewrite($this->_request));
+
 			$page = CM_Page_Abstract::factory($this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);

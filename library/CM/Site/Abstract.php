@@ -39,6 +39,22 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	public function getThemes() {
 		return $this->_themes;
 	}
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @return CM_Request_Abstract
+	 */
+	public function rewrite(CM_Request_Abstract $request) {
+		$path = $request->getPath();
+
+		if (substr($path, 0, 10) == '/userfiles') {
+			// Do not try to load files from /userfiles (happens when there's no nginx, i.e. in development)
+			$this->setHeaderNotfound();
+			$this->sendHeaders();
+			exit();
+		}
+		return $request;
+	}
 	
 	/**
 	 * @param string $theme
