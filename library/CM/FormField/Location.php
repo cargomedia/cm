@@ -27,7 +27,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 
 	protected static function _getSuggestions($term, array $options) {
 		$requestLocation = CM_Location::findByIp(CM_Request_Abstract::getIp());
-		$locations = new SK_Paging_Location_Suggestions($term, $options['levelMin'], $requestLocation);
+		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $requestLocation);
 		$locations->setPage(1, 15);
 		$out = array();
 		foreach ($locations as $location) {
