@@ -11,7 +11,7 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 			foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 				$content .= new CM_File($path);
 			}
-		} elseif ($this->_getFilename() == 'sk.css') {
+		} elseif ($this->_getFilename() == 'internal.css') {
 			$presets = new CM_Css($this->getRender()->getFileThemed('presets.style')->read(), $this->getRender());
 			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
 
