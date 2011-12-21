@@ -85,8 +85,7 @@ abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
 	 * @param array             $params
 	 * @param CM_Form_Abstract  $form
 	 */
-	public function render(array $params, CM_Form_Abstract $form) {
-
+	public function prepare(array $params, CM_Form_Abstract $form) {
 	}
 
 	/**

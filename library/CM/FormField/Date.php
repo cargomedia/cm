@@ -15,7 +15,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 		return new DateTime($yy . '-' . $mm . '-' . $dd);
 	}
 	
-	public function render(array $params, CM_Form_Abstract $form) {	
+	public function prepare(array $params, CM_Form_Abstract $form) {
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 
 		$value = $this->getValue();

@@ -18,7 +18,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 		return $userInput;
 	}
 
-	public function render(array $params, CM_Form_Abstract $form) {
+	public function prepare(array $params, CM_Form_Abstract $form) {
 		$this->setTplParam('tabindex', isset($params['tabindex']) ? $params['tabindex'] : null);
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 		$this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
