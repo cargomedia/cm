@@ -14,8 +14,9 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
 
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
+	/** @var CM_Model_User $viewer */
+	$viewer = $template->smarty->getTemplateVars('viewer');
 
-	$viewer = CM_Session::getInstance()->getViewer();
 	$component->setViewer($viewer);
 	return $render->render($component);
 }

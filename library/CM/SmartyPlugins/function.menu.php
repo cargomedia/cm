@@ -3,10 +3,11 @@
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
+	/** @var CM_Model_User $viewer */
+	$viewer = $template->smarty->getTemplateVars('viewer');
 	$requestHandler = $render->getRequestHandler();
 
-	$user = $requestHandler->getViewer();
-	$userId = $user ? $user->getId() : 0;
+	$userId = $viewer ? $viewer->getId() : 0;
 	$name = $params['name'];
 
 	$cacheKey = CM_CacheConst::Menu . '_name:' . $name . '_siteId:' . $render->getSite()->getId() . '_userId:' . $userId;
