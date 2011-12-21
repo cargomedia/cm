@@ -105,7 +105,7 @@ class CM_Render {
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				self::$_smarty->addPluginsDir(DIR_LIBRARY . '/' . $namespace . '/SmartyPlugins');
+				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
 			}
 
 			SK_Tracking::getInstance()->setPageview();

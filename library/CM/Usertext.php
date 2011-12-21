@@ -1,13 +1,12 @@
 <?php
 
-abstract class CM_UserText_Abstract {
+class CM_Usertext extends CM_Class_Abstract {
 	private $_text;
 
 	protected $_singleTags = array('br', 'img');
-	protected $_allowedAttrs = array();
-	protected $_allowedTags = array();
-	protected $_internalTags = array();
-
+	protected $_allowedAttrs = array('alt', 'class', 'height', 'href', 'src', 'title', 'width');
+	protected $_allowedTags = array('a', 'b', 'i', 'q', 'span', 'u', 'br', 'img');
+	protected $_internalTags = array('emoticon');
 	protected $_wrapLength = 5;
 
 	function __construct($text) {
@@ -54,10 +53,8 @@ abstract class CM_UserText_Abstract {
 
 	private function _getFormat($text, $stripAllowedTags = false, $lengthMax = null) {
 		$domDoc = new DOMDocument();
-		@$domDoc
-				->loadHTML(
-						'<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		</head><body>' . $text . '</body></html>');
+		@$domDoc->loadHTML('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $text .
+				'</body></html>');
 		$domBody = $domDoc->childNodes->item(1)->childNodes->item(1);
 		$text = $this->_collapseDomTree($domBody, $stripAllowedTags, $lengthMax);
 		return $text;
@@ -116,19 +113,18 @@ abstract class CM_UserText_Abstract {
 
 	private function _escapeUnAllowedTags($text) {
 		$_allowedTags = $this->_allowedTags;
-		return preg_replace_callback('#<[/\s]*(?<tag>\w*).*?>#',
-				function ($matches) use ($_allowedTags) {
-					if ($matches['tag'] && in_array($matches['tag'], $_allowedTags)) {
-						return $matches[0];
-					} else {
-						return htmlspecialchars($matches[0], ENT_COMPAT, 'UTF-8');
-					}
-				}, $text);
+		return preg_replace_callback('#<[/\s]*(?<tag>\w*).*?>#', function ($matches) use ($_allowedTags) {
+			if ($matches['tag'] && in_array($matches['tag'], $_allowedTags)) {
+				return $matches[0];
+			} else {
+				return htmlspecialchars($matches[0], ENT_COMPAT, 'UTF-8');
+			}
+		}, $text);
 	}
 
 	/**
-	 * @param DomNode $domNode
-	 * @param boolean $stripAllowedTags
+	 * @param DomNode  $domNode
+	 * @param boolean  $stripAllowedTags
 	 * @param int|null &$lengthMax
 	 */
 	private function _collapseDomTree(DomNode $domNode, $stripAllowedTags, &$lengthMax, $level = 0) {
@@ -224,6 +220,15 @@ abstract class CM_UserText_Abstract {
 	 */
 	public static function getSplitChar() {
 		return html_entity_decode('&#8203;', ENT_COMPAT, 'UTF-8');
+	}
+
+	/**
+	 * @param string $text
+	 * @return CM_Usertext
+	 */
+	public static function factory($text) {
+		$className = self::_getClassName();
+		return new $className($text);
 	}
 
 }
