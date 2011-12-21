@@ -93,28 +93,4 @@ class CM_Menu {
 	public final function getEntries() {
 		return $this->_entries;
 	}
-
-	/**
-	 * @param string					  $name
-	 * @param CM_RequestHandler_Abstract  $requestHandler
-	 * @return CM_Menu|null
-	 */
-	public static final function getInstance($name, CM_RequestHandler_Abstract $requestHandler) {
-		$user = $requestHandler->getViewer();
-		$userId = $user ? $user->getId() : 0;
-		$render = $requestHandler->getRender();
-
-		$cacheKey = CacheConst::Menu . '_name:' . $name . '_siteId:' . $render->getSite()->getId() . '_userId:' . $userId;
-		if (($menu = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$menuArr = include $render->getLayoutPath('menu.php', true);
-			if (isset($menuArr[$name])) {
-				$menu = new CM_Menu($menuArr[$name], $requestHandler->getRequest());
-			} else {
-				$menu = null;
-			}
-			CM_Cache_Runtime::set($cacheKey, $menu);
-		}
-
-		return $menu;
-	}
 }

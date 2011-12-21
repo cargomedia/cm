@@ -17,10 +17,12 @@ class CM_RequestHandler_Resource_JS extends CM_RequestHandler_Resource_Abstract 
 			$renderableJs = array();
 
 			foreach ($namespaces as $namespace) {
-				$renderableJs = array_merge($renderableJs, rglob('*.php', DIR_INTERNALS . $namespace . '/Renderable/'));
-				$componentJs = array_merge($componentJs, rglob('*.php', DIR_INTERNALS . $namespace . '/Component/'));
-				$formFieldJs = array_merge($formFieldJs, rglob('*.php', DIR_INTERNALS . $namespace . '/FormField/'));
-				$formJs = array_merge($formJs, rglob('*.php', DIR_INTERNALS . $namespace . '/Form/'));
+				foreach (array(DIR_INTERNALS, DIR_LIBRARY) as $dir) {
+					$renderableJs = array_merge($renderableJs, rglob('*.php', $dir . $namespace . '/Renderable/'));
+					$componentJs = array_merge($componentJs, rglob('*.php', $dir . $namespace . '/Component/'));
+					$formFieldJs = array_merge($formFieldJs, rglob('*.php', $dir . $namespace . '/FormField/'));
+					$formJs = array_merge($formJs, rglob('*.php', $dir . $namespace . '/Form/'));
+				}
 			}
 
 			$classes = array_merge($renderableJs, $componentJs, $formFieldJs, $formJs);
