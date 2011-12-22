@@ -2,8 +2,6 @@
 
 abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 
-	protected $_layout = 'default';
-	protected $_canvas = 'default';
 	protected $_title = '';
 	protected $_description = '';
 	protected $_keywords = '';
@@ -39,22 +37,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 			$this->_components[$location] = array();
 		}
 		$this->_components[$location][] = $component;
-	}
-
-	/**
-	 * @return string Canvas name
-	 */
-	public final function getCanvas() {
-		return $this->_canvas;
-	}
-
-	/**
-	 * @param string $canvas
-	 * @return CM_Page_Abstract
-	 */
-	public final function setCanvas($canvas) {
-		$this->_canvas = $canvas;
-		return $this;
 	}
 
 	/**
@@ -114,22 +96,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 */
 	public final function setKeywords($keywords) {
 		$this->_keywords = $keywords;
-		return $this;
-	}
-
-	/**
-	 * @return string Layout name
-	 */
-	public final function getLayout() {
-		return $this->_layout;
-	}
-
-	/**
-	 * @param string $layout Layout name
-	 * @return CM_Page_Abstract
-	 */
-	public final function setLayout($layout) {
-		$this->_layout = $layout;
 		return $this;
 	}
 
