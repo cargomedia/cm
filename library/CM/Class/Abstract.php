@@ -41,9 +41,10 @@ abstract class CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static function _getConfig() {
+		$config = Config::get();
 		foreach (self::_getClassHierarchy() as $class) {
-			if ($config = Config::get()->$class) {
-				return $config;
+			if (isset($config->$class)) {
+				return $config->$class;
 			}
 		}
 		throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
