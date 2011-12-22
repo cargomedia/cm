@@ -12,20 +12,29 @@ final class CM_EventHandler {
 	 */
 	private $_callbacks = array();
 
-	public function construct() {
+	public function __construct() {
 		CM_Site_Abstract::factory()->bindEvents($this);
 	}
 
-	public function bind($event, Closure $callback, CM_Params $params = null) {
+	/**
+	 * @param string $event
+	 * @param Closure $callback
+	 * @param array|null $params
+	 */
+	public function bind($event, Closure $callback, array $params = null) {
 		$this->_callbacks[$event][] = array('callback' => $callback, 'params' => $params);
 	}
 
-	public function trigger($event, CM_Params $triggerParams = null) {
+	/**
+	 * @param string $event
+	 * @param array|null $triggerParams
+	 */
+	public function trigger($event, array $triggerParams = null) {
 		if (!empty($this->_callbacks[$event])) {
 			foreach ($this->_callbacks[$event] as $callback) {
-				$params = $triggerParams;
+				$params = $triggerParams ? CM_Params::factory($triggerParams) : null;
 				if (!empty($callback['params'])) {
-					$params = $params ? CM_Params::factory(array_merge($callback['params']->getAll(), $triggerParams->getAll())) : $callback['params'];
+					$params = $params ? CM_Params::factory(array_merge($callback['params'], $triggerParams)) : CM_Params::factory($callback['params']);
 				}
 				$callback['callback']($params);
 			}
