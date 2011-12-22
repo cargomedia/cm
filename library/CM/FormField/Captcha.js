@@ -16,7 +16,7 @@ refresh: function(){
 			var $container = field.$(".captcha_container:eq(0)");
 			var $img = $container.find("img");
 			$img.attr("src", $img.attr("src").replace(/\?[^\?]+$/, '?id=' + id));
-			$container.find("input[name=\'captcha[image_id]\']").val(id);
+			$container.find("input[name=\'captcha[id]\']").val(id);
 			$container.find("input[name=\'captcha[value]\']").val("").focus();
 		}
 	});
