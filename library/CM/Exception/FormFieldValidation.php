@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormFieldValidationException extends Exception {
+class CM_Exception_FormFieldValidation extends Exception {
 	private $error_key;
 
 	/**

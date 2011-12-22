@@ -13,10 +13,10 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
 		try {
 			$captcha = new CM_Captcha($id);
 		} catch (CM_Exception_Nonexistent $e) {
-			throw new CM_FormFieldValidationException('Invalid captcha reference');
+			throw new CM_Exception_FormFieldValidation('Invalid captcha reference');
 		}
 		if (!$captcha->check($text)) {
-			throw new CM_FormFieldValidationException('Number doesn\'t match captcha');
+			throw new CM_Exception_FormFieldValidation('Number doesn\'t match captcha');
 		}
 
 		return $userInput;

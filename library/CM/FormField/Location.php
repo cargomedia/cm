@@ -40,7 +40,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		$value = parent::validate($userInput);
 		list($level, $id) = explode('.', $value);
 		if ($level < $this->_options['levelMin']) {
-			throw new CM_FormFieldValidationException('Invalid location level.');
+			throw new CM_Exception_FormFieldValidation('Invalid location level.');
 		}
 		return new CM_Location($level, $id);
 	}

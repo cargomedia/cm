@@ -40,7 +40,7 @@ class CM_RequestHandler_Upload extends CM_RequestHandler_Abstract {
 			}
 			
 			if ($tmpFile->getSize() > self::MAX_FILE_SIZE) {
-				throw new CM_FormFieldValidationException('File too big', true);
+				throw new CM_Exception_FormFieldValidation('File too big', true);
 			}
 
 			$preview = null;
@@ -54,7 +54,7 @@ class CM_RequestHandler_Upload extends CM_RequestHandler_Abstract {
 						
 			$return['success'] = array('id' => $tmpFile->getUniqid(), 'url' => $tmpFile->getURL(), 'preview' => $preview);
 
-		} catch (CM_FormFieldValidationException $ex) {
+		} catch (CM_Exception_FormFieldValidation $ex) {
 			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getErrorKey());
 		}
 		

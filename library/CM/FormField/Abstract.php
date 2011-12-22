@@ -77,7 +77,7 @@ abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
 	/**
 	 * @param string|array $userInput
 	 * @return mixed Internal value
-	 * @throws CM_FormFieldValidationException
+	 * @throws CM_Exception_FormFieldValidation
 	 */
 	abstract public function validate($userInput);
 

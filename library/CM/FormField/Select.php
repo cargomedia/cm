@@ -29,7 +29,7 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 	public function validate($userInput) {
 		if ($this->_type == self::RADIO || $this->_type == self::SELECT) {
 			if (!in_array($userInput, $this->_getValues())) {
-				throw new CM_FormFieldValidationException('illegal_value' . CM_Util::var_line($this->_getValues()));
+				throw new CM_Exception_FormFieldValidation('Invalid value');
 			}
 		}
 		return $userInput;

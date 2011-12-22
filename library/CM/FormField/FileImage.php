@@ -16,7 +16,7 @@ class CM_FormField_FileImage extends CM_FormField_File {
 		try {
 			new CM_File_Image($file);
 		} catch (CM_Exception $e) {
-			throw new CM_FormFieldValidationException('Invalid image', true);
+			throw new CM_Exception_FormFieldValidation('Invalid image', true);
 		}
 	}
 

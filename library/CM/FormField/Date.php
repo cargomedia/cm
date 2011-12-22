@@ -10,7 +10,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 		$yy = trim($userInput['year']);
 
 		if (!$dd || !$mm || !$yy) {
-			throw new CM_FormFieldValidationException("day, month or year not set");
+			throw new CM_Exception_FormFieldValidation("day, month or year not set");
 		}
 		return new DateTime($yy . '-' . $mm . '-' . $dd);
 	}

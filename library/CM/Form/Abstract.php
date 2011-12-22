@@ -195,7 +195,7 @@ abstract class CM_Form_Abstract extends CM_Renderable_Abstract {
 			if (!$field->isEmpty($data[$field_name])) {
 				try {
 					$form_data[$field_name] = $field->validate($data[$field_name]);
-				} catch (CM_FormFieldValidationException $e) {
+				} catch (CM_Exception_FormFieldValidation $e) {
 					$err_msg = $this->getErrorMessage($field_name, $e->getErrorKey());
 					$response->addError($err_msg, $field_name);
 				}
