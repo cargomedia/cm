@@ -27,18 +27,8 @@ class CM_RequestHandler_Component_Ajax extends CM_RequestHandler_Component_Abstr
 				$success['exec'] = $exec;
 			}
 			$output['success'] = $success;
-		} catch (CM_Exception_AuthRequired $ex) {
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
-		} catch (CM_Exception_Blocked $ex) {
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
-		} catch (CM_Exception_ActionLimit $ex) {
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
-		} catch (SK_Exception_PremiumRequired $ex) {
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
-		} catch (CM_Exception_Nonexistent $ex) {
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
 		} catch (CM_Exception $ex) {
-			if (!$ex->isPublic()) {
+			if (!($ex->isPublic() || in_array(get_class($ex), self::_getConfig()->exceptions))) {
 				throw $ex;
 			}
 			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());

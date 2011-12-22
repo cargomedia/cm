@@ -77,15 +77,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	abstract public function checkAccessible();
 
 	/**
-	 * @return string[] List of class names
-	 */
-	public function getClassHierarchy() {
-		$classHierarchy = array_values(class_parents($this));
-		array_unshift($classHierarchy, get_class($this));
-		return $classHierarchy;
-	}
-
-	/**
 	 * Returns the namespace of a component.
 	 *
 	 * @return string
