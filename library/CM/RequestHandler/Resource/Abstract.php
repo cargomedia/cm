@@ -52,7 +52,7 @@ abstract class CM_RequestHandler_Resource_Abstract extends CM_RequestHandler_Abs
 				throw new CM_Exception('Cannot detect `' . $kind . '`-class inheritance of `' . $path . '`');
 			}
 				
-			if (!isset($class['parent'])) {
+			if (!isset($class['parent']) || $class['parent'] == 'CM_Class_Abstract') {
 				$class['parent'] = 'Backbone.View';
 			}
 				
