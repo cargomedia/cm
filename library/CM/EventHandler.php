@@ -21,12 +21,14 @@ final class CM_EventHandler {
 	}
 
 	public function trigger($event, CM_Params $triggerParams = null) {
-		foreach ($this->_callbacks[$event] as $callback) {
-			$params = $triggerParams;
-			if (!empty($callback['params'])) {
-				$params = $params ? CM_Params::factory(array_merge($callback['params']->getAll(), $triggerParams->getAll())) : $callback['params'];
+		if (!empty($this->_callbacks[$event])) {
+			foreach ($this->_callbacks[$event] as $callback) {
+				$params = $triggerParams;
+				if (!empty($callback['params'])) {
+					$params = $params ? CM_Params::factory(array_merge($callback['params']->getAll(), $triggerParams->getAll())) : $callback['params'];
+				}
+				$callback['callback']($params);
 			}
-			$callback['callback']($params);
 		}
 	}
 
