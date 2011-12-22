@@ -220,15 +220,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * @param string $template Name (without .tpl)
-	 * @param string $tplName  OPTIONAL
-	 * @return string Tpl path
-	 */
-	private function _getTplPath($template, $tplName = 'default') {
-		return CM_Render::getInstance()->getLayoutPath('mail' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR . $tplName . '.tpl', true);
-	}
-
-	/**
 	 * @return int
 	 */
 	public static function getQueueSize() {
@@ -276,7 +267,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 				$mail->Body = $html ? $html : $text;
 				$mail->AltBody = $html ? $text : '';
 
-				$result = $mail->Send();
+				$mail->Send();
 			} catch (phpmailerException $e) {
 			}
 		}
