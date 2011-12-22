@@ -92,7 +92,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
 	final public function _get($field = null) {
-
 		if (!$this->_data) {
 			$cacheKey = $this->_getCacheKey();
 			if (($this->_data = CM_Cache::get($cacheKey)) === false) {

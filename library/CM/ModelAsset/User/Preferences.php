@@ -71,7 +71,6 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @param int $entityType
 	 * @return array of arrays
 	 */
 	public static function getDefaults() {

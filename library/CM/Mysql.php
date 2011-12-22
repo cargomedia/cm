@@ -225,10 +225,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Select fields from a table
 	 *
-	 * @param string	   $table
-	 * @param string|array $attrs Column-name OR Column-names array
-	 * @param string|array $where Associative array field=>value OR string
-	 * @param string	   $order
+	 * @param string			$table
+	 * @param string|array	  $attrs Column-name OR Column-names array
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @param string|null	   $order
+	 * @return CM_MysqlResult
 	 */
 	public static function select($table, $attrs, $where = null, $order = null) {
 		$attrs = (array) $attrs;
@@ -249,8 +250,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Select COUNT(*) from a table
 	 *
-	 * @param string	   $table
-	 * @param string|array $where Associative array field=>value OR string
+	 * @param string			$table
+	 * @param string|array|null $where Associative array field=>value OR string
 	 * @return int
 	 */
 	public static function count($table, $where = null) {
@@ -261,11 +262,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Insert one/multiple rows
 	 *
-	 * @param string	   $table
-	 * @param string|array $attr		   Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array		$onDuplicateKey OPTIONAL
-	 * @param string	   $statement
+	 * @param string				 $table
+	 * @param string|array		   $attr		   Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null	  $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null			 $onDuplicateKey OPTIONAL
+	 * @param string				 $statement
 	 * @return int Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKey = null, $statement = self::STMT_INSERT) {
@@ -322,9 +323,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	   $table
-	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string			$table
+	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
 	public static function insertIgnore($table, $attr, $value = null) {
@@ -332,9 +333,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	   $table
-	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string			$table
+	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
 	public static function insertDelayed($table, $attr, $value = null) {
@@ -346,9 +347,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	   $table
-	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string			$table
+	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
 	public static function replace($table, $attr, $value = null) {
@@ -356,9 +357,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	   $table
-	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string			$table
+	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
 	public static function replaceDelayed($table, $attr, $value = null) {
@@ -370,9 +371,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $table
-	 * @param array  $values Associative array field=>value
-	 * @param array  $where  Associative array field=>value OR string
+	 * @param string			 $table
+	 * @param array			  $values Associative array field=>value
+	 * @param string|array|null  $where  Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
 	public static function update($table, array $values, $where = null) {
@@ -393,8 +394,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $table
-	 * @param array  $where Associative array field=>value OR string
+	 * @param string		$table
+	 * @param string|array  $where Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
 	public static function delete($table, $where) {
@@ -404,9 +405,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $table
-	 * @param string $column OPTIONAL
-	 * @param string $index  OPTIONAL
+	 * @param string	  $table
+	 * @param string|null $column OPTIONAL
+	 * @param string|null $index  OPTIONAL
 	 * @return bool
 	 */
 	public static function exists($table, $column = null, $index = null) {
@@ -421,7 +422,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param mixed $where Associative array field=>value OR string
+	 * @param string|array|null $where Associative array field=>value OR string
 	 * @return string WHERE-query
 	 */
 	private static function _queryWhere($where) {
@@ -463,8 +464,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Returns column info object
 	 *
-	 * @param string $table
-	 * @param string $column
+	 * @param string      $table
+	 * @param string|null $column
 	 * @return CM_MysqlColumn
 	 */
 	public static function describe($table, $column = null) {
