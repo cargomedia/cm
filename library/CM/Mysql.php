@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mysql {
+class CM_Mysql extends CM_Class_Abstract {
 	const STMT_INSERT = 'INSERT';
 	const STMT_INSERT_IGNORE = 'INSERT IGNORE';
 	const STMT_INSERT_DELAYED = 'INSERT DELAYED';
@@ -11,27 +11,30 @@ class CM_Mysql {
 	protected static $link_id_read;
 
 	/**
-	 * Open a connection to a MySQL server.
+	 * @param bool $readOnly OPTIONAL
+	 * @return resource
 	 */
 	public static function connect($readOnly = false) {
-		$user = Config::get()->db->user;
-		$pass = Config::get()->db->pass;
-		$server = Config::get()->db->server;
+		$config = self::_getConfig();
 		$link = &self::$link_id;
+		$server = $config->server;
 		if ($readOnly) {
 			$link = &self::$link_id_read;
-			$servers_read = Config::get()->db->servers_read;
-			if (!empty($servers_read)) {
-				$server = $servers_read[array_rand($servers_read)];
+			if (!empty($config->servers_read)) {
+				$server = $config->servers_read[array_rand($config->servers_read)];
 			}
 		}
+		$db = $config->db;
+		if (IS_TEST) {
+			$db .= '_test';
+		}
 
-		if (!($link = @mysql_connect($server[0] . ':' . $server[1], $user, $pass))) {
+		if (!($link = @mysql_connect($server['host'] . ':' . $server['port'], $config->user, $config->pass))) {
 			throw new CM_Exception('Database connection failed');
 		}
 
-		if (!mysql_select_db(self::_getDbName(), $link)) {
-			throw new CM_Exception('Cannot select database ' . self::_getDbName());
+		if (!mysql_select_db($db, $link)) {
+			throw new CM_Exception('Cannot select database `' . $db . '`');
 		}
 
 		if (!mysql_set_charset('utf8', $link)) {
@@ -47,13 +50,6 @@ class CM_Mysql {
 		} else {
 			return self::$link_id ? self::$link_id : self::connect($readOnly);
 		}
-	}
-
-	private static function _getDbName() {
-		if (IS_TEST) {
-			return Config::get()->db->name . '_test';
-		}
-		return Config::get()->db->name;
 	}
 
 	/**
@@ -111,9 +107,9 @@ class CM_Mysql {
 	 * Generates a query string for execution.
 	 *
 	 * @param string $query_tpl
-	 * @param mixed $arg1
-	 * @param mixed $arg2
-	 * @param mixed $arg3...
+	 * @param mixed  $arg1
+	 * @param mixed  $arg2
+	 * @param mixed  $arg3...
 	 * @return string
 	 */
 	public static function placeholder() {
@@ -173,7 +169,7 @@ class CM_Mysql {
 	/**
 	 * Sends query to a database server.
 	 *
-	 * @param string $query
+	 * @param string  $query
 	 * @param booleab $readOnly
 	 * @throws CM_Exception
 	 * @return CM_MysqlResult
@@ -196,8 +192,8 @@ class CM_Mysql {
 	 * Compile and execute a query.
 	 *
 	 * @param string $query Can contain ?, @? as placeholders
-	 * @param mixed $arg1
-	 * @param mixed $arg2...
+	 * @param mixed  $arg1
+	 * @param mixed  $arg2  ...
 	 * @return CM_MysqlResult|int Either a CM_MysqlResult, last insert id or affected rows.
 	 */
 	public static function exec() {
@@ -217,8 +213,8 @@ class CM_Mysql {
 	 * This might return somewhat stale data
 	 *
 	 * @param string $query Can contain ?, @? as placeholders
-	 * @param mixed $arg1
-	 * @param mixed $arg2...
+	 * @param mixed  $arg1
+	 * @param mixed  $arg2  ...
 	 * @return CM_MysqlResult
 	 */
 	public static function execRead() {
@@ -229,10 +225,10 @@ class CM_Mysql {
 	/**
 	 * Select fields from a table
 	 *
-	 * @param string $table
+	 * @param string	   $table
 	 * @param string|array $attrs Column-name OR Column-names array
 	 * @param string|array $where Associative array field=>value OR string
-	 * @param string $order
+	 * @param string	   $order
 	 */
 	public static function select($table, $attrs, $where = null, $order = null) {
 		$attrs = (array) $attrs;
@@ -253,7 +249,7 @@ class CM_Mysql {
 	/**
 	 * Select COUNT(*) from a table
 	 *
-	 * @param string $table
+	 * @param string	   $table
 	 * @param string|array $where Associative array field=>value OR string
 	 * @return int
 	 */
@@ -265,11 +261,11 @@ class CM_Mysql {
 	/**
 	 * Insert one/multiple rows
 	 *
-	 * @param string $table
-	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array $onDuplicateKey OPTIONAL
-	 * @param string $statement
+	 * @param string	   $table
+	 * @param string|array $attr		   Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array		$onDuplicateKey OPTIONAL
+	 * @param string	   $statement
 	 * @return int Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKey = null, $statement = self::STMT_INSERT) {
@@ -326,8 +322,8 @@ class CM_Mysql {
 	}
 
 	/**
-	 * @param string $table
-	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string	   $table
+	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -336,8 +332,8 @@ class CM_Mysql {
 	}
 
 	/**
-	 * @param string $table
-	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string	   $table
+	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array $value Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -350,8 +346,8 @@ class CM_Mysql {
 	}
 
 	/**
-	 * @param string $table
-	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string	   $table
+	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -360,8 +356,8 @@ class CM_Mysql {
 	}
 
 	/**
-	 * @param string $table
-	 * @param string|array $attr Column-name OR Column-names array OR associative field=>value pair
+	 * @param string	   $table
+	 * @param string|array $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -375,8 +371,8 @@ class CM_Mysql {
 
 	/**
 	 * @param string $table
-	 * @param array $values Associative array field=>value
-	 * @param array $where Associative array field=>value OR string
+	 * @param array  $values Associative array field=>value
+	 * @param array  $where  Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
 	public static function update($table, array $values, $where = null) {
@@ -398,7 +394,7 @@ class CM_Mysql {
 
 	/**
 	 * @param string $table
-	 * @param array $where Associative array field=>value OR string
+	 * @param array  $where Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
 	public static function delete($table, $where) {
@@ -410,7 +406,7 @@ class CM_Mysql {
 	/**
 	 * @param string $table
 	 * @param string $column OPTIONAL
-	 * @param string $index OPTIONAL
+	 * @param string $index  OPTIONAL
 	 * @return bool
 	 */
 	public static function exists($table, $column = null, $index = null) {
@@ -543,7 +539,7 @@ class CM_Mysql {
 		return $columns;
 	}
 
-	private static function _delayedEnabled () {
+	private static function _delayedEnabled() {
 		return !IS_TEST;
 	}
 
