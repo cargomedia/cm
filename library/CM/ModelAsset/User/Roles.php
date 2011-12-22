@@ -112,7 +112,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 		while ($row = $result->fetchAssoc()) {
 			$user = CM_Model_User::factory($row['userId']);
 			$user->getRoles()->delete($row['role']);
-			CM_EventHandler::getInstance()->trigger('membershipExpired', array('user' => $user, 'role' => $row['role']));
+			CM_EventHandler::getInstance()->trigger('roleDeleted', array('user' => $user, 'role' => $row['role']));
 		}
 	}
 }
