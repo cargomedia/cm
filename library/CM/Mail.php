@@ -58,11 +58,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 */
 	public function __construct($recipient, $template = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
-		$config = CM_Config::section('site')->Section('official');
+		$config = $this->_getConfig();
 		if ($template) {
-			if (!file_exists($this->_getTplPath($template))) {
-				throw new CM_Exception_Invalid('Invalid template specified');
-			}
 			$this->_template = (string) $template;
 			$this->setRenderLayout(true);
 		}
@@ -75,10 +72,10 @@ class CM_Mail extends CM_Renderable_Abstract {
 		} else {
 			throw new CM_Exception_Invalid('No Recipient defined.');
 		}
-		parent::setTplParam('siteName', $config->site_name);
+		parent::setTplParam('siteName', $config->siteName);
 		parent::setTplParam('siteUrl', SITE_URL);
-		$this->_senderAddress = $config->no_reply_email;
-		$this->_senderName = $config->site_name;
+		$this->_senderAddress = $config->siteEmailAddress;
+		$this->_senderName = $config->siteName;
 	}
 
 	/**
@@ -107,10 +104,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 */
 	public function setHtml($html) {
 		$this->_htmlBody = $html;
-	}
-
-	public function getHtmlLayoutTplPath() {
-		return $this->_getTplPath('layout', 'html');
 	}
 
 	/**
@@ -142,14 +135,10 @@ class CM_Mail extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * @return string
-	 * @throws CM_Exception_Invalid
+	 * @return string|null
 	 */
-	public function getSubjectTplPath() {
-		if ($this->hasTemplate()) {
-			return $this->_getTplPath($this->_template, 'subject');
-		}
-		throw new CM_Exception_Invalid('Mail has no template');
+	public function getTemplate() {
+		return $this->_template;
 	}
 
 	/**
@@ -167,13 +156,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getTextLayoutTplPath() {
-		return $this->_getTplPath('layout', 'text');
-	}
-
-	/**
 	 * @param string $key
 	 * @param string $value
 	 */
@@ -182,17 +164,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 			throw new CM_Exception_Invalid("Can't assign variables when there is no template specified!");
 		}
 		parent::setTplParam($key, $value);
-	}
-
-	/**
-	 * @return string
-	 * @throws CM_Exception_Invalid
-	 */
-	public function getTplPath() {
-		if ($this->hasTemplate()) {
-			return $this->_getTplPath($this->_template);
-		}
-		throw new CM_Exception_Invalid('Mail has no template');
 	}
 
 	/**

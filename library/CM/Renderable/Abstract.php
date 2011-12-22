@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Renderable_Abstract {
+abstract class CM_Renderable_Abstract extends CM_Class_Abstract{
 
 	/**
 	 * @var array
