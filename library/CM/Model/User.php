@@ -10,9 +10,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int $entityType OPTIONAL
-	 * @param int $actionType OPTIONAL
-	 * @param int $period     OPTIONAL
+	 * @param int|null $entityType
+	 * @param int|null $actionType
+	 * @param int|null $period
+	 * @return CM_Paging_Action_User
 	 */
 	public function getActions($entityType = null, $actionType = null, $period = null) {
 		return new CM_Paging_Action_User($this, $entityType, $actionType, $period);
@@ -64,7 +65,6 @@ class CM_Model_User extends CM_Model_Abstract {
 		} else {
 			CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		}
-		return $this->_change();
 	}
 
 	/**
@@ -78,7 +78,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Site_Abstract
 	 */
 	public function getSite() {
-		$siteType = (int) $this->_get('site');
+		$siteType = $this->_get('site');
 		return CM_Site_Abstract::factory($siteType);
 	}
 
@@ -93,8 +93,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param int $entityType OPTIONAL
 	 * @param int $actionType OPTIONAL
 	 * @param int $limitType  OPTIONAL
-	 * @param int $period     OPTIONAL
-	 *
+	 * @param int $period	 OPTIONAL
 	 * @return CM_Paging_Transgression_User
 	 */
 	public function getTransgressions($entityType = null, $actionType = null, $limitType = null, $period = null) {
