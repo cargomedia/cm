@@ -50,7 +50,7 @@ function _smarty_function_paging_link(Smarty_Internal_Template $template, $page,
 	$href = sk_make_url(null, array('page' => $page));
 	$onclick = null;
 	if (!empty($params['ajax'])) {
-		$jsInstance = 'sk.components["' . $template->smarty->getTemplateVars('render')->getStackLast('components')->auto_id . '"]';
+		$jsInstance = 'cm.components["' . $template->smarty->getTemplateVars('render')->getStackLast('components')->auto_id . '"]';
 		$onclick = $jsInstance . '.reload(' . json_encode(array('page' => $page)) . ')';
 		$href = 'javascript:;';
 	}

@@ -5,7 +5,7 @@ ready: function() {
 	var $input = this.$('input[type="text"]');
 	$input.tokenInput(
 		function (query, handle_results) {
-			sk.rpc(field._class + ".suggest", [query, field.getOptions()], {
+			cm.rpc(field._class + ".suggest", [query, field.getOptions()], {
 				success: function(results) {
 					handle_results(query, results);
 				}

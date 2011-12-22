@@ -148,14 +148,14 @@ popIn: function() {
  * @param string message
  */
 error: function(message) {
-	sk.window.hint.error(message);
+	cm.window.hint.error(message);
 },
 
 /**
  * @param string message
  */
 message: function(message) {
-	sk.window.hint.message(message);
+	cm.window.hint.message(message);
 },
 
 /**
@@ -193,9 +193,9 @@ getArray: function(depth) {
  */
 bindStream: function(callback) {
 	var namespace = this._class;
-	sk.stream.bind(namespace, callback);
+	cm.stream.bind(namespace, callback);
 	this.bind('destruct', function() {
-		sk.stream.unbind(namespace, callback);
+		cm.stream.unbind(namespace, callback);
 	});
 },
 
@@ -205,9 +205,9 @@ bindStream: function(callback) {
  * @param function callback fn(CM_Action_Abstract action, CM_Model_Entity_Abstract entity, array data)
  */
 bindAction: function(actionType, entityType, callback) {
-	sk.action.bind(actionType, entityType, callback);
+	cm.action.bind(actionType, entityType, callback);
 	this.bind('destruct', function() {
-		sk.action.unbind(actionType, entityType, callback);
+		cm.action.unbind(actionType, entityType, callback);
 	});
 },
 
@@ -218,7 +218,7 @@ ajaxCall: function(apply_func, params, callbacks, cache) {
 	callbacks = callbacks || {};
 	params = params || {};
 	var handler = this;
-	var xhr = sk.ajax('ajax', {component:this.getArray(), functionName:apply_func, params:params}, {
+	var xhr = cm.ajax('ajax', {component:this.getArray(), functionName:apply_func, params:params}, {
 		success: function(response) {
 			if (response.exec) {
 				var exec = new Function(response.exec);
@@ -257,7 +257,7 @@ load: function(className, params, options) {
 		successPopOut.call(this);
 	};
 	options.success = function(componentId) {
-		var handlerNew = sk.components[componentId];
+		var handlerNew = cm.components[componentId];
 		callback.call(handlerNew);
 	};
 	options.complete = function() {
@@ -285,7 +285,7 @@ reload: function(params) {
  * @param mixed key
  */
 storageSet: function(key, value) {
-	sk.storage.set(this._class + '_' + key, value);
+	cm.storage.set(this._class + '_' + key, value);
 },
 
 /**
@@ -293,12 +293,12 @@ storageSet: function(key, value) {
  * @return mixed
  */
 storageGet: function(key) {
-	return sk.storage.get(this._class + '_' + key);
+	return cm.storage.get(this._class + '_' + key);
 },
 
 /**
  * @param string key
  */
 storageDelete: function(key) {
-	sk.storage.del(this._class + '_' + key);
+	cm.storage.del(this._class + '_' + key);
 }

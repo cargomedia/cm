@@ -12,18 +12,18 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$page->prepare($requestHandler);
 
 		// Creates header
-		$js->onloadHeaderJs("sk.options.renderStamp = " . floor((microtime(true)) * 1000));
-		$js->onloadHeaderJs('sk.options.siteId = "' . $this->getRender()->getSite()->getId() . '"');
-		$js->onloadHeaderJs('sk.options.urlStatic = "' . URL_STATIC . '"');
-		$js->onloadHeaderJs('sk.options.stream = ' . json_encode(Config::get()->stream));
+		$js->onloadHeaderJs("cm.options.renderStamp = " . floor((microtime(true)) * 1000));
+		$js->onloadHeaderJs('cm.options.siteId = "' . $this->getRender()->getSite()->getId() . '"');
+		$js->onloadHeaderJs('cm.options.urlStatic = "' . URL_STATIC . '"');
+		$js->onloadHeaderJs('cm.options.stream = ' . json_encode(Config::get()->stream));
 		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . URL_STATIC . 'swf/WebSocketMainInsecure.swf"');
 
 		if ($viewer = $page->getViewer()) {
-			$js->onloadHeaderJs('sk.options.stream.channel = ' . CM_Params::encode(CM_Stream::getStreamChannel($viewer), true));
-			$js->onloadHeaderJs('sk.viewer = ' . CM_Params::encode($viewer, true));
+			$js->onloadHeaderJs('cm.options.stream.channel = ' . CM_Params::encode(CM_Stream::getStreamChannel($viewer), true));
+			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 
-		$js->onloadReadyJs('sk.component()._ready();');
+		$js->onloadReadyJs('cm.component()._ready();');
 
 		$js->registerLanguageValue('%interface.ok');
 		$js->registerLanguageValue('%interface.cancel');

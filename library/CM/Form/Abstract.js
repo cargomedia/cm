@@ -145,7 +145,7 @@ collectData: function(action_name) {
 			try {
 				field.validate(data[key], required);
 			} catch (e) {
-				var err_msg = sk.language.get('%forms._errors.illegal_value');
+				var err_msg = cm.language.get('%forms._errors.illegal_value');
 				if (e.message) {
 					err_msg = e.message;
 				}
@@ -155,7 +155,7 @@ collectData: function(action_name) {
 			var err_msg = 'Required';
 			var $labels = $('label[for="' +this.getAutoId()+ '-' +key+ '-input"]');
 			if ($labels.length) {
-				err_msg = sk.language.get('%forms._errors.required', {label:$labels.eq(0).text()});
+				err_msg = cm.language.get('%forms._errors.required', {label:$labels.eq(0).text()});
 			}
 			errors.push({msg: err_msg, key: key});
 		}
@@ -190,7 +190,7 @@ submit: function(action_name, confirmed, data, callbacks) {
 	if (data) {
 		var handler = this;
 		if (this.options.actions[action_name].confirm_msg && !confirmed) {
-			sk.ui.confirm(sk.language.get(this.options.actions[action_name].confirm_msg), function() {
+			cm.ui.confirm(cm.language.get(this.options.actions[action_name].confirm_msg), function() {
 				handler.submit(action_name, true, data);
 			});
 			return false;
@@ -198,7 +198,7 @@ submit: function(action_name, confirmed, data, callbacks) {
 		
 		this.disable()
 		this.trigger('submit', [data]);
-		sk.ajax('form', {component:this.getComponent().getArray(), className:this._class, actionName:action_name, data:data}, {
+		cm.ajax('form', {component:this.getComponent().getArray(), className:this._class, actionName:action_name, data:data}, {
 			success: function(response) {
 				handler.enable();
 				if (response.errors) {
@@ -266,10 +266,10 @@ error: function(message, field_key) {
 			this.getField(field_key).$('input, select, textarea').focus();
 		}
 	} else {
-		sk.window.hint.error(message);
+		cm.window.hint.error(message);
 	}
 },
 
 message: function(message) {
-	sk.window.hint.message(message);
+	cm.window.hint.message(message);
 }

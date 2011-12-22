@@ -47,7 +47,7 @@ class CM_Frontend {
 	}
 
 	public function assignLanguageValue($value, $frontend_lang_addr) {
-		$this->onloadHeaderJs("sk.language.set('$frontend_lang_addr'," . json_encode($value) . ')');
+		$this->onloadHeaderJs("cm.language.set('$frontend_lang_addr'," . json_encode($value) . ')');
 	}
 
 	/**
@@ -85,7 +85,7 @@ class CM_Frontend {
 	 */
 	public function registerForm(CM_Form_Abstract $form, CM_Component_Abstract $component) {
 		$className = get_class($form);
-		$auto_var = 'sk.forms["' . $form->frontend_data['auto_id'] . '"]';
+		$auto_var = 'cm.forms["' . $form->frontend_data['auto_id'] . '"]';
 		$form->frontend_data['js_handler'] = $auto_var;
 
 		$component->forms[] = $form;
@@ -104,7 +104,7 @@ class CM_Frontend {
 		$js = $auto_var . ' = new ' . $className . '({';
 		$js .= 'autoId:"' . $form->frontend_data['auto_id'] . '",';
 		$js .= 'el:$("#' . $form->frontend_data['auto_id'] . '").get(0),';
-		$js .= 'component:sk.components["' . $component->auto_id . '"],';
+		$js .= 'component:cm.components["' . $component->auto_id . '"],';
 		$js .= 'name:"' . $form->getName() . '",';
 		$js .= 'fields:{' . implode(',', $field_list) . '},';
 		$js .= 'actions:{' . implode(',', $action_list) . '},';
@@ -119,7 +119,7 @@ class CM_Frontend {
 	 * @param string				$parentComponentId OPTIONAL
 	 */
 	public function registerComponent(CM_Component_Abstract $component, $parentComponentId = null) {
-		$auto_var = 'sk.components["' . $component->auto_id . '"]';
+		$auto_var = 'cm.components["' . $component->auto_id . '"]';
 		$cmpClass = get_class($component);
 		$handler = $component->getFrontendHandler();
 
@@ -129,7 +129,7 @@ class CM_Frontend {
 		$cmpJs .= 'el:$("#' . $component->auto_id . '").get(0),';
 		$cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAll(), true);
 		if ($parentComponentId) {
-			$cmpJs .= ',parent:sk.components["' . $parentComponentId . '"]';
+			$cmpJs .= ',parent:cm.components["' . $parentComponentId . '"]';
 		}
 		$cmpJs .= '});' . PHP_EOL;
 

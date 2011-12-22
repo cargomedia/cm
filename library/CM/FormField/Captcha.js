@@ -11,7 +11,7 @@ ready: function() {
 
 refresh: function(){
 	var field = this;
-	sk.rpc(this._class + ".createNumber", [], {
+	cm.rpc(this._class + ".createNumber", [], {
 		success: function(id) {
 			var $container = field.$(".captcha_container:eq(0)");
 			var $img = $container.find("img");

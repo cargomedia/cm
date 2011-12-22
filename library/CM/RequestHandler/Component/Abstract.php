@@ -47,12 +47,12 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		$component->prepare();
 		$html = $this->getRender()->render($component, array('parent' => $this->_component['parentId']));
 
-		$this->getRender()->getJs()->onloadHeaderJs('sk.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadHeaderJs('cm.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
 		$this->getRender()->getJs()->onloadPrepareJs(
-			'sk.components["' . $component->auto_id . '"]._callbacks=sk.components["' . $this->_component['id'] . '"]._callbacks;');
+			'cm.components["' . $component->auto_id . '"]._callbacks=cm.components["' . $this->_component['id'] . '"]._callbacks;');
 
 		$this->getRender()->getJs()->onloadPrepareJs($this->annulCOMNode($this->_component));
-		$this->getRender()->getJs()->onloadReadyJs('sk.components["' . $component->auto_id . '"]._ready();');
+		$this->getRender()->getJs()->onloadReadyJs('cm.components["' . $component->auto_id . '"]._ready();');
 		$this->_component['id'] = $component->auto_id;
 
 		return $component->auto_id;
@@ -70,7 +70,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 
 		$html = $this->getRender()->render($component, array('parent' => $this->_component['id']));
 
-		$this->getRender()->getJs()->onloadHeaderJs('sk.window.appendHidden(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
 
 		return $component->auto_id;
 	}
@@ -87,11 +87,11 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		if (null !== $closable) {
 			$params['closable'] = (bool) $closable;
 		}
-		$this->getRender()->getJs()->onloadJs('sk.components[\'' . $this->_component['id'] . '\'].popOut(' . json_encode($params) . ');');
+		$this->getRender()->getJs()->onloadJs('cm.components[\'' . $this->_component['id'] . '\'].popOut(' . json_encode($params) . ');');
 	}
 
 	public function popinComponent() {
-		$this->getRender()->getJs()->onloadJs('sk.components[\'' . $this->_component['id'] . '\'].popIn();');
+		$this->getRender()->getJs()->onloadJs('cm.components[\'' . $this->_component['id'] . '\'].popIn();');
 	}
 
 	public function redirect($url) {
@@ -105,7 +105,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 	public function annulCOMNode(array $comNode) {
 		$js = '';
 		if ($comNode['parentId']) {
-			$js .= 'var children = sk.components["' . $comNode['parentId'] . '"].getChildren();';
+			$js .= 'var children = cm.components["' . $comNode['parentId'] . '"].getChildren();';
 			$js .= 'for (var i = 0, child; child = children[i]; i++) {';
 			$js .= '	if (child.getAutoId() == "' . $comNode['id'] . '") {';
 			$js .= '  children.splice(i,1);';
@@ -116,10 +116,10 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 			$js .= $this->annulCOMNode($child) . PHP_EOL;
 		}
 		foreach ($comNode['forms'] as $form) {
-			$js .= 'delete sk.forms["' . $form['id'] . '"];' . PHP_EOL;
+			$js .= 'delete cm.forms["' . $form['id'] . '"];' . PHP_EOL;
 		}
-		$js .= 'sk.components["' . $comNode['id'] . '"].trigger("destruct");';
-		$js .= 'delete sk.components["' . $comNode['id'] . '"]' . PHP_EOL;
+		$js .= 'cm.components["' . $comNode['id'] . '"].trigger("destruct");';
+		$js .= 'delete cm.components["' . $comNode['id'] . '"]' . PHP_EOL;
 		return $js;
 	}
 }
