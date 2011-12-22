@@ -2,17 +2,12 @@
 
 class CM_FormField_Captcha extends CM_FormField_Abstract {
 
-	public function __construct($name = 'captcha') {
-		parent::__construct($name);
-		$this->_options['urlImage'] = SITE_URL . 'captcha/' . CM_Render::getInstance()->getSite()->getId() . '/';
-	}
-	
 	public function prepare(array $params, CM_Form_Abstract $form) {
 		$this->setTplParam('imageId', self::rpc_createNumber());
 	}
 
 	public function validate($userInput) {
-		$id = (int) $userInput['image_id'];
+		$id = (int) $userInput['id'];
 		$text = (string) $userInput['value'];
 
 		try {
