@@ -228,6 +228,11 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @return array|null ($subject, $html, $text)
 	 */
 	public function send(CM_Site_Abstract $site = null) {
+		if (!$site) {
+			if ($this->_recipient) {
+				$site = $this->_recipient->getSite();
+			}
+		}
 		if (!$this->_recipientAddress) {
 			return null;
 		}
