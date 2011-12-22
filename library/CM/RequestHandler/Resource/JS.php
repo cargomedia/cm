@@ -30,13 +30,7 @@ class CM_RequestHandler_Resource_JS extends CM_RequestHandler_Resource_Abstract 
 			}
 		} elseif ($this->_getFilename() == 'library.js') {
 			$content = '';
-			$content .= new CM_File('static/js/library/json2.js');
-			$content .= new CM_File('static/js/library/jquery.js');
-			$content .= new CM_File('static/js/library/underscore.js');
-			$content .= new CM_File('static/js/library/backbone.js');
-			$content .= new CM_File('static/js/library/socket.io.js');
-			$content .= new CM_File('static/js/library/fileuploader.js');
-			foreach (glob(DIR_PUBLIC . 'static/js/library/jquery-plugins/*.js') as $path) {
+			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
 		} elseif (file_exists(DIR_PUBLIC . 'static/js/' . $this->_getFilename())) {
