@@ -89,7 +89,9 @@ class CM_Session {
 			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
 				$user->updateLatestactivity();
 			}
-			$user->setOnline(true);
+			if (!$user->getOnline()) {
+				$user->setOnline(true);
+			}
 		}
 	}
 

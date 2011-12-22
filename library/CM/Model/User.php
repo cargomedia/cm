@@ -59,12 +59,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param boolean $visible OPTIONAL
 	 */
 	public function setOnline($state = true, $visible = true) {
-		$visible = (int) $visible;
+		$visible = (bool) $visible;
 		if ($state) {
 			CM_Mysql::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => $visible));
 		} else {
 			CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		}
+		$this->_change();
 	}
 
 	/**
