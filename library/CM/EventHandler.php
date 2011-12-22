@@ -24,7 +24,7 @@ final class CM_EventHandler {
 		foreach ($this->_callbacks[$event] as $callback) {
 			$params = $triggerParams;
 			if (!empty($callback['params'])) {
-				$params = $params ? new CM_Params(array_merge($callback['params']->getAll(), $triggerParams->getAll())) : $callback['params'];
+				$params = $params ? CM_Params::factory(array_merge($callback['params']->getAll(), $triggerParams->getAll())) : $callback['params'];
 			}
 			$callback['callback']($params);
 		}
