@@ -11,6 +11,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	public function __construct() {
 		$this->_setNamespace('CM');
 	}
+
+	/**
+	 * @param CM_EventHandler $eventHandler
+	 */
+	public function bindEvents(CM_EventHandler $eventHandler) {
+	}
 	
 	/**
 	 * @return string
