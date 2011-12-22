@@ -32,11 +32,11 @@ final class CM_EventHandler {
 	public function trigger($event, array $triggerParams = null) {
 		if (!empty($this->_callbacks[$event])) {
 			foreach ($this->_callbacks[$event] as $callback) {
-				$params = $triggerParams ? CM_Params::factory($triggerParams) : null;
+				$params = $triggerParams ? : array();
 				if (!empty($callback['params'])) {
-					$params = $params ? CM_Params::factory(array_merge($callback['params'], $triggerParams)) : CM_Params::factory($callback['params']);
+					$params = $params ? array_merge($callback['params'], $triggerParams) : $callback['params'];
 				}
-				$callback['callback']($params);
+				$callback['callback'](CM_Params::factory($params));
 			}
 		}
 	}
