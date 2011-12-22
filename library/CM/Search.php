@@ -1,6 +1,6 @@
 <?php
 
-class CM_Search {
+class CM_Search extends CM_Class_Abstract {
 	const INDEX_LOCATION = 'location';
 
 	/**
@@ -13,6 +13,13 @@ class CM_Search {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public static function getEnabled() {
+		return self::_getConfig()->enabled;
+	}
+
+	/**
 	 * Elasticsearch request
 	 *
 	 * @param string $path   Path to call
@@ -21,12 +28,12 @@ class CM_Search {
 	 * @return array
 	 */
 	public static function call($path, $method = 'GET', array $data = null) {
-		if (!Config::get()->search->enabled) {
+		if (!self::getEnabled()) {
 			return array();
 		}
 
 		if (!self::$_client) {
-			self::$_client = new Elastica_Client(array('servers' => Config::get()->search->servers, 'timeout' => 10,));
+			self::$_client = new Elastica_Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10,));
 		}
 
 		CM_Debug::get()->incStats('search', json_encode($data));
