@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_Node extends CM_Stream_Abstract {
+class CM_StreamAdapter_Socketio extends CM_StreamAdapter_Abstract {
 	
 	public function publish($channel, $data) {
 		CM_Cache_Redis::publish('stream', json_encode(array('channel' => $channel, 'data' => $data)));

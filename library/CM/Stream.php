@@ -1,56 +1,49 @@
 <?php
 
-class CM_Stream {
+class CM_Stream extends CM_Class_Abstract {
+	const SALT = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
+
+	/**
+	 * @var CM_Stream
+	 */
 	private static $_instance;
-	private $_strategy;
-
-	private function __construct() {
-		if (Config::get()->stream->socketio->enabled) {
-			$this->_strategy = new CM_Stream_Node();
-		} else {
-			$this->_strategy = new CM_Stream_Apache();
-		}
-	}
 
 	/**
-	 * Helper function to publish data with the method of the selected strategy. 
-	 * This function should never be called outside of this class, it serves as an instance 
-	 * function that is needed for the static publish function.
-	 * @param string $channel
-	 * @param mixed $data
+	 * @var CM_StreamAdapter_Abstract
 	 */
-	public function _publish($channel, $data) {
-		if (!Config::get()->stream->enabled) {
-			return;
-		}
-		$data = CM_Params::encode($data);
-		
-		$this->_strategy->publish($channel, $data);
-	}
+	private $_adapter;
 
 	/**
-	 * @param string $channel
-	 * @param int|null $idMin
-	 * @return array|null
+	 * @return bool
 	 */
-	private function _subscribe($channel, $idMin = null) {
-		if (!Config::get()->stream->enabled) {
-			return;
-		}
-		return $this->_strategy->subscribe($channel, $idMin);
+	public static function getEnabled() {
+		return (bool) self::_getConfig()->enabled;
 	}
 
 	/**
-	 * Function to publish data $data through the channel with id $channel with the specified strategy (config option)
+	 * @return string
+	 */
+	public static function getAdapterClass() {
+		return get_class(self::_getInstance()->_getAdapter());
+	}
+
+	/**
+	 * @return array ('host', 'port')
+	 */
+	public static function getServer() {
+		return self::_getInstance()->_getAdapter()->getServer();
+	}
+
+	/**
 	 * @param string $channel
-	 * @param mixed $data
+	 * @param mixed  $data
 	 */
 	public static function publish($channel, $data) {
 		self::_getInstance()->_publish($channel, $data);
 	}
 
 	/**
-	 * @param string $channel
+	 * @param string   $channel
 	 * @param int|null $idMin
 	 * @return array|null
 	 */
@@ -59,22 +52,22 @@ class CM_Stream {
 	}
 
 	/**
-	 * @param CM_Model_User $recipient
-	 * @param CM_Action_Abstract $action
+	 * @param CM_Model_User			$recipient
+	 * @param CM_Action_Abstract	   $action
 	 * @param CM_Model_Entity_Abstract $entity
-	 * @param array|null $data
+	 * @param array|null			   $data
 	 */
 	public static function publishAction(CM_Model_User $recipient, CM_Action_Abstract $action, CM_Model_Entity_Abstract $entity, array $data = null) {
 		if (!is_array($data)) {
 			$data = array();
 		}
-		self::publishUser($recipient,
-				array('namespace' => 'CM_Action_Abstract', 'data' => array('action' => $action, 'entity' => $entity, 'data' => $data)));
+		self::publishUser($recipient, array('namespace' => 'CM_Action_Abstract',
+			'data' => array('action' => $action, 'entity' => $entity, 'data' => $data)));
 	}
 
 	/**
 	 * @param CM_Model_User $user
-	 * @param array $data
+	 * @param array		 $data
 	 */
 	public static function publishUser(CM_Model_User $user, array $data) {
 		if (!$user->getOnline()) {
@@ -82,22 +75,56 @@ class CM_Stream {
 		}
 		self::publish(self::getStreamChannel($user), $data);
 	}
+
 	/**
-	 * Returns the computed communication channel for the provided profile
 	 * @param CM_Model_User $user
 	 * @return string hash
 	 */
 	public static function getStreamChannel(CM_Model_User $user) {
-		$salt = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
-		$hash = hash('md5', $salt . ':' . $user->getId());
-		return $hash;
+		return hash('md5', self::SALT . ':' . $user->getId());
 	}
 
-	protected static function _getInstance() {
+	/**
+	 * @return CM_Stream
+	 */
+	private static function _getInstance() {
 		if (self::$_instance === null) {
-			$_instance = new self();
+			self::$_instance = new self();
 		}
-		return $_instance;
+		return self::$_instance;
+	}
+
+	/**
+	 * @return CM_StreamAdapter_Abstract
+	 */
+	private function _getAdapter() {
+		if (!$this->_adapter) {
+			$this->_adapter = CM_StreamAdapter_Abstract::factory();
+		}
+		return $this->_adapter;
+	}
+
+	/**
+	 * @param string $channel
+	 * @param mixed  $data
+	 */
+	private function _publish($channel, $data) {
+		if (!self::getEnabled()) {
+			return;
+		}
+		$this->_getAdapter()->publish($channel, CM_Params::encode($data));
+	}
+
+	/**
+	 * @param string   $channel
+	 * @param int|null $idMin
+	 * @return array|null
+	 */
+	private function _subscribe($channel, $idMin = null) {
+		if (!self::getEnabled()) {
+			return;
+		}
+		return $this->_getAdapter()->subscribe($channel, $idMin);
 	}
 
 }

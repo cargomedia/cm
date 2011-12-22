@@ -58,7 +58,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 */
 	public function __construct($recipient, $template = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
-		$config = $this->_getConfig();
+		$config = self::_getConfig();
 		if ($template) {
 			$this->_template = (string) $template;
 			$this->setRenderLayout(true);

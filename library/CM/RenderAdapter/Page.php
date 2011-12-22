@@ -11,15 +11,22 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 
 		$page->prepare($requestHandler);
 
-		// Creates header
-		$js->onloadHeaderJs("cm.options.renderStamp = " . floor((microtime(true)) * 1000));
-		$js->onloadHeaderJs('cm.options.siteId = "' . $this->getRender()->getSite()->getId() . '"');
-		$js->onloadHeaderJs('cm.options.urlStatic = "' . URL_STATIC . '"');
-		$js->onloadHeaderJs('cm.options.stream = ' . json_encode(Config::get()->stream));
-		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . URL_STATIC . 'swf/WebSocketMainInsecure.swf"');
-
+		$options = array();
+		$options['renderStamp'] = floor((microtime(true)) * 1000);
+		$options['siteId'] = $this->getRender()->getSite()->getId();
+		$options['urlStatic'] = URL_STATIC;
+		$options['stream'] = array();
+		$options['stream']['enabled'] = CM_Stream::getEnabled();
+		$options['stream']['adapter'] = CM_Stream::getAdapterClass();
+		$options['stream']['server'] = CM_Stream::getServer();
 		if ($viewer = $page->getViewer()) {
-			$js->onloadHeaderJs('cm.options.stream.channel = ' . CM_Params::encode(CM_Stream::getStreamChannel($viewer), true));
+			$options['stream']['channel'] = CM_Stream::getStreamChannel($viewer);
+		}
+
+		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
+
+		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . URL_STATIC . 'swf/WebSocketMainInsecure.swf"');
+		if ($viewer = $page->getViewer()) {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 

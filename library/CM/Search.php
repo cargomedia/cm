@@ -16,7 +16,7 @@ class CM_Search extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public static function getEnabled() {
-		return self::_getConfig()->enabled;
+		return (bool) self::_getConfig()->enabled;
 	}
 
 	/**

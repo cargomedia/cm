@@ -40,7 +40,6 @@ class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstr
 	 * Add a success message to response.
 	 *
 	 * @param string $msg_text
-	 * @param string $field_name
 	 */
 	public function addMessage($msg_text) {
 		$this->messages[] = $msg_text;
@@ -75,9 +74,6 @@ class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstr
 		$this->exec('window.location.reload(true)');
 	}
 
-	/**
-	 * Process the response.
-	 */
 	public function process() {
 		$this->setHeader('Content-Type', 'application/json');
 
@@ -113,11 +109,11 @@ class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstr
 				$success['messages'] = $this->messages;
 			}
 			$output['success'] = $success;
-		} catch (CM_Exception $ex) {
-			if (!($ex->isPublic() || in_array(get_class($ex), self::_getConfig()->exceptions))) {
-				throw $ex;
+		} catch (CM_Exception $e) {
+			if (!($e->isPublic() || in_array(get_class($e), self::_getConfig()->catch))) {
+				throw $e;
 			}
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
+			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic());
 		}
 		return json_encode($output);
 	}

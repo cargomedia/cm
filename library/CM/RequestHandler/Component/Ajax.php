@@ -27,11 +27,11 @@ class CM_RequestHandler_Component_Ajax extends CM_RequestHandler_Component_Abstr
 				$success['exec'] = $exec;
 			}
 			$output['success'] = $success;
-		} catch (CM_Exception $ex) {
-			if (!($ex->isPublic() || in_array(get_class($ex), self::_getConfig()->exceptions))) {
-				throw $ex;
+		} catch (CM_Exception $e) {
+			if (!($e->isPublic() || in_array(get_class($e), self::_getConfig()->catch))) {
+				throw $e;
 			}
-			$output['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
+			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic());
 		}
 		return json_encode($output);
 	}
