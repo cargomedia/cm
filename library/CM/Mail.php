@@ -224,16 +224,17 @@ class CM_Mail extends CM_Renderable_Abstract {
 	}
 
 	/**
+	 * @param CM_Site_Abstract|null $site
 	 * @return array|null ($subject, $html, $text)
 	 */
-	public function send() {
+	public function send(CM_Site_Abstract $site = null) {
 		if (!$this->_recipientAddress) {
 			return null;
 		}
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
-		list($subject, $html, $text) = CM_Render::getInstance()->render($this);
+		list($subject, $html, $text) = CM_Render::getInstance($site)->render($this);
 		if ($this->_delayed) {
 			$this->_queue($text, $html);
 		} else {
