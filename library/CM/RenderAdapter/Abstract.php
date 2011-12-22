@@ -33,9 +33,8 @@ abstract class CM_RenderAdapter_Abstract {
 	 * @throws CM_Exception
 	 */
 	protected function _getTplPath($tplName = null) {
-
 		$tplPath = '';
-		$className = get_class($this->_object);
+		$className = get_class($this->_getObject());
 
 		while ($tplPath == '') {
 			// Namespace_ObjectType_Name
@@ -56,7 +55,7 @@ abstract class CM_RenderAdapter_Abstract {
 				$className = get_parent_class($className);
 			}
 			if (empty($className)) {
-				throw new CM_Exception($tplPath . 'no found');
+				throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getObject()) . '`');
 			}
 		}
 

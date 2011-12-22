@@ -16,7 +16,6 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
 
 			$themePath = $this->getRender()->getThemeDir(true);
-
 			foreach (CM_Util::rglob('*.css', $themePath . 'css/') as $path) {
 				$file = new CM_File($path);
 				$content .= new CM_Css($file->read(), $this->getRender(), $presets);
@@ -27,18 +26,13 @@ class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract
 				$components = array_merge($components, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
 			}
 
-			$classes = $this->_getClasses($components);
-
-			foreach ($classes as $class) {
+			foreach ($this->_getClasses($components) as $class) {
 				if (!preg_match('/^(\w+)_Component_(.+)$/', $class['name'], $matches)) {
 					throw new CM_Exception("Cannot detect namespace from component's class-name");
 				}
-
 				$basePath = $this->getRender()->getThemeDir(true, null, $matches[1]);
-
 				foreach (CM_Util::rglob('*.style', $basePath . 'Component/' . $matches[2]) as $path) {
-
-					if (preg_match('~' . $themePath . '(Component/(.+?)/(.+)\.style)~', $path, $match)) {
+					if (preg_match('~' . $basePath . '(Component/(.+?)/(.+)\.style)~', $path, $match)) {
 						$prefix = '.' . $class['name'];
 
 						if ($match[3] != 'default' && strpos($match[3], '/') === false) {

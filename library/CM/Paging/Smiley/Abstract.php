@@ -6,8 +6,8 @@ abstract class CM_Paging_Smiley_Abstract extends CM_Paging_Abstract {
 		$item = array();
 		$item['id'] =  (int) $itemRaw['id'];
 		$item['codes'] = explode(',', $itemRaw['code']);
-		$item['section'] = (int) $itemRaw['section'];
-		$item['path'] = $itemRaw['section'] . '/' . $itemRaw['file'];
+		$item['setId'] = (int) $itemRaw['setId'];
+		$item['path'] = $itemRaw['setId'] . '/' . $itemRaw['file'];
 		return $item;
 	}
 }

@@ -125,6 +125,7 @@ class CM_Bootloader {
 
 	public function constantsTbl() {
 		define('TBL_CM_SMILEY', 'cm_smiley');
+		define('TBL_CM_SMILEYSET', 'cm_smileySet');
 		define('TBL_CM_USER', 'cm_user');
 		define('TBL_CM_USER_ONLINE', 'cm_user_online');
 		define('TBL_CM_USER_PREFERENCE', 'cm_user_preference');
