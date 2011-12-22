@@ -41,23 +41,18 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		$componentParams = CM_Params::factory($componentParams);
 
 		$component = CM_Component_Abstract::factory($this->_component['className'], $componentParams);
+
 		$component->setViewer($this->getViewer());
+		$component->checkAccessible();
+		$component->prepare();
+		$html = $this->getRender()->render($component, array('parent' => $this->_component['parentId']));
 
-		$render = $this->getRender();
-		// Render new component
-		$html = $render->render($component, array('parent' => $this->_component['parentId']));
+		$this->getRender()->getJs()->onloadHeaderJs('sk.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadPrepareJs(
+			'sk.components["' . $component->auto_id . '"]._callbacks=sk.components["' . $this->_component['id'] . '"]._callbacks;');
 
-		$render->getJs()->onloadHeaderJs(
-			'sk.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
-		$render->getJs()->onloadPrepareJs(
-			'sk.components["' . $component->auto_id . '"]._callbacks=sk.components["' . $this->_component['id'] .
-					'"]._callbacks;');
-
-		// Delete old component
-		$render->getJs()->onloadPrepareJs($this->annulCOMNode($this->_component));
-
-		$render->getJs()->onloadReadyJs('sk.components["' . $component->auto_id . '"]._ready();');
-
+		$this->getRender()->getJs()->onloadPrepareJs($this->annulCOMNode($this->_component));
+		$this->getRender()->getJs()->onloadReadyJs('sk.components["' . $component->auto_id . '"]._ready();');
 		$this->_component['id'] = $component->auto_id;
 
 		return $component->auto_id;
@@ -70,6 +65,8 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 	public function loadComponent(CM_Params $params) {
 		$component = CM_Component_Abstract::factory($params->getString('component'), $params);
 		$component->setViewer($this->getViewer());
+		$component->checkAccessible();
+		$component->prepare();
 
 		$html = $this->getRender()->render($component, array('parent' => $this->_component['id']));
 
@@ -79,7 +76,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 	}
 
 	/**
-	 * @param int $width OPTIONAL
+	 * @param int  $width	OPTIONAL
 	 * @param bool $closable OPTIONAL
 	 */
 	public function popoutComponent($width = null, $closable = null) {

@@ -29,8 +29,9 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js->registerLanguageValue('%interface.cancel');
 		$js->registerLanguageValue('%interface.confirmation_title');
 
-		$this->getLayout()->assign('tracking', CM_Tracking::getInstance()->getHtml());
 		$this->getLayout()->assign('page', $page);
+		$this->getLayout()->assign('tracking', CM_Tracking::getInstance()->getHtml());
+		$this->getLayout()->assign('viewer', $page->getViewer());
 		$this->getLayout()->assign('js', $js);
 
 		$tplPath = $this->getRender()->getLayoutPath('layout/base.tpl');

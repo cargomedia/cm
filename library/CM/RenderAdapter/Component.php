@@ -15,13 +15,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		/** @var CM_Component_Abstract $component */
 		$component = $this->_getObject();
 		$component->auto_id = 'cmp' . uniqid();
-		$component->setViewer($this->getRender()->getRequestHandler()->getViewer());
-		$component->checkAccessible();
-
-		if ($component->prepare() === false) {
-			// If false, component is not shown / rendered
-			return null;
-		}
 
 		$this->getRender()->pushStack('components', $component);
 
@@ -30,14 +23,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 		$tplPath = $this->_getTplPath($component->getTpl());
 
-		// Create class hierarchy for css
-		$class = get_class($component);
-		$cssClass = '';
-
-		do {
-			$cssClass .= $class . ' ';
-		} while ($class = get_parent_class($class));
-
+		$cssClass = implode(' ', $component->getClassHierarchy());
 		if (preg_match('#/([^/]+)\.tpl$#', $tplPath, $match)) {
 			if ($match[1] != 'default') {
 				$cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')

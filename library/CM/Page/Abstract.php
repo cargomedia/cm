@@ -35,9 +35,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 * @param int                   $location  OPTIONAL Location to add the component (default = 1)
 	 */
 	public final function addComponent(CM_Component_Abstract $component, $location = 1) {
-		$component->setViewer($this->getViewer());
-		$component->checkAccessible();
-
 		if (!isset($this->_components[$location])) {
 			$this->_components[$location] = array();
 		}

@@ -18,5 +18,8 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
 	$viewer = $template->smarty->getTemplateVars('viewer');
 
 	$component->setViewer($viewer);
+	$component->checkAccessible();
+	$component->prepare();
+
 	return $render->render($component);
 }

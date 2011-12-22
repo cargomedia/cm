@@ -53,10 +53,10 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	protected $_params;
 
 	/**
-	 * @param CM_Params|array $params
+	 * @param CM_Params|array|null $params
 	 */
 	public function __construct($params = null) {
-		if (!$params) {
+		if (is_null($params)) {
 			$params = CM_Params::factory();
 		}
 		if (is_array($params)) {
@@ -77,14 +77,12 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	abstract public function checkAccessible();
 
 	/**
-	 * @return array List of class names
+	 * @return string[] List of class names
 	 */
 	public function getClassHierarchy() {
-
-		$hierarchy = array_values(class_parents($this));
-		array_unshift($hierarchy, get_class($this));
-
-		return $hierarchy;
+		$classHierarchy = array_values(class_parents($this));
+		array_unshift($classHierarchy, get_class($this));
+		return $classHierarchy;
 	}
 
 	/**
@@ -120,9 +118,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 		return $this->_params;
 	}
 
-	/**
-	 * @return bool False if not should be rendered
-	 */
 	public function prepare() {
 	}
 

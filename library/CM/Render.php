@@ -172,11 +172,11 @@ class CM_Render {
 
 		$renderClass = 'CM_RenderAdapter_' . $matches[1];
 
-		/** @var CM_RenderAdapter_Abstract $renderObject */
-		$renderObject = new $renderClass($this, $object);
+		/** @var CM_RenderAdapter_Abstract $renderAdapter */
+		$renderAdapter = new $renderClass($this, $object);
 		$this->getLayout()->assignGlobal('render', $this);
 
-		return $renderObject->fetch($params);
+		return $renderAdapter->fetch($params);
 	}
 
 	/**
