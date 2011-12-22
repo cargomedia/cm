@@ -5,7 +5,14 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	$render = $template->smarty->getTemplateVars('render');
 	/** @var CM_Model_User $viewer */
 	$viewer = $template->smarty->getTemplateVars('viewer');
-	$request = $render->getRequestHandler()->getRequest();
+	/** @var CM_Page_Abstract $page */
+	$page = $template->getTemplateVars('page');
+
+	if ($page) {
+		$request = $page->getRequest();
+	} else {
+		$request = new CM_Request_Get('', array(), $viewer);
+	}
 
 	$userId = $viewer ? $viewer->getId() : 0;
 	$name = $params['name'];
