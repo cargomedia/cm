@@ -122,7 +122,7 @@ abstract class CM_RequestHandler_Abstract {
 	 */
 	public function getRender() {
 		if (!$this->_render) {
-			$this->_render = new CM_Render($this);
+			$this->_render = new CM_Render($this->getSite());
 		}
 		return $this->_render;
 	}

@@ -41,15 +41,13 @@ class CM_Render {
 	protected $_stack = array();
 
 	/**
-	 * @param CM_RequestHandler_Abstract|null $requestHandler
+	 * @param CM_Site_Abstract|null $site
 	 */
-	public function __construct(CM_RequestHandler_Abstract $requestHandler = null) {
-		if ($requestHandler) {
-			$this->_requestHandler = $requestHandler;
-			$this->_site = $requestHandler->getSite();
-		} else {
-			$this->_site = CM_Site_Abstract::factory();
+	public function __construct(CM_Site_Abstract $site = null) {
+		if (!$site) {
+			$site = $this->_site = CM_Site_Abstract::factory();
 		}
+		$this->_site = $site;
 
 		// Language global vars
 		$officialInfoConfigs = CM_Config::section('site')->Section('official')->getConfigsList();
@@ -62,12 +60,11 @@ class CM_Render {
 	}
 
 	/**
-	 * @param CM_RequestHandler_Abstract|null $requestHandler
 	 * @return CM_Render
 	 */
-	public static function getInstance(CM_RequestHandler_Abstract $requestHandler = null) {
+	public static function getInstance() {
 		if (!self::$_instance) {
-			self::$_instance = new self($requestHandler);
+			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
@@ -112,17 +109,6 @@ class CM_Render {
 		}
 
 		return self::$_smarty;
-	}
-
-	/**
-	 * @return CM_RequestHandler_Abstract
-	 */
-	public function getRequestHandler() {
-		if (!$this->_requestHandler) {
-			// @todo: Has or not has requestHandler?
-			throw new CM_Exception_Invalid('Render has no requestHandler');
-		}
-		return $this->_requestHandler;
 	}
 
 	/**
@@ -223,13 +209,13 @@ class CM_Render {
 	}
 
 	/**
-	 * @param string $tpl  Template file name
-	 * @param bool   $full OPTIONAL True for full path
+	 * @param string		$tpl  Template file name
+	 * @param bool		  $full OPTIONAL True for full path
+	 * @param string|null   $namespace
 	 * @return string Layout path based on theme
-	 * @throws CM_Exception
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getLayoutPath($tpl, $full = false, $namespace = null) {
-
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
