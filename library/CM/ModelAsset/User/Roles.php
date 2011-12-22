@@ -46,7 +46,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	 * @param int $duration OPTIONAL
 	 */
 	public function add($role, $duration = null) {
-		self::deleteOld();
+		self::deleteOld($this->_model);
 		if ($duration) {
 			CM_Mysql::exec("INSERT INTO TBL_ROLE VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE `expirationStamp` = `expirationStamp` + ?",
 					$this->_model->getId(), $role, time(), time() + $duration, $duration);
