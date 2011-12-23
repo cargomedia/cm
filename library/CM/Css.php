@@ -169,6 +169,10 @@ class CM_Css {
 					$properties['-moz-transform'] = $value;
 					$properties['-webkit-transform'] = $value;
 					break;
+				case 'transition':
+					$properties['-moz-transition'] = $value;
+					$properties['-webkit-transition'] = $value;
+					break;
 			}
 
 			$properties[$property] = $value;
