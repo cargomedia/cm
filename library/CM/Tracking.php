@@ -74,7 +74,7 @@ class CM_Tracking extends CM_Tracking_Abstract {
 		$html .= 'var _gaq = _gaq || [];';
 		$html .= "_gaq.push(['_setAccount', '" . $this->getCode() . "']);";
 
-		if ($domain = parse_url(Config::get()->site_url, PHP_URL_HOST)) {
+		if ($domain = parse_url(SITE_URL, PHP_URL_HOST)) {
 			$html .= "_gaq.push(['_setDomainName', '" . $domain . "']);";
 		}
 
