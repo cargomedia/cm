@@ -147,12 +147,12 @@ class CM_Bootloader {
 
 		define('TBL_PROFILE_FIELD', 'profile_field');
 
-		define('TBL_LOCATION_COUNTRY', 'location_country');
-		define('TBL_LOCATION_STATE', 'location_state');
-		define('TBL_LOCATION_CITY', 'location_city');
-		define('TBL_LOCATION_ZIP', 'location_zip');
-		define('TBL_LOCATION_CITY_IP', 'location_city_ip');
-		define('TBL_LOCATION_COUNTRY_IP', 'location_country_ip');
+		define('TBL_LOCATION_COUNTRY', 'cm_locationCountry');
+		define('TBL_LOCATION_STATE', 'cm_locationState');
+		define('TBL_LOCATION_CITY', 'cm_locationCity');
+		define('TBL_LOCATION_ZIP', 'cm_locationZip');
+		define('TBL_LOCATION_CITY_IP', 'cm_locationCityIp');
+		define('TBL_LOCATION_COUNTRY_IP', 'cm_locationCountryIp');
 
 		define('TBL_PAYMENT_PROVIDER', 'payment_provider');
 		define('TBL_PAYMENT_PROVIDER_FIELD', 'payment_provider_field');
