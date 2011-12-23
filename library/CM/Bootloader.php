@@ -13,12 +13,10 @@ class CM_Bootloader {
 
 	public function autoloader() {
 		spl_autoload_register(function($className) {
-			$filename = str_replace('_', '/', $className) . '.php';
-			foreach (array(DIR_ROOT . 'internals/', DIR_ROOT . 'library/') as $dir) {
-				if (is_file($dir . $filename)) {
-					require_once $dir . $filename;
-					return;
-				}
+			$path = DIR_ROOT . 'library/' . str_replace('_', '/', $className) . '.php';
+			if (is_file($path)) {
+				require_once $path;
+				return;
 			}
 		});
 	}
@@ -134,7 +132,6 @@ class CM_Bootloader {
 		define('TBL_CM_LOG', 'cm_log');
 		define('TBL_CM_IPBLOCKED', 'cm_ipBlocked');
 
-
 		define('TBL_CONFIG', 'config');
 		define('TBL_CONFIG_SECTION', 'config_section');
 
@@ -193,7 +190,6 @@ class CM_Bootloader {
 
 		define('TBL_PHOTO_VIEW', 'profile_photo_view');
 
-
 		define('TBL_BADWORD', 'badword');
 
 		define('TBL_VIRTUAL_GIFT_TPL', 'virtual_gift_template');
@@ -237,7 +233,6 @@ class CM_Bootloader {
 
 		define('TBL_SVM', 'svm');
 		define('TBL_SVM_TRAINING', 'svm_training');
-
 
 		define('TBL_TRANSACTION_SERVICEBUNDLE', 'transaction_serviceBundle');
 
