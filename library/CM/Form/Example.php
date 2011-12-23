@@ -6,7 +6,6 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerField(new CM_FormField_Integer('int', -10, 20, 2));
 		$this->registerField(new CM_FormField_Distance('locationSlider'));
 		$this->registerField(new CM_FormField_Location('location', CM_Location::LEVEL_COUNTRY, $this->getField('locationSlider')));
-		$this->registerField(new SK_FormField_UsernameFriends('friends', 4));
 		$this->registerField(new CM_FormField_FileImage('image', 2));
 		$this->registerField(new CM_FormField_Color('color'));
 
