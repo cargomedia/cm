@@ -9,7 +9,7 @@ class CM_LanguageEdit {
 	 * @return integer section_id
 	 */
 	private static function parseSectionPath($section_path) {
-		$query_c = CM_Mysql::compile_placeholder('SELECT `lang_section_id` FROM `' . TBL_LANG_SECTION . '`
+		$query_c = CM_Mysql::compile_placeholder('SELECT `lang_section_id` FROM `' . TBL_CM_LANG_SECTION . '`
 				WHERE `parent_section_id`=? AND `section`="?"');
 
 		$_section_id = 0;
@@ -54,7 +54,7 @@ class CM_LanguageEdit {
 
 		$default_lang_id = CM_Language::getDefaultId();
 
-		$result = CM_Mysql::query('SELECT * FROM `' . TBL_LANG . '`');
+		$result = CM_Mysql::query('SELECT * FROM `' . TBL_CM_LANG . '`');
 
 		$languages = array();
 		while ($row = $result->fetchObject()) {
@@ -79,7 +79,7 @@ class CM_LanguageEdit {
 	public static function getSections($parent_section_id) {
 		if ($parent_section_id != 0) {
 			// checking for argued section existence
-			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_LANG_SECTION . '`
+			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_CM_LANG_SECTION . '`
 					WHERE `lang_section_id`=?', $parent_section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
@@ -89,7 +89,7 @@ class CM_LanguageEdit {
 		}
 
 		// getting sections
-		$query = CM_Mysql::placeholder('SELECT * FROM `' . TBL_LANG_SECTION . '`
+		$query = CM_Mysql::placeholder('SELECT * FROM `' . TBL_CM_LANG_SECTION . '`
 				WHERE `parent_section_id`=?', $parent_section_id);
 
 		$result = CM_Mysql::query($query);
@@ -110,7 +110,7 @@ class CM_LanguageEdit {
 		// find out a child sections existence
 		$query = CM_Mysql::placeholder('SELECT DISTINCT `parent_section_id`
 				FROM `'
-			. TBL_LANG_SECTION . '`
+			. TBL_CM_LANG_SECTION . '`
 				WHERE `parent_section_id` IN(?@)', array_keys($sections));
 
 		$result = CM_Mysql::query($query);
@@ -131,7 +131,7 @@ class CM_LanguageEdit {
 	 * @return string key name or FALSE if there are no key with such id
 	 */
 	public static function getKey($lang_key_id) {
-		$query = CM_Mysql::placeholder('SELECT `key` FROM `' . TBL_LANG_KEY . '`
+		$query = CM_Mysql::placeholder('SELECT `key` FROM `' . TBL_CM_LANG_KEY . '`
 				WHERE `lang_key_id`=?', $lang_key_id);
 
 		return CM_Mysql::query($query)->fetchOne();
@@ -171,9 +171,9 @@ class CM_LanguageEdit {
 		}
 		$query = CM_Mysql::placeholder('SELECT `tbl_key`.`lang_key_id`,`key`,`lang_id`,`value`
 				FROM `'
-			. TBL_LANG_KEY . '` `tbl_key`
+			. TBL_CM_LANG_KEY . '` `tbl_key`
 					LEFT JOIN `'
-			. TBL_LANG_VALUE . '` `tbl_val` USING(`lang_key_id`)
+			. TBL_CM_LANG_VALUE . '` `tbl_val` USING(`lang_key_id`)
 				WHERE `lang_section_id`=? ORDER BY `key`', $section_id);
 
 		$result = CM_Mysql::query($query);
@@ -214,7 +214,7 @@ class CM_LanguageEdit {
 		// getting values
 		$query = CM_Mysql::placeholder('SELECT `lang_id`, `value`
 				FROM `'
-			. TBL_LANG_VALUE . '`
+			. TBL_CM_LANG_VALUE . '`
 				WHERE `lang_key_id`=?', $lang_key_id);
 
 		$result = CM_Mysql::query($query);
@@ -258,7 +258,7 @@ class CM_LanguageEdit {
 		} else { // setting by section_id
 			$section_id = (int) $section;
 
-			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_LANG_SECTION . '`
+			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_CM_LANG_SECTION . '`
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
@@ -268,7 +268,7 @@ class CM_LanguageEdit {
 		}
 
 		// checking lang_key for existense
-		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_LANG_KEY . '`
+		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_CM_LANG_KEY . '`
 				WHERE `lang_section_id`=? AND `key`="?"', $section_id, $key);
 
 		$result = CM_Mysql::query($query);
@@ -277,7 +277,7 @@ class CM_LanguageEdit {
 			$lang_key_id = $result->fetchOne();
 			$result->free();
 		} else {
-			$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_LANG_KEY . '`
+			$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_CM_LANG_KEY . '`
 					SET `lang_section_id`=?, `key`="?"', $section_id, $key);
 			CM_Mysql::query($query);
 
@@ -305,7 +305,7 @@ class CM_LanguageEdit {
 
 		$query = CM_Mysql::placeholder('SELECT `lang_id`, `value`
 				FROM `'
-			. TBL_LANG_VALUE . '` WHERE `lang_key_id`=?',
+			. TBL_CM_LANG_VALUE . '` WHERE `lang_key_id`=?',
 			$lang_key_id);
 
 		$result = CM_Mysql::query($query);
@@ -322,13 +322,13 @@ class CM_LanguageEdit {
 		}
 		$result->free();
 
-		$insert_query = CM_Mysql::compile_placeholder("INSERT INTO `" . TBL_LANG_VALUE . "`(`lang_key_id`,`value`,`lang_id`) VALUES($lang_key_id, '?', ?)"
+		$insert_query = CM_Mysql::compile_placeholder("INSERT INTO `" . TBL_CM_LANG_VALUE . "`(`lang_key_id`,`value`,`lang_id`) VALUES($lang_key_id, '?', ?)"
 		);
 
-		$update_query = CM_Mysql::compile_placeholder("UPDATE `" . TBL_LANG_VALUE . "` SET `value`='?' WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
+		$update_query = CM_Mysql::compile_placeholder("UPDATE `" . TBL_CM_LANG_VALUE . "` SET `value`='?' WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
 		);
 
-		$delete_query = CM_Mysql::compile_placeholder("DELETE FROM `" . TBL_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
+		$delete_query = CM_Mysql::compile_placeholder("DELETE FROM `" . TBL_CM_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
 		);
 
 		$lang_ids = array_keys(self::getLanguages());
@@ -380,7 +380,7 @@ class CM_LanguageEdit {
 		} else { // setting by section_id
 			$section_id = (int) $section;
 
-			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_LANG_SECTION . '`
+			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_CM_LANG_SECTION . '`
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
@@ -390,7 +390,7 @@ class CM_LanguageEdit {
 		}
 
 		// getting $lang_key_id
-		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_LANG_KEY . '`
+		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_CM_LANG_KEY . '`
 				WHERE `lang_section_id`=? AND `key`="?"', $section_id, $key);
 
 		$result = CM_Mysql::query($query);
@@ -414,10 +414,10 @@ class CM_LanguageEdit {
 		$lang_key_id = (int) $lang_key_id;
 
 		// deleting values
-		CM_Mysql::query("DELETE FROM `" . TBL_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id");
+		CM_Mysql::query("DELETE FROM `" . TBL_CM_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id");
 
 		// deleting key
-		CM_Mysql::query("DELETE FROM `" . TBL_LANG_KEY . "` WHERE `lang_key_id`=$lang_key_id");
+		CM_Mysql::query("DELETE FROM `" . TBL_CM_LANG_KEY . "` WHERE `lang_key_id`=$lang_key_id");
 
 		if (CM_Mysql::affected_rows()) {
 			CM_CacheLocal::cleanLanguages();
@@ -437,7 +437,7 @@ class CM_LanguageEdit {
 		if (!is_numeric($parent_section)) {
 			$parent_section_id = self::parseSectionPath($parent_section);
 		} elseif ($parent_section_id = (int) $parent_section) { // setting by section_id
-			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_LANG_SECTION . '`
+			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_CM_LANG_SECTION . '`
 					WHERE `lang_section_id`=?', $parent_section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
@@ -446,7 +446,7 @@ class CM_LanguageEdit {
 			}
 		}
 
-		$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_LANG_SECTION . '`
+		$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_CM_LANG_SECTION . '`
 				SET `parent_section_id`=?, `section`="?", `description`="?"', $parent_section_id, $section, $description);
 
 		// sending insert query
@@ -479,7 +479,7 @@ class CM_LanguageEdit {
 		} else { // getting by section_id
 			$section_id = (int) $section;
 
-			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_LANG_SECTION . '`
+			$query = CM_Mysql::placeholder('SELECT `section` FROM `' . TBL_CM_LANG_SECTION . '`
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
@@ -489,7 +489,7 @@ class CM_LanguageEdit {
 		}
 
 		// getting $lang_key_id
-		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_LANG_KEY . '`
+		$query = CM_Mysql::placeholder('SELECT `lang_key_id` FROM `' . TBL_CM_LANG_KEY . '`
 				WHERE `lang_section_id`=? AND `key`="?"', $section_id, $key);
 
 		$result = CM_Mysql::query($query);
@@ -515,7 +515,7 @@ class CM_LanguageEdit {
 				CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
-		$query = CM_Mysql::placeholder('UPDATE `' . TBL_LANG_KEY . '` SET `key`="?" WHERE `lang_key_id`=?', $new_name, $lang_key_id);
+		$query = CM_Mysql::placeholder('UPDATE `' . TBL_CM_LANG_KEY . '` SET `key`="?" WHERE `lang_key_id`=?', $new_name, $lang_key_id);
 
 		CM_Mysql::query($query);
 

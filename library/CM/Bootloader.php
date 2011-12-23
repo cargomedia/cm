@@ -136,10 +136,10 @@ class CM_Bootloader {
 		define('TBL_CONFIG', 'config');
 		define('TBL_CONFIG_SECTION', 'config_section');
 
-		define('TBL_LANG', 'cm_lang');
-		define('TBL_LANG_KEY', 'cm_langKey');
-		define('TBL_LANG_SECTION', 'cm_langSection');
-		define('TBL_LANG_VALUE', 'cm_langValue');
+		define('TBL_CM_LANG', 'cm_lang');
+		define('TBL_CM_LANG_KEY', 'cm_langKey');
+		define('TBL_CM_LANG_SECTION', 'cm_langSection');
+		define('TBL_CM_LANG_VALUE', 'cm_langValue');
 
 		define('TBL_COOKIES_LOGIN', 'cookies_login');
 
@@ -148,12 +148,12 @@ class CM_Bootloader {
 
 		define('TBL_PROFILE_FIELD', 'profile_field');
 
-		define('TBL_LOCATION_COUNTRY', 'cm_locationCountry');
-		define('TBL_LOCATION_STATE', 'cm_locationState');
-		define('TBL_LOCATION_CITY', 'cm_locationCity');
-		define('TBL_LOCATION_ZIP', 'cm_locationZip');
-		define('TBL_LOCATION_CITY_IP', 'cm_locationCityIp');
-		define('TBL_LOCATION_COUNTRY_IP', 'cm_locationCountryIp');
+		define('TBL_CM_LOCATION_COUNTRY', 'cm_locationCountry');
+		define('TBL_CM_LOCATION_STATE', 'cm_locationState');
+		define('TBL_CM_LOCATION_CITY', 'cm_locationCity');
+		define('TBL_CM_LOCATION_ZIP', 'cm_locationZip');
+		define('TBL_CM_LOCATION_CITY_IP', 'cm_locationCityIp');
+		define('TBL_CM_LOCATION_COUNTRY_IP', 'cm_locationCountryIp');
 
 		define('TBL_PAYMENT_PROVIDER', 'payment_provider');
 		define('TBL_PAYMENT_PROVIDER_FIELD', 'payment_provider_field');

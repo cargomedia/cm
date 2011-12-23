@@ -24,31 +24,31 @@ class CM_Location implements CM_ArrayConvertible {
 							`2`.`id` `2.id`, `2`.`name` `2.name`,
 							`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 							`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
-						FROM TBL_LOCATION_ZIP AS `4`
-						LEFT JOIN TBL_LOCATION_CITY AS `3` ON(`4`.`cityId`=`3`.`id`)
-						LEFT JOIN TBL_LOCATION_STATE AS `2` ON(`3`.`stateId`=`2`.`id`)
-						LEFT JOIN TBL_LOCATION_COUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
+						FROM TBL_CM_LOCATION_ZIP AS `4`
+						LEFT JOIN TBL_CM_LOCATION_CITY AS `3` ON(`4`.`cityId`=`3`.`id`)
+						LEFT JOIN TBL_CM_LOCATION_STATE AS `2` ON(`3`.`stateId`=`2`.`id`)
+						LEFT JOIN TBL_CM_LOCATION_COUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
 						WHERE `4`.`id` = ?';
 					break;
 				case self::LEVEL_CITY:
 					$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
 							`2`.`id` `2.id`, `2`.`name` `2.name`,
 							`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`
-						FROM TBL_LOCATION_CITY AS `3`
-						LEFT JOIN TBL_LOCATION_STATE AS `2` ON(`3`.`stateId`=`2`.`id`)
-						LEFT JOIN TBL_LOCATION_COUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
+						FROM TBL_CM_LOCATION_CITY AS `3`
+						LEFT JOIN TBL_CM_LOCATION_STATE AS `2` ON(`3`.`stateId`=`2`.`id`)
+						LEFT JOIN TBL_CM_LOCATION_COUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
 						WHERE `3`.`id` = ?';
 					break;
 				case self::LEVEL_STATE:
 					$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
 							`2`.`id` `2.id`, `2`.`name` `2.name`
-						FROM TBL_LOCATION_STATE AS `2`
-						LEFT JOIN TBL_LOCATION_COUNTRY AS `1` ON(`2`.`countryId`=`1`.`id`)
+						FROM TBL_CM_LOCATION_STATE AS `2`
+						LEFT JOIN TBL_CM_LOCATION_COUNTRY AS `1` ON(`2`.`countryId`=`1`.`id`)
 						WHERE `2`.`id` = ?';
 					break;
 				case self::LEVEL_COUNTRY:
 					$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`
-						FROM TBL_LOCATION_COUNTRY AS `1`
+						FROM TBL_CM_LOCATION_COUNTRY AS `1`
 						WHERE `1`.`id` = ?';
 					break;
 				default:
@@ -166,9 +166,9 @@ class CM_Location implements CM_ArrayConvertible {
 		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
 		if ((list($level, $id) = CM_CacheLocal::get($cacheKey)) === false) {
 			$level = $id = null;
-			if ($id = self::_getLocationIdByIp(TBL_LOCATION_CITY_IP, 'cityId', $ip)) {
+			if ($id = self::_getLocationIdByIp(TBL_CM_LOCATION_CITY_IP, 'cityId', $ip)) {
 				$level = self::LEVEL_CITY;
-			} elseif ($id = self::_getLocationIdByIp(TBL_LOCATION_COUNTRY_IP, 'countryId', $ip)) {
+			} elseif ($id = self::_getLocationIdByIp(TBL_CM_LOCATION_COUNTRY_IP, 'countryId', $ip)) {
 				$level = self::LEVEL_COUNTRY;
 			}
 			CM_CacheLocal::set($cacheKey, array($level, $id));
@@ -212,25 +212,25 @@ class CM_Location implements CM_ArrayConvertible {
 			'INSERT `' . TBL_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
-			FROM `' . TBL_LOCATION_COUNTRY . '` AS `1`
+			FROM `' . TBL_CM_LOCATION_COUNTRY . '` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
 					`2`.`name`, NULL, NULL, NULL
-			FROM `' . TBL_LOCATION_STATE . '` AS `2`
-			LEFT JOIN `' . TBL_LOCATION_COUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
+			FROM `' . TBL_CM_LOCATION_STATE . '` AS `2`
+			LEFT JOIN `' . TBL_CM_LOCATION_COUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 3, `3`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, NULL,
 					`3`.`name`, NULL, `3`.`lat`, `3`.`lon`
-			FROM `' . TBL_LOCATION_CITY . '` AS `3`
-			LEFT JOIN `' . TBL_LOCATION_STATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			LEFT JOIN `' . TBL_LOCATION_COUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)
+			FROM `' . TBL_CM_LOCATION_CITY . '` AS `3`
+			LEFT JOIN `' . TBL_CM_LOCATION_STATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
+			LEFT JOIN `' . TBL_CM_LOCATION_COUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`, 
 					`4`.`name`, NULL, `4`.`lat`, `4`.`lon`
-			FROM `' . TBL_LOCATION_ZIP . '` AS `4`
-			LEFT JOIN `' . TBL_LOCATION_CITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
-			LEFT JOIN `' . TBL_LOCATION_STATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			LEFT JOIN `' . TBL_LOCATION_COUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)'
+			FROM `' . TBL_CM_LOCATION_ZIP . '` AS `4`
+			LEFT JOIN `' . TBL_CM_LOCATION_CITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
+			LEFT JOIN `' . TBL_CM_LOCATION_STATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
+			LEFT JOIN `' . TBL_CM_LOCATION_COUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)'
 		);
 	}
 }

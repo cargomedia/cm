@@ -40,7 +40,7 @@ class CM_Language {
 	}
 
 	public static function getAllIds() {
-		$result = CM_Mysql::query('SELECT lang_id FROM `' . TBL_LANG . '`');
+		$result = CM_Mysql::query('SELECT lang_id FROM `' . TBL_CM_LANG . '`');
 		$ids = array();
 		while ($id = (int) $result->fetchOne()) {
 			$ids[] = $id;
