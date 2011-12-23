@@ -3,20 +3,18 @@ uname: null,
 
 	events: {
 	"click .reload": "reloadChinese",
-		"click .popout": "popOut",
-		"click .popin": "popIn",
-		"click .load": "loadSelector",
-		"click .load2": "loadList",
-		"click .call": "callAjax",
-		"click .rpc": "callRpc",
-		"click .error_500_text_callback": "error_500_text_callback",
-		"click .error_599_text": "error_599_text",
-		"click .error_CM_Exception_public_callback": "error_CM_Exception_public_callback",
-		"click .error_CM_Exception_public": "error_CM_Exception_public",
-		"click .error_CM_Exception": "error_CM_Exception",
-		"click .error_CM_Exception_AuthRequired_public_callback": "error_CM_Exception_AuthRequired_public_callback",
-		"click .error_CM_Exception_AuthRequired_public": "error_CM_Exception_AuthRequired_public",
-		"click .error_CM_Exception_AuthRequired": "error_CM_Exception_AuthRequired"
+	"click .popout": "popOut",
+	"click .popin": "popIn",
+	"click .call": "callAjax",
+	"click .rpc": "callRpc",
+	"click .error_500_text_callback": "error_500_text_callback",
+	"click .error_599_text": "error_599_text",
+	"click .error_CM_Exception_public_callback": "error_CM_Exception_public_callback",
+	"click .error_CM_Exception_public": "error_CM_Exception_public",
+	"click .error_CM_Exception": "error_CM_Exception",
+	"click .error_CM_Exception_AuthRequired_public_callback": "error_CM_Exception_AuthRequired_public_callback",
+	"click .error_CM_Exception_AuthRequired_public": "error_CM_Exception_AuthRequired_public",
+	"click .error_CM_Exception_AuthRequired": "error_CM_Exception_AuthRequired"
 },
 
 ready: function() {
@@ -25,23 +23,6 @@ ready: function() {
 
 reloadChinese: function() {
 	this.reload({foo:'some chinese.. 百度一下，你就知道 繁體字!'});
-},
-
-loadSelector: function() {
-	this.load('FB_Component_Selector_User_Friends', {}, {
-		success: function() {
-			this.bind("select", function(friend) {
-				this.message("Selected: " + friend.username);
-				this.popIn();
-			});
-			this.popOut();
-			this._ready();
-		}
-	});
-},
-
-loadList: function() {
-	this.load('FB_Component_UserList_Friends', {template:'mini'});
 },
 
 callAjax: function() {
@@ -53,7 +34,7 @@ callAjax: function() {
 },
 
 callRpc: function() {
-	cm.rpc('FB_Component_Example.time', [], {
+	cm.rpc('CM_Component_Example.time', [], {
 		success: function(timestamp) {
 			cm.window.hint.message("Time: "+timestamp);
 		}
