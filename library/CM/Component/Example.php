@@ -15,7 +15,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_RequestHandler_Component_Ajax $response) {
 		$x = $params->getString('x');
-		$response->reloadComponent();
+		//$response->reloadComponent();
 		return 'x=' . $x;
 	}
 
