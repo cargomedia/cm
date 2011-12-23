@@ -1,7 +1,7 @@
 uname: null,
-	profile: null,
+profile: null,
 
-	events: {
+events: {
 	"click .reload": "reloadChinese",
 	"click .popout": "popOut",
 	"click .popin": "popIn",
