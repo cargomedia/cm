@@ -73,6 +73,6 @@
 			<a href="http://lucene.apache.org/java/docs/index.html">lucene</a>
 			<a href="http://redis.io/">redis</a>
 		</div>
-		<p class="copyright">&copy;<?php echo date('o'); ?> Your Company AG</p>
+		<p class="copyright">&copy; {$smarty.now|dateyear} Your Company AG</p>
 	</footer>
 </section>
