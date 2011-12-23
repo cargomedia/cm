@@ -82,7 +82,7 @@ class CM_Bootloader {
 
 		define('SITE_URL', Config::get()->site_url);
 
-		define('DIR_SITE_ROOT', Config::get()->site_dir);
+		define('DIR_SITE_ROOT', dirname(dirname(dirname(__FILE__))) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_SITE_ROOT . 'public' . DIRECTORY_SEPARATOR);
 		define('DIR_LAYOUT', DIR_SITE_ROOT . 'layout' . DIRECTORY_SEPARATOR);
