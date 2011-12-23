@@ -165,6 +165,10 @@ class CM_Css {
 					$properties['-moz-user-select'] = $value;
 					$properties['-webkit-user-select'] = $value;
 					break;
+				case 'transform':
+					$properties['-moz-transform'] = $value;
+					$properties['-webkit-transform'] = $value;
+					break;
 			}
 
 			$properties[$property] = $value;
