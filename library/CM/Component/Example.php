@@ -11,7 +11,8 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	}
 
-	public function checkAccessible() {}
+	public function checkAccessible() {
+	}
 
 	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_RequestHandler_Component_Ajax $response) {
 		$x = $params->getString('x');
@@ -33,6 +34,11 @@ class CM_Component_Example extends CM_Component_Abstract {
 		}
 		$public = $params->getBoolean('public', false);
 		throw new $exception($text, $public);
+	}
+
+	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_RequestHandler_Component_Ajax $response) {
+		$number = $params->getInt('number');
+		self::stream($response->getViewer(true), array("number" => $number, "message" => 'pong'));
 	}
 
 	public static function rpc_time() {

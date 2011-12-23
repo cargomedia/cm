@@ -1,5 +1,6 @@
 uname: null,
 profile: null,
+pingCount: 0,
 
 events: {
 	"click .reload": "reloadChinese",
@@ -14,11 +15,17 @@ events: {
 	"click .error_CM_Exception": "error_CM_Exception",
 	"click .error_CM_Exception_AuthRequired_public_callback": "error_CM_Exception_AuthRequired_public_callback",
 	"click .error_CM_Exception_AuthRequired_public": "error_CM_Exception_AuthRequired_public",
-	"click .error_CM_Exception_AuthRequired": "error_CM_Exception_AuthRequired"
+	"click .error_CM_Exception_AuthRequired": "error_CM_Exception_AuthRequired",
+	"click .stream .ping": "ping"
 },
 
 ready: function() {
 	this.message("Component ready, uname: " + this.uname);
+
+	var handler = this;
+	this.bindStream(function(response) {
+		handler.$('.stream .output').append(response.number + ': ' + response.message + '<br />').scrollBottom();
+	});
 },
 
 reloadChinese: function() {
@@ -79,4 +86,9 @@ error_CM_Exception_AuthRequired_public: function() {
 },
 error_CM_Exception_AuthRequired: function() {
 	this.ajaxCall('ajax_error', {exception:'CM_Exception_AuthRequired', text:'Errortext'});
+},
+
+ping: function() {
+	this.ajaxCall('ajax_ping', {number: this.pingCount});
+	this.pingCount++;
 }
