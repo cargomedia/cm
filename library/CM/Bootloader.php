@@ -138,10 +138,10 @@ class CM_Bootloader {
 		define('TBL_CONFIG', 'config');
 		define('TBL_CONFIG_SECTION', 'config_section');
 
-		define('TBL_LANG', 'lang');
-		define('TBL_LANG_KEY', 'lang_key');
-		define('TBL_LANG_SECTION', 'lang_section');
-		define('TBL_LANG_VALUE', 'lang_value');
+		define('TBL_LANG', 'cm_lang');
+		define('TBL_LANG_KEY', 'cm_langKey');
+		define('TBL_LANG_SECTION', 'cm_langSection');
+		define('TBL_LANG_VALUE', 'cm_langValue');
 
 		define('TBL_COOKIES_LOGIN', 'cookies_login');
 
@@ -216,7 +216,7 @@ class CM_Bootloader {
 		define('TBL_CHAT_MEMBER', 'chat_member');
 		define('TBL_CHAT_MESSAGE', 'chat_message');
 
-		define('TBL_CONTENTLIST', 'contentlist');
+		define('TBL_CONTENTLIST', 'cm_contentlist');
 
 		define('TBL_ACTION', 'action');
 		define('TBL_ACTION_LIMIT', 'actionLimit');
@@ -225,7 +225,7 @@ class CM_Bootloader {
 		define('TBL_CONVERSATION_MESSAGE', 'conversation_message');
 		define('TBL_CONVERSATION_RECIPIENT', 'conversation_recipient');
 
-		define('TBL_SESSION', 'session');
+		define('TBL_SESSION', 'cm_session');
 
 		define('TBL_REPORT', 'report');
 
