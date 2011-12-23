@@ -45,7 +45,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		$component->setViewer($this->getViewer());
 		$component->checkAccessible();
 		$component->prepare();
-		$html = $this->getRender()->render($component, array('parent' => $this->_component['parentId']));
+		$html = $this->getRender()->render($component, array('parentId' => $this->_component['parentId']));
 
 		$this->getRender()->getJs()->onloadHeaderJs('cm.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
 		$this->getRender()->getJs()->onloadPrepareJs(
@@ -68,7 +68,7 @@ abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Ab
 		$component->checkAccessible();
 		$component->prepare();
 
-		$html = $this->getRender()->render($component, array('parent' => $this->_component['id']));
+		$html = $this->getRender()->render($component, array('parentId' => $this->_component['id']));
 
 		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
 

@@ -39,7 +39,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 		return $suggestions;
 	}
 
-	public function prepare(array $params, CM_Form_Abstract $form) {
+	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
 		if ($this->getValue()) {
 			$this->setTplParam('prePopulate', array_map(array('static', '_getSuggestion'), $this->getValue()));

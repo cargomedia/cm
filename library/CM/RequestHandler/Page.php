@@ -10,7 +10,8 @@ class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 		try {
 			$this->_setRequest($this->getSite()->rewrite($this->getRequest()));
 			$page = CM_Page_Abstract::factory($this->getRequest());
-			$html = $this->getRender()->render($page, array('requestHandler' => $this));
+			$page->prepare($this);
+			$html = $this->getRender()->render($page);
 		} catch (CM_Exception $e) {
 			if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
 				throw $e;
@@ -18,10 +19,10 @@ class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
 			$path = $this->_getConfig()->catch[get_class($e)];
 			$this->_setRequest(new CM_Request_Get($path, $this->getRequest()->getHeaders()));
 			$page = CM_Page_Abstract::factory($this->getRequest());
-			$html = $this->getRender()->render($page, array('requestHandler' => $this));
+			$page->prepare($this);
+			$html = $this->getRender()->render($page);
 		}
 
 		return $html;
 	}
-
 }

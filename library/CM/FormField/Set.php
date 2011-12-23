@@ -33,7 +33,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		return $userInput;
 	}
 
-	public function prepare(array $params, CM_Form_Abstract $form) {
+	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 		$labelsection = isset($params['labelsection']) ? $params['labelsection'] : '%forms._fields.' . $this->getName() . '.values';
 		$this->setTplParam('labelsForValuesSet', $this->_getLabelsForValuesSet($labelsection));

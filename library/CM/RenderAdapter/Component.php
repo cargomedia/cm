@@ -6,10 +6,10 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$components = $this->getRender()->getStack('components');
 		$parentComponentId = null;
 
-		if (!isset($params['parent']) && !empty($components)) {
+		if (!isset($params['parentId']) && !empty($components)) {
 			$parentComponentId = $this->getRender()->getStackLast('components')->auto_id;
-		} elseif (isset($params['parent'])) {
-			$parentComponentId = $params['parent'];
+		} elseif (isset($params['parentId'])) {
+			$parentComponentId = $params['parentId'];
 		}
 
 		/** @var CM_Component_Abstract $component */

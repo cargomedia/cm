@@ -82,10 +82,9 @@ abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
 	abstract public function validate($userInput);
 
 	/**
-	 * @param array             $params
-	 * @param CM_Form_Abstract  $form
+	 * @param array			 $params
 	 */
-	public function prepare(array $params, CM_Form_Abstract $form) {
+	public function prepare(array $params) {
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 class CM_FormField_Captcha extends CM_FormField_Abstract {
 
-	public function prepare(array $params, CM_Form_Abstract $form) {
+	public function prepare(array $params) {
 		$this->setTplParam('imageId', self::rpc_createNumber());
 	}
 
