@@ -13,7 +13,6 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 		$field->setTplParam('name', $field->getName());
 		$field->setTplParam('value', $field->getValue());
 		$field->setTplParam('options', $field->getOptions());
-		//$field->setTplParam('form', $form);
 
 		$tpl = $this->getTemplate();
 		$tpl->assign($field->getTplParams());
