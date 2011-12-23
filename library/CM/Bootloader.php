@@ -204,8 +204,8 @@ class CM_Bootloader {
 		define('TBL_TMP_USER', 'tmp_user');
 		define('TBL_TMP_VIDEO', 'tmp_video');
 		define('TBL_TMP_BLOGPOST', 'tmp_blogpost');
-		define('TBL_TMP_LOCATION', 'tmp_location');
-		define('TBL_TMP_USERFILE', 'tmp_userfile');
+		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
+		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
 
 		define('TBL_DEV_STREAM', 'dev_stream');
 

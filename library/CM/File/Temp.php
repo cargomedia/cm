@@ -22,7 +22,7 @@ class CM_File_Temp extends CM_File {
 	 * @param string $uniqid
 	 */
 	public function __construct($uniqid) {
-		$file = CM_Mysql::select(TBL_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
+		$file = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
 		if (!$file) {
 			throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
 		}
@@ -56,7 +56,7 @@ class CM_File_Temp extends CM_File {
 
 		$uniqid = md5(uniqid(rand(), true));
 
-		CM_Mysql::insert(TBL_TMP_USERFILE,
+		CM_Mysql::insert(TBL_CM_TMP_USERFILE,
 			array(
 				'uniqid' => $uniqid,
 				'filename' => $filename,
@@ -105,7 +105,7 @@ class CM_File_Temp extends CM_File {
 	}
 
 	public function delete() {
-		CM_Mysql::delete(TBL_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
+		CM_Mysql::delete(TBL_CM_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
 		parent::delete();
 	}
 	
@@ -125,7 +125,7 @@ class CM_File_Temp extends CM_File {
 	* @param int $age
 	*/
 	public static function deleteOlder($age) {
-		$query = CM_Mysql::exec('SELECT `uniqid` FROM `' . TBL_TMP_USERFILE . '` WHERE `uploadstamp`< ?', time() - $age);
+		$query = CM_Mysql::exec('SELECT `uniqid` FROM `' . TBL_CM_TMP_USERFILE . '` WHERE `uploadstamp`< ?', time() - $age);
 		$uniqueIds = $query->fetchCol();
 	
 		foreach ($uniqueIds as $uniqid) {
