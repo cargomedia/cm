@@ -24,20 +24,12 @@ foo={$foo|usertext}<br />	time={$now}<br />
 {form name="CM_Form_Example" viewer=$viewer}
 <table class="form">
 	<tr>
-		<td class="label">{label text="Text" for="text"}:</td>
-		<td class="value">{text_formatter for="text"}{input name="text" placeholder="Enter Text"}</td>
-	</tr>
-	<tr>
 		<td class="label">{label text="Integer" for="int"}:</td>
 		<td class="value">{input name="int"}</td>
 	</tr>
 	<tr>
 		<td class="label">{label text="Location" for="location"}:</td>
 		<td class="value">{input name="location"} {input name="locationSlider"}</td>
-	</tr>
-	<tr>
-		<td class="label">{label text="Friends" for="friends"}:</td>
-		<td class="value">{input name="friends"}</td>
 	</tr>
 	<tr>
 		<td class="label">{label text="Image" for="image"}:</td>
