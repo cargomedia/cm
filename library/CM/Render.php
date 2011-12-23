@@ -178,14 +178,9 @@ class CM_Render {
 			} else {
 				$phrase = 'components.' . $this->getStackLast('components')->getNamespaceLegacy() . '.' . $phrase;
 			}
-			try {
-				$text = CM_Language::text($phrase, $params);
-			} catch(CM_TreeException $e) {
-				if (DEBUG) {
-					throw $e;
-				}
-				$text = $phrase;
-			}
+
+			$text = CM_Language::text($phrase, $params);
+
 		} else {
 			$text = CM_Language::exec($phrase, $params);
 		}

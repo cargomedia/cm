@@ -24,7 +24,7 @@ class CM_Language {
 	 * Return section
 	 *
 	 * @param string $path
-	 * @param int $lang_id
+	 * @param int	$lang_id
 	 * @return CM_TreeNode_Language
 	 */
 	public static function section($path = null, $lang_id = null) {
@@ -52,7 +52,7 @@ class CM_Language {
 	 * Define value for a single constant or a list of key=>value pairs for globally using in text.
 	 *
 	 * @param array|string $key
-	 * @param mixed $value
+	 * @param mixed		$value
 	 */
 	public static function defineGlobal($key, $value = null) {
 		if (is_array($key)) {
@@ -99,24 +99,34 @@ class CM_Language {
 
 	/**
 	 * @param string $path
-	 * @param array $vars
+	 * @param array  $vars
 	 * @return string
 	 */
 	public static function text($path, array $vars = null) {
-		list($path, $key) = self::_parsePath($path);
 
-		$section = self::section($path);
-		if (!$section) {
-			return false;
+		try {
+			list($path, $key) = self::_parsePath($path);
+
+			$section = self::section($path);
+			if (!$section) {
+				return false;
+			}
+			return $section->text($key, $vars);
+
+		} catch (CM_TreeException $e) {
+			if (DEBUG_MODE || IS_TEST ) {
+				throw $e;
+			}
+
+			return $path;
 		}
-		return $section->text($key, $vars);
 	}
 
 	/**
 	 * Executes a text inplacing variables with given kay=>value pair arguments.
 	 *
 	 * @param string $cdata
-	 * @param array $vars
+	 * @param array  $vars
 	 * @return string
 	 */
 	public static function exec($cdata, array $vars = null) {
@@ -150,9 +160,9 @@ class CM_Language {
 	/**
 	 * Convert special characters to html entities using the $charser encoding.
 	 *
-	 * @param string $string
+	 * @param string  $string
 	 * @param integer $quote_style
-	 * @param string $charset
+	 * @param string  $charset
 	 * @return string
 	 */
 	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {
