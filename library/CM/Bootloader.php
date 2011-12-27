@@ -133,20 +133,10 @@ class CM_Bootloader {
 		define('TBL_CM_LOG', 'cm_log');
 		define('TBL_CM_IPBLOCKED', 'cm_ipBlocked');
 
-		define('TBL_CONFIG', 'config');
-		define('TBL_CONFIG_SECTION', 'config_section');
-
 		define('TBL_CM_LANG', 'cm_lang');
 		define('TBL_CM_LANG_KEY', 'cm_langKey');
 		define('TBL_CM_LANG_SECTION', 'cm_langSection');
 		define('TBL_CM_LANG_VALUE', 'cm_langValue');
-
-		define('TBL_COOKIES_LOGIN', 'cookies_login');
-
-		define('TBL_PROFILE_FIELD_KEY', 'profile_field_key');
-		define('TBL_PROFILE_FIELD_VALUE', 'profile_field_value');
-
-		define('TBL_PROFILE_FIELD', 'profile_field');
 
 		define('TBL_CM_LOCATION_COUNTRY', 'cm_locationCountry');
 		define('TBL_CM_LOCATION_STATE', 'cm_locationState');
@@ -154,6 +144,19 @@ class CM_Bootloader {
 		define('TBL_CM_LOCATION_ZIP', 'cm_locationZip');
 		define('TBL_CM_LOCATION_CITY_IP', 'cm_locationCityIp');
 		define('TBL_CM_LOCATION_COUNTRY_IP', 'cm_locationCountryIp');
+
+		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
+		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
+
+		define('TBL_SK_CONFIG', 'sk_config');
+		define('TBL_SK_CONFIG_SECTION', 'sk_config_section');
+
+		define('TBL_COOKIES_LOGIN', 'cookies_login');
+
+		define('TBL_PROFILE_FIELD_KEY', 'profile_field_key');
+		define('TBL_PROFILE_FIELD_VALUE', 'profile_field_value');
+
+		define('TBL_PROFILE_FIELD', 'profile_field');
 
 		define('TBL_PAYMENT_PROVIDER', 'payment_provider');
 		define('TBL_PAYMENT_PROVIDER_FIELD', 'payment_provider_field');
@@ -204,8 +207,6 @@ class CM_Bootloader {
 		define('TBL_TMP_USER', 'tmp_user');
 		define('TBL_TMP_VIDEO', 'tmp_video');
 		define('TBL_TMP_BLOGPOST', 'tmp_blogpost');
-		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
-		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
 
 		define('TBL_DEV_STREAM', 'dev_stream');
 
