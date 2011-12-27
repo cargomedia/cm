@@ -23,7 +23,7 @@ class CM_Bootloader {
 
 	public function exceptionHandler() {
 		set_exception_handler(function(Exception $exception) {
-			$showError = DEBUG_MODE || IS_CRON || IS_TEST;
+			$showError = IS_DEBUG || IS_CRON || IS_TEST;
 
 			if (!IS_CRON) {
 				header('HTTP/1.1 500 Internal Server Error');
@@ -60,7 +60,7 @@ class CM_Bootloader {
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
 				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-				if (!$atSign && DEBUG_MODE) {
+				if (!$atSign && IS_DEBUG) {
 					$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
 						E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
 						E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
@@ -78,10 +78,10 @@ class CM_Bootloader {
 	public function constants() {
 		defined('IS_TEST') || define('IS_TEST', false);
 		defined('IS_CRON') || define('IS_CRON', false);
-		define('DEBUG_MODE', (bool) Config::get()->debug && !IS_TEST);
+		define('IS_DEBUG', (bool) Config::get()->debug && !IS_TEST);
 
 
-		define('SITE_URL', 'http://' . (isset($_SERVER['SERVER_NAME'])?$_SERVER['SERVER_NAME']:'localhost') . '/');
+		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME'])?$_SERVER['SERVER_NAME']:'localhost') . '/');
 
 		define('DIR_SITE_ROOT', dirname(dirname(dirname(__FILE__))) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
@@ -98,12 +98,12 @@ class CM_Bootloader {
 		define('DIR_ADMIN', DIR_PUBLIC . 'admin' . DIRECTORY_SEPARATOR);
 		define('DIR_ADMIN_INC', DIR_ADMIN . 'inc' . DIRECTORY_SEPARATOR);
 
-		define('URL_OBJECTS', isset(Config::get()->objects_cdn) ? Config::get()->objects_cdn : SITE_URL);
-		define('URL_CONTENT', isset(Config::get()->content_cdn) ? Config::get()->content_cdn : SITE_URL);
+		define('URL_OBJECTS', isset(Config::get()->objects_cdn) ? Config::get()->objects_cdn : URL_ROOT);
+		define('URL_CONTENT', isset(Config::get()->content_cdn) ? Config::get()->content_cdn : URL_ROOT);
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
 
-		define('URL_ADMIN', SITE_URL . 'admin/');
+		define('URL_ADMIN', URL_ROOT . 'admin/');
 		define('URL_ADMIN_CSS', URL_ADMIN . 'css/');
 		define('URL_ADMIN_JS', URL_ADMIN . 'js/');
 		define('URL_ADMIN_IMG', URL_ADMIN . 'img/');
@@ -112,7 +112,7 @@ class CM_Bootloader {
 		define('URL_USERFILES', URL_CONTENT . 'userfiles/');
 
 		define('DIR_TMP_USERFILES', DIR_USERFILES . 'tmp' . DIRECTORY_SEPARATOR);
-		define('URL_TMP_USERFILES', SITE_URL . 'userfiles/tmp/');
+		define('URL_TMP_USERFILES', URL_ROOT . 'userfiles/tmp/');
 
 		define('DIR_USERFILES_TEXTFORMATTER', DIR_USERFILES . 'formatter' . DIRECTORY_SEPARATOR);
 		define('URL_USERFILES_TEXTFORMATTER', URL_USERFILES . 'formatter/');
@@ -120,9 +120,7 @@ class CM_Bootloader {
 		define('DIR_CONTACT_GRABBER', DIR_LIBRARY . 'ContactGrabber' . DIRECTORY_SEPARATOR);
 		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
 		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
-	}
 
-	public function constantsTbl() {
 		define('TBL_CM_SMILEY', 'cm_smiley');
 		define('TBL_CM_SMILEYSET', 'cm_smileySet');
 		define('TBL_CM_USER', 'cm_user');

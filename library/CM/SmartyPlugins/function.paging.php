@@ -72,7 +72,7 @@ function sk_make_url($url = null, $params = null, $hash = null) {
 		$url = sk_request_uri($url);
 	}
 
-	$url = SITE_URL . substr($url, 1);
+	$url = URL_ROOT . substr($url, 1);
 
 	$url_info = parse_url($url);
 
@@ -113,7 +113,7 @@ function sk_request_uri($url = null) {
 		$uri = $_SERVER['REQUEST_URI'];
 	}
 
-	$s_url_info = parse_url(SITE_URL);
+	$s_url_info = parse_url(URL_ROOT);
 
 	$uri = str_replace($s_url_info["path"], "/", $uri);
 	return $uri;

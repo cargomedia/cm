@@ -73,7 +73,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 		}
 		$config = self::_getConfig();
 		parent::setTplParam('siteName', $config->siteName);
-		parent::setTplParam('siteUrl', SITE_URL);
+		parent::setTplParam('siteUrl', URL_ROOT);
 		$this->_senderAddress = $config->siteEmailAddress;
 		$this->_senderName = $config->siteName;
 	}

@@ -98,7 +98,7 @@ class CM_Language {
 			return $section->text($key, $vars);
 
 		} catch (CM_TreeException $e) {
-			if (DEBUG_MODE || IS_TEST ) {
+			if (IS_DEBUG || IS_TEST ) {
 				throw $e;
 			}
 

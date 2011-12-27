@@ -251,7 +251,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 			$path = '/';
 		}
 		if ($absolute) {
-			$path = substr(SITE_URL, 0, -1) . $path;
+			$path = substr(URL_ROOT, 0, -1) . $path;
 		}
 		$link = $path;
 

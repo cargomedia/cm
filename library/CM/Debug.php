@@ -8,11 +8,11 @@ class CM_Debug {
 	/**
 	 * Singleton Getter
 	 *
-	 * @return CM_Debug Depending on 'DEBUG_MODE' a Debug-instance or a DebugDummy
+	 * @return CM_Debug Depending on 'IS_DEBUG' a Debug-instance or a DebugDummy
 	 */
 	public static function get() {
 		if (self::$_instance === null) {
-			if (DEBUG_MODE) {
+			if (IS_DEBUG) {
 				self::$_instance = new self();
 			} else {
 				self::$_instance = new CM_DebugDummy();
