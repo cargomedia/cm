@@ -48,15 +48,6 @@ class CM_Render {
 			$site = $this->_site = CM_Site_Abstract::factory();
 		}
 		$this->_site = $site;
-
-		// Language global vars
-		$officialInfoConfigs = CM_Config::section('site')->Section('official')->getConfigsList();
-		$globals = array();
-
-		foreach ($officialInfoConfigs as $item) {
-			$globals[$item->name] = $item->value;
-		}
-		CM_Language::defineGlobal($globals);
 	}
 
 	/**

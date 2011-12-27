@@ -49,22 +49,6 @@ class CM_Language {
 	}
 
 	/**
-	 * Define value for a single constant or a list of key=>value pairs for globally using in text.
-	 *
-	 * @param array|string $key
-	 * @param mixed		$value
-	 */
-	public static function defineGlobal($key, $value = null) {
-		if (is_array($key)) {
-			foreach ($key as $k => $v) {
-				self::$vars_global[$k] = $v;
-			}
-		} else {
-			self::$vars_global[$key] = $value;
-		}
-	}
-
-	/**
 	 * Return whether a text-path exists
 	 *
 	 * @param string $path
@@ -133,8 +117,6 @@ class CM_Language {
 		if (!$vars) {
 			$vars = array();
 		}
-		$vars = array_merge(self::$vars_global, $vars);
-
 		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$vars['\\1']) ? \$vars['\\1']\\2 : '\\0'", $cdata);
 	}
 

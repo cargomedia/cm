@@ -53,12 +53,11 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 	/**
 	 * @param CM_Model_User|string $recipient
-	 * @param string               $template
-	 * @param boolean              $delayed
+	 * @param string			   $template
+	 * @param boolean			  $delayed
 	 */
 	public function __construct($recipient, $template = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
-		$config = self::_getConfig();
 		if ($template) {
 			$this->_template = (string) $template;
 			$this->setRenderLayout(true);
@@ -72,6 +71,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 		} else {
 			throw new CM_Exception_Invalid('No Recipient defined.');
 		}
+		$config = self::_getConfig();
 		parent::setTplParam('siteName', $config->siteName);
 		parent::setTplParam('siteUrl', SITE_URL);
 		$this->_senderAddress = $config->siteEmailAddress;
