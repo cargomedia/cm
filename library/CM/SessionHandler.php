@@ -36,7 +36,7 @@ class CM_SessionHandler {
 	public function read($id) {
 		$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 		if ((list($this->_data, $this->_expires) = CM_Cache::get($cacheKey)) === false) {
-			$row = CM_Mysql::exec("SELECT `data`, `expires` FROM TBL_SESSION WHERE `sessionId` = '?' AND `expires` > ?", $id, time())
+			$row = CM_Mysql::exec("SELECT `data`, `expires` FROM TBL_CM_SESSION WHERE `sessionId` = '?' AND `expires` > ?", $id, time())
 					->fetchAssoc();
 			$this->_data = (string) $row['data'];
 			$this->_expires = (int) $row['expires'];
@@ -54,7 +54,7 @@ class CM_SessionHandler {
 		$expiresSoon = ($this->_expires - time() < $lifetime / 2);
 
 		if ($changed || $expiresSoon) {
-			CM_Mysql::replace(TBL_SESSION, array('sessionId' => $id, 'data' => $data, 'expires' => time() + $lifetime));
+			CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $id, 'data' => $data, 'expires' => time() + $lifetime));
 			$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 			CM_Cache::delete($cacheKey);
 		}
@@ -62,14 +62,14 @@ class CM_SessionHandler {
 	}
 	
 	public function destroy($id) {
-		CM_Mysql::delete(TBL_SESSION, array('sessionId' => $id));
+		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $id));
 		$cacheKey = CM_CacheConst::Session . '_id:' . $id;
 		CM_Cache::delete($cacheKey);
 		return true;
 	}
 	
 	public function gc() {
-		CM_Mysql::exec('DELETE FROM TBL_SESSION WHERE `expires` < ?', time());
+		CM_Mysql::exec('DELETE FROM TBL_CM_SESSION WHERE `expires` < ?', time());
 		return true;
 	}
 }

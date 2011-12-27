@@ -11,7 +11,7 @@ class CM_Captcha {
 	 */
 	public function __construct($id) {
 		$this->_id = (int) $id;
-		$this->_text = CM_Mysql::select(TBL_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchOne();
+		$this->_text = CM_Mysql::select(TBL_CM_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchOne();
 		if (!$this->_text) {
 			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
 		}
@@ -23,7 +23,7 @@ class CM_Captcha {
 	 */
 	public static function create() {
 		$number = rand(10000, 99999);
-		$id = CM_Mysql::insert(TBL_CAPTCHA, array('number' => $number, 'create_time' => time()));
+		$id = CM_Mysql::insert(TBL_CM_CAPTCHA, array('number' => $number, 'create_time' => time()));
 		return new self($id);
 	}
 
@@ -31,7 +31,7 @@ class CM_Captcha {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		CM_Mysql::exec('DELETE FROM TBL_CAPTCHA WHERE `create_time` < ?', (time() - (int) $age));
+		CM_Mysql::exec('DELETE FROM TBL_CM_CAPTCHA WHERE `create_time` < ?', (time() - (int) $age));
 	}
 
 	/**
@@ -59,7 +59,7 @@ class CM_Captcha {
 	}
 
 	private function _delete() {
-		CM_Mysql::delete(TBL_CAPTCHA, array('captcha_id' => $this->getId()));
+		CM_Mysql::delete(TBL_CM_CAPTCHA, array('captcha_id' => $this->getId()));
 	}
 
 	/**

@@ -20,6 +20,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @see CM_ModelAsset_User_Roles::getDefault()
 	 * @return int[]
 	 */
 	public function getDefaultRoles() {

@@ -14,7 +14,7 @@ class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 */
 	public function __construct($type) {
 		$this->_type = (int) $type;
-		$source = new CM_PagingSource_Sql_Deferred('string', TBL_CONTENTLIST, '`type`=' . $this->_type);
+		$source = new CM_PagingSource_Sql_Deferred('string', TBL_CM_STRING, '`type`=' . $this->_type);
 		$source->enableCache();
 		parent::__construct($source);
 	}
@@ -23,7 +23,7 @@ class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 * @param string $string
 	 */
 	public function add($string) {
-		CM_Mysql::replace(TBL_CONTENTLIST, array('type' => $this->_type, 'string' => $string));
+		CM_Mysql::replace(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
 		$this->_change();
 	}
 
@@ -31,7 +31,7 @@ class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 * @param string $string
 	 */
 	public function delete($string) {
-		CM_Mysql::delete(TBL_CONTENTLIST, array('type' => $this->_type, 'string' => $string));
+		CM_Mysql::delete(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
 		$this->_change();
 	}
 

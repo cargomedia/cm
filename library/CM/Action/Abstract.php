@@ -208,7 +208,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static final function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Mysql::exec("DELETE FROM TBL_ACTION WHERE `createStamp` < ?", time() - $age);
+		CM_Mysql::exec("DELETE FROM TBL_CM_ACTION WHERE `createStamp` < ?", time() - $age);
 	}
 
 	/**

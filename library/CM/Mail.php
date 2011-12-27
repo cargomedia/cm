@@ -223,22 +223,22 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @return int
 	 */
 	public static function getQueueSize() {
-		return CM_Mysql::count(TBL_EMAIL_QUEUE);
+		return CM_Mysql::count(TBL_CM_MAIL);
 	}
 
 	/**
 	 * @param int $limit
 	 */
 	public static function processQueue($limit) {
-		$result = CM_Mysql::execRead("SELECT * FROM TBL_EMAIL_QUEUE ORDER BY `createStamp` LIMIT ?", (int) $limit);
+		$result = CM_Mysql::execRead("SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ?", (int) $limit);
 		while ($row = $result->fetchAssoc()) {
 			self::_send($row['subject'], $row['text'], $row['senderAddress'], $row['recipientAddress'], $row['senderName'], $row['html']);
-			CM_Mysql::delete(TBL_EMAIL_QUEUE, array('id' => $row['id']));
+			CM_Mysql::delete(TBL_CM_MAIL, array('id' => $row['id']));
 		}
 	}
 
 	private function _queue($text, $html) {
-		CM_Mysql::insert(TBL_EMAIL_QUEUE, array('subject' => $this->_subject, 'text' => $text, 'html' => $html,
+		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $this->_subject, 'text' => $text, 'html' => $html,
 			'senderAddress' => $this->_senderAddress, 'recipientAddress' => $this->_recipientAddress, 'senderName' => $this->_senderName,
 			'createStamp' => time()));
 	}

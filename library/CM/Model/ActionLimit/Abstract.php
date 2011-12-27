@@ -29,10 +29,10 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract{
 	public function setLimit($role, $limit) {
 		$role = $role ? (int) $role : null;
 		$limit = !isset($limit) ? null : (int) $limit;
-		if (CM_Mysql::count(TBL_ACTION_LIMIT, array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role))) {
-			CM_Mysql::update(TBL_ACTION_LIMIT, array('limit' => $limit), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role))) {
+			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
 		} else {
-			CM_Mysql::insert(TBL_ACTION_LIMIT, array('limit' => $limit, 'entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('limit' => $limit, 'entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
 		}
 		$this->_change();
 	}
@@ -44,10 +44,10 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract{
 	public function setPeriod($role, $period) {
 		$role = $role ? (int) $role : null;
 		$period = (int) $period;
-		if (CM_Mysql::count(TBL_ACTION_LIMIT, array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role))) {
-			CM_Mysql::update(TBL_ACTION_LIMIT, array('period' => $period), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role))) {
+			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
 		} else {
-			CM_Mysql::insert(TBL_ACTION_LIMIT, array('period' => $period, 'entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('period' => $period, 'entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
 		}
 		$this->_change();
 	}
@@ -101,7 +101,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract{
 	}
 
     protected function _loadData() {
-		return array('roles' => CM_Mysql::select(TBL_ACTION_LIMIT, array('role', 'limit', 'period'), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType()))->fetchAllTree());
+		return array('roles' => CM_Mysql::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType()))->fetchAllTree());
     }
 
 	protected function _onChange() {

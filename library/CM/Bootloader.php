@@ -138,109 +138,33 @@ class CM_Bootloader {
 		define('TBL_CM_LANG_SECTION', 'cm_langSection');
 		define('TBL_CM_LANG_VALUE', 'cm_langValue');
 
-		define('TBL_CM_LOCATION_COUNTRY', 'cm_locationCountry');
-		define('TBL_CM_LOCATION_STATE', 'cm_locationState');
-		define('TBL_CM_LOCATION_CITY', 'cm_locationCity');
-		define('TBL_CM_LOCATION_ZIP', 'cm_locationZip');
-		define('TBL_CM_LOCATION_CITY_IP', 'cm_locationCityIp');
-		define('TBL_CM_LOCATION_COUNTRY_IP', 'cm_locationCountryIp');
+		define('TBL_CM_LOCATIONCOUNTRY', 'cm_locationCountry');
+		define('TBL_CM_LOCATIONSTATE', 'cm_locationState');
+		define('TBL_CM_LOCATIONCITY', 'cm_locationCity');
+		define('TBL_CM_LOCATIONZIP', 'cm_locationZip');
+		define('TBL_CM_LOCATIONCITYIP', 'cm_locationCityIp');
+		define('TBL_CM_LOCATIONCOUNTRYIP', 'cm_locationCountryIp');
 
 		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
 		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
 
-		define('TBL_SK_CONFIG', 'sk_config');
-		define('TBL_SK_CONFIG_SECTION', 'sk_config_section');
+		define('TBL_CM_CAPTCHA', 'cm_captcha');
 
-		define('TBL_COOKIES_LOGIN', 'cookies_login');
+		define('TBL_CM_STREAM', 'cm_stream');
 
-		define('TBL_PROFILE_FIELD_KEY', 'profile_field_key');
-		define('TBL_PROFILE_FIELD_VALUE', 'profile_field_value');
+		define('TBL_CM_STRING', 'cm_string');
 
-		define('TBL_PROFILE_FIELD', 'profile_field');
+		define('TBL_CM_ACTION', 'cm_action');
+		define('TBL_CM_ACTIONLIMIT', 'cm_actionLimit');
 
-		define('TBL_PAYMENT_PROVIDER', 'payment_provider');
-		define('TBL_PAYMENT_PROVIDER_FIELD', 'payment_provider_field');
-		define('TBL_PAYMENT_PROVIDER_BUNDLE', 'payment_provider_bundle');
+		define('TBL_CM_SESSION', 'cm_session');
 
-		define('TBL_PROFILE_EMAIL_VERIFY_CODE', 'profile_email_verification_code');
+		define('TBL_CM_MAIL', 'cm_mail');
 
-		define('TBL_PROFILE', 'profile');
-		define('TBL_PROFILE_PHOTO', 'profile_photo');
-		define('TBL_PROFILE_VIDEO', 'profile_video');
-		define('TBL_PROFILE_VIDEO_RATE', 'profile_video_rate');
-		define('TBL_VIDEO_VIEW', 'video_view');
-		define('TBL_VIDEO_CATEGORY', 'video_category');
+		define('TBL_CM_ROLE', 'cm_role');
 
-		define('TBL_ADMIN', 'admin');
-		define('TBL_LINK_ADMIN_DOCUMENT', 'link_admin_document');
-
-		define('TBL_CAPTCHA', 'tmp_captcha');
-
-		define('TBL_BLOG_POST', 'blogpost');
-
-		define('TBL_COMMENT', 'comment');
-
-		define('TBL_BLOG_POST_TAG', 'tag_4');
-		define('TBL_VIDEO_TAG', 'tag_3');
-
-		define('TBL_BLOG_POST_RATE', 'rate_4');
-		define('TBL_PHOTO_RATE', 'rate_2');
-		define('TBL_VIDEO_RATE', 'rate_3');
-		define('TBL_PROFILE_RATE', 'profile_rate');
-
-		define('TBL_TAG', 'tag');
-
-		define('TBL_FEED', 'feed');
-
-		define('TBL_PHOTO_VIEW', 'profile_photo_view');
-
-		define('TBL_BADWORD', 'badword');
-
-		define('TBL_VIRTUAL_GIFT_TPL', 'virtual_gift_template');
-
-		define('TBL_TEXT_FORMATTER_IMAGE', 'text_formatter_image');
-
-		define('TBL_REVIEW', 'review');
-		define('TBL_PROFILE_RESETPASSWORD', 'profile_resetpassword');
-
-		define('TBL_TMP_PHOTO', 'tmp_photo');
-		define('TBL_TMP_USER', 'tmp_user');
-		define('TBL_TMP_VIDEO', 'tmp_video');
-		define('TBL_TMP_BLOGPOST', 'tmp_blogpost');
-
-		define('TBL_DEV_STREAM', 'dev_stream');
-
-		define('TBL_CHAT', 'chat');
-		define('TBL_CHAT_MEMBER', 'chat_member');
-		define('TBL_CHAT_MESSAGE', 'chat_message');
-
-		define('TBL_CONTENTLIST', 'cm_contentlist');
-
-		define('TBL_ACTION', 'action');
-		define('TBL_ACTION_LIMIT', 'actionLimit');
-
-		define('TBL_CONVERSATION', 'conversation');
-		define('TBL_CONVERSATION_MESSAGE', 'conversation_message');
-		define('TBL_CONVERSATION_RECIPIENT', 'conversation_recipient');
-
-		define('TBL_SESSION', 'cm_session');
-
-		define('TBL_REPORT', 'report');
-
-		define('TBL_EMAIL_QUEUE', 'email_queue');
-		define('TBL_MAILING', 'mailing');
-
-		define('TBL_ROLE', 'role');
-		define('TBL_ROLE_ADMIN', 'role_admin');
-
-		define('TBL_SVM', 'svm');
-		define('TBL_SVM_TRAINING', 'svm_training');
-
-		define('TBL_TRANSACTION_SERVICEBUNDLE', 'transaction_serviceBundle');
-
-		define('TBL_SERVICEBUNDLE', 'serviceBundle');
-		define('TBL_SERVICEBUNDLE_SERVICE', 'serviceBundle_service');
-		define('TBL_SERVICE', 'service');
+		define('TBL_CM_SVM', 'cm_svm');
+		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
 	}
 
 	/**

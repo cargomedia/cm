@@ -26,12 +26,12 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 			$time = time() - $period;
 			$where .= ' AND `createStamp` > ' . $time;
 		}
-		$source = new CM_PagingSource_Sql_Deferred('entityType, actionType, createStamp', TBL_ACTION, $where, '`createStamp` DESC');
+		$source = new CM_PagingSource_Sql_Deferred('entityType, actionType, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
 	
 	public function add(CM_Action_Abstract $action) {
-		CM_Mysql::insertDelayed(TBL_ACTION,
+		CM_Mysql::insertDelayed(TBL_CM_ACTION,
 				array('ip' => $this->_ip, 'actionType' => $action->getType(), 'entityType' => $action->getEntityType(), 'createStamp' => time()));
 	}
 }

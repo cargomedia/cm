@@ -27,14 +27,23 @@ final class CM_EventHandler {
 
 	/**
 	 * @param string $event
-	 * @param array|null $triggerParams
 	 */
-	public function trigger($event, array $triggerParams = null) {
+	public function unbind($event) {
+		unset($this->_callbacks[$event]);
+	}
+
+	/**
+	 * @param string $event
+	 * @param array|null $params
+	 */
+	public function trigger($event, array $params = null) {
+		if (!$params) {
+			$params = array();
+		}
 		if (!empty($this->_callbacks[$event])) {
 			foreach ($this->_callbacks[$event] as $callback) {
-				$params = $triggerParams ? : array();
 				if (!empty($callback['params'])) {
-					$params = $params ? array_merge($callback['params'], $triggerParams) : $callback['params'];
+					$params = array_merge($callback['params'], $params);
 				}
 				$callback['callback'](CM_Params::factory($params));
 			}
