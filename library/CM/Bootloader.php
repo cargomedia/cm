@@ -32,7 +32,9 @@ class CM_Bootloader {
 			$class = get_class($exception);
 			$code = $exception->getCode();
 			if ($exception instanceof CM_Exception) {
-				$msg = $exception->getMessagePublic();
+				/** @var CM_Exception $exceptionCm */
+				$exceptionCm = $exception;
+				$msg = $exceptionCm->getMessagePublic();
 			} else {
 				$msg = 'Internal server error';
 			}
