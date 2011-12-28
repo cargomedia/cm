@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Upload extends CM_RequestHandler_Abstract {
+class CM_Response_Upload extends CM_Response_Abstract {
 
 	/**
 	 * Max file size allowed by the ser

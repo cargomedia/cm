@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Longpolling extends CM_RequestHandler_Abstract {
+class CM_Response_Longpolling extends CM_Response_Abstract {
 	
 	/**
 	 * @return string JSON

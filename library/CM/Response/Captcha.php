@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Captcha extends CM_RequestHandler_Abstract {
+class CM_Response_Captcha extends CM_Response_Abstract {
 
 	public function process() {
 		$this->setHeader('Content-Type', 'image/png');

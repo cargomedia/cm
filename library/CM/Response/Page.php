@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Page extends CM_RequestHandler_Abstract {
+class CM_Response_Page extends CM_Response_Abstract {
 
 	/**
 	 * @return string html code of page

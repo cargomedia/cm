@@ -1,10 +1,7 @@
 <?php
 
-class CM_RequestHandler_Component_Ajax extends CM_RequestHandler_Component_Abstract {
+class CM_Response_Component_Ajax extends CM_Response_Component_Abstract {
 
-	/**
-	 * Process the response.
-	 */
 	public function process() {
 		$this->setHeader('Content-Type', 'application/json');
 

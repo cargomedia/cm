@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Resource_CSS extends CM_RequestHandler_Resource_Abstract {
+class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 
 	public function process() {
 		$this->setHeader('Content-Type', 'text/css');

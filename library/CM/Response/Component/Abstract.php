@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_RequestHandler_Component_Abstract extends CM_RequestHandler_Abstract {
+abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 	/**
 	 * Request components object model node.
 	 *

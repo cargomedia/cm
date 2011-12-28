@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Resource_Img extends CM_RequestHandler_Resource_Abstract {
+class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 
 	public function process() {
 		$this->enableCache();

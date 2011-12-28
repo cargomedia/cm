@@ -117,12 +117,12 @@ abstract class CM_FormAction_Abstract {
 	 * An optional abstraction method for action entry data validation.
 	 *
 	 * @param array $data
-	 * @param CM_RequestHandler_Component_Form $response
+	 * @param CM_Response_Component_Form $response
 	 * @param CM_Form_Abstract $form
 	 */
-	public function checkData(array $data, CM_RequestHandler_Component_Form $response, CM_Form_Abstract $form) {
+	public function checkData(array $data, CM_Response_Component_Form $response, CM_Form_Abstract $form) {
 	}
 
-	abstract public function process(array $data, CM_RequestHandler_Component_Form $response, CM_Form_Abstract $form);
+	abstract public function process(array $data, CM_Response_Component_Form $response, CM_Form_Abstract $form);
 
 }

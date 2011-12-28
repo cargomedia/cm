@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Resource_JS extends CM_RequestHandler_Resource_Abstract {
+class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 
 	public function process() {
 		$this->setHeader('Content-Type', 'application/x-javascript');

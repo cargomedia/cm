@@ -22,9 +22,9 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 
 	/**
 	 * @throws CM_Exception_Nonexistent
-	 * @param CM_RequestHandler_Abstract $requestHandler
+	 * @param CM_Response_Abstract $response
 	 */
-	abstract public function prepare(CM_RequestHandler_Abstract $requestHandler);
+	abstract public function prepare(CM_Response_Abstract $response);
 
 	/**
 	 * Adds a component to the page

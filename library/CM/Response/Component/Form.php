@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_Component_Form extends CM_RequestHandler_Component_Abstract {
+class CM_Response_Component_Form extends CM_Response_Component_Abstract {
 	/**
 	 * Added errors.
 	 *

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_RequestHandler_Abstract extends CM_Class_Abstract {
+abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @var CM_Request_Abstract

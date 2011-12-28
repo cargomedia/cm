@@ -1,6 +1,6 @@
 <?php
 
-class CM_RequestHandler_RPC extends CM_RequestHandler_Abstract {
+class CM_Response_RPC extends CM_Response_Abstract {
 	
 	/**
 	 * @return string json encoded string
