@@ -1,0 +1,39 @@
+.panel {
+	position: fixed;
+	z-index: 9999;
+	bottom: 0;
+	left: 0;
+}
+
+.buttons << $border_highlight {
+	background-color: rgba(231, 253, 192, 1);
+	height: 15px;
+	border-top: none;
+	border-left: none;
+}
+
+.containers << $border_highlight {
+	position: absolute;
+	left: 0;
+	bottom: 15px;
+	background-color: rgba(231, 253, 192, 1);
+}
+
+.containers>* {
+	display: none;
+	height: auto;
+	max-height: 500px;
+	max-width: 130%;
+	overflow-y: auto;
+}
+
+.alerts {
+	background-color: rgba(231, 253, 192, 0.5);
+	text-shadow: white 1px 1px 0px;
+}
+
+.errors {
+	font-family: monospace;
+	background-color: orange;
+	margin: 20px;
+}
