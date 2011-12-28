@@ -1,9 +1,15 @@
 <?php
 class CM_Component_Debug extends SK_Component_Abstract {
 
+	public function checkAccessible() {
+		if (!IS_DEBUG) {
+			throw new CM_Exception_NotAllowed();
+		}
+	}
+
 	public function prepare() {
 		$debug = CM_Debug::get();
-		$stats =  $debug->getStats();
+		$stats = $debug->getStats();
 		ksort($stats);
 		$this->setTplParam('stats', $stats);
 		$cacheArray = array();
@@ -17,13 +23,10 @@ class CM_Component_Debug extends SK_Component_Abstract {
 		$this->setTplParam('errors', $errors);
 	}
 
-	public function checkAccessible() {
+	public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
 		if (!IS_DEBUG) {
 			throw new CM_Exception_NotAllowed();
 		}
-	}
-
-	public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
 		$cachesCleared = array();
 		if ($params->getBoolean('CM_Cache', false)) {
 			CM_Cache::flush();

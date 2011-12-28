@@ -5,18 +5,20 @@
 	left: 0;
 }
 
-.buttons << $border_highlight {
+.buttons {
 	background-color: rgba(231, 253, 192, 1);
 	height: 15px;
 	border-top: none;
 	border-left: none;
+	border: 1px solid black;
 }
 
-.containers << $border_highlight {
+.containers {
 	position: absolute;
 	left: 0;
 	bottom: 15px;
 	background-color: rgba(231, 253, 192, 1);
+	border: 1px solid black;
 }
 
 .containers>* {
