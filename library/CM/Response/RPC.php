@@ -20,8 +20,8 @@ class CM_Response_RPC extends CM_Response_Abstract {
 			$params = $query['params'];
 			list($class, $function) = explode('.', $query['method']);
 			$output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params),);
-		} catch (CM_Exception_AuthRequired $ex) {
-			$error = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
+		} catch (CM_Exception_AuthRequired $e) {
+			$error = array('type' => get_class($e), 'msg' => $e->getMessagePublic(), 'isPublic' => $e->isPublic());
 		}
 		if (isset($error)) {
 			$output['error'] = $error;

@@ -35,14 +35,16 @@ class CM_Bootloader {
 				/** @var CM_Exception $exceptionCm */
 				$exceptionCm = $exception;
 				$msg = $exceptionCm->getMessagePublic();
-			} else {
-				$msg = 'Internal server error';
 			}
 
 			if ($showError) {
 				$msg = $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
 				$msg .= 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
 				$msg .= '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
+			}
+
+			if (!$msg) {
+				$msg = 'Internal server error';
 			}
 
 			$logMsg = $class . ' (' . $code . '): ' . $exception->getMessage() . PHP_EOL;

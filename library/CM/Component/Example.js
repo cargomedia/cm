@@ -56,7 +56,7 @@ callRpc: function() {
 error_500_text_callback: function() {
 	this.ajaxCall('ajax_error', {status:500, text:'Errortext'}, {
 		error: function(msg, type) {
-			this.error('Error callback, type:'+type + ', msg:'+msg);
+			this.error('callback( type:'+type + ', msg:'+msg+' )');
 			return false;
 		}
 	});
@@ -67,7 +67,7 @@ error_599_text: function() {
 error_CM_Exception_public_callback: function() {
 	this.ajaxCall('ajax_error', {exception:'CM_Exception', text:'Errortext', 'public':true}, {
 		error: function(msg, type) {
-			this.error('Error callback, type:'+type + ', msg:'+msg);
+			this.error('callback( type:'+type + ', msg:'+msg+' )');
 			return false;
 		}
 	});
@@ -81,7 +81,7 @@ error_CM_Exception: function() {
 error_CM_Exception_AuthRequired_public_callback: function() {
 	this.ajaxCall('ajax_error', {exception:'CM_Exception_AuthRequired', text:'Errortext', 'public':true}, {
 		error: function(msg, type) {
-			this.error('Error callback, type:'+type + ', msg:'+msg);
+			this.error('callback( type:'+type + ', msg:'+msg+' )');
 			return false;
 		}
 	});

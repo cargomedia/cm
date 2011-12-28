@@ -13,11 +13,11 @@ class CM_Exception extends Exception {
 	}
 	
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getMessagePublic() {
 		if (!$this->_public) {
-			return 'Internal server error';
+			return null;
 		}
 		return $this->getMessage();
 	}
