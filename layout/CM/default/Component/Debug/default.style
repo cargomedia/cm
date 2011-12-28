@@ -8,9 +8,9 @@
 .buttons {
 	background-color: rgba(231, 253, 192, 1);
 	height: 15px;
-	border-top: none;
-	border-left: none;
 	border: 1px solid black;
+	border-bottom: none;
+	border-left: none;
 }
 
 .containers {

@@ -1,5 +1,5 @@
 <?php
-class CM_Component_Debug extends SK_Component_Abstract {
+class CM_Component_Debug extends CM_Component_Abstract {
 
 	public function checkAccessible() {
 		if (!IS_DEBUG) {
