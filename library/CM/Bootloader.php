@@ -35,16 +35,14 @@ class CM_Bootloader {
 				/** @var CM_Exception $exceptionCm */
 				$exceptionCm = $exception;
 				$msg = $exceptionCm->getMessagePublic();
+			} else {
+				$msg = 'Internal server error';
 			}
 
 			if ($showError) {
 				$msg = $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
 				$msg .= 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
 				$msg .= '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
-			}
-
-			if (!$msg) {
-				$msg = 'Internal server error';
 			}
 
 			$logMsg = $class . ' (' . $code . '): ' . $exception->getMessage() . PHP_EOL;
@@ -84,8 +82,7 @@ class CM_Bootloader {
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) Config::get()->debug && !IS_TEST);
 
-
-		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME'])?$_SERVER['SERVER_NAME']:'localhost') . '/');
+		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . '/');
 
 		define('DIR_SITE_ROOT', dirname(dirname(dirname(__FILE__))) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
