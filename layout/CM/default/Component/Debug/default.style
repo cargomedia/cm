@@ -25,7 +25,6 @@
 	display: none;
 	height: auto;
 	max-height: 500px;
-	max-width: 130%;
 	overflow-y: auto;
 }
 

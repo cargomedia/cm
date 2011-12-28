@@ -8,8 +8,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 
 		if ($this->_getFilename() == 'internal.js') {
 			$content = '';
-			$content .= new CM_File(DIR_PUBLIC . 'static/js/interface.js') . ';' . PHP_EOL;
-			$content .= new CM_File(DIR_PUBLIC . 'static/js/sk.js') . ';' . PHP_EOL;
+			$content .= new CM_File(DIR_PUBLIC . 'static/js/cm.js') . ';' . PHP_EOL;
 
 			$classes = array();
 			foreach (self::getSite()->getNamespaces() as $namespace) {
