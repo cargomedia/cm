@@ -103,18 +103,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return CM_Paging_Useragent_User
 	 */
 	public function getUseragents() {
-		return CM_Mysql::select(TBL_CM_USERAGENT, array('createStamp',
-			'useragent'), array('userId' => $this->getId()), 'createStamp DESC')->fetchAll();
-	}
-
-	/**
-	 * @param string $useragent
-	 */
-	public function setUseragent($useragent) {
-		CM_Mysql::replace(TBL_CM_USERAGENT, array('userId' => $this->getId(), 'useragent' => $useragent, 'createStamp' => time()));
+		return new CM_Paging_Useragent_User($this);
 	}
 
 	/**
