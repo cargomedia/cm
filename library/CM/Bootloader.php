@@ -94,20 +94,11 @@ class CM_Bootloader {
 
 		define('DIR_TMP', DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_OPENINVITER', DIR_TMP . 'openinviter' . DIRECTORY_SEPARATOR);
-
-		define('DIR_ADMIN', DIR_PUBLIC . 'admin' . DIRECTORY_SEPARATOR);
-		define('DIR_ADMIN_INC', DIR_ADMIN . 'inc' . DIRECTORY_SEPARATOR);
 
 		define('URL_OBJECTS', isset(Config::get()->objects_cdn) ? Config::get()->objects_cdn : URL_ROOT);
 		define('URL_CONTENT', isset(Config::get()->content_cdn) ? Config::get()->content_cdn : URL_ROOT);
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
-
-		define('URL_ADMIN', URL_ROOT . 'admin/');
-		define('URL_ADMIN_CSS', URL_ADMIN . 'css/');
-		define('URL_ADMIN_JS', URL_ADMIN . 'js/');
-		define('URL_ADMIN_IMG', URL_ADMIN . 'img/');
 
 		define('DIR_USERFILES', DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 		define('URL_USERFILES', URL_CONTENT . 'userfiles/');
@@ -115,10 +106,6 @@ class CM_Bootloader {
 		define('DIR_TMP_USERFILES', DIR_USERFILES . 'tmp' . DIRECTORY_SEPARATOR);
 		define('URL_TMP_USERFILES', URL_ROOT . 'userfiles/tmp/');
 
-		define('DIR_USERFILES_TEXTFORMATTER', DIR_USERFILES . 'formatter' . DIRECTORY_SEPARATOR);
-		define('URL_USERFILES_TEXTFORMATTER', URL_USERFILES . 'formatter/');
-
-		define('DIR_CONTACT_GRABBER', DIR_LIBRARY . 'ContactGrabber' . DIRECTORY_SEPARATOR);
 		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
 		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
