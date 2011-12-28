@@ -15,7 +15,7 @@ class CM_Captcha {
 		if (!$this->_text) {
 			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
 		}
-		$this->_fontDir = DIR_PUBLIC . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR . 'font';
+		$this->_fontDir = DIR_PUBLIC . 'static' . DIRECTORY_SEPARATOR . 'font';
 	}
 
 	/**
@@ -63,10 +63,9 @@ class CM_Captcha {
 	}
 
 	/**
-	 * Renders and directly outputs the image.
-	 * 
 	 * @param int $width
 	 * @param int $height
+	 * @return string PNG-data
 	 * @throws CM_Exception
 	 */
 	public function render($width, $height) {
@@ -75,26 +74,25 @@ class CM_Captcha {
 		}
 
 		$fonts = CM_Util::rglob('*.ttf', $this->_fontDir);
-		if (!count($fonts)) {
-			throw new CM_Exception('Couldnt load any fonts');
+		if (empty($fonts)) {
+			throw new CM_Exception('Cannot any .ttf-fonts in `' . $this->_fontDir . '`');
 		}
 
 		// Fill background
 		sscanf('F0A0C0', "%2x%2x%2x", $red, $green, $blue);
-		for ($i = 0, $rd = ($red > 0) ? $red : rand(0, 100), $gr = ($green > 0) ? $green : rand(0, 100), $bl = ($blue > 0) ? $blue : rand(0, 100); $i
-				<= $height; $i++) {
+		for ($i = 0, $rd = ($red > 0) ? $red : rand(0, 100), $gr = ($green > 0) ? $green : rand(0, 100), $bl = ($blue > 0) ? $blue : rand(0, 100);
+			 $i <= $height; $i++) {
 			$color = @imagecolorallocate($resource, $rd += ($rd < 250) ? 2 : 0, $gr += ($gr < 250) ? 2 : 0, $bl += ($bl < 250) ? 2 : 0);
 			@imageline($resource, 0, $i, $width, $i, $color);
 		}
 		$colorBackground = $color;
-		$this->_bg = $colorBackground;
 
 		// Apply text
 		$colorShadow = @imagecolorallocate($resource, 0, rand(0, 255), rand(0, 255));
 		$size = 20;
 		$text = strtoupper($this->getText());
-		$num_fonts = count($fonts);
-		for ($i = 0, $strlen = strlen($text), $p = floor(abs((($width - ($size * $strlen)) / 2) - floor($size / 2))); $i < $strlen; $i++, $p += $size) {
+		for ($i = 0, $strlen = strlen($text), $p = floor(abs((($width - ($size * $strlen)) / 2) - floor($size / 2)));
+			 $i < $strlen; $i++, $p += $size) {
 			$font = $fonts[array_rand($fonts)];
 			$d = rand(-8, 8);
 			$y = rand(floor($height / 2) + floor($size / 2), $height - floor($size / 2));
@@ -117,8 +115,10 @@ class CM_Captcha {
 			imagesetpixel($resource, rand(0, $width), rand(0, $height), $color);
 		}
 
-		@imageinterlace($resource, 1);
+		ob_start();
 		@imagepng($resource);
+		$image = ob_get_clean();
 		@imagedestroy($resource);
+		return $image;
 	}
 }

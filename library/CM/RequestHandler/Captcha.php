@@ -6,6 +6,6 @@ class CM_RequestHandler_Captcha extends CM_RequestHandler_Abstract {
 		$this->setHeader('Content-Type', 'image/png');
 		$params = $this->_request->getQuery();
 		$captcha = new CM_Captcha($params['id']);
-		$captcha->render(200, 40);
+		return $captcha->render(200, 40);
 	}
 }
