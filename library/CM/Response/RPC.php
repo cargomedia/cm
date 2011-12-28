@@ -1,7 +1,7 @@
 <?php
 
 class CM_Response_RPC extends CM_Response_Abstract {
-	
+
 	/**
 	 * @return string json encoded string
 	 */
@@ -20,11 +20,11 @@ class CM_Response_RPC extends CM_Response_Abstract {
 			$params = $query['params'];
 			list($class, $function) = explode('.', $query['method']);
 			$output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params),);
-		} catch (CM_Exception_AuthRequired $e) {
-			$error = array('type' => get_class($e), 'msg' => $e->getMessagePublic(), 'isPublic' => $e->isPublic());
-		}
-		if (isset($error)) {
-			$output['error'] = $error;
+		} catch (CM_Exception $e) {
+			if (!($e->isPublic() || in_array(get_class($e), self::_getConfig()->catch))) {
+				throw $e;
+			}
+			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic(), 'isPublic' => $e->isPublic());
 		}
 		return json_encode($output);
 	}
