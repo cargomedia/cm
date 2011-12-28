@@ -10,10 +10,6 @@ initialize: function() {
 	}
 },
 
-render: function() {
-	console.log("render");
-},
-
 /**
  * Called when all components are loaded
  */
