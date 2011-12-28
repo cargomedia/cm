@@ -10,6 +10,11 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			$content = '';
 			$content .= new CM_File(DIR_PUBLIC . 'static/js/cm.js') . ';' . PHP_EOL;
 
+			$entityTypes = Config::get()->CM_Model_Entity_Abstract->types;
+			if (is_array($entityTypes)) {
+				$content .= 'cm.entity.types = ' . CM_Params::encode(array_flip($entityTypes), true) . ';' . PHP_EOL;
+			}
+
 			$classes = array();
 			foreach (self::getSite()->getNamespaces() as $namespace) {
 				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Renderable/'));

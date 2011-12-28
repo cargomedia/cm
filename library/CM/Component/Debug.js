@@ -18,8 +18,8 @@ ready: function() {
 		});
 	});
 
-	_.each(cm.entity.type, function(entityType, entityName) {
-		_.each(cm.action.type, function(actionType, actionName) {
+	_.each(cm.entity.types, function(entityType, entityName) {
+		_.each(cm.action.types, function(actionType, actionName) {
 			handler.bindAction(actionType, entityType, function(action, entity, data) {
 				var msg = "ACTION: <[USER:" + action.actor.id + "] , " + actionName + " , " + "[" + entityName + ":" + entity.id + "]>";
 				msg += " (" + JSON.stringify(data) + ")";
