@@ -6,6 +6,7 @@ events: {
 	"click .reload": "reloadChinese",
 	"click .popout": "popOut",
 	"click .popin": "popIn",
+	"click .load": "loadExample",
 	"click .call": "callAjax",
 	"click .rpc": "callRpc",
 	"click .error_500_text_callback": "error_500_text_callback",
@@ -30,6 +31,10 @@ ready: function() {
 
 reloadChinese: function() {
 	this.reload({foo:'some chinese.. 百度一下，你就知道 繁體字!'});
+},
+
+loadExample: function() {
+	this.load('CM_Component_Example', {foo:'value2'});
 },
 
 callAjax: function() {

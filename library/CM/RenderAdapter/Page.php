@@ -13,8 +13,10 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$options['urlStatic'] = URL_STATIC;
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream::getEnabled();
-		$options['stream']['adapter'] = CM_Stream::getAdapterClass();
-		$options['stream']['server'] = CM_Stream::getServer();
+		if (CM_Stream::getEnabled()) {
+			$options['stream']['adapter'] = CM_Stream::getAdapterClass();
+			$options['stream']['server'] = CM_Stream::getServer();
+		}
 		if ($viewer = $page->getViewer()) {
 			$options['stream']['channel'] = CM_Stream::getStreamChannel($viewer);
 		}
@@ -37,7 +39,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$this->getLayout()->assign('tracking', CM_Tracking::getInstance()->getHtml());
 		$this->getLayout()->assign('viewer', $page->getViewer());
 		$this->getLayout()->assign('js', $js);
-
 
 		$tplPath = $this->getRender()->getLayoutPath('layout/base.tpl');
 		return $this->getLayout()->fetch($tplPath);

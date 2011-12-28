@@ -14,6 +14,9 @@ abstract class CM_StreamAdapter_Abstract extends CM_Class_Abstract {
 	 */
 	public static function getServer() {
 		$servers = self::_getConfig()->servers;
+		if (empty($servers)) {
+			throw new CM_Exception_Invalid('No servers configured');
+		}
 		$server = $servers[array_rand($servers)];
 		if (self::_getConfig()->hostPrefix) {
 			$server['host'] = rand(1, 9999) . '.' . $server['host'];
