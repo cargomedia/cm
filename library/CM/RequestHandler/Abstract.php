@@ -134,5 +134,8 @@ abstract class CM_RequestHandler_Abstract extends CM_Class_Abstract {
 		$this->_request = $request;
 	}
 
+	/**
+	 * @return string Response data
+	 */
 	abstract public function process();
 }
