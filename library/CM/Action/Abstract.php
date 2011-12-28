@@ -76,6 +76,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return CM_Model_ActionLimit_Abstract|null
 	 */
 	public final function getActionLimit(&$bestRole = null) {
+		/** @var CM_Model_ActionLimit_Abstract $actionLimit */
 		foreach (new CM_Paging_ActionLimit_Action($this) as $actionLimit) {
 			$bestRole = null;
 			if ($this->getActor()) {
