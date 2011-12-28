@@ -214,11 +214,12 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	/**
 	 * Creates a new page based on the given path (including params)
 	 *
+	 * @param CM_Site_Abstract $site
 	 * @param CM_Request_Abstract $request
 	 * @return CM_Page_Abstract
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public static final function factory(CM_Request_Abstract $request) {
+	public static final function factory(CM_Site_Abstract $site, CM_Request_Abstract $request) {
 		$path = $request->getPath();
 
 		if ($path == '/') {
@@ -232,7 +233,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 			$pathToken = preg_replace('/-([a-z])/e', 'strtoupper("$1")', ucfirst($pathToken));
 		}
 
-		$className = Config::get()->namespace . '_Page_' . implode('_', $pathTokens);
+		$className = $site->getNamespace() . '_Page_' . implode('_', $pathTokens);
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
 			throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`');
 		}

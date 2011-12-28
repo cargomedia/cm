@@ -1,13 +1,6 @@
 <?php
 
-/**
- * Abstract cache class for static access on specific implementations.
- * Includes runtime-cache (array) to avoid multiple get()s for the same key.
- * A cache implementation can use a pre-cache (@see _setPreCache()).
- *
- */
-
-abstract class CM_Cache_Abstract {
+abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	protected $_preCache = null;
 	protected $_runtimeCache = array();
 
@@ -130,7 +123,7 @@ abstract class CM_Cache_Abstract {
 	 * @return boolean
 	 */
 	protected static function _enabled() {
-		return true;
+		return static::_getConfig()->enabled;
 	}
 
 	/**
@@ -141,7 +134,7 @@ abstract class CM_Cache_Abstract {
 	/**
 	 * @param string $key
 	 * @param string $data
-	 * @param int $lifeTime
+	 * @param int	$lifeTime
 	 * @return boolean
 	 */
 	abstract protected function _set($key, $data, $lifeTime = null);
@@ -166,8 +159,8 @@ abstract class CM_Cache_Abstract {
 	/**
 	 * @param string $tag
 	 * @param string $key
-	 * @param mixed $data
-	 * @param int $lifeTime
+	 * @param mixed  $data
+	 * @param int	$lifeTime
 	 * @return boolean
 	 */
 	protected final function _setTagged($tag, $key, $data, $lifeTime = null) {

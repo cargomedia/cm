@@ -9,7 +9,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 
 		try {
 			$this->_setRequest($this->getSite()->rewrite($this->getRequest()));
-			$page = CM_Page_Abstract::factory($this->getRequest());
+			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);
 		} catch (CM_Exception $e) {
@@ -18,7 +18,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			}
 			$path = $this->_getConfig()->catch[get_class($e)];
 			$this->_setRequest(new CM_Request_Get($path, $this->getRequest()->getHeaders()));
-			$page = CM_Page_Abstract::factory($this->getRequest());
+			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);
 		}

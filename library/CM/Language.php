@@ -1,6 +1,6 @@
 <?php
 
-class CM_Language {
+class CM_Language extends CM_Class_Abstract {
 	private static $vars_global = array();
 
 	/**
@@ -36,7 +36,7 @@ class CM_Language {
 	}
 
 	public static function getDefaultId() {
-		return Config::get()->language_default_id;
+		return self::_getConfig()->idDefault;
 	}
 
 	public static function getAllIds() {

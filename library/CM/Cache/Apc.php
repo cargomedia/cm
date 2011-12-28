@@ -3,17 +3,13 @@
 abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 	protected static $_instance;
 
-	protected static function _enabled() {
-		return Config::get()->cache->apc->enabled;
-	}
-
 	protected function _getName() {
 		return 'APC';
 	}
 
 	protected function _set($key, $data, $lifeTime = null) {
 		if (!$lifeTime) {
-			$lifeTime = Config::get()->cache->apc->lifetime;
+			$lifeTime = self::_getConfig()->lifetime;
 		}
 		return apc_store($key, $data, $lifeTime);
 	}

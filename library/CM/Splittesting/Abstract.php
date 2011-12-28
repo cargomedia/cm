@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Splittesting_Abstract {
+abstract class CM_Splittesting_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @return string
@@ -16,6 +16,6 @@ abstract class CM_Splittesting_Abstract {
 	 * @return boolean
 	 */
 	public function enabled() {
-		return (boolean) Config::get()->splittesting;
+		return (boolean) self::_getConfig()->enabled;
 	}
 }

@@ -6,13 +6,9 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 
 	function __construct() {
 		$this->_memcache = new Memcache();
-		foreach (Config::get()->cache->memcache->servers as $server) {
-			@$this->_memcache->addServer($server[0] . ':' . $server[1]);
+		foreach (self::_getConfig()->servers as $server) {
+			@$this->_memcache->addServer($server['host'] . ':' . $server['port']);
 		}
-	}
-
-	protected static function _enabled() {
-		return Config::get()->cache->memcache->enabled;
 	}
 
 	protected function _getName() {
@@ -21,7 +17,7 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 
 	protected function _set($key, $data, $lifeTime = null) {
 		if (!$lifeTime) {
-			$lifeTime = Config::get()->cache->memcache->lifetime;
+			$lifeTime = self::_getConfig()->lifetime;
 		}
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}

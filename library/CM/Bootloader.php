@@ -3,7 +3,7 @@
 class CM_Bootloader {
 
 	public function defaults() {
-		date_default_timezone_set(Config::get()->time_zone);
+		date_default_timezone_set(Config::get()->timeZone);
 		mb_internal_encoding('UTF-8');
 	}
 

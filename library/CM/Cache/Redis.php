@@ -12,16 +12,12 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 
 	public function __construct() {
 		$this->_redis = new Redis();
-		$server = Config::get()->cache->redis->server;
+		$server = self::_getConfig()->server;
 		try {
-			$this->_redis->connect($server[0], $server[1]);
+			$this->_redis->connect($server['host'], $server['port']);
 		} catch (RedisException $e) {
-			throw new CM_Exception('Cannot connect to redis server: ' . $e->getMessage());
+			throw new CM_Exception('Cannot connect to redis server `' . $server['host'] . '` on port `' . $server['port'] . '`: ' . $e->getMessage());
 		}
-	}
-
-	protected static function _enabled() {
-		return Config::get()->cache->redis->enabled;
 	}
 
 	protected function _getName() {
@@ -49,7 +45,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	protected function _sAdd($key, $value) {
 		return $this->_redis->sAdd($key, $value);
 	}
-	
+
 	/**
 	 * @param string $channel
 	 * @param string $msg
