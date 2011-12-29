@@ -98,6 +98,14 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return string
+	 */
+	protected static final function _getKeyArmored($key) {
+		return DIR_ROOT . '_' . $key;
+	}
+
+	/**
 	 * @return boolean
 	 */
 	protected static function _enabled() {

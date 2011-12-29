@@ -19,14 +19,17 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 		if (!$lifeTime) {
 			$lifeTime = self::_getConfig()->lifetime;
 		}
+		$key = self::_getKeyArmored($key);
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}
 
 	protected function _get($key) {
+		$key = self::_getKeyArmored($key);
 		return $this->_memcache->get($key);
 	}
 
 	protected function _delete($key) {
+		$key = self::_getKeyArmored($key);
 		return $this->_memcache->delete($key, 0);
 	}
 

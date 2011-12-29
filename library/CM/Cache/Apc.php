@@ -11,14 +11,17 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 		if (!$lifeTime) {
 			$lifeTime = self::_getConfig()->lifetime;
 		}
+		$key = self::_getKeyArmored($key);
 		return apc_store($key, $data, $lifeTime);
 	}
 
 	protected function _get($key) {
+		$key = self::_getKeyArmored($key);
 		return apc_fetch($key);
 	}
 
 	protected function _delete($key) {
+		$key = self::_getKeyArmored($key);
 		return apc_delete($key);
 	}
 
