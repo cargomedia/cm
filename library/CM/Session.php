@@ -9,9 +9,29 @@ class CM_Session {
 	 */
 	private static $_instance = null;
 
+	public function __construct() {
+		CM_SessionHandler::register();
+		if (!headers_sent()) {
+			session_start();
+		}
+
+		if ($user = $this->getViewer()) {
+			if (!$user->canLogin()) {
+				$this->logout();
+				return;
+			}
+			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
+				$user->updateLatestactivity();
+			}
+			if (!$user->getOnline()) {
+				$user->setOnline(true);
+			}
+		}
+	}
+
 	/**
 	 * @param string $key
-	 * @return misc
+	 * @return mixed
 	 */
 	public function get($key) {
 		if (!isset($_SESSION[$key])) {
@@ -21,8 +41,8 @@ class CM_Session {
 	}
 
 	/**
-	 * @param string $key
-	 * @param misc   $data
+	 * @param string  $key
+	 * @param mixed   $data
 	 */
 	public function set($key, $data) {
 		$_SESSION[$key] = $data;
@@ -64,42 +84,22 @@ class CM_Session {
 		if ($user = $this->getViewer()) {
 			$user->setOnline(false);
 		}
-		if (session_id()) {
-			$this->delete('userId');
-			$this->regenerateId();
-		}
+		$this->delete('userId');
+		$this->regenerateId();
 	}
 
+	/**
+	 * @param CM_Model_User $user
+	 */
 	public function login(CM_Model_User $user) {
 		$this->regenerateId();
 		$this->set('userId', $user->getId());
+		$user->setOnline(true);
 	}
 
 	public function regenerateId() {
-		session_regenerate_id(true);
-	}
-
-	public function start() {
-		CM_SessionHandler::register();
 		if (!headers_sent()) {
-			session_start();
-		}
-
-		if (CM_Request_Abstract::isIpBlocked()) {
-			$this->logout();
-			return;
-		}
-		if ($user = $this->getViewer()) {
-			if (!$user->canLogin()) {
-				$this->logout();
-				return;
-			}
-			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
-				$user->updateLatestactivity();
-			}
-			if (!$user->getOnline()) {
-				$user->setOnline(true);
-			}
+			session_regenerate_id(true);
 		}
 	}
 

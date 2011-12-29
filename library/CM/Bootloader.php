@@ -8,7 +8,7 @@ class CM_Bootloader {
 	}
 
 	public function session() {
-		CM_Session::getInstance()->start();
+		CM_Session::getInstance();
 	}
 
 	public function autoloader() {
