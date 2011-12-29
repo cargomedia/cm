@@ -72,9 +72,9 @@ class CM_Session {
 		CM_SessionHandler::register();
 		if (!headers_sent()) {
 			session_start();
-			if ($regenerateId) {
-				session_regenerate_id(true);
-			}
+		}
+		if ($regenerateId) {
+			session_regenerate_id(true);
 		}
 
 		if (CM_Request_Abstract::isIpBlocked()) {
