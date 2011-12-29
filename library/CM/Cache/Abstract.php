@@ -8,10 +8,10 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @return CM_Cache_Abstract
 	 */
 	public static final function getInstance() {
-		if (!isset(static ::$_instance)) {
-			static ::$_instance = new static();
+		if (!isset(static::$_instance)) {
+			static::$_instance = new static();
 		}
-		return static ::$_instance;
+		return static::$_instance;
 	}
 
 	public static final function set($key, $value, $lifeTime = null) {
