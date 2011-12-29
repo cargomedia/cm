@@ -30,6 +30,13 @@ class CM_Session {
 
 	/**
 	 * @param string $key
+	 */
+	public function delete($key) {
+		unset($_SESSION[$key]);
+	}
+
+	/**
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function has($key) {
@@ -58,14 +65,18 @@ class CM_Session {
 			$user->setOnline(false);
 		}
 		if (session_id()) {
-			session_destroy();
-			session_regenerate_id();
+			$this->delete('userId');
+			$this->regenerateId();
 		}
 	}
 
 	public function login(CM_Model_User $user) {
-		$this->start(true);
+		$this->regenerateId();
 		$this->set('userId', $user->getId());
+	}
+
+	public function regenerateId() {
+		session_regenerate_id();
 	}
 
 	public function start($regenerateId = false) {
@@ -73,7 +84,7 @@ class CM_Session {
 		if (!headers_sent()) {
 			session_start();
 			if ($regenerateId) {
-				session_regenerate_id(true);
+				$this->regenerateId(true);
 			}
 		}
 
