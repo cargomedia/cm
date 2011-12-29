@@ -8,7 +8,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	public function process() {
 
 		try {
-			$this->_setRequest($this->getSite()->rewrite($this->getRequest()));
+			$this->getSite()->rewrite($this->getRequest());
 			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);
@@ -17,7 +17,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 				throw $e;
 			}
 			$path = $this->_getConfig()->catch[get_class($e)];
-			$this->_setRequest(new CM_Request_Get($path, $this->getRequest()->getHeaders()));
+			$this->getRequest()->setPath($path);
 			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);

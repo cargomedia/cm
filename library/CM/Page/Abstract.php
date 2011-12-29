@@ -222,9 +222,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	public static final function factory(CM_Site_Abstract $site, CM_Request_Abstract $request) {
 		$path = $request->getPath();
 
-		if ($path == '/') {
-			$path = '/index';
-		}
 		$pathTokens = explode('/', $path);
 		array_shift($pathTokens);
 
@@ -248,9 +245,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 * @return string
 	 */
 	public static final function link($path, array $params = null, $absolute = false) {
-		if ($path == '/index') {
-			$path = '/';
-		}
 		if ($absolute) {
 			$path = substr(URL_ROOT, 0, -1) . $path;
 		}

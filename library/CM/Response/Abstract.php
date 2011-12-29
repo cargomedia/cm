@@ -32,7 +32,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @param int|null            $siteId
 	 */
 	public function __construct(CM_Request_Abstract $request, $siteId = null) {
-		$this->_setRequest($request);
+		$this->_request = $request;
 		$this->_site = CM_Site_Abstract::factory($siteId);
 	}
 
@@ -125,13 +125,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 			$this->_render = new CM_Render($this->getSite());
 		}
 		return $this->_render;
-	}
-
-	/**
-	 * @param CM_Request_Abstract $request
-	 */
-	protected function _setRequest(CM_Request_Abstract $request) {
-		$this->_request = $request;
 	}
 
 	/**

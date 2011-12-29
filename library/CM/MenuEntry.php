@@ -69,10 +69,6 @@ class CM_MenuEntry {
 	 * @return bool True if path/queries match
 	 */
 	public final function compare($path, array $params = array()) {
-		if ($path == '/') {
-			$path = '/index';
-		}
-
 		if ($path == $this->getPage()->getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
 			return true;
 		}

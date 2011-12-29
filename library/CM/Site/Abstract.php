@@ -51,6 +51,9 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @return CM_Request_Abstract
 	 */
 	public function rewrite(CM_Request_Abstract $request) {
+		if ($request->getPath() == '/') {
+			$request->setPath('/index');
+		}
 		return $request;
 	}
 	

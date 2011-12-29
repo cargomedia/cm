@@ -72,6 +72,15 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @param $path
+	 * @return CM_Request_Abstract
+	 */
+	public function setPath($path) {
+		$this->_path = (string) $path;
+		return $this;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getQuery() {
