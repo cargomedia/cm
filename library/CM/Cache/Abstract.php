@@ -1,7 +1,6 @@
 <?php
 
 abstract class CM_Cache_Abstract extends CM_Class_Abstract {
-	protected $_preCache = null;
 	protected $_runtimeCache = array();
 
 	/**
@@ -19,9 +18,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return;
 		}
 		$cache = static::getInstance();
-		if ($preCache = $cache->_getPreCache()) {
-			$preCache::set($key, $value, $lifeTime);
-		}
 		$cache->_runtimeCache[$key] = $value;
 		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-set', $key);
 		$cache->_set($key, $value, $lifeTime);
@@ -35,32 +31,18 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		if (array_key_exists($key, $cache->_runtimeCache)) {
 			return $cache->_runtimeCache[$key];
 		}
-		if ($preCache = $cache->_getPreCache()) {
-			if (($value = $preCache::get($key)) !== false) {
-				return $value;
-			}
-		}
 		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-get', $key);
 		if (($value = $cache->_get($key)) !== false) {
 			$cache->_runtimeCache[$key] = $value;
-			if ($preCache = $cache->_getPreCache()) {
-				// Note: Pre-caching uses default life-time!
-				$preCache::set($key, $value);
-			}
 		}
 		return $value;
 	}
 
 	public static final function delete($key) {
-
 		if (!static::_enabled()) {
 			return;
 		}
 		$cache = static::getInstance();
-
-		if ($preCache = $cache->_getPreCache()) {
-			$preCache::delete($key);
-		}
 		unset($cache->_runtimeCache[$key]);
 		$cache->_delete($key);
 	}
@@ -70,9 +52,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return;
 		}
 		$cache = static::getInstance();
-		if ($preCache = $cache->_getPreCache()) {
-			$preCache::flush();
-		}
 		$cache->_runtimeCache = array();
 		$cache->_flush();
 	}
@@ -109,14 +88,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-' . $functionName, implode(', ', $arguments));
 		}
 		return call_user_func_array(array($cache, '_' . $functionName), $arguments);
-	}
-
-	protected final function _setPreCache(CM_Cache_Abstract $cache) {
-		$this->_preCache = $cache;
-	}
-
-	protected final function _getPreCache() {
-		return $this->_preCache;
 	}
 
 	/**
