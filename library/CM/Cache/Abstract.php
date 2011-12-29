@@ -15,7 +15,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	public static final function set($key, $value, $lifeTime = null) {
-		if (!static ::_enabled()) {
+		if (!static::_enabled()) {
 			return;
 		}
 		$cache = static::getInstance();
@@ -28,7 +28,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	public static final function get($key) {
-		if (!static ::_enabled()) {
+		if (!static::_enabled()) {
 			return false;
 		}
 		$cache = static::getInstance();
@@ -53,7 +53,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	public static final function delete($key) {
 
-		if (!static ::_enabled()) {
+		if (!static::_enabled()) {
 			return;
 		}
 		$cache = static::getInstance();
@@ -66,7 +66,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	public static final function flush() {
-		if (!static ::_enabled()) {
+		if (!static::_enabled()) {
 			return;
 		}
 		$cache = static::getInstance();
@@ -165,7 +165,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	protected final function _setTagged($tag, $key, $data, $lifeTime = null) {
 		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
-		return static ::set($key, $data, $lifeTime);
+		return static::set($key, $data, $lifeTime);
 	}
 
 	/**
@@ -175,7 +175,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	protected final function _getTagged($tag, $key) {
 		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
-		return static ::get($key);
+		return static::get($key);
 	}
 
 	/**
@@ -183,14 +183,14 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @return boolean
 	 */
 	protected final function _deleteTag($tag) {
-		return static ::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
+		return static::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
 	}
 
 	private final function _getTagVersion($tag) {
 		$cacheKey = CM_CacheConst::Tag_Version . '_tag:' . $tag;
-		if (($tagVersion = static ::get($cacheKey)) === false) {
+		if (($tagVersion = static::get($cacheKey)) === false) {
 			$tagVersion = md5(rand() . uniqid());
-			static ::set($cacheKey, $tagVersion);
+			static::set($cacheKey, $tagVersion);
 		}
 		return $tagVersion;
 	}
