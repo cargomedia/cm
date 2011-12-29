@@ -13,11 +13,6 @@ class CM_Form_Example extends CM_Form_Abstract {
 	}
 
 	public function renderStart(array $params = null) {
-		if (!empty($params['viewer'])) {
-			if ($color = $params['viewer']->getProfile()->getBackgroundColor()) {
-				$this->getField('color')->setValue($color);
-			}
-		}
 		if ($locationGuess = CM_Location::findByIp(CM_Request_Abstract::getIp())) {
 			$this->getField('location')->setValue($locationGuess);
 		}
