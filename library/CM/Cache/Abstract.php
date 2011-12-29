@@ -68,11 +68,18 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		static::_callInstance('deleteTag', func_get_args());
 	}
 
-	public static final function key($namespace, $key) {
-		if (!is_scalar($key)) {
-			$key = md5(serialize($key));
+	/**
+	 * @param mixed $keyPart ...
+	 * @return string
+	 */
+	public static final function key($keyPart) {
+		$parts = func_get_args();
+		foreach ($parts as &$part) {
+			if (!is_scalar($part)) {
+				$part = md5(serialize($part));
+			}
 		}
-		return $namespace . '_' . $key;
+		return implode('_', $parts);
 	}
 
 	public static final function __callStatic($name, $arguments) {
