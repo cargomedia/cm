@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_User extends CM_Model_Abstract {
+class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 
 	/**
 	 * @return boolean
@@ -171,5 +171,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
 		$this->getTransgressions()->deleteAll();
+	}
+
+	public function toArray() {
+		return array('id' => $this->getId(), 'displayName' => $this->getDisplayName(), 'email' => $this->getEmail());
+	}
+
+	public static function fromArray(array $data) {
+		return new static($data['id']);
 	}
 }
