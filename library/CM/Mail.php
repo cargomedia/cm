@@ -214,7 +214,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 		if ($this->_delayed) {
 			$this->_queue($text, $html);
 		} else {
-			self::_send($this->_subject, $text, $this->_senderAddress, $this->_recipientAddress, $this->_senderName, $html);
+			self::_send($subject, $text, $this->_senderAddress, $this->_recipientAddress, $this->_senderName, $html);
 		}
 		return array($subject, $html, $text);
 	}
