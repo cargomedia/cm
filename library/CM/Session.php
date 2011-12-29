@@ -59,7 +59,7 @@ class CM_Session {
 		}
 		if (session_id()) {
 			session_destroy();
-			$this->start(true);
+			session_regenerate_id();
 		}
 	}
 
