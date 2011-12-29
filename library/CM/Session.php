@@ -76,16 +76,13 @@ class CM_Session {
 	}
 
 	public function regenerateId() {
-		session_regenerate_id();
+		session_regenerate_id(true);
 	}
 
-	public function start($regenerateId = false) {
+	public function start() {
 		CM_SessionHandler::register();
 		if (!headers_sent()) {
 			session_start();
-			if ($regenerateId) {
-				$this->regenerateId(true);
-			}
 		}
 
 		if (CM_Request_Abstract::isIpBlocked()) {
