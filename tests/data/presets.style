@@ -1,0 +1,16 @@
+/** This file contains some presets that are used by CSSTest.php*/
+
+$var1 {
+	width: 50%;
+	height: 50%;	
+}
+
+$var2 {
+	width: 60%;
+}
+
+$var3 {
+	Height: 190px;
+	border: 1px solid lightGrey;
+	overwriteparam: its overwritten;
+}

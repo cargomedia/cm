@@ -1,0 +1,19 @@
+/*this file is used by CSSTest.php*/
+.test:visible {
+	color: black;
+	height:300px;
+}
+
+.test2 << $var1, $var2  {
+Height:300px;
+}
+
+.test3 .whale, .test4 .whale << $var3, $var1 {
+	testparamb: testParam3;
+	overwriteparam: #FFFFFF;
+}
+
+{
+	testparama: testValue1;
+	testparamb: testValue2;
+}
