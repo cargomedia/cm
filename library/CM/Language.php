@@ -91,7 +91,7 @@ class CM_Language extends CM_Class_Abstract {
 		} catch (CM_TreeException $e) {
 			if (IS_DEBUG || IS_TEST ) {
 
-				if (Config::get()->languageCreate) {
+				if (self::_getConfig()->autoCreate) {
 					CM_LanguageEdit::createKey($fullPath);
 					return self::text($fullPath, $vars);
 				}
