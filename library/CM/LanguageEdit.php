@@ -533,11 +533,14 @@ class CM_LanguageEdit {
 	 * If key already exists, value is updated
 	 *
 	 * @param string $keyPath
-	 * @param string $value
-	 * @param int $langId
+	 * @param string|null $value
+	 * @param int|null $langId
 	 * @return int New key id
 	 */
-	public static function createKey($keyPath, $value = null, $langId = 1) {
+	public static function createKey($keyPath, $value = null, $langId = null) {
+
+		$langId = $langId ? $langId : CM_Language::getDefaultId();
+
 		if (strlen($keyPath) > 0 && $keyPath[0] == '%') {
 			$keyPath = substr($keyPath, 1);
 		}
