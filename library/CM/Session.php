@@ -90,8 +90,12 @@ class CM_Session {
 
 	/**
 	 * @param CM_Model_User $user
+	 * @param int $cookieLifetime
 	 */
-	public function login(CM_Model_User $user) {
+	public function login(CM_Model_User $user, $cookieLifetime = null) {
+		if ($cookieLifetime) {
+			session_set_cookie_params($cookieLifetime);
+		}
 		$this->regenerateId();
 		$this->set('userId', $user->getId());
 		$user->setOnline(true);
