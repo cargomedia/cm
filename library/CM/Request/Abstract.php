@@ -88,6 +88,16 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function setQueryParam($key, $value) {
+		$key = (string) $key;
+		$value = (string) $value;
+		$this->_query[$key] = $value;
+	}
+
+	/**
 	 * @param string $name
 	 * @return bool
 	 */
