@@ -90,7 +90,7 @@ class CM_Session {
 
 	/**
 	 * @param CM_Model_User $user
-	 * @param int $cookieLifetime
+	 * @param int|null $cookieLifetime
 	 */
 	public function login(CM_Model_User $user, $cookieLifetime = null) {
 		if ($cookieLifetime) {
