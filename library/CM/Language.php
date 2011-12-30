@@ -77,10 +77,10 @@ class CM_Language extends CM_Class_Abstract {
 	 * @param array  $vars
 	 * @return string
 	 */
-	public static function text($path, array $vars = null) {
+	public static function text($fullPath, array $vars = null) {
 
 		try {
-			list($path, $key) = self::_parsePath($path);
+			list($path, $key) = self::_parsePath($fullPath);
 
 			$section = self::section($path);
 			if (!$section) {
@@ -90,6 +90,11 @@ class CM_Language extends CM_Class_Abstract {
 
 		} catch (CM_TreeException $e) {
 			if (IS_DEBUG || IS_TEST ) {
+
+				if (Config::get()->languageCreate) {
+					CM_LanguageEdit::createKey($fullPath);
+					return self::text($fullPath, $vars);
+				}
 				throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . CM_Util::var_line($vars, true) . '` not found');
 			}
 

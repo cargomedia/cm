@@ -527,7 +527,11 @@ class CM_LanguageEdit {
 		}
 	}
 
-	public static function createKey($keyPath, $value, $langId = 1) {
+	public static function createKey($keyPath, $value = null, $langId = 1) {
+		if (strlen($keyPath) > 0 && $keyPath[0] == '%') {
+			$keyPath = substr($keyPath, 1);
+		}
+
 		$sections = explode('.', $keyPath);
 
 		// Last entry is lang key
@@ -559,7 +563,12 @@ class CM_LanguageEdit {
 			$keyId = CM_Mysql::insert(TBL_CM_LANG_KEY, array('lang_section_id' => $parentId, 'key' => $keyName));
 		}
 
+		if (!$value) {
+			$value = $keyName;
+		}
+
 		self::updateKeyValues($keyId, array($langId => $value));
+		CM_CacheLocal::cleanLanguages();
 
 		return $keyId;
 	}
