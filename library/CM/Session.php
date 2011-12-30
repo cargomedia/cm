@@ -9,8 +9,7 @@ class CM_Session {
 	 */
 	private static $_instance = null;
 
-	public function __construct() {
-		CM_SessionHandler::register();
+	private function _start() {
 		if (!headers_sent()) {
 			session_start();
 		}
@@ -109,10 +108,13 @@ class CM_Session {
 
 	/**
 	 * @return CM_Session
+	 * @param boolean $renew OPTIONAL
 	 */
-	public static function getInstance() {
-		if (self::$_instance === null) {
+	public static function getInstance($renew = false) {
+		if (self::$_instance === null || $renew) {
 			self::$_instance = new self();
+			CM_SessionHandler::register();
+			self::$_instance->_start();
 		}
 		return self::$_instance;
 	}
