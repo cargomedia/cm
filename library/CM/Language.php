@@ -39,15 +39,6 @@ class CM_Language extends CM_Class_Abstract {
 		return self::_getConfig()->idDefault;
 	}
 
-	public static function getAllIds() {
-		$result = CM_Mysql::query('SELECT lang_id FROM `' . TBL_CM_LANG . '`');
-		$ids = array();
-		while ($id = (int) $result->fetchOne()) {
-			$ids[] = $id;
-		}
-		return $ids;
-	}
-
 	/**
 	 * Return whether a text-path exists
 	 *
@@ -99,7 +90,7 @@ class CM_Language extends CM_Class_Abstract {
 
 		} catch (CM_TreeException $e) {
 			if (IS_DEBUG || IS_TEST ) {
-				throw $e;
+				throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . print_r($vars, true) . '` not found');
 			}
 
 			return $path;
