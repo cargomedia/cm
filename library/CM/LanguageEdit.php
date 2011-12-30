@@ -527,6 +527,16 @@ class CM_LanguageEdit {
 		}
 	}
 
+	/**
+	 * Creates a key and all the necessary sections based on its full path
+	 *
+	 * If key already exists, value is updated
+	 *
+	 * @param string $keyPath
+	 * @param string $value
+	 * @param int $langId
+	 * @return int New key id
+	 */
 	public static function createKey($keyPath, $value = null, $langId = 1) {
 		if (strlen($keyPath) > 0 && $keyPath[0] == '%') {
 			$keyPath = substr($keyPath, 1);
@@ -547,13 +557,15 @@ class CM_LanguageEdit {
 			$newParentId = $result->fetchOne();
 
 			if (!$newParentId) {
-				$object = self::createSection($parentId, $section);
-				$newParentId = $object->lang_section_id;
+				// Section does not exist yet -> create
+				$newParentId = CM_Mysql::insert(TBL_CM_LANG_SECTION,
+					array('parent_section_id' => $parentId, 'section' => $section)
+				);
 			}
 			$parentId = $newParentId;
 		}
 
-		// checking lang_key for existense
+		// checking lang_key for existence
 		$result = CM_Mysql::select(TBL_CM_LANG_KEY, 'lang_key_id',
 			array('lang_section_id' => $parentId, 'key' => $keyName));
 
