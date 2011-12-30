@@ -129,7 +129,7 @@ abstract class CM_Request_Abstract {
 	public static function getIp() {
 		$ip = $_SERVER['REMOTE_ADDR'];
 		if (IS_TEST || IS_DEBUG) {
-			$ip = Config::get()->testIp;
+			$ip = CM_Config::get()->testIp;
 		}
 		$long = sprintf('%u', ip2long($ip));
 		if (0 == $long) {

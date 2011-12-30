@@ -252,7 +252,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 	private static function _send($subject, $text, $senderAddress, $recipientAddress, $senderName, $html = null) {
 		require_once DIR_PHPMAILER . 'class.phpmailer.php';
-		if (Config::get()->debug) {
+		if (CM_Config::get()->debug) {
 			self::_log($subject, $text, $senderAddress, $recipientAddress);
 		} else {
 			try {

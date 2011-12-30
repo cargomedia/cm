@@ -230,7 +230,7 @@ class CM_Render {
 	 * @return string
 	 */
 	public function getUrlImg($path) {
-		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . Config::get()->modified . '/' . $path;
+		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_Config::get()->modified . '/' . $path;
 	}
 
 	/**

@@ -3,7 +3,7 @@
 class CM_Bootloader {
 
 	public function defaults() {
-		date_default_timezone_set(Config::get()->timeZone);
+		date_default_timezone_set(CM_Config::get()->timeZone);
 		mb_internal_encoding('UTF-8');
 	}
 
@@ -80,7 +80,7 @@ class CM_Bootloader {
 	public function constants() {
 		defined('IS_TEST') || define('IS_TEST', false);
 		defined('IS_CRON') || define('IS_CRON', false);
-		define('IS_DEBUG', (bool) Config::get()->debug && !IS_TEST);
+		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
 		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . '/');
 
@@ -95,8 +95,8 @@ class CM_Bootloader {
 		define('DIR_TMP', DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
-		define('URL_OBJECTS', isset(Config::get()->objects_cdn) ? Config::get()->objects_cdn : URL_ROOT);
-		define('URL_CONTENT', isset(Config::get()->content_cdn) ? Config::get()->content_cdn : URL_ROOT);
+		define('URL_OBJECTS', isset(CM_Config::get()->objects_cdn) ? CM_Config::get()->objects_cdn : URL_ROOT);
+		define('URL_CONTENT', isset(CM_Config::get()->content_cdn) ? CM_Config::get()->content_cdn : URL_ROOT);
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
 
