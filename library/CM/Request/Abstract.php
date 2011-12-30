@@ -39,7 +39,7 @@ abstract class CM_Request_Abstract {
 		$this->_headers = array_change_key_case($headers);
 
 		if (!$viewer) {
-			$viewer = CM_Session::getInstance()->getViewer();
+			$viewer = CM_Session::getInstance()->getUser();
 		}
 		$this->_viewer = $viewer;
 	}

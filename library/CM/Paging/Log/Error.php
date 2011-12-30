@@ -14,8 +14,8 @@ class CM_Paging_Log_Error extends CM_Paging_Log_Abstract {
 	 */
 	public function add($msg) {
 		$metaInfo = array();
-		if (CM_Session::getInstance()->getViewer()) {
-			$metaInfo['userId'] = CM_Session::getInstance()->getViewer()->getId();
+		if (CM_Session::getInstance()->getUser()) {
+			$metaInfo['userId'] = CM_Session::getInstance()->getUser()->getId();
 		}
 		if (CM_Request_Abstract::getIp()) {
 			$metaInfo['ip'] = CM_Request_Abstract::getIp();

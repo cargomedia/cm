@@ -14,9 +14,17 @@ class CM_Session {
 			session_start();
 		}
 
-		if ($user = $this->getViewer()) {
+		$this->_applyCookieLifetime();
+
+		$expiration = CM_SessionHandler::getInstance()->getExpiration($this->getId());
+		$expiresSoon = ($expiration - time() < $this->getLifetime() / 2);
+		if ($expiresSoon) {
+			$this->regenerateId();
+		}
+
+		if ($user = $this->getUser()) {
 			if (!$user->canLogin()) {
-				$this->logout();
+				$this->deleteUser();
 				return;
 			}
 			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
@@ -28,9 +36,28 @@ class CM_Session {
 		}
 	}
 
+	private function _applyCookieLifetime() {
+		if ($this->hasLifetime()) {
+			session_set_cookie_params($this->getLifetime());
+		} else {
+			session_set_cookie_params(0);
+		}
+	}
+
+	/**
+	 * @return string|false
+	 */
+	public function getId() {
+		$id = session_id();
+		if (empty($id)) {
+			return false;
+		}
+		return $id;
+	}
+
 	/**
 	 * @param string $key
-	 * @return mixed
+	 * @return mixed|null
 	 */
 	public function get($key) {
 		if (!isset($_SESSION[$key])) {
@@ -63,10 +90,40 @@ class CM_Session {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getLifetime() {
+		if (!$this->hasLifetime()) {
+			return 3600;
+		}
+		return (int) $this->get('lifetime');
+	}
+
+	/**
+	 * @param int|null $lifetime
+	 */
+	public function setLifetime($lifetime = null) {
+		$lifetime = (int) $lifetime;
+		if ($lifetime) {
+			$this->set('lifetime', $lifetime);
+		} else {
+			$this->delete('lifetime');
+		}
+		$this->_applyCookieLifetime();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasLifetime() {
+		return $this->has('lifetime');
+	}
+
+	/**
 	 * @param bool $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
 	 * @return CM_Model_User Session-user OR null
 	 */
-	public function getViewer($needed = false) {
+	public function getUser($needed = false) {
 		if ($this->has('userId')) {
 			try {
 				return CM_Model_User::factory($this->get('userId'));
@@ -79,25 +136,22 @@ class CM_Session {
 		return null;
 	}
 
-	public function logout() {
-		if ($user = $this->getViewer()) {
-			$user->setOnline(false);
-		}
-		$this->delete('userId');
+	/**
+	 * @param CM_Model_User $user
+	 */
+	public function setUser(CM_Model_User $user) {
+		$user->setOnline(true);
+		$this->set('userId', $user->getId());
 		$this->regenerateId();
 	}
 
-	/**
-	 * @param CM_Model_User $user
-	 * @param int|null $cookieLifetime
-	 */
-	public function login(CM_Model_User $user, $cookieLifetime = null) {
-		if ($cookieLifetime) {
-			session_set_cookie_params($cookieLifetime);
+	public function deleteUser() {
+		if ($user = $this->getUser()) {
+			$user->setOnline(false);
 		}
+		$this->delete('userId');
+		$this->setLifetime(null);
 		$this->regenerateId();
-		$this->set('userId', $user->getId());
-		$user->setOnline(true);
 	}
 
 	public function regenerateId() {
@@ -113,7 +167,7 @@ class CM_Session {
 	public static function getInstance($renew = false) {
 		if (self::$_instance === null || $renew) {
 			self::$_instance = new self();
-			CM_SessionHandler::register();
+			CM_SessionHandler::getInstance();
 			self::$_instance->_start();
 		}
 		return self::$_instance;
