@@ -95,8 +95,8 @@ class CM_Bootloader {
 		define('DIR_TMP', DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
-		define('URL_OBJECTS', isset(CM_Config::get()->objects_cdn) ? CM_Config::get()->objects_cdn : URL_ROOT);
-		define('URL_CONTENT', isset(CM_Config::get()->content_cdn) ? CM_Config::get()->content_cdn : URL_ROOT);
+		define('URL_OBJECTS', !empty(CM_Config::get()->urlCdnObjects) ? CM_Config::get()->urlCdnObjects : URL_ROOT);
+		define('URL_CONTENT', !empty(CM_Config::get()->urlCdnContent) ? CM_Config::get()->urlCdnContent : URL_ROOT);
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
 

@@ -8,17 +8,13 @@ class CM_Config {
 	private static $_config = null;
 
 	/**
-	 * @var string Path to config folder
+	 * @param string $filename
 	 */
-	private static $_configPath = '';
-
-	/**
-	 * @param string $file Config file name to load
-	 */
-	public static function load($file) {
-		$filePath = self::$_configPath . $file;
-		if (file_exists($filePath)) {
-			include $filePath;
+	public static function load($filename) {
+		$path = DIR_ROOT . 'config' . DIRECTORY_SEPARATOR . $filename;
+		if (is_file($path)) {
+			$config = self::get();
+			require $path;
 		}
 	}
 
@@ -34,7 +30,6 @@ class CM_Config {
 
 	private static function _init() {
 		self::$_config = new stdClass();
-		self::$_configPath = DIR_ROOT . 'config' . DIRECTORY_SEPARATOR;
 		self::load('default.php');
 		self::load('local.php');
 	}
