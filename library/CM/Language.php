@@ -90,7 +90,7 @@ class CM_Language extends CM_Class_Abstract {
 
 		} catch (CM_TreeException $e) {
 			if (IS_DEBUG || IS_TEST ) {
-				throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . print_r($vars, true) . '` not found');
+				throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . CM_Util::var_line($vars, true) . '` not found');
 			}
 
 			return $path;
