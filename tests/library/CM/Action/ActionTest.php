@@ -43,6 +43,7 @@ class CM_Action_ActionTest extends TestCase {
 	}
 
 	public function testPrepare() {
+		$this->markTestIncomplete('Uses SK');
 		$actor = TH::createUser();
 		TH::createProfile($actor);	// @todo SK
 		/** @var CM_Action_Abstract $action */

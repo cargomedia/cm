@@ -15,6 +15,7 @@ class CM_ParamsTest extends TestCase {
 	}
 
 	public function testGetString() {
+		$this->markTestIncomplete('uses photo');
 		$text = "Foo Bar, Bar Foo";
 		$text3 = TH::createPhoto();
 		$params = new CM_Params(array('text1' => CM_Params::encode($text), 'text2' => $text, 'text3' => $text3));

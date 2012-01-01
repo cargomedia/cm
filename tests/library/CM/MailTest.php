@@ -12,7 +12,7 @@ class CM_MailTest extends TestCase {
 	public function testWithTemplate() {
 
 		$user = TH::createUser();
-		$profile = TH::createProfile($user);
+
 		try {
 			$msg = new CM_Mail($user, 'email_verify');
 			$msg->send();
@@ -47,7 +47,7 @@ class CM_MailTest extends TestCase {
 	}
 
 	public function testQueue() {
-
+		$this->markTestIncomplete('Uses profile');
 		$user = TH::createUser();
 		$profile = TH::createProfile($user);
 		$profile->setEmailVerified();
