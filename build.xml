@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CM" default="build" basedir=".">
+
+	<property name="source" value="${basedir}/library/CM"/>
+	
+	<target name="parallelTasks">
+		<parallel threadCount="2">
+			<sequential>
+				<antcall target="pdepend"/>
+				<antcall target="phpmd-ci"/>
+			</sequential>
+			<antcall target="phpcpd"/>
+			<antcall target="phpcs-ci"/>
+			<antcall target="docblox"/>
+			<antcall target="phpcb"/>
+		</parallel>
+	</target>
+	
+	<target name="clean" description="Cleanup build artifacts">
+		<delete dir="${basedir}/build/api"/>
+		<delete dir="${basedir}/build/code-browser"/>
+		<delete dir="${basedir}/build/coverage"/>
+		<delete dir="${basedir}/build/logs"/>
+		<delete dir="${basedir}/build/pdepend"/>
+		<delete dir="${basedir}/build"/>
+		<delete file="${basedir}/cache.properties"/>
+	</target>
+
+	<target name="prepare" depends="clean" description="Prepare for build">
+		<mkdir dir="${basedir}/build"/>
+		<mkdir dir="${basedir}/build/api"/>
+		<mkdir dir="${basedir}/build/code-browser"/>
+		<mkdir dir="${basedir}/build/coverage"/>
+		<mkdir dir="${basedir}/build/logs"/>
+		<mkdir dir="${basedir}/build/pdepend"/>
+	</target>
+	
+	<target name="lint">
+		<apply executable="php" failonerror="true">
+			<arg value="-l"/>
+
+			<fileset dir="${source}">
+				<include name="**/*.php"/>
+				<modified/>
+			</fileset>
+
+			<fileset dir="${basedir}/tests">
+				<include name="**/*.php"/>
+				<modified/>
+			</fileset>
+		</apply>
+	</target>
+	
+	<target name="phpunit" depends="prepare">
+		<exec executable="phpunit" dir="${basedir}/tests" failonerror="off" />
+	</target>
+
+	<!-- Generate jdepend.xml and software metrics charts -->
+	<target name="pdepend">
+		<exec executable="pdepend">
+			<arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
+			<arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
+			<arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
+			<arg path="${source}" />
+		</exec>
+	</target>
+
+	<target name="phpmd-ci">
+		<exec executable="phpmd">
+			<arg path="${source}" />
+			<arg value="xml" />
+			<arg value="codesize,unusedcode,naming,design" />
+			<arg value="--reportfile" />
+			<arg value="${basedir}/build/logs/pmd.xml" />
+		</exec>
+	</target>
+
+	<!-- Generate pmd-cpd.xml -->
+	<target name="phpcpd">
+		<exec executable="phpcpd">
+			<arg line="--log-pmd ${basedir}/build/logs/pmd-cpd.xml ${source}" />
+		</exec>
+	</target>
+
+	<!-- Generate checkstyle.xml -->
+	<target name="phpcs-ci">
+		<exec executable="phpcs" output="/dev/null">
+			<arg line="--report=checkstyle --report-file=${basedir}/build/logs/checkstyle.xml --standard=${basedir}/test/CodeSniffer/Standards/Xodoa ${source}" />
+		</exec>
+	</target>
+
+	<target name="phploc" description="Generate phploc.csv">
+		<exec executable="phploc">
+		<arg value="--log-csv" />
+		<arg value="${basedir}/build/logs/phploc.csv" />
+		<arg path="${source}" />
+		</exec>
+	</target>
+
+	<!-- Generate API documentation -->
+	<target name="docblox">
+		<exec executable="docblox">
+			<arg line="run" />
+		</exec>
+	</target>
+
+	<target name="phpcb">
+		<exec executable="phpcb">
+			<arg line="--log ${basedir}/build/logs
+					--source ${source}
+					--output ${basedir}/build/code-browser" />
+		</exec>
+	</target>
+
+	<target name="build" depends="prepare,parallelTasks,phpunit"/>
+
+	<!-- Checkstyle with human output -->
+	<target name="phpcs">
+		<exec executable="phpcs">
+			<arg line="--standard=${basedir}/test/CodeSniffer/Standards/Xodoa ${source}" />
+		</exec>
+	</target>
+	
+	<target name="phpmd" description="Perform phpmd with human readable output">
+		<exec executable="phpmd">
+			<arg path="${source}"/>
+			<arg value="text"/>
+			<arg value="codesize,unusedcode,naming,design" />
+			<arg value="${basedir}/build/phpmd.xml"/>
+		</exec>
+	</target>
+</project>
