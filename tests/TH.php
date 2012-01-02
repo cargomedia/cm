@@ -24,9 +24,9 @@ class TH {
 		require_once DIR_ROOT . 'library/CM/Bootloader.php';
 		CM_Bootloader::load(array('Autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
-		if (!is_dir(DIR_DATA)) {
-			mkdir(DIR_DATA);
-		}
+		!is_dir(DIR_DATA)?mkdir(DIR_DATA):null;
+		!is_dir(DIR_USERFILES)?mkdir(DIR_USERFILES):null;
+		!is_dir(DIR_TMP_USERFILES)?mkdir(DIR_TMP_USERFILES):null;
 
 		// Create db
 		if (count(self::_runSql("SHOW DATABASES LIKE '" . CM_Config::get()->CM_Mysql->db . "_test'")) == 0) {

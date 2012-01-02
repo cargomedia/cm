@@ -100,7 +100,7 @@ class CM_Bootloader {
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
 
-		define('DIR_USERFILES', DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
+		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles : DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 		define('URL_USERFILES', URL_CONTENT . 'userfiles/');
 
 		define('DIR_TMP_USERFILES', DIR_USERFILES . 'tmp' . DIRECTORY_SEPARATOR);

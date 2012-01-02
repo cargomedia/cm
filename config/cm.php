@@ -6,6 +6,7 @@ $config->urlCdnObjects = false;
 $config->urlCdnContent = false;
 $config->dirData = null;
 $config->dirTmp = null;
+$config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
 
