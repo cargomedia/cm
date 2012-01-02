@@ -94,107 +94,103 @@
 
 		<h2 id="page">Page</h2>
 		<p>Eine Page liest Parameter aus dem Request aus, wählt eine vorhandene Bildaufteilung (Canvas), um diese mit instanzierten Components zu füllen:</p>
+		<pre>
+		class CM_Page_Example extends CM_Page {
 
-			<pre>
-			class CM_Page_Example extends CM_Page {
+			public function prepare() {
+				$someInt = $this->_params->getInt('someInt');
 
-				public function prepare() {
-					$someInt = $this->_params->getInt('someInt');
+				$this->setCanvas('two-column');
 
-					$this->setCanvas('two-column');
-
-					$this->addComponent(new CM_Component_Foo(), 1);
-					$this->addComponent(new CM_Component_Bar(array('number' => $someInt)), 2);
-				}
+				$this->addComponent(new CM_Component_Foo(), 1);
+				$this->addComponent(new CM_Component_Bar(array('number' => $someInt)), 2);
 			}
-			</pre>
+		}
+		</pre>
 
 		<p>Das entsprechende Canvas-Template rendert die Components in zwei Spalten:</p>
-			<pre>
-			&lt;div class="float_half_left">
-				{foreach from=$page->getComponents(1) item=component}
-					{component name=$component}
-				{/foreach}
-			&lt;/div>
+		<pre>
+		&lt;div class="float_half_left">
+			{foreach from=$page->getComponents(1) item=component}
+				{component name=$component}
+			{/foreach}
+		&lt;/div>
 
-			&lt;div class="float_half_right">
-				{foreach from=$page->getComponents(2) item=component}
-					{component name=$component}
-				{/foreach}
-			&lt;/div>
-			</pre>
+		&lt;div class="float_half_right">
+			{foreach from=$page->getComponents(2) item=component}
+				{component name=$component}
+			{/foreach}
+		&lt;/div>
+		</pre>
 
 		<h2 id="component">Component</h2>
 		<p>Eine Component nimmt Parameter von der sie enthaltenden Page oder von einem direkten AJAX-Request entgegen. Es können dann Werte an das Template sowie die Javascript-Repräsentation der Component geschickt werden.<br />
 			Statische AJAX-Funktionen werden direkt aus der Javascript-Repräsentation her aufgerufen, und können mit der HTTP-Antwort gleich den Component-Zustand und die Darstellung erneuern.
 		</p>
+		<pre>
+		class CM_Component_Example extends CM_Component {
 
-			<pre>
-			class CM_Component_Example extends CM_Component {
+			public function prepare() {
+				$number = $this->_params->getInt('number', 12);
 
-				public function prepare() {
-					$number = $this->_params->getInt('number', 12);
-
-					$this->_js->num = $number;
-					$this->_tpl->assign('now', time());
-				}
-
-				public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, 			CM_RequestHandler_Component_Ajax $response) {
-					$foo = $params->getString('foo');
-					$response->reloadComponent(array('number' => 13));
-					return 'Foo: ' . $foo;
-				}
+				$this->_js->num = $number;
+				$this->_tpl->assign('now', time());
 			}
-			</pre>
+
+			public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, 			CM_RequestHandler_Component_Ajax $response) {
+				$foo = $params->getString('foo');
+				$response->reloadComponent(array('number' => 13));
+				return 'Foo: ' . $foo;
+			}
+		}
+		</pre>
 
 		<p>Jede Component wird clientseitig durch ein Javascript-Objekt repräsentiert. Mittels einem Prototypen können darauf häufig verwendete Funktionen aufgerufen werden: Neuladen der Component, modales Anzeigen der Component in einer “Floatbox”, etc.<br />
 			Bei Bedarf kann diese Funktionalität mit eigenen Funktionen erweitert werden. Die ready()-Funktion wird bei Initialisierung der Component aufgerufen:
 		</p>
+		<pre>
+		ready: function() {
+			this.$(".foo").click(function() {
+				playSound();
+			});
+		},
 
-			<pre>
-			ready: function() {
-				this.$(".foo").click(function() {
-					playSound();
-				});
-			},
-
-			playSound: function(text) {
-				var player = cm.player.audio("foo.mp3");
-				player.play();
-			}
-			</pre>
+		playSound: function(text) {
+			var player = cm.player.audio("foo.mp3");
+			player.play();
+		}
+		</pre>
 
 		<p>Die Präsentation der Component wird in einer Template- (Smarty) und Stylesheetdatei (CSS) geregelt.</p>
 
 		<h2 id="form">Form</h2>
 		<p>Forms sind Sammlungen von FormFields. Jedes Feld nimmt eine Benutzereingabe entgegen und validiert diese.</p>
-			<pre>
-			class form_Example extends CM_Form {
-				public function setup() {
-					$this->registerField(new field_text('text'));
-					$this->registerField(new field_location('location', CM_Location::LEVEL_COUNTRY));
-					$this->registerField(new field_image('image'));
-					$this->registerField(new field_color('color'));
+		<pre>
+		class form_Example extends CM_Form {
+			public function setup() {
+				$this->registerField(new field_text('text'));
+				$this->registerField(new field_location('location', CM_Location::LEVEL_COUNTRY));
+				$this->registerField(new field_image('image'));
+				$this->registerField(new field_color('color'));
 
-					$this->registerAction(new formExample_Go());￼
-				}
+				$this->registerAction(new formExample_Go());￼
 			}
-			</pre>
+		}
+		</pre>
 
 		<p>Die FormAction kommt beim Absenden der Form ins Spiel, und kann mit den eingegebenen Werten eine gewünschte Aktion ausführen:</p>
-
-			<pre>
-			class formExample_Go extends CM_FormAction {
-				public function setup(CM_Form $form) {
-					$this->required_fields = array('text', 'color');
-					parent::setup($form);
-				}
-
-				public function process(array $data, CM_RequestHandler_Component_Form $response, CM_Form 			$form) {
-					$response->addMessage('You chose color: ' . $data['color']);
-				}
+		<pre>
+		class formExample_Go extends CM_FormAction {
+			public function setup(CM_Form $form) {
+				$this->required_fields = array('text', 'color');
+				parent::setup($form);
 			}
-			</pre>
+
+			public function process(array $data, CM_RequestHandler_Component_Form $response, CM_Form 			$form) {
+				$response->addMessage('You chose color: ' . $data['color']);
+			}
+		}
+		</pre>
 
 		<h2 id="class-model">Klassen (Model)</h2>
 		<dl>
