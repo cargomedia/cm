@@ -1,11 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8" />
+		<meta charset="UTF-8" />
 		<title>Cargo Media Framework</title>
 		<link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
 	</head>
 	<body>
-		
+
 		<div id="index">
 			<h2>Index</h2>
 			<ul>
@@ -20,24 +21,25 @@
 				<li><a href="#project-structure">Basic project structure</a></li>
 			</ul>
 		</div>
-		
-		
+
 		<h1>CM Framework</h1>
 		<p>The CM Framework was built for fast development of scalable web applications.</p>
-				
+
 		<h2 id="overview">Overview</h2>
 		<p>Das “CM” Webanwendungs-Framework entstand innert etwa zwei Jahren aus der Arbeit des Teams der Cargo Media AG, Basel. Die Software bedient vielbesuchte Webauftritte, und implementiert entsprechend verschiedene technische Konzepte zur Skalierbarkeit, Erweiterbarkeit und Wartbarkeit.</p>
-		
+
 		<h3>Umfang</h3>
 		<p>Ziel des CM-Frameworks ist es, eine Plattform für rasante Enwicklung von modernen Webapplikationen zu bieten. Zu diesem Zweck werden diverse Technologien und Patterns in stark vereinfachtem und abstrahiertem Umfang zur Verfügung gestellt. CM ist in diesem Sinne ein “opinionated” Framework, bei dessen Benutzung gewisse Konventionen eingehalten werden sollten, um alle Vorteile der Software nutzen zu können. Ist dies der Fall, so kann für die häufigsten Aufgaben auf eine breit gefächerte API zurückgegriffen werden.</p>
 
 		<h3>Templating</h3>
 		<p>Das Templating setzt auf der bewährten Smarty Template Engine (Version 3) auf, welche es auch technisch wenig versierten Webdesignern erlaubt, Templates auf einfache Weise zu erstellen und in das System zu integrieren.<br />
-		Kleinste Einheit sind dabei die Komponenten, welche verschachtelt und auf einer Seite angeordnet werden können. Der Kontrollfluss folgt dabei einer MVC-Struktur.</p>
-		
+			Kleinste Einheit sind dabei die Komponenten, welche verschachtelt und auf einer Seite angeordnet werden können. Der Kontrollfluss folgt dabei einer MVC-Struktur.
+		</p>
+
 		<h3>Javascript/AJAX</h3>
 		<p>Die benötigte Logik eines Applikationszustandes wird in Javascript nachgebildet und steht clientseitig im Browser zur weiteren Verarbeitung zur Verfügung. Jede Komponente im Browser weiss dank einer eindeutigen Identifikation, wie sie heisst und in welchen Kontext sie gehört. Via AJAX-Calls können die einzelnen Komponenten mit der Applikation auf dem Server Kontakt aufnehmen und dort Zustände ändern, welche dann persistent in der Datenback gespeichtert werden. In der Antwort kann die Applikation sogleich eine neue Darstellung der Komponente mitsenden, welche sogleich angezeigt wird.<br />
-		Dadurch können ohne Mehraufwand von Anfang an hochinteraktive Webapplikationen erstellt werden, bei welchen sich das Interface ohne Neuladen der Seite aktualisierten Zuständen anpasst.</p>
+			Dadurch können ohne Mehraufwand von Anfang an hochinteraktive Webapplikationen erstellt werden, bei welchen sich das Interface ohne Neuladen der Seite aktualisierten Zuständen anpasst.
+		</p>
 
 		<h3>Datenbank/Persistenz</h3>
 		<p>Als primäre Persistenzschicht wird die bewährte, robuste und äusserst verbreitete Datenbanklösung Mysql eingesetzt. Um spezifischen Anwendungsfällen auch unter hoher Last gerecht zu werden, können ausserdem Schnittstellen zu Memcache, Elasticsearch und anderen Diensten genutzt werden.</p>
@@ -61,7 +63,7 @@
 
 		<h2 id="requirements">Requirements</h2>
 		<p>Die Lizenz-Angaben dienen rein informativen Zwecken, und wurden grösstenteils von Wikipedia-Artikeln übernommen. Es wird keine Garantie und Gewähr für deren Richtigkeit übernommen.</p>
-		
+
 		<h3>Benötigt</h3>
 		<ul>
 			<li>POSIX.1-konformes Betriebssystem (empf.: Debian 6 - GNU GPL)</li>
@@ -70,7 +72,7 @@
 			<li>PHP 5.3 (PHP License)</li>
 			<li>PHPUnit (BSD)</li>
 			<li>Smarty (LGPL)</li>
-				<li>PHP Erweiterungen/Anbindungen für Memcached, Mysql, GD, Curl, APC</li>
+			<li>PHP Erweiterungen/Anbindungen für Memcached, Mysql, GD, Curl, APC</li>
 			<li>GD Graphics Library (BSD-like)</li>
 			<li>Memcached (BSD)</li>
 			<li>Node.js (MIT)</li>
@@ -78,7 +80,7 @@
 			<li>jQuery (GNU GPL/MIT)</li>
 			<li>Versch. jQuery-Plugins</li>
 		</ul>
-		
+
 		<h3>Empfohlen</h3>
 		<ul>
 			<li>PHP Erweiterungen/Anbindungen für Redis, LibSVM</li>
@@ -93,107 +95,107 @@
 		<h2 id="page">Page</h2>
 		<p>Eine Page liest Parameter aus dem Request aus, wählt eine vorhandene Bildaufteilung (Canvas), um diese mit instanzierten Components zu füllen:</p>
 
-		<pre>
-		class CM_Page_Example extends CM_Page {
+			<pre>
+			class CM_Page_Example extends CM_Page {
 
-			public function prepare() {
-				$someInt = $this->_params->getInt('someInt');
+				public function prepare() {
+					$someInt = $this->_params->getInt('someInt');
 
-				$this->setCanvas('two-column');
+					$this->setCanvas('two-column');
 
-				$this->addComponent(new CM_Component_Foo(), 1);
-				$this->addComponent(new CM_Component_Bar(array('number' => $someInt)), 2);
+					$this->addComponent(new CM_Component_Foo(), 1);
+					$this->addComponent(new CM_Component_Bar(array('number' => $someInt)), 2);
+				}
 			}
-		}
-		</pre>
+			</pre>
 
 		<p>Das entsprechende Canvas-Template rendert die Components in zwei Spalten:</p>
-		<pre>
-		&lt;div class="float_half_left">
-			{foreach from=$page->getComponents(1) item=component}
-				{component name=$component}
-			{/foreach}
-		&lt;/div>
+			<pre>
+			&lt;div class="float_half_left">
+				{foreach from=$page->getComponents(1) item=component}
+					{component name=$component}
+				{/foreach}
+			&lt;/div>
 
-		&lt;div class="float_half_right">
-			{foreach from=$page->getComponents(2) item=component}
-				{component name=$component}
-			{/foreach}
-		&lt;/div>
-		</pre>
-		
-		
+			&lt;div class="float_half_right">
+				{foreach from=$page->getComponents(2) item=component}
+					{component name=$component}
+				{/foreach}
+			&lt;/div>
+			</pre>
+
 		<h2 id="component">Component</h2>
 		<p>Eine Component nimmt Parameter von der sie enthaltenden Page oder von einem direkten AJAX-Request entgegen. Es können dann Werte an das Template sowie die Javascript-Repräsentation der Component geschickt werden.<br />
-		Statische AJAX-Funktionen werden direkt aus der Javascript-Repräsentation her aufgerufen, und können mit der HTTP-Antwort gleich den Component-Zustand und die Darstellung erneuern.</p>
+			Statische AJAX-Funktionen werden direkt aus der Javascript-Repräsentation her aufgerufen, und können mit der HTTP-Antwort gleich den Component-Zustand und die Darstellung erneuern.
+		</p>
 
-		<pre>
-		class CM_Component_Example extends CM_Component {
+			<pre>
+			class CM_Component_Example extends CM_Component {
 
-			public function prepare() {
-				$number = $this->_params->getInt('number', 12);
+				public function prepare() {
+					$number = $this->_params->getInt('number', 12);
 
-				$this->_js->num = $number;
-				$this->_tpl->assign('now', time());
+					$this->_js->num = $number;
+					$this->_tpl->assign('now', time());
+				}
+
+				public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, 			CM_RequestHandler_Component_Ajax $response) {
+					$foo = $params->getString('foo');
+					$response->reloadComponent(array('number' => 13));
+					return 'Foo: ' . $foo;
+				}
 			}
+			</pre>
 
-			public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, 			CM_RequestHandler_Component_Ajax $response) {
-				$foo = $params->getString('foo');
-				$response->reloadComponent(array('number' => 13));
-				return 'Foo: ' . $foo;
-			}
-		}
-		</pre>
-		
 		<p>Jede Component wird clientseitig durch ein Javascript-Objekt repräsentiert. Mittels einem Prototypen können darauf häufig verwendete Funktionen aufgerufen werden: Neuladen der Component, modales Anzeigen der Component in einer “Floatbox”, etc.<br />
-		Bei Bedarf kann diese Funktionalität mit eigenen Funktionen erweitert werden. Die ready()-Funktion wird bei Initialisierung der Component aufgerufen:</p>
+			Bei Bedarf kann diese Funktionalität mit eigenen Funktionen erweitert werden. Die ready()-Funktion wird bei Initialisierung der Component aufgerufen:
+		</p>
 
-		<pre>
-		ready: function() {
-			this.$(".foo").click(function() {
-				playSound();
-			});
-		},
+			<pre>
+			ready: function() {
+				this.$(".foo").click(function() {
+					playSound();
+				});
+			},
 
-		playSound: function(text) {
-			var player = cm.player.audio("foo.mp3");
-			player.play();
-		}
-		</pre>
+			playSound: function(text) {
+				var player = cm.player.audio("foo.mp3");
+				player.play();
+			}
+			</pre>
 
 		<p>Die Präsentation der Component wird in einer Template- (Smarty) und Stylesheetdatei (CSS) geregelt.</p>
-		
 
 		<h2 id="form">Form</h2>
 		<p>Forms sind Sammlungen von FormFields. Jedes Feld nimmt eine Benutzereingabe entgegen und validiert diese.</p>
-		<pre>
-		class form_Example extends CM_Form {
-			public function setup() {
-				$this->registerField(new field_text('text'));
-				$this->registerField(new field_location('location', CM_Location::LEVEL_COUNTRY));
-				$this->registerField(new field_image('image'));
-				$this->registerField(new field_color('color'));
+			<pre>
+			class form_Example extends CM_Form {
+				public function setup() {
+					$this->registerField(new field_text('text'));
+					$this->registerField(new field_location('location', CM_Location::LEVEL_COUNTRY));
+					$this->registerField(new field_image('image'));
+					$this->registerField(new field_color('color'));
 
-				$this->registerAction(new formExample_Go());￼
+					$this->registerAction(new formExample_Go());￼
+				}
 			}
-		}
-		</pre>
+			</pre>
 
 		<p>Die FormAction kommt beim Absenden der Form ins Spiel, und kann mit den eingegebenen Werten eine gewünschte Aktion ausführen:</p>
 
-		<pre>
-		class formExample_Go extends CM_FormAction {
-			public function setup(CM_Form $form) {
-				$this->required_fields = array('text', 'color');
-				parent::setup($form);
-			}
+			<pre>
+			class formExample_Go extends CM_FormAction {
+				public function setup(CM_Form $form) {
+					$this->required_fields = array('text', 'color');
+					parent::setup($form);
+				}
 
-			public function process(array $data, CM_RequestHandler_Component_Form $response, CM_Form 			$form) {
-				$response->addMessage('You chose color: ' . $data['color']);
+				public function process(array $data, CM_RequestHandler_Component_Form $response, CM_Form 			$form) {
+					$response->addMessage('You chose color: ' . $data['color']);
+				}
 			}
-		}
-		</pre>
-		
+			</pre>
+
 		<h2 id="class-model">Klassen (Model)</h2>
 		<dl>
 			<dt>CM_Class_Abstract</dt>
@@ -207,7 +209,7 @@
 			<dt>CM_Model_Entity_Asset_Abstract</dt>
 			<dd>Entity-extending functionality, which can be used across multiple entites (e.g. comments, rating, etc.). Provides hooks to react on an entity’s lifecycle- and state-events. Allows to inject data into an entity’s state-cache.</dd>
 			<dt>CM_Action_Abstract</dt>
-			<dd>Represents a triple <subject, verb, object>, i.e. a Profile doing some action within the application. Several mechanisms allow for logging and restriction of actions.</dd>
+			<dd>Represents a triple &lt;subject, verb, object&gt;, i.e. a Profile doing some action within the application. Several mechanisms allow for logging and restriction of actions.</dd>
 			<dt>CM_Model_ActionLimit_Abstract</dt>
 			<dd>Used to define restrictions on how many times certain actions can be performed by certain profiles.</dd>
 			<dt>CM_Paging_Abstract</dt>
@@ -217,8 +219,7 @@
 			<dt>CM_Tree_Abstract</dt>
 			<dd>Tree-like data structure. Allows for loading from a flat data source (e.g. Mysql), caching and traversing.</dd>
 		</dl>
-		
-		
+
 		<h2 id="class-view">Klassen (View/Controller)</h2>
 		<dl>
 			<dt>CM_Request_Abstract</dt>
@@ -238,7 +239,7 @@
 			<dt>CM_Css</dt>
 			<dd>CSS-compiler which can expand and rewrite certain CSS-properties, and supports the usage of presets (variables).</dd>
 		</dl>
-		
+
 		<h2 id="class-service">Klassen (Service-Zugriffe)</h2>
 		<dl>
 			<dt>CM_Mysql</dt>
@@ -256,7 +257,6 @@
 			<dt>CM_Mail</dt>
 			<dd>Send E-Mails with optional predefined templates.</dd>
 		</dl>
-
 
 		<h2 id="project-structure">Basic project structure</h2>
 		<ul>
@@ -293,24 +293,24 @@
 				</ul>
 			</li>
 		</ul>
-		
+
 		<h3 id="tests">/tests</h3>
 		<p>The folder tests contains everything related to unit and implementation tests.</p>
-	
+
 		<h3>/www/config</h3>
 		<p>This folder contains at least to config files: cm.php as base config file and default.php as the project config file.
-		default.php overwrites all configuration options in cm.php. Further options can be added. cm.php should not be changed</p>
+			default.php overwrites all configuration options in cm.php. Further options can be added. cm.php should not be changed</p>
 
 		<p>A config file with the name local.php can be added for user development environment configuration options like database
-		password or other individual options. This file will not be added to the version management repository.</p>
+			password or other individual options. This file will not be added to the version management repository.</p>
 
 		<h3 id="/www/layout">/www/layout</h3>
 		<p>The layout folder contains the themes for the different sites. The structure is layout/$sitename/$theme/. Inside the the folder </p>
 
 		<h4>Component</h4>
 		<p>This folder contains a folder for every component with the name of the Component. Inside every folder is at least a default.tpl layout file
-		for the default layout of the component. Additional a default.style file can be added for component specific styles.</p>
-	
+			for the default layout of the component. Additional a default.style file can be added for component specific styles.</p>
+
 		<h4>FormField</h4>
 		<p>This folder can contain a template for a specific FormField. The name of the .tpl file is the same as the FormField.</p>
 	</body>
