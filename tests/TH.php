@@ -24,6 +24,10 @@ class TH {
 		require_once DIR_ROOT . 'library/CM/Bootloader.php';
 		CM_Bootloader::load(array('Autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
+		if (!is_dir(DIR_DATA)) {
+			mkdir(DIR_DATA);
+		}
+
 		// Create db
 		if (count(self::_runSql("SHOW DATABASES LIKE '" . CM_Config::get()->CM_Mysql->db . "_test'")) == 0) {
 			echo 'Exporting `skadate`...';

@@ -4,6 +4,7 @@ $config->modified = '0';
 $config->debug = false;
 $config->urlCdnObjects = false;
 $config->urlCdnContent = false;
+$config->dirData = null;
 $config->dirTmp = null;
 $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
