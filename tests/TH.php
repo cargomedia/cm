@@ -30,10 +30,10 @@ class TH {
 
 		// Create db
 		if (count(self::_runSql("SHOW DATABASES LIKE '" . CM_Config::get()->CM_Mysql->db . "_test'")) == 0) {
-			echo 'Exporting `skadate`...';
+			echo 'Exporting database...';
 			self::_runCmd(DIR_TEST_DATA . 'db/export.sh');
 			echo PHP_EOL;
-			echo 'Importing `skadate_test`...';
+			echo 'Importing test-database...';
 			self::_runSql("CREATE DATABASE " . CM_Config::get()->CM_Mysql->db . "_test");
 			self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db . '_test');
 			echo PHP_EOL;

@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname $0)
 
-DB_NAME=skadate
+DB_NAME=example
 DB_USER=root
 DB_PASS=root
 DB_KEEPTABLES=( $( cat keeptables.txt ) )

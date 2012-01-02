@@ -10,16 +10,3 @@ cm_locationZip
 cm_user_preferenceDefault
 cm_smiley
 cm_tmp_location
-sk_config
-sk_config_section
-payment_provider
-payment_provider_field
-link_admin_document
-payment_provider_bundle
-profile_field_key
-profile_field_value
-video_category
-virtual_gift_template
-service
-serviceBundle
-serviceBundle_service
