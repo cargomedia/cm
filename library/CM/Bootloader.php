@@ -92,7 +92,7 @@ class CM_Bootloader {
 		define('DIR_DATA', DIR_SITE_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
 
-		define('DIR_TMP', DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
 		define('URL_OBJECTS', !empty(CM_Config::get()->urlCdnObjects) ? CM_Config::get()->urlCdnObjects : URL_ROOT);
