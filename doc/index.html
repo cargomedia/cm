@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>Cargo Media Framework</title>
+	</head>
+	<body>
+	
+		<h1>CM Framework</h1>
+		<p>The CM Framework was built for fast development of scalable web applications.</p>
+
+		<h2>Basic project structure</h2>
+		<ul>
+			<li>data</li>
+			<li>doc</li>
+			<li><a href="#tests">tests</a></li>
+			<li>www
+				<ul>
+					<li>config</li>
+					<li>data</li>
+					<li><a href="#/www/layout">layout</a>
+						<ul>
+							<li>
+								$sitename/$theme
+								<ul>
+									<li>Component</li>
+									<li>css</li>
+									<li>FormField</li>
+									<li>img</li>
+									<li>layout</li>
+									<li>layout.style</li>
+									<li>mail</li>
+									<li>menu</li>
+									<li>menu.php</li>
+									<li>presets.style</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>library</li>
+					<li>public</li>
+					<li>scripts</li>
+					<li>tmp</li>
+				</ul>
+			</li>
+		</ul>
+		
+		<h3 id="tests">/tests</h3>
+		<p>The folder tests contains everything related to unit and implementation tests.</p>
+	
+		<h3>/www/config</h3>
+		<p>This folder contains at least to config files: cm.php as base config file and default.php as the project config file.
+		default.php overwrites all configuration options in cm.php. Further options can be added. cm.php should not be changed</p>
+
+		<p>A config file with the name local.php can be added for user development environment configuration options like database
+		password or other individual options. This file will not be added to the version management repository.</p>
+
+		<h3 id="/www/layout">/www/layout</h3>
+		<p>The layout folder contains the themes for the different sites. The structure is layout/$sitename/$theme/. Inside the the folder </p>
+
+		<h4>Component</h4>
+		<p>This folder contains a folder for every component with the name of the Component. Inside every folder is at least a default.tpl layout file
+		for the default layout of the component. Additional a default.style file can be added for component specific styles.</p>
+	
+		<h4>FormField</h4>
+		<p>This folder can contain a template for a specific FormField. The name of the .tpl file is the same as the FormField.</p>
+	</body>
+</html>
