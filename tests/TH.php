@@ -14,8 +14,10 @@ class TH {
 		if (self::$initialized) {
 			return;
 		}
+
 		// Setup
-		define('DIR_TEST_DATA', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR);
+		define('DIR_TESTS', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+		define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
 		define('IS_TEST', true);
 
 		define('DIR_ROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
