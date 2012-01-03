@@ -2,13 +2,15 @@
 require_once dirname(__FILE__) . '/../../TestCase.php';
 
 class CM_SessionTest extends TestCase {
+	private static $_configBackup;
 
 	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Model_User->class = 'CM_Model_User';
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Config::get()->CM_Model_User->class = 'SK_User';
+		CM_Config::set(self::$_configBackup);
 		TH::clearEnv();
 	}
 

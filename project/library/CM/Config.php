@@ -28,6 +28,13 @@ class CM_Config {
 		return self::$_config;
 	}
 
+	/**
+	 * @param stdClass $config
+	 */
+	public static function set($config) {
+		self::$_config = $config;
+	}
+
 	private static function _init() {
 		self::$_config = new stdClass();
 		self::load('default.php');
