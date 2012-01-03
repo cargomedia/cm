@@ -78,6 +78,11 @@ $config->CM_Model_ActionLimit_Abstract->types = array();
 $config->CM_Model_Entity_Abstract = new stdClass();
 $config->CM_Model_Entity_Abstract->types = array();
 
+$config->CM_Paging_Log_Abstract = new stdClass();
+$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_Log_Error';
+$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Mail::TYPE] = 'CM_Paging_Log_Mail';
+
+
 $config->CM_Model_User = new stdClass();
 $config->CM_Model_User->class = 'CM_User';
 
