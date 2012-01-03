@@ -20,7 +20,7 @@ class TH {
 		define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
 		define('IS_TEST', true);
 
-		define('DIR_ROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
+		define('DIR_ROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR);
 		require_once DIR_ROOT . 'library/CM/Bootloader.php';
 		CM_Bootloader::load(array('Autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 

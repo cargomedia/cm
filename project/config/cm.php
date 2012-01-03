@@ -2,8 +2,8 @@
 
 $config->modified = '0';
 $config->debug = false;
-$config->urlCdnObjects = false;
-$config->urlCdnContent = false;
+$config->urlCdnObjects = null;
+$config->urlCdnContent = null;
 $config->dirData = null;
 $config->dirTmp = null;
 $config->dirUserfiles = null;

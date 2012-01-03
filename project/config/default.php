@@ -2,8 +2,6 @@
 
 CM_Config::load('cm.php');
 
-$config = CM_Config::get();
-
 $config->modified = '99999999';
 //$config->objects_cdn = 'http://cdn.example.dev/';
 //$config->content_cdn = 'http://cdn.example.dev/';
