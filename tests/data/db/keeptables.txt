@@ -1,6 +1,4 @@
-cm_string
 cm_lang
 cm_langKey
 cm_langSection
 cm_langValue
-cm_smiley
