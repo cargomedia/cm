@@ -6,7 +6,6 @@ require_once 'TH/Page.php';
  */
 
 class TH {
-	private static $db_truncatetables = null;
 	private static $timeDelta = 0;
 	private static $initialized = false;
 
@@ -58,12 +57,8 @@ class TH {
 	}
 
 	public static function clearDb() {
-		if (self::$db_truncatetables === null) {
-			$keeptables = file(DIR_TEST_DATA . 'db/keeptables.txt', FILE_IGNORE_NEW_LINES);
-			$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
-			self::$db_truncatetables = array_diff($alltables, $keeptables);
-		}
-		foreach (self::$db_truncatetables as $table) {
+		$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		foreach ($alltables as $table) {
 			CM_Mysql::truncate($table);
 		}
 	}

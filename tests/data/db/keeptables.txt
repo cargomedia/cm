@@ -1,4 +1,0 @@
-cm_lang
-cm_langKey
-cm_langSection
-cm_langValue

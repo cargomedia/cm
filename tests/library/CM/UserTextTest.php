@@ -10,6 +10,8 @@ allowed tags: <b attr="not-allowed" class="italic">bold</b> <a href="javascript:
 
 un-allowed tags: <foo>foo</foo> <big-grin> Lorem ipsum <averylongunallowedtag>hiho</averylongunallowedtag>
 
+badwords: hallo@yahoo.com
+
 special chars: "<>"
 
 unclosed tags: <u>not <b>closed
@@ -39,6 +41,7 @@ EOD;
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br /><br />
 allowed tags: <b class="italic">bold</b> <a href="window.location.href='http://www.google.com/';">google</a><br /><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br /><br />
+badwords: hallo<br /><br />
 special chars: &quot;&lt;&gt;&quot;<br /><br />
 unclosed tags: <u>not <b>closed</b></u>
 EOD;
@@ -51,8 +54,8 @@ EOD;
 		$badwords->add('@yahoo.com');
 		$splitChar = CM_Usertext::getSplitChar();
 
-		$actual = new CM_Usertext('hallo@yahoo.com');
-		$this->assertEquals("hallo{$splitChar}badword_re{$splitChar}placement", $actual->getFormat());
+		$actual = new CM_Usertext('hallo@yahoo.com world');
+		$this->assertEquals('hallo world', $actual->getFormat());
 	}
 
 	public function testFormatPlain() {
@@ -65,6 +68,8 @@ smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.
 allowed tags: bold google
 
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
+
+badwords: hallo
 
 special chars: &quot;&lt;&gt;&quot;
 
@@ -82,6 +87,8 @@ smilies: :-)
 allowed tags: &lt;b attr=&quot;not-allowed&quot; class{$splitChar}=&quot;italic&quot;&gt;{$splitChar}bold&lt;/b&gt; &lt;a href={$splitChar}&quot;javascrip{$splitChar}t:window.l{$splitChar}ocation.hr{$splitChar}ef='http:/{$splitChar}/www.googl{$splitChar}e.com/';&quot;&gt;{$splitChar}google&lt;/a&gt;
 
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
+
+badwords: hallo
 
 special chars: &quot;&lt;&gt;&quot;
 

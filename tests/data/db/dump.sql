@@ -388,7 +388,3 @@ CREATE TABLE `cm_useragent` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `cm_lang` VALUES (1,'eng','English',1);
-INSERT INTO `cm_langKey` VALUES (1,1,'ok'),(2,1,'cancel'),(3,1,'confirmation_title'),(4,2,'badword_replacement'),(5,4,'required'),(6,4,'illegal_value');
-INSERT INTO `cm_langSection` VALUES (1,0,'interface',NULL),(2,0,'txt',NULL),(3,0,'forms',NULL),(4,3,'_errors',NULL);
-INSERT INTO `cm_langValue` VALUES (1,1,'ok'),(2,1,'cancel'),(3,1,'confirmation_title'),(4,1,'badword_replacement'),(5,1,'required'),(6,1,'illegal_value');
