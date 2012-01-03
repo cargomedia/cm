@@ -7,12 +7,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	$viewer = $template->smarty->getTemplateVars('viewer');
 	/** @var CM_Page_Abstract $page */
 	$page = $template->getTemplateVars('page');
-
-	if ($page) {
-		$request = $page->getRequest();
-	} else {
-		$request = new CM_Request_Get('', array(), $viewer);
-	}
+	$request = $page ? $page->getRequest() : new CM_Request_Get(URL_ROOT, array(), $viewer);
 
 	$userId = $viewer ? $viewer->getId() : 0;
 	$name = $params['name'];
