@@ -1,30 +1,22 @@
 <?php
 
 function smarty_function_paging(array $params, Smarty_Internal_Template $template) {
-	if (isset($params['paging'])) {
-		$paging = $params['paging'];
-	} else {
-		$paging = new CM_Paging_Abstract();
-		$paging->_setCount($params['total']);
-		$paging->setPage($_REQUEST['page'], $params['on_page']);
+	if (!isset($params['paging'])) {
+		trigger_error('Parameter `paging` missing');
 	}
+	$paging = $params['paging'];
+	$size = 5;
 
 	if ($paging->getPageCount() <= 1) {
 		return '';
 	}
 
-	$output = '';
-	$size = isset($params['pages']) ? (int) $params['pages'] : 5;
-
-	$class = 'paging';
-	if (isset($params['class'])) {
-		$class .= ' ' . $params['class'];
-	}
-	$output .= '<div class="' . $class . '">';
+	$html = '';
+	$html .= '<div class="paging">';
 
 	if ($paging->getPage() > 1) {
-		$output .= _smarty_function_paging_link($template, 1, '', $params, 'paging_control pagingFirstPage');
-		$output .= _smarty_function_paging_link($template, $paging->getPage() - 1, '', $params, 'paging_control pagingPrevPage');
+		$html .= _smarty_function_paging_link($template, 1, '', $params, 'paging_control pagingFirstPage');
+		$html .= _smarty_function_paging_link($template, $paging->getPage() - 1, '', $params, 'paging_control pagingPrevPage');
 	}
 
 	$boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
@@ -33,21 +25,21 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$pageMax = min($paging->getPageCount(), ($paging->getPage() + $sizeMax));
 	for ($p = $pageMin; $p <= $pageMax; $p++) {
 		$class = ($p == $paging->getPage()) ? 'active' : '';
-		$output .= _smarty_function_paging_link($template, $p, $p, $params, $class);
+		$html .= _smarty_function_paging_link($template, $p, $p, $params, $class);
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$output .= _smarty_function_paging_link($template, $paging->getPage() + 1, '', $params, 'paging_control pagingNextPage');
-		$output .= _smarty_function_paging_link($template, $paging->getPageCount(), '', $params, 'paging_control pagingLastPage');
+		$html .= _smarty_function_paging_link($template, $paging->getPage() + 1, '', $params, 'paging_control pagingNextPage');
+		$html .= _smarty_function_paging_link($template, $paging->getPageCount(), '', $params, 'paging_control pagingLastPage');
 	}
 
-	$output .= '</div>';
+	$html .= '</div>';
 
-	return $output;
+	return $html;
 }
 
 function _smarty_function_paging_link(Smarty_Internal_Template $template, $page, $text, $params, $class = null) {
-	$href = sk_make_url(null, array('page' => $page));
+	$href = sk_make_url(array('page' => $page));
 	$onclick = null;
 	if (!empty($params['ajax'])) {
 		$jsInstance = 'cm.components["' . $template->smarty->getTemplateVars('render')->getStackLast('components')->auto_id . '"]';
@@ -65,12 +57,9 @@ function _smarty_function_paging_link(Smarty_Internal_Template $template, $page,
 	return $link;
 }
 
-function sk_make_url($url = null, $params = null, $hash = null) {
-	if (!isset($url)) {
-		$url = sk_request_uri();
-	} else {
-		$url = sk_request_uri($url);
-	}
+function sk_make_url($params = null) {
+	$urlInfo = parse_url(URL_ROOT);
+	$url = str_replace($urlInfo["path"], "/", $_SERVER['REQUEST_URI']);
 
 	$url = URL_ROOT . substr($url, 1);
 
@@ -94,27 +83,6 @@ function sk_make_url($url = null, $params = null, $hash = null) {
 
 	$_params = array_merge($_params, $params);
 
-	$hash_str = isset($hash) ? '#' . trim($hash) : (isset($url_info['fragment']) ? '#' . $url_info['fragment'] : '');
 	$query_str = count($_params) ? '?' . http_build_query($_params) : '';
-	return $url . $query_str . $hash_str;
-}
-
-function sk_request_uri($url = null) {
-	if (isset($url)) {
-		$uri_info = @parse_url($url);
-
-		if (isset($uri_info["host"])) {
-			$uri = substr(strstr($url, $uri_info["host"]), strlen($uri_info["host"]));
-		} else {
-			$uri = $url;
-		}
-
-	} else {
-		$uri = $_SERVER['REQUEST_URI'];
-	}
-
-	$s_url_info = parse_url(URL_ROOT);
-
-	$uri = str_replace($s_url_info["path"], "/", $uri);
-	return $uri;
+	return $url . $query_str;
 }
