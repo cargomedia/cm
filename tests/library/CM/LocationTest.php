@@ -5,8 +5,21 @@ class CM_LocationTest extends TestCase {
 	private static $_fields;
 
 	public static function setUpBeforeClass() {
-		$location = CM_Mysql::exec(
-				'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
+		$switzerland = CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'CH', 'name' => 'Switzerland'));
+		$germany = CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'DE', 'name' => 'Germany'));
+
+		$baselStadt = CM_Mysql::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
+		$zuerich = CM_Mysql::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Zürich'));
+
+		$basel = CM_Mysql::insert(TBL_CM_LOCATIONCITY, array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
+			'lat' => 47.569535, 'lon' => 7.574063));
+		$winterthur = CM_Mysql::insert(TBL_CM_LOCATIONCITY, array('stateId' => $zuerich, 'countryId' => $switzerland, 'name' => 'Winterthur',
+			'lat' => 47.502315, 'lon' => 8.724947));
+
+		CM_Mysql::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
+		CM_Mysql::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
+
+		$location = CM_Mysql::exec('SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
 				`2`.`id` `2.id`, `2`.`name` `2.name`,
 				`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 				`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`

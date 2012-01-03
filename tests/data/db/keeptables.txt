@@ -7,6 +7,5 @@ cm_locationCity
 cm_locationCountry
 cm_locationState
 cm_locationZip
-cm_user_preferenceDefault
 cm_smiley
 cm_tmp_location
