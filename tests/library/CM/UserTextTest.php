@@ -40,6 +40,7 @@ EOD;
 	public function testBadwords() {
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
+		TH::clearCache();
 		$splitChar = CM_Usertext::getSplitChar();
 
 		$actual = new CM_Usertext('hallo@yahoo.com');
