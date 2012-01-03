@@ -1,13 +1,10 @@
 <?php
 
 abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
-	
-	CONST TYPE_ERROR = 1;
-	CONST TYPE_MAIL = 3;
-	
+
 	/**
 	 * @param boolean $aggregate
-	 * @param int $ageMax
+	 * @param int     $ageMax
 	 */
 	public function __construct($aggregate = false, $ageMax = null) {
 		$select = '`id`, `msg`, `timeStamp`, `metaInfo`';
@@ -25,7 +22,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		$source = new CM_PagingSource_Sql_Deferred($select, TBL_CM_LOG, $where, $order, null, $group);
 		parent::__construct($source);
 	}
-	
+
 	/**
 	 * @param int $age
 	 */
@@ -33,12 +30,19 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		$age = (int) $age;
 		CM_Mysql::exec("DELETE FROM TBL_CM_LOG WHERE `timeStamp` < ?", time() - $age);
 	}
-	
-	public abstract function getType();
-	
+
+	/**
+	 * @param int $type
+	 * @return CM_Paging_Log_Abstract
+	 */
+	final public static function factory($type) {
+		$className = self::_getClassName($type);
+		return new $className();
+	}
+
 	/**
 	 * @param string $msg
-	 * @param array $metaInfo
+	 * @param array  $metaInfo
 	 */
 	protected function _add($msg, array $metaInfo = null) {
 		$msg = (string) $msg;
@@ -48,7 +52,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		}
 		CM_Mysql::insertDelayed(TBL_CM_LOG, $values);
 	}
-	
+
 	protected function _processItem($item) {
 		if (!empty($item['metaInfo'])) {
 			$item['metaInfo'] = unserialize($item['metaInfo']);

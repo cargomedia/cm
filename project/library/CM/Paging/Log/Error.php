@@ -1,13 +1,7 @@
 <?php
 
 class CM_Paging_Log_Error extends CM_Paging_Log_Abstract {
-
-	/**
-	 * @return int
-	 */
-	public function getType() {
-		return self::TYPE_ERROR;
-	}
+	const TYPE = 1;
 
 	/**
 	 * @param string $msg
