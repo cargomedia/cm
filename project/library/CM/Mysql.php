@@ -405,6 +405,14 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param $table
+	 */
+	public static function truncate($table) {
+		$query = 'TRUNCATE TABLE `' . $table . '`';
+		self::query($query);
+	}
+
+	/**
 	 * @param string	  $table
 	 * @param string|null $column OPTIONAL
 	 * @param string|null $index  OPTIONAL
@@ -464,7 +472,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Returns column info object
 	 *
-	 * @param string      $table
+	 * @param string	  $table
 	 * @param string|null $column
 	 * @return CM_MysqlColumn
 	 */
