@@ -24,9 +24,9 @@ class TH {
 		require_once DIR_ROOT . 'library/CM/Bootloader.php';
 		CM_Bootloader::load(array('Autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
-		!is_dir(DIR_DATA)?mkdir(DIR_DATA):null;
-		!is_dir(DIR_USERFILES)?mkdir(DIR_USERFILES):null;
-		!is_dir(DIR_TMP_USERFILES)?mkdir(DIR_TMP_USERFILES):null;
+		!is_dir(DIR_DATA) ? mkdir(DIR_DATA) : null;
+		!is_dir(DIR_USERFILES) ? mkdir(DIR_USERFILES) : null;
+		!is_dir(DIR_TMP_USERFILES) ? mkdir(DIR_TMP_USERFILES) : null;
 
 		// Create db
 		if (count(self::_runSql("SHOW DATABASES LIKE '" . CM_Config::get()->CM_Mysql->db . "_test'")) == 0) {
@@ -44,101 +44,6 @@ class TH {
 		self::timeInit();
 
 		self::$initialized = true;
-	}
-
-	/**
-	 * @param SK_Entity_Profile $profile
-	 * @return SK_Entity_Profile
-	 */
-	public static function login(SK_Entity_Profile $profile = null) {
-		if (!$profile) {
-			$profile = self::createProfile();
-		}
-		CM_Session::getInstance()->setUser($profile->getUser());
-		return $profile;
-	}
-
-	/**
-	 * @param SK_Entity_Profile $profile
-	 * @return SK_Entity_Photo
-	 */
-	public static function createPhoto(SK_Entity_Profile $profile = null) {
-		// TODO Add real image to also test rotate ...
-		if (!$profile) {
-			$profile = self::createProfile();
-		}
-		$photoId = CM_Mysql::exec("INSERT INTO TBL_PROFILE_PHOTO (`profile_id`, `createStamp`, `privacy`)
-			VALUES (?, ?, ?)", $profile->getId(), time(), SK_ModelAsset_Entity_Privacy::NONE);
-		$photo = new SK_Entity_Photo($photoId);
-		$profile->getPhotos()->_change();
-		return $photo;
-	}
-
-	/**
-	 * @return CM_Model_User
-	 */
-	public static function createUser() {
-		return CM_Model_User::create();
-	}
-
-	/**
-	 * @return CM_Model_User
-	 */
-	public static function createUserPremium() {
-		$user = self::createUser();
-		$user->getRoles()->add(SK_Role::PREMIUM, 1000 * 86400);
-		return $user;
-	}
-
-	/**
-	 * @param SK_Entity_Profile $profile
-	 * @return SK_Entity_Video
-	 */
-	public static function createVideo(SK_Entity_Profile $profile = null) {
-		if (!$profile) {
-			$profile = self::createProfile();
-		}
-		$embed = array('type' => 'iframe', 'src' => 'http://www.youtube.com/embed/MtN1YnoL46Q', 'ratio' => 0.61);
-		return $profile->getVideos()->add(array('title' => 'Duck song', 'privacy' => SK_ModelAsset_Entity_Privacy::NONE, 'embed' => $embed));
-	}
-
-	/**
-	 * @param SK_Entity_Profile $profile
-	 * @return SK_Entity_Blogpost
-	 */
-	public static function createBlogpost(SK_Entity_Profile $profile = null) {
-		if (!$profile) {
-			$profile = self::createProfile();
-		}
-		return $profile->getBlogposts()->add(array('title' => 'TestPost', 'text' => 'TestText'));
-	}
-
-	/**
-	 * @param SK_Entity_Profile $sender	OPTIONAL
-	 * @param SK_Entity_Profile $recipient OPTIONAL
-	 * @return SK_Entity_Conversation
-	 */
-	public static function createConversation(SK_Entity_Profile $sender = null, SK_Entity_Profile $recipient = null) {
-		if (!$sender) {
-			$sender = self::createProfile();
-		}
-		if (!$recipient) {
-			$recipient = self::createProfile();
-		}
-		$conversation = $sender->getConversations()->add('subject' . rand(), $recipient);
-		$conversation->getMessages()->addText($sender, 'some random text blah blah blah!');
-		return $conversation;
-	}
-
-	/**
-	 * @param SK_Entity_Profile $profile OPTIONAL
-	 * @return SK_Entity_Status
-	 */
-	public static function createStatus(SK_Entity_Profile $profile = null) {
-		if (!$profile) {
-			$profile = self::createProfile();
-		}
-		return $profile->getStatuses()->add('Hello there!');
 	}
 
 	public static function clearEnv() {
@@ -159,12 +64,8 @@ class TH {
 			self::$db_truncatetables = array_diff($alltables, $keeptables);
 		}
 		foreach (self::$db_truncatetables as $table) {
-			self::truncateTable($table);
+			CM_Mysql::truncate($table);
 		}
-	}
-
-	public static function truncateTable($table) {
-		CM_Mysql::query('TRUNCATE TABLE `' . $table . '`');
 	}
 
 	private static function _runCmd($cmd) {
@@ -176,8 +77,8 @@ class TH {
 	}
 
 	private static function _runSql($sql, $dbName = null) {
-		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' . CM_Config::get()->CM_Mysql->server['host'] .
-				' -P ' . CM_Config::get()->CM_Mysql->server['port'];
+		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' .
+				CM_Config::get()->CM_Mysql->server['host'] . ' -P ' . CM_Config::get()->CM_Mysql->server['port'];
 		if ($dbName) {
 			$cmd .= ' ' . $dbName;
 		}
@@ -186,8 +87,8 @@ class TH {
 	}
 
 	private static function _loadDb($sqlFile, $dbName) {
-		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' . CM_Config::get()->CM_Mysql->server['host'] .
-				' -P ' . CM_Config::get()->CM_Mysql->server['port'] . ' ' . $dbName . ' < ' . $sqlFile;
+		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' .
+				CM_Config::get()->CM_Mysql->server['host'] . ' -P ' . CM_Config::get()->CM_Mysql->server['port'] . ' ' . $dbName . ' < ' . $sqlFile;
 		return self::_runCmd($cmd);
 	}
 
@@ -223,80 +124,10 @@ class TH {
 	}
 
 	/**
-	 * @param SK_Entity_Profile		   $profile
-	 * @param SK_PaymentProvider_Abstract $paymentProvider
-	 * @param SK_ServiceBundle			$serviceBundle
-	 *
-	 * @return string
+	 * @return CM_Model_User
 	 */
-	public static function payInitial(SK_Entity_Profile $profile, SK_PaymentProvider_Abstract $paymentProvider, SK_ServiceBundle $serviceBundle) {
-		$key = md5(rand());
-		$randomHash = md5(rand() . uniqid());
-		$username = substr($randomHash, 0, 16);
-		$password = substr($randomHash, 16);
-		$providerBundleId = $paymentProvider->getProviderBundleId($serviceBundle);
-
-		switch ($paymentProvider->getId()) {
-			case 4:
-				$query = http_build_query(array('typeId' => $providerBundleId, 'clientAccnum' => $paymentProvider->getAccountNumber(),
-					'clientSubacc' => $paymentProvider->getSubAccount(), 'username' => $username, 'password' => $password, 'subscription_id' => $key,
-					'initialPrice' => $serviceBundle->getPrice(), 'reasonForDeclineCode' => '', 'profileId' => $profile->getUserId()));
-				$uri = '/payment/ccbill/' . $query;
-				$request = new CM_Request_Post($uri, array(), $query, CM_Request_Post::FORMAT_FORM);
-				$response = new SK_Response_Checkout_CCBill($request);
-				$response->process();
-				break;
-			case 100:
-				$query = http_build_query(array('PRICING_ID' => $providerBundleId, 'ZombaioGWPass' => $paymentProvider->getZombaioPass(),
-					'Action' => 'user.add', 'SUBSCRIPTION_ID' => $key, 'TRANSACTION_ID' => md5(rand()), 'SITE_ID' => $paymentProvider->getSiteId(),
-					'username' => $username, 'password' => $password, 'Amount' => $serviceBundle->getPrice(), 'extra' => $profile->getUserId()));
-				$uri = '/payment/zombaio/?' . $query;
-				$request = new CM_Request_Get($uri, array());
-				$response = new SK_Response_Checkout_Zombaio($request);
-				$response->process();
-				break;
-		}
-		return $key;
-	}
-
-	/**
-	 * @param int	$providerId
-	 * @param string $subscriptionKey
-	 * @param float  $amount
-	 *
-	 * @return string
-	 */
-	public static function payRebill(SK_PaymentProvider_Abstract $paymentProvider, $subscriptionKey, $amount) {
-		$key = md5(rand());
-		switch ($paymentProvider->getId()) {
-			case 4:
-				$data = array('REBILL', $paymentProvider->getAccountNumber(), $paymentProvider->getSubAccount(), $subscriptionKey, date("Y-m-d"),
-					$key, // transactionKey
-					$amount, // Amount
-				);
-				$GLOBALS['TEST_CCBILL_DATALINK'] = '"' . implode('","', $data) . '"';
-				$paymentProvider->cronCheckout(true);
-				break;
-			case 100:
-				$query = http_build_query(array('ZombaioGWPass' => $paymentProvider->getZombaioPass(), 'Action' => 'rebill',
-					'SUBSCRIPTION_ID' => $subscriptionKey, 'TRANSACTION_ID' => $key, 'SiteID' => $paymentProvider->getSiteId(), 'Success' => 1,
-					'Amount' => $amount));
-				$uri = '/payment/zombaio/?' . $query;
-				$request = new CM_Request_Get($uri, array());
-				$response = new SK_Response_Checkout_Zombaio($request);
-				$response->process();
-				break;
-		}
-		return $key;
-	}
-
-	public static function inProfileArray(SK_Entity_Profile $needle, array $haystack) {
-		foreach ($haystack as $straw) {
-			if ($needle->equals($straw)) {
-				return true;
-			}
-		}
-		return false;
+	public static function createUser() {
+		return CM_Model_User::create();
 	}
 
 	/**
@@ -348,19 +179,5 @@ class TH {
 		$formField->prepare($params);
 		$html = $render->render($formField, array('form' => $form));
 		return new TH_Page($html);
-	}
-
-	/**
-	 * @param int	$length
-	 * @param string $charset
-	 * @return string
-	 */
-	private static function _randStr($length, $charset = 'abcdefghijklmnopqrstuvwxyz0123456789') {
-		$str = '';
-		$count = strlen($charset);
-		while ($length--) {
-			$str .= $charset[mt_rand(0, $count - 1)];
-		}
-		return $str;
 	}
 }
