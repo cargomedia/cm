@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract{
+abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	
 	/**
 	 * @var array

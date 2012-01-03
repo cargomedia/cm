@@ -4,9 +4,11 @@ require_once dirname(__FILE__) . '/../../../TestCase.php';
 class CM_Action_ActionTest extends TestCase {
 
 	public static function setUpBeforeClass() {
+		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
 	}
 
 	public static function tearDownAfterClass() {
+		unset(CM_Config::get()->CM_Model_ActionLimit_Abstract);
 		TH::clearEnv();
 	}
 
@@ -43,20 +45,17 @@ class CM_Action_ActionTest extends TestCase {
 	}
 
 	public function testPrepare() {
-		$this->markTestIncomplete('Uses SK');
 		$actor = TH::createUser();
-		TH::createProfile($actor);	// @todo SK
-		/** @var CM_Action_Abstract $action */
 		$action = new CM_Action_Mock(1, $actor);
 		$action->prepare();
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('entityType' => 1, 'actionType' => 1, 'type' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'entityType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 		TH::clearCache();
 		try {
 			$action->prepare();
 			$this->fail('Limited action did not throw exception');
 		} catch (CM_Exception_ActionLimit $e) {
-			$this->assertTrue(true);
+			$this->assertSame('Mock overshoot', $e->getMessage());
 		}
 	}
 }
@@ -70,5 +69,13 @@ class CM_Action_Mock extends CM_Action_Abstract {
 	}
 
 	protected function _prepare() {
+	}
+}
+
+class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
+	const TYPE = 1;
+
+	public function overshoot(CM_Action_Abstract $action, $role, $first) {
+		throw new CM_Exception_ActionLimit('Mock overshoot');
 	}
 }
