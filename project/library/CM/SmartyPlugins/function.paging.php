@@ -13,6 +13,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	if (!isset($params['paging'])) {
 		trigger_error('Parameter `paging` missing');
 	}
+	/** @var CM_Paging_Abstract $paging */
 	$paging = $params['paging'];
 	$size = 5;
 
