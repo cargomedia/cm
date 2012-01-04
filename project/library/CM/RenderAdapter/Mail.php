@@ -55,6 +55,6 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 	 * @return string Tpl path
 	 */
 	protected function _getTplPath($template, $tplName = 'default') {
-		return $this->getRender()->getLayoutPath('mail' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR . $tplName . '.tpl', true);
+		return $this->getRender()->getLayoutPath('Mail' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR . $tplName . '.tpl', true);
 	}
 }
