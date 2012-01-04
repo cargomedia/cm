@@ -42,6 +42,15 @@ CREATE TABLE `cm_captcha` (
   KEY `create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_option`;
+
+
+CREATE TABLE `cm_option` (
+  `key` varchar(100) NOT NULL,
+  `value` BLOB NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_contentlist`;
 
 

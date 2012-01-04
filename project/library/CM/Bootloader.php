@@ -151,6 +151,8 @@ class CM_Bootloader {
 
 		define('TBL_CM_SVM', 'cm_svm');
 		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
+
+		define('TBL_CM_OPTION', 'cm_option');
 	}
 
 	/**
