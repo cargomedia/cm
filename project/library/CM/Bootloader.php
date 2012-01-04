@@ -25,7 +25,7 @@ class CM_Bootloader {
 		set_exception_handler(function(Exception $exception) {
 			$showError = IS_DEBUG || IS_CRON || IS_TEST;
 
-			if (!IS_CRON) {
+			if (!IS_CRON && !IS_TEST) {
 				header('HTTP/1.1 500 Internal Server Error');
 			}
 
