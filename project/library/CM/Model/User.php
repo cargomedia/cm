@@ -19,6 +19,9 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 		return new CM_Paging_Action_User($this, $entityType, $actionType, $period);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getCreated() {
 		return $this->_get('createStamp');
 	}
