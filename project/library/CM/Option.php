@@ -41,6 +41,13 @@ class CM_Option {
 	}
 
 	/**
+	 * @param string $key
+	 */
+	public function delete($key) {
+		CM_Mysql::delete(TBL_CM_OPTION, array('key' => $key));
+	}
+
+	/**
 	 * @param string   $key
 	 * @param int|null $change
 	 * @return int New value

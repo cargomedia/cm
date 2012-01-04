@@ -32,6 +32,15 @@ class CM_OptionTest extends TestCase {
 		$this->assertSame($option->get('bar'), 13);
 	}
 
+	public function testDelete() {
+		$option = CM_Option::getInstance();
+		$option->set('foo', 12);
+		$this->assertNotNull($option->get('foo'));
+
+		$option->delete('foo');
+		$this->assertNull($option->get('foo'));
+	}
+
 	public function testInc() {
 		$option = CM_Option::getInstance();
 
