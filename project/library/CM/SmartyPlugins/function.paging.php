@@ -15,6 +15,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	}
 	/** @var CM_Paging_Abstract $paging */
 	$paging = $params['paging'];
+	$ajax = !empty($params['ajax']);
 	$size = 5;
 
 	if ($paging->getPageCount() <= 1) {
@@ -25,8 +26,8 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$html .= '<div class="paging">';
 
 	if ($paging->getPage() > 1) {
-		$html .= _smarty_function_paging_link($request, $component, 1, '', $params, 'paging_control pagingFirstPage');
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $params, 'paging_control pagingPrevPage');
+		$html .= _smarty_function_paging_link($request, $component, 1, '', $ajax, 'paging_control pagingFirstPage');
+		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $ajax, 'paging_control pagingPrevPage');
 	}
 
 	$boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
@@ -35,12 +36,12 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$pageMax = min($paging->getPageCount(), ($paging->getPage() + $sizeMax));
 	for ($p = $pageMin; $p <= $pageMax; $p++) {
 		$class = ($p == $paging->getPage()) ? 'active' : '';
-		$html .= _smarty_function_paging_link($request, $component, $p, $p, $params, $class);
+		$html .= _smarty_function_paging_link($request, $component, $p, $p, $ajax, $class);
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $params, 'paging_control pagingNextPage');
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), '', $params, 'paging_control pagingLastPage');
+		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $ajax, 'paging_control pagingNextPage');
+		$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), '', $ajax, 'paging_control pagingLastPage');
 	}
 
 	$html .= '</div>';
@@ -53,12 +54,12 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
  * @param CM_Component_Abstract $component
  * @param int				   $page
  * @param string				$text
- * @param array				 $params
+ * @param bool                  $ajax
  * @param string|null		   $class
  * @return string
  */
-function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component_Abstract $component, $page, $text, array $params, $class = null) {
-	if (!empty($params['ajax'])) {
+function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
+	if ($ajax) {
 		$href = 'javascript:;';
 		$onClick = 'cm.components["' . $component->auto_id . '"].reload(' . json_encode(array('page' => $page)) . ')';
 	} else {
