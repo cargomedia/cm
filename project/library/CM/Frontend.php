@@ -10,8 +10,8 @@ class CM_Frontend {
 	 * Concatenate a javascript code $line with $var by reference.
 	 *
 	 * @param string  $line
-	 * @param string  $var	 reference
-	 * @param boolean $prepend OPTIONAL
+	 * @param string  &$var	 reference
+	 * @param boolean $prepend  OPTIONAL
 	 */
 	public static function concat_js($line, &$var, $prepend = false) {
 		$line = trim($line);
@@ -92,8 +92,8 @@ class CM_Frontend {
 
 		$field_list = array();
 		foreach ($form->getFields() as $field_key => $field) {
-			$field_list[] = '"' . $field_key . '":{"className":"' . get_class($field) . '","options":' .
-					CM_Params::encode($field->getOptions(), true) . '}';
+			$field_list[] =
+					'"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . '}';
 		}
 		$action_list = array();
 		foreach ($form->getActions() as $action_name => $action) {
@@ -159,9 +159,8 @@ class CM_Frontend {
 	 * @return string
 	 */
 	public function renderScripts() {
-		return '<script type="text/javascript">' . PHP_EOL . '$(function() {' . PHP_EOL . $this->_onloadHeaderJs .
-				PHP_EOL . $this->_onloadPrepareJs . PHP_EOL . $this->_onloadJs . PHP_EOL . $this->_onloadReadyJs .
-				PHP_EOL . '});' . PHP_EOL . '</script>' . PHP_EOL;
+		return '<script type="text/javascript">' . PHP_EOL . '$(function() {' . PHP_EOL . $this->_onloadHeaderJs . PHP_EOL . $this->_onloadPrepareJs .
+				PHP_EOL . $this->_onloadJs . PHP_EOL . $this->_onloadReadyJs . PHP_EOL . '});' . PHP_EOL . '</script>' . PHP_EOL;
 	}
 
 }

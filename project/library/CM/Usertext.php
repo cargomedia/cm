@@ -126,8 +126,13 @@ class CM_Usertext extends CM_Class_Abstract {
 	 * @param DomNode  $domNode
 	 * @param boolean  $stripAllowedTags
 	 * @param int|null &$lengthMax
+	 * @param int|null $level
+	 * @return string
 	 */
-	private function _collapseDomTree(DomNode $domNode, $stripAllowedTags, &$lengthMax, $level = 0) {
+	private function _collapseDomTree(DomNode $domNode, $stripAllowedTags, &$lengthMax, $level = null) {
+		if (is_null($level)) {
+			$level = 0;
+		}
 		$result = '';
 
 		if (null !== $lengthMax && $lengthMax <= 0) {

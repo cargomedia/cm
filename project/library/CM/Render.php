@@ -202,13 +202,16 @@ class CM_Render {
 	}
 
 	/**
-	 * @param string		$tpl  Template file name
-	 * @param bool		  $full OPTIONAL True for full path
-	 * @param string|null   $namespace
+	 * @param string      $tpl  Template file name
+	 * @param bool|null   $full
+	 * @param string|null $namespace
 	 * @return string Layout path based on theme
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getLayoutPath($tpl, $full = false, $namespace = null) {
+	public function getLayoutPath($tpl, $full = null, $namespace = null) {
+		if (is_null($full)) {
+			$full = false;
+		}
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 

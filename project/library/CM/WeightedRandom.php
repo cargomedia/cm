@@ -1,7 +1,8 @@
 <?php
 
-// Based on: http://w-shadow.com/blog/2008/12/10/fast-weighted-random-choice-in-php/
-
+/**
+ * Based on: http://w-shadow.com/blog/2008/12/10/fast-weighted-random-choice-in-php/
+ */
 class CM_WeightedRandom {
 	private $_values = array();
 	private $_lookup = array();
@@ -10,7 +11,7 @@ class CM_WeightedRandom {
 	/**
 	 * Initalize the weighted random selector
 	 *
-	 * @param array $values Array of elements to choose from
+	 * @param array $values  Array of elements to choose from
 	 * @param array $weights An array of weights. Weight must be a positive number.
 	 */
 	function __construct($values, $weights) {
@@ -38,7 +39,7 @@ class CM_WeightedRandom {
 	 * returns the position where it should be inserted, or count($haystack)-1 if the
 	 * $needle is higher than every element in the array.
 	 *
-	 * @param int $needle
+	 * @param int   $needle
 	 * @param array $haystack
 	 * @return int
 	 */

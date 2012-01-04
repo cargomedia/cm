@@ -73,8 +73,8 @@ class CM_Language extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $path
-	 * @param array  $vars
+	 * @param string     $fullPath
+	 * @param array|null $vars
 	 * @return string
 	 */
 	public static function text($fullPath, array $vars = null) {
@@ -89,7 +89,7 @@ class CM_Language extends CM_Class_Abstract {
 			return $section->text($key, $vars);
 
 		} catch (CM_TreeException $e) {
-			if (IS_DEBUG || IS_TEST ) {
+			if (IS_DEBUG || IS_TEST) {
 
 				if (self::_getConfig()->autoCreate) {
 					CM_LanguageEdit::createKey($fullPath);

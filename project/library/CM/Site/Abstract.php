@@ -17,28 +17,28 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 */
 	public function bindEvents(CM_EventHandler $eventHandler) {
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getNamespace() {
 		return $this->_namespaces[0];
 	}
-	
+
 	/**
 	 * @return string[]
 	 */
 	public function getNamespaces() {
 		return $this->_namespaces;
 	}
-	
+
 	/**
 	 * @return string Theme
 	 */
 	public function getTheme() {
 		return $this->_themes[0];
 	}
-	
+
 	/**
 	 * @return string[]
 	 */
@@ -54,7 +54,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 			$request->setPath('/index');
 		}
 	}
-	
+
 	/**
 	 * @param string $theme
 	 * @return CM_Site_Abstract
@@ -74,12 +74,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 		$this->_themes = array('default');
 		return $this;
 	}
-	
+
 	/**
-	* @param int $type|null
-	* @return CM_Site_Abstract
-	* @throws CM_Exception
-	*/
+	 * @param int|null $type
+	 * @return CM_Site_Abstract
+	 * @throws CM_Exception
+	 */
 	public static function factory($type = null) {
 		$class = self::_getClassName($type);
 		return new $class();

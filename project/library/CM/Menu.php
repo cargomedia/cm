@@ -23,9 +23,9 @@ class CM_Menu {
 	/**
 	 * Creates a new menu object with the given menu entries as array
 	 *
-	 * @param array							$menuEntries Menu entries
-	 * @param CM_Request_Abstract			  $request
-	 * @param CM_MenuEntry|null				$parent
+	 * @param array               $menuEntries Menu entries
+	 * @param CM_Request_Abstract $request
+	 * @param CM_MenuEntry|null   $parent
 	 */
 	public final function __construct(array $menuEntries, CM_Request_Abstract $request, CM_MenuEntry $parent = null) {
 		$this->_request = $request;

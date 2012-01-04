@@ -17,7 +17,7 @@ class CM_Paging_Useragent_User extends CM_Paging_Useragent_Abstract {
 	}
 
 	/**
-	 * @param $useragent
+	 * @param string $useragent
 	 */
 	public function add($useragent) {
 		$useragent = (string) $useragent;

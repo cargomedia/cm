@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="CM" default="build" basedir=".">
 
-	<property name="source" value="${basedir}/library/CM"/>
+	<property name="source" value="${basedir}/project/library/CM"/>
 	
 	<target name="parallelTasks">
 		<parallel threadCount="2">
@@ -85,7 +85,7 @@
 	<!-- Generate checkstyle.xml -->
 	<target name="phpcs-ci">
 		<exec executable="phpcs" output="/dev/null">
-			<arg line="--report=checkstyle --report-file=${basedir}/build/logs/checkstyle.xml --standard=${basedir}/test/CodeSniffer/Standards/Xodoa ${source}" />
+			<arg line="--report=checkstyle --report-file=${basedir}/build/logs/checkstyle.xml --standard=${basedir}/tests/CodeSniffer/Standards/Cargomedia ${source}" />
 		</exec>
 	</target>
 
@@ -117,7 +117,7 @@
 	<!-- Checkstyle with human output -->
 	<target name="phpcs">
 		<exec executable="phpcs">
-			<arg line="--standard=${basedir}/test/CodeSniffer/Standards/Xodoa ${source}" />
+			<arg line="--standard=${basedir}/tests/CodeSniffer/Standards/Cargomedia ${source}" />
 		</exec>
 	</target>
 	

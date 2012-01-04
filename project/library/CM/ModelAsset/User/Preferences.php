@@ -63,8 +63,6 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		return $values;
 	}
 
-	/**
-	 */
 	public function reset() {
 		CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
 		$this->_change();

@@ -36,11 +36,8 @@ class CM_File_Image extends CM_File {
 	/**
 	 * Uploads Image file to server
 	 *
-	 * @param string file_uniqid
-	 * @param string result_path
-	 * @param int result_width
-	 * @param int result_height
-	 * @return string Full size image hash
+	 * @param array $options (file_uniqid, result_path, result_width, result_height,
+	 * @return CM_File_Image
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function create(array $options) {

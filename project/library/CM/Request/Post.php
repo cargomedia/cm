@@ -7,12 +7,12 @@ class CM_Request_Post extends CM_Request_Abstract {
 	private $_body;
 
 	/**
-	 * @param string $uri
-	 * @param array $headers
-	 * @param string $body
-	 * @param int|false $bodyQueryFormat OPTIONAL
+	 * @param string     $uri
+	 * @param array|null $headers
+	 * @param string     $body
+	 * @param int|false  $bodyQueryFormat OPTIONAL
 	 */
-	public function __construct($uri, array $headers, $body, $bodyQueryFormat = self::FORMAT_JSON) {
+	public function __construct($uri, array $headers = null, $body, $bodyQueryFormat = self::FORMAT_JSON) {
 		parent::__construct($uri, $headers);
 		$this->_body = (string) $body;
 

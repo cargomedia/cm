@@ -1,11 +1,8 @@
 <?php
 
 /**
- * Local redis cache
  * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
- *
  */
-
 class CM_Cache_Redis extends CM_Cache_Abstract {
 	protected static $_instance;
 	private $_redis = null;

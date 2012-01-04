@@ -22,11 +22,14 @@ abstract class CM_Request_Abstract {
 	protected $_viewer = null;
 
 	/**
-	 * @param string			  $uri
-	 * @param array			   $headers OPTIONAL
-	 * @param CM_Model_User|null  $viewer
+	 * @param string				   $uri
+	 * @param array|null			   $headers OPTIONAL
+	 * @param CM_Model_User|null	   $viewer
 	 */
-	public function __construct($uri, array $headers = array(), CM_Model_User $viewer = null) {
+	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
+		if (is_null($headers)) {
+			$headers = array();
+		}
 		if (false === ($this->_path = parse_url($uri, PHP_URL_PATH))) {
 			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
 		}
@@ -72,7 +75,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param $path
+	 * @param string $path
 	 * @return CM_Request_Abstract
 	 */
 	public function setPath($path) {

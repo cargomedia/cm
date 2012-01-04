@@ -7,6 +7,12 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 		return 'APC';
 	}
 
+	/**
+	 * @param string $key
+	 * @param mixed $data
+	 * @param int|null $lifeTime
+	 * @return bool
+	 */
 	protected function _set($key, $data, $lifeTime = null) {
 		if (!$lifeTime) {
 			$lifeTime = self::_getConfig()->lifetime;

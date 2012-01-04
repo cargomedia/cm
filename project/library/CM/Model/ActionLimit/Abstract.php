@@ -39,7 +39,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param int|null $role
-	 * @param int|null period
+	 * @param int|null $period
 	 */
 	public function setPeriod($role, $period) {
 		$role = $role ? (int) $role : null;
@@ -100,7 +100,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 		return $roles[$role]['period'];
 	}
 
-    protected function _loadData() {
+	protected function _loadData() {
 		return array('roles' => CM_Mysql::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('entityType' => $this->getEntityType(), 'actionType' => $this->getActionType(), 'type' => $this->getType()))->fetchAllTree());
     }
 

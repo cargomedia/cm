@@ -161,8 +161,8 @@ class CM_Session {
 	}
 
 	/**
-	 * @return CM_Session
 	 * @param boolean $renew OPTIONAL
+	 * @return CM_Session
 	 */
 	public static function getInstance($renew = false) {
 		if (self::$_instance === null || $renew) {

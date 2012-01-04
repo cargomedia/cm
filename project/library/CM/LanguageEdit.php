@@ -18,8 +18,9 @@ class CM_LanguageEdit {
 			$result = CM_Mysql::query(CM_Mysql::placeholder($query_c, $_section_id, $section));
 
 			if (!$result->numRows()) {
-				throw new CM_LanguageEditException('Unknown section "' . htmlspecialchars($section) . '" in path "' . htmlspecialchars($section_path) . '"',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException(
+					'Unknown section "' . htmlspecialchars($section) . '" in path "' . htmlspecialchars($section_path) .
+							'"', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 
 			$_section_id = $result->fetchOne();
@@ -83,8 +84,7 @@ class CM_LanguageEdit {
 					WHERE `lang_section_id`=?', $parent_section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
-				throw new CM_LanguageEditException('Section with argued `$parent_section_id` is not exists',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException('Section with argued `$parent_section_id` is not exists', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 		}
 
@@ -109,8 +109,7 @@ class CM_LanguageEdit {
 
 		// find out a child sections existence
 		$query = CM_Mysql::placeholder('SELECT DISTINCT `parent_section_id`
-				FROM `'
-			. TBL_CM_LANG_SECTION . '`
+				FROM `' . TBL_CM_LANG_SECTION . '`
 				WHERE `parent_section_id` IN(?@)', array_keys($sections));
 
 		$result = CM_Mysql::query($query);
@@ -146,9 +145,7 @@ class CM_LanguageEdit {
 	private static function formatValues($text) {
 		$text = CM_Language::htmlspecialchars($text);
 
-		$text = preg_replace('~\{\$\w+\}~',
-			'<span class="text_var">\\0</span>',
-			$text);
+		$text = preg_replace('~\{\$\w+\}~', '<span class="text_var">\\0</span>', $text);
 
 		$text = nl2br($text);
 
@@ -158,8 +155,8 @@ class CM_LanguageEdit {
 	/**
 	 * Get a key-indexed language key nodes list.
 	 *
-	 * @param integer $section_id
-	 * @param boolean $format_values
+	 * @param string|int $section
+	 * @param boolean	$format_values
 	 * @return array lang_key_id-indexed objects list of CM_LanguageKeyNode
 	 */
 	public static function getKeyNodes($section, $format_values = false) {
@@ -170,10 +167,8 @@ class CM_LanguageEdit {
 			$section_id = (int) $section;
 		}
 		$query = CM_Mysql::placeholder('SELECT `tbl_key`.`lang_key_id`,`key`,`lang_id`,`value`
-				FROM `'
-			. TBL_CM_LANG_KEY . '` `tbl_key`
-					LEFT JOIN `'
-			. TBL_CM_LANG_VALUE . '` `tbl_val` USING(`lang_key_id`)
+				FROM `' . TBL_CM_LANG_KEY . '` `tbl_key`
+					LEFT JOIN `' . TBL_CM_LANG_VALUE . '` `tbl_val` USING(`lang_key_id`)
 				WHERE `lang_section_id`=? ORDER BY `key`', $section_id);
 
 		$result = CM_Mysql::query($query);
@@ -207,14 +202,12 @@ class CM_LanguageEdit {
 		$key = self::getKey($lang_key_id);
 
 		if (!$key) {
-			throw new CM_LanguageEditException('a key with $lang_key_id is not exists',
-				CM_LanguageEditException::KEY_NOT_EXISTS);
+			throw new CM_LanguageEditException('a key with $lang_key_id is not exists', CM_LanguageEditException::KEY_NOT_EXISTS);
 		}
 
 		// getting values
 		$query = CM_Mysql::placeholder('SELECT `lang_id`, `value`
-				FROM `'
-			. TBL_CM_LANG_VALUE . '`
+				FROM `' . TBL_CM_LANG_VALUE . '`
 				WHERE `lang_key_id`=?', $lang_key_id);
 
 		$result = CM_Mysql::query($query);
@@ -237,19 +230,17 @@ class CM_LanguageEdit {
 	 * Language key will automatically created if it's need.
 	 *
 	 * @param integer|string $section id or path
-	 * @param string $key
-	 * @param array $values lang_id=>value pairs
+	 * @param string		 $key
+	 * @param array		  $values  lang_id=>value pairs
 	 */
 	public static function setKey($section, $key, array $values) {
 		// checking params
 		if (!$section) {
-			throw new CM_LanguageEditException('argument $section value is empty or equals zero',
-				CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
+			throw new CM_LanguageEditException('argument $section value is empty or equals zero', CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
 		}
 
 		if (!strlen($key)) {
-			throw new CM_LanguageEditException('empty argument $key',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
+			throw new CM_LanguageEditException('empty argument $key', CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
 		// getting section_id
@@ -262,8 +253,7 @@ class CM_LanguageEdit {
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
-				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 		}
 
@@ -292,21 +282,20 @@ class CM_LanguageEdit {
 	 * Update an existent key values using $lang_key_id.
 	 *
 	 * @param integer $lang_key_id
+	 * @param array   $values
+	 * @return bool
 	 * @throws CM_LanguageEditException
 	 */
 	public static function updateKeyValues($lang_key_id, array $values) {
 		if (!($lang_key_id = (int) $lang_key_id)) {
-			throw new CM_LanguageEditException('empty argument $lang_key_id',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY_ID);
+			throw new CM_LanguageEditException('empty argument $lang_key_id', CM_LanguageEditException::EMPTY_ARGUMENT_KEY_ID);
 		}
 
 		// getting existent values
 		$existent_values = array();
 
 		$query = CM_Mysql::placeholder('SELECT `lang_id`, `value`
-				FROM `'
-			. TBL_CM_LANG_VALUE . '` WHERE `lang_key_id`=?',
-			$lang_key_id);
+				FROM `' . TBL_CM_LANG_VALUE . '` WHERE `lang_key_id`=?', $lang_key_id);
 
 		$result = CM_Mysql::query($query);
 		if ($result->numRows()) {
@@ -316,20 +305,18 @@ class CM_LanguageEdit {
 		} else {
 			// checking for key existence
 			if (!CM_LanguageEdit::getKey($lang_key_id)) {
-				throw new CM_LanguageEditException('a key with id ' . $lang_key_id . ' is not exists',
-					CM_LanguageEditException::KEY_NOT_EXISTS);
+				throw new CM_LanguageEditException('a key with id ' . $lang_key_id . ' is not exists', CM_LanguageEditException::KEY_NOT_EXISTS);
 			}
 		}
 		$result->free();
 
-		$insert_query = CM_Mysql::compile_placeholder("INSERT INTO `" . TBL_CM_LANG_VALUE . "`(`lang_key_id`,`value`,`lang_id`) VALUES($lang_key_id, '?', ?)"
-		);
+		$insert_query = CM_Mysql::compile_placeholder(
+			"INSERT INTO `" . TBL_CM_LANG_VALUE . "`(`lang_key_id`,`value`,`lang_id`) VALUES($lang_key_id, '?', ?)");
 
-		$update_query = CM_Mysql::compile_placeholder("UPDATE `" . TBL_CM_LANG_VALUE . "` SET `value`='?' WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
-		);
+		$update_query = CM_Mysql::compile_placeholder(
+			"UPDATE `" . TBL_CM_LANG_VALUE . "` SET `value`='?' WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?");
 
-		$delete_query = CM_Mysql::compile_placeholder("DELETE FROM `" . TBL_CM_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?"
-		);
+		$delete_query = CM_Mysql::compile_placeholder("DELETE FROM `" . TBL_CM_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id AND `lang_id`=?");
 
 		$lang_ids = array_keys(self::getLanguages());
 		foreach ($lang_ids as $lang_id) {
@@ -362,16 +349,14 @@ class CM_LanguageEdit {
 	 * Delete a language key with values which it refer.
 	 *
 	 * @param string|integer $section path or id
-	 * @param string $key
+	 * @param string		 $key
 	 */
 	public static function deleteKey($section, $key) {
 		// checking params
 		if (!$section) {
-			throw new CM_LanguageEditException('argument $section value is empty or equals zero',
-				CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
+			throw new CM_LanguageEditException('argument $section value is empty or equals zero', CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
 		} elseif (!strlen($key)) {
-			throw new CM_LanguageEditException('empty argument $key',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
+			throw new CM_LanguageEditException('empty argument $key', CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
 		// getting section_id
@@ -384,8 +369,7 @@ class CM_LanguageEdit {
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
-				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 		}
 
@@ -429,8 +413,7 @@ class CM_LanguageEdit {
 
 	public static function createSection($parent_section, $section, $description = '') {
 		if (!strlen($section)) {
-			throw new CM_LanguageEditException('empty argument $section',
-				CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
+			throw new CM_LanguageEditException('empty argument $section', CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
 		}
 
 		// getting section_id
@@ -441,8 +424,7 @@ class CM_LanguageEdit {
 					WHERE `lang_section_id`=?', $parent_section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
-				throw new CM_LanguageEditException('Section with argued `$parent_section_id` is not exists',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException('Section with argued `$parent_section_id` is not exists', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 		}
 
@@ -466,11 +448,9 @@ class CM_LanguageEdit {
 	public static function getKeyId($section, $key) {
 		// checking params
 		if (!$section) {
-			throw new CM_LanguageEditException('argument $section value is empty or equals zero',
-				CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
+			throw new CM_LanguageEditException('argument $section value is empty or equals zero', CM_LanguageEditException::EMPTY_ARGUMENT_SECTION);
 		} elseif (!strlen($key)) {
-			throw new CM_LanguageEditException('empty argument $key',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
+			throw new CM_LanguageEditException('empty argument $key', CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
 		// getting section_id
@@ -483,8 +463,7 @@ class CM_LanguageEdit {
 					WHERE `lang_section_id`=?', $section_id);
 
 			if (!CM_Mysql::query($query)->numRows()) {
-				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists',
-					CM_LanguageEditException::SECTION_NOT_EXISTS);
+				throw new CM_LanguageEditException('Section with argued `$section_id` is not exists', CM_LanguageEditException::SECTION_NOT_EXISTS);
 			}
 		}
 
@@ -506,13 +485,11 @@ class CM_LanguageEdit {
 
 	public static function renameKey($lang_key_id, $new_name) {
 		if (!($lang_key_id = (int) $lang_key_id)) {
-			throw new CM_LanguageEditException('empty or zero argument $lang_key_id',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY_ID);
+			throw new CM_LanguageEditException('empty or zero argument $lang_key_id', CM_LanguageEditException::EMPTY_ARGUMENT_KEY_ID);
 		}
 
 		if (!strlen($new_name)) {
-			throw new CM_LanguageEditException('empty argument $new_name',
-				CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
+			throw new CM_LanguageEditException('empty argument $new_name', CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
 		$query = CM_Mysql::placeholder('UPDATE `' . TBL_CM_LANG_KEY . '` SET `key`="?" WHERE `lang_key_id`=?', $new_name, $lang_key_id);
@@ -532,9 +509,9 @@ class CM_LanguageEdit {
 	 *
 	 * If key already exists, value is updated
 	 *
-	 * @param string $keyPath
+	 * @param string	  $keyPath
 	 * @param string|null $value
-	 * @param int|null $langId
+	 * @param int|null	$langId
 	 * @return int New key id
 	 */
 	public static function createKey($keyPath, $value = null, $langId = null) {
@@ -554,23 +531,19 @@ class CM_LanguageEdit {
 
 		// Creates all not existing sections
 		foreach ($sections as $section) {
-			$result = CM_Mysql::select(TBL_CM_LANG_SECTION, 'lang_section_id',
-				array('parent_section_id' => $parentId, 'section' => $section));
+			$result = CM_Mysql::select(TBL_CM_LANG_SECTION, 'lang_section_id', array('parent_section_id' => $parentId, 'section' => $section));
 
 			$newParentId = $result->fetchOne();
 
 			if (!$newParentId) {
 				// Section does not exist yet -> create
-				$newParentId = CM_Mysql::insert(TBL_CM_LANG_SECTION,
-					array('parent_section_id' => $parentId, 'section' => $section)
-				);
+				$newParentId = CM_Mysql::insert(TBL_CM_LANG_SECTION, array('parent_section_id' => $parentId, 'section' => $section));
 			}
 			$parentId = $newParentId;
 		}
 
 		// checking lang_key for existence
-		$result = CM_Mysql::select(TBL_CM_LANG_KEY, 'lang_key_id',
-			array('lang_section_id' => $parentId, 'key' => $keyName));
+		$result = CM_Mysql::select(TBL_CM_LANG_KEY, 'lang_key_id', array('lang_section_id' => $parentId, 'key' => $keyName));
 
 		$keyId = $result->fetchOne();
 

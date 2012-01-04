@@ -30,7 +30,7 @@ abstract class CM_TreeNode_Abstract {
 	}
 
 	/**
-	 * @param $key string
+	 * @param string $name
 	 * @return boolean
 	 */
 	public function hasNode($name) {
@@ -38,7 +38,7 @@ abstract class CM_TreeNode_Abstract {
 	}
 
 	/**
-	 * @param $key string
+	 * @param string $name
 	 * @return CM_TreeNode_Abstract
 	 * @throws CM_TreeException
 	 */
@@ -50,17 +50,18 @@ abstract class CM_TreeNode_Abstract {
 	}
 
 	/**
-	 * @param $key string
+	 * @param string $key
 	 * @return boolean
 	 */
 	public function hasLeaf($key) {
-		if (!$key)
+		if (!$key) {
 			return false;
+		}
 		return array_key_exists($key, $this->leaves);
 	}
 
 	/**
-	 * @param $key string
+	 * @param string $key
 	 * @return string
 	 * @throws CM_TreeException
 	 */
@@ -79,8 +80,8 @@ abstract class CM_TreeNode_Abstract {
 	}
 
 	/**
-	 * @param $key string
-	 * @param $value string
+	 * @param string $key
+	 * @param string $value
 	 */
 	public function setLeaf($key, $value) {
 		$this->leaves[$key] = $value;

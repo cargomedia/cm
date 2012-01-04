@@ -44,7 +44,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_Entity_Abstract $entity
-	 * @param array					$data OPTIONAL
+	 * @param array                    $data OPTIONAL
 	 * @throws CM_Exception_Invalid
 	 */
 	abstract protected function _notify(CM_Model_Entity_Abstract $entity, array $data = null);
@@ -72,7 +72,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int $bestRole OPTIONAL reference for storing role associated with limit
+	 * @param int &$bestRole OPTIONAL reference for storing role associated with limit
 	 * @return CM_Model_ActionLimit_Abstract|null
 	 */
 	public final function getActionLimit(&$bestRole = null) {
@@ -90,8 +90,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				}
 			}
 			$limit = $actionLimit->getLimit($bestRole);
-			if ($limit !== null &&
-					($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())
+			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())
 			) {
 				return $actionLimit;
 			}
@@ -130,7 +129,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_ActionLimit_Abstract	 $actionLimit
-	 * @param int                               $role
+	 * @param int							   $role
 	 * @return bool
 	 */
 	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
@@ -161,8 +160,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private final function _getSiblings($within = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
-				'Looking for actions of type `' . $this->getType() . '` on entityType `' . $this->getEntityType() .
-						'` that is not being logged.');
+				'Looking for actions of type `' . $this->getType() . '` on entityType `' . $this->getEntityType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
 			return $this->getActor()->getActions($this->getEntityType(), $this->getType(), $within);
@@ -179,9 +177,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	private final function _getTransgressions($actionLimitType = null, $period = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
-			throw new CM_Exception_Invalid(
-				'Looking for transgressions of type `' . $this->getType() . '` on entityType `' .
-						$this->getEntityType() . '` that is not being logged.');
+			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on entityType `' . $this->getEntityType() .
+					'` that is not being logged.');
 		}
 		if ($this->getActor()) {
 			return $this->getActor()->getTransgressions($this->getEntityType(), $this->getType(), $actionLimitType, $period);

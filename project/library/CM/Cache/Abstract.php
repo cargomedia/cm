@@ -13,6 +13,11 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		return static::$_instance;
 	}
 
+	/**
+	 * @param string   $key
+	 * @param mixed	$value
+	 * @param int|null $lifeTime
+	 */
 	public static final function set($key, $value, $lifeTime = null) {
 		if (!static::_enabled()) {
 			return;
@@ -23,6 +28,10 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		$cache->_set($key, $value, $lifeTime);
 	}
 
+	/**
+	 * @param string $key
+	 * @return mixed|false
+	 */
 	public static final function get($key) {
 		if (!static::_enabled()) {
 			return false;
@@ -38,6 +47,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		return $value;
 	}
 
+	/**
+	 * @param sting $key
+	 */
 	public static final function delete($key) {
 		if (!static::_enabled()) {
 			return;
@@ -56,14 +68,28 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		$cache->_flush();
 	}
 
+	/**
+	 * @param string   $tag
+	 * @param string   $key
+	 * @param mixed	$value
+	 * @param int|null $lifetime
+	 */
 	public static final function setTagged($tag, $key, $value, $lifetime = null) {
 		static::_callInstance('setTagged', func_get_args());
 	}
 
+	/**
+	 * @param string $tag
+	 * @param string $key
+	 * @return mixed|false
+	 */
 	public static final function getTagged($tag, $key) {
 		return static::_callInstance('getTagged', func_get_args());
 	}
 
+	/**
+	 * @param string $tag
+	 */
 	public static final function deleteTag($tag) {
 		static::_callInstance('deleteTag', func_get_args());
 	}
@@ -82,13 +108,26 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		return implode('_', $parts);
 	}
 
+	/**
+	 * @param string $name
+	 * @param array  $arguments
+	 */
 	public static final function __callStatic($name, $arguments) {
 		static::_callInstance($name, $arguments, true);
 	}
 
-	protected static final function _callInstance($functionName, $arguments, $log = false) {
+	/**
+	 * @param string	$functionName
+	 * @param array	 $arguments
+	 * @param bool|null $log
+	 * @return mixed
+	 */
+	protected static final function _callInstance($functionName, $arguments, $log = null) {
 		if (!static::_enabled()) {
 			return false;
+		}
+		if (is_null($log)) {
+			$log = false;
 		}
 		$cache = static::getInstance();
 		if ($log) {
@@ -118,9 +157,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	abstract protected function _getName();
 
 	/**
-	 * @param string $key
-	 * @param string $data
-	 * @param int	$lifeTime
+	 * @param string	  $key
+	 * @param mixed       $data
+	 * @param int|null	$lifeTime
 	 * @return boolean
 	 */
 	abstract protected function _set($key, $data, $lifeTime = null);
@@ -172,6 +211,10 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		return static::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
 	}
 
+	/**
+	 * @param string $tag
+	 * @return string
+	 */
 	private final function _getTagVersion($tag) {
 		$cacheKey = CM_CacheConst::Tag_Version . '_tag:' . $tag;
 		if (($tagVersion = static::get($cacheKey)) === false) {

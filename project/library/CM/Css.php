@@ -13,9 +13,10 @@ class CM_Css {
 	private $_render = null;
 
 	/**
-	 * @param string $css
-	 * @param CM_Css $presets OPTIONAL
-	 * @param string $prefix OPTIONAL
+	 * @param string		  $css
+	 * @param CM_Render	   $render
+	 * @param CM_Css|null	 $presets
+	 * @param string|null	 $prefix
 	 */
 	public function __construct($css, CM_Render $render, CM_Css $presets = null, $prefix = null) {
 		if ($presets) {
@@ -51,8 +52,8 @@ class CM_Css {
 
 	/**
 	 * @param string $css
-	 * @param array $presets OPTIONAL
-	 * @param string $prefix OPTIONAL
+	 * @param array  $presets OPTIONAL
+	 * @param string $prefix  OPTIONAL
 	 * @return array
 	 */
 	private function _parseCssString($css, array $presets = null, $prefix = null) {
@@ -88,10 +89,10 @@ class CM_Css {
 	}
 
 	/**
-	 *
-	 * @param string $cssBlock
-	 * @param array $presets OPTIONAL
-	 * @param array $presetNames OPTIONAL
+	 * @param string	  $cssBlock
+	 * @param array|null  $presets
+	 * @param array|null  $presetNames
+	 * @return array
 	 * @throws CM_Exception
 	 */
 	private function _parseRules($cssBlock, array $presets = null, array $presetNames = null) {
@@ -124,7 +125,7 @@ class CM_Css {
 						$value[] = '-moz-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
 						$value[] = '-webkit-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
 						$value[] = '-o-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
-						
+
 						if ($match['point'] == 'top' || $match['point'] == 'left') {
 							if ($match['point'] == 'left') {
 								$points = 'left top,right top';
@@ -140,10 +141,8 @@ class CM_Css {
 						if ($match['point'] == 'left') {
 							$filterType = 1;
 						}
-						$properties['filter'] = $this
-								->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
-										'GradientType=' . $filterType . ',startColorstr=' . $match['stop1'] . ',endColorstr=' . $match['stop2'],
-										$properties);
+						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
+								'GradientType=' . $filterType . ',startColorstr=' . $match['stop1'] . ',endColorstr=' . $match['stop2'], $properties);
 					}
 					break;
 				case 'border-radius':
@@ -183,9 +182,10 @@ class CM_Css {
 	/**
 	 * Return a MS-filter property
 	 *
-	 * @param string $name Filter-name
-	 * @param string $value Filter-value
-	 * @param array $properties OPTIONAL Existing properties to use
+	 * @param string     $name	   Filter-name
+	 * @param string     $value	  Filter-value
+	 * @param array|null $properties Existing properties to use
+	 * @return string
 	 */
 	private function _getFilterProperty($name, $value, array $properties = null) {
 		$result = isset($properties['filter']) ? $properties['filter'] : '';

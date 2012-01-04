@@ -21,8 +21,8 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * @throws CM_Exception_Nonexistent
 	 * @param CM_Response_Abstract $response
+	 * @throws CM_Exception_Nonexistent
 	 */
 	abstract public function prepare(CM_Response_Abstract $response);
 

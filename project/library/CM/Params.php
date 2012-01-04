@@ -12,7 +12,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param array $params OPTIONAL
-	 * @param bool $decode OPTIONAL
+	 * @param bool  $decode OPTIONAL
 	 */
 	public function __construct(array $params = array(), $decode = true) {
 		$this->_decode = (bool) $decode;
@@ -26,7 +26,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param mixed $default
+	 * @param mixed  $default
 	 * @return mixed
 	 */
 	protected function _get($key, $default = null) {
@@ -41,7 +41,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	public function set($key, $value) {
 		if ($this->_decode) {
@@ -113,9 +113,9 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param string[] $default OPTIONAL
-	 * @param string[]
+	 * @param string		$key
+	 * @param string[]|null $default
+	 * @return string[]
 	 */
 	public function getStringArray($key, array $default = null) {
 		return array_map(array($this, '_getString'), $this->getArray($key, $default));
@@ -140,7 +140,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param int[] $default OPTIONAL
+	 * @param int[]  $default OPTIONAL
 	 * @return int[]
 	 */
 	public function getIntArray($key, array $default = null) {
@@ -149,7 +149,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param array $default
+	 * @param array  $default
 	 * @return array
 	 * @throws CM_Exception_InvalidParam
 	 */
@@ -162,7 +162,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string  $key
 	 * @param boolean $default
 	 * @return boolean
 	 * @throws CM_Exception_InvalidParam
@@ -180,7 +180,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param int $default
+	 * @param int	$default
 	 * @return int
 	 */
 	public function getPage($key = 'page', $default = 1) {
@@ -192,6 +192,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
+	 * @param string $className
 	 * @return object
 	 * @throws CM_Exception_InvalidParam
 	 */
@@ -260,7 +261,7 @@ class CM_Params extends CM_Class_Abstract {
 	//-------static-------//
 
 	/**
-	 * @param array $value
+	 * @param array   $value
 	 * @param boolean $json OPTIONAL
 	 * @return string
 	 */
@@ -283,7 +284,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $value
+	 * @param string  $value
 	 * @param boolean $json OPTIONAL
 	 * @return array|false
 	 */
