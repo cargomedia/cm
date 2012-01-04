@@ -33,9 +33,7 @@ class CM_Mysql extends CM_Class_Abstract {
 			throw new CM_Exception('Database connection failed');
 		}
 
-		if (!mysql_select_db($db, $link)) {
-			throw new CM_Exception('Cannot select database `' . $db . '`');
-		}
+		self::selectDb($db, $readOnly);
 
 		if (!mysql_set_charset('utf8', $link)) {
 			throw new CM_Exception('Cannot set database charset to utf-8');
@@ -49,6 +47,18 @@ class CM_Mysql extends CM_Class_Abstract {
 			return self::$link_id_read ? self::$link_id_read : self::connect($readOnly);
 		} else {
 			return self::$link_id ? self::$link_id : self::connect($readOnly);
+		}
+	}
+
+	/**
+	 * @param string $db
+	 * @param bool   $readOnly
+	 * @throws CM_Exception
+	 */
+	public static function selectDb($db, $readOnly = false) {
+		$link = self::_getLink($readOnly);
+		if (!mysql_select_db($db, $link)) {
+			throw new CM_Exception('Cannot select database `' . $db . '`');
 		}
 	}
 
@@ -262,11 +272,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Insert one/multiple rows
 	 *
-	 * @param string            $table
-	 * @param string|array      $attr           Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array|null        $onDuplicateKey OPTIONAL
-	 * @param string            $statement
+	 * @param string			$table
+	 * @param string|array	  $attr		   Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null		$onDuplicateKey OPTIONAL
+	 * @param string			$statement
 	 * @return int Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKey = null, $statement = self::STMT_INSERT) {
@@ -371,8 +381,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string            $table
-	 * @param array             $values Associative array field=>value
+	 * @param string			$table
+	 * @param array			 $values Associative array field=>value
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
@@ -394,7 +404,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $table
+	 * @param string	   $table
 	 * @param string|array $where Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
