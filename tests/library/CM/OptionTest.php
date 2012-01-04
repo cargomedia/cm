@@ -31,4 +31,13 @@ class CM_OptionTest extends TestCase {
 		$option->set('bar', 13);
 		$this->assertSame($option->get('bar'), 13);
 	}
+
+	public function testInc() {
+		$option = CM_Option::getInstance();
+
+		$this->assertSame(1, $option->inc('zoo'));
+		$this->assertSame(2, $option->inc('zoo'));
+		$this->assertSame(5, $option->inc('zoo', 3));
+		$this->assertSame(3, $option->inc('zoo', -2));
+	}
 }

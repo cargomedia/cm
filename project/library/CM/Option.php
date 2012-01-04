@@ -39,4 +39,19 @@ class CM_Option {
 	public function set($key, $value) {
 		CM_Mysql::replace(TBL_CM_OPTION, array('key' => $key, 'value' => serialize($value)));
 	}
+
+	/**
+	 * @param string   $key
+	 * @param int|null $change
+	 * @return int New value
+	 */
+	public function inc($key, $change = null) {
+		if (is_null($change)) {
+			$change = +1;
+		}
+		$value = (int) $this->get($key);
+		$value += (int) $change;
+		$this->set($key, $value);
+		return $value;
+	}
 }
