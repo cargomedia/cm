@@ -28,7 +28,7 @@ class TH {
 		!is_dir(DIR_TMP_USERFILES) ? mkdir(DIR_TMP_USERFILES) : null;
 
 		// Import db
-		self::_runSql('DROP DATABASE ' . CM_Config::get()->CM_Mysql->db . '_test');
+		self::_runSql('DROP DATABASE IF EXISTS ' . CM_Config::get()->CM_Mysql->db . '_test');
 		self::_runSql('CREATE DATABASE ' . CM_Config::get()->CM_Mysql->db . '_test');
 		self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db . '_test');
 
