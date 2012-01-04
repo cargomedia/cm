@@ -12,6 +12,7 @@
 			<antcall target="phpcpd"/>
 			<antcall target="phpcs-ci"/>
 			<antcall target="docblox"/>
+			<antcall target="phpdoc"/>
 			<antcall target="phpcb"/>
 		</parallel>
 	</target>
@@ -101,6 +102,15 @@
 	<target name="docblox">
 		<exec executable="docblox">
 			<arg line="run" />
+		</exec>
+	</target>
+	
+	<target name="phpdoc" description="Generate API documentation using PHPDocumentor">
+		<exec executable="phpdoc">
+			<arg value="--directory" />
+			<arg path="${source}" />
+			<arg value="--target" />
+			<arg path="${basedir}/build/api" />
 		</exec>
 	</target>
 

@@ -4,9 +4,9 @@
     <target>./build/api</target>
   </parser>
   <transformer>
-    <target>./build/api</target>
+    <target>./build/docblox</target>
   </transformer>
   <files>
-    <directory>./library/CM</directory>
+    <directory>./project/library/CM</directory>
   </files>
 </docblox>
