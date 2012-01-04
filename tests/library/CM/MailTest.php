@@ -10,14 +10,15 @@ class CM_MailTest extends TestCase {
 	}
 
 	public function testWithTemplate() {
-		$this->markTestIncomplete('No mail template available');
 		$user = new CM_Model_User_Mock(TH::createUser()->getId());
 		try {
-			$msg = new CM_Mail($user, 'template_test');
-			$msg->send();
-			$this->assertTrue(true);
-		} catch (Exception $ex) {
-			$this->fail('Cannot send mail: ' . $ex->getMessage());
+			$msg = new CM_Mail($user, 'welcome');
+			list($subject, $html, $text) = $msg->send();
+			$this->assertNotEmpty($subject);
+			$this->assertNotEmpty($html);
+			$this->assertNotEmpty($text);
+		} catch (Exception $e) {
+			$this->fail('Cannot send mail: ' . $e->getMessage());
 		}
 	}
 
