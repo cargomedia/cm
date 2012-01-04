@@ -27,16 +27,10 @@ class TH {
 		!is_dir(DIR_USERFILES) ? mkdir(DIR_USERFILES) : null;
 		!is_dir(DIR_TMP_USERFILES) ? mkdir(DIR_TMP_USERFILES) : null;
 
-		// Create db
-		if (count(self::_runSql("SHOW DATABASES LIKE '" . CM_Config::get()->CM_Mysql->db . "_test'")) == 0) {
-			echo 'Exporting database...';
-			self::_runCmd(DIR_TEST_DATA . 'db/export.sh');
-			echo PHP_EOL;
-			echo 'Importing test-database...';
-			self::_runSql("CREATE DATABASE " . CM_Config::get()->CM_Mysql->db . "_test");
-			self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db . '_test');
-			echo PHP_EOL;
-		}
+		// Import db
+		self::_runSql('DROP DATABASE ' . CM_Config::get()->CM_Mysql->db . '_test');
+		self::_runSql('CREATE DATABASE ' . CM_Config::get()->CM_Mysql->db . '_test');
+		self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db . '_test');
 
 		// Reset environment
 		self::clearEnv();
