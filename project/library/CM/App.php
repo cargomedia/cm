@@ -39,9 +39,12 @@ class CM_App {
 	}
 
 	/**
-	 * @param int $releaseStamp
+	 * @param int|null $releaseStamp
 	 */
-	public function setReleaseStamp($releaseStamp) {
+	public function setReleaseStamp($releaseStamp = null) {
+		if (null === $releaseStamp) {
+			$releaseStamp = time();
+		}
 		$releaseStamp = (int) $releaseStamp;
 		CM_Option::getInstance()->set('app.releaseStamp', $releaseStamp);
 	}
