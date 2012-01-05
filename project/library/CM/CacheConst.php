@@ -32,4 +32,6 @@ class CM_CacheConst {
 	
 	// _class:X_id:Y
 	const Model = 'Model';
+
+	const Option = 'Option';
 }

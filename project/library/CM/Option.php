@@ -21,11 +21,15 @@ class CM_Option {
 	 * @return mixed|null
 	 */
 	public function get($key) {
-		$value = CM_Mysql::select(TBL_CM_OPTION, 'value', array('key' => $key))->fetchOne();
-		if (false === $value) {
+		$cacheKey = CM_CacheConst::Option;
+		if (($options = CM_Cache::get($cacheKey)) === false) {
+			$options = CM_Mysql::select(TBL_CM_OPTION, array('key', 'value'))->fetchAllTree();
+			CM_Cache::set($cacheKey, $options);
+		}
+		if (!isset($options[$key])) {
 			return null;
 		}
-		$value = unserialize($value);
+		$value = unserialize($options[$key]);
 		if (false === $value) {
 			throw new CM_Exception_Invalid('Cannot unserialize option `' . $key . '`.');
 		}
@@ -38,6 +42,7 @@ class CM_Option {
 	 */
 	public function set($key, $value) {
 		CM_Mysql::replace(TBL_CM_OPTION, array('key' => $key, 'value' => serialize($value)));
+		$this->_clearCache();
 	}
 
 	/**
@@ -45,6 +50,7 @@ class CM_Option {
 	 */
 	public function delete($key) {
 		CM_Mysql::delete(TBL_CM_OPTION, array('key' => $key));
+		$this->_clearCache();
 	}
 
 	/**
@@ -60,5 +66,10 @@ class CM_Option {
 		$value += (int) $change;
 		$this->set($key, $value);
 		return $value;
+	}
+
+	private function _clearCache() {
+		$cacheKey = CM_CacheConst::Option;
+		CM_Cache::delete($cacheKey);
 	}
 }
