@@ -36,7 +36,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 
 		$this->getLayout()->assign($page->getTplParams());
 		$this->getLayout()->assign('page', $page);
-		$this->getLayout()->assign('tracking', CM_Tracking::getInstance()->getHtml());
 		$this->getLayout()->assign('viewer', $page->getViewer());
 		$this->getLayout()->assign('js', $js);
 
