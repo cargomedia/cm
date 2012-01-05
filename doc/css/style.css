@@ -1,5 +1,86 @@
+body{
+	padding: 20px;
+}
+body, p {
+	font-family: Arial, sans-serif;
+	color: rgb(87, 87, 87);
+	font-size: 1em;
+}
+p {
+	line-height: 1.2em;
+	margin-bottom: 15px;
+}
+ul{
+	margin-bottom: 15px;
+}
+li{
+	line-height: 1.2em;
+	list-style-type: disc;
+	margin-left: 20px;
+}
+a, a:link {
+	color: rgb(46, 133, 194);
+	text-decoration: none;
+}
+a:hover, a:active{
+	text-decoration: underline;
+}
+
+h1 {
+	font-size: 3em;
+	color: rgb(46, 133, 194);
+	margin: 20px 0;
+}
+
+h2 {
+	font-size: 1.8em;
+	color: rgb(46, 133, 194);
+	margin: 60px 0 7px 0;
+}
+
+h3 {
+	font-size: 1em;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+h4 {
+	margin: 15px 0 3px 0;
+	color: #888;
+}
+h5 {
+	display: inline;
+	font-style: italic;
+	padding-right: 5px;
+}
+pre{
+	font-family: monospace, "Courier New", serif;
+	font-size: 0.9em;
+	line-height: 1.2em;
+	padding: 10px 0;
+	margin-bottom: 15px;
+	background-color: rgba(46, 133, 194, 0.05);
+}
+dt{
+	font-weight: bold;
+	color: #555;
+	line-height: 1.2em;
+}
+dd{
+	margin-bottom: 1em;
+}
 #index {
 	float:right;
-	border: 1px solid black;
+	border: 1px solid rgb(46, 133, 194);
 	padding:10px;
+	background-color: rgba(46, 133, 194, 0.05);
+}
+#index h2{
+	font-size: 1em;
+	margin-top: 0;
+	color: #333;
+}
+#index li{
+	font-size: 0.9em;
+	line-height: 1.4em;
 }
