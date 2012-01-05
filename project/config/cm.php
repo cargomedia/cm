@@ -1,6 +1,5 @@
 <?php
 
-$config->modified = '0';
 $config->debug = false;
 $config->urlCdnObjects = null;
 $config->urlCdnContent = null;

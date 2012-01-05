@@ -36,7 +36,7 @@ EOD;
 	public function testFormat() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Config::get()->modified;
+		$modified = CM_Option::getInstance()->get('app.releaseStamp');
 		$expected = <<<EOD
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br /><br />
 allowed tags: <b class="italic">bold</b> <a href="window.location.href='http://www.google.com/';">google</a><br /><br />
@@ -61,7 +61,7 @@ EOD;
 	public function testFormatPlain() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Config::get()->modified;
+		$modified = CM_Option::getInstance()->get('app.releaseStamp');
 		$expected = <<<EOD
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" />
 
@@ -109,7 +109,7 @@ EOD;
 	public function testFormatPlainTruncate() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Config::get()->modified;
+		$modified = CM_Option::getInstance()->get('app.releaseStamp');
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
 		$expectedEmoticon = '<img class="smile" alt=":)" title=":)" src="' . $urlStatic . 'img/smiles/1/1.png?' . $modified . '" />';
 
@@ -127,7 +127,7 @@ EOD;
 		return;
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Config::get()->modified;
+		$modified = CM_Option::getInstance()->get('app.releaseStamp');
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
 		$expected = 'Yo <img class="smile" alt="*PLAYMATE*" title="*PLAYMATE*" src="' . $urlStatic . 'img/smiles/1/a52.gif?' . $modified . '" />';

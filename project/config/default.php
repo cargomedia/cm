@@ -2,7 +2,6 @@
 
 CM_Config::load('cm.php');
 
-$config->modified = '0';
 $config->debug = true;
 //$config->urlCdnObjects = 'http://cdn.example.dev/';
 //$config->urlCdnContent = 'http://cdn.example.dev/';
