@@ -17,7 +17,7 @@ class CM_Util {
 	 * Return human-readable information on one line about a variable
 	 *
 	 * @param mixed $expression
-	 * @retum string
+	 * @return string
 	 */
 	public static function var_line($expression) {
 		$line = print_r($expression, true);
