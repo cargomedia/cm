@@ -6,6 +6,7 @@ class CM_Model_UserTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
+		TH::clearEnv();
 	}
 
 	public function testGetCreated() {

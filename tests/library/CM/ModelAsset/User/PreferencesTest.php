@@ -14,7 +14,7 @@ class CM_ModelAsset_User_PreferencesTest extends TestCase {
 
 	public function testGetSet() {
 		$preferences = TH::createUser()->getPreferences();
-		$defaults = $preferences->getAll();
+		$defaults = $preferences->getDefaults();
 		$section = reset(array_keys($defaults));
 		$key = reset(array_keys($defaults[$section]));
 
@@ -28,7 +28,7 @@ class CM_ModelAsset_User_PreferencesTest extends TestCase {
 
 	public function testReset() {
 		$preferences = TH::createUser()->getPreferences();
-		$defaults = $preferences->getAll();
+		$defaults = $preferences->getDefaults();
 		$section = reset(array_keys($defaults));
 		$key = reset(array_keys($defaults[$section]));
 
