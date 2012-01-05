@@ -233,7 +233,7 @@ class CM_Render {
 	 * @return string
 	 */
 	public function getUrlImg($path) {
-		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_Option::getInstance()->get('app.releaseStamp') . '/' . $path;
+		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
 	}
 
 	/**

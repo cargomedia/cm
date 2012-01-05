@@ -36,7 +36,7 @@ EOD;
 	public function testFormat() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Option::getInstance()->get('app.releaseStamp');
+		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br /><br />
 allowed tags: <b class="italic">bold</b> <a href="window.location.href='http://www.google.com/';">google</a><br /><br />
@@ -52,7 +52,6 @@ EOD;
 	public function testBadwords() {
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
-		$splitChar = CM_Usertext::getSplitChar();
 
 		$actual = new CM_Usertext('hallo@yahoo.com world');
 		$this->assertEquals('hallo world', $actual->getFormat());
@@ -61,7 +60,7 @@ EOD;
 	public function testFormatPlain() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Option::getInstance()->get('app.releaseStamp');
+		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" />
 
@@ -109,7 +108,7 @@ EOD;
 	public function testFormatPlainTruncate() {
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Option::getInstance()->get('app.releaseStamp');
+		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
 		$expectedEmoticon = '<img class="smile" alt=":)" title=":)" src="' . $urlStatic . 'img/smiles/1/1.png?' . $modified . '" />';
 
@@ -127,7 +126,7 @@ EOD;
 		return;
 		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
-		$modified = CM_Option::getInstance()->get('app.releaseStamp');
+		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
 		$expected = 'Yo <img class="smile" alt="*PLAYMATE*" title="*PLAYMATE*" src="' . $urlStatic . 'img/smiles/1/a52.gif?' . $modified . '" />';
