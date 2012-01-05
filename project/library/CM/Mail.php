@@ -17,10 +17,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	/**
 	 * @var string
 	 */
-	private $_template;
-	/**
-	 * @var string
-	 */
 	private $_senderName;
 	/**
 	 * @var string
@@ -53,43 +49,33 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 	/**
 	 * @param CM_Model_User|string $recipient
-	 * @param string			   $template
-	 * @param boolean			  $delayed
+	 * @param array $tplParams
+	 * @param boolean $delayed
 	 */
-	public function __construct($recipient, $template = null, $delayed = false) {
+	public function __construct($recipient, array $tplParams = null, $delayed = false) {
 		$this->_delayed = (bool) $delayed;
-		if ($template) {
-			$this->_template = (string) $template;
+		if ($this->hasTemplate()) {
 			$this->setRenderLayout(true);
+		}
+		if ($tplParams) {
+			foreach ($tplParams as $key => $value) {
+				$this->setTplParam($key, $value);
+			}
 		}
 		if (is_string($recipient)) {
 			$this->_recipientAddress = $recipient;
 		} elseif ($recipient instanceof CM_Model_User) {
 			$this->_recipient = $recipient;
 			$this->_recipientAddress = $this->_recipient->getEmail();
-			parent::setTplParam('recipient', $recipient);
+			$this->setTplParam('recipient', $recipient);
 		} else {
 			throw new CM_Exception_Invalid('No Recipient defined.');
 		}
 		$config = self::_getConfig();
-		parent::setTplParam('siteName', $config->siteName);
-		parent::setTplParam('siteUrl', URL_ROOT);
+		$this->setTplParam('siteName', $config->siteName);
+		$this->setTplParam('siteUrl', URL_ROOT);
 		$this->_senderAddress = $config->siteEmailAddress;
 		$this->_senderName = $config->siteName;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getDemoMode() {
-		return $this->_demoMode;
-	}
-
-	/**
-	 * @param boolean $state
-	 */
-	public function setDemoMode($state = true) {
-		$this->_demoMode = (boolean) $state;
 	}
 
 	/**
@@ -137,13 +123,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	/**
 	 * @return string|null
 	 */
-	public function getTemplate() {
-		return $this->_template;
-	}
-
-	/**
-	 * @return string|null
-	 */
 	public function getText() {
 		return $this->_textBody;
 	}
@@ -153,17 +132,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 */
 	public function setText($text) {
 		$this->_textBody = $text;
-	}
-
-	/**
-	 * @param string $key
-	 * @param string $value
-	 */
-	public function setTplParam($key, $value = null) {
-		if (!$this->_template) {
-			throw new CM_Exception_Invalid("Can't assign variables when there is no template specified!");
-		}
-		parent::setTplParam($key, $value);
 	}
 
 	/**
@@ -191,7 +159,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @return boolean
 	 */
 	public function hasTemplate() {
-		return (boolean) $this->_template;
+		return is_subclass_of($this, 'CM_Mail');
 	}
 
 	/**

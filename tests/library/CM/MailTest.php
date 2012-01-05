@@ -12,7 +12,7 @@ class CM_MailTest extends TestCase {
 	public function testWithTemplate() {
 		$user = new CM_Model_User_Mock(TH::createUser()->getId());
 		try {
-			$msg = new CM_Mail($user, 'welcome');
+			$msg = new CM_Mail_Welcome($user);
 			list($subject, $html, $text) = $msg->send();
 			$this->assertNotEmpty($subject);
 			$this->assertNotEmpty($html);
@@ -37,12 +37,11 @@ class CM_MailTest extends TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);
 		}
-		try {
-			$msg->setTplParam('bla', 'bla');
-			$this->failure('Should have thrown an exception');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertTrue(true);
-		}
+		$msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
+		list($subject, $html, $text) = $msg->send();
+		$this->assertEquals('blabla', $subject);
+		$this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
+		$this->assertEquals('Hello (http://www.foo.bar)', $text);
 	}
 
 	public function testQueue() {

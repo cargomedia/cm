@@ -12,24 +12,16 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			if (!$mail->hasTemplate()) {
 				throw new CM_Exception_Invalid('Trying to render mail with neither subject nor template');
 			}
-			if ($mail->getDemoMode()) {
-				$subject = file_get_contents($this->_getTplPath($mail->getTemplate(), 'subject'));
-			} else {
-				$subject = $this->getLayout()->fetch($this->_getTplPath($mail->getTemplate(), 'subject'));
-			}
+			$subject = $this->getLayout()->fetch($this->_getTplPath('subject.tpl'));
 			$subject = trim($subject);
 		}
 		if (!($htmlBody = $mail->getHtml()) && $mail->hasTemplate()) {
-			if ($mail->getDemoMode()) {
-				$htmlBody = file_get_contents($this->_getTplPath($mail->getTemplate()));
-			} else {
-				$htmlBody = $this->getLayout()->fetch($this->_getTplPath($mail->getTemplate()));
-			}
+			$htmlBody = $this->getLayout()->fetch($this->_getTplPath('body.tpl'));
 		}
 		if ($mail->getRenderLayout()) {
 			$this->getLayout()->assign('subject', $subject);
 			$this->getLayout()->assign('body', $htmlBody);
-			$html = $this->getLayout()->fetch($this->_getTplPath('layout', 'html'));
+			$html = $this->getLayout()->fetch($this->getRender()->getLayoutPath('layout/mailHtml.tpl'));
 		} else {
 			$html = $htmlBody;
 		}
@@ -44,17 +36,8 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 		}
 		if ($mail->getRenderLayout()) {
 			$this->getLayout()->assign('body', $text);
-			$text = $this->getLayout()->fetch($this->_getTplPath('layout', 'text'));
+			$text = $this->getLayout()->fetch($this->getRender()->getLayoutPath('layout/mailText.tpl'));
 		}
 		return array($subject, $html, $text);
-	}
-
-	/**
-	 * @param string $template Name (without .tpl)
-	 * @param string $tplName  OPTIONAL
-	 * @return string Tpl path
-	 */
-	protected function _getTplPath($template, $tplName = 'default') {
-		return $this->getRender()->getLayoutPath('Mail' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR . $tplName . '.tpl', true);
 	}
 }
