@@ -25,9 +25,6 @@ class CM_Mysql extends CM_Class_Abstract {
 			}
 		}
 		$db = $config->db;
-		if (IS_TEST) {
-			$db .= '_test';
-		}
 
 		if (!($link = @mysql_connect($server['host'] . ':' . $server['port'], $config->user, $config->pass))) {
 			throw new CM_Exception('Database connection failed');

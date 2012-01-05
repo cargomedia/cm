@@ -15,11 +15,11 @@ class TH {
 		}
 
 		// Setup
-		define('DIR_TESTS', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+		define('DIR_TESTS', __DIR__ . DIRECTORY_SEPARATOR);
 		define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
 		define('IS_TEST', true);
 
-		define('DIR_ROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR);
+		define('DIR_ROOT', dirname(__DIR__) . DIRECTORY_SEPARATOR . 'project' . DIRECTORY_SEPARATOR);
 		require_once DIR_ROOT . 'library/CM/Bootloader.php';
 		CM_Bootloader::load(array('Autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
@@ -28,9 +28,9 @@ class TH {
 		!is_dir(DIR_TMP_USERFILES) ? mkdir(DIR_TMP_USERFILES) : null;
 
 		// Import db
-		self::_runSql('DROP DATABASE IF EXISTS ' . CM_Config::get()->CM_Mysql->db . '_test');
-		self::_runSql('CREATE DATABASE ' . CM_Config::get()->CM_Mysql->db . '_test');
-		self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db . '_test');
+		self::_runSql('DROP DATABASE IF EXISTS ' . CM_Config::get()->CM_Mysql->db);
+		self::_runSql('CREATE DATABASE ' . CM_Config::get()->CM_Mysql->db);
+		self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db);
 
 		// Reset environment
 		self::clearEnv();
