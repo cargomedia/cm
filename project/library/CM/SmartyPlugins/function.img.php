@@ -8,7 +8,7 @@ function smarty_function_img(array $params, Smarty_Internal_Template $template) 
 	$params = array_merge(array('width' => null, 'height' => null, 'title' => null, 'class' => null), $params);
 
 	if (!empty($params['static'])) {
-		$url = URL_STATIC . 'img/' . $path . '?' . CM_Config::get()->modified;
+		$url = URL_STATIC . 'img/' . $path . '?' . CM_Option::getInstance()->get('app.releaseStamp');
 	} else {
 		$url = $render->getUrlImg($path);
 	}
