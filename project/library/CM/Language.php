@@ -89,7 +89,6 @@ class CM_Language extends CM_Class_Abstract {
 			return $section->text($key, $vars);
 
 		} catch (CM_TreeException $e) {
-			throw $e;
 			if (IS_DEBUG || IS_TEST) {
 
 				if (self::_getConfig()->autoCreate) {
