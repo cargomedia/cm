@@ -10,7 +10,9 @@ class CM_MailTest extends TestCase {
 	}
 
 	public function testWithTemplate() {
-		$user = new CM_Model_User_Mock(TH::createUser()->getId());
+		$user = $this->getMock('CM_Model_User', array('getEmail'), array(TH::createUser()->getId()));
+		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
+
 		try {
 			$msg = new CM_Mail_Welcome($user);
 			list($subject, $html, $text) = $msg->send();
@@ -45,18 +47,13 @@ class CM_MailTest extends TestCase {
 	}
 
 	public function testQueue() {
-		$user = new CM_Model_User_Mock(TH::createUser()->getId());
+		$user = $this->getMock('CM_Model_User', array('getEmail'), array(TH::createUser()->getId()));
+		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
 		$msg = new CM_Mail($user, null, true);
 		$msg->setSubject('testSubject');
 		$msg->setHtml('<b>hallo</b>');
 		$msg->send();
 		$this->assertRow(TBL_CM_MAIL, array('subject' => 'testSubject', 'text' => 'hallo', 'html' => '<b>hallo</b>',
 			'recipientAddress' => 'foo@example.com'));
-	}
-}
-
-class CM_Model_User_Mock extends CM_Model_User {
-	public function getEmail() {
-		return 'foo@example.com';
 	}
 }
