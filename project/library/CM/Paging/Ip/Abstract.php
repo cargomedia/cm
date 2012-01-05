@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_Ip_Abstract extends CM_Paging_Abstract {
+abstract class CM_Paging_Ip_Abstract extends CM_Paging_Abstract {
 	/**
 	 * @param int $ip
 	 * @return bool
