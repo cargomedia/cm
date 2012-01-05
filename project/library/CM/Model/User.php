@@ -128,7 +128,7 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 	 * @return CM_Model_User
 	 */
 	public function setVisible($state = true) {
-		CM_Mysql::update(TBL_CM_USER_ONLINE, array('visible' => (int) $state), array('userId' => $this->getId()));
+		CM_Mysql::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => (int) $state));
 		return $this->_change();
 	}
 
