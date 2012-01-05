@@ -31,7 +31,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract implements CM_
 	}
 
 	public function toArray() {
-		return array('id' => $this->getId(), 'type' => $this->getType(),);
+		return array('id' => $this->getId(), 'type' => $this->getType(), 'user' => $this->getUser());
 	}
 
 	public static function fromArray(array $array) {
