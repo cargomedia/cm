@@ -49,10 +49,13 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 	/**
 	 * @param CM_Model_User|string $recipient
-	 * @param array $tplParams
-	 * @param boolean $delayed
+	 * @param array|null $tplParams
+	 * @param boolean|null $delayed
 	 */
-	public function __construct($recipient, array $tplParams = null, $renderLayout = true, $delayed = false) {
+	public function __construct($recipient, array $tplParams = null, $delayed = null) {
+		if ($delayed === null) {
+			$delayed = false;
+		}
 		$this->_delayed = (bool) $delayed;
 		if ($this->hasTemplate()) {
 			$this->setRenderLayout(true);
