@@ -128,6 +128,9 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 	 * @return CM_Model_User
 	 */
 	public function setVisible($state = true) {
+		if (!$this->getOnline()) {
+			throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
+		}
 		CM_Mysql::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => (int) $state));
 		return $this->_change();
 	}

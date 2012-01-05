@@ -43,11 +43,18 @@ class CM_Model_UserTest extends TestCase {
 
 	public function testGetSetVisible() {
 		$user = TH::createUser();
-		$this->assertFalse($user->getVisible());
-		$user->setVisible(true);
+		try {
+			$user->setVisible();
+			$this->fail('Able to modify visibility of a user that is offline.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertTrue(true);
+		}
+		$user->setOnline();
 		$this->assertTrue($user->getVisible());
 		$user->setVisible(false);
 		$this->assertFalse($user->getVisible());
+		$user->setVisible(true);
+		$this->assertTrue($user->getVisible());
 	}
 
 	public function testCreate() {
