@@ -127,7 +127,7 @@ class CM_File_Image extends CM_File {
 	 *
 	 * If newPath is empty, the original image will be overwritten
 	 *
-	 * @param string $type Image type. Use IMAGETYPE_* consts
+	 * @param int $type Image type. Use IMAGETYPE_* consts
 	 * @param string $newPath OPTINAL Where the resulting image should be written
 	 * @return bool True on success
 	 */
@@ -161,6 +161,7 @@ class CM_File_Image extends CM_File {
 	 * @param int $height New height
 	 * @param bool $square True if result image should be a square
 	 * @param string $newPath OPTIONAL If set, image is stored a new location
+	 * @return bool|null
 	 */
 	public function resize($width, $height, $square = false, $newPath = null) {
 		$source_path = $this->getPath();
@@ -197,8 +198,6 @@ class CM_File_Image extends CM_File {
 			$dest_height = $imgHeight;
 			$dest_width = $imgWidth;
 		}
-
-		$result = false;
 
 		$dist_resource = imagecreatetruecolor($dest_width, $dest_height);
 		$result = imagecopyresampled($dist_resource, $resource, 0, 0, 0, 0, $dest_width, $dest_height, $imgWidth, $imgHeight);

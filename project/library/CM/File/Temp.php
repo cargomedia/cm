@@ -1,76 +1,44 @@
 <?php
 
 class CM_File_Temp extends CM_File {
-
-	private static $_errIndex = array(
-		UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
-		UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
-		UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
-		UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
-		UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
-		UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
-		UPLOAD_ERR_EXTENSION => 'File upload stopped by extension.',
-	);
-
+	/**
+	 * @var string
+	 */
 	private $_uniqid;
 
-	private $_type;
-
+	/**
+	 * @var string
+	 */
 	private $_filename;
 
 	/**
 	 * @param string $uniqid
 	 */
 	public function __construct($uniqid) {
-		$file = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
-		if (!$file) {
+		$data = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
+		if (!$data) {
 			throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
 		}
-		
-		$this->_uniqid = $file['uniqid'];
-		$this->_filename = $file['filename'];
+		$this->_uniqid = $data['uniqid'];
+		$this->_filename = $data['filename'];
 	}
 
 	/**
-	 * @param array $file Params: name, extension, size, (error)
+	 * @param string $filename
 	 * @return CM_File_Temp
-	 * @throws CM_Exception
 	 */
-	public static function create(array $file) {
-		if (isset($file['error']) && $file['error'] !== UPLOAD_ERR_OK) {
-			throw new CM_Exception(self::$_errIndex[$file['error']], $file['error']);
-		}
-
-		$filename = $file['name'];
-
-		// Limit filename to 100 chars
+	public static function create($filename) {
+		$filename = (string) $filename;
 		if (strlen($filename) > 100) {
-			$info = pathinfo($filename);
-
-			if (isset($info['extension'])) {
-				$filename = substr($fileame, 0, 90) . '.' . $info['extension'];
-			} else {
-				$filename = substr($filename, 0, 100);
-			}
+			$filename = substr($filename, -1, 100);
 		}
-
-		$uniqid = md5(uniqid(rand(), true));
-
-		CM_Mysql::insert(TBL_CM_TMP_USERFILE,
-			array(
-				'uniqid' => $uniqid,
-				'filename' => $filename,
-				'size' => $file['size'],
-				'uploadstamp' => time(),
-			)
-		);
+		$uniqid = md5(rand() . uniqid());
+		CM_Mysql::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
 		return new self($uniqid);
 	}
 
 	/**
-	 * Get a full path to a temporary file.
-	 *
 	 * @return string
 	 */
 	public function getPath() {
@@ -78,8 +46,6 @@ class CM_File_Temp extends CM_File {
 	}
 
 	/**
-	 * Get a file unique id.
-	 *
 	 * @return string
 	 */
 	public function getUniqid() {
@@ -87,8 +53,6 @@ class CM_File_Temp extends CM_File {
 	}
 
 	/**
-	 * Get a client filename.
-	 *
 	 * @return string
 	 */
 	public function getFileName() {
@@ -96,8 +60,6 @@ class CM_File_Temp extends CM_File {
 	}
 
 	/**
-	 * Get a file URL.
-	 *
 	 * @return string
 	 */
 	public function getURL() {
@@ -108,10 +70,8 @@ class CM_File_Temp extends CM_File {
 		CM_Mysql::delete(TBL_CM_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
 		parent::delete();
 	}
-	
+
 	/**
-	 * Write the given content to disk
-	 * 
 	 * @param string $content
 	 * @throws CM_Exception
 	 */
@@ -120,14 +80,14 @@ class CM_File_Temp extends CM_File {
 			throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to path `' . $this->getPath() . '`');
 		}
 	}
-	
+
 	/**
-	* @param int $age
-	*/
+	 * @param int $age
+	 */
 	public static function deleteOlder($age) {
-		$query = CM_Mysql::exec('SELECT `uniqid` FROM `' . TBL_CM_TMP_USERFILE . '` WHERE `uploadstamp`< ?', time() - $age);
+		$query = CM_Mysql::exec('SELECT `uniqid` FROM `' . TBL_CM_TMP_USERFILE . '` WHERE `createStamp`< ?', time() - $age);
 		$uniqueIds = $query->fetchCol();
-	
+
 		foreach ($uniqueIds as $uniqid) {
 			$tmpFile = new CM_File_Temp($uniqid);
 			$tmpFile->delete();
