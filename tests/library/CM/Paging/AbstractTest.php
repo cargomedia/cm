@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../../TestCase.php';
+require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Paging_Mock extends CM_Paging_Abstract {
 	protected function _processItem($itemRaw) {

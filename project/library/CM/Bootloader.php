@@ -84,7 +84,7 @@ class CM_Bootloader {
 
 		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . ((isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':' . $_SERVER['SERVER_PORT'] : '') . '/');
 
-		define('DIR_SITE_ROOT', dirname(dirname(dirname(__FILE__))) . '/');
+		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_SITE_ROOT . 'public' . DIRECTORY_SEPARATOR);
 		define('DIR_LAYOUT', DIR_SITE_ROOT . 'layout' . DIRECTORY_SEPARATOR);

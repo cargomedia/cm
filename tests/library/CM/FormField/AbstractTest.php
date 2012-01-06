@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../TestCase.php';
+require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_FormField_AbstractTest extends TestCase {
 	

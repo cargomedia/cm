@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../../TestCase.php';
+require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Model_UserTest extends TestCase {
 	public static function setupBeforeClass() {
