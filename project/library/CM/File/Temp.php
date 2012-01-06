@@ -32,7 +32,7 @@ class CM_File_Temp extends CM_File {
 	}
 
 	/**
-	 * @param array $file Params: name, extensions, size, (error)
+	 * @param array $file Params: name, extension, size, (error)
 	 * @return CM_File_Temp
 	 * @throws CM_Exception
 	 */

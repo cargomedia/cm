@@ -8,8 +8,8 @@ class CM_Search extends CM_Class_Abstract {
 	 */
 	private static $_client = null;
 
-	public static function update($index, $entityId) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . $index, $entityId);
+	public static function update($index, $id) {
+		CM_Cache_Redis::sAdd('Search.Updates_' . $index, $id);
 	}
 
 	/**
