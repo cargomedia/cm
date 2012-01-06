@@ -270,8 +270,7 @@ DROP TABLE IF EXISTS `cm_tmp_userfile`;
 CREATE TABLE `cm_tmp_userfile` (
   `uniqid` varchar(32) NOT NULL DEFAULT '',
   `filename` varchar(100) NOT NULL DEFAULT '',
-  `size` int(10) unsigned NOT NULL,
-  `uploadstamp` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`uniqid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
