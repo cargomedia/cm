@@ -113,8 +113,6 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	protected function _onLoad() {
 	}
 
-	public function getType() {}
-
 	/**
 	 * @param int $type
 	 * @param int $modelType

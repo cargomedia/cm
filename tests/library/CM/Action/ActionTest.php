@@ -51,7 +51,7 @@ class CM_Action_ActionTest extends TestCase {
 		$action = new CM_Action_Mock(1, $actor);
 		$action->prepare();
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'entityType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'modelType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 		TH::clearCache();
 		try {
 			$action->prepare();
