@@ -18,7 +18,7 @@ $config->CM_StreamAdapter_Abstract->servers = array(
 	array('host' => 'www.example.dev', 'port' => 8090),
 );
 
-$config->CM_Mysql->db = 'example';
+$config->CM_Mysql->db = 'cm';
 $config->CM_Mysql->user = 'root';
 $config->CM_Mysql->pass = 'root';
 
