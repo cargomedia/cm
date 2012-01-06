@@ -14,7 +14,7 @@ $config->CM_Mail->siteName = 'CM';
 $config->CM_Mail->siteEmailAddress = 'noreply@example.com';
 
 $config->CM_Site_Abstract = new stdClass();
-$config->CM_Site_Abstract->class = 'CM_Site_Abstract';
+$config->CM_Site_Abstract->class = 'CM_Site_CM';
 $config->CM_Site_Abstract->types = array();
 
 $config->CM_Tracking_Abstract = new stdClass();
@@ -63,8 +63,8 @@ $config->CM_StreamAdapter_Abstract->servers = array(
 
 $config->CM_Mysql = new stdClass();
 $config->CM_Mysql->db = 'cm';
-$config->CM_Mysql->user = '';
-$config->CM_Mysql->pass = '';
+$config->CM_Mysql->user = 'root';
+$config->CM_Mysql->pass = 'root';
 $config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Mysql->servers_read = array();
 
@@ -82,7 +82,7 @@ $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_L
 $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Mail::TYPE] = 'CM_Paging_Log_Mail';
 
 $config->CM_Model_User = new stdClass();
-$config->CM_Model_User->class = 'CM_User';
+$config->CM_Model_User->class = 'CM_Model_User';
 
 $config->CM_Params = new stdClass();
 $config->CM_Params->class = 'CM_Params';
