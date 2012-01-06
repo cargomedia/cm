@@ -32,6 +32,6 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 	
 	public function add(CM_Action_Abstract $action) {
 		CM_Mysql::insertDelayed(TBL_CM_ACTION,
-				array('ip' => $this->_ip, 'actionType' => $action->getType(), 'entityType' => $action->getEntityType(), 'createStamp' => time()));
+				array('ip' => $this->_ip, 'actionType' => $action->getType(), 'entityType' => $action->getModelType(), 'createStamp' => time()));
 	}
 }

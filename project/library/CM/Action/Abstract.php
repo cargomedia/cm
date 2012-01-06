@@ -40,14 +40,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @return int
 	 */
-	abstract public function getEntityType();
+	abstract public function getModelType();
 
 	/**
-	 * @param CM_Model_Entity_Abstract $entity
+	 * @param CM_Model_Abstract $model
 	 * @param array                    $data OPTIONAL
 	 * @throws CM_Exception_Invalid
 	 */
-	abstract protected function _notify(CM_Model_Entity_Abstract $entity, array $data = null);
+	abstract protected function _notify(CM_Model_Abstract $model, array $data = null);
 
 	abstract protected function _prepare();
 
@@ -124,7 +124,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return array
 	 */
 	public final function toArray() {
-		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'entityType' => $this->getEntityType());
+		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'entityType' => $this->getModelType());
 	}
 
 	/**
@@ -160,12 +160,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private final function _getSiblings($within = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
-				'Looking for actions of type `' . $this->getType() . '` on entityType `' . $this->getEntityType() . '` that is not being logged.');
+				'Looking for actions of type `' . $this->getType() . '` on entityType `' . $this->getModelType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getActions($this->getEntityType(), $this->getType(), $within);
+			return $this->getActor()->getActions($this->getModelType(), $this->getType(), $within);
 		} else {
-			return new CM_Paging_Action_Ip($this->getIp(), $this->getEntityType(), $this->getType(), $within);
+			return new CM_Paging_Action_Ip($this->getIp(), $this->getModelType(), $this->getType(), $within);
 		}
 	}
 
@@ -177,13 +177,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	private final function _getTransgressions($actionLimitType = null, $period = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
-			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on entityType `' . $this->getEntityType() .
+			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on entityType `' . $this->getModelType() .
 					'` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getTransgressions($this->getEntityType(), $this->getType(), $actionLimitType, $period);
+			return $this->getActor()->getTransgressions($this->getModelType(), $this->getType(), $actionLimitType, $period);
 		} else {
-			return new CM_Paging_Transgression_Ip($this->getIp(), $this->getEntityType(), $this->getType(), $actionLimitType, $period);
+			return new CM_Paging_Transgression_Ip($this->getIp(), $this->getModelType(), $this->getType(), $actionLimitType, $period);
 		}
 	}
 

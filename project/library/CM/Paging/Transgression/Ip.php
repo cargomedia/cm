@@ -45,6 +45,6 @@ class CM_Paging_Transgression_Ip extends CM_Paging_Transgression_Abstract
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
 		CM_Mysql::insertDelayed(TBL_CM_ACTION,
-				array('ip' => $this->_ip, 'actionType' => $action->getType(), 'entityType' => $action->getEntityType(), 'actionLimitType' => $limitType, 'createStamp' => time()));
+				array('ip' => $this->_ip, 'actionType' => $action->getType(), 'entityType' => $action->getModelType(), 'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
 }

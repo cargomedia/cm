@@ -32,6 +32,6 @@ class CM_Paging_Action_User extends CM_Paging_Action_Abstract {
 	
 	public function add(CM_Action_Abstract $action) {
 		CM_Mysql::insertDelayed(TBL_CM_ACTION,
-				array('actorId' => $this->_user->getId(), 'actionType' => $action->getType(), 'entityType' => $action->getEntityType(), 'createStamp' => time()));
+				array('actorId' => $this->_user->getId(), 'actionType' => $action->getType(), 'entityType' => $action->getModelType(), 'createStamp' => time()));
 	}
 }

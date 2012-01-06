@@ -197,13 +197,13 @@ bindStream: function(callback) {
 
 /**
  * @param int actionTypes
- * @param int entityType
- * @param function callback fn(CM_Action_Abstract action, CM_Model_Entity_Abstract entity, array data)
+ * @param int modelType
+ * @param function callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
  */
-bindAction: function(actionType, entityType, callback) {
-	cm.action.bind(actionType, entityType, callback);
+bindAction: function(actionType, modelType, callback) {
+	cm.action.bind(actionType, modelType, callback);
 	this.bind('destruct', function() {
-		cm.action.unbind(actionType, entityType, callback);
+		cm.action.unbind(actionType, modelType, callback);
 	});
 },
 

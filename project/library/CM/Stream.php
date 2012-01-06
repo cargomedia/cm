@@ -54,15 +54,15 @@ class CM_Stream extends CM_Class_Abstract {
 	/**
 	 * @param CM_Model_User			$recipient
 	 * @param CM_Action_Abstract	   $action
-	 * @param CM_Model_Entity_Abstract $entity
+	 * @param CM_Model_Abstract        $model
 	 * @param array|null			   $data
 	 */
-	public static function publishAction(CM_Model_User $recipient, CM_Action_Abstract $action, CM_Model_Entity_Abstract $entity, array $data = null) {
+	public static function publishAction(CM_Model_User $recipient, CM_Action_Abstract $action, CM_Model_Abstract $model, array $data = null) {
 		if (!is_array($data)) {
 			$data = array();
 		}
 		self::publishUser($recipient, array('namespace' => 'CM_Action_Abstract',
-			'data' => array('action' => $action, 'entity' => $entity, 'data' => $data)));
+			'data' => array('action' => $action, 'model' => $model, 'data' => $data)));
 	}
 
 	/**
