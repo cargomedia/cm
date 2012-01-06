@@ -63,11 +63,11 @@ class CM_Action_ActionTest extends TestCase {
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
-	public function getEntityType() {
+	public function getModelType() {
 		return 1;
 	}
 
-	protected function _notify(CM_Model_Entity_Abstract $entity, array $data = null) {
+	protected function _notify(CM_Model_Abstract $model, array $data = null) {
 	}
 
 	protected function _prepare() {
