@@ -71,6 +71,10 @@ $config->CM_Mysql->servers_read = array();
 $config->CM_Action_Abstract = new stdClass();
 $config->CM_Action_Abstract->types = array();
 
+$config->CM_Model_Abstract = new stdClass();
+$config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User';
+$config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet';
+
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract->types = array();
 
@@ -106,7 +110,3 @@ $config->CM_Response_RPC = new stdClass();
 $config->CM_Response_RPC->catch = array(
 	'CM_Exception_AuthRequired',
 );
-
-$config->CM_Model_Abstract = new stdClass();
-$config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User';
-$config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet';
