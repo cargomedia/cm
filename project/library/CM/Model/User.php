@@ -2,6 +2,8 @@
 
 class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 
+	const TYPE = 13;
+
 	/**
 	 * @return boolean
 	 */

@@ -2,6 +2,8 @@
 
 class CM_Model_SmileySet extends CM_Model_Abstract {
 
+	CONST TYPE = 15;
+
 	protected function _loadData() {
 		return CM_Mysql::exec("SELECT * FROM TBL_CM_SMILEYSET WHERE id=?", $this->getId())->fetchAssoc();
 	}
