@@ -52,11 +52,11 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	abstract protected function _prepare();
 
 	/**
-	 * @param CM_Model_Entity_Abstract $entity
+	 * @param CM_Model_Abstract $model
 	 * @param array|null			   $data
 	 */
-	public final function notify(CM_Model_Entity_Abstract $entity, array $data = null) {
-		$this->_notify($entity, $data);
+	public final function notify(CM_Model_Abstract $model, array $data = null) {
+		$this->_notify($model, $data);
 	}
 
 	public final function prepare() {
@@ -124,7 +124,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return array
 	 */
 	public final function toArray() {
-		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'entityType' => $this->getModelType());
+		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'modelType' => $this->getModelType());
 	}
 
 	/**
@@ -160,7 +160,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private final function _getSiblings($within = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
-				'Looking for actions of type `' . $this->getType() . '` on entityType `' . $this->getModelType() . '` that is not being logged.');
+				'Looking for actions of type `' . $this->getType() . '` on modelType `' . $this->getModelType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
 			return $this->getActor()->getActions($this->getModelType(), $this->getType(), $within);
@@ -177,7 +177,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	private final function _getTransgressions($actionLimitType = null, $period = null) {
 		if (in_array($this->getType(), $this->_ignoreLogging)) {
-			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on entityType `' . $this->getModelType() .
+			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on modelType `' . $this->getModelType() .
 					'` that is not being logged.');
 		}
 		if ($this->getActor()) {
@@ -219,13 +219,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @param CM_Model_User $actor
 	 * @param int		   $type
-	 * @param int		   $entityType
+	 * @param int		   $modelType
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $type, $entityType) {
-		$class = self::_getClassName($entityType);
+	public static function factory(CM_Model_User $actor, $type, $modelType) {
+		$class = self::_getClassName($modelType);
 		return new $class($type, $actor);
 	}
 }

@@ -6,17 +6,17 @@ class CM_Paging_Action_User extends CM_Paging_Action_Abstract {
 	
 	/**
 	 * @param CM_Model_User $user
-	 * @param int $entityType OPTIONAL
+	 * @param int $modelType OPTIONAL
 	 * @param int $actionType OPTIONAL
 	 * @param int $period OPTIONAL
 	 */
-	public function __construct(CM_Model_User $user, $entityType = null, $actionType = null, $period = null) {
+	public function __construct(CM_Model_User $user, $modelType = null, $actionType = null, $period = null) {
 		$this->_user = $user;
 		$period = (int) $period;
 		$where = 'actorId=' . $user->getId() . ' AND `actionLimitType` IS NULL';
-		if ($entityType) {
-			$entityType = (int) $entityType;
-			$where .= ' AND `entityType` = ' . $entityType;
+		if ($modelType) {
+			$modelType = (int) $modelType;
+			$where .= ' AND `modelType` = ' . $modelType;
 		}
 		if ($actionType) {
 			$actionType = (int) $actionType;
@@ -26,12 +26,12 @@ class CM_Paging_Action_User extends CM_Paging_Action_Abstract {
 			$time = time() - $period;
 			$where .= ' AND `createStamp` > ' . $time;
 		}
-		$source = new CM_PagingSource_Sql_Deferred('entityType, actionType, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
+		$source = new CM_PagingSource_Sql_Deferred('modelType, actionType, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
 	
 	public function add(CM_Action_Abstract $action) {
 		CM_Mysql::insertDelayed(TBL_CM_ACTION,
-				array('actorId' => $this->_user->getId(), 'actionType' => $action->getType(), 'entityType' => $action->getModelType(), 'createStamp' => time()));
+				array('actorId' => $this->_user->getId(), 'actionType' => $action->getType(), 'modelType' => $action->getModelType(), 'createStamp' => time()));
 	}
 }
