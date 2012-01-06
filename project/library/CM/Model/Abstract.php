@@ -202,10 +202,4 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected static function _create(array $data) {
 		throw new CM_Exception_NotImplemented();
 	}
-
-	public static function factory($type, $id) {
-		$className = self::_getClassName($type);
-		return new $className($id);
-	}
-
 }
