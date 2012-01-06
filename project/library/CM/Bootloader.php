@@ -82,7 +82,7 @@ class CM_Bootloader {
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
-		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . '/');
+		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . ((isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':' . $_SERVER['SERVER_PORT'] : '') . '/');
 
 		define('DIR_SITE_ROOT', dirname(dirname(dirname(__FILE__))) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
