@@ -48,7 +48,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param sting $key
+	 * @param string $key
 	 */
 	public static final function delete($key) {
 		if (!static::_enabled()) {

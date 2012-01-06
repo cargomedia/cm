@@ -30,6 +30,20 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract implements CM_
 		return $this->_get('userId');
 	}
 
+	/**
+	 * Checks if a given user is the entity owner
+	 *
+	 * @param CM_Model_User $user OPTIONAL
+	 * @return bool
+	 */
+	final public function isOwner(CM_Model_User $user = null) {
+		try {
+			return $this->getUser()->equals($user);
+		} catch (CM_Exception_Nonexistent $ex) {
+			return false;
+		}
+	}
+
 	public function toArray() {
 		return array('id' => $this->getId(), 'type' => $this->getType());
 	}
