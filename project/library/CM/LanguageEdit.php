@@ -449,7 +449,12 @@ class CM_LanguageEdit {
 	 * @param int $id
 	 */
 	public static function deleteSection($id) {
-		CM_Mysql::exec("DELETE TBL_CM_LANG_SECTION, TBL_CM_LANG_KEY, TBL_CM_LANG_VALUE FROM TBL_CM_LANG_SECTION JOIN TBL_CM_LANG_KEY USING(`lang_section_id`) JOIN TBL_CM_LANG_VALUE USING(`lang_key_id`) WHERE `lang_section_id` = ?", (int) $id);
+		$id = (int) $id;
+		$childSectionIds = CM_Mysql::select(TBL_CM_LANG_SECTION, 'lang_section_id', array('parent_section_id' => $id))->fetchCol();
+		foreach ($childSectionIds as $childSectionId) {
+			self::deleteSection($childSectionId);
+		}
+		CM_Mysql::exec("DELETE TBL_CM_LANG_SECTION, TBL_CM_LANG_KEY, TBL_CM_LANG_VALUE FROM TBL_CM_LANG_SECTION JOIN TBL_CM_LANG_KEY USING(`lang_section_id`) JOIN TBL_CM_LANG_VALUE USING(`lang_key_id`) WHERE `lang_section_id` = ?", $id);
 		CM_CacheLocal::cleanLanguages();
 	}
 
