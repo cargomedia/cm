@@ -46,9 +46,10 @@ abstract class CM_ModelAsset_Abstract {
 	/**
 	 * Call on model data change
 	 *
-	 * @return CM_Model_Entity_Abstract
+	 * @return CM_ModelAsset_Abstract
 	 */
 	protected function _change() {
-		return $this->_model->_change();
+		$this->_model->_change();
+		return $this;
 	}
 }
