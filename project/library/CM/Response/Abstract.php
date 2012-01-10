@@ -55,7 +55,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @return CM_Model_User|null
 	 * @throws CM_Exception_AuthRequired
 	 */
-	public function  getViewer($needed = false) {
+	public function getViewer($needed = false) {
 		return $this->_request->getViewer($needed);
 	}
 
