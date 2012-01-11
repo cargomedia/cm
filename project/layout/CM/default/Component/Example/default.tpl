@@ -6,7 +6,8 @@ viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}
 {button_link class="reload" label="reload()" icon="reload"}
 {button_link class="popout" label="popOut()"}
 {button_link class="popin" label="popIn()"}
-{button_link class="load" label="load(): Example"}
+{button_link class="load" label="load()"}
+{button_link class="load_callback" label="load()+callback"}
 <hr />
 
 {button_link class="rpc" label="rpc: time()"}

@@ -7,6 +7,7 @@ events: {
 	"click .popout": "popOut",
 	"click .popin": "popIn",
 	"click .load": "loadExample",
+	"click .load_callback": "loadExampleInline",
 	"click .call": "callAjax",
 	"click .rpc": "callRpc",
 	"click .error_500_text_callback": "error_500_text_callback",
@@ -35,6 +36,18 @@ reloadChinese: function() {
 
 loadExample: function() {
 	this.load('CM_Component_Example', {foo:'value2'});
+},
+
+loadExampleInline: function() {
+	var handler = this;
+	this.load('CM_Component_Example', {foo:'value3'}, {
+		success: function() {
+			this.$().hide()
+				.insertAfter(handler.$('.load_callback'))
+				.slideDown(600);
+			this._ready();
+		}
+	});
 },
 
 callAjax: function() {
