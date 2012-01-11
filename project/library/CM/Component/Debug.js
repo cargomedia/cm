@@ -18,17 +18,16 @@ ready: function() {
 		});
 	});
 
-	_.each(cm.entity.types, function(entityType, entityName) {
+	_.each(cm.model.types, function(modelType, modelName) {
 		_.each(cm.action.types, function(actionType, actionName) {
-			handler.bindAction(actionType, entityType, function(action, entity, data) {
-				var msg = "ACTION: <[USER:" + action.actor.id + "] , " + actionName + " , " + "[" + entityName + ":" + entity.id + "]>";
+			handler.bindAction(actionType, modelType, function(action, model, data) {
+				var msg = "ACTION: <[USER:" + action.actor.id + "] , " + actionName + " , " + "[" + modelName + ":" + model.id + "]>";
 				msg += " (" + JSON.stringify(data) + ")";
 				handler.alert(msg);
 			});
 		});
 	});
-}
-,
+},
 
 alert: function(msg) {
 	var $msg = $("<li>" + msg + "</li>");

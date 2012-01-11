@@ -10,9 +10,9 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			$content = '';
 			$content .= new CM_File(DIR_PUBLIC . 'static/js/cm.js') . ';' . PHP_EOL;
 
-			$entityTypes = CM_Config::get()->CM_Model_Entity_Abstract->types;
-			if (is_array($entityTypes)) {
-				$content .= 'cm.entity.types = ' . CM_Params::encode(array_flip($entityTypes), true) . ';' . PHP_EOL;
+			$modelTypes = CM_Config::get()->CM_Model_Abstract->types;
+			if (is_array($modelTypes)) {
+				$content .= 'cm.model.types = ' . CM_Params::encode(array_flip($modelTypes), true) . ';' . PHP_EOL;
 			}
 
 			$classes = array();

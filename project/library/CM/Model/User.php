@@ -186,7 +186,7 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 	}
 
 	public function toArray() {
-		return array('id' => $this->getId(), 'displayName' => $this->getDisplayName(), 'visible' => $this->getVisible());
+		return array('id' => $this->getId(), 'type' => $this->getType(), 'displayName' => $this->getDisplayName(), 'visible' => $this->getVisible());
 	}
 
 	public static function fromArray(array $data) {
