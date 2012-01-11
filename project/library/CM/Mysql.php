@@ -272,11 +272,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string			$table
 	 * @param string|array	  $attr		   Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array|null		$onDuplicateKey OPTIONAL
+	 * @param array|null		$onDuplicateKeyValues
 	 * @param string			$statement
 	 * @return int Insert Id
 	 */
-	public static function insert($table, $attr, $value = null, array $onDuplicateKey = null, $statement = self::STMT_INSERT) {
+	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = self::STMT_INSERT) {
 		if ($value === null && is_array($attr)) {
 			$value = array_values($attr);
 			$attr = array_keys($attr);
@@ -314,9 +314,9 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 
 		$query = $statement . ' INTO `' . $table . '` (' . implode(',', $attrsEscaped) . ') VALUES ' . implode(',', $rowsEscaped);
-		if ($onDuplicateKey) {
+		if ($onDuplicateKeyValues) {
 			$valuesEscaped = array();
-			foreach ($onDuplicateKey as $attr => $value) {
+			foreach ($onDuplicateKeyValues as $attr => $value) {
 				if ($value === null) {
 					$valuesEscaped[] = self::placeholder("`?`=NULL", $attr);
 				} else {
@@ -343,13 +343,14 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string			$table
 	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null		$onDuplicateKeyValues
 	 * @return int Insert Id
 	 */
-	public static function insertDelayed($table, $attr, $value = null) {
+	public static function insertDelayed($table, $attr, $value = null, array $onDuplicateKeyValues = null) {
 		if (self::_delayedEnabled()) {
-			return self::insert($table, $attr, $value, null, self::STMT_INSERT_DELAYED);
+			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT_DELAYED);
 		} else {
-			return self::insert($table, $attr, $value, null, self::STMT_INSERT);
+			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT);
 		}
 	}
 
