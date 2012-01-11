@@ -94,7 +94,8 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadJs('cm.components[\'' . $this->_component['id'] . '\'].popIn();');
 	}
 
-	public function redirect($url) {
+	public function redirect($path, array $params = null) {
+		$url = CM_Page_Abstract::link($path, $params);
 		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
 	}
 
