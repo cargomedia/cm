@@ -45,6 +45,7 @@ viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}
 		<tr>
 			<td class="label">{label text="Color" for="color"}:</td>
 			<td class="value">{input name="color"}</td>
+		</tr>
 		<tr>
 			<td colspan="2" class="submit">
 				{button action="go" label="Go"}
