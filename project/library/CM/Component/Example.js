@@ -43,7 +43,7 @@ loadExampleInline: function() {
 	this.load('CM_Component_Example', {foo:'value3'}, {
 		success: function() {
 			this.$().hide()
-				.insertAfter(handler.$('.load_callback'))
+				.insertBefore(handler.$())
 				.slideDown(600);
 			this._ready();
 		}
