@@ -43,8 +43,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	abstract public function getModelType();
 
 	/**
-	 * @param CM_Model_Abstract $model
-	 * @param array                    $data OPTIONAL
+	 * @param CM_Model_Abstract        $model
+	 * @param array					$data OPTIONAL
 	 * @throws CM_Exception_Invalid
 	 */
 	abstract protected function _notify(CM_Model_Abstract $model, array $data = null);
@@ -52,7 +52,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	abstract protected function _prepare();
 
 	/**
-	 * @param CM_Model_Abstract $model
+	 * @param CM_Model_Abstract        $model
 	 * @param array|null			   $data
 	 */
 	public final function notify(CM_Model_Abstract $model, array $data = null) {
@@ -118,13 +118,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public final function getType() {
 		return $this->_type;
-	}
-
-	/**
-	 * @return array
-	 */
-	public final function toArray() {
-		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'modelType' => $this->getModelType());
 	}
 
 	/**
@@ -209,11 +202,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		CM_Mysql::exec("DELETE FROM TBL_CM_ACTION WHERE `createStamp` < ?", time() - $age);
 	}
 
-	/**
-	 * @param array $data
-	 */
+	public final function toArray() {
+		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'modelType' => $this->getModelType());
+	}
+
 	public static function fromArray(array $data) {
-		throw new CM_Exception_NotImplemented();
+		return self::factory($data['actor'], $data['type'], $data['modelType']);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, Serializable {
+abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, Serializable {
 
 	/**
 	 * @var array $_assets
@@ -51,6 +51,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public function getId() {
 		$id = $this->_getId();
+		if (!array_key_exists('id', $id)) {
+			throw new CM_Exception_Invalid('Id-array has not field `id`.');
+		}
 		return $id['id'];
 	}
 
@@ -74,6 +77,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($this->_loadAssets() as $asset) {
 			$this->_assets[get_class($asset)] = $asset;
 		}
+		$this->_get(); // Make sure data can be loaded
 	}
 
 	/**
@@ -126,7 +130,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param string $field
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	final public function _set($field, $value) {
 		$this->_get(); // Make sure data is loaded
@@ -202,4 +206,33 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected static function _create(array $data) {
 		throw new CM_Exception_NotImplemented();
 	}
+
+	/**
+	 * @param int   $type
+	 * @param array $id
+	 * @return CM_Model_Abstract
+	 */
+	public static function factory($type, array $id) {
+		$className = self::_getClassName($type);
+		/*
+		 * Cannot use __construct(), since signature is unknown.
+		 * unserialize() is ~10% slower.
+		 */
+		$serialized = serialize(array($id, null));
+		return unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
+	}
+
+	public function toArray() {
+		$id = $this->_getId();
+		$array = array('type' => $this->getType(), '_id' => $id);
+		if (array_key_exists('id', $id)) {
+			$array['id'] = $id['id'];
+		}
+		return $array;
+	}
+
+	public static function fromArray(array $data) {
+		return self::factory($data['_type'], $data['_id']);
+	}
+
 }

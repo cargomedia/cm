@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
+class CM_Model_User extends CM_Model_Abstract {
 
 	const TYPE = 13;
 
@@ -186,10 +186,9 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 	}
 
 	public function toArray() {
-		return array('id' => $this->getId(), 'type' => $this->getType(), 'displayName' => $this->getDisplayName(), 'visible' => $this->getVisible());
-	}
-
-	public static function fromArray(array $data) {
-		return new static($data['id']);
+		$array = parent::toArray();
+		$array['displayName'] = $this->getDisplayName();
+		$array['visible'] = $this->getVisible();
+		return $array;
 	}
 }

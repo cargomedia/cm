@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract implements CM_ArrayConvertible {
+abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param boolean $absolute
@@ -42,14 +42,6 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract implements CM_
 		} catch (CM_Exception_Nonexistent $ex) {
 			return false;
 		}
-	}
-
-	public function toArray() {
-		return array('id' => $this->getId(), 'type' => $this->getType());
-	}
-
-	public static function fromArray(array $array) {
-		return new static($array['id']);
 	}
 
 	/**
