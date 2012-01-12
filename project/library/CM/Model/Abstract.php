@@ -103,6 +103,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				if ($this->_data === false) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . $this->getId() . '` has no data.');
 				}
+				/** @var CM_ModelAsset_Abstract $asset */
 				foreach ($this->_assets as $asset) {
 					$asset->_loadAsset();
 				}
