@@ -7,13 +7,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	protected $_viewer;
 
 	/**
-	 * Component work directories namespace.
-	 *
-	 * @var string
-	 */
-	protected $namespace;
-
-	/**
 	 * The name of a component template file.
 	 *
 	 * @var string
@@ -75,25 +68,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	abstract public function checkAccessible();
-
-	/**
-	 * Returns the namespace of a component.
-	 *
-	 * @return string
-	 */
-	public function getNamespaceLegacy() {
-		if (!$this->namespace) {
-			if (!preg_match('/^\w+_Component_(.+)$/', get_class($this), $matches)) {
-				throw new CM_Exception("Cannot detect namespace from component's class-name");
-			}
-			$namespace = lcfirst($matches[1]);
-			$namespace = preg_replace('/([A-Z])/', '_\1', $namespace);
-			$namespace = str_replace('__', '.', strtolower($namespace));
-			$this->namespace = $namespace;
-		}
-
-		return $this->namespace;
-	}
 
 	/**
 	 * @return CM_ComponentFrontendHandler

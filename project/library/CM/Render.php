@@ -167,7 +167,7 @@ class CM_Render {
 			if ($phrase[0] == '.') {
 				$phrase = substr($phrase, 1);
 			} else {
-				$phrase = 'components.' . $this->getStackLast('components')->getNamespaceLegacy() . '.' . $phrase;
+				$phrase = 'components.' . get_class($this->getStackLast('components')) . '.' . $phrase;
 			}
 
 			$text = CM_Language::text($phrase, $params);
