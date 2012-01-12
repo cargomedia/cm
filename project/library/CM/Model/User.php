@@ -181,8 +181,8 @@ class CM_Model_User extends CM_Model_Abstract implements CM_ArrayConvertible {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
 		$this->getTransgressions()->deleteAll();
+		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
 	}
 
 	public function toArray() {
