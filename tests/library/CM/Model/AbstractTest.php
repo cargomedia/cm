@@ -141,6 +141,21 @@ class CM_Model_AbstractTest extends TestCase{
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar2', $modelMock->getModelAsset()->getBar());
 	}
+
+	public function testLazyAsset() {
+		$modelMock = new CM_ModelMock2(1);
+		$this->assertFalse(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$modelMock->getModelAssetMock()->getFoo();
+		$this->assertTrue(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$modelMock->_set('CM_ModelAsset_ModelMock_ModelAssetMock:foo', 'bar');
+
+		$modelMock = new CM_ModelMock2(1);
+		$this->assertTrue(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$this->assertEquals('bar', $modelMock->getModelAssetMock()->getFoo());
+		$modelMock->_change();
+
+		$this->assertEquals('foo', $modelMock->getModelAssetMock()->getFoo());
+	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
@@ -262,5 +277,43 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 		if ($this->get()) {
 			$this->get()->delete();
 		}
+	}
+}
+
+class CM_ModelMock2 extends CM_Model_Abstract {
+	protected function _loadData() {
+		return array();
+	}
+
+	protected function _loadAssets() {
+		return array(new CM_ModelAsset_ModelMock_ModelAssetMock($this));
+	}
+
+	public function getData() {
+		return  $this->_get();
+	}
+
+	/**
+	 * @return CM_ModelAsset_ModelMock2_ModelAssetMock
+	 */
+	public function getModelAssetMock() {
+		return $this->_getAsset('CM_ModelAsset_ModelMock_ModelAssetMock');
+	}
+
+}
+
+class CM_ModelAsset_ModelMock_ModelAssetMock extends CM_ModelAsset_Abstract {
+	public function _onModelDelete() {
+	}
+
+	public function _loadAsset() {
+	}
+
+	public function getFoo() {
+		if (($foo = $this->_cacheGet('foo')) === false) {
+			$foo = 'foo';
+			$this->_cacheSet('foo', $foo);
+		}
+		return $foo;
 	}
 }

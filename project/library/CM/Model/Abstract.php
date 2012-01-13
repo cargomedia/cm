@@ -8,6 +8,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_assets = array();
 
 	/**
+	 * @var boolean $_autoCommitCache
+	 */
+	private $_autoCommitCache = true;
+
+	/**
 	 * @var array $_id
 	 */
 	protected $_id;
@@ -35,6 +40,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_get(); // Make sure data can be loaded
 	}
 
+	/**
+	 * @return array
+	 */
 	abstract protected function _loadData();
 
 	public function delete() {
@@ -100,13 +108,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cacheKey = $this->_getCacheKey();
 			if (($this->_data = CM_Cache::get($cacheKey)) === false) {
 				$this->_data = $this->_loadData();
-				if ($this->_data === false) {
+				if (!is_array($this->_data)) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . $this->getId() . '` has no data.');
 				}
+				$this->_autoCommitCache = false;
 				/** @var CM_ModelAsset_Abstract $asset */
 				foreach ($this->_assets as $asset) {
 					$asset->_loadAsset();
 				}
+				$this->_autoCommitCache = true;
 				CM_Cache::set($cacheKey, $this->_data);
 				$this->_onLoad();
 			}
@@ -136,6 +146,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	final public function _set($field, $value) {
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
+		if ($this->_autoCommitCache) {
+			CM_Cache::set($this->_getCacheKey(), $this->_data);
+		}
 	}
 
 	protected function _onChange() {
