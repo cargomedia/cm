@@ -3,7 +3,6 @@
 class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 
 	public function _loadAsset() {
-		$this->getAll();
 	}
 
 	public function _onModelDelete() {

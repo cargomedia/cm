@@ -3,7 +3,6 @@
 class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 
 	public function _loadAsset() {
-		$this->_getAll();
 	}
 
 	public function _onModelDelete() {
