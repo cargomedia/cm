@@ -26,11 +26,9 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 		$db = $config->db;
 
-		if (!($link = @mysqli_connect($server['host'] . ':' . $server['port'], $config->user, $config->pass))) {
-			throw new CM_Exception('Database connection failed');
+		if (!($link = @mysqli_connect($server['host'], $config->user, $config->pass, $db, $server['port']))) {
+			throw new CM_Exception('Database connection failed: ' . mysqli_connect_error());
 		}
-
-		self::selectDb($db, $readOnly);
 
 		if (!mysqli_set_charset($link, 'utf8')) {
 			throw new CM_Exception('Cannot set database charset to utf-8');
