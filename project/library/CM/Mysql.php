@@ -26,13 +26,13 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 		$db = $config->db;
 
-		if (!($link = @mysql_connect($server['host'] . ':' . $server['port'], $config->user, $config->pass))) {
+		if (!($link = @mysqli_connect($server['host'] . ':' . $server['port'], $config->user, $config->pass))) {
 			throw new CM_Exception('Database connection failed');
 		}
 
 		self::selectDb($db, $readOnly);
 
-		if (!mysql_set_charset('utf8', $link)) {
+		if (!mysqli_set_charset($link, 'utf8')) {
 			throw new CM_Exception('Cannot set database charset to utf-8');
 		}
 
@@ -54,7 +54,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	public static function selectDb($db, $readOnly = false) {
 		$link = self::_getLink($readOnly);
-		if (!mysql_select_db($db, $link)) {
+		if (!mysqli_select_db($link, $db)) {
 			throw new CM_Exception('Cannot select database `' . $db . '`');
 		}
 	}
@@ -145,7 +145,7 @@ class CM_Mysql extends CM_Class_Abstract {
 					case "'":
 					case '`':
 						foreach ($array as &$var) {
-							$var = mysql_real_escape_string($var, self::_getLink());
+							$var = mysqli_real_escape_string(self::_getLink(), $var);
 						}
 						$query .= implode("$type,$type", $array);
 						break;
@@ -161,7 +161,7 @@ class CM_Mysql extends CM_Class_Abstract {
 					case '"':
 					case "'":
 					case '`':
-						$query .= mysql_real_escape_string($var, self::_getLink());
+						$query .= mysqli_real_escape_string(self::_getLink(), $var);
 						break;
 					default:
 						$query .= round($var, 0);
@@ -185,9 +185,9 @@ class CM_Mysql extends CM_Class_Abstract {
 		$readOnly ? CM_Debug::get()->incStats('mysql-read', $query) : CM_Debug::get()->incStats('mysql', $query);
 
 		$link = self::_getLink($readOnly);
-		$result = mysql_query($query, $link);
+		$result = mysqli_query($link, $query);
 		if ($result === false) {
-			throw new CM_Exception('Mysql error `' . mysql_errno($link) . '` with message `' . mysql_error($link) . '` (query: `' . $query . '`)');
+			throw new CM_Exception('Mysql error `' . mysqli_errno($link) . '` with message `' . mysqli_error($link) . '` (query: `' . $query . '`)');
 		} elseif (is_bool($result)) {
 			return true;
 		} else {
@@ -465,7 +465,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return integer the number of affected rows on success, and -1 if the last query failed.
 	 */
 	public static function affected_rows() {
-		return mysql_affected_rows(self::_getLink());
+		return mysqli_affected_rows(self::_getLink());
 	}
 
 	/**
@@ -474,7 +474,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public static function insert_id() {
-		return mysql_insert_id(self::_getLink());
+		return mysqli_insert_id(self::_getLink());
 	}
 
 	/**

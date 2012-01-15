@@ -20,7 +20,7 @@ class CM_MysqlResult {
 	 * @return integer
 	 */
 	public function numRows() {
-		return mysql_num_rows($this->result);
+		return mysqli_num_rows($this->result);
 	}
 
 	/**
@@ -32,11 +32,11 @@ class CM_MysqlResult {
 	 */
 	public function fetchObject($class_name = null, array $params = null) {
 		if (!isset($class_name)) {
-			$result_obj = mysql_fetch_object($this->result);
+			$result_obj = mysqli_fetch_object($this->result);
 		} elseif (!isset($params)) {
-			$result_obj = mysql_fetch_object($this->result, $class_name);
+			$result_obj = mysqli_fetch_object($this->result, $class_name);
 		} else {
-			$result_obj = mysql_fetch_object($this->result, $class_name, $params);
+			$result_obj = mysqli_fetch_object($this->result, $class_name, $params);
 		}
 
 		return $result_obj;
@@ -48,8 +48,8 @@ class CM_MysqlResult {
 	 * @return mixed|false
 	 */
 	public function fetchOne() {
-		$row = mysql_fetch_row($this->result);
-		if (false === $row) {
+		$row = mysqli_fetch_row($this->result);
+		if (is_null($row)) {
 			return false;
 		}
 		return reset($row);
@@ -61,7 +61,7 @@ class CM_MysqlResult {
 	 * @return array|false
 	 */
 	public function fetchAssoc() {
-		return mysql_fetch_assoc($this->result);
+		return mysqli_fetch_assoc($this->result);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class CM_MysqlResult {
 	 */
 	public function fetchCol() {
 		$col = array();
-		while ($row = mysql_fetch_row($this->result)) {
+		while ($row = mysqli_fetch_row($this->result)) {
 			$col[] = $row[0];
 		}
 		return $col;
@@ -84,7 +84,7 @@ class CM_MysqlResult {
 	 */
 	public function fetchAll() {
 		$result = array();
-		while ($row = mysql_fetch_assoc($this->result)) {
+		while ($row = mysqli_fetch_assoc($this->result)) {
 			$result[] = $row;
 		}
 		return $result;
@@ -104,7 +104,7 @@ class CM_MysqlResult {
 	 */
 	public function fetchAllTree($level = 1, $distinctLeaves = true) {
 		$result = array();
-		while ($row = mysql_fetch_assoc($this->result)) {
+		while ($row = mysqli_fetch_assoc($this->result)) {
 			$resultEntry = &$result;
 			for ($i = 0; $i < $level; $i++) {
 				if (!is_array($resultEntry)) {
@@ -134,6 +134,6 @@ class CM_MysqlResult {
 		if (!is_resource($this->result)) {
 			return false;
 		}
-		return mysql_free_result($this->result);
+		return mysqli_free_result($this->result);
 	}
 }
