@@ -57,7 +57,7 @@ class CM_Bootloader {
 	}
 
 	public function errorHandler() {
-		error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE);
+		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function($errno, $errstr, $errfile, $errline) {
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
@@ -82,14 +82,15 @@ class CM_Bootloader {
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
-		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') . ((isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':' . $_SERVER['SERVER_PORT'] : '') . '/');
+		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') .
+				((isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':' . $_SERVER['SERVER_PORT'] : '') . '/');
 
 		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_SITE_ROOT . 'public' . DIRECTORY_SEPARATOR);
 		define('DIR_LAYOUT', DIR_SITE_ROOT . 'layout' . DIRECTORY_SEPARATOR);
 
-		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData: DIR_SITE_ROOT . 'data' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_SITE_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
 
 		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
@@ -100,7 +101,8 @@ class CM_Bootloader {
 
 		define('URL_STATIC', URL_OBJECTS . 'static/');
 
-		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles : DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
+		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
+				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 		define('URL_USERFILES', URL_CONTENT . 'userfiles/');
 
 		define('DIR_TMP_USERFILES', DIR_USERFILES . 'tmp' . DIRECTORY_SEPARATOR);

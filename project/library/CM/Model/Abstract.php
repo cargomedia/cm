@@ -226,7 +226,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array $id
 	 * @return CM_Model_Abstract
 	 */
-	public static function factory($type, array $id) {
+	final public static function factoryGeneric($type, array $id) {
 		$className = self::_getClassName($type);
 		/*
 		 * Cannot use __construct(), since signature is unknown.
@@ -246,7 +246,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	public static function fromArray(array $data) {
-		return self::factory($data['_type'], $data['_id']);
+		return self::factoryGeneric($data['_type'], $data['_id']);
 	}
 
 }

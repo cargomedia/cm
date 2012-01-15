@@ -18,14 +18,6 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 		self::assertRow($table, $columns, 0);
 	}
 
-	/**
-	 * @param int   $expectedCount
-	 * @param array $actualArray
-	 */
-	public static function assertCount($expectedCount, array $actualArray) {
-		self::assertEquals($expectedCount, count($actualArray));
-	}
-
 	public static function assertModelEquals(CM_Model_Abstract $expected, CM_Model_Abstract $actual) {
 		self::assertTrue($expected->equals($actual), 'Models differ');
 	}
