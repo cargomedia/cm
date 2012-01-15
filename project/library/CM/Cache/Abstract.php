@@ -158,7 +158,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string	  $key
-	 * @param mixed       $data
+	 * @param mixed	   $data
 	 * @param int|null	$lifeTime
 	 * @return boolean
 	 */

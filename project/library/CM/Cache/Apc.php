@@ -8,8 +8,8 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param mixed $data
+	 * @param string   $key
+	 * @param mixed    $data
 	 * @param int|null $lifeTime
 	 * @return bool
 	 */
