@@ -50,6 +50,7 @@ $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
 $config->CM_Language = new stdClass();
 $config->CM_Language->idDefault = 1;
+$config->CM_Language->autoCreate = false;
 
 $config->CM_Stream = new stdClass();
 $config->CM_Stream->enabled = true;
