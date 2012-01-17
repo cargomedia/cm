@@ -2,16 +2,17 @@
 
 
 class CM_MysqlResult {
-	private $result;
+	/**
+	 * @var mysqli_result
+	 */
+	private $_result;
 
 	/**
-	 * Constructor.
-	 *
 	 * @param mysqli_result $result
 	 * @return CM_MysqlResult
 	 */
-	public function __construct($result) {
-		$this->result = $result;
+	public function __construct(mysqli_result $result) {
+		$this->_result = $result;
 	}
 
 	/**
@@ -20,23 +21,23 @@ class CM_MysqlResult {
 	 * @return integer
 	 */
 	public function numRows() {
-		return $this->result->num_rows;
+		return $this->_result->num_rows;
 	}
 
 	/**
 	 * Fetch a result row as an object.
 	 *
 	 * @param string $class_name
-	 * @param array $params
+	 * @param array  $params
 	 * @return object an object with string properties that correspond to the fetched row, or FALSE if there are no more rows.
 	 */
 	public function fetchObject($class_name = null, array $params = null) {
 		if (!isset($class_name)) {
-			$result_obj = $this->result->fetch_object();
+			$result_obj = $this->_result->fetch_object();
 		} elseif (!isset($params)) {
-			$result_obj = $this->result->fetch_object($class_name);
+			$result_obj = $this->_result->fetch_object($class_name);
 		} else {
-			$result_obj = $this->result->fetch_object($class_name, $params);
+			$result_obj = $this->_result->fetch_object($class_name, $params);
 		}
 
 		return $result_obj;
@@ -48,7 +49,7 @@ class CM_MysqlResult {
 	 * @return mixed|false
 	 */
 	public function fetchOne() {
-		$row = $this->result->fetch_row();
+		$row = $this->_result->fetch_row();
 		if (is_null($row)) {
 			return false;
 		}
@@ -61,7 +62,7 @@ class CM_MysqlResult {
 	 * @return array|false
 	 */
 	public function fetchAssoc() {
-		return $this->result->fetch_assoc();
+		return $this->_result->fetch_assoc();
 	}
 
 	/**
@@ -71,7 +72,7 @@ class CM_MysqlResult {
 	 */
 	public function fetchCol() {
 		$col = array();
-		while ($row = $this->result->fetch_row()) {
+		while ($row = $this->_result->fetch_row()) {
 			$col[] = $row[0];
 		}
 		return $col;
@@ -84,7 +85,7 @@ class CM_MysqlResult {
 	 */
 	public function fetchAll() {
 		$result = array();
-		while ($row = $this->result->fetch_assoc()) {
+		while ($row = $this->_result->fetch_assoc()) {
 			$result[] = $row;
 		}
 		return $result;
@@ -98,13 +99,13 @@ class CM_MysqlResult {
 	 * Each leaf node contains an array consisting of the $rowcount - $level last entries of the row it represents. Or a scalar in the
 	 * case of $level = $rowcount -1.
 	 *
-	 * @param integer $level the amount of columns that are used as indexes.
-	 * @param bool $distinctLeaves wether or not the leaves are unique given the specified indexes
+	 * @param integer $level          the amount of columns that are used as indexes.
+	 * @param bool    $distinctLeaves wether or not the leaves are unique given the specified indexes
 	 * @return array
 	 */
 	public function fetchAllTree($level = 1, $distinctLeaves = true) {
 		$result = array();
-		while ($row = $this->result->fetch_assoc()) {
+		while ($row = $this->_result->fetch_assoc()) {
 			$resultEntry = &$result;
 			for ($i = 0; $i < $level; $i++) {
 				if (!is_array($resultEntry)) {
@@ -127,13 +128,8 @@ class CM_MysqlResult {
 
 	/**
 	 * Free result memory.
-	 *
-	 * @return bool
 	 */
 	public function free() {
-		if (!is_resource($this->result)) {
-			return false;
-		}
-		return $this->result->free_result();
+		$this->_result->free();
 	}
 }
