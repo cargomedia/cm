@@ -27,14 +27,13 @@ class CM_File_Temp extends CM_File {
 	 * @param string $filename
 	 * @return CM_File_Temp
 	 */
-	public static function create($filename) {
+	public static function createTemp($filename) {
 		$filename = (string) $filename;
 		if (strlen($filename) > 100) {
 			$filename = substr($filename, -1, 100);
 		}
 		$uniqid = md5(rand() . uniqid());
 		CM_Mysql::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
-
 		return new self($uniqid);
 	}
 
