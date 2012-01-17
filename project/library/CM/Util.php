@@ -44,12 +44,13 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string     $cmd
-	 * @param array|null $args
+	 * @param string	  $cmd
+	 * @param array|null  $args
+	 * @param string|null $inputPath
 	 * @return string Output
 	 * @throws CM_Exception If return-status != 0
 	 */
-	public static function exec($cmd, array $args = null) {
+	public static function exec($cmd, array $args = null, $inputPath = null) {
 		if (null === $args) {
 			$args = array();
 		}
@@ -59,10 +60,14 @@ class CM_Util {
 			}
 			$cmd .= ' ' . escapeshellarg($arg);
 		}
+		if ($inputPath) {
+			$cmd .= ' <' . escapeshellarg($inputPath);
+		}
 		exec($cmd, $output, $returnStatus);
+		$output = implode(PHP_EOL, $output);
 		if ($returnStatus != 0) {
 			throw new CM_Exception('Command `' . $cmd . '` failed: `' . $output . '`');
 		}
-		return implode(PHP_EOL, $output);
+		return $output;
 	}
 }
