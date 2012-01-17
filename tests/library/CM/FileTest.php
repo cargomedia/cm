@@ -65,7 +65,10 @@ class CM_FileTest extends TestCase {
 		$this->assertInstanceOf('CM_File', $file);
 		$this->assertEquals($path, $file->getPath());
 		$this->assertEquals('', $file->read());
+		$file->delete();
 
+		$file = CM_File::create($path, 'bar');
+		$this->assertEquals('bar', $file->read());
 		$file->delete();
 	}
 }

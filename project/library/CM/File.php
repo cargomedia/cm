@@ -142,14 +142,19 @@ class CM_File {
 	}
 
 	/**
-	 * @param string $path
+	 * @param string      $path
+	 * @param string|null $content
 	 * @return CM_File
 	 * @throws CM_Exception
 	 */
-	public static function create($path) {
+	public static function create($path, $content = null) {
 		if (false === touch($path)) {
 			throw new CM_Exception('Cannot touch `' . $path . '`.');
 		}
-		return new self($path);
+		$file = new self($path);
+		if (null !== $content) {
+			$file->write($content);
+		}
+		return $file;
 	}
 }
