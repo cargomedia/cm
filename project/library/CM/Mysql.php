@@ -7,8 +7,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	const STMT_REPLACE = 'REPLACE';
 	const STMT_REPLACE_DELAYED = 'REPLACE DELAYED';
 
-	protected static $link;
-	protected static $linkReadOnly;
+	private static $_link;
+	private static $_linkReadOnly;
 
 	/**
 	 * @param bool $readOnly OPTIONAL
@@ -16,10 +16,10 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	public static function connect($readOnly = false) {
 		$config = self::_getConfig();
-		$link = &self::$link;
+		$link = &self::$_link;
 		$server = $config->server;
 		if ($readOnly) {
-			$link = &self::$linkReadOnly;
+			$link = &self::$_linkReadOnly;
 			if (!empty($config->servers_read)) {
 				$server = $config->servers_read[array_rand($config->servers_read)];
 			}
@@ -464,7 +464,8 @@ class CM_Mysql extends CM_Class_Abstract {
 
 		$result = self::query("DESCRIBE `$table`");
 		$columns = array();
-		while ($column = $result->fetchObject("CM_MysqlColumn")) {
+		/** @var CM_MysqlColumn $column */
+		while ($column = $result->fetchObject('CM_MysqlColumn')) {
 			$columns[$column->name()] = $column;
 		}
 		return $columns;
@@ -534,9 +535,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	private static function _getLink($readOnly = false) {
 		if ($readOnly) {
-			return self::$linkReadOnly ? self::$linkReadOnly : self::connect($readOnly);
+			return self::$_linkReadOnly ? self::$_linkReadOnly : self::connect($readOnly);
 		} else {
-			return self::$link ? self::$link : self::connect($readOnly);
+			return self::$_link ? self::$_link : self::connect($readOnly);
 		}
 	}
 

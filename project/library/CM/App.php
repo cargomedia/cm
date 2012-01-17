@@ -50,7 +50,7 @@ class CM_App {
 	}
 
 	/**
-	 * @param              $directory
+	 * @param			  $directory
 	 * @param Closure|null $callbackBefore fn($version)
 	 * @param Closure|null $callbackAfter  fn($version)
 	 */
@@ -59,7 +59,7 @@ class CM_App {
 		CM_CacheLocal::flush();
 		$version = $this->getVersion();
 		while (true) {
-			$updateScript = $directory . '/update/' . ++$version . '.php';
+			$updateScript = $directory . ++$version . '.php';
 			if (!file_exists($updateScript)) {
 				break;
 			}
@@ -67,10 +67,10 @@ class CM_App {
 				$callbackBefore($version);
 			}
 			require $updateScript;
+			$this->setVersion($version);
 			if ($callbackAfter) {
 				$callbackAfter($version);
 			}
-			$this->setVersion($version);
 		}
 	}
 }
