@@ -25,10 +25,11 @@ class CM_Mysql extends CM_Class_Abstract {
 			}
 		}
 
-		$link = new mysqli($server['host'], $config->user, $config->pass, $config->db, $server['port']);
+		$link = new mysqli($server['host'], $config->user, $config->pass, null, $server['port']);
 		if ($link->connect_error) {
 			throw new CM_Exception('Database connection failed: ' . $link->connect_error);
 		}
+		self::selectDb($config->db, $readOnly);
 		if (!$link->set_charset('utf8')) {
 			throw new CM_Exception('Cannot set database charset to utf-8');
 		}
@@ -43,7 +44,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	public static function selectDb($db, $readOnly = false) {
 		$link = self::_getLink($readOnly);
 		if (!$link->select_db($db)) {
-			throw new CM_Exception('Cannot select database `' . $db . '`');
+			throw new CM_Mysql_DbSelectException('Cannot select database `' . $db . '`');
 		}
 	}
 
