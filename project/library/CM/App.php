@@ -48,4 +48,29 @@ class CM_App {
 		$releaseStamp = (int) $releaseStamp;
 		CM_Option::getInstance()->set('app.releaseStamp', $releaseStamp);
 	}
+
+	/**
+	 * @param              $directory
+	 * @param Closure|null $callbackBefore fn($version)
+	 * @param Closure|null $callbackAfter  fn($version)
+	 */
+	public function runUpdateScripts($directory, Closure $callbackBefore = null, Closure $callbackAfter = null) {
+		CM_Cache::flush();
+		CM_CacheLocal::flush();
+		$version = $this->getVersion();
+		while (true) {
+			$updateScript = $directory . '/update/' . ++$version . '.php';
+			if (!file_exists($updateScript)) {
+				break;
+			}
+			if ($callbackBefore) {
+				$callbackBefore($version);
+			}
+			require $updateScript;
+			if ($callbackAfter) {
+				$callbackAfter($version);
+			}
+			$this->setVersion($version);
+		}
+	}
 }

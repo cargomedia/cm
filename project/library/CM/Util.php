@@ -2,6 +2,10 @@
 
 class CM_Util {
 
+	/**
+	 * @param int $number
+	 * @return int[]
+	 */
 	public static function decbinarr($number) {
 		$bin = decbin($number);
 		$binarr = array();
@@ -25,6 +29,11 @@ class CM_Util {
 		return $line;
 	}
 
+	/**
+	 * @param string $pattern OPTIONAL
+	 * @param string $path OPTIONAL
+	 * @return array
+	 */
 	public static function rglob($pattern = '*', $path = './') {
 		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT);
 		$files = glob($path . $pattern);
@@ -32,5 +41,18 @@ class CM_Util {
 			$files = array_merge($files, self::rglob($pattern, $path));
 		}
 		return $files;
+	}
+
+	/**
+	 * @param string $cmd
+	 * @return string Output
+	 * @throws CM_Exception If return-status != 0
+	 */
+	public static function exec($cmd) {
+		exec($cmd, $output, $returnStatus);
+		if ($returnStatus != 0) {
+			throw new CM_Exception('Command `' . $cmd . '` failed: `' . $output . '`');
+		}
+		return implode(PHP_EOL, $output);
 	}
 }
