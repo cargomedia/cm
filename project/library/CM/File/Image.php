@@ -36,11 +36,11 @@ class CM_File_Image extends CM_File {
 	/**
 	 * Uploads Image file to server
 	 *
-	 * @param array $options (file_uniqid, result_path, result_width, result_height,
+	 * @param array $options
 	 * @return CM_File_Image
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function create(array $options) {
+	public static function createImage(array $options) {
 		if (!isset($options['path'])) {
 			throw new CM_Exception_Invalid('path has to be set');
 		}
@@ -51,14 +51,13 @@ class CM_File_Image extends CM_File {
 
 		$path = $options['path'];
 		$newPath = $options['result_path'];
-		$type = (int) IMAGETYPE_JPEG;
 
 		$image = new self($path);
 
 		$width = empty($options['result_width']) ? $image->getWidth() : (int) $options['result_width'];
 		$height = empty($options['result_height']) ? $image->getHeight() : (int) $options['result_height'];
 
-		$image->convert($type, $newPath);
+		$image->convert(IMAGETYPE_JPEG, $newPath);
 
 		if ($width && $height) {
 			$image->resize($width, $height, false, $newPath);

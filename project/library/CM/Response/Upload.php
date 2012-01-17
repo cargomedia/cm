@@ -34,7 +34,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 				}
 
 				$tmpFile = CM_File_Temp::create($query['qqfile']);
-				$tmpFile->writeContent($content);
+				$tmpFile->write($content);
 			} elseif (!empty($_FILES['qqfile'])) {
 				$file = $_FILES['qqfile'];
 

@@ -4,12 +4,7 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_FileTest extends TestCase {
 
-	/**
-	 * Temp storage for file
-	 * 
-	 * @var unknown_type
-	 */
-	protected static $_file;
+	protected static $_backupContent;
 	
 	public static function setUpBeforeClass() {
 	}
@@ -22,11 +17,11 @@ class CM_FileTest extends TestCase {
 	
 	public function setUp() {
 		$this->_testFilePath = DIR_TEST_DATA . 'img/test.jpg';
-		self::$_file = file_get_contents($this->_testFilePath);
+		self::$_backupContent = file_get_contents($this->_testFilePath);
 	}
 	
 	public function tearDown() {
-		file_put_contents($this->_testFilePath, self::$_file);
+		file_put_contents($this->_testFilePath, self::$_backupContent);
 	}
 
 	public function testConstruct() {
@@ -50,6 +45,27 @@ class CM_FileTest extends TestCase {
 		$this->assertFalse(file_exists($this->_testFilePath));
 		
 		// Should do nothing if already deleted
+		$file->delete();
+	}
+
+	public function testWrite() {
+		$file = new CM_File($this->_testFilePath);
+		$this->assertNotEquals('foo', $file->read());
+
+		$file->write('foo');
+		$this->assertEquals('foo', $file->read());
+	}
+
+	public function testCreate() {
+		$path = DIR_TEST_DATA . 'foo';
+		$this->assertFalse(file_exists($path));
+
+		$file = CM_File::create($path);
+		$this->assertTrue(file_exists($path));
+		$this->assertInstanceOf('CM_File', $file);
+		$this->assertEquals($path, $file->getPath());
+		$this->assertEquals('', $file->read());
+
 		$file->delete();
 	}
 }

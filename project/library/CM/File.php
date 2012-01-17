@@ -90,6 +90,16 @@ class CM_File {
 	}
 
 	/**
+	 * @param $content
+	 * @throws CM_Exception
+	 */
+	public function write($content) {
+		if (false === file_put_contents($this->getPath(), $content)) {
+			throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to `' . $this->getPath() . '`');
+		}
+	}
+
+	/**
 	 * @param string $path New file path
 	 * @throws CM_Exception
 	 */
@@ -111,7 +121,7 @@ class CM_File {
 		}
 		$this->_path = $path;
 	}
-	
+
 	/**
 	 * @throws CM_Exception
 	 */
@@ -120,7 +130,7 @@ class CM_File {
 			return;
 		}
 		if (false === unlink($this->getPath())) {
-			throw new CM_Exception('Cannot delete `' . $this->getPath() . '`..');
+			throw new CM_Exception('Cannot delete `' . $this->getPath() . '`.');
 		}
 	}
 
@@ -129,5 +139,17 @@ class CM_File {
 	 */
 	public function __toString() {
 		return $this->read();
+	}
+
+	/**
+	 * @param string $path
+	 * @return CM_File
+	 * @throws CM_Exception
+	 */
+	public static function create($path) {
+		if (false === touch($path)) {
+			throw new CM_Exception('Cannot touch `' . $path . '`.');
+		}
+		return new self($path);
 	}
 }

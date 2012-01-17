@@ -72,16 +72,6 @@ class CM_File_Temp extends CM_File {
 	}
 
 	/**
-	 * @param string $content
-	 * @throws CM_Exception
-	 */
-	public function writeContent($content) {
-		if (false === file_put_contents($this->getPath(), $content)) {
-			throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to path `' . $this->getPath() . '`');
-		}
-	}
-
-	/**
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
