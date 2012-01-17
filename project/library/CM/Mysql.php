@@ -166,7 +166,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * Sends query to a database server.
 	 *
 	 * @param string $query
-	 * @param bool $readOnly
+	 * @param bool   $readOnly
 	 * @throws CM_Exception
 	 * @return CM_MysqlResult|true
 	 */
@@ -528,6 +528,60 @@ class CM_Mysql extends CM_Class_Abstract {
 			}
 		}
 		return $columns;
+	}
+
+	/**
+	 * @param string	 $dbName
+	 * @param bool	   $skipStructure
+	 * @param bool	   $skipData
+	 * @param array|null $tables
+	 * @return mixed|string
+	 */
+	public static function getDump($dbName, $skipStructure = false, $skipData = false, array $tables = null) {
+		$config = self::_getConfig();
+		$args = array();
+		$args[] = '--compact';
+		$args[] = '--add-drop-table';
+		$args[] = '--extended-insert';
+		if ($skipData) {
+			$args[] = '--no-data';
+		}
+		if ($skipStructure) {
+			$args[] = '--no-create-info';
+		}
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->user;
+		$args[] = '--password=' . $config->pass;
+		$args[] = $dbName;
+		if ($tables) {
+			foreach ($tables as $table) {
+				$args[] = $table;
+			}
+		}
+		$queries = CM_Util::exec('mysqldump', $args);
+		$queries = preg_replace('#(\s+)AUTO_INCREMENT\s*=\s*\d+\s+#', '$1', $queries);
+		$queries = preg_replace('#/\*.*?\*/;#', '', $queries);
+
+		$dump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
+		$dump .= '/*!40101 SET NAMES utf8 */;' . PHP_EOL;
+		$dump .= $queries;
+		return $dump;
+	}
+
+	/**
+	 * @param string  $dbName
+	 * @param CM_File $dump
+	 */
+	public static function runDump($dbName, CM_File $dump) {
+		$config = self::_getConfig();
+		$args = array();
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->user;
+		$args[] = '--password=' . $config->pass;
+		$args[] = $dbName;
+		CM_Util::exec('mysql', $args, $dump->getPath());
 	}
 
 	/**
