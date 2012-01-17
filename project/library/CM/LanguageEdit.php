@@ -267,11 +267,8 @@ class CM_LanguageEdit {
 			$lang_key_id = $result->fetchOne();
 			$result->free();
 		} else {
-			$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_CM_LANG_KEY . '`
+			$lang_key_id = CM_Mysql::exec('INSERT INTO `' . TBL_CM_LANG_KEY . '`
 					SET `lang_section_id`=?, `key`="?"', $section_id, $key);
-			CM_Mysql::query($query);
-
-			$lang_key_id = CM_Mysql::insert_id();
 		}
 
 		// setting values
@@ -401,9 +398,9 @@ class CM_LanguageEdit {
 		CM_Mysql::query("DELETE FROM `" . TBL_CM_LANG_VALUE . "` WHERE `lang_key_id`=$lang_key_id");
 
 		// deleting key
-		CM_Mysql::query("DELETE FROM `" . TBL_CM_LANG_KEY . "` WHERE `lang_key_id`=$lang_key_id");
+		$success = CM_Mysql::exec("DELETE FROM `" . TBL_CM_LANG_KEY . "` WHERE `lang_key_id`=$lang_key_id");
 
-		if (CM_Mysql::affected_rows()) {
+		if ($success) {
 			CM_CacheLocal::cleanLanguages();
 			return true;
 		} else {
@@ -428,14 +425,12 @@ class CM_LanguageEdit {
 			}
 		}
 
-		$query = CM_Mysql::placeholder('INSERT INTO `' . TBL_CM_LANG_SECTION . '`
+		// sending insert query
+		$sectionId = CM_Mysql::exec('INSERT INTO `' . TBL_CM_LANG_SECTION . '`
 				SET `parent_section_id`=?, `section`="?", `description`="?"', $parent_section_id, $section, $description);
 
-		// sending insert query
-		CM_Mysql::query($query);
-
 		$object = new stdClass();
-		$object->lang_section_id = CM_Mysql::insert_id();
+		$object->lang_section_id = $sectionId;
 		$object->parent_section_id = "$parent_section_id";
 		$object->section = $section;
 		$object->description = $description;
@@ -506,11 +501,9 @@ class CM_LanguageEdit {
 			throw new CM_LanguageEditException('empty argument $new_name', CM_LanguageEditException::EMPTY_ARGUMENT_KEY);
 		}
 
-		$query = CM_Mysql::placeholder('UPDATE `' . TBL_CM_LANG_KEY . '` SET `key`="?" WHERE `lang_key_id`=?', $new_name, $lang_key_id);
+		$success = CM_Mysql::exec('UPDATE `' . TBL_CM_LANG_KEY . '` SET `key`="?" WHERE `lang_key_id`=?', $new_name, $lang_key_id);
 
-		CM_Mysql::query($query);
-
-		if (CM_Mysql::affected_rows()) {
+		if ($success) {
 			CM_CacheLocal::cleanLanguages();
 			return true;
 		} else {

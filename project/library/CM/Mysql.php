@@ -7,8 +7,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	const STMT_REPLACE = 'REPLACE';
 	const STMT_REPLACE_DELAYED = 'REPLACE DELAYED';
 
-	protected static $link_id;
-	protected static $link_id_read;
+	protected static $link;
+	protected static $linkReadOnly;
 
 	/**
 	 * @param bool $readOnly OPTIONAL
@@ -16,39 +16,23 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	public static function connect($readOnly = false) {
 		$config = self::_getConfig();
-		$link = &self::$link_id;
+		$link = &self::$link;
 		$server = $config->server;
 		if ($readOnly) {
-			$link = &self::$link_id_read;
+			$link = &self::$linkReadOnly;
 			if (!empty($config->servers_read)) {
 				$server = $config->servers_read[array_rand($config->servers_read)];
 			}
 		}
-		$db = $config->db;
 
-		$link = new mysqli($server['host'], $config->user, $config->pass, $db, $server['port']);
-
+		$link = new mysqli($server['host'], $config->user, $config->pass, $config->db, $server['port']);
 		if ($link->connect_error) {
 			throw new CM_Exception('Database connection failed: ' . $link->connect_error);
 		}
-
 		if (!$link->set_charset('utf8')) {
 			throw new CM_Exception('Cannot set database charset to utf-8');
 		}
-
 		return $link;
-	}
-
-	/**
-	 * @param bool $readOnly
-	 * @return mysqli
-	 */
-	protected static function _getLink($readOnly = false) {
-		if ($readOnly) {
-			return self::$link_id_read ? self::$link_id_read : self::connect($readOnly);
-		} else {
-			return self::$link_id ? self::$link_id : self::connect($readOnly);
-		}
 	}
 
 	/**
@@ -180,10 +164,10 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Sends query to a database server.
 	 *
-	 * @param string  $query
-	 * @param booleab $readOnly
+	 * @param string $query
+	 * @param bool $readOnly
 	 * @throws CM_Exception
-	 * @return CM_MysqlResult
+	 * @return CM_MysqlResult|true
 	 */
 	public static function query($query, $readOnly = false) {
 		$readOnly ? CM_Debug::get()->incStats('mysql-read', $query) : CM_Debug::get()->incStats('mysql', $query);
@@ -192,12 +176,12 @@ class CM_Mysql extends CM_Class_Abstract {
 		/** @var mysqli_result $result */
 		$result = $link->query($query);
 
-		if ($result === false) {
-			throw new CM_Exception('Mysql error `' . $link->errno . '` with message `' . $link->error . '` (query: `' . $query . '`)');
-		} elseif (is_bool($result)) {
+		if ($result instanceof MySQLi_Result) {
+			return new CM_MysqlResult($result);
+		} elseif (true === $result) {
 			return true;
 		} else {
-			return new CM_MysqlResult($result);
+			throw new CM_Exception('Mysql error `' . $link->errno . '` with message `' . $link->error . '` (query: `' . $query . '`)');
 		}
 	}
 
@@ -207,17 +191,17 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string $query Can contain ?, @? as placeholders
 	 * @param mixed  $arg1
 	 * @param mixed  $arg2  ...
-	 * @return CM_MysqlResult|int Either a CM_MysqlResult, last insert id or affected rows.
+	 * @return CM_MysqlResult|int|false Either a CM_MysqlResult, last insert id or affected rows.
 	 */
 	public static function exec() {
 		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
 		$result = self::query($query);
 		if ($result instanceof CM_MysqlResult) {
 			return $result;
-		} elseif ($insertId = self::insert_id()) {
+		} elseif ($insertId = self::getInsertId()) {
 			return $insertId;
 		} else {
-			return self::affected_rows();
+			return self::getAffectedRows();
 		}
 	}
 
@@ -332,7 +316,7 @@ class CM_Mysql extends CM_Class_Abstract {
 			$query .= ' ON DUPLICATE KEY UPDATE ' . implode(',', $valuesEscaped);
 		}
 		self::query($query);
-		return self::insert_id();
+		return self::getInsertId();
 	}
 
 	/**
@@ -404,7 +388,7 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 		$query = 'UPDATE `' . $table . '` SET ' . implode(',', $valuesEscaped) . ' ' . self::_queryWhere($where);
 		self::query($query);
-		return self::affected_rows();
+		return self::getAffectedRows();
 	}
 
 	/**
@@ -415,7 +399,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	public static function delete($table, $where) {
 		$query = 'DELETE FROM `' . $table . '` ' . self::_queryWhere($where);
 		self::query($query);
-		return self::affected_rows();
+		return self::getAffectedRows();
 	}
 
 	/**
@@ -444,43 +428,25 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string|array|null $where Associative array field=>value OR string
-	 * @return string WHERE-query
+	 * @return int|false The number of affected rows
 	 */
-	private static function _queryWhere($where) {
-		if (empty($where)) {
-			return '';
+	public static function getAffectedRows() {
+		$affectedRows = self::_getLink()->affected_rows;
+		if ($affectedRows < 0) {
+			return false;
 		}
-		if (is_array($where)) {
-			$valuesEscaped = array();
-			foreach ($where as $attr => $value) {
-				if ($value === null) {
-					$valuesEscaped[] = self::placeholder("`?` IS NULL", $attr);
-				} else {
-					$valuesEscaped[] = self::placeholder("`?`='?'", $attr, $value);
-				}
-			}
-			$where = implode(' AND ', $valuesEscaped);
-		}
-		return 'WHERE ' . $where;
+		return $affectedRows;
 	}
 
 	/**
-	 * Get number of affected rows in previous MySQL operation.
-	 *
-	 * @return integer the number of affected rows on success, and -1 if the last query failed.
+	 * @return string|false Last insert query autoincrement id.
 	 */
-	public static function affected_rows() {
-		return self::_getLink()->affected_rows;
-	}
-
-	/**
-	 * Get the last insert query autoincrement id.
-	 *
-	 * @return string
-	 */
-	public static function insert_id() {
-		return self::_getLink()->insert_id;
+	public static function getInsertId() {
+		$insertId = self::_getLink()->insert_id;
+		if (!$insertId) {
+			return false;
+		}
+		return $insertId;
 	}
 
 	/**
@@ -560,6 +526,40 @@ class CM_Mysql extends CM_Class_Abstract {
 			}
 		}
 		return $columns;
+	}
+
+	/**
+	 * @param bool $readOnly
+	 * @return mysqli
+	 */
+	private static function _getLink($readOnly = false) {
+		if ($readOnly) {
+			return self::$linkReadOnly ? self::$linkReadOnly : self::connect($readOnly);
+		} else {
+			return self::$link ? self::$link : self::connect($readOnly);
+		}
+	}
+
+	/**
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @return string WHERE-query
+	 */
+	private static function _queryWhere($where) {
+		if (empty($where)) {
+			return '';
+		}
+		if (is_array($where)) {
+			$valuesEscaped = array();
+			foreach ($where as $attr => $value) {
+				if ($value === null) {
+					$valuesEscaped[] = self::placeholder("`?` IS NULL", $attr);
+				} else {
+					$valuesEscaped[] = self::placeholder("`?`='?'", $attr, $value);
+				}
+			}
+			$where = implode(' AND ', $valuesEscaped);
+		}
+		return 'WHERE ' . $where;
 	}
 
 	private static function _delayedEnabled() {
