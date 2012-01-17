@@ -33,41 +33,7 @@ class CM_File_Image extends CM_File {
 		imagedestroy($this->_resource);
 	}
 
-	/**
-	 * Uploads Image file to server
-	 *
-	 * @param array $options
-	 * @return CM_File_Image
-	 * @throws CM_Exception_Invalid
-	 */
-	public static function createImage(array $options) {
-		if (!isset($options['path'])) {
-			throw new CM_Exception_Invalid('path has to be set');
-		}
-
-		if (!isset($options['result_path'])) {
-			throw new CM_Exception_Invalid('result_path has to be set');
-		}
-
-		$path = $options['path'];
-		$newPath = $options['result_path'];
-
-		$image = new self($path);
-
-		$width = empty($options['result_width']) ? $image->getWidth() : (int) $options['result_width'];
-		$height = empty($options['result_height']) ? $image->getHeight() : (int) $options['result_height'];
-
-		$image->convert(IMAGETYPE_JPEG, $newPath);
-
-		if ($width && $height) {
-			$image->resize($width, $height, false, $newPath);
-		}
-
-		return $image;
-	}
-
 	private function _resource2image($resource, $path, $type = IMAGETYPE_JPEG) {
-
 		$result = false;
 		switch ($type) {
 			case IMAGETYPE_JPEG:
