@@ -28,8 +28,8 @@ class CM_Mysql extends CM_Class_Abstract {
 
 		$link = new mysqli($server['host'], $config->user, $config->pass, $db, $server['port']);
 
-		if (mysqli_connect_errno()) {
-			throw new CM_Exception('Database connection failed: ' . mysqli_connect_error());
+		if ($link->connect_error) {
+			throw new CM_Exception('Database connection failed: ' . $link->connect_error);
 		}
 
 		if (!$link->set_charset('utf8')) {
