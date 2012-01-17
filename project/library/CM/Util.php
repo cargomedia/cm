@@ -31,7 +31,7 @@ class CM_Util {
 
 	/**
 	 * @param string $pattern OPTIONAL
-	 * @param string $path OPTIONAL
+	 * @param string $path	OPTIONAL
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
@@ -44,11 +44,21 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string $cmd
+	 * @param string     $cmd
+	 * @param array|null $args
 	 * @return string Output
 	 * @throws CM_Exception If return-status != 0
 	 */
-	public static function exec($cmd) {
+	public static function exec($cmd, array $args = null) {
+		if (null === $args) {
+			$args = array();
+		}
+		foreach ($args as $arg) {
+			if (!strlen($arg)) {
+				throw new CM_Exception('Empty argument');
+			}
+			$cmd .= ' ' . escapeshellarg($arg);
+		}
 		exec($cmd, $output, $returnStatus);
 		if ($returnStatus != 0) {
 			throw new CM_Exception('Command `' . $cmd . '` failed: `' . $output . '`');
