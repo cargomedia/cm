@@ -25,9 +25,10 @@ class CM_File_Temp extends CM_File {
 
 	/**
 	 * @param string $filename
+	 * @param string|null $content NOT USED
 	 * @return CM_File_Temp
 	 */
-	public static function createTemp($filename) {
+	public static function create($filename, $content = null) {
 		$filename = (string) $filename;
 		if (strlen($filename) > 100) {
 			$filename = substr($filename, -1, 100);

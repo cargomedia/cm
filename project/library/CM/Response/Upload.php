@@ -33,7 +33,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 					throw new CM_Exception('Different file content length in request and headers');
 				}
 
-				$tmpFile = CM_File_Temp::createTemp($query['qqfile']);
+				$tmpFile = CM_File_Temp::create($query['qqfile']);
 				$tmpFile->write($content);
 			} elseif (!empty($_FILES['qqfile'])) {
 				$file = $_FILES['qqfile'];
@@ -42,7 +42,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 					throw new CM_Exception('File upload error: ' . self::$_uploadErrors[$file['error']]);
 				}
 
-				$tmpFile = CM_File_Temp::createTemp($file['name']);
+				$tmpFile = CM_File_Temp::create($file['name']);
 				if (!move_uploaded_file($file['tmp_name'], $tmpFile->getPath())) {
 					throw new CM_Exception('Could not move upload file `' . $file['tmp_name'] . '`');
 				}
