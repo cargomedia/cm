@@ -81,8 +81,7 @@ class CM_Bootloader {
 		defined('IS_TEST') || define('IS_TEST', false);
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
-
-		define('URL_ROOT', 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') .
+		define('URL_ROOT', !empty(CM_Config::get()->urlRoot) ? CM_Config::get()->urlRoot : 'http://' . (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost') .
 				((isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80) ? ':' . $_SERVER['SERVER_PORT'] : '') . '/');
 
 		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
