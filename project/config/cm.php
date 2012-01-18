@@ -1,6 +1,7 @@
 <?php
 
 $config->debug = false;
+$config->urlRoot = null;
 $config->urlCdnObjects = null;
 $config->urlCdnContent = null;
 $config->dirData = null;
