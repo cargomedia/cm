@@ -28,6 +28,11 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 				$properties = file_exists($jsPath) ? new CM_File($jsPath) : null;
 				$content .= $this->_printClass($class['name'], $class['parent'], $properties);
 			}
+		} elseif ($this->_getFilename() == 'init.js') {
+			$content = '';
+			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
+				$content .= new CM_File($path) . ';' . PHP_EOL;
+			}
 		} elseif ($this->_getFilename() == 'library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
