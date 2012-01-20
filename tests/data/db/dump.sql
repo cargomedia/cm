@@ -8,6 +8,7 @@ CREATE TABLE `cm_action` (
   `modelType` tinyint(3) unsigned NOT NULL,
   `actionLimitType` tinyint(3) unsigned DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `count` int(10) unsigned DEFAULT '1',
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
   KEY `action` (`actionType`),
@@ -320,4 +321,4 @@ CREATE TABLE `cm_user_preferenceDefault` (
   `configurable` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`preferenceId`),
   UNIQUE KEY `section` (`section`,`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
