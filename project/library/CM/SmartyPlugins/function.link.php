@@ -4,31 +4,31 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	$path = 'javascript:;';
 	if (isset($params['path'])) {
 		$path = $params['path'];
-		unset($params['path']);
 	}
+	unset($params['path']);
 
 	$label = '';
 	if (isset($params['label'])) {
 		$label = $params['label'];
-		unset($params['label']);
 	}
+	unset($params['label']);
 
 	$class = '';
 	if (isset($params['class'])) {
 		$class = $params['class'];
-		unset($params['class']);
 	}
+	unset($params['class']);
 
 	$title = '';
 	if (isset($params['title'])) {
 		$title = $params['title'];
-		unset($params['title']);
 	}
+	unset($params['title']);
 
 	if (isset($params['icon'])) {
 		$icon = $params['icon'];
-		unset($params['icon']);
 	}
+	unset($params['icon']);
 
 	$link = CM_Page_Abstract::link($path, $params);
 
@@ -54,6 +54,6 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$html .= '</span>';
 	}
 	$html .= '</a>';
-	
+
 	return $html;
 }

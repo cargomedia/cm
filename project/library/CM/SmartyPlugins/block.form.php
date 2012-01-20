@@ -7,7 +7,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$form = CM_Form_Abstract::factory($params['name']);
 		$form->setup();
 		$form->renderStart($params);
-		$template->assignByRef('_form', $form);
+		$template->assign('_form', $form);
 
 		$form->frontend_data['auto_id'] = 'form' . uniqid();
 

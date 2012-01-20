@@ -250,7 +250,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 		}
 		$link = $path;
 
-		if ($params) {
+		if (!empty($params)) {
 			$params = CM_Params::encode($params);
 			$query = http_build_query($params);
 			$link .= '?' . $query;
