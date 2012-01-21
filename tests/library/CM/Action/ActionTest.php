@@ -119,6 +119,22 @@ class CM_Action_ActionTest extends TestCase {
 		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
 	}
 
+	public function testAggregateInvalidIntervals() {
+		try {
+			CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 10), array('interval' =>11, 'limit' => 20)));
+			$this->fail('Invalid intervals were not detected');
+		} catch(CM_Exception_Invalid $e) {
+			$this->assertContains('`11` is not a multiple of `5`', $e->getMessage());
+		}
+
+		try {
+			CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 10), array('interval' =>10, 'limit' => 20), array('interval' =>21, 'limit' => 30)));
+			$this->fail('Invalid intervals were not detected');
+		} catch(CM_Exception_Invalid $e) {
+			$this->assertContains('`21` is not a multiple of `10`', $e->getMessage());
+		}
+	}
+
 	public function testCollapse() {
 		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'actionType', 'modelType', 'actionLimitType', 'createStamp', 'count'),
 			array(
