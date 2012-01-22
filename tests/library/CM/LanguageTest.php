@@ -12,6 +12,25 @@ class CM_LanguageTest extends TestCase {
 		$this->assertGreaterThan(0, $keyId1);
 
 		$keyId2 = CM_LanguageEdit::createKey('test.' . uniqid() . '.' . uniqid(), 'name');
-		$this->assertGreaterThan($key1, $keyId2);
+		$this->assertGreaterThan($keyId1, $keyId2);
+	}
+
+	public function testAutoCreate() {
+		$configBackup = CM_Config::get();
+
+		CM_LanguageEdit::createSection(0, 'foo');
+
+		CM_Config::get()->CM_Language->autoCreate = false;
+		try {
+			CM_Language::text('foo.bar');
+			$this->fail('Can access nonexistent language path');
+		} catch (CM_Exception $e) {
+			$this->assertContains('not found', $e->getMessage());
+		}
+
+		CM_Config::get()->CM_Language->autoCreate = true;
+		$this->assertSame('bar', CM_Language::text('foo.bar'));
+
+		CM_Config::set($configBackup);
 	}
 }
