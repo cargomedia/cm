@@ -13,7 +13,7 @@ CREATE TABLE `cm_action` (
   KEY `ip` (`ip`),
   KEY `action` (`actionType`),
   KEY `createStamp` (`createStamp`),
-  KEY `entityType` (`modelType`),
+  KEY `modelType` (`modelType`),
   KEY `type` (`actionLimitType`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
