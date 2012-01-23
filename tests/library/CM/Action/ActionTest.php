@@ -115,8 +115,8 @@ class CM_Action_ActionTest extends TestCase {
 				array(null, 1, 1, 2, null, $time-23, 1),
 				array(null, 1, 1, 2, null, $time-24, 4),
 		));
-		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 10), array('interval' =>10, 'limit' => 30), array('interval' => 30, 'limit' => $time - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne())));
-		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
+		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 20), array('interval' =>10, 'limit' => 30), array('interval' => 30, 'limit' => $time - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne())));
+		$this->assertEquals(19, CM_Mysql::count(TBL_CM_ACTION));
 	}
 
 	public function testAggregateInvalidIntervals() {

@@ -243,15 +243,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		}
 		$types = CM_Mysql::exec('SELECT DISTINCT `actionType`, `modelType` FROM ' . TBL_CM_ACTION);
 		$startTime = time() - 86400;
-		$startTime = $startTime - $startTime % max($intervalValues);
 		while ($type = $types->fetchAssoc()) {
+			$current = $startTime = $startTime - $startTime % max($intervalValues);
 			$actionType = (int) $type['actionType'];
 			$modelType = (int) $type['modelType'];
 			$where = '`actionType` = ' . $actionType . ' AND `modelType` = ' . $modelType . ' AND `actionLimitType` IS NULL';
 			foreach ($intervals as $interval) {
-				$j = 1;
-				while ($interval['interval'] * ($j + 1) <= $interval['limit']) {
-					$current = $startTime - $j++ * $interval['interval'];
+				while (($startTime - $current) < $interval['limit']) {
 					$result = CM_Mysql::select(TBL_CM_ACTION, array('actorId', 'ip'),
 							$where . ' AND `createStamp` > ' . ($current - $interval['interval']) . ' AND `createStamp` <= ' . ($current));
 					if ($result->numRows() >= 1) {
@@ -263,6 +261,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 						}
 						self::collapse($current - $interval['interval'], $current, $actionType, $modelType);
 					}
+					$current -= $interval['interval'];
 				}
 			}
 		}
