@@ -242,9 +242,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$intervalValueLast = $intervalValue;
 		}
 		$types = CM_Mysql::exec('SELECT DISTINCT `actionType`, `modelType` FROM ' . TBL_CM_ACTION);
-		$startTime = time() - 86400;
+		$startTime = (time() - 86400) - (time() - 86400) % max($intervalValues);
 		while ($type = $types->fetchAssoc()) {
-			$current = $startTime = $startTime - $startTime % max($intervalValues);
+			$current = $startTime;
 			$actionType = (int) $type['actionType'];
 			$modelType = (int) $type['modelType'];
 			$where = '`actionType` = ' . $actionType . ' AND `modelType` = ' . $modelType . ' AND `actionLimitType` IS NULL';
