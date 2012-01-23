@@ -41,7 +41,7 @@ EOD;
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br /><br />
 allowed tags: <b class="italic">bold</b> <a href="window.location.href='http://www.google.com/';">google</a><br /><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br /><br />
-badwords: hallo<br /><br />
+badwords: hallo​badword_re​placement<br /><br />
 special chars: &quot;&lt;&gt;&quot;<br /><br />
 unclosed tags: <u>not <b>closed</b></u>
 EOD;
@@ -54,7 +54,7 @@ EOD;
 		$badwords->add('@yahoo.com');
 
 		$actual = new CM_Usertext('hallo@yahoo.com world');
-		$this->assertEquals('hallo world', $actual->getFormat());
+		$this->assertEquals('hallo​badword_re​placement world', $actual->getFormat());
 	}
 
 	public function testFormatPlain() {
@@ -68,7 +68,7 @@ allowed tags: bold google
 
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
 
-badwords: hallo
+badwords: hallo​badword_re​placement
 
 special chars: &quot;&lt;&gt;&quot;
 
@@ -87,7 +87,7 @@ allowed tags: &lt;b attr=&quot;not-allowed&quot; class{$splitChar}=&quot;italic&
 
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
 
-badwords: hallo
+badwords: hallo​badword_re​placement
 
 special chars: &quot;&lt;&gt;&quot;
 

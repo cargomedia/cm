@@ -40,8 +40,8 @@ class TH {
 	}
 
 	public static function clearEnv() {
-		self::clearCache();
 		self::clearDb();
+		self::clearCache();
 		self::timeReset();
 	}
 

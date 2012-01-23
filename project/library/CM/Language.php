@@ -73,31 +73,24 @@ class CM_Language extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string     $fullPath
+	 * @param string	 $fullPath
 	 * @param array|null $vars
 	 * @return string
 	 */
 	public static function text($fullPath, array $vars = null) {
-
+		list($path, $key) = self::_parsePath($fullPath);
 		try {
-			list($path, $key) = self::_parsePath($fullPath);
-
 			$section = self::section($path);
 			if (!$section) {
 				return false;
 			}
 			return $section->text($key, $vars);
-
 		} catch (CM_TreeException $e) {
-			if (IS_DEBUG || IS_TEST) {
-				if (self::_getConfig()->autoCreate) {
-					CM_LanguageEdit::createKey($fullPath);
-					return self::text($fullPath, $vars);
-				}
-				throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . CM_Util::var_line($vars, true) . '` not found');
+			if (self::_getConfig()->autoCreate) {
+				CM_LanguageEdit::createKey($fullPath);
+				return self::text($fullPath, $vars);
 			}
-
-			return $path;
+			throw new CM_Exception('Path `' . $path . '.' . $key . '` with vars `' . CM_Util::var_line($vars, true) . '` not found');
 		}
 	}
 

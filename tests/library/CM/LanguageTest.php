@@ -34,7 +34,7 @@ class CM_LanguageTest extends TestCase {
 		CM_Config::set($configBackup);
 	}
 
-	public function testAutoCreate() {
+	public function testTextAutoCreate() {
 		$configBackup = CM_Config::get();
 
 		CM_Config::get()->CM_Language->autoCreate = true;
