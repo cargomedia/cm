@@ -231,18 +231,18 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$intervals = array(array('limit' => 7 * 86400, 'interval' => 3600),	array('limit' => null, 'interval' => 86400));
 		}
 		$intervalValueLast = 1;
-		foreach ($intervals as &$intervalRef) {
+		foreach ($intervals as $i => &$intervalRef) {
 			if ($intervalRef['interval'] % $intervalValueLast !== 0) {
 				throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
 			}
 			$intervalValueLast = $intervalRef['interval'];
-			if (is_null($intervalRef['limit'])) {
+			if ($i == count($intervals)-1) {
 				$startTime = time() - 86400 - (time() - 86400) % $intervalRef['interval'];
-				$interval['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne();
+				if (is_null($intervalRef['limit'])) {
+					$interval['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne();
+				}
 			}
-		}
-		if (!$startTime) {
-			$startTime = time() - 86400 - (time() - 86400) % $intervalValueLast;
+
 		}
 		$types = CM_Mysql::exec('SELECT DISTINCT `actionType`, `modelType` FROM ' . TBL_CM_ACTION);
 		while ($type = $types->fetchAssoc()) {
