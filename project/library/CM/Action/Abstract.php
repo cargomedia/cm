@@ -231,13 +231,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$intervals = array(array('limit' => 7 * 86400, 'interval' => 3600),	array('limit' => null, 'interval' => 86400));
 		}
 		$intervalValueLast = 1;
-		foreach ($intervals as &$interval2) {
-			if ($interval2['interval'] % $intervalValueLast !== 0) {
-				throw new CM_Exception_Invalid('Interval `' . $interval2['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
+		foreach ($intervals as &$intervalRef) {
+			if ($intervalRef['interval'] % $intervalValueLast !== 0) {
+				throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
 			}
-			$intervalValueLast = $interval2['interval'];
-			if (is_null($interval2['limit'])) {
-				$startTime = time() - 86400 - (time() - 86400) % $interval2['interval'];
+			$intervalValueLast = $intervalRef['interval'];
+			if (is_null($intervalRef['limit'])) {
+				$startTime = time() - 86400 - (time() - 86400) % $intervalRef['interval'];
 				$interval['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne();
 			}
 		}
