@@ -228,21 +228,23 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static function aggregate(array $intervals = null) {
 		if (is_null($intervals)) {
-			$intervals = array(array('limit' => 3600, 'interval' => 60), array('limit' => 7 * 86400, 'interval' => 3600),
-				array('limit' => time(), 'interval' => 86400));
+			$intervals = array(array('limit' => 7 * 86400, 'interval' => 3600),	array('limit' => null, 'interval' => 86400));
 		}
-		$intervalValues = array_map(function($element) {
-			return $element['interval'];
-		}, $intervals);
 		$intervalValueLast = 1;
-		foreach ($intervalValues as $intervalValue) {
-			if ($intervalValue % $intervalValueLast !== 0) {
-				throw new CM_Exception_Invalid('Interval `' . $intervalValue . '` is not a multiple of `' . $intervalValueLast . '`.');
+		foreach ($intervals as &$interval2) {
+			if ($interval2['interval'] % $intervalValueLast !== 0) {
+				throw new CM_Exception_Invalid('Interval `' . $interval2['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
 			}
-			$intervalValueLast = $intervalValue;
+			$intervalValueLast = $interval2['interval'];
+			if (is_null($interval2['limit'])) {
+				$startTime = time() - 86400 - (time() - 86400) % $interval2['interval'];
+				$interval['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne();
+			}
+		}
+		if (!$startTime) {
+			$startTime = time() - 86400 - (time() - 86400) % $intervalValueLast;
 		}
 		$types = CM_Mysql::exec('SELECT DISTINCT `actionType`, `modelType` FROM ' . TBL_CM_ACTION);
-		$startTime = (time() - 86400) - (time() - 86400) % max($intervalValues);
 		while ($type = $types->fetchAssoc()) {
 			$current = $startTime;
 			$actionType = (int) $type['actionType'];
