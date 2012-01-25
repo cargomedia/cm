@@ -16,9 +16,11 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
 
 			$themePath = $this->getRender()->getThemeDir(true);
-			foreach (CM_Util::rglob('*.css', $themePath . 'css/') as $path) {
-				$file = new CM_File($path);
-				$content .= new CM_Css($file->read(), $this->getRender(), $presets);
+			foreach ($this->getRender()->getSite()->getThemes() as $theme) {
+				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $path) {
+					$file = new CM_File($path);
+					$content .= new CM_Css($file->read(), $this->getRender(), $presets);
+				}
 			}
 
 			$components = array();
@@ -30,17 +32,19 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				if (!preg_match('/^(\w+)_Component_(.+)$/', $class['name'], $matches)) {
 					throw new CM_Exception("Cannot detect namespace from component's class-name");
 				}
-				$basePath = $this->getRender()->getThemeDir(true, null, $matches[1]);
-				foreach (CM_Util::rglob('*.style', $basePath . 'Component/' . $matches[2]) as $path) {
-					if (preg_match('~' . $basePath . '(Component/(.+?)/(.+)\.style)~', $path, $match)) {
-						$prefix = '.' . $class['name'];
+				foreach ($this->getRender()->getSite()->getThemes() as $theme) {
+					$basePath = $this->getRender()->getThemeDir(true, $theme, $matches[1]);
+					foreach (CM_Util::rglob('*.style', $basePath . 'Component/' . $matches[2]) as $path) {
+						if (preg_match('~' . $basePath . '(Component/(.+?)/(.+)\.style)~', $path, $match)) {
+							$prefix = '.' . $class['name'];
 
-						if ($match[3] != 'default' && strpos($match[3], '/') === false) {
-							$prefix .= '.' . $match[3];
+							if ($match[3] != 'default' && strpos($match[3], '/') === false) {
+								$prefix .= '.' . $match[3];
+							}
+
+							$file = new CM_File($path);
+							$content .= new CM_Css($file->read(), $this->getRender(), $presets, $prefix);
 						}
-
-						$file = new CM_File($path);
-						$content .= new CM_Css($file->read(), $this->getRender(), $presets, $prefix);
 					}
 				}
 			}
