@@ -241,6 +241,23 @@ ajaxCall: function(apply_func, params, callbacks, cache) {
 	return xhr;
 },
 
+/**
+ * @return jqXHR
+ */
+ajaxCallModal: function(apply_func, params, callbacks) {
+	callbacks = callbacks || {};
+	var handler = this;
+	var callbackComplete = callbacks.complete;
+	callbacks.complete = function() {
+		handler.enable();
+		if (callbackComplete) {
+			return callbackComplete(handler);
+		}
+	};
+	this.disable();
+	this.ajaxCall(apply_func, params, callbacks);
+},
+
 load: function(className, params, options) {
 	var handler = this;
 	options = options || {};
