@@ -156,7 +156,7 @@ EOD;
 		$actual = new CM_Css($css, $this->_getRender(), new CM_Css($presets, $this->_getRender()), '.cmp-test');
 		$this->assertEquals($expected, $actual->__toString());
 	}
-	
+
 	public function testAttribute() {
 		$css = <<<'EOD'
 input[attr="val"] {
@@ -186,6 +186,43 @@ EOD;
 
 EOD;
 		$actual = new CM_Css($css, $this->_getRender(), null, '.prefix');
+		$this->assertEquals($expected, $actual->__toString());
+	}
+
+	public function testLinearGradient() {
+		$css = <<<'EOD'
+.foo {
+	background-image: linear-gradient(left, #000000, #ffffff);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#000000,endColorstr=#ffffff);
+	background-image: linear-gradient(left,#000000,#ffffff);
+	background-image: -moz-linear-gradient(left,#000000,#ffffff);
+	background-image: -webkit-linear-gradient(left,#000000,#ffffff);
+	background-image: -o-linear-gradient(left,#000000,#ffffff);
+	background-image: -webkit-gradient(linear,left top,right top,from(#000000),to(#ffffff));
+}
+
+EOD;
+		$actual = new CM_Css($css, $this->_getRender());
+		$this->assertEquals($expected, $actual->__toString());
+	}
+
+	public function testLinearGradientNoMatch() {
+		$css = <<<'EOD'
+.foo {
+	background-image: -foo-linear-gradient(left, #000000, #ffffff);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+	background-image: -foo-linear-gradient(left, #000000, #ffffff);
+}
+
+EOD;
+		$actual = new CM_Css($css, $this->_getRender());
 		$this->assertEquals($expected, $actual->__toString());
 	}
 

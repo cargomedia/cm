@@ -119,7 +119,7 @@ class CM_Css {
 						$imageURL = $this->_render->getUrlImg($filename);
 						$value = str_replace($imgMatch, "url($imageURL)", $value);
 					}
-					if (preg_match('#linear-gradient\((?<point>.+?),\s*(?<stop1>.+?),\s*(?<stop2>.+?)\)#i', $value, $match)) {
+					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<stop1>.+?),\s*(?<stop2>.+?)\)#i', $value, $match)) {
 						$value = array();
 						$value[] = 'linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
 						$value[] = '-moz-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
