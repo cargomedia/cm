@@ -228,7 +228,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static function aggregate(array $intervals = null) {
 		if (is_null($intervals)) {
-			$intervals = array(array('limit' => 86400, 'interval' => null), array('limit' => 7 * 86400, 'interval' => 3600),	array('limit' => null, 'interval' => 86400));
+			$intervals = array(array('limit' => 86400, 'interval' => null), array('limit' => 7 * 86400, 'interval' => 3600),
+				array('limit' => null, 'interval' => 86400));
 		}
 		$intervalValueLast = 1;
 		foreach ($intervals as $i => &$intervalRef) {
@@ -237,10 +238,11 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 					throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
 				}
 				$intervalValueLast = $intervalRef['interval'];
-				if ($i == count($intervals)-1) {
+				if ($i == count($intervals) - 1) {
 					$startTime = time() - time() % $intervalRef['interval'];
 					if (is_null($intervalRef['limit'])) {
-						$intervalRef['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION , '`actionLimitType` IS NOT NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL')->fetchOne();
+						$intervalRef['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' .
+								TBL_CM_ACTION, '`actionLimitType` IS NOT NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL')->fetchOne();
 					}
 				}
 			}
@@ -267,8 +269,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$upperBound = (int) $upperBound;
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound . ' AND `actionLimitType` IS NULL';
-		$result = CM_Mysql::exec(
-			"SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `actionType`, `modelType`");
+		$result = CM_Mysql::exec("SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where .
+				" GROUP BY `actionType`, `modelType`");
 		$insert = array();
 		while ($row = $result->fetchAssoc()) {
 			if ($row['count'] >= 1) {
