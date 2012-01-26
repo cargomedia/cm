@@ -51,7 +51,7 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadPrepareJs(
 			'cm.components["' . $component->auto_id . '"]._callbacks=cm.components["' . $this->_component['id'] . '"]._callbacks;');
 
-		$this->getRender()->getJs()->onloadPrepareJs($this->annulCOMNode($this->_component));
+		$this->getRender()->getJs()->onloadPrepareJs('cm.components["' . $this->_component['id'] . '"].remove(true);');
 		$this->getRender()->getJs()->onloadReadyJs('cm.components["' . $component->auto_id . '"]._ready();');
 		$this->_component['id'] = $component->auto_id;
 
@@ -97,30 +97,5 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 	public function redirect($path, array $params = null) {
 		$url = CM_Page_Abstract::link($path, $params);
 		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
-	}
-
-	/**
-	 * @param array $comNode
-	 * @return string
-	 */
-	public function annulCOMNode(array $comNode) {
-		$js = '';
-		if ($comNode['parentId']) {
-			$js .= 'var children = cm.components["' . $comNode['parentId'] . '"].getChildren();';
-			$js .= 'for (var i = 0, child; child = children[i]; i++) {';
-			$js .= '	if (child.getAutoId() == "' . $comNode['id'] . '") {';
-			$js .= '  children.splice(i,1);';
-			$js .= '	}';
-			$js .= '}' . PHP_EOL;
-		}
-		foreach ($comNode['children'] as $child) {
-			$js .= $this->annulCOMNode($child) . PHP_EOL;
-		}
-		foreach ($comNode['forms'] as $form) {
-			$js .= 'delete cm.forms["' . $form['id'] . '"];' . PHP_EOL;
-		}
-		$js .= 'cm.components["' . $comNode['id'] . '"].trigger("destruct");';
-		$js .= 'delete cm.components["' . $comNode['id'] . '"]' . PHP_EOL;
-		return $js;
 	}
 }

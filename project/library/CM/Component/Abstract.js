@@ -276,6 +276,32 @@ reload: function(params) {
 	return this.ajaxCall('ajax_reload', params, options);
 },
 
+remove: function(skipDomRemoval) {
+	if (this.getParent()) {
+		var siblings = this.getParent().getChildren();
+		for (var i = 0, sibling; sibling = siblings[i]; i++) {
+			if (sibling.getAutoId() == this.getAutoId()) {
+				siblings.splice(i, 1);
+			}
+		}
+	}
+
+	_.each(this.getChildren(), function(child) {
+		child.remove();
+	});
+
+	_.each(this.getForms(), function(form) {
+		delete cm.forms[form.getAutoId()];
+	});
+	this.trigger("destruct");
+	delete cm.components[this.getAutoId()];
+
+
+	if (!skipDomRemoval) {
+		this.$().remove();
+	}
+},
+
 /**
  * @param string key
  * @param mixed key

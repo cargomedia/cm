@@ -4,6 +4,7 @@ pingCount: 0,
 
 events: {
 	"click .reload": "reloadChinese",
+	"click .remove": "myRemove",
 	"click .popout": "popOut",
 	"click .popin": "popIn",
 	"click .load": "loadExample",
@@ -32,6 +33,10 @@ ready: function() {
 
 reloadChinese: function() {
 	this.reload({foo:'some chinese.. 百度一下，你就知道 繁體字!'});
+},
+
+myRemove: function() {
+	this.remove();
 },
 
 loadExample: function() {
