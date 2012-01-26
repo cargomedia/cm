@@ -100,6 +100,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	public function enableCache() {
 		header_remove('Cache-Control');
 		header_remove('Pragma');
+		header_remove('Expires');
 	}
 
 	/**
