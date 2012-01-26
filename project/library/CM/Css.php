@@ -1,10 +1,11 @@
 <?php
 
 class CM_Css {
-	const SELECTORS_REGEX = '[*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~\(\)]+';
-	const PROPERTY_REGEX = '[a-z\-]+';
-	const VALUE_REGEX = '[^;]+';
-	const SPLIT_SELECTORS_REGEX = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
+	const REGEX_SELECTORS = '[*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~\(\)]+';
+	const REGEX_PROPERTY = '[a-z\-]+';
+	const REGEX_VALUE = '[^;]+';
+	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
+	const REGEX_COLOR = 'rgba?\(\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])(?:\s*,\s*(0|1|0?\.\d+))?\s*\)';
 	private $_data = array();
 
 	/**
@@ -59,10 +60,10 @@ class CM_Css {
 	private function _parseCssString($css, array $presets = null, $prefix = null) {
 		$css = preg_replace('~/\*.+\*/~sU', PHP_EOL, $css);
 
-		preg_match_all('~(' . self::SELECTORS_REGEX . ')?\s*\{([^\}]+)\}~isU', $css, $matches, PREG_SET_ORDER);
+		preg_match_all('~(' . self::REGEX_SELECTORS . ')?\s*\{([^\}]+)\}~isU', $css, $matches, PREG_SET_ORDER);
 		$output = array();
 		foreach ($matches as $match) {
-			preg_match(self::SPLIT_SELECTORS_REGEX, $match[1], $splitMatch);
+			preg_match(self::REGEX_SPLIT_SELECTORS, $match[1], $splitMatch);
 			$presetNames = preg_split('~\s*,\s*~', $splitMatch[2], -1, PREG_SPLIT_NO_EMPTY);
 			$selectors = preg_split('~\s*,\s*~', $splitMatch[1], -1, PREG_SPLIT_NO_EMPTY);
 			$rules = $this->_parseRules($match[2], $presets, $presetNames);
@@ -107,7 +108,7 @@ class CM_Css {
 			$properties = array_merge($properties, $presets[$selector]);
 		}
 
-		preg_match_all('~\b(' . self::PROPERTY_REGEX . ')\s*:\s*(' . self::VALUE_REGEX . ');?\s*~i', $cssBlock, $rules, PREG_SET_ORDER);
+		preg_match_all('~\b(' . self::REGEX_PROPERTY . ')\s*:\s*(' . self::REGEX_VALUE . ');?\s*~i', $cssBlock, $rules, PREG_SET_ORDER);
 		foreach ($rules as $rule) {
 			$property = strtolower($rule[1]);
 			$value = $rule[2];
@@ -119,30 +120,35 @@ class CM_Css {
 						$imageURL = $this->_render->getUrlImg($filename);
 						$value = str_replace($imgMatch, "url($imageURL)", $value);
 					}
-					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<stop1>.+?),\s*(?<stop2>.+?)\)#i', $value, $match)) {
+					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>.+?),\s*(?<color2>.+?)\)$#i', $value, $match)) {
+						$point = $match['point'];
+						$color1 = $this->_getColor($match['color1']);
+						$color1Hex = $this->_getColor($match['color1'], true);
+						$color2 = $this->_getColor($match['color2']);
+						$color2Hex = $this->_getColor($match['color2'], true);
 						$value = array();
-						$value[] = 'linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
-						$value[] = '-moz-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
-						$value[] = '-webkit-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
-						$value[] = '-o-linear-gradient(' . $match['point'] . ',' . $match['stop1'] . ',' . $match['stop2'] . ')';
+						$value[] = 'linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
+						$value[] = '-moz-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
+						$value[] = '-webkit-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
+						$value[] = '-o-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
 
-						if ($match['point'] == 'top' || $match['point'] == 'left') {
-							if ($match['point'] == 'left') {
+						if ($point == 'top' || $point == 'left') {
+							if ($point == 'left') {
 								$points = 'left top,right top';
 							}
-							if ($match['point'] == 'top') {
+							if ($point == 'top') {
 								$points = 'left top,left bottom';
 							}
-							$value[] = '-webkit-gradient(linear,' . $points . ',from(' . $match['stop1'] . '),to(' . $match['stop2'] . '))';
+							$value[] = '-webkit-gradient(linear,' . $points . ',from(' . $color1 . '),to(' . $color2 . '))';
 						}
 
 						// MS Filter: http://msdn.microsoft.com/en-us/library/ms532997(VS.85,loband).aspx
 						$filterType = 0;
-						if ($match['point'] == 'left') {
+						if ($point == 'left') {
 							$filterType = 1;
 						}
 						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
-								'GradientType=' . $filterType . ',startColorstr=' . $match['stop1'] . ',endColorstr=' . $match['stop2'], $properties);
+								'GradientType=' . $filterType . ',startColorstr=' . $color1Hex . ',endColorstr=' . $color2Hex, $properties);
 					}
 					break;
 				case 'border-radius':
@@ -182,8 +188,8 @@ class CM_Css {
 	/**
 	 * Return a MS-filter property
 	 *
-	 * @param string     $name	   Filter-name
-	 * @param string     $value	  Filter-value
+	 * @param string	 $name	   Filter-name
+	 * @param string	 $value	  Filter-value
 	 * @param array|null $properties Existing properties to use
 	 * @return string
 	 */
@@ -197,5 +203,34 @@ class CM_Css {
 			$result = $name . '(' . $value . ')';
 		}
 		return $result;
+	}
+
+	/**
+	 * @param string	$colorStr
+	 * @param bool|null $forceHex
+	 * @return string
+	 */
+	private function _getColor($colorStr, $forceHex = null) {
+		$regexDec = '/^rgba?\(\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/';
+		$regexHex = '/^#([0-9a-zA-Z]{2})([0-9a-zA-Z]{2})([0-9a-zA-Z]{2})$/';
+		$red = $green = $blue = $alpha = null;
+		if (preg_match($regexHex, $colorStr, $match)) {
+			$red = hexdec($match[1]);
+			$green = hexdec($match[2]);
+			$blue = hexdec($match[3]);
+			$alpha = 1;
+		} elseif (preg_match($regexDec, $colorStr, $match)) {
+			$red = $match[1];
+			$green = $match[2];
+			$blue = $match[3];
+			$alpha = isset($match[4]) ? $match[4] : 1;
+		} else {
+			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
+		}
+		if ($forceHex || $alpha == 1) {
+			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
+					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
+		}
+		return 'rgba(' . $red . ',' . $green . ',' . $blue . ', ' . $alpha . ')';
 	}
 }
