@@ -5,7 +5,7 @@ class CM_Css {
 	const REGEX_PROPERTY = '[a-z\-]+';
 	const REGEX_VALUE = '[^;]+';
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
-	const REGEX_COLOR = 'rgba?\(\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])(?:\s*,\s*(0|1|0?\.\d+))?\s*\)';
+	const REGEX_COLOR = '(?:(?:\#(?<hex1>\w{2})(?<hex2>\w{2})(?<hex3>\w{2}))|(?:rgba?\((?<dec1>\d+),\s*(?<dec2>\d+),\s*(?<dec3>\d+)(,\s*(?<alpha>[\d\.]+))?\)))';
 	private $_data = array();
 
 	/**
@@ -120,7 +120,8 @@ class CM_Css {
 						$imageURL = $this->_render->getUrlImg($filename);
 						$value = str_replace($imgMatch, "url($imageURL)", $value);
 					}
-					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>.+?),\s*(?<color2>.+?)\)$#i', $value, $match)) {
+					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>' . self::REGEX_COLOR . '),\s*(?<color2>.+?)\)$#i', $value, $match)
+					) {
 						$point = $match['point'];
 						$color1 = $this->_getColor($match['color1']);
 						$color1Hex = $this->_getColor($match['color1'], true);
@@ -211,22 +212,19 @@ class CM_Css {
 	 * @return string
 	 */
 	private function _getColor($colorStr, $forceHex = null) {
-		$regexDec = '/^rgba?\(\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\s*,\s*(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/';
-		$regexHex = '/^#([0-9a-zA-Z]{2})([0-9a-zA-Z]{2})([0-9a-zA-Z]{2})$/';
-		$red = $green = $blue = $alpha = null;
-		if (preg_match($regexHex, $colorStr, $match)) {
-			$red = hexdec($match[1]);
-			$green = hexdec($match[2]);
-			$blue = hexdec($match[3]);
-			$alpha = 1;
-		} elseif (preg_match($regexDec, $colorStr, $match)) {
-			$red = $match[1];
-			$green = $match[2];
-			$blue = $match[3];
-			$alpha = isset($match[4]) ? $match[4] : 1;
-		} else {
+		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
+		if (strlen($match['hex1']) && strlen($match['hex2']) && strlen($match['hex3'])) {
+			$red = hexdec($match['hex1']);
+			$green = hexdec($match['hex2']);
+			$blue = hexdec($match['hex3']);
+		} else {
+			$red = $match['dec1'];
+			$green = $match['dec2'];
+			$blue = $match['dec3'];
+		}
+		$alpha = isset($match['alpha']) ? (float) $match['alpha'] : 1;
 		if ($forceHex || $alpha == 1) {
 			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
 					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
