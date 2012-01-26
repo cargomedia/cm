@@ -212,7 +212,6 @@ class CM_Render {
 		if (is_null($full)) {
 			$full = false;
 		}
-		$bla =$this->getSite()->getThemes();
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
