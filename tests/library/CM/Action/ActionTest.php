@@ -115,7 +115,7 @@ class CM_Action_ActionTest extends TestCase {
 				array(null, 1, 1, 2, null, $time-23, 1),
 				array(null, 1, 1, 2, null, $time-24, 4),
 		));
-		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 20), array('interval' =>10, 'limit' => 30), array('interval' => 30, 'limit' => $time - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne())));
+		CM_Action_Abstract::aggregate(array(array('interval' => null, 'limit' => 86400), array('interval' => 5, 'limit' => 86420), array('interval' =>10, 'limit' => 86430), array('interval' => 30, 'limit' => time() - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne())));
 		$this->assertEquals(19, CM_Mysql::count(TBL_CM_ACTION));
 	}
 
@@ -148,7 +148,7 @@ class CM_Action_ActionTest extends TestCase {
 				array(1, null, 1, 2, null, 4, 100),
 				array(1, null, 1, 1, null, 5, 100),
 		));
-		CM_Action_Abstract::collapse(1, 4, 1, 1);
+		CM_Action_Abstract::collapse(1, 4);
 		$this->assertEquals(7, CM_Mysql::count(TBL_CM_ACTION));
 		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'createStamp' => 2, 'count' => 12));
 

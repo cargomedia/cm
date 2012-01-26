@@ -228,41 +228,30 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static function aggregate(array $intervals = null) {
 		if (is_null($intervals)) {
-			$intervals = array(array('limit' => 7 * 86400, 'interval' => 3600), array('limit' => null, 'interval' => 86400));
+			$intervals = array(array('limit' => 86400, 'interval' => null), array('limit' => 7 * 86400, 'interval' => 3600),	array('limit' => null, 'interval' => 86400));
 		}
 		$intervalValueLast = 1;
 		foreach ($intervals as $i => &$intervalRef) {
-			if ($intervalRef['interval'] % $intervalValueLast !== 0) {
-				throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
-			}
-			$intervalValueLast = $intervalRef['interval'];
-			if ($i == count($intervals) - 1) {
-				$startTime = time() - 86400 - (time() - 86400) % $intervalRef['interval'];
-				if (is_null($intervalRef['limit'])) {
-					$interval['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM TBL_CM_ACTION')->fetchOne();
+			if (!empty($intervalRef['interval'])) {
+				if ($intervalRef['interval'] % $intervalValueLast !== 0) {
+					throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
+				}
+				$intervalValueLast = $intervalRef['interval'];
+				if ($i == count($intervals)-1) {
+					$startTime = time() - time() % $intervalRef['interval'];
+					if (is_null($intervalRef['limit'])) {
+						$intervalRef['limit'] = $startTime - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION , '`actionLimitType` IS NOT NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL')->fetchOne();
+					}
 				}
 			}
-
 		}
-		$types = CM_Mysql::exec('SELECT DISTINCT `actionType`, `modelType` FROM TBL_CM_ACTION');
-		while ($type = $types->fetchAssoc()) {
-			$current = $startTime;
-			$actionType = (int) $type['actionType'];
-			$modelType = (int) $type['modelType'];
-			$where = '`actionType` = ' . $actionType . ' AND `modelType` = ' . $modelType . ' AND `actionLimitType` IS NULL';
-			foreach ($intervals as $interval) {
+		$current = $startTime;
+		foreach ($intervals as $interval) {
+			if (empty($interval['interval'])) {
+				$current = $startTime - $interval['limit'];
+			} else {
 				while (($startTime - $current) < $interval['limit']) {
-					$result = CM_Mysql::select(TBL_CM_ACTION, array('actorId', 'ip'),
-							$where . ' AND `createStamp` > ' . ($current - $interval['interval']) . ' AND `createStamp` <= ' . ($current));
-					if ($result->numRows() >= 1) {
-						if ($result->numRows() == 1) {
-							$row = $result->fetchAssoc();
-							if (is_null($row['actorId']) && is_null($row['ip'])) {
-								continue; // Interval is already collapsed
-							}
-						}
-						self::collapse($current - $interval['interval'], $current, $actionType, $modelType);
-					}
+					self::collapse($current - $interval['interval'], $current);
 					$current -= $interval['interval'];
 				}
 			}
@@ -272,20 +261,19 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @param int $lowerBound
 	 * @param int $upperBound
-	 * @param int $actionType
-	 * @param int $modelType
 	 */
-	public static function collapse($lowerBound, $upperBound, $actionType, $modelType) {
+	public static function collapse($lowerBound, $upperBound) {
 		$lowerBound = (int) $lowerBound;
 		$upperBound = (int) $upperBound;
-		$actionType = (int) $actionType;
-		$modelType = (int) $modelType;
-		$where = '`actionType` = ' . $actionType . ' AND `modelType` = ' . $modelType . ' AND `createStamp` > ' . $lowerBound .
-				' AND `createStamp` <= ' . $upperBound . ' AND `actionLimitType` IS NULL';
-		$count = CM_Mysql::exec('SELECT SUM(`count`) FROM TBL_CM_ACTION WHERE ' . $where)->fetchOne();
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
-		CM_Mysql::delete(TBL_CM_ACTION, $where);
-		CM_Mysql::insert(TBL_CM_ACTION, array('actionType' => $actionType, 'modelType' => $modelType, 'createStamp' => $timeStamp,
-			'count' => $count));
+		$where = '`createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound . ' AND `actionLimitType` IS NULL';
+		$result = CM_Mysql::exec(
+			"SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `actionType`, `modelType`");
+		while ($row = $result->fetchAssoc()) {
+			if ($row['count'] > 1) {
+				CM_Mysql::delete(TBL_CM_ACTION, $where . ' AND `actionType` = ' . $row['actionType'] . ' AND `modelType` = ' . $row['modelType']);
+				CM_Mysql::insert(TBL_CM_ACTION, array('actionType' => $row['actionType'], 'modelType' => $row['modelType'], 'createStamp' => $timeStamp, 'count' => $row['sum']));
+			}
+		}
 	}
 }
