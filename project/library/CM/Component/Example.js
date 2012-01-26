@@ -50,7 +50,6 @@ loadExampleInline: function() {
 			this.$().hide()
 				.insertBefore(handler.$())
 				.slideDown(600);
-			this._ready();
 		}
 	});
 },

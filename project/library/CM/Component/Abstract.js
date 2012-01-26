@@ -264,14 +264,13 @@ load: function(className, params, options) {
 	params = params || {};
 	params.component = className;
 	var successPopOut = options.successPopOut || function() {};
-	var callback = options.success || function() {
-		this.popOut();
-		this._ready();
-		successPopOut.call(this);
-	};
+	var successPre = options.success ? options.success :  function() { this.popOut(); };
+	var successPost = options.success ? function() {} : function() { successPopOut.call(this); }
 	options.success = function(componentId) {
 		var handlerNew = cm.components[componentId];
-		callback.call(handlerNew);
+		successPre.call(handlerNew);
+		handlerNew._ready();
+		successPost.call(handlerNew);
 	};
 	options.complete = function() {
 		handler.enable();
