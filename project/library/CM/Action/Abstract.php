@@ -269,11 +269,15 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$where = '`createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound . ' AND `actionLimitType` IS NULL';
 		$result = CM_Mysql::exec(
 			"SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `actionType`, `modelType`");
+		$insert = array();
 		while ($row = $result->fetchAssoc()) {
-			if ($row['count'] > 1) {
-				CM_Mysql::delete(TBL_CM_ACTION, $where . ' AND `actionType` = ' . $row['actionType'] . ' AND `modelType` = ' . $row['modelType']);
-				CM_Mysql::insert(TBL_CM_ACTION, array('actionType' => $row['actionType'], 'modelType' => $row['modelType'], 'createStamp' => $timeStamp, 'count' => $row['sum']));
+			if ($row['count'] >= 1) {
+				$insert[] = array((int) $row['actionType'], (int) $row['modelType'], $timeStamp, (int) $row['sum']);
 			}
+		}
+		if (!empty($insert)) {
+			CM_Mysql::delete(TBL_CM_ACTION, $where);
+			CM_Mysql::insert(TBL_CM_ACTION, array('actionType', 'modelType', 'createStamp', 'count'), $insert);
 		}
 	}
 }
