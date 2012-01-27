@@ -29,7 +29,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param int|null            $siteId
+	 * @param int|null			$siteId
 	 */
 	public function __construct(CM_Request_Abstract $request, $siteId = null) {
 		$this->_request = $request;
