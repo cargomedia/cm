@@ -9,12 +9,14 @@ CREATE TABLE `cm_action` (
   `actionLimitType` tinyint(3) unsigned DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `count` int(10) unsigned DEFAULT '1',
+  `interval` int(10) unsigned DEFAULT '1' NOT NULL,
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
   KEY `action` (`actionType`),
   KEY `createStamp` (`createStamp`),
   KEY `modelType` (`modelType`),
-  KEY `type` (`actionLimitType`)
+  KEY `actionLimitType` (`actionLimitType`),
+  KEY `interval` (`interval`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_actionLimit`;

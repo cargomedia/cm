@@ -228,35 +228,30 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static function aggregate(array $intervals = null) {
 		if (is_null($intervals)) {
-			$intervals = array(array('limit' => 86400, 'interval' => null), array('limit' => 7 * 86400, 'interval' => 3600),
-				array('limit' => null, 'interval' => 86400));
+			$intervals = array(array('limit' => 86400, 'interval' => 3600), array('limit' => 7 * 86400, 'interval' => 86400));
 		}
-		$timeMin = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' .
-				TBL_CM_ACTION . ' WHERE `actionLimitType` IS NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL)')->fetchOne();
 		$intervalValueLast = 1;
-		foreach ($intervals as $i => &$intervalRef) {
+		foreach ($intervals as &$intervalRef) {
 			if (!empty($intervalRef['interval'])) {
 				if ($intervalRef['interval'] % $intervalValueLast !== 0) {
 					throw new CM_Exception_Invalid('Interval `' . $intervalRef['interval'] . '` is not a multiple of `' . $intervalValueLast . '`.');
 				}
 				$intervalValueLast = $intervalRef['interval'];
-				if ($i == count($intervals) - 1) {
-					$timeMax = time() - time() % $intervalRef['interval'];
-					if (is_null($intervalRef['limit'])) {
-						$intervalRef['limit'] = $timeMax - $timeMin;
-					}
-				}
 			}
 		}
-		$timeCurrent = $timeMax;
-		foreach ($intervals as $interval) {
-			if (empty($interval['interval'])) {
-				$timeCurrent = $timeMax - $interval['limit'];
-			} else {
-				while (($timeMax - $timeCurrent) < $interval['limit'] && $timeCurrent > $timeMin) {
-					self::collapse($timeCurrent - $interval['interval'], $timeCurrent);
-					$timeCurrent -= $interval['interval'];
-				}
+
+		$time = time();
+		foreach (array_reverse($intervals) as $interval) {
+			$timeMin = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION .
+					' WHERE `actionLimitType` IS NULL AND `interval` < ?', $interval['interval'])->fetchOne();
+			if (false === $timeMin) {
+				return;
+			}
+			$timeMin -= $timeMin % $interval['interval'];
+			$timeMax = $time - $interval['limit'];
+
+			for ($timeCurrent = $timeMin; ($timeCurrent + $interval['interval']) <= $timeMax; $timeCurrent += $interval['interval']) {
+				self::collapse($timeCurrent, $timeCurrent + $interval['interval']);
 			}
 		}
 	}
@@ -269,18 +264,18 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$lowerBound = (int) $lowerBound;
 		$upperBound = (int) $upperBound;
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
-		$where = '`createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound . ' AND `actionLimitType` IS NULL';
+		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
 		$result = CM_Mysql::exec("SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where .
 				" GROUP BY `actionType`, `modelType`");
 		$insert = array();
 		while ($row = $result->fetchAssoc()) {
 			if ($row['count'] >= 1) {
-				$insert[] = array((int) $row['actionType'], (int) $row['modelType'], $timeStamp, (int) $row['sum']);
+				$insert[] = array((int) $row['actionType'], (int) $row['modelType'], $timeStamp, (int) $row['sum'], ($upperBound - $lowerBound));
 			}
 		}
 		if (!empty($insert)) {
 			CM_Mysql::delete(TBL_CM_ACTION, $where);
-			CM_Mysql::insert(TBL_CM_ACTION, array('actionType', 'modelType', 'createStamp', 'count'), $insert);
+			CM_Mysql::insert(TBL_CM_ACTION, array('actionType', 'modelType', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
 }

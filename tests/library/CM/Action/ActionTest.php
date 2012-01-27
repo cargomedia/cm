@@ -66,8 +66,9 @@ class CM_Action_ActionTest extends TestCase {
 	}
 
 	public function testAggregate() {
+		TH::timeForward(-(time() % 30)); // Make sure time() is a multiple of 30
+
 		$time = time() - 86400;
-		$time = $time - $time % 30;
 		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'actionType', 'modelType', 'actionLimitType', 'createStamp', 'count'),
 			array(
 				array(1, null, 1, 1, null, time()-10000, 1),
@@ -100,12 +101,12 @@ class CM_Action_ActionTest extends TestCase {
 				array(null, 1, 2, 1, null, $time-14, 1),
 				array(null, 1, 2, 1, null, $time-15, 1),
 				array(null, 1, 2, 1, null, $time-16, 1),
+				array(null, 1, 2, 1, 1, $time-6, 1),
 				array(null, 1, 2, 1, 1, $time-6, 2),
-				array(null, 1, 2, 1, 1, $time-6, 2),
-				array(null, 1, 2, 1, 2, $time-6, 2),
-				array(null, 1, 2, 1, 2, $time-7, 2),
-				array(null, 1, 2, 1, 2, $time-1, 1),
-				array(null, 1, 2, 1, 2, $time-1, 1),
+				array(null, 1, 2, 1, 2, $time-6, 3),
+				array(null, 1, 2, 1, 2, $time-7, 4),
+				array(null, 1, 2, 1, 2, $time-1, 5),
+				array(null, 1, 2, 1, 2, $time-1, 6),
 				array(null, 1, 1, 2, null, $time-17, 1),
 				array(null, 1, 1, 2, null, $time-18, 1),
 				array(null, 1, 1, 2, null, $time-19, 1),
@@ -115,8 +116,27 @@ class CM_Action_ActionTest extends TestCase {
 				array(null, 1, 1, 2, null, $time-23, 1),
 				array(null, 1, 1, 2, null, $time-24, 4),
 		));
-		CM_Action_Abstract::aggregate(array(array('interval' => null, 'limit' => 86400), array('interval' => 5, 'limit' => 86420), array('interval' =>10, 'limit' => 86430), array('interval' => 30, 'limit' => time() - CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION)->fetchOne())));
-		$this->assertEquals(19, CM_Mysql::count(TBL_CM_ACTION));
+		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 86400), array('interval' =>10, 'limit' => 86400+20), array('interval' => 30, 'limit' => 86400+30)));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 1, 'count' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 8));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 3));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 10, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 30, 'count' => 12));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 5));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 1, 'actionLimitType' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 2, 'actionLimitType' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 3, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 4, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 5, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 6, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 2, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 2, 'interval' => 10, 'count' => 7));
+
+		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
 	}
 
 	public function testAggregateInvalidIntervals() {
@@ -149,9 +169,8 @@ class CM_Action_ActionTest extends TestCase {
 				array(1, null, 1, 1, null, 5, 100),
 		));
 		CM_Action_Abstract::collapse(1, 4);
-		$this->assertEquals(7, CM_Mysql::count(TBL_CM_ACTION));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'createStamp' => 2, 'count' => 12));
-
+		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
+		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'createStamp' => 2, 'count' => 5));
 	}
 }
 
