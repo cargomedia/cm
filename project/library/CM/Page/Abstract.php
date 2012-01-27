@@ -2,7 +2,7 @@
 
 abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 
-	protected $_title = '';
+	protected $_title = null;
 	protected $_description = '';
 	protected $_keywords = '';
 	protected $_params;
@@ -151,7 +151,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	/**
 	 * Returns the translated title
 	 *
-	 * @return string Page title
+	 * @return string|null
 	 */
 	public final function getTitle() {
 		return $this->_title;
@@ -162,7 +162,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 * @return CM_Page_Abstract
 	 */
 	public final function setTitle($title) {
-		$this->_title = $title;
+		$this->_title = (string) $title;
 		return $this;
 	}
 
