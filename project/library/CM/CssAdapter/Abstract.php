@@ -13,7 +13,7 @@ abstract class CM_CssAdapter_Abstract {
 	protected $_presets = null;
 
 	/**
-	 * @var string
+	 * @var string|null
 	 */
 	protected $_prefix = null;
 
@@ -29,9 +29,6 @@ abstract class CM_CssAdapter_Abstract {
 	 * @param string|null	 $prefix
 	 */
 	public function __construct($css, CM_Render $render, CM_Css $presets = null, $prefix = null) {
-		if ($presets) {
-			$presets = $presets->getData();
-		}
 		$this->_render = $render;
 		$this->_presets = $presets;
 		$this->_prefix = $prefix;
@@ -39,7 +36,7 @@ abstract class CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
-	abstract public function parse();
+	abstract public function getRules();
 }

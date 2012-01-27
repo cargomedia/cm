@@ -1,11 +1,10 @@
 <?php
 
 class CM_Css {
-
 	/**
-	 * @var CM_Render
+	 * @var CM_CssAdapter_Abstract
 	 */
-	private $_render = null;
+	private $_adapter;
 
 	/**
 	 * @param string		  $css
@@ -20,15 +19,24 @@ class CM_Css {
 	/**
 	 * @return array
 	 */
-	public function getData() {
-		$this->_adapter->parse();
-		return $this->_adapter->getData();
+	public function getRules() {
+		return $this->_adapter->getRules();
 	}
 
 	/**
 	 * @return string
 	 */
-	public function __toString(){
-		return $this->_adapter->parse();
+	public function __toString() {
+		$output = '';
+		foreach ($this->getRules() as $selector => $properies) {
+			$output .= $selector . ' {' . PHP_EOL;
+			foreach ($properies as $property => $values) {
+				foreach ((array) $values as $value) {
+					$output .= "\t" . $property . ': ' . $value . ';' . PHP_EOL;
+				}
+			}
+			$output .= '}' . PHP_EOL;
+		}
+		return $output;
 	}
 }
