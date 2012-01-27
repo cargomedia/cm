@@ -232,7 +232,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				array('limit' => null, 'interval' => 86400));
 		}
 		$timeMin = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' .
-				TBL_CM_ACTION, '`actionLimitType` IS NOT NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL')->fetchOne();
+				TBL_CM_ACTION . ' WHERE `actionLimitType` IS NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL)')->fetchOne();
 		$intervalValueLast = 1;
 		foreach ($intervals as $i => &$intervalRef) {
 			if (!empty($intervalRef['interval'])) {
