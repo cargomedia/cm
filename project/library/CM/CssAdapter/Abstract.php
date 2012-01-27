@@ -1,6 +1,11 @@
 <?php
 
-class CM_Css {
+abstract class CM_CssAdapter_Abstract {
+
+	/**
+	 * @var array
+	 */
+	private $_data = array();
 
 	/**
 	 * @var CM_Render
@@ -14,21 +19,18 @@ class CM_Css {
 	 * @param string|null	 $prefix
 	 */
 	public function __construct($css, CM_Render $render, CM_Css $presets = null, $prefix = null) {
-		$this->_adapter = new CM_CssAdapter_CM($css, $render, $presets, $prefix);
+		if ($presets) {
+			$presets = $presets->getData();
+		}
+		$this->_render = $render;
+		$this->_presets = $presets;
+		$this->_prefix = $prefix;
+		$this->_css = $css;
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getData() {
-		$this->_adapter->parse();
-		return $this->_adapter->getData();
-	}
-
-	/**
+	 * @param string $css
 	 * @return string
 	 */
-	public function __toString(){
-		return $this->_adapter->parse();
-	}
+	abstract public function parse();
 }
