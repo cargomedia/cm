@@ -231,7 +231,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$intervals = array(array('limit' => 86400, 'interval' => null), array('limit' => 7 * 86400, 'interval' => 3600),
 				array('limit' => null, 'interval' => 86400));
 		}
-		$limit = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' .
+		$timeMin = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' .
 				TBL_CM_ACTION, '`actionLimitType` IS NOT NULL AND (`actorId` IS NOT NULL OR `ip` IS NOT NULL')->fetchOne();
 		$intervalValueLast = 1;
 		foreach ($intervals as $i => &$intervalRef) {
@@ -241,21 +241,21 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				}
 				$intervalValueLast = $intervalRef['interval'];
 				if ($i == count($intervals) - 1) {
-					$startTime = time() - time() % $intervalRef['interval'];
+					$timeMax = time() - time() % $intervalRef['interval'];
 					if (is_null($intervalRef['limit'])) {
-						$intervalRef['limit'] = $startTime - $limit;
+						$intervalRef['limit'] = $timeMax - $timeMin;
 					}
 				}
 			}
 		}
-		$current = $startTime;
+		$timeCurrent = $timeMax;
 		foreach ($intervals as $interval) {
 			if (empty($interval['interval'])) {
-				$current = $startTime - $interval['limit'];
+				$timeCurrent = $timeMax - $interval['limit'];
 			} else {
-				while (($startTime - $current) < $interval['limit'] && $current > $limit) {
-					self::collapse($current - $interval['interval'], $current);
-					$current -= $interval['interval'];
+				while (($timeMax - $timeCurrent) < $interval['limit'] && $timeCurrent > $timeMin) {
+					self::collapse($timeCurrent - $interval['interval'], $timeCurrent);
+					$timeCurrent -= $interval['interval'];
 				}
 			}
 		}
