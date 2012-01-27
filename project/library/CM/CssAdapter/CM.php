@@ -7,6 +7,12 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
 	const REGEX_COLOR = '(?:(?:\#(?<hex1>\w{2})(?<hex2>\w{2})(?<hex3>\w{2}))|(?:rgba?\((?<dec1>\d+),\s*(?<dec2>\d+),\s*(?<dec3>\d+)(,\s*(?<alpha>[\d\.]+))?\)))';
 
+
+	/**
+	 * @var array
+	 */
+	private $_data = array();
+
 	public function parse() {
 		$this->_data = $this->_parseCssString($this->_css, $this->_presets, $this->_prefix);
 		return $this->__toString();

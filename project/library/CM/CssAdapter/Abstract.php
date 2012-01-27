@@ -3,14 +3,24 @@
 abstract class CM_CssAdapter_Abstract {
 
 	/**
-	 * @var array
-	 */
-	private $_data = array();
-
-	/**
 	 * @var CM_Render
 	 */
-	private $_render = null;
+	protected $_render = null;
+
+	/**
+	 * @var CM_Css
+	 */
+	protected $_presets = null;
+
+	/**
+	 * @var string
+	 */
+	protected $_prefix = null;
+
+	/**
+	 * @var string
+	 */
+	protected $_css = null;
 
 	/**
 	 * @param string		  $css
@@ -29,7 +39,6 @@ abstract class CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @param string $css
 	 * @return string
 	 */
 	abstract public function parse();
