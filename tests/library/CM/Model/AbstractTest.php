@@ -258,7 +258,7 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 	public function get() {
 		if (($modelMock = $this->_cacheGet('modelMock')) === false) {
 			try {
-				$modelMockId = CM_Mysql::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()));
+				$modelMockId = CM_Mysql::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchOne();
 				$modelMock = new CM_ModelThasIsAnAssetMock($modelMockId);
 				$this->_cacheSet('modelMock', $modelMock);
 			} catch (CM_Exception_Nonexistent $ex) {
