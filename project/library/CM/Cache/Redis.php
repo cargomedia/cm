@@ -44,10 +44,31 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
+	 * Remove a value from a set
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
+	protected function _sRem($key, $value) {
+		$this->_redis->sRem($key, $value);
+	}
+
+	/**
+	 * Remove and return all members of a set
+	 *
+	 * @param string $key
+	 * @return string[]
+	 */
+	protected function _sFlush($key) {
+		$values = $this->_redis->multi()->sMembers($key)->delete($key)->exec();
+		return $values[0];
+	}
+
+	/**
 	 * Add a value to a list
 	 *
 	 * @param string $key
-	 * @param mixed $value
+	 * @param string $value
 	 */
 	protected function _lPush($key, $value) {
 		$this->_redis->lPush($key, $value);
@@ -57,7 +78,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * Remove and return a value from a list
 	 *
 	 * @param string $key
-	 * @return mixed
+	 * @return string
 	 */
 	protected function _rPop($key) {
 		return $this->_redis->rPop($key);
@@ -72,7 +93,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	protected function _flush() {
-		return $this->_redis->flushAll();
+		$this->_redis->flushAll();
 	}
 
 }

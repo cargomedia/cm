@@ -19,7 +19,7 @@ class CM_Queue {
 		if (empty($this->_key)) {
 			throw new CM_Exception_Invalid('Key is empty');
 		}
-		$this->_adapter = new CM_QueueAdapter_Redis($key);
+		$this->_adapter = new CM_QueueAdapter_Redis();
 	}
 
 	/**

@@ -1,11 +1,6 @@
 <?php
 
 abstract class CM_QueueAdapter_Abstract {
-	protected $_key;
-
-	public function __construct($key) {
-		$this->_key = $key;
-	}
 
 	/**
 	 * @param string $key
