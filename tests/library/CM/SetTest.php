@@ -23,7 +23,7 @@ class CM_SetTest extends TestCase {
 		$this->assertSame('foo', $queue->getKey());
 	}
 
-	public function testAddPopAll() {
+	public function testAddFlush() {
 		$set1 = new CM_Set('foo');
 		$set2 = new CM_Set('bar');
 
