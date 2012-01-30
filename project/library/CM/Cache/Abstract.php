@@ -113,7 +113,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param array  $arguments
 	 */
 	public static final function __callStatic($name, $arguments) {
-		static::_callInstance($name, $arguments, true);
+		return static::_callInstance($name, $arguments, true);
 	}
 
 	/**

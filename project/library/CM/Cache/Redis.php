@@ -40,7 +40,27 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $value
 	 */
 	protected function _sAdd($key, $value) {
-		return $this->_redis->sAdd($key, $value);
+		$this->_redis->sAdd($key, $value);
+	}
+
+	/**
+	 * Add a value to a list
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	protected function _lPush($key, $value) {
+		$this->_redis->lPush($key, $value);
+	}
+
+	/**
+	 * Remove and return a value from a list
+	 *
+	 * @param string $key
+	 * @return mixed
+	 */
+	protected function _rPop($key) {
+		return $this->_redis->rPop($key);
 	}
 
 	/**
