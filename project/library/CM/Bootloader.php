@@ -110,7 +110,6 @@ class CM_Bootloader {
 
 		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
 		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
-		define('DIR_WURFL', DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR);
 
 		define('TBL_CM_SMILEY', 'cm_smiley');
 		define('TBL_CM_SMILEYSET', 'cm_smileySet');
