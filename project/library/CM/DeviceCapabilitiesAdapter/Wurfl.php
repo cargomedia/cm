@@ -11,17 +11,15 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	/**
 	 * @param string $userAgent
 	 */
-	public function __construct($userAgent = null) {
-		if (is_null($userAgent)) {
-			$userAgent = WurflSupport::getUserAgent();
-			if (!$userAgent) {
-				throw new CM_Exception_Invalid('Useragent could not be determined.');
-			}
-		}
-		self::init();
+	public function __construct($userAgent) {
+		$config = self::_getConfig();
+		TeraWurflConfig::$DB_HOST = implode(':',$config->server);
+		TeraWurflConfig::$DB_USER = $config->user;
+		TeraWurflConfig::$DB_PASS =$config->pass;
+		TeraWurflConfig::$DB_SCHEMA = $config->db;
+		TeraWurflConfig::$TABLE_PREFIX = $config->tblPrefix;
 		$this->_wurfl = new TeraWurfl();
 		parent::__construct($userAgent);
-
 	}
 
 	/**
@@ -42,17 +40,6 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		}
 		return $this->_wurfl->capabilities;
 	}
-
-	public static function init() {
-		$config = self::_getConfig();
-		TeraWurflConfig::setConfig(array('server' => $config->server, 'db' => $config->db, 'user' => $config->user, 'pass' => $config->pass,
-			'tblPrefix' => $config->tblPrefix));
-	}
-
-	public static function update() {
-		include(DIR_WURFL . 'admin' . DIRECTORY_SEPARATOR . 'updatedb.php');
-	}
-
 }
 
 class TeraWurflConfig {
@@ -181,15 +168,4 @@ class TeraWurflConfig {
 	 * @var Mixed
 	 */
 	public static $CAPABILITY_FILTER = false;
-
-	/**
-	 * @param array $params
-	 */
-	public static function setConfig(array $params) {
-		self::$DB_HOST = implode(':', $params['server']);
-		self::$DB_SCHEMA = $params['db'];
-		self::$DB_USER = $params['user'];
-		self::$DB_PASS = $params['pass'];
-		self::$TABLE_PREFIX = $params['tblPrefix'];
-	}
 }
