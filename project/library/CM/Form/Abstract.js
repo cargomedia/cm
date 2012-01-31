@@ -18,7 +18,7 @@ initialize: function() {
 	
 	_.each(this.options.actions, function(action, name) {
 		var $btn = $('#'+this.getAutoId()+'-'+name+'-button');
-		$btn.bind('click', {action: name}, function(event) {
+		$btn.on('click', {action: name}, function(event) {
 			handler.submit(event.data.action);
 			return false;
 		});
@@ -73,7 +73,7 @@ getField: function(name) {
  */
 $: function(selector) {
 	if (!selector) {
-		return $(this.el);
+		return this.$el;
 	}
 	selector = selector.replace('#', '#'+this.getAutoId()+'-');
 	return $(selector, this.el);

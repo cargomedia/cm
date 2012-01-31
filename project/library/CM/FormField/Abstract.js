@@ -20,7 +20,7 @@ getForm: function() {
  */
 $: function(selector) {
 	if (!selector) {
-		return $(this.el);
+		return this.$el;
 	}
 	return $(selector, this.el);
 },

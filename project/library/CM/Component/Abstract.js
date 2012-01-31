@@ -117,7 +117,7 @@ registerForm: function(form) {
  */
 $: function(selector) {
 	if (!selector) {
-		return $(this.el);
+		return this.$el;
 	}
 	selector = selector.replace('#', '#'+this.getAutoId()+'-');
 	return $(selector, this.el);
@@ -190,7 +190,7 @@ getArray: function(depth) {
 bindStream: function(callback) {
 	var namespace = this._class;
 	cm.stream.bind(namespace, callback);
-	this.bind('destruct', function() {
+	this.on('destruct', function() {
 		cm.stream.unbind(namespace, callback);
 	});
 },
@@ -202,7 +202,7 @@ bindStream: function(callback) {
  */
 bindAction: function(actionType, modelType, callback) {
 	cm.action.bind(actionType, modelType, callback);
-	this.bind('destruct', function() {
+	this.on('destruct', function() {
 		cm.action.unbind(actionType, modelType, callback);
 	});
 },
@@ -235,7 +235,7 @@ ajaxCall: function(apply_func, params, callbacks, cache) {
 			}
 		}
 	}, cache);
-	this.bind('destruct', function() {
+	this.on('destruct', function() {
 		xhr.abort();
 	});
 	return xhr;
