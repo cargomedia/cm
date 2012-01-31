@@ -5,7 +5,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	const REGEX_PROPERTY = '[a-z\-]+';
 	const REGEX_VALUE = '[^;]+';
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
-	const REGEX_COLOR = '(?:(?:\#(?<hex1>\w{2})(?<hex2>\w{2})(?<hex3>\w{2}))|(?:rgba?\((?<dec1>\d+),\s*(?<dec2>\d+),\s*(?<dec3>\d+)(,\s*(?<alpha>[\d\.]+))?\)))';
+	const REGEX_COLOR = '(?:(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)))';
 
 	/**
 	 * @return array
@@ -87,7 +87,8 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 						$imageURL = $this->_render->getUrlImg($filename);
 						$value = str_replace($imgMatch, "url($imageURL)", $value);
 					}
-					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>' . self::REGEX_COLOR . '),\s*(?<color2>.+?)\)$#i', $value, $match)
+					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>' . self::REGEX_COLOR . '),\s*(?<color2>' . self::REGEX_COLOR .
+							')\)$#i', $value, $match)
 					) {
 						$point = $match['point'];
 						$color1 = $this->_getColor($match['color1']);
@@ -182,16 +183,16 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
-		if (strlen($match['hex1']) && strlen($match['hex2']) && strlen($match['hex3'])) {
-			$red = hexdec($match['hex1']);
-			$green = hexdec($match['hex2']);
-			$blue = hexdec($match['hex3']);
+		if (strlen($match[1]) && strlen($match[2]) && strlen($match[3])) {
+			$red = hexdec($match[1]);
+			$green = hexdec($match[2]);
+			$blue = hexdec($match[3]);
 		} else {
-			$red = $match['dec1'];
-			$green = $match['dec2'];
-			$blue = $match['dec3'];
+			$red = $match[4];
+			$green = $match[5];
+			$blue = $match[6];
 		}
-		$alpha = isset($match['alpha']) ? (float) $match['alpha'] : 1;
+		$alpha = isset($match[7]) ? (float) $match[7] : 1;
 		if ($forceHex || $alpha == 1) {
 			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
 					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
