@@ -54,18 +54,10 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @return CM_DeviceCapabilities
-	 * @throws CM_Exception_Invalid
 	 */
 	public function getDeviceCapabilities() {
 		if (!isset($this->_capabilities)) {
-			try {
-				$this->_capabilities = new CM_DeviceCapabilities($this->getHeader('user-agent'));
-			} catch (CM_Exception_Invalid $ex) {
-				$this->_capabilities = null;
-			}
-		}
-		if (is_null($this->_capabilities)) {
-			throw new CM_Exception_Invalid('Device capabilities not set.');
+			$this->_capabilities = new CM_DeviceCapabilities($this->getHeader('user-agent'));
 		}
 		return $this->_capabilities;
 	}

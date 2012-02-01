@@ -1,5 +1,5 @@
 <?php
-require_once(DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php');
+require_once DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
 
 class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Abstract {
 
@@ -9,11 +9,6 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	private $_wurfl;
 
 	/**
-	 * @var array
-	 */
-	private $_capabilities;
-
-	/**
 	 * @param string $userAgent
 	 */
 	public function __construct($userAgent) {
@@ -21,17 +16,18 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		self::init();
 		$this->_wurfl = new TeraWurfl();
 		$this->_wurfl->getDeviceCapabilitiesFromAgent($userAgent);
-		$this->_capabilities = $this->_wurfl->capabilities;
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getCapabilities() {
-		if (empty($this->_capabilities)) {
-			return null;
+		if (empty($this->_wurfl->capabilities)) {
+			return array('mobile' => false, 'tablet' => false, 'hasTouchscreen' => false);
 		}
-		return array('mobile' => (boolean) $this->_capabilities['product_info']['is_wireless_device']);
+		return array('mobile' => (boolean) $this->_wurfl->capabilities['product_info']['is_wireless_device'],
+			'tablet' => (boolean) $this->_wurfl->capabilities['product_info']['is_tablet'],
+			'hasTouschreen' => ($this->_wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
 	}
 
 	public static function init() {
@@ -43,20 +39,22 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
 	}
 
+	/**
+	 *  xml file repository http://sourceforge.net/projects/wurfl/files/WURFL/
+	 */
 	public static function setup() {
 		self::init();
-		TeraWurflConfig::$WURFL_FILE = 'wurfl-2.3.xml';
 		$zip = file_get_contents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3/wurfl-2.3.xml.zip');
 		$dataDir = DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
-		$wurflZip = $dataDir . 'wurfl.zip';
-		file_put_contents($wurflZip, $zip);
+		$zipFile = CM_File::create($dataDir . 'wurfl.zip', $zip);
 		$zipArchive = new ZipArchive();
-		$zipArchive->open($wurflZip);
-		$fileName = $zipArchive->getNameIndex(0);
+		$zipArchive->open($zipFile->getPath());
+		$xmlFile = $dataDir . $zipArchive->getNameIndex(0);
+		TeraWurflConfig::$WURFL_FILE = $zipArchive->getNameIndex(0);
 		$zipArchive->extractTo($dataDir);
-		include(DIR_LIBRARY . 'Tera-Wurfl/admin/updatedb.php');
-		unlink($wurflZip);
-		unlink($dataDir . $fileName);
+		$zipFile->delete();
+		require(DIR_LIBRARY . 'Tera-Wurfl/admin/updatedb.php');
+		unlink($xmlFile);
 	}
 }
 

@@ -3,7 +3,7 @@
 abstract class CM_DeviceCapabilitiesAdapter_Abstract extends CM_Class_Abstract {
 
 	/**
-	 * @returns boolean
+	 * @returns array
 	 */
 	abstract public function getCapabilities();
 }

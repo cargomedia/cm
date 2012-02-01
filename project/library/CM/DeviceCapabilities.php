@@ -20,11 +20,16 @@ class CM_DeviceCapabilities extends CM_Model_Abstract {
 		return $this->_get('mobile');
 	}
 
+	public function isTablet() {
+		return $this->_get('tablet');
+	}
+
+	public function hasTouchscreen() {
+		return $this->_get('hasTouchscreen');
+	}
+
 	protected function _loadData() {
 		$capabilities = $this->_adapter->getCapabilities();
-		if (is_null($capabilities)) {
-			throw new CM_Exception_Nonexistent('Unable to fetch properties for userAgent `' . $userAgent . '`.');
-		}
 		return $capabilities;
 	}
 
