@@ -183,7 +183,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 		}
 		list($subject, $html, $text) = CM_Render::getInstance($site)->render($this);
 		if ($this->_delayed) {
-			$this->_queue($text, $html);
+			$this->_queue($subject, $text, $html);
 		} else {
 			self::_send($subject, $text, $this->_senderAddress, $this->_recipientAddress, $this->_senderName, $html);
 		}
@@ -208,8 +208,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 		}
 	}
 
-	private function _queue($text, $html) {
-		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $this->_subject, 'text' => $text, 'html' => $html,
+	private function _queue($subject, $text, $html) {
+		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html,
 			'senderAddress' => $this->_senderAddress, 'recipientAddress' => $this->_recipientAddress, 'senderName' => $this->_senderName,
 			'createStamp' => time()));
 	}
