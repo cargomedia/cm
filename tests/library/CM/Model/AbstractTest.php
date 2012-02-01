@@ -156,6 +156,23 @@ class CM_Model_AbstractTest extends TestCase{
 
 		$this->assertEquals('foo', $modelMock->getModelAssetMock()->getFoo());
 	}
+
+	public function testCachingStrategy() {
+		$modelMock = new CM_ModelMock(1);
+		try {
+			$modelMock->_change();
+			$this->assertTrue(true);
+		} catch (CM_Exception_NotAllowed $ex) {
+			$this->fail("Using CacheLocal instead of Cache.");
+		}
+		$modelMock = new CM_ModelMock_Local(1);
+		try {
+			$modelMock->_change();
+			$this->fail("Using Cache instead of CacheLocal.");
+		} catch (CM_Exception_NotAllowed $ex) {
+			$this->assertTrue(true);
+		}
+	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
@@ -197,6 +214,15 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		return new self(CM_Mysql::insert('modelMock', array('foo' => $data['foo'])));
+	}
+
+}
+
+class CM_ModelMock_Local extends CM_ModelMock {
+
+	public function __construct($id) {
+		$this->_setCacheLocal();
+		parent::__construct($id);
 	}
 
 }
