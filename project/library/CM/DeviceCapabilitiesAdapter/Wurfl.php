@@ -3,9 +3,6 @@ require_once DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
 
 class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Abstract {
 
-	/**
-	 * @return array
-	 */
 	public function getCapabilities() {
 		self::init();
 		$wurfl = new TeraWurfl();
