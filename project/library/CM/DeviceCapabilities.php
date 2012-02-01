@@ -16,14 +16,23 @@ class CM_DeviceCapabilities extends CM_Model_Abstract {
 		parent::__construct($userAgent);
 	}
 
+	/**
+	 * @return boolean
+	 */
 	public function isMobile() {
 		return $this->_get('mobile');
 	}
 
+	/**
+	 * @return boolean
+	 */
 	public function isTablet() {
 		return $this->_get('tablet');
 	}
 
+	/**
+	 * @return boolean
+	 */
 	public function hasTouchscreen() {
 		return $this->_get('hasTouchscreen');
 	}
