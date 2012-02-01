@@ -37,6 +37,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		TeraWurflConfig::$DB_PASS = $config->pass;
 		TeraWurflConfig::$DB_SCHEMA = $config->db;
 		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
+		TeraWurflConfig::$LOG_LEVEL = LOG_EMERG;
 	}
 
 	/**
