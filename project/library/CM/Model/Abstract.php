@@ -7,7 +7,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected $_id;
 
-	private $_cache = 'CM_Cache';
+	private $_cacheClass = 'CM_Cache';
 
 	/**
 	 * @var array $_data
@@ -52,7 +52,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$asset->_onModelDelete();
 		}
 		$this->_onDelete();
-		$cache = $this->_cache;
+		$cache = $this->_cacheClass;
 		$cache::delete($this->_getCacheKey());
 		$this->_data = null;
 	}
@@ -95,7 +95,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract
 	 */
 	public function _change() {
-		$cache = $this->_cache;
+		$cache = $this->_cacheClass;
 		$cache::delete($this->_getCacheKey());
 		$this->_data = null;
 		$this->_onChange();
@@ -110,7 +110,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	final public function _get($field = null) {
 		if (!$this->_data) {
 			$cacheKey = $this->_getCacheKey();
-			$cache = $this->_cache;
+			$cache = $this->_cacheClass;
 			if (($this->_data = $cache::get($cacheKey)) === false) {
 				$this->_data = $this->_loadData();
 				if (!is_array($this->_data)) {
@@ -152,7 +152,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
 		if ($this->_autoCommitCache) {
-			$cache = $this->_cache;
+			$cache = $this->_cacheClass;
 			$cache::set($this->_getCacheKey(), $this->_data);
 		}
 	}
@@ -200,7 +200,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final protected function _setCacheLocal() {
-		$this->_cache = 'CM_CacheLocal';
+		$this->_cacheClass = 'CM_CacheLocal';
 	}
 
 	/**
