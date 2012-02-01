@@ -31,7 +31,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	}
 
 	public static function init() {
-		$config = self::_getConfig();
+		$config = CM_Config::get()->CM_Mysql;
 		TeraWurflConfig::$DB_HOST = implode(':', $config->server);
 		TeraWurflConfig::$DB_USER = $config->user;
 		TeraWurflConfig::$DB_PASS = $config->pass;
