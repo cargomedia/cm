@@ -6,39 +6,57 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	/**
 	 * @var TeraWurfl $_wurfl
 	 */
-	public $_wurfl;
+	private $_wurfl;
+
+	/**
+	 * @var array
+	 */
+	private $_capabilities;
 
 	/**
 	 * @param string $userAgent
 	 */
 	public function __construct($userAgent) {
-		$config = self::_getConfig();
-		TeraWurflConfig::$DB_HOST = implode(':',$config->server);
-		TeraWurflConfig::$DB_USER = $config->user;
-		TeraWurflConfig::$DB_PASS =$config->pass;
-		TeraWurflConfig::$DB_SCHEMA = $config->db;
-		TeraWurflConfig::$TABLE_PREFIX = $config->tblPrefix;
+		$userAgent = (string) $userAgent;
+		self::init();
 		$this->_wurfl = new TeraWurfl();
-		parent::__construct($userAgent);
+		$this->_wurfl->getDeviceCapabilitiesFromAgent($userAgent);
+		$this->_capabilities = $this->_wurfl->capabilities;
 	}
 
 	/**
-	 * @return boolean
+	 * @return array
 	 */
-	public function isMobile() {
-		$productInfo = $this->_get('product_info');
-		return (boolean) $productInfo['is_wireless_device'];
-	}
-
 	public function getCapabilities() {
-		return $this->_get();
+		if (empty($this->_capabilities)) {
+			return null;
+		}
+		return array('mobile' => (boolean) $this->_capabilities['product_info']['is_wireless_device']);
 	}
 
-	protected function _loadData() {
-		if (!$this->_wurfl->getDeviceCapabilitiesFromAgent($this->getId())) {
-			throw new CM_Exception_Nonexistent('Useragent: ` ' . $this->getId() . '` could not be matched to a device.');
-		}
-		return $this->_wurfl->capabilities;
+	public static function init() {
+		$config = self::_getConfig();
+		TeraWurflConfig::$DB_HOST = implode(':', $config->server);
+		TeraWurflConfig::$DB_USER = $config->user;
+		TeraWurflConfig::$DB_PASS = $config->pass;
+		TeraWurflConfig::$DB_SCHEMA = $config->db;
+		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
+	}
+
+	public static function setup() {
+		self::init();
+		TeraWurflConfig::$WURFL_FILE = 'wurfl-2.3.xml';
+		$zip = file_get_contents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3/wurfl-2.3.xml.zip');
+		$dataDir = DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+		$wurflZip = $dataDir . 'wurfl.zip';
+		file_put_contents($wurflZip, $zip);
+		$zipArchive = new ZipArchive();
+		$zipArchive->open($wurflZip);
+		$fileName = $zipArchive->getNameIndex(0);
+		$zipArchive->extractTo($dataDir);
+		include(DIR_LIBRARY . 'Tera-Wurfl/admin/updatedb.php');
+		unlink($wurflZip);
+		unlink($dataDir . $fileName);
 	}
 }
 

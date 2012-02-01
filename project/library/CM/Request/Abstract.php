@@ -22,6 +22,11 @@ abstract class CM_Request_Abstract {
 	protected $_viewer = null;
 
 	/**
+	 * @var CM_DeviceCapabilities
+	 */
+	private $_capabilities;
+
+	/**
 	 * @param string				   $uri
 	 * @param array|null			   $headers OPTIONAL
 	 * @param CM_Model_User|null	   $viewer
@@ -45,6 +50,14 @@ abstract class CM_Request_Abstract {
 			$viewer = CM_Session::getInstance()->getUser();
 		}
 		$this->_viewer = $viewer;
+		$this->_capabilities = new CM_DeviceCapabilities($this->getHeader('user-agent'));
+	}
+
+	/**
+	 * @return CM_DeviceCapabilities
+	 */
+	public function getDeviceCapabilities() {
+		return $this->_capabilities;
 	}
 
 	/**
