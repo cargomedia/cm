@@ -57,9 +57,9 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getDeviceCapabilities() {
 		if (!isset($this->_capabilities)) {
-			try {
+			if ($this->hasHeader('user-agent')) {
 				$userAgent = $this->getHeader('user-agent');
-			} catch (CM_Exception_Invalid $ex) {
+			} else {
 				$userAgent = '';
 			}
 			$this->_capabilities = new CM_DeviceCapabilities($userAgent);
