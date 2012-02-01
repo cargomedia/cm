@@ -112,3 +112,6 @@ $config->CM_Response_RPC = new stdClass();
 $config->CM_Response_RPC->catch = array(
 	'CM_Exception_AuthRequired',
 );
+
+$config->CM_DeviceCapabilities = new stdClass();
+$config->CM_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
