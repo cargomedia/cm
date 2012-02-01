@@ -49,12 +49,12 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		$zipFile = CM_File::create($dataDir . 'wurfl.zip', $zip);
 		$zipArchive = new ZipArchive();
 		$zipArchive->open($zipFile->getPath());
-		$xmlFile = $dataDir . $zipArchive->getNameIndex(0);
 		TeraWurflConfig::$WURFL_FILE = $zipArchive->getNameIndex(0);
 		$zipArchive->extractTo($dataDir);
 		$zipFile->delete();
+		$xmlFile = new CM_File($dataDir . $zipArchive->getNameIndex(0));
 		require(DIR_LIBRARY . 'Tera-Wurfl/admin/updatedb.php');
-		unlink($xmlFile);
+		$xmlFile->delete();
 	}
 }
 
