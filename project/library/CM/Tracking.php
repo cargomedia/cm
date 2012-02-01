@@ -7,9 +7,9 @@ class CM_Tracking extends CM_Tracking_Abstract {
 	private $_orders = array();
 
 	/**
-	 * @param string $path
+	 * @param string|null $path
 	 */
-	public function setPageview($path = '') {
+	public function setPageview($path = null) {
 		$this->_pageviews = array($path);
 	}
 

@@ -95,8 +95,6 @@ class CM_Render {
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
 				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
 			}
-
-			CM_Tracking::getInstance()->setPageview();
 		}
 
 		return self::$_smarty;
