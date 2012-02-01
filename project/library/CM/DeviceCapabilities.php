@@ -3,17 +3,17 @@
 class CM_DeviceCapabilities extends CM_Model_Abstract {
 
 	/**
-	 * @var CM_DeviceCapabilitiesAdapter_Abstract $_adapter
+	 * @var string $_userAgent
 	 */
-	private $_adapter;
+	private $_userAgent;
 
 	/**
 	 * @param string $userAgent
 	 */
 	public function __construct($userAgent) {
+		$userAgent = (string) $userAgent;
 		$this->_setCacheLocal();
-		$adapterClass = self::_getConfig()->adapter;
-		$this->_adapter = new $adapterClass($userAgent);
+		$this->_userAgent = $userAgent;
 		parent::__construct($userAgent);
 	}
 
@@ -39,7 +39,12 @@ class CM_DeviceCapabilities extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		$capabilities = $this->_adapter->getCapabilities();
+		$adapterClass = self::_getConfig()->adapter;
+		$adapter = new $adapterClass($this->_userAgent);
+		$capabilities = $adapter->getCapabilities();
+		if (is_null($capabilities)) {
+			$capabilities = array('mobile' => false, 'tablet' => false, 'hasTouchscreen' => false);
+		}
 		return $capabilities;
 	}
 

@@ -4,30 +4,18 @@ require_once DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
 class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Abstract {
 
 	/**
-	 * @var TeraWurfl $_wurfl
-	 */
-	private $_wurfl;
-
-	/**
-	 * @param string $userAgent
-	 */
-	public function __construct($userAgent) {
-		$userAgent = (string) $userAgent;
-		self::init();
-		$this->_wurfl = new TeraWurfl();
-		$this->_wurfl->getDeviceCapabilitiesFromAgent($userAgent);
-	}
-
-	/**
 	 * @return array
 	 */
 	public function getCapabilities() {
-		if (empty($this->_wurfl->capabilities)) {
-			return array('mobile' => false, 'tablet' => false, 'hasTouchscreen' => false);
+		self::init();
+		$wurfl = new TeraWurfl();
+		$wurfl->getDeviceCapabilitiesFromAgent($this->_useragent);
+		if (empty($wurfl->capabilities)) {
+			return null;
 		}
-		return array('mobile' => (boolean) $this->_wurfl->capabilities['product_info']['is_wireless_device'],
-			'tablet' => (boolean) $this->_wurfl->capabilities['product_info']['is_tablet'],
-			'hasTouschreen' => ($this->_wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
+		return array('mobile' => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
+			'tablet' => (boolean) $wurfl->capabilities['product_info']['is_tablet'],
+			'hasTouschreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
 	}
 
 	public static function init() {
