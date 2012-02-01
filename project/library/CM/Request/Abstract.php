@@ -24,7 +24,7 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @var CM_DeviceCapabilities
 	 */
-	private $_capabilities = null;
+	private $_capabilities;
 
 	/**
 	 * @param string				   $uri
@@ -50,9 +50,6 @@ abstract class CM_Request_Abstract {
 			$viewer = CM_Session::getInstance()->getUser();
 		}
 		$this->_viewer = $viewer;
-		try {
-			$this->_capabilities = new CM_DeviceCapabilities($this->getHeader('user-agent'));
-		} catch (CM_Exception_Invalid $ex) {}
 	}
 
 	/**
@@ -60,6 +57,13 @@ abstract class CM_Request_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getDeviceCapabilities() {
+		if (!isset($this->_capabilities)) {
+			try {
+				$this->_capabilities = new CM_DeviceCapabilities($this->getHeader('user-agent'));
+			} catch (CM_Exception_Invalid $ex) {
+				$this->_capabilities = null;
+			}
+		}
 		if (is_null($this->_capabilities)) {
 			throw new CM_Exception_Invalid('Device capabilities not set.');
 		}
