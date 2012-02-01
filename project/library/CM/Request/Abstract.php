@@ -159,12 +159,13 @@ abstract class CM_Request_Abstract {
 	 * @return int|false
 	 */
 	public static function getIp() {
-		if (!isset($_SERVER['REMOTE_ADDR'])) {
-			return false;
-		}
-		$ip = $_SERVER['REMOTE_ADDR'];
 		if (IS_TEST || IS_DEBUG) {
 			$ip = CM_Config::get()->testIp;
+		} else {
+			if (!isset($_SERVER['REMOTE_ADDR'])) {
+				return false;
+			}
+			$ip = $_SERVER['REMOTE_ADDR'];
 		}
 		$long = sprintf('%u', ip2long($ip));
 		if (0 == $long) {
