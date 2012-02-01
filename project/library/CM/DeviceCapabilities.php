@@ -11,6 +11,7 @@ class CM_DeviceCapabilities extends CM_Model_Abstract {
 	 * @param string $userAgent
 	 */
 	public function __construct($userAgent) {
+		$this->_setCacheLocal();
 		$adapterClass = self::_getConfig()->adapter;
 		$this->_adapter = new $adapterClass($userAgent);
 		parent::__construct($userAgent);
