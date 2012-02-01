@@ -53,11 +53,12 @@ class CM_App {
 	 * @param			  $directory
 	 * @param Closure|null $callbackBefore fn($version)
 	 * @param Closure|null $callbackAfter  fn($version)
+	 * @return int Number of version bumps
 	 */
 	public function runUpdateScripts($directory, Closure $callbackBefore = null, Closure $callbackAfter = null) {
 		CM_Cache::flush();
 		CM_CacheLocal::flush();
-		$version = $this->getVersion();
+		$version = $versionStart = $this->getVersion();
 		while (true) {
 			$updateScript = $directory . ++$version . '.php';
 			if (!file_exists($updateScript)) {
@@ -72,5 +73,6 @@ class CM_App {
 				$callbackAfter($version);
 			}
 		}
+		return ($version - $versionStart);
 	}
 }
