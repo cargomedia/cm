@@ -48,7 +48,7 @@ class CM_File {
 	 * @return string File mime type
 	 * @throws CM_Exception
 	 */
-	public function getType() {
+	public function getMimeType() {
 		$info = new finfo(FILEINFO_MIME);
 		$infoFile = $info->file($this->getPath());
 		if (false === $infoFile) {

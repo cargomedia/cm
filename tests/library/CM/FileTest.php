@@ -28,7 +28,7 @@ class CM_FileTest extends TestCase {
 		$file = new CM_File($this->_testFilePath);
 		
 		$this->assertEquals($this->_testFilePath, $file->getPath());
-		$this->assertEquals('image/jpeg', $file->getType());
+		$this->assertEquals('image/jpeg', $file->getMimeType());
 		$this->assertEquals('jpg', $file->getExtension());
 		$this->assertEquals('test.jpg', $file->getFileName());
 		$this->assertEquals(filesize($this->_testFilePath), $file->getSize());
