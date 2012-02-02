@@ -258,24 +258,14 @@ load: function(className, params, options) {
 		handlerNew._ready();
 		successPost.call(handlerNew);
 	};
-	options.complete = function() {
-		handler.enable();
-	};
-	this.disable();
-	return this.ajax('load', params, options);
+	return this.ajaxModal('load', params, options);
 },
 
 /**
  * @return XMLHttpRequest
  */
 reload: function(params) {
-	var handler = this;
-	var options = {};
-	options.complete = function() {
-		handler.enable();
-	};
-	this.disable();
-	return this.ajax('reload', params, options);
+	return this.ajaxModal('reload', params);
 },
 
 remove: function(skipDomRemoval) {

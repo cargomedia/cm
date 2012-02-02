@@ -200,7 +200,6 @@ submit: function(action_name, confirmed, data, callbacks) {
 		this.trigger('submit', [data]);
 		cm.ajax('form', {component:this.getComponent()._getArray(), className:this._class, actionName:action_name, data:data}, {
 			success: function(response) {
-				handler.enable();
 				if (response.errors) {
 					for (var i = response.errors.length-1, error; error = response.errors[i]; i--) {
 						if (error.constructor == Array) {
@@ -231,10 +230,8 @@ submit: function(action_name, confirmed, data, callbacks) {
 					handler.trigger('success', [response.data]);
 				}
 			},
-			error: function(msg, name) {
-				handler.enable();
-			},
 			complete: function() {
+				handler.enable();
 				handler.trigger('complete');
 			}
 		});
