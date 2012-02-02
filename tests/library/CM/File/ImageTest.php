@@ -104,7 +104,6 @@ class CM_File_ImageTest extends TestCase {
 		$scale = ($image->getWidth() / 50 > $image->getHeight() / 50) ? 50 / $image->getWidth() : 50 / $image->getHeight();
 		$widthExpected = (int) ($image->getWidth() * $scale);
 		$heightExpected = (int) ($image->getHeight() * $scale);
-		var_dump($widthExpected, $heightExpected);
 		$this->assertSame($widthExpected, $imageNew->getWidth());
 		$this->assertSame($heightExpected, $imageNew->getHeight());
 	}
