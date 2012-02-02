@@ -19,9 +19,9 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @param string $css
-	 * @param array  $presets OPTIONAL
-	 * @param string $prefix  OPTIONAL
+	 * @param string      $css
+	 * @param array|null  $presets
+	 * @param string|null $prefix
 	 * @return array
 	 */
 	private function _parseCssString($css, array $presets = null, $prefix = null) {
