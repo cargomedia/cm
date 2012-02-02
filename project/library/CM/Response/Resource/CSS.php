@@ -15,7 +15,6 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			$presets = new CM_Css($this->getRender()->getFileThemed('presets.style')->read(), $this->getRender());
 			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
 
-			$themePath = $this->getRender()->getThemeDir(true);
 			foreach ($this->getRender()->getSite()->getThemes() as $theme) {
 				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $path) {
 					$file = new CM_File($path);
@@ -51,7 +50,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		} elseif (file_exists(DIR_PUBLIC . 'static/css/' . $this->_getFilename())) {
 			$content = new CM_File(DIR_PUBLIC . 'static/css/' . $this->_getFilename());
 		} else {
-			throw new CM_Exception_Invalid('Invalid filename');
+			throw new CM_Exception_Invalid('Invalid filename: `' . $this->_getFilename() . '`');
 		}
 		return $content;
 	}
