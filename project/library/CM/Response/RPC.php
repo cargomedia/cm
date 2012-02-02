@@ -19,7 +19,7 @@ class CM_Response_RPC extends CM_Response_Abstract {
 			}
 			$params = $query['params'];
 			list($class, $function) = explode('.', $query['method']);
-			$output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params),);
+			$output['success'] = array('result' => call_user_func_array(array($class, 'rpc_' . $function), $params));
 		} catch (CM_Exception $e) {
 			if (!($e->isPublic() || in_array(get_class($e), self::_getConfig()->catch))) {
 				throw $e;

@@ -155,36 +155,6 @@ message: function(message) {
 },
 
 /**
- * @param int depth OPTIONAL
- * @return array
- */
-getArray: function(depth) {
-	if (!depth) {
-		depth = 0;
-	}
-	var array = {
-		className: this._class, 
-		id: this.getAutoId(),
-		parentId: null,
-		children: [],
-		forms: []
-	};
-	if (depth == 0) {
-		array.params = this.getParams();
-	}
-	if (this.getParent()) {
-		array.parentId = this.getParent().getAutoId();
-	}
-	_.each(this.getChildren(), function(child) {
-		array.children.push(child.getArray(depth+1));
-	});
-	_.each(this.getForms(), function(form) {
-		array.forms.push({className: form._class, id: form.getAutoId()});
-	});
-	return array;
-},
-
-/**
  * @param function callback fn(array data)
  */
 bindStream: function(callback) {
@@ -208,13 +178,23 @@ bindAction: function(actionType, modelType, callback) {
 },
 
 /**
+ * @param string functionName
+ * @param array|null params
+ * @param object|null callbacks
+ * @param bool|null cache
  * @return jqXHR
  */
-ajaxCall: function(apply_func, params, callbacks, cache) {
+ajax: function(functionName, params, callbacks, cache) {
 	callbacks = callbacks || {};
 	params = params || {};
+	var componentInfo = {
+		className: this._class,
+		id: this.getAutoId(),
+		params: this.getParams(),
+		parentId: this.getParent() ? this.getParent().getAutoId() : null
+	};
 	var handler = this;
-	var xhr = cm.ajax('ajax', {component:this.getArray(), functionName:apply_func, params:params}, {
+	var xhr = cm.ajax('ajax', {component:componentInfo, method:functionName, params:params}, {
 		success: function(response) {
 			if (response.exec) {
 				var exec = new Function(response.exec);
@@ -244,7 +224,7 @@ ajaxCall: function(apply_func, params, callbacks, cache) {
 /**
  * @return jqXHR
  */
-ajaxCallModal: function(apply_func, params, callbacks) {
+ajaxModal: function(apply_func, params, callbacks) {
 	callbacks = callbacks || {};
 	var handler = this;
 	var callbackComplete = callbacks.complete;
@@ -255,7 +235,7 @@ ajaxCallModal: function(apply_func, params, callbacks) {
 		}
 	};
 	this.disable();
-	this.ajaxCall(apply_func, params, callbacks);
+	this.ajax(apply_func, params, callbacks);
 },
 
 load: function(className, params, options) {
@@ -276,7 +256,7 @@ load: function(className, params, options) {
 		handler.enable();
 	};
 	this.disable();
-	return this.ajaxCall('ajax_load', params, options);
+	return this.ajax('load', params, options);
 },
 
 /**
@@ -289,7 +269,7 @@ reload: function(params) {
 		handler.enable();
 	};
 	this.disable();
-	return this.ajaxCall('ajax_reload', params, options);
+	return this.ajax('reload', params, options);
 },
 
 remove: function(skipDomRemoval) {

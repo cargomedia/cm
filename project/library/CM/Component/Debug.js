@@ -8,7 +8,7 @@ ready: function() {
 		});
 	});
 	this.$('.clearCache').click(function() {
-		handler.ajaxCall('ajax_clearCache', {
+		handler.ajax('clearCache', {
 			'CM_Cache': handler.$('#CM_Cache').is(':checked'),
 			'CM_CacheLocal': handler.$('#CM_CacheLocal').is(':checked')
 		}, {

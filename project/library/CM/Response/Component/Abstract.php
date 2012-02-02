@@ -50,7 +50,6 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadHeaderJs('cm.components["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
 		$this->getRender()->getJs()->onloadPrepareJs(
 			'cm.components["' . $component->auto_id . '"]._callbacks=cm.components["' . $this->_component['id'] . '"]._callbacks;');
-
 		$this->getRender()->getJs()->onloadPrepareJs('cm.components["' . $this->_component['id'] . '"].remove(true);');
 		$this->getRender()->getJs()->onloadReadyJs('cm.components["' . $component->auto_id . '"]._ready();');
 		$this->_component['id'] = $component->auto_id;
@@ -87,11 +86,11 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 		if (null !== $closable) {
 			$params['closable'] = (bool) $closable;
 		}
-		$this->getRender()->getJs()->onloadJs('cm.components[\'' . $this->_component['id'] . '\'].popOut(' . json_encode($params) . ');');
+		$this->getRender()->getJs()->onloadJs('cm.components["' . $this->_component['id'] . '"].popOut(' . json_encode($params) . ');');
 	}
 
 	public function popinComponent() {
-		$this->getRender()->getJs()->onloadJs('cm.components[\'' . $this->_component['id'] . '\'].popIn();');
+		$this->getRender()->getJs()->onloadJs('cm.components["' . $this->_component['id'] . '"].popIn();');
 	}
 
 	public function redirect($path, array $params = null) {

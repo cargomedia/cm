@@ -9,15 +9,17 @@ class CM_Response_Component_Ajax extends CM_Response_Component_Abstract {
 		try {
 			$success = array();
 			$query = $this->_request->getQuery();
-			$functionName = $query['functionName'];
-			if (substr($functionName, 0, 5) != 'ajax_') {
-				throw new CM_Exception_Invalid('Invalid function name `' . $functionName . '`.');
+			if (!isset($query['method']) || !preg_match('/^[\w_]+$/i', $query['method'])) {
+				throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`');
 			}
-			$functionName = array($this->_component['className'], $query['functionName']);
+			if (!isset($query['params']) || !is_array($query['params'])) {
+				throw new CM_Exception_Invalid('Illegal params');
+			}
+			$function = array($this->_component['className'], 'ajax_' . $query['method']);
+			$params = CM_Params::factory($query['params']);
 			$componentHandler = new CM_ComponentFrontendHandler();
-			$functionParams = CM_Params::factory($query['params']);
-			$success['data'] = CM_Params::encode(call_user_func($functionName, $functionParams, $componentHandler, $this));
-	
+			$success['data'] = CM_Params::encode(call_user_func($function, $params, $componentHandler, $this));
+
 			$exec = $componentHandler->compile_js('this');
 			CM_Frontend::concat_js($this->getRender()->getJs()->getJs(), $exec);
 			if (strlen($exec)) {

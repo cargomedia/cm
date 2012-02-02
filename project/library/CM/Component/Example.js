@@ -55,7 +55,7 @@ loadExampleInline: function() {
 },
 
 callAjax: function() {
-	this.ajaxCall('ajax_test', {x:'myX'}, {
+	this.ajax('test', {x:'myX'}, {
 		success: function(data) {
 			this.message('ajax_test(): ' + data);
 		}
@@ -71,7 +71,7 @@ callRpc: function() {
 },
 
 error_500_text_callback: function() {
-	this.ajaxCall('ajax_error', {status:500, text:'Errortext'}, {
+	this.ajax('error', {status:500, text:'Errortext'}, {
 		error: function(msg, type) {
 			this.error('callback( type:' + type + ', msg:' + msg + ' )');
 			return false;
@@ -79,10 +79,10 @@ error_500_text_callback: function() {
 	});
 },
 error_599_text: function() {
-	this.ajaxCall('ajax_error', {status:599, text:'Errortext'});
+	this.ajax('error', {status:599, text:'Errortext'});
 },
 error_CM_Exception_public_callback: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception', text:'Errortext', 'public':true}, {
+	this.ajax('error', {exception:'CM_Exception', text:'Errortext', 'public':true}, {
 		error: function(msg, type) {
 			this.error('callback( type:' + type + ', msg:' + msg + ' )');
 			return false;
@@ -90,13 +90,13 @@ error_CM_Exception_public_callback: function() {
 	});
 },
 error_CM_Exception_public: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception', text:'Errortext', 'public':true});
+	this.ajax('error', {exception:'CM_Exception', text:'Errortext', 'public':true});
 },
 error_CM_Exception: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception', text:'Errortext'});
+	this.ajax('error', {exception:'CM_Exception', text:'Errortext'});
 },
 error_CM_Exception_AuthRequired_public_callback: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception_AuthRequired', text:'Errortext', 'public':true}, {
+	this.ajax('error', {exception:'CM_Exception_AuthRequired', text:'Errortext', 'public':true}, {
 		error: function(msg, type) {
 			this.error('callback( type:' + type + ', msg:' + msg + ' )');
 			return false;
@@ -104,13 +104,13 @@ error_CM_Exception_AuthRequired_public_callback: function() {
 	});
 },
 error_CM_Exception_AuthRequired_public: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception_AuthRequired', text:'Errortext', 'public':true});
+	this.ajax('error', {exception:'CM_Exception_AuthRequired', text:'Errortext', 'public':true});
 },
 error_CM_Exception_AuthRequired: function() {
-	this.ajaxCall('ajax_error', {exception:'CM_Exception_AuthRequired', text:'Errortext'});
+	this.ajax('error', {exception:'CM_Exception_AuthRequired', text:'Errortext'});
 },
 
 ping: function() {
-	this.ajaxCall('ajax_ping', {number: this.pingCount});
+	this.ajax('ping', {number: this.pingCount});
 	this.pingCount++;
 }
