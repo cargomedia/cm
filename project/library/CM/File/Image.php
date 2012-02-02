@@ -107,7 +107,7 @@ class CM_File_Image extends CM_File {
 		if (false === $width) {
 			throw new CM_Exception_Invalid('Cannot detect image width');
 		}
-		return $width;
+		return (int) $width;
 	}
 
 	/**
@@ -118,7 +118,7 @@ class CM_File_Image extends CM_File {
 		if (false === $height) {
 			throw new CM_Exception_Invalid('Cannot detect image height');
 		}
-		return $height;
+		return (int) $height;
 	}
 
 	/**

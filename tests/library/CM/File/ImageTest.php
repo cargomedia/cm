@@ -74,21 +74,61 @@ class CM_File_ImageTest extends TestCase {
 
 	public function testRotate() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathDest = '/tmp/' . uniqid();
+		$pathNew = '/tmp/' . uniqid();
 		$image = new CM_File_Image($path);
-		$image->rotate(90, $pathDest);
+
+		$image->rotate(90, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame($image->getHeight(), $imageNew->getWidth());
+		$this->assertSame($image->getWidth(), $imageNew->getHeight());
 	}
 
-	public function testSquareImages() {
-		$sourcePath = DIR_TEST_DATA . 'img/square-image.';
-		$path = '/tmp/' . uniqid();
+	public function testConvert() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$pathNew = '/tmp/' . uniqid();
+		$image = new CM_File_Image($path);
 
-		$image = new CM_File_Image($sourcePath);
-		$image->resize(900, 900, false, $path);
+		$image->convert(IMAGETYPE_GIF, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame($image->getWidth(), $imageNew->getWidth());
+		$this->assertSame($image->getHeight(), $imageNew->getHeight());
+	}
 
-		$image->resize(250, 250, false, $path);
+	public function testResize() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$pathNew = '/tmp/' . uniqid();
+		$image = new CM_File_Image($path);
 
-		$imagePreview = new CM_File_Image($path);
-		$imagePreview->resize(100, 100, true, $path);
+		$image->resize(50, 50, false, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$scale = ($image->getWidth() / 50 > $image->getHeight() / 50) ? 50 / $image->getWidth() : 50 / $image->getHeight();
+		$widthExpected = (int) ($image->getWidth() * $scale);
+		$heightExpected = (int) ($image->getHeight() * $scale);
+		var_dump($widthExpected, $heightExpected);
+		$this->assertSame($widthExpected, $imageNew->getWidth());
+		$this->assertSame($heightExpected, $imageNew->getHeight());
+	}
+
+	public function testResizeSquare() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$pathNew = '/tmp/' . uniqid();
+		$image = new CM_File_Image($path);
+
+		$image->resize(50, 50, true, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame(50, $imageNew->getWidth());
+		$this->assertSame(50, $imageNew->getHeight());
+	}
+
+	public function testResizeSquareNoBlowup() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$pathNew = '/tmp/' . uniqid();
+		$image = new CM_File_Image($path);
+
+		$image->resize(5000, 5000, true, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$sizeExpected = min($image->getWidth(), $image->getHeight());
+		$this->assertSame($sizeExpected, $imageNew->getWidth());
+		$this->assertSame($sizeExpected, $imageNew->getHeight());
 	}
 }
