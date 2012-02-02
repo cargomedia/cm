@@ -178,6 +178,18 @@ bindAction: function(actionType, modelType, callback) {
 },
 
 /**
+ * @return object
+ */
+_getArray: function() {
+	return {
+		className: this._class,
+		id: this.getAutoId(),
+		params: this.getParams(),
+		parentId: this.getParent() ? this.getParent().getAutoId() : null
+	};
+},
+
+/**
  * @param string functionName
  * @param array|null params
  * @param object|null callbacks
@@ -187,14 +199,8 @@ bindAction: function(actionType, modelType, callback) {
 ajax: function(functionName, params, callbacks, cache) {
 	callbacks = callbacks || {};
 	params = params || {};
-	var componentInfo = {
-		className: this._class,
-		id: this.getAutoId(),
-		params: this.getParams(),
-		parentId: this.getParent() ? this.getParent().getAutoId() : null
-	};
 	var handler = this;
-	var xhr = cm.ajax('ajax', {component:componentInfo, method:functionName, params:params}, {
+	var xhr = cm.ajax('ajax', {component:this._getArray(), method:functionName, params:params}, {
 		success: function(response) {
 			if (response.exec) {
 				var exec = new Function(response.exec);

@@ -198,7 +198,7 @@ submit: function(action_name, confirmed, data, callbacks) {
 		
 		this.disable()
 		this.trigger('submit', [data]);
-		cm.ajax('form', {component:this.getComponent().getArray(), className:this._class, actionName:action_name, data:data}, {
+		cm.ajax('form', {component:this.getComponent()._getArray(), className:this._class, actionName:action_name, data:data}, {
 			success: function(response) {
 				handler.enable();
 				if (response.errors) {
