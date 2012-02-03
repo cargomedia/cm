@@ -42,10 +42,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @var boolean
 	 */
 	private $_delayed;
-	/**
-	 * @var boolean
-	 */
-	private $_demoMode = false;
 
 	/**
 	 * @param CM_Model_User|string $recipient
@@ -229,12 +225,10 @@ class CM_Mail extends CM_Renderable_Abstract {
 			try {
 				$mail = new PHPMailer(true);
 
-				$mail->SetFrom($senderAddress, $senderName);
-				$mail->AddReplyTo($senderAddress, $senderName);
-				$mail->Sender = $senderAddress;
 				$mail->AddAddress($recipientAddress);
+				$mail->SetFrom($senderAddress, $senderName);
 				$mail->Subject = $subject;
-				$mail->IsHTML($html);
+				$mail->IsHTML(!empty($html));
 				$mail->Body = $html ? $html : $text;
 				$mail->AltBody = $html ? $text : '';
 
