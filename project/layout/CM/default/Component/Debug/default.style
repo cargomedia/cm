@@ -35,6 +35,6 @@
 
 .errors {
 	font-family: monospace;
-	background-color: orange;
+	background-color: #FFA500;
 	margin: 20px;
 }
