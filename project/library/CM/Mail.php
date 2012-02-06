@@ -83,6 +83,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param string|null $name
 	 */
 	public function addTo($address, $name = null) {
+		$address = (string) $address;
+		$name = is_null($name) ? $name : (string) $name;
 		$this->_to[] = array('address' => $address, 'name' => $name);
 	}
 
@@ -98,6 +100,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param string|null $name
 	 */
 	public function addReplyTo($address, $name = null) {
+		$address = (string) $address;
+		$name = is_null($name) ? $name : (string) $name;
 		$this->_replyTo[] = array('address' => $address, 'name' => $name);
 	}
 
@@ -113,6 +117,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param string|null $name
 	 */
 	public function addCc($address, $name = null) {
+		$address = (string) $address;
+		$name = is_null($name) ? $name : (string) $name;
 		$this->_cc[] = array('address' => $address, 'name' => $name);
 	}
 
@@ -128,6 +134,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param string|null $name
 	 */
 	public function addBcc($address, $name = null) {
+		$address = (string) $address;
+		$name = is_null($name) ? $name : (string) $name;
 		$this->_bcc[] = array('address' => $address, 'name' => $name);
 	}
 
@@ -164,6 +172,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param string|null $name
 	 */
 	public function setSender($address, $name = null) {
+		$address = (string) $address;
+		$name = is_null($name) ? $name : (string) $name;
 		$this->_sender = array('address' => $address, 'name' => $name);
 
 	}
@@ -237,7 +247,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 			}
 		}
 		if (empty($this->_to)) {
-			throw new CM_Exception_Invalid('No recipient specified.');
+			return null;
 		}
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
