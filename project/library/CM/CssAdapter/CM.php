@@ -91,15 +91,18 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 							')\)$#i', $value, $match)
 					) {
 						$point = $match['point'];
-						$color1 = $this->_getColor($match['color1']);
-						$color1Hex = $this->_getColor($match['color1'], true);
-						$color2 = $this->_getColor($match['color2']);
-						$color2Hex = $this->_getColor($match['color2'], true);
+						$color1 = $this->_parseColor($match['color1']);
+						$color2 = $this->_parseColor($match['color2']);
+
+						$color1str = $this->_printColor($color1);
+						$color1strHex = $this->_printColor($color1, true);
+						$color2str = $this->_printColor($color2);
+						$color2strHex = $this->_printColor($color2, true);
 						$value = array();
-						$value[] = 'linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
-						$value[] = '-moz-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
-						$value[] = '-webkit-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
-						$value[] = '-o-linear-gradient(' . $point . ',' . $color1 . ',' . $color2 . ')';
+						$value[] = 'linear-gradient(' . $point . ',' . $color1str . ',' . $color2str . ')';
+						$value[] = '-moz-linear-gradient(' . $point . ',' . $color1str . ',' . $color2str . ')';
+						$value[] = '-webkit-linear-gradient(' . $point . ',' . $color1str . ',' . $color2str . ')';
+						$value[] = '-o-linear-gradient(' . $point . ',' . $color1str . ',' . $color2str . ')';
 
 						if ($point == 'top' || $point == 'left') {
 							if ($point == 'left') {
@@ -108,7 +111,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 							if ($point == 'top') {
 								$points = 'left top,left bottom';
 							}
-							$value[] = '-webkit-gradient(linear,' . $points . ',from(' . $color1 . '),to(' . $color2 . '))';
+							$value[] = '-webkit-gradient(linear,' . $points . ',from(' . $color1str . '),to(' . $color2str . '))';
 						}
 
 						// MS Filter: http://msdn.microsoft.com/en-us/library/ms532997(VS.85,loband).aspx
@@ -117,8 +120,13 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 							$filterType = 1;
 						}
 						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
-								'GradientType=' . $filterType . ',startColorstr=' . $color1Hex . ',endColorstr=' . $color2Hex, $properties);
+								'GradientType=' . $filterType . ',startColorstr=' . $color1strHex . ',endColorstr=' . $color2strHex, $properties);
 					}
+					break;
+				case 'background-color':
+				case 'opacity':
+					$value = round($value, 2);
+					$properties['filter'] = $this->_getFilterProperty('alpha', 'opacity=' . ($value * 100), $properties);
 					break;
 				case 'border-radius':
 					$properties['-moz-border-radius'] = $value;
@@ -130,10 +138,6 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 				case 'box-sizing':
 					$properties['-moz-box-sizing'] = $value;
 					$properties['-webkit-box-sizing'] = $value;
-					break;
-				case 'opacity':
-					$value = round($value, 2);
-					$properties['filter'] = $this->_getFilterProperty('alpha', 'opacity=' . ($value * 100), $properties);
 					break;
 				case 'user-select':
 					$properties['-moz-user-select'] = $value;
@@ -175,11 +179,11 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @param string	$colorStr
-	 * @param bool|null $forceAlphaHex
-	 * @return string
+	 * @param string $colorStr
+	 * @return CM_Color
+	 * @throws CM_Exception
 	 */
-	private function _getColor($colorStr, $forceAlphaHex = null) {
+	private function _parseColor($colorStr) {
 		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
@@ -193,14 +197,41 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$blue = $match[6];
 		}
 		$alpha = isset($match[7]) ? (float) $match[7] : 1;
-		if (1 == $alpha) {
-			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
-					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
+		return new CM_Color($red / 255, $green / 255, $blue / 255, $alpha);
+	}
+
+	/**
+	 * @param CM_Color  $color
+	 * @param bool|null $forceAlphaHex
+	 * @return string
+	 */
+	private function _printColor(CM_Color $color, $forceAlphaHex = null) {
+		if ($color->getAlpha() == 1) {
+			return '#' . $this->_printColorHexComponent($color->getRed()) . $this->_printColorHexComponent($color->getGreen()) .
+					$this->_printColorHexComponent($color->getBlue());
 		}
 		if ($forceAlphaHex) {
-			return '#' . str_pad(dechex($alpha * 255), 2, '0', STR_PAD_LEFT) . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) .
-					str_pad(dechex($green), 2, '0', STR_PAD_LEFT) . str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
+			return '#' . $this->_printColorHexComponent($color->getAlpha()) . $this->_printColorHexComponent($color->getRed()) .
+					$this->_printColorHexComponent($color->getGreen()) . $this->_printColorHexComponent($color->getBlue());
 		}
-		return 'rgba(' . $red . ',' . $green . ',' . $blue . ', ' . $alpha . ')';
+		return 'rgba(' . $this->_printColorDecComponent($color->getRed()) . ',' . $this->_printColorDecComponent($color->getGreen()) . ',' .
+				$this->_printColorDecComponent($color->getBlue()) . ', ' . $color->getAlpha() . ')';
 	}
+
+	/**
+	 * @param float $value
+	 * @return string
+	 */
+	private function _printColorHexComponent($value) {
+		return str_pad(dechex($value * 255), 2, '0', STR_PAD_LEFT);
+	}
+
+	/**
+	 * @param float $value
+	 * @return string
+	 */
+	private function _printColorDecComponent($value) {
+		return (string) intval($value * 255);
+	}
+
 }
