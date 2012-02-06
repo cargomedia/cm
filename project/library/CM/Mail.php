@@ -237,7 +237,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 			}
 		}
 		if (empty($this->_to)) {
-			return null;
+			throw new CM_Exception_Invalid('No recipient specified.');
 		}
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
