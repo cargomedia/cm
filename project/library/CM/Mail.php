@@ -339,7 +339,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 					$mail->AddCC($cc['address'], $cc['name']);
 				}
 				foreach ($this->_bcc as $bcc) {
-					$mail->AddBCC($bcc['address'], $cc['name']);
+					$mail->AddBCC($bcc['address'], $bcc['name']);
 				}
 				$mail->Subject = $subject;
 				$mail->IsHTML($html);
