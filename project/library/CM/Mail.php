@@ -356,7 +356,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 				$mail->Send();
 			} catch (phpmailerException $e) {
-				throw new CM_Exception_Invalid('Error sending mail.');
+				throw new CM_Exception_Invalid('Error sending mail. ' . $e->getMessage());
 			}
 		}
 	}
