@@ -302,18 +302,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 		}
 	}
 
-	public static function processQueueLegacy() {
-		$result = CM_Mysql::execRead("SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp`");
-		while ($row = $result->fetchAssoc()) {
-			//self::_send($row['subject'], $row['text'], $row['senderAddress'], $row['recipientAddress'], $row['senderName'], $row['html']);
-			$mail = new CM_Mail();
-			$mail->setSender($row['senderAddress'], $row['senderName']);
-			$mail->addTo($row['recipientAddress']);
-			$mail->_send($row['subject'], $row['text'], $row['html']);
-		}
-		CM_Mysql::truncate(TBL_CM_MAIL);
-	}
-
 	private function _queue($subject, $text, $html) {
 		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
 			'sender' => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()), 'to' => serialize($this->getTo()),
