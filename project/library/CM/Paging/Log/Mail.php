@@ -4,11 +4,10 @@ class CM_Paging_Log_Mail extends CM_Paging_Log_Abstract {
 	const TYPE = 3;
 
 	/**
-	 * @param string $msg
-	 * @param string $senderAddress
-	 * @param string $recipientAddress
+	 * @param CM_Mail $mail
+	 * @param $msg
 	 */
-	public function add($msg, $senderAddress, $recipientAddress) {
-		$this->_add($msg, array('senderAddress' => $senderAddress, 'recipientAddress' => $recipientAddress));
+	public function add(CM_Mail $mail, $msg) {
+		$this->_add($msg, array('sender' => $mail->getSender(), 'replyTo' => $mail->getReplyTo(), 'to' => $mail->getTo(), 'cc' => $mail->getCc(), 'bcc' => $mail->getBcc()));
 	}
 }

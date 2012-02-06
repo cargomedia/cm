@@ -168,10 +168,12 @@ CREATE TABLE `cm_mail` (
   `subject` varchar(256) DEFAULT NULL,
   `text` text,
   `html` mediumtext,
-  `senderAddress` varchar(256) NOT NULL,
-  `recipientAddress` varchar(256) NOT NULL,
-  `senderName` varchar(64) DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `sender` text,
+  `replyTo` text,
+  `to` text,
+  `cc` text,
+  `bcc` text,
   PRIMARY KEY (`id`),
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

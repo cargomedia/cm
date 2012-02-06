@@ -52,8 +52,11 @@ class CM_MailTest extends TestCase {
 		$msg = new CM_Mail($user, null, true);
 		$msg->setSubject('testSubject');
 		$msg->setHtml('<b>hallo</b>');
-		$msg->send();
-		$this->assertRow(TBL_CM_MAIL, array('subject' => 'testSubject', 'text' => 'hallo', 'html' => '<b>hallo</b>',
-			'recipientAddress' => 'foo@example.com'));
+		$msg->addReplyTo('foo@bar.com');
+		$msg->addCc('foo@bar.org', 'foobar');
+		$msg->addBcc('foo@bar.net');
+		$msg->sendDelayed();
+		$this->assertRow(TBL_CM_MAIL, array('subject' => 'testSubject', 'text' => 'hallo', 'html' => '<b>hallo</b>', 'to' => serialize($msg->getTo()),
+			'replyTo' => serialize($msg->getReplyTo()), 'cc' => serialize($msg->getCc()), 'bcc' => serialize($msg->getBcc())));
 	}
 }
