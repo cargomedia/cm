@@ -176,10 +176,10 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 
 	/**
 	 * @param string	$colorStr
-	 * @param bool|null $forceHex
+	 * @param bool|null $forceAlphaHex
 	 * @return string
 	 */
-	private function _getColor($colorStr, $forceHex = null) {
+	private function _getColor($colorStr, $forceAlphaHex = null) {
 		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
@@ -193,13 +193,13 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$blue = $match[6];
 		}
 		$alpha = isset($match[7]) ? (float) $match[7] : 1;
-		if ($forceHex) {
-			return '#' . str_pad(dechex($alpha * 255), 2, '0', STR_PAD_LEFT) . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) .
-					str_pad(dechex($green), 2, '0', STR_PAD_LEFT) . str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
-		}
 		if (1 == $alpha) {
 			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
 					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
+		}
+		if ($forceAlphaHex) {
+			return '#' . str_pad(dechex($alpha * 255), 2, '0', STR_PAD_LEFT) . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) .
+					str_pad(dechex($green), 2, '0', STR_PAD_LEFT) . str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
 		}
 		return 'rgba(' . $red . ',' . $green . ',' . $blue . ', ' . $alpha . ')';
 	}
