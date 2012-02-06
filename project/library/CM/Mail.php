@@ -49,12 +49,9 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 	/**
 	 * @param CM_Model_User|string|null $recipient
-	 * @param array|null                $tplParams
+	 * @param array|null				$tplParams
 	 */
 	public function __construct($recipient = null, array $tplParams = null) {
-		if ($delayed === null) {
-			$delayed = false;
-		}
 		if ($this->hasTemplate()) {
 			$this->setRenderLayout(true);
 		}
@@ -63,7 +60,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 				$this->setTplParam($key, $value);
 			}
 		}
-		if ($recipient) {
+		if (!is_null($recipient)) {
 			if (is_string($recipient)) {
 				$this->addTo($recipient);
 			} elseif ($recipient instanceof CM_Model_User) {
@@ -228,11 +225,11 @@ class CM_Mail extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * @param boolean|null		  $delayed
 	 * @param CM_Site_Abstract|null $site
+	 * @param boolean|null          $delayed
 	 * @return array|null ($subject, $html, $text)
 	 */
-	public function send($delayed = null, CM_Site_Abstract $site = null) {
+	public function send(CM_Site_Abstract $site = null, $delayed = null) {
 		$delayed = (boolean) $delayed;
 		if (!$site) {
 			if ($this->_recipient) {
@@ -245,7 +242,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
-		list($subject, $html, $text) = CM_Render::getInstance($site)->render($this);
+		$render = new CM_Render($site);
+		list($subject, $html, $text) = $render->render($this);
 		if ($delayed) {
 			$this->_queue($subject, $text, $html);
 		} else {
@@ -258,7 +256,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 	 * @param CM_Site_Abstract|null $site
 	 */
 	public function sendDelayed(CM_Site_Abstract $site = null) {
-		$this->send(true, $site);
+		$this->send($site, true);
 	}
 
 	/**
@@ -348,6 +346,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 				$mail->Send();
 			} catch (phpmailerException $e) {
+				throw new CM_Exception_Invalid('Error sending mail.');
 			}
 		}
 	}
