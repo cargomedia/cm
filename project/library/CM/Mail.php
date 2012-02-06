@@ -335,7 +335,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 			try {
 				$mail = new PHPMailer(true);
 
-				$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 				foreach ($this->_replyTo as $replyTo) {
 					$mail->AddReplyTo($replyTo['address'], $replyTo['name']);
 				}
@@ -349,6 +348,8 @@ class CM_Mail extends CM_Renderable_Abstract {
 				foreach ($this->_bcc as $bcc) {
 					$mail->AddBCC($bcc['address'], $bcc['name']);
 				}
+				$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
+
 				$mail->Subject = $subject;
 				$mail->IsHTML($html);
 				$mail->Body = $html ? $html : $text;
