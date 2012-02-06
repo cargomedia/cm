@@ -123,7 +123,6 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 								'GradientType=' . $filterType . ',startColorstr=' . $color1strHex . ',endColorstr=' . $color2strHex, $properties);
 					}
 					break;
-				case 'background-color':
 				case 'opacity':
 					$value = round($value, 2);
 					$properties['filter'] = $this->_getFilterProperty('alpha', 'opacity=' . ($value * 100), $properties);
