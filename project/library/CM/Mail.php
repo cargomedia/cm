@@ -338,7 +338,6 @@ class CM_Mail extends CM_Renderable_Abstract {
 				foreach ($this->_replyTo as $replyTo) {
 					$mail->AddReplyTo($replyTo['address'], $replyTo['name']);
 				}
-				$mail->Sender = $this->_sender['address'];
 				foreach ($this->_to as $to) {
 					$mail->AddAddress($to['address'], $to['name']);
 				}
@@ -357,7 +356,7 @@ class CM_Mail extends CM_Renderable_Abstract {
 
 				$mail->Send();
 			} catch (phpmailerException $e) {
-				throw new CM_Exception_Invalid('Error sending mail. ' . $e->getMessage());
+				throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
 			}
 		}
 	}
