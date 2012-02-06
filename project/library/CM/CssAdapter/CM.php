@@ -19,7 +19,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @param string      $css
+	 * @param string	  $css
 	 * @param array|null  $presets
 	 * @param string|null $prefix
 	 * @return array
@@ -193,7 +193,11 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$blue = $match[6];
 		}
 		$alpha = isset($match[7]) ? (float) $match[7] : 1;
-		if ($forceHex || $alpha == 1) {
+		if ($forceHex) {
+			return '#' . str_pad(dechex($alpha * 255), 2, '0', STR_PAD_LEFT) . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) .
+					str_pad(dechex($green), 2, '0', STR_PAD_LEFT) . str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
+		}
+		if (1 == $alpha) {
 			return '#' . str_pad(dechex($red), 2, '0', STR_PAD_LEFT) . str_pad(dechex($green), 2, '0', STR_PAD_LEFT) .
 					str_pad(dechex($blue), 2, '0', STR_PAD_LEFT);
 		}
