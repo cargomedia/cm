@@ -5,7 +5,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	const REGEX_PROPERTY = '[a-z\-]+';
 	const REGEX_VALUE = '[^;]+';
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
-	const REGEX_COLOR = '(?:(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)))';
+	const REGEX_COLOR = '(?:(?:\#(\w{1})(\w{1})(\w{1}))|(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)))';
 
 	/**
 	 * @return array
@@ -123,6 +123,13 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 								'GradientType=' . $filterType . ',startColorstr=' . $color1strHex . ',endColorstr=' . $color2strHex, $properties);
 					}
 					break;
+				case 'background-color':
+					$color = $this->_parseColor($value);
+					if ($color->getAlpha() < 1) {
+						$colorStrHex = $this->_printColor($color, true);
+						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
+								'GradientType=0,startColorstr=' . $colorStrHex . ',endColorstr=' . $colorStrHex, $properties);
+					}
 				case 'opacity':
 					$value = round($value, 2);
 					$properties['filter'] = $this->_getFilterProperty('alpha', 'opacity=' . ($value * 100), $properties);
@@ -187,16 +194,20 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
 		if (strlen($match[1]) && strlen($match[2]) && strlen($match[3])) {
-			$red = hexdec($match[1]);
-			$green = hexdec($match[2]);
-			$blue = hexdec($match[3]);
+			$red = hexdec($match[1]) / 15;
+			$green = hexdec($match[2]) / 15;
+			$blue = hexdec($match[3]) / 15;
+		} elseif (strlen($match[4]) && strlen($match[5]) && strlen($match[6])) {
+			$red = hexdec($match[4]) / 255;
+			$green = hexdec($match[5]) / 255;
+			$blue = hexdec($match[6]) / 255;
 		} else {
-			$red = $match[4];
-			$green = $match[5];
-			$blue = $match[6];
+			$red = $match[7] / 255;
+			$green = $match[8] / 255;
+			$blue = $match[9] / 255;
 		}
-		$alpha = isset($match[7]) ? (float) $match[7] : 1;
-		return new CM_Color($red / 255, $green / 255, $blue / 255, $alpha);
+		$alpha = isset($match[10]) ? (float) $match[10] : 1;
+		return new CM_Color($red, $green, $blue, $alpha);
 	}
 
 	/**
