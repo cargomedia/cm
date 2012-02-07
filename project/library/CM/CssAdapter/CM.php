@@ -199,7 +199,6 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
-		$alpha = 1;
 		if (strlen($match[1]) && strlen($match[2]) && strlen($match[3])) {
 			return new CM_Color(hexdec($match[1]) * 17, hexdec($match[2]) * 17, hexdec($match[3]) * 17);
 		} elseif (strlen($match[4]) && strlen($match[5]) && strlen($match[6])) {
@@ -233,7 +232,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	}
 
 	/**
-	 * @param float $value
+	 * @param int $value
 	 * @return string
 	 */
 	private function _printColorHexComponent($value) {
