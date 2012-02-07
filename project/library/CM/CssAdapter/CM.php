@@ -128,12 +128,14 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 					}
 					break;
 				case 'background-color':
-					$color = $this->_parseColor($value);
-					$value = $this->_printColor($color);
-					if ($color->getAlpha() < 1) {
-						$colorStrHex = $this->_printColor($color, true);
-						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
-								'GradientType=0,startColorstr=' . $colorStrHex . ',endColorstr=' . $colorStrHex, $properties);
+					if ('transparent' != $value && 'inherit' != $value) {
+						$color = $this->_parseColor($value);
+						$value = $this->_printColor($color);
+						if ($color->getAlpha() < 1) {
+							$colorStrHex = $this->_printColor($color, true);
+							$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
+									'GradientType=0,startColorstr=' . $colorStrHex . ',endColorstr=' . $colorStrHex, $properties);
+						}
 					}
 					break;
 				case 'opacity':
