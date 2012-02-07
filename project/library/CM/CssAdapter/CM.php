@@ -5,7 +5,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	const REGEX_PROPERTY = '[a-z\-]+';
 	const REGEX_VALUE = '[^;]+';
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
-	const REGEX_COLOR = '(?:(?:\#(\w{1})(\w{1})(\w{1}))|(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\)))';
+	const REGEX_COLOR = '(?:(?:\#(\w{1})(\w{1})(\w{1}))|(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\))|(?:(\w{2,40})))';
 
 	/**
 	 * @return array
@@ -86,7 +86,9 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 						list($imgMatch, $filename) = $match;
 						$imageURL = $this->_render->getUrlImg($filename);
 						$value = str_replace($imgMatch, "url($imageURL)", $value);
+						break;
 					}
+				case 'background-image':
 					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>' . self::REGEX_COLOR . '),\s*(?<color2>' . self::REGEX_COLOR .
 							')\)$#i', $value, $match)
 					) {
@@ -121,15 +123,17 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 						}
 						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
 								'GradientType=' . $filterType . ',startColorstr=' . $color1strHex . ',endColorstr=' . $color2strHex, $properties);
+						break;
 					}
-					break;
 				case 'background-color':
 					$color = $this->_parseColor($value);
+					$value = $this->_printColor($color);
 					if ($color->getAlpha() < 1) {
 						$colorStrHex = $this->_printColor($color, true);
 						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
 								'GradientType=0,startColorstr=' . $colorStrHex . ',endColorstr=' . $colorStrHex, $properties);
 					}
+					break;
 				case 'opacity':
 					$value = round($value, 2);
 					$properties['filter'] = $this->_getFilterProperty('alpha', 'opacity=' . ($value * 100), $properties);
@@ -193,6 +197,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 		if (!preg_match('#^' . self::REGEX_COLOR . '$#', $colorStr, $match)) {
 			throw new CM_Exception('Cannot parse color `' . $colorStr . '`');
 		}
+		$alpha = 1;
 		if (strlen($match[1]) && strlen($match[2]) && strlen($match[3])) {
 			$red = hexdec($match[1]) / 15;
 			$green = hexdec($match[2]) / 15;
@@ -201,12 +206,18 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$red = hexdec($match[4]) / 255;
 			$green = hexdec($match[5]) / 255;
 			$blue = hexdec($match[6]) / 255;
-		} else {
+		} elseif (strlen($match[7]) && strlen($match[8]) && strlen($match[9])) {
 			$red = $match[7] / 255;
 			$green = $match[8] / 255;
 			$blue = $match[9] / 255;
+			if (strlen($match[10])) {
+				$alpha = (float) $match[10];
+			}
+		} elseif (strlen($match[11])) {
+			if ('white' == $match[11]) {
+				$red = $green = $blue = 1;
+			}
 		}
-		$alpha = isset($match[10]) ? (float) $match[10] : 1;
 		return new CM_Color($red, $green, $blue, $alpha);
 	}
 
