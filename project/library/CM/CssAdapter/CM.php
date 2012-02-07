@@ -81,14 +81,16 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$value = $rule[2];
 			switch ($property) {
 				case 'background':
-				case 'background-image':
-					if (preg_match('~(?:image)\(([^\)\s]+)\)~', $value, $match)) {
-						list($imgMatch, $filename) = $match;
-						$imageURL = $this->_render->getUrlImg($filename);
-						$value = str_replace($imgMatch, "url($imageURL)", $value);
-						break;
+					if (preg_match('#(?:image)\(([^\)\s]+)\)#', $value, $match)) {
+						$url = $this->_render->getUrlImg($match[1]);
+						$value = str_replace($match[0], 'url(' . $url . ')', $value);
 					}
+					break;
 				case 'background-image':
+					if (preg_match('#(?:image)\(([^\)\s]+)\)#', $value, $match)) {
+						$url = $this->_render->getUrlImg($match[1]);
+						$value = str_replace($match[0], 'url(' . $url . ')', $value);
+					}
 					if (preg_match('#^linear-gradient\((?<point>.+?),\s*(?<color1>' . self::REGEX_COLOR . '),\s*(?<color2>' . self::REGEX_COLOR .
 							')\)$#i', $value, $match)
 					) {
@@ -116,15 +118,15 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 							$value[] = '-webkit-gradient(linear,' . $points . ',from(' . $color1str . '),to(' . $color2str . '))';
 						}
 
-						// MS Filter: http://msdn.microsoft.com/en-us/library/ms532997(VS.85,loband).aspx
+						// @see http://msdn.microsoft.com/en-us/library/ms532997(VS.85,loband).aspx
 						$filterType = 0;
 						if ($point == 'left') {
 							$filterType = 1;
 						}
 						$properties['filter'] = $this->_getFilterProperty('progid:DXImageTransform.Microsoft.gradient',
 								'GradientType=' . $filterType . ',startColorstr=' . $color1strHex . ',endColorstr=' . $color2strHex, $properties);
-						break;
 					}
+					break;
 				case 'background-color':
 					$color = $this->_parseColor($value);
 					$value = $this->_printColor($color);
@@ -232,6 +234,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 					$this->_printColorHexComponent($color->getBlue());
 		}
 		if ($forceAlphaHex) {
+			// @see http://msdn.microsoft.com/en-us/library/ms532930(v=vs.85).aspx
 			return '#' . $this->_printColorHexComponent($color->getAlpha()) . $this->_printColorHexComponent($color->getRed()) .
 					$this->_printColorHexComponent($color->getGreen()) . $this->_printColorHexComponent($color->getBlue());
 		}
