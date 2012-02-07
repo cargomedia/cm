@@ -201,26 +201,17 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 		}
 		$alpha = 1;
 		if (strlen($match[1]) && strlen($match[2]) && strlen($match[3])) {
-			$red = hexdec($match[1]) / 15;
-			$green = hexdec($match[2]) / 15;
-			$blue = hexdec($match[3]) / 15;
+			return new CM_Color(hexdec($match[1]) * 17, hexdec($match[2]) * 17, hexdec($match[3]) * 17);
 		} elseif (strlen($match[4]) && strlen($match[5]) && strlen($match[6])) {
-			$red = hexdec($match[4]) / 255;
-			$green = hexdec($match[5]) / 255;
-			$blue = hexdec($match[6]) / 255;
+			return new CM_Color(hexdec($match[4]), hexdec($match[5]), hexdec($match[6]));
 		} elseif (strlen($match[7]) && strlen($match[8]) && strlen($match[9])) {
-			$red = $match[7] / 255;
-			$green = $match[8] / 255;
-			$blue = $match[9] / 255;
-			if (strlen($match[10])) {
-				$alpha = (float) $match[10];
-			}
+			$alpha = strlen($match[10]) ? (float) $match[10] : null;
+			return new CM_Color($match[7], $match[8], $match[9], $alpha);
 		} elseif (strlen($match[11])) {
-			if ('white' == $match[11]) {
-				$red = $green = $blue = 1;
-			}
+			return CM_Color::parseX11($match[11]);
+		} else {
+			throw new CM_Exception('Cannot parse color `' . $colorStr . '`.');
 		}
-		return new CM_Color($red, $green, $blue, $alpha);
 	}
 
 	/**
@@ -235,11 +226,10 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 		}
 		if ($forceAlphaHex) {
 			// @see http://msdn.microsoft.com/en-us/library/ms532930(v=vs.85).aspx
-			return '#' . $this->_printColorHexComponent($color->getAlpha()) . $this->_printColorHexComponent($color->getRed()) .
+			return '#' . $this->_printColorHexComponent($color->getAlpha() * 255) . $this->_printColorHexComponent($color->getRed()) .
 					$this->_printColorHexComponent($color->getGreen()) . $this->_printColorHexComponent($color->getBlue());
 		}
-		return 'rgba(' . $this->_printColorDecComponent($color->getRed()) . ',' . $this->_printColorDecComponent($color->getGreen()) . ',' .
-				$this->_printColorDecComponent($color->getBlue()) . ', ' . $color->getAlpha() . ')';
+		return 'rgba(' . $color->getRed() . ',' . $color->getGreen() . ',' . $color->getBlue() . ',' . $color->getAlpha() . ')';
 	}
 
 	/**
@@ -247,15 +237,7 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	 * @return string
 	 */
 	private function _printColorHexComponent($value) {
-		return str_pad(dechex($value * 255), 2, '0', STR_PAD_LEFT);
-	}
-
-	/**
-	 * @param float $value
-	 * @return string
-	 */
-	private function _printColorDecComponent($value) {
-		return (string) intval($value * 255);
+		return str_pad(dechex($value), 2, '0', STR_PAD_LEFT);
 	}
 
 }

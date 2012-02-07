@@ -198,11 +198,11 @@ EOD;
 		$expected = <<<'EOD'
 .foo {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#000000,endColorstr=#661e321e);
-	background-image: linear-gradient(left,#000000,rgba(30,50,30, 0.4));
-	background-image: -moz-linear-gradient(left,#000000,rgba(30,50,30, 0.4));
-	background-image: -webkit-linear-gradient(left,#000000,rgba(30,50,30, 0.4));
-	background-image: -o-linear-gradient(left,#000000,rgba(30,50,30, 0.4));
-	background-image: -webkit-gradient(linear,left top,right top,from(#000000),to(rgba(30,50,30, 0.4)));
+	background-image: linear-gradient(left,#000000,rgba(30,50,30,0.4));
+	background-image: -moz-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+	background-image: -webkit-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+	background-image: -o-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+	background-image: -webkit-gradient(linear,left top,right top,from(#000000),to(rgba(30,50,30,0.4)));
 }
 
 EOD;
