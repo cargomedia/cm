@@ -264,7 +264,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 * @param array  $params Query parameters
 	 * @return string
 	 */
-	public static final function LinkAbs($path, array $params = null) {
+	public static final function linkAbs($path, array $params = null) {
 		return self::link($path, $params, true);
 	}
 
