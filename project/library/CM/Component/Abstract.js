@@ -144,14 +144,14 @@ popIn: function() {
  * @param string message
  */
 error: function(message) {
-	cm.window.hint.error(message);
+	cm.window.hint(message);
 },
 
 /**
  * @param string message
  */
 message: function(message) {
-	cm.window.hint.message(message);
+	cm.window.hint(message);
 },
 
 /**

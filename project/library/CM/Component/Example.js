@@ -65,7 +65,7 @@ callAjax: function() {
 callRpc: function() {
 	cm.rpc('CM_Component_Example.time', [], {
 		success: function(timestamp) {
-			cm.window.hint.message("Time: "+timestamp);
+			cm.window.hint("Time: "+timestamp);
 		}
 	});
 },

@@ -263,10 +263,10 @@ error: function(message, field_key) {
 			this.getField(field_key).$('input, select, textarea').focus();
 		}
 	} else {
-		cm.window.hint.error(message);
+		cm.window.hint(message);
 	}
 },
 
 message: function(message) {
-	cm.window.hint.message(message);
+	cm.window.hint(message);
 }
