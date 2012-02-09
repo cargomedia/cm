@@ -12,7 +12,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @var array $_data
 	 */
-	public $_data;
+	private $_data;
 
 	/**
 	 * @var array $_assets
