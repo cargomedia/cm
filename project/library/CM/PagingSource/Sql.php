@@ -1,7 +1,7 @@
 <?php
 
 class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
-	private $_select, $_table, $_where, $_order, $_join, $_group, $_queries = 0;
+	private $_select, $_table, $_where, $_order, $_join, $_group, $_queryCount = 0;
 	protected $_dbSlave = false;
 
 	/**
@@ -15,14 +15,14 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 	function __construct($select, $table, $where = null, $order = null, $join = null, $group = null) {
 		foreach (func_get_args() as $arg) {
 			if (is_array($arg)) {
-				if ($this->_queries && $this->_queries != count($arg)) {
+				if ($this->_queryCount && $this->_queryCount != count($arg)) {
 					throw new CM_Exception_Invalid('Cannot do a union with an inconsistent amount of parameters.');
 				}
-				$this->_queries = count($arg);
+				$this->_queryCount = count($arg);
 			}
 		}
-		if (!$this->_queries) {
-			$this->_queries = 1;
+		if (!$this->_queryCount) {
+			$this->_queryCount = 1;
 		}
 		$this->_select = $select;
 		$this->_table = $table;
@@ -40,10 +40,10 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 		$cacheKey = array('count');
 		if (($count = $this->_cacheGet($cacheKey)) === false) {
 			$query = '';
-			for ($i = 0 ; $i < $this->_queries; $i++) {
+			for ($i = 0 ; $i < $this->_queryCount; $i++) {
 				if ($this->_group) {
 					$select = '1';
-				} elseif ($this->_queries > 1) {
+				} elseif ($this->_queryCount > 1) {
 					if (is_array($this->_select)) {
 						$select =  $this->_select[$i];
 					} else {
@@ -79,7 +79,7 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 				}
 			}
 			$result = CM_Mysql::query($query, $this->_dbSlave);
-			if ($this->_group || ($this->_queries > 1)) {
+			if ($this->_group || ($this->_queryCount > 1)) {
 				$count = (int) $result->numRows();
 			} else {
 				$count = (int) $result->fetchOne();
@@ -93,7 +93,7 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 		$cacheKey = array('items', $this->_select, $this->_order, $offset, $count);
 		if (($items = $this->_cacheGet($cacheKey)) === false) {
 			$query = '';
-			for ($i = 0; $i < $this->_queries; $i++) {
+			for ($i = 0; $i < $this->_queryCount; $i++) {
 				if ($i > 0) {
 					$query .= ' UNION ';
 				}
