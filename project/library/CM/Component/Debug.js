@@ -21,7 +21,7 @@ ready: function() {
 	_.each(cm.model.types, function(modelType, modelName) {
 		_.each(cm.action.types, function(actionType, actionName) {
 			handler.bindAction(actionType, modelType, function(action, model, data) {
-				var msg = "ACTION: <[ACTOR:" + action.actor.id + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
+				var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
 				msg += " (" + JSON.stringify(data) + ")";
 				handler.alert(msg);
 			});
