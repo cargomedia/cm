@@ -8,7 +8,7 @@ class CM_DeviceCapabilities extends CM_Model_Abstract {
 	public function __construct($userAgent) {
 		$userAgent = (string) $userAgent;
 		$this->_setCacheLocal();
-		parent::__construct($userAgent);
+		$this->_construct(array('id' => (string) $userAgent));
 	}
 
 	/**
