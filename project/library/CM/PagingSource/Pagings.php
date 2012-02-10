@@ -33,7 +33,7 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 	 * @return int
 	 */
 	public function getCount($offset = null, $count = null) {
-		if ($this->_unique || $offset) {
+		if ($this->_unique || $offset || $count) {
 			$items = $this->getItems($offset, $count);
 			$count = count($items);
 		} else {
