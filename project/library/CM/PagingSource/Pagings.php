@@ -4,19 +4,21 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 
 	private $_pagings = array();
 	private $_unique;
+	private $_field;
 
 	/**
 	 * @param CM_Paging_Abstract[]
 	 * @param boolean|null $unique
 	 */
-	public function __construct(array $pagings, $unique = null) {
+	public function __construct(array $pagings, $field = null, $unique = null) {
 		foreach ($pagings as $paging) {
 			if (!$paging instanceof CM_Paging_Abstract) {
 				throw new CM_Exception_Invalid("Not a Paging.");
 			}
 		}
-		$this->_unique = (boolean) $unique;
 		$this->_pagings = $pagings;
+		$this->_field = (string) $field;
+		$this->_unique = (boolean) $unique;
 	}
 
 	public function enableCache($lifetime = 600) {
@@ -33,7 +35,7 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 	 * @return int
 	 */
 	public function getCount($offset = null, $count = null) {
-		if ($this->_unique || $offset || $count) {
+		if ($this->_unique || $this->_field || $offset || $count) {
 			$items = $this->getItems($offset, $count);
 			$count = count($items);
 		} else {
@@ -55,9 +57,16 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 		$items = array();
 		/** @var CM_Paging_Abstract $paging */
 		foreach ($this->_pagings as $paging) {
-			if ($this->_unique) {
+			if ($this->_unique || $this->_field) {
 				foreach ($paging->getItemsRaw() as $item) {
-					if (!in_array($item, $items)) {
+					if ($this->_field && is_array($item)) {
+						if (isset($item[$this->_field])) {
+							$item = $item[$this->_field];
+						} else {
+							$item = null;
+						}
+					}
+					if ($item && (!$this->_unique || !in_array($item, $items))) {
 						$items[] = $item;
 					}
 				}
