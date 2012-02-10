@@ -161,6 +161,23 @@ class CM_Session {
 	}
 
 	/**
+	 * @param string $sessionId
+	 * @return array
+	 */
+	public static function getData($sessionId) {
+		$encodedData = CM_SessionHandler::getInstance()->read(((string) $sessionId));
+		if (!$encodedData) {
+			throw new CM_Exception_Invalid('Session `' . $sessionId . "` has no data or doesn't exist.");
+		}
+		$decodedData = array();
+		$vars = preg_split('/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\|/', $encodedData, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+		for ($i = 0; $vars[$i]; $i++) {
+			$decodedData[$vars[$i++]] = unserialize($vars[$i]);
+		}
+		return $decodedData;
+	}
+
+	/**
 	 * @param boolean $renew OPTIONAL
 	 * @return CM_Session
 	 */
