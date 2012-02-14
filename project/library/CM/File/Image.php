@@ -170,6 +170,7 @@ class CM_File_Image extends CM_File {
 	 * @throws CM_Exception_Invalid
 	 */
 	private function _getResource() {
+		ini_set('gd.jpeg_ignore_warning', 1);
 		if (!isset($this->_resource)) {
 			switch ($this->_getImageType()) {
 				case IMAGETYPE_GIF:
