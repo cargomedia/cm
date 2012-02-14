@@ -11,7 +11,7 @@ class CM_PagingSource_PagingsTest extends TestCase {
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
-		for ($i = 0; $i < 10; $i++) {
+		for ($i = 1; $i <= 10; $i++) {
 			CM_Mysql::insert(TBL_TEST_A, array('num' => $i % 5));
 		}
 		CM_Mysql::exec('CREATE TABLE TBL_TEST_B (
@@ -19,8 +19,8 @@ class CM_PagingSource_PagingsTest extends TestCase {
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
-		for ($i = 0; $i < 5; $i++) {
-			CM_Mysql::insert(TBL_TEST_B, array('num' => 5 - $i));
+		for ($i = 1; $i <=5; $i++) {
+			CM_Mysql::insert(TBL_TEST_B, array('num' => $i % 5));
 		}
 	}
 
@@ -28,23 +28,31 @@ class CM_PagingSource_PagingsTest extends TestCase {
 		TH::clearEnv();
 	}
 
+	public function testCaching() {
+		$source = new CM_PagingSource_Pagings(array(new CM_Paging_A()));
+		$source->enableCache();
+		try {
+			$source->clearCache();
+			$this->fail('CM_PagingSource_Pagings should not use caching.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertTrue(true);
+		}
+	}
+
 	public function testGetCount() {
 		$pagingA = new CM_Paging_A();
 		$this->assertEquals(10, $pagingA->getCount());
 		$pagingB = new CM_Paging_B();
 		$this->assertEquals(5, $pagingB->getCount());
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'id');
+		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB));
 		$this->assertEquals(15, $pagingSource->getCount());
 
 		$this->assertEquals(4, $pagingSource->getCount(11));
 
 		//duplicate elimination
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'id', true);
+		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), true);
 		$this->assertEquals(10, $pagingSource->getCount());
 
-		//invalid field
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'nonexistent');
-		$this->assertEquals(0, $pagingSource->getCount());
 	}
 
 	public function testGetItems() {
@@ -52,21 +60,23 @@ class CM_PagingSource_PagingsTest extends TestCase {
 		$this->assertEquals(10, $pagingA->getCount());
 		$pagingB = new CM_Paging_B();
 		$this->assertEquals(5, $pagingB->getCount());
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'id');
+		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB));
 		$items = $pagingSource->getItems(8, 5);
-		$this->assertEquals(9, reset($items));
-		$this->assertEquals(3, end($items));
+		$this->assertEquals(array('id' => 9, 'num' => 4), reset($items));
+		$this->assertEquals(array('id' => 3, 'num' => 3), end($items));
 
 		//duplicate elimination
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'id', true);
+		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), true);
 		$items = $pagingSource->getItems(8, 5);
-		$this->assertEquals(9, reset($items));
-		$this->assertEquals(10, end($items));
+		$this->assertEquals(array('id' => 9, 'num' => 4), reset($items));
+		$this->assertEquals(array('id' => 10, 'num' => 0), end($items));
 		$this->assertEquals(2, count($items));
 
-		//invalid field
-		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), 'nonexistent');
-		$this->assertEmpty($pagingSource->getItems());
+		$items = $pagingSource->getItems(null, 3);
+		$this->assertEquals(array('id' => 1, 'num' => 1), reset($items));
+		$this->assertEquals(array('id' => 3, 'num' => 3), end($items));
+		$this->assertEquals(3, count($items));
+
 	}
 }
 
