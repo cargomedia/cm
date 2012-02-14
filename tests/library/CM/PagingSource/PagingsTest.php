@@ -47,7 +47,7 @@ class CM_PagingSource_PagingsTest extends TestCase {
 		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB));
 		$this->assertEquals(15, $pagingSource->getCount());
 
-		$this->assertEquals(4, $pagingSource->getCount(11));
+		$this->assertEquals(15, $pagingSource->getCount(11));
 
 		//duplicate elimination
 		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), true);

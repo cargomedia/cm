@@ -2,7 +2,7 @@
 
 class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 
-	private $_pagings = array();
+	private $_pagings;
 	private $_distinct;
 
 	/**
@@ -43,9 +43,6 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 		return $items;
 	}
 
-	/**
-	 * @return mixed
-	 */
 	protected function _cacheKeyBase() {
 		throw new CM_Exception_Invalid('`' . __CLASS__  . '` does not support caching.');
 	}
