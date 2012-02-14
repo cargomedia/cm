@@ -47,6 +47,6 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 	 * @return mixed
 	 */
 	protected function _cacheKeyBase() {
-		throw new CM_Exception_Invalid('`' . get_class()  . '` does not support caching.');
+		throw new CM_Exception_Invalid('`' . __CLASS__  . '` does not support caching.');
 	}
 }
