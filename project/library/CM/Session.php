@@ -5,54 +5,57 @@ class CM_Session {
 	const ACTIVITY_EXPIRATION = 240; // 4 mins
 
 	/**
-	 * @var CM_Session $_instance
+	 * @var string
+	 */
+	private $_id;
+	/**
+	 * @var array
+	 */
+	public $_data;
+	/**
+	 * @var int
+	 */
+	private $_expires;
+	/**
+	 * @var CM_Session|null $_instance
 	 */
 	private static $_instance = null;
 
-	private function _start() {
-		if (!headers_sent()) {
-			session_start();
-		}
-
-		$this->_applyCookieLifetime();
-
-		$expiration = CM_SessionHandler::getInstance()->getExpiration($this->getId());
-		$expiresSoon = ($expiration - time() < $this->getLifetime() / 2);
-		if ($expiresSoon) {
-			$this->regenerateId();
-		}
-
-		if ($user = $this->getUser()) {
-			if (!$user->canLogin()) {
-				$this->deleteUser();
-				return;
-			}
-			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
-				$user->updateLatestactivity();
-			}
-			if (!$user->getOnline()) {
-				$user->setOnline(true);
-			}
-		}
-	}
-
-	private function _applyCookieLifetime() {
-		if ($this->hasLifetime()) {
-			session_set_cookie_params($this->getLifetime());
+	/**
+	 * @param string|null $id
+	 */
+	public function __construct($id = null) {
+		if ($id) {
+			$this->_id = (string) $id;
+			$loadedData = $this->_loadData();
+			$data = unserialize($loadedData['data']);
+			$expires = (int) $loadedData['expires'];
 		} else {
-			session_set_cookie_params(0);
+			$id = self::_generateId();
+			$data = array();
+			$expires = time() + $this->getLifetime();
+			$this->_id = (string) $id;
 		}
+		$this->_data = $data;
+		$this->_expires = $expires;
 	}
 
 	/**
-	 * @return string|false
+	 * @param string $key
 	 */
-	public function getId() {
-		$id = session_id();
-		if (empty($id)) {
-			return false;
+	public function delete($key) {
+		unset($this->_data[$key]);
+	}
+
+	public function deleteUser() {
+		if ($this->has('userId')) {
+			if ($user = $this->getUser()) {
+				$user->setOnline(false);
+			}
+			$this->delete('userId');
+			$this->delete('cookieLifeTime');
+			$this->regenerateId();
 		}
-		return $id;
 	}
 
 	/**
@@ -60,33 +63,32 @@ class CM_Session {
 	 * @return mixed|null
 	 */
 	public function get($key) {
-		if (!isset($_SESSION[$key])) {
-			return null;
+		if (isset($this->_data[$key])) {
+			return $this->_data[$key];
 		}
-		return $_SESSION[$key];
-	}
-
-	/**
-	 * @param string  $key
-	 * @param mixed   $data
-	 */
-	public function set($key, $data) {
-		$_SESSION[$key] = $data;
+		return null;
 	}
 
 	/**
 	 * @param string $key
+	 * @param mixed  $value
 	 */
-	public function delete($key) {
-		unset($_SESSION[$key]);
+	public function set($key, $value) {
+		$this->_data[$key] = $value;
 	}
 
 	/**
-	 * @param string $key
-	 * @return boolean
+	 * @return int
 	 */
-	public function has($key) {
-		return isset($_SESSION[$key]);
+	public function getExpiration() {
+		return $this->_expires;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getId() {
+		return $this->_id;
 	}
 
 	/**
@@ -109,14 +111,6 @@ class CM_Session {
 		} else {
 			$this->delete('lifetime');
 		}
-		$this->_applyCookieLifetime();
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function hasLifetime() {
-		return $this->has('lifetime');
 	}
 
 	/**
@@ -145,46 +139,91 @@ class CM_Session {
 		$this->regenerateId();
 	}
 
-	public function deleteUser() {
-		if ($user = $this->getUser()) {
-			$user->setOnline(false);
-		}
-		$this->delete('userId');
-		$this->setLifetime(null);
-		$this->regenerateId();
+	/**
+	 * @param string $key
+	 * @return boolean
+	 */
+	public function has($key) {
+		return isset($this->_data[$key]);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasLifetime() {
+		return $this->has('lifetime');
+	}
+
+	public function persist() {
+		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data), 'expires' => $this->_expires));
+		$this->_change();
+	}
+
+	public function unpersist() {
+		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+		$this->_change();
 	}
 
 	public function regenerateId() {
-		if (!headers_sent()) {
-			session_regenerate_id(true);
-		}
+		$this->unpersist();
+		$this->_id = self::_generateId();
+	}
+
+	public function _change() {
+		CM_Cache::delete($this->_getCacheKey());
+	}
+
+	private function _getCacheKey() {
+		return CM_CacheConst::Session . '_id:' . $this->getId();
 	}
 
 	/**
-	 * @param string $sessionId
 	 * @return array
+	 * @throws CM_Exception_Nonexistent
 	 */
-	public static function getData($sessionId) {
-		$encodedData = CM_SessionHandler::getInstance()->read(((string) $sessionId));
-		if (!$encodedData) {
-			throw new CM_Exception_Invalid('Session `' . $sessionId . "` has no data or doesn't exist.");
+	private function _loadData() {
+		$cacheKey = $this->_getCacheKey();
+		if (($data = CM_Cache::get($cacheKey)) === false) {
+			$data = CM_Mysql::select(TBL_CM_SESSION, '*', array('sessionId' => $this->getId()))->fetchAssoc();
+			if (!$data) {
+				throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
+			}
+			CM_Cache::set($cacheKey, $data);
 		}
-		$decodedData = array();
-		$vars = preg_split('/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\|/', $encodedData, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-		for ($i = 0; $vars[$i]; $i++) {
-			$decodedData[$vars[$i++]] = unserialize($vars[$i]);
+		return $data;
+	}
+
+	private function _start() {
+		$expiration = $this->getExpiration();
+		$expiresSoon = ($expiration - time() < $this->getLifetime() / 2);
+		if ($expiresSoon) {
+			$this->regenerateId();
 		}
-		return $decodedData;
+
+		if ($user = $this->getUser()) {
+			if (!$user->canLogin()) {
+				$this->deleteUser();
+				return;
+			}
+			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
+				$user->updateLatestactivity();
+			}
+			if (!$user->getOnline()) {
+				$user->setOnline(true);
+			}
+		}
 	}
 
 	/**
-	 * @param boolean $renew OPTIONAL
 	 * @return CM_Session
 	 */
-	public static function getInstance($renew = false) {
+	public static function getInstance($sessionId = null, $renew = null) {
 		if (self::$_instance === null || $renew) {
-			self::$_instance = new self();
-			CM_SessionHandler::getInstance();
+			try {
+				self::$_instance = new self($sessionId);
+			} catch (CM_Exception_Nonexistent $ex) {
+				self::$_instance = new self();
+			}
 			self::$_instance->_start();
 		}
 		return self::$_instance;
@@ -201,5 +240,16 @@ class CM_Session {
 				CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
 			}
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	private static function _generateId() {
+		$id = md5(uniqid());
+		while (CM_Mysql::count(TBL_CM_SESSION, array('sessionId' => $id))) {
+			$id = md5(uniqid());
+		}
+		return $id;
 	}
 }
