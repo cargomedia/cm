@@ -63,7 +63,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public function getId() {
 		$id = $this->_getId();
 		if (!array_key_exists('id', $id)) {
-			throw new CM_Exception_Invalid('Id-array has not field `id`.');
+			throw new CM_Exception_Invalid('Id-array has no field `id`.');
 		}
 		return $id['id'];
 	}
