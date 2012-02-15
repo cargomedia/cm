@@ -27,6 +27,11 @@ abstract class CM_Request_Abstract {
 	private $_capabilities;
 
 	/**
+	 * @var CM_Session
+	 */
+	private $_session;
+
+	/**
 	 * @param string				   $uri
 	 * @param array|null			   $headers OPTIONAL
 	 * @param CM_Model_User|null	   $viewer
@@ -46,8 +51,11 @@ abstract class CM_Request_Abstract {
 
 		$this->_headers = array_change_key_case($headers);
 
+		$sessionId = $_COOKIE['sessionId'];
+		$this->_session = CM_Session::getInstance($sessionId);
+
 		if (!$viewer) {
-			$viewer = CM_Session::getInstance()->getUser();
+			$viewer = $this->getSession()->getUser();
 		}
 		$this->_viewer = $viewer;
 	}
@@ -117,6 +125,13 @@ abstract class CM_Request_Abstract {
 		$key = (string) $key;
 		$value = (string) $value;
 		$this->_query[$key] = $value;
+	}
+
+	/**
+	 * @return CM_Session
+	 */
+	public function getSession() {
+		return $this->_session;
 	}
 
 	/**

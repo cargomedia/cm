@@ -40,11 +40,12 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session();
 		$session->set('foo', 'bar');
 		$session->set('bar', array('foo', 'bar'));
-		$session->persist();
 		$expiration = $session->getExpiration();
+		$sessionId = $session->getId();
+		unset($session);
 
 		try {
-			$session = new CM_Session($session->getId());
+			$session = new CM_Session($sessionId);
 			$this->assertTrue(true);
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->fail('Session not persistent.');
@@ -53,20 +54,45 @@ class CM_SessionTest extends TestCase {
 		$this->assertEquals(array('foo', 'bar'), $session->get('bar'));
 		$this->assertEquals($expiration, $session->getExpiration());
 
-		//caching
-		$session->set('foo', 'foo');
-		$session->persist();
-
-		$session = new CM_Session($session->getId());
+		//test that session is only persisted when data changed
+		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo'))), array('sessionId' => $session->getId()));
+		$session->_change();
+		unset($session);
+		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
 
-		$session->unpersist();
+
+		//caching
+		$session->set('foo', 'foo');
+		$sessionId = $session->getId();
+		unset($session);
+
+		$session = new CM_Session($sessionId);
+		$this->assertEquals('foo', $session->get('foo'));
+
+		$sessionId = $session->getId();
+		$session->regenerateId();
 		try {
-			$session = new CM_Session($session->getId());
+			$session = new CM_Session($sessionId);
 			$this->fail('Session not deleted.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+	}
+
+	public function testGc() {
+		$session = new CM_Session();
+		$sessionId = $session->getId();
+		unset($session);
+		TH::timeForward(4000);
+		CM_Session::gc();
+		try {
+			new CM_Session($sessionId);
+			$this->fail('Expired Session was not deleted.');
+		} catch (CM_Exception_Nonexistent $ex) {
+			$this->assertTrue(true);
+		}
+
 	}
 
 	public function testLogin() {

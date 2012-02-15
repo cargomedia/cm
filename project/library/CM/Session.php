@@ -11,7 +11,11 @@ class CM_Session {
 	/**
 	 * @var array
 	 */
-	public $_data;
+	private $_data;
+	/**
+	 * @var array
+	 */
+	private $_dataOld = null;
 	/**
 	 * @var int
 	 */
@@ -27,9 +31,17 @@ class CM_Session {
 	public function __construct($id = null) {
 		if ($id) {
 			$this->_id = (string) $id;
-			$loadedData = $this->_loadData();
-			$data = unserialize($loadedData['data']);
-			$expires = (int) $loadedData['expires'];
+			$cacheKey = $this->_getCacheKey();
+			if (($data = CM_Cache::get($cacheKey)) === false) {
+				$data = CM_Mysql::select(TBL_CM_SESSION, '*', array('sessionId' => $this->getId()))->fetchAssoc();
+				if (!$data) {
+					throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
+				}
+				CM_Cache::set($cacheKey, $data);
+			}
+			$expires = (int) $data['expires'];
+			$data = unserialize($data['data']);
+			$this->_dataOld = $data;
 		} else {
 			$id = self::_generateId();
 			$data = array();
@@ -38,6 +50,12 @@ class CM_Session {
 		}
 		$this->_data = $data;
 		$this->_expires = $expires;
+	}
+
+	public function __destruct() {
+		if ($this->_data !== $this->_dataOld) {
+			$this->_write();
+		}
 	}
 
 	/**
@@ -154,18 +172,8 @@ class CM_Session {
 		return $this->has('lifetime');
 	}
 
-	public function persist() {
-		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data), 'expires' => $this->_expires));
-		$this->_change();
-	}
-
-	public function unpersist() {
-		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
-		$this->_change();
-	}
-
 	public function regenerateId() {
-		$this->unpersist();
+		$this->_destroy();
 		$this->_id = self::_generateId();
 	}
 
@@ -173,24 +181,13 @@ class CM_Session {
 		CM_Cache::delete($this->_getCacheKey());
 	}
 
-	private function _getCacheKey() {
-		return CM_CacheConst::Session . '_id:' . $this->getId();
+	private function _destroy() {
+		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+		$this->_change();
 	}
 
-	/**
-	 * @return array
-	 * @throws CM_Exception_Nonexistent
-	 */
-	private function _loadData() {
-		$cacheKey = $this->_getCacheKey();
-		if (($data = CM_Cache::get($cacheKey)) === false) {
-			$data = CM_Mysql::select(TBL_CM_SESSION, '*', array('sessionId' => $this->getId()))->fetchAssoc();
-			if (!$data) {
-				throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
-			}
-			CM_Cache::set($cacheKey, $data);
-		}
-		return $data;
+	private function _getCacheKey() {
+		return CM_CacheConst::Session . '_id:' . $this->getId();
 	}
 
 	private function _start() {
@@ -212,6 +209,15 @@ class CM_Session {
 				$user->setOnline(true);
 			}
 		}
+	}
+
+	private function _write() {
+		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data), 'expires' => $this->_expires));
+		$this->_change();
+	}
+
+	public static function gc() {
+		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
 	}
 
 	/**
@@ -246,9 +252,9 @@ class CM_Session {
 	 * @return string
 	 */
 	private static function _generateId() {
-		$id = md5(uniqid());
+		$id = md5(rand() . uniqid());
 		while (CM_Mysql::count(TBL_CM_SESSION, array('sessionId' => $id))) {
-			$id = md5(uniqid());
+			$id = md5(rand() . uniqid());
 		}
 		return $id;
 	}
