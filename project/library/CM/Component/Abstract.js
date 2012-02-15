@@ -8,6 +8,10 @@ initialize: function() {
 	if (this.getParent()) {
 		this.getParent().registerChild(this);
 	}
+
+	if (this.actions) {
+		this._bindActions(this.actions);
+	}
 },
 
 /**
@@ -159,7 +163,7 @@ message: function(message) {
  */
 bindStream: function(callback) {
 	var namespace = this._class;
-	cm.stream.bind(namespace, callback);
+	cm.stream.bind(namespace, callback, this);
 	this.on('destruct', function() {
 		cm.stream.unbind(namespace, callback);
 	});
@@ -171,22 +175,10 @@ bindStream: function(callback) {
  * @param function callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
  */
 bindAction: function(actionType, modelType, callback) {
-	cm.action.bind(actionType, modelType, callback);
+	cm.action.bind(actionType, modelType, callback, this);
 	this.on('destruct', function() {
 		cm.action.unbind(actionType, modelType, callback);
 	});
-},
-
-/**
- * @return object
- */
-_getArray: function() {
-	return {
-		className: this._class,
-		id: this.getAutoId(),
-		params: this.getParams(),
-		parentId: this.getParent() ? this.getParent().getAutoId() : null
-	};
 },
 
 /**
@@ -315,4 +307,32 @@ storageGet: function(key) {
  */
 storageDelete: function(key) {
 	cm.storage.del(this._class + '_' + key);
+},
+
+/**
+ * @return object
+ */
+_getArray: function() {
+	return {
+		className: this._class,
+		id: this.getAutoId(),
+		params: this.getParams(),
+		parentId: this.getParent() ? this.getParent().getAutoId() : null
+	};
+},
+
+/**
+ * @param object
+ */
+_bindActions: function(actions) {
+	for (key in actions) {
+		var callback = actions[key];
+		var match = key.match(/^(\S+)\s+(.+)$/);
+		var modelType = cm.model.types[match[1]];
+		var actionNames = match[2].split(/\s*,\s*/);
+		_.each(actionNames, function(actionName) {
+			var actionType = cm.action.types[actionName];
+			this.bindAction(actionType, modelType, callback);
+		}, this);
+	}
 }
