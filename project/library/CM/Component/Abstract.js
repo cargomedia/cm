@@ -165,7 +165,7 @@ bindStream: function(callback) {
 	var namespace = this._class;
 	cm.stream.bind(namespace, callback, this);
 	this.on('destruct', function() {
-		cm.stream.unbind(namespace, callback);
+		cm.stream.unbind(namespace, callback, this);
 	});
 },
 
@@ -177,7 +177,7 @@ bindStream: function(callback) {
 bindAction: function(actionType, modelType, callback) {
 	cm.action.bind(actionType, modelType, callback, this);
 	this.on('destruct', function() {
-		cm.action.unbind(actionType, modelType, callback);
+		cm.action.unbind(actionType, modelType, callback, this);
 	});
 },
 
