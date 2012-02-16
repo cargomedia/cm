@@ -57,6 +57,7 @@ class CM_Session {
 	 */
 	public function delete($key) {
 		unset($this->_data[$key]);
+		$this->_write = true;
 	}
 
 	public function deleteUser() {
@@ -178,7 +179,7 @@ class CM_Session {
 		$expiration = $this->getExpiration();
 		$expiresSoon = ($expiration - time() < $this->getLifetime() / 2);
 		if ($expiresSoon) {
-			$this->regenerateId();
+			$this->_write = true;
 		}
 
 		if ($user = $this->getUser()) {

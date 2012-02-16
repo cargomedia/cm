@@ -38,8 +38,12 @@ class CM_SessionTest extends TestCase {
 
 	public function testPersistence() {
 		$session = new CM_Session();
+		$sessionId = $session->getId();
+		unset($session);
+		$session = new CM_Session($sessionId);
 		$session->set('foo', 'bar');
 		$session->set('bar', array('foo', 'bar'));
+		$session->set('foobar', 'foobar');
 		$expiration = $session->getExpiration();
 		$sessionId = $session->getId();
 		TH::timeForward(10);
@@ -56,12 +60,16 @@ class CM_SessionTest extends TestCase {
 		$this->assertEquals($expiration + 10, $session->getExpiration());
 
 		//test that session is only persisted when data changed
-		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo'))), array('sessionId' => $session->getId()));
+		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
 		$session->_change();
 		unset($session);
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
 
+		$session->delete('foobar');
+		unset($session);
+		$session = new CM_Session($sessionId);
+		$this->assertNull($session->get('foobar'));
 
 		//caching
 		$session->set('foo', 'foo');
