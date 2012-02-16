@@ -68,7 +68,7 @@ abstract class CM_Request_Abstract {
 			$viewer = $this->getSession()->getUser();
 		}
 		$this->_viewer = $viewer;
-		$this->setInstance();
+		self::$_instance = $this;
 	}
 
 	/**
@@ -209,10 +209,6 @@ abstract class CM_Request_Abstract {
 		}
 		$blockedIps = new CM_Paging_Ip_Blocked();
 		return $blockedIps->contains($ip);
-	}
-
-	public function setInstance() {
-		self::$_instance = $this;
 	}
 
 	/**
