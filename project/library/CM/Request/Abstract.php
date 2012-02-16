@@ -143,7 +143,11 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getSession() {
 		if (!$this->hasSession()) {
-			$this->_session = new CM_Session($this->_sessionId);
+			try {
+				$this->_session = new CM_Session($this->_sessionId);
+			} catch (CM_Exception_Nonexistent $ex) {
+				$this->_session = new CM_Session();
+			}
 			$this->_session->start();
 		}
 		return $this->_session;
