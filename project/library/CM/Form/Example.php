@@ -13,7 +13,8 @@ class CM_Form_Example extends CM_Form_Abstract {
 	}
 
 	public function renderStart(array $params = null) {
-		if ($locationGuess = CM_Location::findByIp(CM_Request_Abstract::getIp())) {
+		$ip = CM_Request_Abstract::getInstance()->getIp();
+		if ($locationGuess = CM_Location::findByIp($ip)) {
 			$this->getField('location')->setValue($locationGuess);
 		}
 	}

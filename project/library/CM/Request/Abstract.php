@@ -182,8 +182,8 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @return bool
 	 */
-	public static function isIpBlocked() {
-		$ip = self::getIp();
+	public function getIpBlocked() {
+		$ip = $this->getIp();
 		if (!$ip) {
 			return false;
 		}
@@ -192,11 +192,18 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return CM_Request_Abstract|null
+	 * @return bool
 	 */
-	public static function findInstance() {
-		if (!isset(self::$_instance)) {
-			return null;
+	public static function hasInstance() {
+		return isset(self::$_instance);
+	}
+
+	/**
+	 * @return CM_Request_Abstract
+	 */
+	public static function getInstance() {
+		if (!self::hasInstance()) {
+			throw new CM_Exception_Invalid('No request set');
 		}
 		return self::$_instance;
 	}
@@ -204,7 +211,7 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @return int|false
 	 */
-	public static function getIp() {
+	public function getIp() {
 		if (IS_TEST || IS_DEBUG) {
 			$ip = CM_Config::get()->testIp;
 		} else {
