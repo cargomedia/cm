@@ -180,6 +180,25 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return int|false
+	 */
+	public function getIp() {
+		if (IS_TEST || IS_DEBUG) {
+			$ip = CM_Config::get()->testIp;
+		} else {
+			if (!isset($_SERVER['REMOTE_ADDR'])) {
+				return false;
+			}
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		$long = sprintf('%u', ip2long($ip));
+		if (0 == $long) {
+			return false;
+		}
+		return $long;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function getIpBlocked() {
@@ -206,24 +225,5 @@ abstract class CM_Request_Abstract {
 			throw new CM_Exception_Invalid('No request set');
 		}
 		return self::$_instance;
-	}
-
-	/**
-	 * @return int|false
-	 */
-	public function getIp() {
-		if (IS_TEST || IS_DEBUG) {
-			$ip = CM_Config::get()->testIp;
-		} else {
-			if (!isset($_SERVER['REMOTE_ADDR'])) {
-				return false;
-			}
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		$long = sprintf('%u', ip2long($ip));
-		if (0 == $long) {
-			return false;
-		}
-		return $long;
 	}
 }
