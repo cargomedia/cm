@@ -345,11 +345,8 @@ _bindActions: function(actions) {
  * @param object
  */
 _bindStreams: function(streams) {
-	for (key in streams) {
-		var callback = streams[key];
-		var events = key.split(/\s+/);
-		_.each(events, function(event) {
-			this.bindStream(event, callback);
-		}, this);
+	for (event in streams) {
+		var callback = streams[event];
+		this.bindStream(event, callback);
 	}
 }
