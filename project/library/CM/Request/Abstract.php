@@ -68,7 +68,7 @@ abstract class CM_Request_Abstract {
 			$viewer = $this->getSession()->getUser();
 		}
 		$this->_viewer = $viewer;
-		self::$_instance = $this;
+		$this->setInstance();
 	}
 
 	/**
@@ -143,7 +143,8 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getSession() {
 		if (!$this->hasSession()) {
-			$this->_session = CM_Session::getInstance($this->_sessionId);
+			$this->_session = new CM_Session($this->_sessionId);
+			$this->_session->start();
 		}
 		return $this->_session;
 	}
@@ -208,6 +209,10 @@ abstract class CM_Request_Abstract {
 		}
 		$blockedIps = new CM_Paging_Ip_Blocked();
 		return $blockedIps->contains($ip);
+	}
+
+	public function setInstance() {
+		self::$_instance = $this;
 	}
 
 	/**

@@ -20,10 +20,6 @@ class CM_Session {
 	 * @var int
 	 */
 	private $_expires;
-	/**
-	 * @var CM_Session|null $_instance
-	 */
-	private static $_instance = null;
 
 	/**
 	 * @param string|null $id
@@ -177,20 +173,7 @@ class CM_Session {
 		$this->_id = self::_generateId();
 	}
 
-	public function _change() {
-		CM_Cache::delete($this->_getCacheKey());
-	}
-
-	private function _destroy() {
-		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
-		$this->_change();
-	}
-
-	private function _getCacheKey() {
-		return CM_CacheConst::Session . '_id:' . $this->getId();
-	}
-
-	private function _start() {
+	public function start() {
 		$expiration = $this->getExpiration();
 		$expiresSoon = ($expiration - time() < $this->getLifetime() / 2);
 		if ($expiresSoon) {
@@ -211,6 +194,19 @@ class CM_Session {
 		}
 	}
 
+	public function _change() {
+		CM_Cache::delete($this->_getCacheKey());
+	}
+
+	private function _destroy() {
+		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+		$this->_change();
+	}
+
+	private function _getCacheKey() {
+		return CM_CacheConst::Session . '_id:' . $this->getId();
+	}
+
 	private function _write() {
 		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data), 'expires' => $this->_expires));
 		$this->_change();
@@ -218,21 +214,6 @@ class CM_Session {
 
 	public static function gc() {
 		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
-	}
-
-	/**
-	 * @return CM_Session
-	 */
-	public static function getInstance($sessionId = null, $renew = null) {
-		if (self::$_instance === null || $renew) {
-			try {
-				self::$_instance = new self($sessionId);
-			} catch (CM_Exception_Nonexistent $ex) {
-				self::$_instance = new self();
-			}
-			self::$_instance->_start();
-		}
-		return self::$_instance;
 	}
 
 	public static function logoutOld() {

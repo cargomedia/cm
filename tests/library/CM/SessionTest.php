@@ -97,7 +97,7 @@ class CM_SessionTest extends TestCase {
 
 	public function testLogin() {
 		$user = CM_Model_User::create();
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 
 		$session->setUser($user);
 		$this->assertModelEquals($user, $session->getUser(true));
@@ -105,7 +105,7 @@ class CM_SessionTest extends TestCase {
 	}
 
 	public function testLogout() {
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 		$session->setUser(CM_Model_User::create());
 		$user = $session->getUser(true);
 
@@ -116,7 +116,7 @@ class CM_SessionTest extends TestCase {
 	}
 
 	public function testGetViewer() {
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 		$this->assertNull($session->getUser());
 		try {
 			$session->getUser(true);
@@ -137,18 +137,18 @@ class CM_SessionTest extends TestCase {
 		$user = CM_Model_User::create();
 
 		$activityStamp1 = time();
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 		$session->setUser($user);
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
 		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 10);
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 		$session->setUser($user);
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
 		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 2);
 		$activityStamp2 = time();
-		$session = CM_Session::getInstance(null, true);
+		$session = new CM_Session();
 		$session->setUser($user);
 		$this->assertEquals($activityStamp2, $session->getUser(true)->getLatestactivity(), null, 1);
 	}

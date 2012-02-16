@@ -89,7 +89,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		if ($this->getRequest()->hasSession()) {
 			$session = $this->getRequest()->getSession();
 			$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
-			setcookie('sessionId', $session->getId(), $sessionExpiration, '/');
+			if (!setcookie('sessionId', $session->getId(), $sessionExpiration, '/')) {
+				throw new CM_Exception_Invalid('Unable to send session-cookie.');
+			}
 		}
 
 		foreach ($this->_rawHeaders as $header) {
