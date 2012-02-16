@@ -86,9 +86,11 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	public function sendHeaders() {
 
-		$session = $this->getRequest()->getSession();
-		$sessionExpiration = $session->hasLifetime() ? $session->getLifetime() : null;
-		setcookie('sessionId', $session->getId(), $sessionExpiration, '/');
+		if ($this->getRequest()->hasSession()) {
+			$session = $this->getRequest()->getSession();
+			$sessionExpiration = $session->hasLifetime() ? $session->getLifetime() : null;
+			setcookie('sessionId', $session->getId(), $sessionExpiration, '/');
+		}
 
 		foreach ($this->_rawHeaders as $header) {
 			header($header);
