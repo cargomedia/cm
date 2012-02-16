@@ -7,10 +7,6 @@ class CM_Bootloader {
 		mb_internal_encoding('UTF-8');
 	}
 
-	public function session() {
-		CM_Session::getInstance();
-	}
-
 	public function autoloader() {
 		spl_autoload_register(function($className) {
 			$path = DIR_ROOT . 'library/' . str_replace('_', '/', $className) . '.php';
