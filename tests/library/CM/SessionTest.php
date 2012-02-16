@@ -42,6 +42,7 @@ class CM_SessionTest extends TestCase {
 		$session->set('bar', array('foo', 'bar'));
 		$expiration = $session->getExpiration();
 		$sessionId = $session->getId();
+		TH::timeForward(10);
 		unset($session);
 
 		try {
@@ -52,7 +53,7 @@ class CM_SessionTest extends TestCase {
 		}
 		$this->assertEquals('bar', $session->get('foo'));
 		$this->assertEquals(array('foo', 'bar'), $session->get('bar'));
-		$this->assertEquals($expiration, $session->getExpiration());
+		$this->assertEquals($expiration + 10, $session->getExpiration());
 
 		//test that session is only persisted when data changed
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo'))), array('sessionId' => $session->getId()));
@@ -78,6 +79,31 @@ class CM_SessionTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+	}
+
+	public function testRegenerateId() {
+		$session = new CM_Session();
+		$session->set('foo', 'bar');
+		$sessionId = $session->getId();
+		unset($session);
+		$session = new CM_Session($sessionId);
+		$oldSessionId = $session->getId();
+		$session->regenerateId();
+		$newSessionId = $session->getId();
+		unset($session);
+		try {
+			new CM_Session($oldSessionId);
+			$this->fail('Db entry not updated.');
+		} catch (CM_Exception_Nonexistent $ex) {
+			$this->assertTrue(true);
+		}
+		try {
+			$session = new CM_Session($newSessionId);
+			$this->assertTrue(true);
+		} catch (CM_Exception_Nonexistent $ex) {
+			$this->fail('Db entry not updated.');
+		}
+		$this->assertEquals('bar', $session->get('foo'));
 	}
 
 	public function testGc() {

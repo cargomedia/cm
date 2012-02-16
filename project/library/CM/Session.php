@@ -13,13 +13,11 @@ class CM_Session {
 	 */
 	private $_data;
 	/**
-	 * @var array
-	 */
-	private $_dataOld = null;
-	/**
 	 * @var int
 	 */
 	private $_expires;
+
+	private $_write = false;
 
 	/**
 	 * @param string|null $id
@@ -29,7 +27,7 @@ class CM_Session {
 			$this->_id = (string) $id;
 			$cacheKey = $this->_getCacheKey();
 			if (($data = CM_Cache::get($cacheKey)) === false) {
-				$data = CM_Mysql::select(TBL_CM_SESSION, '*', array('sessionId' => $this->getId()))->fetchAssoc();
+				$data = CM_Mysql::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $this->getId()))->fetchAssoc();
 				if (!$data) {
 					throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
 				}
@@ -37,19 +35,19 @@ class CM_Session {
 			}
 			$expires = (int) $data['expires'];
 			$data = unserialize($data['data']);
-			$this->_dataOld = $data;
 		} else {
 			$id = self::_generateId();
 			$data = array();
 			$expires = time() + $this->getLifetime();
 			$this->_id = (string) $id;
+			$this->_write = true;
 		}
 		$this->_data = $data;
 		$this->_expires = $expires;
 	}
 
 	public function __destruct() {
-		if ($this->_data !== $this->_dataOld) {
+		if ($this->_write) {
 			$this->_write();
 		}
 	}
@@ -89,6 +87,7 @@ class CM_Session {
 	 */
 	public function set($key, $value) {
 		$this->_data[$key] = $value;
+		$this->_write = true;
 	}
 
 	/**
@@ -169,8 +168,10 @@ class CM_Session {
 	}
 
 	public function regenerateId() {
-		$this->_destroy();
-		$this->_id = self::_generateId();
+		$newId = self::_generateId();
+		CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
+		$this->_change();
+		$this->_id = $newId;
 	}
 
 	public function start() {
@@ -198,17 +199,13 @@ class CM_Session {
 		CM_Cache::delete($this->_getCacheKey());
 	}
 
-	private function _destroy() {
-		CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
-		$this->_change();
-	}
-
 	private function _getCacheKey() {
 		return CM_CacheConst::Session . '_id:' . $this->getId();
 	}
 
 	private function _write() {
-		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data), 'expires' => $this->_expires));
+		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
+			'expires' => time() + $this->getLifetime()));
 		$this->_change();
 	}
 
