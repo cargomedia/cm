@@ -131,6 +131,23 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return CM_Session
+	 */
+	public function getSession() {
+		if (!$this->hasSession()) {
+			$this->_session = CM_Session::getInstance($this->_sessionId);
+		}
+		return $this->_session;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function hasSession() {
+		return isset($this->_session);
+	}
+
+	/**
 	 * @param string $name
 	 * @return bool
 	 */
