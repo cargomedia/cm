@@ -12,6 +12,9 @@ initialize: function() {
 	if (this.actions) {
 		this._bindActions(this.actions);
 	}
+	if (this.streams) {
+		this._bindStreams(this.streams);
+	}
 },
 
 /**
@@ -159,10 +162,11 @@ message: function(message) {
 },
 
 /**
+ * @param string event
  * @param function callback fn(array data)
  */
-bindStream: function(callback) {
-	var namespace = this._class;
+bindStream: function(event, callback) {
+	var namespace = this._class + ':' + event;
 	cm.stream.bind(namespace, callback, this);
 	this.on('destruct', function() {
 		cm.stream.unbind(namespace, callback, this);
@@ -333,6 +337,19 @@ _bindActions: function(actions) {
 		_.each(actionNames, function(actionName) {
 			var actionType = cm.action.types[actionName];
 			this.bindAction(actionType, modelType, callback);
+		}, this);
+	}
+},
+
+/**
+ * @param object
+ */
+_bindStreams: function(streams) {
+	for (key in streams) {
+		var callback = streams[key];
+		var events = key.split(/\s+/);
+		_.each(events, function(event) {
+			this.bindStream(event, callback);
 		}, this);
 	}
 }

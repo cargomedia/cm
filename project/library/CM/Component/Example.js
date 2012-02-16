@@ -3,32 +3,33 @@ profile: null,
 pingCount: 0,
 
 events: {
-	"click .reload": "reloadChinese",
-	"click .remove": "myRemove",
-	"click .popout": "popOut",
-	"click .popin": "popIn",
-	"click .load": "loadExample",
-	"click .load_callback": "loadExampleInline",
-	"click .call": "callAjax",
-	"click .rpc": "callRpc",
-	"click .error_500_text_callback": "error_500_text_callback",
-	"click .error_599_text": "error_599_text",
-	"click .error_CM_Exception_public_callback": "error_CM_Exception_public_callback",
-	"click .error_CM_Exception_public": "error_CM_Exception_public",
-	"click .error_CM_Exception": "error_CM_Exception",
-	"click .error_CM_Exception_AuthRequired_public_callback": "error_CM_Exception_AuthRequired_public_callback",
-	"click .error_CM_Exception_AuthRequired_public": "error_CM_Exception_AuthRequired_public",
-	"click .error_CM_Exception_AuthRequired": "error_CM_Exception_AuthRequired",
-	"click .stream .ping": "ping"
+	'click .reload': 'reloadChinese',
+	'click .remove': 'myRemove',
+	'click .popout': 'popOut',
+	'click .popin': 'popIn',
+	'click .load': 'loadExample',
+	'click .load_callback': 'loadExampleInline',
+	'click .call': 'callAjax',
+	'click .rpc': 'callRpc',
+	'click .error_500_text_callback': 'error_500_text_callback',
+	'click .error_599_text': 'error_599_text',
+	'click .error_CM_Exception_public_callback': 'error_CM_Exception_public_callback',
+	'click .error_CM_Exception_public': 'error_CM_Exception_public',
+	'click .error_CM_Exception': 'error_CM_Exception',
+	'click .error_CM_Exception_AuthRequired_public_callback': 'error_CM_Exception_AuthRequired_public_callback',
+	'click .error_CM_Exception_AuthRequired_public': 'error_CM_Exception_AuthRequired_public',
+	'click .error_CM_Exception_AuthRequired': 'error_CM_Exception_AuthRequired',
+	'click .stream .ping': 'ping'
+},
+
+streams: {
+	'ping': function(response) {
+		this.$('.stream .output').append(response.number + ': ' + response.message + '<br />').scrollBottom();
+	}
 },
 
 ready: function() {
 	this.message("Component ready, uname: " + this.uname);
-
-	var handler = this;
-	this.bindStream(function(response) {
-		handler.$('.stream .output').append(response.number + ': ' + response.message + '<br />').scrollBottom();
-	});
 },
 
 reloadChinese: function() {

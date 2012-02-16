@@ -149,18 +149,17 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * sends a stream to the given user's channel,
-	 * preformatted with the namespace set to the corresponding component.
-	 * the given data is enclosed in the associative array under the key data
 	 * @param CM_Model_User $user
-	 * @param mixed $data
+	 * @param string		$event
+	 * @param mixed		 $data
 	 */
-	public static function stream(CM_Model_User $user, $data) {
-		CM_Stream::publishUser($user, array('namespace' => get_called_class(), 'data' => $data));
+	public static function stream(CM_Model_User $user, $event, $data) {
+		$namespace = get_called_class() . ':' . $event;
+		CM_Stream::publishUser($user, array('namespace' => $namespace, 'data' => $data));
 	}
 
 	/**
-	 * @param string $className
+	 * @param string		  $className
 	 * @param CM_Params|array $params
 	 * @return CM_Component_Abstract
 	 * @throws CM_Exception

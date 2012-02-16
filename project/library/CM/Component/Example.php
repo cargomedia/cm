@@ -38,7 +38,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
 		$number = $params->getInt('number');
-		self::stream($response->getViewer(true), array("number" => $number, "message" => 'pong'));
+		self::stream($response->getViewer(true), 'ping', array("number" => $number, "message" => 'pong'));
 	}
 
 	public static function rpc_time() {
