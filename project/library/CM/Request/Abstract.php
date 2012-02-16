@@ -30,7 +30,14 @@ abstract class CM_Request_Abstract {
 	 * @var CM_Session
 	 */
 	private $_session;
+	/**
+	 * @var int|null
+	 */
 	private $_sessionId = null;
+	/**
+	 * @var CM_Request_Abstract
+	 */
+	private static $_instance;
 
 	/**
 	 * @param string				   $uri
@@ -61,6 +68,7 @@ abstract class CM_Request_Abstract {
 			$viewer = $this->getSession()->getUser();
 		}
 		$this->_viewer = $viewer;
+		self::$_instance = $this;
 	}
 
 	/**
@@ -181,6 +189,16 @@ abstract class CM_Request_Abstract {
 		}
 		$blockedIps = new CM_Paging_Ip_Blocked();
 		return $blockedIps->contains($ip);
+	}
+
+	/**
+	 * @return CM_Request_Abstract|null
+	 */
+	public static function findInstance() {
+		if (!isset(self::$_instance)) {
+			return null;
+		}
+		return self::$_instance;
 	}
 
 	/**

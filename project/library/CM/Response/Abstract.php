@@ -88,7 +88,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
 		if ($this->getRequest()->hasSession()) {
 			$session = $this->getRequest()->getSession();
-			$sessionExpiration = $session->hasLifetime() ? $session->getLifetime() : null;
+			$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
 			setcookie('sessionId', $session->getId(), $sessionExpiration, '/');
 		}
 
