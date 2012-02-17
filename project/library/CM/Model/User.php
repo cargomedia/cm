@@ -172,7 +172,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	public static function offlineOld() {
-			$res = CM_Mysql::exec('SELECT `o`.`userId` FROM TBL_CM_USER_ONLINE `o` JOIN TBL_CM_USER `u` USING(`userId`) WHERE `u`.`activityStamp` < ?',
+			$res = CM_Mysql::exec('SELECT `o`.`userId` FROM TBL_CM_USER_ONLINE `o` LEFT JOIN TBL_CM_USER `u` USING(`userId`) WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
 					time() - CM_Session::ACTIVITY_EXPIRATION);
 			while ($userId = $res->fetchOne()) {
 				try {
@@ -195,6 +195,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		$this->getTransgressions()->deleteAll();
+		CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
 	}
 
