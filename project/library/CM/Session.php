@@ -17,8 +17,14 @@ class CM_Session {
 	 * @var int
 	 */
 	private $_expires;
-
+	/**
+	 * @var boolean
+	 */
 	private $_write = false;
+	/**
+	 * @var boolean
+	 */
+	private $_isPersistent = false;
 
 	/**
 	 * @param string|null $id
@@ -34,6 +40,7 @@ class CM_Session {
 				}
 				CM_Cache::set($cacheKey, $data, self::LIFETIME_DEFAULT);
 			}
+			$this->_isPersistent = true;
 			$expires = (int) $data['expires'];
 			$data = unserialize($data['data']);
 		} else {
@@ -168,6 +175,13 @@ class CM_Session {
 		return $this->has('lifetime');
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function isEmpty() {
+		return empty($this->_data);
+	}
+
 	public function regenerateId() {
 		$newId = self::_generateId();
 		CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
@@ -205,9 +219,14 @@ class CM_Session {
 	}
 
 	private function _write() {
-		CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
-			'expires' => time() + $this->getLifetime()));
-		$this->_change();
+		if (!$this->isEmpty()) {
+			CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
+				'expires' => time() + $this->getLifetime()));
+			$this->_change();
+		} elseif ($this->_isPersistent) {
+			CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+			$this->_change();
+		}
 	}
 
 	public static function gc() {

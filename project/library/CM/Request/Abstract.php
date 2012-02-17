@@ -204,7 +204,7 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getViewer($needed = false) {
 		if ($this->_viewer === false) {
-			$this->_viewer = $this->hasSession() ? $this->getSession()->getUser(): null;
+			$this->_viewer = $this->getSession()->getUser();
 		}
 		if (!$this->_viewer) {
 			if ($needed) {

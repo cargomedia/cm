@@ -40,8 +40,18 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session();
 		$sessionId = $session->getId();
 		unset($session);
-		$session = new CM_Session($sessionId);
+		try {
+			new CM_Session($sessionId);
+			$this->fail('Empty Session stored in db.');
+		} catch (CM_Exception_Nonexistent $ex) {
+			$this->assertTrue(true);
+		}
+		$session = new CM_Session();
+		$sessionId = $session->getId();
 		$session->set('foo', 'bar');
+		unset($session);
+		$session = new CM_Session($sessionId);
+
 		$session->set('bar', array('foo', 'bar'));
 		$session->set('foobar', 'foobar');
 		$expiration = $session->getExpiration();
@@ -205,6 +215,7 @@ class CM_SessionTest extends TestCase {
 
 	public function testExpiration() {
 		$session = new CM_Session();
+		$session->set('foo', 'bar');
 		$sessionId = $session->getId();
 		unset($session);
 		$session = new CM_Session($sessionId);
