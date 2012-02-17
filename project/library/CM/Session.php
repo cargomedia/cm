@@ -184,8 +184,10 @@ class CM_Session {
 
 	public function regenerateId() {
 		$newId = self::_generateId();
-		CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
-		$this->_change();
+		if ($this->_isPersistent) {
+			CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
+			$this->_change();
+		}
 		$this->_id = $newId;
 	}
 
@@ -211,7 +213,9 @@ class CM_Session {
 	}
 
 	private function _change() {
-		CM_Cache::delete($this->_getCacheKey());
+		if ($this->_isPersistent) {
+			CM_Cache::delete($this->_getCacheKey());
+		}
 	}
 
 	private function _getCacheKey() {
@@ -237,10 +241,6 @@ class CM_Session {
 	 * @return string
 	 */
 	private static function _generateId() {
-		$id = md5(rand() . uniqid());
-		while (CM_Mysql::count(TBL_CM_SESSION, array('sessionId' => $id))) {
-			$id = md5(rand() . uniqid());
-		}
-		return $id;
+		return md5(rand() . uniqid());
 	}
 }
