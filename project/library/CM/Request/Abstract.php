@@ -72,6 +72,10 @@ abstract class CM_Request_Abstract {
 			}
 		}
 
+		if ($viewer){
+			$this->_viewer = $viewer;
+		}
+
 		self::$_instance = $this;
 	}
 
