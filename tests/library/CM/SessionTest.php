@@ -85,12 +85,16 @@ class CM_SessionTest extends TestCase {
 		$session->set('foo', 'foo');
 		$sessionId = $session->getId();
 		unset($session);
+		$session = new CM_Session($sessionId);
+		unset($session);
 
+		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'bar'))), array('sessionId' => $sessionId));
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
 
-		$sessionId = $session->getId();
-		$session->regenerateId();
+		$session->delete('foo');
+		$this->assertTrue($session->isEmpty());
+		unset($session);
 		try {
 			$session = new CM_Session($sessionId);
 			$this->fail('Session not deleted.');
