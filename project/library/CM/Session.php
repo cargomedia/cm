@@ -3,7 +3,7 @@
 class CM_Session {
 
 	const ACTIVITY_EXPIRATION = 240; // 4 mins
-	const DEFAULT_SESSION_LIFETIME = 3600;
+	const LIFETIME_DEFAULT = 3600;
 
 	/**
 	 * @var string
@@ -32,7 +32,7 @@ class CM_Session {
 				if (!$data) {
 					throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
 				}
-				CM_Cache::set($cacheKey, $data, self::DEFAULT_SESSION_LIFETIME);
+				CM_Cache::set($cacheKey, $data, self::LIFETIME_DEFAULT);
 			}
 			$expires = (int) $data['expires'];
 			$data = unserialize($data['data']);
@@ -110,7 +110,7 @@ class CM_Session {
 	 */
 	public function getLifetime() {
 		if (!$this->hasLifetime()) {
-			return self::DEFAULT_SESSION_LIFETIME;
+			return self::LIFETIME_DEFAULT;
 		}
 		return (int) $this->get('lifetime');
 	}

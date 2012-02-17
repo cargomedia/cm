@@ -17,9 +17,9 @@ abstract class CM_Request_Abstract {
 	protected $_headers = array();
 
 	/**
-	 * @var CM_Model_User
+	 * @var CM_Model_User|null
 	 */
-	protected $_viewer = null;
+	protected $_viewer = false;
 
 	/**
 	 * @var CM_DeviceCapabilities
@@ -33,7 +33,7 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @var int|null
 	 */
-	private $_sessionId = null;
+	private $_sessionId;
 	/**
 	 * @var CM_Request_Abstract
 	 */
@@ -64,10 +64,6 @@ abstract class CM_Request_Abstract {
 			$this->_sessionId = $sessionId;
 		}
 
-		if (!$viewer && $this->_sessionId) {
-			$viewer = $this->getSession()->getUser();
-		}
-		$this->_viewer = $viewer;
 		self::$_instance = $this;
 	}
 
@@ -142,7 +138,7 @@ abstract class CM_Request_Abstract {
 	 * @return CM_Session
 	 */
 	public function getSession() {
-		if (!$this->hasSession()) {
+		if (!$this->_session) {
 			try {
 				$this->_session = new CM_Session($this->_sessionId);
 			} catch (CM_Exception_Nonexistent $ex) {
@@ -157,7 +153,7 @@ abstract class CM_Request_Abstract {
 	 * @return boolean
 	 */
 	public function hasSession() {
-		return isset($this->_session);
+		return ($this->_session || $this->_sessionId);
 	}
 
 	/**
@@ -175,6 +171,11 @@ abstract class CM_Request_Abstract {
 	 * @throws CM_Exception_AuthRequired
 	 */
 	public function getViewer($needed = false) {
+		if ($this->_viewer === false) {
+			if ($this->hasSession()) {
+				$this->_viewer = $this->getSession()->getUser();
+			}
+		}
 		if (!$this->_viewer) {
 			if ($needed) {
 				throw new CM_Exception_AuthRequired();
