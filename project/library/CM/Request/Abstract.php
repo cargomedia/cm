@@ -17,6 +17,11 @@ abstract class CM_Request_Abstract {
 	protected $_headers = array();
 
 	/**
+	 * @var array
+	 */
+	protected $_cookies;
+
+	/**
 	 * @var CM_Model_User|null
 	 */
 	protected $_viewer = false;
@@ -58,11 +63,6 @@ abstract class CM_Request_Abstract {
 		parse_str($queryString, $this->_query);
 
 		$this->_headers = array_change_key_case($headers);
-
-		$sessionId = $_COOKIE['sessionId'];
-		if ($sessionId) {
-			$this->_sessionId = $sessionId;
-		}
 
 		self::$_instance = $this;
 	}
@@ -135,12 +135,36 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @param string $name
+	 * @return string|null
+	 * @throws CM_Exception
+	 */
+	public function getCookie($name) {
+		if (!isset($this->_cookies)) {
+			$this->_cookies = array();
+			if ($this->hasHeader('cookie')) {
+				$header = $this->getHeader('cookie');
+				if (false === preg_match_all('/([^=;\s]+)\s*=\s*([^=;\s]+)/', $header, $matches, PREG_SET_ORDER)) {
+					throw new CM_Exception('Cannot parse Cookie-header `' . $header . '`');
+				}
+				foreach ($matches as $match) {
+					$this->_cookies[urldecode($match[1])] = urldecode($match[2]);
+				}
+			}
+		}
+		if (!array_key_exists($name, $this->_cookies)) {
+			return null;
+		}
+		return $this->_cookies[$name];
+	}
+
+	/**
 	 * @return CM_Session
 	 */
 	public function getSession() {
 		if (!$this->_session) {
 			try {
-				$this->_session = new CM_Session($this->_sessionId);
+				$this->_session = new CM_Session($this->getCookie('sessionId'));
 			} catch (CM_Exception_Nonexistent $ex) {
 				$this->_session = new CM_Session();
 			}
@@ -153,7 +177,7 @@ abstract class CM_Request_Abstract {
 	 * @return boolean
 	 */
 	public function hasSession() {
-		return ($this->_session || $this->_sessionId);
+		return ($this->_session || $this->getCookie('sessionId'));
 	}
 
 	/**
