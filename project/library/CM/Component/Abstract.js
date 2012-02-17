@@ -345,8 +345,8 @@ _bindActions: function(actions) {
  * @param object
  */
 _bindStreams: function(streams) {
-	for (event in streams) {
-		var callback = streams[event];
-		this.bindStream(event, callback);
+	for (key in streams) {
+		var callback = streams[key];
+		this.bindStream(key, callback);
 	}
 }
