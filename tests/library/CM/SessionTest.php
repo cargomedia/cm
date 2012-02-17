@@ -61,7 +61,7 @@ class CM_SessionTest extends TestCase {
 
 		//test that session is only persisted when data changed
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
-		$session->_change();
+		TH::clearCache();
 		unset($session);
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
@@ -165,25 +165,41 @@ class CM_SessionTest extends TestCase {
 		$this->assertModelEquals($user, $session->getUser(true));
 	}
 
-	public function testLatestactivity() {
-		$this->markTestSkipped('test broken');
+	public function testStart() {
 		/** @var CM_Model_User $user */
 		$user = CM_Model_User::create();
 
 		$activityStamp1 = time();
 		$session = new CM_Session();
 		$session->setUser($user);
+		$sessionId = $session->getId();
+		unset($session);
+		$session = new CM_Session($sessionId);
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
 		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 10);
-		$session = new CM_Session();
-		$session->setUser($user);
+		$session = new CM_Session($sessionId);
+		$session->start();
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
+
+		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
+		unset($session);
+		TH::clearCache();
 
 		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 2);
 		$activityStamp2 = time();
-		$session = new CM_Session();
-		$session->setUser($user);
+		$session = new CM_Session($sessionId);
+		$session->start();
 		$this->assertEquals($activityStamp2, $session->getUser(true)->getLatestactivity(), null, 1);
+		TH::timeForward($session->getLifetime() / 2);
+		$session->start();
+
+		$this->assertEquals('bar', $session->get('foo'));
+		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
+		unset($session);
+		TH::clearCache();
+
+		$session = new CM_Session($sessionId);
+		$this->assertEquals('bar', $session->get('foo'));
 	}
 }

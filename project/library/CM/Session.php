@@ -3,6 +3,7 @@
 class CM_Session {
 
 	const ACTIVITY_EXPIRATION = 240; // 4 mins
+	const DEFAULT_SESSION_LIFETIME = 3600;
 
 	/**
 	 * @var string
@@ -31,7 +32,7 @@ class CM_Session {
 				if (!$data) {
 					throw new CM_Exception_Nonexistent('Session `' . $this->getId() . '` does not exist.');
 				}
-				CM_Cache::set($cacheKey, $data);
+				CM_Cache::set($cacheKey, $data, self::DEFAULT_SESSION_LIFETIME);
 			}
 			$expires = (int) $data['expires'];
 			$data = unserialize($data['data']);
@@ -66,7 +67,6 @@ class CM_Session {
 				$user->setOnline(false);
 			}
 			$this->delete('userId');
-			$this->delete('cookieLifeTime');
 			$this->regenerateId();
 		}
 	}
@@ -110,7 +110,7 @@ class CM_Session {
 	 */
 	public function getLifetime() {
 		if (!$this->hasLifetime()) {
-			return 3600;
+			return self::DEFAULT_SESSION_LIFETIME;
 		}
 		return (int) $this->get('lifetime');
 	}
@@ -196,7 +196,7 @@ class CM_Session {
 		}
 	}
 
-	public function _change() {
+	private function _change() {
 		CM_Cache::delete($this->_getCacheKey());
 	}
 
