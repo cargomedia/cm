@@ -202,4 +202,23 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('bar', $session->get('foo'));
 	}
+
+	public function testExpiration() {
+		$session = new CM_Session();
+		$sessionId = $session->getId();
+		unset($session);
+		$session = new CM_Session($sessionId);
+		$this->assertEquals(time() + CM_Session::LIFETIME_DEFAULT, $session->getExpiration(), null, 1);
+
+		$session->setLifetime(10 * 86400);
+		unset($session);
+		$session = new CM_Session($sessionId);
+		$this->assertEquals(time() + 10 * 86400, $session->getExpiration(), null, 1);
+
+		$session->setLifetime();
+		$sessionId = $session->getId();
+		unset($session);
+		$session = new CM_Session($sessionId);
+		$this->assertEquals(time() + CM_Session::LIFETIME_DEFAULT, $session->getExpiration(), null, 1);
+	}
 }
