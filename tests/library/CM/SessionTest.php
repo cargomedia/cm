@@ -133,7 +133,7 @@ class CM_SessionTest extends TestCase {
 		$sessionId = $session->getId();
 		unset($session);
 		TH::timeForward(4000);
-		CM_Session::gc();
+		CM_Session::deleteExpired();
 		try {
 			new CM_Session($sessionId);
 			$this->fail('Expired Session was not deleted.');
