@@ -171,6 +171,19 @@ class CM_Model_User extends CM_Model_Abstract {
 		return new $className($id);
 	}
 
+	public static function offlineOld() {
+			$res = CM_Mysql::exec('SELECT `o`.`userId` FROM TBL_CM_USER_ONLINE `o` JOIN TBL_CM_USER `u` USING(`userId`) WHERE `u`.`activityStamp` < ?',
+					time() - CM_Session::ACTIVITY_EXPIRATION);
+			while ($userId = $res->fetchOne()) {
+				try {
+					$user = CM_Model_User::factory($userId);
+					$user->setOnline(false);
+				} catch (CM_Exception_Nonexistent $e) {
+					CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
+				}
+			}
+		}
+
 	/**
 	 * @param array $data
 	 * @return CM_Model_User
