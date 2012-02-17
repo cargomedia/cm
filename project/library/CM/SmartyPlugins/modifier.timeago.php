@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Based on and compatible with http://timeago.yarp.com/
+ *
+ * @param int $stamp
+ * @return string
+ */
 function smarty_modifier_timeago($stamp) {
 	$seconds = time() - $stamp;
 	$minutes = $seconds / 60;
@@ -9,8 +15,10 @@ function smarty_modifier_timeago($stamp) {
 
 	$langSection = CM_Language::section('date.timeago');
 	if ($seconds >= 0) {
+		$prefix = $langSection->text('prefixAgo');
 		$suffix = $langSection->text('suffixAgo');
 	} else {
+		$prefix = $langSection->text('prefixFromNow');
 		$suffix = $langSection->text('suffixFromNow');
 	}
 
@@ -38,7 +46,7 @@ function smarty_modifier_timeago($stamp) {
 		$print = $langSection->text('years', array('count' => floor($years)));
 	}
 
-	$print = $print . ' ' . $suffix;
+	$print = trim(implode(' ', array($prefix, $print, $suffix)));
 
 	$date = new DateTime('@' . $stamp);
 	$iso8601 = $date->format('c');
