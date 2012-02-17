@@ -64,6 +64,14 @@ abstract class CM_Request_Abstract {
 
 		$this->_headers = array_change_key_case($headers);
 
+		if ($sessionId = $this->getCookie('sessionId')) {
+			try {
+				$this->_session = new CM_Session($sessionId);
+				$this->_session->start();
+			} catch (CM_Exception_Nonexistent $ex) {
+			}
+		}
+
 		self::$_instance = $this;
 	}
 
@@ -162,12 +170,8 @@ abstract class CM_Request_Abstract {
 	 * @return CM_Session
 	 */
 	public function getSession() {
-		if (!$this->_session) {
-			try {
-				$this->_session = new CM_Session($this->getCookie('sessionId'));
-			} catch (CM_Exception_Nonexistent $ex) {
-				$this->_session = new CM_Session();
-			}
+		if (!$this->hasSession()) {
+			$this->_session = new CM_Session();
 			$this->_session->start();
 		}
 		return $this->_session;
@@ -177,7 +181,7 @@ abstract class CM_Request_Abstract {
 	 * @return boolean
 	 */
 	public function hasSession() {
-		return ($this->_session || $this->getCookie('sessionId'));
+		return isset($this->_session);
 	}
 
 	/**
