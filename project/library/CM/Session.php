@@ -233,7 +233,7 @@ class CM_Session {
 		}
 	}
 
-	public static function gc() {
+	public static function deleteExpired() {
 		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
 	}
 
