@@ -9,7 +9,7 @@ class CM_FormField_Email extends CM_FormField_Text {
 	public function validate($userInput) {
 		$userInput = parent::validate($userInput);
 
-		if (!preg_match("/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i", $userInput)) {
+		if (false === filter_var($userInput, FILTER_VALIDATE_EMAIL)) {
 			throw new CM_Exception_FormFieldValidation('Invalid email address');
 		}
 
