@@ -325,4 +325,32 @@ CREATE TABLE `cm_user_preferenceDefault` (
   `configurable` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`preferenceId`),
   UNIQUE KEY `section` (`section`,`key`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_videoStream_publish`;
+CREATE TABLE `cm_videoStream_publish` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(10) unsigned NOT NULL,
+  `start` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned NOT NULL,
+  `key` varchar(32) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `key` (`key`),
+  KEY `userId` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_videoStream_subscribe`;
+CREATE TABLE `cm_videoStream_subscribe` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(10) unsigned NOT NULL,
+  `start` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned NOT NULL,
+  `publishId` int(10) unsigned NOT NULL,
+  `key` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  KEY `userId` (`userId`),
+  KEY `publishId` (`publishId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

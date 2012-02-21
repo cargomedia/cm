@@ -169,4 +169,50 @@ class TH {
 		$html = $render->render($formField, array('form' => $form));
 		return new TH_Page($html);
 	}
+
+	/**
+	 * @param CM_Model_User|null $user
+	 * @return CM_VideoStream_Publish
+	 */
+	public static function createVideoStreamPublish(CM_Model_User $user = null) {
+		if (!$user) {
+			$user = TH::createUser();
+		}
+		$data = array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10,
+			'key' => rand(1, 10000) . '_' . rand(1, 100));
+		while (empty($data['name']) || CM_VideoStream_Publish::findStreamName($data['name'])) {
+			$data['name'] .= self::_randStr(2);
+		}
+		return CM_VideoStream_Publish::create($data);
+	}
+
+	/**
+	 * @param CM_Model_User|null				$user
+	 * @param CM_VideoStream_Publish|null       $videoStreamPublish
+	 * @return CM_VideoStream_Subscribe
+	 */
+	public static function createVideoStreamSubscribe(CM_Model_User $user = null, CM_VideoStream_Publish $videoStreamPublish = null) {
+		if (!$user) {
+			$user = TH::createUser();
+		}
+		if (!$videoStreamPublish) {
+			$videoStreamPublish = TH::createVideoStreamPublish($user);
+		}
+		return CM_VideoStream_Subscribe::create(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'publish' => $videoStreamPublish, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+	}
+
+	/**
+	 * @param int	$length
+	 * @param string $charset
+	 * @return string
+	 */
+	private static function _randStr($length, $charset = 'abcdefghijklmnopqrstuvwxyz0123456789') {
+		$str = '';
+		$count = strlen($charset);
+		while ($length--) {
+			$str .= $charset[mt_rand(0, $count - 1)];
+		}
+		return $str;
+	}
 }
