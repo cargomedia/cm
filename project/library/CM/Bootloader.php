@@ -150,6 +150,9 @@ class CM_Bootloader {
 		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
 
 		define('TBL_CM_OPTION', 'cm_option');
+
+		define('TBL_CM_VIDEOSTREAM_PUBLISH', 'cm_videoStream_publish');
+		define('TBL_CM_VIDEOSTREAM_SUBSCRIBE', 'cm_videoStream_subscribe');
 	}
 
 	/**
