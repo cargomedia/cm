@@ -166,7 +166,7 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	 */
 	public static function factory($className, $params) {
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-			throw new CM_Exception('Illegal component name `' . $className . '`.');
+			throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
 		}
 		$component = new $className($params);
 		return $component;
