@@ -7,20 +7,22 @@
  * @return string
  */
 function smarty_modifier_timeago($stamp) {
-	$seconds = time() - $stamp;
-	$minutes = $seconds / 60;
-	$hours = $minutes / 60;
-	$days = $hours / 24;
-	$years = $days / 365;
+	$distance = time() - $stamp;
 
 	$langSection = CM_Language::section('date.timeago');
-	if ($seconds >= 0) {
+	if ($distance >= 0) {
 		$prefix = $langSection->text('prefixAgo');
 		$suffix = $langSection->text('suffixAgo');
 	} else {
 		$prefix = $langSection->text('prefixFromNow');
 		$suffix = $langSection->text('suffixFromNow');
 	}
+
+	$seconds = abs($distance);
+	$minutes = $seconds / 60;
+	$hours = $minutes / 60;
+	$days = $hours / 24;
+	$years = $days / 365;
 
 	if ($seconds < 45) {
 		$print = $langSection->text('seconds', array('count' => round($seconds)));
