@@ -28,7 +28,7 @@ class CM_Paging_VideoStreamSubscribe_Publish extends CM_Paging_VideoStreamSubscr
 	 */
 	public function delete(CM_VideoStream_Subscribe $videoStreamSubscribe) {
 		if (!$this->contains($videoStreamSubscribe)) {
-			throw new CM_Exception_Invalid("Cannot remove a videoStream from a videoStream it doesn' subscribe to.");
+			throw new CM_Exception_Invalid("Cannot remove a videoStream from a videoStream it doesn't subscribe to.");
 		}
 		$videoStreamSubscribe->delete();
 		$this->_change();

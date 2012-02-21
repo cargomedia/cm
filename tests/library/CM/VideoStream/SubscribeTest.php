@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../TestCase.php';
 
-class SK_VideoStream_SubscribeTest extends TestCase {
+class CM_VideoStream_SubscribeTest extends TestCase {
 
 	public static function setUpBeforeClass() {
 	}
