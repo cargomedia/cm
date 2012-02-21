@@ -3,17 +3,17 @@
 interface CM_VideoStreamDelegate {
 	/**
 	 * @param CM_VideoStream_Publish $streamPublish
-     * @param array|null $data
+     * @param CM_Params|null $params
 	 * @return boolean
 	 */
-    public function onPublish(CM_VideoStream_Publish $streamPublish, array $data = null);
+    public function onPublish(CM_VideoStream_Publish $streamPublish, CM_Params $params = null);
 
 	/**
 	 * @param CM_VideoStream_Subscribe $streamSubscribe
-     * @param array|null $data
+     * @param CM_Params|null $params
 	 * @return boolean
 	 */
-	public function onSubscribe(CM_VideoStream_Subscribe $streamSubscribe, array $data = null);
+	public function onSubscribe(CM_VideoStream_Subscribe $streamSubscribe, CM_Params $params = null);
 
 	/**
 	 * @param CM_VideoStream_Publish $streamPublish
