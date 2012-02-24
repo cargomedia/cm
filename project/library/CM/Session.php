@@ -169,10 +169,17 @@ class CM_Session {
 	}
 
 	/**
-	 * @return bool
+	 * @return boolean
 	 */
 	public function hasLifetime() {
 		return $this->has('lifetime');
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function hasUser() {
+		return $this->has('userId');
 	}
 
 	/**

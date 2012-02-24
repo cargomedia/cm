@@ -16,11 +16,13 @@ class CM_Paging_VideoStreamSubscribe_Publish extends CM_Paging_VideoStreamSubscr
 
 	/**
 	 * @param array $data
+	 * @return CM_VideoStream_Subscribe
 	 */
 	public function add(array $data) {
 		$data['publish'] = $this->_videoStreamPublish;
-		CM_VideoStream_Subscribe::create($data);
+		$videoStreamSubscribe = CM_VideoStream_Subscribe::create($data);
 		$this->_change();
+		return $videoStreamSubscribe;
 	}
 
 	/**

@@ -5,12 +5,13 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string $streamName
 	 * @param string $clientKey
-	 * @param int $start
+	 * @param int    $start
 	 * @param string $data
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $data) {
-		$data = new CM_Params(json_decode($data, true));
-		$session = new CM_Session($data->getString('sessionId'));
+		$params = CM_Params::factory(json_decode($data, true));
+		$streamType = $params->getInt('streamType');
+		$session = new CM_Session($params->getString('sessionId'));
 		if (!$session->hasUser()) {
 			throw new CM_Exception_Invalid('Session `' . $session->getId() . '` has no user.');
 		}
@@ -18,49 +19,62 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$user) {
 			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
 		}
-		$chatId = (int) $data['chatId'];
-		$chat = new SK_Entity_Chat_Video($chatId);
-		$allowedUntil = null;
-		$price = null;
-		$data = array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'price' => $price, 'key' => $clientKey,
-			'name' => $streamName);
-		$chat->getVideoStreamPublishs()->add($data);
+		$allowedUntil = null; //TODO set to some reasonable time in the future
+		$videoStreamPublish = CM_VideoStream_Publish::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+			'key' => $clientKey, 'name' => $streamName, 'delegateType' => $streamType));
+		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		if (!$streamChannel->onPublish($params)) {
+			$videoStreamPublish->delete();
+			//return failure
+		}
+		//return success
 	}
 
 	public static function rpc_unpublish($streamName, $clientKey) {
-		$sessionData = CM_Session::getData($sessionId);
-		$user = new SK_User($sessionData['userId']);
-		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($pubName);
+		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
 		if ($videoStreamPublish) {
-			if ($videoStreamPublish->hasChat()) {
-				$videoStreamPublish->getChat()->getVideoStreamPublishs()->delete($videoStreamPublish);
-			} else {
-				$videoStreamPublish->delete();
-			}
+			$streamChannel = new CM_StreamChannel($videoStreamPublish);
+			$streamChannel->onUnpublish();
 		}
+		$videoStreamPublish->delete();
 	}
 
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
-		$data = new CM_Params(json_decode($data, true));
-		$sessionData = CM_Session::getData($data->getString('sessionId'));
-		$user = new SK_User($sessionData['userId']);
-		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
-		$allowedUntil = null;
-		if ($videoStreamPublish) {
-			$data = array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey);
-			$videoStreamPublish->getVideoStreamSubscribes()->add($data);
+		$params = CM_Params::factory(json_decode($data, true));
+		$session = new CM_Session($params->getString('sessionId'));
+		if (!$session->hasUser()) {
+			throw new CM_Exception_Invalid('Session `' . $session->getId() . '` has no user.');
 		}
-
+		$user = $session->getUser();
+		if (!$user) {
+			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
+		}
+		$allowedUntil = null;
+		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
+		if (!$videoStreamPublish) {
+			//publisher not found
+		}
+		$videoStreamSubscribe = $videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		if (!$streamChannel->onSubscribe($videoStreamSubscribe, $params)) {
+			$videoStreamPublish->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
+			//return failure
+		}
+		//return success
 	}
 
 	public static function rpc_unsubscribe($streamName, $clientKey) {
-		$sessionData = CM_Session::getData($sessionId);
-		$user = new SK_User($sessionData['userId']);
-		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($pubName);
-		$videoStreamSubscribe = CM_VideoStream_Subscribe::findKey($clientKey);
-		if ($videoStreamPublish && $videoStreamSubscribe) {
-			$videoStreamSubscribe->getVideoStreamPublish()->delete($videoStreamSubscribe);
+		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
+		if (!$videoStreamPublish) {
+
 		}
+		$videoStreamSubscribe = CM_VideoStream_Subscribe::findKey($clientKey);
+		if (!$videoStreamSubscribe || !$videoStreamPublish->getVideoStreamSubscribes()->contains($videoStreamSubscribe)) {
+
+		}
+		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		$streamChannel->onUnsubscribe($videoStreamSubscribe);
+		$videoStreamSubscribe->getVideoStreamPublish()->delete($videoStreamSubscribe);
 	}
 
 	/*
@@ -78,12 +92,4 @@ class CM_Wowza extends CM_Class_Abstract {
 			$videoStream->getVideoStreamPublish()->getVideoStreamSubscribes()->delete($videoStream);
 		}
 	}*/
-
-	protected function _getDelegate($type) {
-		$delegates = $this->_getConfig()->delegates;
-		if (empty($delegates[$type])) {
-			throw new CM_Exception_Invalid('Stream type `' . $type . '` not defined.');
-		}
-		return $delegates[$type];
-	}
 }
