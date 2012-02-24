@@ -179,7 +179,7 @@ class TH {
 			$user = TH::createUser();
 		}
 		$data = array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10,
-			'key' => rand(1, 10000) . '_' . rand(1, 100));
+			'key' => rand(1, 10000) . '_' . rand(1, 100), 'delegateType' => 1);
 		while (empty($data['name']) || CM_VideoStream_Publish::findStreamName($data['name'])) {
 			$data['name'] .= self::_randStr(2);
 		}

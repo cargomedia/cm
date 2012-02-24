@@ -335,6 +335,7 @@ CREATE TABLE `cm_videoStream_publish` (
   `allowedUntil` int(10) unsigned NOT NULL,
   `key` varchar(32) NOT NULL,
   `name` varchar(64) NOT NULL,
+  `delegateType` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `key` (`key`),

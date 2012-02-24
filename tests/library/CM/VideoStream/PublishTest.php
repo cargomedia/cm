@@ -32,16 +32,16 @@ class CM_VideoStream_PublishTest extends TestCase {
 	public function testGetName() {
 		/** @var CM_VideoStream_Publish $videoStream */
 		$videoStream = CM_VideoStream_Publish::create(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
-			'key' => '123123_3', 'name' => '12312fghdadsw123'));
+			'key' => '123123_3', 'name' => '12312fghdadsw123', 'delegateType' => 1));
 		$this->assertEquals('12312fghdadsw123', $videoStream->getName());
 	}
 
 	public function testCreate() {
 		$user = TH::createUser();
 		$videoStream = CM_VideoStream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
-			'key' => '123123_2', 'name' => '123123qadadsw123'));
+			'key' => '123123_2', 'name' => '123123qadadsw123', 'delegateType' => 1));
 		$this->assertRow(TBL_CM_VIDEOSTREAM_PUBLISH, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234,
-			'key' => '123123_2'));
+			'key' => '123123_2', 'delegateType' => 1));
 	}
 
 	public function testDelete() {
@@ -79,4 +79,11 @@ class CM_VideoStream_PublishTest extends TestCase {
 		$videoStreamPublish = CM_VideoStream_Publish::findKey('doesnotexist');
 		$this->assertNull($videoStreamPublish);
 	}
+
+    public function testGetDelegateType() {
+        /** @var CM_VideoStream_Publish $videoStreamPublish */
+        $videoStreamPublish = CM_VideoStream_Publish::create(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+        			'key' => '1323_3', 'name' => '12312fghdadsasdw123', 'delegateType' => 1));
+        $this->assertEquals(1, $videoStreamPublish->getDelegateType());
+    }
 }

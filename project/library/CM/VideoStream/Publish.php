@@ -2,6 +2,13 @@
 
 class CM_VideoStream_Publish extends CM_VideoStream_Abstract {
 
+    /**
+     * @return int
+     */
+    public function getDelegateType() {
+        return (int) $this->_get('delegateType');
+    }
+
 	/**
 	 * @return string
 	 */
@@ -70,8 +77,9 @@ class CM_VideoStream_Publish extends CM_VideoStream_Abstract {
 		$allowedUntil = (int) $data['allowedUntil'];
 		$key = (string) $data['key'];
 		$name = (string) $data['name'];
+        $delegateType = (int) $data['delegateType'];
 		$id = CM_Mysql::insert(TBL_CM_VIDEOSTREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'key' => $key, 'name' => $name));
+			'key' => $key, 'name' => $name, 'delegateType' => $delegateType));
 		return new self($id);
 	}
 }
