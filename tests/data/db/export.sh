@@ -1,7 +1,7 @@
 #!/bin/bash
 cd $(dirname $0)
 
-DB_NAME=example
+DB_NAME=cm_test
 DB_USER=root
 DB_PASS=root
 
