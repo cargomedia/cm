@@ -378,9 +378,22 @@ CREATE TABLE `cm_user_preferenceDefault` (
   `configurable` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`preferenceId`),
   UNIQUE KEY `section` (`section`,`key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_useragent`;
+
+
+CREATE TABLE `cm_useragent` (
+  `userId` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
+  `useragent` varchar(200) NOT NULL,
+  PRIMARY KEY (`userId`,`useragent`),
+  KEY `createStamp` (`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_videoStream_publish`;
+
+
 CREATE TABLE `cm_videoStream_publish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
@@ -396,6 +409,8 @@ CREATE TABLE `cm_videoStream_publish` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_videoStream_subscribe`;
+
+
 CREATE TABLE `cm_videoStream_subscribe` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
@@ -407,16 +422,5 @@ CREATE TABLE `cm_videoStream_subscribe` (
   UNIQUE KEY `key` (`key`),
   KEY `userId` (`userId`),
   KEY `publishId` (`publishId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_useragent`;
-
-
-CREATE TABLE `cm_useragent` (
-  `userId` int(10) unsigned NOT NULL,
-  `createStamp` int(10) unsigned NOT NULL,
-  `useragent` varchar(200) NOT NULL,
-  PRIMARY KEY (`userId`,`useragent`),
-  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
