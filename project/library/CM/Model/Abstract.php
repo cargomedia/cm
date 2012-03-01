@@ -61,11 +61,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 */
 	public function getId() {
-		$id = $this->_getId();
-		if (!array_key_exists('id', $id)) {
-			throw new CM_Exception_Invalid('Id-array has no field `id`.');
-		}
-		return $id['id'];
+		return $this->_getId('id');
 	}
 
 	/**
@@ -167,10 +163,18 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return array
+	 * @param string|null $key
+	 * @return array|mixed
 	 */
-	protected function _getId() {
-		return $this->_id;
+	protected function _getId($key = null) {
+		if (null === $key) {
+			return $this->_id;
+		}
+		$key = (string) $key;
+		if (!array_key_exists($key, $this->_id)) {
+			throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
+		}
+		return $this->_id[$key];
 	}
 
 	/**
