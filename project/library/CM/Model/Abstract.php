@@ -34,7 +34,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param array $id
 	 */
-	protected function _construct(array $id) {
+	final protected function _construct(array $id) {
 		$this->_id = $id;
 		foreach ($this->_loadAssets() as $asset) {
 			$this->_assets[get_class($asset)] = $asset;
@@ -110,7 +110,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if (($this->_data = $cache::get($cacheKey)) === false) {
 				$this->_data = $this->_loadData();
 				if (!is_array($this->_data)) {
-					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . $this->getId() . '` has no data.');
+					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
 				}
 				$this->_autoCommitCache = false;
 				/** @var CM_ModelAsset_Abstract $asset */
@@ -163,10 +163,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @return CM_ModelAsset_Abstract[]
+	 */
+	protected function _loadAssets() {
+		return array();
+	}
+
+	/**
 	 * @param string|null $key
 	 * @return array|mixed
 	 */
-	protected function _getId($key = null) {
+	final protected function _getId($key = null) {
 		if (null === $key) {
 			return $this->_id;
 		}
@@ -175,13 +182,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
 		}
 		return $this->_id[$key];
-	}
-
-	/**
-	 * @return CM_ModelAsset_Abstract[]
-	 */
-	protected function _loadAssets() {
-		return array();
 	}
 
 	/**
