@@ -25,7 +25,8 @@ class CM_PagingSource_PagingsTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CM_Mysql::exec('DROP TABLE TBL_TEST_A');
+		CM_Mysql::exec('DROP TABLE TBL_TEST_B');
 	}
 
 	public function testCaching() {
