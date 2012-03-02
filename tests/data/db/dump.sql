@@ -263,6 +263,42 @@ CREATE TABLE `cm_smileySet` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_splittest`;
+
+
+CREATE TABLE `cm_splittest` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `createStamp` (`createStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `cm_splittestVariation`;
+
+
+CREATE TABLE `cm_splittestVariation` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `splittestId` int(10) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `splittestId_name` (`splittestId`,`name`),
+  KEY `splittestId` (`splittestId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `cm_splittestVariation_user`;
+
+
+CREATE TABLE `cm_splittestVariation_user` (
+  `splittestId` int(10) unsigned NOT NULL,
+  `userId` int(10) unsigned NOT NULL,
+  `variationId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`splittestId`,`userId`),
+  KEY `splittestId` (`splittestId`),
+  KEY `userId` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 DROP TABLE IF EXISTS `cm_stream`;
 
 

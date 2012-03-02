@@ -149,6 +149,10 @@ class CM_Bootloader {
 		define('TBL_CM_SVM', 'cm_svm');
 		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
 
+		define('TBL_CM_SPLITTEST', 'cm_splittest');
+		define('TBL_CM_SPLITTESTVARIATION', 'cm_splittestVariation');
+		define('TBL_CM_SPLITTESTVARIATION_USER', 'cm_splittestVariation_user');
+
 		define('TBL_CM_OPTION', 'cm_option');
 
 		define('TBL_CM_VIDEOSTREAM_PUBLISH', 'cm_videoStream_publish');

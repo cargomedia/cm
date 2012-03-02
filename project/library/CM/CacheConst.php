@@ -34,4 +34,7 @@ class CM_CacheConst {
 	const Model = 'Model';
 
 	const Option = 'Option';
+
+	// _userId:X
+	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 }
