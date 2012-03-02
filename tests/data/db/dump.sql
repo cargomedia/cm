@@ -293,7 +293,7 @@ DROP TABLE IF EXISTS `cm_splittestVariation_user`;
 CREATE TABLE `cm_splittestVariation_user` (
   `splittestId` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned NOT NULL,
-  `variationId` int(10) unsigned DEFAULT NULL,
+  `variationId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`splittestId`,`userId`),
   KEY `splittestId` (`splittestId`),
   KEY `userId` (`userId`)

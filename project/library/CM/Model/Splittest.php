@@ -40,7 +40,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_User $user
-	 * @return string|null
+	 * @return string
 	 */
 	public function getVariation(CM_Model_User $user) {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
@@ -56,16 +56,12 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			$variationId = $variationFixtures[$this->getId()];
 		} else {
 			$variationIds = array_keys($variations);
-			$variationIds[] = null;
 			$variationId = $variationIds[array_rand($variationIds)];
 			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
 				'variationId' => $variationId));
 			CM_Cache::delete($cacheKey);
 		}
 
-		if (null === $variationId) {
-			return null;
-		}
 		if (!array_key_exists($variationId, $variations)) {
 			throw new CM_Exception_Invalid('Unknown variation `' . $variationId . '` for splittest `' . $this->getId() . '`.');
 		}
@@ -84,6 +80,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		$name = (string) $data['name'];
 		$variations = array_unique($data['variations']);
+		if (empty($variations)) {
+			throw new CM_Exception('Cannot create splittest without variations');
+		}
 		try {
 			$id = CM_Mysql::insert(TBL_CM_SPLITTEST, array('name' => $name, 'createStamp' => time()));
 			foreach ($variations as $variation) {

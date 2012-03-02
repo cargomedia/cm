@@ -55,7 +55,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
 		$variationUser1 = $test->getVariation($user1);
-		$this->assertContains($variationUser1, array(null, 'v1', 'v2'));
+		$this->assertContains($variationUser1, array('v1', 'v2'));
 		$this->assertSame($variationUser1, $test->getVariation($user1));
 
 		$test->delete();
