@@ -32,6 +32,20 @@ class CM_StreamChannel extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return CM_Paging_User_StreamChannel
+	 */
+	public function getVideoStreamSubscribers() {
+		return new CM_Paging_User_StreamChannel($this);
+	}
+
+	/**
+	 * @return CM_Paging_VideoStreamSubscribe_StreamChannel
+	 */
+	public function getVideoStreamSubscribes() {
+		return new CM_Paging_VideoStreamSubscribe_StreamChannel($this);
+	}
+
+	/**
 	 * @param CM_Params|null $params
 	 * @return boolean
 	 */

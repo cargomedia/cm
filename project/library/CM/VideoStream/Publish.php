@@ -17,17 +17,10 @@ class CM_VideoStream_Publish extends CM_VideoStream_Abstract {
 	}
 
 	/**
-	 * @return CM_Paging_User_VideoStreamPublish
+	 * @return CM_StreamChannel
 	 */
-	public function getVideoStreamSubscribers() {
-		return new CM_Paging_User_VideoStreamPublish($this);
-	}
-
-	/**
-	 * @return CM_Paging_VideoStreamSubscribe_Publish
-	 */
-	public function getVideoStreamSubscribes() {
-		return new CM_Paging_VideoStreamSubscribe_Publish($this);
+	public function getStreamChannel() {
+		return new CM_StreamChannel($this);
 	}
 
 	public function setAllowedUntil($timeStamp) {
@@ -41,7 +34,7 @@ class CM_VideoStream_Publish extends CM_VideoStream_Abstract {
 
 	protected function _onDelete() {
 		/** @var CM_VideoStream_Subscribe $videoStreamSubscribe */
-		foreach ($this->getVideoStreamSubscribes() as $videoStreamSubscribe) {
+		foreach ($this->getStreamChannel()->getVideoStreamSubscribes() as $videoStreamSubscribe) {
 			$videoStreamSubscribe->delete();
 		}
 		CM_Mysql::delete(TBL_CM_VIDEOSTREAM_PUBLISH, array('id' => $this->getId()));

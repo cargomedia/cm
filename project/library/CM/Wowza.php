@@ -54,10 +54,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$videoStreamPublish) {
 			//publisher not found
 		}
-		$videoStreamSubscribe = $videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+		$videoStreamSubscribe = $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 		$streamChannel = new CM_StreamChannel($videoStreamPublish);
 		if (!$streamChannel->onSubscribe($videoStreamSubscribe, $params)) {
-			$videoStreamPublish->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
+			$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
 			//return failure
 		}
 		//return success
@@ -69,7 +69,7 @@ class CM_Wowza extends CM_Class_Abstract {
 
 		}
 		$videoStreamSubscribe = CM_VideoStream_Subscribe::findKey($clientKey);
-		if (!$videoStreamSubscribe || !$videoStreamPublish->getVideoStreamSubscribes()->contains($videoStreamSubscribe)) {
+		if (!$videoStreamSubscribe || !$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->contains($videoStreamSubscribe)) {
 
 		}
 		$streamChannel = new CM_StreamChannel($videoStreamPublish);

@@ -1,15 +1,15 @@
 <?php
 
-class CM_Paging_VideoStreamSubscribe_Publish extends CM_Paging_VideoStreamSubscribe_Abstract {
+class CM_Paging_VideoStreamSubscribe_StreamChannel extends CM_Paging_VideoStreamSubscribe_Abstract {
 
-	private $_videoStreamPublish;
+	private $_streamChannel;
 
 	/**
-	 * @param CM_VideoStream_Publish $videoStreamPublish
+	 * @param CM_VideoStream_Publish $streamChannel
 	 */
-	public function __construct(CM_VideoStream_Publish $videoStreamPublish) {
-		$this->_videoStreamPublish = $videoStreamPublish;
-		$source = new CM_PagingSource_Sql('`id`', TBL_CM_VIDEOSTREAM_SUBSCRIBE, '`publishId` = ' . $videoStreamPublish->getId());
+	public function __construct(CM_StreamChannel $streamChannel) {
+		$this->_streamChannel = $streamChannel;
+		$source = new CM_PagingSource_Sql('`id`', TBL_CM_VIDEOSTREAM_SUBSCRIBE, '`publishId` = ' . $streamChannel->getStreamPublish()->getId());
 		$source->enableCache();
 		return parent::__construct($source);
 	}
@@ -19,7 +19,7 @@ class CM_Paging_VideoStreamSubscribe_Publish extends CM_Paging_VideoStreamSubscr
 	 * @return CM_VideoStream_Subscribe
 	 */
 	public function add(array $data) {
-		$data['publish'] = $this->_videoStreamPublish;
+		$data['publish'] = $this->_streamChannel->getStreamPublish();
 		$videoStreamSubscribe = CM_VideoStream_Subscribe::create($data);
 		$this->_change();
 		return $videoStreamSubscribe;
