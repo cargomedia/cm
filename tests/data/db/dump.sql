@@ -295,11 +295,13 @@ CREATE TABLE `cm_splittestVariation_user` (
   `splittestId` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`splittestId`,`userId`),
   KEY `splittestId` (`splittestId`),
   KEY `userId` (`userId`),
-  KEY `conversionStamp` (`conversionStamp`)
+  KEY `conversionStamp` (`conversionStamp`),
+  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;

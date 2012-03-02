@@ -74,7 +74,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			$variationIds = array_keys($variations);
 			$variationId = $variationIds[array_rand($variationIds)];
 			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
-				'variationId' => $variationId));
+				'variationId' => $variationId, 'createStamp' => time()));
 			CM_Cache::delete($cacheKey);
 		}
 
