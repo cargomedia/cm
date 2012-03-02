@@ -273,7 +273,7 @@ CREATE TABLE `cm_splittest` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `createStamp` (`createStamp`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_splittestVariation`;
 
@@ -285,7 +285,7 @@ CREATE TABLE `cm_splittestVariation` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `splittestId_name` (`splittestId`,`name`),
   KEY `splittestId` (`splittestId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_splittestVariation_user`;
 
@@ -297,7 +297,7 @@ CREATE TABLE `cm_splittestVariation_user` (
   PRIMARY KEY (`splittestId`,`userId`),
   KEY `splittestId` (`splittestId`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;
 

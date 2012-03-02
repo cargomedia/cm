@@ -81,11 +81,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $data;
 	}
 
-	/**
-	 * @param array $data
-	 * @return CM_Model_Splittest
-	 * @throws CM_Exception_Duplicate
-	 */
 	protected static function _create(array $data) {
 		$name = (string) $data['name'];
 		$variations = array_unique($data['variations']);
