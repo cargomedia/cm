@@ -32,6 +32,22 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getRunning() {
+		return (bool) $this->_get('running');
+	}
+
+	/**
+	 * @param bool $state
+	 */
+	public function setRunning($state) {
+		$state = (bool) $state;
+		CM_Mysql::update(TBL_CM_SPLITTEST, array('running' => $state), array('id' => $this->getId()));
+		$this->_change();
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getVariations() {
@@ -42,7 +58,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @param CM_Model_User $user
 	 * @return string
 	 */
-	public function getVariation(CM_Model_User $user) {
+	public function getVariationFixture(CM_Model_User $user) {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
 		if (($variationFixtures = CM_Cache::get($cacheKey)) === false) {
 			$variationFixtures = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId',
@@ -66,6 +82,30 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			throw new CM_Exception_Invalid('Unknown variation `' . $variationId . '` for splittest `' . $this->getId() . '`.');
 		}
 		return $variations[$variationId];
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getVariationFixtureCount() {
+		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
+	}
+
+	/**
+	 * @param int $variationId
+	 * @return int
+	 */
+	public function getConversionCount($variationId) {
+		$variationId = (int) $variationId;
+		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->getId(), $variationId)->fetchOne();
+	}
+
+	/**
+	 * @param CM_Model_User $user
+	 */
+	public function setConversion(CM_Model_User $user) {
+		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_USER, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
+			'userId' => $user->getId()));
 	}
 
 	protected function _loadData() {
@@ -99,5 +139,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_SPLITTEST, array('id' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $this->getId()));
+		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
 	}
 }

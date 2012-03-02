@@ -270,6 +270,7 @@ CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
+  `running` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `createStamp` (`createStamp`)
@@ -294,9 +295,11 @@ CREATE TABLE `cm_splittestVariation_user` (
   `splittestId` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
+  `conversionStamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`splittestId`,`userId`),
   KEY `splittestId` (`splittestId`),
-  KEY `userId` (`userId`)
+  KEY `userId` (`userId`),
+  KEY `conversionStamp` (`conversionStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;
