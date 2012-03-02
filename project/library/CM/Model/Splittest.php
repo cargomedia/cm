@@ -85,10 +85,12 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param int $variationId
 	 * @return int
 	 */
-	public function getVariationFixtureCount() {
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
+	public function getVariationFixtureCount($variationId) {
+		$variationId = (int) $variationId;
+		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'variationId' => $variationId));
 	}
 
 	/**

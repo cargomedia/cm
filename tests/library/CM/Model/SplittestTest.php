@@ -66,14 +66,20 @@ class CM_Model_SplittestTest extends TestCase {
 		$user2 = TH::createUser();
 		/** @var CM_Model_Splittest $test */
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		$variations = $test->getVariations();
 
-		$this->assertSame(0, $test->getVariationFixtureCount());
+		foreach ($variations as $variationId => $variationName) {
+			$this->assertSame(0, $test->getVariationFixtureCount($variationId));
+		}
+
+		$variationFixture1Name = $test->getVariationFixture($user1);
+		$variationFixture1Id = array_search($variationFixture1Name, $variations);
+		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
 		$test->getVariationFixture($user1);
-		$this->assertSame(1, $test->getVariationFixtureCount());
-		$test->getVariationFixture($user1);
-		$this->assertSame(1, $test->getVariationFixtureCount());
-		$test->getVariationFixture($user2);
-		$this->assertSame(2, $test->getVariationFixtureCount());
+		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
+		$variationFixture2Name = $test->getVariationFixture($user2);
+		$variationFixture2Id = array_search($variationFixture2Name, $variations);
+		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture2Id));
 
 		$test->delete();
 	}
