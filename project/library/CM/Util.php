@@ -26,6 +26,7 @@ class CM_Util {
 	public static function var_line($expression) {
 		$line = print_r($expression, true);
 		$line = str_replace(PHP_EOL, ' ', $line);
+		$line = trim($line);
 		return $line;
 	}
 
