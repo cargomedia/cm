@@ -13,10 +13,10 @@ class CM_Paging_VideoStreamSubscribe_PublishTest extends TestCase {
 	public function testAdd() {
 		$videoStreamPublish = TH::createVideoStreamPublish();
 		$user = TH::createUser();
-		$this->assertEquals(0, $videoStreamPublish->getVideoStreamSubscribes()->getCount());
-		$videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		$this->assertEquals(0, $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getCount());
+		$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2'));
-		$this->assertEquals(1, $videoStreamPublish->getVideoStreamSubscribes()->getCount());
+		$this->assertEquals(1, $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getCount());
 		$this->assertRow(TBL_CM_VIDEOSTREAM_SUBSCRIBE, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2'));
 	}
@@ -24,17 +24,17 @@ class CM_Paging_VideoStreamSubscribe_PublishTest extends TestCase {
 	public function testDelete() {
 		$videoStreamPublish = TH::createVideoStreamPublish();
 		$user = TH::createUser();
-		$videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123124_1'));
-		$videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123124_2'));
-		$this->assertEquals(2, $videoStreamPublish->getVideoStreamSubscribes()->getCount());
-		$videoStreamPublish->getVideoStreamSubscribes()->delete($videoStreamPublish->getVideoStreamSubscribes()->getItem(0));
-		$this->assertEquals(1, $videoStreamPublish->getVideoStreamSubscribes()->getCount());
+		$this->assertEquals(2, $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getCount());
+		$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->delete($videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getItem(0));
+		$this->assertEquals(1, $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getCount());
 
 		$videoStreamSubscribe = TH::createVideoStreamSubscribe();
 		try {
-			$videoStreamPublish->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
+			$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
 			$this->fail('VideoStream_Publish deleted VideoStreamSubscribe not subscribing to it.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);

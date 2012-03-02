@@ -46,9 +46,9 @@ class CM_VideoStream_PublishTest extends TestCase {
 
 	public function testDelete() {
 		$videoStreamPublish = TH::createVideoStreamPublish();
-		$videoStreamPublish->getVideoStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '133123_1'));
-		$videoStreamSubscribe = $videoStreamPublish->getVideoStreamSubscribes()->getItem(0);
+		$videoStreamSubscribe = $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->getItem(0);
 		$videoStreamPublish->delete();
 		try {
 			new CM_VideoStream_Publish($videoStreamPublish->getId());
