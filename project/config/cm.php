@@ -118,4 +118,4 @@ $config->CM_DeviceCapabilities = new stdClass();
 $config->CM_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
 $config->CM_StreamChannel = new stdClass();
-$config->CM_StreamChannel->delegates[1] = 'CM_StreamDelegate_Dummy';
+$config->CM_StreamChannel->delegates = array();

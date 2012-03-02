@@ -3,10 +3,17 @@ require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_VideoStream_PublishTest extends TestCase {
 
+	private static $_configBackup;
+
 	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
+		$testCase = new self();
+		$mock = $testCase->getMock('CM_VideoStreamDelegate');
+		CM_Config::get()->CM_StreamChannel->delegates[1] = get_class($mock);
 	}
 
 	public static function tearDownAfterClass() {
+		CM_Config::set(self::$_configBackup);
 		TH::clearEnv();
 	}
 
