@@ -33,14 +33,34 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getConversionCount() {
+		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFixtureCount() {
+		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
+	}
+
+	/**
 	 * @return CM_Model_Splittest
 	 */
 	public function getSplittest() {
-		$splittestId = (int) $this->_get('splittestId');
-		return CM_Model_Splittest::findId($splittestId);
+		return CM_Model_Splittest::findId($this->_getSplittestId());
 	}
 
 	protected function _loadData() {
 		return CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetchAssoc();
+	}
+
+	/**
+	 * @return int
+	 */
+	private function _getSplittestId() {
+		return (int) $this->_get('splittestId');
 	}
 }

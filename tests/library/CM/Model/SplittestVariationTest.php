@@ -67,4 +67,40 @@ class CM_Model_SplittestVariationTest extends TestCase {
 		}
 	}
 
+	public function testGetConversionCount() {
+		$user1 = TH::createUser();
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest::create(array('name' => 'bar', 'variations' => array('v1')));
+		/** @var CM_Model_SplittestVariation $variation */
+		$variation = $test->getVariations()->getItem(0);
+
+		$test->getVariationFixture($user1);
+		$this->assertSame(0, $variation->getConversionCount());
+
+		$test->setConversion($user1);
+		$this->assertSame(1, $variation->getConversionCount());
+
+		$test->delete();
+	}
+
+	public function testGetFixtureCount() {
+		$user1 = TH::createUser();
+		$user2 = TH::createUser();
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest::create(array('name' => 'bar', 'variations' => array('v1')));
+		/** @var CM_Model_SplittestVariation $variation */
+		$variation = $test->getVariations()->getItem(0);
+
+		$this->assertSame(0, $variation->getFixtureCount());
+
+		$test->getVariationFixture($user1);
+		$this->assertSame(1, $variation->getFixtureCount());
+		$test->getVariationFixture($user1);
+		$this->assertSame(1, $variation->getFixtureCount());
+		$test->getVariationFixture($user2);
+		$this->assertSame(2, $variation->getFixtureCount());
+
+		$test->delete();
+	}
+
 }

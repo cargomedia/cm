@@ -76,27 +76,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_SplittestVariation $variation
-	 * @return int
-	 */
-	public function getVariationFixtureCount(CM_Model_SplittestVariation $variation) {
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'variationId' => $variation->getId()));
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getVariationFixtureCreatedMin() {
 		return (int) CM_Mysql::exec(
 			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId` = ' . $this->getId())->fetchOne();
-	}
-
-	/**
-	 * @param CM_Model_SplittestVariation $variation
-	 * @return int
-	 */
-	public function getConversionCount(CM_Model_SplittestVariation $variation) {
-		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->getId(), $variation->getId())->fetchOne();
 	}
 
 	/**
