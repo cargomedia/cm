@@ -48,10 +48,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return string[]
+	 * @return CM_Paging_SplittestVariation_Splittest
 	 */
 	public function getVariations() {
-		return $this->_get('variations');
+		return new CM_Paging_SplittestVariation_Splittest($this);
 	}
 
 	/**
@@ -60,37 +60,33 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public function getVariationFixture(CM_Model_User $user) {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
-		if (($variationFixtures = CM_Cache::get($cacheKey)) === false) {
-			$variationFixtures = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId',
-				'variationId'), array('userId' => $user->getId()))->fetchAllTree();
+		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
+			$variationFixtures = CM_Mysql::exec('
+				SELECT `variation`.`splittestId`, `variation`.`name`
+				FROM TBL_CM_SPLITTESTVARIATION_USER `fixture`
+				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
+				WHERE `fixture`.`userId` = ?', $user->getId())->fetchAllTree();
 
-			CM_Cache::set($cacheKey, $variationFixtures);
+			if (!array_key_exists($this->getId(), $variationFixtures)) {
+				/** @var CM_Model_SplittestVariation $variation */
+				$variation = $this->getVariations()->getItemRand();
+				CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
+					'variationId' => $variation->getId(), 'createStamp' => time()));
+				$variationFixtures[$this->getId()] = $variation->getName();
+			}
+
+			CM_CacheLocal::set($cacheKey, $variationFixtures);
 		}
 
-		$variations = $this->getVariations();
-		if (array_key_exists($this->getId(), $variationFixtures)) {
-			$variationId = $variationFixtures[$this->getId()];
-		} else {
-			$variationIds = array_keys($variations);
-			$variationId = $variationIds[array_rand($variationIds)];
-			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
-				'variationId' => $variationId, 'createStamp' => time()));
-			CM_Cache::delete($cacheKey);
-		}
-
-		if (!array_key_exists($variationId, $variations)) {
-			throw new CM_Exception_Invalid('Unknown variation `' . $variationId . '` for splittest `' . $this->getId() . '`.');
-		}
-		return $variations[$variationId];
+		return $variationFixtures[$this->getId()];
 	}
 
 	/**
-	 * @param int $variationId
+	 * @param CM_Model_SplittestVariation $variation
 	 * @return int
 	 */
-	public function getVariationFixtureCount($variationId) {
-		$variationId = (int) $variationId;
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'variationId' => $variationId));
+	public function getVariationFixtureCount(CM_Model_SplittestVariation $variation) {
+		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'variationId' => $variation->getId()));
 	}
 
 	/**
@@ -102,12 +98,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int $variationId
+	 * @param CM_Model_SplittestVariation $variation
 	 * @return int
 	 */
-	public function getConversionCount($variationId) {
-		$variationId = (int) $variationId;
-		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->getId(), $variationId)->fetchOne();
+	public function getConversionCount(CM_Model_SplittestVariation $variation) {
+		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->getId(), $variation->getId())->fetchOne();
 	}
 
 	/**

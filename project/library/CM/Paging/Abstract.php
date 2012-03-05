@@ -17,8 +17,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	}
 
 	/**
-	 * @param int $offset Negative: from end
-	 * @param int $length
+	 * @param int  $offset Negative: from end
+	 * @param int  $length
 	 * @param bool $skipNonexistent
 	 * @return array
 	 */
@@ -43,14 +43,14 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 			}
 		}
 		if ($offset) {
-			return array_slice($this->_items, $offset, $length);	
+			return array_slice($this->_items, $offset, $length);
 		}
 		return $this->_items;
 	}
 
 	/**
 	 * Return Un-processed, un-filtered items
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getItemsRaw() {
@@ -68,6 +68,14 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	public function getItem($offset) {
 		$items = $this->getItems($offset, 1);
 		return array_shift($items);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getItemRand() {
+		$offset = rand(0, $this->getCount() - 1);
+		return $this->getItem($offset);
 	}
 
 	/**
@@ -122,7 +130,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 
 	/**
 	 * Filter result of getItems() by a callback
-	 * 
+	 *
 	 * @param callback $filter function(mixed $item): boolean
 	 */
 	public function filter($filter) {
@@ -271,15 +279,19 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	function rewind() {
 		$this->_itemsPosition = 0;
 	}
+
 	function current() {
 		return $this->getItem($this->_itemsPosition);
 	}
+
 	function key() {
 		return $this->_itemsPosition;
 	}
+
 	function next() {
 		++$this->_itemsPosition;
 	}
+
 	function valid() {
 		$items = $this->getItems();
 		return isset($items[$this->_itemsPosition]);

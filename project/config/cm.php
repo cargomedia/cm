@@ -77,6 +77,7 @@ $config->CM_Model_Abstract = new stdClass();
 $config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User';
 $config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet';
 $config->CM_Model_Abstract->types[CM_Model_Splittest::TYPE] = 'CM_Model_Splittest';
+$config->CM_Model_Abstract->types[CM_Model_SplittestVariation::TYPE] = 'CM_Model_SplittestVariation';
 
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract->types = array();

@@ -44,7 +44,7 @@ class CM_Model_SplittestTest extends TestCase {
 	public function testGetVariations() {
 		/** @var CM_Model_Splittest $test */
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$this->assertContainsAll(array('v1', 'v2'), $test->getVariations());
+		$this->assertInstanceOf('CM_Paging_SplittestVariation_Splittest', $test->getVariations());
 
 		$test->delete();
 	}
@@ -54,9 +54,11 @@ class CM_Model_SplittestTest extends TestCase {
 		/** @var CM_Model_Splittest $test */
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
-		$variationUser1 = $test->getVariationFixture($user1);
-		$this->assertContains($variationUser1, array('v1', 'v2'));
-		$this->assertSame($variationUser1, $test->getVariationFixture($user1));
+		for ($i = 0; $i < 2; $i++) {
+			$variationUser1 = $test->getVariationFixture($user1);
+			$this->assertContains($variationUser1, array('v1', 'v2'));
+			$this->assertSame($variationUser1, $test->getVariationFixture($user1));
+		}
 
 		$test->delete();
 	}
@@ -65,26 +67,18 @@ class CM_Model_SplittestTest extends TestCase {
 		$user1 = TH::createUser();
 		$user2 = TH::createUser();
 		/** @var CM_Model_Splittest $test */
-		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$variations = $test->getVariations();
+		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1')));
+		/** @var CM_Model_SplittestVariation $variation */
+		$variation = $test->getVariations()->getItem(0);
 
-		foreach ($variations as $variationId => $variationName) {
-			$this->assertSame(0, $test->getVariationFixtureCount($variationId));
-		}
+		$this->assertSame(0, $test->getVariationFixtureCount($variation));
 
-		$variationFixture1Name = $test->getVariationFixture($user1);
-		$variationFixture1Id = array_search($variationFixture1Name, $variations);
-		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
 		$test->getVariationFixture($user1);
-		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
-
-		$variationFixture2Name = $test->getVariationFixture($user2);
-		$variationFixture2Id = array_search($variationFixture2Name, $variations);
-		if ($variationFixture1Id == $variationFixture2Id) {
-			$this->assertSame(2, $test->getVariationFixtureCount($variationFixture2Id));
-		} else {
-			$this->assertSame(1, $test->getVariationFixtureCount($variationFixture2Id));
-		}
+		$this->assertSame(1, $test->getVariationFixtureCount($variation));
+		$test->getVariationFixture($user1);
+		$this->assertSame(1, $test->getVariationFixtureCount($variation));
+		$test->getVariationFixture($user2);
+		$this->assertSame(2, $test->getVariationFixtureCount($variation));
 
 		$test->delete();
 	}
@@ -92,15 +86,15 @@ class CM_Model_SplittestTest extends TestCase {
 	public function testGetConversionCount() {
 		$user1 = TH::createUser();
 		/** @var CM_Model_Splittest $test */
-		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$variations = $test->getVariations();
+		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1')));
+		/** @var CM_Model_SplittestVariation $variation */
+		$variation = $test->getVariations()->getItem(0);
 
-		$variationFixtureName = $test->getVariationFixture($user1);
-		$variationFixtureId = array_search($variationFixtureName, $variations);
-		$this->assertSame(0, $test->getConversionCount($variationFixtureId));
+		$test->getVariationFixture($user1);
+		$this->assertSame(0, $test->getConversionCount($variation));
 
 		$test->setConversion($user1);
-		$this->assertSame(1, $test->getConversionCount($variationFixtureId));
+		$this->assertSame(1, $test->getConversionCount($variation));
 
 		$test->delete();
 	}
