@@ -39,6 +39,13 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return CM_Paging_SplittestVariation_SplittestEnabled
+	 */
+	public function getVariationsEnabled() {
+		return new CM_Paging_SplittestVariation_SplittestEnabled($this);
+	}
+
+	/**
 	 * @param CM_Model_User $user
 	 * @return string
 	 */
@@ -53,7 +60,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 			if (!array_key_exists($this->getId(), $variationFixtures)) {
 				/** @var CM_Model_SplittestVariation $variation */
-				$variation = $this->getVariations()->getItemRand();
+				$variation = $this->getVariationsEnabled()->getItemRand();
+				if (!$variation) {
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+				}
 				CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
 					'variationId' => $variation->getId(), 'createStamp' => time()));
 				$variationFixtures[$this->getId()] = $variation->getName();
@@ -76,7 +86,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	/**
 	 * @return int
 	 */
-	public function getVariationFixtureMin() {
+	public function getVariationFixtureCreatedMin() {
 		return (int) CM_Mysql::exec(
 			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId` = ' . $this->getId())->fetchOne();
 	}
@@ -95,6 +105,20 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	public function setConversion(CM_Model_User $user) {
 		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_USER, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
 			'userId' => $user->getId()));
+	}
+
+	/**
+	 * @param int $id
+	 * @return CM_Model_Splittest
+	 * @throws CM_Exception_Nonexistent
+	 */
+	public static function findId($id) {
+		$id = (int) $id;
+		$name = CM_Mysql::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchOne();
+		if (false === $name) {
+			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
+		}
+		return new self($name);
 	}
 
 	protected function _loadData() {

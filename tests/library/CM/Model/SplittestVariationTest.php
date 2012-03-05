@@ -37,12 +37,33 @@ class CM_Model_SplittestVariationTest extends TestCase {
 		}
 	}
 
-	public function testGetSetEnabled() {
+	public function testGetSplittest() {
 		/** @var CM_Model_SplittestVariation $variation */
 		foreach ($this->_test->getVariations() as $variation) {
-			$this->assertTrue($variation->getEnabled());
-			$variation->setEnabled(false);
-			$this->assertFalse($variation->getEnabled());
+			$this->assertModelEquals($this->_test, $variation->getSplittest());
+		}
+	}
+
+	public function testGetSetEnabled() {
+		/** @var CM_Model_SplittestVariation $variation1 */
+		$variation1 = $this->_test->getVariations()->getItem(0);
+		/** @var CM_Model_SplittestVariation $variation2 */
+		$variation2 = $this->_test->getVariations()->getItem(0);
+
+		$this->assertTrue($variation1->getEnabled());
+		$this->assertTrue($variation2->getEnabled());
+
+		$variation1->setEnabled(false);
+		$this->assertFalse($variation1->getEnabled());
+		$variation1->setEnabled(true);
+		$this->assertTrue($variation1->getEnabled());
+
+		$variation1->setEnabled(false);
+		try {
+			$variation2->setEnabled(false);
+			$this->fail('Could disable all variations');
+		} catch (CM_Exception $e) {
+			$this->assertTrue(true);
 		}
 	}
 
