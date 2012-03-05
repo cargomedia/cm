@@ -77,9 +77,14 @@ class CM_Model_SplittestTest extends TestCase {
 		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
 		$test->getVariationFixture($user1);
 		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture1Id));
+
 		$variationFixture2Name = $test->getVariationFixture($user2);
 		$variationFixture2Id = array_search($variationFixture2Name, $variations);
-		$this->assertSame(1, $test->getVariationFixtureCount($variationFixture2Id));
+		if ($variationFixture1Id == $variationFixture2Id) {
+			$this->assertSame(2, $test->getVariationFixtureCount($variationFixture2Id));
+		} else {
+			$this->assertSame(1, $test->getVariationFixtureCount($variationFixture2Id));
+		}
 
 		$test->delete();
 	}
