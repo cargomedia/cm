@@ -99,19 +99,6 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
-	public function testGetSetRunning() {
-		/** @var CM_Model_Splittest $test */
-		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$this->assertTrue($test->getRunning());
-
-		$test->setRunning(true);
-		$this->assertTrue($test->getRunning());
-		$test->setRunning(false);
-		$this->assertFalse($test->getRunning());
-
-		$test->delete();
-	}
-
 	public function testDelete() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();

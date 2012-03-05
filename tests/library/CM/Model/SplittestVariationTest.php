@@ -37,4 +37,13 @@ class CM_Model_SplittestVariationTest extends TestCase {
 		}
 	}
 
+	public function testGetSetEnabled() {
+		/** @var CM_Model_SplittestVariation $variation */
+		foreach ($this->_test->getVariations() as $variation) {
+			$this->assertTrue($variation->getEnabled());
+			$variation->setEnabled(false);
+			$this->assertFalse($variation->getEnabled());
+		}
+	}
+
 }

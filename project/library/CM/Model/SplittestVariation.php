@@ -11,6 +11,22 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getEnabled() {
+		return (bool) $this->_get('enabled');
+	}
+
+	/**
+	 * @param bool $state
+	 */
+	public function setEnabled($state) {
+		$state = (bool) $state;
+		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
+		$this->_change();
+	}
+
+	/**
 	 * @return CM_Model_Splittest
 	 */
 	public function getSplittest() {

@@ -32,22 +32,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function getRunning() {
-		return (bool) $this->_get('running');
-	}
-
-	/**
-	 * @param bool $state
-	 */
-	public function setRunning($state) {
-		$state = (bool) $state;
-		CM_Mysql::update(TBL_CM_SPLITTEST, array('running' => $state), array('id' => $this->getId()));
-		$this->_change();
-	}
-
-	/**
 	 * @return CM_Paging_SplittestVariation_Splittest
 	 */
 	public function getVariations() {
