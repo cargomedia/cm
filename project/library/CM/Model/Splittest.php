@@ -58,7 +58,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @param CM_Model_User $user
 	 * @return string
 	 */
-	public function getVariationFixture(CM_Model_User $user,$t) {
+	public function getVariationFixture(CM_Model_User $user) {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
 		if (($variationFixtures = CM_Cache::get($cacheKey)) === false) {
 			$variationFixtures = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId',
@@ -74,7 +74,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			$variationIds = array_keys($variations);
 			$variationId = $variationIds[array_rand($variationIds)];
 			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
-				'variationId' => $variationId, 'createStamp' => $t));
+				'variationId' => $variationId, 'createStamp' => time()));
 			CM_Cache::delete($cacheKey);
 		}
 
@@ -113,8 +113,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	/**
 	 * @param CM_Model_User $user
 	 */
-	public function setConversion(CM_Model_User $user,$t) {
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_USER, array('conversionStamp' => $t), array('splittestId' => $this->getId(),
+	public function setConversion(CM_Model_User $user) {
+		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_USER, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
 			'userId' => $user->getId()));
 	}
 
