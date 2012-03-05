@@ -84,6 +84,24 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return CM_Model_SplittestVariation
+	 */
+	public function getVariationBest() {
+		$variationBest = null;
+		$variationBestRate = 0;
+		/** @var CM_Model_SplittestVariation $variation */
+		foreach ($this->getVariations() as $variation) {
+			if (null === $variation || $variation->getConversionRate() > $variationBestRate) {
+				$variationBest = $variation;
+			}
+		}
+		if (!$variationBest) {
+			throw new CM_Exception('Splittest `' . $this->getId() . '` has no variations');
+		}
+		return $variationBest;
+	}
+
+	/**
 	 * @param CM_Model_User $user
 	 */
 	public function setConversion(CM_Model_User $user) {
