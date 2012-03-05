@@ -63,6 +63,23 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
+	public function testGetVariationFixtureDisabledVariation() {
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		/** @var CM_Model_SplittestVariation $variation1 */
+		$variation1 = $test->getVariations()->getItem(0);
+		/** @var CM_Model_SplittestVariation $variation2 */
+		$variation2 = $test->getVariations()->getItem(1);
+
+		$variation1->setEnabled(false);
+		for ($i = 0; $i < 10; $i++) {
+			$user = TH::createUser();
+			$this->assertSame($variation2->getName(), $test->getVariationFixture($user));
+		}
+
+		$test->delete();
+	}
+
 	public function testGetVariationFixtureCount() {
 		$user1 = TH::createUser();
 		$user2 = TH::createUser();

@@ -24,7 +24,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	public function setEnabled($state) {
 		$state = (bool) $state;
 		$variationsEnabled = $this->getSplittest()->getVariationsEnabled();
-		if (!$state && $variationsEnabled->getCount() <= 1) {
+		if (!$state && $state != $this->getEnabled() && $variationsEnabled->getCount() <= 1) {
 			throw new CM_Exception('At least one variation needs to be enabled');
 		}
 		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
