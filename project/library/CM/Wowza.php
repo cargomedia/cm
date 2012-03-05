@@ -20,9 +20,9 @@ class CM_Wowza extends CM_Class_Abstract {
 			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
 		}
 		$allowedUntil = null; //TODO set to some reasonable time in the future
-		$videoStreamPublish = CM_VideoStream_Publish::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$videoStreamPublish = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $clientKey, 'name' => $streamName, 'delegateType' => $streamType));
-		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		$streamChannel = new CM_Model_StreamChannel_Abstract($videoStreamPublish);
 		if (!$streamChannel->onPublish($params)) {
 			$videoStreamPublish->delete();
 			//return failure
@@ -31,9 +31,10 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	public static function rpc_unpublish($streamName, $clientKey) {
+		//todo: refactor
 		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
 		if ($videoStreamPublish) {
-			$streamChannel = new CM_StreamChannel($videoStreamPublish);
+			$streamChannel = new CM_Model_StreamChannel_Abstract($videoStreamPublish);
 			$streamChannel->onUnpublish();
 		}
 		$videoStreamPublish->delete();
@@ -50,12 +51,13 @@ class CM_Wowza extends CM_Class_Abstract {
 			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
 		}
 		$allowedUntil = null;
+		//todo: refactor
 		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
 		if (!$videoStreamPublish) {
 			//publisher not found
 		}
 		$videoStreamSubscribe = $videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
-		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		$streamChannel = new CM_Model_StreamChannel_Abstract($videoStreamPublish);
 		if (!$streamChannel->onSubscribe($videoStreamSubscribe, $params)) {
 			$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->delete($videoStreamSubscribe);
 			//return failure
@@ -64,15 +66,16 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	public static function rpc_unsubscribe($streamName, $clientKey) {
+		//todo: refactor
 		$videoStreamPublish = SK_VideoStream_Publish::findStreamName($streamName);
 		if (!$videoStreamPublish) {
 
 		}
-		$videoStreamSubscribe = CM_VideoStream_Subscribe::findKey($clientKey);
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey($clientKey);
 		if (!$videoStreamSubscribe || !$videoStreamPublish->getStreamChannel()->getVideoStreamSubscribes()->contains($videoStreamSubscribe)) {
 
 		}
-		$streamChannel = new CM_StreamChannel($videoStreamPublish);
+		$streamChannel = new CM_Model_StreamChannel_Abstract($videoStreamPublish);
 		$streamChannel->onUnsubscribe($videoStreamSubscribe);
 		$videoStreamSubscribe->getVideoStreamPublish()->delete($videoStreamSubscribe);
 	}

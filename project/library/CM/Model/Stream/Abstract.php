@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_VideoStream_Abstract extends CM_Model_Abstract {
+abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param int $timeStamp

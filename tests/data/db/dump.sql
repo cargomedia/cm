@@ -433,36 +433,39 @@ CREATE TABLE `cm_useragent` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_videoStream_publish`;
-
-
-CREATE TABLE `cm_videoStream_publish` (
+DROP TABLE IF EXISTS `cm_streamChannel`;
+CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userId` int(10) unsigned NOT NULL,
-  `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
-  `key` varchar(32) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  `delegateType` tinyint(3) unsigned NOT NULL,
+  `key` varchar(64) NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`)
+  UNIQUE KEY `key` (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_videoStream_subscribe`;
-
-
-CREATE TABLE `cm_videoStream_subscribe` (
+DROP TABLE IF EXISTS `cm_stream_publish`;
+CREATE TABLE `cm_stream_publish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
   `start` int(10) unsigned NOT NULL,
   `allowedUntil` int(10) unsigned NOT NULL,
-  `publishId` int(10) unsigned NOT NULL,
   `key` varchar(32) NOT NULL,
+  `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`),
   KEY `userId` (`userId`),
-  KEY `publishId` (`publishId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `channelId` (`channelId`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_stream_subscribe`;
+CREATE TABLE `cm_stream_subscribe` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(10) unsigned NOT NULL,
+  `start` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned NOT NULL,
+  `key` varchar(32) NOT NULL,
+  `channelId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  KEY `userId` (`userId`),
+  KEY `channelId` (`channelId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

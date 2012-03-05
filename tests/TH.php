@@ -170,36 +170,49 @@ class TH {
 		return new TH_Page($html);
 	}
 
+	public static function createStreamChannel($type = null) {
+		if (is_null($type)) {
+			$type = CM_Model_StreamChannel_Video::TYPE;
+		}
+		switch ($type) {
+			case CM_Model_StreamChannel_Video::TYPE:
+				return CM_Model_StreamChannel_Video::create(array('key' => rand(1, 10000) . '_' . rand(1, 100)));
+				break;
+			default:
+				throw new CM_Exception_Invalid('Invalid StreamChannel type `' . $type . '`');
+		}
+	}
+
 	/**
 	 * @param CM_Model_User|null $user
-	 * @return CM_VideoStream_Publish
+	 * @return CM_Model_Stream_Publish
 	 */
-	public static function createVideoStreamPublish(CM_Model_User $user = null) {
+	public static function createStreamPublish(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (!$user) {
 			$user = TH::createUser();
 		}
-		$data = array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10,
-			'key' => rand(1, 10000) . '_' . rand(1, 100), 'delegateType' => 1);
-		while (empty($data['name']) || CM_VideoStream_Publish::findStreamName($data['name'])) {
-			$data['name'] .= self::_randStr(2);
+		if (is_null($streamChannel)) {
+			$streamChannel = TH::createStreamChannel();
 		}
-		return CM_VideoStream_Publish::create($data);
+		$data = array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10,
+			'key' => rand(1, 10000) . '_' . rand(1, 100), 'streamChannel' => $streamChannel);
+		return CM_Model_Stream_Publish::create($data);
 	}
 
 	/**
 	 * @param CM_Model_User|null				$user
-	 * @param CM_VideoStream_Publish|null       $videoStreamPublish
-	 * @return CM_VideoStream_Subscribe
+	 * @param CM_Model_Stream_Publish|null       $streamPublish
+	 * @return CM_Model_Stream_Subscribe
 	 */
-	public static function createVideoStreamSubscribe(CM_Model_User $user = null, CM_VideoStream_Publish $videoStreamPublish = null) {
+	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (!$user) {
 			$user = TH::createUser();
 		}
-		if (!$videoStreamPublish) {
-			$videoStreamPublish = TH::createVideoStreamPublish($user);
+		if (is_null($streamChannel)) {
+			$streamChannel = TH::createStreamChannel();
 		}
-		return CM_VideoStream_Subscribe::create(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'publish' => $videoStreamPublish, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'streamChannel' => $streamChannel, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
