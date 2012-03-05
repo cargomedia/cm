@@ -91,8 +91,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		$variationBestRate = 0;
 		/** @var CM_Model_SplittestVariation $variation */
 		foreach ($this->getVariations() as $variation) {
-			if (null === $variation || $variation->getConversionRate() > $variationBestRate) {
+			$variationRate = $variation->getConversionRate();
+			if (null === $variation || $variationRate > $variationBestRate) {
 				$variationBest = $variation;
+				$variationBestRate = $variationRate;
 			}
 		}
 		if (!$variationBest) {
