@@ -28,8 +28,15 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 	public function getCount($offset = null, $count = null) {
 		$cacheKey = array('count');
 		if (($count = $this->_cacheGet($cacheKey)) === false) {
-			$select = $this->_group ? '1' : 'COUNT(*)';
-			$select = !$this->_group && preg_match('/distinct/i', $this->_select) ? 'COUNT(' . $this->_select . ')' : $select;
+			if ($this->_group) {
+				$select = '1';
+			} else {
+				if (stripos($this->_select, 'DISTINCT') === 0) {
+					$select = 'COUNT(' . $this->_select . ')';
+				} else {
+					$select = 'COUNT(*)';
+				}
+			}
 			$query = 'SELECT ' . $select . ' FROM `' . $this->_table . '`';
 			if ($this->_join) {
 				$query .= ' ' . $this->_join;
