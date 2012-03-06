@@ -24,6 +24,7 @@ class CM_Paging_StreamPublish_StreamChannel extends CM_Paging_StreamPublish_Abst
 
 	/**
 	 * @param CM_Model_Stream_Publish $streamPublish
+	 * @throws CM_Exception_Invalid
 	 */
 	public function delete(CM_Model_Stream_Publish $streamPublish) {
 		if (!$this->contains($streamPublish)) {

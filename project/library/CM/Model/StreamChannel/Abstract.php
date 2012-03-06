@@ -38,6 +38,13 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return CM_Paging_User_StreamChannel
+	 */
+	public function getUsers() {
+		return new CM_Paging_User_StreamChannel($this);
+	}
+
+	/**
 	 * @param CM_Params|null $params
 	 * @return boolean
 	 */
