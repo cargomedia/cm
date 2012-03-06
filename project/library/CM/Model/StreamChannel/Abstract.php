@@ -98,13 +98,8 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		if (is_null($type)) {
 			$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
 		}
-		switch ($type) {
-			case CM_Model_StreamChannel_Video::TYPE:
-				return new CM_Model_StreamChannel_Video($id);
-			break;
-			default:
-				throw new CM_Exception_Invalid('Invalid StreamChannel type: `' . $type . '`');
-		}
+		$class = self::_getClassName($type);
+		return new $class($id);
 	}
 
 	/**

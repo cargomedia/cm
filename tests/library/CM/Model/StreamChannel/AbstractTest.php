@@ -29,6 +29,10 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd'));
 		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
+
+		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss'));
+		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
+		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 	}
 
 	public function testFindKey() {
