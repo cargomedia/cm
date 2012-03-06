@@ -20,7 +20,7 @@ class CM_File_ImageTest extends TestCase {
 	}
 
 	public function testConstructCorruptFile() {
-		$this->markTestIncomplete('something wrong -> imagick version problem');
+		$this->markTestSkipped('something wrong -> imagick version problem');
 		$path = DIR_TEST_DATA . 'img/corrupt-content.jpg';
 
 		try {

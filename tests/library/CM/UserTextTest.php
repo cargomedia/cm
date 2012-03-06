@@ -26,7 +26,8 @@ EOD;
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
-		
+		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
+
 		TH::clearCache();
 	}
 
@@ -143,6 +144,17 @@ EOD;
 		$this->assertEquals('Anybody <u>i</u>…', $actual->getFormat(9));
 		$this->assertEquals('Anybody …', $actual->getFormat(8));
 		$this->assertEquals('Anybody…', $actual->getFormat(7));
+	}
+
+	public function testFormatUnallowedTagsFiltering() {
+		$urlStatic = URL_STATIC;
+		$modified = CM_App::getInstance()->getReleaseStamp();
+		$expected =
+				'<img class="smile" alt="&lt;3" title="&lt;3" src="' . $urlStatic . 'img/smiles/1/5.png?' . $modified . '" /> love<br />' . PHP_EOL .
+						'you';
+
+		$actual = new CM_Usertext('<3 love' . PHP_EOL . 'you');
+		$this->assertEquals($expected, $actual->getFormat());
 	}
 
 	public function testMultibyte() {

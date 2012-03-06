@@ -31,8 +31,8 @@ class CM_Usertext extends CM_Class_Abstract {
 	public function getFormat($lengthMax = null) {
 		$text = $this->_text;
 		$text = nl2br($text);
-		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_insertEmoticonTags($text);
+		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_getFormat($text, false, $lengthMax);
 		$text = $this->_insertEmoticonHtml($text);
 		return $text;
@@ -44,8 +44,8 @@ class CM_Usertext extends CM_Class_Abstract {
 	 */
 	public function getFormatPlain($lengthMax = null) {
 		$text = $this->_text;
-		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_insertEmoticonTags($text);
+		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_getFormat($text, true, $lengthMax);
 		$text = $this->_insertEmoticonHtml($text);
 		return $text;
@@ -69,7 +69,7 @@ class CM_Usertext extends CM_Class_Abstract {
 					$path = URL_STATIC . 'img/smiles/' . $smiley['path'] . '?' . CM_App::getInstance()->getReleaseStamp();
 					$emoticons['codes'][] = $code;
 					$emoticons['tags'][] = '<emoticon>' . $smiley['id'] . '</emoticon>';
-					$emoticons['htmls'][] = '<img class="smile" alt="' . $code . '" title="' . $code . '" src="' . $path . '" />';
+					$emoticons['htmls'][] = '<img class="smile" alt="' . $this->_escape($code) . '" title="' . $this->_escape($code) . '" src="' . $path . '" />';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
@@ -111,8 +111,15 @@ class CM_Usertext extends CM_Class_Abstract {
 		return htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
 	}
 
+	/**
+	 * Escape unallowed tags before creating a DOM tree of the input, to make sure
+	 * we don't create (closing-)tags for them (e.g. "<foo>bar" -> "<foo>bar</foo>")
+	 *
+	 * @param string $text
+	 * @return string
+	 */
 	private function _escapeUnAllowedTags($text) {
-		$_allowedTags = $this->_allowedTags;
+		$_allowedTags = array_merge($this->_allowedTags, $this->_internalTags);
 		return preg_replace_callback('#<[/\s]*(?<tag>\w*).*?>#', function ($matches) use ($_allowedTags) {
 			if ($matches['tag'] && in_array($matches['tag'], $_allowedTags)) {
 				return $matches[0];
