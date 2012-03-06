@@ -25,6 +25,7 @@ EOD;
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
+		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
 		
 		TH::clearCache();
 	}
@@ -98,7 +99,6 @@ EOD;
 	}
 
 	public function testPlainTruncate() {
-		$splitChar = CM_Usertext::getSplitChar();
 		$actual = new CM_Usertext('Hello World');
 		$this->assertEquals('Hello…', $actual->getPlain(10));
 		$this->assertEquals('Hello World', $actual->getPlain(11));
@@ -106,7 +106,6 @@ EOD;
 	}
 
 	public function testFormatPlainTruncate() {
-		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
@@ -123,18 +122,19 @@ EOD;
 	}
 
 	public function testFormatPlainTruncateSmiley() {
-		return;
-		$splitChar = CM_Usertext::getSplitChar();
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
-		$expected = 'Yo <img class="smile" alt="*PLAYMATE*" title="*PLAYMATE*" src="' . $urlStatic . 'img/smiles/1/a52.gif?' . $modified . '" />';
+		$expected = 'Yo <img class="smile" alt="*PLAYMATE*" title="*PLAYMATE*" src="' . $urlStatic . 'img/smiles/1/4.png?' . $modified . '" />';
 		$this->assertEquals($expected, $actual->getFormatPlain(1000));
+		$this->assertEquals($expected, $actual->getFormatPlain(4));
+		$this->assertEquals('Yo ', $actual->getFormatPlain(3));
+		$this->assertEquals('Yo…', $actual->getFormatPlain(2));
+		$this->assertEquals('Y…', $actual->getFormatPlain(1));
 	}
 
 	public function testFormatTruncate() {
-		$splitChar = CM_Usertext::getSplitChar();
 		$actual = new CM_Usertext('Anybody <u>in</u> there?');
 
 		$this->assertEquals('Anybody <u>in</u> there?', $actual->getFormat(17));
