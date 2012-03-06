@@ -3,15 +3,17 @@
 class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @var CM_Model_Stream_Publish
-	 */
-	private $_streamPublish;
-
-	/**
 	 * @return string
 	 */
 	public function getKey() {
 		return (string) $this->_get('key');
+	}
+
+	/**
+	 * @return CM_Paging_User_StreamChannelPublisher
+	 */
+	public function getPublishers() {
+		return new CM_Paging_User_StreamChannelPublisher($this);
 	}
 
 	/**
@@ -22,24 +24,17 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Stream_Publish
-	 */
-	public function getStreamPublish() {
-		return $this->_streamPublish;
-	}
-
-	/**
-	 * @return CM_Paging_User_StreamChannel
-	 */
-	public function getVideoStreamSubscribers() {
-		return new CM_Paging_User_StreamChannel($this);
-	}
-
-	/**
 	 * @return CM_Paging_StreamSubscribe_StreamChannel
 	 */
 	public function getStreamSubscribes() {
 		return new CM_Paging_StreamSubscribe_StreamChannel($this);
+	}
+
+	/**
+	 * @return CM_Paging_User_StreamChannelSubscriber
+	 */
+	public function getSubscribers() {
+		return new CM_Paging_User_StreamChannelSubscriber($this);
 	}
 
 	/**
