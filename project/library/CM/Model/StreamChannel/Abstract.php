@@ -1,6 +1,42 @@
 <?php
 
-class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
+abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
+
+	/**
+	 * @param CM_Model_User $user
+	 * @return boolean
+	 */
+	abstract public function canPublish(CM_Model_User $user);
+
+	/**
+	 * @param CM_Model_User $user
+	 * @return boolean
+	 */
+	abstract public function canSubscribe(CM_Model_User $user);
+
+	/**
+	 * @param CM_Model_Stream_Publish $streamPublish
+	 * @param CM_Params|null          $params
+	 */
+	abstract public function onPublish(CM_Model_Stream_Publish $streamPublish, CM_Params $params = null);
+
+	/**
+	 * @param CM_Model_Stream_Subscribe $streamSubscribe
+	 * @param CM_Params|null            $params
+	 * @return boolean
+	 */
+	abstract public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe, CM_Params $params = null);
+
+	/**
+	 * @return boolean
+	 */
+	abstract public function onUnpublish(CM_Model_Stream_Publish $streamPublish);
+
+	/**
+	 * @param CM_Model_Stream_Subscribe $streamSubscribe
+	 * @return boolean
+	 */
+	abstract public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe);
 
 	/**
 	 * @return string
@@ -44,34 +80,6 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return new CM_Paging_User_StreamChannel($this);
 	}
 
-	/**
-	 * @param CM_Params|null $params
-	 * @return boolean
-	 */
-	public function onPublish(CM_Params $params = null) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	/**
-	 * @param CM_Model_Stream_Subscribe $streamSubscribe
-	 * @param CM_Params|null $params
-	 * @return boolean
-	 */
-	public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe, CM_Params $params = null) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	public function onUnpublish() {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	/**
-	 * @param CM_Model_Stream_Subscribe $streamSubscribe
-	 */
-	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-		throw new CM_Exception_NotImplemented();
-	}
-
 	protected function _loadData() {
 		return CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetchAssoc();
 	}
@@ -89,7 +97,7 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int      $id
 	 * @param int|null $type
 	 * @return CM_Model_StreamChannel_Video
 	 * @throws CM_Exception_Invalid
@@ -113,7 +121,7 @@ class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return self::factory($result['id'], $result['type']);
 	}
 
-	protected static function _create(array $data ) {
+	protected static function _create(array $data) {
 		$key = $data ['key'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		return new static($id);

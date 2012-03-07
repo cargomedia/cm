@@ -5,7 +5,7 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param int $timeStamp
 	 */
-	public abstract function setAllowedUntil($timeStamp);
+	abstract public function setAllowedUntil($timeStamp);
 
 	/**
 	 * @return int

@@ -21,7 +21,7 @@ abstract class CM_Class_Abstract {
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	protected static function _getClassName($type = null) {
+	public static function _getClassName($type = null) {
 		$type = (int) $type;
 		$config = self::_getConfig();
 		if (!$type) {
