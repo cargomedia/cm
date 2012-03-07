@@ -25,8 +25,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if ($channelId) {
 			$streamChannel = CM_Model_StreamChannel_Abstract::factory($channelId);
 		} else {
-			$class = CM_Model_StreamChannel_Abstract::_getClassName($streamType);
-			$streamChannel = $class::create(array('key' => $streamName));
+			$streamChannel = CM_Model_StreamChannel_Abstract::create(array('key' => $streamName, 'type' => $streamType));
 		}
 		if (!$streamChannel->canPublish($user)) {
 			//return failure
