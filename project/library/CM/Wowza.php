@@ -5,7 +5,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string $streamName
 	 * @param string $clientKey
-	 * @param int	$start
+	 * @param int	 $start
 	 * @param string $data
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $data) {
@@ -25,7 +25,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if ($channelId) {
 			$streamChannel = CM_Model_StreamChannel_Abstract::factory($channelId);
 		} else {
-			$streamChannel = CM_Model_StreamChannel_Abstract::create(array('key' => $streamName, 'type' => $streamType));
+			$streamChannel = CM_Model_StreamChannel_Abstract::create(array_merge($data, array('key' => $streamName, 'type' => $streamType)));
 		}
 		if (!$streamChannel->canPublish($user)) {
 			//return failure
