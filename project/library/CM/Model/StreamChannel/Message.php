@@ -4,10 +4,10 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
 	const TYPE = 18;
 
-	public function canPublish(CM_Model_User $user) {
+	public function canPublish(CM_Model_User $user, CM_Params $params = null) {
 	}
 
-	public function canSubscribe(CM_Model_User $user) {
+	public function canSubscribe(CM_Model_User $user, CM_Params $params = null) {
 	}
 
 	public function onPublish(CM_Model_Stream_Publish $streamPublish, CM_Params $params = null) {

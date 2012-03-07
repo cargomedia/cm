@@ -3,26 +3,28 @@
 abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @param CM_Model_User $user
+	 * @param CM_Model_User  $user
+	 * @param CM_Params|null $params
 	 * @return boolean
 	 */
-	abstract public function canPublish(CM_Model_User $user);
+	abstract public function canPublish(CM_Model_User $user, CM_Params $params = null);
 
 	/**
-	 * @param CM_Model_User $user
+	 * @param CM_Model_User  $user
+	 * @param CM_Params|null $params
 	 * @return boolean
 	 */
-	abstract public function canSubscribe(CM_Model_User $user);
+	abstract public function canSubscribe(CM_Model_User $user, CM_Params $params = null);
 
 	/**
 	 * @param CM_Model_Stream_Publish $streamPublish
-	 * @param CM_Params|null          $params
+	 * @param CM_Params|null		  $params
 	 */
 	abstract public function onPublish(CM_Model_Stream_Publish $streamPublish, CM_Params $params = null);
 
 	/**
 	 * @param CM_Model_Stream_Subscribe $streamSubscribe
-	 * @param CM_Params|null            $params
+	 * @param CM_Params|null			$params
 	 * @return boolean
 	 */
 	abstract public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe, CM_Params $params = null);
@@ -97,7 +99,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int      $id
+	 * @param int	  $id
 	 * @param int|null $type
 	 * @return CM_Model_StreamChannel_Video
 	 * @throws CM_Exception_Invalid
@@ -122,7 +124,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected static function _create(array $data) {
-		$key = $data ['key'];
+		$key = (string) $data ['key'];
 		if (get_called_class() == get_class()) {
 			$type = (int) $data['type'];
 			$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => $type));
