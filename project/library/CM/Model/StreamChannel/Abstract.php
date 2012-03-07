@@ -123,6 +123,12 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		$key = $data ['key'];
+		if (get_called_class() == get_class()) {
+			$type = (int) $data['type'];
+			$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => $type));
+			$class = self::_getClassName($type);
+			return new $class($id);
+		}
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		return new static($id);
 	}

@@ -112,4 +112,9 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		$streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '112_4'));
 		$this->assertEquals(2, $streamChannel->getUsers()->getCount());
 	}
+
+	public function testCreate() {
+		$streamChannel = CM_Model_StreamChannel_Abstract::create(array('key' => 'foo1', 'type' => CM_Model_StreamChannel_Message::TYPE));
+		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+	}
 }
