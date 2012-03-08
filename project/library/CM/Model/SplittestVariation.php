@@ -43,7 +43,11 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return float
 	 */
 	public function getConversionRate() {
-		return $this->getConversionCount() / $this->getFixtureCount();
+		$fixtureCount = $this->getFixtureCount();
+		if (0 == $fixtureCount) {
+			return 0;
+		}
+		return $this->getConversionCount() / $fixtureCount;
 	}
 
 	/**
