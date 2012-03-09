@@ -215,7 +215,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $data
+	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 */
 	final public static function create(array $data = null) {
@@ -228,8 +228,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @param int $type
+	 * @param array|null $data
+	 * @return CM_Model_Abstract
+	 */
+	final public static function createType($type, array $data = null) {
+		/** @var CM_Model_Abstract $className */
+		$className = static::_getClassName($type);
+		return $className::create($data);
+	}
+
+	/**
 	 * @param array $data
-	 * @return CM_Model
+	 * @return CM_Model_Abstract
 	 */
 	protected static function _create(array $data) {
 		throw new CM_Exception_NotImplemented();
