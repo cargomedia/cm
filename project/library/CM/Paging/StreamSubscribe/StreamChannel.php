@@ -22,6 +22,7 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 		$data['streamChannel'] = $this->_streamChannel;
 		$streamSubscribe = CM_Model_Stream_Subscribe::create($data);
 		$this->_change();
+		$this->_streamChannel->onSubscribe($streamSubscribe);
 		return $streamSubscribe;
 	}
 
@@ -33,6 +34,7 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 		if (!$this->contains($streamSubscribe)) {
 			throw new CM_Exception_Invalid("Cannot remove a stream from a channel it doesn't subscribe to.");
 		}
+		$this->_streamChannel->onUnsubscribe($streamSubscribe);
 		$streamSubscribe->delete();
 		$this->_change();
 	}

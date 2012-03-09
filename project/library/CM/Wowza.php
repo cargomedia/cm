@@ -12,7 +12,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		$params = CM_Params::factory(json_decode($data, true));
 		$streamType = $params->getInt('streamType');
 		$session = new CM_Session($params->getString('sessionId'));
-		$channelId = $params->getInt('channelId');
 		if (!$session->hasUser()) {
 			throw new CM_Exception_Invalid('Session `' . $session->getId() . '` has no user.');
 		}
@@ -22,18 +21,12 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 		$allowedUntil = null; //TODO set to some reasonable time in the future
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		if ($channelId) {
-			$streamChannel = CM_Model_StreamChannel_Abstract::factory($channelId);
-		} else {
-			$streamChannel = CM_Model_StreamChannel_Abstract::create(array_merge($data, array('key' => $streamName, 'type' => $streamType)));
-		}
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
 		if (!$streamChannel->canPublish($user)) {
-			//return failure
+			throw new CM_Exception_NotAllowed();
 		}
 		$streamPublish = $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $clientKey));
-		$streamChannel->onPublish($streamPublish, $params);
-		$streamChannel->getStreamPublishs()->delete($streamPublish);
 		//return success
 	}
 
@@ -46,8 +39,9 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamPublish) {
 
 		}
+
 		$streamChannel->onUnpublish($streamPublish);
-		$streamChannel->getStreamPublishs()->delete($streamPublish);
+		$streamChannel->delete();
 	}
 
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
@@ -71,7 +65,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 		$streamChannel->onSubscribe($streamSubscribe, $params);
-		$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
 		//return success
 	}
 
@@ -86,7 +79,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamSubscribe) {
 
 		}
-		$streamChannel->onUnsubscribe($streamSubscribe);
 		$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
 	}
 

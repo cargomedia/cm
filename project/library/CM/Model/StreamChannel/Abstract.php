@@ -83,13 +83,15 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		/** @var CM_Model_Stream_Subscribe $videoStreamSubscribe */
-		foreach ($this->getStreamSubscribes() as $videoStreamSubscribe) {
-			$videoStreamSubscribe->delete();
+		$streamSubscribes = $this->getStreamSubscribes();
+		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+		foreach ($streamSubscribes as $streamSubscribe) {
+			$streamSubscribes->delete($streamSubscribe);
 		}
+		$streamPublishs = $this->getStreamPublishs();
 		/** @var CM_Model_Stream_Publish $streamPublish */
-		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
+		foreach ($streamPublishs as $streamPublish) {
+			$streamPublishs->delete($streamPublish);
 		}
 		CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
 	}
