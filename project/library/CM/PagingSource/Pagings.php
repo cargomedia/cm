@@ -6,7 +6,7 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 	private $_distinct;
 
 	/**
-	 * @param CM_Paging_Abstract[]
+	 * @param array CM_Paging_Abstract[]
 	 * @param boolean|null $distinct
 	 */
 	public function __construct(array $pagings, $distinct = null) {

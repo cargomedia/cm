@@ -1,4 +1,3 @@
-
 <?php
 
 class CM_Paging_User_StreamChannelPublisher extends CM_Paging_User_Abstract {
