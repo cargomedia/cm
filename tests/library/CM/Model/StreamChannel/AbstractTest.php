@@ -114,7 +114,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testCreate() {
-		$streamChannel = CM_Model_StreamChannel_Abstract::create(array('key' => 'foo1', 'type' => CM_Model_StreamChannel_Message::TYPE));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1'));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 	}
 }

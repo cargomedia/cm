@@ -29,7 +29,14 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_User
+	 * @return CM_Model_StreamChannel_Abstract
+	 */
+	public function getStreamChannel() {
+		return CM_Model_StreamChannel_Abstract::factory($this->_get('channelId'));
+	}
+
+	/**
+	 * @return CM_Model_User
 	 */
 	public function getUser() {
 		return CM_Model_User::factory($this->_get('userId'));
