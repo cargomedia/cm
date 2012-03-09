@@ -59,13 +59,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_SplittestVariation $variationWorse
-	 * @return float P-value
+	 * @return float|null P-value
 	 */
 	public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
 		$conversionsA = $this->getConversionCount();
 		$fixturesA = $this->getFixtureCount();
 		$conversionsB = $variationWorse->getConversionCount();
 		$fixturesB = $variationWorse->getFixtureCount();
+		if (0 == $fixturesA || 0 == $fixturesB) {
+			return null;
+		}
 		$rateA = $conversionsA / $fixturesA;
 		$rateB = $conversionsB / $fixturesB;
 		$error = sqrt(($rateA * (1 - $rateA) / $fixturesA) + ($rateB * (1 - $rateB) / $fixturesB));
