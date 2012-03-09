@@ -173,6 +173,11 @@ class CM_Model_AbstractTest extends TestCase{
 			$this->assertTrue(true);
 		}
 	}
+
+	public function testCreateType() {
+		$user = CM_Model_Abstract::createType(CM_Model_User::TYPE);
+		$this->assertInstanceOf('CM_Model_User', $user);
+	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
