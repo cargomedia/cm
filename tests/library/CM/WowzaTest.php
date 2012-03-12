@@ -18,11 +18,10 @@ class CM_WowzaTest extends TestCase {
 		TH::createStreamSubscribe(null, $streamChannel);
 		TH::createStreamSubscribe(null, $streamChannel);
 		TH::createStreamSubscribe(null, $streamChannel);
-		$streamChannel = TH::createStreamChannel();
-		$streamChannels[] = $streamChannel;
-		TH::createStreamPublish(null, $streamChannel);
-		TH::createStreamSubscribe(null, $streamChannel);
-		TH::createStreamSubscribe(null, $streamChannel);
+		$streamChannel1 = TH::createStreamChannel();
+		$streamChannels[] = $streamChannel1;
+		TH::createStreamPublish(null, $streamChannel1);
+		TH::createStreamSubscribe(null, $streamChannel1);
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
 		$addedChannelKey = $streamChannel->getKey();
@@ -32,6 +31,7 @@ class CM_WowzaTest extends TestCase {
 		$wowzaData = $this->_generateWowzaData($streamChannels);
 		$streamChannelToBeAdded = clone($streamChannel);
 		$streamChannel->delete();
+		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(null, $streamChannel1);
 		try {
 			new CM_Model_StreamChannel_Video($streamChannelToBeAdded->getId());
 			$this->fail();
@@ -43,6 +43,7 @@ class CM_WowzaTest extends TestCase {
 		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		CM_Wowza::synchronize($wowzaData);
+		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved3->getKey()));
 
 		//stuff that should have been added
 		$this->assertNotNull($streamChannelAdded = CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeAdded->getKey()));

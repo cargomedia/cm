@@ -212,14 +212,13 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		$data = array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10,
-			'key' => rand(1, 10000) . '_' . rand(1, 100), 'streamChannel' => $streamChannel);
-		return CM_Model_Stream_Publish::create($data);
+		return $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'price' => rand(10, 50) / 10, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
-	 * @param CM_Model_User|null				$user
-	 * @param CM_Model_Stream_Publish|null       $streamPublish
+	 * @param CM_Model_User|null				 $user
+	 * @param CM_Model_Stream_Publish|null	   $streamPublish
 	 * @return CM_Model_Stream_Subscribe
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
@@ -229,8 +228,8 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		return CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'streamChannel' => $streamChannel, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return $streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**

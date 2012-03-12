@@ -52,8 +52,8 @@ class CM_Wowza extends CM_Class_Abstract {
 				$publish = $status[$streamPublishKey];
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-					if (!isset($publish['subscribers'])) {
-						self::rpc_unpublish($streamChannel->getKey(), $streamSubscribe->getKey());
+					if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {
+						self::rpc_unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 					}
 				}
 			}
@@ -67,6 +67,10 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $data
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $data) {
+		$streamName = (string) $streamName;
+		$clientKey = (string) $clientKey;
+		$start = (int) $start;
+		$data = (string) $data;
 		$params = CM_Params::factory(json_decode($data, true));
 		$streamType = $params->getInt('streamType');
 		$session = new CM_Session($params->getString('sessionId'));
@@ -88,7 +92,13 @@ class CM_Wowza extends CM_Class_Abstract {
 		//return success
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 */
 	public static function rpc_unpublish($streamName, $clientKey) {
+		$streamName = (string) $streamName;
+		$clientKey = (string) $clientKey;
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			return;
@@ -100,7 +110,18 @@ class CM_Wowza extends CM_Class_Abstract {
 		$streamChannel->delete();
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @param int $start
+	 * @param string $data
+	 * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
+	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
+		$streamName = (string) $streamName;
+		$clientKey = (string) $clientKey;
+		$start = (int) $start;
+		$data = (string) $data;
 		$params = CM_Params::factory(json_decode($data, true));
 		$session = new CM_Session($params->getString('sessionId'));
 		if (!$session->hasUser()) {
@@ -124,7 +145,13 @@ class CM_Wowza extends CM_Class_Abstract {
 		//return success
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
+		$streamName = (string) $streamName;
+		$clientKey = (string) $clientKey;
 		$allowedUntil = null;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
@@ -137,23 +164,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 	}
 
+	/**
+	 * @param string $clientKey
+	 */
 	public static function stop($clientKey) {
-
+		file_get_contents(self::_getStopPageUrl(). '?clientId=' . ((string) $clientKey));
 	}
-
-	/*
-	public static function rpc_stop($clientKey) {
-		$videoStream = CM_VideoStream_Publish::findKey($clientKey);
-		if ($videoStream) {
-			if ($videoStream->hasChat()) {
-				$videoStream->getChat()->getVideoStreamPublishs()->delete($videoStream);
-			} else {
-				$videoStream->delete();
-			}
-		}
-		$videoStream = CM_VideoStream_Subscribe::findKey($clientKey);
-		if ($videoStream) {
-			$videoStream->getVideoStreamPublish()->getVideoStreamSubscribes()->delete($videoStream);
-		}
-	}*/
 }
