@@ -125,4 +125,5 @@ $config->CM_Model_StreamChannel_Abstract->types = array();
 $config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video';
 $config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message';
 
-
+$config->CM_Wowza = new stdClass();
+$config->CM_Wowza->streamChannelTypes[] = CM_Model_StreamChannel_Video::TYPE;

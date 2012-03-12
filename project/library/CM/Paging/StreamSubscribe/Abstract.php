@@ -3,7 +3,7 @@
 abstract class CM_Paging_StreamSubscribe_Abstract extends CM_Paging_Abstract {
 
 	protected function _processItem($item) {
-		return new CM_Model_Stream_Subscribe($item['id']);
+		return new CM_Model_Stream_Subscribe($item);
 	}
 
 	/**

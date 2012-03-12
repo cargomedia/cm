@@ -170,6 +170,24 @@ class TH {
 		return new TH_Page($html);
 	}
 
+	/**
+	 * @param CM_Model_User|null $user
+	 * @return CM_Session
+	 */
+	public static function createSession(CM_Model_User $user = null) {
+		if (is_null($user)) {
+			$user = TH::createUser();
+		}
+		$session = new CM_Session();
+		$session->setUser($user);
+		return $session;
+	}
+
+	/**
+	 * @param int|null $type
+	 * @return CM_Model_StreamChannel_Abstract
+	 * @throws CM_Exception_Invalid
+	 */
 	public static function createStreamChannel($type = null) {
 		if (is_null($type)) {
 			$type = CM_Model_StreamChannel_Video::TYPE;
