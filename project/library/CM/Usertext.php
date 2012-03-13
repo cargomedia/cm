@@ -5,7 +5,7 @@ class CM_Usertext extends CM_Class_Abstract {
 
 	protected $_singleTags = array('br', 'img');
 	protected $_allowedAttrs = array('alt', 'class', 'height', 'href', 'src', 'title', 'width');
-	protected $_allowedTags = array('a', 'b', 'i', 'q', 'span', 'u', 'br', 'img');
+	protected $_allowedTags = array('b', 'i', 'q', 'span', 'u', 'br', 'img');
 	protected $_internalTags = array('emoticon');
 	protected $_wrapLength = 5;
 
