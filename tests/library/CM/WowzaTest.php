@@ -26,7 +26,6 @@ class CM_WowzaTest extends TestCase {
 		TH::createStreamSubscribe(null, $streamChannel1);
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
-		$addedChannelKey = $streamChannel->getKey();
 		$streamPublishToBeAdded = TH::createStreamPublish(null, $streamChannel);
 		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(null, $streamChannel);
 		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(null, $streamChannel);
@@ -69,10 +68,8 @@ class CM_WowzaTest extends TestCase {
 
 	private function _generateWowzaData(array $streamChannels) {
 		$jsonData = array();
-		$i = 0;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
-			$j = 0;
 			$subscribes = array();
 			/** @var CM_Model_Stream_Publish $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
