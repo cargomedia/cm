@@ -71,4 +71,26 @@ class CM_Util {
 		}
 		return $output;
 	}
+
+	/**
+	 * @param string     $url
+	 * @param array|null $params
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function getContents($url, array $params = null) {
+		$url = (string) $url;
+		if (!empty($params)) {
+			$url .= '?' . http_build_query($params);
+		}
+		try {
+			$contents = file_get_contents($url);
+		} catch (ErrorException $ex) {
+			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
+		}
+		if ($contents === false) {
+			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
+		}
+		return $contents;
+	}
 }

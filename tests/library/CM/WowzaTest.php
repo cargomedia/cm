@@ -11,6 +11,8 @@ class CM_WowzaTest extends TestCase {
 	}
 
 	public function testSynchronize() {
+		/** @var CM_Wowza $wowza */
+		$wowza = $this->getMock('CM_Wowza', array('fetchData', 'stop'));
 		$streamChannels = array();
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
@@ -28,7 +30,8 @@ class CM_WowzaTest extends TestCase {
 		$streamPublishToBeAdded = TH::createStreamPublish(null, $streamChannel);
 		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(null, $streamChannel);
 		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(null, $streamChannel);
-		$wowzaData = $this->_generateWowzaData($streamChannels);
+		$json = $this->_generateWowzaData($streamChannels);
+		$wowza->expects($this->any())->method('fetchData')->will($this->returnValue($json));
 		$streamChannelToBeAdded = clone($streamChannel);
 		$streamChannel->delete();
 		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(null, $streamChannel1);
@@ -42,7 +45,7 @@ class CM_WowzaTest extends TestCase {
 		$streamPublishToBeRemoved = TH::createStreamPublish(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
-		CM_Wowza::synchronize($wowzaData);
+		$wowza->synchronize();
 
 		//stuff that should have been added
 		$this->assertNotNull($streamChannelAdded = CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeAdded->getKey()));
@@ -56,7 +59,6 @@ class CM_WowzaTest extends TestCase {
 		$this->assertModelEquals($streamSubscribeToBeAdded1->getUser(), $streamSubscribeAdded1->getUser());
 		$this->assertModelEquals($streamSubscribeToBeAdded2->getUser(), $streamSubscribeAdded2->getUser());
 
-
 		//stuff that should have been removed
 		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeRemoved->getKey()));
 		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublishToBeRemoved->getKey()));
@@ -67,24 +69,26 @@ class CM_WowzaTest extends TestCase {
 
 	private function _generateWowzaData(array $streamChannels) {
 		$jsonData = array();
+		$i = 0;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
+			$j = 0;
 			$subscribes = array();
 			/** @var CM_Model_Stream_Publish $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				$session = TH::createSession($streamSubscribe->getUser());
-				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(),
-					'clientId' => $streamSubscribe->getKey(), 'data' => json_encode(array('sessionId' => $session->getId())));
+				$subscribes['sub' . ++$j] = array('startTimeStamp' => $streamSubscribe->getStart(), 'clientId' => $streamSubscribe->getKey(),
+					'data' => json_encode(array('sessionId' => $session->getId())));
 				unset($session);
 			}
 			$session = TH::createSession($streamPublish->getUser());
-			$jsonData[$streamPublish->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
+			$jsonData['sub' . ++$i] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
 				'data' => json_encode(array('sessionId' => $session->getId(), 'streamType' => $streamChannel->getType())),
 				'streamName' => $streamChannel->getKey(), 'subscribers' => $subscribes);
 			unset($session);
 		}
-		return $jsonData;
+		return json_encode($jsonData);
 	}
 }
