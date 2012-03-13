@@ -23,6 +23,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	 * @return array
 	 */
 	public function getItems($offset = null, $length = null, $skipNonexistent = true) {
+		if (null === $offset) {
+			$offset = 0;
+		}
 		if ($this->_items === null) {
 			$itemsRaw = $this->_getItemsRaw();
 			$this->_items = array();
@@ -42,7 +45,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 				}
 			}
 		}
-		if ($offset) {
+		if (0 != $offset || null != $length) {
 			return array_slice($this->_items, $offset, $length);
 		}
 		return $this->_items;

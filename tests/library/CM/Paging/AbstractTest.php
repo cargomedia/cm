@@ -207,6 +207,9 @@ class CM_Paging_AbstractTest extends TestCase {
 		$items = $paging->getItems(0, 9999);
 		$this->assertSame(range(0, 99), $items);
 
+		$items = $paging->getItems(0, 3);
+		$this->assertSame(range(0, 2), $items);
+
 		// Paged
 		$paging->setPage(2, 10);
 		$items = $paging->getItems();
