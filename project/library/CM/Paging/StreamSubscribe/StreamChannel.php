@@ -38,4 +38,19 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 		$streamSubscribe->delete();
 		$this->_change();
 	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Model_Stream_Subscribe|null
+	 */
+	public function findKey($key) {
+		$key = (int) $key;
+		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+		foreach($this as $streamSubscribe) {
+			if ($streamSubscribe->getKey() == $key) {
+				return $streamSubscribe;
+			}
+		}
+		return null;
+	}
 }

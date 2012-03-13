@@ -35,4 +35,19 @@ class CM_Paging_StreamPublish_StreamChannel extends CM_Paging_StreamPublish_Abst
 		$streamPublish->delete();
 		$this->_change();
 	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Model_Stream_Publish|null
+	 */
+	public function findKey($key) {
+		$key = (int) $key;
+		/** @var CM_Model_Stream_Publish $streamPublish */
+		foreach($this as $streamPublish) {
+			if ($streamPublish->getKey() == $key) {
+				return $streamPublish;
+			}
+		}
+		return null;
+	}
 }

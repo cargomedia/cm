@@ -12,7 +12,9 @@ class CM_Wowza extends CM_Class_Abstract {
 		$status = CM_Params::decode($this->fetchData(), true);
 		$streamChannels = new CM_Paging_StreamChannel_Type(self::_getConfig()->streamChannelTypes);
 		foreach ($status as $streamName => $publish) {
-			if (!(CM_Model_Stream_Publish::findKey($publish['clientId']))) {
+			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
+			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
+			if (!($streamChannel && $streamChannel->getStreamPublishs()->findKey($publish['clientId']))) {
 				try {
 					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['data']);
 				} catch (CM_Exception $ex) {
@@ -20,7 +22,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				}
 			}
 			foreach ($publish['subscribers'] as $clientId => $subscribe) {
-				if (!CM_Model_Stream_Subscribe::findKey($clientId)) {
+				if (!($streamChannel && $streamChannel->getStreamSubscribes()->findKey($clientId))) {
 					try {
 						$this->subscribe($streamName, $clientId, $subscribe['start'], $subscribe['data']);
 					} catch (CM_Exception $ex) {
@@ -47,60 +49,47 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string  $streamName
-	 * @param string  $clientKey
-	 * @param int	 $start
-	 * @param string  $data
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @param int    $start
+	 * @param string $data
 	 */
 	public function publish($streamName, $clientKey, $start, $data) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
 		$data = (string) $data;
-		$params = CM_Params::factory(json_decode($data, true));
+		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$streamType = $params->getInt('streamType');
 		$session = new CM_Session($params->getString('sessionId'));
-		if (!$session->hasUser()) {
-			throw new CM_Exception_Invalid('Session `' . $session->getId() . '` has no user.');
-		}
-		$user = $session->getUser();
-		if (!$user) {
-			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
-		}
+		$user = $session->getUser(true);
 		$allowedUntil = null; //TODO set to some reasonable time in the future
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
 		if (!$streamChannel->canPublish($user)) {
 			throw new CM_Exception_NotAllowed();
 		}
-		$streamPublish = $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'key' => $clientKey));
-		//return success
+		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+		//todo delete $streamChannel?
 	}
 
 	/**
 	 * @param string $streamName
-	 * @param string $clientKey
 	 */
-	public function unpublish($streamName, $clientKey) {
+	public function unpublish($streamName) {
 		$streamName = (string) $streamName;
-		$clientKey = (string) $clientKey;
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			return;
 		}
-		$streamPublish = CM_Model_Stream_Publish::findKey($clientKey);
-		if ($streamPublish) {
-			$streamChannel->onUnpublish($streamPublish);
-		}
 		$streamChannel->delete();
 	}
 
+	/**
+	 * @param string $clientKey
+	 */
 	public function stop($clientKey) {
-		try {
-			CM_Util::getContents($this->_getStopPageUrl(), array('clientId' => (string) $clientKey));
-		} catch (CM_Exception_Invalid $ex) {
-		}
+		CM_Util::getContents($this->_getStopPageUrl(), array('clientId' => (string) $clientKey));
 	}
 
 	/**
@@ -115,16 +104,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
 		$data = (string) $data;
-		$params = CM_Params::factory(json_decode($data, true));
+		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$session = new CM_Session($params->getString('sessionId'));
-		if (!$session->hasUser()) {
-			throw new CM_Exception_Invalid('Session `' . $session->getId() . '` has no user.');
-		}
-		$user = $session->getUser();
-		if (!$user) {
-			throw new CM_Exception_Nonexistent('User with id `' . $session->get('userId') . '` does not exist.');
-		}
-		$allowedUntil = null;
+		$user = $session->getUser(true);
+		$allowedUntil = null; //todo: set time
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
@@ -133,10 +116,8 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamChannel->canSubscribe($user)) {
 			throw new CM_Exception_NotAllowed();
 		}
-		$streamSubscribe = $streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $clientKey));
-		$streamChannel->onSubscribe($streamSubscribe, $params);
-		//return success
 	}
 
 	/**
@@ -146,13 +127,12 @@ class CM_Wowza extends CM_Class_Abstract {
 	public function unsubscribe($streamName, $clientKey) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
-		$allowedUntil = null;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			return;
 		}
-		$streamSubscribe = CM_Model_Stream_Subscribe::findKey($clientKey);
+		$streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamSubscribe) {
 			$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
 		}
@@ -168,18 +148,22 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	public static function rpc_publish($streamName, $clientKey, $start, $data) {
 		self::_getInstance()->publish($streamName, $clientKey, $start, $data);
+		return true;
 	}
 
 	public static function rpc_unpublish($streamName, $clientKey) {
 		self::_getInstance()->unpublish($streamName, $clientKey);
+		return true;
 	}
 
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
 		self::_getInstance()->subscribe($streamName, $clientKey, $start, $data);
+		return true;
 	}
 
 	public static function rpc_unsubscribe($streamName, $clientKey) {
 		self::_getInstance()->unsubscribe($streamName, $clientKey);
+		return true;
 	}
 
 	/**

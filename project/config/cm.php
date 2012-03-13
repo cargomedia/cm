@@ -115,6 +115,7 @@ $config->CM_Response_Component_Abstract->catch = array(
 $config->CM_Response_RPC = new stdClass();
 $config->CM_Response_RPC->catch = array(
 	'CM_Exception_AuthRequired',
+	'CM_Exception_NotAllowed',
 );
 
 $config->CM_DeviceCapabilities = new stdClass();
