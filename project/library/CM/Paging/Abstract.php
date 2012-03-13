@@ -134,9 +134,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	/**
 	 * Filter result of getItems() by a callback
 	 *
-	 * @param callback $filter function(mixed $item): boolean
+	 * @param Closure $filter function(mixed $item): boolean
 	 */
-	public function filter($filter) {
+	public function filter(Closure $filter) {
 		$this->_clearItems();
 		$this->_filters[] = $filter;
 	}
