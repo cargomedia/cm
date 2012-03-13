@@ -79,14 +79,14 @@ class CM_WowzaTest extends TestCase {
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				$session = TH::createSession($streamSubscribe->getUser());
-				$subscribes['sub' . ++$j] = array('startTimeStamp' => $streamSubscribe->getStart(), 'clientId' => $streamSubscribe->getKey(),
+				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(), 'clientId' => $streamSubscribe->getKey(),
 					'data' => json_encode(array('sessionId' => $session->getId())));
 				unset($session);
 			}
 			$session = TH::createSession($streamPublish->getUser());
-			$jsonData['sub' . ++$i] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
+			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
 				'data' => json_encode(array('sessionId' => $session->getId(), 'streamType' => $streamChannel->getType())),
-				'streamName' => $streamChannel->getKey(), 'subscribers' => $subscribes);
+				'subscribers' => $subscribes);
 			unset($session);
 		}
 		return json_encode($jsonData);

@@ -2,7 +2,7 @@
 
 class CM_Wowza extends CM_Class_Abstract {
 
-	private $_instance = null;
+	private static $_instance = null;
 
 	public function fetchData() {
 		return CM_Util::getContents($this->_getStatusPageUrl());
@@ -10,29 +10,21 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	public function synchronize() {
 		$status = CM_Params::decode($this->fetchData(), true);
-		foreach ($status as $pubKey => $publisher) {
-			foreach ($publisher['subscribers'] as $subKey => $subscriber) {
-				$publisher['subscribers'][$subscriber['clientId']] = $subscriber;
-				unset($publisher['subscribers'][$subKey]);
-			}
-			$status[$publisher['clientId']] = $publisher;
-			unset($status[$pubKey]);
-		}
 		$streamChannels = new CM_Paging_StreamChannel_Type(self::_getConfig()->streamChannelTypes);
-		foreach ($status as $publish) {
+		foreach ($status as $streamName => $publish) {
 			if (!(CM_Model_Stream_Publish::findKey($publish['clientId']))) {
 				try {
-					$this->publish($publish['streamName'], $publish['clientId'], $publish['startTimeStamp'], $publish['data']);
+					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['data']);
 				} catch (CM_Exception $ex) {
 					$this->stop($publish['clientId']);
 				}
 			}
-			foreach ($publish['subscribers'] as $subscribe) {
-				if (!CM_Model_Stream_Subscribe::findKey($subscribe['clientId'])) {
+			foreach ($publish['subscribers'] as $clientId => $subscribe) {
+				if (!CM_Model_Stream_Subscribe::findKey($clientId)) {
 					try {
-						$this->subscribe($publish['streamName'], $subscribe['clientId'], $subscribe['start'], $subscribe['data']);
+						$this->subscribe($streamName, $clientId, $subscribe['start'], $subscribe['data']);
 					} catch (CM_Exception $ex) {
-						$this->stop($subscribe['clientId']);
+						$this->stop($clientId);
 					}
 				}
 			}
@@ -40,10 +32,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
 			$streamPublishKey = $streamChannel->getStreamPublishs()->getCount() ? $streamChannel->getStreamPublishs()->getItem(0)->getKey() : null;
-			if ($streamPublishKey && !isset($status[$streamPublishKey])) {
+			if ($streamPublishKey && !isset($status[$streamChannel->getKey()])) {
 				$this->unpublish($streamChannel->getKey(), $streamPublishKey);
 			} else {
-				$publish = $status[$streamPublishKey];
+				$publish = $status[$streamChannel->getKey()];
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 					if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {

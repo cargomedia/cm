@@ -83,11 +83,7 @@ class CM_Util {
 		if (!empty($params)) {
 			$url .= '?' . http_build_query($params);
 		}
-		try {
-			$contents = file_get_contents($url);
-		} catch (ErrorException $ex) {
-			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
-		}
+		$contents = @file_get_contents($url);
 		if ($contents === false) {
 			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
 		}
