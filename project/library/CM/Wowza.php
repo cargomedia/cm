@@ -51,7 +51,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string $streamName
 	 * @param string $clientKey
-	 * @param int    $start
+	 * @param int	$start
 	 * @param string $data
 	 */
 	public function publish($streamName, $clientKey, $start, $data) {
@@ -66,11 +66,15 @@ class CM_Wowza extends CM_Class_Abstract {
 		$allowedUntil = null; //TODO set to some reasonable time in the future
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
-		if (!$streamChannel->canPublish($user)) {
-			throw new CM_Exception_NotAllowed();
+		try {
+			if (!$streamChannel->canPublish($user)) {
+				throw new CM_Exception_NotAllowed();
+			}
+			$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+		} catch (CM_Exception $ex) {
+			$streamChannel->delete();
+			throw $ex;
 		}
-		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
-		//todo delete $streamChannel?
 	}
 
 	/**
@@ -116,8 +120,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamChannel->canSubscribe($user)) {
 			throw new CM_Exception_NotAllowed();
 		}
-		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'key' => $clientKey));
+		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 	}
 
 	/**
