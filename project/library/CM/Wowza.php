@@ -135,10 +135,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
-
+			throw new CM_Exception_NotAllowed();
 		}
 		if (!$streamChannel->canSubscribe($user)) {
-
+			throw new CM_Exception_NotAllowed();
 		}
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 		$streamChannel->onSubscribe($streamSubscribe, $params);

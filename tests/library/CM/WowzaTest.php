@@ -43,7 +43,6 @@ class CM_WowzaTest extends TestCase {
 		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		CM_Wowza::synchronize($wowzaData);
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved3->getKey()));
 
 		//stuff that should have been added
 		$this->assertNotNull($streamChannelAdded = CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeAdded->getKey()));
@@ -63,6 +62,7 @@ class CM_WowzaTest extends TestCase {
 		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublishToBeRemoved->getKey()));
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved1->getKey()));
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved2->getKey()));
+		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved3->getKey()));
 	}
 
 	private function _generateWowzaData(array $streamChannels) {
