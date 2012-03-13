@@ -231,6 +231,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param int $type
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
+	 * @throws CM_Exception_Invalid
 	 */
 	final public static function createType($type, array $data = null) {
 		/** @var CM_Model_Abstract $className */

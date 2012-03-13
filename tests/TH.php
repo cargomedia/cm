@@ -192,13 +192,7 @@ class TH {
 		if (is_null($type)) {
 			$type = CM_Model_StreamChannel_Video::TYPE;
 		}
-		switch ($type) {
-			case CM_Model_StreamChannel_Video::TYPE:
-				return CM_Model_StreamChannel_Video::create(array('key' => rand(1, 10000) . '_' . rand(1, 100)));
-				break;
-			default:
-				throw new CM_Exception_Invalid('Invalid StreamChannel type `' . $type . '`');
-		}
+		return CM_Model_StreamChannel_Abstract::createType($type, array('key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
