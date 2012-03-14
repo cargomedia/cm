@@ -8,7 +8,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function fetchStatus() {
-		return CM_Util::getContents($this->_getStatusPageUrl());
+		return CM_Util::getContents(self::_getConfig()->url . '/status');
 	}
 
 	public function synchronize() {
@@ -96,7 +96,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $clientKey
 	 */
 	public function stop($clientKey) {
-		CM_Util::getContents($this->_getStopPageUrl(), array('clientId' => (string) $clientKey));
+		CM_Util::getContents(self::_getConfig()->url . '/stop', array('clientId' => (string) $clientKey));
 	}
 
 	/**
@@ -142,14 +142,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		if ($streamSubscribe) {
 			$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
 		}
-	}
-
-	private function _getStatusPageUrl() {
-		return self::_getConfig()->url . '/status';
-	}
-
-	private function _getStopPageUrl() {
-		return self::_getConfig()->url . '/stop';
 	}
 
 	/**
