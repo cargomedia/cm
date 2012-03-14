@@ -112,6 +112,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param string $key
+	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
 	public static function findKey($key) {
 		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => (string) $key))->fetchAssoc();
