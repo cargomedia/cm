@@ -4,12 +4,15 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	private static $_instance = null;
 
-	public function fetchData() {
+	/**
+	 * @return string
+	 */
+	public function fetchStatus() {
 		return CM_Util::getContents($this->_getStatusPageUrl());
 	}
 
 	public function synchronize() {
-		$status = CM_Params::decode($this->fetchData(), true);
+		$status = CM_Params::decode($this->fetchStatus(), true);
 		$streamChannels = new CM_Paging_StreamChannel_Type(self::_getConfig()->streamChannelTypes);
 		foreach ($status as $streamName => $publish) {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
@@ -51,7 +54,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string $streamName
 	 * @param string $clientKey
-	 * @param int	$start
+	 * @param int    $start
 	 * @param string $data
 	 */
 	public function publish($streamName, $clientKey, $start, $data) {
@@ -149,21 +152,45 @@ class CM_Wowza extends CM_Class_Abstract {
 		return self::_getConfig()->url . '/stop';
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @param string $start
+	 * @param string $data
+	 * @return boolean
+	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $data) {
 		self::_getInstance()->publish($streamName, $clientKey, $start, $data);
 		return true;
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @return boolean
+	 */
 	public static function rpc_unpublish($streamName, $clientKey) {
 		self::_getInstance()->unpublish($streamName, $clientKey);
 		return true;
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @param string $start
+	 * @param string $data
+	 * @return boolean
+	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
 		self::_getInstance()->subscribe($streamName, $clientKey, $start, $data);
 		return true;
 	}
 
+	/**
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @return boolean
+	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
 		self::_getInstance()->unsubscribe($streamName, $clientKey);
 		return true;

@@ -12,7 +12,7 @@ class CM_WowzaTest extends TestCase {
 
 	public function testSynchronize() {
 		/** @var CM_Wowza $wowza */
-		$wowza = $this->getMock('CM_Wowza', array('fetchData', 'stop'));
+		$wowza = $this->getMock('CM_Wowza', array('fetchStatus', 'stop'));
 		$streamChannels = array();
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
@@ -30,7 +30,7 @@ class CM_WowzaTest extends TestCase {
 		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(null, $streamChannel);
 		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(null, $streamChannel);
 		$json = $this->_generateWowzaData($streamChannels);
-		$wowza->expects($this->any())->method('fetchData')->will($this->returnValue($json));
+		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
 		$streamChannelToBeAdded = clone($streamChannel);
 		$streamChannel->delete();
 		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(null, $streamChannel1);

@@ -91,7 +91,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($id));
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
-		$streamSubscribe = $streamChannel->getStreamPublishs()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		$streamPublish = $streamChannel->getStreamPublishs()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 		$user = TH::createUser();
@@ -99,7 +99,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
 		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
-		$streamChannel->getStreamPublishs()->delete($streamSubscribe);
+		$streamChannel->getStreamPublishs()->delete($streamPublish);
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 	}
 
