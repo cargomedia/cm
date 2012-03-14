@@ -122,6 +122,14 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return self::factory($result['id'], $result['type']);
 	}
 
+	/**
+	 * @param int $type
+	 * @return CM_Paging_StreamChannel_Type
+	 */
+	public static function getAllByType($type) {
+		return new CM_Paging_StreamChannel_Type(array($type));
+	}
+
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
