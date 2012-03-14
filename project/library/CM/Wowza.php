@@ -169,11 +169,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		return true;
 	}
 
-	public static function rpc_stop($clientKey) {
-		self::_getInstance()->stop($clientKey);
-		return true;
-	}
-
 	/**
 	 * @return CM_Wowza
 	 */
