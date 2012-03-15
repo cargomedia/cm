@@ -200,7 +200,7 @@ class CM_Render {
 	}
 
 	/**
-	 * @param string      $tpl  Template file name
+	 * @param string	  $tpl  Template file name
 	 * @param bool|null   $full
 	 * @param string|null $namespace
 	 * @return string Layout path based on theme
@@ -235,10 +235,11 @@ class CM_Render {
 	}
 
 	/**
-	 * @param string $path
+	 * @param string        $path
+	 * @param string|null   $namespace
 	 * @return CM_File
 	 */
-	public function getFileThemed($path) {
-		return new CM_File($this->getLayoutPath($path, true));
+	public function getFileThemed($path, $namespace = null) {
+		return new CM_File($this->getLayoutPath($path, true, $namespace));
 	}
 }
