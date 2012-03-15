@@ -8,16 +8,16 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 
 		if ($this->_getFilename() == 'library.css') {
 			$content = '';
-			foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $relativePath) {
-				$content .= new CM_File($relativePath);
+			foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
+				$content .= new CM_File($path);
 			}
 		} elseif ($this->_getFilename() == 'internal.css') {
 			$presets = new CM_Css($this->getRender()->getFileThemed('presets.style')->read(), $this->getRender());
 			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
 
 			foreach ($this->getRender()->getSite()->getThemes() as $theme) {
-				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $relativePath) {
-					$file = new CM_File($relativePath);
+				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $path) {
+					$file = new CM_File($path);
 					$content .= new CM_Css($file->read(), $this->getRender(), $presets);
 				}
 			}
@@ -36,17 +36,17 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				$relativePaths = array();
 				foreach ($this->getRender()->getSite()->getThemes() as $theme) {
 					$basePath = $this->getRender()->getThemeDir(true, $theme, $namespace) . 'Component/' . $componentName . '/';
-					foreach (CM_Util::rglob('*.style', $basePath) as $relativePath) {
-						$relativePaths[] = preg_replace('#^' . $basePath . '#', '', $relativePath);
+					foreach (CM_Util::rglob('*.style', $basePath) as $path) {
+						$relativePaths[] = preg_replace('#^' . $basePath . '#', '', $path);
 					}
 				}
-				foreach (array_unique($relativePaths) as $relativePath) {
+				foreach (array_unique($relativePaths) as $path) {
 					$prefix = '.' . $class['name'];
-					if ($relativePath != 'default.style' && strpos($relativePath, '/') === false) {
-						$prefix .= '.' . preg_replace('#.style$#', '', $relativePath);
+					if ($path != 'default.style' && strpos($path, '/') === false) {
+						$prefix .= '.' . preg_replace('#.style$#', '', $path);
 					}
 
-					$file = $this->getRender()->getFileThemed('Component/' . $componentName . '/' . $relativePath, $namespace);
+					$file = $this->getRender()->getFileThemed('Component/' . $componentName . '/' . $path, $namespace);
 					$content .= new CM_Css($file->read(), $this->getRender(), $presets, $prefix);
 				}
 			}
