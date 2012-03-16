@@ -35,7 +35,7 @@ class CM_Comparable_Mock implements CM_Comparable {
 class CM_PagingSource_Mock extends CM_PagingSource_Abstract {
 	private $_items;
 
-	public function __construct($min = 1, $max = 12) {
+	public function __construct($min, $max) {
 		$this->_items = range($min, $max);
 	}
 
@@ -247,11 +247,16 @@ class CM_Paging_AbstractTest extends TestCase {
 		$this->assertEquals(range(0, 9), $paging->getItemsRaw());
 		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10, 11, 13, 14), $paging->getItems());
 
+		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
+		$paging->setPage(1, 10);
+		$this->assertEquals(range(0, 9), $paging->getItemsRaw());
+		$this->assertSame(array(null, 1, 2, null, 4, 5, null, 7, 8, null), $paging->getItems(null, null, true));
+
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_Mock(0, 20));
 		try {
 			$paging->getItems();
 			$this->fail('Getting stale data with a not-stale-expecting source did not throw exception');
-		} catch(CM_Exception_Nonexistent $e) {
+		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertTrue(true);
 		}
 	}

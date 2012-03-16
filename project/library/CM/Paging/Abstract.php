@@ -24,37 +24,63 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	 */
 	public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
 		$itemsRaw = $this->_getItemsRaw();
+
+		// Count of available items
+		$count = count($itemsRaw);
+		if (null !== $this->_pageSize) {
+			$count = min($count, $this->_pageSize);
+		}
+
+		// Offset
 		if (null === $offset) {
 			$offset = 0;
 		}
-		if (null === $length) {
-			$length = count($itemsRaw) - $offset;
+		if ($offset < 0) {
+			$offset = $count - (-$offset);
 		}
-		$staleDataExpected = ($this->_getStalenessChance() != 0);
-		if ($this->_items === null) {
-			$itemsRaw = $this->_getItemsRaw();
-			$this->_items = array();
-			foreach ($itemsRaw as &$itemRaw) {
-				try {
-					$item = $this->_processItem($itemRaw);
-					if (!$this->_isFilterMatch($item)) {
-						$this->_items[] = $item;
+		$offset = max(0, min($offset, $count));
+
+		// Length
+		if (null === $length) {
+			$length = $count - $offset;
+		}
+		$length = max(0, min($length, $count - $offset));
+
+		$nonExistentItemsExpected = ($this->_getStalenessChance() != 0);
+		$nonProcessableItemsExpected = $nonExistentItemsExpected || count($this->_filters);
+
+		if ($nonProcessableItemsExpected) {
+			// Process all items, exclude or null non-processable ones
+			if ($this->_items === null) {
+				$this->_items = array();
+				foreach ($itemsRaw as &$itemRaw) {
+					try {
+						$item = $this->_processItem($itemRaw);
+						if (!$this->_isFilterMatch($item)) {
+							$this->_items[] = $item;
+						}
+					} catch (CM_Exception_Nonexistent $e) {
+						if ($returnNonexistentItems) {
+							$this->_items[] = null;
+						}
 					}
-				} catch (CM_Exception_Nonexistent $e) {
-					if (!$staleDataExpected) {
-						throw new CM_Exception_Nonexistent(
-							'Paging `' . get_class($this) . '` unexpectedly contains a nonexistent item: ' . $e->getMessage());
-					}
-					if ($returnNonexistentItems) {
-						$this->_items[] = null;
+					if (count($this->_items) === $count) {
+						break;
 					}
 				}
-				if (count($this->_items) === $this->_pageSize) {
-					break;
+			}
+		} else {
+			// Fill all items with null, process the ones which are needed
+			if ($this->_items === null) {
+				$this->_items = $count ? array_fill(0, $count, null) : array();
+			}
+			for ($i = $offset; $i < $offset + $length; $i++) {
+				if (!isset($this->_items[$i])) {
+					$this->_items[$i] = $this->_processItem($itemsRaw[$i]);
 				}
 			}
 		}
-		if (0 != $offset || null != $length) {
+		if ($offset > 0 || $length < $count) {
 			return array_slice($this->_items, $offset, $length);
 		}
 		return $this->_items;
