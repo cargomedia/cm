@@ -189,6 +189,22 @@ EOD;
 		$this->assertEquals($expected, $actual->__toString());
 	}
 
+	public function testAtFontFace() {
+		$css = <<<'EOD'
+@font-face: {
+	font-family: 'AkkuratRegular';
+}
+EOD;
+		$expected = <<<'EOD'
+@font-face: {
+	font-family: 'AkkuratRegular';
+}
+
+EOD;
+		$actual = new CM_Css($css, $this->_getRender());
+		$this->assertEquals($expected, $actual->__toString());
+	}
+
 	public function testLinearGradient() {
 		$css = <<<'EOD'
 .foo {

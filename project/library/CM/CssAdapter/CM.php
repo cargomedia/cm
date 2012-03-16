@@ -1,7 +1,7 @@
 <?php
 
 class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
-	const REGEX_SELECTORS = '[*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~\(\)]+';
+	const REGEX_SELECTORS = '[@*+\$\.\#\w<>:\~]+[*+\$\.\#\w\-<>\:\[="\'\],\s\~\(\)]+';
 	const REGEX_PROPERTY = '[a-z\-]+';
 	const REGEX_VALUE = '[^;]+';
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
@@ -35,10 +35,14 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$selectors = preg_split('~\s*,\s*~', $splitMatch[1], -1, PREG_SPLIT_NO_EMPTY);
 			$rules = $this->_parseRules($match[2], $presets, $presetNames);
 			if (count($selectors)) {
-				if ($prefix) {
-					foreach ($selectors as &$selector) {
+				foreach ($selectors as &$selector) {
+					if ('@' == $selector) {
+						$selector = '';
+					}
+					if ($prefix) {
 						$selector = $prefix . ' ' . $selector;
 					}
+					$selector = trim($selector);
 				}
 				$selector = implode(', ', $selectors);
 				if (!isset($output[$selector])) {
