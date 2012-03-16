@@ -35,7 +35,7 @@ abstract class CM_PagingSource_Abstract {
 	}
 
 	/**
-	 * @return float Chance that an item contains stale data (0-1)
+	 * @return float Chance that an item contains stale (non-processable) data (0-1)
 	 */
 	public function getStalenessChance() {
 		return 0;
