@@ -60,10 +60,11 @@ class CM_App {
 		CM_CacheLocal::flush();
 		$version = $versionStart = $this->getVersion();
 		while (true) {
-			$updateScript = $directory . ++$version . '.php';
+			$updateScript = $directory . ($version + 1) . '.php';
 			if (!file_exists($updateScript)) {
 				break;
 			}
+			$version++;
 			if ($callbackBefore) {
 				$callbackBefore($version);
 			}
