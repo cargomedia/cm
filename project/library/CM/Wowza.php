@@ -41,22 +41,11 @@ class CM_Wowza extends CM_Class_Abstract {
 			if ($streamPublish && !isset($status[$streamChannel->getKey()])) {
 				$this->unpublish($streamChannel->getKey(), $streamPublish->getKey());
 			} else {
-				if ($allowedUntil = $streamChannel->canPublish($streamPublish->getUser())) {
-					$streamPublish->setAllowedUntil($allowedUntil);
-				} else {
-					$this->stop($streamPublish->getKey());
-				}
 				$publish = $status[$streamChannel->getKey()];
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 					if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {
 						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
-					} else {
-						if ($allowedUntil = $streamChannel->canSubscribe($streamSubscribe->getUser())) {
-							$streamSubscribe->setAllowedUntil($allowedUntil);
-						} else {
-							$this->stop($streamSubscribe->getKey());
-						}
 					}
 				}
 			}
