@@ -102,6 +102,7 @@ $config->CM_Response_Page->catch = array(
 	'CM_Exception_Nonexistent' => '/error/not-found',
 	'CM_Exception_InvalidParam' => '/error/not-found',
 	'CM_Exception_AuthRequired' => '/error/auth-required',
+	'CM_Exception_NotAllowed' => '/error/not-allowed',
 );
 
 $config->CM_Response_Component_Abstract = new stdClass();
