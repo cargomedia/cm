@@ -16,14 +16,16 @@ class CM_WowzaTest extends TestCase {
 		$streamChannels = array();
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
-		TH::createStreamPublish(null, $streamChannel);
+		$streamPublish = TH::createStreamPublish(null, $streamChannel);
+		$streamPublish->setAllowedUntil(0);
 		TH::createStreamSubscribe(null, $streamChannel);
 		TH::createStreamSubscribe(null, $streamChannel);
 		TH::createStreamSubscribe(null, $streamChannel);
 		$streamChannel1 = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel1;
 		TH::createStreamPublish(null, $streamChannel1);
-		TH::createStreamSubscribe(null, $streamChannel1);
+		$streamSubscribe = TH::createStreamSubscribe(null, $streamChannel1);
+		$streamSubscribe->setAllowedUntil(0);
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
 		$streamPublishToBeAdded = TH::createStreamPublish(null, $streamChannel);
@@ -44,6 +46,9 @@ class CM_WowzaTest extends TestCase {
 		$streamPublishToBeRemoved = TH::createStreamPublish(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
 		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
+		$this->assertEquals(0, $streamSubscribe->getAllowedUntil());
+		$this->assertEquals(0, $streamPublish->getAllowedUntil());
+
 		$wowza->synchronize();
 
 		//stuff that should have been added
@@ -64,6 +69,11 @@ class CM_WowzaTest extends TestCase {
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved1->getKey()));
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved2->getKey()));
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved3->getKey()));
+
+		$streamSubscribe->_change();
+		$streamPublish->_change();
+		$this->assertGreaterThan(0, $streamSubscribe->getAllowedUntil());
+		$this->assertGreaterThan(0, $streamPublish->getAllowedUntil());
 	}
 
 	private function _generateWowzaData(array $streamChannels) {

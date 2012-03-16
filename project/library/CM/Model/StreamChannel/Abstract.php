@@ -5,16 +5,20 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param CM_Model_User  $user
 	 * @param CM_Params|null $params
-	 * @return boolean
+	 * @return int
 	 */
-	abstract public function canPublish(CM_Model_User $user, CM_Params $params = null);
+	public function canPublish(CM_Model_User $user, CM_Params $params = null) {
+		return time() + 100;
+	}
 
 	/**
 	 * @param CM_Model_User  $user
 	 * @param CM_Params|null $params
-	 * @return boolean
+	 * @return int
 	 */
-	abstract public function canSubscribe(CM_Model_User $user, CM_Params $params = null);
+	public function canSubscribe(CM_Model_User $user, CM_Params $params = null) {
+		return time() + 100;
+	}
 
 	/**
 	 * @param CM_Model_Stream_Publish $streamPublish
