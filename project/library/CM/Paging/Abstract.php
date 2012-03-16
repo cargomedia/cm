@@ -23,9 +23,14 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	 * @return array
 	 */
 	public function getItems($offset = null, $length = null, $skipNonexistent = true) {
+		$itemsRaw = $this->_getItemsRaw();
 		if (null === $offset) {
 			$offset = 0;
 		}
+		if (null === $length) {
+			$length = count($itemsRaw) - $offset;
+		}
+		$staleDataExpected = ($this->_source && $this->_source->getStalenessChance() != 0);
 		if ($this->_items === null) {
 			$itemsRaw = $this->_getItemsRaw();
 			$this->_items = array();
@@ -36,6 +41,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 						$this->_items[] = $item;
 					}
 				} catch (CM_Exception_Nonexistent $e) {
+					if (!$staleDataExpected) {
+						throw new CM_Exception_Nonexistent(
+							'Paging `' . get_class($this) . '` unexpectedly contains a nonexistent item: ' . $e->getMessage());
+					}
 					if (!$skipNonexistent) {
 						$this->_items[] = null;
 					}
@@ -191,6 +200,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 	 * @return int Multiple of items per page to load from CM_PagingSource_Abstract
 	 */
 	protected function _getPageFillRate() {
+		if ($this->_source) {
+			return 1 + $this->_source->getStalenessChance();
+		}
 		return 1;
 	}
 

@@ -13,7 +13,7 @@ abstract class CM_PagingSource_Abstract {
 	public function enableCache($lifetime = 600) {
 		$this->_cacheLifetime = (int) $lifetime;
 	}
-	
+
 	/**
 	 * Enable local (non-invalidatable) cache
 	 * Cost: 1 apc request
@@ -32,6 +32,13 @@ abstract class CM_PagingSource_Abstract {
 			$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
 			CM_Cache::deleteTag($tag);
 		}
+	}
+
+	/**
+	 * @return float Chance that an item contains stale data (0-1)
+	 */
+	public function getStalenessChance() {
+		return 0;
 	}
 
 	protected function _cacheSet($key, $value) {

@@ -4,10 +4,10 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	private $_indexName, $_typeName, $_query, $_fields;
 
 	/**
-	 * @param string $indexName
-	 * @param string $typeName
+	 * @param string                  $indexName
+	 * @param string                  $typeName
 	 * @param CM_SearchQuery_Abstract $query
-	 * @param array $fields OPTIONAL
+	 * @param array                   $fields OPTIONAL
 	 */
 	function __construct($indexName, $typeName, CM_SearchQuery_Abstract $query, array $fields = null) {
 		$this->_indexName = $indexName;
@@ -58,5 +58,9 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	public function getItems($offset = null, $count = null) {
 		$result = $this->_getResult($offset, $count);
 		return $result['items'];
+	}
+
+	public function getStalenessChance() {
+		return 0.1;
 	}
 }
