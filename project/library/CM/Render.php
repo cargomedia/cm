@@ -135,20 +135,20 @@ class CM_Render {
 	}
 
 	/**
-	 * @param CM_Renderable_Abstract $object Object to render
+	 * @param CM_Renderable_Abstract $renderable Object to render
 	 * @param array				  $params
 	 * @return string Output
 	 * @throws CM_Exception
 	 */
-	public function render(CM_Renderable_Abstract $object, array $params = array()) {
-		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($object), $matches)) {
-			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($object) . "`");
+	public function render(CM_Renderable_Abstract $renderable, array $params = array()) {
+		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($renderable), $matches)) {
+			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($renderable) . "`");
 		}
 
 		$renderClass = 'CM_RenderAdapter_' . $matches[1];
 
 		/** @var CM_RenderAdapter_Abstract $renderAdapter */
-		$renderAdapter = new $renderClass($this, $object);
+		$renderAdapter = new $renderClass($this, $renderable);
 		$this->getLayout()->assignGlobal('render', $this);
 
 		return $renderAdapter->fetch($params);
@@ -203,10 +203,11 @@ class CM_Render {
 	 * @param string	  $tpl  Template file name
 	 * @param bool|null   $full
 	 * @param string|null $namespace
+	 * @param bool|null   $needed
 	 * @return string Layout path based on theme
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getLayoutPath($tpl, $full = null, $namespace = null) {
+	public function getLayoutPath($tpl, $full = null, $namespace = null, $needed = true) {
 		if (is_null($full)) {
 			$full = false;
 		}
@@ -222,8 +223,11 @@ class CM_Render {
 			}
 		}
 
-		throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespace `' . $this->getSite()->getNamespace() . '` and themes `' .
-				implode(', ', $this->getSite()->getThemes()) . '`');
+		if ($needed) {
+			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespace `' . $this->getSite()->getNamespace() . '` and themes `' .
+					implode(', ', $this->getSite()->getThemes()) . '`');
+		}
+		return null;
 	}
 
 	/**

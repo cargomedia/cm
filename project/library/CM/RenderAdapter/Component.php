@@ -13,7 +13,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		}
 
 		/** @var CM_Component_Abstract $component */
-		$component = $this->_getObject();
+		$component = $this->_getRenderable();
 		$component->auto_id = 'cmp' . uniqid();
 
 		$this->getRender()->pushStack('components', $component);

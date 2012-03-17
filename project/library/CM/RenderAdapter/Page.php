@@ -4,7 +4,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 
 	public function fetch(array $params = array()) {
 		/** @var CM_Page_Abstract $page */
-		$page = $this->_getObject();
+		$page = $this->_getRenderable();
 		$js = $this->getRender()->getJs();
 
 		$options = array();

@@ -1,10 +1,23 @@
 <?php
 
 abstract class CM_RenderAdapter_Abstract {
+	/**
+	 * @var CM_Render
+	 */
+	private $_render;
 
-	public function __construct(CM_Render $render, $object) {
+	/**
+	 * @var CM_Renderable_Abstract
+	 */
+	private $_renderable;
+
+	/**
+	 * @param CM_Render $render
+	 * @param $renderable
+	 */
+	public function __construct(CM_Render $render, CM_Renderable_Abstract $renderable) {
 		$this->_render = $render;
-		$this->_object = $object;
+		$this->_renderable = $renderable;
 	}
 
 	/**
@@ -34,7 +47,7 @@ abstract class CM_RenderAdapter_Abstract {
 	 */
 	protected function _getTplPath($tplName = null) {
 		$tplPath = '';
-		$className = get_class($this->_getObject());
+		$className = get_class($this->_getRenderable());
 
 		while ($tplPath == '') {
 			// Namespace_ObjectType_Name
@@ -55,24 +68,31 @@ abstract class CM_RenderAdapter_Abstract {
 				$className = get_parent_class($className);
 			}
 			if (empty($className)) {
-				throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getObject()) . '`');
+				throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getRenderable()) . '`');
 			}
 		}
 
 		return $tplPath;
 	}
 
-	protected function _getObject() {
-		return $this->_object;
+	/**
+	 * @return CM_Renderable_Abstract
+	 */
+	protected function _getRenderable() {
+		return $this->_renderable;
 	}
 
+	/**
+	 * @param array $params
+	 * @return string
+	 */
 	abstract public function fetch(array $params = array());
 
-	public function createTemplate($tplPath) {
-		return $this->getLayout()->createTemplate($tplPath);
-	}
-
+	/**
+	 * @param string|null $tplName
+	 * @return Smarty_Internal_Template
+	 */
 	public function getTemplate($tplName = null) {
-		return $this->createTemplate($this->_getTplPath($tplName));
+		return $this->getLayout()->createTemplate($this->_getTplPath($tplName));
 	}
 }

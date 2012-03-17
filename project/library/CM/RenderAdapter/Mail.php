@@ -4,7 +4,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 
 	public function fetch(array $params = array()) {
 		/** @var CM_Mail $mail */
-		$mail = $this->_getObject();
+		$mail = $this->_getRenderable();
 		if ($mail->getRenderLayout() || $mail->hasTemplate()) {
 			$this->getLayout()->assign($mail->getTplParams());
 		}
