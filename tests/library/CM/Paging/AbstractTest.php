@@ -267,7 +267,7 @@ class CM_Paging_AbstractTest extends TestCase {
 		$paging->filter(function ($item) {
 			return ($item % 2 == 0);
 		});
-		$this->assertSame(array(0, 2, 4, 6, 8), $paging->getItems());
+		$this->assertSame(array(0, 2, 4, 6, 8, 10), $paging->getItems());
 
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
 		$paging->setPage(1, 10);
@@ -282,12 +282,12 @@ class CM_Paging_AbstractTest extends TestCase {
 		$paging->setPage(1, 10);
 		$paging->exclude(1);
 		$paging->exclude(array(3, 5));
-		$this->assertSame(array(0, 2, 4, 6, 7, 8, 9), $paging->getItems());
+		$this->assertSame(array(0, 2, 4, 6, 7, 8, 9, 10), $paging->getItems());
 		$this->assertEquals(0, $paging->getItem(0));
 		$this->assertEquals(2, $paging->getItem(1));
 
 		$paging->exclude(2);
-		$this->assertSame(array(0, 4, 6, 7, 8, 9), $paging->getItems());
+		$this->assertSame(array(0, 4, 6, 7, 8, 9, 10), $paging->getItems());
 
 		$paging = new CM_Paging_Mock_Comparable(new CM_PagingSource_Mock(1, 5));
 		$paging->exclude(array(new CM_Comparable_Mock(3), new CM_Comparable_Mock(2)));
