@@ -12,8 +12,8 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				$content .= new CM_File($path);
 			}
 		} elseif ($this->_getFilename() == 'internal.css') {
-			$presets = new CM_Css($this->getRender()->getFileThemed('presets.style')->read(), $this->getRender());
-			$content = new CM_Css($this->getRender()->getFileThemed('layout.style')->read(), $this->getRender(), $presets);
+			$presets = new CM_Css($this->getRender()->getLayoutFile('presets.style')->read(), $this->getRender());
+			$content = new CM_Css($this->getRender()->getLayoutFile('layout.style')->read(), $this->getRender(), $presets);
 
 			foreach ($this->getRender()->getSite()->getThemes() as $theme) {
 				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $path) {
@@ -46,7 +46,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 						$prefix .= '.' . preg_replace('#.style$#', '', $path);
 					}
 
-					$file = $this->getRender()->getFileThemed('Component/' . $componentName . '/' . $path, $namespace);
+					$file = $this->getRender()->getLayoutFile('Component/' . $componentName . '/' . $path, $namespace);
 					$content .= new CM_Css($file->read(), $this->getRender(), $presets, $prefix);
 				}
 			}

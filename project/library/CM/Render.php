@@ -227,19 +227,20 @@ class CM_Render {
 	}
 
 	/**
+	 * @param string		$path
+	 * @param string|null   $namespace
+	 * @return CM_File
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getLayoutFile($path, $namespace = null) {
+		return new CM_File($this->getLayoutPath($path, true, $namespace));
+	}
+
+	/**
 	 * @param string $path
 	 * @return string
 	 */
 	public function getUrlImg($path) {
 		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
-	}
-
-	/**
-	 * @param string        $path
-	 * @param string|null   $namespace
-	 * @return CM_File
-	 */
-	public function getFileThemed($path, $namespace = null) {
-		return new CM_File($this->getLayoutPath($path, true, $namespace));
 	}
 }
