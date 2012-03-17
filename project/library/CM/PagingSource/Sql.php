@@ -85,6 +85,6 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
 	}
 
 	public function getStalenessChance() {
-		return 0;
+		return 0.01;
 	}
 }
