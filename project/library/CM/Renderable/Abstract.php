@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Renderable_Abstract extends CM_Class_Abstract{
+abstract class CM_Renderable_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @var array
@@ -9,7 +9,7 @@ abstract class CM_Renderable_Abstract extends CM_Class_Abstract{
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return CM_Component_Abstract
 	 */
 	public function setTplParam($key, $value) {
