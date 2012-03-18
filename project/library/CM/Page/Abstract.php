@@ -116,14 +116,11 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	public final function getPath() {
 		// Caches path locally because stays the same
 		if (!$this->_path) {
-
-			$class = get_class($this);
 			$list = explode('_', get_class($this));
 
 			// Remove first parts
 			foreach ($list as $index => $entry) {
 				unset($list[$index]);
-
 				if ($entry == 'Page') {
 					break;
 				}

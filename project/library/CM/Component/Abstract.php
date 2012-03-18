@@ -7,23 +7,11 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	protected $_viewer;
 
 	/**
-	 * The name of a component template file.
-	 *
 	 * @var string
 	 */
-	protected $tpl_file = 'default.tpl';
+	protected $_tplName = 'default.tpl';
 
 	/**
-	 * Component cache id.
-	 *
-	 * @var string
-	 */
-	protected $cache_id;
-
-	/**
-	 * Component layout auto id.
-	 * Set up by a CM_Layout when rendering.
-	 *
 	 * @var string
 	 */
 	public $auto_id;
@@ -34,8 +22,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	protected $_js = null;
 
 	/**
-	 * Component forms.
-	 *
 	 * @var array
 	 */
 	public $forms = array();
@@ -126,8 +112,8 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	/**
 	 * @return string
 	 */
-	public function getTpl() {
-		return $this->tpl_file;
+	public function getTplName() {
+		return $this->_tplName;
 	}
 
 	/**

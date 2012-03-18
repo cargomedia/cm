@@ -21,7 +21,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$this->getLayout()->assign($component->getTplParams());
 		$this->getLayout()->assign('viewer', $component->getViewer());
 
-		$tplPath = $this->_getTplPath($component->getTpl());
+		$tplPath = $this->_getTplPath($component->getTplName());
 
 		$cssClass = implode(' ', $component->getClassHierarchy());
 		if (preg_match('#/([^/]+)\.tpl$#', $tplPath, $match)) {
