@@ -9,9 +9,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$form->renderStart($params);
 		$template->assign('_form', $form);
 
-		$form->frontend_data['auto_id'] = 'form' . uniqid();
-
-		$html = '<form id="' . $form->frontend_data['auto_id'] . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
+		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
 
 		/** @var CM_FormField_Abstract $field */
 		foreach ($form->getFields() as $field) {

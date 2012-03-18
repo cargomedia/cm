@@ -7,14 +7,13 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$parentComponentId = null;
 
 		if (!isset($params['parentId']) && !empty($components)) {
-			$parentComponentId = $this->getRender()->getStackLast('components')->auto_id;
+			$parentComponentId = $this->getRender()->getStackLast('components')->getAutoId();
 		} elseif (isset($params['parentId'])) {
 			$parentComponentId = $params['parentId'];
 		}
 
 		/** @var CM_Component_Abstract $component */
 		$component = $this->_getRenderable();
-		$component->auto_id = 'cmp' . uniqid();
 
 		$this->getRender()->pushStack('components', $component);
 
@@ -30,7 +29,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 			}
 		}
 
-		$html = '<div id="' . $component->auto_id . '" class="' . $cssClass . '">';
+		$html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
 		$html .= $this->getRender()->getLayout()->fetch($tplPath);
 		$html .= '</div>';
 

@@ -34,7 +34,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		$class .= ' hasIcon';
 	}
 
-	$id = $form->frontend_data['auto_id'] . '-' . $action->getName() . '-button';
+	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
 	$type = $form->getActionDefaultName() ? 'submit' : 'button';
 

@@ -49,12 +49,12 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 
 		$this->getRender()->getJs()->onloadHeaderJs('cm.views["' . $this->_component['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
 		$this->getRender()->getJs()->onloadPrepareJs(
-			'cm.views["' . $component->auto_id . '"]._callbacks=cm.views["' . $this->_component['id'] . '"]._callbacks;');
+			'cm.views["' . $component->getAutoId() . '"]._callbacks=cm.views["' . $this->_component['id'] . '"]._callbacks;');
 		$this->getRender()->getJs()->onloadPrepareJs('cm.views["' . $this->_component['id'] . '"].remove(true);');
-		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->auto_id . '"]._ready();');
-		$this->_component['id'] = $component->auto_id;
+		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
+		$this->_component['id'] = $component->getAutoId();
 
-		return $component->auto_id;
+		return $component->getAutoId();
 	}
 
 	/**
@@ -71,7 +71,7 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 
 		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
 
-		return $component->auto_id;
+		return $component->getAutoId();
 	}
 
 	/**

@@ -175,7 +175,7 @@ abstract class CM_Form_Abstract extends CM_Renderable_Abstract {
 	 * @return string
 	 */
 	final public function getTagAutoId($id_value) {
-		return $this->frontend_data['auto_id'] . '-' . $id_value;
+		return $this->getAutoId() . '-' . $id_value;
 	}
 
 	/**

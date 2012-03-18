@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Renderable_Abstract extends CM_Class_Abstract {
+	private $_autoId;
 
 	/**
 	 * @var array
@@ -22,5 +23,15 @@ abstract class CM_Renderable_Abstract extends CM_Class_Abstract {
 	 */
 	public function getTplParams() {
 		return $this->_tplParams;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAutoId() {
+		if (!$this->_autoId) {
+			$this->_autoId = uniqid();
+		}
+		return $this->_autoId;
 	}
 }

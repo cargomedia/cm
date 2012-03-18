@@ -16,5 +16,5 @@ function smarty_function_label(array $params, Smarty_Internal_Template $template
 
 	$text = $render->getText($params['text']);
 
-	return '<label for="' . $form->frontend_data['auto_id'] . '-' . $for . '-input">' . $text . '</label>';
+	return '<label for="' . $form->getAutoId() . '-' . $for . '-input">' . $text . '</label>';
 }

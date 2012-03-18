@@ -12,11 +12,6 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	protected $_tplName = 'default.tpl';
 
 	/**
-	 * @var string
-	 */
-	public $auto_id;
-
-	/**
 	 * @var CM_ComponentFrontendHandler
 	 */
 	protected $_js = null;
@@ -123,7 +118,7 @@ abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
 	 * @return string
 	 */
 	final public function getTagAutoId($id_value) {
-		return $this->auto_id . '-' . $id_value;
+		return $this->getAutoId() . '-' . $id_value;
 	}
 
 	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
