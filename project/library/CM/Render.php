@@ -116,8 +116,8 @@ class CM_Render {
 	}
 
 	public function popStack($key) {
-		array_pop($this->_stack[$key]);
-		return $this->getStack($key);
+		$last = array_pop($this->_stack[$key]);
+		return $last;
 	}
 
 	/**

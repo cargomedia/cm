@@ -7,7 +7,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$form = CM_Form_Abstract::factory($params['name']);
 		$form->setup();
 		$form->renderStart($params);
-		$template->assign('_form', $form);
+		$render->pushStack('form', $form);
 
 		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
 
@@ -31,7 +31,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		return $html;
 
 	} else {
-		$form = $template->getTemplateVars('_form');
+		$form = $render->popStack('form');
 		$render->getJs()->registerForm($form, $render->getStackLast('components'));
 		$content .= '</form>';
 		return $content;

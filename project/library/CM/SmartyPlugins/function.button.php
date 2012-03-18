@@ -1,15 +1,17 @@
 <?php
 
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
 	/** @var CM_Form_Abstract $form */
-	$form = $template->getTemplateVars('_form');
+	$form = $render->getStackLast('form');
 	if (empty($params['action'])) {
 		trigger_error('Param `action` missing.');
 	}
 	$action = $form->getAction($params['action']);
 
 	if (isset($params['label'])) {
-		$params['label'] = $template->smarty->getVariable('render')->value->getText($params['label']);
+		$params['label'] = $render->getText($params['label']);
 	}
 
 	$class = '';

@@ -11,7 +11,7 @@
 		{resource file='init.js'}
 		{block name='head'}{/block}
 	</head>
-	<body>
+	<body id="{$page->getAutoId()}">
 		{block name='body-start'}{/block}
 		{block name='content'}{/block}
 		{resource file='library.js'}

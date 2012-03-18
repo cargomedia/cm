@@ -7,7 +7,7 @@ function smarty_function_input(array $params, Smarty_Internal_Template $template
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
 	/** @var CM_Form_Abstract $form */
-	$form = $template->getTemplateVars('_form');
+	$form = $render->getStackLast('form');
 	/** @var CM_FormField_Abstract $field */
 	$field = $form->getField($params['name']);
 

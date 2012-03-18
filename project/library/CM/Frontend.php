@@ -114,9 +114,9 @@ class CM_Frontend {
 
 	/**
 	 * @param CM_Component_Abstract $component
-	 * @param string				$parentComponentId OPTIONAL
+	 * @param string				$parentAutoId OPTIONAL
 	 */
-	public function registerComponent(CM_Component_Abstract $component, $parentComponentId = null) {
+	public function registerComponent(CM_Component_Abstract $component, $parentAutoId = null) {
 		$auto_var = 'cm.views["' . $component->getAutoId() . '"]';
 		$cmpClass = get_class($component);
 		$handler = $component->getFrontendHandler();
@@ -125,8 +125,8 @@ class CM_Frontend {
 		$cmpJs .= $auto_var . ' = new ' . $cmpClass . '({';
 		$cmpJs .= 'el:$("#' . $component->getAutoId() . '").get(0),';
 		$cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAll(), true);
-		if ($parentComponentId) {
-			$cmpJs .= ',parent:cm.views["' . $parentComponentId . '"]';
+		if ($parentAutoId) {
+			$cmpJs .= ',parent:cm.views["' . $parentAutoId . '"]';
 		}
 		$cmpJs .= '});' . PHP_EOL;
 
@@ -136,6 +136,18 @@ class CM_Frontend {
 
 		$this->onloadPrepareJs($cmpJs, true);
 		$this->onloadJs($handler->compile_js($auto_var));
+	}
+
+	/**
+	 * @param CM_Page_Abstract $page
+	 */
+	public function registerPage(CM_Page_Abstract $page) {
+		$auto_var = 'cm.views["' . $page->getAutoId() . '"]';
+		$js = '';
+		$js .= $auto_var . ' = new CM_View_Abstract({';
+		$js .= 'el:$("#' . $page->getAutoId() . '").get(0)';
+		$js .= '});' . PHP_EOL;
+		$this->onloadHeaderJs($js, true);
 	}
 
 	/**

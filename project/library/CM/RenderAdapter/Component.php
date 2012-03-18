@@ -3,13 +3,13 @@
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 	public function fetch(array $params = array()) {
-		$components = $this->getRender()->getStack('components');
 		$parentComponentId = null;
-
-		if (!isset($params['parentId']) && !empty($components)) {
-			$parentComponentId = $this->getRender()->getStackLast('components')->getAutoId();
-		} elseif (isset($params['parentId'])) {
+		if (isset($params['parentId'])) {
 			$parentComponentId = $params['parentId'];
+		} elseif (count($this->getRender()->getStack('components'))) {
+			$parentComponentId = $this->getRender()->getStackLast('components')->getAutoId();
+		} elseif (count($this->getRender()->getStack('pages'))) {
+			$parentComponentId = $this->getRender()->getStackLast('pages')->getAutoId();
 		}
 
 		/** @var CM_Component_Abstract $component */

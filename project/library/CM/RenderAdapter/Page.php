@@ -7,6 +7,8 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$page = $this->_getView();
 		$js = $this->getRender()->getJs();
 
+		$this->getRender()->pushStack('pages', $page);
+
 		$options = array();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
@@ -27,6 +29,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 
+		$this->getRender()->getJs()->registerPage($page);
 		$js->onloadReadyJs('cm.findView()._ready();');
 
 		$js->registerLanguageValue('%interface.ok');
@@ -40,6 +43,10 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$this->getTemplate()->assign('viewer', $page->getViewer());
 		$this->getTemplate()->assign('js', $js);
 
-		return $this->getTemplate()->fetch($tplPath);
+		$html = $this->getTemplate()->fetch($tplPath);
+
+		$this->getRender()->popStack('pages');
+
+		return $html;
 	}
 }
