@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_FormField_Abstract extends CM_Renderable_Abstract {
+abstract class CM_FormField_Abstract extends CM_View_Abstract {
 	/**
 	 * @var string
 	 */

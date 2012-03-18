@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
+abstract class CM_Page_Abstract extends CM_View_Abstract {
 
 	protected $_title = null;
 	protected $_description = '';

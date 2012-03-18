@@ -13,7 +13,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		}
 
 		/** @var CM_Component_Abstract $component */
-		$component = $this->_getRenderable();
+		$component = $this->_getView();
 
 		$this->getRender()->pushStack('components', $component);
 

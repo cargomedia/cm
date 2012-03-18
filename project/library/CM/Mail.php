@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mail extends CM_Renderable_Abstract {
+class CM_Mail extends CM_View_Abstract {
 
 	/**
 	 * @var CM_Model_User

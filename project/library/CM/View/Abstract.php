@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Renderable_Abstract extends CM_Class_Abstract {
+abstract class CM_View_Abstract extends CM_Class_Abstract {
 	private $_autoId;
 
 	/**

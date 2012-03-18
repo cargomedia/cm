@@ -7,17 +7,17 @@ abstract class CM_RenderAdapter_Abstract {
 	private $_render;
 
 	/**
-	 * @var CM_Renderable_Abstract
+	 * @var CM_View_Abstract
 	 */
-	private $_renderable;
+	private $_view;
 
 	/**
 	 * @param CM_Render $render
-	 * @param		   $renderable
+	 * @param		   $view
 	 */
-	public function __construct(CM_Render $render, CM_Renderable_Abstract $renderable) {
+	public function __construct(CM_Render $render, CM_View_Abstract $view) {
 		$this->_render = $render;
-		$this->_renderable = $renderable;
+		$this->_view = $view;
 	}
 
 	/**
@@ -60,9 +60,9 @@ abstract class CM_RenderAdapter_Abstract {
 	 * @throws CM_Exception
 	 */
 	protected function _getTplPath($tplName = null) {
-		foreach ($this->_getRenderable()->getClassHierarchy() as $className) {
+		foreach ($this->_getView()->getClassHierarchy() as $className) {
 			if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
-				throw new CM_Exception('Cannot detect namespace/renderable-class/renderable-name for `' . $className . '`.');
+				throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
 			}
 			if ($tplName) {
 				$tpl = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $tplName;
@@ -74,13 +74,13 @@ abstract class CM_RenderAdapter_Abstract {
 			}
 		}
 
-		throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getRenderable()) . '`.');
+		throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getView()) . '`.');
 	}
 
 	/**
-	 * @return CM_Renderable_Abstract
+	 * @return CM_View_Abstract
 	 */
-	protected function _getRenderable() {
-		return $this->_renderable;
+	protected function _getView() {
+		return $this->_view;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Form_Abstract extends CM_Renderable_Abstract {
+abstract class CM_Form_Abstract extends CM_View_Abstract {
 
 	/**
 	 * The name of a form.

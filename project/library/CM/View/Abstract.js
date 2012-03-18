@@ -26,14 +26,14 @@ _ready: function() {
 },
 
 /**
- * @param CM_Renderable_Abstract child
+ * @param CM_View_Abstract child
  */
 registerChild: function(child) {
 	this._children.push(child);
 },
 
 /**
- * @return CM_Renderable_Abstract[]
+ * @return CM_View_Abstract[]
  */
 getChildren: function() {
 	return this._children;
@@ -41,7 +41,7 @@ getChildren: function() {
 
 /**
  * @param string className
- * @return CM_Renderable_Abstract|null
+ * @return CM_View_Abstract|null
  */
 findChild: function(className){
 	return _.find(this.getChildren(), function(child) {
@@ -50,7 +50,7 @@ findChild: function(className){
 },
 
 /**
- * @return CM_Renderable_Abstract|null
+ * @return CM_View_Abstract|null
  */
 getParent: function() {
 	if (this.options.parent) {

@@ -135,20 +135,20 @@ class CM_Render {
 	}
 
 	/**
-	 * @param CM_Renderable_Abstract $renderable Object to render
-	 * @param array				  $params
+	 * @param CM_View_Abstract $view Object to render
+	 * @param array            $params
 	 * @return string Output
 	 * @throws CM_Exception
 	 */
-	public function render(CM_Renderable_Abstract $renderable, array $params = array()) {
-		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($renderable), $matches)) {
-			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($renderable) . "`");
+	public function render(CM_View_Abstract $view, array $params = array()) {
+		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($view), $matches)) {
+			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($view) . "`");
 		}
 
 		$renderClass = 'CM_RenderAdapter_' . $matches[1];
 
 		/** @var CM_RenderAdapter_Abstract $renderAdapter */
-		$renderAdapter = new $renderClass($this, $renderable);
+		$renderAdapter = new $renderClass($this, $view);
 		$this->getLayout()->assignGlobal('render', $this);
 
 		return $renderAdapter->fetch($params);

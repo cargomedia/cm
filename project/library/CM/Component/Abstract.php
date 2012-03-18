@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Component_Abstract extends CM_Renderable_Abstract {
+abstract class CM_Component_Abstract extends CM_View_Abstract {
 	/**
 	 * @var CM_Model_User
 	 */
