@@ -8,7 +8,13 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 
 		if ($this->_getFilename() == 'internal.js') {
 			$content = '';
-			$content .= new CM_File(DIR_PUBLIC . 'static/js/cm.js') . ';' . PHP_EOL;
+
+			foreach (array_reverse(self::getSite()->getNamespaces()) as $namespace) {
+				$path = DIR_PUBLIC . 'static/js/' . $namespace . '.js';
+				if (is_file($path)) {
+					$content .= new CM_File($path) . ';' . PHP_EOL;
+				}
+			}
 
 			$modelTypes = CM_Config::get()->CM_Model_Abstract->types;
 			if (is_array($modelTypes)) {

@@ -261,7 +261,7 @@ class CM_Params extends CM_Class_Abstract {
 	//-------static-------//
 
 	/**
-	 * @param array   $value
+	 * @param mixed   $value
 	 * @param boolean $json OPTIONAL
 	 * @return string
 	 */
@@ -286,7 +286,7 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string  $value
 	 * @param boolean $json OPTIONAL
-	 * @return array|false
+	 * @return mixed|false
 	 */
 	public static function decode($value, $json = false) {
 		if ($json) {

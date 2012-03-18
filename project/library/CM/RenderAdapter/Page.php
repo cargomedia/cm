@@ -8,7 +8,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js = $this->getRender()->getJs();
 
 		$options = array();
-		$options['renderStamp'] = floor((microtime(true)) * 1000);
+		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
 		$options['urlStatic'] = URL_STATIC;
 		$options['stream'] = array();
@@ -20,7 +20,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		if ($viewer = $page->getViewer()) {
 			$options['stream']['channel'] = CM_Stream::getStreamChannel($viewer);
 		}
-
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 
 		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . URL_STATIC . 'swf/WebSocketMainInsecure.swf"');
@@ -34,12 +33,13 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js->registerLanguageValue('%interface.cancel');
 		$js->registerLanguageValue('%interface.confirmation_title');
 
+		$tplPath = $this->_getTplPath('default.tpl');
+
 		$this->getTemplate()->assign($page->getTplParams());
 		$this->getTemplate()->assign('page', $page);
 		$this->getTemplate()->assign('viewer', $page->getViewer());
 		$this->getTemplate()->assign('js', $js);
 
-		$tplPath = $this->getRender()->getLayoutPath('layout/base.tpl');
 		return $this->getTemplate()->fetch($tplPath);
 	}
 }

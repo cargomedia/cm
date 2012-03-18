@@ -218,7 +218,7 @@ class CM_Render {
 				if ($full) {
 					return $file;
 				} else {
-					return $file = $this->getThemeDir(false, $theme, $namespace) . $tpl;
+					return $this->getThemeDir(false, $theme, $namespace) . $tpl;
 				}
 			}
 		}
