@@ -17,7 +17,7 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 		$params = $request->getQuery();
 		$this->_request = $request;
 		$this->_params = CM_Params::factory($params);
-		$this->setViewer($request->getViewer());
+		$this->_viewer = $request->getViewer();
 	}
 
 	/**
@@ -55,19 +55,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * Overwrites complete components array including location
-	 *
-	 * Example: array(1 => array('Component1', 'Component2'), 2 => array('Component3'))
-	 *
-	 * @param array $components Components array
-	 * @return CM_Page_Abstract
-	 */
-	public final function setComponents(array $components) {
-		$this->_components = $components;
-		return $this;
-	}
-
-	/**
 	 * @return string Description
 	 */
 	public final function getDescription() {
@@ -75,10 +62,24 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	}
 
 	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) {
+		$this->_description = (string) $description;
+	}
+
+	/**
 	 * @return string keywords
 	 */
 	public final function getKeywords() {
 		return $this->_keywords;
+	}
+
+	/**
+	 * @param string $keywords
+	 */
+	public function setKeywords($keywords) {
+		$this->_keywords = (string) $keywords;
 	}
 
 	/**
@@ -138,11 +139,9 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 
 	/**
 	 * @param string $title
-	 * @return CM_Page_Abstract
 	 */
 	public final function setTitle($title) {
 		$this->_title = (string) $title;
-		return $this;
 	}
 
 	/**
@@ -161,33 +160,12 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	}
 
 	/**
-	 * Sets the viewer of this page
-	 *
-	 * @param CM_Model_User $viewer
-	 * @return CM_Page_Abstract Page object
-	 */
-	public final function setViewer(CM_Model_User $viewer = null) {
-		$this->_viewer = $viewer;
-		return $this;
-	}
-
-	/**
 	 * Checks if the page is viewable by the current user
 	 *
 	 * @return bool True if page is visible
 	 */
 	public function isViewable() {
 		return true;
-	}
-
-	/**
-	 * Resets the component list
-	 *
-	 * @return CM_Page_Abstract
-	 */
-	public final function resetComponents() {
-		$this->_components = array();
-		return $this;
 	}
 
 	/**
