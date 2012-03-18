@@ -6,7 +6,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	/** @var CM_Model_User $viewer */
 	$viewer = $template->smarty->getTemplateVars('viewer');
 	/** @var CM_Page_Abstract $page */
-	$page = $template->getTemplateVars('page');
+	$page = $render->getStackLast('pages');
 	$request = $page ? $page->getRequest() : new CM_Request_Get(URL_ROOT, array(), $viewer);
 
 	$userId = $viewer ? $viewer->getId() : 0;
@@ -28,8 +28,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	}
 
 	$menuEntries = null;
-
-	$page = $template->getTemplateVars('page');
 
 	$depth = isset($params['depth']) ? (int) $params['depth'] : null;
 

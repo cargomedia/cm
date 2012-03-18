@@ -111,10 +111,22 @@ class CM_Render {
 		return $this->_stack[$key];
 	}
 
+	/**
+	 * @param string $key
+	 * @return mixed|null
+	 */
 	public function getStackLast($key) {
-		return $this->_stack[$key][count($this->_stack[$key]) - 1];
+		$stack = $this->getStack($key);
+		if (empty($stack)) {
+			return null;
+		}
+		return $stack[count($stack) - 1];
 	}
 
+	/**
+	 * @param string $key
+	 * @return mixed|null
+	 */
 	public function popStack($key) {
 		$last = array_pop($this->_stack[$key]);
 		return $last;
@@ -136,7 +148,7 @@ class CM_Render {
 
 	/**
 	 * @param CM_View_Abstract $view Object to render
-	 * @param array            $params
+	 * @param array			$params
 	 * @return string Output
 	 * @throws CM_Exception
 	 */
