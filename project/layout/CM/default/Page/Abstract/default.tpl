@@ -13,7 +13,7 @@
 	</head>
 	<body id="{$page->getAutoId()}">
 		{block name='body-start'}{/block}
-		{block name='content'}{/block}
+		{block name='body'}{/block}
 		{resource file='library.js'}
 		{resource file='internal.js'}
 		{$render->getJs()->renderScripts()}
