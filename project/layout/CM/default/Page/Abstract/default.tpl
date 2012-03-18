@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<meta name="description" content="{$page->getDescription()|escape}">
-		<meta name="keywords" content="{$page->getKeywords()|escape}">
+		<meta name="description" content="{block name='description'}{/block}">
+		<meta name="keywords" content="{block name='keywords'}{/block}">
 		<title>{block name='title'}{$page->getTitle()|escape}{/block}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}

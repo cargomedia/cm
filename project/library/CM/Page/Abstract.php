@@ -3,8 +3,6 @@
 abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 
 	protected $_title = null;
-	protected $_description = '';
-	protected $_keywords = '';
 	protected $_params;
 	protected $_components = array();
 	protected $_viewer = null;
@@ -64,38 +62,6 @@ abstract class CM_Page_Abstract extends CM_Renderable_Abstract {
 	 */
 	public final function setComponents(array $components) {
 		$this->_components = $components;
-		return $this;
-	}
-
-	/**
-	 * @return string Description
-	 */
-	public final function getDescription() {
-		return $this->_description;
-	}
-
-	/**
-	 * @param string $description
-	 * @return CM_Page_Abstract
-	 */
-	public final function setDescription($description) {
-		$this->_description = $description;
-		return $this;
-	}
-
-	/**
-	 * @return string keywords
-	 */
-	public final function getKeywords() {
-		return $this->_keywords;
-	}
-
-	/**
-	 * @param string $keywords Keywords
-	 * @return CM_Page_Abstract
-	 */
-	public final function setKeywords($keywords) {
-		$this->_keywords = $keywords;
 		return $this;
 	}
 
