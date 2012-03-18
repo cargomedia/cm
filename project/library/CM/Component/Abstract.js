@@ -1,31 +1,4 @@
-_children: [],
-_forms: [],
-
-initialize: function() {
-	this._children = [];
-	this._forms = [];
-	
-	if (this.getParent()) {
-		this.getParent().registerChild(this);
-	}
-
-	if (this.actions) {
-		this._bindActions(this.actions);
-	}
-	if (this.streams) {
-		this._bindStreams(this.streams);
-	}
-},
-
-/**
- * Called when all components are loaded
- */
-ready: function() {
-},
-
 _ready: function() {
-	this.ready();
-
 	this.$(".timeago").timeago();
 	this.$().placeholder();
 	this.$('button[title]').qtip({
@@ -33,9 +6,7 @@ _ready: function() {
 		style: {classes: 'ui-tooltip-tipped'}
 	});
 
-	_.each(this.getForms(), function(form) {
-		form.ready();
-	});
+	this.ready();
 	_.each(this.getChildren(), function(child) {
 		child._ready();
 	});
@@ -48,75 +19,10 @@ repaint: function() {
 },
 
 /**
- * @return string
- */
-getAutoId: function() {
-	return this.options.autoId;
-},
-
-/**
  * @return object
  */
 getParams: function() {
 	return this.options.params;
-},
-
-/**
- * @return CM_Component_Abstract[]
- */
-getChildren: function() {
-	return this._children;
-},
-
-/**
- * @param string className
- * @return CM_Component_Abstract|null
- */
-findChild: function(className){
-	return _.find(this.getChildren(), function(child) {
-		return child._class == className;
-	}) || null;
-},
-
-/**
- * @param CM_Component_Abstract child
- */
-registerChild: function(child) {
-	this._children.push(child);
-},
-
-/**
- * @return CM_Component_Abstract|null
- */
-getParent: function() {
-	if (this.options.parent) {
-		return this.options.parent;
-	}
-	return null;
-},
-
-/**
- * @return CM_Form_Abstract[]
- */
-getForms: function() {
-	return this._forms;
-},
-
-/**
- * @param string name
- * @return CM_Form_Abstract|null
- */
-findForm: function(name) {
-	return _.find(this.getForms(), function(form) {
-		return form._class == name;
-	}) || null;
-},
-
-/**
- * @param CM_Form_Abstract form
- */
-registerForm: function(form) {
-	this._forms.push(form);
 },
 
 /**
@@ -159,30 +65,6 @@ error: function(message) {
  */
 message: function(message) {
 	cm.window.hint(message);
-},
-
-/**
- * @param string event
- * @param function callback fn(array data)
- */
-bindStream: function(event, callback) {
-	var namespace = this._class + ':' + event;
-	cm.stream.bind(namespace, callback, this);
-	this.on('destruct', function() {
-		cm.stream.unbind(namespace, callback, this);
-	});
-},
-
-/**
- * @param int actionTypes
- * @param int modelType
- * @param function callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
- */
-bindAction: function(actionType, modelType, callback) {
-	cm.action.bind(actionType, modelType, callback, this);
-	this.on('destruct', function() {
-		cm.action.unbind(actionType, modelType, callback, this);
-	});
 },
 
 /**
@@ -248,8 +130,8 @@ load: function(className, params, options) {
 	var successPopOut = options.successPopOut || function() {};
 	var successPre = options.success ? options.success :  function() { this.popOut(); };
 	var successPost = options.success ? function() {} : function() { successPopOut.call(this); }
-	options.success = function(componentId) {
-		var handlerNew = cm.components[componentId];
+	options.success = function(autoId) {
+		var handlerNew = cm.views[autoId];
 		successPre.call(handlerNew);
 		handlerNew._ready();
 		successPost.call(handlerNew);
@@ -262,32 +144,6 @@ load: function(className, params, options) {
  */
 reload: function(params) {
 	return this.ajaxModal('reload', params);
-},
-
-remove: function(skipDomRemoval) {
-	if (this.getParent()) {
-		var siblings = this.getParent().getChildren();
-		for (var i = 0, sibling; sibling = siblings[i]; i++) {
-			if (sibling.getAutoId() == this.getAutoId()) {
-				siblings.splice(i, 1);
-			}
-		}
-	}
-
-	_.each(this.getChildren(), function(child) {
-		child.remove();
-	});
-
-	_.each(this.getForms(), function(form) {
-		delete cm.forms[form.getAutoId()];
-	});
-	this.trigger("destruct");
-	delete cm.components[this.getAutoId()];
-
-
-	if (!skipDomRemoval) {
-		this.$().remove();
-	}
 },
 
 /**
@@ -323,30 +179,4 @@ _getArray: function() {
 		params: this.getParams(),
 		parentId: this.getParent() ? this.getParent().getAutoId() : null
 	};
-},
-
-/**
- * @param object
- */
-_bindActions: function(actions) {
-	for (key in actions) {
-		var callback = actions[key];
-		var match = key.match(/^(\S+)\s+(.+)$/);
-		var modelType = cm.model.types[match[1]];
-		var actionNames = match[2].split(/\s*,\s*/);
-		_.each(actionNames, function(actionName) {
-			var actionType = cm.action.types[actionName];
-			this.bindAction(actionType, modelType, callback);
-		}, this);
-	}
-},
-
-/**
- * @param object
- */
-_bindStreams: function(streams) {
-	for (key in streams) {
-		var callback = streams[key];
-		this.bindStream(key, callback);
-	}
 }

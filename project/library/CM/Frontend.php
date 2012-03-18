@@ -85,7 +85,7 @@ class CM_Frontend {
 	 */
 	public function registerForm(CM_Form_Abstract $form, CM_Component_Abstract $component) {
 		$className = get_class($form);
-		$auto_var = 'cm.forms["' . $form->frontend_data['auto_id'] . '"]';
+		$auto_var = 'cm.views["' . $form->frontend_data['auto_id'] . '"]';
 		$form->frontend_data['js_handler'] = $auto_var;
 
 		$component->forms[] = $form;
@@ -102,9 +102,8 @@ class CM_Frontend {
 		$default_action = $form->getActionDefaultName();
 
 		$js = $auto_var . ' = new ' . $className . '({';
-		$js .= 'autoId:"' . $form->frontend_data['auto_id'] . '",';
 		$js .= 'el:$("#' . $form->frontend_data['auto_id'] . '").get(0),';
-		$js .= 'component:cm.components["' . $component->auto_id . '"],';
+		$js .= 'parent:cm.views["' . $component->auto_id . '"],';
 		$js .= 'name:"' . $form->getName() . '",';
 		$js .= 'fields:{' . implode(',', $field_list) . '},';
 		$js .= 'actions:{' . implode(',', $action_list) . '},';
@@ -119,17 +118,16 @@ class CM_Frontend {
 	 * @param string				$parentComponentId OPTIONAL
 	 */
 	public function registerComponent(CM_Component_Abstract $component, $parentComponentId = null) {
-		$auto_var = 'cm.components["' . $component->auto_id . '"]';
+		$auto_var = 'cm.views["' . $component->auto_id . '"]';
 		$cmpClass = get_class($component);
 		$handler = $component->getFrontendHandler();
 
 		$cmpJs = '';
 		$cmpJs .= $auto_var . ' = new ' . $cmpClass . '({';
-		$cmpJs .= 'autoId:"' . $component->auto_id . '",';
 		$cmpJs .= 'el:$("#' . $component->auto_id . '").get(0),';
 		$cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAll(), true);
 		if ($parentComponentId) {
-			$cmpJs .= ',parent:cm.components["' . $parentComponentId . '"]';
+			$cmpJs .= ',parent:cm.views["' . $parentComponentId . '"]';
 		}
 		$cmpJs .= '});' . PHP_EOL;
 

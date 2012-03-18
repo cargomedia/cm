@@ -59,7 +59,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
 	if ($ajax) {
 		$href = 'javascript:;';
-		$onClick = 'cm.components["' . $component->auto_id . '"].reload(' . json_encode(array('page' => $page)) . ')';
+		$onClick = 'cm.views["' . $component->auto_id . '"].reload(' . json_encode(array('page' => $page)) . ')';
 	} else {
 		$href = CM_Page_Abstract::link($request->getPath(), array_merge($request->getQuery(), array('page' => $page)));
 		$onClick = null;

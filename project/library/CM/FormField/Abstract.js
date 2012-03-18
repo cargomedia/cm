@@ -12,7 +12,7 @@ validate: function(value, required) {
  * @return CM_Form_Abstract
  */
 getForm: function() {
-	return this.options.form;
+	return this.getParent();
 },
 
 /**

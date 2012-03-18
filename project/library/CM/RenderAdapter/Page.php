@@ -27,7 +27,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 
-		$js->onloadReadyJs('cm.component()._ready();');
+		$js->onloadReadyJs('cm.findView()._ready();');
 
 		$js->registerLanguageValue('%interface.ok');
 		$js->registerLanguageValue('%interface.cancel');

@@ -1,21 +1,22 @@
 _fields: {},
 
-initialize: function() {
+ready: function() {
+},
+
+
+_ready: function() {
 	this._fields = {};
 	_.each(this.options.fields, function(fieldInfo, name) {
 		// Lazy construct
 		var $field = this.$("#"+name);
 		if ($field.length) {
 			var fieldClass = window[fieldInfo.className];
-			this._fields[name] = new fieldClass({"el": $field, "form": this, "name": name, "options": fieldInfo.options});
+			this._fields[name] = new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options});
 		}
 	}, this);
-	_.each(this._fields, function(field, name) {
-		field.ready();
-	}, this);
-	
+
 	var handler = this;
-	
+
 	_.each(this.options.actions, function(action, name) {
 		var $btn = $('#'+this.getAutoId()+'-'+name+'-button');
 		$btn.on('click', {action: name}, function(event) {
@@ -30,32 +31,18 @@ initialize: function() {
 			return false;
 		});
 	}
-	
-	this.getComponent().registerForm(this);
-},
 
-
-ready: function() {
-},
-
-
-_ready: function() {
 	this.ready();
-	this.trigger('ready');
+	_.each(this.getChildren(), function(child) {
+		child._ready();
+	});
 },
 
 /**
- * @return string
- */
-getAutoId: function() {
-	return this.options.autoId;
-},
-
-/**
- * @return CM_Component
+ * @return CM_Component_Abstract
  */
 getComponent: function() {
-	return this.options.component;
+	return this.getParent();
 },
 
 /**
@@ -139,7 +126,7 @@ collectData: function(action_name) {
 	var focusSet = false;
 	for (key in action.fields) {
 		required = action.fields[key];
-		field = this._fields[key];
+		field = this.getField(key);
 
 		if ( data[key] && (data[key].length !== 0) ) {
 			try {
