@@ -16,7 +16,7 @@
 		{block name='content'}{/block}
 		{resource file='library.js'}
 		{resource file='internal.js'}
-		{$js->renderScripts()}
+		{$render->getJs()->renderScripts()}
 		{CM_Tracking::getInstance()->getHtml()}
 		{block name='body-end'}{/block}
 	</body>

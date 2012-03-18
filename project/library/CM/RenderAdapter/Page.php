@@ -41,7 +41,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$this->getTemplate()->assign($page->getTplParams());
 		$this->getTemplate()->assign('page', $page);
 		$this->getTemplate()->assign('viewer', $page->getViewer());
-		$this->getTemplate()->assign('js', $js);
 
 		$html = $this->getTemplate()->fetch($tplPath);
 
