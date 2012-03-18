@@ -31,11 +31,11 @@ class CM_FormField_SetTest extends TestCase {
 	public function testValidate() {
 		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
 		$field = new CM_FormField_Set('foo', $data, null, true);
-		
+
 		$userInputGood = array(32, 64, 128);
 		$validationResult = $field->validate($userInputGood);
 		$this->assertSame($userInputGood, $validationResult);
-		
+
 		$userInputTainted = array(32, 23, 132);
 		$validationResult = $field->validate($userInputTainted);
 		$this->assertSame(array(32), $validationResult);
@@ -43,14 +43,15 @@ class CM_FormField_SetTest extends TestCase {
 
 	public function testRender() {
 		$name = 'foo';
-		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');		
+		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
+		$form = $this->getMockForm();
 		$field = new CM_FormField_Set($name, $data, null, true);
 		$values = array(64, 128);
 		$field->setValue($values);
 		$cssWidth = '50%';
 		$field->setColumnSize($cssWidth);
-		$doc = TH::renderFormField($this->getMockForm(), $field, array());
-		$this->assertTrue($doc->exists('ul[id="formId-' . $name . '-input"]'));
+		$doc = TH::renderFormField($form, $field, array());
+		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
 		$this->assertSame($cssWidth, preg_replace('/^width: /', '', $doc->getAttr('li', 'style')));
@@ -59,10 +60,10 @@ class CM_FormField_SetTest extends TestCase {
 			$spanQuery = 'span[class="' . $name . '_label_' . $value . '"]';
 			$this->assertTrue($doc->exists($spanQuery));
 			$this->assertSame($label, $doc->getText($spanQuery));
-			$this->assertTrue($doc->exists('input[value="' . $value . '"]'));			
+			$this->assertTrue($doc->exists('input[value="' . $value . '"]'));
 			if (in_array($value, $values)) {
 				$this->assertSame('checked', $doc->getAttr('input[value="' . $value . '"]', 'checked'));
-			}		
+			}
 		}
 	}
 
