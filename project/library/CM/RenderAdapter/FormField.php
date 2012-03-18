@@ -14,7 +14,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 		$field->setTplParam('value', $field->getValue());
 		$field->setTplParam('options', $field->getOptions());
 
-		$tpl = $this->getTemplate();
+		$tpl = $this->createTemplate();
 		$tpl->assign($field->getTplParams());
 
 		$html = '<span id="' . $form->frontend_data['auto_id'] . '-' . $field->getName() . '">';

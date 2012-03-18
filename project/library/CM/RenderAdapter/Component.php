@@ -18,8 +18,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 		$this->getRender()->pushStack('components', $component);
 
-		$this->getLayout()->assign($component->getTplParams());
-		$this->getLayout()->assign('viewer', $component->getViewer());
+		$this->getTemplate()->assign($component->getTplParams());
+		$this->getTemplate()->assign('viewer', $component->getViewer());
 
 		$tplPath = $this->_getTplPath($component->getTplName());
 

@@ -6,22 +6,22 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 		/** @var CM_Mail $mail */
 		$mail = $this->_getRenderable();
 		if ($mail->getRenderLayout() || $mail->hasTemplate()) {
-			$this->getLayout()->assign($mail->getTplParams());
+			$this->getTemplate()->assign($mail->getTplParams());
 		}
 		if (!($subject = $mail->getSubject())) {
 			if (!$mail->hasTemplate()) {
 				throw new CM_Exception_Invalid('Trying to render mail with neither subject nor template');
 			}
-			$subject = $this->getLayout()->fetch($this->_getTplPath('subject.tpl'));
+			$subject = $this->getTemplate()->fetch($this->_getTplPath('subject.tpl'));
 			$subject = trim($subject);
 		}
 		if (!($htmlBody = $mail->getHtml()) && $mail->hasTemplate()) {
-			$htmlBody = $this->getLayout()->fetch($this->_getTplPath('body.tpl'));
+			$htmlBody = $this->getTemplate()->fetch($this->_getTplPath('body.tpl'));
 		}
 		if ($mail->getRenderLayout()) {
-			$this->getLayout()->assign('subject', $subject);
-			$this->getLayout()->assign('body', $htmlBody);
-			$html = $this->getLayout()->fetch($this->getRender()->getLayoutPath('layout/mailHtml.tpl'));
+			$this->getTemplate()->assign('subject', $subject);
+			$this->getTemplate()->assign('body', $htmlBody);
+			$html = $this->getTemplate()->fetch($this->getRender()->getLayoutPath('layout/mailHtml.tpl'));
 		} else {
 			$html = $htmlBody;
 		}
@@ -35,8 +35,8 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			$text = trim(strip_tags($text));
 		}
 		if ($mail->getRenderLayout()) {
-			$this->getLayout()->assign('body', $text);
-			$text = $this->getLayout()->fetch($this->getRender()->getLayoutPath('layout/mailText.tpl'));
+			$this->getTemplate()->assign('body', $text);
+			$text = $this->getTemplate()->fetch($this->getRender()->getLayoutPath('layout/mailText.tpl'));
 		}
 		return array($subject, $html, $text);
 	}
