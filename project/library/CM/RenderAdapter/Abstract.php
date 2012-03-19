@@ -28,25 +28,21 @@ abstract class CM_RenderAdapter_Abstract {
 	}
 
 	/**
-	 * @return Smarty
-	 */
-	public function getTemplate() {
-		return $this->_render->getLayout();
-	}
-
-	/**
-	 * @param string|null $tplName
-	 * @return Smarty_Internal_Template
-	 */
-	public function createTemplate($tplName = null) {
-		return $this->getTemplate()->createTemplate($this->_getTplPath($tplName));
-	}
-
-	/**
 	 * @param array $params
 	 * @return string
 	 */
 	abstract public function fetch(array $params = array());
+
+	/**
+	 * @param string|null	  $tplName
+	 * @param array|null	   $variables
+	 * @param bool|null		$isolated
+	 * @return string
+	 */
+	protected function _renderTemplate($tplName = null, array $variables = null, $isolated = null) {
+		$tplPath = $this->_getTplPath($tplName);
+		return $this->getRender()->renderTemplate($tplPath, $variables, $isolated);
+	}
 
 	/**
 	 * Return tpl path

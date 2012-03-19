@@ -167,6 +167,31 @@ class CM_Render {
 	}
 
 	/**
+	 * @param string	 $tplPath
+	 * @param array|null $variables
+	 * @param bool|null  $isolated
+	 * @return string
+	 */
+	public function renderTemplate($tplPath, $variables = null, $isolated = null) {
+		$compileId = $this->getSite()->getTheme();
+		/** @var Smarty_Internal_TemplateBase $template */
+		if ($isolated) {
+			$template = $this->getLayout()->createTemplate($tplPath, null, $compileId);
+		} else {
+			$template = $this->getLayout();
+		}
+		$template->assignGlobal('render', $this);
+		if ($variables) {
+			$template->assign($variables);
+		}
+		if ($isolated) {
+			return $template->fetch();
+		} else {
+			return $template->fetch($tplPath, null, $compileId);
+		}
+	}
+
+	/**
 	 * @param string $phrase
 	 * @param array  $params OPTIONAL
 	 * @return string

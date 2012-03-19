@@ -17,20 +17,18 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 		$this->getRender()->pushStack('components', $component);
 
-		$this->getTemplate()->assign($component->getTplParams());
-		$this->getTemplate()->assign('viewer', $component->getViewer());
-
-		$tplPath = $this->_getTplPath($component->getTplName());
-
 		$cssClass = implode(' ', $component->getClassHierarchy());
-		if (preg_match('#/([^/]+)\.tpl$#', $tplPath, $match)) {
+		if (preg_match('#([^/]+)\.tpl$#', $component->getTplName(), $match)) {
 			if ($match[1] != 'default') {
 				$cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
 			}
 		}
-
 		$html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
-		$html .= $this->getRender()->getLayout()->fetch($tplPath);
+
+		$assign = $component->getTplParams();
+		$assign['viewer'] = $component->getViewer();
+		$html .= $this->_renderTemplate($component->getTplName(), $assign);
+
 		$html .= '</div>';
 
 		$this->getRender()->getJs()->registerComponent($component, $parentComponentId);

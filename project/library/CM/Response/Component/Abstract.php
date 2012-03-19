@@ -9,16 +9,10 @@ abstract class CM_Response_Component_Abstract extends CM_Response_Abstract {
 	protected $_component;
 
 	/**
-	 * @var Smarty
-	 */
-	protected $_layout;
-
-	/**
 	 * @param CM_Request_Abstract $request
 	 */
 	public function __construct(CM_Request_Abstract $request) {
 		parent::__construct($request);
-		$this->_layout = $this->getRender()->getLayout();
 		$query = $this->_request->getQuery();
 		if (!isset($query['component'])) {
 			throw new CM_Exception_Invalid('Component param not set (query: `' . CM_Util::var_line($query) . '`)');

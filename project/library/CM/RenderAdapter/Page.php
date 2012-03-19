@@ -36,13 +36,10 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js->registerLanguageValue('%interface.cancel');
 		$js->registerLanguageValue('%interface.confirmation_title');
 
-		$tplPath = $this->_getTplPath('default.tpl');
-
-		$this->getTemplate()->assign($page->getTplParams());
-		$this->getTemplate()->assign('page', $page);
-		$this->getTemplate()->assign('viewer', $page->getViewer());
-
-		$html = $this->getTemplate()->fetch($tplPath);
+		$assign = $page->getTplParams();
+		$assign['page'] = $page;
+		$assign['viewer'] = $page->getViewer();
+		$html = $this->_renderTemplate('default.tpl', $assign);
 
 		$this->getRender()->popStack('pages');
 
