@@ -41,12 +41,12 @@ myRemove: function() {
 },
 
 loadExample: function() {
-	this.load('CM_Component_Example', {foo:'value2'});
+	this.loadComponent('CM_Component_Example', {foo:'value2'});
 },
 
 loadExampleInline: function() {
 	var handler = this;
-	this.load('CM_Component_Example', {foo:'value3'}, {
+	this.loadComponent('CM_Component_Example', {foo:'value3'}, {
 		success: function() {
 			this.$().hide()
 				.insertBefore(handler.$())

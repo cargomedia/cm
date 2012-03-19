@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Component_Form extends CM_Response_Component_Abstract {
+class CM_Response_View_Form extends CM_Response_View_Abstract {
 	/**
 	 * Added errors.
 	 *
@@ -81,8 +81,9 @@ class CM_Response_Component_Form extends CM_Response_Component_Abstract {
 		try {
 			$success = array();
 			$query = $this->_request->getQuery();
-	
-			$form = CM_Form_Abstract::factory($query['className']);
+			$formInfo = $this->_getViewInfo('form');
+
+			$form = CM_Form_Abstract::factory($formInfo['className']);
 			$action = (string) $query['actionName'];
 			$data = (array) $query['data'];
 			

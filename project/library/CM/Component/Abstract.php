@@ -121,12 +121,8 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 		return $this->getAutoId() . '-' . $id_value;
 	}
 
-	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
+	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		return $response->reloadComponent($params->getAll());
-	}
-
-	public static function ajax_load(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
-		return $response->loadComponent($params);
 	}
 
 	/**

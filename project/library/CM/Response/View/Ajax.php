@@ -1,6 +1,6 @@
 <?php
 
-class CM_Response_Component_Ajax extends CM_Response_Component_Abstract {
+class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 
 	public function process() {
 		$this->setHeader('Content-Type', 'application/json');
@@ -15,7 +15,8 @@ class CM_Response_Component_Ajax extends CM_Response_Component_Abstract {
 			if (!isset($query['params']) || !is_array($query['params'])) {
 				throw new CM_Exception_Invalid('Illegal params');
 			}
-			$function = array($this->_component['className'], 'ajax_' . $query['method']);
+			$view = $this->_getViewInfo();
+			$function = array($view['className'], 'ajax_' . $query['method']);
 			$params = CM_Params::factory($query['params']);
 			$componentHandler = new CM_ComponentFrontendHandler();
 			$success['data'] = CM_Params::encode(call_user_func($function, $params, $componentHandler, $this));

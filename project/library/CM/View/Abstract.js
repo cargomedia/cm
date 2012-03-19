@@ -67,6 +67,13 @@ getAutoId: function() {
 },
 
 /**
+ * @return object
+ */
+getParams: function() {
+	return this.options.params || {};
+},
+
+/**
  * @param bool skipDomRemoval OPTIONAL
  */
 remove: function(skipDomRemoval) {
@@ -90,6 +97,88 @@ remove: function(skipDomRemoval) {
 	if (!skipDomRemoval) {
 		this.$().remove();
 	}
+},
+
+disable: function() {
+	this.$().disable();
+},
+
+enable: function() {
+	this.$().enable();
+},
+
+/**
+ * @param string functionName
+ * @param array|null params
+ * @param object|null callbacks
+ * @param bool|null cache
+ * @return jqXHR
+ */
+ajax: function(functionName, params, callbacks, cache) {
+	callbacks = callbacks || {};
+	params = params || {};
+	var handler = this;
+	var xhr = cm.ajax('ajax', {view:this._getArray(), method:functionName, params:params}, {
+		success: function(response) {
+			if (response.exec) {
+				var exec = new Function(response.exec);
+				exec.call(handler);
+			}
+			if (callbacks.success) {
+				return callbacks.success.call(handler, response.data);
+			}
+		},
+		error: function(msg, type) {
+			if (callbacks.error) {
+				return callbacks.error.call(handler, msg, type);
+			}
+		},
+		complete: function() {
+			if (callbacks.complete) {
+				return callbacks.complete.call(handler);
+			}
+		}
+	}, cache);
+	this.on('destruct', function() {
+		xhr.abort();
+	});
+	return xhr;
+},
+
+/**
+ * @param string functionName
+ * @param array|null params
+ * @param object|null callbacks
+ * @return jqXHR
+ */
+ajaxModal: function(functionName, params, callbacks) {
+	callbacks = callbacks || {};
+	var handler = this;
+	var callbackComplete = callbacks.complete;
+	callbacks.complete = function() {
+		handler.enable();
+		if (callbackComplete) {
+			return callbackComplete(handler);
+		}
+	};
+	this.disable();
+	this.ajax(functionName, params, callbacks);
+},
+
+loadComponent: function(className, params, options) {
+	options = options || {};
+	params = params || {};
+	params.className = className;
+	var successPopOut = options.successPopOut || function() {};
+	var successPre = options.success ? options.success :  function() { this.popOut(); };
+	var successPost = options.success ? function() {} : function() { successPopOut.call(this); }
+	options.success = function(autoId) {
+		var handlerNew = cm.views[autoId];
+		successPre.call(handlerNew);
+		handlerNew._ready();
+		successPost.call(handlerNew);
+	};
+	return this.ajaxModal('loadComponent', params, options);
 },
 
 /**
@@ -140,4 +229,16 @@ _bindStreams: function(streams) {
 		var callback = streams[key];
 		this.bindStream(key, callback);
 	}
+},
+
+/**
+ * @return object
+ */
+_getArray: function() {
+	return {
+		className: this._class,
+		id: this.getAutoId(),
+		params: this.getParams(),
+		parentId: this.getParent() ? this.getParent().getAutoId() : null
+	};
 }

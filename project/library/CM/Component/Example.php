@@ -14,13 +14,13 @@ class CM_Component_Example extends CM_Component_Abstract {
 	public function checkAccessible() {
 	}
 
-	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
+	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$x = $params->getString('x');
 		//$response->reloadComponent();
 		return 'x=' . $x;
 	}
 
-	public static function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
+	public static function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$status = $params->getInt('status', 200);
 		$text = $params->has('text') ? $params->getString('text') : null;
 		if (in_array($status, array(500, 599))) {
@@ -36,7 +36,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 		throw new $exception($text, $public);
 	}
 
-	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_Component_Ajax $response) {
+	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$number = $params->getInt('number');
 		self::stream($response->getViewer(true), 'ping', array("number" => $number, "message" => 'pong'));
 	}

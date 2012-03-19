@@ -34,4 +34,8 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		}
 		return $this->_autoId;
 	}
+
+	public static function ajax_loadComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+		return $response->loadComponent($params);
+	}
 }

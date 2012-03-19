@@ -10,7 +10,7 @@ class CM_FormAction_Example_Go extends CM_FormAction_Abstract {
 		parent::setup($form);
 	}
 
-	public function process(array $data, CM_Response_Component_Form $response, CM_Form_Abstract $form) {
+	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		//$response->reloadComponent();
 		$response->addMessage(nl2br($this->_printVar($data)));
 	}
