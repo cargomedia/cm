@@ -78,29 +78,6 @@ class CM_Render {
 	}
 
 	/**
-	 * @return Smarty
-	 */
-	public function getLayout() {
-		if (!isset(self::$_smarty)) {
-			self::$_smarty = new Smarty();
-
-			self::$_smarty->setTemplateDir(DIR_LAYOUT);
-			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
-			self::$_smarty->_file_perms = 0777;
-			self::$_smarty->_dir_perms = 0777;
-			umask(0);
-			self::$_smarty->compile_check = IS_DEBUG;
-			self::$_smarty->caching = false;
-			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
-			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
-			}
-		}
-
-		return self::$_smarty;
-	}
-
-	/**
 	 * @param string $key
 	 * @return array Stack
 	 */
@@ -156,12 +133,10 @@ class CM_Render {
 		if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($view), $matches)) {
 			throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($view) . "`");
 		}
-
 		$renderClass = 'CM_RenderAdapter_' . $matches[1];
 
 		/** @var CM_RenderAdapter_Abstract $renderAdapter */
 		$renderAdapter = new $renderClass($this, $view);
-		$this->getLayout()->assignGlobal('render', $this);
 
 		return $renderAdapter->fetch($params);
 	}
@@ -176,9 +151,9 @@ class CM_Render {
 		$compileId = $this->getSite()->getTheme();
 		/** @var Smarty_Internal_TemplateBase $template */
 		if ($isolated) {
-			$template = $this->getLayout()->createTemplate($tplPath, null, $compileId);
+			$template = $this->_getSmarty()->createTemplate($tplPath, null, $compileId);
 		} else {
-			$template = $this->getLayout();
+			$template = $this->_getSmarty();
 		}
 		$template->assignGlobal('render', $this);
 		if ($variables) {
@@ -283,5 +258,28 @@ class CM_Render {
 	 */
 	public function getUrlImg($path) {
 		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+	}
+
+	/**
+	 * @return Smarty
+	 */
+	private function _getSmarty() {
+		if (!isset(self::$_smarty)) {
+			self::$_smarty = new Smarty();
+
+			self::$_smarty->setTemplateDir(DIR_LAYOUT);
+			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
+			self::$_smarty->_file_perms = 0777;
+			self::$_smarty->_dir_perms = 0777;
+			umask(0);
+			self::$_smarty->compile_check = IS_DEBUG;
+			self::$_smarty->caching = false;
+			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
+				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
+			}
+		}
+
+		return self::$_smarty;
 	}
 }
