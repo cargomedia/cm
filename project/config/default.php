@@ -38,7 +38,7 @@ $config->CM_Response_Page->catch = array(
 	'CM_Exception_AuthRequired' => '/account/signup',
 );
 
-$config->CM_Response_Component_Abstract->catch = array(
+$config->CM_Response_View_Abstract->catch = array(
 	'CM_Exception_AuthRequired',
 	'CM_Exception_Blocked',
 	'CM_Exception_ActionLimit',

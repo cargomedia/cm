@@ -99,19 +99,21 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param string				   $form
-	 * @param string				   $action
+	 * @param string				   $formClassName
+	 * @param string				   $actionName
 	 * @param array					$data
 	 * @param string|null			  $componentClassName Component that uses that form
 	 * @param CM_Model_User|null	   $viewer
 	 * @return mixed
 	 */
-	public function getMockFormResponse($form, $action, array $data, $componentClassName = null, CM_Model_User $viewer = null) {
+	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null) {
 		$requestMock = $this->getMockBuilder('CM_Request_Post')->disableOriginalConstructor()->getMock();
 		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
-		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('component' => array('className' => $componentClassName,
-			'params' => array(), 'children' => array(), 'forms' => array()), 'className' => $form, 'actionName' => $action, 'data' => $data)));
-		$response = new CM_Response_Component_Form($requestMock);
+		$viewArray = array('className' => $componentClassName, 'params' => array(), 'id' => 'mockFormComponentId');
+		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
+		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'form' => $formArray,
+			'actionName' => $actionName, 'data' => $data)));
+		$response = new CM_Response_View_Form($requestMock);
 		$responseArray = json_decode($response->process(), true);
 		return $responseArray['success'];
 	}
