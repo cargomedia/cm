@@ -10,10 +10,9 @@ ready: function() {
 },
 
 refresh: function(){
-	var field = this;
-	cm.rpc(this._class + ".createNumber", [], {
+	this.ajax('createNumber', {}, {
 		success: function(id) {
-			var $container = field.$(".captcha_container:eq(0)");
+			var $container = this.$(".captcha_container:eq(0)");
 			var $img = $container.find("img");
 			$img.attr("src", $img.attr("src").replace(/\?[^\?]+$/, '?id=' + id));
 			$container.find("input[name=\'captcha[id]\']").val(id);

@@ -5,7 +5,7 @@ ready: function() {
 	var $input = this.$('input[type="text"]');
 	$input.tokenInput(
 		function (query, handle_results) {
-			cm.rpc(field._class + ".suggest", [query, field.getOptions()], {
+			field.ajax('getSuggestions', {'term':query, 'options':field.getOptions()}, {
 				success: function(results) {
 					handle_results(query, results);
 				}

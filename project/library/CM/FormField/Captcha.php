@@ -3,7 +3,7 @@
 class CM_FormField_Captcha extends CM_FormField_Abstract {
 
 	public function prepare(array $params) {
-		$this->setTplParam('imageId', self::rpc_createNumber());
+		$this->setTplParam('imageId', CM_Captcha::create()->getId());
 	}
 
 	public function validate($userInput) {
@@ -22,10 +22,7 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
 		return $userInput;
 	}
 
-	/**
-	 * @return int Captcha-id
-	 */
-	public static function rpc_createNumber() {
+	public static function ajax_createNumber(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		return CM_Captcha::create()->getId();
 	}
 }

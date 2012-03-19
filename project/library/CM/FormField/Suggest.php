@@ -4,8 +4,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
 	/**
 	 * @param string $name
-	 * @param int $cardinality OPTIONAL
-	 * @param array $options OPTIONAL
+	 * @param int	$cardinality OPTIONAL
 	 */
 	public function __construct($name, $cardinality = null) {
 		parent::__construct($name);
@@ -14,7 +13,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
 	/**
 	 * @param string $term
-	 * @param array $options
+	 * @param array  $options
 	 * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img]))
 	 */
 	protected static function _getSuggestions($term, array $options) {
@@ -27,16 +26,6 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 	 */
 	protected static function _getSuggestion($item) {
 		throw new CM_Exception_NotImplemented();
-	}
-
-	/**
-	 * @param string $term
-	 * @param array $options
-	 * @return array
-	 */
-	public static function rpc_suggest($term, array $options) {
-		$suggestions = static::_getSuggestions($term, $options);
-		return $suggestions;
 	}
 
 	public function prepare(array $params) {
@@ -57,5 +46,10 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 			throw new CM_Exception_FormFieldValidation('Too many elements.');
 		}
 		return $values;
+	}
+
+	public static function ajax_getSuggestions(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+		$suggestions = static::_getSuggestions($params->getString('term'), $params->getArray('options'));
+		return $suggestions;
 	}
 }
