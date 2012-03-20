@@ -14,6 +14,7 @@
 	<body id="{$pageObj->getAutoId()}">
 		{block name='body-start'}{/block}
 		{block name='body'}{/block}
+		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
 		{resource file='library.js'}
 		{resource file='internal.js'}
 		{$render->getJs()->renderScripts()}
