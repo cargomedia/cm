@@ -19,6 +19,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			}
 			$path = $this->_getConfig()->catch[get_class($e)];
 			$this->getRequest()->setPath($path);
+			$this->getRender()->getJs()->clear();
 			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);

@@ -29,6 +29,13 @@ class CM_Frontend {
 		}
 	}
 
+	public function clear() {
+		$this->_onloadHeaderJs = '';
+		$this->_onloadPrepareJs = '';
+		$this->_onloadJs = '';
+		$this->_onloadReadyJs = '';
+	}
+
 	/**
 	 * @param string $lang_addr
 	 * @param string $frontend_lang_addr OPTIONAL
