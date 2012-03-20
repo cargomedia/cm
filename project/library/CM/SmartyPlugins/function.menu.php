@@ -69,10 +69,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		$tplName = $params['template'];
 	}
 
-	$tpl = $template->smarty->createTemplate($render->getLayoutPath('menu/' . $tplName . '.tpl'));
-
-	$tpl->assign('menu_entries', $menuEntries);
-	$tpl->assign('menu_class', $class);
-
-	return $tpl->fetch();
+	$tplPath = $render->getLayoutPath('menu/' . $tplName . '.tpl');
+	$assign = array('menu_entries' => $menuEntries, 'menu_class' => $class);
+	return $render->renderTemplate($tplPath, $assign, true);
 }

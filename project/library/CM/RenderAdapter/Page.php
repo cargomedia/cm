@@ -37,7 +37,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js->registerLanguageValue('%interface.confirmation_title');
 
 		$assign = $page->getTplParams();
-		$assign['page'] = $page;
+		$assign['pageObj'] = $page;
 		$assign['viewer'] = $page->getViewer();
 		$html = $this->_renderTemplate('default.tpl', $assign);
 
