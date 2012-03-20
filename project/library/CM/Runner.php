@@ -25,14 +25,16 @@ class CM_Runner {
 	 */
 	public function run() {
 		if (file_exists($this->_pidPath)) {
-			$pid = (int) trim(file_get_contents($this->_pidPath));
+			$pidFile = new CM_File($this->_pidPath);
+			$pid = (int) trim($pidFile->read());
 			if (posix_getsid($pid) !== false) {
 				throw new CM_Exception('Process `' . $pid . '` still running.');
 			}
 		}
 		$pid = posix_getpid();
-		file_put_contents($this->_pidPath, $pid);
+		$pidFile = CM_File::create($this->_pidPath, $pid);
 		$handle = $this->_handle;
 		$handle();
+		$pidFile->delete();
 	}
 }
