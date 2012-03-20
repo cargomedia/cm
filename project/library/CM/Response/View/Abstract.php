@@ -13,22 +13,22 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		}
 		$query = $this->_request->getQuery();
 		if (!isset($query[$key])) {
-			throw new CM_Exception_Invalid('Component param not set (query: `' . CM_Util::var_line($query) . '`)');
+			throw new CM_Exception_Invalid('View `' . $key . '` not set.');
 		}
 		$viewInfo = $query[$key];
 		if (!is_array($viewInfo)) {
-			throw new CM_Exception_Invalid('Component param is not an array');
+			throw new CM_Exception_Invalid('View `' . $key . '` is not an array');
 		}
 		if (!isset($viewInfo['id'])) {
-			throw new CM_Exception_Invalid('Id not set.');
+			throw new CM_Exception_Invalid('View id `' . $key . '` not set.');
 		}
 		if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) ||
 				!('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
 		) {
-			throw new CM_Exception_Invalid('Illegal className: `' . $viewInfo['className'] . '`.');
+			throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] . '`.');
 		}
 		if (!isset($viewInfo['params'])) {
-			throw new CM_Exception_Invalid('Id not set.');
+			throw new CM_Exception_Invalid('View params `' . $key . '` not set.');
 		}
 		if (!isset($viewInfo['parentId'])) {
 			$viewInfo['parentId'] = null;
