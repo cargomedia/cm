@@ -6,7 +6,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	protected $_description = '';
 	protected $_keywords = '';
 	protected $_params;
-	protected $_components = array();
 	protected $_viewer = null;
 	protected $_path = null;
 
@@ -25,34 +24,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	abstract public function prepare(CM_Response_Abstract $response);
-
-	/**
-	 * Adds a component to the page
-	 *
-	 * @param CM_Component_Abstract $component
-	 * @param int                   $location  OPTIONAL Location to add the component (default = 1)
-	 */
-	public final function addComponent(CM_Component_Abstract $component, $location = 1) {
-		if (!isset($this->_components[$location])) {
-			$this->_components[$location] = array();
-		}
-		$this->_components[$location][] = $component;
-	}
-
-	/**
-	 * Returns an array with all components assigned to this page
-	 *
-	 * Sorted in subarray defined by location
-	 *
-	 * @param int $index
-	 * @return array Components list
-	 */
-	public final function getComponents($index = 1) {
-		if (!isset($this->_components[$index])) {
-			return array();
-		}
-		return $this->_components[$index];
-	}
 
 	/**
 	 * @return string Description
