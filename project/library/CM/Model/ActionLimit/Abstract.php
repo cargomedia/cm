@@ -20,7 +20,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	 * @param int|null $role
 	 * @param boolean $first
 	 */
-	abstract public function overshoot(CM_Action_Abstract $action, $role, $first);
+	abstract public function  overshoot(CM_Action_Abstract $action, $role, $first);
 
 	/**
 	 * @param int|null $role
