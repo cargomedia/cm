@@ -16,6 +16,7 @@ class CM_Runner {
 		if (!$filename = realpath($_SERVER['SCRIPT_FILENAME'])) {
 			throw new CM_Exception('Cannot detect realpath() of script-filename');
 		}
+		$filename = preg_replace('#^' . DIR_ROOT . '#', '', $filename);
 		$this->_pidPath = DIR_DATA_LOCKS . preg_replace('/[^\w]/', '_', $filename) . '.pid';
 	}
 
