@@ -126,7 +126,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	 * @param int $type
 	 * @param int $modelType
 	 * @param int $actionType
-	 * @return CM_ActionLimit_Abstract
+	 * @return CM_Model_ActionLimit_Abstract
 	 */
 	public static function factory($type, $modelType, $actionType) {
 		$class = self::_getClassName($type);
