@@ -41,9 +41,8 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 						}
 					}
 					foreach (array_unique($relativePaths) as $path) {
-						$prefix = null;
+						$prefix = '.' . $viewClass['name'];
 						if ('Component' == $viewType) {
-							$prefix = '.' . $viewClass['name'];
 							if ($path != 'default.style' && strpos($path, '/') === false) {
 								$prefix .= '.' . preg_replace('#.style$#', '', $path);
 							}

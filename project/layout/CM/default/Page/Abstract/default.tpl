@@ -11,7 +11,7 @@
 		{resource file='init.js'}
 		{block name='head'}{/block}
 	</head>
-	<body id="{$pageObj->getAutoId()}">
+	<body id="{$pageObj->getAutoId()}" class="{$pageObj->getClassHierarchy()|implode:' '}">
 		{block name='body-start'}{/block}
 		{block name='body'}{/block}
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
