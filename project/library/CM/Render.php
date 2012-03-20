@@ -148,7 +148,7 @@ class CM_Render {
 	 * @return string
 	 */
 	public function renderTemplate($tplPath, $variables = null, $isolated = null) {
-		$compileId = $this->getSite()->getTheme();
+		$compileId = $this->getSite()->getId();
 		/** @var Smarty_Internal_TemplateBase $template */
 		if ($isolated) {
 			$template = $this->_getSmarty()->createTemplate($tplPath, null, $compileId);
