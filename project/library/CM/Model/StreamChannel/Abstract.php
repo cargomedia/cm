@@ -4,20 +4,20 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_User  $user
-	 * @param CM_Params|null $params
-	 * @return int
+	 * @param int $timeStamp
+	 * @return int|false
 	 */
-	public function canPublish(CM_Model_User $user) {
-		return time() + 100;
+	public function canPublish(CM_Model_User $user, $timeStamp) {
+		return $timeStamp + 10000;
 	}
 
 	/**
 	 * @param CM_Model_User  $user
-	 * @param CM_Params|null $params
-	 * @return int
+	 * @param int $timeStamp
+	 * @return int|false
 	 */
-	public function canSubscribe(CM_Model_User $user) {
-		return time() + 100;
+	public function canSubscribe(CM_Model_User $user, $timeStamp) {
+		return $timeStamp + 10000;
 	}
 
 	/**
