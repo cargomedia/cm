@@ -80,11 +80,16 @@ class CM_WowzaTest extends TestCase {
 		// allowedUntil will be updated, if stream has expired and it's user isn't $userUnchanged
 		$userUnchanged = TH::createUser();
 		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo1'));
-		$streamSubscribeUnchanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
-		$streamSubscribeUnchanged2 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_4', 'start' => time(), 'allowedUntil' => time() + 100));
-		$streamSubscribeChanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_3', 'start' => time(), 'allowedUntil' => 0));
-		$streamPublishUnchanged1 = $streamChannel->getStreamPublishs()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
-		$streamPublishChanged1 = CM_Model_StreamChannel_Mock::create(array('key' => 'foo2'))->getStreamPublishs()->add(array('user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
+		$streamSubscribeUnchanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
+			'allowedUntil' => 0));
+		$streamSubscribeUnchanged2 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_4',
+			'start' => time(), 'allowedUntil' => time() + 100));
+		$streamSubscribeChanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_3', 'start' => time(),
+			'allowedUntil' => 0));
+		$streamPublishUnchanged1 = $streamChannel->getStreamPublishs()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
+			'allowedUntil' => 0));
+		$streamPublishChanged1 = CM_Model_StreamChannel_Mock::create(array('key' => 'foo2'))->getStreamPublishs()->add(array('user' => TH::createUser(),
+			'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
 		$wowza->checkStreams();
 		$this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil(), $streamSubscribeUnchanged1->_change()->getAllowedUntil());
 		$this->assertEquals($streamSubscribeUnchanged2->getAllowedUntil(), $streamSubscribeUnchanged2->_change()->getAllowedUntil());
@@ -105,8 +110,8 @@ class CM_WowzaTest extends TestCase {
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				$session = TH::createSession($streamSubscribe->getUser());
-				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(), 'clientId' => $streamSubscribe->getKey(),
-					'data' => json_encode(array('sessionId' => $session->getId())));
+				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(),
+					'clientId' => $streamSubscribe->getKey(), 'data' => json_encode(array('sessionId' => $session->getId())));
 				unset($session);
 			}
 			$session = TH::createSession($streamPublish->getUser());
@@ -124,11 +129,11 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 	const TYPE = 100;
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
-		return $user->getId() != 1 ? $allowedUntil + 100: false;
+		return $user->getId() != 1 ? $allowedUntil + 100 : false;
 	}
 
 	public function canSubscribe(CM_Model_User $user, $timeStamp) {
-		return $user->getId() != 1 ? $timeStamp + 100: false;
+		return $user->getId() != 1 ? $timeStamp + 100 : false;
 	}
 
 	/**

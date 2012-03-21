@@ -67,11 +67,10 @@ class CM_Wowza extends CM_Class_Abstract {
 		$streamType = $params->getInt('streamType');
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
-		$allowedUntil = null; //TODO set to some reasonable time in the future
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
 		try {
-			if (!$streamChannel->canPublish($user, $allowedUntil)) {
+			if (!$allowedUntil = $streamChannel->canPublish($user, time())) {
 				throw new CM_Exception_NotAllowed();
 			}
 			$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
@@ -115,13 +114,12 @@ class CM_Wowza extends CM_Class_Abstract {
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
-		$allowedUntil = null; //todo: set time
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			throw new CM_Exception_NotAllowed();
 		}
-		if (!$streamChannel->canSubscribe($user, $allowedUntil)) {
+		if (!$allowedUntil = $streamChannel->canSubscribe($user, time())) {
 			throw new CM_Exception_NotAllowed();
 		}
 		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
