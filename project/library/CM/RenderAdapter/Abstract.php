@@ -65,7 +65,7 @@ abstract class CM_RenderAdapter_Abstract {
 			} else {
 				$tpl = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . '.tpl';
 			}
-			if ($tplPath = $this->getRender()->getLayoutPath($tpl, false, $matches[1], false)) {
+			if ($tplPath = $this->getRender()->getLayoutPath($tpl, $matches[1], false, false)) {
 				return $tplPath;
 			}
 		}

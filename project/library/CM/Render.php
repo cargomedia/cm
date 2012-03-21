@@ -213,13 +213,13 @@ class CM_Render {
 
 	/**
 	 * @param string	  $tpl  Template file name
-	 * @param bool|null   $full
 	 * @param string|null $namespace
+	 * @param bool|null   $full
 	 * @param bool|null   $needed
 	 * @return string Layout path based on theme
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getLayoutPath($tpl, $full = null, $namespace = null, $needed = true) {
+	public function getLayoutPath($tpl, $namespace = null, $full = null, $needed = true) {
 		if (is_null($full)) {
 			$full = false;
 		}
@@ -249,7 +249,7 @@ class CM_Render {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getLayoutFile($path, $namespace = null) {
-		return new CM_File($this->getLayoutPath($path, true, $namespace));
+		return new CM_File($this->getLayoutPath($path, $namespace, true));
 	}
 
 	/**

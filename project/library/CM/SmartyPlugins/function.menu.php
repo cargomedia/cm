@@ -14,7 +14,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 
 	$cacheKey = CM_CacheConst::Menu . '_name:' . $name . '_siteId:' . $render->getSite()->getId() . '_userId:' . $userId;
 	if (($menu = CM_Cache_Runtime::get($cacheKey)) === false) {
-		$menuArr = include $render->getLayoutPath('menu.php', true);
+		$menuArr = include $render->getLayoutPath('menu.php', null, true);
 		if (isset($menuArr[$name])) {
 			$menu = new CM_Menu($menuArr[$name], $request);
 		} else {
