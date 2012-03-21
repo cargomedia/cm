@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width">
+		<meta name="viewport" content="width=device-width, user-scalable=no" />
 		<meta name="description" content="{$pageObj->getDescription()|escape}">
 		<meta name="keywords" content="{$pageObj->getKeywords()|escape}">
 		<title>{block name='title'}{$pageObj->getTitle()|escape}{/block}</title>
