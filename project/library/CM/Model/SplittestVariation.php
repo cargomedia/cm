@@ -72,6 +72,9 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		$rateA = $conversionsA / $fixturesA;
 		$rateB = $conversionsB / $fixturesB;
 		$error = sqrt(($rateA * (1 - $rateA) / $fixturesA) + ($rateB * (1 - $rateB) / $fixturesB));
+		if (0 == $error) {
+			return null;
+		}
 		$x = ($rateB - $rateA) / $error;
 
 		// Abramowitz & Stegun - Handbook of Mathematical Functions: 26.2.19
