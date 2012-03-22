@@ -129,11 +129,11 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 	const TYPE = 100;
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
-		return $user->getId() != 1 ? $allowedUntil + 100 : false;
+		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
 	}
 
-	public function canSubscribe(CM_Model_User $user, $timeStamp) {
-		return $user->getId() != 1 ? $timeStamp + 100 : false;
+	public function canSubscribe(CM_Model_User $user, $allowedUntil) {
+		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
 	}
 
 	/**

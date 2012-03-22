@@ -70,7 +70,8 @@ class CM_Wowza extends CM_Class_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
 		try {
-			if (!$allowedUntil = $streamChannel->canPublish($user, time())) {
+			$allowedUntil = $streamChannel->canPublish($user, time());
+			if ($allowedUntil <= time()) {
 				throw new CM_Exception_NotAllowed();
 			}
 			$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
@@ -119,7 +120,8 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamChannel) {
 			throw new CM_Exception_NotAllowed();
 		}
-		if (!$allowedUntil = $streamChannel->canSubscribe($user, time())) {
+		$allowedUntil = $streamChannel->canSubscribe($user, time());
+		if ($allowedUntil <= time()) {
 			throw new CM_Exception_NotAllowed();
 		}
 		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
