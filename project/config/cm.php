@@ -80,6 +80,9 @@ $config->CM_Model_Abstract->types[CM_Model_Splittest::TYPE] = 'CM_Model_Splittes
 $config->CM_Model_Abstract->types[CM_Model_SplittestVariation::TYPE] = 'CM_Model_SplittestVariation';
 $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message';
 $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video';
+$config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model_DeviceCapabilities';
+$config->CM_Model_Abstract->types[CM_Model_Stream_Publish::TYPE] = 'CM_Model_Stream_Publish';
+$config->CM_Model_Abstract->types[CM_Model_Stream_Subscribe::TYPE] = 'CM_Model_Stream_Subscribe';
 
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract->types = array();
@@ -119,8 +122,8 @@ $config->CM_Response_RPC->catch = array(
 	'CM_Exception_NotAllowed',
 );
 
-$config->CM_DeviceCapabilities = new stdClass();
-$config->CM_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
+$config->CM_Model_DeviceCapabilities = new stdClass();
+$config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
 $config->CM_Model_StreamChannel_Abstract = new stdClass();
 $config->CM_Model_StreamChannel_Abstract->types = array();
