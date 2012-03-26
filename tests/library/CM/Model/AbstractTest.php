@@ -102,15 +102,6 @@ class CM_Model_AbstractTest extends TestCase{
 		}
 	}
 
-	public function testOnload() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
-		$modelMock = new CM_ModelMock($modelMock->getId());
-		$this->assertEquals(0, $modelMock->onLoadCounter);
-		$modelMock->_change();
-		$modelMock->_get();
-		$this->assertEquals(1, $modelMock->onLoadCounter);
-	}
-
 	public function testOnChange() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -182,7 +173,6 @@ class CM_Model_AbstractTest extends TestCase{
 
 class CM_ModelMock extends CM_Model_Abstract {
 
-	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
 
 	public function getFoo() {
@@ -207,10 +197,6 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		CM_Mysql::delete('modelMock', array('id' => $this->getId()));
-	}
-
-	protected function _onLoad() {
-		$this->onLoadCounter++;
 	}
 
 	protected function _loadAssets() {
@@ -270,9 +256,6 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		CM_Mysql::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
-	}
-
-	protected function _onLoad() {
 	}
 
 	protected static function _create(array $data) {
