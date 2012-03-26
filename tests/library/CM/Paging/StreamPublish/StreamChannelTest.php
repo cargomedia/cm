@@ -31,12 +31,12 @@ class CM_Paging_StreamPublish_StreamChannelTest extends TestCase {
 		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123124_2'));
 		$this->assertEquals(2, $streamChannel->getStreamPublishs()->getCount());
-		$streamChannel->getStreamPublishs()->delete($streamChannel->getStreamPublishs()->getItem(0));
+		$streamChannel->getStreamPublishs()->remove($streamChannel->getStreamPublishs()->getItem(0));
 		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 
 		$streamPublish = TH::createStreamPublish();
 		try {
-			$streamChannel->getStreamPublishs()->delete($streamPublish);
+			$streamChannel->getStreamPublishs()->remove($streamPublish);
 			$this->fail('StreamChannel deleted StreamPublish not belonging to it.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);

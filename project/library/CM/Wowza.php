@@ -141,7 +141,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamSubscribe) {
-			$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
+			$streamChannel->getStreamSubscribes()->remove($streamSubscribe);
 		}
 	}
 

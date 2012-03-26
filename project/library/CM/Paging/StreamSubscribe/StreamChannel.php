@@ -30,7 +30,7 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 	 * @param CM_Model_Stream_Subscribe $streamSubscribe
 	 * @throws CM_Exception_Invalid
 	 */
-	public function delete(CM_Model_Stream_Subscribe $streamSubscribe) {
+	public function remove(CM_Model_Stream_Subscribe $streamSubscribe) {
 		if (!$this->contains($streamSubscribe)) {
 			throw new CM_Exception_Invalid("Cannot remove a stream from a channel it doesn't subscribe to.");
 		}

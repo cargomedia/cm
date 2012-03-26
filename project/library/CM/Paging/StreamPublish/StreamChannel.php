@@ -27,7 +27,7 @@ class CM_Paging_StreamPublish_StreamChannel extends CM_Paging_StreamPublish_Abst
 	 * @param CM_Model_Stream_Publish $streamPublish
 	 * @throws CM_Exception_Invalid
 	 */
-	public function delete(CM_Model_Stream_Publish $streamPublish) {
+	public function remove(CM_Model_Stream_Publish $streamPublish) {
 		if (!$this->contains($streamPublish)) {
 			throw new CM_Exception_Invalid("Cannot remove a stream from a channel it doesn't publish to.");
 		}

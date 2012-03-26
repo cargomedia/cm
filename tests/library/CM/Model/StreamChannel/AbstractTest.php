@@ -82,7 +82,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
 		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
-		$streamChannel->getStreamSubscribes()->delete($streamSubscribe);
+		$streamChannel->getStreamSubscribes()->remove($streamSubscribe);
 		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 	}
 
@@ -99,7 +99,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
 		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
-		$streamChannel->getStreamPublishs()->delete($streamPublish);
+		$streamChannel->getStreamPublishs()->remove($streamPublish);
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 	}
 

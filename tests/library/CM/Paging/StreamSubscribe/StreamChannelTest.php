@@ -31,12 +31,12 @@ class CM_Paging_StreamSubscribe_StreamChannelTest extends TestCase {
 		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123124_2'));
 		$this->assertEquals(2, $streamChannel->getStreamSubscribes()->getCount());
-		$streamChannel->getStreamSubscribes()->delete($streamChannel->getStreamSubscribes()->getItem(0));
+		$streamChannel->getStreamSubscribes()->remove($streamChannel->getStreamSubscribes()->getItem(0));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
 
 		$videoStreamSubscribe = TH::createStreamSubscribe();
 		try {
-			$streamChannel->getStreamSubscribes()->delete($videoStreamSubscribe);
+			$streamChannel->getStreamSubscribes()->remove($videoStreamSubscribe);
 			$this->fail('StreamChannel deleted StreamSubscribe not belonging to it.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);
