@@ -3,7 +3,7 @@
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
 	/**
-	 * @var CM_Model_User
+	 * @var CM_Model_User|int
 	 */
 	protected $_actor = null;
 
@@ -29,7 +29,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	public final function __construct($type, $actor) {
 		if ($actor instanceof CM_Model_User) {
 			$this->_actor = $actor;
-		} elseif (ctype_digit($actor)) {
+		} elseif (is_int($actor) || ctype_digit($actor)) {
 			$this->_ip = $actor;
 		} else {
 			throw new CM_Exception_Invalid('Actor must be of type `CM_Model_User` or `int`');
