@@ -14,6 +14,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			$page->prepare($this);
 			$html = $this->getRender()->render($page);
 		} catch (CM_Exception $e) {
+			throw $e;
 			if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
 				throw $e;
 			}

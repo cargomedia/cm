@@ -222,6 +222,19 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
+	 * @return CM_Model_Abstract
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getModel($key) {
+		$param = $this->_get($key);
+		if (!($param instanceof CM_Model_Abstract)) {
+			throw new CM_Exception_Invalid('Not a CM_Model_Abstract');
+		}
+		return $param;
+	}
+
+	/**
+	 * @param string $key
 	 * @return CM_Paging_Abstract
 	 * @throws CM_Exception_Invalid
 	 */
