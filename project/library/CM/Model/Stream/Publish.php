@@ -2,6 +2,8 @@
 
 class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 
+	const TYPE = 21;
+
 	public function setAllowedUntil($timeStamp) {
 		CM_Mysql::update(TBL_CM_STREAM_PUBLISH, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
 		$this->_change();

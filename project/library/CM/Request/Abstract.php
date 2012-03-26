@@ -27,7 +27,7 @@ abstract class CM_Request_Abstract {
 	protected $_viewer = false;
 
 	/**
-	 * @var CM_DeviceCapabilities
+	 * @var CM_Model_DeviceCapabilities
 	 */
 	private $_capabilities;
 
@@ -80,7 +80,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return CM_DeviceCapabilities
+	 * @return CM_Model_DeviceCapabilities
 	 */
 	public function getDeviceCapabilities() {
 		if (!isset($this->_capabilities)) {
@@ -88,7 +88,7 @@ abstract class CM_Request_Abstract {
 			if ($this->hasHeader('user-agent')) {
 				$userAgent = $this->getHeader('user-agent');
 			}
-			$this->_capabilities = new CM_DeviceCapabilities($userAgent);
+			$this->_capabilities = new CM_Model_DeviceCapabilities($userAgent);
 		}
 		return $this->_capabilities;
 	}

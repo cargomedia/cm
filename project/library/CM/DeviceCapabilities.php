@@ -1,6 +1,8 @@
 <?php
 
-class CM_DeviceCapabilities extends CM_Model_Abstract {
+class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
+
+	const TYPE = 20;
 
 	/**
 	 * @param string $userAgent
