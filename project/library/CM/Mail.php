@@ -322,6 +322,7 @@ class CM_Mail extends CM_View_Abstract {
 			require_once DIR_PHPMAILER . 'class.phpmailer.php';
 			try {
 				$mail = new PHPMailer(true);
+				$mail->CharSet = 'utf-8';
 
 				foreach ($this->_replyTo as $replyTo) {
 					$mail->AddReplyTo($replyTo['address'], $replyTo['name']);
