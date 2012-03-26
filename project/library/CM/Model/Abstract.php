@@ -15,7 +15,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_data;
 
 	/**
-	 * @var array $_assets
+	 * @var CM_ModelAsset_Abstract[]
 	 */
 	private $_assets = array();
 
@@ -51,9 +51,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
+		$containingPagings = $this->_getContainingPagings();
 		$this->_onDelete();
-		$cache = $this->_cacheClass;
-		$cache::delete($this->_getCacheKey());
+		$cacheClass = $this->_cacheClass;
+		$cacheClass::delete($this->_getCacheKey());
+		foreach ($containingPagings as $paging) {
+			$paging->_change();
+		}
 		$this->_data = null;
 	}
 
@@ -91,8 +95,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract
 	 */
 	public function _change() {
-		$cache = $this->_cacheClass;
-		$cache::delete($this->_getCacheKey());
+		$cacheClass = $this->_cacheClass;
+		$cacheClass::delete($this->_getCacheKey());
 		$this->_data = null;
 		$this->_onChange();
 		return $this;
@@ -106,8 +110,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	final public function _get($field = null) {
 		if (!$this->_data) {
 			$cacheKey = $this->_getCacheKey();
-			$cache = $this->_cacheClass;
-			if (($this->_data = $cache::get($cacheKey)) === false) {
+			$cacheClass = $this->_cacheClass;
+			if (($this->_data = $cacheClass::get($cacheKey)) === false) {
 				$this->_data = $this->_loadData();
 				if (!is_array($this->_data)) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
@@ -118,8 +122,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					$asset->_loadAsset();
 				}
 				$this->_autoCommitCache = true;
-				$cache::set($cacheKey, $this->_data);
-				$this->_onLoad();
+				$cacheClass::set($cacheKey, $this->_data);
 			}
 		}
 		if ($field === null) {
@@ -148,8 +151,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
 		if ($this->_autoCommitCache) {
-			$cache = $this->_cacheClass;
-			$cache::set($this->_getCacheKey(), $this->_data);
+			$cacheClass = $this->_cacheClass;
+			$cacheClass::set($this->_getCacheKey(), $this->_data);
 		}
 	}
 
@@ -157,9 +160,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	protected function _onDelete() {
-	}
-
-	protected function _onLoad() {
 	}
 
 	/**
@@ -215,6 +215,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @return CM_Paging_Abstract[]
+	 */
+	protected function _getContainingPagings() {
+		return array();
+	}
+
+	/**
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 */
@@ -224,11 +231,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$model = static::_create($data);
 		$model->_onChange();
+		foreach ($model->_getContainingPagings() as $paging) {
+			$paging->_change();
+		}
 		return $model;
 	}
 
 	/**
-	 * @param int $type
+	 * @param int		$type
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_Invalid

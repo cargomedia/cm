@@ -113,15 +113,6 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 			'actionType' => $this->getActionType(), 'type' => $this->getType()))->fetchAllTree());
 	}
 
-	protected function _onChange() {
-	}
-
-	protected function _onDelete() {
-	}
-
-	protected function _onLoad() {
-	}
-
 	/**
 	 * @param int $type
 	 * @param int $modelType
