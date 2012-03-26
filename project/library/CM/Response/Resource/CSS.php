@@ -15,16 +15,18 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			$presets = new CM_Css($this->getRender()->getLayoutFile('presets.style')->read(), $this->getRender());
 			$content = new CM_Css($this->getRender()->getLayoutFile('layout.style')->read(), $this->getRender(), $presets);
 
-			foreach ($this->getRender()->getSite()->getThemes() as $theme) {
-				foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme) . 'css/') as $path) {
-					$file = new CM_File($path);
-					$content .= new CM_Css($file->read(), $this->getRender(), $presets);
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
+				foreach ($this->getSite()->getThemes() as $theme) {
+					foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
+						$file = new CM_File($path);
+						$content .= new CM_Css($file->read(), $this->getRender(), $presets);
+					}
 				}
 			}
 
 			foreach (array('Component', 'Page') as $viewType) {
 				$viewClasses = array();
-				foreach (self::getSite()->getNamespaces() as $namespace) {
+				foreach ($this->getSite()->getNamespaces() as $namespace) {
 					$viewClasses = array_merge($viewClasses, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/' . $viewType . '/'));
 				}
 				foreach ($this->_getClasses($viewClasses) as $viewClass) {
