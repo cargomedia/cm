@@ -16,7 +16,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			$content = new CM_Css($this->getRender()->getLayoutFile('layout.style')->read(), $this->getRender(), $presets);
 
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				foreach ($this->getSite()->getThemes() as $theme) {
+				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
 					foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
 						$file = new CM_File($path);
 						$content .= new CM_Css($file->read(), $this->getRender(), $presets);
