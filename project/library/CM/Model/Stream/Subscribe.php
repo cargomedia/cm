@@ -9,6 +9,10 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		$this->_change();
 	}
 
+	protected function _getContainingPagings() {
+		return array($this->getStreamChannel()->getStreamSubscribes());
+	}
+
 	protected function _loadData() {
 		return CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, '*', array('id' => $this->getId()))->fetchAssoc();
 	}

@@ -3,16 +3,27 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Model_StreamChannel_AbstractTest extends TestCase {
 
+	static $_configBackup;
+
 	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[1] = 'CM_Model_StreamChannel_Mock';
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
+		CM_Config::set(self::$_configBackup);
+	}
+
+	public function setup() {
+		if (!class_exists('CM_Model_StreamChannel_Mock')) {
+			$this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(), 'CM_Model_StreamChannel_Mock', false);
+		}
 	}
 
 	public function testConstructor() {
 		try {
-			$this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(1));
+			new CM_Model_StreamChannel_Mock(123123);
 			$this->fail('Can instantiate streamChannel without data.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
@@ -20,8 +31,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testGetKey() {
-		CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'foo', 'type' => 1));
-		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(1));
+		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'foo', 'type' => 1));
+		$streamChannel = new CM_Model_StreamChannel_Mock($id);
 		$this->assertEquals('foo', $streamChannel->getKey());
 	}
 
@@ -45,20 +56,20 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	public function testDelete() {
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar', 'type' => 1));
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($id));
-		$streamChannel->getStreamPublishs()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_1',));
-		$streamChannel->getStreamPublishs()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2',));
-		$streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '133123_3'));
-		$streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '133123_4'));
 		$this->assertEquals(2, $streamChannel->getStreamPublishs()->getCount());
 		$this->assertEquals(2, $streamChannel->getStreamSubscribes()->getCount());
 		$streamChannel->delete();
 		try {
-			$this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($streamChannel->getId()));
+			new CM_Model_StreamChannel_Mock($id);
 			$this->fail('streamChannel not deleted.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
@@ -72,52 +83,52 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	public function testGetSubscribers() {
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar', 'type' => 1));
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($id));
+		$streamChannel = new CM_Model_StreamChannel_Mock($id);
 		$this->assertEquals(0, $streamChannel->getSubscribers()->getCount());
-		$streamSubscribe = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
 		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 		$user = TH::createUser();
-		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_2'));
+		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_2'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
-		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
+		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
-		$streamChannel->getStreamSubscribes()->remove($streamSubscribe);
+		$streamSubscribe->delete();
 		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 	}
 
 	public function testGetPublishers() {
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar1', 'type' => 1));
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($id));
+		$streamChannel = new CM_Model_StreamChannel_Mock($id);
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
-		$streamPublish = $streamChannel->getStreamPublishs()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 		$user = TH::createUser();
-		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_2'));
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_2'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
-		$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '111_3'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
-		$streamChannel->getStreamPublishs()->remove($streamPublish);
+		$streamPublish->delete();
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 	}
 
 	public function testGetUsers() {
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar2', 'type' => 1));
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array($id));
+		$streamChannel = new CM_Model_StreamChannel_Mock($id);
 		$this->assertEquals(0, $streamChannel->getUsers()->getCount());
 		$user = TH::createUser();
-		$streamSubscribe = $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '112_1'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		$streamSubscribe = $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '112_2'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '112_3'));
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '112_3'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		$streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '112_4'));
+		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '112_4'));
 		$this->assertEquals(2, $streamChannel->getUsers()->getCount());
 	}
 

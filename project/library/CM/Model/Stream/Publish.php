@@ -9,6 +9,10 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		$this->_change();
 	}
 
+	protected function _getContainingPagings() {
+		return array($this->getStreamChannel()->getStreamPublishs());
+	}
+
 	protected function _loadData() {
 		return CM_Mysql::select(TBL_CM_STREAM_PUBLISH, '*', array('id' => $this->getId()))->fetchAssoc();
 	}

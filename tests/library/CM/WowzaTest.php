@@ -80,16 +80,16 @@ class CM_WowzaTest extends TestCase {
 		// allowedUntil will be updated, if stream has expired and it's user isn't $userUnchanged
 		$userUnchanged = TH::createUser();
 		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo1'));
-		$streamSubscribeUnchanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
+		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
 			'allowedUntil' => 0));
-		$streamSubscribeUnchanged2 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_4',
+		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_4',
 			'start' => time(), 'allowedUntil' => time() + 100));
-		$streamSubscribeChanged1 = $streamChannel->getStreamSubscribes()->add(array('user' => TH::createUser(), 'key' => 'foo1_3', 'start' => time(),
+		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_3', 'start' => time(),
 			'allowedUntil' => 0));
-		$streamPublishUnchanged1 = $streamChannel->getStreamPublishs()->add(array('user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
-			'allowedUntil' => 0));
-		$streamPublishChanged1 = CM_Model_StreamChannel_Mock::create(array('key' => 'foo2'))->getStreamPublishs()->add(array('user' => TH::createUser(),
-			'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
+		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
+			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
+		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Mock::create(array('key' => 'foo2')),
+			'user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
 		$wowza->checkStreams();
 		$this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil(), $streamSubscribeUnchanged1->_change()->getAllowedUntil());
 		$this->assertEquals($streamSubscribeUnchanged2->getAllowedUntil(), $streamSubscribeUnchanged2->_change()->getAllowedUntil());

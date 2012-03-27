@@ -206,7 +206,7 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		return $streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
 			'price' => rand(10, 50) / 10, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
@@ -222,7 +222,7 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		return $streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
 			'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 

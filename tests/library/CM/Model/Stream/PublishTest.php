@@ -32,14 +32,18 @@ class CM_Model_Stream_PublishTest extends TestCase {
 	public function testCreate() {
 		$user = TH::createUser();
 		$streamChannel = TH::createStreamChannel();
+		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
 		$videoStream = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2', 'streamChannel' => $streamChannel));
 		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2', 'channelId' => $streamChannel->getId()));
+		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 	}
 
 	public function testDelete() {
-		$videoStreamPublish = TH::createStreamPublish();
+		$streamChannel = TH::createStreamChannel();
+		$videoStreamPublish = TH::createStreamPublish(null, $streamChannel);
+		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 		$videoStreamPublish->delete();
 		try {
 			new CM_Model_Stream_Publish($videoStreamPublish->getId());
@@ -47,6 +51,7 @@ class CM_Model_Stream_PublishTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
 	}
 
 	public function testFindKey() {

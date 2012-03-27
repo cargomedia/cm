@@ -34,15 +34,21 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	public function testCreate() {
 		$user = TH::createUser();
 		$streamChannel = TH::createStreamChannel();
+		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_2'));
 		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id' => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
 			'allowedUntil' => 324234, 'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
+		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
+
+
 	}
 
 	public function testDelete() {
+		$streamChannel = TH::createStreamChannel();
 		$videoStreamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
-			'streamChannel' => TH::createStreamChannel(), 'key' => '13215231_2'));
+			'streamChannel' => $streamChannel, 'key' => '13215231_2'));
+		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStreamSubscribe->delete();
 		try {
 			new CM_Model_Stream_Subscribe($videoStreamSubscribe->getId());
@@ -50,6 +56,7 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 	}
 
 	public function testFindKey() {

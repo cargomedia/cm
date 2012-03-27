@@ -74,7 +74,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			if ($allowedUntil <= time()) {
 				throw new CM_Exception_NotAllowed();
 			}
-			$streamChannel->getStreamPublishs()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+			CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 		} catch (CM_Exception $ex) {
 			$streamChannel->delete();
 			throw $ex;
@@ -124,7 +124,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if ($allowedUntil <= time()) {
 			throw new CM_Exception_NotAllowed();
 		}
-		$streamChannel->getStreamSubscribes()->add(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil, 'key' => $clientKey));
 	}
 
 	/**
@@ -141,7 +141,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamSubscribe) {
-			$streamChannel->getStreamSubscribes()->remove($streamSubscribe);
+			$streamSubscribe->delete();
 		}
 	}
 
