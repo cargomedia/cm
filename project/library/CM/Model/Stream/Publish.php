@@ -18,7 +18,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _onDelete() {
-        $this->getStreamChannel()->onUnpublish($this);
+		$this->getStreamChannel()->onUnpublish($this);
 		CM_Mysql::delete(TBL_CM_STREAM_PUBLISH, array('id' => $this->getId()));
 	}
 

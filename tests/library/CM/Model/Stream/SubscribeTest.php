@@ -40,8 +40,6 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id' => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
 			'allowedUntil' => 324234, 'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
-
-
 	}
 
 	public function testDelete() {
