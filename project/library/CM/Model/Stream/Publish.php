@@ -42,6 +42,8 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		$key = (string) $data['key'];
 		$id = CM_Mysql::insert(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $key, 'channelId' => $streamChannel->getId()));
-		return new self($id);
+		$streamPublish = new self($id);
+		$streamChannel->onPublish($streamPublish);
+		return $streamPublish;
 	}
 }

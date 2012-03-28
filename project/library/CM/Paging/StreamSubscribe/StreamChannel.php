@@ -2,13 +2,10 @@
 
 class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_Abstract {
 
-	private $_streamChannel;
-
 	/**
 	 * @param CM_Model_StreamChannel_Abstract $streamChannel
 	 */
 	public function __construct(CM_Model_StreamChannel_Abstract $streamChannel) {
-		$this->_streamChannel = $streamChannel;
 		$source = new CM_PagingSource_Sql('`id`', TBL_CM_STREAM_SUBSCRIBE, '`channelId` = ' . $streamChannel->getId());
 		$source->enableCache();
 		return parent::__construct($source);
