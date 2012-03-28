@@ -18,6 +18,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _onDelete() {
+        $this->getStreamChannel()->onUnsubscribe($this);
 		CM_Mysql::delete(TBL_CM_STREAM_SUBSCRIBE, array('id' => $this->getId()));
 	}
 
@@ -42,6 +43,8 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		$key = (string) $data['key'];
 		$id = CM_Mysql::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'channelId' => $streamChannel->getId(), 'key' => $key));
-		return new self($id);
+		$streamSubscribe = new self($id);
+        $streamChannel->onSubscribe($streamSubscribe);
+        return $streamSubscribe;
 	}
 }
