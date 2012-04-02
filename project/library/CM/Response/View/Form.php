@@ -26,7 +26,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 	 * Adds an error to response.
 	 *
 	 * @param string $err_msg
-	 * @param st$photoTmpring $field_name
+	 * @param string $field_name
 	 */
 	public function addError($err_msg, $field_name = null) {
 		if (isset($field_name)) {
