@@ -1,10 +1,5 @@
 _ready: function() {
-	this.$(".timeago").timeago();
-	this.$().placeholder();
-	this.$('button[title]').qtip({
-		position: {my: 'bottom center', at: 'top center'},
-		style: {classes: 'ui-tooltip-tipped'}
-	});
+	this.initDom(this.$());
 
 	this.ready();
 	_.each(this.getChildren(), function(child) {
