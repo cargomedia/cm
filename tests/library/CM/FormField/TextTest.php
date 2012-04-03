@@ -15,8 +15,10 @@ class CM_FormField_TextTest extends TestCase {
 		$field = new CM_FormField_Text('foo');
 		$doc = TH::renderFormField($form, $field, array());
 		$this->assertSame(1, $doc->getCount('input'));
-		$this->assertSame('<span id="' . $form->getAutoId() . '-foo"><input name="foo" id="' . $form->getAutoId() .
-				'-foo-input" type="text" class="textinput " /><span class="messages"></span></span>', $doc->getHtml());
+		$this->assertSame('<div class="input" id="' . $form->getAutoId() . '-foo"><div class="input-inner"><input name="foo" id="' .
+				$form->getTagAutoId($field->getName() . '-input') .
+				'" type="text" class="textinput " /><span class="messages"></span></div></div>', $doc->getHtml());
+
 	}
 
 	public function testRenderValue() {
@@ -25,7 +27,8 @@ class CM_FormField_TextTest extends TestCase {
 		$field->setValue('bar');
 		$doc = TH::renderFormField($form, $field, array());
 		$this->assertSame('bar', $doc->getAttr('input', 'value'));
-		$this->assertSame('<span id="' . $form->getAutoId() . '-foo"><input name="foo" id="' . $form->getAutoId() .
-				'-foo-input" type="text" value="bar" class="textinput " /><span class="messages"></span></span>', $doc->getHtml());
+		$this->assertSame('<div class="input" id="' . $form->getAutoId() . '-foo"><div class="input-inner"><input name="foo" id="' .
+				$form->getTagAutoId($field->getName() . '-input') .
+				'" type="text" value="bar" class="textinput " /><span class="messages"></span></div></div>', $doc->getHtml());
 	}
 }
