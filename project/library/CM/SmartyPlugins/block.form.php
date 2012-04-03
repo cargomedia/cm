@@ -11,14 +11,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
 		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
 
-		/** @var CM_FormField_Abstract $field */
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CM_FormField_Hidden) {
-				$field->prepare(array());
-				$html .= $render->render($field, array('form' => $form));
-			}
-		}
-
 		/** @var CM_FormAction_Abstract $action */
 		foreach ($form->getActions() as $action) {
 			if ($confirm_msg = $action->getConfirmation()) {
@@ -32,6 +24,15 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
 	} else {
 		$form = $render->popStack('form');
+
+		/** @var CM_FormField_Abstract $field */
+		foreach ($form->getFields() as $field) {
+			if ($field instanceof CM_FormField_Hidden) {
+				$field->prepare(array());
+				$content .= $render->render($field, array('form' => $form));
+			}
+		}
+
 		$render->getJs()->registerForm($form, $render->getStackLast('components'));
 		$content .= '</form>';
 		return $content;
