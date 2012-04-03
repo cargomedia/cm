@@ -26,33 +26,29 @@ viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}
 <hr />
 
 {form name="CM_Form_Example" viewer=$viewer}
-	<table class="form">
-		<tr>
-			<td class="label">{label text="Text" for="text"}:</td>
-			<td class="value">{input name="text"}</td>
-		</tr>
-		<tr>
-			<td class="label">{label text="Integer" for="int"}:</td>
-			<td class="value">{input name="int"}</td>
-		</tr>
-		<tr>
-			<td class="label">{label text="Location" for="location"}:</td>
-			<td class="value">{input name="location"} {input name="locationSlider"}</td>
-		</tr>
-		<tr>
-			<td class="label">{label text="Image" for="image"}:</td>
-			<td class="value">{input name="image" label="Upload 0-2 Photos"}</td>
-		</tr>
-		<tr>
-			<td class="label">{label text="Color" for="color"}:</td>
-			<td class="value">{input name="color"}</td>
-		</tr>
-		<tr>
-			<td colspan="2" class="submit">
-				{button action="go" label="Go"}
-			</td>
-		</tr>
-	</table>
+	<div class="formField">
+		{label text="Text" for="text"}
+		{input name="text"}
+	</div>
+	<div class="formField">
+		{label text="Integer" for="int"}
+		{input name="int"}
+	</div>
+	<div class="formField">
+		{label text="Location" for="location"}
+		{input name="location"} {input name="locationSlider"}
+	</div>
+	<div class="formField">
+		{label text="Image" for="image"}
+		{input name="image" label="Upload 0-2 Photos"}
+	</div>
+	<div class="formField">
+		{label text="Color" for="color"}
+		{input name="color"}
+	</div>
+	<div class="formField submit">
+		{button action="go" label="Go"}
+	</div>
 {/form}
 
 <div class="stream">

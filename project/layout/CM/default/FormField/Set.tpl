@@ -1,4 +1,4 @@
-<ul id="{$id}" class="{$class}">
+<ul id="{$id}" class="{$class} clearfix">
 {foreach $labelsForValuesSet as $key=>$label}
 	<li class="list_label {$name}_value_{$key}"{if isset($colSize)} style="width: {$colSize}"{/if}>
 		<label>
