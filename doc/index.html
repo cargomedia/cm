@@ -170,7 +170,7 @@
 		class form_Example extends CM_Form {
 			public function setup() {
 				$this->registerField(new field_text('text'));
-				$this->registerField(new field_location('location', CM_Location::LEVEL_COUNTRY));
+				$this->registerField(new field_location('location', CM_Model_Location::LEVEL_COUNTRY));
 				$this->registerField(new field_image('image'));
 				$this->registerField(new field_color('color'));
 

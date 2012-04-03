@@ -23,9 +23,9 @@ class CM_SearchQuery_Location extends CM_SearchQuery_Abstract {
 	}
 	
 	/**
-	 * @param CM_Location $location
+	 * @param CM_Model_Location $location
 	 */
-	public function sortDistance(CM_Location $location) {
+	public function sortDistance(CM_Model_Location $location) {
 		$this->sortGeoDistance('coordinates', $location);
 	}
 }

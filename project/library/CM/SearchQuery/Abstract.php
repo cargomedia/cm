@@ -59,10 +59,10 @@ class CM_SearchQuery_Abstract {
 
 	/**
 	 * @param string $field
-	 * @param CM_Location $location
+	 * @param CM_Model_Location $location
 	 * @param int $distance
 	 */
-	public function filterGeoDistance($field, CM_Location $location, $distance) {
+	public function filterGeoDistance($field, CM_Model_Location $location, $distance) {
 		if (!$location->getCoordinates()) {
 			return;
 		}
@@ -72,9 +72,9 @@ class CM_SearchQuery_Abstract {
 
 	/**
 	 * @param string $field
-	 * @param CM_Location $location
+	 * @param CM_Model_Location $location
 	 */
-	public function sortGeoDistance($field, CM_Location $location) {
+	public function sortGeoDistance($field, CM_Model_Location $location) {
 		if (!$location->getCoordinates()) {
 			return;
 		}

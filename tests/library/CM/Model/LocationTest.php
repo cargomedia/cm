@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
+require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_LocationTest extends TestCase {
+class CM_Model_LocationTest extends TestCase {
 	private static $_fields;
 
 	public static function setUpBeforeClass() {
@@ -29,10 +29,10 @@ class CM_LocationTest extends TestCase {
 			JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
 			LIMIT 1')->fetchAssoc();
 
-		self::$_fields[CM_Location::LEVEL_COUNTRY] = array('id' => (int) $location['1.id'], 'name' => $location['1.name']);
-		self::$_fields[CM_Location::LEVEL_STATE] = array('id' => (int) $location['2.id'], 'name' => $location['2.name']);
-		self::$_fields[CM_Location::LEVEL_CITY] = array('id' => (int) $location['3.id'], 'name' => $location['3.name']);
-		self::$_fields[CM_Location::LEVEL_ZIP] = array('id' => (int) $location['4.id'], 'name' => $location['4.name']);
+		self::$_fields[CM_Model_Location::LEVEL_COUNTRY] = array('id' => (int) $location['1.id'], 'name' => $location['1.name']);
+		self::$_fields[CM_Model_Location::LEVEL_STATE] = array('id' => (int) $location['2.id'], 'name' => $location['2.name']);
+		self::$_fields[CM_Model_Location::LEVEL_CITY] = array('id' => (int) $location['3.id'], 'name' => $location['3.name']);
+		self::$_fields[CM_Model_Location::LEVEL_ZIP] = array('id' => (int) $location['4.id'], 'name' => $location['4.name']);
 	}
 
 	public static function tearDownAfterClass() {
@@ -41,11 +41,11 @@ class CM_LocationTest extends TestCase {
 
 	public function testConstructor() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
-			$this->assertInstanceOf('CM_Location', $location);
+			$location = new CM_Model_Location($level, $fields['id']);
+			$this->assertInstanceOf('CM_Model_Location', $location);
 
 			try {
-				$location = new CM_Location($level, -1);
+				$location = new CM_Model_Location($level, -1);
 				$this->fail('Can instantiate invalid cityId');
 			} catch (CM_Exception_Invalid $e) {
 				$this->assertTrue(true);
@@ -53,7 +53,7 @@ class CM_LocationTest extends TestCase {
 		}
 
 		try {
-			$location = new CM_Location(-1, 1);
+			$location = new CM_Model_Location(-1, 1);
 			$this->fail('Can instantiate invalid level');
 		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
@@ -62,15 +62,15 @@ class CM_LocationTest extends TestCase {
 
 	public function testGetLevel() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
+			$location = new CM_Model_Location($level, $fields['id']);
 			$this->assertSame($level, $location->getLevel());
 		}
 	}
 
 	public function testGetId() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
-			foreach (array(CM_Location::LEVEL_COUNTRY, CM_Location::LEVEL_STATE, CM_Location::LEVEL_CITY, CM_Location::LEVEL_ZIP) as $level2) {
+			$location = new CM_Model_Location($level, $fields['id']);
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
 				if ($level >= $level2) {
 					$this->assertSame(self::$_fields[$level2]['id'], $location->getId($level2));
 				} else {
@@ -82,8 +82,8 @@ class CM_LocationTest extends TestCase {
 
 	public function testGetName() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
-			foreach (array(CM_Location::LEVEL_COUNTRY, CM_Location::LEVEL_STATE, CM_Location::LEVEL_CITY, CM_Location::LEVEL_ZIP) as $level2) {
+			$location = new CM_Model_Location($level, $fields['id']);
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
 				if ($level >= $level2) {
 					$this->assertSame(self::$_fields[$level2]['name'], $location->getName($level2));
 				} else {
@@ -95,13 +95,13 @@ class CM_LocationTest extends TestCase {
 
 	public function testGet() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
-			foreach (array(CM_Location::LEVEL_COUNTRY, CM_Location::LEVEL_STATE, CM_Location::LEVEL_CITY, CM_Location::LEVEL_ZIP) as $level2) {
+			$location = new CM_Model_Location($level, $fields['id']);
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
 				$location2 = $location->get($level2);
 				if ($level2 > $level) {
 					$this->assertNull($location2);
 				} else {
-					$this->assertInstanceOf('CM_Location', $location2);
+					$this->assertInstanceOf('CM_Model_Location', $location2);
 					$this->assertSame($location->getId($level2), $location2->getId());
 					$this->assertSame($level2, $location2->getLevel());
 				}
@@ -111,9 +111,9 @@ class CM_LocationTest extends TestCase {
 
 	public function testGetCoordinates() {
 		foreach (self::$_fields as $level => $fields) {
-			$location = new CM_Location($level, $fields['id']);
+			$location = new CM_Model_Location($level, $fields['id']);
 			$coordinates = $location->getCoordinates();
-			if ($level >= CM_Location::LEVEL_CITY) {
+			if ($level >= CM_Model_Location::LEVEL_CITY) {
 				$this->assertInternalType('array', $coordinates);
 				$this->assertCount(2, $coordinates);
 				$this->assertInternalType('float', $coordinates['lat']);
@@ -134,14 +134,14 @@ class CM_LocationTest extends TestCase {
 		$countryId2 = CM_Mysql::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
 		CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
 
-		$this->assertEquals(new CM_Location(CM_Location::LEVEL_CITY, $cityId1), CM_Location::findByIp(3));
-		$this->assertNull(CM_Location::findByIp(6));
-		$this->assertEquals(new CM_Location(CM_Location::LEVEL_CITY, $cityId2), CM_Location::findByIp(223456700));
-		$this->assertNull(CM_Location::findByIp(223456800));
+		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId1), CM_Model_Location::findByIp(3));
+		$this->assertNull(CM_Model_Location::findByIp(6));
+		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId2), CM_Model_Location::findByIp(223456700));
+		$this->assertNull(CM_Model_Location::findByIp(223456800));
 
-		$this->assertEquals(new CM_Location(CM_Location::LEVEL_COUNTRY, $countryId1), CM_Location::findByIp(12));
-		$this->assertNull(CM_Location::findByIp(16));
-		$this->assertEquals(new CM_Location(CM_Location::LEVEL_COUNTRY, $countryId2), CM_Location::findByIp(2234567870));
-		$this->assertNull(CM_Location::findByIp(2234567900));
+		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId1), CM_Model_Location::findByIp(12));
+		$this->assertNull(CM_Model_Location::findByIp(16));
+		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId2), CM_Model_Location::findByIp(2234567870));
+		$this->assertNull(CM_Model_Location::findByIp(2234567900));
 	}
 }

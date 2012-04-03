@@ -264,11 +264,11 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return CM_Location
+	 * @return CM_Model_Location
 	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getLocation($key) {
-		return $this->_getObject($key, 'CM_Location');
+		return $this->_getObject($key, 'CM_Model_Location');
 	}
 
 	//-------static-------//

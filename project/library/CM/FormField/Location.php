@@ -7,27 +7,27 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 * @param int $minLevel OPTIONAL
 	 * @param CM_FormField_Distance $distance OPTIONAL
 	 */
-	public function __construct($name = 'location', $minLevel = CM_Location::LEVEL_COUNTRY, CM_FormField_Distance $distance = null) {
+	public function __construct($name = 'location', $minLevel = CM_Model_Location::LEVEL_COUNTRY, CM_FormField_Distance $distance = null) {
 		parent::__construct($name);
 		$this->_options['levelMin'] = (int) $minLevel;
 		if ($distance) {
 			$this->_options['distanceName'] = $distance->getName();
-			$this->_options['distanceLevelMin'] = CM_Location::LEVEL_CITY;
+			$this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
 		}
 	}
 
 	protected static function _getSuggestion($location) {
 		$names = array();
-		for ($level = $location->getLevel(); $level >= CM_Location::LEVEL_COUNTRY; $level--) {
+		for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
 			$names[] = $location->getName($level);
 		}
 		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)),
-				'img' => URL_STATIC . 'img/flags/' . strtolower($location->getAbbreviation(CM_Location::LEVEL_COUNTRY)) . '.png');
+				'img' => URL_STATIC . 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png');
 	}
 
 	protected static function _getSuggestions($term, array $options) {
 		$ip = CM_Request_Abstract::getInstance()->getIp();
-		$requestLocation = CM_Location::findByIp($ip);
+		$requestLocation = CM_Model_Location::findByIp($ip);
 		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $requestLocation);
 		$locations->setPage(1, 15);
 		$out = array();
@@ -43,6 +43,6 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		if ($level < $this->_options['levelMin']) {
 			throw new CM_Exception_FormFieldValidation('Invalid location level.');
 		}
-		return new CM_Location($level, $id);
+		return new CM_Model_Location($level, $id);
 	}
 }

@@ -5,9 +5,9 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
 	/**
 	 * @param string	  $term
 	 * @param int		 $minLevel
-	 * @param CM_Location $location OPTIONAL
+	 * @param CM_Model_Location $location OPTIONAL
 	 */
-	function __construct($term, $minLevel, CM_Location $location = null) {
+	function __construct($term, $minLevel, CM_Model_Location $location = null) {
 		if (CM_Search::getEnabled()) {
 			$query = new CM_SearchQuery_Location();
 			$query->filterLevel((int) $minLevel);
