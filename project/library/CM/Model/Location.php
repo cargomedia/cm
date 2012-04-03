@@ -11,6 +11,7 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 	 * @param int $id
 	 */
 	public function __construct($level, $id) {
+		$this->_setCacheLocal();
 		$this->_construct(array('id' => $id, 'level' => $level));
 	}
 
@@ -204,7 +205,7 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 
 	public static function dumpToTable() {
 		CM_Mysql::exec('TRUNCATE TABLE `' . TBL_CM_TMP_LOCATION . '`');
-		$result = CM_Mysql::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+		CM_Mysql::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
