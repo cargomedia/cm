@@ -15,7 +15,7 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 	}
 
 	/**
-	 * @param int $level
+	 * @param int	$level
 	 * @param string $key
 	 * @return mixed|null
 	 */
@@ -139,19 +139,19 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 				break;
 		}
 
-		$fields = CM_Mysql::execRead($query, $this->getId())->fetchAssoc();
-		if (!$fields) {
+		$row = CM_Mysql::execRead($query, $this->getId())->fetchAssoc();
+		if (!$row) {
 			throw new CM_Exception_Invalid('Cannot load location `' . $this->getId() . '` on level `' . $this->getLevel() . '`.');
 		}
-		$bla = array();
-		foreach ($fields as $key => $value) {
+		$fields = array();
+		foreach ($row as $key => $value) {
 			list($level, $field) = explode('.', $key);
-			if (!array_key_exists($level, $bla)) {
-				$bla[$level] = array();
+			if (!array_key_exists($level, $fields)) {
+				$fields[$level] = array();
 			}
-			$bla[$level][$field] = $value;
+			$fields[$level][$field] = $value;
 		}
-		return array('fields' => $bla);
+		return array('fields' => $fields);
 	}
 
 	/**
@@ -178,7 +178,7 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 	/**
 	 * @param string $db_table
 	 * @param string $db_column
-	 * @param int $ip
+	 * @param int	$ip
 	 * @return int|false
 	 */
 	private static function _getLocationIdByIp($db_table, $db_column, $ip) {
@@ -204,8 +204,7 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 
 	public static function dumpToTable() {
 		CM_Mysql::exec('TRUNCATE TABLE `' . TBL_CM_TMP_LOCATION . '`');
-		$result = CM_Mysql::exec(
-			'INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+		$result = CM_Mysql::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
@@ -226,7 +225,6 @@ class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible
 			FROM `' . TBL_CM_LOCATIONZIP . '` AS `4`
 			LEFT JOIN `' . TBL_CM_LOCATIONCITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)'
-		);
+			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)');
 	}
 }
