@@ -24,7 +24,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				}
 			}
 
-			foreach (array('Component', 'Page') as $viewType) {
+			foreach (array('Component', 'Page', 'FormField') as $viewType) {
 				$viewClasses = array();
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
 					$viewClasses = array_merge($viewClasses, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/' . $viewType . '/'));

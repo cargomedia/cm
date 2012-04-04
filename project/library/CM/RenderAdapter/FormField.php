@@ -14,7 +14,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 		$field->setTplParam('value', $field->getValue());
 		$field->setTplParam('options', $field->getOptions());
 
-		$html = '<div class="input" id="' . $form->getAutoId() . '-' . $field->getName() . '">';
+		$html = '<div class="input ' . implode(' ', $field->getClassHierarchy()) . ' " id="' . $form->getAutoId() . '-' . $field->getName() . '">';
 		$html .= '<div class="input-inner">';
 
 		$html .= trim($this->_renderTemplate('default.tpl', $field->getTplParams(), true));
