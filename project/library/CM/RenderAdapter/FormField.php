@@ -17,7 +17,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 		$html = '<div class="input" id="' . $form->getAutoId() . '-' . $field->getName() . '">';
 		$html .= '<div class="input-inner">';
 
-		$html .= trim($this->_renderTemplate(null, $field->getTplParams(), true));
+		$html .= trim($this->_renderTemplate('default.tpl', $field->getTplParams(), true));
 
 		if (!$field instanceof CM_FormField_Hidden) {
 			$html .= '<span class="messages"></span>';
