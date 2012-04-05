@@ -72,11 +72,11 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 			$presetNames = array();
 		}
 		$properties = array();
-		foreach ($presetNames as $selector) {
-			if (!isset($presets[$selector])) {
-				throw new CM_Exception("Undefined preset `$selector`");
+		foreach ($presetNames as $presetName) {
+			if (!isset($presets[$presetName])) {
+				throw new CM_Exception('Undefined preset `' . $presetName . '`');
 			}
-			$properties = array_merge($properties, $presets[$selector]);
+			$properties = array_merge($properties, $presets[$presetName]);
 		}
 
 		preg_match_all('~\b(' . self::REGEX_PROPERTY . ')\s*:\s*(' . self::REGEX_VALUE . ');?\s*~i', $cssBlock, $rules, PREG_SET_ORDER);
