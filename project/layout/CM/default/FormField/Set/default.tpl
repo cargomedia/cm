@@ -8,4 +8,3 @@
 	</li>
 {/foreach}
 </ul>
-<div class="clearfix"></div>

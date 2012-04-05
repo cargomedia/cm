@@ -14,15 +14,11 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 		$field->setTplParam('value', $field->getValue());
 		$field->setTplParam('options', $field->getOptions());
 
-		$html = '<div class="input ' . implode(' ', $field->getClassHierarchy()) . ' " id="' . $form->getAutoId() . '-' . $field->getName() . '">';
-		$html .= '<div class="input-inner">';
-
+		$html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $field->getName() . '">';
 		$html .= trim($this->_renderTemplate('default.tpl', $field->getTplParams(), true));
-
 		if (!$field instanceof CM_FormField_Hidden) {
 			$html .= '<span class="messages"></span>';
 		}
-		$html .= '</div>';
 		$html .= '</div>';
 
 		return $html;

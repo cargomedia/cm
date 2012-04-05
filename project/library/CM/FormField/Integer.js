@@ -8,12 +8,14 @@ ready: function() {
 		max: field.getOption("max"),
 		step: field.getOption("step"),
 		slide: function(event, ui) {
-			$input.val(ui.value);
-			$(this).children(".ui-slider-handle").text(ui.value);
+			var value = ui.value + 0;
+			$input.val(value);
+			$(this).children(".ui-slider-handle").text(value);
 		},
 		change: function(event, ui) {
-			$input.val(ui.value);
-			$(this).children(".ui-slider-handle").text(ui.value);
+			var value = ui.value + 0;
+			$input.val(value);
+			$(this).children(".ui-slider-handle").text(value);
 		}
 	});
 	$slider.children(".ui-slider-handle").text($input.val());

@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Tags extends CM_FormField_Textarea {
+class CM_FormField_Tags extends CM_FormField_Text {
 	/**
 	 * Constructor.
 	 *

@@ -26,29 +26,13 @@ viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}
 <hr />
 
 {form name="CM_Form_Example" viewer=$viewer}
-	<div class="formField">
-		{label text="Text" for="text"}
-		{input name="text"}
-	</div>
-	<div class="formField">
-		{label text="Integer" for="int"}
-		{input name="int"}
-	</div>
-	<div class="formField">
-		{label text="Location" for="location"}
-		{input name="location"} {input name="locationSlider"}
-	</div>
-	<div class="formField">
-		{label text="Image" for="image"}
-		{input name="image" label="Upload 0-2 Photos"}
-	</div>
-	<div class="formField">
-		{label text="Color" for="color"}
-		{input name="color"}
-	</div>
-	<div class="formField submit">
-		{button action="go" label="Go"}
-	</div>
+	{formField name='text' label='Text'}
+	{formField name='int' label='Integer'}
+	{formField name='location' label='Location'}
+	{formField name='locationSlider' label='Radius'}
+	{formField name='image' label='Upload 0-2 Photos'}
+	{formField name='color' label='Color'}
+	{formAction action='go' label='Go'}
 {/form}
 
 <div class="stream">

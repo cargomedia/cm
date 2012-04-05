@@ -9,7 +9,7 @@
 		</li>
 	</ul>
 	
-	<ul class="previews clearfix">
+	<ul class="previews">
 		{foreach $value as $tmpFile}
 			<li class="qq-upload-success">
 				{$field->getPreview($tmpFile)}
@@ -19,8 +19,8 @@
 	</ul>
 	<div class="file-uploader">
 		<div class="qq-uploader">
-			<div style="display:none;" class="qq-upload-drop-area"><span>{$labelDropArea}</span></div>
-			<div class="qq-upload-button">{$label}</div>
+			<div style="display:none;" class="qq-upload-drop-area"><span>{$textDropArea}</span></div>
+			<div class="qq-upload-button">{$text}</div>
 		</div>
 	</div>
 </div>

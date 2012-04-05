@@ -59,7 +59,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	public function prepare(array $params) {
-		$this->setTplParam('label', isset($params['label']) ? (string) $params['label'] : 'Upload File');
-		$this->setTplParam('labelDropArea', isset($params['labelDropArea']) ? (string) $params['labelDropArea'] : 'Drop files here to upload');
+		$this->setTplParam('text', isset($params['text']) ? (string) $params['text'] : 'Upload File');
+		$this->setTplParam('textDropArea', isset($params['textDropArea']) ? (string) $params['textDropArea'] : 'Drop files here to upload');
 	}
 }
