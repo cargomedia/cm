@@ -26,9 +26,9 @@ class CM_Runner {
 	public function run() {
 		if (file_exists($this->_pidPath)) {
 			$pidFile = new CM_File($this->_pidPath);
-			$pid = (int) trim($pidFile->read());
-			if (posix_getsid($pid) !== false) {
-				throw new CM_Exception('Process `' . $pid . '` still running.');
+			$pidOld = $pidFile->read();
+			if (ctype_digit($pidOld) && posix_getsid($pidOld) !== false) {
+				throw new CM_Exception('Process `' . $pidOld . '` still running.');
 			}
 		}
 		$pid = posix_getpid();
