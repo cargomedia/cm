@@ -1,5 +1,5 @@
 select {
 	display: block;
 	float: left;
-	width: 33%;
+	max-width: 33%;
 }
