@@ -148,13 +148,11 @@ class CM_File {
 	 * @throws CM_Exception
 	 */
 	public static function create($path, $content = null) {
-		if (false === touch($path)) {
-			throw new CM_Exception('Cannot touch `' . $path . '`.');
+		$content = (string) $content;
+		if (false === file_put_contents($path, $content)) {
+			throw new CM_Exception('Cannot write to `' . $path . '`.');
 		}
 		$file = new self($path);
-		if (null !== $content) {
-			$file->write($content);
-		}
 		return $file;
 	}
 }
