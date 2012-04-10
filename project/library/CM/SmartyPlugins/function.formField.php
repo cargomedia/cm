@@ -19,8 +19,8 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
 
 	$input = null;
 	$inputName = null;
-	if (isset($params['input'])) {
-		$input .= (string) $params['input'];
+	if (isset($params['prepend'])) {
+		$input .= (string) $params['prepend'];
 	}
 	if (isset($params['name'])) {
 		$inputName = (string) $params['name'];
@@ -28,6 +28,9 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
 		$field = $form->getField($inputName);
 		$field->prepare($params);
 		$input .= $render->render($field, array('form' => $form));
+	}
+	if (isset($params['append'])) {
+		$input .= (string) $params['append'];
 	}
 
 	$html = '<div class="formField clearfix ' . $inputName . ' ' . $class . '">';
