@@ -7,9 +7,6 @@ class CM_CssAdapter_CM extends CM_CssAdapter_Abstract {
 	const REGEX_SPLIT_SELECTORS = '/^(.+)\s*(?:(?-U)\<\<\s*([\$\w\.\s,-]+))?$/sU';
 	const REGEX_COLOR = '(?:(?:\#(\w{1})(\w{1})(\w{1}))|(?:\#(\w{2})(\w{2})(\w{2}))|(?:rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d\.]+))?\))|(?:(\w{2,40})))';
 
-	/**
-	 * @return array
-	 */
 	public function getRules() {
 		$presetRules = array();
 		if ($this->_presets) {
