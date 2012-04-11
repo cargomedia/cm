@@ -33,11 +33,12 @@ class CM_FormField_SetTest extends TestCase {
 		$field = new CM_FormField_Set('foo', $data, null, true);
 
 		$userInputGood = array(32, 64, 128);
-		$validationResult = $field->validate($userInputGood);
+		$response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+		$validationResult = $field->validate($userInputGood, $response);
 		$this->assertSame($userInputGood, $validationResult);
 
 		$userInputTainted = array(32, 23, 132);
-		$validationResult = $field->validate($userInputTainted);
+		$validationResult = $field->validate($userInputTainted, $response);
 		$this->assertSame(array(32), $validationResult);
 	}
 
