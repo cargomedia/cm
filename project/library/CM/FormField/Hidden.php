@@ -10,7 +10,7 @@ class CM_FormField_Hidden extends CM_FormField_Abstract {
 		parent::__construct($name);
 	}
 
-	public function validate($userInput) {
+	function validate($userInput, CM_Response_Abstract $response) {
 		return $userInput;
 	}
 

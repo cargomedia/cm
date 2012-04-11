@@ -10,7 +10,7 @@ class CM_FormField_Tags extends CM_FormField_Text {
 		parent::__construct($name);
 	}
 
-	public function validate($userInput) {
+	function validate($userInput, CM_Response_Abstract $response) {
 		$userInput = preg_split('/[,\s\n\r]+/', $userInput);
 		foreach ($userInput as &$tag) {
 			$tag = strip_tags($tag);

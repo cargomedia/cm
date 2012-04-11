@@ -1,26 +1,15 @@
 <?php
 
-class CM_Exception_FormFieldValidation extends Exception {
-	private $error_key;
+class CM_Exception_FormFieldValidation extends CM_Exception {
 
 	/**
-	 * Constructor.
-	 *
-	 * @param string $error_key
+	 * @param string|null $message
+	 * @param boolean $public
 	 */
-	public function __construct($error_key) {
-		$this->error_key = $error_key;
-
-		//parent::__construct('', 0);
+	public function __construct($message = null, $public = true) {
+		if (is_null($message)) {
+			$public = false;
 		}
-
-	/**
-	 * Get validation error key.
-	 *
-	 * @return string
-	 */
-	public function getErrorKey() {
-		return $this->error_key;
+		parent::__construct($message, $public);
 	}
-
 }

@@ -18,8 +18,8 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 	 * @param string $userInput
 	 * @return string|null
 	 */
-	public function validate($userInput) {
-		$values = parent::validate($userInput);
+	function validate($userInput, CM_Response_Abstract $response) {
+		$values = parent::validate($userInput, $response);
 		return $values ? reset($values) : null;
 	}
 }

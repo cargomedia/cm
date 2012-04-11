@@ -26,7 +26,7 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 		parent::__construct($name);
 	}
 
-	public function validate($userInput) {
+	function validate($userInput, CM_Response_Abstract $response) {
 		if ($this->_type == self::RADIO || $this->_type == self::SELECT) {
 			if (!in_array($userInput, $this->_getValues())) {
 				throw new CM_Exception_FormFieldValidation('Invalid value');

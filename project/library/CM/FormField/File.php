@@ -36,22 +36,17 @@ class CM_FormField_File extends CM_FormField_Abstract {
 		return $html;
 	}
 
-	/**
-	 * @param string[] $fileIds
-	 * @return CM_File_Temp[]
-	 * @see CM_FormField_Abstract::validate()
-	 */
-	public function validate($fileIds) {
-		$fileIds = array_filter($fileIds, function ($value) {
+	function validate($userInput, CM_Response_Abstract $response) {
+		$userInput = array_filter($userInput, function ($value) {
 			return !empty($value);
 		});
 
-		if ($this->_options['cardinality'] > 0 && sizeof($fileIds) > $this->_options['cardinality']) {
+		if ($this->_options['cardinality'] > 0 && sizeof($userInput) > $this->_options['cardinality']) {
 			throw new CM_Exception_Invalid('Too many files uploaded');
 		}
 
 		$files = array();
-		foreach ($fileIds as $file) {
+		foreach ($userInput as $file) {
 			$files[] = new CM_File_Temp($file);
 		}
 

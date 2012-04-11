@@ -129,15 +129,6 @@ collectData: function(action_name) {
 		field = this.getField(key);
 
 		if ( data[key] && (data[key].length !== 0) ) {
-			try {
-				field.validate(data[key], required);
-			} catch (e) {
-				var err_msg = cm.language.get('%forms._errors.illegal_value');
-				if (e.message) {
-					err_msg = e.message;
-				}
-				errors.push({msg: err_msg, key: key});
-			}
 		} else if (required) {
 			var err_msg = 'Required';
 			var $labels = $('label[for="' +this.getAutoId()+ '-' +key+ '-input"]');

@@ -75,11 +75,12 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string|array $userInput
+	 * @param string|array         $userInput
+	 * @param CM_Response_Abstract $response
 	 * @return mixed Internal value
 	 * @throws CM_Exception_FormFieldValidation
 	 */
-	abstract public function validate($userInput);
+	abstract function validate($userInput, CM_Response_Abstract $response);
 
 	/**
 	 * @param array			 $params
@@ -116,6 +117,12 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 		}
 		$field = new $className();
 		return $field;
+	}
+
+	public static function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+		$userInput = $params->getString('userInput');
+		$field = new static('field');
+		$field->validate($userInput, $response);
 	}
 
 }

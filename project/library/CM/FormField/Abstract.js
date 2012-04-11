@@ -3,9 +3,18 @@ ready: function() {
 
 /**
  * @param mixed value
- * @param boolean required
  */
-validate: function(value, required) {
+validate: function(value) {
+	field = this;
+	this.ajax('validate', {'userInput': value} , {
+		success: function () {
+			field.error();
+		},
+		error: function(errorMessage) {
+			field.error(errorMessage);
+			return false;
+		}
+	});
 },
 
 /**

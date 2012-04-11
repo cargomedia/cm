@@ -19,7 +19,7 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
 		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
 	}
 
-	public function validate($userInput) {
+	function validate($userInput, CM_Response_Abstract $response) {
 		if (!is_numeric($userInput)) {
 			throw new CM_Exception_FormFieldValidation('Invalid number');
 		}
