@@ -40,6 +40,15 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param $key
+	 * @param mixed|null $default
+	 * @return mixed
+	 */
+	public function get($key, $default = null) {
+		return $this->_get($key, $default);
+	}
+
+	/**
 	 * @param string $key
 	 * @param mixed  $value
 	 */
@@ -87,8 +96,8 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param string $default
-	 * @retur float
+	 * @param string|null $default
+	 * @return float
 	 */
 	public function getFloat($key, $default = null) {
 		$param = $this->_get($key, $default);
@@ -104,7 +113,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param string $default
+	 * @param string|null $default
 	 * @return string
 	 */
 	public function getString($key, $default = null) {
@@ -130,7 +139,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param string $default
+	 * @param string|null $default
 	 * @return int
 	 */
 	public function getInt($key, $default = null) {
