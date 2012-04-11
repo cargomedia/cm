@@ -71,11 +71,10 @@ collectData: function(action_name) {
 	var action = this.options.actions[action_name];
 
 	var data = {};
-	var regex = /^([\w\-]+)(\[([^\]]+)?\])?(\[([^\]]+)?\])?/i;
-	var name, match, key;
+	var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
+	var name, match;
 
 	for (var i = 0, item; item = form_data[i]; i++) {
-		// parsing html name
 		match = regex.exec(item.name);
 		name = match[1];
 		item.value = item.value || '';
@@ -84,67 +83,42 @@ collectData: function(action_name) {
 			continue;
 		}
 
-		if (match[2]) {
-			if (match[2] == '[]') {
-				if (data[name] === undefined) {
-					data[name] = [];
-				}
-				data[name].push(item.value);
-			} else if (match[3]) {
-				key = match[3];
-				if (typeof data[name] == 'undefined') {
-					data[name] = {length: 0};
-				}
-
-				data[name].length++;
-
-				//second brackets
-				if (match[4] == '[]') {
-					if (data[name][key] === undefined) {
-						data[name][key] = [];
-					}
-					data[name][key].push(item.value);
-				} else if (match[5]) {
-					var sub_key = match[5];
-					if (typeof data[name][key] == 'undefined') {
-						data[name][key] = {length: 0};
-					}
-					data[name][key][sub_key] = item.value;
-				} else {
-					data[name][key] = item.value;
-				}
-
-			}
-		} else { // if there are no brackets
+		if (!match[2]) {
+			// Scalar
 			data[name] = item.value;
-		}
-	}
-
-	var errors = [];
-
-	for (key in action.fields) {
-		var required = action.fields[key];
-
-		if (required && (!data[key] || (data[key].length === 0))) {
-			var err_msg = 'Required';
-			var $labels = $('label[for="' +this.getAutoId()+ '-' +key+ '-input"]');
-			if ($labels.length) {
-				err_msg = cm.language.get('%forms._errors.required', {label:$labels.eq(0).text()});
+		} else if (match[2] == '[]') {
+			// Array
+			if (typeof data[name] == 'undefined') {
+				data[name] = [];
 			}
-			errors.push({msg: err_msg, key: key});
-		}
-
-		if (data[key] && data[key].length !== undefined) {
-			delete(data[key]['length']);
+			data[name].push(item.value);
+		} else if (match[3]) {
+			// Associative array
+			if (typeof data[name] == 'undefined') {
+				data[name] = {};
+			}
+			data[name][match[3]] = item.value;
 		}
 	}
 
-	if (errors.length) {
-		for (var i = errors.length-1, err; err = errors[i]; i--) {
-			this.getField(err.key).error(err.msg);
+	var hasErrors = false
+	for (var fieldName in action.fields) {
+		var required = action.fields[fieldName];
+		if (required && _.isEmpty(data[fieldName])) {
+			var field = this.getField(fieldName);
+			var errorMessage = 'Required';
+			var $labels = $('label[for="' + field.getAutoId() + '-input"]');
+			if ($labels.length) {
+				errorMessage = cm.language.get('%forms._errors.required', {label:$labels.first().text()});
+			}
+			field.error(errorMessage);
+			hasErrors = true;
 		}
+	}
+	if (hasErrors) {
 		return false;
 	}
+
 	return data;
 },
 
