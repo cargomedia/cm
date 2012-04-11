@@ -52,8 +52,16 @@ getOption: function(name) {
 },
 
 /**
- * @param string message
+ * @param string|null message
  */
 error: function(message) {
-	this.getForm().error(message, this.getName());
+	var $container = this.$('.messages');
+	$container.html('');
+
+	if (message) {
+		$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />')
+		.children('.form_field_error').html(message).fadeIn('fast');
+
+		this.$('input, select, textarea').focus();
+	}
 }

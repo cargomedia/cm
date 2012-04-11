@@ -154,7 +154,7 @@ collectData: function(action_name) {
 
 	if (errors.length) {
 		for (var i = errors.length-1, err; err = errors[i]; i--) {
-			this.error(err.msg, err.key);
+			this.getField(err.key).error(err.msg);
 		}
 		return false;
 	}
@@ -189,8 +189,8 @@ submit: function(action_name, confirmed, data, callbacks) {
 			success: function(response) {
 				if (response.errors) {
 					for (var i = response.errors.length-1, error; error = response.errors[i]; i--) {
-						if (error.constructor == Array) {
-							handler.error(error[0], error[1]);
+						if (_.isArray(error)) {
+							handler.getField(error[1]).error(error[0]);
 						} else {
 							handler.error(error);
 						}
@@ -237,23 +237,16 @@ enable: function() {
 	this.$().enable();
 },
 
-error: function(message, field_key) {
-	var field = field_key ? this.getField(field_key) : null;
-	if (field) {
-		var $container = field.$('.messages');
-		$container.html("");
-
-		if (message) {
-			$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />')
-			.children('.form_field_error').html(message).fadeIn('fast');
-			
-			this.getField(field_key).$('input, select, textarea').focus();
-		}
-	} else {
-		cm.window.hint(message);
-	}
+/**
+ * @param string message
+ */
+error: function(message) {
+	cm.window.hint(message);
 },
 
+/**
+ * @param string message
+ */
 message: function(message) {
 	cm.window.hint(message);
 }
