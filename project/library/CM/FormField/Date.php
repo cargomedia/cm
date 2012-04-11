@@ -4,7 +4,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	
 	protected $_range = array();
 
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		$dd = trim($userInput['day']);
 		$mm = trim($userInput['month']);
 		$yy = trim($userInput['year']);

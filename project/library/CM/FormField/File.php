@@ -36,7 +36,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 		return $html;
 	}
 
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		$userInput = array_filter($userInput, function ($value) {
 			return !empty($value);
 		});

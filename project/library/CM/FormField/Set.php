@@ -24,7 +24,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		$this->_columnSize = $cssSize;
 	}
 
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		foreach ($userInput as $key => $value) {
 			if (!in_array($value, $this->_getValuesSet())) {
 				unset($userInput[$key]);

@@ -80,7 +80,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 	 * @return mixed Internal value
 	 * @throws CM_Exception_FormFieldValidation
 	 */
-	abstract function validate($userInput, CM_Response_Abstract $response);
+	abstract public function validate($userInput, CM_Response_Abstract $response);
 
 	/**
 	 * @param array			 $params

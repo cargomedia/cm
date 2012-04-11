@@ -8,7 +8,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 		$this->_options['lengthMax'] = isset($lengthMax) ? (int) $lengthMax : null;
 	}
 	
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		if (isset($this->_options['lengthMax']) && strlen($userInput) > $this->_options['lengthMax']) {
 			throw new CM_Exception_FormFieldValidation('Too long');
 		}

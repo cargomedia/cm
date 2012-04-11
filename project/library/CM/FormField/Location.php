@@ -37,7 +37,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		return $out;
 	}
 
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		$value = parent::validate($userInput, $response);
 		list($level, $id) = explode('.', $value);
 		if ($level < $this->_options['levelMin']) {

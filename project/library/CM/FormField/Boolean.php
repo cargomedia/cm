@@ -2,7 +2,7 @@
 
 class CM_FormField_Boolean extends CM_FormField_Abstract {
 
-	function validate($userInput, CM_Response_Abstract $response) {
+	public function validate($userInput, CM_Response_Abstract $response) {
 		return (bool) $userInput;
 	}
 
