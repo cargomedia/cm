@@ -9,9 +9,15 @@ validate: function() {
 	}
 	this.ajax('validate', {'userInput': value} , {
 		success: function () {
+			if (value != this.getValue()) {
+				return false;
+			}
 			this.error();
 		},
 		error: function(msg, type) {
+			if (value != this.getValue()) {
+				return false;
+			}
 			if ('CM_Exception_FormFieldValidation' == type) {
 				this.error(msg);
 				return false;
