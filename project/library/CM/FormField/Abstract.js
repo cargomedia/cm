@@ -49,9 +49,13 @@ getName: function() {
  */
 getValue: function() {
 	var formData = this.getForm().$().serializeArray();
-	return _.find(formData, function(fieldData) {
+	var fieldData = _.find(formData, function(fieldData) {
 		return fieldData.name == this.getName();
-	}, this).value || null;
+	}, this);
+	if (!fieldData) {
+		return null;
+	}
+	return fieldData.value;
 },
 
 /**

@@ -121,15 +121,11 @@ collectData: function(action_name) {
 	}
 
 	var errors = [];
-	var field, required;
 
-	var focusSet = false;
 	for (key in action.fields) {
-		required = action.fields[key];
-		field = this.getField(key);
+		var required = action.fields[key];
 
-		if ( data[key] && (data[key].length !== 0) ) {
-		} else if (required) {
+		if (required && (!data[key] || (data[key].length === 0))) {
 			var err_msg = 'Required';
 			var $labels = $('label[for="' +this.getAutoId()+ '-' +key+ '-input"]');
 			if ($labels.length) {

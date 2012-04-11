@@ -201,8 +201,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 				}
 			} else {
 				if ($required) {
-					$err_msg = $this->getErrorMessage($field_name, 'required');
-					$response->addError($err_msg, $field_name);
+					$response->addError('Required', $field_name);
 				} else {
 					$form_data[$field_name] = null;
 				}
@@ -218,19 +217,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		}
 
 		return $action->process($form_data, $response, $this);
-	}
-
-	/**
-	 * @param string $field_name
-	 * @param string $error_key
-	 * @return string
-	 */
-	private function getErrorMessage($field_name, $error_key) {
-		$msg = $error_key;
-		if (!$msg) {
-			$msg = CM_Language::text($this->getErrorKey($field_name, $error_key));
-		}
-		return $msg;
 	}
 
 	private function getErrorKey($field_name, $error_key) {
