@@ -1,18 +1,21 @@
 ready: function() {
 },
 
-/**
- * @param mixed value
- */
-validate: function(value) {
-	field = this;
+validate: function() {
+	var value = this.getValue();
+	if (null === value) {
+		this.error();
+		return;
+	}
 	this.ajax('validate', {'userInput': value} , {
 		success: function () {
-			field.error();
+			this.error();
 		},
-		error: function(errorMessage) {
-			field.error(errorMessage);
-			return false;
+		error: function(msg, type) {
+			if ('CM_Exception_FormFieldValidation' == type) {
+				this.error(msg);
+				return false;
+			}
 		}
 	});
 },
@@ -39,6 +42,16 @@ $: function(selector) {
  */
 getName: function() {
 	return this.options.name;
+},
+
+/**
+ * @return string|null
+ */
+getValue: function() {
+	var formData = this.getForm().$().serializeArray();
+	return _.find(formData, function(fieldData) {
+		return fieldData.name == this.getName();
+	}, this).value || null;
 },
 
 /**
