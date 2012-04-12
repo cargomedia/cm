@@ -35,10 +35,7 @@ abstract class CM_Request_Abstract {
 	 * @var CM_Session
 	 */
 	private $_session;
-	/**
-	 * @var int|null
-	 */
-	private $_sessionId;
+
 	/**
 	 * @var CM_Request_Abstract
 	 */
