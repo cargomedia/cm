@@ -218,8 +218,4 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		return $action->process($form_data, $response, $this);
 	}
 
-	private function getErrorKey($field_name, $error_key) {
-		return CM_Language::key_exists_first('forms.' . $this->name . '.fields.' . $field_name . '.errors.' . $error_key, 'forms._fields.' . $field_name . '.errors.' . $error_key, 'forms._errors.' . $error_key);
-	}
-
 }
