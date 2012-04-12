@@ -1,5 +1,4 @@
 <div>
-	<input type="hidden" name="{$name}[]" />
 	<ul style="display:none;" class="previewsTemplate">
 		<li>
 			<span class="qq-upload-spinner"></span>
@@ -8,7 +7,6 @@
 			<span style="display:none;" class="qq-upload-cancel"></span>
 		</li>
 	</ul>
-	
 	<ul class="previews">
 		{foreach $value as $tmpFile}
 			<li class="qq-upload-success">

@@ -186,10 +186,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 */
 	public function process(array $data, $action_name, CM_Response_View_Form $response) {
 		$action = $this->getAction($action_name);
-		$process_fields = $action->getProcessFields();
 
 		$form_data = array();
-		foreach ($process_fields as $field_name => $required) {
+		foreach ($action->getFields() as $field_name => $required) {
 			$field = $this->getField($field_name);
 
 			if (!$field->isEmpty($data[$field_name])) {

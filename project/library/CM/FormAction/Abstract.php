@@ -13,14 +13,7 @@ abstract class CM_FormAction_Abstract {
 	 *
 	 * @var array
 	 */
-	private $fields = array();
-
-	/**
-	 * The list of fields which are acts in this action.
-	 *
-	 * @var array
-	 */
-	protected $process_fields = array();
+	private $_fields = array();
 
 	/**
 	 * The list of fields which are required for this action.
@@ -73,28 +66,22 @@ abstract class CM_FormAction_Abstract {
 	}
 
 	/**
-	 * The getter for {@link $this->fields}.
-	 *
-	 * @return array
+	 * @return array name => required
 	 */
-	public function getProcessFields() {
-		return $this->fields;
+	public function getFields() {
+		return $this->_fields;
 	}
 
 	public function setup(CM_Form_Abstract $form) {
-		if (empty($this->process_fields)) {
-			$this->process_fields = array_keys($form->getFields());
-		}
-
-		foreach ($this->process_fields as $field_key) {
-			$this->fields[$field_key] = in_array($field_key, $this->required_fields);
+		foreach ($form->getFields() as $fieldName => $field) {
+			$this->_fields[$fieldName] = in_array($fieldName, $this->required_fields);
 		}
 
 	}
 
 	final public function js_presentation() {
 		$data = array();
-		$data['fields'] = $this->fields;
+		$data['fields'] = $this->_fields;
 
 		if ($this->confirm_msg_lang_addr) {
 			$data['confirm_msg'] = $this->confirm_msg_lang_addr;
@@ -102,15 +89,6 @@ abstract class CM_FormAction_Abstract {
 
 		return json_encode($data);
 
-	}
-
-	/**
-	 * The getter for $this->required_fields.
-	 *
-	 * @return array
-	 */
-	public function required_fields() {
-		return $this->required_fields;
 	}
 
 	/**

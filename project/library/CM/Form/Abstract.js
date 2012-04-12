@@ -66,9 +66,12 @@ $: function(selector) {
 	return $(selector, this.el);
 },
 
-collectData: function(action_name) {
+/**
+ * @param string|null actionName
+ */
+getData: function(actionName) {
 	var form_data = this.$().serializeArray();
-	var action = this.options.actions[action_name];
+	var action = actionName ? this.options.actions[actionName] : null;
 
 	var data = {};
 	var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
@@ -79,7 +82,7 @@ collectData: function(action_name) {
 		name = match[1];
 		item.value = item.value || '';
 
-		if (typeof action.fields[name] == 'undefined') {
+		if (action && typeof action.fields[name] == 'undefined') {
 			continue;
 		}
 
@@ -101,8 +104,25 @@ collectData: function(action_name) {
 		}
 	}
 
+	return data;
+},
+
+submit: function(actionName, confirmed, data, callbacks) {
+	confirmed = confirmed || false;
+	callbacks = callbacks || {};
+	actionName = actionName || this.options.default_action;
+	var action = this.options.actions[actionName];
+	
+	if (!confirmed) {
+		$('.form_field_error', this.$())
+			.next('br').remove()
+			.andSelf().remove();
+	}
+
+	data = data || this.getData(actionName);
+
 	var hasErrors = false
-	for (var fieldName in action.fields) {
+	_.each(_.keys(action.fields).reverse(), function(fieldName) {
 		var required = action.fields[fieldName];
 		if (required && _.isEmpty(data[fieldName])) {
 			var field = this.getField(fieldName);
@@ -114,76 +134,58 @@ collectData: function(action_name) {
 			field.error(errorMessage);
 			hasErrors = true;
 		}
-	}
+	}, this);
 	if (hasErrors) {
 		return false;
 	}
 
-	return data;
-},
-
-submit: function(action_name, confirmed, data, callbacks) {
-	confirmed = confirmed || false;
-	callbacks = callbacks || {};
-	action_name = action_name || this.options.default_action;
-	
-	if (!confirmed) {
-		$('.form_field_error', this.$())
-			.next('br').remove()
-			.andSelf().remove();
-	}
-
-	data = data || this.collectData(action_name);
-
-	if (data) {
-		var handler = this;
-		if (this.options.actions[action_name].confirm_msg && !confirmed) {
-			cm.ui.confirm(cm.language.get(this.options.actions[action_name].confirm_msg), function() {
-				handler.submit(action_name, true, data);
-			});
-			return false;
-		}
-		
-		this.disable()
-		this.trigger('submit', [data]);
-		cm.ajax('form', {view:this.getComponent()._getArray(), form:this._getArray(), actionName:action_name, data:data}, {
-			success: function(response) {
-				if (response.errors) {
-					for (var i = response.errors.length-1, error; error = response.errors[i]; i--) {
-						if (_.isArray(error)) {
-							handler.getField(error[1]).error(error[0]);
-						} else {
-							handler.error(error);
-						}
-					}
-					handler.trigger('error');
-				}
-
-				if (response.exec) {
-					handler.evaluation = new Function(response.exec);
-					handler.evaluation();
-				}
-					
-				if (callbacks.success) {
-					callbacks.success(response.data);
-				}
-				
-				if (response.messages) {
-					for (var i = 0, msg; msg = response.messages[i]; i++) {
-						handler.message(msg);
-					}
-				}
-
-				if (!response.errors) {
-					handler.trigger('success', [response.data]);
-				}
-			},
-			complete: function() {
-				handler.enable();
-				handler.trigger('complete');
-			}
+	var handler = this;
+	if (action.confirm_msg && !confirmed) {
+		cm.ui.confirm(cm.language.get(action.confirm_msg), function() {
+			handler.submit(actionName, true, data);
 		});
+		return false;
 	}
+
+	this.disable()
+	this.trigger('submit', [data]);
+	cm.ajax('form', {view:this.getComponent()._getArray(), form:this._getArray(), actionName:actionName, data:data}, {
+		success: function(response) {
+			if (response.errors) {
+				for (var i = response.errors.length-1, error; error = response.errors[i]; i--) {
+					if (_.isArray(error)) {
+						handler.getField(error[1]).error(error[0]);
+					} else {
+						handler.error(error);
+					}
+				}
+				handler.trigger('error');
+			}
+
+			if (response.exec) {
+				handler.evaluation = new Function(response.exec);
+				handler.evaluation();
+			}
+
+			if (callbacks.success) {
+				callbacks.success(response.data);
+			}
+
+			if (response.messages) {
+				for (var i = 0, msg; msg = response.messages[i]; i++) {
+					handler.message(msg);
+				}
+			}
+
+			if (!response.errors) {
+				handler.trigger('success', [response.data]);
+			}
+		},
+		complete: function() {
+			handler.enable();
+			handler.trigger('complete');
+		}
+	});
 },
 
 reset: function() {

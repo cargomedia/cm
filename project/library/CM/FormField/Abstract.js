@@ -3,7 +3,7 @@ ready: function() {
 
 validate: function() {
 	var value = this.getValue();
-	if (null === value) {
+	if (_.isEmpty(value)) {
 		this.error();
 		return;
 	}
@@ -54,14 +54,11 @@ getName: function() {
  * @return string|null
  */
 getValue: function() {
-	var formData = this.getForm().$().serializeArray();
-	var fieldData = _.find(formData, function(fieldData) {
-		return fieldData.name == this.getName();
-	}, this);
-	if (!fieldData) {
+	var formData = this.getForm().getData();
+	if (!_.has(formData, this.getName())) {
 		return null;
 	}
-	return fieldData.value;
+	return formData[this.getName()];
 },
 
 /**
