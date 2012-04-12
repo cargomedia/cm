@@ -114,6 +114,15 @@ class CM_MysqlTest extends TestCase {
 		
 		CM_Mysql::insert(TBL_TEST, array('id' => $insertId, 'foo' => 'foo24'), null, array('foo' => 'foo25', 'bar' => 'bar25'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo25', 'bar' => 'bar25'));
+
+		// Constraint violation
+		$id = CM_Mysql::insert(TBL_TEST, array());
+		try {
+			CM_Mysql::insert(TBL_TEST, array('id' => $id));
+			$this->fail('Can insert duplicate id');
+		} catch(CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
 	}
 
 	public function testUpdate() {
