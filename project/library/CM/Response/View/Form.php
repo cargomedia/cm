@@ -67,13 +67,6 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 		CM_Frontend::concat_js($jsCode, $this->_jsCode);
 	}
 
-	/**
-	 * Add a reload to the response.
-	 */
-	public function reloadPage() {
-		$this->exec('window.location.reload(true)');
-	}
-
 	public function process() {
 		$this->setHeader('Content-Type', 'application/json');
 

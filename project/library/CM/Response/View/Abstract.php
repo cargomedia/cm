@@ -90,6 +90,13 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadJs('cm.views["' . $componentInfo['id'] . '"].popIn();');
 	}
 
+	/**
+	 * Add a reload to the response.
+	 */
+	public function reloadPage() {
+		$this->getRender()->getJs()->onloadJs('window.location.reload(true)');
+	}
+
 	public function redirect($path, array $params = null) {
 		$url = CM_Page_Abstract::link($path, $params);
 		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
