@@ -4,7 +4,7 @@ require_once DIR_LIBRARY . 'lessphp/lessc.inc.php';
 class CM_Css {
 
 	/**
-	 * @var string
+	 * @var string|null
 	 */
 	private $_css = null;
 	/**
@@ -14,22 +14,27 @@ class CM_Css {
 	/**
 	 * @var CM_Css[]
 	 */
-	public $_csss = array();
+	private $_children = array();
+
+	/**
+	 * @param string|null $css
+	 * @param string|null $prefix
+	 */
+	public function __construct($css = null, $prefix = null) {
+		if (!is_null($css)) {
+			$this->_css = (string) $css;
+		}
+		if (!is_null($prefix)) {
+			$this->_prefix = (string) $prefix;
+		}
+	}
 
 	/**
 	 * @param string $css
 	 * @param string|null $prefix
 	 */
-	public function __construct($css, $prefix = null) {
-		$this->_css = (string) $css;
-		$this->_prefix = (string) $prefix;
-	}
-
-	public function add(CM_Css $css) {
-		if (count($this->_csss) == 0) {
-			$this->_csss[0] = new CM_Css($this->_css);
-		}
-		$this->_csss[] = $css;
+	public function add($css, $prefix = null) {
+		$this->_children[] = new CM_Css($css, $prefix);
 	}
 
 	public function __toString() {
@@ -37,12 +42,11 @@ class CM_Css {
 		if ($this->_prefix) {
 			$content .= $this->_prefix . ' {' . PHP_EOL;
 		}
-		if (count($this->_csss)) {
-			foreach ($this->_csss as $css) {
-				$content .= $css;
-			}
-		} else {
+		if ($this->_css) {
 			$content .= $this->_css . PHP_EOL;
+		}
+		foreach ($this->_children as $css) {
+			$content .= $css;
 		}
 		if ($this->_prefix) {
 			$content .= '}' . PHP_EOL;

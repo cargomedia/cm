@@ -18,8 +18,8 @@ class CM_CssTest extends TestCase {
 	height:300px;
 }
 EOD;
-		$css->add(new CM_Css($css1, '.bar'));
-		$css->add(new CM_Css('color: green;'));
+		$css->add($css1, '.bar');
+		$css->add('color: green;');
 		$expected = <<<'EOD'
 #foo {
 font-size: 12
