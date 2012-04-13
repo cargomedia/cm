@@ -1,42 +1,59 @@
 <?php
+require_once DIR_LIBRARY . 'lessphp/lessc.inc.php';
 
 class CM_Css {
-	/**
-	 * @var CM_CssAdapter_Abstract
-	 */
-	private $_adapter;
 
 	/**
-	 * @param string		  $css
-	 * @param CM_Render	   $render
-	 * @param CM_Css|null	 $presets
-	 * @param string|null	 $prefix
+	 * @var string
 	 */
-	public function __construct($css, CM_Render $render, CM_Css $presets = null, $prefix = null) {
-		$this->_adapter = new CM_CssAdapter_CM($css, $render, $presets, $prefix);
+	private $_css = null;
+	/**
+	 * @var string|null
+	 */
+	private $_prefix = null;
+	/**
+	 * @var CM_Css[]
+	 */
+	public $_csss = array();
+
+	/**
+	 * @param string $css
+	 * @param string|null $prefix
+	 */
+	public function __construct($css, $prefix = null) {
+		$this->_css = (string) $css;
+		$this->_prefix = (string) $prefix;
 	}
 
-	/**
-	 * @return array
-	 */
-	public function getRules() {
-		return $this->_adapter->getRules();
-	}
-
-	/**
-	 * @return string
-	 */
-	public function __toString() {
-		$output = '';
-		foreach ($this->getRules() as $selector => $properies) {
-			$output .= $selector . ' {' . PHP_EOL;
-			foreach ($properies as $property => $values) {
-				foreach ((array) $values as $value) {
-					$output .= "\t" . $property . ': ' . $value . ';' . PHP_EOL;
-				}
-			}
-			$output .= '}' . PHP_EOL;
+	public function add(CM_Css $css) {
+		if (count($this->_csss) == 0) {
+			$this->_csss[0] = new CM_Css($this->_css);
 		}
+		$this->_csss[] = $css;
+	}
+
+	public function __toString() {
+		$content = '';
+		if ($this->_prefix) {
+			$content .= $this->_prefix . ' {' . PHP_EOL;
+		}
+		if (count($this->_csss)) {
+			foreach ($this->_csss as $css) {
+				$content .= $css;
+			}
+		} else {
+			$content .= $this->_css . PHP_EOL;
+		}
+		if ($this->_prefix) {
+			$content .= '}' . PHP_EOL;
+		}
+		return $content;
+	}
+
+	public function compile() {
+		$lessc = new lessc();
+		$output = $lessc->parse((string) $this);
 		return $output;
 	}
+
 }

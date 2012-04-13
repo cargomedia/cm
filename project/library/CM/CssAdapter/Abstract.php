@@ -8,7 +8,7 @@ abstract class CM_CssAdapter_Abstract {
 	protected $_render = null;
 
 	/**
-	 * @var CM_Css
+	 * @var CM_CssLegacy
 	 */
 	protected $_presets = null;
 
@@ -25,10 +25,10 @@ abstract class CM_CssAdapter_Abstract {
 	/**
 	 * @param string		  $css
 	 * @param CM_Render	   $render
-	 * @param CM_Css|null	 $presets
+	 * @param CM_CssLegacy|null	 $presets
 	 * @param string|null	 $prefix
 	 */
-	public function __construct($css, CM_Render $render, CM_Css $presets = null, $prefix = null) {
+	public function __construct($css, CM_Render $render, CM_CssLegacy $presets = null, $prefix = null) {
 		$this->_render = $render;
 		$this->_presets = $presets;
 		$this->_prefix = $prefix;
