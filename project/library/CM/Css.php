@@ -54,8 +54,12 @@ class CM_Css {
 		return $content;
 	}
 
-	public function compile() {
+	public function compile(CM_Render $render) {
 		$lessc = new lessc();
+		$lessc->registerFunction('image', function ($arg) use($render) {
+			list($type, $path) = $arg;
+			return array($type, ' url(' . $render->getUrlImg(substr($path, 1, -1)) . ')');
+		});
 		$output = $lessc->parse((string) $this);
 		return $output;
 	}

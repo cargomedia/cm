@@ -11,6 +11,17 @@ class CM_CssTest extends TestCase {
 	}
 
 	public function testToString() {
+		$css = new CM_Css('color: black;', '.foo');
+		$expected = <<<'EOD'
+.foo {
+color: black;
+}
+
+EOD;
+		$this->assertSame($expected, (string) $css);
+	}
+
+	public function testAdd() {
 		$css = new CM_Css('font-size: 12', '#foo');
 		$css1 = <<<'EOD'
 .test:visible {
@@ -33,6 +44,44 @@ color: green;
 }
 
 EOD;
-		$this->assertEquals($expected, (string) $css);
+		$this->assertSame($expected, (string) $css);
+	}
+
+	public function testImage() {
+		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
+		var_dump($css->compile(CM_Render::getInstance()));
+
+		$expected = <<<'EOD'
+background: url(http://localhost/img/1/0/icon/mailbox_read.png) no-repeat 66px 7px;
+
+EOD;
+		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testMixin() {
+		$css = <<<'EOD'
+.mixin() {
+	font-size:5;
+	border:1px solid red;
+	#bar {
+		color:blue;
+	}
+}
+.foo {
+	color:red;
+	.mixin;
+}
+EOD;
+		$css = new CM_Css($css);
+$expected = <<<'EOD'
+.foo {
+  color:red;
+  font-size:5;
+  border:1px solid red;
+}
+.foo #bar { color:blue; }
+
+EOD;
+		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
 	}
 }
