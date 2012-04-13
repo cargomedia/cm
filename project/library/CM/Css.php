@@ -30,11 +30,25 @@ class CM_Css {
 	}
 
 	/**
-	 * @param string $css
+	 * @param string      $css
 	 * @param string|null $prefix
 	 */
 	public function add($css, $prefix = null) {
 		$this->_children[] = new CM_Css($css, $prefix);
+	}
+
+	/**
+	 * @param CM_Render $render
+	 * @return string
+	 */
+	public function compile(CM_Render $render) {
+		$lessc = new lessc();
+		$lessc->registerFunction('image', function ($arg) use($render) {
+			list($type, $path) = $arg;
+			return array($type, ' url(' . $render->getUrlImg(substr($path, 1, -1)) . ')');
+		});
+		$output = $lessc->parse((string) $this);
+		return $output;
 	}
 
 	public function __toString() {
@@ -53,15 +67,4 @@ class CM_Css {
 		}
 		return $content;
 	}
-
-	public function compile(CM_Render $render) {
-		$lessc = new lessc();
-		$lessc->registerFunction('image', function ($arg) use($render) {
-			list($type, $path) = $arg;
-			return array($type, ' url(' . $render->getUrlImg(substr($path, 1, -1)) . ')');
-		});
-		$output = $lessc->parse((string) $this);
-		return $output;
-	}
-
 }

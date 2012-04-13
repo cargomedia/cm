@@ -49,13 +49,13 @@ EOD;
 
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-		var_dump($css->compile(CM_Render::getInstance()));
-
-		$expected = <<<'EOD'
-background: url(http://localhost/img/1/0/icon/mailbox_read.png) no-repeat 66px 7px;
+		$render = CM_Render::getInstance();
+		$url = $render->getUrlImg('icon/mailbox_read.png');
+		$expected = <<<EOD
+background: url($url) no-repeat 66px 7px;
 
 EOD;
-		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertEquals($expected, $css->compile($render));
 	}
 
 	public function testMixin() {
