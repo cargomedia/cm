@@ -3,12 +3,12 @@
 class CM_Usertext extends CM_Class_Abstract {
 	private $_text;
 
-	protected $_singleTags = array('area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
+	private $_singleTags = array('area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
 		'track', 'wbr');
-	protected $_allowedAttrs = array('alt', 'class', 'height', 'href', 'src', 'title', 'width');
-	protected $_allowedTags = array('b', 'i', 'q', 'span', 'u', 'br', 'img');
-	protected $_internalTags = array('emoticon');
-	protected $_wrapLength = 5;
+	private $_allowedAttrs = array('alt', 'class', 'height', 'href', 'src', 'title', 'width');
+	private $_allowedTags = array('b', 'i', 'q', 'span', 'u', 'br', 'img');
+	private $_internalTags = array('emoticon');
+	private $_wrapLength = 5;
 
 	function __construct($text) {
 		$this->_text = (string) $text;
@@ -53,7 +53,13 @@ class CM_Usertext extends CM_Class_Abstract {
 		return $text;
 	}
 
-	private function _getFormat($text, $stripAllowedTags = false, $lengthMax = null) {
+	/**
+	 * @param string   $text
+	 * @param bool	 $stripAllowedTags
+	 * @param int|null $lengthMax
+	 * @return string
+	 */
+	private function _getFormat($text, $stripAllowedTags, $lengthMax = null) {
 		$domDoc = new DOMDocument();
 		@$domDoc->loadHTML('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $text .
 				'</body></html>');
@@ -62,6 +68,9 @@ class CM_Usertext extends CM_Class_Abstract {
 		return $text;
 	}
 
+	/**
+	 * @return array
+	 */
 	private function _getEmoticonData() {
 		$cacheKey = CM_CacheConst::Usertext_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
@@ -80,16 +89,28 @@ class CM_Usertext extends CM_Class_Abstract {
 		return $emoticons;
 	}
 
+	/**
+	 * @param string $text
+	 * @return mixed
+	 */
 	private function _insertEmoticonTags($text) {
 		$emoticons = $this->_getEmoticonData();
 		return str_replace($emoticons['codes'], $emoticons['tags'], $text);
 	}
 
+	/**
+	 * @param string $text
+	 * @return mixed
+	 */
 	private function _insertEmoticonHtml($text) {
 		$emoticons = $this->_getEmoticonData();
 		return str_replace($emoticons['tags'], $emoticons['htmls'], $text);
 	}
 
+	/**
+	 * @param string $text
+	 * @return mixed
+	 */
 	private function _censor($text) {
 		$cacheKey = CM_CacheConst::Usertext_Badwords;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
@@ -105,15 +126,28 @@ class CM_Usertext extends CM_Class_Abstract {
 		return preg_replace($badwords['search'], $badwords['replace'], $text);
 	}
 
+	/**
+	 * @param string $text
+	 * @return mixed
+	 */
 	private function _wrap($text) {
 		$length = $this->_wrapLength;
 		return preg_replace('/([^\s-]{' . $length . '})([^\s-]{' . $length . '})/u', '$1' . self::getSplitChar() . '$2', $text);
 	}
 
+	/**
+	 * @param string $text
+	 * @return string
+	 */
 	private function _escape($text) {
 		return htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
 	}
 
+	/**
+	 * @param string   $text
+	 * @param int|null $countMax
+	 * @return string
+	 */
 	private function _nl2br($text, $countMax = null) {
 		$text = str_replace("\r", '', $text);
 		if (null !== $countMax) {
