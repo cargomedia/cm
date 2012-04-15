@@ -21,59 +21,53 @@ class CM_Usertext extends CM_Class_Abstract {
 	public function getPlain($lengthMax = null) {
 		$text = $this->_text;
 		$text = $this->_escape($text);
-		$text = $this->_getFormat($text, array(), true, $lengthMax);
+		$text = $this->_getFormat($text, array(), array(), $lengthMax);
 		return $text;
 	}
 
 	/**
-	 * @param int|null	  $lengthMax
+	 * @param int|null      $lengthMax
 	 * @param string[]|null $allowedTags
+	 * @param string[]|null $visibleTags
 	 * @return string Formated text with allowed tags preserved, un-allowed tags escaped and smilies images inserted
 	 */
-	public function getFormat($lengthMax = null, array $allowedTags = null) {
+	public function getFormat($lengthMax = null, array $allowedTags = null, array $visibleTags = null) {
 		if (null === $allowedTags) {
 			$allowedTags = $this->_allowedTags;
+		}
+		if (null === $visibleTags) {
+			$visibleTags = $allowedTags;
 		}
 		$text = $this->_text;
 		$text = $this->_nl2br($text, 3);
 		$text = $this->_insertEmoticonTags($text);
 		$text = $this->_escapeUnAllowedTags($text, $allowedTags);
-		$text = $this->_getFormat($text, $allowedTags, false, $lengthMax);
+		$text = $this->_getFormat($text, $allowedTags, $visibleTags, $lengthMax);
 		$text = $this->_insertEmoticonHtml($text);
 		return $text;
 	}
 
 	/**
 	 * @param int|null	  $lengthMax
-	 * @param string[]|null $allowedTags
 	 * @return string Formated text with allowed tags stripped, un-allowed tags escaped and smilies as text
 	 */
-	public function getFormatPlain($lengthMax = null, array $allowedTags = null) {
-		if (null === $allowedTags) {
-			$allowedTags = $this->_allowedTags;
-		}
-		$text = $this->_text;
-		$text = $this->_nl2br($text, 2);
-		$text = $this->_insertEmoticonTags($text);
-		$text = $this->_escapeUnAllowedTags($text, $allowedTags);
-		$text = $this->_getFormat($text, $allowedTags, true, $lengthMax);
-		$text = $this->_insertEmoticonHtml($text);
-		return $text;
+	public function getFormatPlain($lengthMax = null) {
+		return $this->getFormat($lengthMax, null, array());
 	}
 
 	/**
 	 * @param string   $text
 	 * @param string[] $allowedTags
-	 * @param bool     $stripAllowedTags
+	 * @param string[] $visibleTags
 	 * @param int|null $lengthMax
 	 * @return string
 	 */
-	private function _getFormat($text, array $allowedTags, $stripAllowedTags, $lengthMax = null) {
+	private function _getFormat($text, array $allowedTags, array $visibleTags, $lengthMax = null) {
 		$domDoc = new DOMDocument();
 		@$domDoc->loadHTML('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $text .
 				'</body></html>');
 		$domBody = $domDoc->childNodes->item(1)->childNodes->item(1);
-		$text = $this->_collapseDomTree($domBody, $allowedTags, $stripAllowedTags, $lengthMax);
+		$text = $this->_collapseDomTree($domBody, $allowedTags, $visibleTags, $lengthMax);
 		return $text;
 	}
 
@@ -188,14 +182,14 @@ class CM_Usertext extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param DomNode  $domNode
-	 * @param string[] $allowedTags
-	 * @param boolean  $stripAllowedTags
-	 * @param int|null &$lengthMax
-	 * @param int|null $level
+	 * @param DomNode   $domNode
+	 * @param string[]  $allowedTags
+	 * @param string[]  $visibleTags
+	 * @param int|null  &$lengthMax
+	 * @param int|null  $level
 	 * @return string
 	 */
-	private function _collapseDomTree(DomNode $domNode, array $allowedTags, $stripAllowedTags, &$lengthMax, $level = null) {
+	private function _collapseDomTree(DomNode $domNode, array $allowedTags, array $visibleTags, &$lengthMax, $level = null) {
 		if (is_null($level)) {
 			$level = 0;
 		}
@@ -228,7 +222,7 @@ class CM_Usertext extends CM_Class_Abstract {
 
 				} elseif ($domNode->nodeType == XML_ELEMENT_NODE) {
 					if (null === $lengthMax || $lengthMax > 0) {
-						$childNodeResult = $this->_collapseDomTree($domNode, $allowedTags, $stripAllowedTags, $lengthMax, $level + 1);
+						$childNodeResult = $this->_collapseDomTree($domNode, $allowedTags, $visibleTags, $lengthMax, $level + 1);
 
 						if (in_array($domNode->nodeName, $this->_internalTags)) {
 							$result .= '<' . $domNode->nodeName . '>' . $childNodeResult . '</' . $domNode->nodeName . '>';
@@ -259,9 +253,9 @@ class CM_Usertext extends CM_Class_Abstract {
 								$endTag = '</' . $domNode->nodeName . '>';
 							}
 
-							// skip allowed tags if they are to be stripped, otherwise escape tag
+							// skip allowed tags if they are not visible, otherwise escape tag
 							if (in_array($domNode->nodeName, $allowedTags)) {
-								if ($stripAllowedTags) {
+								if (!in_array($domNode->nodeName, $visibleTags)) {
 									$startTag = '';
 									$endTag = '';
 								}

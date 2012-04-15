@@ -12,35 +12,35 @@
  *  {$someLongText|usertext:100}
  *  {$someLongText|usertext:format:100}
  *
- * To define configure allowedTags:
- * {$someLongText|usertext:[b,u]}
- * {$someLongText|usertext:format:100:[b,u]}
+ * To configure visibleTags:
+ * {$someLongText|usertext:format:[b,u]}
+ * {$someLongText|usertext:format:[b,u]:100}
  *
  * @param string		$text
  * @param string|null   $mode
  * @param int|null	  $lengthMax
- * @param string[]|null $allowedTags
+ * @param string[]|null $visibleTags
  * @return string
  */
-function smarty_modifier_usertext($text, $mode = null, $lengthMax = null, $allowedTags = null) {
+function smarty_modifier_usertext($text, $mode = null, $lengthMax = null, $visibleTags = null) {
 	$userText = new CM_Usertext($text);
 
 	$args = func_get_args();
 	array_shift($args);
-	$mode = $lengthMax = $allowedTags = null;
+	$mode = $lengthMax = $visibleTags = null;
 	foreach ($args as $arg) {
 		if (is_string($arg) && in_array($arg, array('format', 'plain', 'format_plain'))) {
 			$mode = $arg;
 		} elseif (is_int($arg)) {
 			$lengthMax = $arg;
 		} elseif (is_array($arg)) {
-			$allowedTags = $arg;
+			$visibleTags = $arg;
 		}
 	}
 
 	switch ($mode) {
 		case 'format':
-			$text = $userText->getFormat($lengthMax, $allowedTags);
+			$text = $userText->getFormat($lengthMax, null, $visibleTags);
 			break;
 		case 'plain':
 			$text = $userText->getPlain($lengthMax);
@@ -48,7 +48,7 @@ function smarty_modifier_usertext($text, $mode = null, $lengthMax = null, $allow
 		case 'format_plain':
 		default:
 			$mode = 'format_plain';
-			$text = $userText->getFormatPlain($lengthMax, $allowedTags);
+			$text = $userText->getFormat($lengthMax, null, array());
 	}
 
 	return '<span class="usertext ' . $mode . '">' . $text . '</span>';
