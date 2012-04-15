@@ -13,8 +13,8 @@
  *  {$someLongText|usertext:format:100}
  *
  * To define configure allowedTags:
- * {$someLongText|usertext:['b','u']}
- * {$someLongText|usertext:format:100:['b','u']}
+ * {$someLongText|usertext:[b,u]}
+ * {$someLongText|usertext:format:100:[b,u]}
  *
  * @param string		$text
  * @param string|null   $mode
@@ -27,6 +27,7 @@ function smarty_modifier_usertext($text, $mode = null, $lengthMax = null, $allow
 
 	$args = func_get_args();
 	array_shift($args);
+	$mode = $lengthMax = $allowedTags = null;
 	foreach ($args as $arg) {
 		if (is_string($arg) && in_array($arg, array('format', 'plain', 'format_plain'))) {
 			$mode = $arg;
