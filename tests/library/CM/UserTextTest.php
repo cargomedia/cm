@@ -166,4 +166,15 @@ EOD;
 		$this->assertEquals($expected, $actual->getFormat());
 	}
 
+	public function testNewlines() {
+		$actual = new CM_Usertext("a\n\n\n\nb\nc\n");
+		$this->assertEquals("a<br /><br /><br />\nb<br />\nc", $actual->getFormat());
+	}
+
+	public function testAllowedTags() {
+		$actual = new CM_Usertext('<b>hello</b> <u>test</u>');
+		$this->assertEquals('<b>hello</b> <u>test</u>', $actual->getFormat());
+		$this->assertEquals('<b>hello</b> &lt;u&gt;te​st&lt;/u&gt;', $actual->getFormat(null, array('b')));
+		$this->assertEquals('&lt;b&gt;he​llo&lt;/b&gt; &lt;u&gt;te​st&lt;/u&gt;', $actual->getFormat(null, array()));
+	}
 }
