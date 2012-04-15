@@ -538,11 +538,8 @@ class CM_LanguageEdit {
 
 		// Creates all not existing sections
 		foreach ($sections as $section) {
-			$result = CM_Mysql::select(TBL_CM_LANG_SECTION, 'lang_section_id', array('parent_section_id' => $parentId, 'section' => $section));
-
-			$newParentId = $result->fetchOne();
-
-			if (!$newParentId) {
+			$newParentId = CM_Mysql::select(TBL_CM_LANG_SECTION, 'lang_section_id', array('parent_section_id' => $parentId, 'section' => $section))->fetchOne();
+			if (false === $newParentId) {
 				// Section does not exist yet -> create
 				$newParentId = CM_Mysql::insert(TBL_CM_LANG_SECTION, array('parent_section_id' => $parentId, 'section' => $section));
 			}
@@ -550,11 +547,8 @@ class CM_LanguageEdit {
 		}
 
 		// checking lang_key for existence
-		$result = CM_Mysql::select(TBL_CM_LANG_KEY, 'lang_key_id', array('lang_section_id' => $parentId, 'key' => $keyName));
-
-		$keyId = $result->fetchOne();
-
-		if (!$keyId) {
+		$keyId = CM_Mysql::select(TBL_CM_LANG_KEY, 'lang_key_id', array('lang_section_id' => $parentId, 'key' => $keyName))->fetchOne();
+		if (false === $keyId) {
 			$keyId = CM_Mysql::insert(TBL_CM_LANG_KEY, array('lang_section_id' => $parentId, 'key' => $keyName));
 		}
 

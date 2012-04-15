@@ -18,6 +18,8 @@ unclosed tags: <u>not <b>closed
 EOD;
 
 	public static function setUpBeforeClass() {
+		CM_Mysql::insert(TBL_CM_LANG, array('abbrev' => 'EN', 'label' => 'English', 'enabled' => 1)); // For censoring
+
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
 
