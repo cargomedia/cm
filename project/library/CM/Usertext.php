@@ -3,7 +3,8 @@
 class CM_Usertext extends CM_Class_Abstract {
 	private $_text;
 
-	protected $_singleTags = array('br', 'img');
+	protected $_singleTags = array('area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
+		'track', 'wbr');
 	protected $_allowedAttrs = array('alt', 'class', 'height', 'href', 'src', 'title', 'width');
 	protected $_allowedTags = array('b', 'i', 'q', 'span', 'u', 'br', 'img');
 	protected $_internalTags = array('emoticon');
@@ -30,7 +31,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 */
 	public function getFormat($lengthMax = null) {
 		$text = $this->_text;
-		$text = nl2br($text);
+		$text = $this->_nl2br($text);
 		$text = $this->_insertEmoticonTags($text);
 		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_getFormat($text, false, $lengthMax);
@@ -44,6 +45,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 */
 	public function getFormatPlain($lengthMax = null) {
 		$text = $this->_text;
+		$text = $this->_nl2br($text, 1);
 		$text = $this->_insertEmoticonTags($text);
 		$text = $this->_escapeUnAllowedTags($text);
 		$text = $this->_getFormat($text, true, $lengthMax);
@@ -69,7 +71,8 @@ class CM_Usertext extends CM_Class_Abstract {
 					$path = URL_STATIC . 'img/smiles/' . $smiley['path'] . '?' . CM_App::getInstance()->getReleaseStamp();
 					$emoticons['codes'][] = $code;
 					$emoticons['tags'][] = '<emoticon>' . $smiley['id'] . '</emoticon>';
-					$emoticons['htmls'][] = '<img class="smile" alt="' . $this->_escape($code) . '" title="' . $this->_escape($code) . '" src="' . $path . '" />';
+					$emoticons['htmls'][] =
+							'<img class="smile" alt="' . $this->_escape($code) . '" title="' . $this->_escape($code) . '" src="' . $path . '" />';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
@@ -109,6 +112,17 @@ class CM_Usertext extends CM_Class_Abstract {
 
 	private function _escape($text) {
 		return htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
+	}
+
+	private function _nl2br($text, $countMax = null) {
+		$text = str_replace("\r", '', $text);
+		if (null !== $countMax) {
+			$countMax = (int) $countMax;
+			$text = preg_replace('#(\n{' . $countMax . '})\n+#', '$1', $text);
+		}
+		$text = trim($text, "\n");
+		$text = str_replace("\n", "<br />\n", $text);
+		return $text;
 	}
 
 	/**

@@ -5,15 +5,10 @@ class CM_UsertextTest extends TestCase {
 
 	private $_text = <<<EOD
 smilies: :-)
-
 allowed tags: <b attr="not-allowed" class="italic">bold</b>
-
 un-allowed tags: <foo>foo</foo> <big-grin> Lorem ipsum <averylongunallowedtag>hiho</averylongunallowedtag>
-
 badwords: hallo@yahoo.com
-
 special chars: "<>"
-
 unclosed tags: <u>not <b>closed
 EOD;
 
@@ -42,11 +37,11 @@ EOD;
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
-smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br /><br />
-allowed tags: <b class="italic">bold</b><br /><br />
-un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br /><br />
-badwords: hallo​badword_re​placement<br /><br />
-special chars: &quot;&lt;&gt;&quot;<br /><br />
+smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" /><br />
+allowed tags: <b class="italic">bold</b><br />
+un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br />
+badwords: hallo​badword_re​placement<br />
+special chars: &quot;&lt;&gt;&quot;<br />
 unclosed tags: <u>not <b>closed</b></u>
 EOD;
 		$actual = new CM_Usertext($this->_text);
@@ -67,15 +62,10 @@ EOD;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
 smilies: <img class="smile" alt=":)" title=":)" src="{$urlStatic}img/smiles/1/1.png?{$modified}" />
-
 allowed tags: bold
-
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
-
 badwords: hallo​badword_re​placement
-
 special chars: &quot;&lt;&gt;&quot;
-
 unclosed tags: not closed
 EOD;
 		$actual = new CM_Usertext($this->_text);
@@ -86,15 +76,10 @@ EOD;
 		$splitChar = CM_Usertext::getSplitChar();
 		$expected = <<<EOD
 smilies: :-)
-
 allowed tags: &lt;b attr=&quot;not-allowed&quot; class{$splitChar}=&quot;italic&quot;&gt;{$splitChar}bold&lt;/b&gt;
-
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
-
 badwords: hallo​badword_re​placement
-
 special chars: &quot;&lt;&gt;&quot;
-
 unclosed tags: &lt;u&gt;not &lt;b&gt;closed
 EOD;
 		$actual = new CM_Usertext($this->_text);
