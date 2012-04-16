@@ -25,37 +25,32 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @param int		 $type	Image type. Use IMAGETYPE_* consts
-	 * @param string|null $newPath Where the resulting image should be written
+	 * @param string|null $pathNew Where the resulting image should be written
 	 */
-	public function convert($type, $newPath = null) {
+	public function convert($type, $pathNew = null) {
 		if ($this->_getImageType() == $type) {
 			// Copy image if no conversion necessary
-			if (isset($newPath)) {
-				$this->copy($newPath);
+			if (isset($pathNew)) {
+				$this->copy($pathNew);
+				@chmod($pathNew, 0777);
 			}
 			return;
 		}
 
-		$this->_writeResource($this->_resource, $newPath, $type);
-		@chmod($newPath, 0777);
+		$this->_writeResource($this->_resource, $pathNew, $type);
+		@chmod($pathNew, 0777);
 	}
 
 	/**
-	 * @param int	$widthMax   New width
-	 * @param int	$heightMax  New height
-	 * @param bool   $square     True if result image should be a square
-	 * @param string $pathNew    OPTIONAL If set, image is stored a new location
+	 * @param int         $widthMax
+	 * @param int         $heightMax
+	 * @param bool        $square	 True if result image should be a square
+	 * @param string|null $pathNew
+	 * @param int|null    $typeNew
 	 */
-	public function resize($widthMax, $heightMax, $square = false, $pathNew = null) {
+	public function resize($widthMax, $heightMax, $square = false, $pathNew = null, $typeNew = null) {
 		$width = $this->getWidth();
 		$height = $this->getHeight();
-
-		if (($width == $widthMax) && ($height == $heightMax)) {
-			if (isset($pathNew)) {
-				$this->copy($pathNew);
-			}
-			return;
-		}
 
 		$resource = $this->_getResource();
 		if ($square) {
@@ -82,21 +77,22 @@ class CM_File_Image extends CM_File {
 		if (!$result) {
 			throw new CM_Exception_Invalid('Cannot resample image');
 		}
-		$this->_writeResource($resourceNew, $pathNew);
+		$this->_writeResource($resourceNew, $pathNew, $typeNew, $typeNew);
 		@chmod($pathNew, 0777);
 	}
 
 	/**
 	 * @param int		 $angle   Angle to rotate the image
-	 * @param string|null $pathNew OPTIONAL New path for the rotate image
+	 * @param string|null $pathNew
+	 * @param int|null	$typeNew
 	 * @throws CM_Exception_Invalid If something goes wrong during rotation or conversion
 	 */
-	public function rotate($angle, $pathNew = null) {
+	public function rotate($angle, $pathNew = null, $typeNew = null) {
 		$resource = imagerotate($this->_resource, $angle + 180, 0);
 		if (!$resource) {
 			throw new CM_Exception_Invalid('Cannot rotate image');
 		}
-		$this->_writeResource($resource, $pathNew);
+		$this->_writeResource($resource, $pathNew, $typeNew);
 	}
 
 	/**
@@ -194,9 +190,9 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
-	 * @param resource $resource
+	 * @param resource	$resource
 	 * @param string|null $path
-	 * @param int|null $type
+	 * @param int|null	$type
 	 * @throws CM_Exception_Invalid
 	 */
 	private function _writeResource($resource, $path = null, $type = null) {
