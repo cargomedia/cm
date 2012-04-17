@@ -95,10 +95,10 @@ class CM_Util {
 	 * @throws CM_Exception
 	 */
 	public static function mkDir($path) {
+		$path = (string) $path;
 		if (is_dir($path)) {
 			return;
 		}
-		$path = (string) $path;
 		if (false === mkdir($path, 0777, true)) {
 			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
 		}
