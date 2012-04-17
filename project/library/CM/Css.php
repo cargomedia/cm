@@ -54,6 +54,7 @@ class CM_Css {
 	background-image: -moz-linear-gradient(left,@color1,@color2);
 	background-image: -webkit-linear-gradient(left,@color1,@color2);
 	background-image: -o-linear-gradient(left,@color1,@color2);
+	background-image: -ms-linear-gradient(left,@color1,@color2);
 	background-image: -webkit-gradient(linear,left top,right top,from(@color1),to(@color2));
 }
 .gradient(@direction, @color1, @color2) when (@direction = vertical) {
@@ -62,6 +63,7 @@ class CM_Css {
 	background-image: -moz-linear-gradient(top,@color1,@color2);
 	background-image: -webkit-linear-gradient(top,@color1,@color2);
 	background-image: -o-linear-gradient(top,@color1,@color2);
+	background-image: -ms-linear-gradient(top,@color1,@color2);
 	background-image: -webkit-gradient(linear,left top,left bottom,from(@color1),to(@color2));
 }
 .background-color(@color) when (isColor(@color)) {
@@ -77,20 +79,20 @@ class CM_Css {
 	-moz-box-shadow: @args;
 	-webkit-box-shadow: @args;
 }
-.box-sizing(@sizing) {
-	box-sizing: @sizing;
-	-moz-box-sizing: @sizing;
-	-webkit-box-sizing: @sizing;
+.box-sizing(@args...) {
+	box-sizing: @args;
+	-moz-box-sizing: @args;
+	-webkit-box-sizing: @args;
 }
-.user-select(@selection) {
-	user-select: @selection;
-	-moz-user-select: @selection;
-	-webkit-user-select: @selection;
+.user-select(@args...) {
+	user-select: @args;
+	-moz-user-select: @args;
+	-webkit-user-select: @args;
 }
-.transform(@function) {
-	transform: @function;
-	-moz-transform: @function;
-	-webkit-transform: @function;
+.transform(@args...) {
+	transform: @args;
+	-moz-transform: @args;
+	-webkit-transform: @args;
 }
 .transition(@args...) {
 	transition: @args;
