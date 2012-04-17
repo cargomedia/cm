@@ -73,7 +73,7 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $params
 	 * @return string
 	 * @throws CM_Exception_Invalid
@@ -88,5 +88,19 @@ class CM_Util {
 			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
 		}
 		return $contents;
+	}
+
+	/**
+	 * @param string $path
+	 * @throws CM_Exception
+	 */
+	public static function mkDir($path) {
+		if (is_dir($path)) {
+			return;
+		}
+		$path = (string) $path;
+		if (false === mkdir($path, 0777, true)) {
+			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+		}
 	}
 }
