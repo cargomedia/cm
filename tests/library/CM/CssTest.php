@@ -149,8 +149,8 @@ EOD;
 		//illegal parameters
 		$css = <<<'EOD'
 .foo {
-	.gradient(diagonal, foo, rgba(30, 50,30, 0.4));
-	.gradient(diagonal, #000000, foo);
+	.gradient(vertical, foo, rgba(30, 50,30, 0.4));
+	.gradient(vertical, #000000, foo);
 	.gradient(horizontal, foo, rgba(30, 50,30, 0.4));
 	.gradient(horizontal, #000000, foo);
 	.gradient(foo, #000000, rgba(30, 50,30, 0.4));
