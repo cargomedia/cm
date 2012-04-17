@@ -70,13 +70,8 @@ class CM_Css {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
 	background-color: @color;
 }
-.border-radius(@args...) {
-	border-radius: @args;
-	-moz-border-radius: @args;
-}
 .box-shadow(@args...) {
 	box-shadow: @args;
-	-moz-box-shadow: @args;
 	-webkit-box-shadow: @args;
 }
 .box-sizing(@args...) {
@@ -87,11 +82,14 @@ class CM_Css {
 .user-select(@args...) {
 	user-select: @args;
 	-moz-user-select: @args;
+	-ms-user-select: @args;
 	-webkit-user-select: @args;
 }
 .transform(@args...) {
 	transform: @args;
 	-moz-transform: @args;
+	-o-transform: @args;
+	-ms-transform: @args;
 	-webkit-transform: @args;
 }
 .transition(@args...) {
