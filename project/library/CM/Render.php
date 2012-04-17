@@ -271,7 +271,6 @@ class CM_Render {
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
 			self::$_smarty->_file_perms = 0777;
 			self::$_smarty->_dir_perms = 0777;
-			umask(0);
 			self::$_smarty->compile_check = IS_DEBUG;
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
