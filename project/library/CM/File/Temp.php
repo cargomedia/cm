@@ -62,7 +62,7 @@ class CM_File_Temp extends CM_File {
 	/**
 	 * @return string
 	 */
-	public function getURL() {
+	public function getUrl() {
 		return URL_TMP_USERFILES . $this->getUniqid() . '.' . $this->getExtension();
 	}
 

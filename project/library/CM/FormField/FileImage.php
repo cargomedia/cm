@@ -22,7 +22,7 @@ class CM_FormField_FileImage extends CM_FormField_File {
 
 	public function getPreview(CM_File_Temp $file) {
 		$html = '';
-		$html .= '<img src="' . $file->getURL() . '" />';
+		$html .= '<img src="' . $file->getUrl() . '" />';
 		$html .= '<a href="javascript:;" class="icon delete hover"></a>';
 		return $html;
 	}

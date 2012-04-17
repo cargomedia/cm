@@ -63,7 +63,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 				$preview = $field->getPreview($tmpFile);
 			}
 
-			$return['success'] = array('id' => $tmpFile->getUniqid(), 'url' => $tmpFile->getURL(), 'preview' => $preview);
+			$return['success'] = array('id' => $tmpFile->getUniqid(), 'url' => $tmpFile->getUrl(), 'preview' => $preview);
 
 		} catch (CM_Exception_FormFieldValidation $ex) {
 			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
