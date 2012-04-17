@@ -52,7 +52,7 @@ EOD;
 		$render = CM_Render::getInstance();
 		$url = $render->getUrlImg('icon/mailbox_read.png');
 		$expected = <<<EOD
-background: url($url) no-repeat 66px 7px;
+background:url($url) no-repeat 66px 7px;
 
 EOD;
 		$this->assertEquals($expected, $css->compile($render));
@@ -83,5 +83,203 @@ $expected = <<<'EOD'
 
 EOD;
 		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testOpacity() {
+		$css = <<<'EOD'
+filter:hello(world);
+.opacity(0.3);
+EOD;
+		$expected = <<<'EOD'
+filter:hello(world);
+opacity:0.3;
+filter:alpha(opacity=30);
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testLinearGradient() {
+		//horizontal
+		$css = <<<'EOD'
+.foo {
+	.gradient(horizontal, #000000, rgba(30, 50,30, 0.4));
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#ff000000,endColorstr=#661e321e);
+  background-image:linear-gradient(left,#000000,rgba(30,50,30,0.4));
+  background-image:-moz-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+  background-image:-webkit-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+  background-image:-o-linear-gradient(left,#000000,rgba(30,50,30,0.4));
+  background-image:-webkit-gradient(linear,left top,right top,from(#000000),to(rgba(30,50,30,0.4)));
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		//vertical
+		$css = <<<'EOD'
+.foo {
+	.gradient(vertical, #000000, rgba(30, 50,30, 0.4));
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ff000000,endColorstr=#661e321e);
+  background-image:linear-gradient(top,#000000,rgba(30,50,30,0.4));
+  background-image:-moz-linear-gradient(top,#000000,rgba(30,50,30,0.4));
+  background-image:-webkit-linear-gradient(top,#000000,rgba(30,50,30,0.4));
+  background-image:-o-linear-gradient(top,#000000,rgba(30,50,30,0.4));
+  background-image:-webkit-gradient(linear,left top,left bottom,from(#000000),to(rgba(30,50,30,0.4)));
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		//illegal direction
+		$css = <<<'EOD'
+.foo {
+	.gradient(diagonal, #000000, rgba(30, 50,30, 0.4));
+}
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame('', $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testBackgroundColor() {
+		$css = <<<'EOD'
+.foo {
+	.background-color(rgba(1,1,1,0.5));
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
+  background-color:rgba(1,1,1,0.5);
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+
+		//illegal value
+		$css = <<<'EOD'
+.foo {
+	.background-color(123);
+}
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame('', $css->compile(CM_Render::getInstance()));
+
+	}
+
+	public function testBorderRadius() {
+		$css = <<<'EOD'
+.foo {
+	.border-radius(~'2em 1em 4em / 0.5em 3em');
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  border-radius:2em 1em 4em / 0.5em 3em;
+  -moz-border-radius:2em 1em 4em / 0.5em 3em;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testBoxShadow() {
+		$css = <<<'EOD'
+.foo {
+	.box-shadow(0 0 2px #dddddd);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  box-shadow:0 0 2px #dddddd;
+  -moz-box-shadow:0 0 2px #dddddd;
+  -webkit-box-shadow:0 0 2px #dddddd;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testBoxSizing() {
+		$css = <<<'EOD'
+.foo {
+	.box-sizing(border-box);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testUserSelect() {
+		$css = <<<'EOD'
+.foo {
+	.user-select(none);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  user-select:none;
+  -moz-user-select:none;
+  -webkit-user-select:none;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testTransform() {
+		$css = <<<'EOD'
+.foo {
+	.transform(matrix(0.866,0.5,-0.5,0.866,0,0));
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+  -moz-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+  -webkit-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testTransition() {
+		$css = <<<'EOD'
+.foo {
+	.transition(width 2s ease-in 2s);
+}
+EOD;
+		$expected = <<<'EOD'
+.foo {
+  transition:width 2s ease-in 2s;
+  -moz-transition:width 2s ease-in 2s;
+  -webkit-transition:width 2s ease-in 2s;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
 	}
 }
