@@ -87,13 +87,20 @@ EOD;
 
 	public function testOpacity() {
 		$css = <<<'EOD'
-filter:hello(world);
-.opacity(0.3);
+.foo {
+	filter:hello(world);
+	.opacity(.3);
+}
+.bar {
+	.opacity(foo);
+}
 EOD;
 		$expected = <<<'EOD'
-filter:hello(world);
-opacity:0.3;
-filter:alpha(opacity=30);
+.foo {
+  filter:hello(world);
+  opacity:.3;
+  filter:alpha(opacity=30);
+}
 
 EOD;
 		$css = new CM_Css($css);
@@ -115,7 +122,6 @@ EOD;
   background-image:-webkit-linear-gradient(left,#000000,rgba(30,50,30,0.4));
   background-image:-o-linear-gradient(left,#000000,rgba(30,50,30,0.4));
   background-image:-ms-linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-gradient(linear,left top,right top,from(#000000),to(rgba(30,50,30,0.4)));
 }
 
 EOD;
@@ -135,16 +141,19 @@ EOD;
   background-image:-webkit-linear-gradient(top,#000000,rgba(30,50,30,0.4));
   background-image:-o-linear-gradient(top,#000000,rgba(30,50,30,0.4));
   background-image:-ms-linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-gradient(linear,left top,left bottom,from(#000000),to(rgba(30,50,30,0.4)));
 }
 
 EOD;
 		$css = new CM_Css($css);
 		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
-		//illegal direction
+		//illegal parameters
 		$css = <<<'EOD'
 .foo {
-	.gradient(diagonal, #000000, rgba(30, 50,30, 0.4));
+	.gradient(diagonal, foo, rgba(30, 50,30, 0.4));
+	.gradient(diagonal, #000000, foo);
+	.gradient(horizontal, foo, rgba(30, 50,30, 0.4));
+	.gradient(horizontal, #000000, foo);
+	.gradient(foo, #000000, rgba(30, 50,30, 0.4));
 }
 EOD;
 		$css = new CM_Css($css);
@@ -156,12 +165,16 @@ EOD;
 .foo {
 	.background-color(rgba(1,1,1,0.5));
 }
+.bar {
+	.background-color(rgba(1,1,1,1));
+}
 EOD;
 		$expected = <<<'EOD'
 .foo {
   filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
   background-color:rgba(1,1,1,0.5);
 }
+.bar { background-color:#010101; }
 
 EOD;
 		$css = new CM_Css($css);
@@ -178,23 +191,6 @@ EOD;
 
 	}
 
-	public function testBorderRadius() {
-		$css = <<<'EOD'
-.foo {
-	.border-radius(~'2em 1em 4em / 0.5em 3em');
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  border-radius:2em 1em 4em / 0.5em 3em;
-  -moz-border-radius:2em 1em 4em / 0.5em 3em;
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
-	}
-
 	public function testBoxShadow() {
 		$css = <<<'EOD'
 .foo {
@@ -204,7 +200,6 @@ EOD;
 		$expected = <<<'EOD'
 .foo {
   box-shadow:0 0 2px #dddddd;
-  -moz-box-shadow:0 0 2px #dddddd;
   -webkit-box-shadow:0 0 2px #dddddd;
 }
 
@@ -241,6 +236,7 @@ EOD;
 .foo {
   user-select:none;
   -moz-user-select:none;
+  -ms-user-select:none;
   -webkit-user-select:none;
 }
 
@@ -259,6 +255,8 @@ EOD;
 .foo {
   transform:matrix(0.866,0.5,-0.5,0.866,0,0);
   -moz-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+  -o-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+  -ms-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
   -webkit-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
 }
 

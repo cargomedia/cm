@@ -43,12 +43,12 @@ class CM_Css {
 	 */
 	public function compile(CM_Render $render) {
 		$mixins = <<< 'EOD'
-.opacity(@opacity) {
+.opacity(@opacity) when (isnumber(@opacity)) {
 	opacity: @opacity;
 	@ieOpacity = @opacity*100;
 	filter:e("alpha(opacity=@{ieOpacity})");
 }
-.gradient(@direction, @color1, @color2) when (@direction = horizontal) {
+.gradient(@direction, @color1, @color2) when (@direction = horizontal) and (isColor(@color1)) and (isColor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
 	background-image: linear-gradient(left,@color1,@color2);
 	background-image: -moz-linear-gradient(left,@color1,@color2);
@@ -56,7 +56,7 @@ class CM_Css {
 	background-image: -o-linear-gradient(left,@color1,@color2);
 	background-image: -ms-linear-gradient(left,@color1,@color2);
 }
-.gradient(@direction, @color1, @color2) when (@direction = vertical) {
+.gradient(@direction, @color1, @color2) when (@direction = vertical) and (isColor(@color1)) and (isColor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
 	background-image: linear-gradient(top,@color1,@color2);
 	background-image: -moz-linear-gradient(top,@color1,@color2);
@@ -64,8 +64,11 @@ class CM_Css {
 	background-image: -o-linear-gradient(top,@color1,@color2);
 	background-image: -ms-linear-gradient(top,@color1,@color2);
 }
-.background-color(@color) when (isColor(@color)) {
+.background-color(@color) when (isColor(@color)) and (alpha(@color) < 1) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
+	background-color: @color;
+}
+.background-color(@color) when (isColor(@color)) and (alpha(@color) = 1) {
 	background-color: @color;
 }
 .box-shadow(@args...) {
