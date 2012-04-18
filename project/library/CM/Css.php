@@ -113,9 +113,9 @@ EOD;
 		});
 		$css = $mixins . $this;
 		$cachKey = CM_CacheConst::Css . '_md5:' . md5($css);
-		if (($parsedCss = CM_Cache::get($cachKey)) === false) {
+		if (($parsedCss = CM_CacheLocal::get($cachKey)) === false) {
 			$parsedCss = $lessc->parse($css);
-			CM_Cache::set($cachKey, $parsedCss);
+			CM_CacheLocal::set($cachKey, $parsedCss);
 		}
 		return $parsedCss;
 	}
