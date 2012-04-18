@@ -105,7 +105,7 @@ class CM_File {
 	 */
 	public function copy($path) {
 		$path = (string) $path;
-		if (!copy($this->getPath(), $path)) {
+		if (!@copy($this->getPath(), $path)) {
 			throw new CM_Exception('Cannot copy `' . $this->getPath() . '` to `' . $path . '`.');
 		}
 	}
@@ -116,7 +116,7 @@ class CM_File {
 	 */
 	public function move($path) {
 		$path = (string) $path;
-		if (!rename($this->getPath(), $path)) {
+		if (!@rename($this->getPath(), $path)) {
 			throw new CM_Exception('Cannot move `' . $this->getPath() . '` to `' . $path . '`.');
 		}
 		$this->_path = $path;
