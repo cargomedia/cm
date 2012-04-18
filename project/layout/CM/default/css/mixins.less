@@ -1,10 +1,18 @@
-.footer() {
-	border-top: 1px solid #E6E7E8;
-	color: #bbbbbb;
+.clearfix {
+	*zoom: 1;
+	display: block;
+	&:before,
+	&:after {
+		display: table;
+		content: "";
+	}
+	&:after {
+		clear: both;
+	}
 }
 
 .link() {
-	color: #0a7bc3;
+	color: @colorLink;
 	text-decoration: none;
 }
 
@@ -13,79 +21,79 @@
 }
 
 .link_alt() {
-	color: #6d6e71;
+	color: @colorLinkAlt;
 }
 
 .link_alt_hover() {
-	color: #525252;;
+	color: @colorLinkAltHover;
 }
 
 .color_alt() {
-	color: #888888;
+	color: @colorAlt;
 }
 
 .color_light() {
-	color: #f7f7f7;
+	color: @colorUltraLight;
 }
 
 .color_online() {
-	color: #008845;
+	color: @colorOnline;
 }
 
 .color_highlight() {
-	color: #ed3261;
+	color: @colorFb;
 }
 
 .bg() {
-	.background-color(#fafafa);
+	.background-color(@colorBg);
 }
 
 .bg_alt() {
-	.background-color(#f2f2f2);
+	.background-color(@colorBgAlt);
 }
 
 .bg_highlight() {
-	.background-color(#ed3261);
+	.background-color(@colorFb);
 }
 
 .bg_highlight_dark() {
-	.background-color(#c30d3a);
+	.background-color(@colorFbAlt);
 }
 
 .bg_highlight_gradient() {
-	.gradient(vertical, #ed3261, #c30d3a);
+	.gradient(vertical, @colorFb, @colorFbAlt);
 }
 
 .bg_select() {
-	.background-color(#fdf1f5);
+	.background-color(@colorSelect);
 }
 
-.bg_emphasize() {
-	.background-color(#FDF6EB);
+.bg_emphasize(@colorEmphasize) {
+	.background-color();
 }
 
 .message() {
-	color: #ffffff;
+	color: @colorUltraLight;
 	background: #f5c400;
 	border-color: #fcad66;
 }
 
 .error() {
-	border-color: #c30d3a;
-	background: #c30d3a;
-	color: #ffffff;
+	border-color: @colorFbAlt;
+	background: @colorFbAlt;
+	color: white;
 }
 
 .notice() {
-	border-color: #ea8e0b;
-	background: #ea8e0b;
+	border-color: @colorNotice;
+	background: @colorNotice;
 	color: white;
 }
 
 .notice_alt() {
-	border-color: #FDC85D;
-	background: #FDC85D;
-	color: #333333;
+	border-color: @colorNoticeAlt;
+	background: @colorNoticeAlt;
+	color: @color;
 }
 
 /* Fonts */
@@ -115,10 +123,9 @@
 
 .font_placeholder() {
 	font-style: italic;
-	color: #888;
+	color: @colorAlt;
 }
 .h1() {
-	color: #f13c6a;
 	font: normal 18px Tahoma, Verdana, Arial, sans-serif;
 	letter-spacing: 1px;
 	margin: 7px 0;
@@ -137,7 +144,7 @@
 .h4() {
 	font-size: 12px;
 	font-familiy: "Lucida Grande", Verdana, Arial, sans-serif;
-	color: #333;
+	color: @color;
 	margin: 8px 0 2px 0;
 }
 
@@ -149,35 +156,35 @@
 }
 
 .border() {
-	border: 1px solid #BDBDBD;
+	border: 1px solid @colorBorder;
 }
 
 .border_alt() {
-	border: 1px solid #ddd;
+	border: 1px solid @colorLight;
 }
 
 .border_light() {
-	border: 1px solid #ebebeb;
+	border: 1px solid @colorBorderLight;
 }
 
 .border_select() {
-	border: 1px solid #008845;
+	border: 1px solid @colorOnline;
 }
 
 .border_notice() {
-	border: 1px solid #ea8e0b;
+	border: 1px solid @colorNotice;
 }
 
 .border_highlight() {
-	border: 1px solid #ed3261;
+	border: 1px solid @colorFb;
 }
 
 .border_highlight_dark() {
-	border: 1px solid #c30d3a;
+	border: 1px solid @colorFbAlt;
 }
 
 .input_focus() {
-	border: 1px solid #FDC85D;
+	border: 1px solid @colorNoticeAlt;
 }
 
 .input_disabled() {
@@ -221,7 +228,7 @@
 	height: 24px;
 	margin: 1px;
 	padding: 0 8px;
-	color: #6d6e71;
+	color: @colorLinkAlt;
 	.box-shadow(0 0 2px #dddddd);
 	.gradient(vertical, #ffffff, #f2f2f2);
 	border: 1px solid #999;
