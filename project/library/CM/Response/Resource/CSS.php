@@ -13,8 +13,8 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			}
 		} elseif ($this->_getFilename() == 'internal.css') {
 			$css = new CM_Css();
-			$css->add(new CM_Css($this->getRender()->getLayoutFile('presets.less')->read()));
-			$css->add(new CM_Css($this->getRender()->getLayoutFile('layout.less')->read()));
+			$css->add(new CM_Css($this->getRender()->getLayoutFile('presets.style')->read()));
+			$css->add(new CM_Css($this->getRender()->getLayoutFile('layout.style')->read()));
 
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
 				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
