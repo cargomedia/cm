@@ -13,10 +13,17 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			}
 		} elseif ($this->_getFilename() == 'internal.css') {
 			$css = new CM_Css();
-			$css->add(new CM_Css($this->getRender()->getLayoutFile('presets.less')->read()));
-			$css->add(new CM_Css($this->getRender()->getLayoutFile('layout.less')->read()));
 
-			foreach ($this->getSite()->getNamespaces() as $namespace) {
+			foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
+				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
+					$path = $this->getRender()->getThemeDir(true, $theme, $namespace) . 'variables.less';
+					if (is_file($path)) {
+						$css->add(new CM_Css(new CM_File($path)));
+					}
+				}
+			}
+
+			foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
 				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
 					foreach (CM_Util::rglob('*.less', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
 						$file = new CM_File($path);
