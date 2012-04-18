@@ -18,7 +18,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
 				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
-					foreach (CM_Util::rglob('*.less', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
+					foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
 						$file = new CM_File($path);
 						$css->add(new CM_Css($file->read()));
 					}
@@ -39,15 +39,15 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 					$relativePaths = array();
 					foreach ($this->getRender()->getSite()->getThemes() as $theme) {
 						$basePath = $this->getRender()->getThemeDir(true, $theme, $namespace) . $viewType . '/' . $viewName . '/';
-						foreach (CM_Util::rglob('*.less', $basePath) as $path) {
+						foreach (CM_Util::rglob('*.style', $basePath) as $path) {
 							$relativePaths[] = preg_replace('#^' . $basePath . '#', '', $path);
 						}
 					}
 					foreach (array_unique($relativePaths) as $path) {
 						$prefix = '.' . $viewClass['name'];
 						if ('Component' == $viewType) {
-							if ($path != 'default.less' && strpos($path, '/') === false) {
-								$prefix .= '.' . preg_replace('#.less#', '', $path);
+							if ($path != 'default.style' && strpos($path, '/') === false) {
+								$prefix .= '.' . preg_replace('#.style$#', '', $path);
 							}
 						}
 
