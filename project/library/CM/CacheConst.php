@@ -37,4 +37,7 @@ class CM_CacheConst {
 
 	// _userId:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
+
+	//_md5:X
+	const Css = 'Css';
 }

@@ -112,7 +112,7 @@ EOD;
 				$color[1],$color[2], $color[3]);
 		});
 		$css = $mixins . $this;
-		$cachKey = md5($css);
+		$cachKey = CM_CacheConst::Css . '_md5:' . md5($css);
 		if (($parsedCss = CM_Cache::get($cachKey)) === false) {
 			$parsedCss = $lessc->parse($css);
 			CM_Cache::set($cachKey, $parsedCss);
