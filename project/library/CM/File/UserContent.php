@@ -19,14 +19,16 @@ class CM_File_UserContent extends CM_File {
 	private $_sequence;
 
 	/**
-	 * @param string $namespace
-	 * @param string $filename
-	 * @param int	$sequence
+	 * @param string   $namespace
+	 * @param string   $filename
+	 * @param int|null $sequence
 	 */
-	public function __construct($namespace, $filename, $sequence) {
+	public function __construct($namespace, $filename, $sequence = null) {
 		$this->_namespace = (string) $namespace;
 		$this->_filename = (string) $filename;
-		$this->_sequence = (int) $sequence;
+		if (null !== $sequence) {
+			$this->_sequence = (int) $sequence;
+		}
 	}
 
 	/**
@@ -39,36 +41,26 @@ class CM_File_UserContent extends CM_File {
 	/**
 	 * @return string
 	 */
-	public function getPathRelative() {
-		$bucket = $this->_sequence % self::BUCKETS_COUNT;
-		return $this->_namespace . DIRECTORY_SEPARATOR . $bucket . DIRECTORY_SEPARATOR . $this->getFileName();
-	}
-
-	/**
-	 * @return string
-	 */
 	public function getPath() {
-		return DIR_USERFILES . $this->getPathRelative();
+		return DIR_USERFILES . $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getUrl() {
-		return URL_USERFILES . $this->getPathRelative();
+		return URL_USERFILES . $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
 	}
 
 	public function mkDir() {
-		$bucket = $this->_sequence % self::BUCKETS_COUNT;
-		CM_Util::mkDir(DIR_USERFILES . $this->_namespace . DIRECTORY_SEPARATOR . $bucket);
+		CM_Util::mkDir(DIR_USERFILES . $this->_getDir());
 	}
 
-	/**
-	 * @param string $namespace
-	 */
-	public static function mkDirAll($namespace) {
-		for ($bucket = 0; $bucket < self::BUCKETS_COUNT; $bucket++) {
-			CM_Util::mkDir(DIR_USERFILES . $namespace . DIRECTORY_SEPARATOR . $bucket);
+	private function _getDir() {
+		$dirs[] = $this->_namespace;
+		if (null !== $this->_sequence) {
+			$dirs[] = $this->_sequence % self::BUCKETS_COUNT;
 		}
+		return implode(DIRECTORY_SEPARATOR, $dirs);
 	}
 }
