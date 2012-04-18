@@ -68,7 +68,7 @@ class CM_Css {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
 	background-color: @color;
 }
-.background-color(@color) {
+.background-color(@color) when not (iscolor(@color)), (iscolor(@color)) and (alpha(@color) = 1)  {
 	background-color: @color;
 }
 .box-shadow(@args...) {

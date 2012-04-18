@@ -179,16 +179,6 @@ EOD;
 EOD;
 		$css = new CM_Css($css);
 		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
-
-		//illegal value
-		$css = <<<'EOD'
-.foo {
-	.background-color(123);
-}
-EOD;
-		$css = new CM_Css($css);
-		$this->assertSame('', $css->compile(CM_Render::getInstance()));
-
 	}
 
 	public function testBoxShadow() {
