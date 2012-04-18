@@ -6,7 +6,7 @@
 }
 
 .buttons {
-	background-color: rgb(231, 253, 192);
+	.background-color(rgb(231, 253, 192));
 	height: 15px;
 	border: 1px solid black;
 	border-bottom: none;
@@ -17,7 +17,7 @@
 	position: absolute;
 	left: 0;
 	bottom: 15px;
-	background-color: rgb(231, 253, 192);
+	.background-color(rgb(231, 253, 192));
 	border: 1px solid black;
 }
 
@@ -29,12 +29,12 @@
 }
 
 .alerts {
-	background-color: rgba(231, 253, 192, 0.5);
+	.background-color(rgba(231, 253, 192, 0.5));
 	text-shadow: white 1px 1px 0px;
 }
 
 .errors {
 	font-family: monospace;
-	background-color: #FFA500;
+	.background-color(#FFA500);
 	margin: 20px;
 }

@@ -111,8 +111,13 @@ EOD;
 				isset($color[4]) ? $color[4]*255 : 255,
 				$color[1],$color[2], $color[3]);
 		});
-		$output = $lessc->parse($mixins . (string) $this);
-		return $output;
+		$css = $mixins . $this;
+		$cachKey = md5($css);
+		if (($parsedCss = CM_Cache::get($cachKey)) === false) {
+			$parsedCss = $lessc->parse($css);
+			CM_Cache::set($cachKey, $parsedCss);
+		}
+		return $parsedCss;
 	}
 
 	public function __toString() {

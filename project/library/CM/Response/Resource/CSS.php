@@ -12,14 +12,15 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				$content .= new CM_File($path);
 			}
 		} elseif ($this->_getFilename() == 'internal.css') {
-			$presets = new CM_CssLegacy($this->getRender()->getLayoutFile('presets.style')->read(), $this->getRender());
-			$content = new CM_CssLegacy($this->getRender()->getLayoutFile('layout.style')->read(), $this->getRender(), $presets);
+			$css = new CM_Css();
+			$css->add(new CM_Css($this->getRender()->getLayoutFile('presets.style')->read()));
+			$css->add(new CM_Css($this->getRender()->getLayoutFile('layout.style')->read()));
 
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
 				foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
 					foreach (CM_Util::rglob('*.css', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
 						$file = new CM_File($path);
-						$content .= new CM_CssLegacy($file->read(), $this->getRender(), $presets);
+						$css->add(new CM_Css($file->read()));
 					}
 				}
 			}
@@ -51,10 +52,11 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 						}
 
 						$file = $this->getRender()->getLayoutFile($viewType . '/' . $viewName . '/' . $path, $namespace);
-						$content .= new CM_CssLegacy($file->read(), $this->getRender(), $presets, $prefix);
+						$css->add(new CM_Css($file->read(), $prefix));
 					}
 				}
 			}
+			$content = $css->compile($this->getRender());
 		} elseif (file_exists(DIR_PUBLIC . 'static/css/' . $this->_getFilename())) {
 			$content = new CM_File(DIR_PUBLIC . 'static/css/' . $this->_getFilename());
 		} else {

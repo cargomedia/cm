@@ -1,4 +1,4 @@
-@ {
+& {
 	max-width: 470px;
 	color: blue;
 }
@@ -6,6 +6,6 @@
 .stream .output {
 	height: 100px;
 	overflow-y: scroll;
-	box-shadow: inset 0 0 10px 0 #ccc;
+	.box-shadow (inset 0 0 10px 0 #ccc);
 	padding: 5px;
 }
