@@ -1,6 +1,6 @@
 /*  Basic elements  */
 body {
-	.background-color(white);
+	.background-color(@colorBg);
 	background-attachment: fixed;
 	background-position: top center;
 }
@@ -14,27 +14,36 @@ a:hover {
 }
 
 h1, h2, h3 {
-	.color_highlight;
+	color: @colorBrand;
 }
 
 h1 {
-	.h1;
+	font: normal 18px Tahoma, Verdana, Arial, sans-serif;
+	letter-spacing: 1px;
+	margin: 7px 0;
 }
 
 h2 {
-	.h2;
+	font: normal 15px "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
+	line-height: 22px;
 }
 
 h3 {
-	.h3;
+	font: normal 13px "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
+    line-height: 17px;
 }
 
 h4 {
-	.h4;
+	font-size: 12px;
+	font-familiy: "Lucida Grande", Verdana, Arial, sans-serif;
+	color: @colorFg;
+	margin: 8px 0 2px 0;
 }
 
 hr {
-	.hr;
+	height: 1px;
+	.border_shy;
+	border-width: 1px 0 0 0;
 }
 
 body, p, input, table, textarea, select, button {
@@ -60,7 +69,7 @@ input[type=checkbox], input[type=radio] {
 .textinput {
 	.input_text;
 	.input_text_height;
-	.border_alt;
+	.border;
 }
 
 button:focus, .textinput:focus, .textinput.focus {

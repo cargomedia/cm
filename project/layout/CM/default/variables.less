@@ -1,24 +1,32 @@
-@color: 			#333333;
-@colorAlt: 			#888888;
+/*Special*/
+@colorOnline:			#008845;
+@colorNotice: 			#ea8e0b;
+@colorError: 			#C2113D;
+@colorBrand:			#e22b59;
 
-@colorUltraLight: 	#f7f7f7;
-@colorLight:		#dddddd;
+/*Basic*/
+@colorBg:				#ffffff;
+@colorFg: 				#333333;
+@colorFgShy: 			lighten(@colorFg, 25);
+@colorBgShy: 			lighten(@colorBg, 25);
+@colorBgStrong:			@colorBrand;
+@colorFgStrong:			#ffffff;
 
-@colorBorder:		#BDBDBD;
-@colorBorderLight: 	#ebebeb;
+@colorFgHeading:		@colorBrand;
 
-@colorBg:			#fafafa;
-@colorBgAlt:		#f2f2f2;
+/*Link*/
+@colorFgLink:			#0a7bc3;
+@colorFgLinkLight:		#6d6e71;
+@colorBgSelect:			lighten(@colorBrand, 43);
 
-@colorLink:			#0a7bc3;
-@colorLinkAlt:		#6d6e71;
-@colorLinkAltHover:	#525252;
+/*Lines*/
+@colorFgBorder:			#E8E8E8;
 
-@colorOnline:		#008845;
-@colorSelect:		#fdf1f5;
-@colorEmphasize:	#FDF6EB;
-@colorNotice: 		#ea8e0b;
-@colorNoticeAlt:	#FDC85D;
+/*Buttons*/
+@colorBgButton:			@colorBg;
+@colorFgButton:			@colorFg;
+@colorFgButtonFont:		lighten(@colorFgButton, 25);
 
-@colorFb:			#ed3261;
-@colorFbAlt:		#c30d3a;
+@colorBgButtonAlt:		#f5c400;
+@colorFgButtonAlt:		#fab85f;
+@colorFgButtonAltFont:	white;
