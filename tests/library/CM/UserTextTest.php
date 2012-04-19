@@ -61,7 +61,7 @@ EOD;
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-1 smileySet-1" alt=":)" title=":)"></span>
+smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span>
 allowed tags: bold
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
 badwords: hallo​badword_re​placement
@@ -97,7 +97,7 @@ EOD;
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
-		$expectedEmoticon = '<span class="smiley smiley-1 smileySet-1" alt=":)" title=":)"></span>';
+		$expectedEmoticon = '<span class="smiley smiley-1 smileySet-1" title=":)"></span>';
 
 		$this->assertEquals('Ein Gespenst geht um in Europa ' . $expectedEmoticon . ' test', $actual->getFormatPlain(1000));
 		$this->assertEquals('Ein Gespenst geht um in…', $actual->getFormatPlain(29));
@@ -114,7 +114,7 @@ EOD;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
-		$expected = 'Yo <span class="smiley smiley-4 smileySet-1" alt="*PLAYMATE*" title="*PLAYMATE*"></span>';
+		$expected = 'Yo <span class="smiley smiley-4 smileySet-1" title="*PLAYMATE*"></span>';
 		$this->assertEquals($expected, $actual->getFormatPlain(1000));
 		$this->assertEquals($expected, $actual->getFormatPlain(4));
 		$this->assertEquals('Yo ', $actual->getFormatPlain(3));
