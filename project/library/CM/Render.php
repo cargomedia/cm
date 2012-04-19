@@ -258,7 +258,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlResource($type, $path) {
-		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
 		return $urlBase . $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
 	}
 
@@ -267,7 +267,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlStatic($path) {
-		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
 		return $urlBase . 'static/' . $path . '?' . CM_App::getInstance()->getReleaseStamp();
 	}
 
@@ -276,7 +276,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file) {
-		$urlBase = (self::_getConfig()->cdnUserContent) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		$urlBase = (self::_getConfig()->cdnUserContent) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
 		return $urlBase . 'userfiles/' . $file->getPathRelative();
 	}
 

@@ -68,7 +68,7 @@ class CM_Mail extends CM_View_Abstract {
 				$this->_recipient = $recipient;
 				$this->addTo($this->_recipient->getEmail());
 				$this->setTplParam('recipient', $recipient);
-				$this->setTplParam('siteUrl', $this->_recipient->getSite()->getUrlRoot());
+				$this->setTplParam('siteUrl', $this->_recipient->getSite()->getUrl());
 			} else {
 				throw new CM_Exception_Invalid('Invalid Recipient defined.');
 			}
