@@ -37,7 +37,7 @@ EOD;
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-1 smileySet-1" alt=":)" title=":)"></span><br />
+smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span><br />
 allowed tags: <b class="italic">bold</b><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br />
 badwords: hallo​badword_re​placement<br />
@@ -137,7 +137,7 @@ EOD;
 		$urlStatic = URL_STATIC;
 		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected =
-				'<span class="smiley smiley-5 smileySet-1" alt="&lt;3" title="&lt;3"></span> love<br />' . PHP_EOL .
+				'<span class="smiley smiley-5 smileySet-1" title="&lt;3"></span> love<br />' . PHP_EOL .
 						'you';
 
 		$actual = new CM_Usertext('<3 love' . PHP_EOL . 'you');
