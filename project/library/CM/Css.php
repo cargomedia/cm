@@ -105,9 +105,10 @@ EOD;
 			list($type, $path) = $arg;
 			return array($type, 'url(' . $render->getUrlResource('img', substr($path, 1, -1)) . ')');
 		});
-		$lessc->registerFunction('rgbahex', function($color) {
-			if ($color[0] != 'color') {
-				throw new CM_Exception_Invalid("color expected for rgbahex");
+		$lessc->registerFunction('rgbahex', function($color, lessc $lessc) {
+			$color = $lessc->coerceColor($color);
+			if (is_null($color)) {
+				$lessc->throwError("color expected for rgbahex");
 			}
 			return sprintf("#%02x%02x%02x%02x", isset($color[4]) ? $color[4] * 255 : 255, $color[1], $color[2], $color[3]);
 		});
