@@ -49,9 +49,17 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	/**
 	 * @return string
 	 */
+	public function getUrlCdn() {
+		return self::_getConfig()->urlCdn;
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getUrlRoot() {
 		return self::_getConfig()->urlRoot;
 	}
+
 	/**
 	 * @param CM_Request_Abstract $request
 	 */
