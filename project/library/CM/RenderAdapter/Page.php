@@ -12,7 +12,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$options = array();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
-		$options['urlStatic'] = URL_STATIC;
+		$options['urlStatic'] = $this->getRender()->getUrlStatic('');
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream::getEnabled();
 		if (CM_Stream::getEnabled()) {
@@ -24,7 +24,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		}
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 
-		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . URL_STATIC . 'swf/WebSocketMainInsecure.swf"');
+		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . $this->getRender()->getUrlStatic('swf/WebSocketMainInsecure.swf') . '"');
 		if ($viewer = $page->getViewer()) {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}

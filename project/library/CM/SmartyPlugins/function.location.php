@@ -5,6 +5,8 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	$location = $params['location'];
 	$showLink = !empty($params['link']);
 	$parts = array();
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
 
 	if ($city = $location->get(CM_Model_Location::LEVEL_CITY)) {
 		$part = $city->getName();
@@ -37,7 +39,7 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	$html = implode(', ', $parts);
 
 	if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
-		$html .= ' <img class="flag" src="' . URL_STATIC . 'img/flags/' . strtolower($country->getAbbreviation()) . '.png" />';
+		$html .= ' <img class="flag" src="' . $render->getUrlStatic('img/flags/' . strtolower($country->getAbbreviation()) . '.png') . '" />';
 	}
 	return $html;
 }
