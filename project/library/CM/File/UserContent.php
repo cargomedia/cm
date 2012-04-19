@@ -52,6 +52,13 @@ class CM_File_UserContent extends CM_File {
 		return URL_USERFILES . $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getPathRelative() {
+		return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
+	}
+
 	public function mkDir() {
 		CM_Util::mkDir(DIR_USERFILES . $this->_getDir());
 	}

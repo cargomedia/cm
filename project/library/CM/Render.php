@@ -2,7 +2,7 @@
 
 require_once DIR_SMARTY . 'Smarty.class.php';
 
-class CM_Render {
+class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @var CM_Render
@@ -253,11 +253,34 @@ class CM_Render {
 	}
 
 	/**
+	 * @param string $type
 	 * @param string $path
 	 * @return string
 	 */
-	public function getUrlImg($path) {
-		return URL_OBJECTS . 'img/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+	public function getUrlResource($type, $path) {
+		$baseUrl = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		//return URL_OBJECTS . $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+		return $baseUrl . $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+	}
+
+	/**
+	 * @param string $path
+	 * @return string
+	 */
+	public function getUrlStatic($path) {
+		$baseUrl = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		return URL_STATIC . $path . '?' . CM_App::getInstance()->getReleaseStamp();
+		//return $baseUrl . 'static/' . $path . '?' . CM_App::getInstance()->getReleaseStamp();
+	}
+
+	/**
+	 * @param CM_File_UserContent $file
+	 * @return string
+	 */
+	public function getUrlUserContent(CM_File_UserContent $file) {
+		$baseUrl = (self::_getConfig()->cdnUserContent) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrlRoot();
+		return URL_USERFILES . $file->getPathRelative();
+		//return $baseUrl . 'userfiles/' . $file->getPathRelative();
 	}
 
 	/**

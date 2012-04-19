@@ -30,7 +30,7 @@ class CM_Css {
 	}
 
 	/**
-	 * @param string      $css
+	 * @param string	  $css
 	 * @param string|null $prefix
 	 */
 	public function add($css, $prefix = null) {
@@ -101,15 +101,15 @@ class CM_Css {
 EOD;
 		$lessc = new lessc();
 		$lessc->registerFunction('image', function ($arg) use($render) {
+			/** @var CM_Render $render */
 			list($type, $path) = $arg;
-			return array($type, 'url(' . $render->getUrlImg(substr($path, 1, -1)) . ')');
+			return array($type, 'url(' . $render->getUrlResource('img', substr($path, 1, -1)) . ')');
 		});
 		$lessc->registerFunction('rgbahex', function($color) {
-			if ($color[0] != 'color')
+			if ($color[0] != 'color') {
 				throw new CM_Exception_Invalid("color expected for rgbahex");
-			return sprintf("#%02x%02x%02x%02x",
-				isset($color[4]) ? $color[4]*255 : 255,
-				$color[1],$color[2], $color[3]);
+			}
+			return sprintf("#%02x%02x%02x%02x", isset($color[4]) ? $color[4] * 255 : 255, $color[1], $color[2], $color[3]);
 		});
 		$css = $mixins . $this;
 		$cachKey = CM_CacheConst::Css . '_md5:' . md5($css);

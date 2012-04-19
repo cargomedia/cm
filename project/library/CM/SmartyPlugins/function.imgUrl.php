@@ -7,9 +7,9 @@ function smarty_function_imgUrl(array $params, Smarty_Internal_Template $templat
 	$path = $params['path'];
 
 	if (!empty($params['static'])) {
-		$url = URL_STATIC . 'img/' . $path;
+		$url = $render->getUrlStatic('img/' . $path);
 	} else {
-		$url = $render->getUrlImg($path);
+		$url = $render->getUrlResource('img', $path);
 	}
 
 	return $url;

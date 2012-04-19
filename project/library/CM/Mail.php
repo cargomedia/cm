@@ -63,10 +63,12 @@ class CM_Mail extends CM_View_Abstract {
 		if (!is_null($recipient)) {
 			if (is_string($recipient)) {
 				$this->addTo($recipient);
+				$this->setTplParam('siteUrl', URL_ROOT);
 			} elseif ($recipient instanceof CM_Model_User) {
 				$this->_recipient = $recipient;
 				$this->addTo($this->_recipient->getEmail());
 				$this->setTplParam('recipient', $recipient);
+				$this->setTplParam('siteUrl', $this->_recipient->getSite()->getUrlRoot());
 			} else {
 				throw new CM_Exception_Invalid('Invalid Recipient defined.');
 			}
@@ -74,7 +76,6 @@ class CM_Mail extends CM_View_Abstract {
 
 		$config = self::_getConfig();
 		$this->setTplParam('siteName', $config->siteName);
-		$this->setTplParam('siteUrl', URL_ROOT);
 		$this->setSender($config->siteEmailAddress, $config->siteName);
 	}
 
