@@ -55,6 +55,7 @@ class CM_Css {
 	background-image: -webkit-linear-gradient(left,@color1,@color2);
 	background-image: -o-linear-gradient(left,@color1,@color2);
 	background-image: -ms-linear-gradient(left,@color1,@color2);
+	background-image: -webkit-gradient(linear,left top,right top,from(@color1),to(@color2));
 }
 .gradient(@direction, @color1, @color2) when (@direction = vertical) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
@@ -63,6 +64,7 @@ class CM_Css {
 	background-image: -webkit-linear-gradient(top,@color1,@color2);
 	background-image: -o-linear-gradient(top,@color1,@color2);
 	background-image: -ms-linear-gradient(top,@color1,@color2);
+	background-image: -webkit-gradient(linear,left top,left bottom,from(@color1),to(@color2));
 }
 .background-color(@color) when (iscolor(@color)) and (alpha(@color) < 1) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
