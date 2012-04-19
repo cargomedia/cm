@@ -10,6 +10,8 @@ $config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
 
+$config->CM_Render = new stdClass();
+
 $config->CM_Mail = new stdClass();
 $config->CM_Mail->siteName = 'CM';
 $config->CM_Mail->siteEmailAddress = 'noreply@example.com';

@@ -3,7 +3,12 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_CssTest extends TestCase {
 
+	private static $_configBackup;
+
 	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
+		CM_Config::get()->CM_Render->cdnResource = false;
+		CM_Config::get()->CM_Render->cdnUsetContent = false;
 	}
 
 	public static function tearDownAfterClass() {
@@ -50,7 +55,7 @@ EOD;
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
 		$render = CM_Render::getInstance();
-		$url = $render->getUrlImg('icon/mailbox_read.png');
+		$url = $render->getUrlResource('img', 'icon/mailbox_read.png');
 		$expected = <<<EOD
 background:url($url) no-repeat 66px 7px;
 
