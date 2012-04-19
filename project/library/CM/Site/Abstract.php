@@ -6,6 +6,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	protected $_namespaces = array();
 
 	/**
+	 * @return string
+	 */
+	abstract public function getUrl();
+
+	/**
 	 * Default constructor to set CM namespace
 	 */
 	public function __construct() {
@@ -50,14 +55,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlCdn() {
-		return self::_getConfig()->urlCdn;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getUrlRoot() {
-		return self::_getConfig()->urlRoot;
+		throw new CM_Exception_NotImplemented();
 	}
 
 	/**
