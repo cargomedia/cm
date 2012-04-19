@@ -83,8 +83,8 @@ class CM_Usertext extends CM_Class_Abstract {
 					$emoticons['codes'][] = $code;
 					$emoticons['tags'][] = '<emoticon>' . $smiley['id'] . '</emoticon>';
 					$emoticons['htmls'][] =
-							'<span class="smiley smiley-' . $smiley['id'] . ' smileySet-' . $smiley['setId'] . '" alt="' . $this->_escape($code) .
-									'" title="' . $this->_escape($code) . '"></span>';
+							'<span class="smiley smiley-' . $smiley['id'] . ' smileySet-' . $smiley['setId'] . '" title="' . $this->_escape($code) .
+									'"></span>';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
