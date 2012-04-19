@@ -8,7 +8,7 @@ class CM_Site_AbstractTest extends TestCase {
 	public static function setUpBeforeClass() {
 		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Site_Abstract = new stdClass();
-		CM_Config::get()->CM_Site_Abstract->urlRoot = 'http://www.foo.com';
+		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
 	}
 
