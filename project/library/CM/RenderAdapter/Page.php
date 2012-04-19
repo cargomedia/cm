@@ -12,7 +12,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$options = array();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
-		$options['urlStatic'] = $this->getRender()->getUrlStatic('');
+		$options['urlStatic'] = URL_STATIC;
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream::getEnabled();
 		if (CM_Stream::getEnabled()) {
