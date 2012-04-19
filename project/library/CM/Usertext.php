@@ -26,7 +26,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param int|null      $lengthMax
+	 * @param int|null	  $lengthMax
 	 * @param string[]|null $allowedTags
 	 * @param string[]|null $visibleTags
 	 * @return string Formated text with allowed tags preserved, un-allowed tags escaped and smilies images inserted
@@ -80,11 +80,11 @@ class CM_Usertext extends CM_Class_Abstract {
 			$emoticons = array('codes' => array(), 'tags' => array(), 'htmls' => array());
 			foreach (new CM_Paging_Smiley_All() as $smiley) {
 				foreach ($smiley['codes'] as $code) {
-					$path = URL_STATIC . 'img/smiles/' . $smiley['path'] . '?' . CM_App::getInstance()->getReleaseStamp();
 					$emoticons['codes'][] = $code;
 					$emoticons['tags'][] = '<emoticon>' . $smiley['id'] . '</emoticon>';
 					$emoticons['htmls'][] =
-							'<img class="smile" alt="' . $this->_escape($code) . '" title="' . $this->_escape($code) . '" src="' . $path . '" />';
+							'<span class="smiley smiley-' . $smiley['id'] . ' smileySet-' . $smiley['setId'] . '" alt="' . $this->_escape($code) .
+									'" title="' . $this->_escape($code) . '"></span>';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);

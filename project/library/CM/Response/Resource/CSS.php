@@ -64,11 +64,26 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				}
 			}
 			$content = $css->compile($this->getRender());
+
+			$content .= $this->_getCssSmiley();
 		} elseif (file_exists(DIR_PUBLIC . 'static/css/' . $this->_getFilename())) {
 			$content = new CM_File(DIR_PUBLIC . 'static/css/' . $this->_getFilename());
 		} else {
 			throw new CM_Exception_Invalid('Invalid filename: `' . $this->_getFilename() . '`');
 		}
 		return $content;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getCssSmiley() {
+		$css = '';
+		foreach (new CM_Paging_Smiley_All() as $smiley) {
+			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
+			$css .= 'background-image: url('.$this->getRender()->getUrlStatic('img/smiles/' . $smiley['path']).')';
+			$css .= '}' . PHP_EOL;
+		}
+		return $css;
 	}
 }
