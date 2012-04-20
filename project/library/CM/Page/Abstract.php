@@ -3,8 +3,6 @@
 abstract class CM_Page_Abstract extends CM_View_Abstract {
 
 	protected $_title = null;
-	protected $_description = '';
-	protected $_keywords = '';
 	protected $_params;
 	protected $_viewer = null;
 	protected $_path = null;
@@ -24,34 +22,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	abstract public function prepare(CM_Response_Abstract $response);
-
-	/**
-	 * @return string Description
-	 */
-	public final function getDescription() {
-		return $this->_description;
-	}
-
-	/**
-	 * @param string $description
-	 */
-	public function setDescription($description) {
-		$this->_description = (string) $description;
-	}
-
-	/**
-	 * @return string keywords
-	 */
-	public final function getKeywords() {
-		return $this->_keywords;
-	}
-
-	/**
-	 * @param string $keywords
-	 */
-	public function setKeywords($keywords) {
-		$this->_keywords = (string) $keywords;
-	}
 
 	/**
 	 * @return CM_Params

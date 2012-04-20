@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta name="description" content="{$pageObj->getDescription()|escape}">
-		<meta name="keywords" content="{$pageObj->getKeywords()|escape}">
+		<meta name="description" content="{"{block name='head-description'}{/block}"|escape}">
+		<meta name="keywords" content="{"{block name='head-keywords'}{/block}"|escape}">
 		<title>{block name='title'}{$pageObj->getTitle()|escape}{/block}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}
