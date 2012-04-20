@@ -78,7 +78,7 @@ EOD;
 }
 EOD;
 		$css = new CM_Css($css);
-$expected = <<<'EOD'
+		$expected = <<<'EOD'
 .foo {
   color:red;
   font-size:5;
@@ -273,6 +273,27 @@ EOD;
   transition:width 2s ease-in 2s;
   -moz-transition:width 2s ease-in 2s;
   -webkit-transition:width 2s ease-in 2s;
+}
+
+EOD;
+		$css = new CM_Css($css);
+		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+	}
+
+	public function testMedia() {
+		$this->markTestIncomplete('Media query bubbling not working, see https://github.com/leafo/lessphp/issues/222');
+		$css = <<<'EOD'
+.foo {
+	color: blue;
+	@media (max-width: 767px) & {
+		color: red;
+	}
+}
+EOD;
+		$expected = <<<'EOD'
+.foo { color:blue; }
+@media (max-width: 767px) {
+  .foo { color:red; }
 }
 
 EOD;
