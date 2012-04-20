@@ -278,7 +278,7 @@ class CM_Render extends CM_Class_Abstract {
 			$absolute = false;
 		}
 		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-			throw new CM_Exception_Invalid('Cannot find valid class definition for component `' . $pageClassName . '`.');
+			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
 		}
 		$pathTokens = explode('_', $pageClassName);
 		array_shift($pathTokens);
