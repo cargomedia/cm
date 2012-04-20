@@ -33,8 +33,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 					throw new CM_Exception('Different file content length in request and headers');
 				}
 
-				$tmpFile = CM_File_UserContent_Temp::create($query['qqfile']);
-				$tmpFile->write($content);
+				$tmpFile = CM_File_UserContent_Temp::create($query['qqfile'], $content);
 			} elseif (!empty($_FILES['qqfile'])) {
 				$file = $_FILES['qqfile'];
 

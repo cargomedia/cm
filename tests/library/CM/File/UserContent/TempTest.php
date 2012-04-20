@@ -38,21 +38,19 @@ class CM_File_UserContent_TempTest extends TestCase {
 		$this->assertSame('', $file->getExtension());
 	}
 
+	public function testCreateContent() {
+		$file = CM_File_UserContent_Temp::create('foo.txt', 'bar');
+		$this->assertSame('bar', $file->read());
+	}
+
 	public function testConstruct() {
 		$file = CM_File_UserContent_Temp::create('foo.txt');
 		$file2 = new CM_File_UserContent_Temp($file->getUniqid());
 		$this->assertEquals($file2, $file);
 	}
 
-	public function testWriteRead() {
-		$file = CM_File_UserContent_Temp::create('foo.txt');
-		$file->write('bar');
-		$this->assertSame('bar', $file->read());
-	}
-
 	public function testDelete() {
-		$file = CM_File_UserContent_Temp::create('foo.txt');
-		$file->write('bar');
+		$file = CM_File_UserContent_Temp::create('foo.txt', 'bar');
 		$this->assertTrue($file->getExists());
 
 		$file->delete();

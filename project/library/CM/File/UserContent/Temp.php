@@ -21,7 +21,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 
 	/**
 	 * @param string      $filename
-	 * @param string|null $content NOT USED
+	 * @param string|null $content
 	 * @return CM_File_UserContent_Temp
 	 */
 	public static function create($filename, $content = null) {
@@ -31,7 +31,13 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 		}
 		$uniqid = md5(rand() . uniqid());
 		CM_Mysql::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
-		return new self($uniqid);
+
+		$file = new self($uniqid);
+		$file->mkDir();
+		if (null !== $content) {
+			$file->write($content);
+		}
+		return $file;
 	}
 
 	/**

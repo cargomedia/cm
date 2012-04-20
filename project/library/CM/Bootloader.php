@@ -101,9 +101,6 @@ class CM_Bootloader {
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 		define('URL_USERFILES', URL_CONTENT . 'userfiles/');
 
-		define('DIR_TMP_USERFILES', DIR_USERFILES . 'tmp' . DIRECTORY_SEPARATOR);
-		define('URL_TMP_USERFILES', URL_ROOT . 'userfiles/tmp/');
-
 		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
 		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
