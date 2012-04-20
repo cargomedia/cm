@@ -64,8 +64,7 @@ class CM_File_UserContent_TempTest extends TestCase {
 	}
 
 	public function testDeleteOlder() {
-		$file = CM_File_UserContent_Temp::create('foo.txt');
-		$file->write('bar');
+		$file = CM_File_UserContent_Temp::create('foo.txt', 'bar');
 		$this->assertTrue($file->getExists());
 
 		CM_File_UserContent_Temp::deleteOlder(100);
