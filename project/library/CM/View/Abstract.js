@@ -31,10 +31,7 @@ _ready: function() {
 initDom: function($dom) {
 	$dom.placeholder();
 	$dom.find('.timeago').timeago();
-	$dom.find('button[title]').qtip({
-		position: {my: 'bottom center', at: 'top center'},
-		style: {classes: 'ui-tooltip-tipped'}
-	});
+	$dom.find('button[title]').tooltip();
 },
 
 /**
