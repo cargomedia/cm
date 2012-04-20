@@ -253,22 +253,58 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $type
-	 * @param string $path
+	 * @param string|null $path
+	 * @param boolean|null $cdn
 	 * @return string
 	 */
-	public function getUrlResource($type, $path) {
-		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
-		return $urlBase . $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+	public function getUrl($path = null, $cdn = null) {
+		if (is_null($cdn)) {
+			$cdn = false;
+		}
+		$urlBase = $cdn ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
+		return $urlBase . $path;
+	}
+
+	/**
+	 * @param $path
+	 * @param array|null $params
+	 * @param boolean|null $absolute
+	 * @return string
+	 */
+	public function getUrlPage($path, array $params = null, $absolute = null) {
+		if (is_null($absolute)) {
+			$absolute = false;
+		}
+		$urlBase = $absolute ? $this->getSite()->getUrl() : '/';
+		return $urlBase . CM_Page_Abstract::link($path, $params);
+	}
+
+	/**
+	 * @param string|null $type
+	 * @param string|null $path
+	 * @return string
+	 */
+	public function getUrlResource($type = null, $path = null) {
+		$type = (string) $type;
+		$path = (string) $path;
+		$urlPath = '';
+		if ($type && $path) {
+			$urlPath .= $type . '/' . $this->getSite()->getId() . '/' .CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+		}
+		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
 
 	/**
 	 * @param string $path
 	 * @return string
 	 */
-	public function getUrlStatic($path) {
-		$urlBase = (self::_getConfig()->cdnResource) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
-		return $urlBase . 'static/' . $path . '?' . CM_App::getInstance()->getReleaseStamp();
+	public function getUrlStatic($path = null) {
+		$path = (string) $path;
+		$urlPath = 'static/';
+		if ($path) {
+			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
+		}
+		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
 
 	/**
@@ -276,8 +312,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file) {
-		$urlBase = (self::_getConfig()->cdnUserContent) ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
-		return $urlBase . 'userfiles/' . $file->getPathRelative();
+		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
 	}
 
 	/**
