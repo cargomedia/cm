@@ -13,49 +13,41 @@ a:hover {
 	.link_hover;
 }
 
-h1, h2, h3 {
-	color: @colorBrand;
-}
-
 h1 {
-	font: normal 18px Tahoma, Verdana, Arial, sans-serif;
+	.font( 18px, @fontFamilyHeading, @colorFgHeading );
 	letter-spacing: 1px;
 	margin: 7px 0;
 }
 
 h2 {
-	font: normal 15px "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
-	line-height: 22px;
+	.font( 15px, @fontFamilyHeading, @colorFgHeading );
 }
 
 h3 {
-	font: normal 13px "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
-	line-height: 17px;
+	.font( 13px, @fontFamilyHeading, @colorFgHeading );
 }
 
 h4 {
-	font-size: 12px;
-	font-familiy: "Lucida Grande", Verdana, Arial, sans-serif;
-	color: @colorFg;
+	.font(@fontSize, @fontFamily, @colorFg );
 	margin: 8px 0 2px 0;
 }
 
 hr {
 	height: 1px;
-	.border_shy;
+	.border(@colorFgBorderShy);
 	border-width: 1px 0 0 0;
 }
 
 body, p, input, table, textarea, select, button {
-	.font;
+	.font(@fontSize, @fontFamily, @colorFg );
 }
 
 strong {
-	.strong;
+	font-weight: bold;
 }
 
 small {
-	.font_small;
+	font-size: @fontSizeSmall;
 }
 
 button:disabled, input:disabled {
@@ -69,7 +61,11 @@ input[type=checkbox], input[type=radio] {
 .textinput {
 	.input_text;
 	.input_text_height;
-	.border;
+	.border(@colorFgBorder);
+	html.no-boxsizing & {
+		height: @hightInputText - 10px;
+		width: 90%;
+	}
 }
 
 button:focus, .textinput:focus, .textinput.focus {
@@ -78,6 +74,9 @@ button:focus, .textinput:focus, .textinput.focus {
 
 textarea.textinput {
 	.input_textarea;
+	html.no-boxsizing & {
+		height: 60px;
+	}
 }
 
 button, input[type=submit], input[type=button] {

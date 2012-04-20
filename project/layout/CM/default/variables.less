@@ -4,25 +4,25 @@
 @colorError: 			#C2113D;
 @colorBrand:			#e22b59;
 
-/*Basic*/
+// Basic Color
 @colorBg:				#ffffff;
 @colorFg: 				#333333;
 @colorFgShy: 			lighten(@colorFg, 25);
 @colorBgShy: 			lighten(@colorBg, 25);
 @colorBgStrong:			@colorBrand;
 @colorFgStrong:			#ffffff;
-
 @colorFgHeading:		@colorBrand;
 
-/*Link*/
+//Links
 @colorFgLink:			#0a7bc3;
 @colorFgLinkLight:		#6d6e71;
 @colorBgSelect:			lighten(@colorBrand, 43);
 
-/*Lines*/
+//Border
 @colorFgBorder:			#E8E8E8;
-
-/*Buttons*/
+@colorFgBorderEmphasize:darken(@colorFgBorder, 15);
+@colorFgBorderShy:		lighten(@colorFgBorder, 5);
+//Buttons
 @colorBgButton:			@colorBg;
 @colorFgButton:			@colorFg;
 @colorFgButtonFont:		lighten(@colorFgButton, 25);
@@ -30,3 +30,22 @@
 @colorBgButtonAlt:		#f5c400;
 @colorFgButtonAlt:		#fab85f;
 @colorFgButtonAltFont:	white;
+
+//Font
+@fontFamily:			"Lucida Grande", Verdana, Arial, sans-serif;
+@fontFamilyHeading:		"Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
+
+@fontSize: 				12px;
+@fontSizeSmall:			11px;
+@fontSizeTiny:			9px;
+
+//Buttons
+@heightButton:			24px;
+@fontSizeButton:		11px;
+
+@heightButtonLarge:		56px;
+@fontSizeButtonLarge:	25px;
+
+//Textinput
+@hightInputText:		24px;
+@heightInputTextarea:	65px;

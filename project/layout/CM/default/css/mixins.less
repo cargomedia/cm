@@ -32,12 +32,9 @@
 	.background-color(@colorBgSelect);
 }
 
-.border() {
-	border: 1px solid @colorFgBorder;
-}
 
-.border_emphasize() {
-	border: 1px solid darken(@colorFgBorder, 15);
+.border(@color) {
+	border: 1px solid @color;
 }
 
 .border_shy() {
@@ -67,28 +64,9 @@
 }
 
 /* Fonts */
-.font() {
-	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
-	font-size: 12px;
-	line-height: 15px;
-	color: @colorFg;
-}
-
-.strong() {
-	font-weight: bold;
-}
-
-.font_menu() {
-	font-family: "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
-	font-size: 14px;
-}
-
-.font_small() {
-	font-size: 11px;
-}
-
-.font_tiny() {
-	font-size: 9px;
+.font(@size, @family, @color) {
+	font: normal @size ~"/" @size * 1.2 @family;
+	color: @color;
 }
 
 .font_placeholder() {
@@ -117,14 +95,14 @@
 
 .input_text_height() {
 	.box-sizing(border-box);
-	height: 24px;
+	height: @hightInputText;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
 .input_textarea() {
 	.box-sizing(border-box);
-	height: 65px;
+	height: @heightInputTextarea;
 	overflow: auto;
 	resize: vertical;
 }
@@ -138,16 +116,17 @@
 
 .input_button() {
 	width: auto;
-	height: 24px;
+	min-width: @heightButton;
+	height: @heightButton;
 	margin: 1px;
-	padding: 0 8px;
+	padding: 0 @heightButton / 3;
 	color: @colorFgButtonFont;
 	.box-shadow(0 0 2px darken(@colorBgButton, 15));
 	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
 	border: 1px solid lighten(@colorFgButton, 40);
 	border-radius: 2px;
 	font-weight: bold;
-	font-size: 11px;
+	font-size: @fontSizeButton;
 	cursor: pointer;
 	overflow: visible;
 	white-space: nowrap;
@@ -189,10 +168,10 @@
 }
 
 .input_button_large() {
-	height: 56px !important;
-	padding: 0 20px;
+	height: @heightButtonLarge !important;
+	padding: 0 @heightButtonLarge / 3;
 	border-radius: 3px;
-	font-size: 25px;
+	font-size: @fontSizeButtonLarge;
 	text-shadow: 1px 1px 1px white;
 	font-weight: bold;
 	text-transform: uppercase;
