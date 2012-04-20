@@ -13,6 +13,7 @@ class CM_File_Temp extends CM_File {
 
 	/**
 	 * @param string $uniqid
+	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($uniqid) {
 		$data = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
@@ -31,7 +32,7 @@ class CM_File_Temp extends CM_File {
 	public static function create($filename, $content = null) {
 		$filename = (string) $filename;
 		if (strlen($filename) > 100) {
-			$filename = substr($filename, -1, 100);
+			$filename = substr($filename, -100, 100);
 		}
 		$uniqid = md5(rand() . uniqid());
 		CM_Mysql::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));

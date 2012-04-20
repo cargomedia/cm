@@ -4,18 +4,17 @@ class CM_File {
 	private $_path;
 
 	/**
-	 * Creates file object
-	 *
 	 * @param string|CM_File $file Path to file
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($file) {
 		if ($file instanceof CM_File) {
 			$file = $file->getPath();
 		}
-		if (!is_file($file)) {
+		$this->_path = (string) $file;
+		if (!$this->getExists()) {
 			throw new CM_Exception_Invalid('File path `' . $file . '` does not exist or is not a file.');
 		}
-		$this->_path = $file;
 	}
 
 	/**
@@ -75,6 +74,13 @@ class CM_File {
 			throw new CM_Exception('Cannot detect md5-sum of `' . $this->getPath() . '`');
 		}
 		return $md5;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getExists() {
+		return is_file($this->getPath());
 	}
 
 	/**
