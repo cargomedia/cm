@@ -253,7 +253,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string|null $path
+	 * @param string|null  $path
 	 * @param boolean|null $cdn
 	 * @return string
 	 */
@@ -261,20 +261,33 @@ class CM_Render extends CM_Class_Abstract {
 		if (is_null($cdn)) {
 			$cdn = false;
 		}
+		$path = (string) $path;
 		$urlBase = $cdn ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
 		return $urlBase . $path;
 	}
 
 	/**
-	 * @param $path
-	 * @param array|null $params
+	 * @param              $pageClassName
+	 * @param array|null   $params
 	 * @param boolean|null $absolute
 	 * @return string
 	 */
-	public function getUrlPage($path, array $params = null, $absolute = null) {
+	public function getUrlPage($pageClassName, array $params = null, $absolute = null) {
+		$pageClassName = (string) $pageClassName;
 		if (is_null($absolute)) {
 			$absolute = false;
 		}
+		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
+			throw new CM_Exception_Invalid('Cannot find valid class definition for component `' . $pageClassName . '`.');
+		}
+		$pathTokens = explode('_', $pageClassName);
+		array_shift($pathTokens);
+		array_shift($pathTokens);
+		// Rewrites CodeOfHonor to code-of-honor
+		foreach ($pathTokens as &$pathToken) {
+			$pathToken = preg_replace('/([A-Z])/e', '"-".strtolower("$1")', lcfirst($pathToken));
+		}
+		$path = implode('/', $pathTokens);
 		$urlBase = $absolute ? $this->getSite()->getUrl() : '/';
 		return $urlBase . CM_Page_Abstract::link($path, $params);
 	}
@@ -285,11 +298,11 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlResource($type = null, $path = null) {
-		$type = (string) $type;
-		$path = (string) $path;
 		$urlPath = '';
-		if ($type && $path) {
-			$urlPath .= $type . '/' . $this->getSite()->getId() . '/' .CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+		if (!(is_null($type) || is_null($path))) {
+			$type = (string) $type;
+			$path = (string) $path;
+			$urlPath .= $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -299,9 +312,9 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlStatic($path = null) {
-		$path = (string) $path;
 		$urlPath = 'static/';
-		if ($path) {
+		if (!is_null($path)) {
+			$path = (string) $path;
 			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
