@@ -20,7 +20,7 @@ class CM_Response_UploadTest extends TestCase {
 
 		$this->assertNotEmpty($data->success);
 		
-		$tmpFile = new CM_File_Temp($data->success->id);
+		$tmpFile = new CM_File_UserContent_Temp($data->success->id);
 		
 		$this->assertEquals($content, $tmpFile->read());
 	}

@@ -27,10 +27,10 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	/**
-	 * @param CM_File_Temp $file
+	 * @param CM_File_UserContent_Temp $file
 	 * @return string HTML
 	 */
-	public function getPreview(CM_File_Temp $file) {
+	public function getPreview(CM_File_UserContent_Temp $file) {
 		$html = '';
 		$html .= '<a href="javascript:;" class="icon delete hover"></a>';
 		return $html;
@@ -47,7 +47,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 
 		$files = array();
 		foreach ($userInput as $file) {
-			$files[] = new CM_File_Temp($file);
+			$files[] = new CM_File_UserContent_Temp($file);
 		}
 
 		return (array) $files;

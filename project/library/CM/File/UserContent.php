@@ -42,14 +42,14 @@ class CM_File_UserContent extends CM_File {
 	 * @return string
 	 */
 	public function getPath() {
-		return DIR_USERFILES . $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
+		return DIR_USERFILES . $this->getPathRelative();
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getUrl() {
-		return URL_USERFILES . $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
+		return URL_USERFILES . $this->getPathRelative();
 	}
 
 	/**
@@ -63,7 +63,10 @@ class CM_File_UserContent extends CM_File {
 		CM_Util::mkDir(DIR_USERFILES . $this->_getDir());
 	}
 
-	private function _getDir() {
+	/**
+	 * @return string
+	 */
+	protected function _getDir() {
 		$dirs[] = $this->_namespace;
 		if (null !== $this->_sequence) {
 			$dirs[] = $this->_sequence % self::BUCKETS_COUNT;
