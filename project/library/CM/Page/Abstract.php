@@ -169,13 +169,9 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	/**
 	 * @param string  $path
 	 * @param array   $params Query parameters
-	 * @param boolean $absolute
 	 * @return string
 	 */
-	public static final function link($path, array $params = null, $absolute = false) {
-		if ($absolute) {
-			$path = substr(URL_ROOT, 0, -1) . $path;
-		}
+	public static final function link($path, array $params = null) {
 		$link = $path;
 
 		if (!empty($params)) {
@@ -186,14 +182,4 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 
 		return $link;
 	}
-
-	/**
-	 * @param string $path
-	 * @param array  $params Query parameters
-	 * @return string
-	 */
-	public static final function linkAbs($path, array $params = null) {
-		return self::link($path, $params, true);
-	}
-
 }

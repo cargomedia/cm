@@ -3,10 +3,9 @@
 abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @param boolean $absolute
 	 * @return string
 	 */
-	abstract public function getLink($absolute = false);
+	abstract public function getLink();
 
 	/**
 	 * @param boolean $throwNonexistent OPTIONAL

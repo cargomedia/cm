@@ -1,11 +1,25 @@
 <?php
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
 	$path = 'javascript:;';
 	if (isset($params['path'])) {
 		$path = $params['path'];
 	}
 	unset($params['path']);
+
+	$page = null;
+	if (isset($params['page'])) {
+		$page = $params['page'];
+	}
+	unset($params['page']);
+
+	$absolute = false;
+	if (isset($params['absolute'])) {
+		$absolute = $params['absolute'];
+	}
+	unset($params['absolute']);
 
 	$label = '';
 	if (isset($params['label'])) {
@@ -30,7 +44,11 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	unset($params['icon']);
 
-	$link = CM_Page_Abstract::link($path, $params);
+	if (!is_null($page)) {
+		$link = $render->getUrlPage($page, $params, $absolute);
+	} else {
+		$link = CM_Page_Abstract::link($path, $params);
+	}
 
 	$html = '<a href="' . $link . '"';
 	if (!empty($class)) {
@@ -47,7 +65,9 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	if (!empty($icon) && !empty($label)) {
 		$html .= '<span class="label">';
 	}
-
+	if (empty($title) && empty($label)) {
+		$label = $link;
+	}
 	$html .= CM_Language::htmlspecialchars($label);
 
 	if (!empty($icon) && !empty($label)) {
