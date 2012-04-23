@@ -3,11 +3,6 @@
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
-	$path = 'javascript:;';
-	if (isset($params['path'])) {
-		$path = $params['path'];
-	}
-	unset($params['path']);
 
 	$page = null;
 	if (isset($params['page'])) {
@@ -38,13 +33,12 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	unset($params['icon']);
 
+	$href = 'javascript:;';
 	if (!is_null($page)) {
-		$link = $render->getUrlPage($page, $params);
-	} else {
-		$link = CM_Page_Abstract::link($path, $params);
+		$href = $render->getUrlPage($page, $params);
 	}
 
-	$html = '<a href="' . $link . '"';
+	$html = '<a href="' . $href . '"';
 	if (!empty($class)) {
 		$html .= ' class="' . $class . '"';
 	}
@@ -60,7 +54,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$html .= '<span class="label">';
 	}
 	if (empty($title) && empty($label)) {
-		$label = $link;
+		$label = $href;
 	}
 	$html .= CM_Language::htmlspecialchars($label);
 
