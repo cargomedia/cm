@@ -9,6 +9,8 @@ class CM_RenderTest extends TestCase {
 		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com/';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com/';
+		CM_Config::get()->Test_Site_Test = new stdClass();
+		CM_Config::get()->Test_Site_Test->url = 'http://www.test.com/';
 	}
 
 	public static function tearDownAfterClass() {
@@ -38,21 +40,6 @@ class CM_RenderTest extends TestCase {
 			'foo' => 'bar')));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', array('userId' => 15,
 			'foo' => 'bar')));
-		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Index', false);
-		$this->assertSame('http://www.foo.com/', $render->getUrlPage('Test_Page_Index'));
-		try {
-			$render->getUrlPage('NonexistentPage');
-			$this->fail('Can compute path of nonexistent page class');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertTrue(true);
-		}
-		$this->getMockForAbstractClass('CM_Model_Abstract', array(), 'InvalidClass', false);
-		try {
-			$render->getUrlPage('InvalidClass');
-			$this->fail('Can compute path of invalid class');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertTrue(true);
-		}
 		$this->getMockForAbstractClass('CM_Model_Abstract', array(), 'InvalidNamespace_Page_Test', false);
 		try {
 			$render->getUrlPage('InvalidNamespace_Page_Test');
@@ -60,6 +47,13 @@ class CM_RenderTest extends TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);
 		}
+		$render->getUrlPage('Test_Page_Foo_Bar_FooBar');
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'Test_Site_Test', true, true, true, array('getId', 'getNamespaces'));
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Test', 'CM')));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$this->assertSame('http://www.test.com/foo/bar/foo-bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', null, $site));
+		$this->assertSame('http://www.test.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', array('userId' => 15,
+					'foo' => 'bar'), $site));
 	}
 
 	public function testGetUrlResource() {

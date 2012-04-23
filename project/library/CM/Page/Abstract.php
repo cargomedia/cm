@@ -137,6 +137,29 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	}
 
 	/**
+	 * @param string $pageClassName
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function getUrlPage($pageClassName) {
+		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
+			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
+		}
+		$pathTokens = explode('_', $pageClassName);
+		array_shift($pathTokens);
+		array_shift($pathTokens);
+		// Rewrites CodeOfHonor to code-of-honor
+		foreach ($pathTokens as &$pathToken) {
+			$pathToken = preg_replace('/([A-Z])/e', '"-".strtolower("$1")', lcfirst($pathToken));
+		}
+		$path = implode('/', $pathTokens);
+		if ($path == 'index') {
+			$path = '';
+		}
+		return $path;
+	}
+
+	/**
 	 * @param string  $path
 	 * @param array   $params Query parameters
 	 * @return string

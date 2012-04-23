@@ -285,16 +285,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!in_array($namespace, $site->getNamespaces())) {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
-		array_shift($pathTokens);
-		// Rewrites CodeOfHonor to code-of-honor
-		foreach ($pathTokens as &$pathToken) {
-			$pathToken = preg_replace('/([A-Z])/e', '"-".strtolower("$1")', lcfirst($pathToken));
-		}
-		$path = implode('/', $pathTokens);
-		if ($path == 'index') {
-			$path = '';
-		}
-		return $site->getUrl() . CM_Page_Abstract::link($path, $params);
+		return $site->getUrl() . CM_Page_Abstract::link(CM_Page_Abstract::getUrlPage($pageClassName), $params);
 	}
 
 	/**
