@@ -236,16 +236,15 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param CM_Site_Abstract|null $site
-	 * @param boolean|null          $delayed
-	 * @return array|null ($subject, $html, $text)
+	 * @param boolean|null $delayed
+	 * @return array|null  ($subject, $html, $text)
 	 */
-	public function send(CM_Site_Abstract $site = null, $delayed = null) {
+	public function send($delayed = null) {
 		$delayed = (boolean) $delayed;
-		if (!$site) {
-			if ($this->_recipient) {
-				$site = $this->_recipient->getSite();
-			}
+		if ($this->_recipient) {
+			$site = $this->_recipient->getSite();
+		} else {
+			$site = null;
 		}
 		if (empty($this->_to)) {
 			throw new CM_Exception_Invalid('No recipient specified.');
@@ -263,11 +262,8 @@ class CM_Mail extends CM_View_Abstract {
 		return array($subject, $html, $text);
 	}
 
-	/**
-	 * @param CM_Site_Abstract|null $site
-	 */
-	public function sendDelayed(CM_Site_Abstract $site = null) {
-		$this->send($site, true);
+	public function sendDelayed() {
+		$this->send(true);
 	}
 
 	/**
