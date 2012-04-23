@@ -15,12 +15,6 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	unset($params['page']);
 
-	$absolute = false;
-	if (isset($params['absolute'])) {
-		$absolute = $params['absolute'];
-	}
-	unset($params['absolute']);
-
 	$label = '';
 	if (isset($params['label'])) {
 		$label = $params['label'];
@@ -45,7 +39,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	unset($params['icon']);
 
 	if (!is_null($page)) {
-		$link = $render->getUrlPage($page, $params, $absolute);
+		$link = $render->getUrlPage($page, $params);
 	} else {
 		$link = CM_Page_Abstract::link($path, $params);
 	}

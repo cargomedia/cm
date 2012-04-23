@@ -208,6 +208,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator 
 		}
 
 		$this->filter($filter);
+		return $this;
 	}
 
 	/**

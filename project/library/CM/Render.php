@@ -267,29 +267,34 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param              $pageClassName
-	 * @param array|null   $params
-	 * @param boolean|null $absolute
+	 * @param string                $pageClassName
+	 * @param array|null            $params
+	 * @param CM_Site_Abstract|null $site
 	 * @return string
 	 */
-	public function getUrlPage($pageClassName, array $params = null, $absolute = null) {
+	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
 		$pageClassName = (string) $pageClassName;
-		if (is_null($absolute)) {
-			$absolute = false;
+		if (is_null($site)) {
+			$site = $this->getSite();
 		}
 		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
 			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
 		}
 		$pathTokens = explode('_', $pageClassName);
-		array_shift($pathTokens);
+		$namespace = array_shift($pathTokens);
+		if (!in_array($namespace, $site->getNamespaces())) {
+			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
+		}
 		array_shift($pathTokens);
 		// Rewrites CodeOfHonor to code-of-honor
 		foreach ($pathTokens as &$pathToken) {
 			$pathToken = preg_replace('/([A-Z])/e', '"-".strtolower("$1")', lcfirst($pathToken));
 		}
 		$path = implode('/', $pathTokens);
-		$urlBase = $absolute ? $this->getSite()->getUrl() : '/';
-		return $urlBase . CM_Page_Abstract::link($path, $params);
+		if ($path == 'index') {
+			$path = '';
+		}
+		return $site->getUrl() . CM_Page_Abstract::link($path, $params);
 	}
 
 	/**

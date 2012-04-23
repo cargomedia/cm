@@ -12,14 +12,8 @@ function smarty_function_linkUrl(array $params, Smarty_Internal_Template $templa
 	}
 	unset($params['page']);
 
-	$absolute = false;
-	if (isset($params['absolute'])) {
-		$absolute = $params['absolute'];
-	}
-	unset($params['absolute']);
-
 	if (!is_null($page)) {
-		$link = $render->getUrlPage($page, $params, $absolute);
+		$link = $render->getUrlPage($page, $params);
 	} else {
 		$link = CM_Page_Abstract::link($path, $params);
 	}

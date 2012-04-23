@@ -33,11 +33,13 @@ class CM_RenderTest extends TestCase {
 	public function testGetUrlPage() {
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Foo_Bar_FooBar', false);
 		$render = $this->_getRender();
-		$this->assertSame('/foo/bar/foo-bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar'));
-		$this->assertSame('/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', array('userId' => 15,
+		$this->assertSame('http://www.foo.com/foo/bar/foo-bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar'));
+		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', array('userId' => 15,
 			'foo' => 'bar')));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('Test_Page_Foo_Bar_FooBar', array('userId' => 15,
-			'foo' => 'bar'), true));
+			'foo' => 'bar')));
+		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Index', false);
+		$this->assertSame('http://www.foo.com/', $render->getUrlPage('Test_Page_Index'));
 		try {
 			$render->getUrlPage('NonexistentPage');
 			$this->fail('Can compute path of nonexistent page class');
@@ -48,6 +50,13 @@ class CM_RenderTest extends TestCase {
 		try {
 			$render->getUrlPage('InvalidClass');
 			$this->fail('Can compute path of invalid class');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertTrue(true);
+		}
+		$this->getMockForAbstractClass('CM_Model_Abstract', array(), 'InvalidNamespace_Page_Test', false);
+		try {
+			$render->getUrlPage('InvalidNamespace_Page_Test');
+			$this->fail('Can compute path of page with invalid namespace');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);
 		}
