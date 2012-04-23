@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="{block name='html-class'}{/block}">
 	<head>
 		<meta charset="utf-8">
 		<meta name="description" content="{"{block name='head-description'}{/block}"|escape}">
