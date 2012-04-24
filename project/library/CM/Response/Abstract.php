@@ -29,7 +29,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param int|null			$siteId
+	 * @param int|null            $siteId
 	 */
 	public function __construct(CM_Request_Abstract $request, $siteId = null) {
 		$this->_request = $request;
@@ -120,12 +120,12 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string		   $path
-	 * @param array|null	   $params
+	 * @param CM_Page_Abstract|string $page
+	 * @param array|null              $params
 	 * @throws CM_Exception_Redirect
 	 */
-	public function redirect($path, array $params = null) {
-		$url = CM_Page_Abstract::link($path, $params);
+	public function redirect($page, array $params = null) {
+		$url = $this->getRender()->getUrlPage($page, $params);
 		if (IS_TEST) {
 			throw new CM_Exception_Redirect($url);
 		}

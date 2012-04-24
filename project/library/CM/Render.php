@@ -271,6 +271,8 @@ class CM_Render extends CM_Class_Abstract {
 	 * @param array|null              $params
 	 * @param CM_Site_Abstract|null   $site
 	 * @return string
+	 *
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
 		if (is_null($site)) {
@@ -292,7 +294,7 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
 		$path = $pageClassName::getPath2($params);
-		return $site->getUrl() . CM_Page_Abstract::link($path, $params);
+		return $site->getUrl() . $path;
 	}
 
 	/**

@@ -97,8 +97,13 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadJs('window.location.reload(true)');
 	}
 
-	public function redirect($path, array $params = null) {
-		$url = CM_Page_Abstract::link($path, $params);
+	public function redirect($page, array $params = null) {
+		$url = $this->getRender()->getUrlPage($page, $params);
+		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
+	}
+
+	public function redirectUrl($page, array $params = null) {
+		$url = CM_Page_Abstract::link($page, $params);
 		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
 	}
 }

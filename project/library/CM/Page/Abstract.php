@@ -125,7 +125,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @return string
 	 */
 	public static function getPath2(array &$params = null) {
-		return static::getPathByClassName(get_called_class());
+		return self::link(self::getPathByClassName(get_called_class()), $params);
 	}
 
 	/**
