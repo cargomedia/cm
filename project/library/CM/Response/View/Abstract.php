@@ -99,11 +99,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 	public function redirect($page, array $params = null) {
 		$url = $this->getRender()->getUrlPage($page, $params);
-		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
+		$this->redirectUrl($url);
 	}
 
-	public function redirectUrl($page, array $params = null) {
-		$url = CM_Page_Abstract::link($page, $params);
+	public function redirectUrl($url, array $params = null) {
 		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
 	}
 }
