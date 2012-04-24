@@ -40,23 +40,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	public final function getPath() {
 		// Caches path locally because stays the same
 		if (!$this->_path) {
-			$list = explode('_', get_class($this));
-
-			// Remove first parts
-			foreach ($list as $index => $entry) {
-				unset($list[$index]);
-				if ($entry == 'Page') {
-					break;
-				}
-			}
-
-			// Converts upper case letters to dashes: CodeOfHonor => code-of-honor
-			foreach ($list as $index => $entry) {
-				$entry = lcfirst($entry);
-				$list[$index] = preg_replace('/([A-Z])/', '-\1', $entry);
-			}
-
-			$this->_path = strtolower('/' . implode('/', $list));
+			$this->_path = '/' . self::getPathByClassName(get_class($this));
 		}
 
 		return $this->_path;
@@ -112,7 +96,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	/**
 	 * Creates a new page based on the given path (including params)
 	 *
-	 * @param CM_Site_Abstract $site
+	 * @param CM_Site_Abstract    $site
 	 * @param CM_Request_Abstract $request
 	 * @return CM_Page_Abstract
 	 * @throws CM_Exception_Nonexistent
@@ -141,18 +125,26 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function getUrlPage($pageClassName) {
+	public static function getPathByClassName($pageClassName) {
 		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
 			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
 		}
-		$pathTokens = explode('_', $pageClassName);
-		array_shift($pathTokens);
-		array_shift($pathTokens);
-		// Rewrites CodeOfHonor to code-of-honor
-		foreach ($pathTokens as &$pathToken) {
-			$pathToken = preg_replace('/([A-Z])/e', '"-".strtolower("$1")', lcfirst($pathToken));
+		$list = explode('_', $pageClassName);
+
+		// Remove first parts
+		foreach ($list as $index => $entry) {
+			unset($list[$index]);
+			if ($entry == 'Page') {
+				break;
+			}
 		}
-		$path = implode('/', $pathTokens);
+
+		// Converts upper case letters to dashes: CodeOfHonor => code-of-honor
+		foreach ($list as $index => $entry) {
+			$list[$index] = preg_replace('/([A-Z])/', '-\1', lcfirst($entry));
+		}
+
+		$path = strtolower(implode('/', $list));
 		if ($path == 'index') {
 			$path = '';
 		}
