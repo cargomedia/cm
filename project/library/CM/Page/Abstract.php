@@ -121,6 +121,14 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	}
 
 	/**
+	 * @param array|null $params
+	 * @return string
+	 */
+	public static function getPath2(array $params = null) {
+		return static::getPathByClassName(get_called_class());
+	}
+
+	/**
 	 * @param string $pageClassName
 	 * @return string
 	 * @throws CM_Exception_Invalid
@@ -150,6 +158,8 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 		}
 		return $path;
 	}
+
+
 
 	/**
 	 * @param string  $path
