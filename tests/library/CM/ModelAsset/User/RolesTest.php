@@ -40,8 +40,6 @@ class CM_ModelAsset_User_RolesTest extends TestCase {
 	}
 	
 	public function testClean() {
-		CM_EventHandler::getInstance()->unbind('roleExpired');
-
 		TH::clearEnv();
 		$user1 = TH::createUser();
 		$user2 = TH::createUser();

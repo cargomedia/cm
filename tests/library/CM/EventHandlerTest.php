@@ -14,7 +14,7 @@ class CM_EventHandlerTest extends TestCase{
 	}
 
 	public function test() {
-		$eventHandler = CM_EventHandler::getInstance();
+		$eventHandler = new CM_EventHandler();
 		self::$_foo = 'bar';
 		$eventHandler->bind('foo', function(CM_Params $params = null) {
 			$text = $params->getString('text');
