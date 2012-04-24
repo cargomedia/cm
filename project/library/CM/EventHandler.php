@@ -12,10 +12,6 @@ final class CM_EventHandler {
 	 */
 	private $_callbacks = array();
 
-	public function __construct() {
-		CM_Site_Abstract::factory()->bindEvents($this);
-	}
-
 	/**
 	 * @param string $event
 	 * @param Closure $callback

@@ -4,12 +4,27 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 
 	protected $_themes = array();
 	protected $_namespaces = array();
+	/**
+	 * @var CM_EventHandler
+	 */
+	protected $_eventHandler = null;
 
 	/**
 	 * Default constructor to set CM namespace
 	 */
 	public function __construct() {
 		$this->_setNamespace('CM');
+	}
+
+	/**
+	 * @return CM_EventHandler
+	 */
+	public function getEventHandler() {
+		if (!$this->_eventHandler) {
+			$this->_eventHandler = new CM_EventHandler();
+			$this->bindEvents($this->_eventHandler);
+		}
+		return $this->_eventHandler;
 	}
 
 	/**
