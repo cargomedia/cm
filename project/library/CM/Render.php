@@ -125,7 +125,7 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_View_Abstract $view Object to render
-	 * @param array			$params
+	 * @param array            $params
 	 * @return string Output
 	 * @throws CM_Exception
 	 */
@@ -142,7 +142,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	 $tplPath
+	 * @param string     $tplPath
 	 * @param array|null $variables
 	 * @param bool|null  $isolated
 	 * @return string
@@ -189,8 +189,8 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param bool   $full	  OPTIONAL True if full path required
-	 * @param string $theme	 OPTIONAL
+	 * @param bool   $full      OPTIONAL True if full path required
+	 * @param string $theme     OPTIONAL
 	 * @param string $namespace OPTIONAL
 	 * @return string Theme base path
 	 */
@@ -212,7 +212,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	  $tpl  Template file name
+	 * @param string      $tpl  Template file name
 	 * @param string|null $namespace
 	 * @param bool|null   $full
 	 * @param bool|null   $needed
@@ -243,7 +243,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string		$path
+	 * @param string        $path
 	 * @param string|null   $namespace
 	 * @return CM_File
 	 * @throws CM_Exception_Invalid
@@ -267,25 +267,27 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string                $pageClassName
-	 * @param array|null            $params
-	 * @param CM_Site_Abstract|null $site
+	 * @param CM_Page_Abstract|string $page
+	 * @param array|null              $params
+	 * @param CM_Site_Abstract|null   $site
 	 * @return string
 	 */
-	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
-		$pageClassName = (string) $pageClassName;
+	public function getUrlPage($page, array $params = null, CM_Site_Abstract $site = null) {
 		if (is_null($site)) {
 			$site = $this->getSite();
 		}
-		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
+		if ($page instanceof CM_Page_Abstract) {
+			$this->_checkNamespace(get_class($page), $site);
+			$path = substr($page->getPath(), 1);
+		} else {
+			$pageClassName = (string) $page;
+			if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
+				throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
+			}
+			$this->_checkNamespace($pageClassName, $site);
+			$path = CM_Page_Abstract::getPathByClassName($pageClassName);
 		}
-		$pathTokens = explode('_', $pageClassName);
-		$namespace = array_shift($pathTokens);
-		if (!in_array($namespace, $site->getNamespaces())) {
-			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
-		}
-		return $site->getUrl() . CM_Page_Abstract::link(CM_Page_Abstract::getPathByClassName($pageClassName), $params);
+		return $site->getUrl() . CM_Page_Abstract::link($path, $params);
 	}
 
 	/**
@@ -322,6 +324,19 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file) {
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+	}
+
+	/**
+	 * @param string           $className
+	 * @param CM_Site_Abstract $site
+	 * @throws CM_Exception_Invalid
+	 */
+	private function _checkNamespace($className, CM_Site_Abstract $site) {
+		preg_match('/^([A-Z]+)_/', $className, $matches);
+		$namespace = $matches[1];
+		if (!in_array($namespace, $site->getNamespaces())) {
+			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
+		}
 	}
 
 	/**

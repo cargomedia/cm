@@ -134,7 +134,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	protected function _getRender() {
 		/** @var CM_Site_Abstract $siteMock */
 		$siteMock = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
-		$siteMock->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Test', 'CM')));
+		$siteMock->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('TEST', 'CM')));
 		$siteMock->expects($this->any())->method('getId')->will($this->returnValue(1));
 		return new CM_Render($siteMock);
 	}
