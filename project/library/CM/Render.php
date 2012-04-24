@@ -267,26 +267,31 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Page_Abstract|string $page
+	 * @param CM_Page_Abstract|string $pageClassName
 	 * @param array|null              $params
 	 * @param CM_Site_Abstract|null   $site
 	 * @return string
 	 */
-	public function getUrlPage($page, array $params = null, CM_Site_Abstract $site = null) {
+	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
 		if (is_null($site)) {
 			$site = $this->getSite();
 		}
-		if ($page instanceof CM_Page_Abstract) {
-			$this->_checkNamespace(get_class($page), $site);
-			$path = substr($page->getPath(), 1);
-		} else {
-			$pageClassName = (string) $page;
-			if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-				throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
-			}
-			$this->_checkNamespace($pageClassName, $site);
-			$path = CM_Page_Abstract::getPathByClassName($pageClassName);
+		if ($pageClassName instanceof CM_Page_Abstract) {
+			$pageClassName = get_class($pageClassName);
 		}
+		$pageClassName = (string) $pageClassName;
+
+		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
+			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
+		}
+		if (!preg_match('/^([A-Za-z]+)_/', $pageClassName, $matches)) {
+			throw new CM_Exception_Invalid('Cannot find namespace of `' . $pageClassName . '`');
+		}
+		$namespace = $matches[1];
+		if (!in_array($namespace, $site->getNamespaces())) {
+			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
+		}
+		$path = CM_Page_Abstract::getPathByClassName($pageClassName);
 		return $site->getUrl() . CM_Page_Abstract::link($path, $params);
 	}
 
@@ -324,19 +329,6 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file) {
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
-	}
-
-	/**
-	 * @param string           $className
-	 * @param CM_Site_Abstract $site
-	 * @throws CM_Exception_Invalid
-	 */
-	private function _checkNamespace($className, CM_Site_Abstract $site) {
-		preg_match('/^([A-Z]+)_/', $className, $matches);
-		$namespace = $matches[1];
-		if (!in_array($namespace, $site->getNamespaces())) {
-			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
-		}
 	}
 
 	/**
