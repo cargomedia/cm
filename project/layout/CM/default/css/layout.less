@@ -63,7 +63,7 @@ input[type=checkbox], input[type=radio] {
 	.input_text_height;
 	.border(@colorFgBorder);
 	html.no-boxsizing & {
-		height: @heightInputText - 10px;
+		height: 14px; // @ie7: line-height - border
 		width: 90%;
 	}
 }
