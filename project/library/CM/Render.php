@@ -293,7 +293,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!in_array($namespace, $site->getNamespaces())) {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
-		$path = $pageClassName::getPath2($params);
+		$path = $pageClassName::getPath($params);
 		return $site->getUrl() . $path;
 	}
 

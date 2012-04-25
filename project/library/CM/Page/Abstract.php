@@ -31,22 +31,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Returns the page path based on the class name.
-	 *
-	 * Removes all in front of Page_ including Page.
-	 *
-	 * @return string Page path
-	 */
-	public final function getPath() {
-		// Caches path locally because stays the same
-		if (!$this->_path) {
-			$this->_path = '/' . self::getPathByClassName(get_class($this));
-		}
-
-		return $this->_path;
-	}
-
-	/**
 	 * @return CM_Request_Abstract
 	 */
 	public function getRequest() {
@@ -124,19 +108,8 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @param array|null $params
 	 * @return string
 	 */
-	public static function getPath2(array &$params = null) {
-		return self::link(self::getPathByClassName(get_called_class()), $params);
-	}
-
-	/**
-	 * @param string $pageClassName
-	 * @return string
-	 * @throws CM_Exception_Invalid
-	 */
-	public static function getPathByClassName($pageClassName) {
-		if (!class_exists($pageClassName) || !is_subclass_of($pageClassName, 'CM_Page_Abstract')) {
-			throw new CM_Exception_Invalid('Cannot find valid class definition for page `' . $pageClassName . '`.');
-		}
+	public static function getPath(array $params = null) {
+		$pageClassName = get_called_class();
 		$list = explode('_', $pageClassName);
 
 		// Remove first parts
@@ -156,10 +129,8 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 		if ($path == 'index') {
 			$path = '';
 		}
-		return $path;
+		return self::link($path, $params);
 	}
-
-
 
 	/**
 	 * @param string  $path

@@ -69,7 +69,8 @@ class CM_MenuEntry {
 	 * @return bool True if path/queries match
 	 */
 	public final function compare($path, array $params = array()) {
-		if ($path == $this->getPage()->getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
+		$page = $this->getPage();
+		if ($path == '/' . $page::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
 			return true;
 		}
 		return false;
@@ -166,15 +167,6 @@ class CM_MenuEntry {
 		}
 
 		return $parents;
-	}
-
-	/**
-	 * Returns the url path (inclusive params)
-	 *
-	 * @return string Path
-	 */
-	public final function getPath() {
-		return CM_Page_Abstract::link($this->getPage()->getPath(), $this->getParams());
 	}
 
 	/**

@@ -57,7 +57,7 @@ class CM_Menu {
 		foreach ($this->getAllEntries() as $entry) {
 			// Page found
 			if ($_currentDepth >= $depthMin) {
-				if ($entry->compare($page->getPath(), $page->getParams()->getAll())) {
+				if ($entry->compare('/' . $page::getPath(), $page->getParams()->getAll())) {
 					return $entry;
 				}
 			}
