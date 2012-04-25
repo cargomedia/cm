@@ -8,6 +8,11 @@ function smarty_function_linkUrl(array $params, Smarty_Internal_Template $templa
 		trigger_error('Param `page` missing.');
 	}
 
+	if (!empty($params['params'])) {
+		$params = array_merge($params, $params['params']);
+	}
+	unset($params['params']);
+
 	$page = $params['page'];
 	unset($params['page']);
 

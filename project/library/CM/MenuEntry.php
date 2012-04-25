@@ -170,16 +170,6 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * Returns the url path (inclusive params)
-	 *
-	 * @return string Path
-	 */
-	public final function getPath() {
-		$page = $this->getPage();
-		return $page::getPath($this->getParams());
-	}
-
-	/**
 	 * @return CM_Menu
 	 */
 	public final function getSiblings() {

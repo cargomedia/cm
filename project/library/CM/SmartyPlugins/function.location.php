@@ -11,21 +11,21 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	if ($city = $location->get(CM_Model_Location::LEVEL_CITY)) {
 		$part = $city->getName();
 		if ($showLink) {
-			$part = '<a class="nowrap" href="' . CM_Page_Abstract::link('/users/search', array('location' => $city)) . '">' . $part . '</a>';
+			$part = '<a class="nowrap" href="' . $render->getUrlPage('FB_Page_Users_Search', array('location' => $city)) . '">' . $part . '</a>';
 		}
 		$parts[] = $part;
 	}
 	if ($state = $location->get(CM_Model_Location::LEVEL_STATE)) {
 		$part = $state->getName();
 		if ($showLink) {
-			$part = '<a class="nowrap" href="' . CM_Page_Abstract::link('/users/search', array('location' => $state)) . '">' . $part . '</a>';
+			$part = '<a class="nowrap" href="' . $render->getUrlPage('FB_Page_Users_Search', array('location' => $state)) . '">' . $part . '</a>';
 		}
 		$parts[] = $part;
 	}
 	if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
 		$part = $country->getName();
 		if ($showLink) {
-			$part = '<a class="nowrap" href="' . CM_Page_Abstract::link('/users/search', array('location' => $country)) . '">' . $part . '</a>';
+			$part = '<a class="nowrap" href="' . $render->getUrlPage('FB_Page_Users_Search', array('location' => $country)) . '">' . $part . '</a>';
 		}
 		$parts[] = $part;
 	}
