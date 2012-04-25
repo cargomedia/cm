@@ -33,8 +33,8 @@ class CM_MenuEntry {
 	protected $_menu = null;
 
 	/**
-	 * @param array			  $data
-	 * @param CM_Menu|null	   $menu
+	 * @param array              $data
+	 * @param CM_Menu|null       $menu
 	 * @param CM_MenuEntry|null  $parent
 	 */
 	public final function __construct(array $data, CM_Menu $menu, CM_MenuEntry $parent = null) {
@@ -167,6 +167,16 @@ class CM_MenuEntry {
 		}
 
 		return $parents;
+	}
+
+	/**
+	 * Returns the url path (inclusive params)
+	 *
+	 * @return string Path
+	 */
+	public final function getPath() {
+		$page = $this->getPage();
+		return $page::getPath($this->getParams());
 	}
 
 	/**
