@@ -26,10 +26,14 @@ class CM_RenderTest extends TestCase {
 	public function testGetUrl() {
 		$render = $this->_getRender();
 		$this->assertSame('http://www.foo.com/', $render->getUrl());
-		$this->assertSame('http://www.cdn.com/', $render->getUrl(null, true));
+		$this->assertSame('http://www.cdn.com/', $render->getUrl(null, null, true));
 		$this->assertSame('http://www.foo.com/foo/bar', $render->getUrl('foo/bar'));
-		$this->assertSame('http://www.cdn.com/foo/bar', $render->getUrl('foo/bar', true));
+		$this->assertSame('http://www.cdn.com/foo/bar', $render->getUrl('foo/bar', null, true));
 		$this->assertSame('http://www.foo.com/0', $render->getUrl(0));
+		$this->assertSame('http://www.cdn.com/0', $render->getUrl(0, null, true));
+		$this->assertSame('http://www.foo.com/0?foo=1&bar=2', $render->getUrl(0, array('foo' => 1, 'bar' => 2)));
+		$this->assertSame('http://www.cdn.com/0?foo=1&bar=2', $render->getUrl(0, array('foo' => 1, 'bar' => 2), true));
+
 	}
 
 	public function testGetUrlPage() {

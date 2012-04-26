@@ -254,15 +254,19 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param string|null  $path
+	 * @param array|null   $params
 	 * @param boolean|null $cdn
 	 * @return string
 	 */
-	public function getUrl($path = null, $cdn = null) {
+	public function getUrl($path = null, array $params = null, $cdn = null) {
 		if (is_null($cdn)) {
 			$cdn = false;
 		}
 		$path = (string) $path;
 		$urlBase = $cdn ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
+		if (!empty($params)) {
+			$path = CM_Page_Abstract::link($path, $params);
+		}
 		return $urlBase . $path;
 	}
 
@@ -309,7 +313,7 @@ class CM_Render extends CM_Class_Abstract {
 			$path = (string) $path;
 			$urlPath .= $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
 		}
-		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+		return $this->getUrl($urlPath, null, self::_getConfig()->cdnResource);
 	}
 
 	/**
@@ -322,7 +326,7 @@ class CM_Render extends CM_Class_Abstract {
 			$path = (string) $path;
 			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
 		}
-		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+		return $this->getUrl($urlPath, null, self::_getConfig()->cdnResource);
 	}
 
 	/**
@@ -330,7 +334,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file) {
-		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+		return $this->getUrl('userfiles/' . $file->getPathRelative(), null, self::_getConfig()->cdnUserContent);
 	}
 
 	/**
