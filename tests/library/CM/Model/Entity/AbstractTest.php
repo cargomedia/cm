@@ -57,11 +57,7 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
 
-	/**
-	 * @param boolean $absolute
-	 * @return string
-	 */
-	public function getLink($absolute = false) {
+	public function getPath() {
 	}
 
 	public function getFoo() {
