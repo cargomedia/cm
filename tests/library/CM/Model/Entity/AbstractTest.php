@@ -58,6 +58,7 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 	public $onChangeCounter = 0;
 
 	public function getPath() {
+		return null;
 	}
 
 	public function getFoo() {

@@ -55,10 +55,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	public function toArray() {
 		$array = parent::toArray();
-		try {
-			$array['path'] = $this->getPath();
-		} catch (CM_Exception_NotImplemented $ex) {
-		}
+		$array['path'] = $this->getPath();
 		return $array;
 	}
 }
