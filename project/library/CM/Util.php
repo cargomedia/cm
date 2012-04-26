@@ -109,7 +109,7 @@ class CM_Util {
 	 * @param array   $params Query parameters
 	 * @return string
 	 */
-	public static final function link($path, array $params = null) {
+	public static function link($path, array $params = null) {
 		$link = $path;
 
 		if (!empty($params)) {
