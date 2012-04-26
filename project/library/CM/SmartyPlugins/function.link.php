@@ -1,14 +1,9 @@
 <?php
+require_once 'function.linkUrl.php';
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
-
-	$page = null;
-	if (isset($params['page'])) {
-		$page = $params['page'];
-	}
-	unset($params['page']);
 
 	$label = '';
 	if (isset($params['label'])) {
@@ -34,8 +29,8 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	unset($params['icon']);
 
 	$href = 'javascript:;';
-	if (!is_null($page)) {
-		$href = $render->getUrlPage($page, $params);
+	if (isset($params['page'])) {
+		$href = smarty_function_linkUrl($params, $template);
 	}
 
 	$html = '<a href="' . $href . '"';

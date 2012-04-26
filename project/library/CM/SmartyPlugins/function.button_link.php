@@ -1,4 +1,5 @@
 <?php
+require_once 'function.linkUrl.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
 	$label = '';
@@ -45,6 +46,8 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 		$path = $params['path'];
 		unset($params['path']);
 		$onclick .= ' location.href=\'' . CM_Page_Abstract::link($path, $params) . '\';';
+	} elseif (isset($params['page'])) {
+		$onclick .= ' location.href=\'' . smarty_function_linkUrl($params, $template) . '\';';
 	}
 
 	if ($onclick) {
