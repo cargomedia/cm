@@ -5,7 +5,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 	/**
 	 * @return string
 	 */
-	abstract public function getLink();
+	abstract public function getPath();
 
 	/**
 	 * @param boolean $throwNonexistent OPTIONAL
@@ -51,5 +51,14 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 	final public static function factory($type, $id) {
 		$className = self::_getClassName($type);
 		return new $className($id);
+	}
+
+	public function toArray() {
+		$array = parent::toArray();
+		try {
+			$array['path'] = $this->getPath();
+		} catch (CM_Exception_NotImplemented $ex) {
+		}
+		return $array;
 	}
 }
