@@ -265,7 +265,7 @@ class CM_Render extends CM_Class_Abstract {
 		$path = (string) $path;
 		$urlBase = $cdn ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
 		if (!empty($params)) {
-			$path = CM_Page_Abstract::link($path, $params);
+			$path = CM_Util::link($path, $params);
 		}
 		return $urlBase . $path;
 	}

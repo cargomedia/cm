@@ -129,23 +129,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 		if ($path == 'index') {
 			$path = '';
 		}
-		return self::link($path, $params);
-	}
-
-	/**
-	 * @param string  $path
-	 * @param array   $params Query parameters
-	 * @return string
-	 */
-	public static final function link($path, array $params = null) {
-		$link = $path;
-
-		if (!empty($params)) {
-			$params = CM_Params::encode($params);
-			$query = http_build_query($params);
-			$link .= '?' . $query;
-		}
-
-		return $link;
+		return CM_Util::link($path, $params);
 	}
 }

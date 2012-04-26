@@ -61,7 +61,7 @@ function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component
 		$href = 'javascript:;';
 		$onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
 	} else {
-		$href = CM_Page_Abstract::link($request->getPath(), array_merge($request->getQuery(), array('page' => $page)));
+		$href = CM_Util::link($request->getPath(), array_merge($request->getQuery(), array('page' => $page)));
 		$onClick = null;
 	}
 	$html = '<a href="' . $href . '"';

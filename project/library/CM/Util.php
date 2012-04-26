@@ -32,7 +32,7 @@ class CM_Util {
 
 	/**
 	 * @param string $pattern OPTIONAL
-	 * @param string $path	OPTIONAL
+	 * @param string $path    OPTIONAL
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
@@ -45,7 +45,7 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string	  $cmd
+	 * @param string      $cmd
 	 * @param array|null  $args
 	 * @param string|null $inputPath
 	 * @return string Output
@@ -73,7 +73,7 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string	 $url
+	 * @param string     $url
 	 * @param array|null $params
 	 * @return string
 	 * @throws CM_Exception_Invalid
@@ -102,5 +102,22 @@ class CM_Util {
 		if (false === mkdir($path, 0777, true)) {
 			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
 		}
+	}
+
+	/**
+	 * @param string  $path
+	 * @param array   $params Query parameters
+	 * @return string
+	 */
+	public static final function link($path, array $params = null) {
+		$link = $path;
+
+		if (!empty($params)) {
+			$params = CM_Params::encode($params);
+			$query = http_build_query($params);
+			$link .= '?' . $query;
+		}
+
+		return $link;
 	}
 }

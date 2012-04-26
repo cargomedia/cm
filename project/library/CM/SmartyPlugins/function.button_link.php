@@ -45,7 +45,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	if (isset($params['path']) && $params['path']) {
 		$path = $params['path'];
 		unset($params['path']);
-		$onclick .= ' location.href=\'' . CM_Page_Abstract::link($path, $params) . '\';';
+		$onclick .= ' location.href=\'' . CM_Util::link($path, $params) . '\';';
 	} elseif (isset($params['page'])) {
 		$onclick .= ' location.href=\'' . smarty_function_linkUrl($params, $template) . '\';';
 	}
