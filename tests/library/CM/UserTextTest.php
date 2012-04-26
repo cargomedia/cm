@@ -34,8 +34,6 @@ EOD;
 
 	public function testFormat() {
 		$splitChar = CM_Usertext::getSplitChar();
-		$urlStatic = URL_STATIC;
-		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
 smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span><br />
 allowed tags: <b class="italic">bold</b><br />
@@ -58,8 +56,6 @@ EOD;
 
 	public function testFormatPlain() {
 		$splitChar = CM_Usertext::getSplitChar();
-		$urlStatic = URL_STATIC;
-		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected = <<<EOD
 smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span>
 allowed tags: bold
@@ -94,8 +90,6 @@ EOD;
 	}
 
 	public function testFormatPlainTruncate() {
-		$urlStatic = URL_STATIC;
-		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
 		$expectedEmoticon = '<span class="smiley smiley-1 smileySet-1" title=":)"></span>';
 
@@ -110,8 +104,6 @@ EOD;
 	}
 
 	public function testFormatPlainTruncateSmiley() {
-		$urlStatic = URL_STATIC;
-		$modified = CM_App::getInstance()->getReleaseStamp();
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
 		$expected = 'Yo <span class="smiley smiley-4 smileySet-1" title="*PLAYMATE*"></span>';
@@ -134,8 +126,6 @@ EOD;
 	}
 
 	public function testFormatUnallowedTagsFiltering() {
-		$urlStatic = URL_STATIC;
-		$modified = CM_App::getInstance()->getReleaseStamp();
 		$expected =
 				'<span class="smiley smiley-5 smileySet-1" title="&lt;3"></span> love<br />' . PHP_EOL .
 						'you';
