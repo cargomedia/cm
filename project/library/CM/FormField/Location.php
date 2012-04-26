@@ -3,8 +3,8 @@
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
 	/**
-	 * @param string $name OPTIONAL
-	 * @param int $minLevel OPTIONAL
+	 * @param string                $name     OPTIONAL
+	 * @param int                   $minLevel OPTIONAL
 	 * @param CM_FormField_Distance $distance OPTIONAL
 	 */
 	public function __construct($name = 'location', $minLevel = CM_Model_Location::LEVEL_COUNTRY, CM_FormField_Distance $distance = null) {
@@ -16,23 +16,23 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		}
 	}
 
-	protected static function _getSuggestion($location) {
+	public function getSuggestion($location, CM_Render $render = null) {
 		$names = array();
 		for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
 			$names[] = $location->getName($level);
 		}
-		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)),
-				'img' => URL_STATIC . 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png');
+		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)), 'img' =>
+		$render->getUrlStatic('img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
 	}
 
-	protected static function _getSuggestions($term, array $options) {
+	protected function _getSuggestions($term, array $options, CM_Render $render) {
 		$ip = CM_Request_Abstract::getInstance()->getIp();
 		$requestLocation = CM_Model_Location::findByIp($ip);
 		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $requestLocation);
 		$locations->setPage(1, 15);
 		$out = array();
 		foreach ($locations as $location) {
-			$out[] = self::_getSuggestion($location);
+			$out[] = $this->getSuggestion($location, $render);
 		}
 		return $out;
 	}
