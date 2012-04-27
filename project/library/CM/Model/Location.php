@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_Location extends CM_Model_Abstract implements CM_ArrayConvertible {
+class CM_Model_Location extends CM_Model_Abstract {
 	const LEVEL_COUNTRY = 1;
 	const LEVEL_STATE = 2;
 	const LEVEL_CITY = 3;

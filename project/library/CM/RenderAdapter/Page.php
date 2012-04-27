@@ -10,6 +10,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$this->getRender()->pushStack('pages', $page);
 
 		$options = array();
+		$options['releaseStamp'] = CM_App::getInstance()->getReleaseStamp();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
 		$options['urlStatic'] = $this->getRender()->getUrlStatic();
