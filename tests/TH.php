@@ -27,9 +27,11 @@ class TH {
 		!is_dir(DIR_USERFILES) ? mkdir(DIR_USERFILES) : null;
 
 		// Import db
-		self::_runSql('DROP DATABASE IF EXISTS ' . CM_Config::get()->CM_Mysql->db);
-		self::_runSql('CREATE DATABASE ' . CM_Config::get()->CM_Mysql->db);
-		self::_loadDb(DIR_TEST_DATA . 'db/dump.sql', CM_Config::get()->CM_Mysql->db);
+		$dbName = CM_Config::get()->CM_Mysql->db;
+		CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
+		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
+		CM_Mysql::selectDb($dbName);
+		CM_Mysql::runDump($dbName, new CM_File(DIR_TEST_DATA . 'db/dump.sql'));
 
 		// Reset environment
 		self::clearEnv();
@@ -54,30 +56,6 @@ class TH {
 		foreach ($alltables as $table) {
 			CM_Mysql::truncate($table);
 		}
-	}
-
-	private static function _runCmd($cmd) {
-		exec($cmd, $output, $return_status);
-		if ($return_status != 0) {
-			exit(1);
-		}
-		return $output;
-	}
-
-	private static function _runSql($sql, $dbName = null) {
-		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' .
-				CM_Config::get()->CM_Mysql->server['host'] . ' -P ' . CM_Config::get()->CM_Mysql->server['port'];
-		if ($dbName) {
-			$cmd .= ' ' . $dbName;
-		}
-		$cmd .= ' -s -e"' . $sql . '"';
-		return self::_runCmd($cmd);
-	}
-
-	private static function _loadDb($sqlFile, $dbName) {
-		$cmd = 'mysql -u' . CM_Config::get()->CM_Mysql->user . ' -p' . CM_Config::get()->CM_Mysql->pass . ' -h' .
-				CM_Config::get()->CM_Mysql->server['host'] . ' -P ' . CM_Config::get()->CM_Mysql->server['port'] . ' ' . $dbName . ' < ' . $sqlFile;
-		return self::_runCmd($cmd);
 	}
 
 	public static function timeInit() {
@@ -120,7 +98,7 @@ class TH {
 
 	/**
 	 * @param CM_Component_Abstract $component
-	 * @param CM_Model_User		 $viewer OPTIONAL
+	 * @param CM_Model_User         $viewer OPTIONAL
 	 * @return TH_Page
 	 */
 	public static function renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
@@ -134,9 +112,9 @@ class TH {
 	}
 
 	/**
-	 * @param string			 $pageClass
+	 * @param string             $pageClass
 	 * @param CM_Model_User|null $viewer OPTIONAL
-	 * @param array			  $params OPTIONAL
+	 * @param array              $params OPTIONAL
 	 * @return CM_Page_Abstract
 	 */
 	public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
@@ -157,9 +135,9 @@ class TH {
 	}
 
 	/**
-	 * @param CM_Form_Abstract	  $form
+	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
-	 * @param array				 $params OPTIONAL
+	 * @param array                 $params OPTIONAL
 	 * @return TH_Page
 	 */
 	public static function renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = array()) {
@@ -205,13 +183,13 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'price' => rand(10, 50) / 10, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+			'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
-	 * @param CM_Model_User|null				 $user
-	 * @param CM_Model_Stream_Publish|null	   $streamPublish
+	 * @param CM_Model_User|null                 $user
+	 * @param CM_Model_Stream_Publish|null       $streamPublish
 	 * @return CM_Model_Stream_Subscribe
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
@@ -221,12 +199,12 @@ class TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
-		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
-	 * @param int	$length
+	 * @param int    $length
 	 * @param string $charset
 	 * @return string
 	 */
