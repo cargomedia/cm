@@ -48,10 +48,6 @@ class CM_File_UserContent extends CM_File {
 	/**
 	 * @return string
 	 */
-	public function getUrl() {
-		return URL_USERFILES . $this->getPathRelative();
-	}
-
 	public function getUrlPath() {
 		return 'userfiles' . DIRECTORY_SEPARATOR . $this->getPathRelative();
 	}
