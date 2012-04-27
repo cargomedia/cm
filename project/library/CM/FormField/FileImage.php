@@ -20,9 +20,9 @@ class CM_FormField_FileImage extends CM_FormField_File {
 		}
 	}
 
-	public function getPreview(CM_File_UserContent_Temp $file) {
+	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
 		$html = '';
-		$html .= '<img src="' . $file->getUrl() . '" />';
+		$html .= '<img src="' . $render->getUrlUserContent($file) . '" />';
 		$html .= '<a href="javascript:;" class="icon delete hover"></a>';
 		return $html;
 	}

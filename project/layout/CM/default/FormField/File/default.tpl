@@ -10,7 +10,7 @@
 	<ul class="previews">
 		{foreach $value as $tmpFile}
 			<li class="qq-upload-success">
-				{$field->getPreview($tmpFile)}
+				{$field->getPreview($tmpFile, $render)}
 				<input type="hidden" name="{$name}[]" value="{$tmpFile->getUniqid()}" />
 			</li>
 		{/foreach}

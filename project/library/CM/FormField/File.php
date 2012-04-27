@@ -30,7 +30,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	 * @param CM_File_UserContent_Temp $file
 	 * @return string HTML
 	 */
-	public function getPreview(CM_File_UserContent_Temp $file) {
+	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
 		$html = '';
 		$html .= '<a href="javascript:;" class="icon delete hover"></a>';
 		return $html;

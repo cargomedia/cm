@@ -59,10 +59,10 @@ class CM_Response_Upload extends CM_Response_Abstract {
 				// Validate file with field
 				$field = CM_FormField_Abstract::factory($query['field']);
 				$field->validateFile($tmpFile);
-				$preview = $field->getPreview($tmpFile);
+				$preview = $field->getPreview($tmpFile, $this->getRender());
 			}
 
-			$return['success'] = array('id' => $tmpFile->getUniqid(), 'url' => $tmpFile->getUrl(), 'preview' => $preview);
+			$return['success'] = array('id' => $tmpFile->getUniqid(), 'preview' => $preview);
 
 		} catch (CM_Exception_FormFieldValidation $ex) {
 			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
