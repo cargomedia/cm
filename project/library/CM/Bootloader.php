@@ -92,15 +92,14 @@ class CM_Bootloader {
 		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
-		define('URL_OBJECTS', !empty(CM_Config::get()->urlCdnObjects) ? CM_Config::get()->urlCdnObjects : URL_ROOT);
+		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
-		define('URL_STATIC', URL_OBJECTS . 'static/');
+		define('URL_STATIC', CM_Render::getInstance()->getUrlStatic());
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 
 		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
-		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
 		define('TBL_CM_SMILEY', 'cm_smiley');
 		define('TBL_CM_SMILEYSET', 'cm_smileySet');

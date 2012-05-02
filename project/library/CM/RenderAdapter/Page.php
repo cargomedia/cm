@@ -13,8 +13,9 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$options['releaseStamp'] = CM_App::getInstance()->getReleaseStamp();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
-		$options['urlStatic'] = $this->getRender()->getUrlStatic();
 		$options['url'] = $this->getRender()->getUrl();
+		$options['urlStatic'] = $this->getRender()->getUrlStatic();
+		$options['urlUserContent'] = $this->getRender()->getUrlUserContent();
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream::getEnabled();
 		if (CM_Stream::getEnabled()) {

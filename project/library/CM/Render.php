@@ -326,10 +326,13 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_File_UserContent $file
+	 * @param CM_File_UserContent|null $file
 	 * @return string
 	 */
-	public function getUrlUserContent(CM_File_UserContent $file) {
+	public function getUrlUserContent(CM_File_UserContent $file = null) {
+		if (is_null($file)) {
+			return $this->getUrl('userfiles/' , self::_getConfig()->cdnUserContent);
+		}
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
 	}
 
