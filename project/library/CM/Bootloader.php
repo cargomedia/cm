@@ -94,8 +94,6 @@ class CM_Bootloader {
 
 		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
-		define('URL_STATIC', CM_Render::getInstance()->getUrlStatic());
-
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 
