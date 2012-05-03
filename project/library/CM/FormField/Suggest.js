@@ -39,9 +39,14 @@ ready: function() {
 		animateDropdown: false,
 		preventDuplicates: true,
 		hintText: null,
+		deleteText: '',
 		searchDelay: 0,
 		tokenLimit: field.getOption("cardinality"),
-		prePopulate: prePopulate
+		prePopulate: prePopulate,
+		classes: {
+			tokenDelete: 'token-input-delete-token icon close small inline',
+			focused: 'focus'
+		}
 	});
 	this.getForm().$().bind("reset", function() {
 		$input.tokenInput("clear");
