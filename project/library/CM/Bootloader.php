@@ -77,7 +77,6 @@ class CM_Bootloader {
 		defined('IS_TEST') || define('IS_TEST', false);
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
-		define('URL_ROOT', CM_Site_Abstract::factory()->getUrl());
 
 		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
