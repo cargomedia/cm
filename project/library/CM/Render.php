@@ -52,6 +52,7 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @return CM_Render
+	 * todo: remove occurences of getInstance() when new admin site is finished
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {
