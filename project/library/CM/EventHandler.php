@@ -3,11 +3,6 @@
 final class CM_EventHandler {
 
 	/**
-	 * @var CM_EventHandler $_instance
-	 */
-	private static $_instance = null;
-
-	/**
 	 * @var array $_callbacks
 	 */
 	private $_callbacks = array();
