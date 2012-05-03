@@ -28,6 +28,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
 
 	/**
 	 * @param CM_File_UserContent_Temp $file
+	 * @param CM_Render                $render
 	 * @return string HTML
 	 */
 	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
