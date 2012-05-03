@@ -12,7 +12,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public function __construct($level, $id) {
 		$this->_setCacheLocal();
-		$this->_construct(array('id' => $id, 'level' => $level));
+		$this->_construct(array('id' => (int) $id, 'level' => (int) $level));
 	}
 
 	/**
