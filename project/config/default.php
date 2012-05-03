@@ -3,8 +3,9 @@
 CM_Config::load('cm.php');
 
 $config->debug = true;
-//$config->urlCdnObjects = 'http://cdn.example.dev/';
-//$config->urlCdnContent = 'http://cdn.example.dev/';
+
+$config->CM_Render->cdnResource = false;
+$config->CM_Render->cdnUserContent = false;
 
 $config->CM_Language = new stdClass();
 $config->CM_Language->idDefault = 1;
@@ -44,6 +45,3 @@ $config->CM_Response_View_Abstract->catch = array(
 	'CM_Exception_ActionLimit',
 	'CM_Exception_Nonexistent',
 );
-
-$config->CM_Site_Abstract->class = 'CM_Site_CM';
-//$config->CM_Site_Abstract->types[CM_Site_CM::TYPE] = 'CM_Site_CM';
