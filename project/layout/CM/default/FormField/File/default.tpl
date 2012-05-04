@@ -21,9 +21,4 @@
 			<div class="qq-upload-button">{$text}</div>
 		</div>
 	</div>
-
-	<div class="aurigma">
-		<a href="http://itunes.apple.com/en/app/aurigma-up/id432611633?mt=8">Install App</a>
-		<a href="aurup:?uploadUrl=http%3A%2F%2Fwww.fuckbook.dev%2Fupload&redirectUrl=http%3A%2F%2Fwww.fuckbook.dev%2Fphotos%3Fuser%3D26406&licenseKey=79FF1-0008F-C3710-00008-9646B-EF564B&cookies=sessionId%3Dfoo">Upload Images</a>
-	</div>
 </div>
