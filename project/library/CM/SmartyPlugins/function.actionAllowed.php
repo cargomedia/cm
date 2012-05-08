@@ -25,5 +25,5 @@ function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $
 	$action = CM_Action_Abstract::factory($viewer, (int) $params['actionType'], (int) $params['modelType']);
 
 	/** @var $action SK_Action_Abstract */
-	return ($action->getActionLimit() == NULL);
+	return ($action->getActionLimit() === null);
 }
