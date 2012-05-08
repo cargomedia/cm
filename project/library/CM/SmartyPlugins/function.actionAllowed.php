@@ -12,19 +12,18 @@ function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $
 	if (!isset($params['actionType'])) {
 		trigger_error('Param `actionType` missing.');
 	}
-	if (isset($params['forceAllow']) && $params['forceAllow'] == true) {
+	if (!empty($params['forceAllow'])) {
 		return true;
 	}
 
 	/** @var CM_Model_User $viewer */
 	$viewer = $template->smarty->getTemplateVars('viewer');
-	if (isset($viewer)) {
-		$action = CM_Action_Abstract::factory($viewer, (int) $params['actionType'], (int) $params['modelType']);
-
-		/** @var $action SK_Action_Abstract */
-		return ($action->getActionLimit() == NULL);
-	} else{
+	if (!isset($viewer)) {
 		return false;
 	}
 
+	$action = CM_Action_Abstract::factory($viewer, (int) $params['actionType'], (int) $params['modelType']);
+
+	/** @var $action SK_Action_Abstract */
+	return ($action->getActionLimit() == NULL);
 }
