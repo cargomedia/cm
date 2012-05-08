@@ -172,6 +172,25 @@ class CM_Action_ActionTest extends TestCase {
 		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
 		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'createStamp' => 2, 'count' => 5));
 	}
+
+	public function testForceAllow() {
+		$actor = TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+
+		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'modelType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+
+		$action->forceAllow(false);
+		try {
+			$action->prepare();
+			$this->fail('Limited action did not throw exception');
+		} catch (CM_Exception_ActionLimit $e) {
+			$this->assertSame('Mock overshoot', $e->getMessage());
+		}
+
+		$action->forceAllow(true);
+		$action->prepare();
+		$this->assertTrue(true);
+	}
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {

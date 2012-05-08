@@ -23,6 +23,11 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	protected $_ignoreLogging = array();
 
 	/**
+	 * @var bool
+	 */
+	private $_forceAllow = false;
+
+	/**
 	 * @param int			   $type
 	 * @param CM_Model_User|int $actor
 	 */
@@ -72,10 +77,20 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
+	 * @param bool $forceAllow
+	 */
+	public function forceAllow($forceAllow) {
+		$this->_forceAllow = (bool) $forceAllow;
+	}
+
+	/**
 	 * @param int &$bestRole OPTIONAL reference for storing role associated with limit
 	 * @return CM_Model_ActionLimit_Abstract|null
 	 */
 	public final function getActionLimit(&$bestRole = null) {
+		if ($this->_forceAllow) {
+			return null;
+		}
 		/** @var CM_Model_ActionLimit_Abstract $actionLimit */
 		foreach (new CM_Paging_ActionLimit_Action($this) as $actionLimit) {
 			$bestRole = null;
