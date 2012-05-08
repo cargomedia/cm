@@ -227,15 +227,15 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int		   $type
+	 * @param int		   $actionType
 	 * @param int		   $modelType
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $type, $modelType) {
+	public static function factory(CM_Model_User $actor, $actionType, $modelType) {
 		$class = self::_getClassName($modelType);
-		return new $class($type, $actor);
+		return new $class($actionType, $actor);
 	}
 
 	/**
