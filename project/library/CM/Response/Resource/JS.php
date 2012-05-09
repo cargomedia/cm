@@ -22,7 +22,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			}
 
 			$classes = array();
-			foreach (self::getSite()->getNamespaces() as $namespace) {
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
 				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/View/'));
 				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
 				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/FormField/'));
