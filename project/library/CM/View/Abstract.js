@@ -31,6 +31,7 @@ _ready: function() {
 initDom: function($dom) {
 	$dom.placeholder();
 	$dom.find('.timeago').timeago();
+	$dom.find('.clipSlide').clipSlide();
 	$dom.find('button[title]').tooltip();
 },
 
