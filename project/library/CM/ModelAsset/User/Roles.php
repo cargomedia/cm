@@ -26,11 +26,17 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @param int $role
+	 * @param int $role...
 	 * @return boolean
 	 */
 	public function contains($role) {
-		return array_key_exists($role, $this->_getAll());
+		$roles = func_get_args();
+		foreach ($roles as $role) {
+			if (array_key_exists((int) $role, $this->_getAll())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
