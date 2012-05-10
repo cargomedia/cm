@@ -42,11 +42,11 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 
 	/**
 	 * @param int $role
-	 * @param int $duration OPTIONAL
+	 * @param int|null $duration
 	 */
 	public function add($role, $duration = null) {
 		$role = (int) $role;
-		if ($duration) {
+		if (null !== $duration) {
 			$duration = (int) $duration;
 		}
 		self::deleteOld($this->_model);
