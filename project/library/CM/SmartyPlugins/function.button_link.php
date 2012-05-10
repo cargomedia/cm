@@ -54,8 +54,15 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 		$attrs .= ' onclick="' . $onclick . '"';
 	}
 
+	$dataString = '';
+	if (isset($params['data'])) {
+		foreach ($params['data'] as $name => $value) {
+			$dataString .= ' data-' . $name . '="' . $value . '"';
+		}
+	}
+
 	$html = '';
-	$html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
+	$html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . $dataString . '>';
 	if ($icon) {
 		$html .= '<span class="icon inline hover ' . $icon . '"></span>';
 	}
