@@ -33,6 +33,7 @@ initDom: function($dom) {
 	$dom.find('.timeago').timeago();
 	$dom.find('.clipSlide').clipSlide();
 	$dom.find('button[title]').tooltip();
+	$dom.find('.toggleNext').toggleNext();
 },
 
 /**
