@@ -6,7 +6,6 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
 	$user = $params['user'];
 
 	if ($user->getVisible()) {
-		/** @var CM_Model_User $viewer  */
 		return '<span class="online">Online</span>';
 	}
 
