@@ -12,7 +12,7 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
 
 	$activity_stamp = $user->getLatestactivity();
 	$activity_delta = time() - $activity_stamp;
-	if (!$force_display && $activity_delta > 7 * 86400) {
+	if (!$force_display && $activity_delta > 10 * 86400) {
 		return '';
 	}
 
