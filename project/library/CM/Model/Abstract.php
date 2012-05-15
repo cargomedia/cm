@@ -68,6 +68,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return $this->_getId('id');
 	}
 
+
+	/**
+	 * @return array
+	 */
+	final public function getIdRaw() {
+		return $this->_id;
+	}
+
 	/**
 	 * @param CM_Model_Abstract $model OPTIONAL
 	 * @return boolean
