@@ -1,18 +1,13 @@
 <?php
 
 class CM_Component_Graph extends CM_Component_Abstract {
-	public function checkAccessible() {
-
-	}
 
 	public function prepare() {
 		$xmode = $this->_params->has('xmode') ? $this->_params->get('xmode') : 'time';
-		$height = $this->_params->has('height') ? $this->_params->get('height') : 250;
-		$width = $this->_params->has('width') ? $this->_params->get('width') : 740;
 		$stack = $this->_params->has('stack') ? $this->_params->get('stack') : false;
 		$legend = $this->_params->has('legend') ? $this->_params->get('legend') : true;
-
 		$series = $this->_params->get('series');
+
 		$flotSeries = array();
 		$numPoints = 0;
 		foreach ($series as $serie) {
@@ -44,14 +39,14 @@ class CM_Component_Graph extends CM_Component_Abstract {
 				}
 			}
 		}
-		if ($width / $numPoints < 10) {
+		if (700 / $numPoints < 10) {
 			$flotOptions['points']['show'] = false;
 		}
 
-		$this->setTplParam('graphId', $this->_params->getString('graphId'));
-		$this->setTplParam('width', $width);
-		$this->setTplParam('height', $height);
-		$this->setTplParam('flotSeries', json_encode($flotSeries));
-		$this->setTplParam('flotOptions', json_encode($flotOptions));
+		$this->_js->flotSeries = $flotSeries;
+		$this->_js->flotOptions = $flotOptions;
+	}
+
+	public function checkAccessible() {
 	}
 }
