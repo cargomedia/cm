@@ -5,7 +5,7 @@ ready: function() {
 	
 	this.fileUploader = new qq.FileUploader({
 		element: field.$(".file-uploader").get(0),
-		action: "/upload/" + cm.options.siteId + "/?field=" + field._class,
+		action: "/upload/" + cm.options.siteId + "/?field=" + field.getClass(),
 		multiple: !field.getOption("cardinality") || field.getOption("cardinality") > 1,
 		allowedExtensions: field.getOption("allowedExtensions"),
 		template: field.$(".file-uploader").html(),

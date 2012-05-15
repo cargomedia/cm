@@ -45,6 +45,17 @@ class CM_Util {
 	}
 
 	/**
+	 * @param array $array
+	 * @param mixed $value
+	 * @return array
+	 */
+	public static function array_remove(array $array, $value) {
+		return array_filter($array, function($entry) use ($value) {
+			return $value != $entry;
+		});
+	}
+
+	/**
 	 * @param string      $cmd
 	 * @param array|null  $args
 	 * @param string|null $inputPath

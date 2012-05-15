@@ -38,7 +38,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 					$viewClasses = array_merge($viewClasses, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/' . $viewType . '/'));
 				}
 				foreach ($this->_getClasses($viewClasses) as $viewClass) {
-					if (!preg_match('#^(\w+)_' . $viewType . '_(.+)$#', $viewClass['name'], $matches)) {
+					if (!preg_match('#^(\w+)_' . $viewType . '_(.+)$#', $viewClass['classNames'][0], $matches)) {
 						throw new CM_Exception("Cannot detect namespace from component's class-name");
 					}
 					$namespace = $matches[1];
@@ -51,7 +51,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 						}
 					}
 					foreach (array_unique($relativePaths) as $path) {
-						$prefix = '.' . $viewClass['name'];
+						$prefix = '.' . $viewClass['classNames'][0];
 						if ('Component' == $viewType) {
 							if ($path != 'default.less' && strpos($path, '/') === false) {
 								$prefix .= '.' . preg_replace('#.less$#', '', $path);

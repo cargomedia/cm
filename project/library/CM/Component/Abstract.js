@@ -59,7 +59,7 @@ reload: function(params) {
  * @param mixed key
  */
 storageSet: function(key, value) {
-	cm.storage.set(this._class + '_' + key, value);
+	cm.storage.set(this.getClass() + '_' + key, value);
 },
 
 /**
@@ -67,12 +67,12 @@ storageSet: function(key, value) {
  * @return mixed
  */
 storageGet: function(key) {
-	return cm.storage.get(this._class + '_' + key);
+	return cm.storage.get(this.getClass() + '_' + key);
 },
 
 /**
  * @param string key
  */
 storageDelete: function(key) {
-	cm.storage.del(this._class + '_' + key);
+	cm.storage.del(this.getClass() + '_' + key);
 }

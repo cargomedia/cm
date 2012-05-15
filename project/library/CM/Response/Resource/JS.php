@@ -21,18 +21,18 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 				$content .= 'cm.model.types = ' . CM_Params::encode(array_flip($modelTypes), true) . ';' . PHP_EOL;
 			}
 
-			$classes = array();
+			$viewPaths = array();
 			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/View/'));
-				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
-				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/FormField/'));
-				$classes = array_merge($classes, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Form/'));
+				$viewPaths = array_merge($viewPaths, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/View/'));
+				$viewPaths = array_merge($viewPaths, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Component/'));
+				$viewPaths = array_merge($viewPaths, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/FormField/'));
+				$viewPaths = array_merge($viewPaths, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/Form/'));
 			}
 
-			foreach ($this->_getClasses($classes) as $class) {
-				$jsPath = preg_replace('/\.php$/', '.js', $class['path']);
+			foreach ($this->_getClasses($viewPaths) as $viewClass) {
+				$jsPath = preg_replace('/\.php$/', '.js', $viewClass['path']);
 				$properties = file_exists($jsPath) ? new CM_File($jsPath) : null;
-				$content .= $this->_printClass($class['name'], $class['parent'], $properties);
+				$content .= $this->_printClass($viewClass['path'], $viewClass['classNames'], $properties);
 			}
 		} elseif ($this->_getFilename() == 'init.js') {
 			$content = '';
@@ -53,15 +53,15 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $parentName
-	 * @param string $properties JSON
+	 * @param string   $path
+	 * @param string[] $classNames
+	 * @param string   $properties JSON
 	 * @return string
 	 */
-	private function _printClass($name, $parentName, $properties = null) {
-		$str = 'var ' . $name . ' = ' . $parentName . '.extend({';
-		$str .= '_class:"' . $name . '"';
-		//$str .= ',__super__:' . $parentName . '.prototype';
+	private function _printClass($path, array $classNames, $properties = null) {
+		$parentClass = isset($classNames[1]) ? $classNames[1] : 'Backbone.View';
+		$str = 'var ' . $classNames[0] . ' = ' . $parentClass . '.extend({';
+		$str .= '_class:"' . $classNames[0] . '"';
 		if (!empty($properties)) {
 			$str .= ',' . PHP_EOL . trim($properties) . PHP_EOL;
 		}

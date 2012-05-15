@@ -9,7 +9,7 @@ abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param int $siteId OPTIONAL
+	 * @param int                 $siteId OPTIONAL
 	 */
 	public function __construct(CM_Request_Abstract $request, $siteId = null) {
 		parent::__construct($request, $siteId);
@@ -26,46 +26,38 @@ abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
 	protected function _getFilename() {
 		return $this->_filename;
 	}
-	
+
 	/**
-	* @param array $paths
-	* @param string $kind OPTIONAL
-	* @return array Ordered class infos, each an array with keys 'name', 'parent' and 'path'
-	* @throws CM_Exception
-	*/
-	protected function _getClasses(array $paths, $kind = 'php') {
+	 * @param array $paths
+	 * @return array Ordered class infos, each an array with keys 'classNames' and 'path'
+	 * @throws CM_Exception
+	 */
+	protected function _getClasses(array $paths) {
 		$classes = array();
-	
-		if ($kind == 'php') {
-			$regexp = '#class\s+(?<name>.+?)\s+(extends\s+(?<parent>.+?))?\s*{#';
-		} elseif ($kind = 'js') {
-			$regexp = '#var (?<name>.+?) = (?<parent>.+?)\.extend\(#';
-		} else {
-			throw new CM_Exception('Invalid class kind `' . $kind . '`.');
-		}
-	
+		$regexp = '#class\s+(?<name>.+?)\s+(extends\s+(?<parent>.+?))?\s*{#';
+
 		// Detect class names and parents
 		foreach ($paths as $path) {
 			$file = new CM_File($path);
-				
-			if (!preg_match($regexp, $file->read(), $class)) {
-				throw new CM_Exception('Cannot detect `' . $kind . '`-class inheritance of `' . $path . '`');
+
+			if (!preg_match($regexp, $file->read(), $match)) {
+				throw new CM_Exception('Cannot detect php-class inheritance of `' . $path . '`');
 			}
-				
-			if (!isset($class['parent']) || $class['parent'] == 'CM_Class_Abstract') {
-				$class['parent'] = 'Backbone.View';
+
+			$classHierarchy = array_values(class_parents($match['name']));
+			array_unshift($classHierarchy, $match['name']);
+			if ('CM_Class_Abstract' == end($classHierarchy)) {
+				array_pop($classHierarchy);
 			}
-				
-			$class['path'] = $path;
-			$classes[] = $class;
+			$classes[] = array('classNames' => $classHierarchy, 'path' => $path);
 		}
-	
+
 		// Order classes by inheritance
 		for ($i1 = 0; $i1 < count($classes); $i1++) {
 			$class1 = $classes[$i1];
 			for ($i2 = $i1 + 1; $i2 < count($classes); $i2++) {
 				$class2 = $classes[$i2];
-				if ($class1['parent'] == $class2['name']) {
+				if (isset($class1['classNames'][1]) && $class1['classNames'][1] == $class2['classNames'][0]) {
 					$tmp = $classes[$i1];
 					$classes[$i1] = $classes[$i2];
 					$classes[$i2] = $tmp;
@@ -74,7 +66,7 @@ abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
 				}
 			}
 		}
-	
+
 		return $classes;
 	}
 }

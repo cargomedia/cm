@@ -54,9 +54,9 @@ getChildren: function() {
  * @param string className
  * @return CM_View_Abstract|null
  */
-findChild: function(className){
+findChild: function(className) {
 	return _.find(this.getChildren(), function(child) {
-		return child._class == className;
+		return _.contains(child.getClasses(), className);
 	}) || null;
 },
 
@@ -71,6 +71,21 @@ getParent: function() {
 },
 
 /**
+ * @param string className
+ * @return CM_View_Abstract|null
+ */
+findParent: function(className) {
+	var parent = this.getParent();
+	if (!parent) {
+		return null;
+	}
+	if (_.contains(parent.getClasses(), className)) {
+		return parent;
+	}
+	return parent.findParent(className);
+},
+
+/**
  * @return string
  */
 getAutoId: function() {
@@ -82,6 +97,24 @@ getAutoId: function() {
  */
 getParams: function() {
 	return this.options.params || {};
+},
+
+/**
+ * @return string[]
+ */
+getClasses: function() {
+	var classes = [this.getClass()];
+	if ('CM_View_Abstract' != this.getClass()) {
+		classes = classes.concat(this.constructor.__super__.getClasses());
+	}
+	return classes;
+},
+
+/**
+ * @return string
+ */
+getClass: function() {
+	return this._class;
 },
 
 /**
@@ -209,7 +242,7 @@ bindAction: function(actionType, modelType, callback) {
  * @param function callback fn(array data)
  */
 bindStream: function(event, callback) {
-	var namespace = this._class + ':' + event;
+	var namespace = this.getClass() + ':' + event;
 	cm.stream.bind(namespace, callback, this);
 	this.on('destruct', function() {
 		cm.stream.unbind(namespace, callback, this);
@@ -247,7 +280,7 @@ _bindStreams: function(streams) {
  */
 _getArray: function() {
 	return {
-		className: this._class,
+		className: this.getClass(),
 		id: this.getAutoId(),
 		params: this.getParams(),
 		parentId: this.getParent() ? this.getParent().getAutoId() : null
