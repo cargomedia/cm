@@ -17,6 +17,16 @@
 	text-overflow: ellipsis;
 }
 
+.quote {
+	font-style: italic;
+	&:before {
+		content: "«";
+	}
+	&:after {
+		content: "»";
+	}
+}
+
 .link() {
 	color: @colorFgLink;
 	text-decoration: none;
