@@ -1,15 +1,20 @@
 .paging {
 	margin-top: 5px;
-}
-.paging a {
-	.border(@colorFgBorderShy);
-	color: @colorFgLinkLight;
-	float: left;
-	padding: 0 7px;
-	text-align: center;
-	border-width: 0 1px 0 0;
+	.clearfix;
+
+	.paging-inner {
+		a {
+			.border(@colorFgBorderShy);
+			color: @colorFgLinkLight;
+			float: left;
+			padding: 0 7px;
+			text-align: center;
+			border-width: 0 1px 0 0;
+
+			&.active {
+				font-weight: bold;
+			}
+		}
+	}
 }
 
-.paging a.active {
-	font-weight: bold;
-}
