@@ -9,7 +9,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
 
 	$content = '';
 	if (isset($params['content'])) {
-		$content = $params['content'];
+		$content = (string) $params['content'];
 		unset($params['content']);
 	}
 
@@ -22,7 +22,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
 	$html = '<' . $name;
 	foreach ($attributes as $attributeName => $attributeValue) {
 		if (isset($attributeValue)) {
-			$html .= ' ' . $attributeName . '="' . $attributeValue . '"';
+			$html .= ' ' . $attributeName . '="' . CM_Language::htmlspecialchars($attributeValue) . '"';
 		}
 	}
 	if (in_array($name, $namesVoid)) {
