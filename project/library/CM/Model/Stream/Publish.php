@@ -9,7 +9,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		$this->_change();
 	}
 
-	protected function _getContainingPagings() {
+	protected function _getContainingCacheables() {
 		return array($this->getStreamChannel()->getStreamPublishs());
 	}
 

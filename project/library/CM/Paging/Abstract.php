@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator {
+abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable {
 	private $_count = null;
 	private $_itemsRaw = null, $_items = null;
 	private $_pageOffset = 0;

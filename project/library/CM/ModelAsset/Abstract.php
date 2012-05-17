@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_ModelAsset_Abstract {
+abstract class CM_ModelAsset_Abstract implements CM_Cacheable{
 	/**
 	 * @var CM_Model_Abstract
 	 */
@@ -24,6 +24,16 @@ abstract class CM_ModelAsset_Abstract {
 	abstract public function _onModelDelete();
 
 	/**
+	 * Call on model data change
+	 *
+	 * @return CM_ModelAsset_Abstract
+	 */
+	public function _change() {
+		$this->_model->_change();
+		return $this;
+	}
+
+	/**
 	 * @param string $key
 	 * @return mixed|false
 	 */
@@ -41,15 +51,5 @@ abstract class CM_ModelAsset_Abstract {
 	 */
 	protected function _cacheSet($key, $value) {
 		$this->_model->_set(get_class($this) . ':' . $key, $value);
-	}
-
-	/**
-	 * Call on model data change
-	 *
-	 * @return CM_ModelAsset_Abstract
-	 */
-	protected function _change() {
-		$this->_model->_change();
-		return $this;
 	}
 }

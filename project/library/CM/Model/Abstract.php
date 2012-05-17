@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, Serializable {
+abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable {
 
 	/**
 	 * @var array $_id
@@ -51,12 +51,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
-		$containingPagings = $this->_getContainingPagings();
+		$containingCacheables = $this->_getContainingCacheables();
 		$this->_onDelete();
 		$cacheClass = $this->_cacheClass;
 		$cacheClass::delete($this->_getCacheKey());
-		foreach ($containingPagings as $paging) {
-			$paging->_change();
+		foreach ($containingCacheables as $cacheable) {
+			$cacheable->_change();
 		}
 		$this->_data = null;
 	}
@@ -223,9 +223,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return CM_Paging_Abstract[]
+	 * @return CM_Cacheable[]
 	 */
-	protected function _getContainingPagings() {
+	protected function _getContainingCacheables() {
 		return array();
 	}
 
@@ -239,8 +239,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$model = static::_create($data);
 		$model->_onChange();
-		foreach ($model->_getContainingPagings() as $paging) {
-			$paging->_change();
+		foreach ($model->_getContainingCacheables() as $cacheable) {
+			$cacheable->_change();
 		}
 		return $model;
 	}
