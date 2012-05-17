@@ -332,7 +332,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file = null) {
 		if (is_null($file)) {
-			return $this->getUrl('userfiles/' , self::_getConfig()->cdnUserContent);
+			return $this->getUrl('userfiles/', self::_getConfig()->cdnUserContent);
 		}
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
 	}
@@ -351,10 +351,13 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->compile_check = IS_DEBUG;
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
-			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				self::$_smarty->addPluginsDir(DIR_LIBRARY . $namespace . '/SmartyPlugins');
-			}
 		}
+
+		$pluginDirs = array();
+		foreach ($this->getSite()->getNamespaces() as $namespace) {
+			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
+		}
+		self::$_smarty->setPluginsDir($pluginDirs);
 
 		return self::$_smarty;
 	}
