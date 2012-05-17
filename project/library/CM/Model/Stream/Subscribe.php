@@ -10,7 +10,9 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _getContainingCacheables() {
-		return array($this->getStreamChannel()->getStreamSubscribes());
+		$cacheables = parent::_getContainingCacheables();
+		$cacheables[] = $this->getStreamChannel()->getStreamSubscribes();
+		return $cacheables;
 	}
 
 	protected function _loadData() {
