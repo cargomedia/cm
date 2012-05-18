@@ -40,7 +40,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param $key
+	 * @param            $key
 	 * @param mixed|null $default
 	 * @return mixed
 	 */
@@ -95,7 +95,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string      $key
 	 * @param string|null $default
 	 * @return float
 	 */
@@ -112,7 +112,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string      $key
 	 * @param string|null $default
 	 * @return string
 	 */
@@ -122,7 +122,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string		$key
+	 * @param string        $key
 	 * @param string[]|null $default
 	 * @return string[]
 	 */
@@ -138,7 +138,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string      $key
 	 * @param string|null $default
 	 * @return int
 	 */
@@ -189,7 +189,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param int	$default
+	 * @param int    $default
 	 * @return int
 	 */
 	public function getPage($key = 'page', $default = 1) {
@@ -256,12 +256,13 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @return CM_Model_User
+	 * @param string                   $key
+	 * @param CM_Model_User|null       $default
 	 * @throws CM_Exception_InvalidParam
+	 * @return CM_Model_User
 	 */
-	public function getUser($key) {
-		$param = $this->_get($key);
+	public function getUser($key, CM_Model_User $default = null) {
+		$param = $this->_get($key, $default);
 		if (ctype_digit($param) || is_int($param)) {
 			return CM_Model_User::factory($param);
 		}
