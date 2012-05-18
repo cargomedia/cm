@@ -88,8 +88,12 @@ error: function(message) {
 	$container.html('');
 
 	if (message) {
-		$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />')
-		.children('.form_field_error').html(message).fadeIn('fast');
+		if ($container.length) {
+			$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />')
+			.children('.form_field_error').html(message).fadeIn('fast');
+		} else {
+			cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
+		}
 
 		this.$('input, select, textarea').focus();
 	}
