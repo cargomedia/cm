@@ -10,11 +10,13 @@ class CM_Component_Graph extends CM_Component_Abstract {
 
 		$flotSeries = array();
 		$numPoints = 0;
+		$valueMin = 0;
 		foreach ($series as $serie) {
 			$data = array();
 			foreach ($serie['data'] as $key => $value) {
 				$value = (float) $value;
 				$data[] = array($key, $value);
+				$valueMin = min($valueMin, $value);
 			}
 			$flotSeries[] = array('label' => $serie['label'], 'data' => $data);
 			$numPoints = max($numPoints, count($data));
@@ -22,7 +24,7 @@ class CM_Component_Graph extends CM_Component_Abstract {
 		$flotOptions = array();
 		$flotOptions['series'] = array();
 		$flotOptions['xaxis'] = array();
-		$flotOptions['yaxis'] = array('min' => 0);
+		$flotOptions['yaxis'] = array('min' => $valueMin);
 		$flotOptions['points'] = array('show' => true, 'radius' => 1.5);
 		$flotOptions['series']['lines'] = array('show' => true);
 		$flotOptions['legend'] = array('position' => 'nw', 'show' => $legend);
