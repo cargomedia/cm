@@ -8,6 +8,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$js = $this->getRender()->getJs();
 
 		$this->getRender()->pushStack('pages', $page);
+		$this->getRender()->pushStack('views', $page);
 
 		$options = array();
 		$options['releaseStamp'] = CM_App::getInstance()->getReleaseStamp();
@@ -45,6 +46,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$html = $this->_renderTemplate('default.tpl', $assign);
 
 		$this->getRender()->popStack('pages');
+		$this->getRender()->popStack('views');
 
 		return $html;
 	}

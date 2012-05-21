@@ -31,14 +31,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 */
 	protected $default_action = null;
 
-	/**
-	 * Form frontend data store.
-	 * This data sets up and most used by a frontend handler.
-	 *
-	 * @var array
-	 */
-	public $frontend_data = array();
-
 	public function __construct() {
 		if (!preg_match('/^\w+_Form_(.+)$/', get_class($this), $matches)) {
 			throw new CM_Exception("Cannot detect namespace from forms class-name");

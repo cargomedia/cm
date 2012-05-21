@@ -10,7 +10,7 @@ class CM_Frontend {
 	 * Concatenate a javascript code $line with $var by reference.
 	 *
 	 * @param string  $line
-	 * @param string  &$var	 reference
+	 * @param string  &$var     reference
 	 * @param boolean $prepend  OPTIONAL
 	 */
 	public static function concat_js($line, &$var, $prepend = false) {
@@ -87,13 +87,11 @@ class CM_Frontend {
 	}
 
 	/**
-	 * @param CM_Form_Abstract	  $form
-	 * @param CM_Component_Abstract $component
+	 * @param CM_Form_Abstract      $form
+	 * @param CM_View_Abstract      $parentView
 	 */
-	public function registerForm(CM_Form_Abstract $form, CM_Component_Abstract $component) {
+	public function registerForm(CM_Form_Abstract $form, CM_View_Abstract $parentView) {
 		$className = get_class($form);
-
-		$component->forms[] = $form;
 
 		$field_list = array();
 		foreach ($form->getFields() as $field_key => $field) {
@@ -109,19 +107,19 @@ class CM_Frontend {
 		$auto_var = 'cm.views["' . $form->getAutoId() . '"]';
 		$js = $auto_var . ' = new ' . $className . '({';
 		$js .= 'el:$("#' . $form->getAutoId() . '").get(0),';
-		$js .= 'parent:cm.views["' . $component->getAutoId() . '"],';
+		$js .= 'parent:cm.views["' . $parentView->getAutoId() . '"],';
 		$js .= 'name:"' . $form->getName() . '",';
 		$js .= 'fields:{' . implode(',', $field_list) . '},';
 		$js .= 'actions:{' . implode(',', $action_list) . '},';
 		$js .= 'default_action:"' . $default_action . '"';
 		$js .= '});' . PHP_EOL;
 
-		$form->frontend_data['init_js'] = $js;
+		$this->onloadPrepareJs($js, true);
 	}
 
 	/**
 	 * @param CM_Component_Abstract $component
-	 * @param string				$parentAutoId OPTIONAL
+	 * @param string                $parentAutoId OPTIONAL
 	 */
 	public function registerComponent(CM_Component_Abstract $component, $parentAutoId = null) {
 		$auto_var = 'cm.views["' . $component->getAutoId() . '"]';
@@ -136,10 +134,6 @@ class CM_Frontend {
 			$cmpJs .= ',parent:cm.views["' . $parentAutoId . '"]';
 		}
 		$cmpJs .= '});' . PHP_EOL;
-
-		foreach ($component->forms as $form) {
-			$cmpJs .= $form->frontend_data['init_js'] . PHP_EOL;
-		}
 
 		$this->onloadPrepareJs($cmpJs, true);
 		$this->onloadJs($handler->compile_js($auto_var));

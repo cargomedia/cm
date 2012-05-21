@@ -17,11 +17,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	protected $_js = null;
 
 	/**
-	 * @var array
-	 */
-	public $forms = array();
-
-	/**
 	 * @var CM_Params
 	 */
 	protected $_params;

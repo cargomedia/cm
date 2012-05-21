@@ -3,19 +3,20 @@
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 	public function fetch(array $params = array()) {
-		$parentComponentId = null;
+		$parentViewId = null;
 		if (isset($params['parentId'])) {
-			$parentComponentId = $params['parentId'];
-		} elseif (count($this->getRender()->getStack('components'))) {
-			$parentComponentId = $this->getRender()->getStackLast('components')->getAutoId();
-		} elseif (count($this->getRender()->getStack('pages'))) {
-			$parentComponentId = $this->getRender()->getStackLast('pages')->getAutoId();
+			$parentViewId = $params['parentId'];
+		} elseif (count($this->getRender()->getStack('views'))) {
+			/** @var CM_View_Abstract $parentView */
+			$parentView = $this->getRender()->getStackLast('views');
+			$parentViewId = $parentView->getAutoId();
 		}
 
 		/** @var CM_Component_Abstract $component */
 		$component = $this->_getView();
 
 		$this->getRender()->pushStack('components', $component);
+		$this->getRender()->pushStack('views', $component);
 
 		$cssClass = implode(' ', $component->getClassHierarchy());
 		if (preg_match('#([^/]+)\.tpl$#', $component->getTplName(), $match)) {
@@ -31,8 +32,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 		$html .= '</div>';
 
-		$this->getRender()->getJs()->registerComponent($component, $parentComponentId);
+		$this->getRender()->getJs()->registerComponent($component, $parentViewId);
 		$this->getRender()->popStack('components');
+		$this->getRender()->popStack('views');
 
 		return $html;
 	}

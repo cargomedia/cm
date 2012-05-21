@@ -7,7 +7,8 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$form = CM_Form_Abstract::factory($params['name']);
 		$form->setup();
 		$form->renderStart($params);
-		$render->pushStack('form', $form);
+		$render->pushStack('forms', $form);
+		$render->pushStack('views', $form);
 
 		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
 
@@ -23,7 +24,8 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		return $html;
 
 	} else {
-		$form = $render->popStack('form');
+		$form = $render->popStack('forms');
+		$render->popStack('views');
 
 		/** @var CM_FormField_Abstract $field */
 		foreach ($form->getFields() as $field) {
@@ -33,7 +35,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 			}
 		}
 
-		$render->getJs()->registerForm($form, $render->getStackLast('components'));
+		$render->getJs()->registerForm($form, $render->getStackLast('views'));
 		$content .= '</form>';
 		return $content;
 	}
