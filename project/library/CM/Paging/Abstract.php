@@ -12,7 +12,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	/**
 	 * @param CM_PagingSource_Abstract $source
 	 */
-	function __construct(CM_PagingSource_Abstract $source = null) {
+	public function __construct(CM_PagingSource_Abstract $source = null) {
 		$this->_source = $source;
 	}
 
