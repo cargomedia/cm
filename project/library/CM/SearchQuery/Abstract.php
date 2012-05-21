@@ -4,13 +4,21 @@ class CM_SearchQuery_Abstract {
 	private $_queries = array();
 	private $_filters = array();
 	private $_sorts = array();
-	private $_mode;
+	private $_mode, $_filterMode;
 
 	/**
-	 * @param string $mode must,must_not,should
+	 * @param string|null $mode       must,must_not,should
+	 * @param string|null $filterMode or, and, not
 	 */
-	function __construct($mode = 'must') {
-		$this->_mode = $mode;
+	function __construct($mode = null, $filterMode = null) {
+		if (is_null($mode)) {
+			$mode = 'must';
+		}
+		if (is_null($filterMode)) {
+			$filterMode = 'and';
+		}
+		$this->_mode = (string) $mode;
+		$this->_filterMode = (string) $filterMode;
 	}
 
 	public function query($query) {
@@ -31,7 +39,7 @@ class CM_SearchQuery_Abstract {
 	protected function _filter(array $filter) {
 		$this->_filters[] = $filter;
 	}
-	
+
 	public function filterPrefix($field, $value) {
 		$this->_filter(array('prefix' => array($field => $value)));
 	}
@@ -58,9 +66,9 @@ class CM_SearchQuery_Abstract {
 	}
 
 	/**
-	 * @param string $field
+	 * @param string            $field
 	 * @param CM_Model_Location $location
-	 * @param int $distance
+	 * @param int               $distance
 	 */
 	public function filterGeoDistance($field, CM_Model_Location $location, $distance) {
 		if (!$location->getCoordinates()) {
@@ -71,7 +79,7 @@ class CM_SearchQuery_Abstract {
 	}
 
 	/**
-	 * @param string $field
+	 * @param string            $field
 	 * @param CM_Model_Location $location
 	 */
 	public function sortGeoDistance($field, CM_Model_Location $location) {
@@ -101,7 +109,7 @@ class CM_SearchQuery_Abstract {
 			$query = array('bool' => array($this->_mode => $this->_queries));
 		}
 		if (!empty($this->_filters)) {
-			$query = array('filtered' => array('query' => $query, 'filter' => array('and' => $this->_filters)));
+			$query = array('filtered' => array('query' => $query, 'filter' => array($this->_filterMode => $this->_filters)));
 		}
 		return $query;
 	}
@@ -123,7 +131,7 @@ class CM_SearchQuery_Abstract {
 
 	/**
 	 * @param int $timestamp Timestamp to return as date
-	 * @param int $round OPTIONAL Number of seconds the result should be rounded (floor) (default = 1)
+	 * @param int $round     OPTIONAL Number of seconds the result should be rounded (floor) (default = 1)
 	 * @return string Date in format Y-m-d\TH:i:s\Z
 	 */
 	public static function formatDateTime($timestamp, $round = 1) {
@@ -133,11 +141,11 @@ class CM_SearchQuery_Abstract {
 
 	/**
 	 * @param string $term
-	 * @param array $chars OPTIONAL
+	 * @param array  $chars OPTIONAL
 	 * @return string
 	 */
-	public static function escape($term,
-			array $chars = array('\\', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':')) {
+	public static function escape($term, array $chars = array('\\', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?',
+		':')) {
 		foreach ($chars as $char) {
 			$term = str_replace($char, '\\' . $char, $term);
 		}
