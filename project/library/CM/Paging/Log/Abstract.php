@@ -32,12 +32,14 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	}
 
 	/**
-	 * @param int $type
+	 * @param int       $type
+	 * @param bool|null $aggregate
+	 * @param int|null  $ageMax
 	 * @return CM_Paging_Log_Abstract
 	 */
-	final public static function factory($type) {
+	final public static function factory($type, $aggregate = null, $ageMax = null) {
 		$className = self::_getClassName($type);
-		return new $className();
+		return new $className($aggregate, $ageMax);
 	}
 
 	/**
