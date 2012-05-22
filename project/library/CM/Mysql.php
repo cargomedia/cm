@@ -294,11 +294,11 @@ class CM_Mysql extends CM_Class_Abstract {
 				throw new CM_Exception('Row size does not match number of fields');
 			}
 			$rowEscaped = array();
-			foreach ($row as $value) {
-				if ($value === null) {
+			foreach ($row as $rowValue) {
+				if ($rowValue === null) {
 					$rowEscaped[] = 'NULL';
 				} else {
-					$rowEscaped[] = self::placeholder("'?'", $value);
+					$rowEscaped[] = self::placeholder("'?'", $rowValue);
 				}
 			}
 			$rowsEscaped[] = '(' . implode(',', $rowEscaped) . ')';
