@@ -23,6 +23,10 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		parent::__construct($source);
 	}
 
+	public function flush() {
+		CM_Mysql::delete(TBL_CM_LOG, array('type' => $this->getType()));
+	}
+
 	/**
 	 * @param int $age
 	 */
