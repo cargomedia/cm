@@ -25,21 +25,28 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$html = '';
 	$html .= '<div class="paging"><div class="paging-inner">';
 
-	if ($paging->getPage() > 1) {
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $ajax, 'paging_control pagingPrevPage');
-	}
-
 	$boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
 	$sizeMax = $size - min($boundDistMin, floor($size / 2)) - 1;
 	$pageMin = max(1, $paging->getPage() - $sizeMax);
 	$pageMax = min($paging->getPageCount(), ($paging->getPage() + $sizeMax));
+
+	if ($paging->getPage() > 1) {
+		if ($pageMin > 1) {
+			$html .= _smarty_function_paging_link($request, $component, 1, '1', $ajax, 'pagingFirst');
+		}
+		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev');
+	}
+
 	for ($p = $pageMin; $p <= $pageMax; $p++) {
-		$class = ($p == $paging->getPage()) ? 'active' : '';
-		$html .= _smarty_function_paging_link($request, $component, $p, $p, $ajax, $class);
+		$classActive = ($p == $paging->getPage()) ? 'active' : '';
+		$html .= _smarty_function_paging_link($request, $component, $p, $p, $ajax, 'pagingNumber ' . $classActive);
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $ajax, 'paging_control pagingNextPage');
+		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext');
+		if ($pageMax < $paging->getPageCount()) {
+			$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
+		}
 	}
 
 	$html .= '</div></div>';
@@ -50,10 +57,10 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 /**
  * @param CM_Request_Abstract   $request
  * @param CM_Component_Abstract $component
- * @param int				   $page
- * @param string				$text
+ * @param int                   $page
+ * @param string                $text
  * @param bool                  $ajax
- * @param string|null		   $class
+ * @param string|null           $class
  * @return string
  */
 function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {

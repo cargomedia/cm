@@ -9,10 +9,24 @@
 			float: left;
 			padding: 0 7px;
 			text-align: center;
-			border-width: 0 1px 0 0;
+			border-width: 0;
+
+			&.pagingFirst, &.pagingPrev {
+				border-right-width: 1px;
+			}
+			&.pagingNumber {
+				border-left-width: 1px;
+				&:first-child {
+					border-left-width: 0;
+				}
+				font-weight: bold;
+			}
+			&.pagingNext, &.pagingLast {
+				border-left-width: 1px;
+			}
 
 			&.active {
-				font-weight: bold;
+				color: darken(@colorFgHeading, 15);
 			}
 		}
 	}
