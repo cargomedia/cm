@@ -8,18 +8,15 @@ class CM_Component_Graph extends CM_Component_Abstract {
 		$legend = $this->_params->has('legend') ? $this->_params->get('legend') : true;
 		$series = $this->_params->get('series');
 
-		$flotSeries = array();
 		$numPoints = 0;
 		$valueMin = 0;
-		foreach ($series as $serie) {
-			$data = array();
-			foreach ($serie['data'] as $key => $value) {
+		foreach ($series as &$serie) {
+			$serie['label'] = (string) $serie['label'];
+			foreach ($serie['data'] as $key => &$value) {
 				$value = (float) $value;
-				$data[] = array($key, $value);
 				$valueMin = min($valueMin, $value);
 			}
-			$flotSeries[] = array('label' => $serie['label'], 'data' => $data);
-			$numPoints = max($numPoints, count($data));
+			$numPoints = max($numPoints, count($serie['data']));
 		}
 		$flotOptions = array();
 		$flotOptions['series'] = array();
@@ -35,17 +32,12 @@ class CM_Component_Graph extends CM_Component_Abstract {
 		}
 		if ($xmode == 'time') {
 			$flotOptions['xaxis']['mode'] = 'time';
-			foreach ($flotSeries as &$serie) {
-				foreach ($serie['data'] as &$point) {
-					$point[0] = $point[0] . '000';
-				}
-			}
 		}
 		if (700 / $numPoints < 10) {
 			$flotOptions['points']['show'] = false;
 		}
 
-		$this->_js->flotSeries = $flotSeries;
+		$this->_js->series = $series;
 		$this->_js->flotOptions = $flotOptions;
 	}
 
