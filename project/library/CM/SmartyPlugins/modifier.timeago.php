@@ -7,6 +7,7 @@
  * @return string
  */
 function smarty_modifier_timeago($stamp) {
+	$stamp = (int) $stamp;
 	$distance = time() - $stamp;
 
 	$langSection = CM_Language::section('date.timeago');
