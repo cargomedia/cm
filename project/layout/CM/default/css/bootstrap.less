@@ -7,3 +7,35 @@
 .tooltip.top .tooltip-arrow {
 	border-top-color: @colorBgTooltip;
 }
+
+.nav {
+	margin-bottom: 0;
+
+	&.nav-pills > li {
+		> a {
+			margin-bottom: 4px;
+			margin-right: 3px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			color: @colorFg;
+			border-radius: 3px;
+			.background-color(darken(@colorBg, 6));
+
+			&:hover {
+				.bg_select;
+				text-decoration: none;
+			}
+		}
+		&.active > a {
+			.background-color(darken(@colorBg, 10));
+			.box-shadow(inset 1px 1px 1px #bbb);
+			color: @colorFg;
+
+			&:hover {
+				.bg_select;
+				color: @colorFg;
+			}
+		}
+	}
+}
+
