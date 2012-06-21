@@ -62,7 +62,10 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		return '';
 	}
 
-	$class = 'menu ' . $params['name'];
+	$class = 'menu';
+	if (isset($params['name'])) {
+		$class .= ' ' . $params['name'];
+	}
 	if (isset($params['class'])) {
 		$class .= ' ' . $params['class'];
 	}
