@@ -3,16 +3,6 @@
 class CM_MenuEntry {
 
 	/**
-	 * @var string
-	 */
-	protected $_class = '';
-
-	/**
-	 * @var string
-	 */
-	private $_icon = null;
-
-	/**
 	 * @var CM_Menu
 	 */
 	protected $_submenu = null;
@@ -53,14 +43,6 @@ class CM_MenuEntry {
 		if (isset($data['submenu'])) {
 			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getRequest(), $this);
 		}
-
-		if (isset($data['class'])) {
-			$this->_class = $data['class'];
-		}
-
-		if (isset($data['icon'])) {
-			$this->_icon = $data['icon'];
-		}
 	}
 
 	/**
@@ -84,13 +66,6 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return string
-	 */
-	public final function getClass() {
-		return $this->_class;
-	}
-
-	/**
 	 * @return int Entry depth (starting by 0)
 	 */
 	public final function getDepth() {
@@ -100,8 +75,31 @@ class CM_MenuEntry {
 	/**
 	 * @return string|null
 	 */
+	public final function getClass() {
+		if (!isset($this->_data['class'])) {
+			return '';
+		}
+		return (string) $this->_data['class'];
+	}
+
+	/**
+	 * @return string|null
+	 */
 	public final function getIcon() {
-		return $this->_icon;
+		if (!isset($this->_data['icon'])) {
+			return null;
+		}
+		return (string) $this->_data['icon'];
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public final function getIndication() {
+		if (!isset($this->_data['indication'])) {
+			return null;
+		}
+		return (string) $this->_data['indication'];
 	}
 
 	/**
