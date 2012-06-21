@@ -13,8 +13,9 @@
 
 	&.nav-pills > li {
 		> a {
+			width: auto;
 			margin-bottom: 4px;
-			margin-right: 3px;
+			margin-right: 4px;
 			padding-top: 5px;
 			padding-bottom: 5px;
 			color: @colorFg;
@@ -25,8 +26,13 @@
 				.bg_select;
 				text-decoration: none;
 			}
+
+			.caret {
+				border-top-color: @colorFg;
+				border-bottom-color: @colorFg;
+			}
 		}
-		&.active > a {
+		&.active > a, &.dropdown.open > a {
 			.background-color(darken(@colorBg, 10));
 			.box-shadow(inset 1px 1px 1px #bbb);
 			color: @colorFg;
@@ -34,6 +40,11 @@
 			&:hover {
 				.bg_select;
 				color: @colorFg;
+			}
+
+			.caret {
+				border-top-color: @colorFg;
+				border-bottom-color: @colorFg;
 			}
 		}
 	}
