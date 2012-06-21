@@ -17,9 +17,22 @@
 			min-width: 0;
 
 			&.menu-dropdown {
-				li a {
-					padding-left: 15px;
-					padding-right: 15px;
+				li {
+					a {
+						padding-left: 15px;
+						padding-right: 15px;
+
+						&:hover {
+							color: @colorFg;
+						}
+					}
+					&.active a {
+						color: @colorFg;
+						&:hover {
+							background: none;
+							color: @colorFg;
+						}
+					}
 				}
 			}
 		}
