@@ -51,32 +51,28 @@
 			&.active > a {
 				.background-color(darken(@colorBg, 10));
 			}
-		}
-	}
 
-	.dropdown-menu {
-		min-width: 100%;
-		border-radius: 0;
-		margin-top: -4px;
-		padding: 0;
-		.border(@colorFgBorderEmphasize);
+			.dropdown-menu {
+				min-width: 100%;
+				border-radius: 0;
+				margin-top: -5px;
+				padding: 0;
+				.border(@colorFgBorderEmphasize);
 
-		&.menu-dropdown {
-			li {
-				a {
-					padding-left: 15px;
-					padding-right: 15px;
+				li {
+					a {
 
-					&:hover {
-						color: @colorFg;
-						.bg_emphasize;
+						&:hover {
+							color: @colorFg;
+							.bg_emphasize;
+						}
 					}
-				}
-				&.active a {
-					color: @colorFg;
-					&:hover {
-						background: none;
+					&.active a {
 						color: @colorFg;
+						&:hover {
+							background: none;
+							color: @colorFg;
+						}
 					}
 				}
 			}
