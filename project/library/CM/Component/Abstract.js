@@ -1,5 +1,5 @@
 _ready: function() {
-	this.initDom(this.$());
+	cm.dom.setup(this.$());
 
 	this.ready();
 	_.each(this.getChildren(), function(child) {

@@ -26,17 +26,6 @@ _ready: function() {
 },
 
 /**
- * @param jQuery $dom
- */
-initDom: function($dom) {
-	$dom.placeholder();
-	$dom.find('.timeago').timeago();
-	$dom.find('.clipSlide').clipSlide();
-	$dom.find('button[title]').tooltip();
-	$dom.find('.toggleNext').toggleNext();
-},
-
-/**
  * @param CM_View_Abstract child
  */
 registerChild: function(child) {
