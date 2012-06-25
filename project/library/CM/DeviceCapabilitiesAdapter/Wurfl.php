@@ -6,8 +6,8 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	public function getCapabilities() {
 		self::init();
 		$wurfl = new TeraWurfl();
-		$deviceFound = $wurfl->getDeviceCapabilitiesFromAgent($this->_useragent);
-		if (!$deviceFound) {
+		$exactDeviceMatch = $wurfl->getDeviceCapabilitiesFromAgent($this->_useragent);
+		if (!isset($wurfl->capabilities['product_info'])) {
 			return null;
 		}
 		return array('mobile' => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
