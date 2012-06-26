@@ -1,8 +1,6 @@
 <?php
 
-class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
-	const TYPE_VIDEOSRC = 1;
-	const TYPE_BADWORDS = 2;
+abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 
 	/**
 	 * @var int
@@ -14,7 +12,7 @@ class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 */
 	public function __construct($type) {
 		$this->_type = (int) $type;
-		$source = new CM_PagingSource_Sql_Deferred('string', TBL_CM_STRING, '`type`=' . $this->_type);
+		$source = new CM_PagingSource_Sql_Deferred('string', TBL_CM_STRING, '`type`=' . $this->_type, 'string ASC');
 		$source->enableCache();
 		parent::__construct($source);
 	}
@@ -47,5 +45,14 @@ class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param int $type
+	 * @return CM_Paging_ContentList_Abstract
+	 */
+	static public function factory($type) {
+		$className = self::_getClassName($type);
+		return new $className();
 	}
 }
