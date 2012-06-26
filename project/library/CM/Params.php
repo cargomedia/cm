@@ -178,8 +178,11 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getBoolean($key, $default = null) {
 		$param = $this->_get($key, $default);
-		if (1 === (int) $param) {
-			$param = true; // Allow '1', '1abc', 1 or true
+		if (1 === $param || '1' === $param || 'true' === $param) {
+			$param = true;
+		}
+		if (0 === $param || '0' === $param || 'false' === $param) {
+			$param = false;
 		}
 		if (!is_bool($param)) {
 			throw new CM_Exception_InvalidParam('Not a boolean');
