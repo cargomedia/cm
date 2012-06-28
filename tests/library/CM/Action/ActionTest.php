@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Action_ActionTest extends TestCase {
+
 	private static $_configBackup;
 
 	public static function setUpBeforeClass() {
@@ -21,17 +22,20 @@ class CM_Action_ActionTest extends TestCase {
 	public function testConstruct() {
 		$actor = TH::createUser();
 		/** @var CM_Action_Abstract $action */
-		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor));
+		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor), '', true, true, true, array('getType'));
+		$action->expects($this->any())->method('getType')->will($this->returnValue(123));
+
 		$this->assertInstanceOf('CM_Action_Abstract', $action);
-		$this->assertSame(1, $action->getType());
+		$this->assertSame(1, $action->getVerb());
 		$this->assertSame($actor, $action->getActor());
 		$this->assertNull($action->getIp());
 
 		$actor = 123456; // IP address
 		/** @var CM_Action_Abstract $action */
-		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor));
+		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor), '', true, true, true, array('getType'));
+		$action->expects($this->any())->method('getType')->will($this->returnValue(123));
 		$this->assertInstanceOf('CM_Action_Abstract', $action);
-		$this->assertSame(1, $action->getType());
+		$this->assertSame(1, $action->getVerb());
 		$this->assertNull($action->getActor());
 		$this->assertSame($actor, $action->getIp());
 
@@ -55,7 +59,7 @@ class CM_Action_ActionTest extends TestCase {
 		$action = new CM_Action_Mock(1, $actor);
 		$action->prepare();
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'modelType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 		TH::clearCache();
 		try {
 			$action->prepare();
@@ -69,7 +73,7 @@ class CM_Action_ActionTest extends TestCase {
 		TH::timeForward(-(time() % 30)); // Make sure time() is a multiple of 30
 
 		$time = time() - 86400;
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'actionType', 'modelType', 'actionLimitType', 'createStamp', 'count'),
+		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'),
 			array(
 				array(1, null, 1, 1, null, time()-10000, 1),
 				array(1, null, 1, 1, null, $time-1, 2),
@@ -117,24 +121,24 @@ class CM_Action_ActionTest extends TestCase {
 				array(null, 1, 1, 2, null, $time-24, 4),
 		));
 		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 86400), array('interval' =>10, 'limit' => 86400+20), array('interval' => 30, 'limit' => 86400+30)));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 1, 'count' => 1));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 4));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 8));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 3));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 5, 'count' => 2));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 10, 'count' => 4));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'interval' => 30, 'count' => 12));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 4));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 5));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 5, 'count' => 1));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 1, 'actionLimitType' => 1));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 2, 'actionLimitType' => 1));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 3, 'actionLimitType' => 2));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 4, 'actionLimitType' => 2));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 5, 'actionLimitType' => 2));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 2, 'modelType' => 1, 'interval' => 1, 'count' => 6, 'actionLimitType' => 2));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 2, 'interval' => 5, 'count' => 4));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 2, 'interval' => 10, 'count' => 7));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 1, 'count' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 5, 'count' => 8));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 5, 'count' => 3));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 5, 'count' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 10, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 30, 'count' => 12));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 5, 'count' => 5));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 5, 'count' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 1, 'actionLimitType' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 2, 'actionLimitType' => 1));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 3, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 4, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 5, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 2, 'type' => 1, 'interval' => 1, 'count' => 6, 'actionLimitType' => 2));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 5, 'count' => 4));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 10, 'count' => 7));
 
 		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
 	}
@@ -156,7 +160,7 @@ class CM_Action_ActionTest extends TestCase {
 	}
 
 	public function testCollapse() {
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'actionType', 'modelType', 'actionLimitType', 'createStamp', 'count'),
+		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'),
 			array(
 				array(1, null, 1, 1, null, 1, 1),
 				array(1, null, 1, 1, null, 1, 2),
@@ -170,14 +174,14 @@ class CM_Action_ActionTest extends TestCase {
 		));
 		CM_Action_Abstract::collapse(1, 4);
 		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
-		$this->assertRow(TBL_CM_ACTION, array('actionType' => 1, 'modelType' => 1, 'createStamp' => 2, 'count' => 5));
+		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'createStamp' => 2, 'count' => 5));
 	}
 
 	public function testForceAllow() {
 		$actor = TH::createUser();
 		$action = new CM_Action_Mock(1, $actor);
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'modelType' => 1, 'actionType' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 
 		$action->forceAllow(false);
 		try {
@@ -194,9 +198,7 @@ class CM_Action_ActionTest extends TestCase {
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
-	public function getModelType() {
-		return 1;
-	}
+	const TYPE = 1;
 
 	protected function _notify() {
 	}

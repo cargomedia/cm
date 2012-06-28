@@ -6,17 +6,17 @@ DROP TABLE IF EXISTS `cm_action`;
 CREATE TABLE `cm_action` (
   `actorId` int(10) unsigned DEFAULT NULL,
   `ip` int(10) unsigned DEFAULT NULL,
-  `actionType` tinyint(3) unsigned NOT NULL,
-  `modelType` tinyint(3) unsigned NOT NULL,
+  `verb` tinyint(3) DEFAULT NULL,
+  `type` tinyint(3) DEFAULT NULL,
   `actionLimitType` tinyint(3) unsigned DEFAULT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `count` int(10) unsigned DEFAULT '1',
   `interval` int(10) unsigned NOT NULL DEFAULT '1',
   KEY `actorId` (`actorId`),
   KEY `ip` (`ip`),
-  KEY `action` (`actionType`),
+  KEY `action` (`verb`),
   KEY `createStamp` (`createStamp`),
-  KEY `modelType` (`modelType`),
+  KEY `modelType` (`type`),
   KEY `actionLimitType` (`actionLimitType`),
   KEY `interval` (`interval`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -25,13 +25,13 @@ DROP TABLE IF EXISTS `cm_actionLimit`;
 
 
 CREATE TABLE `cm_actionLimit` (
-  `modelType` int(10) unsigned NOT NULL,
-  `actionType` int(10) unsigned NOT NULL,
+  `actionType` tinyint(3) DEFAULT NULL,
+  `actionVerb` tinyint(3) DEFAULT NULL,
   `type` tinyint(3) unsigned NOT NULL,
   `role` tinyint(3) unsigned DEFAULT NULL,
   `limit` int(10) unsigned DEFAULT NULL,
   `period` int(10) unsigned NOT NULL,
-  UNIQUE KEY `entityType` (`modelType`,`actionType`,`type`,`role`)
+  UNIQUE KEY `entityType` (`actionType`,`actionVerb`,`type`,`role`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_captcha`;
@@ -316,6 +316,49 @@ CREATE TABLE `cm_stream` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_streamChannel`;
+
+
+CREATE TABLE `cm_streamChannel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(64) NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_stream_publish`;
+
+
+CREATE TABLE `cm_stream_publish` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(10) unsigned NOT NULL,
+  `start` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned NOT NULL,
+  `key` varchar(32) NOT NULL,
+  `channelId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  KEY `userId` (`userId`),
+  KEY `channelId` (`channelId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_stream_subscribe`;
+
+
+CREATE TABLE `cm_stream_subscribe` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` int(10) unsigned NOT NULL,
+  `start` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned NOT NULL,
+  `key` varchar(32) NOT NULL,
+  `channelId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  KEY `userId` (`userId`),
+  KEY `channelId` (`channelId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_string`;
 
 
@@ -433,39 +476,3 @@ CREATE TABLE `cm_useragent` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_streamChannel`;
-CREATE TABLE `cm_streamChannel` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(64) NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_stream_publish`;
-CREATE TABLE `cm_stream_publish` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userId` int(10) unsigned NOT NULL,
-  `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
-  `key` varchar(32) NOT NULL,
-  `channelId` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_stream_subscribe`;
-CREATE TABLE `cm_stream_subscribe` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userId` int(10) unsigned NOT NULL,
-  `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
-  `key` varchar(32) NOT NULL,
-  `channelId` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
