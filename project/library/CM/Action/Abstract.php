@@ -47,21 +47,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	abstract public function getModelType();
 
-	/**
-	 * @param CM_Model_Abstract		$model
-	 * @param array					$data OPTIONAL
-	 * @throws CM_Exception_Invalid
-	 */
-	abstract protected function _notify(CM_Model_Abstract $model, array $data = null);
+	abstract protected function _notify();
 
 	abstract protected function _prepare();
 
-	/**
-	 * @param CM_Model_Abstract		$model
-	 * @param array|null			   $data
-	 */
-	public final function notify(CM_Model_Abstract $model, array $data = null) {
-		$this->_notify($model, $data);
+	public function notify() {
+		$this->_notify();
 	}
 
 	public final function prepare() {

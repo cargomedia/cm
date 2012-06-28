@@ -12,13 +12,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int|null $entityType
+	 * @param int|null $modelType
 	 * @param int|null $actionType
 	 * @param int|null $period
 	 * @return CM_Paging_Action_User
 	 */
-	public function getActions($entityType = null, $actionType = null, $period = null) {
-		return new CM_Paging_Action_User($this, $entityType, $actionType, $period);
+	public function getActions($modelType = null, $actionType = null, $period = null) {
+		return new CM_Paging_Action_User($this, $modelType, $actionType, $period);
 	}
 
 	/**
