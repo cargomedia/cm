@@ -8,11 +8,11 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public $_data;
 
 	/**
-	 * @param int $modelType
 	 * @param int $actionType
+	 * @param int $actionVerb
 	 */
-	public function __construct($modelType, $actionType) {
-		parent::_construct(array('modelType' => (int) $modelType, 'actionType' => (int) $actionType));
+	public function __construct($actionType, $actionVerb) {
+		parent::_construct(array('actionType' => (int) $actionType, 'actionVerb' => (int) $actionVerb));
 	}
 
 	/**
@@ -29,14 +29,14 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public function setLimit($role, $limit) {
 		$role = $role ? (int) $role : null;
 		$limit = !isset($limit) ? null : (int) $limit;
-		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('modelType' => $this->getModelType(), 'actionType' => $this->getActionType(),
+		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
-			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('modelType' => $this->getModelType(),
-				'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('actionType' => $this->getActionType(),
+				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		} else {
-			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('limit' => $limit, 'modelType' => $this->getModelType(),
-				'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('limit' => $limit, 'actionType' => $this->getActionType(),
+				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		}
 		$this->_change();
 	}
@@ -48,16 +48,24 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public function setPeriod($role, $period) {
 		$role = $role ? (int) $role : null;
 		$period = (int) $period;
-		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('modelType' => $this->getModelType(), 'actionType' => $this->getActionType(),
+		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
-			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('modelType' => $this->getModelType(),
-				'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('actionType' => $this->getActionType(),
+				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		} else {
-			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('period' => $period, 'modelType' => $this->getModelType(),
-				'actionType' => $this->getActionType(), 'type' => $this->getType(), 'role' => $role));
+			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('period' => $period, 'actionType' => $this->getActionType(),
+				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		}
 		$this->_change();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getActionVerb() {
+		$id = $this->_getId();
+		return (int) $id['actionVerb'];
 	}
 
 	/**
@@ -66,14 +74,6 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public function getActionType() {
 		$id = $this->_getId();
 		return (int) $id['actionType'];
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getModelType() {
-		$id = $this->_getId();
-		return (int) $id['modelType'];
 	}
 
 	/**
@@ -109,19 +109,19 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return array('roles' => CM_Mysql::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('modelType' => $this->getModelType(),
-			'actionType' => $this->getActionType(), 'type' => $this->getType()))->fetchAllTree());
+		return array('roles' => CM_Mysql::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('actionType' => $this->getActionType(),
+			'actionVerb' => $this->getActionVerb(), 'type' => $this->getType()))->fetchAllTree());
 	}
 
 	/**
 	 * @param int $type
-	 * @param int $modelType
 	 * @param int $actionType
+	 * @param int $actionVerb
 	 * @return CM_Model_ActionLimit_Abstract
 	 */
-	public static function factory($type, $modelType, $actionType) {
+	public static function factory($type, $actionType, $actionVerb) {
 		$class = self::_getClassName($type);
-		return new $class($modelType, $actionType);
+		return new $class($actionType, $actionVerb);
 	}
 
 	/**

@@ -10,7 +10,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @var int
 	 */
-	protected $_type;
+	protected $_verb;
 
 	/**
 	 * @var int|null
@@ -28,10 +28,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private $_forceAllow = false;
 
 	/**
-	 * @param int			   $type
+	 * @param int			   $verb
 	 * @param CM_Model_User|int $actor
 	 */
-	public final function __construct($type, $actor) {
+	public final function __construct($verb, $actor) {
 		if ($actor instanceof CM_Model_User) {
 			$this->_actor = $actor;
 		} elseif (is_int($actor) || ctype_digit($actor)) {
@@ -39,13 +39,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		} else {
 			throw new CM_Exception_Invalid('Actor must be of type `CM_Model_User` or `int`');
 		}
-		$this->_type = (int) $type;
+		$this->_verb = (int) $verb;
 	}
-
-	/**
-	 * @return int
-	 */
-	abstract public function getModelType();
 
 	abstract protected function _notify();
 
@@ -122,8 +117,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @return int
 	 */
-	public final function getType() {
-		return $this->_type;
+	public final function getVerb() {
+		return $this->_verb;
 	}
 
 	/**
@@ -157,14 +152,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	private final function _getSiblings($within = null) {
-		if (in_array($this->getType(), $this->_ignoreLogging)) {
+		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
-				'Looking for actions of type `' . $this->getType() . '` on modelType `' . $this->getModelType() . '` that is not being logged.');
+				'Looking for actions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getActions($this->getModelType(), $this->getType(), $within);
+			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within);
 		} else {
-			return new CM_Paging_Action_Ip($this->getIp(), $this->getModelType(), $this->getType(), $within);
+			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within);
 		}
 	}
 
@@ -175,14 +170,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	private final function _getTransgressions($actionLimitType = null, $period = null) {
-		if (in_array($this->getType(), $this->_ignoreLogging)) {
-			throw new CM_Exception_Invalid('Looking for transgressions of type `' . $this->getType() . '` on modelType `' . $this->getModelType() .
+		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
+			throw new CM_Exception_Invalid('Looking for transgressions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() .
 					'` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getTransgressions($this->getModelType(), $this->getType(), $actionLimitType, $period);
+			return $this->getActor()->getTransgressions($this->getType(), $this->getVerb(), $actionLimitType, $period);
 		} else {
-			return new CM_Paging_Transgression_Ip($this->getIp(), $this->getModelType(), $this->getType(), $actionLimitType, $period);
+			return new CM_Paging_Transgression_Ip($this->getIp(), $this->getType(), $this->getVerb(), $actionLimitType, $period);
 		}
 	}
 
@@ -191,7 +186,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @param int						   $role		OPTIONAL
 	 */
 	private final function _log(CM_Model_ActionLimit_Abstract $actionLimit = null, $role = null) {
-		if (!in_array($this->getType(), $this->_ignoreLogging)) {
+		if (!in_array($this->getVerb(), $this->_ignoreLogging)) {
 			if ($actionLimit) {
 				$this->_getTransgressions()->add($this, $actionLimit->getType(), $actionLimit->getPeriod($role));
 			} else {
@@ -209,24 +204,24 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	public final function toArray() {
-		return array('actor' => $this->getActor(), 'type' => $this->getType(), 'modelType' => $this->getModelType());
+		return array('actor' => $this->getActor(), 'verb' => $this->getVerb(), 'type' => $this->getType());
 	}
 
 	public static function fromArray(array $data) {
-		return self::factory($data['actor'], $data['type'], $data['modelType']);
+		return self::factory($data['actor'], $data['verb'], $data['type']);
 	}
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int		   $actionType
-	 * @param int		   $modelType
+	 * @param int		   $verb
+	 * @param int		   $type
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $actionType, $modelType) {
-		$class = self::_getClassName($modelType);
-		return new $class($actionType, $actor);
+	public static function factory(CM_Model_User $actor, $verb, $type) {
+		$class = self::_getClassName($type);
+		return new $class($verb, $actor);
 	}
 
 	/**
@@ -271,17 +266,17 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$upperBound = (int) $upperBound;
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
-		$result = CM_Mysql::exec("SELECT `actionType`, `modelType`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where .
-				" GROUP BY `actionType`, `modelType`");
+		$result = CM_Mysql::exec("SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where .
+				" GROUP BY `verb`, `type`");
 		$insert = array();
 		while ($row = $result->fetchAssoc()) {
 			if ($row['count'] >= 1) {
-				$insert[] = array((int) $row['actionType'], (int) $row['modelType'], $timeStamp, (int) $row['sum'], ($upperBound - $lowerBound));
+				$insert[] = array((int) $row['verb'], (int) $row['type'], $timeStamp, (int) $row['sum'], ($upperBound - $lowerBound));
 			}
 		}
 		if (!empty($insert)) {
 			CM_Mysql::delete(TBL_CM_ACTION, $where);
-			CM_Mysql::insert(TBL_CM_ACTION, array('actionType', 'modelType', 'createStamp', 'count', 'interval'), $insert);
+			CM_Mysql::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
 }

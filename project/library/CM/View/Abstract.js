@@ -215,14 +215,14 @@ loadComponent: function(className, params, options) {
 },
 
 /**
- * @param int actionTypes
+ * @param int actionVerbs
  * @param int modelType
  * @param function callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
  */
-bindAction: function(actionType, modelType, callback) {
-	cm.action.bind(actionType, modelType, callback, this);
+bindAction: function(actionVerb, modelType, callback) {
+	cm.action.bind(actionVerb, modelType, callback, this);
 	this.on('destruct', function() {
-		cm.action.unbind(actionType, modelType, callback, this);
+		cm.action.unbind(actionVerb, modelType, callback, this);
 	});
 },
 
@@ -248,8 +248,8 @@ _bindActions: function(actions) {
 		var modelType = cm.model.types[match[1]];
 		var actionNames = match[2].split(/\s*,\s*/);
 		_.each(actionNames, function(actionName) {
-			var actionType = cm.action.types[actionName];
-			this.bindAction(actionType, modelType, callback);
+			var actionVerb = cm.action.verbs[actionName];
+			this.bindAction(actionVerb, modelType, callback);
 		}, this);
 	}
 },

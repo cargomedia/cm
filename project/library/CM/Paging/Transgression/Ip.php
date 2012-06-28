@@ -6,25 +6,25 @@ class CM_Paging_Transgression_Ip extends CM_Paging_Transgression_Abstract {
 
 	/**
 	 * @param int $ip
-	 * @param int $modelType  OPTIONAL
-	 * @param int $actionType OPTIONAL
+	 * @param int $actionType  OPTIONAL
+	 * @param int $actionVerb OPTIONAL
 	 * @param int $limitType  OPTIONAL
 	 * @param int $period     OPTIONAL
 	 */
-	public function __construct($ip = null, $modelType = null, $actionType = null, $limitType = null, $period = null) {
+	public function __construct($ip = null, $actionType = null, $actionVerb = null, $limitType = null, $period = null) {
 		if ($ip) {
 			$this->_ip = (int) $ip;
 			$where = '`ip` = ' . $this->_ip;
 		} else {
 			$where = '`ip` IS NOT NULL';
 		}
-		if ($modelType) {
-			$modelType = (int) $modelType;
-			$where .= ' AND `modelType` = ' . $modelType;
-		}
 		if ($actionType) {
 			$actionType = (int) $actionType;
-			$where .= ' AND `actionType` = ' . $actionType;
+			$where .= ' AND `type` = ' . $actionType;
+		}
+		if ($actionVerb) {
+			$actionVerb = (int) $actionVerb;
+			$where .= ' AND `verb` = ' . $actionVerb;
 		}
 		if ($limitType) {
 			$limitType = (int) $limitType;
@@ -37,13 +37,13 @@ class CM_Paging_Transgression_Ip extends CM_Paging_Transgression_Abstract {
 			$time = time() - $period;
 			$where .= ' AND `createStamp` > ' . $time;
 		}
-		$source = new CM_PagingSource_Sql_Deferred('modelType, actionType, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
+		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
 
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
-		CM_Mysql::insertDelayed(TBL_CM_ACTION, array('ip' => $this->_ip, 'actionType' => $action->getType(), 'modelType' => $action->getModelType(),
+		CM_Mysql::insertDelayed(TBL_CM_ACTION, array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(),
 				'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
 }

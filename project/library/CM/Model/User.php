@@ -12,13 +12,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int|null $modelType
 	 * @param int|null $actionType
+	 * @param int|null $actionVerb
 	 * @param int|null $period
 	 * @return CM_Paging_Action_User
 	 */
-	public function getActions($modelType = null, $actionType = null, $period = null) {
-		return new CM_Paging_Action_User($this, $modelType, $actionType, $period);
+	public function getActions($actionType = null, $actionVerb = null, $period = null) {
+		return new CM_Paging_Action_User($this, $actionType, $actionVerb, $period);
 	}
 
 	/**
@@ -101,14 +101,14 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int $entityType OPTIONAL
 	 * @param int $actionType OPTIONAL
+	 * @param int $actionVerb OPTIONAL
 	 * @param int $limitType  OPTIONAL
 	 * @param int $period	 OPTIONAL
 	 * @return CM_Paging_Transgression_User
 	 */
-	public function getTransgressions($entityType = null, $actionType = null, $limitType = null, $period = null) {
-		return new CM_Paging_Transgression_User($this, $entityType, $actionType, $limitType, $period);
+	public function getTransgressions($actionType = null, $actionVerb = null, $limitType = null, $period = null) {
+		return new CM_Paging_Transgression_User($this, $actionType, $actionVerb, $limitType, $period);
 	}
 
 	/**
