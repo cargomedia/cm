@@ -198,7 +198,7 @@ class CM_Action_Mock extends CM_Action_Abstract {
 		return 1;
 	}
 
-	protected function _notify(CM_Model_Abstract $model, array $data = null) {
+	protected function _notify() {
 	}
 
 	protected function _prepare() {
