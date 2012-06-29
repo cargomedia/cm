@@ -46,10 +46,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	abstract protected function _prepare();
 
-	public function notify() {
-		$this->_notify();
-	}
-
 	public final function prepare() {
 		$actionLimit = $this->getActionLimit($role);
 		if ($actionLimit) {
