@@ -30,7 +30,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	 */
 	public static function setup() {
 		self::init();
-		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3/wurfl-2.3.xml.zip');
+		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3.1/wurfl-2.3.1.zip');
 		$dataDir = DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 		$zipFile = CM_File::create($dataDir . 'wurfl.zip', $zip);
 		$zipArchive = new ZipArchive();
@@ -44,8 +44,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	}
 }
 
-class TeraWurflConfig {
-
+class TeraWurflConfig{
 	/**
 	 * Database Hostname
 	 * To specify the MySQL 5 TCP port or use a named pipe / socket, put it at the end of your hostname,
@@ -112,7 +111,7 @@ class TeraWurflConfig {
 	 * ex: $PATCH_FILE = 'web_browsers_patch.xml;custom_patch_ver2.3.xml';
 	 * @var String
 	 */
-	public static $PATCH_FILE = 'custom_web_patch.xml;web_browsers_patch.xml';
+	public static $PATCH_FILE = 'custom_web_patch.xml';
 	/**
 	 * Filename of main WURFL file (found in DATADIR; default: wurfl.xml)
 	 * @var String
@@ -151,7 +150,7 @@ class TeraWurflConfig {
 	/**
 	 * Allows you to store only the specified capabilities from the WURFL file.  By default, every capability in the WURFL is stored in the
 	 * database and made available to your scripts.  If you only want to know if the device is wireless or not, you can store only the
-	 * is_wireless_device capability.  To disable the filter, set it zto false, to enable it, you must set it to an array.  This array can
+	 * is_wireless_device capability.  To disable the filter, set it to false, to enable it, you must set it to an array.  This array can
 	 * contain the group names (if you want to include the entire group, i.e. "product_info") and/or capability names (if you want just a
 	 * specific capability, i.e. "is_wireless_device").
 	 *
