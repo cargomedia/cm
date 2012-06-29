@@ -50,6 +50,13 @@ class CM_Model_ActionLimit_AbstractTest extends TestCase {
 		$this->assertSame(0, $actionLimit->getPeriod($this->_role));
 	}
 
+	public function testHasLimit() {
+		$actionLimit = new CM_Model_ActionLimit_AbstractMock($this->_actionType, $this->_actionVerb);
+		$this->assertTrue($actionLimit->hasLimit($this->_role));
+		$this->assertTrue($actionLimit->hasLimit());
+		$this->assertFalse($actionLimit->hasLimit(45));
+	}
+
 	public function testUnsetLimit() {
 		$actionLimit = new CM_Model_ActionLimit_AbstractMock($this->_actionType, $this->_actionVerb);
 		$this->assertEquals(2, $actionLimit->getLimit($this->_role));
@@ -57,9 +64,11 @@ class CM_Model_ActionLimit_AbstractTest extends TestCase {
 		$actionLimit->unsetLimit($this->_role);
 		$this->assertEquals(10, $actionLimit->getLimit($this->_role));
 		$this->assertSame(11, $actionLimit->getPeriod($this->_role));
+		$this->assertFalse($actionLimit->hasLimit($this->_role));
 		$actionLimit->unsetLimit();
 		$this->assertNull($actionLimit->getLimit($this->_role));
 		$this->assertNull($actionLimit->getPeriod($this->_role));
+		$this->assertFalse($actionLimit->hasLimit());
 	}
 }
 

@@ -109,6 +109,17 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param null|int $role
+	 *
+	 * @return boolean
+	 */
+	public function hasLimit($role = null) {
+		$role = $role ? (int) $role : null;
+		$roles = $this->_get('roles');
+		return isset($roles[$role]);
+	}
+
+	/**
 	 * @param int|null $role
 	 */
 	public function unsetLimit($role = null) {
