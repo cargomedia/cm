@@ -6,11 +6,11 @@
  */
 function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $template) {
 
-	if (!isset($params['actionType'])) {
-		trigger_error('Param `actionType` missing.');
+	if (!isset($params['type'])) {
+		trigger_error('Param `type` missing.');
 	}
-	if (!isset($params['actionVerb'])) {
-		trigger_error('Param `actionVerb` missing.');
+	if (!isset($params['verb'])) {
+		trigger_error('Param `verb` missing.');
 	}
 	if (!empty($params['forceAllow'])) {
 		return true;
@@ -22,7 +22,7 @@ function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $
 		return false;
 	}
 
-	$action = CM_Action_Abstract::factory($viewer, (int) $params['actionVerb'], (int) $params['actionType']);
+	$action = CM_Action_Abstract::factory($viewer, (int) $params['verb'], (int) $params['type']);
 
 	/** @var $action SK_Action_Abstract */
 	return ($action->getActionLimit() === null);
