@@ -324,7 +324,7 @@ class CM_Render extends CM_Class_Abstract {
 		}
 		$params = array(
 			'user' =>  $mail->getRecipient()->getId(),
-			'type' => $mail->getType()
+			'mailType' => $mail->getType()
 		);
 		return CM_Util::link($this->getSite()->getUrl() . 'emailtracking/' . $this->getSite()->getId(), $params);
 	}
