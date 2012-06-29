@@ -22,6 +22,11 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 		} else {
 			$html = $htmlBody;
 		}
+		if ($mail->getRecipient()) {
+			$imageTag = '<img style="display: none; width: 0px; height: 0px;" src="' . $this->getRender()->getUrlEmailTracking($mail) . '" />';
+			$html = preg_replace('#</body>#', $imageTag . '$0', $html);
+		}
+
 		if (!($text = $mail->getText())) {
 			if (!$htmlBody) {
 				throw new CM_Exception_Invalid('Mail has neither text nor html content');

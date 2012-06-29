@@ -314,6 +314,22 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Mail $mail
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getUrlEmailTracking(CM_Mail $mail) {
+		if (!$mail->getRecipient()) {
+			throw new CM_Exception_Invalid('Needs user');
+		}
+		$params = array(
+			'user' =>  $mail->getRecipient()->getId(),
+			'type' => $mail->getType()
+		);
+		return CM_Util::link($this->getSite()->getUrl() . 'emailtracking/' . $this->getSite()->getId(), $params);
+	}
+
+	/**
 	 * @param string $path
 	 * @return string
 	 */

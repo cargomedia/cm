@@ -78,6 +78,13 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
+	 * @return CM_Model_User|null
+	 */
+	public function getRecipient() {
+		return $this->_recipient;
+	}
+
+	/**
 	 * @param string	  $address
 	 * @param string|null $name
 	 */
