@@ -3,7 +3,7 @@
 abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	abstract public function getPath();
 
