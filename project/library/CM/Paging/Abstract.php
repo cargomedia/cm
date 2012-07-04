@@ -79,7 +79,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					}
 				}
 				if (!is_null($item) || $returnNonexistentItems) {
-					if (!$this->_isFilterMatch($item)) {
+					if (is_null($item) || !$this->_isFilterMatch($item)) {
 						$items[$index] = $item;
 						$this->_items[$index] = $item;
 					}
