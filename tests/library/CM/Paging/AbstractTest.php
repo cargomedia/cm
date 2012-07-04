@@ -228,6 +228,18 @@ class CM_Paging_AbstractTest extends TestCase {
 		$this->assertInternalType('array', $items);
 		$this->assertCount(10, $items);
 		$this->assertSame(range(10, 19), $items);
+
+		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
+
+		$this->assertSame(array(7,8,10,11,13,14,16,17,19,20), $paging->getItems(-10));
+
+		$this->assertSame(array(1,2,4,5,7,8,10), $paging->getItems(0,7));
+		$this->assertSame(array(10,11,13,14,16,17,19,20), $paging->getItems(10));
+		$this->assertSame(array(4,5,7,8), $paging->getItems(3,4));
+		$this->assertSame(array(17,19,20), $paging->getItems(-3));
+		$this->assertSame(array(17,19), $paging->getItems(-4, 2));
+		$this->assertSame(array(16,17,19,20), $paging->getItems(-4, 10));
+		$this->assertSame(array(13,14,16,17,19,20), $paging->getItems(-6));
 	}
 
 	public function testGetItem() {

@@ -39,7 +39,7 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 * @return boolean
 	 */
 	public function contains($string, $pattern = '/^\Q$item\E$/i') {
-		foreach ($this->getItems() as $item) {
+		foreach ($this as $item) {
 			if (preg_match(str_replace('$item', $item, $pattern), $string)) {
 				return true;
 			}

@@ -23,7 +23,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return array
 	 */
 	public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
+		$negativeOffset = false;
 		$itemsRaw = $this->_getItemsRaw();
+		$forceFill = true; //whether the method should fill the array if it hasn't enough values
 
 		// Count of available items
 		$count = count($itemsRaw);
@@ -36,15 +38,23 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			$offset = 0;
 		}
 		if ($offset < 0) {
+			$negativeOffset = true;
 			$offset = $count - (-$offset);
 		}
-		$offset = max(0, min($offset, $count));
-
+		$offset = max(0, $offset);
+		if ($offset >= $count) {
+			$length = 0;
+		}
 		// Length
 		if (null === $length) {
 			$length = $count - $offset;
+			$forceFill = $negativeOffset;
+		} else {
+			if ($negativeOffset) {
+				$length = min($length, $count - $offset);
+			}
 		}
-		$length = max(0, min($length, $count - $offset));
+		$length = max(0, min($count, $length));
 
 		$nonExistentItemsExpected = ($this->_getStalenessChance() != 0);
 		$nonProcessableItemsExpected = $nonExistentItemsExpected || count($this->_filters);
@@ -53,22 +63,38 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			// Process all items, exclude or null non-processable ones
 			if ($this->_items === null) {
 				$this->_items = array();
-				foreach ($itemsRaw as &$itemRaw) {
+			}
+			$direction = 1;
+			$items = array();
+			$i = 0;
+			while (count($items) < $length) {
+				$item = null;
+				$index = $offset + ($i * $direction);
+				if (array_key_exists($index, $this->_items)) {
+					$item = $this->_items[$index];
+				} else {
 					try {
-						$item = $this->_processItem($itemRaw);
-						if (!$this->_isFilterMatch($item)) {
-							$this->_items[] = $item;
-						}
+						$item = $this->_processItem($itemsRaw[$index]);
 					} catch (CM_Exception_Nonexistent $e) {
-						if ($returnNonexistentItems) {
-							$this->_items[] = null;
-						}
-					}
-					if (count($this->_items) === $count) {
-						break;
 					}
 				}
+				if (!is_null($item) || $returnNonexistentItems) {
+					if (!$this->_isFilterMatch($item)) {
+						$items[$index] = $item;
+						$this->_items[$index] = $item;
+					}
+				}
+				if ($index == count($itemsRaw) - 1) {
+					if (!$forceFill) {
+						break;
+					}
+					$i = 0;
+					$direction = -1;
+				}
+				$i++;
 			}
+			ksort($items);
+			ksort($this->_items);
 		} else {
 			// Fill all items with null, process the ones which are needed
 			if ($this->_items === null) {
@@ -79,11 +105,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					$this->_items[$i] = $this->_processItem($itemsRaw[$i]);
 				}
 			}
+			$items = $this->_items;
+			if ($offset > 0 || $length < $count) {
+				array_slice(items, $offset, $length);
+			}
 		}
-		if ($offset > 0 || $length < $count) {
-			return array_slice($this->_items, $offset, $length);
-		}
-		return $this->_items;
+		return array_values($items);
 	}
 
 	/**
