@@ -116,18 +116,18 @@ EOD;
 		//horizontal
 		$css = <<<'EOD'
 .foo {
-	.gradient(horizontal, #000000, rgba(30, 50,30, 0.4));
+	.gradient(horizontal, #000000, rgba(30, 50,30, 0.4), 15%);
 }
 EOD;
 		$expected = <<<'EOD'
 .foo {
   filter:progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image:linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-moz-linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-o-linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-ms-linear-gradient(left,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-gradient(linear,left top,right top,from(#000000),to(rgba(30,50,30,0.4)));
+  background-image:linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image:-moz-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image:-webkit-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image:-o-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image:-ms-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image:-webkit-gradient(linear,left top,right top,color-stop(15%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
 }
 
 EOD;
@@ -142,12 +142,12 @@ EOD;
 		$expected = <<<'EOD'
 .foo {
   filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image:linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-moz-linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-o-linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-ms-linear-gradient(top,#000000,rgba(30,50,30,0.4));
-  background-image:-webkit-gradient(linear,left top,left bottom,from(#000000),to(rgba(30,50,30,0.4)));
+  background-image:linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image:-moz-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image:-webkit-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image:-o-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image:-ms-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
 }
 
 EOD;
