@@ -28,7 +28,11 @@ class TH {
 
 		// Import db
 		$dbName = CM_Config::get()->CM_Mysql->db;
-		CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
+		try {
+			CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
+		} catch(CM_Mysql_DbSelectException $e) {
+			// Database does not exist
+		}
 		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
 		CM_Mysql::selectDb($dbName);
 		CM_Mysql::runDump($dbName, new CM_File(DIR_TEST_DATA . 'db/dump.sql'));
