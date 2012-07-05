@@ -231,15 +231,15 @@ class CM_Paging_AbstractTest extends TestCase {
 
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
 
-		$this->assertSame(array(7,8,10,11,13,14,16,17,19,20), $paging->getItems(-10));
+		$this->assertSame(array(7, 8, 10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(-10));
 
-		$this->assertSame(array(1,2,4,5,7,8,10), $paging->getItems(0,7));
-		$this->assertSame(array(10,11,13,14,16,17,19,20), $paging->getItems(10));
-		$this->assertSame(array(4,5,7,8), $paging->getItems(3,4));
-		$this->assertSame(array(17,19,20), $paging->getItems(-3));
-		$this->assertSame(array(17,19), $paging->getItems(-4, 2));
-		$this->assertSame(array(16,17,19,20), $paging->getItems(-4, 10));
-		$this->assertSame(array(13,14,16,17,19,20), $paging->getItems(-6));
+		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10), $paging->getItems(0, 7));
+		$this->assertSame(array(10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(10));
+		$this->assertSame(array(4, 5, 7, 8), $paging->getItems(3, 4));
+		$this->assertSame(array(17, 19, 20), $paging->getItems(-3));
+		$this->assertSame(array(17, 19), $paging->getItems(-4, 2));
+		$this->assertSame(array(16, 17, 19, 20), $paging->getItems(-4, 10));
+		$this->assertSame(array(13, 14, 16, 17, 19, 20), $paging->getItems(-6));
 	}
 
 	public function testGetItem() {
@@ -284,9 +284,17 @@ class CM_Paging_AbstractTest extends TestCase {
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
 		$paging->setPage(1, 10);
 		$paging->filter(function ($item) {
+			if (is_null($item)) {
+				throw new CM_Exception_Invalid();
+			}
 			return ($item % 4 != 0);
 		});
 		$this->assertSame(array(1, 2, 5, 7, 10, 11, 13, 14, 17, 19), $paging->getItems());
+		try {
+			$this->assertSame(array(null, 1, 2, null, 5, null, 7, null, 10, 11), $paging->getItems(null, null, true));
+		} catch (CM_Exception_Invalid $ex) {
+			$this->fail('Applying filters to null items');
+		}
 	}
 
 	public function testExclude() {

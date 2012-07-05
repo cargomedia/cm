@@ -79,7 +79,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					}
 				}
 				if (!is_null($item) || $returnNonexistentItems) {
-					if (is_null($item) || !$this->_isFilterMatch($item)) {
+					if (!$this->_isFilterMatch($item)) {
 						$items[$index] = $item;
 						$this->_items[$index] = $item;
 					}
@@ -280,6 +280,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return boolean Whether the item is matched by any of the registered filters
 	 */
 	private function _isFilterMatch($item) {
+		if (is_null($item)) {
+			return false;
+		}
 		foreach ($this->_filters as $filter) {
 			if (false === $filter($item)) {
 				return true;
