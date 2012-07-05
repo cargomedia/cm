@@ -2,7 +2,7 @@
 
 abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable {
 	private $_count = null;
-	private $_itemsRaw = null, $_items = null;
+	private $_itemsRaw = null, $_items = array();
 	private $_pageOffset = 0;
 	private $_pageSize = null;
 	private $_source = null;
@@ -48,54 +48,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		}
 		$length = max(0, min($length, $count - $offset));
 
-		$nonExistentItemsExpected = ($this->_getStalenessChance() != 0);
-		$nonProcessableItemsExpected = $nonExistentItemsExpected || count($this->_filters);
-
-		if ($this->_items === null) {
-			$this->_items = array();
-		}
-		$items = array();
-		if ($nonProcessableItemsExpected) {
-			// Process all items, exclude or null non-processable ones
-			$direction = 1;
-			$i = 0;
-			while (count($items) < $length) {
-				$index = $offset + ($i * $direction);
-				if (array_key_exists($index, $this->_items)) {
-					$item = $this->_items[$index];
-				} else {
-					try {
-						$item = $this->_processItem($itemsRaw[$index]);
-					} catch (CM_Exception_Nonexistent $e) {
-						$item = null;
-					}
-					$this->_items[$index] = $item;
-				}
-				if ((is_null($item) && $returnNonexistentItems) || (!is_null($item) && !$this->_isFilterMatch($item))) {
-					$items[$index] = $item;
-				}
-				if ($index == count($itemsRaw) - 1) {
-					if (!$negativeOffset) {
-						break;
-					}
-					$i = 0;
-					$direction = -1;
-				}
-				if ($index == -1) {
-					break;
-				}
-				$i++;
-			}
-			ksort($items);
+		if ($this->_canContainUnprocessableItems() || $this->_hasFilters()) {
+			$items = $this->_getItems($offset, $length, $returnNonexistentItems, $negativeOffset);
 		} else {
-			// Fill all items with null, process the ones which are needed
-			for ($i = $offset; $i < $offset + $length; $i++) {
-				if (array_key_exists($i, $this->_items)) {
-					$items[$i] = $this->_items[$i];
-				} else {
-					$items[$i] = $this->_processItem($itemsRaw[$i]);
-				}
-			}
+			$items = $this->_getItemsInstantiable($offset, $length);
 		}
 		return array_values($items);
 	}
@@ -276,6 +232,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @return bool
+	 */
+	private function _hasFilters() {
+		return count($this->_filters) > 0;
+	}
+
+	/**
 	 * @return array Raw items (might contain more than $this->_pageSize)
 	 */
 	private function _getItemsRaw() {
@@ -306,7 +269,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	private function _clearItems() {
-		$this->_items = null;
+		$this->_items = array();
 		$this->_itemsRaw = null;
 		$this->_iteratorPosition = 0;
 		$this->_iteratorItems = null;
@@ -314,6 +277,75 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	private function _clearCount() {
 		$this->_count = null;
+	}
+
+	/**
+	 * @param $offset                 int
+	 * @param $length                 int
+	 * @param $returnNonexistentItems bool
+	 * @param $allowBackwardsLookup   bool
+	 * @return array
+	 */
+	private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
+		$itemsRaw = $this->_getItemsRaw();
+		$itemsRawCount = count($itemsRaw);
+		$items = array();
+		$direction = 1;
+		$i = 0;
+		while (count($items) < $length) {
+			$index = $offset + ($i * $direction);
+			if (array_key_exists($index, $this->_items)) {
+				$item = $this->_items[$index];
+			} else {
+				try {
+					$item = $this->_processItem($itemsRaw[$index]);
+				} catch (CM_Exception_Nonexistent $e) {
+					$item = null;
+				}
+				$this->_items[$index] = $item;
+			}
+			if ((is_null($item) && $returnNonexistentItems) || (!is_null($item) && !$this->_isFilterMatch($item))) {
+				$items[$index] = $item;
+			}
+
+			if (0 == $index && -1 == $direction) {
+				break;
+			}
+			if ($index == $itemsRawCount - 1) {
+				if ($offset == 0 || !$allowBackwardsLookup) {
+					break;
+				}
+				$i = 0;
+				$direction = -1;
+			}
+			$i++;
+		}
+		ksort($items);
+		return $items;
+	}
+
+	/**
+	 * @param $offset                 int
+	 * @param $length                 int
+	 * @return array
+	 */
+	private function _getItemsInstantiable($offset, $length) {
+		$itemsRaw = $this->_getItemsRaw();
+		$items = array();
+		for ($i = $offset; $i < $offset + $length; $i++) {
+			if (!array_key_exists($i, $this->_items)) {
+				$this->_items[$i] = $this->_processItem($itemsRaw[$i]);
+			}
+			$items[$i] = $this->_items[$i];
+		}
+		return $items;
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function _canContainUnprocessableItems() {
+		return ($this->_getStalenessChance() != 0);
 	}
 
 	/**
