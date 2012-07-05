@@ -36,10 +36,11 @@ class CM_Model_LanguageTest extends TestCase {
 
 	public function testCreate() {
 		/** @var CM_Model_Language $language */
-		$language = CM_Model_Language::create(array('name' => 'Deutsch', 'abbreviation' => 'de',));
+		$language = CM_Model_Language::create(array('name' => 'Deutsch', 'abbreviation' => 'de', 'enabled' => true));
 
 		$this->assertSame('Deutsch', $language->getName());
 		$this->assertSame('de', $language->getAbbreviation());
+		$this->assertSame(1, $language->getEnabled());
 	}
 
 	public function testCreateWithoutName() {
