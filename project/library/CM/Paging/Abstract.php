@@ -25,7 +25,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
 		$negativeOffset = false;
 		$itemsRaw = $this->_getItemsRaw();
-		$forceFill = true; //whether the method should fill the array if it hasn't enough values
 
 		// Count of available items
 		$count = count($itemsRaw);
@@ -41,34 +40,26 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			$negativeOffset = true;
 			$offset = $count - (-$offset);
 		}
-		$offset = max(0, $offset);
-		if ($offset >= $count) {
-			$length = 0;
-		}
+		$offset = max(0, min($offset, $count));
+
 		// Length
 		if (null === $length) {
 			$length = $count - $offset;
-			$forceFill = $negativeOffset;
-		} else {
-			if ($negativeOffset) {
-				$length = min($length, $count - $offset);
-			}
 		}
-		$length = max(0, min($count, $length));
+		$length = max(0, min($length, $count - $offset));
 
 		$nonExistentItemsExpected = ($this->_getStalenessChance() != 0);
 		$nonProcessableItemsExpected = $nonExistentItemsExpected || count($this->_filters);
 
+		if ($this->_items === null) {
+			$this->_items = array();
+		}
+		$items = array();
 		if ($nonProcessableItemsExpected) {
 			// Process all items, exclude or null non-processable ones
-			if ($this->_items === null) {
-				$this->_items = array();
-			}
 			$direction = 1;
-			$items = array();
 			$i = 0;
 			while (count($items) < $length) {
-				$item = null;
 				$index = $offset + ($i * $direction);
 				if (array_key_exists($index, $this->_items)) {
 					$item = $this->_items[$index];
@@ -76,6 +67,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					try {
 						$item = $this->_processItem($itemsRaw[$index]);
 					} catch (CM_Exception_Nonexistent $e) {
+						$item = null;
 					}
 					$this->_items[$index] = $item;
 				}
@@ -83,29 +75,26 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					$items[$index] = $item;
 				}
 				if ($index == count($itemsRaw) - 1) {
-					if (!$forceFill) {
+					if (!$negativeOffset) {
 						break;
 					}
 					$i = 0;
 					$direction = -1;
 				}
+				if ($index == -1) {
+					break;
+				}
 				$i++;
 			}
 			ksort($items);
-			ksort($this->_items);
 		} else {
 			// Fill all items with null, process the ones which are needed
-			if ($this->_items === null) {
-				$this->_items = $count ? array_fill(0, $count, null) : array();
-			}
 			for ($i = $offset; $i < $offset + $length; $i++) {
-				if (!isset($this->_items[$i])) {
-					$this->_items[$i] = $this->_processItem($itemsRaw[$i]);
+				if (array_key_exists($i, $this->_items)) {
+					$items[$i] = $this->_items[$i];
+				} else {
+					$items[$i] = $this->_processItem($itemsRaw[$i]);
 				}
-			}
-			$items = $this->_items;
-			if ($offset > 0 || $length < $count) {
-				array_slice(items, $offset, $length);
 			}
 		}
 		return array_values($items);

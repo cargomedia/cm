@@ -211,10 +211,13 @@ class CM_Paging_AbstractTest extends TestCase {
 		$this->assertSame(array(), $items);
 
 		$items = $paging->getItems(98, 5);
-		//		$this->assertSame(array(97, 98, 99), $items);
+		$this->assertSame(array(98, 99), $items);
 
 		$items = $paging->getItems(-5, 3);
 		$this->assertSame(range(95, 97), $items);
+
+		$items = $paging->getItems(-5, 30);
+		$this->assertSame(range(95, 99), $items);
 
 		$items = $paging->getItems(-9999, 3);
 		$this->assertSame(range(0, 2), $items);
@@ -238,11 +241,19 @@ class CM_Paging_AbstractTest extends TestCase {
 
 		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10), $paging->getItems(0, 7));
 		$this->assertSame(array(10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(10));
-		$this->assertSame(array(4, 5, 7, 8), $paging->getItems(3, 4));
-		$this->assertSame(array(17, 19, 20), $paging->getItems(-3));
-		$this->assertSame(array(17, 19), $paging->getItems(-4, 2));
-		$this->assertSame(array(16, 17, 19, 20), $paging->getItems(-4, 10));
 		$this->assertSame(array(13, 14, 16, 17, 19, 20), $paging->getItems(-6));
+		$this->assertSame(array(1,2,4,5,7,8,10,11,13,14,16,17,19,20), $paging->getItems(-30));
+		$this->assertSame(array(1,2,4,5,7,8,10,11,13,14,16,17,19,20), $paging->getItems(-17));
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(0, 20));
+
+		$this->assertSame(range(5, 9), $paging->getItems(5, 5));
+		$this->assertSame(range(15, 20), $paging->getItems(15));
+		$this->assertSame(range(15, 20), $paging->getItems(15, 30));
+		$this->assertSame(array(), $paging->getItems(30, 50));
+		$this->assertSame(range(16, 20), $paging->getItems(-5));
+		$this->assertSame(range(16, 20), $paging->getItems(-5, 30));
+		$this->assertSame(range(0, 20), $paging->getItems());
 	}
 
 	public function testGetItem() {
