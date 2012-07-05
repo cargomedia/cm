@@ -115,6 +115,10 @@ class CM_Bootloader {
 		define('TBL_CM_LANG_SECTION', 'cm_langSection');
 		define('TBL_CM_LANG_VALUE', 'cm_langValue');
 
+		define('TBL_CM_LANGUAGE', 'cm_language');
+		define('TBL_CM_LANGUAGEKEY', 'cm_languageKey');
+		define('TBL_CM_LANGUAGEVALUE', 'cm_languageValue');
+
 		define('TBL_CM_LOCATIONCOUNTRY', 'cm_locationCountry');
 		define('TBL_CM_LOCATIONSTATE', 'cm_locationState');
 		define('TBL_CM_LOCATIONCITY', 'cm_locationCity');

@@ -374,6 +374,7 @@ class CM_Render extends CM_Class_Abstract {
 			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
 		}
 		self::$_smarty->setPluginsDir($pluginDirs);
+		self::$_smarty->loadFilter('pre', 'translate');
 
 		return self::$_smarty;
 	}

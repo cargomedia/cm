@@ -101,6 +101,40 @@ CREATE TABLE `cm_langValue` (
   KEY `lang_id` (`lang_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_language`;
+
+
+CREATE TABLE `cm_language` (
+  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `abbreviation` varchar(5) NOT NULL,
+  `enabled` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `abbreviation` (`abbreviation`),
+  KEY `enabled` (`enabled`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `cm_languageKey`;
+
+
+CREATE TABLE `cm_languageKey` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` text NOT NULL,
+  `accessStamp` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `accessStamp` (`accessStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `cm_languageValue`;
+
+
+CREATE TABLE `cm_languageValue` (
+  `languageKeyId` int(11) unsigned NOT NULL,
+  `languageId` int(11) unsigned NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`languageKeyId`,`languageId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 DROP TABLE IF EXISTS `cm_locationCity`;
 
 
