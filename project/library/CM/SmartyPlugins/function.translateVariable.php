@@ -4,8 +4,8 @@ function smarty_function_translateVariable($params, Smarty_Internal_Template $te
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
 
-	$phrase = $params['key'];
+	$key = $params['key'];
 	unset($params['key']);
 
-	return $render->getText($phrase, $params);
+	return $render->getText($key, $params);
 }
