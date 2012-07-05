@@ -210,6 +210,9 @@ class CM_Paging_AbstractTest extends TestCase {
 		$items = $paging->getItems(9999, 3);
 		$this->assertSame(array(), $items);
 
+		$items = $paging->getItems(98, 5);
+		//		$this->assertSame(array(97, 98, 99), $items);
+
 		$items = $paging->getItems(-5, 3);
 		$this->assertSame(range(95, 97), $items);
 
@@ -313,5 +316,21 @@ class CM_Paging_AbstractTest extends TestCase {
 		$paging->exclude(array(new CM_Comparable_Mock(3), new CM_Comparable_Mock(2)));
 		$expected = array(new CM_Comparable_Mock(1), new CM_Comparable_Mock(4), new CM_Comparable_Mock(5));
 		$this->assertEquals($expected, $paging->getItems());
+	}
+
+	public function testIterator() {
+		$paging = new CM_Paging_Mock(self::$_source);
+
+		$paging->rewind();
+
+		for ($i = 0; $i < 30; $i++) {
+			$this->assertTrue($paging->valid());
+			$this->assertSame($paging->current(), $i);
+			$this->assertSame($paging->key(), $i);
+			$paging->next();
+		}
+
+		$paging->_change();
+		$this->assertFalse($paging->valid());
 	}
 }

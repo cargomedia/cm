@@ -6,7 +6,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	private $_pageOffset = 0;
 	private $_pageSize = null;
 	private $_source = null;
-	private $_itemsPosition = 0;
+	private $_iteratorItems, $_iteratorPosition = 0;
 	private $_filters = array();
 
 	/**
@@ -77,12 +77,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 						$item = $this->_processItem($itemsRaw[$index]);
 					} catch (CM_Exception_Nonexistent $e) {
 					}
+					$this->_items[$index] = $item;
 				}
-				if (!is_null($item) || $returnNonexistentItems) {
-					if (!$this->_isFilterMatch($item)) {
-						$items[$index] = $item;
-						$this->_items[$index] = $item;
-					}
+				if ((is_null($item) && $returnNonexistentItems) || (!is_null($item) && !$this->_isFilterMatch($item))) {
+					$items[$index] = $item;
 				}
 				if ($index == count($itemsRaw) - 1) {
 					if (!$forceFill) {
@@ -127,7 +125,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param int $offset Negative: from end
+	 * @param int       $offset Negative: from end
 	 * @return mixed|null Item at given index
 	 */
 	public function getItem($offset) {
@@ -280,9 +278,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return boolean Whether the item is matched by any of the registered filters
 	 */
 	private function _isFilterMatch($item) {
-		if (is_null($item)) {
-			return false;
-		}
 		foreach ($this->_filters as $filter) {
 			if (false === $filter($item)) {
 				return true;
@@ -324,7 +319,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	private function _clearItems() {
 		$this->_items = null;
 		$this->_itemsRaw = null;
-		$this->_itemsPosition = 0;
+		$this->_iteratorPosition = 0;
+		$this->_iteratorItems = null;
 	}
 
 	private function _clearCount() {
@@ -355,24 +351,24 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/* Iterator functions */
 	function rewind() {
-		$this->_itemsPosition = 0;
+		$this->_iteratorItems = $this->getItems();
+		$this->_iteratorPosition = 0;
 	}
 
 	function current() {
-		return $this->getItem($this->_itemsPosition);
+		return $this->_iteratorItems[$this->_iteratorPosition];
 	}
 
 	function key() {
-		return $this->_itemsPosition;
+		return $this->_iteratorPosition;
 	}
 
 	function next() {
-		++$this->_itemsPosition;
+		++$this->_iteratorPosition;
 	}
 
 	function valid() {
-		$items = $this->getItems();
-		return isset($items[$this->_itemsPosition]);
+		return isset($this->_iteratorItems[$this->_iteratorPosition]);
 	}
 
 }
