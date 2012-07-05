@@ -101,6 +101,11 @@ abstract class CM_FormAction_Abstract {
 	public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 	}
 
+	/**
+	 * @param array                 $data
+	 * @param CM_Response_View_Form $response
+	 * @param CM_Form_Abstract      $form
+	 */
 	abstract public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form);
 
 }

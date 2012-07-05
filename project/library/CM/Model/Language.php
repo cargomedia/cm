@@ -14,6 +14,27 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getName() {
+		return (string) $this->_get('name');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAbbreviation() {
+		return (string) $this->_get('abbreviation');
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getEnabled() {
+		return (int) $this->_get('enabled');
+	}
+
+	/**
 	 * @return CM_Paging_Translation_Language
 	 */
 	public function getTranslations() {
@@ -65,17 +86,29 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return string
+	 * @param string	$name
+	 * @param string	$abbreviation
+	 * @param bool		$enabled
 	 */
-	public function getName() {
-		return (string) $this->_get('name');
+	public function setData($name, $abbreviation, $enabled = false) {
+		$name = (string) $name;
+		$abbreviation = (string) $abbreviation;
+		$enabled = (bool) $enabled;
+		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled), array('id' => $this->getId()));
+		$this->_change();
 	}
 
 	/**
-	 * @return string
+	 * @param string $abbreviation
+	 * @return CM_Model_Language|null
 	 */
-	public function getAbbreviation() {
-		return (string) $this->_get('abbreviation');
+	public static function findByAbbreviation($abbreviation) {
+		$abbreviation = (string) $abbreviation;
+		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
+		if (!$languageId) {
+			return null;
+		}
+		return new static($languageId);
 	}
 
 	protected function _onChange() {
