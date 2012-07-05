@@ -64,11 +64,11 @@ class CM_Wowza extends CM_Class_Abstract {
 		$start = (int) $start;
 		$data = (string) $data;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
-		$streamType = $params->getInt('streamType');
+		$streamChannelType = $params->getInt('streamChannelType');
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamType, array('key' => $streamName, 'params' => $params));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
