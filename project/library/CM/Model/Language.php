@@ -123,7 +123,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		$data = CM_Params::factory($data);
-		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation')));
+		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation'), 'enabled' => $data->getBoolean('enabled')));
 		return new static($id);
 	}
 
