@@ -45,8 +45,12 @@ class CM_Bootloader {
 			$logMsg .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
 			$logMsg .= $exception->getTraceAsString() . PHP_EOL;
 
-			$log = new CM_Paging_Log_Error();
-			$log->add($logMsg);
+			try {
+				$log = new CM_Paging_Log_Error();
+				$log->add($logMsg);
+			} catch (Exception $e) {
+				echo 'Cannot log exception (' . $e->getMessage() . ')' . PHP_EOL;
+			}
 			echo $msg;
 			exit(1);
 		});
