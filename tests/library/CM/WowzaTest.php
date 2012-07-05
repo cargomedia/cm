@@ -116,7 +116,7 @@ class CM_WowzaTest extends TestCase {
 			}
 			$session = TH::createSession($streamPublish->getUser());
 			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
-				'data' => json_encode(array('sessionId' => $session->getId(), 'streamType' => $streamChannel->getType())),
+				'data' => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
 				'subscribers' => $subscribes);
 			unset($session);
 		}
