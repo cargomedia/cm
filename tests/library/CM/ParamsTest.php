@@ -106,6 +106,12 @@ class CM_ParamsTest extends TestCase {
 		} catch (CM_Exception_InvalidParam $ex) {
 			$this->fail('Is float');
 		}
+	}
 
+	public function testGetObject() {
+		$language = CM_Model_Language::create(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
+		$params = new CM_Params(array('language' => $language, 'languageId' => $language->getId()));
+		$this->assertModelEquals($language, $params->getLanguage('language'));
+		$this->assertModelEquals($language, $params->getLanguage('languageId'));
 	}
 }

@@ -284,7 +284,14 @@ class CM_Params extends CM_Class_Abstract {
 		return $this->_getObject($key, 'CM_Model_Location');
 	}
 
-	//-------static-------//
+	/**
+	 * @param string $key
+	 * @return CM_Model_Language
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getLanguage($key) {
+		return $this->_getObject($key, 'CM_Model_Language');
+	}
 
 	/**
 	 * @param mixed   $value
