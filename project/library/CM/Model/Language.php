@@ -32,10 +32,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	/**
 	 * @param string      $key
+	 * @param array|null  $params
 	 * @param bool|null   $skipCacheLocal
 	 * @return string
 	 */
-	public function getTranslation($key, $skipCacheLocal = null) {
+	public function getTranslation($key, array $params = null, $skipCacheLocal = null) {
 		$cacheKey = CM_CacheConst::Language . '_languageId:' . $this->getId();
 		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
@@ -51,8 +52,22 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 		if (is_null($translations[$key])) {
 			return $key;
+		};
+		if ($params) {
+			return $this->_parseVariables($translations[$key], $params);
+		} else {
+			return $translations[$key];
 		}
-		return $translations[$key];
+	}
+
+	/**
+	 * @static
+	 * @param string	$key
+	 * @param array		$variables
+	 * @return string
+	 */
+	public function _parseVariables($key, array $variables) {
+		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $key);
 	}
 
 	/**
