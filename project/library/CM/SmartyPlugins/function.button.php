@@ -47,7 +47,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	}
 	$html .= '>';
 	if ($icon) {
-		$html .= '<span class="icon inline hover ' . $icon . '"></span>';
+		$html .= '<span class="icon ' . $icon . '"></span>';
 	}
 	if ($label) {
 		$html .= '<span class="label">' . CM_Language::htmlspecialchars($label) . '</span>';

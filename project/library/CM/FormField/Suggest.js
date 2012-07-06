@@ -44,7 +44,7 @@ ready: function() {
 		tokenLimit: field.getOption("cardinality"),
 		prePopulate: prePopulate,
 		classes: {
-			tokenDelete: 'token-input-delete-token icon close small inline',
+			tokenDelete: 'token-input-delete-token icon close small',
 			focused: 'focus'
 		}
 	});

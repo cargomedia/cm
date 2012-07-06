@@ -63,7 +63,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	$html = '';
 	$html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
 	if ($icon) {
-		$html .= '<span class="icon inline hover ' . $icon . '"></span>';
+		$html .= '<span class="icon ' . $icon . '"></span>';
 	}
 	if ($label) {
 		$html .= '<span class="label">' . CM_Language::htmlspecialchars($label) . '</span>';

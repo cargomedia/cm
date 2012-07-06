@@ -43,7 +43,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	$html .= '>';
 
 	if (!empty($icon)) {
-		$html .= '<span class="icon hover ' . $icon . '"></span>';
+		$html .= '<span class="icon ' . $icon . '"></span>';
 	}
 	if (!empty($icon) && !empty($label)) {
 		$html .= '<span class="label">';

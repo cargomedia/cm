@@ -30,7 +30,7 @@ class CM_Css {
 	}
 
 	/**
-	 * @param string	  $css
+	 * @param string      $css
 	 * @param string|null $prefix
 	 */
 	public function add($css, $prefix = null) {
@@ -106,6 +106,11 @@ EOD;
 			/** @var CM_Render $render */
 			list($type, $path) = $arg;
 			return array($type, 'url(' . $render->getUrlResource('img', substr($path, 1, -1)) . ')');
+		});
+		$lessc->registerFunction('urlFont', function ($arg) use($render) {
+			/** @var CM_Render $render */
+			list($type, $path) = $arg;
+			return array($type, $render->getUrlStatic('font/' . substr($path, 1, -1)));
 		});
 		$lessc->registerFunction('rgbahex', function($color, lessc $lessc) {
 			$color = $lessc->coerceColor($color);
