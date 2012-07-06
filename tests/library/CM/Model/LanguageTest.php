@@ -1,5 +1,6 @@
 <?php
-		require_once __DIR__ . '/../../../TestCase.php';
+
+require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Model_LanguageTest extends TestCase {
 
@@ -67,5 +68,17 @@ class CM_Model_LanguageTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertContains('CM_Model_Language', $e->getMessage());
 		}
+	}
+
+	public function testSetData() {
+		$this->_language->setData('Polish', 'pl', false);
+		$this->assertSame('Polish', $this->_language->getName());
+		$this->assertSame('pl', $this->_language->getAbbreviation());
+		$this->assertSame(false, $this->_language->getEnabled());
+	}
+
+	public function testFind() {
+		$this->assertModelEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
+		$this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
 	}
 }

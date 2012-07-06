@@ -52,7 +52,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 		if (is_null($translations[$key])) {
 			return $key;
-		};
+		}
 		if ($params) {
 			return $this->_parseVariables($translations[$key], $params);
 		} else {
