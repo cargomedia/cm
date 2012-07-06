@@ -16,22 +16,24 @@ class CM_Model_LanguageTest extends TestCase {
 	}
 
 	public function testSettingTranslation() {
-		$this->assertSame(array(), $this->_language->_get('translations'));
-
-		$languageKeyGet = 'test-by-getTranslation';
-		$languageKeySet = 'test-by-setTranslation';
-		$languageValue = 'This is the value';
 
 		// Test adding languageKey by getTranslation() and setting value by setTranslation
-		$this->assertSame($languageKeyGet, $this->_language->getTranslation($languageKeyGet));
-		$this->_language->setTranslation($languageKeyGet, $languageValue);
-		$this->assertSame($languageValue, $this->_language->getTranslation($languageKeyGet));
-		$this->assertSame(array($languageKeyGet => $languageValue), $this->_language->_get('translations'));
+		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', true));
+		$this->_language->setTranslation('keyFirst', 'abc');
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', true));
+		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
 
 		// Test adding languageKey and setting value by setTranslation()
-		$this->_language->setTranslation($languageKeySet, $languageValue);
-		$this->assertSame($languageValue, $this->_language->getTranslation($languageKeySet));
-		$this->assertSame(array($languageKeyGet => $languageValue, $languageKeySet => $languageValue), $this->_language->_get('translations'));
+		$this->_language->setTranslation('keySecond', 'abc');
+		$this->assertSame('abc', $this->_language->getTranslation('keySecond', true));
+		$this->assertSame(array('keyFirst' => 'abc', 'keySecond' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
+
+		// Test adding languageKey with not flushing and flushing cache
+		$this->_language->getTranslation('keySecond'); // Make sure its cached
+		$this->_language->setTranslation('keySecond', 'xyz');
+		$this->assertNotSame('xyz', $this->_language->getTranslation('keySecond'));
+		CM_Model_Language::flushCacheLocal();
+		$this->assertSame('xyz', $this->_language->getTranslation('keySecond'));
 	}
 
 	public function testCreate() {
@@ -40,7 +42,7 @@ class CM_Model_LanguageTest extends TestCase {
 
 		$this->assertSame('Deutsch', $language->getName());
 		$this->assertSame('de', $language->getAbbreviation());
-		$this->assertSame(1, $language->getEnabled());
+		$this->assertSame(true, $language->getEnabled());
 	}
 
 	public function testCreateWithoutName() {

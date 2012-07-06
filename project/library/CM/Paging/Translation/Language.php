@@ -9,4 +9,15 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		parent::__construct($source);
 	}
 
+	/**
+	 * @return string[]
+	 */
+	public function getAssociativeArray() {
+		$translations = array();
+		foreach ($this as $translation) {
+			$translations[$translation['key']] = $translation['value'];
+		}
+		return $translations;
+	}
+
 }

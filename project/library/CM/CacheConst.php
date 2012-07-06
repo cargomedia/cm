@@ -40,4 +40,7 @@ class CM_CacheConst {
 
 	//_md5:X
 	const Css = 'Css';
+
+	// _languageId:X
+	const Language = 'Language';
 }

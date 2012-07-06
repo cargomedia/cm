@@ -2,17 +2,6 @@
 
 class CM_Model_Language extends CM_Model_Abstract {
 
-	protected function _loadData() {
-		$data = CM_Mysql::select(TBL_CM_LANGUAGE, '*', array('id' => $this->getId()))->fetchAssoc();
-		if ($data) {
-			$data['translations'] = array();
-			foreach ($this->getTranslations() as $translation) {
-				$data['translations'][$translation['key']] = $translation['value'];
-			}
-		}
-		return $data;
-	}
-
 	/**
 	 * @return string
 	 */
@@ -28,10 +17,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return int
+	 * @return bool
 	 */
 	public function getEnabled() {
-		return (int) $this->_get('enabled');
+		return (bool) $this->_get('enabled');
 	}
 
 	/**
@@ -42,11 +31,20 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string      $key
+	 * @param bool|null   $skipCacheLocal
 	 * @return string
 	 */
-	public function getTranslation($key) {
-		$translations = $this->_get('translations');
+	public function getTranslation($key, $skipCacheLocal = null) {
+		$cacheKey = CM_CacheConst::Language . '_languageId:' . $this->getId();
+		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
+			$translations = $this->getTranslations()->getAssociativeArray();
+
+			if (!$skipCacheLocal) {
+				CM_CacheLocal::set($cacheKey, $translations);
+			}
+		}
+
 		if (!array_key_exists($key, $translations)) {
 			static::_addKey($key);
 			$this->_change();
@@ -67,35 +65,46 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$languageKeyId = static::_addKey($key);
 		}
 
-		CM_Mysql::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId, 'languageId' => $this->getId()), null, array('value' => $value));
+		CM_Mysql::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
+			'languageId' => $this->getId()), null, array('value' => $value));
 		$this->_change();
 	}
 
 	/**
-	 * @param string $name
-	 * @return int
+	 * @param string           $name
+	 * @param string           $abbreviation
+	 * @param bool|null        $enabled
 	 */
-	protected static function _addKey($name) {
-		$name = (string) $name;
-		$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name, 'accessStamp' => time()), null, array('accessStamp' => time()));
-		/** @var CM_Model_Language $language */
-		foreach (new CM_Paging_Language_All() as $language) {
-			$language->_change();
-		}
-		return $languageKeyId;
-	}
-
-	/**
-	 * @param string	$name
-	 * @param string	$abbreviation
-	 * @param bool		$enabled
-	 */
-	public function setData($name, $abbreviation, $enabled = false) {
+	public function setData($name, $abbreviation, $enabled = null) {
 		$name = (string) $name;
 		$abbreviation = (string) $abbreviation;
 		$enabled = (bool) $enabled;
-		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled), array('id' => $this->getId()));
+		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation,
+			'enabled' => $enabled), array('id' => $this->getId()));
 		$this->_change();
+	}
+
+	public static function flushCacheLocal() {
+		CM_CacheLocal::flush();
+	}
+
+	protected function _loadData() {
+		return CM_Mysql::select(TBL_CM_LANGUAGE, '*', array('id' => $this->getId()))->fetchAssoc();
+	}
+
+	protected function _onChange() {
+		$this->getTranslations()->_change();
+	}
+
+	protected function _getContainingCacheables() {
+		$cacheables = parent::_getContainingCacheables();
+		$cacheables[] = new CM_Paging_Language_All();
+		return $cacheables;
+	}
+
+	protected function _onDelete() {
+		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
+		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
 	}
 
 	/**
@@ -111,25 +120,25 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return new static($languageId);
 	}
 
-	protected function _onChange() {
-		$this->getTranslations()->_change();
-	}
-
-	protected function _getContainingCacheables() {
-		$cacheables = parent::_getContainingCacheables();
-		$cacheables[] = new CM_Paging_Language_All();
-		return $cacheables;
-	}
-
 	protected static function _create(array $data) {
 		$data = CM_Params::factory($data);
-		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation'), 'enabled' => $data->getBoolean('enabled')));
+		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation'),
+			'enabled' => $data->getBoolean('enabled')));
 		return new static($id);
 	}
 
-	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
+	/**
+	 * @param string $name
+	 * @return int
+	 */
+	protected static function _addKey($name) {
+		$name = (string) $name;
+		$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name, 'accessStamp' => time()), null, array('accessStamp' => time()));
+		/** @var CM_Model_Language $language */
+		foreach (new CM_Paging_Language_All() as $language) {
+			$language->_change();
+		}
+		return $languageKeyId;
 	}
 
 }
