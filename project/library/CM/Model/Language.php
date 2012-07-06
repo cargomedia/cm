@@ -47,7 +47,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($key, $translations)) {
-			static::_addKey($key);
+			static::_setKey($key);
 			$this->_change();
 		}
 		if (is_null($translations[$key])) {
@@ -74,10 +74,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param string $value
 	 */
 	public function setTranslation($key, $value) {
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
-		if (!$languageKeyId) {
-			$languageKeyId = static::_addKey($key);
-		}
+		$languageKeyId = static::_setKey($key);
 
 		CM_Mysql::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
 			'languageId' => $this->getId()), null, array('value' => $value));
@@ -145,14 +142,16 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param string $name
 	 * @return int
 	 */
-	protected static function _addKey($name) {
+	protected static function _setKey($name) {
 		$name = (string) $name;
-		$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name, 'accessStamp' => time()), null, array('accessStamp' => time()));
-		/** @var CM_Model_Language $language */
-		foreach (new CM_Paging_Language_All() as $language) {
-			$language->_change();
+		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
+		if (!$languageKeyId) {
+			$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name), null, array());
+			/** @var CM_Model_Language $language */
+			foreach (new CM_Paging_Language_All() as $language) {
+				$language->_change();
+			}
 		}
 		return $languageKeyId;
 	}
-
 }

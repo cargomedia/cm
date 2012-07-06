@@ -120,9 +120,7 @@ DROP TABLE IF EXISTS `cm_languageKey`;
 CREATE TABLE `cm_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
-  `accessStamp` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `accessStamp` (`accessStamp`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `cm_languageValue`;
