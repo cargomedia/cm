@@ -61,12 +61,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @static
 	 * @param string	$key
 	 * @param array		$variables
 	 * @return string
 	 */
-	public function _parseVariables($key, array $variables) {
+	private function _parseVariables($key, array $variables) {
 		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $key);
 	}
 
