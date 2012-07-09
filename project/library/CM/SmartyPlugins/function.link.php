@@ -33,10 +33,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$href = smarty_function_linkUrl($params, $template);
 	}
 
-	$html = '<a href="' . $href . '"';
-	if (!empty($class)) {
-		$html .= ' class="' . $class . '"';
-	}
+	$html = '<a href="' . $href . '" class="link ' . $class . '"';
 	if (!empty($title)) {
 		$html .= ' title="' . $title . '"';
 	}
