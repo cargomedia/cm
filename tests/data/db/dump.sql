@@ -105,11 +105,11 @@ DROP TABLE IF EXISTS `cm_language`;
 
 
 CREATE TABLE `cm_language` (
-  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `abbreviation` varchar(5) NOT NULL,
   `enabled` tinyint(1) unsigned NOT NULL,
-  `backupId` tinyint(3) unsigned DEFAULT NULL,
+  `backupId` int(10) unsigned NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `abbreviation` (`abbreviation`),
   KEY `enabled` (`enabled`)

@@ -95,10 +95,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param integer|null             $backupId
 	 * @return void
 	 */
-	public function setData($name, $abbreviation, $enabled = null, $backupId = null) {
+	public function setData($name, $abbreviation, $enabled = null, CM_Model_Language $backup = null) {
 		$name = (string) $name;
 		$abbreviation = (string) $abbreviation;
 		$enabled = (bool) $enabled;
+		$backupId = ($backup) ? $backup->getId() : null;
 		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation,
 			'enabled' => $enabled, 'backupId' => $backupId), array('id' => $this->getId()));
 		$this->_change();
@@ -186,7 +187,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		$data = CM_Params::factory($data);
-		$backupId = ($data->has('backupId')) ? $data->getLanguage('backupId')->getId() : null;
+		$backupId = ($data->has('backup')) ? $data->getLanguage('backup')->getId() : null;
 		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation'),
 			'enabled' => $data->getBoolean('enabled'), 'backupId' => $backupId));
 		return new static($id);
@@ -207,9 +208,5 @@ class CM_Model_Language extends CM_Model_Abstract {
 			}
 		}
 		return $languageKeyId;
-	}
-
-	public static function clearCache() {
-		CM_CacheLocal::flush();
 	}
 }
