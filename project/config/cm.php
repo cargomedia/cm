@@ -95,7 +95,7 @@ $config->CM_Model_Entity_Abstract->types = array();
 $config->CM_Mail = new stdClass();
 $config->CM_Mail->types = array();
 $config->CM_Mail->types[CM_Mail::TYPE] = 'CM_Mail';
-$config->CM_Mail->types[CM_Mail_Welcome::TYPE] = 'CM_M	ail_Welcome';
+$config->CM_Mail->types[CM_Mail_Welcome::TYPE] = 'CM_Mail_Welcome';
 
 $config->CM_Paging_Log_Abstract = new stdClass();
 $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_Log_Error';
