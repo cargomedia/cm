@@ -89,19 +89,18 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string                   $name
-	 * @param string                   $abbreviation
-	 * @param bool|null                $enabled
-	 * @param integer|null             $backupId
-	 * @return void
+	 * @param string                             $name
+	 * @param string                             $abbreviation
+	 * @param bool|null                          $enabled
+	 * @param CM_Model_Language|null             $backup
 	 */
 	public function setData($name, $abbreviation, $enabled = null, CM_Model_Language $backup = null) {
 		$name = (string) $name;
 		$abbreviation = (string) $abbreviation;
 		$enabled = (bool) $enabled;
 		$backupId = ($backup) ? $backup->getId() : null;
-		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation,
-			'enabled' => $enabled, 'backupId' => $backupId), array('id' => $this->getId()));
+		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled,
+			'backupId' => $backupId), array('id' => $this->getId()));
 		$this->_change();
 	}
 
