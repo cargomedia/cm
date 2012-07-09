@@ -353,13 +353,16 @@ class CM_Render extends CM_Class_Abstract {
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
 	}
 
+	public function clearTemplates() {
+		$this->_getSmarty()->clearCompiledTemplate();
+	}
+
 	/**
 	 * @return Smarty
 	 */
 	private function _getSmarty() {
 		if (!isset(self::$_smarty)) {
 			self::$_smarty = new Smarty();
-
 			self::$_smarty->setTemplateDir(DIR_LAYOUT);
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
 			self::$_smarty->_file_perms = 0777;

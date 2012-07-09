@@ -109,6 +109,7 @@ CREATE TABLE `cm_language` (
   `name` varchar(30) NOT NULL,
   `abbreviation` varchar(5) NOT NULL,
   `enabled` tinyint(1) unsigned NOT NULL,
+  `backupId` tinyint(3) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `abbreviation` (`abbreviation`),
   KEY `enabled` (`enabled`)

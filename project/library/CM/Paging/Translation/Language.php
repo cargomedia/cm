@@ -16,7 +16,9 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		$join = 'LEFT JOIN ' . TBL_CM_LANGUAGEVALUE . ' ON id = languageKeyId AND languageId = ' . $language->getId();
 		$where = array();
 		if ($searchPhrase) {
-			$where[] = CM_Mysql::placeholder("name LIKE '?'", '%' . $searchPhrase . '%');
+			$whereName = CM_Mysql::placeholder("name LIKE '?'", '%' . $searchPhrase . '%');
+			$whereValue = CM_Mysql::placeholder("value LIKE '?'", '%' . $searchPhrase . '%');
+			$where[] = '(' . $whereName . ' OR ' . $whereValue . ')';
 		}
 		if ($translated === true) {
 			$where[] = 'value IS NOT NULL';
@@ -26,7 +28,6 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		}
 		$where = ($where) ? join(' AND ', $where) : null;
 		$source = new CM_PagingSource_Sql_Deferred('name AS `key`, value', TBL_CM_LANGUAGEKEY, $where, null, $join);
-		$source->enableCache();
 		parent::__construct($source);
 	}
 
