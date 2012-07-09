@@ -61,10 +61,17 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	abstract public function setup();
 
 	/**
-	 * @param array $params OPTIONAL
-	 * @return string
+	 * @param array|null $params
 	 */
 	public function renderStart(array $params = null) {
+		$this->_renderStart(CM_Params::factory($params));
+	}
+
+	/**
+	 * @param CM_Params $params
+	 */
+	protected function _renderStart(CM_Params $params) {
+
 	}
 
 	/**

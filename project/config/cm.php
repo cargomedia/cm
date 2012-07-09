@@ -84,6 +84,7 @@ $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Mode
 $config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model_DeviceCapabilities';
 $config->CM_Model_Abstract->types[CM_Model_Stream_Publish::TYPE] = 'CM_Model_Stream_Publish';
 $config->CM_Model_Abstract->types[CM_Model_Stream_Subscribe::TYPE] = 'CM_Model_Stream_Subscribe';
+$config->CM_Model_Abstract->types[CM_Model_Language::TYPE] = 'CM_Model_Language';
 
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract->types = array();
@@ -94,7 +95,7 @@ $config->CM_Model_Entity_Abstract->types = array();
 $config->CM_Mail = new stdClass();
 $config->CM_Mail->types = array();
 $config->CM_Mail->types[CM_Mail::TYPE] = 'CM_Mail';
-$config->CM_Mail->types[CM_Mail_Welcome::TYPE] = 'CM_Mail_Welcome';
+$config->CM_Mail->types[CM_Mail_Welcome::TYPE] = 'CM_M	ail_Welcome';
 
 $config->CM_Paging_Log_Abstract = new stdClass();
 $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_Log_Error';

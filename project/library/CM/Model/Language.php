@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_Language extends CM_Model_Abstract {
+	const TYPE = 23;
 
 	/**
 	 * @return string
@@ -125,6 +126,17 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public static function findByAbbreviation($abbreviation) {
 		$abbreviation = (string) $abbreviation;
 		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
+		if (!$languageId) {
+			return null;
+		}
+		return new static($languageId);
+	}
+
+	/**
+	 * @return CM_Model_Language|null
+	 */
+	public static function findDefault() {
+		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id')->fetchOne();
 		if (!$languageId) {
 			return null;
 		}

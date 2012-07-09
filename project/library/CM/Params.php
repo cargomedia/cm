@@ -203,13 +203,14 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param string $className
-	 * @return object
+	 * @param string       $key
+	 * @param string       $className
+	 * @param mixed|null   $default
 	 * @throws CM_Exception_InvalidParam
+	 * @return object
 	 */
-	protected function _getObject($key, $className) {
-		$param = $this->_get($key);
+	protected function _getObject($key, $className, $default = null) {
+		$param = $this->_get($key, $default);
 		if (ctype_digit($param) || is_int($param)) {
 			return new $className($param);
 		}
@@ -285,12 +286,12 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param CM_Model_Language|string      $key
+	 * @param CM_Model_Language|string|null $default
 	 * @return CM_Model_Language
-	 * @throws CM_Exception_InvalidParam
 	 */
-	public function getLanguage($key) {
-		return $this->_getObject($key, 'CM_Model_Language');
+	public function getLanguage($key, $default = null) {
+		return $this->_getObject($key, 'CM_Model_Language', $default);
 	}
 
 	/**
