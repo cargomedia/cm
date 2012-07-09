@@ -2,15 +2,10 @@
 
 class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 
-	const TYPE_ALL = 1;
-	const TYPE_TRANSLATED = 2;
-	const TYPE_UNTRANSLATED = 3;
-
 	/**
-	 * @param CM_Model_Language         $language
-	 * @param string|null               $searchPhrase
-	 * @param integer|null              $type
-	 * @throws CM_Exception_InvalidParam
+	 * @param CM_Model_Language              $language
+	 * @param string|null                    $searchPhrase
+	 * @param bool|null                      $translated
 	 */
 	public function __construct(CM_Model_Language $language, $searchPhrase = null, $translated = null) {
 		$join = 'LEFT JOIN ' . TBL_CM_LANGUAGEVALUE . ' ON id = languageKeyId AND languageId = ' . $language->getId();
