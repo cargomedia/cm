@@ -3,6 +3,7 @@
 class CM_Model_Language extends CM_Model_Abstract {
 	const TYPE = 23;
 
+	/** @var CM_Model_Language|null $_backup */
 	private $_backup;
 
 	/**
@@ -113,6 +114,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $this->_backup;
 	}
 
+	/**
+	 * @param CM_Model_Language $language
+	 * @return bool
+	 */
 	public function isBackedUpBy(CM_Model_Language $language) {
 		while (!is_null($language)) {
 			if ($this->equals($language)) {
