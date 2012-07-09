@@ -286,6 +286,15 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Model_Language|string      $key
+	 * @param CM_Model_Language|string|null $default
+	 * @return CM_Model_Language
+	 */
+	public function getLanguage($key, $default = null) {
+		return $this->_getObject($key, 'CM_Model_Language', $default);
+	}
+
+	/**
 	 * @param string $key
 	 * @return CM_Model_Stream_Publish
 	 * @throws CM_Exception_InvalidParam
@@ -302,8 +311,6 @@ class CM_Params extends CM_Class_Abstract {
 	public function getStreamSubscribe($key) {
 		return $this->_getObject($key, 'CM_Model_Stream_Subscribe');
 	}
-
-	//-------static-------//
 
 	/**
 	 * @param mixed   $value
