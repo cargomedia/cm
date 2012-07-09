@@ -32,7 +32,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 
 	if ($paging->getPage() > 1) {
 		if ($pageMin > 1) {
-			$html .= _smarty_function_paging_link($request, $component, 1, '1', $ajax, 'pagingFirst icon');
+			$html .= _smarty_function_paging_link($request, $component, 1, '1', $ajax, 'pagingFirst');
 		}
 		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev icon');
 	}
@@ -45,7 +45,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	if ($paging->getPage() < $paging->getPageCount()) {
 		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon');
 		if ($pageMax < $paging->getPageCount()) {
-			$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast icon');
+			$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
 		}
 	}
 
