@@ -15,6 +15,13 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	}
 	unset($params['icon']);
 
+	$iconPosition = 'left';
+	if (!empty($params['iconPosition']) && $params['iconPosition'] == 'right') {
+		$iconPosition = 'right';
+	}
+	unset($params['iconPosition']);
+
+
 	if (isset($params['title'])) {
 		$attrs .= ' title="' . CM_Language::htmlspecialchars($params['title']) . '"';
 		unset($params['title']);
@@ -29,13 +36,17 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	if (isset($params['class'])) {
 		$class = $params['class'];
 	}
+	unset($params['class']);
 	if ($label) {
 		$class .= ' hasLabel';
 	}
 	if ($icon) {
+		$iconMarkup = '<span class="icon ' . $icon . '"></span>';
 		$class .= ' hasIcon';
+		if ($iconPosition == 'right') {
+			$class .= ' hasIconRight';
+		}
 	}
-	unset($params['class']);
 
 	$onclick = false;
 	if (isset($params['onclick'])) {
@@ -62,11 +73,14 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
 	$html = '';
 	$html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
-	if ($icon) {
-		$html .= '<span class="icon ' . $icon . '"></span>';
+	if ($icon && $iconPosition == 'left') {
+		$html .= $iconMarkup;
 	}
 	if ($label) {
 		$html .= '<span class="label">' . CM_Language::htmlspecialchars($label) . '</span>';
+	}
+	if ($icon && $iconPosition == 'right') {
+		$html .= $iconMarkup;
 	}
 	$html .= '</button>';
 	return $html;
