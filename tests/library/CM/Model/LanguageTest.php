@@ -26,13 +26,6 @@ class CM_Model_LanguageTest extends TestCase {
 		$this->_language->setTranslation('keyFirst', 'abc');
 		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', true));
 		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
-
-		// Test adding languageKey and retrieving it with not flushing and flushing cache
-		$this->_language->getTranslation('keySecond'); // Make sure its cached
-		$this->_language->setTranslation('keySecond', 'xyz');
-		$this->assertNotSame('xyz', $this->_language->getTranslation('keySecond'));
-		CM_Model_Language::flushCacheLocal();
-		$this->assertSame('xyz', $this->_language->getTranslation('keySecond'));
 	}
 
 	public function testCreate() {
