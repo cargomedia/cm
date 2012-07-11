@@ -149,21 +149,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	/**
 	 * @param string      $abbreviation
-	 * @param bool|null   $skipCacheLocal
 	 * @return CM_Model_Language|null
 	 */
-	public static function findByAbbreviation($abbreviation, $skipCacheLocal = null) {
+	public static function findByAbbreviation($abbreviation) {
 		$abbreviation = (string) $abbreviation;
-		$cacheKey = CM_CacheConst::Language_ByAbbreviation . '_abbreviation:' . $abbreviation;
-		if ($skipCacheLocal || false === ($languageId = CM_CacheLocal::get($cacheKey))) {
-			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
-			if (!$languageId) {
-				$languageId = null;
-			}
-			if (!$skipCacheLocal) {
-				CM_CacheLocal::set($cacheKey, $languageId);
-			}
-		}
+		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
 		if (!$languageId) {
 			return null;
 		}

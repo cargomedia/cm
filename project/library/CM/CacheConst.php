@@ -44,9 +44,6 @@ class CM_CacheConst {
 	// _languageId:X
 	const Language_Translations = 'Language_Translations';
 
-	// _abbreviation:X
-	const Language_ByAbbreviation = 'Language_ByAbbreviation';
-
 	// _languageId:X
 	const LanguageDefault = 'LanguageDefault';
 }
