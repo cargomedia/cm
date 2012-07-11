@@ -53,7 +53,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			static::_setKey($key);
 			$this->_change();
 		}
-		if (is_null($translations[$key])) {
+		if (!isset($translations[$key])) {
 			if (!$this->getBackup()) {
 				return $key;
 			}
@@ -215,6 +215,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			foreach (new CM_Paging_Language_All() as $language) {
 				$language->_change();
 			}
+			self::flushCacheLocal();
 		}
 		return $languageKeyId;
 	}
