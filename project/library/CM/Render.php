@@ -167,6 +167,9 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function renderTemplate($tplPath, $variables = null, $isolated = null) {
 		$compileId = $this->getSite()->getId();
+		if ($this->getLanguage()) {
+			$compileId .= '_' . $this->getLanguage()->getAbbreviation();
+		}
 		/** @var Smarty_Internal_TemplateBase $template */
 		if ($isolated) {
 			$template = $this->_getSmarty()->createTemplate($tplPath, null, $compileId);
