@@ -17,12 +17,20 @@ class CM_Model_LanguageTest extends TestCase {
 	}
 
 	public function testSetGetTranslation() {
+		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
+		$this->assertSame(array('keyFirst' => null), $this->_language->getTranslations()->getAssociativeArray());
 
-		// Test adding languageKey by getTranslation()
+		$this->_language->getTranslation('keyFirst');	// Fill APC
+		$this->_language->setTranslation('keyFirst', 'abc');
+		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
+		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
+	}
+
+	public function testSetGetTranslationWithoutLocalCache() {
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', true));
 		$this->assertSame(array('keyFirst' => null), $this->_language->getTranslations()->getAssociativeArray());
 
-		// Test adding languageKey by setTranslation()
+		$this->_language->getTranslation('keyFirst');	// Fill APC
 		$this->_language->setTranslation('keyFirst', 'abc');
 		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', true));
 		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
