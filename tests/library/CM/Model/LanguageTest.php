@@ -16,20 +16,18 @@ class CM_Model_LanguageTest extends TestCase {
 		TH::clearEnv();
 	}
 
-	public function testSettingTranslation() {
+	public function testSetGetTranslation() {
 
-		// Test adding languageKey by getTranslation() and setting value by setTranslation
+		// Test adding languageKey by getTranslation()
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', true));
+		$this->assertSame(array('keyFirst' => null), $this->_language->getTranslations()->getAssociativeArray());
+
+		// Test adding languageKey by setTranslation()
 		$this->_language->setTranslation('keyFirst', 'abc');
 		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', true));
 		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
 
-		// Test adding languageKey and setting value by setTranslation()
-		$this->_language->setTranslation('keySecond', 'abc');
-		$this->assertSame('abc', $this->_language->getTranslation('keySecond', true));
-		$this->assertSame(array('keyFirst' => 'abc', 'keySecond' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
-
-		// Test adding languageKey with not flushing and flushing cache
+		// Test adding languageKey and retrieving it with not flushing and flushing cache
 		$this->_language->getTranslation('keySecond'); // Make sure its cached
 		$this->_language->setTranslation('keySecond', 'xyz');
 		$this->assertNotSame('xyz', $this->_language->getTranslation('keySecond'));
@@ -41,9 +39,11 @@ class CM_Model_LanguageTest extends TestCase {
 		/** @var CM_Model_Language $language */
 		$language = CM_Model_Language::create(array('name' => 'Deutsch', 'abbreviation' => 'de', 'enabled' => true));
 
+		$this->assertInstanceOf('CM_Model_Language', $language);
 		$this->assertSame('Deutsch', $language->getName());
 		$this->assertSame('de', $language->getAbbreviation());
-		$this->assertSame(true, $language->getEnabled());
+		$this->assertTrue($language->getEnabled());
+		$this->assertNull($language->getBackup());
 	}
 
 	public function testCreateWithoutName() {
@@ -55,7 +55,23 @@ class CM_Model_LanguageTest extends TestCase {
 		}
 	}
 
+	public function testCreateWithDuplicateAbbreviation() {
+		try {
+			CM_Model_Language::create(array('name' => 'Another one', 'abbreviation' => $this->_language->getAbbreviation(), 'enabled' => true));
+			$this->fail('Could create language with duplicate abbreviation');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
+	}
+
 	public function testDelete() {
+		/** @var CM_Model_Language $backedUpLanguage */
+		$backedUpLanguage = CM_Model_Language::create(array(
+			'name' => 'Backed up language',
+			'abbreviation' => 'bul',
+			'enabled' => true,
+			'backup' => $this->_language,
+		));
 		$this->_language->delete();
 		try {
 			new CM_Model_Language($this->_language->getId());
@@ -63,6 +79,8 @@ class CM_Model_LanguageTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertContains('CM_Model_Language', $e->getMessage());
 		}
+		TH::reinstantiateModel($backedUpLanguage);
+		$this->assertNull($backedUpLanguage->getBackup());
 	}
 
 	public function testSetData() {
@@ -72,7 +90,21 @@ class CM_Model_LanguageTest extends TestCase {
 		$this->assertSame(false, $this->_language->getEnabled());
 	}
 
-	public function testFind() {
+	public function testSetDataDuplicateAbbreviation() {
+		CM_Model_Language::create(array(
+			'name' => 'Another',
+			'abbreviation' => 'pl',
+			'enabled' => true
+		));
+		try {
+			$this->_language->setData('Polish', 'pl', false);
+			$this->fail('Could set language with duplicate abbreviation');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
+	}
+
+	public function testFindByAbbreviation() {
 		$this->assertModelEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
 		$this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
 	}
@@ -81,11 +113,52 @@ class CM_Model_LanguageTest extends TestCase {
 		$key = 'languageKey';
 		$this->_language->setTranslation($key, 'abc');
 		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
-		$this->assertGreaterThan(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
-		$this->assertGreaterThan(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+		$this->assertSame(array($key => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
 
 		CM_Model_Language::deleteKey($key);
+		$this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
 		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
 		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+	}
+
+	public function testUnsetTranslation() {
+		$this->_language->setTranslation('phrase', 'abc');
+		$this->assertSame('abc', $this->_language->getTranslation('phrase', true));
+		$this->_language->unsetTranslation('phrase');
+		$this->assertSame('phrase', $this->_language->getTranslation('phrase', true));
+	}
+
+	public function testGetTranslationWithBackup() {
+		/** @var CM_Model_Language $backedUpLanguage */
+		$backedUpLanguage = CM_Model_Language::create(array(
+			'name' => 'Backed up language',
+			'abbreviation' => 'bul',
+			'enabled' => true,
+			'backup' => $this->_language
+		));
+		$this->_language->setTranslation('phrase', 'abc');
+		$this->assertSame('abc', $backedUpLanguage->getTranslation('phrase'));
+	}
+
+	public function testIsBackingUp() {
+		/** @var CM_Model_Language $backedUpLanguage */
+		$backedUpLanguage = CM_Model_Language::create(array(
+			'name' => 'Backed up language',
+			'abbreviation' => 'bul',
+			'enabled' => true,
+			'backup' => $this->_language
+		));
+		$this->assertTrue($this->_language->isBackingUp($backedUpLanguage));
+		$this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
+	}
+
+	public function testFindDefault() {
+		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+
+		$this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
+		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+
+		CM_CacheLocal::flush();
+		$this->assertNull(CM_Model_Language::findDefault());
 	}
 }

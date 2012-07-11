@@ -220,4 +220,11 @@ class TH {
 		}
 		return $str;
 	}
+
+	/**
+	 * @param CM_Model_Abstract $model
+	 */
+	public static function reinstantiateModel(CM_Model_Abstract &$model) {
+		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
+	}
 }

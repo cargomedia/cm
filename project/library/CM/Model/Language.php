@@ -113,7 +113,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param CM_Model_Language $language
 	 * @return bool
 	 */
-	public function isBackedUpBy(CM_Model_Language $language) {
+	public function isBackingUp(CM_Model_Language $language) {
 		while (!is_null($language)) {
 			if ($this->equals($language)) {
 				return true;
@@ -144,7 +144,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
+		CM_Mysql::update(TBL_CM_LANGUAGE, array('backupId' => null), array('backupId' => $this->getId()));
 		CM_Mysql::update(TBL_CM_USER, array('languageId' => null), array('languageId' => $this->getId()));
+		/** @var CM_Model_Language $language */
+		foreach (new CM_Paging_Language_All() as $language) {
+			$language->_change();
+		}
 	}
 
 	/**
@@ -166,7 +171,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public static function findDefault() {
 		$cacheKey = CM_CacheConst::Language_Default;
 		if (false === ($languageId = CM_CacheLocal::get($cacheKey))) {
-			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true))->fetchOne();
+			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true, 'backupId' => null))->fetchOne();
 			CM_CacheLocal::set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
