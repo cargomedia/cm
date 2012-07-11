@@ -92,7 +92,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 		if ($request->getPath() == '/') {
 			$request->setPath('/index');
 		}
-
 	}
 
 	/**

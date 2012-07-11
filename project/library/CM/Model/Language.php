@@ -161,14 +161,13 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Language
-	 * @throws CM_Exception_Invalid
+	 * @return CM_Model_Language|null
 	 */
 	public static function findDefault() {
-		$cacheKey = CM_CacheConst::LanguageDefault;
+		$cacheKey = CM_CacheConst::Language_Default;
 		if (false === ($languageId = CM_CacheLocal::get($cacheKey))) {
 			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true))->fetchOne();
-			CM_CacheLocal::set($cacheKey, $languageId, 300);
+			CM_CacheLocal::set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
 			return null;

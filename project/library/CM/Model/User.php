@@ -146,7 +146,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Language
+	 * @return CM_Model_Language|null
 	 */
 	public function getLanguage() {
 		if (!$this->_get('languageId')) {

@@ -459,11 +459,13 @@ CREATE TABLE `cm_user` (
   `activityStamp` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `site` tinyint(3) unsigned DEFAULT NULL,
-  `languageId` tinyint(3) unsigned DEFAULT NULL,
+  `languageId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`userId`),
   KEY `activityStamp` (`activityStamp`),
-  KEY `createStamp` (`createStamp`)
+  KEY `createStamp` (`createStamp`),
+  KEY `languageId` (`languageId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 DROP TABLE IF EXISTS `cm_user_online`;
 

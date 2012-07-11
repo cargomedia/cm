@@ -25,12 +25,12 @@ class CM_Render extends CM_Class_Abstract {
 	protected $_site = null;
 
 	/**
-	 * @var CM_Model_Language
+	 * @var CM_Model_Language|null
 	 */
 	private $_language;
 
 	/**
-	 * @var bool $language
+	 * @var bool
 	 */
 	private $_languageRewrite;
 
@@ -51,13 +51,11 @@ class CM_Render extends CM_Class_Abstract {
 	protected $_stack = array();
 
 	/**
-	 * @param CM_Site_Abstract|null  $site
-	 * @param CM_Model_Language|null $language
-	 * @param null                   $languageRewrite
+	 * @param CM_Site_Abstract|null          $site
+	 * @param CM_Model_Language|null         $language
+	 * @param boolean|null                   $languageRewrite
 	 */
 	public function __construct(CM_Site_Abstract $site = null, CM_Model_Language $language = null, $languageRewrite = null) {
-		$this->_languageRewrite = (bool) $languageRewrite;
-
 		if (!$site) {
 			$site = CM_Site_Abstract::factory();
 		}
@@ -66,6 +64,7 @@ class CM_Render extends CM_Class_Abstract {
 		}
 		$this->_site = $site;
 		$this->_language = $language;
+		$this->_languageRewrite = (bool) $languageRewrite;
 	}
 
 	/**
@@ -372,7 +371,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Language
+	 * @return CM_Model_Language|null
 	 */
 	public function getLanguage() {
 		return $this->_language;
@@ -380,14 +379,15 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param array  $params
+	 * @param array|null  $params
 	 * @return string
 	 */
 	public function getTranslation($key, array $params = null) {
+		$translation = $key;
 		if ($this->getLanguage()) {
-			$key = $this->getLanguage()->getTranslation($key);
+			$translation = $this->getLanguage()->getTranslation($key);
 		}
-		return $this->_parseVariables($key, $params);
+		return $this->_parseVariables($translation, $params);
 	}
 
 	public function clearTemplates() {
@@ -420,11 +420,11 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $key
+	 * @param              $phrase
 	 * @param array        $variables
 	 * @return string
 	 */
-	private function _parseVariables($key, array $variables) {
-		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $key);
+	private function _parseVariables($phrase, array $variables) {
+		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $phrase);
 	}
 }

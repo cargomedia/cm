@@ -76,4 +76,8 @@ class CM_App {
 		}
 		return ($version - $versionStart);
 	}
+
+	public function generateClassesConfig() {
+		//foreach ()
+	}
 }

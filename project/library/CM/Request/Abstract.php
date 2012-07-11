@@ -219,7 +219,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return int|null
+	 * @return string|null	very long number (string used)
 	 */
 	public function getIp() {
 		if (IS_TEST || IS_DEBUG) {
@@ -234,7 +234,7 @@ abstract class CM_Request_Abstract {
 		if (0 == $long) {
 			return null;
 		}
-		return (int) $long;
+		return $long;
 	}
 
 	/**
@@ -250,7 +250,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Language
+	 * @return CM_Model_Language|null
 	 */
 	public function getLanguage() {
 		if ($language = $this->_getLanguageViewer()) {
