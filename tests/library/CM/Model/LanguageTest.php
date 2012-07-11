@@ -76,4 +76,16 @@ class CM_Model_LanguageTest extends TestCase {
 		$this->assertModelEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
 		$this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
 	}
+
+	public function testDeleteKey() {
+		$key = 'languageKey';
+		$this->_language->setTranslation($key, 'abc');
+		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
+		$this->assertGreaterThan(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
+		$this->assertGreaterThan(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+
+		CM_Model_Language::deleteKey($key);
+		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
+		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+	}
 }

@@ -312,7 +312,7 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
 		$path = $pageClassName::getPath($params);
-		if ($this->_languageRewrite) {
+		if ($this->_languageRewrite && $this->getLanguage()) {
 			$path = $this->getLanguage()->getAbbreviation() . '/' . $path;
 		}
 		return $site->getUrl() . $path;
