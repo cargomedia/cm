@@ -390,7 +390,10 @@ class CM_Render extends CM_Class_Abstract {
 		if ($this->getLanguage()) {
 			$translation = $this->getLanguage()->getTranslation($key);
 		}
-		return $this->_parseVariables($translation, $params);
+		if (null !== $params) {
+			$translation = $this->_parseVariables($translation, $params);
+		}
+		return $translation;
 	}
 
 	public function clearTemplates() {
@@ -428,6 +431,6 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	private function _parseVariables($phrase, array $variables) {
-		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $phrase);
+		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : ''", $phrase);
 	}
 }

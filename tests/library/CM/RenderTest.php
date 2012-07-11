@@ -104,7 +104,11 @@ class CM_RenderTest extends TestCase {
 
 	public function testGetTranslation() {
 		$render = $this->_getRender();
+
+		$this->assertSame('abc', $render->getTranslation('abc'));
 		$this->assertSame('abc cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+		$this->assertSame('abc {$variable}', $render->getTranslation('abc {$variable}'));
+		$this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
 
 		/** @var CM_Model_Language $language */
 		$language = CM_Model_Language::create(array(
