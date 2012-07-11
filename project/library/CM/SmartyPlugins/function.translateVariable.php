@@ -7,5 +7,5 @@ function smarty_function_translateVariable($params, Smarty_Internal_Template $te
 	$key = $params['key'];
 	unset($params['key']);
 
-	return $render->getText($key, $params);
+	return $render->getTranslation($key, $params);
 }

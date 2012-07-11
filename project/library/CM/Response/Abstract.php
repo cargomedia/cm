@@ -139,7 +139,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	public function getRender() {
 		if (!$this->_render) {
-			$this->_render = new CM_Render($this->getSite());
+			$this->_render = new CM_Render($this->getSite(), $this->getRequest()->getLanguage(), !$this->getViewer() && $this->getRequest()->getLanguageUrl());
 		}
 		return $this->_render;
 	}

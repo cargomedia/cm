@@ -24,6 +24,16 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	protected $_site = null;
 
+	/**
+	 * @var CM_Model_Language
+	 */
+	private $_language;
+
+	/**
+	 * @var bool $language
+	 */
+	private $_languageRewrite;
+
 	public static $block_cap = '';
 
 	/**
@@ -41,13 +51,21 @@ class CM_Render extends CM_Class_Abstract {
 	protected $_stack = array();
 
 	/**
-	 * @param CM_Site_Abstract|null $site
+	 * @param CM_Site_Abstract|null  $site
+	 * @param CM_Model_Language|null $language
+	 * @param null                   $languageRewrite
 	 */
-	public function __construct(CM_Site_Abstract $site = null) {
+	public function __construct(CM_Site_Abstract $site = null, CM_Model_Language $language = null, $languageRewrite = null) {
+		$this->_languageRewrite = (bool) $languageRewrite;
+
 		if (!$site) {
-			$site = $this->_site = CM_Site_Abstract::factory();
+			$site = CM_Site_Abstract::factory();
+		}
+		if (!$language) {
+			$language = CM_Model_Language::findDefault();
 		}
 		$this->_site = $site;
+		$this->_language = $language;
 	}
 
 	/**
@@ -295,6 +313,9 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
 		$path = $pageClassName::getPath($params);
+		if ($this->_languageRewrite) {
+			$path = $this->getLanguage()->getAbbreviation() . '/' . $path;
+		}
 		return $site->getUrl() . $path;
 	}
 
@@ -322,10 +343,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!$mail->getRecipient()) {
 			throw new CM_Exception_Invalid('Needs user');
 		}
-		$params = array(
-			'user' =>  $mail->getRecipient()->getId(),
-			'mailType' => $mail->getType()
-		);
+		$params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
 		return CM_Util::link($this->getSite()->getUrl() . 'emailtracking/' . $this->getSite()->getId(), $params);
 	}
 
@@ -351,6 +369,25 @@ class CM_Render extends CM_Class_Abstract {
 			return $this->getUrl('userfiles/', self::_getConfig()->cdnUserContent);
 		}
 		return $this->getUrl('userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+	}
+
+	/**
+	 * @return CM_Model_Language
+	 */
+	public function getLanguage() {
+		return $this->_language;
+	}
+
+	/**
+	 * @param string $key
+	 * @param array  $params
+	 * @return string
+	 */
+	public function getTranslation($key, array $params = null) {
+		if ($this->getLanguage()) {
+			$key = $this->getLanguage()->getTranslation($key);
+		}
+		return $this->_parseVariables($key, $params);
 	}
 
 	public function clearTemplates() {
@@ -380,5 +417,14 @@ class CM_Render extends CM_Class_Abstract {
 		self::$_smarty->loadFilter('pre', 'translate');
 
 		return self::$_smarty;
+	}
+
+	/**
+	 * @param string       $key
+	 * @param array        $variables
+	 * @return string
+	 */
+	private function _parseVariables($key, array $variables) {
+		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $key);
 	}
 }

@@ -19,14 +19,14 @@ class CM_Model_LanguageTest extends TestCase {
 	public function testSettingTranslation() {
 
 		// Test adding languageKey by getTranslation() and setting value by setTranslation
-		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', null, true));
+		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', true));
 		$this->_language->setTranslation('keyFirst', 'abc');
-		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', null, true));
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', true));
 		$this->assertSame(array('keyFirst' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
 
 		// Test adding languageKey and setting value by setTranslation()
 		$this->_language->setTranslation('keySecond', 'abc');
-		$this->assertSame('abc', $this->_language->getTranslation('keySecond', null, true));
+		$this->assertSame('abc', $this->_language->getTranslation('keySecond', true));
 		$this->assertSame(array('keyFirst' => 'abc', 'keySecond' => 'abc'), $this->_language->getTranslations()->getAssociativeArray());
 
 		// Test adding languageKey with not flushing and flushing cache
@@ -35,11 +35,6 @@ class CM_Model_LanguageTest extends TestCase {
 		$this->assertNotSame('xyz', $this->_language->getTranslation('keySecond'));
 		CM_Model_Language::flushCacheLocal();
 		$this->assertSame('xyz', $this->_language->getTranslation('keySecond'));
-	}
-
-	public function testVariables() {
-		$this->_language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
-		$this->assertSame('translated stuff is cool', $this->_language->getTranslation('abc {$variable}', array('variable' => 'cool')));
 	}
 
 	public function testCreate() {

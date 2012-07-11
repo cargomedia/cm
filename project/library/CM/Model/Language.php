@@ -36,12 +36,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	/**
 	 * @param string      $key
-	 * @param array|null  $params
 	 * @param bool|null   $skipCacheLocal
 	 * @return string
 	 */
-	public function getTranslation($key, array $params = null, $skipCacheLocal = null) {
-		$cacheKey = CM_CacheConst::Language . '_languageId:' . $this->getId();
+	public function getTranslation($key, $skipCacheLocal = null) {
+		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
 		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
 
@@ -58,13 +57,9 @@ class CM_Model_Language extends CM_Model_Abstract {
 			if (!$this->getBackup()) {
 				return $key;
 			}
-			return $this->getBackup()->getTranslation($key, $params, $skipCacheLocal);
+			return $this->getBackup()->getTranslation($key, $skipCacheLocal);
 		}
-		if ($params) {
-			return $this->_parseVariables($translations[$key], $params);
-		} else {
-			return $translations[$key];
-		}
+		return $translations[$key];
 	}
 
 	/**
@@ -149,24 +144,26 @@ class CM_Model_Language extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
+		CM_Mysql::update(TBL_CM_USER, array('languageId' => null), array('languageId' => $this->getId()));
 	}
 
 	/**
-	 * @param string       $key
-	 * @param array        $variables
-	 * @return string
-	 */
-	private function _parseVariables($key, array $variables) {
-		return preg_replace('~\{\$(\w+)(->\w+\(.*?\))?\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1']\\2 : '\\0'", $key);
-	}
-
-	/**
-	 * @param string $abbreviation
+	 * @param string      $abbreviation
+	 * @param bool|null   $skipCacheLocal
 	 * @return CM_Model_Language|null
 	 */
-	public static function findByAbbreviation($abbreviation) {
+	public static function findByAbbreviation($abbreviation, $skipCacheLocal = null) {
 		$abbreviation = (string) $abbreviation;
-		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
+		$cacheKey = CM_CacheConst::Language_ByAbbreviation . '_abbreviation:' . $abbreviation;
+		if ($skipCacheLocal || false === ($languageId = CM_CacheLocal::get($cacheKey))) {
+			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
+			if (!$languageId) {
+				$languageId = null;
+			}
+			if (!$skipCacheLocal) {
+				CM_CacheLocal::set($cacheKey, $languageId);
+			}
+		}
 		if (!$languageId) {
 			return null;
 		}
@@ -174,21 +171,40 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Language|null
+	 * @return CM_Model_Language
+	 * @throws CM_Exception_Invalid
 	 */
 	public static function findDefault() {
-		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id')->fetchOne();
+		$cacheKey = CM_CacheConst::LanguageDefault;
+		if (false === ($languageId = CM_CacheLocal::get($cacheKey))) {
+			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true))->fetchOne();
+			CM_CacheLocal::set($cacheKey, $languageId, 300);
+		}
 		if (!$languageId) {
 			return null;
 		}
 		return new static($languageId);
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public static function deleteKey($name) {
+		$name = (string) $name;
+		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
+		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId));
+		CM_Mysql::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyId));
+		/** @var CM_Model_Language $language */
+		foreach (new CM_Paging_Language_All() as $language) {
+			$language->_change();
+		}
 	}
 
 	protected static function _create(array $data) {
-		$data = CM_Params::factory($data);
-		$backupId = ($data->has('backup')) ? $data->getLanguage('backup')->getId() : null;
-		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $data->getString('name'), 'abbreviation' => $data->getString('abbreviation'),
-			'enabled' => $data->getBoolean('enabled'), 'backupId' => $backupId));
+		$params = CM_Params::factory($data);
+		$backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
+		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
+			'enabled' => $params->getBoolean('enabled'), 'backupId' => $backupId));
 		return new static($id);
 	}
 

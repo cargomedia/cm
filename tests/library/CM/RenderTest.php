@@ -101,4 +101,20 @@ class CM_RenderTest extends TestCase {
 		CM_Config::get()->CM_Render->cdnUserContent = true;
 		$this->assertSame('http://www.cdn.com/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
 	}
+
+	public function testGetTranslation() {
+		$render = $this->_getRender();
+		$this->assertSame('abc cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+
+		/** @var CM_Model_Language $language */
+		$language = CM_Model_Language::create(array(
+			'name' => 'Test language',
+			'abbreviation' => 'test',
+			'enabled' => true
+		));
+		$render = $this->_getRender();
+		$language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
+		CM_Model_Language::flushCacheLocal();
+		$this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+	}
 }

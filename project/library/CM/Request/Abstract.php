@@ -37,14 +37,20 @@ abstract class CM_Request_Abstract {
 	private $_session;
 
 	/**
+	 * @var CM_Model_Language|null
+	 */
+	private $_languageUrl;
+
+	/**
 	 * @var CM_Request_Abstract
 	 */
 	private static $_instance;
 
 	/**
-	 * @param string				   $uri
-	 * @param array|null			   $headers OPTIONAL
-	 * @param CM_Model_User|null	   $viewer
+	 * @param string                   $uri
+	 * @param array|null               $headers OPTIONAL
+	 * @param CM_Model_User|null       $viewer
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (is_null($headers)) {
@@ -69,7 +75,7 @@ abstract class CM_Request_Abstract {
 			}
 		}
 
-		if ($viewer){
+		if ($viewer) {
 			$this->_viewer = $viewer;
 		}
 
@@ -213,22 +219,22 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return int|false
+	 * @return int|null
 	 */
 	public function getIp() {
 		if (IS_TEST || IS_DEBUG) {
 			$ip = CM_Config::get()->testIp;
 		} else {
 			if (!isset($_SERVER['REMOTE_ADDR'])) {
-				return false;
+				return null;
 			}
 			$ip = $_SERVER['REMOTE_ADDR'];
 		}
 		$long = sprintf('%u', ip2long($ip));
 		if (0 == $long) {
-			return false;
+			return null;
 		}
-		return $long;
+		return (int) $long;
 	}
 
 	/**
@@ -244,6 +250,64 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return CM_Model_Language
+	 */
+	public function getLanguage() {
+		if ($language = $this->_getLanguageViewer()) {
+			return $language;
+		}
+		if ($language = $this->getLanguageUrl()) {
+			return $language;
+		}
+		if ($language = $this->_getLanguageBrowser()) {
+			return $language;
+		}
+		return CM_Model_Language::findDefault();
+	}
+
+	/**
+	 * @return CM_Model_Language|null
+	 */
+	public function getLanguageUrl() {
+		return $this->_languageUrl;
+	}
+
+	/**
+	 * @param CM_Model_Language|null $language
+	 */
+	public function setLanguageUrl(CM_Model_Language $language = null) {
+		$this->_languageUrl = $language;
+	}
+
+	/**
+	 * @return CM_Model_Language|null
+	 */
+	private function _getLanguageViewer() {
+		if (!$this->getViewer()) {
+			return null;
+		}
+		return $this->getViewer(true)->getLanguage();
+	}
+
+	/**
+	 * @return CM_Model_Language|null
+	 */
+	private function _getLanguageBrowser() {
+		if ($this->hasHeader('Accept-Language')) {
+			$languagePaging = new CM_Paging_Language_Enabled();
+			$acceptLanguageHeader = explode(',', $this->getHeader('Accept-Language'));
+			foreach ($acceptLanguageHeader as $acceptLanguage) {
+				$acceptLanguage = explode(';', trim($acceptLanguage));
+				$locale = explode('-', $acceptLanguage[0]);
+				if ($language = $languagePaging->findByAbbreviation($locale[0])) {
+					return $language;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function hasInstance() {
@@ -251,6 +315,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Abstract
 	 */
 	public static function getInstance() {

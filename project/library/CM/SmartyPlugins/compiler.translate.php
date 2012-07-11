@@ -7,5 +7,5 @@ function smarty_compiler_translate($params, Smarty $smarty) {
 	$key = substr($params['key'], 1, -1);
 	unset($params['key']);
 
-	return $render->getText($key, $params);
+	return $render->getTranslation($key, $params);
 }

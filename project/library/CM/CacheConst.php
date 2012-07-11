@@ -42,5 +42,11 @@ class CM_CacheConst {
 	const Css = 'Css';
 
 	// _languageId:X
-	const Language = 'Language';
+	const Language_Translations = 'Language_Translations';
+
+	// _abbreviation:X
+	const Language_ByAbbreviation = 'Language_ByAbbreviation';
+
+	// _languageId:X
+	const LanguageDefault = 'LanguageDefault';
 }

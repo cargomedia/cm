@@ -127,6 +127,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	/**
 	 * @param boolean $state
+	 * @throws CM_Exception_Invalid
 	 * @return CM_Model_User
 	 */
 	public function setVisible($state = true) {
@@ -142,6 +143,24 @@ class CM_Model_User extends CM_Model_Abstract {
 	 */
 	public function getDisplayName() {
 		return 'user' . $this->getId();
+	}
+
+	/**
+	 * @return CM_Model_Language
+	 */
+	public function getLanguage() {
+		if (!$this->_get('languageId')) {
+			return null;
+		}
+		return new CM_Model_Language($this->_get('languageId'));
+	}
+
+	/**
+	 * @param CM_Model_Language $language
+	 */
+	public function setLanguage(CM_Model_Language $language) {
+		CM_Mysql::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
+		$this->_change();
 	}
 
 	/**
