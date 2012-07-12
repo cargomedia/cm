@@ -1,6 +1,7 @@
+<h2>{translate 'This is an example'}</h2>
+{if $viewer}{translate 'Hello {$user->getDisplayName()}!' user=$viewer}{/if}<br />
 foo={$foo|usertext}<br />
 time={$now}<br />
-viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}</span><br />
 <hr />
 
 {button_link class="reload" label="reload()" icon="reload"}
@@ -26,13 +27,13 @@ viewer=<span class="user">{if $viewer}{$viewer->getDisplayName()}{else}null{/if}
 <hr />
 
 {form name="CM_Form_Example" viewer=$viewer}
-	{formField name='text' label='Text'}
-	{formField name='int' label='Integer'}
-	{formField name='location' label='Location'}
-	{formField name='locationSlider' label='Radius'}
-	{formField name='image' label='Upload 0-2 Photos'}
-	{formField name='color' label='Color'}
-	{formAction action='go' label='Go'}
+	{formField name='text' label="{translate 'Text'}"}
+	{formField name='int' label="{translate 'Integer'}"}
+	{formField name='location' label="{translate 'Location'}"}
+	{formField name='locationSlider' label="{translate 'Radius'}"}
+	{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
+	{formField name='color' label="{translate 'Color'}"}
+	{formAction action='go' label="{translate 'Go'}"}
 {/form}
 
 <div class="stream">
