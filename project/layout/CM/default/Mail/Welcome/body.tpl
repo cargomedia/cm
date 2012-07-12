@@ -1,1 +1,1 @@
-<strong>Welcome</strong> to {$siteName}!
+{translate 'Welcome to {$siteName}!' siteName=$siteName}

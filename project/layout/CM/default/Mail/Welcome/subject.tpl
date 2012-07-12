@@ -1,1 +1,1 @@
-Welcome {$recipient->getDisplayName()}
+{translate 'Welcome {$username}' username=$recipient->getDisplayName()}
