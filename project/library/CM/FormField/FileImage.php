@@ -23,7 +23,7 @@ class CM_FormField_FileImage extends CM_FormField_File {
 	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
 		$html = '';
 		$html .= '<img src="' . $render->getUrlUserContent($file) . '" />';
-		$html .= '<a href="javascript:;" class="icon delete"></a>';
+		$html .= '<div class="actions"><a href="javascript:;" class="icon delete"></a></div>';
 		return $html;
 	}
 	
