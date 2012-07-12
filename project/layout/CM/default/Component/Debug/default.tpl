@@ -1,10 +1,10 @@
 <div class="panel">
 	<ul class="alerts"></ul>
 	<div class="buttons">
-		<a href="javascript:;" class="actions">ACTIONS</a> ·
-	{foreach from=$stats key=stat item=value}
-		<a href="javascript:;" class="{$stat}">{$stat}</a> ({$value|@count})
-	{/foreach}
+		<a href="javascript:;" class="actions">{{translate 'Actions'}|strtoupper}</a> ·
+		{foreach from=$stats key=stat item=value}
+			<a href="javascript:;" class="{$stat}">{$stat}</a> ({$value|@count})
+		{/foreach}
 	</div>
 	<div class="containers">
 	{foreach from=$stats key=key item=stat}
@@ -21,7 +21,7 @@
 			<input id="{id tag=$var}" checked="checked" type="checkbox" name="{$var}" />
 			<label for="{id tag=$var}">{$text}</label><br />
 		{/foreach}
-			<input class="clearCache" type="submit" value="Clear Cache">
+			<input class="clearCache" type="submit" value="{translate 'Clear Cache'}">
 		</div>
 	</div>
 </div>
