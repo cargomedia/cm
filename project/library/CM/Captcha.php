@@ -3,11 +3,11 @@
 class CM_Captcha {
 	private $_id;
 	private $_text;
-	private $_fontDir;
+	private $_fontPath;
 
 	/**
 	 * @param int $id
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($id) {
 		$this->_id = (int) $id;
@@ -15,7 +15,7 @@ class CM_Captcha {
 		if (!$this->_text) {
 			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
 		}
-		$this->_fontDir = DIR_PUBLIC . 'static' . DIRECTORY_SEPARATOR . 'font';
+		$this->_fontPath = DIR_PUBLIC . 'static' . DIRECTORY_SEPARATOR . 'font' . DIRECTORY_SEPARATOR . 'comicsans.ttf';
 	}
 
 	/**
@@ -73,12 +73,8 @@ class CM_Captcha {
 			throw new CM_Exception('Could not create captcha image');
 		}
 
-		$fonts = CM_Util::rglob('*.ttf', $this->_fontDir);
-		if (empty($fonts)) {
-			throw new CM_Exception('Cannot any .ttf-fonts in `' . $this->_fontDir . '`');
-		}
-
 		// Fill background
+		$red = $green = $blue = null;
 		sscanf('F0A0C0', "%2x%2x%2x", $red, $green, $blue);
 		for ($i = 0, $rd = ($red > 0) ? $red : rand(0, 100), $gr = ($green > 0) ? $green : rand(0, 100), $bl = ($blue > 0) ? $blue : rand(0, 100);
 			 $i <= $height; $i++) {
@@ -93,13 +89,12 @@ class CM_Captcha {
 		$text = strtoupper($this->getText());
 		for ($i = 0, $strlen = strlen($text), $p = floor(abs((($width - ($size * $strlen)) / 2) - floor($size / 2)));
 			 $i < $strlen; $i++, $p += $size) {
-			$font = $fonts[array_rand($fonts)];
 			$d = rand(-8, 8);
 			$y = rand(floor($height / 2) + floor($size / 2), $height - floor($size / 2));
 			for ($b = 0; $b <= 3; $b++) {
-				imagettftext($resource, $size, $d, $p++, $y++, $colorShadow, $font, $text{$i});
+				imagettftext($resource, $size, $d, $p++, $y++, $colorShadow, $this->_fontPath, $text{$i});
 			}
-			@imagettftext($resource, $size, $d, $p, $y, $colorBackground, $font, $text{$i});
+			@imagettftext($resource, $size, $d, $p, $y, $colorBackground, $this->_fontPath, $text{$i});
 		}
 
 		// Apply grid
