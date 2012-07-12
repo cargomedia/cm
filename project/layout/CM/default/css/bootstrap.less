@@ -35,11 +35,11 @@
 				}
 			}
 			&.active > a, &.dropdown.open > a {
-				.background-color(@colorFgBorderEmphasize);
+				.background-color(darken(@colorBgShy, 10));
 				color: @colorFg;
 
 				&:hover {
-					.background-color(@colorFgBorderEmphasize);
+					.background-color(darken(@colorBgShy, 10));
 					color: @colorFg;
 				}
 
@@ -47,9 +47,6 @@
 					border-top-color: @colorFg;
 					border-bottom-color: @colorFg;
 				}
-			}
-			&.active > a {
-				.background-color(darken(@colorBg, 10));
 			}
 
 			.dropdown-menu {
