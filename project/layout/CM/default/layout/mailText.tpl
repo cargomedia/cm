@@ -1,6 +1,11 @@
-Dear {if $recipient}{$recipient->getDisplayName()}{else}user{/if},
+{if $recipient}
+	{translate 'Dear {$username}' username=$recipient->getDisplayName()},
+{else}
+	{translate 'Dear user'},
+{/if}
+
 
 {$body}
 
-Thanks,
+{translate 'Thanks'},
  {$siteName}

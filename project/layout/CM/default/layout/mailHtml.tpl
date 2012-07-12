@@ -6,7 +6,11 @@
 	<body style="margin: 0px">
 
 		<p>
-			Dear {if $recipient}{$recipient->getDisplayName()}{else}user{/if},
+			{if $recipient}
+				{translate 'Dear {$username}' username=$recipient->getDisplayName()},
+			{else}
+				{translate 'Dear user'},
+			{/if}
 		</p>
 
 		<p>
@@ -14,7 +18,7 @@
 		</p>
 
 		<p>
-			Thanks,<br />
+			{translate 'Thanks'},<br />
 				{$siteName}
 		</p>
 	</body>
