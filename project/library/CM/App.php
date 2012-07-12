@@ -109,7 +109,7 @@ class CM_App {
 	private function _generateClassTypesConfig($typeNamespace) {
 		$verifiedClasses = array();
 		$highestTypeUsed = 0;
-		foreach (CM_Util::getChildrenClasses($typeNamespace) as $className) {
+		foreach (CM_Util::getClassChildren($typeNamespace) as $className) {
 			$reflectionClass = new ReflectionClass($className);
 			if ($reflectionClass->hasConstant('TYPE')) {
 				$type = $className::TYPE;

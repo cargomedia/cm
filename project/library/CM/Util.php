@@ -133,11 +133,11 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string $parentClassName
+	 * @param string     $className
 	 * @param array|null $libraryDirectories
 	 * @return string[]
 	 */
-	public static function getChildrenClasses($parentClassName, array $libraryDirectories = null) {
+	public static function getClassChildren($className, array $libraryDirectories = null) {
 		if (!$libraryDirectories) {
 			$libraryDirectories = array(DIR_LIBRARY);
 		}
@@ -148,7 +148,7 @@ class CM_Util {
 				$file = new CM_File($path);
 				$regexp = '#class\s+(?<name>.+?)\b#';
 				if (preg_match($regexp, $file->read(), $matches)) {
-					if (class_exists($matches['name'], true) && is_subclass_of($matches['name'], $parentClassName)) {
+					if (class_exists($matches['name'], true) && is_subclass_of($matches['name'], $className)) {
 						$classes[] = $matches['name'];
 					}
 				}

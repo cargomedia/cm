@@ -3,10 +3,10 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_UtilTest extends TestCase {
 
-	public function testGetChildrenClasses() {
+	public function testGetClassChildren() {
 		$parent = 'CM_Model_Abstract';
 		$grandParent = get_parent_class($parent);
-		$childrenClasses = CM_Util::getChildrenClasses($parent);
+		$childrenClasses = CM_Util::getClassChildren($parent);
 		$this->assertContains('CM_Model_Language', $childrenClasses);
 		$this->assertContains('CM_Model_StreamChannel_Message', $childrenClasses);
 		$this->assertNotContains($grandParent, $childrenClasses);
