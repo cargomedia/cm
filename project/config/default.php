@@ -1,7 +1,5 @@
 <?php
 
-CM_Config::load('cm.php');
-
 $config->debug = true;
 
 $config->CM_Render->cdnResource = false;

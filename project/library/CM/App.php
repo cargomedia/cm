@@ -135,6 +135,7 @@ class CM_App {
 		$lines[] = 'if (!isset($config->' . $typeNamespace . ')) {';
 		$lines[] = "\t" . '$config->' . $typeNamespace . ' = new StdClass();';
 		$lines[] = '}';
+		$lines[] = '$config->' . $typeNamespace . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
 		$lines[] = '';

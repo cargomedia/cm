@@ -17,7 +17,6 @@ $config->CM_Mail->siteEmailAddress = 'noreply@example.com';
 
 $config->CM_Site_Abstract = new stdClass();
 $config->CM_Site_Abstract->class = 'CM_Site_CM';
-$config->CM_Site_Abstract->types = array();
 
 $config->CM_Tracking_Abstract = new stdClass();
 $config->CM_Tracking_Abstract->enabled = false;
@@ -72,38 +71,12 @@ $config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Mysql->servers_read = array();
 
 $config->CM_Action_Abstract = new stdClass();
-$config->CM_Action_Abstract->types = array();
-
 $config->CM_Model_Abstract = new stdClass();
-$config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User';
-$config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet';
-$config->CM_Model_Abstract->types[CM_Model_Splittest::TYPE] = 'CM_Model_Splittest';
-$config->CM_Model_Abstract->types[CM_Model_SplittestVariation::TYPE] = 'CM_Model_SplittestVariation';
-$config->CM_Model_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message';
-$config->CM_Model_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video';
-$config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model_DeviceCapabilities';
-$config->CM_Model_Abstract->types[CM_Model_Stream_Publish::TYPE] = 'CM_Model_Stream_Publish';
-$config->CM_Model_Abstract->types[CM_Model_Stream_Subscribe::TYPE] = 'CM_Model_Stream_Subscribe';
-$config->CM_Model_Abstract->types[CM_Model_Language::TYPE] = 'CM_Model_Language';
-$config->CM_Model_Abstract->types[CM_Model_Location::TYPE] = 'CM_Model_Location';
-
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
-$config->CM_Model_ActionLimit_Abstract->types = array();
-
 $config->CM_Model_Entity_Abstract = new stdClass();
-$config->CM_Model_Entity_Abstract->types = array();
-
 $config->CM_Mail = new stdClass();
-$config->CM_Mail->types = array();
-$config->CM_Mail->types[CM_Mail::TYPE] = 'CM_Mail';
-$config->CM_Mail->types[CM_Mail_Welcome::TYPE] = 'CM_Mail_Welcome';
-
 $config->CM_Paging_Log_Abstract = new stdClass();
-$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_Log_Error';
-$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Mail::TYPE] = 'CM_Paging_Log_Mail';
-
 $config->CM_Paging_ContentList_Abstract = new stdClass();
-$config->CM_Paging_ContentList_Abstract->types[CM_Paging_ContentList_Badwords::TYPE] = 'CM_Paging_ContentList_Badwords';
 
 $config->CM_Model_User = new stdClass();
 $config->CM_Model_User->class = 'CM_Model_User';
@@ -137,9 +110,6 @@ $config->CM_Model_DeviceCapabilities = new stdClass();
 $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
 $config->CM_Model_StreamChannel_Abstract = new stdClass();
-$config->CM_Model_StreamChannel_Abstract->types = array();
-$config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video';
-$config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message';
 
 $config->CM_Wowza = new stdClass();
 $config->CM_Wowza->streamChannelTypes[] = CM_Model_StreamChannel_Video::TYPE;
