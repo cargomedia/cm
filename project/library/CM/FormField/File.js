@@ -37,7 +37,7 @@ ready: function() {
 	});
 	
 	this.$(".previews").on("click", ".delete", function() {
-		$(this).parent("li").remove();
+		$(this).closest("li").remove();
 	});
 },
 
