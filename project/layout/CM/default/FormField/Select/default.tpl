@@ -15,7 +15,7 @@
 {else}
 	<select id="{$id}" name="{$name}"  class="{$class}">
 		{if $invite}
-			<option value="">- Select -</option>
+			<option value="">- {translate 'Select'} -</option>
 		{/if}
 		{foreach $valuesAndLabels as $itemValue => $itemLabel}
 			<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>{$itemLabel|escape}</option>
