@@ -100,6 +100,19 @@ class TH {
 		return CM_Model_User::create();
 	}
 
+	public static function createLanguage($abbreviation = null) {
+		if (!$abbreviation) {
+			do {
+				$abbreviation = self::_randStr(5);
+			} while (CM_Model_Language::findByAbbreviation($abbreviation));
+		}
+		return CM_Model_Language::create(array(
+			'name' => 'English',
+			'abbreviation' => $abbreviation,
+			'enabled' => 1
+		));
+	}
+
 	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User         $viewer OPTIONAL
