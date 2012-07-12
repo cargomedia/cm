@@ -131,4 +131,29 @@ class CM_Util {
 
 		return $link;
 	}
+
+	/**
+	 * @param string $parentClassName
+	 * @param array|null $libraryDirectories
+	 * @return string[]
+	 */
+	public static function getChildrenClasses($parentClassName, array $libraryDirectories = null) {
+		if (!$libraryDirectories) {
+			$libraryDirectories = array(DIR_LIBRARY);
+		}
+		$classes = array();
+		foreach ($libraryDirectories as $directory) {
+			$paths = CM_Util::rglob('*.php', $directory);
+			foreach ($paths as $path) {
+				$file = new CM_File($path);
+				$regexp = '#class\s+(?<name>.+?)\b#';
+				if (preg_match($regexp, $file->read(), $matches)) {
+					if (class_exists($matches['name'], true) && is_subclass_of($matches['name'], $parentClassName)) {
+						$classes[] = $matches['name'];
+					}
+				}
+			}
+		}
+		return $classes;
+	}
 }

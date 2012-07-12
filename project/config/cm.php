@@ -85,6 +85,7 @@ $config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model
 $config->CM_Model_Abstract->types[CM_Model_Stream_Publish::TYPE] = 'CM_Model_Stream_Publish';
 $config->CM_Model_Abstract->types[CM_Model_Stream_Subscribe::TYPE] = 'CM_Model_Stream_Subscribe';
 $config->CM_Model_Abstract->types[CM_Model_Language::TYPE] = 'CM_Model_Language';
+$config->CM_Model_Abstract->types[CM_Model_Location::TYPE] = 'CM_Model_Location';
 
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract->types = array();

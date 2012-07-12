@@ -37,12 +37,12 @@ class CM_Config {
 
 	private static function _init() {
 		self::$_config = new stdClass();
+		self::load('cm.php');
 		self::load('default.php');
-
 		if (IS_TEST) {
 			self::load('test.php');
 		}
-
 		self::load('local.php');
+		self::load('class-types.php');
 	}
 }
