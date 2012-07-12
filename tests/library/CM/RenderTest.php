@@ -66,6 +66,30 @@ class CM_RenderTest extends TestCase {
 		}
 	}
 
+	public function testGetUrlPageLanguageRewrite() {
+		TH::clearEnv(); // Clear languages
+		$baseUrl = CM_Config::get()->CM_Site_CM->url;
+		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
+
+		$render = new CM_Render(null, null, null);
+		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$render = new CM_Render(null, null, true); // This should never happen in application, but lets test it
+		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+
+		$language = TH::createLanguage('en');
+
+		$render = new CM_Render(null, null, null);
+		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$render = new CM_Render(null, null, true); // This should never happen in application, but lets test it
+		$this->assertSame($baseUrl . 'en/test', $render->getUrlPage($page));
+
+		$render = new CM_Render(null, $language, null);
+		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$render = new CM_Render(null, $language, true);
+		$this->assertSame($baseUrl . 'en/test', $render->getUrlPage($page));
+
+	}
+
 	public function testGetUrlResource() {
 		$render = $this->_getRender();
 		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
@@ -103,6 +127,7 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function testGetTranslation() {
+		TH::clearEnv(); // Clear languages
 		$render = $this->_getRender();
 
 		$this->assertSame('abc', $render->getTranslation('abc'));

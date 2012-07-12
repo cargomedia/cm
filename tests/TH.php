@@ -100,6 +100,10 @@ class TH {
 		return CM_Model_User::create();
 	}
 
+	/**
+	 * @param string|null $abbreviation
+	 * @return CM_Model_Language
+	 */
 	public static function createLanguage($abbreviation = null) {
 		if (!$abbreviation) {
 			do {
