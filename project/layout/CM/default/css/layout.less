@@ -66,10 +66,6 @@ input[type=checkbox], input[type=radio] {
 	.input_text;
 	.input_text_height;
 	.border(@colorFgBorder);
-	html.no-boxsizing & {
-		height: 14px; // @ie7: line-height - border
-		width: 90%;
-	}
 }
 
 button:focus, .textinput:focus, .textinput.focus {
@@ -78,9 +74,6 @@ button:focus, .textinput:focus, .textinput.focus {
 
 textarea.textinput {
 	.input_textarea;
-	html.no-boxsizing & {
-		height: 60px;
-	}
 }
 
 button, input[type=submit], input[type=button] {
