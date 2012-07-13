@@ -2,7 +2,6 @@
 
 abstract class CM_Page_Abstract extends CM_View_Abstract {
 
-	protected $_title = null;
 	protected $_params;
 	protected $_viewer = null;
 	protected $_path = null;
@@ -35,22 +34,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 */
 	public function getRequest() {
 		return $this->_request;
-	}
-
-	/**
-	 * Returns the translated title
-	 *
-	 * @return string|null
-	 */
-	public final function getTitle() {
-		return $this->_title;
-	}
-
-	/**
-	 * @param string $title
-	 */
-	public final function setTitle($title) {
-		$this->_title = (string) $title;
 	}
 
 	/**
