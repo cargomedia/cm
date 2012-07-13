@@ -1,5 +1,5 @@
 <h2>{translate 'This is an example'}</h2>
-{if $viewer}{translate 'Hello {$user->getDisplayName()}!' user=$viewer}{/if}<br />
+{if $viewer}{translate 'Hello {$username}!' user=$viewer->getDisplayName()|escape}{/if}<br />
 foo={$foo|usertext}<br />
 time={$now}<br />
 <hr />
