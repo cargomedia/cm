@@ -13,8 +13,11 @@ class CM_RenderTest extends TestCase {
 		CM_Config::get()->TEST_Site_Test->url = 'http://www.test.com/';
 	}
 
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		TH::clearEnv();
+	}
+
+	public static function tearDownAfterClass() {
 		CM_Config::set(self::$_configBackup);
 	}
 
@@ -67,7 +70,6 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function testGetUrlPageLanguageRewrite() {
-		TH::clearEnv(); // Clear languages
 		$baseUrl = CM_Config::get()->CM_Site_CM->url;
 		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
 
@@ -127,7 +129,6 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function testGetTranslation() {
-		TH::clearEnv(); // Clear languages
 		$render = $this->_getRender();
 
 		$this->assertSame('abc', $render->getTranslation('abc'));
