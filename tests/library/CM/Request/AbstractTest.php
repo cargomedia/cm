@@ -77,10 +77,10 @@ class CM_Request_AbstractTest extends TestCase {
 		$request = $this->_prepareRequest('/de/home');
 		$site->rewrite($request);
 		$this->assertNull($request->getLanguage());
-		CM_CacheLocal::flush(); // Need to flush CM_Paging_Languages_Enabled() cache
 
 		TH::createLanguage('en'); // default language
 		$urlLanguage = TH::createLanguage('de');
+		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
 		$site->rewrite($request);
 		$this->assertModelEquals($request->getLanguage(), $urlLanguage);
