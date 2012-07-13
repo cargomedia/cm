@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="description" content="{"{block name='head-description'}{/block}"|escape}">
 		<meta name="keywords" content="{"{block name='head-keywords'}{/block}"|escape}">
-		<title>{block name='title'}{$pageObj->getTitle()|escape}{/block}</title>
+		<title>{block name='title'}{/block}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}
 		{resource file='init.js'}
