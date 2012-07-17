@@ -1,10 +1,18 @@
 <?php
 
 class CM_Tracking extends CM_Tracking_Abstract {
-	
+
 	private static $_instance = null;
 	private $_pageviews = array();
 	private $_orders = array();
+	private $_customVars = array();
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 */
+	public function trackPageview(CM_Request_Abstract $request) {
+		$this->setPageview();
+	}
 
 	/**
 	 * @param string|null $path
@@ -23,7 +31,7 @@ class CM_Tracking extends CM_Tracking_Abstract {
 	/**
 	 * @param string $orderId
 	 * @param string $productId
-	 * @param float $amount
+	 * @param float  $amount
 	 */
 	public function addSale($orderId, $productId, $amount) {
 		if (!isset($this->_orders[$orderId])) {
@@ -33,13 +41,23 @@ class CM_Tracking extends CM_Tracking_Abstract {
 	}
 
 	/**
+	 * @param int    $index 1-5
+	 * @param string $name
+	 * @param string $value
+	 * @param int    $scope 1 (visitor-level), 2 (session-level), or 3 (page-level)
+	 */
+	public function addCustomVar($index, $name, $value, $scope) {
+		$this->_customVars[] = array('index' => (int) $index, 'name' => (string) $name, 'value' => (string) $value, 'scope' => (int) $scope);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getJs() {
 		if (!$this->enabled()) {
 			return '';
 		}
-		
+
 		$js = '';
 		foreach ($this->_pageviews as $pageview) {
 			if (empty($pageview)) {
@@ -58,6 +76,10 @@ class CM_Tracking extends CM_Tracking_Abstract {
 				$js .= "_gaq.push(['_addItem', '$orderId', '$productId', 'product-$productId', '', '$amount', '1']);";
 			}
 			$js .= "_gaq.push(['_trackTrans']);";
+		}
+		foreach ($this->_customVars as $customVar) {
+			$js .= "_gaq.push(['_setCustomVar', " . $customVar['index'] . ", '" . $customVar['name'] . "', '" . $customVar['value'] . "', " .
+					$customVar['scope'] . "]);";
 		}
 		return $js;
 	}
@@ -84,16 +106,17 @@ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga
 })();
 EOT;
 		$html .= '</script>';
-		
+
 		return $html;
 	}
-	
+
 	/**
 	 * @return CM_Tracking
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {
-			self::$_instance = new self();
+			$className = self::_getClassName();
+			self::$_instance = new $className();
 		}
 		return self::$_instance;
 	}

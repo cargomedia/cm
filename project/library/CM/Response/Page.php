@@ -8,7 +8,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	public function process() {
 		try {
-			CM_Tracking::getInstance()->setPageview();
+			CM_Tracking::getInstance()->trackPageview($this->getRequest());
 			$this->getSite()->rewrite($this->getRequest());
 			$page = CM_Page_Abstract::factory($this->getSite(), $this->getRequest());
 			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
