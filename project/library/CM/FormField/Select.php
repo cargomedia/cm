@@ -45,7 +45,7 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 	}
 
 	protected function _getOptionList() {
-		if ($this->_labelsInValues) {
+		if ($this->_labelsInValues || !$this->_values) {
 			return $this->_values;
 		} else {
 			return array_combine($this->_values, $this->_values);
