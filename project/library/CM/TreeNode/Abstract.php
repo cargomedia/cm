@@ -1,32 +1,54 @@
 <?php
 
 abstract class CM_TreeNode_Abstract {
-	private $id;
-	private $name;
-	private $parent_id = null;
-	private $nodes = array();
-	private $leaves = array();
 
-	public function __construct($id, $name, $parent_id = null) {
-		$this->id = $id;
-		$this->name = $name;
-		$this->parent_id = $parent_id;
+	/** @var string */
+	private $_id;
+
+	/** @var string */
+	private $_name;
+
+	/** @var string|null */
+	private $_parentId = null;
+
+	/** @var CM_TreeNode_Abstract[] */
+	private $_nodes = array();
+
+	/** @var CM_TreeNode_Abstract[] */
+	private $_leaves = array();
+
+	public function __construct($id, $name, $parentId = null) {
+		$this->_id = $id;
+		$this->_name = $name;
+		$this->_parentId = $parentId;
 	}
 
+	/**
+	 * @param CM_TreeNode_Abstract $node
+	 */
 	public function addNode(CM_TreeNode_Abstract $node) {
-		$this->nodes[$node->getName()] = $node;
+		$this->_nodes[$node->getName()] = $node;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getId() {
-		return $this->id;
+		return $this->_id;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getName() {
-		return $this->name;
+		return $this->_name;
 	}
 
+	/**
+	 * @return null|string
+	 */
 	public function getParentId() {
-		return $this->parent_id;
+		return $this->_parentId;
 	}
 
 	/**
@@ -34,7 +56,26 @@ abstract class CM_TreeNode_Abstract {
 	 * @return boolean
 	 */
 	public function hasNode($name) {
-		return array_key_exists($name, $this->nodes);
+		return array_key_exists($name, $this->_nodes);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasNodes() {
+		return count($this->_nodes) > 0;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasGrandNodes() {
+		foreach ($this->getNodes() as $node) {
+			if ($node->hasNodes()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -46,7 +87,14 @@ abstract class CM_TreeNode_Abstract {
 		if (!$this->hasNode($name)) {
 			throw new CM_TreeException("Node `" . $this->getId() . "` does not contain node `$name`.");
 		}
-		return $this->nodes[$name];
+		return $this->_nodes[$name];
+	}
+
+	/**
+	 * @return CM_TreeNode_Abstract[]
+	 */
+	public function getNodes() {
+		return $this->_nodes;
 	}
 
 	/**
@@ -57,7 +105,7 @@ abstract class CM_TreeNode_Abstract {
 		if (!$key) {
 			return false;
 		}
-		return array_key_exists($key, $this->leaves);
+		return array_key_exists($key, $this->_leaves);
 	}
 
 	/**
@@ -69,14 +117,14 @@ abstract class CM_TreeNode_Abstract {
 		if (!$this->hasLeaf($key)) {
 			throw new CM_TreeException("Node `" . $this->getId() . "` does not contain leaf `$key`.");
 		}
-		return $this->leaves[$key];
+		return $this->_leaves[$key];
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getLeaves() {
-		return $this->leaves;
+		return $this->_leaves;
 	}
 
 	/**
@@ -84,6 +132,6 @@ abstract class CM_TreeNode_Abstract {
 	 * @param string $value
 	 */
 	public function setLeaf($key, $value) {
-		$this->leaves[$key] = $value;
+		$this->_leaves[$key] = $value;
 	}
 }

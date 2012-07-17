@@ -9,16 +9,24 @@
 abstract class CM_Tree_Abstract {
 	private $params;
 	private $nodeClass;
-	private $tree = array();
+
+	/** @var CM_TreeNode_Abstract */
+	private $_root;
+
+	/** @var array */
+	protected $_nodesCache = array();
+
+	/** @var array */
+	protected $_nodesTmp = array();
 
 	public function __construct($nodeClass = 'CM_TreeNode_Abstract', $params = array()) {
 		$this->nodeClass = $nodeClass;
 		$this->params = $params;
 
-		$this->tmp_nodes = array();
+		$this->_nodesTmp = array();
 		$this->_load();
 		$this->_buildTree();
-		unset($this->tmp_nodes);
+		unset($this->_nodesTmp);
 	}
 
 	/**
@@ -27,21 +35,28 @@ abstract class CM_Tree_Abstract {
 	 * @throws CM_TreeException
 	 */
 	public function findNode($path) {
-		if (!isset($this->nodes_cache))
-			$this->nodes_cache = array();
+		if (!isset($this->_nodesCache))
+			$this->_nodesCache = array();
 		if (!$path) {
 			return false;
 		}
-		if (!array_key_exists($path, $this->nodes_cache)) {
-			$node = $this->tree;
+		if (!array_key_exists($path, $this->_nodesCache)) {
+			$node = $this->_root;
 			if ($path) {
 				foreach (explode('.', $path) as $node_name) {
 					$node = $node->getNode($node_name);
 				}
 			}
-			$this->nodes_cache[$path] = $node;
+			$this->_nodesCache[$path] = $node;
 		}
-		return $this->nodes_cache[$path];
+		return $this->_nodesCache[$path];
+	}
+
+	/**
+	 * @return CM_TreeNode_Abstract
+	 */
+	public function getRoot() {
+		return $this->_root;
 	}
 
 	/**
@@ -58,15 +73,15 @@ abstract class CM_Tree_Abstract {
 	 * @param mixed $parent_id
 	 */
 	protected function _addNode($id, $name, $parent_id = null) {
-		$this->tmp_nodes[$id] = new $this->nodeClass($id, $name, $parent_id);
+		$this->_nodesTmp[$id] = new $this->nodeClass($id, $name, $parent_id);
 	}
 
 	protected function _addLeaf($node_id, $id, $value = null) {
-		if (!array_key_exists($node_id, $this->tmp_nodes)) {
+		if (!array_key_exists($node_id, $this->_nodesTmp)) {
 			trigger_error("Cannot add leaf `$id` because node `$node_id` does not exist.", E_USER_NOTICE);
 			return;
 		}
-		$this->tmp_nodes[$node_id]->setLeaf($id, $value);
+		$this->_nodesTmp[$node_id]->setLeaf($id, $value);
 	}
 
 	protected function _getParam($key) {
@@ -76,16 +91,16 @@ abstract class CM_Tree_Abstract {
 	}
 
 	private function _buildTree() {
-		$this->tree = new $this->nodeClass(0, 'root');
-		$this->_buildNode($this->tree);
+		$this->_root = new $this->nodeClass(0, 'root');
+		$this->_buildNode($this->_root);
 	}
 
 	private function _buildNode(CM_TreeNode_Abstract $parent) {
-		foreach ($this->tmp_nodes as $id => $node) {
+		foreach ($this->_nodesTmp as $id => $node) {
 			if ($parent->getId() === $node->getParentId()) {
 				$parent->addNode($node);
 				$this->_buildNode($node);
-				unset($this->tmp_nodes[$id]);
+				unset($this->_nodesTmp[$id]);
 			}
 		}
 	}
