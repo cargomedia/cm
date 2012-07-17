@@ -13,8 +13,8 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 	 * @param array|null   $values
 	 * @param bool|null    $labelsInValues
 	 */
-	public function __construct($name, array $values = array(), $labelsInValues = null) {
-		$this->_values = $values;
+	public function __construct($name, array $values = null, $labelsInValues = null) {
+		$this->_values = (array) $values;
 		$this->_labelsInValues = (bool) $labelsInValues;
 		parent::__construct($name);
 	}
@@ -45,9 +45,6 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 	}
 
 	protected function _getOptionList() {
-		if (!$this->_values) {
-			return array();
-		}
 		if ($this->_labelsInValues) {
 			return $this->_values;
 		} else {
