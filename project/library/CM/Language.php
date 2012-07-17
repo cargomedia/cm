@@ -5,7 +5,7 @@ class CM_Language extends CM_Class_Abstract {
 
 	/**
 	 * @param int $lang_id
-	 * @return CM_Tree_Language;
+	 * @return CM_Tree_Lang;
 	 */
 	public static function getTree($lang_id) {
 		$lang_id = (int) $lang_id;
@@ -13,7 +13,7 @@ class CM_Language extends CM_Class_Abstract {
 		$cacheKey = CM_CacheConst::Language_Tree . '_langId:' . $lang_id;
 		$tree = CM_CacheLocal::get($cacheKey);
 		if ($tree === false) {
-			$tree = new CM_Tree_Language('CM_TreeNode_Language', array('lang' => $lang_id));
+			$tree = new CM_Tree_Lang('CM_TreeNode_Lang', array('lang' => $lang_id));
 			CM_CacheLocal::set($cacheKey, $tree);
 		}
 
@@ -25,7 +25,7 @@ class CM_Language extends CM_Class_Abstract {
 	 *
 	 * @param string $path
 	 * @param int	$lang_id
-	 * @return CM_TreeNode_Language
+	 * @return CM_TreeNode_Lang
 	 */
 	public static function section($path = null, $lang_id = null) {
 		if (!($lang_id = (int) $lang_id)) {
