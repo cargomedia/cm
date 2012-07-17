@@ -44,6 +44,9 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 		$this->setTplParam('colSize', !empty($params['colSize']) ? $params['colSize'] : '');
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function _getOptionList() {
 		if ($this->_labelsInValues || !$this->_values) {
 			return $this->_values;
@@ -52,6 +55,9 @@ class CM_FormField_Select extends CM_FormField_Abstract {
 		}
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function _getValues() {
 		if ($this->_labelsInValues) {
 			return array_keys($this->_values);
