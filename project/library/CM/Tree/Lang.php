@@ -1,6 +1,6 @@
 <?php
 
-class CM_Tree_Language extends CM_Tree_Abstract {
+class CM_Tree_Lang extends CM_Tree_Abstract {
 
 	protected function _load() {
 		// Add sections

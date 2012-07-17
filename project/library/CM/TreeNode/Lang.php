@@ -1,6 +1,6 @@
 <?php
 
-class CM_TreeNode_Language extends CM_TreeNode_Abstract {
+class CM_TreeNode_Lang extends CM_TreeNode_Abstract {
 	public function section($name) {
 		return $this->getNode($name);
 	}
