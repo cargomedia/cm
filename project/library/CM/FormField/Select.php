@@ -2,76 +2,64 @@
 
 class CM_FormField_Select extends CM_FormField_Abstract {
 
-	private $_valuesSet = array();
-	private $_type;
+	private $_values = array();
 	private $_labelsInValues = false;
-	private $_labelPrefix;
 
-	const SELECT = 1;
-	const RADIO = 2;
-	const RADIO_ITEM = 3;
+	const DISPLAY_SELECT = 'select';
+	const DISPLAY_RADIOS = 'radios';
 
 	/**
-	 * @param string  $name
-	 * @param integer $type		   OPTIONAL
-	 * @param array   $valuesSet	  OPTIONAL
-	 * @param string  $labelPrefix	OPTIONAL
-	 * @param bool	$labelsInValues OPTIONAL
+	 * @param string       $name
+	 * @param array|null   $values
+	 * @param bool|null    $labelsInValues
 	 */
-	public function __construct($name, $type = self::SELECT, array $valuesSet = array(), $labelPrefix = null, $labelsInValues = false) {
-		$this->_type = (int) $type;
-		$this->_valuesSet = $valuesSet;
-		$this->_labelPrefix = (string) $labelPrefix;
+	public function __construct($name, array $values = array(), $labelsInValues = null) {
+		$this->_values = $values;
 		$this->_labelsInValues = (bool) $labelsInValues;
 		parent::__construct($name);
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
-		if ($this->_type == self::RADIO || $this->_type == self::SELECT) {
-			if (!in_array($userInput, $this->_getValues())) {
-				throw new CM_Exception_FormFieldValidation('Invalid value');
-			}
+		if (!in_array($userInput, $this->_getValues())) {
+			throw new CM_Exception_FormFieldValidation('Invalid value');
 		}
 		return $userInput;
 	}
 
 	public function prepare(array $params) {
-		$this->setTplParam('type', $this->_type);
-		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
+		if (!isset($params['display'])) {
+			$params['display'] = self::DISPLAY_SELECT;
+		}
+		if ($params['display'] !== self::DISPLAY_SELECT && $params['display'] !== self::DISPLAY_RADIOS) {
+			throw new CM_Exception_InvalidParam('Display needs to be either `select` or `radios`');
+		}
+		$this->setTplParam('display', $params['display']);
+		$this->setTplParam('class', !empty($params['class']) ? $params['class'] : null);
 
-		if ($this->_type == self::RADIO_ITEM) {
-			$this->setTplParam('item', isset($params['item']) ? $params['item'] : null);
+		$this->setTplParam('placeholder', !empty($params['placeholder']));
+		$this->setTplParam('optionList', $this->_getOptionList());
+
+		$this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
+		$this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
+		$this->setTplParam('colSize', !empty($params['colSize']) ? $params['colSize'] : '');
+	}
+
+	protected function _getOptionList() {
+		if (!$this->_values) {
+			return array();
 		}
-		if ($this->_type == self::RADIO) {
-			$this->setTplParam('colSize', isset($params['col_size']) ? $params['col_size'] : null);
-		}
-		if ($this->_type == self::SELECT) {
-			$this->setTplParam('invite', !empty($params['invite']));
-		}
-		if ($this->_type == self::RADIO || $this->_type == self::SELECT) {
-			$labelsection = isset($params['labelsection']) ? $params['labelsection'] : '%forms._fields.' . $this->getName();
-			$this->setTplParam('valuesAndLabels', $this->_getValuesAndLabels($labelsection));
+		if ($this->_labelsInValues) {
+			return $this->_values;
+		} else {
+			return array_combine($this->_values, $this->_values);
 		}
 	}
 
-	private function _getValuesAndLabels($labelsection) {
+	protected function _getValues() {
 		if ($this->_labelsInValues) {
-			$values = $this->_valuesSet;
+			return array_keys($this->_values);
 		} else {
-			$values = array();
-			foreach ($this->_valuesSet as $value) {
-				$lang_key = $this->_labelPrefix ? $this->_labelPrefix . '_' . $value : $value;
-				$values[$value] = CM_Language::text($labelsection . '.' . $lang_key);
-			}
-		}
-		return $values;
-	}
-
-	private function _getValues() {
-		if ($this->_labelsInValues) {
-			return array_keys($this->_valuesSet);
-		} else {
-			return $this->_valuesSet;
+			return $this->_values;
 		}
 	}
 }
