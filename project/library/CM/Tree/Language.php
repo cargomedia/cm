@@ -20,19 +20,17 @@ class CM_Tree_Language extends CM_Tree_Abstract {
 	 * @param string $languageKey
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _addLanguageNode($languageKey) {
+	private function _addLanguageNode($languageKey) {
 		if (!preg_match('#^(.*)\.([^\.]+)$#', $languageKey , $matches)) {
 			throw new CM_Exception_Invalid('Invalid Language Key found: `' . $languageKey . '`');
 		}
 		list($id, $parentId, $name) = $matches;
-		if (!array_key_exists($id, $this->_nodesTmp)) {
-			if ($parentId) {
-				$this->_addLanguageNode($parentId);
-			} else {
-				$parentId = 0;
-			}
-			parent::_addNode($id, $name, $parentId);
+		if ($parentId && !array_key_exists($parentId, $this->_nodesTmp)) {
+			$this->_addLanguageNode($parentId);
+		} else {
+			$parentId = 0;
 		}
+		parent::_addNode($id, $name, $parentId);
 	}
 
 }

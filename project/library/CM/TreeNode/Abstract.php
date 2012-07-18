@@ -20,6 +20,11 @@ abstract class CM_TreeNode_Abstract {
 	/** @var CM_TreeNode_Abstract[] */
 	private $_leaves = array();
 
+	/**
+	 * @param mixed      $id
+	 * @param string     $name
+	 * @param mixed|null $parentId
+	 */
 	public function __construct($id, $name, $parentId = null) {
 		$this->_id = $id;
 		$this->_name = $name;
@@ -49,7 +54,7 @@ abstract class CM_TreeNode_Abstract {
 	}
 
 	/**
-	 * @return null|string
+	 * @return string|null
 	 */
 	public function getParentId() {
 		return $this->_parentId;
