@@ -97,7 +97,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $clientKey
 	 */
 	public function stop($clientKey) {
-		CM_Util::getContents(self::_getConfig()->url . '/stop', array('clientId' => (string) $clientKey));
+		CM_Util::getContents(self::_getConfig()->url . '/stop', array('clientId' => (string) $clientKey), true);
 	}
 
 	/**
