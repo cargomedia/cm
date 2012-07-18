@@ -194,6 +194,18 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 	}
 
+	/**
+	 * @return CM_Tree_Language
+	 */
+	public static function getTree() {
+		$cacheKey = CM_CacheConst::Language_Tree;
+		if (false === ($tree = CM_CacheLocal::get($cacheKey))) {
+			$tree = new CM_Tree_Language();
+			CM_CacheLocal::set($cacheKey, $tree);
+		}
+		return $tree;
+	}
+
 	protected static function _create(array $data) {
 		$params = CM_Params::factory($data);
 		$backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;

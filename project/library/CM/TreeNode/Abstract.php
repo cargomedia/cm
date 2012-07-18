@@ -11,6 +11,9 @@ abstract class CM_TreeNode_Abstract {
 	/** @var string|null */
 	private $_parentId = null;
 
+	/** @var CM_TreeNode_Abstract|null */
+	private $_parent;
+
 	/** @var CM_TreeNode_Abstract[] */
 	private $_nodes = array();
 
@@ -28,6 +31,7 @@ abstract class CM_TreeNode_Abstract {
 	 */
 	public function addNode(CM_TreeNode_Abstract $node) {
 		$this->_nodes[$node->getName()] = $node;
+		$node->setParent($this);
 	}
 
 	/**
@@ -133,5 +137,30 @@ abstract class CM_TreeNode_Abstract {
 	 */
 	public function setLeaf($key, $value) {
 		$this->_leaves[$key] = $value;
+	}
+
+	/**
+	 * @param CM_TreeNode_Abstract $parent
+	 */
+	public function setParent(CM_TreeNode_Abstract $parent) {
+		$this->_parent = $parent;
+	}
+
+	/**
+	 * @return CM_TreeNode_Abstract|null
+	 */
+	public function getParent() {
+		return $this->_parent;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPath() {
+		$path = '';
+		if ($this->getParent()) {
+			$path = $this->getParent()->getPath() . '.';
+		}
+		return $path . $this->getName();
 	}
 }

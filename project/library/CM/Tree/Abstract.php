@@ -1,14 +1,12 @@
 <?php
 
-/**
- * Data-tree with id=>name nodes
- * Build tree by adding "flat" data in _load()
- *
- */
-
 abstract class CM_Tree_Abstract {
-	private $params;
-	private $nodeClass;
+
+	/** @var array */
+	private $_params;
+
+	/** @var string */
+	private $_nodeClass;
 
 	/** @var CM_TreeNode_Abstract */
 	private $_root;
@@ -19,10 +17,17 @@ abstract class CM_Tree_Abstract {
 	/** @var array */
 	protected $_nodesTmp = array();
 
-	public function __construct($nodeClass = 'CM_TreeNode_Abstract', $params = array()) {
-		$this->nodeClass = $nodeClass;
-		$this->params = $params;
-
+	/**
+	 * @param string                      $nodeClass
+	 * @param array|null                  $params
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function __construct($nodeClass, array $params) {
+		if (!is_subclass_of($nodeClass, 'CM_TreeNode_Abstract')) {
+			throw new CM_Exception_InvalidParam('`nodeClass` needs to be subclass of `CM_TreeNode_Abstract`');
+		}
+		$this->_nodeClass = $nodeClass;
+		$this->_params = (array) $params;
 		$this->_nodesTmp = array();
 		$this->_load();
 		$this->_buildTree();
@@ -35,8 +40,9 @@ abstract class CM_Tree_Abstract {
 	 * @throws CM_TreeException
 	 */
 	public function findNode($path) {
-		if (!isset($this->_nodesCache))
+		if (!isset($this->_nodesCache)) {
 			$this->_nodesCache = array();
+		}
 		if (!$path) {
 			return false;
 		}
@@ -73,28 +79,41 @@ abstract class CM_Tree_Abstract {
 	 * @param mixed $parent_id
 	 */
 	protected function _addNode($id, $name, $parent_id = null) {
-		$this->_nodesTmp[$id] = new $this->nodeClass($id, $name, $parent_id);
+		$this->_nodesTmp[$id] = new $this->_nodeClass($id, $name, $parent_id);
 	}
 
-	protected function _addLeaf($node_id, $id, $value = null) {
-		if (!array_key_exists($node_id, $this->_nodesTmp)) {
-			trigger_error("Cannot add leaf `$id` because node `$node_id` does not exist.", E_USER_NOTICE);
+	/**
+	 * @param mixed      $nodeId
+	 * @param mixed      $id
+	 * @param mixed|null $value
+	 */
+	protected function _addLeaf($nodeId, $id, $value = null) {
+		if (!array_key_exists($nodeId, $this->_nodesTmp)) {
+			trigger_error("Cannot add leaf `$id` because node `$nodeId` does not exist.", E_USER_NOTICE);
 			return;
 		}
-		$this->_nodesTmp[$node_id]->setLeaf($id, $value);
+		$this->_nodesTmp[$nodeId]->setLeaf($id, $value);
 	}
 
+	/**
+	 * @param $key
+	 * @return null
+	 */
 	protected function _getParam($key) {
-		if (!array_key_exists($key, $this->params))
+		if (!array_key_exists($key, $this->_params)) {
 			return null;
-		return $this->params[$key];
+		}
+		return $this->_params[$key];
 	}
 
 	private function _buildTree() {
-		$this->_root = new $this->nodeClass(0, 'root');
+		$this->_root = new $this->_nodeClass(0, 'root');
 		$this->_buildNode($this->_root);
 	}
 
+	/**
+	 * @param CM_TreeNode_Abstract $parent
+	 */
 	private function _buildNode(CM_TreeNode_Abstract $parent) {
 		foreach ($this->_nodesTmp as $id => $node) {
 			if ($parent->getId() === $node->getParentId()) {

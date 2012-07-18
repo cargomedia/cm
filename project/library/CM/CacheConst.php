@@ -5,7 +5,7 @@ class CM_CacheConst {
 	const Tag_Version = 'Tag_Version';
 
 	// _langId:X
-	const Language_Tree = 'Language.Tree';
+	const Lang_Tree = 'Language.Tree';
 
 
 	// _level:X_id:X
@@ -45,4 +45,6 @@ class CM_CacheConst {
 	const Language_Translations = 'Language_Translations';
 
 	const Language_Default = 'Language_Default';
+
+	const Language_Tree = 'Language_Tree';
 }

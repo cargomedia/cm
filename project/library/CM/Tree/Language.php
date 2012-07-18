@@ -4,20 +4,15 @@ class CM_Tree_Language extends CM_Tree_Abstract {
 
 	/**
 	 * @param array|null $params
-	 *
 	 */
 	public function __construct($params = null) {
-		if (!$params) {
-			$params = array();
-		}
 		parent::__construct('CM_TreeNode_Language', $params);
 	}
 
 	protected function _load() {
-		$query = CM_Mysql::placeholder('SELECT `name` AS `key` FROM `' . TBL_CM_LANGUAGEKEY . '` WHERE `name` LIKE  ".%"');
-		$result = CM_Mysql::query($query);
+		$result = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'name', 'name LIKE ".%"');
 		while ($section = $result->fetchAssoc()) {
-			$this->_addLanguageNode($section['key']);
+			$this->_addLanguageNode($section['name']);
 		}
 	}
 
