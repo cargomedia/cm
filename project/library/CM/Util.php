@@ -86,15 +86,23 @@ class CM_Util {
 	/**
 	 * @param string     $url
 	 * @param array|null $params
+	 * @param boolean|null $methodPost
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function getContents($url, array $params = null) {
+	public static function getContents($url, array $params = null, $methodPost = null) {
 		$url = (string) $url;
 		if (!empty($params)) {
 			$url .= '?' . http_build_query($params);
 		}
-		$contents = @file_get_contents($url);
+
+		$context = null;
+		if ($methodPost) {
+			$opts = array('http' => array('method' => 'POST'));
+			$context = stream_context_create($opts);
+		}
+
+		$contents = @file_get_contents($url, null, $context);
 		if ($contents === false) {
 			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
 		}
