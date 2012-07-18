@@ -1,0 +1,86 @@
+& {
+	position: relative;
+}
+
+.selector {
+	.label {
+		display: inline-block;
+		text-align: left;
+	}
+	.icon {
+		font-size: 11px;
+	}
+}
+
+.options {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	padding-right: 10px;
+	max-height: 500px;
+	overflow-y: auto;
+	border: 1px solid @colorBgShy;
+	background-color: white;
+	z-index: 1;
+
+	ul {
+		padding-left: 14px;
+	}
+
+	ul ul {
+		display: none;
+	}
+
+	li {
+		padding: 4px;
+		position: relative;
+
+		.toggle {
+			position: absolute;
+			display: none;
+			left: -10px;
+			top: 5px;
+			font-size: 11px;
+		}
+
+		.node {
+			cursor: pointer;
+			.nowrap;
+
+			&:hover {
+				text-decoration: underline;
+			}
+
+			&.selected {
+				font-weight: bold;
+			}
+		}
+
+		&.unselect {
+			cursor: pointer;
+			color: @colorFgLinkLight;
+			.nowrap;
+		}
+
+		.count {
+			display: none;
+		}
+	}
+
+	li.hasChildren {
+		> .toggle,
+		> .node .count {
+			display: inline-block;
+		}
+	}
+
+	li.active {
+		> ul {
+			display: block;
+		}
+
+		> .toggle {
+		}
+	}
+}
