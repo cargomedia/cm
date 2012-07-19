@@ -168,4 +168,21 @@ abstract class CM_TreeNode_Abstract {
 		}
 		return $path . $this->getName();
 	}
+
+	/**
+	 * @param string $id
+	 * @return CM_TreeNode_Abstract|null
+	 */
+	public function findById($id) {
+		if ((string) $this->getId() === (string) $id) {
+			return $this;
+		}
+		foreach ($this->getNodes() as $node) {
+			if ($node = $node->findById($id)) {
+				return $node;
+			}
+		}
+		return null;
+
+	}
 }

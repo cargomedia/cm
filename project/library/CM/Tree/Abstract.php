@@ -9,12 +9,18 @@ abstract class CM_Tree_Abstract {
 	private $_nodeClass;
 
 	/** @var CM_TreeNode_Abstract */
-	private $_root;
+	protected $_root;
+
+	/** @var mixed */
+	protected $_rootId = 0;
+
+	/** @var string */
+	protected $_rootName = 'root';
 
 	/** @var array */
 	protected $_nodesCache = array();
 
-	/** @var array */
+	/** @var CM_TreeNode_Abstract[] */
 	protected $_nodesTmp = array();
 
 	/**
@@ -59,6 +65,14 @@ abstract class CM_Tree_Abstract {
 	}
 
 	/**
+	 * @param string $id
+	 * @return CM_TreeNode_Abstract|null
+	 */
+	public function findNodeById($id) {
+		return $this->_root->findById($id);
+	}
+
+	/**
 	 * @return CM_TreeNode_Abstract
 	 */
 	public function getRoot() {
@@ -72,32 +86,30 @@ abstract class CM_Tree_Abstract {
 	protected abstract function _load();
 
 	/**
-	 * Add a node
-	 *
-	 * @param mixed $id Unique
-	 * @param mixed $name
-	 * @param mixed $parent_id
+	 * @param mixed $id
+	 * @param string $name
+	 * @param mixed|null $parentId
 	 */
-	protected function _addNode($id, $name, $parent_id = null) {
-		$this->_nodesTmp[$id] = new $this->_nodeClass($id, $name, $parent_id);
+	protected function _addNode($id, $name, $parentId = null) {
+		$this->_nodesTmp[$id] = new $this->_nodeClass($id, $name, $parentId);
 	}
 
 	/**
 	 * @param mixed      $nodeId
 	 * @param mixed      $id
 	 * @param mixed|null $value
+	 * @throws CM_Exception_Invalid
 	 */
 	protected function _addLeaf($nodeId, $id, $value = null) {
 		if (!array_key_exists($nodeId, $this->_nodesTmp)) {
-			trigger_error("Cannot add leaf `$id` because node `$nodeId` does not exist.", E_USER_NOTICE);
-			return;
+			throw new CM_Exception_Invalid("Cannot add leaf `$id` because node `$nodeId` does not exist.");
 		}
 		$this->_nodesTmp[$nodeId]->setLeaf($id, $value);
 	}
 
 	/**
 	 * @param $key
-	 * @return null
+	 * @return mixed|null
 	 */
 	protected function _getParam($key) {
 		if (!array_key_exists($key, $this->_params)) {
@@ -106,8 +118,29 @@ abstract class CM_Tree_Abstract {
 		return $this->_params[$key];
 	}
 
+	/**
+	 * @return CM_TreeNode_Abstract
+	 */
+	protected function _createRoot() {
+		return new $this->_nodeClass($this->_rootId, $this->_rootName);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	protected function _getRootId() {
+		return $this->_rootId;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _getRootName() {
+		return $this->_rootName;
+	}
+
 	private function _buildTree() {
-		$this->_root = new $this->_nodeClass(0, 'root');
+		$this->_root = $this->_createRoot();
 		$this->_buildNode($this->_root);
 	}
 
@@ -116,7 +149,7 @@ abstract class CM_Tree_Abstract {
 	 */
 	private function _buildNode(CM_TreeNode_Abstract $parent) {
 		foreach ($this->_nodesTmp as $id => $node) {
-			if ($parent->getId() === $node->getParentId()) {
+			if ((string) $parent->getId() === (string) $node->getParentId()) {
 				$parent->addNode($node);
 				$this->_buildNode($node);
 				unset($this->_nodesTmp[$id]);

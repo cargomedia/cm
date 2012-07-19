@@ -2,6 +2,8 @@
 
 class CM_Tree_Language extends CM_Tree_Abstract {
 
+	protected $_rootId = '.';
+
 	/**
 	 * @param array|null $params
 	 */
@@ -27,8 +29,9 @@ class CM_Tree_Language extends CM_Tree_Abstract {
 		list($id, $parentId, $name) = $matches;
 		if ($parentId && !array_key_exists($parentId, $this->_nodesTmp)) {
 			$this->_addLanguageNode($parentId);
-		} else {
-			$parentId = 0;
+		}
+		if (!$parentId) {
+			$parentId = $this->_getRootId();
 		}
 		parent::_addNode($id, $name, $parentId);
 	}
