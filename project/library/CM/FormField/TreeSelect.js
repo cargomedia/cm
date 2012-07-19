@@ -26,7 +26,7 @@ ready: function() {
 	this.on('change', function () {
 		handler.$('.selected').removeClass('selected');
 		var $item = handler.getSelectedItem();
-			if ($item.length) {
+		if ($item.length) {
 			$item.addClass('selected');
 			handler.$selector.find('.label').text($item.data('path'));
 		} else {
@@ -43,6 +43,9 @@ ready: function() {
 
 toggle: function() {
 	this.$options.toggleModal();
+	if (this.$options.is(':visible')) {
+		this.getSelectedItem().parent().parents('.CM_FormField_TreeSelect li').addClass('active').find('> .toggle').addClass('active');
+	}
 },
 
 close: function() {
