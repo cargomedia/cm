@@ -17,7 +17,7 @@
 	</ul>
 	<div class="file-uploader">
 		<div class="qq-uploader">
-			<div style="display:none;" class="qq-upload-drop-area"><span>{translate 'Drop files here to upload'}</span></div>
+			<div style="display:none;" class="qq-upload-drop-area"><span>{translate 'Drop files here to upload.'}</span></div>
 			<div class="qq-upload-button">{if isset($text)}{$text}{else}{translate 'Upload File'}{/if}</div>
 		</div>
 	</div>

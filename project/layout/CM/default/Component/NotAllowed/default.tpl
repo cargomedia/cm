@@ -1,1 +1,1 @@
-{translate 'This action is not allowed.'}
+{translate 'This Action is Not Allowed.'}
