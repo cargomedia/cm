@@ -12,6 +12,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	/**
 	 * @param string $section
 	 * @param string $key
+	 * @throws CM_Exception
 	 * @return boolean
 	 */
 	public function get($section, $key) {
@@ -23,9 +24,10 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @param string $section
-	 * @param string $key
+	 * @param string  $section
+	 * @param string  $key
 	 * @param boolean $value
+	 * @throws CM_Exception
 	 */
 	public function set($section, $key, $value) {
 		$value = (bool) $value;
@@ -36,8 +38,8 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		if ($value == $defaults[$section][$key]['value']) {
 			CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
 		} else {
-			CM_Mysql::replace(TBL_CM_USER_PREFERENCE,
-					array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'], 'value' => $value));
+			CM_Mysql::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
+					'value' => $value));
 		}
 		$this->_change();
 	}
@@ -48,8 +50,8 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	public function getAll() {
 		if (($values = $this->_cacheGet('values')) === false) {
 			$values = self::getDefaults();
-			$valuesSpecific = CM_Mysql::select(TBL_CM_USER_PREFERENCE, array('preferenceId', 'value'), array('userId' => $this->_model->getId()))
-					->fetchAllTree();
+			$valuesSpecific = CM_Mysql::select(TBL_CM_USER_PREFERENCE, array('preferenceId',
+				'value'), array('userId' => $this->_model->getId()))->fetchAllTree();
 			foreach ($values as &$section) {
 				foreach ($section as &$key) {
 					if (isset($valuesSpecific[$key['id']])) {
@@ -74,19 +76,20 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		$cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
 		if (($defaults = CM_CacheLocal::get($cacheKey)) === false) {
 			$defaults = array();
-			$rows = CM_Mysql::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue', 'configurable'))->fetchAll();
+			$rows = CM_Mysql::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue',
+				'configurable'))->fetchAll();
 			foreach ($rows as $default) {
 				if (!isset($defaults[$default['section']])) {
 					$defaults[$default['section']] = array();
 				}
 				$defaults[$default['section']][$default['key']] = array('id' => (int) $default['preferenceId'],
-						'value' => (bool) $default['defaultValue'], 'configurable' => (boolean) $default['configurable']);
+					'value' => (bool) $default['defaultValue'], 'configurable' => (boolean) $default['configurable']);
 			}
 			CM_CacheLocal::set($cacheKey, $defaults);
 		}
 		return $defaults;
 	}
-	
+
 	/**
 	 * @return array
 	 */
