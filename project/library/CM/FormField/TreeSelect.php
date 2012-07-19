@@ -15,7 +15,9 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract {
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
-		//TODO: Validation
+		if (!$this->_tree->findNodeById($userInput)) {
+			throw new CM_Exception_FormFieldValidation('Invalid value');
+		}
 		return $userInput;
 	}
 
