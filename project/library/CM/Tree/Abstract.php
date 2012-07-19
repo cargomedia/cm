@@ -22,7 +22,7 @@ abstract class CM_Tree_Abstract {
 	 * @param array|null                  $params
 	 * @throws CM_Exception_InvalidParam
 	 */
-	public function __construct($nodeClass, array $params) {
+	public function __construct($nodeClass, array $params = null) {
 		if (!is_subclass_of($nodeClass, 'CM_TreeNode_Abstract')) {
 			throw new CM_Exception_InvalidParam('`nodeClass` needs to be subclass of `CM_TreeNode_Abstract`');
 		}
