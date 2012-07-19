@@ -11,8 +11,8 @@ abstract class CM_Tree_Abstract {
 	/** @var CM_TreeNode_Abstract */
 	protected $_root;
 
-	/** @var mixed */
-	protected $_rootId = 0;
+	/** @var string */
+	protected $_rootId = '0';
 
 	/** @var string */
 	protected $_rootName = 'root';
@@ -86,21 +86,23 @@ abstract class CM_Tree_Abstract {
 	protected abstract function _load();
 
 	/**
-	 * @param mixed $id
-	 * @param string $name
-	 * @param mixed|null $parentId
+	 * @param string      $id
+	 * @param string      $name
+	 * @param string|null $parentId
 	 */
 	protected function _addNode($id, $name, $parentId = null) {
 		$this->_nodesTmp[$id] = new $this->_nodeClass($id, $name, $parentId);
 	}
 
 	/**
-	 * @param mixed      $nodeId
-	 * @param mixed      $id
-	 * @param mixed|null $value
+	 * @param string      $nodeId
+	 * @param string      $id
+	 * @param mixed|null  $value
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _addLeaf($nodeId, $id, $value = null) {
+		$nodeId = (string) $nodeId;
+		$id = (string) $id;
 		if (!array_key_exists($nodeId, $this->_nodesTmp)) {
 			throw new CM_Exception_Invalid("Cannot add leaf `$id` because node `$nodeId` does not exist.");
 		}
@@ -108,7 +110,7 @@ abstract class CM_Tree_Abstract {
 	}
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 * @return mixed|null
 	 */
 	protected function _getParam($key) {
@@ -118,29 +120,8 @@ abstract class CM_Tree_Abstract {
 		return $this->_params[$key];
 	}
 
-	/**
-	 * @return CM_TreeNode_Abstract
-	 */
-	protected function _createRoot() {
-		return new $this->_nodeClass($this->_rootId, $this->_rootName);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	protected function _getRootId() {
-		return $this->_rootId;
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function _getRootName() {
-		return $this->_rootName;
-	}
-
 	private function _buildTree() {
-		$this->_root = $this->_createRoot();
+		$this->_root = new $this->_nodeClass($this->_rootId, $this->_rootName);
 		$this->_buildNode($this->_root);
 	}
 
@@ -149,7 +130,7 @@ abstract class CM_Tree_Abstract {
 	 */
 	private function _buildNode(CM_TreeNode_Abstract $parent) {
 		foreach ($this->_nodesTmp as $id => $node) {
-			if ((string) $parent->getId() === (string) $node->getParentId()) {
+			if ($parent->getId() === $node->getParentId()) {
 				$parent->addNode($node);
 				$this->_buildNode($node);
 				unset($this->_nodesTmp[$id]);

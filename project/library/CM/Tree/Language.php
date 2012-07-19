@@ -31,7 +31,7 @@ class CM_Tree_Language extends CM_Tree_Abstract {
 			$this->_addLanguageNode($parentId);
 		}
 		if (!$parentId) {
-			$parentId = $this->_getRootId();
+			$parentId = $this->_rootId;
 		}
 		parent::_addNode($id, $name, $parentId);
 	}

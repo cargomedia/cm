@@ -21,14 +21,14 @@ abstract class CM_TreeNode_Abstract {
 	private $_leaves = array();
 
 	/**
-	 * @param mixed      $id
-	 * @param string     $name
-	 * @param mixed|null $parentId
+	 * @param strin        $id
+	 * @param string       $name
+	 * @param string|null  $parentId
 	 */
 	public function __construct($id, $name, $parentId = null) {
-		$this->_id = $id;
-		$this->_name = $name;
-		$this->_parentId = $parentId;
+		$this->_id = (string) $id;
+		$this->_name = (string) $name;
+		$this->_parentId = (string) $parentId;
 	}
 
 	/**
@@ -174,7 +174,8 @@ abstract class CM_TreeNode_Abstract {
 	 * @return CM_TreeNode_Abstract|null
 	 */
 	public function findById($id) {
-		if ((string) $this->getId() === (string) $id) {
+		$id = (string) $id;
+		if ($this->getId() === $id) {
 			return $this;
 		}
 		foreach ($this->getNodes() as $node) {
