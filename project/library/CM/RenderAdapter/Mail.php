@@ -32,14 +32,14 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 				throw new CM_Exception_Invalid('Mail has neither text nor html content');
 			}
 			$text = preg_replace('!\n!', ' ', $htmlBody);
+			$text = preg_replace(array('!<br\s*/?>!', '!<a .*?href="(.*?)".*?>(.*?)</a>!', '!</?p>!'), array("\n", '$2 ($1)', "\n"), $text);
+			$text = preg_replace('!(\n)\s+!', "\n", $text);
+			$text = trim(strip_tags($text));
 		}
 		if ($mail->getRenderLayout()) {
 			$tplPath = $this->getRender()->getLayoutPath('layout/mailText.tpl');
 			$assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $text));
 			$text = $this->getRender()->renderTemplate($tplPath, $assign);
-			$text = preg_replace(array('!<br\s*/?>!', '!<a .*?href="(.*?)".*?>(.*?)</a>!', '!</?p>!'), array("\n", '$2 ($1)', "\n"), $text);
-			$text = preg_replace('!(\n)\s+!', "\n", $text);
-			$text = trim(strip_tags($text));
 		}
 		return array($subject, $html, $text);
 	}

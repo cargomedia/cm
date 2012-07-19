@@ -393,9 +393,6 @@ class CM_Render extends CM_Class_Abstract {
 		if (null !== $params) {
 			$translation = $this->_parseVariables($translation, $params);
 		}
-
-		$translation = str_replace("\r", '', $translation);
-		$translation = str_replace("\n", '<br />', $translation);
 		return $translation;
 	}
 
