@@ -113,7 +113,7 @@ CREATE TABLE `cm_language` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `abbreviation` (`abbreviation`),
   KEY `enabled` (`enabled`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_languageKey`;
 
@@ -121,8 +121,21 @@ DROP TABLE IF EXISTS `cm_languageKey`;
 CREATE TABLE `cm_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
+  `accessStamp` int(10) unsigned DEFAULT NULL,
+  `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_languageKey_variable`;
+
+
+CREATE TABLE `cm_languageKey_variable` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `languageKeyId` int(10) unsigned NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `languageKeyId` (`languageKeyId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_languageValue`;
 
@@ -132,7 +145,7 @@ CREATE TABLE `cm_languageValue` (
   `languageId` int(11) unsigned NOT NULL,
   `value` text NOT NULL,
   PRIMARY KEY (`languageKeyId`,`languageId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_locationCity`;
 
