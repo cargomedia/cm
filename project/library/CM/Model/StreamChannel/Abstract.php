@@ -13,11 +13,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_User  $user
-	 * @param int $timeStamp
+	 * @param int $allowedUntil
 	 * @return int
 	 */
-	public function canSubscribe(CM_Model_User $user, $timeStamp) {
-		return $timeStamp + 10000;
+	public function canSubscribe(CM_Model_User $user, $allowedUntil) {
+		return $allowedUntil + 10000;
 	}
 
 	/**
