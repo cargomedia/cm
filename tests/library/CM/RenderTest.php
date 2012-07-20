@@ -133,7 +133,7 @@ class CM_RenderTest extends TestCase {
 
 		$this->assertSame('abc', $render->getTranslation('abc'));
 		$this->assertSame('abc cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
-		$this->assertSame('abc {$variable}', $render->getTranslation('abc {$variable}'));
+		$this->assertSame('abc ', $render->getTranslation('abc {$variable}'));
 		$this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
 
 		/** @var CM_Model_Language $language */
