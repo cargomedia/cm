@@ -16,8 +16,7 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 			$where[] = '(' . $whereName . ' OR ' . $whereValue . ')';
 		}
 		if ($section) {
-			$where[] = CM_Mysql::placeholder("k.name LIKE '?%'", $section);
-			$where[] = CM_Mysql::placeholder("name LIKE '?'", $section . '%');
+			$where[] = CM_Mysql::placeholder("k.name LIKE '?'", $section . '%');
 		}
 		if ($translated === true) {
 			$where[] = 'v.value IS NOT NULL';
