@@ -248,7 +248,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$updateCount = (CM_App::getInstance()->getReleaseStamp() > $updateParams['accessStamp']) ? 1 : $updateParams['updateCount'] + 1;
 			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount));
 			if ($updateCount > 10) {
-				throw new CM_Exception_InvalidParam('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');			}
+				throw new CM_Exception_InvalidParam('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
+			}
 
 			// Delete language variable, insert new ones
 			CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
