@@ -5,10 +5,16 @@ class CM_CssTest extends TestCase {
 
 	private static $_configBackup;
 
+	/**
+	 * @var CM_Render
+	 */
+	private static $_render;
+
 	public static function setUpBeforeClass() {
 		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Render->cdnResource = false;
 		CM_Config::get()->CM_Render->cdnUsetContent = false;
+		self::$_render = new CM_Render();
 	}
 
 	public static function tearDownAfterClass() {
@@ -54,8 +60,8 @@ EOD;
 
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-		$render = CM_Render::getInstance();
-		$url = $render->getUrlResource('img', 'icon/mailbox_read.png');
+		$render = new CM_Render();
+		$url = self::$_render->getUrlResource('img', 'icon/mailbox_read.png');
 		$expected = <<<EOD
 background:url($url) no-repeat 66px 7px;
 
@@ -87,7 +93,7 @@ EOD;
 .foo #bar { color:blue; }
 
 EOD;
-		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertEquals($expected, $css->compile(self::$_render));
 	}
 
 	public function testOpacity() {
@@ -109,7 +115,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertEquals($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertEquals($expected, $css->compile(self::$_render));
 	}
 
 	public function testLinearGradient() {
@@ -132,7 +138,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 		//vertical
 		$css = <<<'EOD'
 .foo {
@@ -152,7 +158,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 		//illegal parameters
 		$css = <<<'EOD'
 .foo {
@@ -164,7 +170,7 @@ EOD;
 }
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame('', $css->compile(CM_Render::getInstance()));
+		$this->assertSame('', $css->compile(self::$_render));
 	}
 
 	public function testBackgroundColor() {
@@ -185,7 +191,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testBoxShadow() {
@@ -202,7 +208,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testBoxSizing() {
@@ -220,7 +226,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testUserSelect() {
@@ -239,7 +245,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testTransform() {
@@ -259,7 +265,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testTransition() {
@@ -277,7 +283,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 
 	public function testMedia() {
@@ -298,6 +304,6 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(CM_Render::getInstance()));
+		$this->assertSame($expected, $css->compile(self::$_render));
 	}
 }
