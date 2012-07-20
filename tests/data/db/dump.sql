@@ -134,7 +134,7 @@ CREATE TABLE `cm_languageKey_variable` (
   `languageKeyId` int(10) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `name` (`name`,`languageKeyId`),
   KEY `languageKeyId` (`languageKeyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
