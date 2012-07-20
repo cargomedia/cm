@@ -372,7 +372,7 @@ class CM_Render extends CM_Class_Abstract {
 	public function getTranslation($key, array $params = null) {
 		$translation = $key;
 		if ($this->getLanguage()) {
-			$translation = $this->getLanguage()->getTranslation($key);
+			$translation = $this->getLanguage()->getTranslation($key, array_keys($params));
 		}
 		if (null !== $params) {
 			$translation = $this->_parseVariables($translation, $params);

@@ -35,11 +35,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string      $key
-	 * @param bool|null   $skipCacheLocal
+	 * @param string           $key
+	 * @param array|null       $variableNames
+	 * @param bool|null        $skipCacheLocal
 	 * @return string
 	 */
-	public function getTranslation($key, $skipCacheLocal = null) {
+	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
 		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
@@ -49,25 +50,35 @@ class CM_Model_Language extends CM_Model_Abstract {
 			}
 		}
 
+		// Check if translation exists and if variables provided match the ones in database
 		if (!array_key_exists($key, $translations)) {
-			static::_setKey($key);
+			static::_setKey($key, $variableNames);
 			$this->_change();
+		} elseif ($variableNames !== null) {
+			sort($variableNames);
+			if ($variableNames !== $translations[$key]['variables']) {
+				static::_setKey($key, $variableNames);
+				$this->_change();
+			}
 		}
-		if (!isset($translations[$key])) {
+		// Getting value from backup language if backup is present and value does not exist
+		if (!isset($translations[$key]['value'])) {
 			if (!$this->getBackup()) {
 				return $key;
 			}
-			return $this->getBackup()->getTranslation($key, $skipCacheLocal);
+			return $this->getBackup()->getTranslation($key, $variableNames, $skipCacheLocal);
 		}
-		return $translations[$key];
+		return $translations[$key]['value'];
 	}
 
 	/**
 	 * @param string $key
 	 * @param string $value
+	 * @param array  $variables
+	 * @return void
 	 */
-	public function setTranslation($key, $value) {
-		$languageKeyId = static::_setKey($key);
+	public function setTranslation($key, $value, array $variables = null) {
+		$languageKeyId = static::_setKey($key, $variables);
 
 		CM_Mysql::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
 			'languageId' => $this->getId()), null, array('value' => $value));
@@ -215,10 +226,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string $name
+	 * @param string     $name
+	 * @param array|null $variables
+	 * @throws CM_Exception_InvalidParam
 	 * @return int
 	 */
-	protected static function _setKey($name) {
+	protected static function _setKey($name, array $variables = null) {
 		$name = (string) $name;
 		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
 		if (!$languageKeyId) {
@@ -226,6 +239,22 @@ class CM_Model_Language extends CM_Model_Abstract {
 			/** @var CM_Model_Language $language */
 			foreach (new CM_Paging_Language_All() as $language) {
 				$language->_change();
+			}
+			self::flushCacheLocal();
+		}
+		if ($variables !== null) {
+			// Update key counter and accessStamp
+			$updateParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('accessStamp', 'updateCount'), array('name' => $name))->fetchObject();
+			$updateCount = (CM_App::getInstance()->getReleaseStamp() > $updateParams->accessStamp) ? 1 : $updateParams->updateCount + 1;
+			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount));
+			if ($updateCount > 10) {
+				throw new CM_Exception_InvalidParam("Variables for languageKey `$name` have been already updated over 10 times since release");
+			}
+
+			// Delete language variable, insert new ones
+			CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
+			foreach ($variables as $variableName) {
+				CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
 			}
 			self::flushCacheLocal();
 		}
