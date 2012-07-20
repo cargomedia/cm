@@ -1,7 +1,7 @@
 {if $recipient}
-	{translate 'Dear {$username}' username=$recipient->getDisplayName()},
+{translate 'Dear {$username}' username=$recipient->getDisplayName()|escape},
 {else}
-	{translate 'Dear user'},
+{translate 'Dear user'},
 {/if}
 
 
