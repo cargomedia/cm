@@ -5,11 +5,6 @@ require_once DIR_SMARTY . 'Smarty.class.php';
 class CM_Render extends CM_Class_Abstract {
 
 	/**
-	 * @var CM_Render
-	 */
-	private static $_instance = null;
-
-	/**
 	 * @var Smarty
 	 */
 	private static $_smarty = null;
@@ -65,17 +60,6 @@ class CM_Render extends CM_Class_Abstract {
 		$this->_site = $site;
 		$this->_language = $language;
 		$this->_languageRewrite = (bool) $languageRewrite;
-	}
-
-	/**
-	 * @return CM_Render
-	 * todo: remove occurences of getInstance() when new admin site is finished
-	 */
-	public static function getInstance() {
-		if (!self::$_instance) {
-			self::$_instance = new self();
-		}
-		return self::$_instance;
 	}
 
 	/**
