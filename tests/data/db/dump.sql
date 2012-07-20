@@ -394,7 +394,7 @@ DROP TABLE IF EXISTS `cm_stream_subscribe`;
 
 CREATE TABLE `cm_stream_subscribe` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userId` int(10) unsigned NOT NULL,
+  `userId` int(10) unsigned,
   `start` int(10) unsigned NOT NULL,
   `allowedUntil` int(10) unsigned NOT NULL,
   `key` varchar(32) NOT NULL,

@@ -35,18 +35,33 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		return new static($id);
 	}
 
+	/**
+	 * @return CM_Model_User|null
+	 */
+	public function getUser() {
+		if (is_null($this->_get('userId'))) {
+			return null;
+		}
+		return CM_Model_User::factory($this->_get('userId'));
+	}
+
 	protected static function _create(array $data) {
-		/** @var CM_Model_User $user */
-		$user = $data['user'];
+		$userId = null;
+		if (isset($data['user'])) {
+			/** @var CM_Model_User $user */
+			$user = $data['user'];
+			$userId = $user->getId();
+		}
 		$start = (int) $data['start'];
 		$allowedUntil = (int) $data['allowedUntil'];
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$key = (string) $data['key'];
-		$id = CM_Mysql::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$id = CM_Mysql::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'channelId' => $streamChannel->getId(), 'key' => $key));
 		$streamSubscribe = new self($id);
 		$streamChannel->onSubscribe($streamSubscribe);
 		return $streamSubscribe;
 	}
+
 }

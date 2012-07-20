@@ -17,23 +17,23 @@ class CM_WowzaTest extends TestCase {
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
 		TH::createStreamPublish(null, $streamChannel);
-		TH::createStreamSubscribe(null, $streamChannel);
-		TH::createStreamSubscribe(null, $streamChannel);
-		TH::createStreamSubscribe(null, $streamChannel);
+		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
+		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
+		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
 		$streamChannel1 = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel1;
 		TH::createStreamPublish(null, $streamChannel1);
-		TH::createStreamSubscribe(null, $streamChannel1);
+		TH::createStreamSubscribe(TH::createUser(), $streamChannel1);
 		$streamChannel = TH::createStreamChannel();
 		$streamChannels[] = $streamChannel;
 		$streamPublishToBeAdded = TH::createStreamPublish(null, $streamChannel);
-		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(null, $streamChannel);
-		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(null, $streamChannel);
+		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(TH::createUser(), $streamChannel);
+		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(TH::createUser(), $streamChannel);
 		$json = $this->_generateWowzaData($streamChannels);
 		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
 		$streamChannelToBeAdded = clone($streamChannel);
 		$streamChannel->delete();
-		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(null, $streamChannel1);
+		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(TH::createUser(), $streamChannel1);
 		try {
 			new CM_Model_StreamChannel_Video($streamChannelToBeAdded->getId());
 			$this->fail();
@@ -42,8 +42,8 @@ class CM_WowzaTest extends TestCase {
 		}
 		$streamChannelToBeRemoved = TH::createStreamChannel();
 		$streamPublishToBeRemoved = TH::createStreamPublish(null, $streamChannelToBeRemoved);
-		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
-		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(null, $streamChannelToBeRemoved);
+		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(TH::createUser(), $streamChannelToBeRemoved);
+		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(TH::createUser(), $streamChannelToBeRemoved);
 
 		$wowza->synchronize();
 

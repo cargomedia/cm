@@ -30,7 +30,7 @@ class TH {
 		$dbName = CM_Config::get()->CM_Mysql->db;
 		try {
 			CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
-		} catch(CM_Mysql_DbSelectException $e) {
+		} catch (CM_Mysql_DbSelectException $e) {
 			// Database does not exist
 		}
 		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
@@ -110,11 +110,7 @@ class TH {
 				$abbreviation = self::_randStr(5);
 			} while (CM_Model_Language::findByAbbreviation($abbreviation));
 		}
-		return CM_Model_Language::create(array(
-			'name' => 'English',
-			'abbreviation' => $abbreviation,
-			'enabled' => 1
-		));
+		return CM_Model_Language::create(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
 	}
 
 	/**
@@ -214,9 +210,6 @@ class TH {
 	 * @return CM_Model_Stream_Subscribe
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
-		if (!$user) {
-			$user = TH::createUser();
-		}
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
 		}
