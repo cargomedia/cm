@@ -30,6 +30,7 @@ class CM_MysqlResult {
 	 * @param string $class_name
 	 * @param array  $params
 	 * @return object an object with string properties that correspond to the fetched row, or FALSE if there are no more rows.
+	 * @deprecated
 	 */
 	public function fetchObject($class_name = null, array $params = null) {
 		if (!isset($class_name)) {
