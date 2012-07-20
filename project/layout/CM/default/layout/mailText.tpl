@@ -4,7 +4,6 @@
 {translate 'Dear user'},
 {/if}
 
-
 {$body}
 
 {translate 'Thanks'},
