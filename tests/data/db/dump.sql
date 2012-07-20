@@ -120,7 +120,7 @@ DROP TABLE IF EXISTS `cm_languageKey`;
 
 CREATE TABLE `cm_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text NOT NULL,
+  `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `accessStamp` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -132,7 +132,7 @@ DROP TABLE IF EXISTS `cm_languageKey_variable`;
 CREATE TABLE `cm_languageKey_variable` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `languageKeyId` int(10) unsigned NOT NULL,
-  `name` varchar(50) NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`languageKeyId`),
   KEY `languageKeyId` (`languageKeyId`)

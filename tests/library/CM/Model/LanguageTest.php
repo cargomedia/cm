@@ -188,6 +188,15 @@ class CM_Model_LanguageTest extends TestCase {
 		}
 	}
 
+	public function testGetTranslationWithDifferentVariableNamesAndKeysLoop() {
+		for ($i = 0; $i < 5; $i++) {
+			$this->_language->getTranslation('myKey', array('oneVariable'), true);
+			$this->_language->getTranslation('MyKey', array('oneVariable', 'secondOne'), true);
+			$this->_language->getTranslation('myKéy', array('oneVariable', 'thirdOne'), true);
+		}
+		$this->assertTrue(true);
+	}
+
 	public function testGetTranslationDuplicateVariableNames() {
 		try {
 			$this->_language->getTranslation('someKey', array('foo', 'bar', 'foo'));
