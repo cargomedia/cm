@@ -74,7 +74,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	/**
 	 * @param string $key
 	 * @param string $value
-	 * @param array  $variables
+	 * @param array|null $variables
 	 * @return void
 	 */
 	public function setTranslation($key, $value, array $variables = null) {
@@ -244,11 +244,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 		if ($variables !== null) {
 			// Update key counter and accessStamp
-			$updateParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('accessStamp', 'updateCount'), array('name' => $name))->fetchObject();
-			$updateCount = (CM_App::getInstance()->getReleaseStamp() > $updateParams->accessStamp) ? 1 : $updateParams->updateCount + 1;
+			$updateParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('accessStamp', 'updateCount'), array('name' => $name))->fetchAssoc();
+			$updateCount = (CM_App::getInstance()->getReleaseStamp() > $updateParams['accessStamp']) ? 1 : $updateParams['updateCount'] + 1;
 			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount));
 			if ($updateCount > 10) {
-				throw new CM_Exception_InvalidParam("Variables for languageKey `$name` have been already updated over 10 times since release");
+				throw new CM_Exception_InvalidParam('Variables for languageKey `$name` have been already updated over 10 times since release');
 			}
 
 			// Delete language variable, insert new ones
