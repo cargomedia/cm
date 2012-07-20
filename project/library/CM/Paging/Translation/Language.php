@@ -30,7 +30,6 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		$groupBy = 'k.name';
 		$source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, GROUP_CONCAT(kv.name SEPARATOR ",") as variables',
 				TBL_CM_LANGUAGEKEY . '` as `k', $where, null, $join, $groupBy);
-		$source->getItems();
 		parent::__construct($source);
 	}
 
