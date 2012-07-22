@@ -72,8 +72,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param string $value
+	 * @param string     $key
+	 * @param string     $value
 	 * @param array|null $variables
 	 * @return void
 	 */
@@ -227,11 +227,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	/**
 	 * @param string     $name
-	 * @param array|null $variables
-	 * @throws CM_Exception_InvalidParam
+	 * @param array      $variableNames
 	 * @return int
 	 */
-	protected static function _setKey($name, array $variables = null) {
+	protected static function _setKey($name, array $variableNames = null) {
 		$name = (string) $name;
 		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
 		if (!$languageKeyId) {
@@ -242,22 +241,48 @@ class CM_Model_Language extends CM_Model_Abstract {
 			}
 			self::flushCacheLocal();
 		}
-		if ($variables !== null) {
-			// Update key counter and accessStamp
-			$updateParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('accessStamp', 'updateCount'), array('name' => $name))->fetchAssoc();
-			$updateCount = (CM_App::getInstance()->getReleaseStamp() > $updateParams['accessStamp']) ? 1 : $updateParams['updateCount'] + 1;
-			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount));
-			if ($updateCount > 10) {
-				throw new CM_Exception_InvalidParam('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
-			}
-
-			// Delete language variable, insert new ones
-			CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
-			foreach ($variables as $variableName) {
-				CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
-			}
-			self::flushCacheLocal();
+		if ($variableNames !== null) {
+			self::_setKeyVariables($name, $variableNames);
 		}
 		return $languageKeyId;
+	}
+
+	/**
+	 * @static
+	 * @param string $name
+	 * @param array  $variableNames
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static function _setKeyVariables($name, array $variableNames) {
+		$languageKeyParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('id', 'accessStamp', 'updateCount'), array('name' => $name))->fetchAssoc();
+		$languageKeyId = $languageKeyParams['id'];
+		$updateCount = (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) ? 1 : $languageKeyParams['updateCount'] + 1;
+		CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
+		if ($updateCount > 10) {
+			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
+		}
+
+		// Delete language variable, insert new ones
+		CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
+		foreach ($variableNames as $variableName) {
+			CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
+		}
+		self::flushCacheLocal();
+	}
+
+	/**
+	 * @static
+	 * @param string       $name
+	 * @param string|null  $updatedName
+	 * @param array|null   $updatedVariableNames
+	 */
+	public static function updateKey($name, $updatedName = null, array $updatedVariableNames = null) {
+		if ($updatedVariableNames !== null) {
+			self::_setKeyVariables($name, $updatedVariableNames);
+		}
+		if ($updatedName !== null) {
+			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $updatedName), array('name' => $name));
+			self::flushCacheLocal();
+		}
 	}
 }
