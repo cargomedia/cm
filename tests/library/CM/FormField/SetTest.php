@@ -30,7 +30,7 @@ class CM_FormField_SetTest extends TestCase {
 
 	public function testValidate() {
 		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
-		$field = new CM_FormField_Set('foo', $data, null, true);
+		$field = new CM_FormField_Set('foo', $data, true);
 
 		$userInputGood = array(32, 64, 128);
 		$response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
@@ -46,7 +46,7 @@ class CM_FormField_SetTest extends TestCase {
 		$name = 'foo';
 		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
 		$form = $this->getMockForm();
-		$field = new CM_FormField_Set($name, $data, null, true);
+		$field = new CM_FormField_Set($name, $data, true);
 		$values = array(64, 128);
 		$field->setValue($values);
 		$cssWidth = '50%';
@@ -55,12 +55,12 @@ class CM_FormField_SetTest extends TestCase {
 		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
-		$this->assertSame($cssWidth, preg_replace('/^width: /', '', $doc->getAttr('li', 'style')));
+		$this->assertSame($cssWidth, preg_replace('/(^width: |;$)/', '', $doc->getAttr('li', 'style')));
 		foreach ($data as $value => $label) {
-			$this->assertTrue($doc->exists('li[class~="' . $name . '_value_' . $value . '"]'));
+			$this->assertTrue($doc->exists('li.' . $name . '_value_' . $value));
 			$spanQuery = 'span[class="' . $name . '_label_' . $value . '"]';
 			$this->assertTrue($doc->exists($spanQuery));
-			$this->assertSame($label, $doc->getText($spanQuery));
+			$this->assertSame($label, trim($doc->getText($spanQuery)));
 			$this->assertTrue($doc->exists('input[value="' . $value . '"]'));
 			if (in_array($value, $values)) {
 				$this->assertSame('checked', $doc->getAttr('input[value="' . $value . '"]', 'checked'));
