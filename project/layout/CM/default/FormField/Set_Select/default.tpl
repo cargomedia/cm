@@ -1,4 +1,4 @@
-{if $display === CM_FormField_Select::DISPLAY_RADIOS}
+{if $display === CM_FormField_Set_Select::DISPLAY_RADIOS}
 <ul id="{$id}" class="{$class}">
 	{foreach $optionList as $itemValue => $itemLabel}
 		<li class="list_label {$name}_value_{$itemValue}" {if $colSize}style="width:{$colSize};"{/if}>
@@ -18,7 +18,7 @@
 <br clear="all" />
 {/if}
 
-{if $display === CM_FormField_Select::DISPLAY_SELECT}
+{if $display === CM_FormField_Set_Select::DISPLAY_SELECT}
 <select id="{$id}" name="{$name}"  class="{$class}">
 	{if $placeholder}
 		<option value="">- {translate 'Select'} -</option>

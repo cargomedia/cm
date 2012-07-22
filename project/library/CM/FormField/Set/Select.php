@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Select extends CM_FormField_Abstract {
+class CM_FormField_Set_Select extends CM_FormField_Abstract {
 
 	private $_values = array();
 	private $_labelsInValues = false;
