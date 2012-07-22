@@ -182,8 +182,8 @@ class CM_Model_LanguageTest extends TestCase {
 				$this->_language->getTranslation('sameKey', array('oneVariable', 'secondOne'), true);
 				$this->_language->getTranslation('sameKey', array('oneVariable'), true);
 			}
-			$this->fail('Did not throw exception after ' . ($i * 2 + 1) . ' changes');
-		} catch (CM_Exception_InvalidParam $e) {
+			$this->fail('Did not throw exception after ' . ($i * 2) . ' changes');
+		} catch (CM_Exception_Invalid $e) {
 			$this->assertContains('`sameKey`', $e->getMessage());
 		}
 	}
