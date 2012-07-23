@@ -13,8 +13,8 @@ class CM_Page_AbstractTest extends TestCase {
 
 	public function testGetPath() {
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Foo_Bar_FooBar2', false);
-		$this->assertSame('foo/bar/foo-bar2?foo=1&bar=2', Test_Page_Foo_Bar_FooBar2::getPath(array('foo' => 1, 'bar' => 2)));
+		$this->assertSame('/foo/bar/foo-bar2?foo=1&bar=2', Test_Page_Foo_Bar_FooBar2::getPath(array('foo' => 1, 'bar' => 2)));
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Index', false);
-		$this->assertSame('', Test_Page_Index::getPath());
+		$this->assertSame('/', Test_Page_Index::getPath());
 	}
 }
