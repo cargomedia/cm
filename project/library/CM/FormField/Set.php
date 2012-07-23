@@ -18,7 +18,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 	}
 
 	/**
-	 * @param $cssSize
+	 * @param string $cssSize
 	 * @deprecated
 	 */
 	public function setColumnSize($cssSize) {
