@@ -236,29 +236,37 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string|null  $path
-	 * @param boolean|null $cdn
+	 * @param string|null                  $path
+	 * @param boolean|null                 $cdn
+	 * @param CM_Site_Abstract|null        $site
+	 * @param CM_Model_Language|null       $language
 	 * @return string
 	 */
-	public function getUrl($path = null, $cdn = null) {
-		if (is_null($cdn)) {
+	public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
+		if (null === $cdn) {
 			$cdn = false;
 		}
+		if (null === $site) {
+			$site = $this->getSite();
+		}
 		$path = (string) $path;
-		$urlBase = $cdn ? $this->getSite()->getUrlCdn() : $this->getSite()->getUrl();
+		if ($language) {
+			$path = $language->getAbbreviation() . '/' . $path;
+		}
+		$urlBase = $cdn ? $site->getUrlCdn() : $site->getUrl();
 		return $urlBase . $path;
 	}
 
 	/**
-	 * @param CM_Page_Abstract|string $pageClassName
-	 * @param array|null              $params
-	 * @param CM_Site_Abstract|null   $site
+	 * @param CM_Page_Abstract|string      $pageClassName
+	 * @param array|null                   $params
+	 * @param CM_Site_Abstract|null        $site
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 *
-	 * @throws CM_Exception_Invalid
 	 */
 	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
-		if (is_null($site)) {
+		if (null === $site) {
 			$site = $this->getSite();
 		}
 		if ($pageClassName instanceof CM_Page_Abstract) {
@@ -277,10 +285,11 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
 		$path = $pageClassName::getPath($params);
-		if ($this->_languageRewrite && $this->getLanguage()) {
-			$path = $this->getLanguage()->getAbbreviation() . '/' . $path;
+		$language = null;
+		if ($this->_languageRewrite) {
+			$language = $this->getLanguage();
 		}
-		return $site->getUrl() . $path;
+		return $this->getUrl($path, false, $site, $language);
 	}
 
 	/**
@@ -343,7 +352,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string      $key
 	 * @param array|null  $params
 	 * @return string
 	 */
