@@ -27,7 +27,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 	 * @param CM_Render $render
 	 * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img])
 	 */
-	abstract public function getSuggestion($item, CM_Render $render = null);
+	abstract public function getSuggestion($item, CM_Render $render);
 
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);

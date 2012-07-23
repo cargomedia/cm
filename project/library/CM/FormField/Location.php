@@ -16,7 +16,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		}
 	}
 
-	public function getSuggestion($location, CM_Render $render = null) {
+	public function getSuggestion($location, CM_Render $render) {
 		$names = array();
 		for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
 			$names[] = $location->getName($level);
