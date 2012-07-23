@@ -244,7 +244,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
 		if (null === $path) {
-			$path = '/';
+			$path = '';
 		}
 		if (null === $cdn) {
 			$cdn = false;
@@ -287,7 +287,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!in_array($namespace, $site->getNamespaces())) {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
-		$path = '/' . $pageClassName::getPath($params);
+		$path = $pageClassName::getPath($params);
 		$language = null;
 		if ($this->_languageRewrite) {
 			$language = $this->getLanguage();
@@ -301,11 +301,11 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function getUrlResource($type = null, $path = null) {
-		$urlPath = '/';
-		if (!(is_null($type) || is_null($path))) {
+		$urlPath = '';
+		if (!is_null($type) && !is_null($path)) {
 			$type = (string) $type;
 			$path = (string) $path;
-			$urlPath .= $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+			$urlPath .= '/' . $type . '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -329,9 +329,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrlStatic($path = null) {
 		$urlPath = '/static';
-		if (null === $path) {
-			$urlPath .= '/';
-		} else {
+		if (null !== $path) {
 			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
@@ -343,7 +341,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getUrlUserContent(CM_File_UserContent $file = null) {
 		if (is_null($file)) {
-			return $this->getUrl('/userfiles/', self::_getConfig()->cdnUserContent);
+			return $this->getUrl('/userfiles', self::_getConfig()->cdnUserContent);
 		}
 		return $this->getUrl('/userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
 	}

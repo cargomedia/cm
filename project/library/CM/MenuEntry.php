@@ -52,7 +52,7 @@ class CM_MenuEntry {
 	 */
 	public final function compare($path, array $params = array()) {
 		$page = $this->getPage();
-		if ($path == '/' . $page::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
+		if ($path == $page::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
 			return true;
 		}
 		return false;

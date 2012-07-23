@@ -108,9 +108,9 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 			$list[$index] = preg_replace('/([A-Z])/', '-\1', lcfirst($entry));
 		}
 
-		$path = strtolower(implode('/', $list));
-		if ($path == 'index') {
-			$path = '';
+		$path = '/' . strtolower(implode('/', $list));
+		if ($path == '/index') {
+			$path = '/';
 		}
 		return CM_Util::link($path, $params);
 	}
