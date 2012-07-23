@@ -9,11 +9,11 @@ function smarty_function_label(array $params, Smarty_Internal_Template $template
 	if (empty($params['for'])) {
 		trigger_error('Param `for` missing');
 	}
-	$for = $params['for'];
+	$for = (string) $params['for'];
 	if (empty($params['text'])) {
 		trigger_error('Param `text` missing');
 	}
-	$text = $params['text'];
+	$text = (string) $params['text'];
 
 	return '<label for="' . $form->getAutoId() . '-' . $for . '-input">' . $text . '</label>';
 }
