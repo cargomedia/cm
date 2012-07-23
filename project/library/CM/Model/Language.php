@@ -217,7 +217,6 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @static
 	 * @param string       $name
 	 * @param string|null  $nameNew
 	 * @param array|null   $variableNamesNew
