@@ -121,5 +121,5 @@ $config->CM_Wowza = new stdClass();
 $config->CM_Wowza->streamChannelTypes[] = CM_Model_StreamChannel_Video::TYPE;
 
 $config->CM_Site_CM = new stdClass();
-$config->CM_Site_CM->url = 'http://www.example.dev/';
-$config->CM_Site_CM->urlCdn = 'http://cdn.example.dev/';
+$config->CM_Site_CM->url = 'http://www.example.dev';
+$config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';

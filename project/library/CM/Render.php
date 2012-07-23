@@ -254,7 +254,7 @@ class CM_Render extends CM_Class_Abstract {
 			$path = $language->getAbbreviation() . '/' . $path;
 		}
 		$urlBase = $cdn ? $site->getUrlCdn() : $site->getUrl();
-		return $urlBase . $path;
+		return $urlBase . '/' . $path;
 	}
 
 	/**
@@ -317,7 +317,7 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Needs user');
 		}
 		$params = array('user' => $mail->getRecipient()->getId(), 'mailType' => $mail->getType());
-		return CM_Util::link($this->getSite()->getUrl() . 'emailtracking/' . $this->getSite()->getId(), $params);
+		return CM_Util::link($this->getSite()->getUrl() . '/emailtracking/' . $this->getSite()->getId(), $params);
 	}
 
 	/**
