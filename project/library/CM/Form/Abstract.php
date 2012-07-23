@@ -194,7 +194,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 				try {
 					$form_data[$field_name] = $field->validate($data[$field_name], $response);
 				} catch (CM_Exception_FormFieldValidation $e) {
-					$err_msg = $e->getMessagePublic();
+					$err_msg = $e->getMessagePublic($response->getRender());
 					$response->addError($err_msg, $field_name);
 				}
 			} else {

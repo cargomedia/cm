@@ -1,31 +1,39 @@
 <?php
 
 class CM_Exception extends Exception {
-	private $_public;
+
+	/** @var string|null */
+	private $_messagePublic;
+
+	/** @var array */
+	private $_variables;
 
 	/**
-	 * @param string $message OPTIONAL
-	 * @param bool $public OPTIONAL
+	 * @param string|null $message
+	 * @param string|null $messagePublic
+	 * @param array|null  $variables
 	 */
-	public function __construct($message = null, $public = false) {
+	public function __construct($message = null, $messagePublic = null, array $variables = null) {
+		$this->_messagePublic = $messagePublic;
+		$this->_variables = (array) $variables;
 		parent::__construct($message);
-		$this->_public = (bool) $public;
 	}
-	
+
 	/**
-	 * @return string|null
+	 * @param CM_Render $render
+	 * @return string
 	 */
-	public function getMessagePublic() {
-		if (!$this->_public) {
+	public function getMessagePublic(CM_Render $render) {
+		if (!$this->isPublic()) {
 			return 'Internal server error';
 		}
-		return $this->getMessage();
+		return $render->getTranslation($this->_messagePublic, $this->_variables);
 	}
-	
+
 	/**
 	 * @return boolean
 	 */
 	public function isPublic() {
-		return $this->_public;
+		return (null !== $this->_messagePublic);
 	}
 }

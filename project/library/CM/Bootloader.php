@@ -28,30 +28,24 @@ class CM_Bootloader {
 
 			$class = get_class($exception);
 			$code = $exception->getCode();
-			if ($exception instanceof CM_Exception) {
-				/** @var CM_Exception $exception */
-				$msg = $exception->getMessagePublic();
-			} else {
-				$msg = 'Internal server error';
-			}
-
-			if ($showError) {
-				$msg = $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
-				$msg .= 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
-				$msg .= '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
-			}
 
 			$logMsg = $class . ' (' . $code . '): ' . $exception->getMessage() . PHP_EOL;
 			$logMsg .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
 			$logMsg .= $exception->getTraceAsString() . PHP_EOL;
-
 			try {
 				$log = new CM_Paging_Log_Error();
 				$log->add($logMsg);
 			} catch (Exception $e) {
 				echo 'Cannot log exception (' . $e->getMessage() . ')' . PHP_EOL;
 			}
-			echo $msg;
+
+			if ($showError) {
+				echo $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
+				echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
+				echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
+			} else {
+				echo 'Internal server error';
+			}
 			exit(1);
 		});
 	}

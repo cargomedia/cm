@@ -31,7 +31,7 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			if (!($e->isPublic() || in_array(get_class($e), self::_getConfig()->catch))) {
 				throw $e;
 			}
-			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic(), 'isPublic' => $e->isPublic());
+			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
 		return json_encode($output);
 	}

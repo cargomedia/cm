@@ -65,7 +65,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 			$return['success'] = array('id' => $tmpFile->getUniqid(), 'preview' => $preview);
 
 		} catch (CM_Exception_FormFieldValidation $ex) {
-			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic());
+			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic($this->getRender()));
 		}
 
 		return json_encode($return, JSON_HEX_TAG);	// JSON decoding in IE-iframe needs JSON_HEX_TAG
