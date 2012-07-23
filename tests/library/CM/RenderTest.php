@@ -7,10 +7,10 @@ class CM_RenderTest extends TestCase {
 
 	public static function setUpBeforeClass() {
 		self::$_configBackup = CM_Config::get();
-		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com/';
-		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com/';
+		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
+		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
 		CM_Config::get()->TEST_Site_Test = new stdClass();
-		CM_Config::get()->TEST_Site_Test->url = 'http://www.test.com/';
+		CM_Config::get()->TEST_Site_Test->url = 'http://www.test.com';
 	}
 
 	public function tearDown() {
@@ -74,21 +74,21 @@ class CM_RenderTest extends TestCase {
 		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
 
 		$render = new CM_Render(null, null, null);
-		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 		$render = new CM_Render(null, null, true); // This should never happen in application, but lets test it
-		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
 		$language = TH::createLanguage('en');
 
 		$render = new CM_Render(null, null, null);
-		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 		$render = new CM_Render(null, null, true); // This should never happen in application, but lets test it
-		$this->assertSame($baseUrl . 'en/test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
 
 		$render = new CM_Render(null, $language, null);
-		$this->assertSame($baseUrl . 'test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 		$render = new CM_Render(null, $language, true);
-		$this->assertSame($baseUrl . 'en/test', $render->getUrlPage($page));
+		$this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
 
 	}
 

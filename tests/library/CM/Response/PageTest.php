@@ -15,7 +15,7 @@ class CM_Response_PageTest extends TestCase {
 			$response->process();
 			$this->fail('Language redirect doesn\'t work');
 		} catch (CM_Exception_Redirect $e) {
-			$this->assertSame(CM_Config::get()->CM_Site_CM->url . 'mock5', $e->getUri());
+			$this->assertSame(CM_Config::get()->CM_Site_CM->url . '/mock5', $e->getUri());
 		}
 	}
 
