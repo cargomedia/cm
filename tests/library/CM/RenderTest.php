@@ -30,10 +30,10 @@ class CM_RenderTest extends TestCase {
 		$render = $this->_getRender();
 		$this->assertSame('http://www.foo.com/', $render->getUrl());
 		$this->assertSame('http://www.cdn.com/', $render->getUrl(null, true));
-		$this->assertSame('http://www.foo.com/foo/bar', $render->getUrl('foo/bar'));
-		$this->assertSame('http://www.cdn.com/foo/bar', $render->getUrl('foo/bar', true));
-		$this->assertSame('http://www.foo.com/0', $render->getUrl(0));
-		$this->assertSame('http://www.cdn.com/0', $render->getUrl(0, true));
+		$this->assertSame('http://www.foo.com/foo/bar', $render->getUrl('/foo/bar'));
+		$this->assertSame('http://www.cdn.com/foo/bar', $render->getUrl('/foo/bar', true));
+		$this->assertSame('http://www.foo.com/0', $render->getUrl('/0'));
+		$this->assertSame('http://www.cdn.com/0', $render->getUrl('/0', true));
 
 	}
 
@@ -112,11 +112,11 @@ class CM_RenderTest extends TestCase {
 		$render = $this->_getRender();
 		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
 		$this->assertSame('http://www.foo.com/static/', $render->getUrlStatic());
-		$this->assertSame('http://www.foo.com/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('foo.jpg'));
+		$this->assertSame('http://www.foo.com/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('/foo.jpg'));
 		CM_Config::get()->CM_Render->cdnResource = true;
 		$this->assertSame('http://www.cdn.com/static/', $render->getUrlStatic());
-		$this->assertSame('http://www.cdn.com/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('foo.jpg'));
-		$this->assertSame('http://www.cdn.com/static/0?' . $releaseStamp, $render->getUrlStatic('0'));
+		$this->assertSame('http://www.cdn.com/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('/foo.jpg'));
+		$this->assertSame('http://www.cdn.com/static/0?' . $releaseStamp, $render->getUrlStatic('/0'));
 	}
 
 	public function testGetUrlUserContent() {
