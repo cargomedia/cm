@@ -8,7 +8,7 @@ ready: function() {
 	$.fn.mColorPicker.init.showLogo = false;
 	$.fn.mColorPicker.init.enhancedSwatches = false;
 	this.$('input').mColorPicker({
-		"imageFolder": cm.getUrlStatic("img/jquery.mColorPicker/")
+		"imageFolder": cm.getUrlStatic('/img/jquery.mColorPicker/')
 	});
 	$("#mColorPickerFooter").remove();
 	$("#mColorPicker").height(158);
