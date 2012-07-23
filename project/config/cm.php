@@ -71,11 +71,17 @@ $config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Mysql->servers_read = array();
 
 $config->CM_Action_Abstract = new stdClass();
+
 $config->CM_Model_Abstract = new stdClass();
+
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
+
 $config->CM_Model_Entity_Abstract = new stdClass();
+
 $config->CM_Mail = new stdClass();
+
 $config->CM_Paging_Log_Abstract = new stdClass();
+
 $config->CM_Paging_ContentList_Abstract = new stdClass();
 
 $config->CM_Model_User = new stdClass();
