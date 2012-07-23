@@ -194,12 +194,11 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 				try {
 					$form_data[$field_name] = $field->validate($data[$field_name], $response);
 				} catch (CM_Exception_FormFieldValidation $e) {
-					$err_msg = $e->getMessagePublic($response->getRender());
-					$response->addError($err_msg, $field_name);
+					$response->addError($e->getMessagePublic($response->getRender()), $field_name);
 				}
 			} else {
 				if ($required) {
-					$response->addError('Required', $field_name);
+					$response->addError($response->getRender()->getTranslation('Required'), $field_name);
 				} else {
 					$form_data[$field_name] = null;
 				}
