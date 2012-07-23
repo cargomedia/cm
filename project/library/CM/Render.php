@@ -172,28 +172,6 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $phrase
-	 * @param array  $params OPTIONAL
-	 * @return string
-	 */
-	public function getText($phrase, $params = array()) {
-		if ($phrase[0] == '%') {
-			$phrase = substr($phrase, 1);
-			if ($phrase[0] == '.') {
-				$phrase = substr($phrase, 1);
-			} else {
-				$phrase = 'components.' . get_class($this->getStackLast('components')) . '.' . $phrase;
-			}
-
-			$text = CM_Language::text($phrase, $params);
-
-		} else {
-			$text = CM_Language::exec($phrase, $params);
-		}
-		return $text;
-	}
-
-	/**
 	 * @param bool   $full      OPTIONAL True if full path required
 	 * @param string $theme     OPTIONAL
 	 * @param string $namespace OPTIONAL

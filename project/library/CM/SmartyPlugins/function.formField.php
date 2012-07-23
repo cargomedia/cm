@@ -14,7 +14,7 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
 
 	$label = null;
 	if (isset($params['label'])) {
-		$label = $render->getText($params['label']);
+		$label = (string) $params['label'];
 	}
 
 	$input = null;

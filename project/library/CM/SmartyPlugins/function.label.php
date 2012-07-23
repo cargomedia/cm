@@ -5,6 +5,7 @@ function smarty_function_label(array $params, Smarty_Internal_Template $template
 	$render = $template->smarty->getTemplateVars('render');
 	/** @var CM_Form_Abstract $form */
 	$form = $render->getStackLast('forms');
+
 	if (empty($params['for'])) {
 		trigger_error('Param `for` missing');
 	}
@@ -12,8 +13,7 @@ function smarty_function_label(array $params, Smarty_Internal_Template $template
 	if (empty($params['text'])) {
 		trigger_error('Param `text` missing');
 	}
-
-	$text = $render->getText($params['text']);
+	$text = $params['text'];
 
 	return '<label for="' . $form->getAutoId() . '-' . $for . '-input">' . $text . '</label>';
 }

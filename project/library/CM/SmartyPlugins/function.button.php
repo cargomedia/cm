@@ -10,10 +10,6 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	}
 	$action = $form->getAction($params['action']);
 
-	if (isset($params['label'])) {
-		$params['label'] = $render->getText($params['label']);
-	}
-
 	$class = '';
 	if (isset($params['class'])) {
 		$class = trim($params['class']);
