@@ -17,7 +17,10 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		parent::__construct($name);
 	}
 
-	// TODO: Should be removed
+	/**
+	 * @param $cssSize
+	 * @deprecated
+	 */
 	public function setColumnSize($cssSize) {
 		$this->_columnSize = $cssSize;
 	}
@@ -54,11 +57,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 	 * @return array
 	 */
 	protected function _getValues() {
-		if ($this->_labelsInValues) {
-			return array_keys($this->_values);
-		} else {
-			return $this->_values;
-		}
+		return array_keys($this->_getOptionList());
 	}
 
 }
