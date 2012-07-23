@@ -81,7 +81,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$css = '';
 		foreach (new CM_Paging_Smiley_All() as $smiley) {
 			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
-			$css .= 'background-image: url('.$this->getRender()->getUrlStatic('img/smiles/' . $smiley['path']).')';
+			$css .= 'background-image: url('.$this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']).')';
 			$css .= '}' . PHP_EOL;
 		}
 		return $css;

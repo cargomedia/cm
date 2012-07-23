@@ -110,7 +110,7 @@ EOD;
 		$lessc->registerFunction('urlFont', function ($arg) use($render) {
 			/** @var CM_Render $render */
 			list($type, $path) = $arg;
-			return array($type, $render->getUrlStatic('font/' . substr($path, 1, -1)));
+			return array($type, $render->getUrlStatic('/font/' . substr($path, 1, -1)));
 		});
 		$lessc->registerFunction('rgbahex', function($color, lessc $lessc) {
 			$color = $lessc->coerceColor($color);

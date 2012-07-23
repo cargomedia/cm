@@ -29,7 +29,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		}
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 
-		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . $this->getRender()->getUrlStatic('swf/WebSocketMainInsecure.swf') . '"');
+		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . $this->getRender()->getUrlStatic('/swf/WebSocketMainInsecure.swf') . '"');
 		if ($viewer = $page->getViewer()) {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
