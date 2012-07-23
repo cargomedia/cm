@@ -205,4 +205,30 @@ class CM_Model_LanguageTest extends TestCase {
 			$this->assertContains('Duplicate', $e->getMessage());
 		}
 	}
+
+	public function testUpdateKey() {
+		$this->_language->setTranslation('someKey', 'value');
+		CM_Model_Language::updateKey('someKey', 'otherKey');
+		$this->assertSame(array('otherKey' => array('value' => 'value', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
+
+		$this->_language->setTranslation('thirdKey', 'its value');
+		try {
+			CM_Model_Language::updateKey('thirdKey', 'otherKey');
+			$this->fail('Should throw exception in duplicate update value');
+		} catch (CM_Exception_Duplicate $e) {
+			$this->assertSame(array(
+				'otherKey' => array('value' => 'value', 'variables' => array()),
+				'thirdKey' => array('value' => 'its value', 'variables' => array()),
+			), $this->_language->getTranslations()->getAssociativeArray());
+		}
+
+		$this->_language->setTranslation('variableKey', 'value', array('foo', 'bar'));
+		CM_Model_Language::updateKey('variableKey', null, array('foo', 'bar', 'more'));
+		$this->assertSame(array(
+			'otherKey' => array('value' => 'value', 'variables' => array()),
+			'thirdKey' => array('value' => 'its value', 'variables' => array()),
+			'variableKey' => array('value' => 'value', 'variables' => array('bar', 'foo', 'more')),
+		), $this->_language->getTranslations()->getAssociativeArray());
+
+	}
 }

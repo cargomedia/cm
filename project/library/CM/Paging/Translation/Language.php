@@ -25,11 +25,12 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 			$where[] = 'v.value IS NULL';
 		}
 		$where = ($where) ? join(' AND ', $where) : null;
+		$orderBy = 'k.name ASC';
 		$join = 'LEFT JOIN ' . TBL_CM_LANGUAGEVALUE . ' AS v ON k.id = v.languageKeyId AND v.languageId = ' . $language->getId() . ' ';
 		$join .= 'LEFT JOIN ' . TBL_CM_LANGUAGEKEY_VARIABLE . ' AS kv ON k.id = kv.languageKeyId';
 		$groupBy = 'k.name';
 		$source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, GROUP_CONCAT(kv.name SEPARATOR ",") as variables',
-				TBL_CM_LANGUAGEKEY . '` as `k', $where, null, $join, $groupBy);
+				TBL_CM_LANGUAGEKEY . '` as `k', $where, $orderBy, $join, $groupBy);
 		parent::__construct($source);
 	}
 

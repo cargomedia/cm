@@ -75,7 +75,6 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param string     $key
 	 * @param string     $value
 	 * @param array|null $variables
-	 * @return void
 	 */
 	public function setTranslation($key, $value, array $variables = null) {
 		$languageKeyId = static::_setKey($key, $variables);
@@ -217,6 +216,26 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $tree;
 	}
 
+	/**
+	 * @static
+	 * @param string       $name
+	 * @param string|null  $nameNew
+	 * @param array|null   $variableNamesNew
+	 * @throws CM_Exception_Duplicate
+	 */
+	public static function updateKey($name, $nameNew = null, array $variableNamesNew = null) {
+		if ($variableNamesNew !== null) {
+			self::_setKeyVariables($name, $variableNamesNew);
+		}
+		if ($nameNew !== null) {
+			if (CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchOne()) {
+				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . ' already exists');
+			}
+			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
+			self::flushCacheLocal();
+		}
+	}
+
 	protected static function _create(array $data) {
 		$params = CM_Params::factory($data);
 		$backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
@@ -226,11 +245,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string     $name
-	 * @param array      $variableNames
+	 * @param string          $name
+	 * @param array|null      $variableNames
 	 * @return int
 	 */
-	protected static function _setKey($name, array $variableNames = null) {
+	private static function _setKey($name, array $variableNames = null) {
 		$name = (string) $name;
 		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
 		if (!$languageKeyId) {
@@ -248,13 +267,15 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @static
 	 * @param string $name
 	 * @param array  $variableNames
 	 * @throws CM_Exception_Invalid
 	 */
-	protected static function _setKeyVariables($name, array $variableNames) {
+	private static function _setKeyVariables($name, array $variableNames) {
 		$languageKeyParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('id', 'accessStamp', 'updateCount'), array('name' => $name))->fetchAssoc();
+		if (!$languageKeyParams) {
+			throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
+		}
 		$languageKeyId = $languageKeyParams['id'];
 		$updateCount = (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) ? 1 : $languageKeyParams['updateCount'] + 1;
 		CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
@@ -262,27 +283,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
 		}
 
-		// Delete language variable, insert new ones
 		CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
 		foreach ($variableNames as $variableName) {
 			CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
 		}
 		self::flushCacheLocal();
-	}
-
-	/**
-	 * @static
-	 * @param string       $name
-	 * @param string|null  $updatedName
-	 * @param array|null   $updatedVariableNames
-	 */
-	public static function updateKey($name, $updatedName = null, array $updatedVariableNames = null) {
-		if ($updatedVariableNames !== null) {
-			self::_setKeyVariables($name, $updatedVariableNames);
-		}
-		if ($updatedName !== null) {
-			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $updatedName), array('name' => $name));
-			self::flushCacheLocal();
-		}
 	}
 }
