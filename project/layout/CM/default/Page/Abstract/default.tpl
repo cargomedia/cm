@@ -16,8 +16,8 @@
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
 		{resource file='library.js'}
 		{resource file='internal.js'}
-		{if $render->getLanguage()}
-			{resource file={$render->getUrlTranslations()}}
+		{if $language = $render->getLanguage()}
+			{resource file="translations/{CM_Model_Language::getVersionJavascript()}/{$language->getId()}.js"}
 		{/if}
 		{$render->getJs()->renderScripts()}
 		{CM_Tracking::getInstance()->getHtml()}
