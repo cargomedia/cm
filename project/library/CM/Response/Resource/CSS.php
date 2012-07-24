@@ -6,12 +6,12 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$this->setHeader('Content-Type', 'text/css');
 		$this->enableCache();
 
-		if ($this->_getFilename() == 'library.css') {
+		if ($this->_getPath() == 'library.css') {
 			$content = '';
 			foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 				$content .= new CM_File($path);
 			}
-		} elseif ($this->_getFilename() == 'internal.css') {
+		} elseif ($this->_getPath() == 'internal.css') {
 			$css = new CM_Css();
 
 			foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
@@ -66,10 +66,10 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 			$content = $css->compile($this->getRender());
 
 			$content .= $this->_getCssSmiley();
-		} elseif (file_exists(DIR_PUBLIC . 'static/css/' . $this->_getFilename())) {
-			$content = new CM_File(DIR_PUBLIC . 'static/css/' . $this->_getFilename());
+		} elseif (file_exists(DIR_PUBLIC . 'static/css/' . $this->_getPath())) {
+			$content = new CM_File(DIR_PUBLIC . 'static/css/' . $this->_getPath());
 		} else {
-			throw new CM_Exception_Invalid('Invalid filename: `' . $this->_getFilename() . '`');
+			throw new CM_Exception_Invalid('Invalid filename: `' . $this->_getPath() . '`');
 		}
 		return $content;
 	}

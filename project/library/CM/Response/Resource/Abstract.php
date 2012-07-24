@@ -3,9 +3,9 @@
 abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
 
 	/**
-	 * @var string
+	 * @var string[]
 	 */
-	private $_filename;
+	private $_pathParts;
 
 	/**
 	 * @param CM_Request_Abstract $request
@@ -14,17 +14,23 @@ abstract class CM_Response_Resource_Abstract extends CM_Response_Abstract {
 	public function __construct(CM_Request_Abstract $request, $siteId = null) {
 		parent::__construct($request, $siteId);
 		$path = explode('/', $request->getPath());
-		$filenamePaths = array_filter(array_splice($path, 4), function ($dir) {
+		$this->_pathParts = array_filter(array_splice($path, 4), function ($dir) {
 			return '..' != $dir;
 		});
-		$this->_filename = implode('/', $filenamePaths);
 	}
 
 	/**
+	 * @param int|null $partNumber
 	 * @return string
 	 */
-	protected function _getFilename() {
-		return $this->_filename;
+	protected function _getPath($partNumber = null) {
+		if (null === $partNumber) {
+			return implode('/', $this->_pathParts);
+		}
+		if (isset($this->_pathParts[$partNumber])) {
+			return $this->_pathParts[$partNumber];
+		}
+		return null;
 	}
 
 	/**
