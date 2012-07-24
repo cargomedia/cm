@@ -186,7 +186,14 @@ class TH {
 		if (is_null($type)) {
 			$type = CM_Model_StreamChannel_Video::TYPE;
 		}
-		return CM_Model_StreamChannel_Abstract::createType($type, array('key' => rand(1, 10000) . '_' . rand(1, 100)));
+
+		$data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
+		if (CM_Model_StreamChannel_Video::TYPE == $type){
+			$data['width'] = 480;
+			$data['height'] = 720;
+		}
+
+		return CM_Model_StreamChannel_Abstract::createType($type, $data);
 	}
 
 	/**

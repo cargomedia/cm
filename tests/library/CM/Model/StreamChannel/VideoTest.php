@@ -3,18 +3,17 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Model_StreamChannel_VideoTest extends TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		TH::clearEnv();
 	}
 
 	public function testCreate() {
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk342gkfsd'));
-		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
-		$this->assertGreaterThanOrEqual(1, $streamChannel->getId());
-		$this->assertRow(TBL_CM_STREAMCHANNEL, array('id' => $streamChannel->getId(), 'type' => CM_Model_StreamChannel_Video::TYPE, 'key' => 'dsljkfk342gkfsd'));
+		/** @var CM_Model_StreamChannel_Video $channel */
+		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200));
+		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
+		$this->assertSame(100, $channel->getWidth());
+		$this->assertSame(200, $channel->getHeight());
+		$this->assertSame('foo', $channel->getKey());
 	}
 }
+

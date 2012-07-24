@@ -47,10 +47,11 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testFindKey() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'testKey', 'type' => CM_Model_StreamChannel_Video::TYPE));
-		$streamChannel = CM_Model_StreamChannel_Abstract::findKey('testKey');
+		/** @var CM_Model_StreamChannel_Video $streamChannelOriginal */
+		$streamChannelOriginal = TH::createStreamChannel(CM_Model_StreamChannel_Video::TYPE);
+		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamChannelOriginal->getKey());
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
-		$this->assertEquals($id, $streamChannel->getId());
+		$this->assertEquals($streamChannelOriginal->getId(), $streamChannel->getId());
 	}
 
 	public function testDelete() {
