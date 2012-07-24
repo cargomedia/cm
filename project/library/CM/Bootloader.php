@@ -151,6 +151,7 @@ class CM_Bootloader {
 		define('TBL_CM_STREAM_PUBLISH', 'cm_stream_publish');
 		define('TBL_CM_STREAM_SUBSCRIBE', 'cm_stream_subscribe');
 		define('TBL_CM_STREAMCHANNEL', 'cm_streamChannel');
+		define('TBL_CM_STREAMCHANNEL_VIDEO', 'cm_streamChannel_video');
 	}
 
 	/**

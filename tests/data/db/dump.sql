@@ -374,6 +374,16 @@ CREATE TABLE `cm_streamChannel` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_streamChannel_video`;
+
+
+CREATE TABLE `cm_streamChannel_video` (
+  `id` int(10) unsigned NOT NULL,
+  `width` int(10) unsigned NOT NULL,
+  `height` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_stream_publish`;
 
 
