@@ -37,27 +37,6 @@ class CM_Frontend {
 	}
 
 	/**
-	 * @param string $lang_addr
-	 * @param string $frontend_lang_addr OPTIONAL
-	 */
-	public function registerLanguageValue($lang_addr, $frontend_lang_addr = null) {
-		$value = CM_Language::text($lang_addr);
-
-		if (!isset($frontend_lang_addr)) {
-			$frontend_lang_addr = $lang_addr;
-		}
-		if (substr($frontend_lang_addr, 0, 1) != '%') {
-			$frontend_lang_addr = '%' . $frontend_lang_addr;
-		}
-
-		$this->assignLanguageValue($value, $frontend_lang_addr);
-	}
-
-	public function assignLanguageValue($value, $frontend_lang_addr) {
-		$this->onloadHeaderJs("cm.language.set('$frontend_lang_addr'," . json_encode($value) . ')');
-	}
-
-	/**
 	 * @param string $jsCode
 	 */
 	public function onloadHeaderJs($jsCode) {

@@ -37,10 +37,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$this->getRender()->getJs()->registerPage($page);
 		$js->onloadReadyJs('cm.findView()._ready();');
 
-		$js->registerLanguageValue('%interface.ok');
-		$js->registerLanguageValue('%interface.cancel');
-		$js->registerLanguageValue('%interface.confirmation_title');
-
 		$assign = $page->getTplParams();
 		$assign['pageObj'] = $page;
 		$assign['viewer'] = $page->getViewer();

@@ -16,6 +16,9 @@
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
 		{resource file='library.js'}
 		{resource file='internal.js'}
+		{if $render->getLanguage()}
+			{resource file={$render->getUrlTranslations()}}
+		{/if}
 		{$render->getJs()->renderScripts()}
 		{CM_Tracking::getInstance()->getHtml()}
 		{block name='body-end'}{/block}

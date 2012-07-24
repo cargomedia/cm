@@ -373,6 +373,18 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getUrlTranslations() {
+		if (!$this->getLanguage()) {
+			return null;
+		}
+		$accessStampJs = CM_Model_Language::getVersionJavascript();
+		$languageId = $this->getLanguage()->getId();
+		return 'translations/' . $accessStampJs . '/' . $languageId . '.js';
+	}
+
+	/**
 	 * @return Smarty
 	 */
 	private function _getSmarty() {

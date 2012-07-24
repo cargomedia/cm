@@ -233,6 +233,29 @@ class CM_Model_Language extends CM_Model_Abstract {
 			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
 			self::flushCacheLocal();
 		}
+
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getVersionJavascript() {
+		return (int) CM_Option::getInstance()->get('language.javascript.version');
+	}
+
+	public static function updateVersionJavascript() {
+		CM_Option::getInstance()->set('language.javascript.version', time());
+	}
+
+	/**
+	 * @param string $languageKey
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function rpc_requestTranslationJs($languageKey) {
+		if (!CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey))) {
+			throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
+		}
+		self::updateVersionJavascript();
 	}
 
 	protected static function _create(array $data) {
@@ -260,7 +283,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::flushCacheLocal();
 		}
 		if ($variableNames !== null) {
-			self::_setKeyVariables($name, $variableNames);
+			self::_setKeyVariables($name, null, $variableNames);
 		}
 		return $languageKeyId;
 	}
@@ -276,7 +299,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 			throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
 		}
 		$languageKeyId = $languageKeyParams['id'];
-		$updateCount = (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) ? 1 : $languageKeyParams['updateCount'] + 1;
+		$updateCount = $languageKeyParams['updateCount'] + 1;
+		if (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) {
+			$updateCount = 1;
+		}
 		CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
 		if ($updateCount > 10) {
 			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');

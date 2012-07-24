@@ -121,7 +121,7 @@ submit: function(actionName, confirmed, data, callbacks) {
 
 	data = data || this.getData(actionName);
 
-	var hasErrors = false
+	var hasErrors = false;
 	_.each(_.keys(action.fields).reverse(), function(fieldName) {
 		var required = action.fields[fieldName];
 		if (required && _.isEmpty(data[fieldName])) {
@@ -129,7 +129,7 @@ submit: function(actionName, confirmed, data, callbacks) {
 			var errorMessage = 'Required';
 			var $labels = $('label[for="' + field.getAutoId() + '-input"]');
 			if ($labels.length) {
-				errorMessage = cm.language.get('%forms._errors.required', {label:$labels.first().text()});
+				errorMessage = cm.language.get('{$label} is required.', {label: $labels.first().text()});
 			}
 			field.error(errorMessage);
 			hasErrors = true;
@@ -147,7 +147,7 @@ submit: function(actionName, confirmed, data, callbacks) {
 		return false;
 	}
 
-	this.disable()
+	this.disable();
 	this.trigger('submit', [data]);
 	cm.ajax('form', {view:this.getComponent()._getArray(), form:this._getArray(), actionName:actionName, data:data}, {
 		success: function(response) {

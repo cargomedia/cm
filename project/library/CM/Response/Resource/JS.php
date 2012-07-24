@@ -44,6 +44,8 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
+		} elseif (substr($this->_getFilename(), 0, 13) == 'translations/') {
+			return $this->_generateTranslationsFile();
 		} elseif (file_exists(DIR_PUBLIC . 'static/js/' . $this->_getFilename())) {
 			$content = new CM_File(DIR_PUBLIC . 'static/js/' . $this->_getFilename());
 		} else {
@@ -67,5 +69,12 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		}
 		$str .= '});' . PHP_EOL;
 		return $str;
+	}
+
+	private function _generateTranslationsFile() {
+		list ($stub, $timestamp, $languageId) = explode('/', $this->_getFilename());
+		$language = new CM_Model_Language($languageId);
+		$translations = new CM_Paging_Translation_Language($language, null, null, null, true);
+		return 'cm.language.set(' . CM_Params::encode($translations->getAssociativeArray(), true) . ');';
 	}
 }

@@ -7,8 +7,9 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 	 * @param string|null                    $searchPhrase
 	 * @param string|null                    $section
 	 * @param bool|null                      $translated
+	 * @param bool|null                      $javascriptOnly
 	 */
-	public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null) {
+	public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null, $javascriptOnly = null) {
 		$where = array();
 		if ($searchPhrase) {
 			$whereName = CM_Mysql::placeholder("k.name LIKE '?'", '%' . $searchPhrase . '%');
@@ -23,6 +24,9 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		}
 		if ($translated === false) {
 			$where[] = 'v.value IS NULL';
+		}
+		if ($javascriptOnly) {
+			$where[] = 'k.javascript = 1';
 		}
 		$where = ($where) ? join(' AND ', $where) : null;
 		$orderBy = 'k.name ASC';
