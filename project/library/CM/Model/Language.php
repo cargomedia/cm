@@ -283,7 +283,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::flushCacheLocal();
 		}
 		if ($variableNames !== null) {
-			self::_setKeyVariables($name, null, $variableNames);
+			self::_setKeyVariables($name, $variableNames);
 		}
 		return $languageKeyId;
 	}
