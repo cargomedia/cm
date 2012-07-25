@@ -218,6 +218,10 @@ abstract class CM_Request_Abstract {
 		return $this->_viewer;
 	}
 
+	public function resetViewer() {
+		$this->_viewer = false;
+	}
+
 	/**
 	 * @return string|null	very long number (string used)
 	 */
