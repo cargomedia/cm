@@ -38,7 +38,7 @@ EOD;
 smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span><br />
 allowed tags: <b class="italic">bold</b><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br />
-badwords: hallo​badword_re​placement<br />
+badwords: hallo...<br />
 special chars: &quot;&lt;&gt;&quot;<br />
 unclosed tags: <u>not <b>closed</b></u>
 EOD;
@@ -51,7 +51,7 @@ EOD;
 		$badwords->add('@yahoo.com');
 
 		$actual = new CM_Usertext('hallo@yahoo.com world');
-		$this->assertEquals('hallo​badword_re​placement world', $actual->getFormat());
+		$this->assertEquals('hallo... world', $actual->getFormat());
 	}
 
 	public function testFormatPlain() {
@@ -60,7 +60,7 @@ EOD;
 smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span>
 allowed tags: bold
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
-badwords: hallo​badword_re​placement
+badwords: hallo...
 special chars: &quot;&lt;&gt;&quot;
 unclosed tags: not closed
 EOD;
@@ -74,7 +74,7 @@ EOD;
 smilies: :-)
 allowed tags: &lt;b attr=&quot;not-allowed&quot; class{$splitChar}=&quot;italic&quot;&gt;{$splitChar}bold&lt;/b&gt;
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
-badwords: hallo​badword_re​placement
+badwords: hallo...
 special chars: &quot;&lt;&gt;&quot;
 unclosed tags: &lt;u&gt;not &lt;b&gt;closed
 EOD;
