@@ -25,7 +25,11 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		}
 		if ($this->_getPath(0) == 'translations') {
 			$language = new CM_Model_Language($this->_getPath(2));
-			return $this->_getTranslations($language);
+			$translations = array();
+			foreach (new CM_Paging_Translation_Language($language, null, null, null, true) as $translation) {
+				$translations[$translation['key']] = $language->getTranslation($translation['key']);
+			}
+			return 'cm.language.setAll(' . CM_Params::encode($translations, true) . ');';
 		}
 		if (file_exists(DIR_PUBLIC . 'static/js/' . $this->_getPath())) {
 			return (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->_getPath());
@@ -82,14 +86,5 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		}
 		$str .= '});' . PHP_EOL;
 		return $str;
-	}
-
-	/**
-	 * @param CM_Model_Language $language
-	 * @return string
-	 */
-	private function _getTranslations(CM_Model_Language $language) {
-		$translations = new CM_Paging_Translation_Language($language, null, null, null, true);
-		return 'cm.language.set(' . CM_Params::encode($translations->getAssociativeArray(), true) . ');';
 	}
 }
