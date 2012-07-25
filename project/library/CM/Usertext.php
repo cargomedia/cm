@@ -117,7 +117,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	private function _censor($text) {
 		$cacheKey = CM_CacheConst::Usertext_Badwords;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
-			$badwords = array('search' => array(), 'replace' => CM_Language::text('txt.badword_replacement'));
+			$badwords = array('search' => array(), 'replace' => '...');
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {
 				$badword = str_replace('*', '[^\s]*', $badword);
 				$badwords['search'][] = '#(\b' . $badword . '\b)#i';
