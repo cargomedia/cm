@@ -22,7 +22,7 @@ abstract class CM_Request_Abstract {
 	protected $_cookies;
 
 	/**
-	 * @var CM_Model_User|null
+	 * @var bool|CM_Model_User|null
 	 */
 	protected $_viewer = false;
 
