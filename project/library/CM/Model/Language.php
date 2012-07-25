@@ -230,8 +230,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::_setKeyVariables($name, $variableNamesNew);
 		}
 		if ($nameNew !== null) {
+			if (!CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne()) {
+				throw new CM_Exception_Nonexistent('LanguageKey `' . $name. '` does not exist');
+			}
 			if (CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchOne()) {
-				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . ' already exists');
+				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
 			}
 			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
 			self::flushCacheLocal();
