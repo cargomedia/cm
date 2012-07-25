@@ -196,6 +196,9 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public static function deleteKey($name) {
 		$name = (string) $name;
 		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
+		if (!$languageKeyId) {
+			return;
+		}
 		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId));
 		CM_Mysql::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyId));
 		/** @var CM_Model_Language $language */
@@ -252,10 +255,14 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function rpc_requestTranslationJs($languageKey) {
-		if (!CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey))) {
+		$javascriptAlready = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'javascript', array('name' => $languageKey))->fetchOne();
+		if ($javascriptAlready === false) {
 			throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
 		}
-		self::updateVersionJavascript();
+		if (!$javascriptAlready) {
+			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey));
+			self::updateVersionJavascript();
+		}
 	}
 
 	protected static function _create(array $data) {
