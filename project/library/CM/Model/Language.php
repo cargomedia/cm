@@ -255,11 +255,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function rpc_requestTranslationJs($languageKey) {
-		$javascriptAlready = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'javascript', array('name' => $languageKey))->fetchOne();
-		if ($javascriptAlready === false) {
+		$javascript = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'javascript', array('name' => $languageKey))->fetchOne();
+		if ($javascript === false) {
 			throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
 		}
-		if (!$javascriptAlready) {
+		if ($javascript == 0) {
 			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey));
 			self::updateVersionJavascript();
 		}
