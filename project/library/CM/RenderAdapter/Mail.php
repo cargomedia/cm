@@ -31,11 +31,16 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			if (!$htmlBody) {
 				throw new CM_Exception_Invalid('Mail has neither text nor html content');
 			}
-			$text = preg_replace('!\n!', ' ', $htmlBody);
-			$text = preg_replace(array('!<br\s*/?>!', '!<a .*?href="(.*?)".*?>(.*?)</a>!', '!</?p>!'), array("\n", '$2 ($1)', "\n"), $text);
-			$text = preg_replace('!(\n)\s+!', "\n", $text);
-			$text = preg_replace('!([ \t])[ \t]+!', '$1', $text);
-			$text = trim(strip_tags($text));
+			$text = $htmlBody;
+			$text = preg_replace('#\n#', ' ', $text);
+			$text = preg_replace('#<br\s*/?>#', "\n", $text);
+			$text = preg_replace('#</?p>#', "\n", $text);
+			$text = preg_replace('#<a .*?href="(.+?)".*?>(.+?)</a>#s', '$2 ($1)', $text);
+			$text = preg_replace('#<li.*?>\s*(.+?)</li>#s', '* $1', $text);
+			$text = strip_tags($text);
+			$text = preg_replace('#(\n)\s+#', '$1', $text);
+			$text = preg_replace('#([ \t])[ \t]+#', '$1', $text);
+			$text = trim($text);
 		}
 		if ($mail->getRenderLayout()) {
 			$tplPath = $this->getRender()->getLayoutPath('layout/mailText.tpl');
