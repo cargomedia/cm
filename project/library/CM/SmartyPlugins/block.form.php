@@ -10,7 +10,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$render->pushStack('forms', $form);
 		$render->pushStack('views', $form);
 
-		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . '" method="post" onsubmit="return false;">';
+		$html = '<form id="' . $form->getAutoId() . '" class="' . $form->getName() . ' clearfix" method="post" onsubmit="return false;">';
 
 		return $html;
 
