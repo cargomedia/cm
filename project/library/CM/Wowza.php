@@ -187,7 +187,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string  $streamName
 	 * @param string  $clientKey
-	 * @param string  $start
+	 * @param int     $start
 	 * @param int     $width
 	 * @param int     $height
 	 * @param string  $data
