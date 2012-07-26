@@ -57,18 +57,24 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $clientKey
 	 * @param int    $start
 	 * @param string $data
+	 * @param int    $width
+	 * @param int    $height
+	 * @throws CM_Exception
+	 * @throws CM_Exception_NotAllowed
 	 */
-	public function publish($streamName, $clientKey, $start, $data) {
+	public function publish($streamName, $clientKey, $start, $width, $height, $data) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
+		$width = (int) $width;
+		$height = (int) $height;
 		$data = (string) $data;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$streamChannelType = $params->getInt('streamChannelType');
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params, 'width' => $width, 'height' => $height));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
@@ -184,8 +190,8 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $data
 	 * @return boolean
 	 */
-	public static function rpc_publish($streamName, $clientKey, $start, $data) {
-		self::_getInstance()->publish($streamName, $clientKey, $start, $data);
+	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
+		self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $data);
 		return true;
 	}
 
