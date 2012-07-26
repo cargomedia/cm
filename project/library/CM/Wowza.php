@@ -56,9 +56,9 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $streamName
 	 * @param string $clientKey
 	 * @param int    $start
-	 * @param string $data
 	 * @param int    $width
 	 * @param int    $height
+	 * @param string $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 */
@@ -184,10 +184,12 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $streamName
-	 * @param string $clientKey
-	 * @param string $start
-	 * @param string $data
+	 * @param $streamName
+	 * @param $clientKey
+	 * @param $start
+	 * @param $width
+	 * @param $height
+	 * @param $data
 	 * @return boolean
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
