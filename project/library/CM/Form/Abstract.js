@@ -178,7 +178,7 @@ submit: function(actionName, confirmed, data, callbacks) {
 			}
 
 			if (!response.errors) {
-				handler.trigger('success', response.data);
+				handler.trigger('success success.' + actionName, response.data);
 			}
 		},
 		complete: function() {
