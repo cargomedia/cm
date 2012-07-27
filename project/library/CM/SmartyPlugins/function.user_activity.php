@@ -17,5 +17,4 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
 	}
 
 	return 'Online: ' . smarty_function_date_timeago(array('time' => $activityStamp), $template);
-
 }
