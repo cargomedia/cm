@@ -58,7 +58,7 @@ class CM_FormField_SetTest extends TestCase {
 		$this->assertSame($cssWidth, preg_replace('/(^width: |;$)/', '', $doc->getAttr('li', 'style')));
 		foreach ($data as $value => $label) {
 			$this->assertTrue($doc->exists('li.' . $name . '_value_' . $value));
-			$spanQuery = 'span[class="' . $name . '_label_' . $value . '"]';
+			$spanQuery = 'label[class="' . $name . '_label_' . $value . '"]';
 			$this->assertTrue($doc->exists($spanQuery));
 			$this->assertSame($label, trim($doc->getText($spanQuery)));
 			$this->assertTrue($doc->exists('input[value="' . $value . '"]'));
