@@ -116,20 +116,12 @@ input[type=checkbox] {
 			color: @colorFgButton;
 		}
 	}
+	&:focus {
+		.input_focus;
+	}
 }
 
 .formField > .input > .CM_FormField_Set, .formField > .input > .CM_FormField_Boolean {
-
-	.list_label:hover {
-
-		input[type=checkbox]{
-			.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
-
-			&:after {
-				color: lighten(@colorFgButton, 50);
-			}
-		}
-	}
 
 	label {
 		cursor: pointer;
