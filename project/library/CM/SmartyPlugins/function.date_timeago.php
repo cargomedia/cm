@@ -12,6 +12,10 @@ function smarty_function_date_timeago($params, Smarty_Internal_Template $templat
 	$render = $template->smarty->getTemplateVars('render');
 	$stamp = (int) $params['time'];
 	$distance = time() - $stamp;
+	$class = 'timeago';
+	if (isset($params['class'])) {
+		$class .= ' ' . $params['class'];
+	}
 
 	if ($distance >= 0) {
 		$prefix = $render->getTranslation('.date.timeago.prefixAgo');
@@ -52,8 +56,7 @@ function smarty_function_date_timeago($params, Smarty_Internal_Template $templat
 	}
 
 	$print = trim($prefix . ' ' . $print . ' ' . $suffix);
-
 	$date = new DateTime('@' . $stamp);
 	$iso8601 = $date->format('c');
-	return '<abbr title="' . $iso8601 . '" class="timeago">' . $print . '</abbr>';
+	return '<abbr title="' . $iso8601 . '" class="' . $class . '">' . $print . '</abbr>';
 }
