@@ -1,4 +1,5 @@
 <?php
+require_once 'function.date_timeago.php';
 
 function smarty_function_user_activity(array $params, Smarty_Internal_Template $template) {
 	$forceDisplay = isset($params['force_display']);
