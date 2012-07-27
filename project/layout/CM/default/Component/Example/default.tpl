@@ -33,8 +33,10 @@ time={$now}<br />
 	{formField name='locationSlider' label="{translate 'Radius'}"}
 	{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
 	{formField name='color' label="{translate 'Color'}"}
-	{formField name='radio' label="{translate 'Set'}" display='radios'}
-	{formField name='setSelect' label="{translate 'Set Select'}"}
+	{formField name='set' label="{translate 'Set'}"}
+	{formField name='boolean' text="{translate 'Bool'}"}
+	{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
+	{formField name='setSelect2' label="{translate 'Set Select'}"}
 	{formAction action='go' label="{translate 'Go'}"}
 {/form}
 
