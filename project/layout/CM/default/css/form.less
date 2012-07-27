@@ -1,0 +1,197 @@
+button:disabled, input:disabled {
+	.input_disabled;
+}
+
+button:focus, .textinput:focus, .textinput.focus {
+	.input_focus;
+}
+
+textarea.textinput {
+	.input_textarea;
+}
+
+button, input[type=submit], input[type=button] {
+	.input_button;
+}
+
+button.large, input[type=submit].large, input[type=button].large {
+	.input_button_large;
+}
+
+button:hover, input[type=submit]:hover, input[type=button]:hover {
+	.input_button_hover;
+}
+
+button:active, input[type=submit]:active, input[type=button]:active {
+	.input_button_active;
+}
+
+button.alt, input[type=submit].alt, input[type=button].alt {
+	.input_button_alt;
+}
+
+button.alt:hover, input[type=submit].alt:hover, input[type=button].alt:hover {
+	.input_button_alt_hover;
+}
+
+button.alt:active, input[type=submit].alt:active, input[type=button].alt:active {
+	.input_button_alt_active;
+}
+
+.textinput {
+	.input_text;
+	.input_text_height;
+	.border(@colorFgBorder);
+
+	&:hover {
+		border-left: 1px solid @colorNotice;
+	}
+}
+
+button .icon, button .label {
+	vertical-align: middle;
+	line-height: @heightButton - 4px;
+}
+
+button.large span.label {
+	line-height: 56px;
+}
+
+button .icon {
+	margin: 1px 3px;
+	top: -1px;
+	font-size: @iconSizeClickable;
+}
+
+button.hasIcon {
+	padding: 0;
+}
+
+button.hasIcon.hasLabel {
+	padding: 0 8px 0 1px;
+}
+
+button.hasIconRight.hasLabel {
+	padding: 0 1px 0 8px;
+}
+
+input[type=radio] {
+	margin: 0 1px;
+	padding: 0;
+	width: 1em;
+}
+
+input[type=checkbox] {
+	.icon;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	width: @sizeCheckbox;
+	height: @sizeCheckbox;
+	margin: 0 1px;
+	cursor: pointer;
+	position: relative;
+	.bg_emphasize;
+	.box-shadow(0 0 2px darken(@colorBgButton, 15));
+	.gradient(vertical,  darken(@colorBgButton, 12), @colorBgButton);
+	border: 1px solid lighten(@colorFgButton, 40);
+	border-radius: 2px;
+	vertical-align: middle;
+
+	&:after {
+		color: transparent;
+		content: "&#10004;";
+		font-size: (@sizeCheckbox - 4px);
+		position: absolute;
+		top: -1px;
+		left: 1px;
+	}
+	&:checked {
+		border: 1px solid lighten(@colorFgButton, 30);
+		.box-shadow(0 0 3px darken(@colorBgButton, 25) inset);
+		.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
+
+		&:after {
+			text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2) inset;
+			color: @colorFgButton;
+		}
+	}
+}
+
+.formField > .input > .CM_FormField_Set, .formField > .input > .CM_FormField_Boolean {
+
+	.list_label:hover {
+
+		input[type=checkbox]{
+			.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
+
+			&:after {
+				color: lighten(@colorFgButton, 50);
+			}
+		}
+	}
+
+	label {
+		cursor: pointer;
+		position: relative;
+		top: 2px;
+	}
+}
+
+.formField {
+	.border(@colorFgBorderShy);
+	padding: 5px 0;
+	border-width: 1px 0 0 0;
+	width: 600px;
+	max-width: 100%;
+	min-height: 24px;
+}
+
+.formField:first-child, .formField.first, .formField.submit {
+	border-width: 0;
+}
+
+.formField > label {
+				 color: @colorFgLinkLight;
+				 width: 95px;
+				 float: left;
+				 padding-top: 4px;
+				 font-weight: bold;
+			 }
+
+.formField > label:after {
+				 content: ":";
+			 }
+
+.formField > .input {
+	margin-left: 100px;
+}
+
+.formField.noLabel > .input {
+	margin-left: 0;
+}
+
+.formField > .input > .CM_FormField_Integer {
+	padding-top: 2px;
+}
+
+.formField > .input > .CM_FormField_Date,
+.formField > .input > .CM_FormField_Set_Select {
+	padding-top: 3px;
+}
+
+.formField > label .CM_FormField_Abstract {
+	float: left;
+	margin-right: 3px;
+}
+
+.formField.submit {
+	text-align: center;
+}
+
+.form_field_error {
+	.error;
+	float: left;
+	margin: 4px 0 0;
+	padding: 3px 7px;
+}

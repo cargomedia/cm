@@ -8,6 +8,8 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerField(new CM_FormField_Location('location', CM_Model_Location::LEVEL_COUNTRY, $this->getField('locationSlider')));
 		$this->registerField(new CM_FormField_FileImage('image', 2));
 		$this->registerField(new CM_FormField_Color('color'));
+		$this->registerField(new CM_FormField_Set_Select('radio', array(1 => 'Eins', 2 => 'Zwei'), true));
+		$this->registerField(new CM_FormField_Set_Select('setSelect', array(1 => 'Eins', 2 => 'Zwei'), true));
 
 		$this->registerAction(new CM_FormAction_Example_Go());
 	}
