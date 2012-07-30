@@ -5,7 +5,7 @@ function smarty_function_date($params, Smarty_Internal_Template $template) {
 	$render = $template->smarty->getTemplateVars('render');
 	$dateFormatter = $render->getDateFormatter();
 	$time = (int) $params['time'];
-	$showTime = (bool) $params['showTime'];
+	$showTime = !empty($params['showTime']);
 
 	if ($showTime) {
 		$dateFormatter->setPattern('M d, Y - h:i');
