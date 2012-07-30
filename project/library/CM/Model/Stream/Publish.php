@@ -12,6 +12,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	protected function _getContainingCacheables() {
 		$cacheables = parent::_getContainingCacheables();
 		$cacheables[] = $this->getStreamChannel()->getStreamPublishs();
+		$cacheables[] = $this->getStreamChannel()->getPublishers();
 		return $cacheables;
 	}
 
