@@ -25,6 +25,11 @@ class CM_Render extends CM_Class_Abstract {
 	private $_language;
 
 	/**
+	 * @var IntlDateFormatter
+	 */
+	private $_dateFormatter;
+
+	/**
 	 * @var bool
 	 */
 	private $_languageRewrite;
@@ -370,6 +375,16 @@ class CM_Render extends CM_Class_Abstract {
 
 	public function clearTemplates() {
 		$this->_getSmarty()->clearCompiledTemplate();
+	}
+
+	/**
+	 * @return IntlDateFormatter
+	 */
+	public function getDateFormatter() {
+		if (!$this->_dateFormatter) {
+			$this->_dateFormatter = new IntlDateFormatter($this->getLanguage()->getAbbreviation(), IntlDateFormatter::FULL, IntlDateFormatter::FULL);
+		}
+		return $this->_dateFormatter;
 	}
 
 	/**
