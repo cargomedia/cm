@@ -112,6 +112,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return CM_Paging_StreamSubscribe_User
+	 */
+	public function getStreamSubscribes() {
+		return new CM_Paging_StreamSubscribe_User($this);
+	}
+
+	/**
 	 * @return CM_Paging_Useragent_User
 	 */
 	public function getUseragents() {
@@ -214,6 +221,9 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		$this->getTransgressions()->deleteAll();
+		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
+			$streamSubscribe->delete();
+		}
 		CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
 	}
