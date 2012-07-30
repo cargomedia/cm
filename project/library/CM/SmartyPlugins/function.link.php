@@ -48,7 +48,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	if (empty($title) && empty($label)) {
 		$label = $href;
 	}
-	$html .= CM_Language::htmlspecialchars($label);
+	$html .= CM_Util::htmlspecialchars($label);
 
 	if (!empty($icon) && !empty($label)) {
 		$html .= '</span>';

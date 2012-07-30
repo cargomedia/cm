@@ -2,9 +2,11 @@
 require_once 'function.linkUrl.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
 	$label = '';
 	if (isset($params['label'])) {
-		$label = CM_Language::htmlspecialchars($params['label']);
+		$label = CM_Util::htmlspecialchars($params['label']);
 		unset($params['label']);
 	}
 
@@ -23,7 +25,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
 
 	if (isset($params['title'])) {
-		$attrs .= ' title="' . CM_Language::htmlspecialchars($params['title']) . '"';
+		$attrs .= ' title="' . CM_Util::htmlspecialchars($params['title']) . '"';
 		unset($params['title']);
 	}
 
@@ -67,7 +69,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
 	if (isset($params['data'])) {
 		foreach ($params['data'] as $name => $value) {
-			$attrs .= ' data-' . $name . '="' . CM_Language::htmlspecialchars($value) . '"';
+			$attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
 		}
 	}
 
@@ -77,7 +79,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 		$html .= $iconMarkup;
 	}
 	if ($label) {
-		$html .= '<span class="label">' . CM_Language::htmlspecialchars($label) . '</span>';
+		$html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
 	}
 	if ($icon && $iconPosition == 'right') {
 		$html .= $iconMarkup;

@@ -1,6 +1,8 @@
 <?php
 
 function smarty_function_tag(array $params, Smarty_Internal_Template $template) {
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
 	if (!isset($params['el'])) {
 		trigger_error('Param `el` missing.');
 	}
@@ -22,7 +24,7 @@ function smarty_function_tag(array $params, Smarty_Internal_Template $template) 
 	$html = '<' . $name;
 	foreach ($attributes as $attributeName => $attributeValue) {
 		if (isset($attributeValue)) {
-			$html .= ' ' . $attributeName . '="' . CM_Language::htmlspecialchars($attributeValue) . '"';
+			$html .= ' ' . $attributeName . '="' . CM_Util::htmlspecialchars($attributeValue) . '"';
 		}
 	}
 	if (in_array($name, $namesVoid)) {

@@ -164,4 +164,14 @@ class CM_Util {
 		}
 		return $classes;
 	}
+
+	/**
+	 * @param string $string
+	 * @param int    $quote_style
+	 * @param string $charset
+	 * @return string
+	 */
+	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {
+		return htmlspecialchars($string, $quote_style, $charset);
+	}
 }
