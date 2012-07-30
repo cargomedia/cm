@@ -191,6 +191,7 @@ class TH {
 		if (CM_Model_StreamChannel_Video::TYPE == $type){
 			$data['width'] = 480;
 			$data['height'] = 720;
+			$data['wowzaIp'] = '127.0.0.1';
 		}
 
 		return CM_Model_StreamChannel_Abstract::createType($type, $data);
