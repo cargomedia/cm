@@ -2,8 +2,6 @@
 require_once 'function.linkUrl.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
-	/** @var CM_Render $render */
-	$render = $template->smarty->getTemplateVars('render');
 	$label = '';
 	if (isset($params['label'])) {
 		$label = CM_Util::htmlspecialchars($params['label']);

@@ -1,8 +1,6 @@
 <?php
 
 function smarty_function_tag(array $params, Smarty_Internal_Template $template) {
-	/** @var CM_Render $render */
-	$render = $template->smarty->getTemplateVars('render');
 	if (!isset($params['el'])) {
 		trigger_error('Param `el` missing.');
 	}
