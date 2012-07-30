@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../TestCase.php';
 
-
 class CM_Paging_User_StreamChannelSubscriberTest extends TestCase {
 
 	public static function setUpBeforeClass() {
@@ -13,15 +12,20 @@ class CM_Paging_User_StreamChannelSubscriberTest extends TestCase {
 	}
 
 	public function testPaging() {
+		$usersExpected = array(TH::createUser(), TH::createUser(), TH::createUser());
 		$streamChannel = TH::createStreamChannel();
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
+
+		foreach ($usersExpected as $user) {
+			TH::createStreamSubscribe($user, $streamChannel);
+		}
 		TH::createStreamSubscribe(null, $streamChannel);
 		TH::createStreamSubscribe(null, $streamChannel);
 
-		$users = new CM_Paging_User_StreamChannelSubscriber($streamChannel);
-
-		$this->assertEquals(3, $users->getCount());
+		$usersActual = new CM_Paging_User_StreamChannelSubscriber($streamChannel);
+		$this->assertEquals(3, $usersActual->getCount());
+		$i = 0;
+		foreach ($usersActual as $user) {
+			$this->assertModelEquals($usersExpected[$i++], $user);
+		}
 	}
 }

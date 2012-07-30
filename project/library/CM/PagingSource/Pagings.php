@@ -2,12 +2,20 @@
 
 class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 
+	/**
+	 * @var CM_Paging_Abstract[]
+	 */
 	private $_pagings;
+
+	/**
+	 * @var bool
+	 */
 	private $_distinct;
 
 	/**
-	 * @param array CM_Paging_Abstract[]
-	 * @param boolean|null $distinct
+	 * @param  CM_Paging_Abstract[] $pagings
+	 * @param boolean|null          $distinct
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct(array $pagings, $distinct = null) {
 		foreach ($pagings as $paging) {
@@ -44,6 +52,6 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 	}
 
 	protected function _cacheKeyBase() {
-		throw new CM_Exception_Invalid('`' . __CLASS__  . '` does not support caching.');
+		throw new CM_Exception_Invalid('`' . __CLASS__ . '` does not support caching.');
 	}
 }
