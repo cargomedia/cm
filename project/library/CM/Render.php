@@ -382,7 +382,11 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getDateFormatter() {
 		if (!$this->_dateFormatter) {
-			$this->_dateFormatter = new IntlDateFormatter($this->getLanguage()->getAbbreviation(), IntlDateFormatter::FULL, IntlDateFormatter::FULL);
+			$locale = 'en';
+			if ($this->getLanguage()) {
+				$locale = $this->getLanguage()->getAbbreviation();
+			}
+			$this->_dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
 		}
 		return $this->_dateFormatter;
 	}
