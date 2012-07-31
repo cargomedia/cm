@@ -75,29 +75,17 @@ button.hasIconRight.hasLabel {
 	padding: 0 1px 0 8px;
 }
 
-input[type=radio] {
+input[type=radio], input[type=checkbox] {
 	margin: 0 1px;
 	padding: 0;
 	width: 1em;
 }
 
-input[type=checkbox] {
-	position: relative;
-	top: 2px;
-}
-
-.formField > .input > .CM_FormField_Set
-
-,
-.formField > .input > .CM_FormField_Boolean
-
-{
-label {
-	cursor: pointer;
-	position: relative;
-	top: 2px;
-}
-
+.formField > .input > .CM_FormField_Set,
+.formField > .input > .CM_FormField_Boolean{
+	label {
+		cursor: pointer;
+	}
 }
 
 .formField {
@@ -113,9 +101,7 @@ label {
 	border-width: 0;
 }
 
-.formField >
-
-label {
+.formField > label {
 	color: @colorFgLinkLight;
 	width: 95px;
 	float: left;
@@ -123,43 +109,28 @@ label {
 	font-weight: bold;
 }
 
-.formField >
-
-label:after {
+.formField > label:after {
 	content: ":";
 }
 
-.formField > .input
-
-{
-	margin-left: 100px
-;
+.formField > .input {
+	margin-left: 100px;
 }
 
 .formField.noLabel > .input {
 	margin-left: 0;
 }
 
-.formField > .input > .CM_FormField_Integer
-
-{
-	padding-top: 2px
-;
+.formField > .input > .CM_FormField_Integer {
+	padding-top: 2px;
 }
 
-.formField > .input > .CM_FormField_Date
-
-,
-.formField > .input > .CM_FormField_Set_Select
-
-{
-	padding-top: 3px
-;
+.formField > .input > .CM_FormField_Date,
+.formField > .input > .CM_FormField_Set_Select {
+	padding-top: 3px;
 }
 
-.formField >
-
-label .CM_FormField_Abstract {
+.formField > label .CM_FormField_Abstract {
 	float: left;
 	margin-right: 3px;
 }
