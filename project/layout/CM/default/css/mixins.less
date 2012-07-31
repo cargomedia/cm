@@ -198,3 +198,38 @@
 	letter-spacing: -1px;
 	font-family: Arial;
 }
+
+.inputCheckbox(@size) {
+	.icon;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	width: @size;
+	height: @size;
+	margin: 0 1px;
+	cursor: pointer;
+	position: relative;
+	.box-shadow(0 0 2px darken(@colorBgButton, 15));
+	.gradient(vertical,  @colorBgButton, darken(@colorBgButton, 12));
+	border: 1px solid lighten(@colorFgButton, 40);
+	border-radius: 2px;
+	vertical-align: middle;
+
+	&:checked {
+		border: 1px solid lighten(@colorFgButton, 30);
+		.box-shadow(0 0 3px darken(@colorBgButton, 25) inset);
+		.gradient(vertical, darken(@colorBgButton, 10), darken(@colorBgButton, 16));
+
+		&:after {
+			text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2) inset;
+			color: lighten(@colorFgButton, 10);
+			font-size: (@size * .8px);
+			position: absolute;
+			left: @size * .1px - 1px;
+			bottom: @size * .2px - 1px;
+		}
+	}
+	&:focus {
+		.input_focus;
+	}
+}

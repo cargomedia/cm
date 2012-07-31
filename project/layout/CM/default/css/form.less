@@ -82,51 +82,25 @@ input[type=radio] {
 }
 
 input[type=checkbox] {
-	.icon;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	-o-appearance: none;
-	width: @sizeCheckbox;
-	height: @sizeCheckbox;
-	margin: 0 1px;
-	cursor: pointer;
-	position: relative;
-	.bg_emphasize;
-	.box-shadow(0 0 2px darken(@colorBgButton, 15));
-	.gradient(vertical,  darken(@colorBgButton, 12), @colorBgButton);
-	border: 1px solid lighten(@colorFgButton, 40);
-	border-radius: 2px;
-	vertical-align: middle;
+	.inputCheckbox(@sizeCheckbox);
 
-	&:after {
-		color: transparent;
-		content: "&#10004;";
-		font-size: (@sizeCheckbox - 4px);
-		position: absolute;
-		top: -1px;
-		left: 1px;
-	}
-	&:checked {
-		border: 1px solid lighten(@colorFgButton, 30);
-		.box-shadow(0 0 3px darken(@colorBgButton, 25) inset);
-		.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
-
-		&:after {
-			text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2) inset;
-			color: @colorFgButton;
-		}
-	}
-	&:focus {
-		.input_focus;
+	&:checked:after {
+		content: "\2714";
 	}
 }
 
-.formField > .input > .CM_FormField_Set, .formField > .input > .CM_FormField_Boolean {
-	label {
-		cursor: pointer;
-		position: relative;
-		top: 2px;
-	}
+.formField > .input > .CM_FormField_Set
+
+,
+.formField > .input > .CM_FormField_Boolean
+
+{
+label {
+	cursor: pointer;
+	position: relative;
+	top: 2px;
+}
+
 }
 
 .formField {
@@ -142,36 +116,53 @@ input[type=checkbox] {
 	border-width: 0;
 }
 
-.formField > label {
-				 color: @colorFgLinkLight;
-				 width: 95px;
-				 float: left;
-				 padding-top: 4px;
-				 font-weight: bold;
-			 }
+.formField >
 
-.formField > label:after {
-				 content: ":";
-			 }
+label {
+	color: @colorFgLinkLight;
+	width: 95px;
+	float: left;
+	padding-top: 4px;
+	font-weight: bold;
+}
 
-.formField > .input {
-	margin-left: 100px;
+.formField >
+
+label:after {
+	content: ":";
+}
+
+.formField > .input
+
+{
+	margin-left: 100px
+;
 }
 
 .formField.noLabel > .input {
 	margin-left: 0;
 }
 
-.formField > .input > .CM_FormField_Integer {
-	padding-top: 2px;
+.formField > .input > .CM_FormField_Integer
+
+{
+	padding-top: 2px
+;
 }
 
-.formField > .input > .CM_FormField_Date,
-.formField > .input > .CM_FormField_Set_Select {
-	padding-top: 3px;
+.formField > .input > .CM_FormField_Date
+
+,
+.formField > .input > .CM_FormField_Set_Select
+
+{
+	padding-top: 3px
+;
 }
 
-.formField > label .CM_FormField_Abstract {
+.formField >
+
+label .CM_FormField_Abstract {
 	float: left;
 	margin-right: 3px;
 }
