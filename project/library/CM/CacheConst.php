@@ -4,10 +4,6 @@ class CM_CacheConst {
 	// _tag:X
 	const Tag_Version = 'Tag_Version';
 
-	// _langId:X
-	const Lang_Tree = 'Language.Tree';
-
-
 	// _level:X_id:X
 	const Location = 'Location';
 	// _ip:X
