@@ -13,7 +13,6 @@ unclosed tags: <u>not <b>closed
 EOD;
 
 	public static function setUpBeforeClass() {
-
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
 
