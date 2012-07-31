@@ -381,7 +381,7 @@ CREATE TABLE `cm_streamChannel_video` (
   `id` int(10) unsigned NOT NULL,
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
-  `wowza_ip` int(15) unsigned NOT NULL,
+  `wowzaIp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
