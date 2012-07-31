@@ -37,7 +37,7 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testFactory() {
-		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd'));
+		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'wowzaIp' => ip2long('127.0.0.1')));
 		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
 

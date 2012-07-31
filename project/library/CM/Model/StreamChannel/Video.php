@@ -36,9 +36,9 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	protected static function _create(array $data) {
 		$key = (string) $data['key'];
-		$width = (int) $data ['width'];
-		$height = (int) $data ['height'];
-		$wowzaIp = $data ['wowzaIp'];
+		$width = (int) $data['width'];
+		$height = (int) $data['height'];
+		$wowzaIp = $data['wowzaIp'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		try {
 			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp));

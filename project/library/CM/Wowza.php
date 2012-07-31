@@ -19,7 +19,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 			if (!($streamChannel && $streamChannel->getStreamPublishs()->findKey($publish['clientId']))) {
 				try {
-					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['data']);
+					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], ip2long('127.0.0.1'), $publish['data']);
 				} catch (CM_Exception $ex) {
 					$this->stop($publish['clientId']);
 				}
@@ -62,7 +62,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 */
-	public function publish($streamName, $clientKey, $start, $width, $height, $data) {
+	public function publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
@@ -75,7 +75,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params,
-			'width' => $width, 'height' => $height));
+			'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
@@ -194,7 +194,8 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
-		self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $data);
+		$wowzaIp = CM_Request_Abstract::getInstance()->getIp();
+		self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data);
 		return true;
 	}
 
