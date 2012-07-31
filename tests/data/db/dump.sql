@@ -55,55 +55,6 @@ CREATE TABLE `cm_ipBlocked` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_lang`;
-
-
-CREATE TABLE `cm_lang` (
-  `lang_id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `abbrev` varchar(5) NOT NULL DEFAULT '',
-  `label` varchar(30) NOT NULL DEFAULT '',
-  `enabled` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`lang_id`),
-  UNIQUE KEY `abbrev` (`abbrev`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_langKey`;
-
-
-CREATE TABLE `cm_langKey` (
-  `lang_key_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `lang_section_id` int(10) unsigned NOT NULL,
-  `key` varchar(60) NOT NULL DEFAULT '',
-  PRIMARY KEY (`lang_key_id`),
-  KEY `lang_section_id` (`lang_section_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_langSection`;
-
-
-CREATE TABLE `cm_langSection` (
-  `lang_section_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_section_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `section` varchar(60) NOT NULL DEFAULT '',
-  `description` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`lang_section_id`),
-  UNIQUE KEY `section` (`parent_section_id`,`section`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_langValue`;
-
-
-CREATE TABLE `cm_langValue` (
-  `lang_key_id` int(10) unsigned NOT NULL,
-  `lang_id` tinyint(3) unsigned NOT NULL,
-  `value` text NOT NULL,
-  UNIQUE KEY `lang_key_id` (`lang_key_id`,`lang_id`),
-  KEY `lang_id` (`lang_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_language`;
-
-
 CREATE TABLE `cm_language` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
