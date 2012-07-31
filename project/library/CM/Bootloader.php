@@ -104,11 +104,6 @@ class CM_Bootloader {
 		define('TBL_CM_LOG', 'cm_log');
 		define('TBL_CM_IPBLOCKED', 'cm_ipBlocked');
 
-		define('TBL_CM_LANG', 'cm_lang');
-		define('TBL_CM_LANG_KEY', 'cm_langKey');
-		define('TBL_CM_LANG_SECTION', 'cm_langSection');
-		define('TBL_CM_LANG_VALUE', 'cm_langValue');
-
 		define('TBL_CM_LANGUAGE', 'cm_language');
 		define('TBL_CM_LANGUAGEKEY', 'cm_languageKey');
 		define('TBL_CM_LANGUAGEKEY_VARIABLE', 'cm_languageKey_variable');
