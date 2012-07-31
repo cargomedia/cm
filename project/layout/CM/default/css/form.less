@@ -82,11 +82,8 @@ input[type=radio] {
 }
 
 input[type=checkbox] {
-	.inputCheckbox(@sizeCheckbox);
-
-	&:checked:after {
-		content: "\2714";
-	}
+	position: relative;
+	top: 2px;
 }
 
 .formField > .input > .CM_FormField_Set
