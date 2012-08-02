@@ -43,7 +43,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		if (is_null($this->_get('userId'))) {
 			return null;
 		}
-		return CM_Model_User::factory($this->_get('userId'));
+		return parent::getUser();
 	}
 
 	protected static function _create(array $data) {

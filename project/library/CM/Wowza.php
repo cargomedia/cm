@@ -70,6 +70,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param int    $height
 	 * @param string $wowzaIp
 	 * @param string $data
+	 * @return int
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 */
@@ -95,6 +96,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			}
 			CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
 				'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+			return $streamChannel->getId();
 		} catch (CM_Exception $ex) {
 			$streamChannel->delete();
 			throw $ex;
@@ -208,8 +210,8 @@ class CM_Wowza extends CM_Class_Abstract {
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
 		$wowzaIp = CM_Request_Abstract::getInstance()->getIp();
-		self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data);
-		return true;
+		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data);
+		return $channelId;
 	}
 
 	/**
