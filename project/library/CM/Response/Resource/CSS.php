@@ -37,7 +37,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
 					$viewClasses = array_merge($viewClasses, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/' . $viewType . '/'));
 				}
-				foreach ($this->_getClasses($viewClasses) as $viewClass) {
+				foreach (CM_Util::getClasses($viewClasses) as $viewClass) {
 					if (!preg_match('#^(\w+)_' . $viewType . '_(.+)$#', $viewClass['classNames'][0], $matches)) {
 						throw new CM_Exception("Cannot detect namespace from component's class-name");
 					}
