@@ -15,10 +15,10 @@ class CM_File_Javascript extends CM_File {
 		$content[] = self::_getDocBlock(array('class' => $className, 'extends' => $parentClass));
 		$content[] = 'var ' . $className . ' = ' . $parentClass . '.extend({';
 		$content[] = '';
-		$content[] = self::_getDoc('@type string', 1);
+		$content[] = self::_getDoc('@type String', 1);
 		$content[] = "\t_class: '" . $className . "'";
 		$content[] = '});';
-		$path = DIR_ROOT . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
+		$path = DIR_LIBRARY . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
 		return CM_File_Javascript::create($path, implode(PHP_EOL, $content));
 	}
 
