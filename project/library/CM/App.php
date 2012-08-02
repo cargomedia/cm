@@ -145,46 +145,45 @@ class CM_App {
 	}
 
 	/**
-	 * @param string $typeNamespace
+	 * @param string $className
 	 * @throws CM_Exception_Invalid
 	 * @return string[]
 	 */
-	public function getClassTypes($typeNamespace) {
-		$verifiedClasses = array();
-		foreach (CM_Util::getClassChildren($typeNamespace) as $className) {
+	public function getClassTypes($className) {
+		$classTypes = array();
+		foreach (CM_Util::getClassChildren($className) as $className) {
 			$reflectionClass = new ReflectionClass($className);
 			if ($reflectionClass->hasConstant('TYPE')) {
 				$type = $className::TYPE;
-				if (in_array($type, $verifiedClasses)) {
-					throw new CM_Exception_Invalid('Duplicate `TYPE` constant for `' . $className . '` and `' . $verifiedClasses[$type] . '`. Both equal `' . $type . '` (within `' . $typeNamespace . '` type namespace).');
+				if (in_array($type, $classTypes)) {
+					throw new CM_Exception_Invalid('Duplicate `TYPE` constant for `' . $className . '` and `' . $classTypes[$type] . '`. Both equal `' . $type . '` (within `' . $className . '` type namespace).');
 				}
-				$verifiedClasses[$className] = $type;
+				$classTypes[$className] = $type;
 			} elseif (!$reflectionClass->isAbstract()) {
 				throw new CM_Exception_Invalid('`' . $className . '` does not have `TYPE` constant defined');
 			}
 		}
-		return $verifiedClasses;
+		return $classTypes;
 	}
 
 	/**
-	 * @param string $typeNamespace
+	 * @param string $namespace
 	 * @return string[]
 	 */
-	private function _generateClassTypesConfig($typeNamespace) {
-		$verifiedClasses = $this->getClassTypes($typeNamespace);
+	private function _generateClassTypesConfig($namespace) {
 		$declarations = array();
 		$highestTypeUsed = 0;
-		foreach ($verifiedClasses as $className => $type) {
-			$declarations[$type] = '$config->' . $typeNamespace . '->types[' . $className . '::TYPE] = \'' . $className . '\'; // #' . $type;
+		foreach ($this->getClassTypes($namespace) as $className => $type) {
+			$declarations[$type] = '$config->' . $namespace . '->types[' . $className . '::TYPE] = \'' . $className . '\'; // #' . $type;
 			$highestTypeUsed = max($highestTypeUsed, $type);
 		}
 
 		$lines = array();
 		$lines[] = '';
-		$lines[] = 'if (!isset($config->' . $typeNamespace . ')) {';
-		$lines[] = "\t" . '$config->' . $typeNamespace . ' = new StdClass();';
+		$lines[] = 'if (!isset($config->' . $namespace . ')) {';
+		$lines[] = "\t" . '$config->' . $namespace . ' = new StdClass();';
 		$lines[] = '}';
-		$lines[] = '$config->' . $typeNamespace . '->types = array();';
+		$lines[] = '$config->' . $namespace . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
 		$lines[] = '';
