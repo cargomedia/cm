@@ -26,7 +26,10 @@ function smarty_helper_resource_internal(CM_Render $render) {
 
 	// Get all static javascript files
 	foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
-		$paths[] = '/static/js/' . $namespace . '.js';
+		$publicPath = 'static/js/' . $namespace . '.js';
+		if (file_exists(DIR_PUBLIC . $publicPath)) {
+			$paths[] = '/' . $publicPath;
+		}
 	}
 
 	// Sorts all classes according to inheritance order, pairs them with path
