@@ -37,7 +37,7 @@ time={$now}<br />
 	{formField name='boolean' text="{translate 'Bool'}"}
 	{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
 	{formField name='setSelect2' label="{translate 'Set Select'}"}
-	{formAction action='go' label="{translate 'Go'}"}
+	{formAction class="alt" action='go' label="{translate 'Go'}"}
 {/form}
 
 <div class="stream">
