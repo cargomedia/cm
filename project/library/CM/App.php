@@ -78,14 +78,14 @@ class CM_App {
 	}
 
 
-	public function generateActionVerbsConfig() {
+	public function generateConfigActionVerbs() {
 		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
 		$content .= '	$config->CM_Action_Abstract = new StdClass();' . PHP_EOL;
 		$content .= '}' . PHP_EOL;
 		$content .= '$config->CM_Action_Abstract->verbs = array();';
-		foreach ($this->getActionVerbs() as $constant => $declaration) {
+		foreach ($this->getActionVerbs() as $actionVerb) {
 			$content .= PHP_EOL;
-			$content .= '$config->CM_Action_Abstract->verbs[' . $declaration . '] = \'' . CM_Util::camelize($constant) . '\';';
+			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' . CM_Util::camelize($actionVerb['name']) . '\';';
 		}
 		return $content;
 	}
@@ -93,30 +93,33 @@ class CM_App {
 	/**
 	 *
 	 * @throws CM_Exception_Invalid
-	 * @return string[]
+	 * @return array
 	 */
 	public function getActionVerbs() {
 		$actionVerbs = array();
-		$actionDeclarations = array();
-		$classNames = CM_Util::getClassChildren('CM_Action_Abstract');
-		foreach ($classNames as $className) {
+		$actionVerbsValues = array();
+		foreach (CM_Util::getClassChildren('CM_Action_Abstract') as $className) {
 			$class = new ReflectionClass($className);
 			$constants = $class->getConstants();
 			unset($constants['TYPE']);
 			foreach ($constants as $constant => $value) {
-				if (array_key_exists($constant, $actionVerbs) && $actionVerbs[$constant] !== $value) {
-					throw new CM_Exception_Invalid('Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' . $actionVerbs[$constant] . '`.');
+				if (array_key_exists($constant, $actionVerbsValues) && $actionVerbsValues[$constant] !== $value) {
+					throw new CM_Exception_Invalid('Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' . $actionVerbsValues[$constant] . '`.');
 				}
-				if (!array_key_exists($constant, $actionVerbs) && in_array($value, $actionVerbs)) {
-					throw new CM_Exception_Invalid('Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className . '::' . array_search($value, $actionVerbs) . '`.');
+				if (!array_key_exists($constant, $actionVerbsValues) && in_array($value, $actionVerbsValues)) {
+					throw new CM_Exception_Invalid('Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className . '::' . array_search($value, $actionVerbsValues) . '`.');
 				}
-				if (!array_key_exists($constant, $actionVerbs)) {
-					$actionVerbs[$constant] = $value;
-					$actionDeclarations[$constant] = $className . '::' . $constant;
+				if (!array_key_exists($constant, $actionVerbsValues)) {
+					$actionVerbsValues[$constant] = $value;
+					$actionVerbs[] = array(
+						'name' => $constant,
+						'value' => $value,
+						'className' => $className,
+					);
 				}
 			}
 		}
-		return $actionDeclarations;
+		return $actionVerbs;
 	}
 
 	/**

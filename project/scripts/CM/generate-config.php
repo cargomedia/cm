@@ -16,16 +16,16 @@ try {
 EOS;
 	$path = DIR_ROOT . 'config/internal.php';
 	$classTypesConfig  = CM_App::getInstance()->generateClassTypesConfig();
-	$actionVerbsConfig = CM_App::getInstance()->generateActionVerbsConfig();
+	$actionVerbsConfig = CM_App::getInstance()->generateConfigActionVerbs();
 	CM_File::create($path, $fileHeader . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig);
 	echo 'create  ' . $path . PHP_EOL;
 
 	// Create model class types and action verbs config JS
 	$path = DIR_ROOT . 'config/js/internal.js';
 	$modelTypesConfig = 'cm.model.types = ' . CM_Params::encode(CM_App::getInstance()->getClassTypes('CM_Model_Abstract'), true) . ';';
-	$actionVerbs = CM_App::getInstance()->getActionVerbs();
-	foreach ($actionVerbs as $name => $declaration) {
-		$actionVerbs[$name] = eval('return ' . $declaration . ';');
+	$actionVerbs = array();
+	foreach (CM_App::getInstance()->getActionVerbs() as $verb) {
+		$actionVerbs[$verb['name']] = $verb['value'];
 	}
 	$actionVerbsConfig = 'cm.action.verbs = ' . CM_Params::encode($actionVerbs, true) . ';';
 	CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionVerbsConfig);
