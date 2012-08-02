@@ -91,6 +91,28 @@ class CM_App {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function generateConfigClassTypes() {
+		$content = '';
+		$typeNamespaces = array(
+			'CM_Site_Abstract',
+			'CM_Action_Abstract',
+			'CM_Model_Abstract',
+			'CM_Model_ActionLimit_Abstract',
+			'CM_Model_Entity_Abstract',
+			'CM_Model_StreamChannel_Abstract',
+			'CM_Mail',
+			'CM_Paging_Log_Abstract',
+			'CM_Paging_ContentList_Abstract',
+		);
+		foreach ($typeNamespaces as $typeNamespace) {
+			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typeNamespace));
+		}
+		return $content;
+	}
+
+	/**
 	 *
 	 * @throws CM_Exception_Invalid
 	 * @return array
@@ -120,28 +142,6 @@ class CM_App {
 			}
 		}
 		return $actionVerbs;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function generateClassTypesConfig() {
-		$content = '';
-		$typeNamespaces = array(
-			'CM_Site_Abstract',
-			'CM_Action_Abstract',
-			'CM_Model_Abstract',
-			'CM_Model_ActionLimit_Abstract',
-			'CM_Model_Entity_Abstract',
-			'CM_Model_StreamChannel_Abstract',
-			'CM_Mail',
-			'CM_Paging_Log_Abstract',
-			'CM_Paging_ContentList_Abstract',
-		);
-		foreach ($typeNamespaces as $typeNamespace) {
-			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typeNamespace));
-		}
-		return $content;
 	}
 
 	/**
