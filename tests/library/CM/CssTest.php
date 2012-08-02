@@ -19,6 +19,7 @@ class CM_CssTest extends TestCase {
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
+		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testToString() {

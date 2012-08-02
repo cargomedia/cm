@@ -13,6 +13,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
+		$this->assertSame('127.0.0.1', $channel->getWowzaIp());
 		$this->assertSame('foo', $channel->getKey());
 	}
 }

@@ -31,8 +31,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testGetKey() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'foo', 'type' => 1));
-		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo'));
 		$this->assertEquals('foo', $streamChannel->getKey());
 	}
 
@@ -55,9 +55,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testDelete() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar', 'type' => 1));
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar'));
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_1',));
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
@@ -82,9 +81,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testGetSubscribers() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar', 'type' => 1));
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar'));
 		$this->assertEquals(0, $streamChannel->getSubscribers()->getCount());
 		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
@@ -99,9 +97,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testGetPublishers() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar1', 'type' => 1));
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar1'));
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
 		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
@@ -116,9 +113,8 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	}
 
 	public function testGetUsers() {
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => 'bar2', 'type' => 1));
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = new CM_Model_StreamChannel_Mock($id);
+		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar2'));
 		$this->assertEquals(0, $streamChannel->getUsers()->getCount());
 		$user = TH::createUser();
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
@@ -136,5 +132,42 @@ class CM_Model_StreamChannel_AbstractTest extends TestCase {
 	public function testCreate() {
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1'));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+	}
+}
+
+class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
+
+	const TYPE = 1;
+
+	public function canPublish(CM_Model_User $user, $allowedUntil) {
+		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
+	}
+
+	public function canSubscribe(CM_Model_User $user, $allowedUntil) {
+		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
+	}
+
+	/**
+	 * @param CM_Model_Stream_Publish $streamPublish
+	 */
+	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
+	}
+
+	/**
+	 * @param CM_Model_Stream_Subscribe $streamSubscribe
+	 */
+	public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
+	}
+
+	/**
+	 * @param CM_Model_Stream_Publish $streamPublish
+	 */
+	public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
+	}
+
+	/**
+	 * @param CM_Model_Stream_Subscribe $streamSubscribe
+	 */
+	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
 	}
 }

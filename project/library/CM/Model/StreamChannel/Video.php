@@ -30,6 +30,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return (int) $this->_get('height');
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getWowzaIp() {
+		return (string) long2ip($this->_get('wowzaIp'));
+	}
+
 	protected function _loadData() {
 		return CM_Mysql::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`) WHERE `id` = ?", $this->getId())->fetchAssoc();
 	}

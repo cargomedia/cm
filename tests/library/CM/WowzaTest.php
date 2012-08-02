@@ -3,11 +3,18 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_WowzaTest extends TestCase {
 
+	private static $_configBackup;
+
 	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
+		CM_Config::get()->CM_Wowza->servers = array(
+			array('host' => 'localhost', 'hostPrivate' => '127.0.0.1'),
+		);
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
+		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testSynchronize() {
@@ -71,15 +78,15 @@ class CM_WowzaTest extends TestCase {
 		TH::clearEnv();
 		$configBackup = CM_Config::get();
 		$mockType = 100;
-		CM_Config::get()->CM_Model_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Mock';
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Mock';
+		CM_Config::get()->CM_Model_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Video_Mock';
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Video_Mock';
 		CM_Config::get()->CM_Wowza->streamChannelTypes[] = $mockType;
 		$wowza = $wowza = $this->getMock('CM_Wowza', array('stop'));
 		$wowza->expects($this->exactly(2))->method('stop')->will($this->returnValue(1));
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
+		/** @var CM_Model_StreamChannel_Video_Mock $streamChannel */
 		// allowedUntil will be updated, if stream has expired and it's user isn't $userUnchanged
 		$userUnchanged = TH::createUser();
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo1'));
+		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'wowzaIp' => '127.0.0.1'));
 		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
 			'allowedUntil' => 0));
 		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_4',
@@ -88,7 +95,7 @@ class CM_WowzaTest extends TestCase {
 			'allowedUntil' => 0));
 		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
-		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Mock::create(array('key' => 'foo2')),
+		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2', 'wowzaIp' => ip2long('127.0.0.1'))),
 			'user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
 		$wowza->checkStreams();
 		$this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil(), $streamSubscribeUnchanged1->_change()->getAllowedUntil());
@@ -124,7 +131,7 @@ class CM_WowzaTest extends TestCase {
 	}
 }
 
-class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
+class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
 
 	const TYPE = 100;
 
@@ -137,31 +144,9 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_Stream_Publish $streamPublish
+	 * @return string
 	 */
-	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
-		// TODO: Implement onPublish() method.
+	public function getWowzaIp() {
+		return (string) long2ip($this->_get('wowzaIp'));
 	}
-
-	/**
-	 * @param CM_Model_Stream_Subscribe $streamSubscribe
-	 */
-	public function onSubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-		// TODO: Implement onSubscribe() method.
-	}
-
-	/**
-	 * @param CM_Model_Stream_Publish $streamPublish
-	 */
-	public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
-		// TODO: Implement onUnpublish() method.
-	}
-
-	/**
-	 * @param CM_Model_Stream_Subscribe $streamSubscribe
-	 */
-	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
-		// TODO: Implement onUnsubscribe() method.
-	}
-
 }
