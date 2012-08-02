@@ -79,7 +79,7 @@ class CM_App {
 
 
 	public function generateActionVerbsConfig() {
-		$content = '$config->CM_Action_Abstract = array();';
+		$content = '$config->ActionVerbs = array();';
 		foreach ($this->getActionVerbs(true) as $constant => $declaration) {
 			$content .= PHP_EOL;
 			$content .= '$config->ActionVerbs[' . $declaration . '] = \'' . CM_Util::camelize($constant) . '\';';

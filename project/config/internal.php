@@ -76,4 +76,4 @@ $config->CM_Paging_ContentList_Abstract->types[CM_Paging_ContentList_Badwords::T
 // Highest type used: #
 
 
-$config->CM_Action_Abstract = array();
+$config->ActionVerbs = array();
