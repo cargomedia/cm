@@ -158,7 +158,7 @@ class CM_File {
 		if (false === file_put_contents($path, $content)) {
 			throw new CM_Exception('Cannot write to `' . $path . '`.');
 		}
-		$file = new self($path);
+		$file = new static($path);
 		return $file;
 	}
 }

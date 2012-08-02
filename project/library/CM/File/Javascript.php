@@ -1,59 +1,25 @@
 <?php
 
-class CM_File_JS extends CM_File {
+class CM_File_Javascript extends CM_File {
 
 	/**
 	 * @param $className
-	 * @return CM_File_JS
+	 * @return CM_File_Javascript
 	 */
 	public static function createLibraryClass($className) {
-		$path = DIR_ROOT . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
-		touch($path);
-		$file = new self($path);
-		$file->wrapWithClassDeclaration($className);
-		$file->validate();
-		return $file;
-	}
-
-	/**
-	 * @param $className
-	 * @return string
-	 */
-	public function hasClassDeclaration($className) {
-		return strstr($this->read(), '@class ' . $className);
-	}
-
-	/**
-	 * @param string $className
-	 */
-	public function wrapWithClassDeclaration($className) {
 		$parentClass = get_parent_class($className);
 		if (!$parentClass || $parentClass === 'CM_Class_Abstract') {
 			$parentClass = 'Backbone.View';
 		}
-
-		// Wrapper start
 		$content = array();
-		$content[] = $this->_createDocBlock(array('class' => $className, 'extends' => $parentClass));
+		$content[] = self::_getDocBlock(array('class' => $className, 'extends' => $parentClass));
 		$content[] = 'var ' . $className . ' = ' . $parentClass . '.extend({';
 		$content[] = '';
-		$content[] = $this->_createDoc('@type string', 1);
-		$content[] = "\t_class: '" . $className . "',";
-
-		// Getting and formatting content
-		if ($fileContent = trim($this->read())) {
-			$lines = preg_split('#[\n\r]#', $fileContent);
-			$lines = array_map(function ($input) {
-				return "\t" . $input;
-			}, $lines);
-			array_unshift($lines, '');
-			$content = array_merge($content, $lines);
-		}
-		$content[] = trim(array_pop($content), ',');
-
-		// Wrapper end
+		$content[] = self::_getDoc('@type string', 1);
+		$content[] = "\t_class: '" . $className . "'";
 		$content[] = '});';
-		$this->write(implode(PHP_EOL, $content));
+		$path = DIR_ROOT . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
+		return CM_File_Javascript::create($path, implode(PHP_EOL, $content));
 	}
 
 	/**
@@ -61,7 +27,7 @@ class CM_File_JS extends CM_File {
 	 * @param int|null     $indentation
 	 * @return string
 	 */
-	private function _createDocBlock($docLines, $indentation = null) {
+	private function _getDocBlock($docLines, $indentation = null) {
 		$docLines = (array) $docLines;
 		$indentation = (int) $indentation;
 		$docBlock = '/**' . PHP_EOL;
@@ -83,7 +49,7 @@ class CM_File_JS extends CM_File {
 	 * @param int|null $indentation
 	 * @return string
 	 */
-	private function _createDoc($doc, $indentation = null) {
+	private function _getDoc($doc, $indentation = null) {
 		$indentation = str_repeat("\t", (int) $indentation);
 		return $indentation . '/** ' . $doc . ' */';
 	}
