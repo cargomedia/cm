@@ -22,7 +22,7 @@ EOS;
 
 	// Create model class types and action verbs config JS
 	$path = DIR_ROOT . 'config/js/internal.js';
-	$modelTypesConfig = 'cm.mode.types = ' . CM_Params::encode(CM_App::getInstance()->getClassTypes('CM_Model_Abstract'), true) . ';';
+	$modelTypesConfig = 'cm.model.types = ' . CM_Params::encode(CM_App::getInstance()->getClassTypes('CM_Model_Abstract'), true) . ';';
 	$actionVerbs = CM_App::getInstance()->getActionVerbs();
 	foreach ($actionVerbs as $name => $declaration) {
 		$actionVerbs[$name] = eval('return ' . $declaration . ';');
