@@ -3,8 +3,6 @@
  * @extends CM_FormField_SuggestOne
  */
 var CM_FormField_Location = CM_FormField_SuggestOne.extend({
-
-	/** @type String */
 	_class: 'CM_FormField_Location',
 
 	getDistanceField: function() {

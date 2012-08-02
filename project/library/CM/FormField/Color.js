@@ -3,8 +3,6 @@
  * @extends CM_FormField_Abstract
  */
 var CM_FormField_Color = CM_FormField_Abstract.extend({
-
-	/** @type String */
 	_class: 'CM_FormField_Color',
 
 	ready: function() {

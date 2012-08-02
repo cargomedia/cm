@@ -3,8 +3,6 @@
  * @extends CM_View_Abstract
  */
 var CM_FormField_Abstract = CM_View_Abstract.extend({
-
-	/** @type String */
 	_class: 'CM_FormField_Abstract',
 
 	ready: function() {

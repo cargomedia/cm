@@ -3,8 +3,6 @@
  * @extends Backbone.View
  */
 var CM_View_Abstract = Backbone.View.extend({
-
-	/** @type String */
 	_class: 'CM_View_Abstract',
 
 	_children: [],
