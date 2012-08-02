@@ -53,26 +53,4 @@ class CM_File_Javascript extends CM_File {
 		$indentation = str_repeat("\t", (int) $indentation);
 		return $indentation . '/** ' . $doc . ' */';
 	}
-
-	public function validate() {
-		$content = $this->read();
-		$content = preg_replace('#(@param\s+)([^}{\s]+)(\s)#', '$1{$2}$3', $content);
-
-		$typeReplaces = array(
-			'string' => 'String',
-			'null' => 'Null',
-			'array' => 'Array',
-			'bool' => 'Boolean',
-			'boolean' => 'Boolean',
-			'object' => 'Object',
-			'function' => 'Function',
-		);
-		foreach ($typeReplaces as $existingType => $properType) {
-			$content = preg_replace('#(@param\s+\{(?:[^}]+|)?)' . $existingType . '((?:|[^}]+)?\})#', '$1' . $properType . '$2', $content);
-			$content = preg_replace('#(@type\s+)' . $existingType . '(\s+)#', '$1' . $properType . '$2', $content);
-			$content = preg_replace('#(@return\s+)' . $existingType . '(\s+)#', '$1' . $properType . '$2', $content);
-		}
-
-		$this->write($content);
-	}
 }
