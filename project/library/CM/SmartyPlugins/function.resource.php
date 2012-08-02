@@ -9,7 +9,6 @@ function smarty_function_resource(array $params, Smarty_Internal_Template $templ
 		return '<link rel="stylesheet" type="text/css" href="' . $url . '" />';
 	} elseif (substr($params['file'], -2, 2) == 'js') {
 		if ($params['file'] === 'internal.js' && IS_DEBUG) {
-			require_once __DIR__ . '/function.resource_internal.php';
 			return smarty_helper_resource_internal($render);
 		}
 		$url = $render->getUrlResource('js', $params['file']);
