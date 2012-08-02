@@ -222,6 +222,6 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function camelize($string) {
-		return preg_replace('/[-_\s]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
+		return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
 }

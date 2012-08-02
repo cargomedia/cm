@@ -76,7 +76,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 
 		// Rewrites code-of-honor to CodeOfHonor
 		foreach ($pathTokens as &$pathToken) {
-			$pathToken = preg_replace('/-([a-z])/e', 'strtoupper("$1")', ucfirst($pathToken));
+			$pathToken = CM_Util::camelize($pathToken);
 		}
 
 		$className = $site->getNamespace() . '_Page_' . implode('_', $pathTokens);
