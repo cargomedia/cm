@@ -9,7 +9,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public function fetchStatus($wowzaIp) {
-		return CM_Util::getContents('http://' . $wowzaIp. ':' . self::_getConfig()->httpPort . '/status');
+		return CM_Util::getContents('http://' . long2ip($wowzaIp) . ':' . self::_getConfig()->httpPort . '/status');
 	}
 
 	public function synchronize() {
@@ -17,7 +17,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		foreach (self::_getConfig()->servers as $wowzaServer) {
 			$singleStatus = CM_Params::decode($this->fetchStatus($wowzaServer['privateIp']), true);
 			foreach ($singleStatus as $key => $publish) {
-				$publish['wowzaIp'] = ip2long($wowzaServer['privateIp']);
+				$publish['wowzaIp'] = $wowzaServer['privateIp'];
 				$status[$key] = $publish;
 			}
 		}
@@ -79,6 +79,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$start = (int) $start;
 		$width = (int) $width;
 		$height = (int) $height;
+		$wowzaIp = (string) $wowzaIp;
 		$data = (string) $data;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$streamChannelType = $params->getInt('streamChannelType');
