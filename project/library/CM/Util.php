@@ -84,8 +84,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $params
+	 * @param string       $url
+	 * @param array|null   $params
 	 * @param boolean|null $methodPost
 	 * @return string
 	 * @throws CM_Exception_Invalid
@@ -173,5 +173,13 @@ class CM_Util {
 	 */
 	public static function htmlspecialchars($string, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {
 		return htmlspecialchars($string, $quote_style, $charset);
+	}
+
+	/**
+	 * @param string $string
+	 * @return string
+	 */
+	public static function camelize($string) {
+		return preg_replace('/[-_\s]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
 }

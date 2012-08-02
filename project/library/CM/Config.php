@@ -43,6 +43,6 @@ class CM_Config {
 			self::load('test.php');
 		}
 		self::load('local.php');
-		self::load('class-types.php');
+		self::load('internal.php');
 	}
 }
