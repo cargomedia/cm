@@ -167,23 +167,23 @@ class CM_App {
 	}
 
 	/**
-	 * @param string $namespace
+	 * @param string $className
 	 * @return string[]
 	 */
-	private function _generateClassTypesConfig($namespace) {
+	private function _generateClassTypesConfig($className) {
 		$declarations = array();
 		$highestTypeUsed = 0;
-		foreach ($this->getClassTypes($namespace) as $className => $type) {
-			$declarations[$type] = '$config->' . $namespace . '->types[' . $className . '::TYPE] = \'' . $className . '\'; // #' . $type;
+		foreach ($this->getClassTypes($className) as $childClassName => $type) {
+			$declarations[$type] = '$config->' . $className . '->types[' . $childClassName . '::TYPE] = \'' . $childClassName . '\'; // #' . $type;
 			$highestTypeUsed = max($highestTypeUsed, $type);
 		}
 
 		$lines = array();
 		$lines[] = '';
-		$lines[] = 'if (!isset($config->' . $namespace . ')) {';
-		$lines[] = "\t" . '$config->' . $namespace . ' = new StdClass();';
+		$lines[] = 'if (!isset($config->' . $className . ')) {';
+		$lines[] = "\t" . '$config->' . $className . ' = new StdClass();';
 		$lines[] = '}';
-		$lines[] = '$config->' . $namespace . '->types = array();';
+		$lines[] = '$config->' . $className . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
 		$lines[] = '';
