@@ -4,7 +4,6 @@ textarea.textinput {
 
 button, input[type=submit], input[type=button] {
 	.input_button;
-	.box-sizing(border-box);
 }
 
 button:disabled, input:disabled {
@@ -59,7 +58,6 @@ button.large span.label {
 }
 
 button .icon {
-	margin: 1px 3px;
 	top: -1px;
 	font-size: @iconSizeClickable;
 }
@@ -70,6 +68,10 @@ button.hasIcon {
 
 button.hasIcon.hasLabel {
 	padding: 0 8px 0 1px;
+
+	.icon {
+		margin: 1px 3px;
+	}
 }
 
 button.hasIconRight.hasLabel {
