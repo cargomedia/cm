@@ -5,10 +5,11 @@ class CM_Wowza extends CM_Class_Abstract {
 	private static $_instance = null;
 
 	/**
+	 * @param string $wowzaIp
 	 * @return string
 	 */
 	public function fetchStatus($wowzaIp) {
-			return CM_Util::getContents('http://' . $wowzaIp. ':' . self::_getConfig()->httpPort . '/status');
+		return CM_Util::getContents('http://' . $wowzaIp. ':' . self::_getConfig()->httpPort . '/status');
 	}
 
 	public function synchronize() {
@@ -67,6 +68,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param int    $start
 	 * @param int    $width
 	 * @param int    $height
+	 * @param string $wowzaIp
 	 * @param string $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
@@ -112,9 +114,10 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	/**
 	 * @param string $clientKey
+	 * @param string $wowzaIp
 	 */
 	public function stop($clientKey, $wowzaIp) {
-		CM_Util::getContents('http://' . $wowzaIp . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
+		CM_Util::getContents('http://' . long2ip($wowzaIp) . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
 	}
 
 	/**
@@ -122,7 +125,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $clientKey
 	 * @param int    $start
 	 * @param string $data
-	 * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
+	 * @throws CM_Exception_NotAllowed
 	 */
 	public function subscribe($streamName, $clientKey, $start, $data) {
 		$streamName = (string) $streamName;

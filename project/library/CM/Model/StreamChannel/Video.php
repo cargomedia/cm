@@ -34,7 +34,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 * @return string
 	 */
 	public function getWowzaIp() {
-		return (string) long2ip($this->_get('wowzaIp'));
+		return (string) $this->_get('wowzaIp');
 	}
 
 	protected function _loadData() {
