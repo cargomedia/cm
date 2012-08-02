@@ -11,7 +11,7 @@ function smarty_function_resource_internal(array $params, Smarty_Internal_Templa
 	}
 
 	// Sorts all classes according to inheritance order, pairs them with path
-	$phpClasses = CM_View_Abstract::getClasses($render->getSite()->getNamespaces());
+	$phpClasses = CM_View_Abstract::getClasses($render->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
 	foreach ($phpClasses as $class) {
 		$path = str_replace(DIRECTORY_SEPARATOR, '/', $class['path']);
 		$publicPath = preg_replace('#.*library#', '/library', $path);

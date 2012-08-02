@@ -224,4 +224,18 @@ class CM_Util {
 	public static function camelize($string) {
 		return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
+
+	public static function getNamespaces() {
+		$namespaces = array();
+		$sites = CM_Util::getClassChildren('CM_Site_Abstract');
+		foreach ($sites as $siteClassName) {
+			$siteClass = new ReflectionClass($siteClassName);
+			if (!$siteClass->isAbstract()) {
+				/** @var $site CM_Site_Abstract */
+				$site = new $siteClassName();
+				$namespaces = array_merge($namespaces, $site->getNamespaces());
+			}
+		}
+		return array_unique($namespaces);
+	}
 }
