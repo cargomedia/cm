@@ -79,21 +79,23 @@ class CM_App {
 
 
 	public function generateActionVerbsConfig() {
-		$content = '$config->ActionVerbs = array();';
-		foreach ($this->getActionVerbs(true) as $constant => $declaration) {
+		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
+		$content .= '	$config->CM_Action_Abstract = new StdClass();' . PHP_EOL;
+		$content .= '}' . PHP_EOL;
+		$content .= '$config->CM_Action_Abstract->verbs = array();';
+		foreach ($this->getActionVerbs() as $constant => $declaration) {
 			$content .= PHP_EOL;
-			$content .= '$config->ActionVerbs[' . $declaration . '] = \'' . CM_Util::camelize($constant) . '\';';
+			$content .= '$config->CM_Action_Abstract->verbs[' . $declaration . '] = \'' . CM_Util::camelize($constant) . '\';';
 		}
 		return $content;
 	}
 
 	/**
 	 *
-	 * @param bool|null $returnDeclarations
 	 * @throws CM_Exception_Invalid
-	 * @return int[]
+	 * @return string[]
 	 */
-	public function getActionVerbs($returnDeclarations = null) {
+	public function getActionVerbs() {
 		$actionVerbs = array();
 		$actionDeclarations = array();
 		$classNames = CM_Util::getClassChildren('CM_Action_Abstract');
@@ -114,11 +116,7 @@ class CM_App {
 				}
 			}
 		}
-		if ($returnDeclarations) {
-			return $actionDeclarations;
-		} else {
-			return $actionVerbs;
-		}
+		return $actionDeclarations;
 	}
 
 	/**
@@ -150,7 +148,6 @@ class CM_App {
 	 */
 	public function getClassTypes($typeNamespace) {
 		$verifiedClasses = array();
-		$highestTypeUsed = 0;
 		foreach (CM_Util::getClassChildren($typeNamespace) as $className) {
 			$reflectionClass = new ReflectionClass($className);
 			if ($reflectionClass->hasConstant('TYPE')) {
@@ -159,7 +156,6 @@ class CM_App {
 					throw new CM_Exception_Invalid('Duplicate `TYPE` constant for `' . $className . '` and `' . $verifiedClasses[$type] . '`. Both equal `' . $type . '` (within `' . $typeNamespace . '` type namespace).');
 				}
 				$verifiedClasses[$className] = $type;
-				$highestTypeUsed = max($highestTypeUsed, $type);
 			} elseif (!$reflectionClass->isAbstract()) {
 				throw new CM_Exception_Invalid('`' . $className . '` does not have `TYPE` constant defined');
 			}
@@ -174,8 +170,10 @@ class CM_App {
 	private function _generateClassTypesConfig($typeNamespace) {
 		$verifiedClasses = $this->getClassTypes($typeNamespace);
 		$declarations = array();
+		$highestTypeUsed = 0;
 		foreach ($verifiedClasses as $className => $type) {
 			$declarations[$type] = '$config->' . $typeNamespace . '->types[' . $className . '::TYPE] = \'' . $className . '\'; // #' . $type;
+			$highestTypeUsed = max($highestTypeUsed, $type);
 		}
 
 		$lines = array();
