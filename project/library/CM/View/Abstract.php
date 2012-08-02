@@ -67,12 +67,4 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		}
 		return CM_Util::getClasses($paths);
 	}
-
-	/**
-	 * @param string[] $namespaces
-	 * @return string[]
-	 */
-	private static function _getFiles(array $namespaces) {
-		return $paths;
-	}
 }

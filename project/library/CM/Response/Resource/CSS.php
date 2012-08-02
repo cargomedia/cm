@@ -32,7 +32,6 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				}
 			}
 
-
 			$viewClasses = CM_View_Abstract::getClasses($this->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_CSS);
 			foreach ($viewClasses as $viewClass) {
 				if (!preg_match('#^([^_]+)_([^_]+)_(.+)$#', $viewClass['classNames'][0], $matches)) {

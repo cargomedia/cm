@@ -225,6 +225,9 @@ class CM_Util {
 		return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
 
+	/**
+	 * @return string[]
+	 */
 	public static function getNamespaces() {
 		$namespaces = array();
 		$sites = CM_Util::getClassChildren('CM_Site_Abstract');
