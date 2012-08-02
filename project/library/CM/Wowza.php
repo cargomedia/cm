@@ -5,11 +5,11 @@ class CM_Wowza extends CM_Class_Abstract {
 	private static $_instance = null;
 
 	/**
-	 * @param string $wowzaIp
+	 * @param string $wowzaHost
 	 * @return string
 	 */
-	public function fetchStatus($wowzaIp) {
-		return CM_Util::getContents('http://' . long2ip($wowzaIp) . ':' . self::_getConfig()->httpPort . '/status');
+	public function fetchStatus($wowzaHost) {
+		return CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/status');
 	}
 
 	public function synchronize() {
@@ -31,7 +31,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				try {
 					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['wowzaIp'], $publish['data']);
 				} catch (CM_Exception $ex) {
-					$this->stop($publish['clientId'], $publish['wowzaIp']);
+					$this->stop($publish['clientId'], long2ip($publish['wowzaIp']));
 				}
 			}
 			foreach ($publish['subscribers'] as $clientId => $subscribe) {
@@ -39,7 +39,7 @@ class CM_Wowza extends CM_Class_Abstract {
 					try {
 						$this->subscribe($streamName, $clientId, $subscribe['start'], $subscribe['data']);
 					} catch (CM_Exception $ex) {
-						$this->stop($clientId, $publish['wowzaIp']);
+						$this->stop($clientId, long2ip($publish['wowzaIp']));
 					}
 				}
 			}
@@ -117,10 +117,10 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	/**
 	 * @param string $clientKey
-	 * @param string $wowzaIp
+	 * @param string $wowzaHost
 	 */
-	public function stop($clientKey, $wowzaIp) {
-		CM_Util::getContents('http://' . long2ip($wowzaIp) . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
+	public function stop($clientKey, $wowzaHost) {
+		CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
 	}
 
 	/**
@@ -183,7 +183,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				if ($allowedUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil())) {
 					$streamPublish->setAllowedUntil($allowedUntil);
 				} else {
-					$this->stop($streamPublish->getKey(), $streamChannel->getWowzaIp());
+					$this->stop($streamPublish->getKey(), long2ip($streamChannel->getWowzaIp()));
 				}
 			}
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe*/
@@ -192,7 +192,7 @@ class CM_Wowza extends CM_Class_Abstract {
 					if ($allowedUntil = $streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil())) {
 						$streamSubscribe->setAllowedUntil($allowedUntil);
 					} else {
-						$this->stop($streamSubscribe->getKey(), $streamChannel->getWowzaIp());
+						$this->stop($streamSubscribe->getKey(), long2ip($streamChannel->getWowzaIp()));
 					}
 				}
 			}
