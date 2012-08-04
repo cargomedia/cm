@@ -41,6 +41,11 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function _getInternal() {
+		$internalFileCompiled = DIR_ROOT . 'tmp/internal-compiled.js';
+		if (file_exists($internalFileCompiled)) {
+			return new CM_File($internalFileCompiled);
+		}
+
 		$paths = array();
 		foreach (array_reverse(self::getSite()->getNamespaces()) as $namespace) {
 			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
