@@ -226,6 +226,27 @@ class TH {
 	}
 
 	/**
+	 * @param CM_Model_Abstract $model
+	 */
+	public static function reinstantiateModel(CM_Model_Abstract &$model) {
+		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
+	}
+
+	/**
+	 * @param string             $uri
+	 * @param array|null         $headers
+	 * @param CM_Model_User|null $user
+	 * @return CM_Response_Page
+	 */
+	public static function prepareGetResponse($uri, array $headers = null, CM_Model_User $user = null) {
+		if (!$headers) {
+			$headers = array();
+		}
+		$request = new CM_Request_Get($uri, $headers, $user);
+		return new CM_Response_Page($request, CM_Site_CM::TYPE);
+	}
+
+	/**
 	 * @param int    $length
 	 * @param string $charset
 	 * @return string
@@ -237,12 +258,5 @@ class TH {
 			$str .= $charset[mt_rand(0, $count - 1)];
 		}
 		return $str;
-	}
-
-	/**
-	 * @param CM_Model_Abstract $model
-	 */
-	public static function reinstantiateModel(CM_Model_Abstract &$model) {
-		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
 	}
 }
