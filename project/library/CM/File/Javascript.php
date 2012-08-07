@@ -27,7 +27,7 @@ class CM_File_Javascript extends CM_File {
 	 * @param int|null     $indentation
 	 * @return string
 	 */
-	private function _getDocBlock($docLines, $indentation = null) {
+	private static function _getDocBlock($docLines, $indentation = null) {
 		$docLines = (array) $docLines;
 		$indentation = (int) $indentation;
 		$docBlock = '/**' . PHP_EOL;
@@ -49,7 +49,7 @@ class CM_File_Javascript extends CM_File {
 	 * @param int|null $indentation
 	 * @return string
 	 */
-	private function _getDoc($doc, $indentation = null) {
+	private static function _getDoc($doc, $indentation = null) {
 		$indentation = str_repeat("\t", (int) $indentation);
 		return $indentation . '/** ' . $doc . ' */';
 	}
