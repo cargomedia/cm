@@ -224,6 +224,13 @@ class CM_Util {
 	public static function camelize($string) {
 		return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
+	/**
+	 * @param string $string
+	 * @return string
+	 */
+	public static function titleize($string) {
+		return preg_replace('/[-_]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
+	}
 
 	/**
 	 * @return string[]
