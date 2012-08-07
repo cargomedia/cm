@@ -26,7 +26,11 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 		'click .error_CM_Exception_AuthRequired_public_callback': 'error_CM_Exception_AuthRequired_public_callback',
 		'click .error_CM_Exception_AuthRequired_public': 'error_CM_Exception_AuthRequired_public',
 		'click .error_CM_Exception_AuthRequired': 'error_CM_Exception_AuthRequired',
-		'click .stream .ping': 'ping'
+		'click .stream .ping': 'ping',
+		'click .opener': function(e) {
+			var $opener = $(e.currentTarget);
+			this.toggleOpener($opener);
+		}
 	},
 	
 	streams: {
@@ -121,5 +125,15 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 	ping: function() {
 		this.ajax('ping', {number: this.pingCount});
 		this.pingCount++;
+	},
+
+	toggleOpener: function($opener) {
+		var $button = $opener.children('.panel');
+		var $window = $opener.children('.window');
+		$window.toggleModal(function() {
+			$(this).toggle();
+			$button.toggleClass('active');
+		});
 	}
 });
+
