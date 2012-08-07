@@ -48,7 +48,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			/** @var CM_Model_Stream_Publish|null $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
 			if (!$streamPublish || !isset($status[$streamChannel->getKey()])) {
-				$this->unpublish($streamChannel->getKey(), $streamPublish->getKey());
+				$this->unpublish($streamChannel->getKey());
 			} else {
 				$publish = $status[$streamChannel->getKey()];
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
