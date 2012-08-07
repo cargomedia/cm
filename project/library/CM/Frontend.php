@@ -75,7 +75,7 @@ class CM_Frontend {
 		$field_list = array();
 		foreach ($form->getFields() as $field_key => $field) {
 			$field_list[] =
-					'"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . ',}';
+					'"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . '}';
 		}
 		$action_list = array();
 		foreach ($form->getActions() as $action_name => $action) {
