@@ -295,6 +295,23 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Site_Abstract|int      $key
+	 * @param CM_Site_Abstract|int|null $default
+	 * @throws CM_Exception_InvalidParam
+	 * @return CM_Site_Abstract
+	 */
+	public function getSite($key, $default = null) {
+		$param = $this->_get($key, $default);
+		if (ctype_digit($param) || is_int($param)) {
+			return CM_Site_Abstract::factory($param);
+		}
+		if (!($param instanceof CM_Site_Abstract)) {
+			throw new CM_Exception_InvalidParam('Not a CM_Site_Abstract');
+		}
+		return $param;
+	}
+
+	/**
 	 * @param string $key
 	 * @return CM_Model_Stream_Publish
 	 * @throws CM_Exception_InvalidParam
