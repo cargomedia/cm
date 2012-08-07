@@ -37,6 +37,11 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return (string) $this->_get('wowzaIp');
 	}
 
+	protected function _onDelete() {
+		CM_Mysql::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
+		parent::_onDelete();
+	}
+
 	protected function _loadData() {
 		return CM_Mysql::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`) WHERE `id` = ?", $this->getId())->fetchAssoc();
 	}
