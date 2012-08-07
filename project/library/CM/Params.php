@@ -313,6 +313,15 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return CM_Model_StreamChannel_Abstract
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getStreamChannel($key) {
+		return $this->_getObject($key, 'CM_Model_StreamChannel_Abstract');
+	}
+
+	/**
 	 * @param mixed   $value
 	 * @param boolean $json OPTIONAL
 	 * @return string
