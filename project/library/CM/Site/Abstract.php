@@ -10,16 +10,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	protected $_eventHandler = null;
 
 	/**
-	 * @param CM_Request_Abstract $request
-	 * @return boolean
-	 */
-	abstract static function match(CM_Request_Abstract $request);
-
-	/**
 	 * Default constructor to set CM namespace
 	 */
 	public function __construct() {
 		$this->_setNamespace('CM');
+	}
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @return boolean
+	 */
+	public static function match(CM_Request_Abstract $request) {
+		return false;
 	}
 
 	/**
