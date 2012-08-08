@@ -96,6 +96,14 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
 	}
 
+	public function testFactory() {
+		$uri = '/test';
+		$bodyGet = '';
+		$bodyPost = 'Content sent by user';
+		$this->assertInstanceOf('CM_Request_Get', CM_Request_Abstract::factory($uri, null, null, $bodyGet));
+		$this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory($uri, null, null, $bodyPost));
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders
