@@ -13,10 +13,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @param CM_Request_Abstract $request
 	 * @return boolean
 	 */
-	public static function match(CM_Request_Abstract $request) {
-		// TODO: This method will be abstract; Has body for CM-based projects for now
-		return true;
-	}
+	abstract static function match(CM_Request_Abstract $request);
 
 	/**
 	 * Default constructor to set CM namespace
