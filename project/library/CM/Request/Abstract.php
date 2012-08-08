@@ -128,9 +128,6 @@ abstract class CM_Request_Abstract {
 	 * @return string
 	 */
 	public final function getPath() {
-		if ($this->_path === null) {
-			$this->_path = '/' . implode('/', $this->_pathParts);
-		}
 		return $this->_path;
 	}
 
@@ -157,8 +154,7 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @param int $position
-	 * @return string
-	 * @throws CM_Exception_Invalid
+	 * @return string|null
 	 */
 	public function getPathPart($position) {
 		$position = (int) $position;
@@ -172,8 +168,8 @@ abstract class CM_Request_Abstract {
 	 * @param array $parts
 	 */
 	public function setPathParts(array $parts) {
-		$this->_path = null;
 		$this->_pathParts = $parts;
+		$this->_path = '/' . implode('/', $this->_pathParts);
 	}
 
 	/**
@@ -399,16 +395,18 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param string              $uri
-	 * @param array|null          $headers
-	 * @param CM_Model_User|null  $viewer
-	 * @param mixed|null          $body
+	 * @param string               $method
+	 * @param string               $uri
+	 * @param array|null           $headers
+	 * @param CM_Model_User|null   $viewer
+	 * @param string|null          $body
 	 * @return CM_Request_Get|CM_Request_Post
 	 */
-	public static function factory($uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
-		if ($body) {
+	public static function factory($method, $uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
+		if ($method === 'POST') {
 			return new CM_Request_Post($uri, $headers, $viewer, $body);
-		} else {
+		}
+		if ($method === 'GET') {
 			return new CM_Request_Get($uri, $headers, $viewer);
 		}
 	}

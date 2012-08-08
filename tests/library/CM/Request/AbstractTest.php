@@ -97,11 +97,8 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testFactory() {
-		$uri = '/test';
-		$bodyGet = '';
-		$bodyPost = 'Content sent by user';
-		$this->assertInstanceOf('CM_Request_Get', CM_Request_Abstract::factory($uri, null, null, $bodyGet));
-		$this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory($uri, null, null, $bodyPost));
+		$this->assertInstanceOf('CM_Request_Get', CM_Request_Abstract::factory('GET', '/test'));
+		$this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory('POST', '/test'));
 	}
 
 	/**
@@ -121,6 +118,4 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertSame($request->getViewer(), $user);
 		return $request;
 	}
-
-
 }
