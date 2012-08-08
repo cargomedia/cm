@@ -243,7 +243,7 @@ class TH {
 			$headers = array();
 		}
 		$request = new CM_Request_Get($uri, $headers, $user);
-		return new CM_Response_Page($request, CM_Site_CM::TYPE);
+		return new CM_Response_Page($request);
 	}
 
 	/**
