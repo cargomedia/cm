@@ -177,7 +177,7 @@ abstract class CM_Request_Abstract {
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	public function popPathPart($position) {
+	public function popPathPart($position = null) {
 		$position = (int) $position;
 		if (!array_key_exists($position, $this->getPathParts())) {
 			throw new CM_Exception_Invalid('Cannot find `' . $position . '` element in request\'s path');

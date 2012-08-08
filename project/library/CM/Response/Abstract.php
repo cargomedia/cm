@@ -34,11 +34,12 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param int|null            $siteId
 	 */
-	public function __construct(CM_Request_Abstract $request, $siteId = null) {
+	public function __construct(CM_Request_Abstract $request) {
 		$this->_request = $request;
-		$this->_site = CM_Site_Abstract::factory($siteId);
+		$request->popPathLanguage();
+		$responseType = $request->popPathPart();
+		$this->_site = CM_Site_Abstract::factory($request->popPathPart());
 	}
 
 	/**
@@ -158,7 +159,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		/** @var $responseClass CM_Response_Abstract */
 		foreach (array_reverse(self::getClassChildren()) as $responseClass) {
 			if ($responseClass::match($request)) {
-				return new $responseClass($request, $request->getPathPart(1));
+				return new $responseClass($request);
 			}
 		}
 		return new CM_Response_Page($request);

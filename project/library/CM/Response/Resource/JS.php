@@ -6,35 +6,35 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		$this->setHeader('Content-Type', 'application/x-javascript');
 		$this->enableCache();
 
-		if ($this->_getPath() == 'internal.js') {
+		if ($this->getRequest()->getPathPart(0) == 'internal.js') {
 			return $this->_getInternal();
 		}
-		if ($this->_getPath() == 'init.js') {
+		if ($this->getRequest()->getPathPart(0) == 'init.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
 			return $content;
 		}
-		if ($this->_getPath() == 'library.js') {
+		if ($this->getRequest()->getPathPart(0) == 'library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
 			return $content;
 		}
-		if ($this->_getPath(0) == 'translations') {
-			$language = new CM_Model_Language($this->_getPath(2));
+		if ($this->getRequest()->getPathPart(0) == 'translations') {
+			$language = new CM_Model_Language($this->getRequest()->getPathPart(2));
 			$translations = array();
 			foreach (new CM_Paging_Translation_Language($language, null, null, null, true) as $translation) {
 				$translations[$translation['key']] = $language->getTranslation($translation['key']);
 			}
 			return 'cm.language.setAll(' . CM_Params::encode($translations, true) . ');';
 		}
-		if (file_exists(DIR_PUBLIC . 'static/js/' . $this->_getPath())) {
-			return (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->_getPath());
+		if (file_exists(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath())) {
+			return (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath());
 		}
-		throw new CM_Exception_Invalid('Invalid filename: `' . $this->_getPath() . '`');
+		throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 	}
 
 	/**
