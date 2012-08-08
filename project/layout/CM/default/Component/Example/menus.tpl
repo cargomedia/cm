@@ -7,7 +7,7 @@
 			{if !empty($menu)}
 				<ul class="menu-dropdown">
 					{foreach $menu as $menuEntry}
-						<li>
+						<li {if !empty($menuEntry@first)}class="active"{/if}>
 							<a href="javascript:;">
 								{if !empty($menuEntry['icon'])}<span class="icon {$menuEntry['icon']}"></span>{/if}
 								<span class="label">{translate $menuEntry['label']}</span>
@@ -18,7 +18,7 @@
 				<h3>Menu Tabs</h3>
 				<ul class="menu-tabs clearfix">
 					{foreach $menu as $menuEntry}
-						<li>
+						<li {if !empty($menuEntry@first)}class="active"{/if}>
 							<a href="javascript:;">
 								{if !empty($menuEntry['icon'])}<span class="icon {$menuEntry['icon']}"></span>{/if}
 								<span class="label">{translate $menuEntry['label']}</span>
@@ -29,7 +29,7 @@
 				<h3>Menu Pills</h3>
 				<ul class="nav nav-pills">
 					{foreach $menu as $menuEntry}
-						<li>
+						<li {if !empty($menuEntry@first)}class="active"{/if}>
 							<a href="javascript:;">
 								{if !empty($menuEntry['icon'])}<span class="icon {$menuEntry['icon']}"></span>{/if}
 								<span class="label">{translate $menuEntry['label']}</span>
@@ -42,16 +42,16 @@
 		<td>
 			<h3>Markup</h3>
 			{code language='html'}
-<ul class="menu-dropdown">
-{foreach $menu as $menuEntry}
-	<li>
-		<a href="javascript:;">
-			{if !empty($menuEntry['icon'])}<span class="icon {$menuEntry['icon']}"></span>{/if}
-			<span class="label">{translate $menuEntry['label']}</span>
-		</a>
-	</li>
-{/foreach}
-</ul>
+				<ul class="menu-dropdown">
+				{foreach $menu as $menuEntry}
+					<li>
+						<a href="javascript:;">
+							{if !empty($menuEntry['icon'])}<span class="icon {$menuEntry['icon']}"></span>{/if}
+							<span class="label">{translate $menuEntry['label']}</span>
+						</a>
+					</li>
+				{/foreach}
+				</ul>
 			{/code}
 			<h3>Smarty Helper</h3>
 			{code language="html"}{literal}{menu name="[optional: browse, user, account, about ]" class="[optional: menu-sub, menu-pills, menu-tabs]" template='[optional: tree]' depth=[optional: int]}{/literal}{/code}

@@ -26,4 +26,4 @@
 <div class="stream">
 	<div class="output"></div>
 	{button_link class="ping" label="ajax: ping()"}
-</div>	<br />
+</div>

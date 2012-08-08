@@ -29,7 +29,6 @@
 				{formField name='shadowBlur' label="{translate 'Shadow Blur'}"}
 				<h4>Grab Code</h4>
 				<code class="iconMarkup html-syntax">Select icon to generate code!</code>
-				<br />
 				<code class="iconCss less-syntax"></code>
 			{/form}
 		</td>

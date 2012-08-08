@@ -10,10 +10,8 @@ code {
 	display: block;
 	padding: 10px;
 	margin-bottom: 15px;
-	border-style: dashed;
-
 	.background-color(darken(@colorBg, 2));
-	.border(@colorFgBorderEmphasize);
+	border: 1px dashed @colorFgBorderEmphasize;
 
 	&.html-syntax {
 		background-color: @colorHtml;
@@ -32,6 +30,6 @@ code {
 
 	&.php-syntax {
 		background-color: @colorPhp;
-		border-color: darken(@colorPhp, 30);
+		border-color: darken(@colorPhp, 50);
 	}
 }

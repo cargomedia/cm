@@ -28,7 +28,6 @@
 				</div>
 			</div>
 		{/literal}{/code}
-		<br />
 		{code language="less"}{literal}
 			.opener {
 				position: relative;
