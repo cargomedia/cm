@@ -21,26 +21,26 @@
 
 <h3>Add Translation</h3>
 <p>Use this translation method for words, short reusable sentences.</p>
-{code}{literal}{{/literal}translate 'Some cool phrase'}{/code}
-{code}{literal}{{/literal}translate 'Some cool phrase with {literal}{$variable}{/literal}' variable=$variable}{/code}
+{code language="html"}{literal}{{/literal}translate 'Some cool phrase'}{/code}
+{code language="html"}{literal}{{/literal}translate 'Some cool phrase with {literal}{$variable}{/literal}' variable=$variable}{/code}
 
 <h3>Add Key Translation</h3>
 <p>Use this translation method for internal generated words, long texts, unique sentences.</p>
-{code}{ldelim}translate '.language.key'}{/code}
+{code language="html"}{ldelim}translate '.language.key'}{/code}
 
 <br />
 
-{code}<?php
+{code language="php"}<?php
 $langauge = CM_Model_Language::findByAbbreviation('en');
 $language->setTranslation('.language.key', 'Translation without variables');
 {/code}
 
 <h3>Add Translation with Variables</h3>
-{code}{ldelim}translate '.language.key' variable=$variable}{/code}
+{code language="html"}{ldelim}translate '.language.key' variable=$variable}{/code}
 
 <br />
 
-{code}
+{code language="php"}
 {literal}<?php
 $language = CM_Model_Language::findByAbbreviation('en');
 $language->setTranslation('.language.key', 'Transalation with {$variable}');
@@ -48,7 +48,7 @@ $language->setTranslation('.language.key', 'Transalation with {$variable}');
 {/code}
 
 <h3>Delete Translation</h3>
-{code}<?php
+{code language="php"}<?php
 CM_Model_Language::deleteKey('Some cool phrase');
 CM_Model_Language::deleteKey('Some cool phrase with {literal}{$variable}{/literal}');
 CM_Model_Language::deleteKey('.language.key');

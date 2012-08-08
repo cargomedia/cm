@@ -54,7 +54,7 @@
 </ul>
 			{/code}
 			<h3>Smarty Helper</h3>
-			{code}{literal}{menu name="[optional: browse, user, account, about ]" class="[optional: menu-sub, menu-pills, menu-tabs]" template='[optional: tree]' depth=[optional: int]}{/literal}{/code}
+			{code language="html"}{literal}{menu name="[optional: browse, user, account, about ]" class="[optional: menu-sub, menu-pills, menu-tabs]" template='[optional: tree]' depth=[optional: int]}{/literal}{/code}
 		</td>
 	</tr>
 </table>

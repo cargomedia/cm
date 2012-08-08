@@ -1,4 +1,4 @@
-<h2>{translate 'Forms'}</h2>
+<h2>Forms</h2>
 <table>
 	<tr>
 		<td>
@@ -18,7 +18,7 @@
 		</td>
 		<td>
 			<h3>Markup</h3>
-				{code}{literal}
+				{code language="html"}{literal}
 					{form name="CM_Form_Example" viewer=$viewer}
 						{formField name='text' label="{translate 'Text'}"}
 						{formField name='int' label="{translate 'Integer'}"}
@@ -37,9 +37,9 @@
 			<hr />
 
 			<h4>Link</h4>
-			{code}{literal}{formField name='[name]' label='[string]'}{/literal}{/code}
+			{code language="html"}{literal}{formField name='[name]' label='[string]'}{/literal}{/code}
 			<h4>Action</h4>
-			{code}{literal}{formAction action='[action]' label='[string]'}{/literal}{/code}
+			{code language="html"}{literal}{formAction action='[action]' label='[string]'}{/literal}{/code}
 		</td>
 	</tr>
 </table>

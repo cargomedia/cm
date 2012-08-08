@@ -20,7 +20,7 @@
 		</td>
 		<td>
 			<h3>Markup</h3>
-				{code}{literal}
+					{code language="html"}{literal}
 					{button_link icon="close"}
 					{button_link label="Button"}
 					{button_link icon="close" label="With Icon"}
@@ -35,11 +35,11 @@
 			<br />
 			<hr />
 			<h4>Link</h4>
-			{code}{literal}{button_link path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]"}{/literal}{/code}
+			{code language="html"}{literal}{button_link path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]"}{/literal}{/code}
 			<h4>Form</h4>
-			{code}{literal}{button path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]"}{/literal}{/code}
+			{code language="html"}{literal}{button path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]"}{/literal}{/code}
 			<h4>With Tooltip</h4>
-			{code}{literal}{button_link path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]" title="[string]"}{/literal}{/code}
+			{code language="html"}{literal}{button_link path="[optional]" icon="[optional]" class="[optional: alt, large, string]" label="[optional: string]" title="[string]"}{/literal}{/code}
 		</td>
 	</tr>
 </table>

@@ -1,7 +1,37 @@
+@colorHtml: #f6ecec;
+@colorLess: #e3f0dc;
+@colorJs: 	#D9EDF7;
+@colorPhp:	#FCF8E3;
+
 code {
 	font-family: monospace, 'Courier New';
 	white-space: pre-line;
 	.background-color(lighten(@colorNotice, 48));
 	display: block;
 	padding: 10px;
+	margin-bottom: 15px;
+	border-style: dashed;
+
+	.background-color(darken(@colorBg, 2));
+	.border(@colorFgBorderEmphasize);
+
+	&.html-syntax {
+		background-color: @colorHtml;
+		border-color: darken(@colorHtml, 30);
+	}
+
+	&.less-syntax {
+		background-color: @colorLess;
+		border-color: darken(@colorLess, 30);
+	}
+
+	&.js-syntax {
+		background-color: @colorJs;
+		border-color: darken(@colorJs, 30);
+	}
+
+	&.php-syntax {
+		background-color: @colorPhp;
+		border-color: darken(@colorPhp, 30);
+	}
 }
