@@ -156,31 +156,12 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	public static function factory(CM_Request_Abstract $request) {
 		/** @var $responseClass CM_Response_Abstract */
-		foreach (self::findAll() as $responseClass) {
+		foreach (array_reverse(self::getClassChildren()) as $responseClass) {
 			if ($responseClass::match($request)) {
 				return new $responseClass($request, $request->getPathPart(1));
 			}
 		}
 		return new CM_Response_Page($request);
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public static function findAll() {
-		// TODO: Move to CM_Class_Abstract
-		$key = CM_CacheConst::Responses;
-		if (false === ($responses = CM_CacheLocal::get($key))) {
-			$responses = array();
-			foreach (CM_Util::getClassChildren(get_class()) as $className) {
-				$reflectionClass = new ReflectionClass($className);
-				if (!$reflectionClass->isAbstract()) {
-					$responses[] = $className;
-				}
-			}
-			CM_CacheLocal::set($key, $responses);
-		}
-		return $responses;
 	}
 
 	/**

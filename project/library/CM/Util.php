@@ -141,31 +141,6 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string     $className
-	 * @param array|null $libraryDirectories
-	 * @return string[]
-	 */
-	public static function getClassChildren($className, array $libraryDirectories = null) {
-		if (!$libraryDirectories) {
-			$libraryDirectories = array(DIR_LIBRARY);
-		}
-		$classes = array();
-		foreach ($libraryDirectories as $directory) {
-			$paths = CM_Util::rglob('*.php', $directory);
-			foreach ($paths as $path) {
-				$file = new CM_File($path);
-				$regexp = '#class\s+(?<name>.+?)\b#';
-				if (preg_match($regexp, $file->read(), $matches)) {
-					if (class_exists($matches['name'], true) && is_subclass_of($matches['name'], $className)) {
-						$classes[] = $matches['name'];
-					}
-				}
-			}
-		}
-		return $classes;
-	}
-
-	/**
 	 * @param string $string
 	 * @param int    $quote_style
 	 * @param string $charset
@@ -177,7 +152,7 @@ class CM_Util {
 
 	/**
 	 * @param string[] $paths
-	 * @return array[] Ordered class infos, each an array with keys 'classNames' and 'path'
+	 * @return array[]
 	 * @throws CM_Exception
 	 */
 	public static function getClasses(array $paths) {
@@ -214,7 +189,12 @@ class CM_Util {
 				}
 			}
 		}
-		return $classes;
+
+		$classesAssociative = array();
+		foreach ($classes as $classInfo) {
+			$classesAssociative[$classInfo['path']] = $classInfo['classNames'][0];
+		}
+		return $classesAssociative;
 	}
 
 	/**
@@ -237,14 +217,10 @@ class CM_Util {
 	 */
 	public static function getNamespaces() {
 		$namespaces = array();
-		$sites = CM_Util::getClassChildren('CM_Site_Abstract');
-		foreach ($sites as $siteClassName) {
-			$siteClass = new ReflectionClass($siteClassName);
-			if (!$siteClass->isAbstract()) {
-				/** @var $site CM_Site_Abstract */
-				$site = new $siteClassName();
-				$namespaces = array_merge($namespaces, $site->getNamespaces());
-			}
+		foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
+			/** @var $site CM_Site_Abstract */
+			$site = new $siteClassName();
+			$namespaces = array_merge($namespaces, $site->getNamespaces());
 		}
 		return array_unique($namespaces);
 	}

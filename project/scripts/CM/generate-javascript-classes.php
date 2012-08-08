@@ -7,9 +7,8 @@ CM_Bootloader::load(array('autoloader', 'constants', 'exceptionHandler', 'errorH
 
 $namespaces = CM_Util::getNamespaces();
 $viewClasses = CM_View_Abstract::getClasses($namespaces, CM_View_Abstract::CONTEXT_JAVASCRIPT);
-foreach ($viewClasses as $class) {
-	$jsPath = preg_replace('/\.php$/', '.js', $class['path']);
-	$className = $class['classNames'][0];
+foreach ($viewClasses as $path => $className) {
+	$jsPath = preg_replace('/\.php$/', '.js', $path);
 	if (!file_exists($jsPath)) {
 		$jsFile = CM_File_Javascript::createLibraryClass($className);
 		echo 'create  ' . $jsFile->getPath() . PHP_EOL;

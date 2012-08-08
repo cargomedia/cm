@@ -136,29 +136,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 */
 	public static function findByRequest(CM_Request_Abstract $request) {
 		/** @var CM_Site_Abstract $className */
-		foreach (self::findAll() as $className) {
+		foreach (array_reverse(self::getClassChildren()) as $className) {
 			if ($className::match($request)) {
 				return new $className();
 			}
 		}
 		throw new CM_Exception_Invalid('Cannot identify site from current request');
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public static function findAll() {
-		$key = CM_CacheConst::Sites;
-		if (false === ($sites = CM_CacheLocal::get($key))) {
-			$sites = array();
-			foreach (CM_Util::getClassChildren(get_class()) as $className) {
-				$reflectionClass = new ReflectionClass($className);
-				if (!$reflectionClass->isAbstract()) {
-					$sites[] = $className;
-				}
-			}
-			CM_CacheLocal::set($key, $sites);
-		}
-		return $sites;
 	}
 }

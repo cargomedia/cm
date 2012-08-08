@@ -120,7 +120,7 @@ class CM_App {
 	public function getActionVerbs() {
 		$actionVerbs = array();
 		$actionVerbsValues = array();
-		foreach (CM_Util::getClassChildren('CM_Action_Abstract') as $className) {
+		foreach (CM_Action_Abstract::getClassChildren(true) as $className) {
 			$class = new ReflectionClass($className);
 			$constants = $class->getConstants();
 			unset($constants['TYPE']);
@@ -151,7 +151,8 @@ class CM_App {
 	 */
 	public function getClassTypes($className) {
 		$classTypes = array();
-		foreach (CM_Util::getClassChildren($className) as $className) {
+		/** @var $className CM_Class_Abstract */
+		foreach ($className::getClassChildren() as $className) {
 			$reflectionClass = new ReflectionClass($className);
 			if ($reflectionClass->hasConstant('TYPE')) {
 				$type = $className::TYPE;
