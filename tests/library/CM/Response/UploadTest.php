@@ -15,7 +15,6 @@ class CM_Response_UploadTest extends TestCase {
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
 		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -32,7 +31,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename . '&field=CM_FormField_FileImage', array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -50,7 +48,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -65,7 +62,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -78,7 +74,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -92,7 +87,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -109,7 +103,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 		$data = json_decode($upload->process());
 
@@ -124,7 +117,6 @@ class CM_Response_UploadTest extends TestCase {
 
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=' . $field . '&qqfile=' . $filename, array('Content-Length' => strlen($content)), null, $content);
-		$request->setBodyEncoding(false);
 		$upload = new CM_Response_Upload($request);
 
 		try {
