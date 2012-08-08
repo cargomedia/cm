@@ -28,6 +28,8 @@
 				{formField name='shadowY' label="{translate 'Shadow Y'}"}
 				{formField name='shadowBlur' label="{translate 'Shadow Blur'}"}
 				<h4>Grab Code</h4>
+				<code class="codeBox iconMarkup"></code>
+				<br />
 				<code class="codeBox iconCss"></code>
 			{/form}
 		</td>

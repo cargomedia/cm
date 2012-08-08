@@ -1,4 +1,4 @@
-<ul class="tabs menu-tabs clearfix">
+<ul class="tabs menu-tabs">
 	{foreach $sections as $title => $filename}
 		<li><a href="javascript:;">{$title}</a></li>
 	{/foreach}

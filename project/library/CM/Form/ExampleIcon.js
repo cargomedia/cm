@@ -16,6 +16,13 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 			this.$('.iconCss').text('background-color: ' + $(".iconBox").css('background-color') + '; \n' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";\n"));
 		});
 		this.trigger('change');
+
+		$('.iconBox').click(function(){
+			var handler = $(this);
+			$('.iconBox').removeClass('active');
+			handler.addClass('active');
+			$('.iconMarkup').text('<span class="icon ' + handler.find('.label').html() + '"></span>');
+		})
 	},
 
 	getShadowValue: function() {

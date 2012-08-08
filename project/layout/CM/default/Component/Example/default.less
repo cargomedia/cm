@@ -37,6 +37,11 @@ h5 {
 	font-style: italic;
 }
 
+.tabs.menu-tabs {
+	text-align: left;
+	margin-bottom: 35px;
+}
+
 code.codeBox {
 	.background-color(darken(@colorBg, 2));
 	.border(@colorFgBorderEmphasize);
@@ -73,6 +78,12 @@ code.codeBox {
 	padding: 10px;
 	margin: 5px;
 	background-color: darken(@colorBg, 2);
+	border: 2px solid transparent;
+	cursor: pointer;
+
+	&.active {
+		border-color: @colorFg;
+	}
 
 	.icon {
 		font-size: 25px;
