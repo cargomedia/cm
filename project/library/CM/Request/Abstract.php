@@ -7,6 +7,11 @@ abstract class CM_Request_Abstract {
 	protected $_path;
 
 	/**
+	 * @var array|null
+	 */
+	protected $_pathParts;
+
+	/**
 	 * @var array
 	 */
 	protected $_query = array();
@@ -120,6 +125,9 @@ abstract class CM_Request_Abstract {
 	 * @return string
 	 */
 	public final function getPath() {
+		if ($this->_path === null) {
+			$this->_path = '/' . implode('/', $this->_pathParts);
+		}
 		return $this->_path;
 	}
 
@@ -129,7 +137,65 @@ abstract class CM_Request_Abstract {
 	 */
 	public function setPath($path) {
 		$this->_path = (string) $path;
+		$this->_pathParts = null;
 		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPathParts() {
+		if ($this->_pathParts === null) {
+			$this->_pathParts = explode('/', $this->_path);
+			array_shift($this->_pathParts);
+		}
+		return $this->_pathParts;
+	}
+
+	/**
+	 * @param int $position
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getPathPart($position) {
+		$position = (int) $position;
+		if (!array_key_exists($position, $this->getPathParts())) {
+			return null;
+		}
+		return $this->_pathParts[$position];
+	}
+
+	/**
+	 * @param array $parts
+	 */
+	public function setPathParts(array $parts) {
+		$this->_path = null;
+		$this->_pathParts = $parts;
+	}
+
+	/**
+	 * @param int $position
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function popPathPart($position) {
+		$position = (int) $position;
+		if (!array_key_exists($position, $this->getPathParts())) {
+			throw new CM_Exception_Invalid('Cannot find `' . $position . '` element in request\'s path');
+		}
+		$value = array_splice($this->_pathParts, $position, 1);
+		$this->setPathParts($this->_pathParts);
+		return current($value);
+	}
+
+	public function popPathLanguage() {
+		if ($abbreviation = $this->getPathPart(0)) {
+			$languagePaging = new CM_Paging_Language_Enabled();
+			if ($language = $languagePaging->findByAbbreviation($abbreviation)) {
+				$this->setLanguageUrl($language);
+				$this->popPathPart(0);
+			}
+		}
 	}
 
 	/**
