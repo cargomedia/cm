@@ -328,4 +328,19 @@ abstract class CM_Request_Abstract {
 		}
 		return self::$_instance;
 	}
+
+	/**
+	 * @param string              $uri
+	 * @param array|null          $headers
+	 * @param CM_Model_User|null  $viewer
+	 * @param mixed|null          $body
+	 * @return CM_Request_Get|CM_Request_Post
+	 */
+	public static function factory($uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
+		if ($body) {
+			return new CM_Request_Post($uri, $headers, $viewer, $body);
+		} else {
+			return new CM_Request_Get($uri, $headers, $viewer);
+		}
+	}
 }
