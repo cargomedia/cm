@@ -1,13 +1,13 @@
 <?php
 
 class CM_Request_Post extends CM_Request_Abstract {
-	const FORMAT_JSON = 1;
-	const FORMAT_FORM = 2;
+	const ENCODING_JSON = 1;
+	const ENCODING_FORM = 2;
 
 	private $_body;
 
 	/** @var int|boolean */
-	private $_bodyEncoding = self::FORMAT_JSON;
+	private $_bodyEncoding = self::ENCODING_JSON;
 
 	/**
 	 * @param string     $uri
@@ -27,14 +27,14 @@ class CM_Request_Post extends CM_Request_Abstract {
 	}
 
 	public function getQuery() {
-		if ($this->_bodyEncoding == self::FORMAT_JSON) {
+		if ($this->_bodyEncoding == self::ENCODING_JSON) {
 			if (!is_array($bodyQuery = json_decode($this->getBody(), true))) {
 				throw new CM_Exception_Invalid('Cannot extract query from body `' . $this->getBody() . '`.');
 			}
 			return array_merge($this->_query, $bodyQuery);
 		}
 
-		if ($this->_bodyEncoding == self::FORMAT_FORM) {
+		if ($this->_bodyEncoding == self::ENCODING_FORM) {
 			parse_str($this->getBody(), $bodyQuery);
 			return array_merge($this->_query, $bodyQuery);
 		}
