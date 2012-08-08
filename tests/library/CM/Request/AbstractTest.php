@@ -72,17 +72,15 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testGetLanguageByUrl() {
-		/** @var CM_Site_Abstract $site */
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract');
 		$request = $this->_prepareRequest('/de/home');
-		$site->rewrite($request);
+		CM_Response_Abstract::factory($request);
 		$this->assertNull($request->getLanguage());
 
 		TH::createLanguage('en'); // default language
 		$urlLanguage = TH::createLanguage('de');
 		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
-		$site->rewrite($request);
+		CM_Response_Abstract::factory($request);
 		$this->assertModelEquals($request->getLanguage(), $urlLanguage);
 	}
 

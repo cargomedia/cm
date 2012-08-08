@@ -158,10 +158,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		/** @var $responseClass CM_Response_Abstract */
 		foreach (self::findAll() as $responseClass) {
 			if ($responseClass::match($request)) {
-				return new $responseClass($request, $request->getPath(1));
+				return new $responseClass($request, $request->getPathPart(1));
 			}
 		}
-		return null;
+		return new CM_Response_Page($request);
 	}
 
 	/**
