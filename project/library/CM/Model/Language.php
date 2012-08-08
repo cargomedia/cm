@@ -41,6 +41,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @return string
 	 */
 	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
+		$key = (string) $key;
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
 		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();

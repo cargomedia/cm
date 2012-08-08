@@ -33,18 +33,18 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	public static function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$status = $params->getInt('status', 200);
-		$text = $params->has('text') ? $params->getString('text') : null;
+		$message = $params->has('text') ? $params->getString('text') : null;
+		$messagePublic = $params->getBoolean('public', false) ? $message : null;
 		if (in_array($status, array(500, 599))) {
 			$response->addHeaderRaw('HTTP/1.1 ' . $status . ' Internal Server Error');
 			$response->sendHeaders();
-			exit($text);
+			exit($message);
 		}
 		$exception = $params->getString('exception');
-		if ($exception != 'CM_Exception' && $exception != 'CM_Exception_AuthRequired') {
+		if (!in_array($exception, array('CM_Exception', 'CM_Exception_AuthRequired'))) {
 			$exception = 'CM_Exception';
 		}
-		$public = $params->getBoolean('public', false);
-		throw new $exception($text, $public);
+		throw new $exception($message, $messagePublic);
 	}
 
 	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
