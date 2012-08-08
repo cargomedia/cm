@@ -2,6 +2,12 @@
 
 class CM_Response_Page extends CM_Response_Abstract {
 
+	public function __construct(CM_Request_Abstract $request) {
+		$this->_request = $request;
+		$this->_site = CM_Site_Abstract::findByRequest($request);
+		$request->popPathLanguage();
+	}
+
 	/**
 	 * @return string html code of page
 	 * @throws CM_Exception

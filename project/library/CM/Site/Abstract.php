@@ -87,16 +87,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @param CM_Request_Abstract $request
 	 */
 	public function rewrite(CM_Request_Abstract $request) {
-		$pathParams = explode('/', $request->getPath());
-		array_shift($pathParams);
-		if (count($pathParams) > 0) {
-			$languagePaging = new CM_Paging_Language_Enabled();
-			if ($language = $languagePaging->findByAbbreviation(array_shift($pathParams))) {
-				$request->setLanguageUrl($language);
-				$request->setPath('/' . implode('/', $pathParams));
-			}
-		}
-
 		if ($request->getPath() == '/') {
 			$request->setPath('/index');
 		}
