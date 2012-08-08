@@ -400,14 +400,17 @@ abstract class CM_Request_Abstract {
 	 * @param array|null           $headers
 	 * @param CM_Model_User|null   $viewer
 	 * @param string|null          $body
+	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Get|CM_Request_Post
 	 */
 	public static function factory($method, $uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
-		if ($method === 'POST') {
+		$method = strtolower($method);
+		if ($method === 'post') {
 			return new CM_Request_Post($uri, $headers, $viewer, $body);
 		}
-		if ($method === 'GET') {
+		if ($method === 'get') {
 			return new CM_Request_Get($uri, $headers, $viewer);
 		}
+		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}
 }
