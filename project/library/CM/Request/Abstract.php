@@ -187,14 +187,19 @@ abstract class CM_Request_Abstract {
 		return current($value);
 	}
 
+	/**
+	 * @return CM_Model_Language|null
+	 */
 	public function popPathLanguage() {
 		if ($abbreviation = $this->getPathPart(0)) {
 			$languagePaging = new CM_Paging_Language_Enabled();
 			if ($language = $languagePaging->findByAbbreviation($abbreviation)) {
 				$this->setLanguageUrl($language);
 				$this->popPathPart(0);
+				return $language;
 			}
 		}
+		return null;
 	}
 
 	/**
