@@ -58,4 +58,8 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		}
 		return $content;
 	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'js';
+	}
 }

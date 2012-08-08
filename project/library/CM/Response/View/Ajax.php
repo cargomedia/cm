@@ -36,4 +36,8 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 		return json_encode($output);
 	}
 
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'ajax';
+	}
+
 }

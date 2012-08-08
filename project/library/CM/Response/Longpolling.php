@@ -26,4 +26,8 @@ class CM_Response_Longpolling extends CM_Response_Abstract {
 		$this->setHeader('ETag', $data['id']);
 		return $data['data'];
 	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'longpolling';
+	}
 }

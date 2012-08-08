@@ -155,42 +155,39 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @return CM_Response_Abstract
 	 */
 	public static function factory(CM_Request_Abstract $request) {
-		switch ($request->getPathPart(0)) {
-			case 'form':
-				$response = new CM_Response_View_Form($request, $request->getPath(1));
-				break;
-			case 'rpc':
-				$response = new CM_Response_RPC($request, $request->getPath(1));
-				break;
-			case 'ajax':
-				$response = new CM_Response_View_Ajax($request, $request->getPath(1));
-				break;
-			case 'css':
-				$response = new CM_Response_Resource_CSS($request, $request->getPath(1));
-				break;
-			case 'js':
-				$response = new CM_Response_Resource_JS($request, $request->getPath(1));
-				break;
-			case 'img':
-				$response = new CM_Response_Resource_Img($request, $request->getPath(1));
-				break;
-			case 'captcha':
-				$response = new CM_Response_Captcha($request, $request->getPath(1));
-				break;
-			case 'upload':
-				/** @var $request CM_Request_Post */
-				$request->setBodyEncoding(false);
-				$response = new CM_Response_Upload($request, $request->getPath(1));
-				break;
-			case 'emailtracking':
-				$response = new CM_Response_EmailTracking($request, $request->getPath(1));
-				break;
-			case 'longpolling':
-				$response = new CM_Response_Longpolling($request, $request->getPath(1));
-				break;
-			default:
-				$response = null;
+		/** @var $responseClass CM_Response_Abstract */
+		foreach (self::findAll() as $responseClass) {
+			if ($responseClass::match($request)) {
+				return new $responseClass($request, $request->getPath(1));
+			}
 		}
-		return $response;
+		return null;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public static function findAll() {
+		// TODO: Move to CM_Class_Abstract
+		$key = CM_CacheConst::Responses;
+		if (false === ($responses = CM_CacheLocal::get($key))) {
+			$responses = array();
+			foreach (CM_Util::getClassChildren(get_class()) as $className) {
+				$reflectionClass = new ReflectionClass($className);
+				if (!$reflectionClass->isAbstract()) {
+					$responses[] = $className;
+				}
+			}
+			CM_CacheLocal::set($key, $responses);
+		}
+		return $responses;
+	}
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @return bool
+	 */
+	public static function match(CM_Request_Abstract $request) {
+		return false;
 	}
 }

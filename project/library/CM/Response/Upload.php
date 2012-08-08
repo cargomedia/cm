@@ -19,6 +19,11 @@ class CM_Response_Upload extends CM_Response_Abstract {
 		UPLOAD_ERR_EXTENSION => 'File upload stopped by extension.',
 	);
 
+	public function __construct(CM_Request_Post $request, $siteId = null) {
+		$request->setBodyEncoding(false);
+		parent::__construct($request, $siteId);
+	}
+
 	public function process() {
 		$query = $this->_request->getQuery();
 
@@ -69,5 +74,9 @@ class CM_Response_Upload extends CM_Response_Abstract {
 		}
 
 		return json_encode($return, JSON_HEX_TAG);	// JSON decoding in IE-iframe needs JSON_HEX_TAG
+	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'upload';
 	}
 }

@@ -19,4 +19,8 @@ class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 		$this->setHeader('Content-Type', $file->getMimeType());
 		return $file->read();
 	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'img';
+	}
 }
