@@ -28,4 +28,13 @@ class CM_Site_AbstractTest extends TestCase {
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract');
 		$this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
 	}
+
+	public function testFindAll() {
+		$this->assertSame(array('CM_Site_CM'), CM_Site_Abstract::findAll());
+	}
+
+	public function testFindByRequest() {
+		$request = new CM_Request_Get('/test');
+		$this->assertInstanceOf('CM_Site_CM', CM_Site_Abstract::findByRequest($request));
+	}
 }
