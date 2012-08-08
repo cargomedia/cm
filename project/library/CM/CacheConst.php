@@ -43,4 +43,6 @@ class CM_CacheConst {
 	const Language_Default = 'Language_Default';
 
 	const Language_Tree = 'Language_Tree';
+
+	const Sites = 'Sites';
 }
