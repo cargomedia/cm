@@ -146,6 +146,51 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Request_Abstract $request
+	 * @return CM_Response_Abstract
+	 */
+	public static function factory(CM_Request_Abstract $request) {
+		$params = explode('/', substr($request->getPath(), 1));
+		switch ($params[0]) {
+			case 'form':
+				$response = new CM_Response_View_Form($request, $params[1]);
+				break;
+			case 'rpc':
+				$response = new CM_Response_RPC($request, $params[1]);
+				break;
+			case 'ajax':
+				$response = new CM_Response_View_Ajax($request, $params[1]);
+				break;
+			case 'css':
+				$response = new CM_Response_Resource_CSS($request, $params[1]);
+				break;
+			case 'js':
+				$response = new CM_Response_Resource_JS($request, $params[1]);
+				break;
+			case 'img':
+				$response = new CM_Response_Resource_Img($request, $params[1]);
+				break;
+			case 'captcha':
+				$response = new CM_Response_Captcha($request, $params[1]);
+				break;
+			case 'upload':
+				/** @var $request CM_Request_Post */
+				$request->setBodyEncoding(false);
+				$response = new CM_Response_Upload($request, $params[1]);
+				break;
+			case 'emailtracking':
+				$response = new CM_Response_EmailTracking($request, $params[1]);
+				break;
+			case 'longpolling':
+				$response = new CM_Response_Longpolling($request, $params[1]);
+				break;
+			default:
+				$response = null;
+		}
+		return $response;
+	}
+
+	/**
 	 * @return string Response data
 	 */
 	abstract public function process();
