@@ -7,7 +7,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$viewer = $template->smarty->getTemplateVars('viewer');
 	/** @var CM_Page_Abstract $page */
 	$page = $render->getStackLast('pages');
-	$request = $page ? $page->getRequest() : new CM_Request_Get($render->getSite()->getUrl(), array(), $viewer);
+	$request = $page ? $page->getRequest() : new CM_Request_Get('/', array(), $viewer);
 	$component = $render->getStackLast('components');
 
 	if (!isset($params['paging'])) {

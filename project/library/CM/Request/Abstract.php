@@ -64,6 +64,9 @@ abstract class CM_Request_Abstract {
 		if (false === ($this->_path = parse_url($uri, PHP_URL_PATH))) {
 			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
 		}
+		if ($this->_path === null) {
+			$this->_path = '/';
+		}
 
 		if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
 			throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
