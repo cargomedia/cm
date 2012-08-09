@@ -35,6 +35,8 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 
+		$js->onloadHeaderJs('cm.ready();');
+
 		$this->getRender()->getJs()->registerPage($page);
 		$js->onloadReadyJs('cm.findView()._ready();');
 
