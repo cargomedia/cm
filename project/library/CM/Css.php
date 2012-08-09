@@ -120,10 +120,13 @@ EOD;
 			return sprintf("#%02x%02x%02x%02x", isset($color[4]) ? $color[4] * 255 : 255, $color[1], $color[2], $color[3]);
 		});
 		$css = $mixins . $this;
-		$cachKey = CM_CacheConst::Css . '_md5:' . md5($css);
-		if (($parsedCss = CM_CacheLocal::get($cachKey)) === false) {
+		$cacheKey = CM_CacheConst::Css . '_md5:' . md5($css);
+		if ($render->getLanguage()) {
+			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
+		}
+		if (($parsedCss = CM_CacheLocal::get($cacheKey)) === false) {
 			$parsedCss = $lessc->parse($css);
-			CM_CacheLocal::set($cachKey, $parsedCss);
+			CM_CacheLocal::set($cacheKey, $parsedCss);
 		}
 		return $parsedCss;
 	}

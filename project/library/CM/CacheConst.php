@@ -26,7 +26,7 @@ class CM_CacheConst {
 	// _id:X
 	const Session = 'Session';
 	
-	// _class:X_id:Y
+	// _class:X_id:X
 	const Model = 'Model';
 
 	const Option = 'Option';
@@ -35,6 +35,7 @@ class CM_CacheConst {
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 
 	//_md5:X
+	//_md5:X_languageId:X
 	const Css = 'Css';
 
 	// _languageId:X
@@ -44,6 +45,6 @@ class CM_CacheConst {
 
 	const Language_Tree = 'Language_Tree';
 
-	// _className:X_abstracts:Y
+	// _className:X_abstracts:X
 	const ClassChildren = 'ClassChildren';
 }
