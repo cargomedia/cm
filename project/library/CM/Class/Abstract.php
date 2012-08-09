@@ -87,9 +87,4 @@ abstract class CM_Class_Abstract {
 		}
 		return $classNames;
 	}
-
-
-	public static function getClassNamespace() {
-		return current(explode('_', get_called_class()));
-	}
 }

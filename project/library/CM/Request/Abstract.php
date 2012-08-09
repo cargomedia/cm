@@ -173,7 +173,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param int $position
+	 * @param int|null $position
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
@@ -403,18 +403,17 @@ abstract class CM_Request_Abstract {
 	 * @param string               $method
 	 * @param string               $uri
 	 * @param array|null           $headers
-	 * @param CM_Model_User|null   $viewer
 	 * @param string|null          $body
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Get|CM_Request_Post
 	 */
-	public static function factory($method, $uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
+	public static function factory($method, $uri, array $headers = null, $body = null) {
 		$method = strtolower($method);
 		if ($method === 'post') {
-			return new CM_Request_Post($uri, $headers, $viewer, $body);
+			return new CM_Request_Post($uri, $headers, null, $body);
 		}
 		if ($method === 'get') {
-			return new CM_Request_Get($uri, $headers, $viewer);
+			return new CM_Request_Get($uri, $headers);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}

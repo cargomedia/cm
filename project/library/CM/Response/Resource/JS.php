@@ -6,17 +6,17 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		$this->setHeader('Content-Type', 'application/x-javascript');
 		$this->enableCache();
 
-		if ($this->getRequest()->getPathPart(0) == 'internal.js') {
+		if ($this->getRequest()->getPath() == '/internal.js') {
 			return $this->_getInternal();
 		}
-		if ($this->getRequest()->getPathPart(0) == 'init.js') {
+		if ($this->getRequest()->getPath() == '/init.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
 			return $content;
 		}
-		if ($this->getRequest()->getPathPart(0) == 'library.js') {
+		if ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
@@ -24,7 +24,10 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			return $content;
 		}
 		if ($this->getRequest()->getPathPart(0) == 'translations') {
-			$language = new CM_Model_Language($this->getRequest()->getPathPart(2));
+			$language = $this->getRender()->getLanguage();
+			if (!$language) {
+				throw new CM_Exception_Invalid('Render has no language');
+			}
 			$translations = array();
 			foreach (new CM_Paging_Translation_Language($language, null, null, null, true) as $translation) {
 				$translations[$translation['key']] = $language->getTranslation($translation['key']);

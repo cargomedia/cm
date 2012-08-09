@@ -7,14 +7,14 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$this->enableCache();
 
 
-		switch ($this->getRequest()->getPathPart(0)) {
-			case 'library.css':
+		switch ($this->getRequest()->getPath()) {
+			case '/library.css':
 				$content = '';
 				foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 					$content .= new CM_File($path);
 				}
 				return $content;
-			case 'internal.css':
+			case '/internal.css':
 				$css = new CM_Css();
 
 				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
@@ -65,10 +65,10 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				$content .= $this->_getCssSmiley();
 				return $content;
 			default:
-				if (!file_exists(DIR_PUBLIC . 'static/css/' . $this->getRequest()->getPath())) {
+				if (!file_exists(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath())) {
 					throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 				}
-				return new CM_File(DIR_PUBLIC . 'static/css/' . $this->getRequest()->getPath());
+				return new CM_File(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath());
 		}
 	}
 
