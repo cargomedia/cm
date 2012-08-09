@@ -227,13 +227,6 @@ class TH {
 	}
 
 	/**
-	 * @param CM_Model_Abstract $model
-	 */
-	public static function reinstantiateModel(CM_Model_Abstract &$model) {
-		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
-	}
-
-	/**
 	 * @param string             $uri
 	 * @param array|null         $headers
 	 * @param CM_Model_User|null $viewer
@@ -245,6 +238,13 @@ class TH {
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	/**
+	 * @param CM_Model_Abstract $model
+	 */
+	public static function reinstantiateModel(CM_Model_Abstract &$model) {
+		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
 	}
 
 	/**
