@@ -36,7 +36,13 @@ class CM_Bootloader {
 				$log = new CM_Paging_Log_Error();
 				$log->add($logMsg);
 			} catch (Exception $e) {
-				echo 'Cannot log exception (' . $e->getMessage() . ')' . PHP_EOL;
+				$log_Entry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL .
+								'(' . $e->getCode() . ')' . $e->getMessage() . PHP_EOL .
+								'Log Exception: ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL .
+								$exception->getTraceAsString() . PHP_EOL .
+								'### Original Exception: ' . PHP_EOL .
+								$logMsg . PHP_EOL;
+				file_put_contents(DIR_DATA_LOG . 'not_logged.log', $log_Entry, FILE_APPEND);
 			}
 
 			if ($showError) {
@@ -83,6 +89,7 @@ class CM_Bootloader {
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_SITE_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
+		define ('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
 
 		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
