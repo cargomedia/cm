@@ -18,6 +18,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 		$options['urlStatic'] = $this->getRender()->getUrlStatic();
 		$options['urlUserContent'] = $this->getRender()->getUrlUserContent();
 		$options['urlResource'] = $this->getRender()->getUrlResource();
+		$options['language'] = $this->getRender()->getLanguage();
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream::getEnabled();
 		if (CM_Stream::getEnabled()) {
