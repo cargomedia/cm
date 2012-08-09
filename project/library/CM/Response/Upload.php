@@ -20,7 +20,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 	);
 
 	public function __construct(CM_Request_Post $request, $siteId = null) {
-		$request->setBodyEncoding(false);
+		$request->setBodyEncoding(CM_Request_Post::ENCODING_NONE);
 		parent::__construct($request, $siteId);
 	}
 
