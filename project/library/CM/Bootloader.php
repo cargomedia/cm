@@ -42,7 +42,7 @@ class CM_Bootloader {
 								$exception->getTraceAsString() . PHP_EOL .
 								'### Original Exception: ' . PHP_EOL .
 								$logMsg . PHP_EOL;
-				file_put_contents(DIR_DATA_LOG . 'not_logged.log', $log_Entry, FILE_APPEND);
+				file_put_contents(DIR_DATA_LOG . 'error.log', $log_Entry, FILE_APPEND);
 			}
 
 			if ($showError) {
