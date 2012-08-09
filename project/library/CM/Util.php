@@ -169,9 +169,7 @@ class CM_Util {
 
 			$classHierarchy = array_values(class_parents($match['name']));
 			array_unshift($classHierarchy, $match['name']);
-			if ('CM_Class_Abstract' == end($classHierarchy)) {
-				array_pop($classHierarchy);
-			}
+
 			$classes[] = array('classNames' => $classHierarchy, 'path' => $path);
 		}
 
@@ -204,6 +202,7 @@ class CM_Util {
 	public static function camelize($string) {
 		return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
 	}
+
 	/**
 	 * @param string $string
 	 * @return string
