@@ -35,13 +35,13 @@ class CM_Component_Example extends CM_Component_Abstract {
 		$status = $params->getInt('status', 200);
 		$message = $params->has('text') ? $params->getString('text') : null;
 		$messagePublic = $params->getBoolean('public', false) ? $message : null;
-		if (in_array($status, array(500, 599))) {
+		if (in_array($status, array(500, 599), true)) {
 			$response->addHeaderRaw('HTTP/1.1 ' . $status . ' Internal Server Error');
 			$response->sendHeaders();
 			exit($message);
 		}
 		$exception = $params->getString('exception');
-		if (!in_array($exception, array('CM_Exception', 'CM_Exception_AuthRequired'))) {
+		if (!in_array($exception, array('CM_Exception', 'CM_Exception_AuthRequired'), true)) {
 			$exception = 'CM_Exception';
 		}
 		throw new $exception($message, $messagePublic);
