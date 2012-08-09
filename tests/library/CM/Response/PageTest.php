@@ -10,7 +10,7 @@ class CM_Response_PageTest extends TestCase {
 	public function testProcessLanguageRedirect() {
 		TH::createLanguage('en');
 		$user = TH::createUser();
-		$response = TH::prepareGetResponse('/en/mock5', null, $user);
+		$response = TH::createResponsePage('/en/mock5', null, $user);
 		try {
 			$response->process();
 			$this->fail('Language redirect doesn\'t work');
@@ -23,15 +23,15 @@ class CM_Response_PageTest extends TestCase {
 		$language = TH::createLanguage('en');
 		$user = TH::createUser();
 		try {
-			$response = TH::prepareGetResponse('/en/mock5');
+			$response = TH::createResponsePage('/en/mock5');
 			$response->process();
 			$this->assertModelEquals($language, $response->getRequest()->getLanguageUrl());
 
-			$response = TH::prepareGetResponse('/mock5');
+			$response = TH::createResponsePage('/mock5');
 			$response->process();
 			$this->assertNull($response->getRequest()->getLanguageUrl());
 			
-			$response = TH::prepareGetResponse('/mock5', null, $user);
+			$response = TH::createResponsePage('/mock5', null, $user);
 			$response->process();
 			$this->assertNull($response->getRequest()->getLanguageUrl());
 		} catch (CM_Exception_Redirect $e) {

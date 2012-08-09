@@ -188,7 +188,7 @@ class TH {
 		}
 
 		$data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-		if (CM_Model_StreamChannel_Video::TYPE == $type){
+		if (CM_Model_StreamChannel_Video::TYPE == $type) {
 			$data['width'] = 480;
 			$data['height'] = 720;
 			$data['wowzaIp'] = ip2long('127.0.0.1');
@@ -198,7 +198,8 @@ class TH {
 	}
 
 	/**
-	 * @param CM_Model_User|null $user
+	 * @param CM_Model_User|null                   $user
+	 * @param CM_Model_StreamChannel_Abstract|null $streamChannel
 	 * @return CM_Model_Stream_Publish
 	 */
 	public static function createStreamPublish(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
@@ -213,8 +214,8 @@ class TH {
 	}
 
 	/**
-	 * @param CM_Model_User|null                 $user
-	 * @param CM_Model_Stream_Publish|null       $streamPublish
+	 * @param CM_Model_User|null                         $user
+	 * @param CM_Model_StreamChannel_Abstract|null       $streamChannel
 	 * @return CM_Model_Stream_Subscribe
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
@@ -235,14 +236,14 @@ class TH {
 	/**
 	 * @param string             $uri
 	 * @param array|null         $headers
-	 * @param CM_Model_User|null $user
+	 * @param CM_Model_User|null $viewer
 	 * @return CM_Response_Page
 	 */
-	public static function prepareGetResponse($uri, array $headers = null, CM_Model_User $user = null) {
+	public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (!$headers) {
 			$headers = array();
 		}
-		$request = new CM_Request_Get($uri, $headers, $user);
+		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
 	}
 
