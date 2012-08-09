@@ -8,21 +8,21 @@ class CM_Response_AbstractTest extends TestCase {
 	}
 
 	public function testFactory() {
-		$responses = array(
-			'/captcha'       => 'CM_Response_Captcha',
-			'/emailtracking' => 'CM_Response_EmailTracking',
-			'/longpolling'   => 'CM_Response_Longpolling',
-			'/rpc'           => 'CM_Response_RPC',
-			'/upload'        => 'CM_Response_Upload',
-			'/css'           => 'CM_Response_Resource_CSS',
-			'/img'           => 'CM_Response_Resource_Img',
-			'/js'            => 'CM_Response_Resource_JS',
-			'/ajax'          => 'CM_Response_View_Ajax',
-			'/form'          => 'CM_Response_View_Form',
-			'/homepage'      => 'CM_Response_Page',
-		);
+		$responses = array();
+		$responses['/captcha'] = 'CM_Response_Captcha';
+		$responses['/emailtracking'] = 'CM_Response_EmailTracking';
+		$responses['/longpolling'] = 'CM_Response_Longpolling';
+		$responses['/rpc'] = 'CM_Response_RPC';
+		$responses['/upload'] = 'CM_Response_Upload';
+		$responses['/css'] = 'CM_Response_Resource_CSS';
+		$responses['/img'] = 'CM_Response_Resource_Img';
+		$responses['/js'] = 'CM_Response_Resource_JS';
+		$responses['/ajax'] = 'CM_Response_View_Ajax';
+		$responses['/form'] = 'CM_Response_View_Form';
+		$responses['/homepage'] = 'CM_Response_Page';
+
 		foreach ($responses as $path => $expectedResponse) {
-			$request = new CM_Request_Post($path . '/1/timestamp', null, null, '');
+			$request = new CM_Request_Post($path . '/' . CM_Site_CM::TYPE . '/timestamp', null, null, '');
 			$this->assertInstanceOf($expectedResponse, CM_Response_Abstract::factory($request));
 		}
 	}
