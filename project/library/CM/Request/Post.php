@@ -49,8 +49,12 @@ class CM_Request_Post extends CM_Request_Abstract {
 
 	/**
 	 * @param int $bodyEncoding
+	 * @throws CM_Exception_Invalid
 	 */
 	public function setBodyEncoding($bodyEncoding) {
+		if (!in_array($bodyEncoding, array(self::ENCODING_NONE, self::ENCODING_JSON, self::ENCODING_FORM), true)) {
+			throw new CM_Exception_Invalid('Invalid body encoding `' . $bodyEncoding . '`.');
+		}
 		$this->_bodyEncoding = (int) $bodyEncoding;
 		$this->_bodyQuery = null;
 	}
