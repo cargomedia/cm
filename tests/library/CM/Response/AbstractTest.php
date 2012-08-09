@@ -22,7 +22,7 @@ class CM_Response_AbstractTest extends TestCase {
 		$responses['/homepage'] = 'CM_Response_Page';
 
 		foreach ($responses as $path => $expectedResponse) {
-			$request = new CM_Request_Post($path . '/' . CM_Site_CM::TYPE . '/timestamp', null, null, '');
+			$request = new CM_Request_Post($path . '/' . CM_Site_CM::TYPE . '/timestamp', null, '');
 			$this->assertInstanceOf($expectedResponse, CM_Response_Abstract::factory($request));
 		}
 	}

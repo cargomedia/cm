@@ -18,10 +18,9 @@ class CM_Request_Post extends CM_Request_Abstract {
 	/**
 	 * @param string             $uri
 	 * @param array|null         $headers
-	 * @param CM_Model_User|null $viewer
 	 * @param string|null        $body
 	 */
-	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null, $body = null) {
+	public function __construct($uri, array $headers = null, $body = null) {
 		parent::__construct($uri, $headers);
 		$this->_body = (string) $body;
 	}

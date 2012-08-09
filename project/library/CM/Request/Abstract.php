@@ -410,7 +410,7 @@ abstract class CM_Request_Abstract {
 	public static function factory($method, $uri, array $headers = null, $body = null) {
 		$method = strtolower($method);
 		if ($method === 'post') {
-			return new CM_Request_Post($uri, $headers, null, $body);
+			return new CM_Request_Post($uri, $headers, $body);
 		}
 		if ($method === 'get') {
 			return new CM_Request_Get($uri, $headers);
