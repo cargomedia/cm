@@ -17,14 +17,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Request_Abstract $request
-	 * @return boolean
-	 */
-	public static function match(CM_Request_Abstract $request) {
-		return false;
-	}
-
-	/**
 	 * @return CM_EventHandler
 	 */
 	public function getEventHandler() {
@@ -110,6 +102,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 		// Resets themes if new namespace is set
 		$this->_themes = array('default');
 		return $this;
+	}
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @return boolean
+	 */
+	public static function match(CM_Request_Abstract $request) {
+		return false;
 	}
 
 	/**
