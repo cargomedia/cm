@@ -169,5 +169,4 @@ class CM_Bootloader {
 			$instance->$function();
 		}
 	}
-
 }
