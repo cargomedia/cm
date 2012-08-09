@@ -19,34 +19,34 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		set_exception_handler(function(Exception $exception) {
+		$exceptionFormatter = function(Exception $exception) {
+			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
+			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
+			$text .= $exception->getTraceAsString() . PHP_EOL;
+			return $text;
+		};
+
+		set_exception_handler(function(Exception $exception) use($exceptionFormatter) {
 			$showError = IS_DEBUG || IS_CRON || IS_TEST;
 
 			if (!IS_CRON && !IS_TEST) {
 				header('HTTP/1.1 500 Internal Server Error');
 			}
 
-			$class = get_class($exception);
-			$code = $exception->getCode();
-
-			$logMsg = $class . ' (' . $code . '): ' . $exception->getMessage() . PHP_EOL;
-			$logMsg .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
-			$logMsg .= $exception->getTraceAsString() . PHP_EOL;
 			try {
 				$log = new CM_Paging_Log_Error();
-				$log->add($logMsg);
-			} catch (Exception $e) {
-				$log_Entry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL .
-								'(' . $e->getCode() . ')' . $e->getMessage() . PHP_EOL .
-								'Log Exception: ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL .
-								$exception->getTraceAsString() . PHP_EOL .
-								'### Original Exception: ' . PHP_EOL .
-								$logMsg . PHP_EOL;
-				file_put_contents(DIR_DATA_LOG . 'error.log', $log_Entry, FILE_APPEND);
+				$log->add($exceptionFormatter($exception));
+			} catch (Exception $loggerException) {
+				$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
+				$logEntry .= '### Cannot log error: ' . PHP_EOL;
+				$logEntry .= $exceptionFormatter($loggerException);
+				$logEntry .= '### Original Exception: ' . PHP_EOL;
+				$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
+				file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 			}
 
 			if ($showError) {
-				echo $class . ' (' . $code . '): <b>' . $exception->getMessage() . '</b><br/>';
+				echo get_class($exception) . ' (' . $exception->getCode() . '): <b>' . $exception->getMessage() . '</b><br/>';
 				echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
 				echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
 			} else {
@@ -169,4 +169,5 @@ class CM_Bootloader {
 			$instance->$function();
 		}
 	}
+
 }
