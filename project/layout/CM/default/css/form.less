@@ -14,10 +14,6 @@ button:focus, .textinput:focus, .textinput.focus {
 	.input_focus;
 }
 
-button.large, input[type=submit].large, input[type=button].large {
-	.input_button_large;
-}
-
 button:hover, input[type=submit]:hover, input[type=button]:hover {
 	.input_button_hover;
 }
@@ -29,18 +25,26 @@ button:active, input[type=submit]:active, input[type=button]:active {
 button.alt, input[type=submit].alt, input[type=button].alt {
 	.input_button_alt;
 }
-
 button.alt:hover, input[type=submit].alt:hover, input[type=button].alt:hover {
 	.input_button_alt_hover;
 }
-
 button.alt:active, input[type=submit].alt:active, input[type=button].alt:active {
 	.input_button_alt_active;
+}
+
+button.large, input[type=submit].large, input[type=button].large {
+	.input_button_large;
 }
 
 button.alt.large, input[type=submit].alt.large, input[type=button].alt.large {
 	.input_button_alt;
 	.input_button_large;
+}
+button.alt.large:hover, input[type=submit].alt.large:hover, input[type=button].alt.large:hover {
+	.input_button_alt_hover;
+}
+button.alt.large:active, input[type=submit].alt.large:active, input[type=button].alt.large:active {
+	.input_button_alt_active;
 }
 
 .textinput {
