@@ -418,6 +418,9 @@ abstract class CM_Request_Abstract {
 		if ($method === 'head') {
 			return new CM_Request_Head($uri, $headers);
 		}
+		if ($method === 'options') {
+			return new CM_Request_Head($uri, $headers);
+		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}
 }
