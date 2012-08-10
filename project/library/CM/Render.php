@@ -265,11 +265,11 @@ class CM_Render extends CM_Class_Abstract {
 	 * @param CM_Page_Abstract|string      $pageClassName
 	 * @param array|null                   $params
 	 * @param CM_Site_Abstract|null        $site
+	 * @param CM_Model_Language|null       $language
 	 * @throws CM_Exception_Invalid
 	 * @return string
-	 *
 	 */
-	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null) {
+	public function getUrlPage($pageClassName, array $params = null, CM_Site_Abstract $site = null, CM_Model_Language $language = null) {
 		if (null === $site) {
 			$site = $this->getSite();
 		}
@@ -289,8 +289,13 @@ class CM_Render extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
 		$path = $pageClassName::getPath($params);
-		if ($this->_languageRewrite && $this->getLanguage()) {
-			$path = '/' . $this->getLanguage()->getAbbreviation() . $path;
+
+		$languageRewrite = $this->_languageRewrite || $language;
+		if (!$language) {
+			$language = $this->getLanguage();
+		}
+		if ($languageRewrite && $language) {
+			$path = '/' . $language->getAbbreviation() . $path;
 		}
 		return $this->getUrl($path, false, $site);
 	}
