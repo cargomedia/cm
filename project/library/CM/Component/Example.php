@@ -20,7 +20,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 	}
 
 	public function checkAccessible() {
-		if (!$this->getViewer(true)->getRoles()->contains(SK_Role::ADMIN, SK_Role::DEVELOPER)) {
+		if (!IS_DEBUG && !$this->getViewer(true)->getRoles()->contains(SK_Role::ADMIN, SK_Role::DEVELOPER)) {
 			throw new CM_Exception_NotAllowed();
 		}
 	}
