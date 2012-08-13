@@ -30,7 +30,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	 */
 	public static function setup() {
 		self::init();
-		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3.1/wurfl-2.3.1.zip');
+		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3.2/wurfl-2.3.2.zip');
 		$dataDir = DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 		$zipFile = CM_File::create($dataDir . 'wurfl.zip', $zip);
 		$zipArchive = new ZipArchive();
