@@ -44,8 +44,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	}
 }
 
-
-class TeraWurflConfig{
+class TeraWurflConfig {
 	/**
 	 * Database Hostname
 	 * To specify the MySQL 5 TCP port or use a named pipe / socket, put it at the end of your hostname,
@@ -157,15 +156,15 @@ class TeraWurflConfig{
 	 *
 	 * Usage Example:
 	 * <code>
-	 *	public static $CAPABILITY_FILTER = array(
-	 *		// Complete Capability Groups
-	 *		"product_info",
+	 *    public static $CAPABILITY_FILTER = array(
+	 *        // Complete Capability Groups
+	 *        "product_info",
 	 *
-	 *		// Individual Capabilities
-	 *		"max_image_width",
-	 *		"max_image_height",
-	 *		"chtml_make_phone_call_string",
-	 *	);
+	 *        // Individual Capabilities
+	 *        "max_image_width",
+	 *        "max_image_height",
+	 *        "chtml_make_phone_call_string",
+	 *    );
 	 * </code>
 	 * @var Mixed
 	 */
