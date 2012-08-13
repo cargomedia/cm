@@ -180,7 +180,7 @@ abstract class CM_Request_Abstract {
 	public function popPathPart($position = null) {
 		$position = (int) $position;
 		if (!array_key_exists($position, $this->getPathParts())) {
-			throw new CM_Exception_Invalid('Cannot find `' . $position . '` element in request\'s path');
+			throw new CM_Exception_Invalid('Cannot find request\'s path part at position `' . $position . '`.');
 		}
 		$value = array_splice($this->_pathParts, $position, 1);
 		$this->setPathParts($this->_pathParts);
