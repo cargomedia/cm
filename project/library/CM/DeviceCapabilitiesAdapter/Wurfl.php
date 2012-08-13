@@ -44,6 +44,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	}
 }
 
+
 class TeraWurflConfig{
 	/**
 	 * Database Hostname
