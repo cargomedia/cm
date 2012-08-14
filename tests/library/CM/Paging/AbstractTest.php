@@ -27,7 +27,7 @@ class CM_Comparable_Mock implements CM_Comparable {
 		return $this->_value;
 	}
 
-	public function equals(self $other = null) {
+	public function equals(CM_Comparable $other = null) {
 		return ($other && $this->getValue() == $other->getValue());
 	}
 }

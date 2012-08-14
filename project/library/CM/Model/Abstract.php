@@ -52,6 +52,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$asset->_onModelDelete();
 		}
 		$containingCacheables = $this->_getContainingCacheables();
+		if ($this instanceof CM_Archiveable) {
+			$this->archive();
+		}
 		$this->_onDelete();
 		$cacheClass = $this->_cacheClass;
 		$cacheClass::delete($this->_getCacheKey());
@@ -77,10 +80,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param CM_Model_Abstract $model OPTIONAL
+	 * @param CM_Comparable $model OPTIONAL
 	 * @return boolean
 	 */
-	public function equals(self $model = null) {
+	public function equals(CM_Comparable $model = null) {
 		if (empty($model)) {
 			return false;
 		}

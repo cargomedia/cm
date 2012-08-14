@@ -488,3 +488,16 @@ CREATE TABLE `cm_useragent` (
   KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
+
+
+CREATE TABLE `cm_streamChannelArchive_video` (
+  `id` int(10) unsigned NOT NULL,
+  `userId` int(10) unsigned NOT NULL,
+  `width` int(10) unsigned NOT NULL,
+  `height` int(10) unsigned NOT NULL,
+  `duration` int(10) unsigned NOT NULL,
+  `createStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
