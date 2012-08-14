@@ -7,8 +7,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract imple
 	public function archive() {
 		/** @var CM_Model_Stream_Publish $streamPublish */
 		$streamPublish = $this->getStreamPublishs()->getItem(0);
+		if ($streamPublish) {
 		CM_Model_StreamChannelArchive_Video::create(array('id' => $this->getId(), 'userId' => $streamPublish->getUser()->getId(),
 			'width' => $this->getWidth(), 'height' => $this->getHeight(), 'start' => $streamPublish->getStart(), 'end' => time()));
+		}
 	}
 
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
