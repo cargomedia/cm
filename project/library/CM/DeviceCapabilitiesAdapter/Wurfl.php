@@ -27,9 +27,14 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 
 	/**
 	 *  xml file repository http://sourceforge.net/projects/wurfl/files/WURFL/
+	 *
+	 * 	ON UPDATE: flush APC-cache!!!
 	 */
 	public static function setup() {
 		self::init();
+		if (CM_Mysql::exists('wurflCache')) {
+			CM_Mysql::truncate('wurflCache');
+		}
 		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3.2/wurfl-2.3.2.zip');
 		$dataDir = DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 		$zipFile = CM_File::create($dataDir . 'wurfl.zip', $zip);
