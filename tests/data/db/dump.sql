@@ -492,12 +492,14 @@ DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
 
 
 CREATE TABLE `cm_streamChannelArchive_video` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL DEFAULT '0',
   `userId` int(10) unsigned NOT NULL,
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
   `duration` int(10) unsigned NOT NULL,
+  `thumbnailCount` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `userId` (`userId`)
+  KEY `userId` (`userId`),
+  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

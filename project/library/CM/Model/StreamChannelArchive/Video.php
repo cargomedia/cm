@@ -26,6 +26,13 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getThumbnailCount() {
+		return (int) $this->_get('thumbnailCount');
+	}
+
+	/**
 	 * @return CM_Model_User
 	 */
 	public function getUser() {
@@ -59,10 +66,11 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		/** @var CM_Model_Stream_Publish $streamPublish */
 		$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
 		$createStamp = $streamPublish->getStart();
+		$thumbnailCount = $streamChannel->getThumbnailCount();
 		$end = time();
 		$duration = $end - $createStamp;
 		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $streamChannel->getId(), 'userId' => $streamPublish->getUser()->getId(), 'width' => $streamChannel->getWidth(), 'height' => $streamChannel->getHeight(),
-			'duration' => $duration, 'createStamp' => $createStamp));
+			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'createStamp' => $createStamp));
 		return new self($streamChannel->getId());
 	}
 

@@ -23,5 +23,6 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$this->assertSame($streamChannel->getHeight(), $archive->getHeight());
 		$this->assertSame($streamPublish->getStart(), $archive->getCreated());
 		$this->assertSame(10, $archive->getDuration());
+		$this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
 	}
 }
