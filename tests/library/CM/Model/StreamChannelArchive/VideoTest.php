@@ -14,7 +14,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$streamPublish = TH::createStreamPublish($user, $streamChannel);
 		TH::timeForward(10);
 		/** @var CM_Model_StreamChannelArchive_Video $archive */
-		$archive = CM_Model_StreamChannelArchive_Video::create(array('object' => $streamChannel));
+		$archive = CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
 		$this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
 		$this->assertSame($streamChannel->getId(), $archive->getId());
 		$this->assertSame($user->getId(), $archive->getUserId());

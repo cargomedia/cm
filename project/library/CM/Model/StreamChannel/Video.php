@@ -4,11 +4,6 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	const TYPE = 19;
 
-	public function __construct($id) {
-		parent::__construct($id);
-		$this->setArchive('CM_Model_StreamChannelArchive_Video');
-	}
-
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
 	}
 
@@ -56,6 +51,12 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getThumbnailCount() {
 		return (int) $this->_get('thumbnailCount');
+	}
+
+	protected function _onBeforeDelete() {
+		if ($this->getStreamPublishs()->getCount()) {
+			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
+		}
 	}
 
 	protected function _onDelete() {

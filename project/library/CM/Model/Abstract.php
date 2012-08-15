@@ -15,11 +15,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_data;
 
 	/**
-	 * @var CM_Model_Abstract|string $_archive
-	 */
-	private $_archive = null;
-
-	/**
 	 * @var CM_ModelAsset_Abstract[]
 	 */
 	private $_assets = array();
@@ -57,9 +52,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$asset->_onModelDelete();
 		}
 		$containingCacheables = $this->_getContainingCacheables();
-		if ($this->_archive) {
-			$this->_archive();
-		}
+		$this->_onBeforeDelete();
 		$this->_onDelete();
 		$cacheClass = $this->_cacheClass;
 		$cacheClass::delete($this->_getCacheKey());
@@ -105,13 +98,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$this->_assets[get_class($asset)] = $asset;
 		}
 		$this->_get(); // Make sure data can be loaded
-	}
-
-	/**
-	 * @param CM_Model_Abstract|string $archive
-	 */
-	public function setArchive($archive) {
-		$this->_archive = $archive;
 	}
 
 	/**
@@ -177,6 +163,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cacheClass = $this->_cacheClass;
 			$cacheClass::set($this->_getCacheKey(), $this->_data);
 		}
+	}
+
+	protected function _onBeforeDelete() {
 	}
 
 	protected function _onChange() {
