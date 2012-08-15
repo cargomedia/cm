@@ -65,6 +65,7 @@ class CM_WowzaTest extends TestCase {
 		$this->assertModelEquals($streamPublishToBeAdded->getUser(), $streamPublishAdded->getUser());
 		$this->assertModelEquals($streamSubscribeToBeAdded1->getUser(), $streamSubscribeAdded1->getUser());
 		$this->assertModelEquals($streamSubscribeToBeAdded2->getUser(), $streamSubscribeAdded2->getUser());
+		$this->assertEquals(2, $streamChannelAdded->getThumbnailCount());
 
 		//stuff that should have been removed
 		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeRemoved->getKey()));
@@ -124,7 +125,7 @@ class CM_WowzaTest extends TestCase {
 			$session = TH::createSession($streamPublish->getUser());
 			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
 				'data' => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
-				'subscribers' => $subscribes);
+				'subscribers' => $subscribes, 'thumbnailCount' => 2, 'width' => 480, 'height' => 720, 'wowzaIp' => ip2long('192.168.0.1'));
 			unset($session);
 		}
 		return json_encode($jsonData);

@@ -333,7 +333,7 @@ CREATE TABLE `cm_streamChannel_video` (
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
   `wowzaIp` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
+  `thumbnailCount` int(10) unsigned NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_publish`;

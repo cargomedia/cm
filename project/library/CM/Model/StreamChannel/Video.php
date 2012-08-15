@@ -26,6 +26,15 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract imple
 	}
 
 	/**
+	 * @param int $thumbnailCount
+	 */
+	public function setThumbnailCount($thumbnailCount) {
+		$thumbnailCount = (int) $thumbnailCount;
+		CM_Mysql::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+		$this->_change();
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getWidth() {
@@ -46,6 +55,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract imple
 		return (string) $this->_get('wowzaIp');
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getThumbnailCount() {
+		return (int) $this->_get('thumbnailCount');
+	}
+
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
 		parent::_onDelete();
@@ -60,9 +76,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract imple
 		$width = (int) $data['width'];
 		$height = (int) $data['height'];
 		$wowzaIp = $data['wowzaIp'];
+		$thumbnailCount = (int) $data['thumbnailCount'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		try {
-			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp));
+			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp, 'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
 			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
 			throw $ex;

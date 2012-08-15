@@ -24,15 +24,20 @@ class CM_Wowza extends CM_Class_Abstract {
 
 		$streamChannels = self::_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
-			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
+			/** @var CM_Model_StreamChannel_Video $streamChannel */
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				try {
-					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['wowzaIp'], $publish['data']);
+					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['wowzaIp'], $publish['thumbnailCount'], $publish['data']);
 				} catch (CM_Exception $ex) {
 					$this->_stopClient($publish['clientId'], long2ip($publish['wowzaIp']));
 				}
 			}
+
+			if($streamChannel instanceof CM_Model_StreamChannel_Video) {
+				$streamChannel->setThumbnailCount($publish['thumbnailCount']);
+			}
+
 			foreach ($publish['subscribers'] as $clientId => $subscribe) {
 				if (!$streamChannel || !$streamChannel->getStreamSubscribes()->findKey($clientId)) {
 					try {
@@ -44,17 +49,23 @@ class CM_Wowza extends CM_Class_Abstract {
 			}
 		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		foreach ($streamChannels as $streamChannel) {
+		foreach ($this->_getStreamChannels() as $streamChannel) {
+			$streamPublishs = $streamChannel->getStreamPublishs();
+			if (!$streamPublishs->getCount()) {
+				$streamChannel->delete();
+				continue;
+			}
 			/** @var CM_Model_Stream_Publish|null $streamPublish */
-			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-			if (!$streamPublish || !isset($status[$streamChannel->getKey()])) {
-				$this->unpublish($streamChannel->getKey());
-			} else {
-				$publish = $status[$streamChannel->getKey()];
-				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-					if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {
-						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
+			foreach ($streamPublishs as $streamPublish) {
+				if (!isset($status[$streamChannel->getKey()])) {
+					$this->unpublish($streamChannel->getKey());
+				} else {
+					$publish = $status[$streamChannel->getKey()];
+					/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+					foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+						if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {
+							$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
+						}
 					}
 				}
 			}
@@ -73,13 +84,14 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 */
-	public function publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data) {
+	public function publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $thumbnailCount, $data) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
 		$width = (int) $width;
 		$height = (int) $height;
 		$wowzaIp = (string) $wowzaIp;
+		$thumbnailCount = (int) $thumbnailCount;
 		$data = (string) $data;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		$streamChannelType = $params->getInt('streamChannelType');
@@ -87,7 +99,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params,
-			'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp));
+			'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp, 'thumbnailCount' => $thumbnailCount));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
@@ -220,9 +232,9 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string  $data
 	 * @return boolean
 	 */
-	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
+	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$wowzaIp = CM_Request_Abstract::getInstance()->getIp();
-		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $data);
+		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $thumbnailCount, $data);
 		return $channelId;
 	}
 
