@@ -117,12 +117,19 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string $streamName
 	 */
-	public function unpublish($streamName) {
+	public function unpublish($streamName, $thumbnailCount = 0) {
 		$streamName = (string) $streamName;
+		$thumbnailCount = (int) $thumbnailCount;
+		/** @var CM_Model_StreamChannel_Video $streamChannel  */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			return;
 		}
+
+		if ($thumbnailCount > 0) {
+			$streamChannel->setThumbnailCount($thumbnailCount);
+		}
+
 		$streamChannel->delete();
 	}
 
@@ -242,8 +249,8 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $streamName
 	 * @return boolean
 	 */
-	public static function rpc_unpublish($streamName) {
-		self::_getInstance()->unpublish($streamName);
+	public static function rpc_unpublish($streamName, $thumbnailCount) {
+		self::_getInstance()->unpublish($streamName, $thumbnailCount);
 		return true;
 	}
 
