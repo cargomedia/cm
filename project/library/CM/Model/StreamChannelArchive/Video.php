@@ -2,6 +2,8 @@
 
 class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_Abstract {
 
+	const TYPE = 25;
+
 	/**
 	 * @return int
 	 */
@@ -52,15 +54,16 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	}
 
 	protected static function _create(array $data) {
-		$id = (int) $data['id'];
-		$userId = (int) $data['userId'];
-		$width = (int) $data['width'];
-		$height = (int) $data['height'];
-		$createStamp = (int) $data['start'];
-		$end = (int) $data['end'];
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = $data['object'];
+		/** @var CM_Model_Stream_Publish $streamPublish */
+		$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
+		$createStamp = $streamPublish->getStart();
+		$end = time();
 		$duration = $end - $createStamp;
-		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $id, 'userId' => $userId, 'width' => $width, 'height' => $height,
+		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $streamChannel->getId(), 'userId' => $streamPublish->getUser()->getId(), 'width' => $streamChannel->getWidth(), 'height' => $streamChannel->getHeight(),
 			'duration' => $duration, 'createStamp' => $createStamp));
-		return new self($id);
+		return new self($streamChannel->getId());
 	}
+
 }

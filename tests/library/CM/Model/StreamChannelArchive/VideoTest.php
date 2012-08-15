@@ -8,16 +8,20 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 	}
 
 	public function testCreate() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
 		$user = TH::createUser();
+		$streamPublish = TH::createStreamPublish($user, $streamChannel);
+		TH::timeForward(10);
 		/** @var CM_Model_StreamChannelArchive_Video $archive */
-		$archive = CM_Model_StreamChannelArchive_Video::create(array('id' => 12, 'userId' => $user->getId(), 'width' => 640, 'height' => 480, 'start' => 56, 'end' => 100));
+		$archive = CM_Model_StreamChannelArchive_Video::create(array('object' => $streamChannel));
 		$this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
-		$this->assertSame(12, $archive->getId());
+		$this->assertSame($streamChannel->getId(), $archive->getId());
 		$this->assertSame($user->getId(), $archive->getUserId());
 		$this->assertModelEquals($user, $archive->getUser());
-		$this->assertSame(640, $archive->getWidth());
-		$this->assertSame(480, $archive->getHeight());
-		$this->assertSame(56, $archive->getCreated());
-		$this->assertSame(44, $archive->getDuration());
+		$this->assertSame($streamChannel->getWidth(), $archive->getWidth());
+		$this->assertSame($streamChannel->getHeight(), $archive->getHeight());
+		$this->assertSame($streamPublish->getStart(), $archive->getCreated());
+		$this->assertSame(10, $archive->getDuration());
 	}
 }

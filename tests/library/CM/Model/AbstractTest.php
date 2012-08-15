@@ -100,6 +100,13 @@ class CM_Model_AbstractTest extends TestCase{
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+
+		//archive
+		$modelMock = $this->getMockForAbstractClass('CM_Model_Abstract', array(), 'CM_Model_AbstractMock', false, true, true);
+		$archiveMock = $this->getMockForAbstractClass('CM_Model_Abstract', array(), 'CM_Model_ArchiveMock', false, true, true, array('create', '_create'));
+		$archiveMock->staticExpects($this->once())->method('_create')->with($this->identicalTo(array('object' => $modelMock)))->will($this->returnValue($archiveMock));
+		$modelMock->setArchive($archiveMock);
+		$modelMock->delete();
 	}
 
 	public function testOnChange() {
