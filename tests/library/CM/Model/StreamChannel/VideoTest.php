@@ -21,10 +21,11 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		$this->assertSame('127.0.0.1', long2ip($channel->getWowzaIp()));
 		$this->assertSame('foo', $channel->getKey());
 		$this->assertSame(2, $channel->getThumbnailCount());
+	}
 
+	public function testCreateWithoutWowzaIp() {
 		try {
-			CM_Model_StreamChannel_Video::create(array('key' => null, 'width' => 100, 'height' => 200, 'wowzaIp' => null,
-				'thumbnailCount' => 2));
+			CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'wowzaIp' => null, 'thumbnailCount' => 2));
 			$this->fail('Can create streamChannel without wowzaIp');
 		} catch (CM_Exception $ex) {
 			$this->assertContains("`Column 'wowzaIp' cannot be null`", $ex->getMessage());
