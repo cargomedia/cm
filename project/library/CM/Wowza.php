@@ -24,7 +24,7 @@ class CM_Wowza extends CM_Class_Abstract {
 
 		$streamChannels = self::_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
-			/** @var CM_Model_StreamChannel_Video $streamChannel */
+			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				try {
@@ -34,7 +34,8 @@ class CM_Wowza extends CM_Class_Abstract {
 				}
 			}
 
-			if($streamChannel instanceof CM_Model_StreamChannel_Video) {
+			if ($streamChannel instanceof CM_Model_StreamChannel_Video) {
+				/** @var CM_Model_StreamChannel_Video $streamChannel */
 				$streamChannel->setThumbnailCount($publish['thumbnailCount']);
 			}
 
@@ -49,7 +50,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			}
 		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		foreach ($this->_getStreamChannels() as $streamChannel) {
+		foreach ($streamChannels as $streamChannel) {
 			$streamPublishs = $streamChannel->getStreamPublishs();
 			if (!$streamPublishs->getCount()) {
 				$streamChannel->delete();
@@ -73,16 +74,17 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $streamName
-	 * @param string $clientKey
-	 * @param int    $start
-	 * @param int    $width
-	 * @param int    $height
-	 * @param string $wowzaIp
-	 * @param string $data
-	 * @return int
+	 * @param string  $streamName
+	 * @param string  $clientKey
+	 * @param int     $start
+	 * @param int     $width
+	 * @param int     $height
+	 * @param string  $wowzaIp
+	 * @param int     $thumbnailCount
+	 * @param string  $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
+	 * @return int
 	 */
 	public function publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $thumbnailCount, $data) {
 		$streamName = (string) $streamName;
@@ -115,18 +117,21 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $streamName
+	 * @param string     $streamName
+	 * @param int|null   $thumbnailCount
+	 * @return
 	 */
-	public function unpublish($streamName, $thumbnailCount = 0) {
+	public function unpublish($streamName, $thumbnailCount = null) {
 		$streamName = (string) $streamName;
 		$thumbnailCount = (int) $thumbnailCount;
-		/** @var CM_Model_StreamChannel_Video $streamChannel  */
+		/** @var CM_Model_StreamChannel_Abstract $streamChannel  */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 		if (!$streamChannel) {
 			return;
 		}
 
-		if ($thumbnailCount > 0) {
+		if (null !== $thumbnailCount && $streamChannel instanceof CM_Model_StreamChannel_Video) {
+			/** @var CM_Model_StreamChannel_Video $streamChannel  */
 			$streamChannel->setThumbnailCount($thumbnailCount);
 		}
 
@@ -236,8 +241,9 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param int     $start
 	 * @param int     $width
 	 * @param int     $height
+	 * @param int     $thumbnailCount
 	 * @param string  $data
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$wowzaIp = CM_Request_Abstract::getInstance()->getIp();
@@ -246,8 +252,9 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $streamName
-	 * @return boolean
+	 * @param string   $streamName
+	 * @param int      $thumbnailCount
+	 * @return bool
 	 */
 	public static function rpc_unpublish($streamName, $thumbnailCount) {
 		self::_getInstance()->unpublish($streamName, $thumbnailCount);

@@ -13,12 +13,21 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'wowzaIp' => ip2long('127.0.0.1')));
+		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'wowzaIp' => ip2long('127.0.0.1'),
+			'thumbnailCount' => 2));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
 		$this->assertSame('127.0.0.1', long2ip($channel->getWowzaIp()));
 		$this->assertSame('foo', $channel->getKey());
+		$this->assertSame(2, $channel->getThumbnailCount());
+	}
+
+	public function testThumbnailCount() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$streamChannel->setThumbnailCount(15);
+		$this->assertSame(15, $streamChannel->getThumbnailCount());
 	}
 
 	public function testOnDelete() {

@@ -192,6 +192,7 @@ class TH {
 			$data['width'] = 480;
 			$data['height'] = 720;
 			$data['wowzaIp'] = ip2long('127.0.0.1');
+			$data['thumbnailCount'] = 0;
 		}
 
 		return CM_Model_StreamChannel_Abstract::createType($type, $data);
