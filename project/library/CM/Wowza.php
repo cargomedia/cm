@@ -56,17 +56,13 @@ class CM_Wowza extends CM_Class_Abstract {
 				$streamChannel->delete();
 				continue;
 			}
-			/** @var CM_Model_Stream_Publish|null $streamPublish */
-			foreach ($streamPublishs as $streamPublish) {
-				if (!isset($status[$streamChannel->getKey()])) {
-					$this->unpublish($streamChannel->getKey());
-				} else {
-					$publish = $status[$streamChannel->getKey()];
-					/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-					foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-						if (!isset($publish['subscribers'][$streamSubscribe->getKey()])) {
-							$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
-						}
+			if (!isset($status[$streamChannel->getKey()])) {
+				$this->unpublish($streamChannel->getKey());
+			} else {
+				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+					if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
+						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 					}
 				}
 			}
@@ -119,7 +115,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string     $streamName
 	 * @param int|null   $thumbnailCount
-	 * @return
+	 * @return null
 	 */
 	public function unpublish($streamName, $thumbnailCount = null) {
 		$streamName = (string) $streamName;
