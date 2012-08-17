@@ -63,9 +63,6 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	protected static function _create(array $data) {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = $data['streamChannel'];
-		if (!$streamChannel->hasStreamPublish()) {
-			throw new CM_Exception_Invalid('Missing StreamPublish. StreamChannel `' . $streamChannel->getId() . '` cannot be archived.');
-		}
 		$streamPublish = $streamChannel->getStreamPublish();
 		$createStamp = $streamPublish->getStart();
 		$thumbnailCount = $streamChannel->getThumbnailCount();

@@ -40,11 +40,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Stream_Publish|null
+	 * @return CM_Model_Stream_Publish
+	 *
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getStreamPublish() {
 		if (!$this->hasStreamPublish()) {
-			return null;
+			throw new CM_Exception_Invalid('StreamChannel `' . $this->getId() . '` has no StreamPublish.');
 		}
 		return $this->getStreamPublishs()->getItem(0);
 	}
