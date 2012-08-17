@@ -493,7 +493,7 @@ DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
 
 
 CREATE TABLE `cm_streamChannelArchive_video` (
-  `id` int(10) unsigned NOT NULL DEFAULT '0',
+  `id` int(10) unsigned NOT NULL,
   `userId` int(10) unsigned NOT NULL,
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
