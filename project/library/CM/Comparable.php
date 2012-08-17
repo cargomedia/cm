@@ -1,7 +1,7 @@
 <?php 
 interface CM_Comparable {
 	/**
-	 * @param mixed $other
+	 * @param CM_Comparable $other
 	 * @return boolean
 	 */
 	public function equals(CM_Comparable $other = null);

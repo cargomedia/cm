@@ -7,6 +7,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected $_id;
 
+	/**
+	 * @var CM_Cache_Abstract $_cacheClass
+	 */
 	private $_cacheClass = 'CM_Cache';
 
 	/**
@@ -78,13 +81,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param CM_Comparable $model OPTIONAL
+	 * @param CM_Comparable|null $model
 	 * @return boolean
 	 */
 	public function equals(CM_Comparable $model = null) {
 		if (empty($model)) {
 			return false;
 		}
+		/** @var CM_Model_Abstract $model */
 		return (get_class($this) == get_class($model) && $this->_getId() === $model->_getId());
 	}
 
@@ -184,6 +188,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string|null $key
 	 * @return array|mixed
+	 *
+	 * @throws CM_Exception_Invalid
 	 */
 	final protected function _getId($key = null) {
 		if (null === $key) {
@@ -207,6 +213,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string $className
 	 * @return CM_ModelAsset_Abstract
+	 *
+	 * @throws CM_Exception
 	 */
 	final protected function _getAsset($className) {
 		if (!$this->_hasAsset($className)) {
@@ -217,11 +225,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	final protected function _setCacheLocal() {
 		$this->_cacheClass = 'CM_CacheLocal';
-	}
-
-	final private function _archive() {
-		$archive = $this->_archive;
-		$archive::create(array('object' => $this));
 	}
 
 	/**
