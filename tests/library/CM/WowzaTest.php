@@ -110,11 +110,11 @@ class CM_WowzaTest extends TestCase {
 
 	private function _generateWowzaData(array $streamChannels) {
 		$jsonData = array();
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
 			$subscribes = array();
 			/** @var CM_Model_Stream_Publish $streamPublish */
-			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
+			$streamPublish = $streamChannel->getStreamPublish();
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				$session = TH::createSession($streamSubscribe->getUser());

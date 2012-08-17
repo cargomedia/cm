@@ -209,13 +209,15 @@ class CM_Wowza extends CM_Class_Abstract {
 	public function checkStreams() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		foreach (self::_getStreamChannels() as $streamChannel) {
-			/** @var CM_Model_Stream_Publish|null $streamPublish  */
-			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-			if ($streamPublish->getAllowedUntil() < time()) {
-				if ($allowedUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil())) {
-					$streamPublish->setAllowedUntil($allowedUntil);
-				} else {
-					$this->stop($streamPublish);
+			if ($streamChannel->hasStreamPublish()) {
+				/** @var CM_Model_Stream_Publish $streamPublish  */
+				$streamPublish = $streamChannel->getStreamPublish();
+				if ($streamPublish->getAllowedUntil() < time()) {
+					if ($allowedUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil())) {
+						$streamPublish->setAllowedUntil($allowedUntil);
+					} else {
+						$this->stop($streamPublish);
+					}
 				}
 			}
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe*/
