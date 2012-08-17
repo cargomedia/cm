@@ -70,6 +70,7 @@ abstract class CM_Class_Abstract {
 		if (false === ($classNames = CM_CacheLocal::get($key))) {
 			$pathsFiltered = array();
 			$paths = CM_Util::rglob('*.php', DIR_LIBRARY);
+			sort($paths);
 			foreach ($paths as $path) {
 				$file = new CM_File($path);
 				$regexp = '#class\s+(?<name>.+?)\b#';
