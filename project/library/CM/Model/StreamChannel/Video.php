@@ -40,6 +40,23 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
+	 * @return CM_Model_Stream_Publish|null
+	 */
+	public function getStreamPublish() {
+		if (!$this->hasStreamPublish()) {
+			return null;
+		}
+		return $this->getStreamPublishs()->getItem(0);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function hasStreamPublish() {
+		return (boolean) $this->getStreamPublishs()->getCount();
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getWowzaIp() {

@@ -32,6 +32,23 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		}
 	}
 
+	public function testGetStreamPublish() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$this->assertNull($streamChannel->getStreamPublish());
+		$streamPublish = TH::createStreamPublish(null, $streamChannel);
+		$this->assertModelEquals($streamPublish, $streamChannel->getStreamPublish());
+	}
+
+	public function testHasStreamPublish() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$this->assertFalse($streamChannel->hasStreamPublish());
+		TH::createStreamPublish(null, $streamChannel);
+		$this->assertTrue($streamChannel->hasStreamPublish());
+
+	}
+
 	public function testThumbnailCount() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = TH::createStreamChannel();
