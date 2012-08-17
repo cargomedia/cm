@@ -272,6 +272,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param array $data
 	 * @return CM_Model_Abstract
+	 * @throws CM_Exception_NotImplemented
 	 */
 	protected static function _create(array $data) {
 		throw new CM_Exception_NotImplemented();
