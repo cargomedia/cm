@@ -24,5 +24,13 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$this->assertSame($streamPublish->getStart(), $archive->getCreated());
 		$this->assertSame(10, $archive->getDuration());
 		$this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
+
+		$streamChannel = TH::createStreamChannel();
+		try {
+			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+			$this->fail('StreamChannelArchive_Video created without StreamPublish.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertTrue(true);
+		}
 	}
 }
