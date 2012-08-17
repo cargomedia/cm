@@ -41,7 +41,6 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @return CM_Model_Stream_Publish
-	 *
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getStreamPublish() {

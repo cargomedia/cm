@@ -35,7 +35,12 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 	public function testGetStreamPublish() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = TH::createStreamChannel();
-		$this->assertNull($streamChannel->getStreamPublish());
+		try {
+			$streamChannel->getStreamPublish();
+			$this->fail();
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertTrue(true);
+		}
 		$streamPublish = TH::createStreamPublish(null, $streamChannel);
 		$this->assertModelEquals($streamPublish, $streamChannel->getStreamPublish());
 	}
