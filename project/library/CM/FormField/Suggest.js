@@ -38,10 +38,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			onAdd: function(item) {
 				field.onAdd(item);
 				field.onChange($input.tokenInput("get"));
+				field.trigger('add', item);
 			},
 			onDelete: function(item) {
 				field.onDelete(item);
 				field.onChange($input.tokenInput("get"));
+				field.trigger('delete', item);
 			},
 			animateDropdown: false,
 			preventDuplicates: true,
