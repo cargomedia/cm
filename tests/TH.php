@@ -211,7 +211,7 @@ class TH {
 			$streamChannel = TH::createStreamChannel();
 		}
 		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-			'allowedUntil' => time() + 100, 'price' => rand(10, 50) / 10, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
