@@ -34,4 +34,14 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 			$this->assertTrue(true);
 		}
 	}
+
+	public function testGetUser() {
+		$user = TH::createUser();
+		$streamChannel = TH::createStreamChannel();
+		TH::createStreamPublish($user, $streamChannel);
+		$archive = TH::createStreamChannelVideoArchive($streamChannel);
+		$this->assertModelEquals($user, $archive->getUser());
+		$user->delete();
+		$this->assertNull($archive->getUser());
+	}
 }

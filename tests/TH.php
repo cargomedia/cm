@@ -199,6 +199,17 @@ class TH {
 	}
 
 	/**
+	 * @param CM_Model_StreamChannel_Video $streamChannel|null
+	 * @return CM_Model_StreamChannelArchive_Video
+	 */
+	public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null) {
+		if (is_null($streamChannel)) {
+			$streamChannel = TH::createStreamChannel();
+		}
+		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+	}
+
+	/**
 	 * @param CM_Model_User|null                   $user
 	 * @param CM_Model_StreamChannel_Abstract|null $streamChannel
 	 * @return CM_Model_Stream_Publish

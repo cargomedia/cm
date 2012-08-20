@@ -40,10 +40,14 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	}
 
 	/**
-	 * @return CM_Model_User
+	 * @return CM_Model_User|null
 	 */
 	public function getUser() {
-		return CM_Model_User::factory($this->getUserId());
+		try {
+			return CM_Model_User::factory($this->getUserId());
+		} catch (CM_Exception_Nonexistent $ex) {
+			return null;
+		}
 	}
 
 	/**
