@@ -230,6 +230,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @param string       $name
 	 * @param string|null  $nameNew
 	 * @param array|null   $variableNamesNew
+	 * @throws CM_Exception_Nonexistent
 	 * @throws CM_Exception_Duplicate
 	 */
 	public static function updateKey($name, $nameNew = null, array $variableNamesNew = null) {
