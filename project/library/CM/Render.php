@@ -30,6 +30,11 @@ class CM_Render extends CM_Class_Abstract {
 	private $_dateFormatter;
 
 	/**
+	 * @var IntlDateFormatter
+	 */
+	private $_dateTimeFormatter;
+
+	/**
 	 * @var bool
 	 */
 	private $_languageRewrite;
@@ -386,13 +391,30 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getDateFormatter() {
 		if (!$this->_dateFormatter) {
-			$locale = 'en';
-			if ($this->getLanguage()) {
-				$locale = $this->getLanguage()->getAbbreviation();
-			}
-			$this->_dateFormatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
+			$this->_dateFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 		}
 		return $this->_dateFormatter;
+	}
+
+	/**
+	 * @return IntlDateFormatter
+	 */
+	public function getDateTimeFormatter() {
+		if (!$this->_dateTimeFormatter) {
+			$this->_dateTimeFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+		}
+		return $this->_dateTimeFormatter;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getLocale() {
+		$locale = 'en';
+		if ($this->getLanguage()) {
+			$locale = $this->getLanguage()->getAbbreviation();
+		}
+		return $locale;
 	}
 
 	/**

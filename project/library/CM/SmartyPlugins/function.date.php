@@ -3,14 +3,13 @@
 function smarty_function_date($params, Smarty_Internal_Template $template) {
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
-	$dateFormatter = $render->getDateFormatter();
+
 	$time = (int) $params['time'];
 	$showTime = !empty($params['showTime']);
-
 	if ($showTime) {
-		$dateFormatter->setPattern('M d, Y - h:i');
+		$formatter = $render->getDateTimeFormatter();
 	} else {
-		$dateFormatter->setPattern('M d, Y');
+		$formatter = $render->getDateFormatter();
 	}
-	return $dateFormatter->format($time);
+	return $formatter->format($time);
 }
