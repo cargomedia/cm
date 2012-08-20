@@ -24,6 +24,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$this->assertSame($streamPublish->getStart(), $archive->getCreated());
 		$this->assertSame(10, $archive->getDuration());
 		$this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
+		$this->assertSame(md5($streamPublish->getKey()), $archive->getHash());
 
 		$streamChannel = TH::createStreamChannel();
 		try {
