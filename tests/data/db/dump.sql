@@ -503,5 +503,5 @@ CREATE TABLE `cm_streamChannelArchive_video` (
   `createStamp` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`),
-  KEY `createStamp` (`createStamp`),
+  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
