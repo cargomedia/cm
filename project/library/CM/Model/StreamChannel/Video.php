@@ -33,6 +33,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getHash() {
+		return md5($this->getStreamPublish()->getKey());
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getHeight() {
@@ -71,6 +78,27 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return (int) $this->_get('thumbnailCount');
 	}
 
+	/**
+	 * @param int $index
+	 * @return CM_File_UserContent
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getThumbnail($index) {
+		$index = (int) $index;
+		if ($index < 1 || $index > $this->getThumbnailCount()) {
+			throw new CM_Exception_Invalid('Index `' . $index . '` out of bounds.');
+		}
+		$filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.jpg';
+		return new CM_File_UserContent('streamChannels', $filename, $this->getId());
+	}
+
+	/**
+	 * @return CM_Paging_File_StreamChannelVideoThumbnails
+	 */
+	public function getThumbnails() {
+		return new CM_Paging_File_StreamChannelVideoThumbnails($this);
+	}
+
 	protected function _onBeforeDelete() {
 		if ($this->hasStreamPublish()) {
 			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
@@ -94,7 +122,8 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		$thumbnailCount = (int) $data['thumbnailCount'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		try {
-			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp, 'thumbnailCount' => $thumbnailCount));
+			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp,
+				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
 			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
 			throw $ex;

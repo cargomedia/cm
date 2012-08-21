@@ -208,7 +208,7 @@ class TH {
 			TH::createStreamPublish(null, $streamChannel);
 		}
 		if (!$streamChannel->hasStreamPublish()) {
-			TH::createStreamPublish(TH::createUser(), $streamChannel);
+			TH::createStreamPublish(null, $streamChannel);
 		}
 		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
 	}

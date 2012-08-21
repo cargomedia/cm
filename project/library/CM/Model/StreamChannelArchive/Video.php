@@ -108,9 +108,8 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		$thumbnailCount = $streamChannel->getThumbnailCount();
 		$end = time();
 		$duration = $end - $createStamp;
-		$hash = md5($streamPublish->getKey());
 		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $streamChannel->getId(), 'userId' => $streamPublish->getUser()->getId(), 'width' => $streamChannel->getWidth(), 'height' => $streamChannel->getHeight(),
-			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'hash' => $hash, 'createStamp' => $createStamp));
+			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'hash' => $streamChannel->getHash(), 'createStamp' => $createStamp));
 		return new self($streamChannel->getId());
 	}
 }
