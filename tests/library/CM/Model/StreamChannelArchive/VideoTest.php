@@ -44,4 +44,21 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$user->delete();
 		$this->assertNull($archive->getUser());
 	}
+
+	public function testGetVideo() {
+		$archive = TH::createStreamChannelVideoArchive();
+		$videoFile = $archive->getVideo();
+		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() . '-original.mp4', $videoFile->getPathRelative());
+	}
+
+	public function testGetThumbnails() {
+		$archive = TH::createStreamChannelVideoArchive();
+		$this->assertSame(array(), $archive->getThumbnails()->getItems());
+
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$streamChannel->setThumbnailCount(2);
+		$archive = TH::createStreamChannelVideoArchive($streamChannel);
+		$this->assertEquals(array($archive->getThumbnail(1), $archive->getThumbnail(2)), $archive->getThumbnails()->getItems());
+	}
 }

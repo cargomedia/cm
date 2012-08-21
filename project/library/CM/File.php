@@ -132,7 +132,7 @@ class CM_File {
 	 * @throws CM_Exception
 	 */
 	public function delete() {
-		if (!is_file($this->getPath())) {
+		if (!file_exists($this->getPath())) {
 			return;
 		}
 		if (false === unlink($this->getPath())) {
