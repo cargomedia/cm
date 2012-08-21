@@ -5,30 +5,28 @@
 
 code {
 	font-family: monospace, 'Courier New';
-	white-space: pre-line;
-	.background-color(lighten(@colorNotice, 48));
 	display: block;
 	padding: 10px;
 	margin-bottom: 15px;
 	.background-color(darken(@colorBg, 2));
 	border: 1px dashed @colorFgBorderEmphasize;
 
-	&.html-syntax {
+	&.html5 {
 		background-color: @colorHtml;
 		border-color: darken(@colorHtml, 30);
 	}
 
-	&.less-syntax {
+	&.css {
 		background-color: @colorLess;
 		border-color: darken(@colorLess, 30);
 	}
 
-	&.js-syntax {
+	&.js {
 		background-color: @colorJs;
 		border-color: darken(@colorJs, 30);
 	}
 
-	&.php-syntax {
+	&.php {
 		background-color: @colorPhp;
 		border-color: darken(@colorPhp, 50);
 	}

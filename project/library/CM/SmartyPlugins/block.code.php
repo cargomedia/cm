@@ -14,7 +14,9 @@ function smarty_block_code($params, $content, Smarty_Internal_Template $template
 			$class .= $language;
 		}
 
+		$content = trim($content, PHP_EOL);
 		$geshi = new GeSHi($content, $language);
+		$geshi->set_tab_width(4);
 		$geshi->set_header_type(GESHI_HEADER_NONE);
 
 		return '<code class="' . $class . '">' . $geshi->parse_code() . '</code>';
