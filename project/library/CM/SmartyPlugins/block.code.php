@@ -1,19 +1,22 @@
 <?php
 
+require_once DIR_LIBRARY . 'geshi/geshi.php';
+
 function smarty_block_code($params, $content, Smarty_Internal_Template $template, $open) {
 
 	if ($open) {
-		array_unshift(CM_Render::$block_stack, array());
 		return '';
 	} else {
-		$attributes = '';
-		if (!empty($params['language'])) {
-			$language = (string) $params['language'];
-			$attributes .= 'class="' . $language . '-syntax"';
+		$language = isset($params['language']) ? (string) $params['language'] : null;
+
+		$class = '';
+		if ($language) {
+			$class .= $language;
 		}
 
+		$geshi = new GeSHi($content, $language);
+		$geshi->set_header_type(GESHI_HEADER_NONE);
 
-		return '<code ' . $attributes . '>' . htmlspecialchars(trim($content, "\n\r")) . '</code>';
+		return '<code class="' . $class . '">' . $geshi->parse_code() . '</code>';
 	}
 }
-
