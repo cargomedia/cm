@@ -64,8 +64,27 @@ EOD;
 		$render = new CM_Render();
 		$url = self::$_render->getUrlResource('img', 'icon/mailbox_read.png');
 		$expected = <<<EOD
-background:url($url) no-repeat 66px 7px;
+background: url('$url') no-repeat 66px 7px;
+EOD;
+		$this->assertEquals($expected, $css->compile($render));
+	}
 
+	public function testBackgroundImage() {
+		$css = new CM_Css("background-image: image('icon/mailbox_read.png');");
+		$render = new CM_Render();
+		$url = self::$_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$expected = <<<EOD
+background-image: url('$url');
+EOD;
+		$this->assertEquals($expected, $css->compile($render));
+	}
+
+	public function testUrlFont() {
+		$css = new CM_Css("src: url(urlFont('file.eot'));");
+		$render = new CM_Render();
+		$url = $render->getUrlStatic('/font/file.eot');
+		$expected = <<<EOD
+src: url('$url');
 EOD;
 		$this->assertEquals($expected, $css->compile($render));
 	}
@@ -87,11 +106,13 @@ EOD;
 		$css = new CM_Css($css);
 		$expected = <<<'EOD'
 .foo {
-  color:red;
-  font-size:5;
-  border:1px solid red;
+  color: red;
+  font-size: 5;
+  border: 1px solid red;
 }
-.foo #bar { color:blue; }
+.foo #bar {
+  color: blue;
+}
 
 EOD;
 		$this->assertEquals($expected, $css->compile(self::$_render));
@@ -109,9 +130,9 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  filter:hello(world);
-  opacity:.3;
-  filter:alpha(opacity=30);
+  filter: hello(world);
+  opacity: .3;
+  filter: alpha(opacity=30);
 }
 
 EOD;
@@ -128,13 +149,13 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image:linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
-  background-image:-moz-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
-  background-image:-webkit-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
-  background-image:-o-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
-  background-image:-ms-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
-  background-image:-webkit-gradient(linear,left top,right top,color-stop(15%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=#ff000000,endColorstr=#661e321e);
+  background-image: linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image: -moz-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image: -webkit-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image: -o-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image: -ms-linear-gradient(left,#000000 15%,rgba(30,50,30,0.4) 100%);
+  background-image: -webkit-gradient(linear,left top,right top,color-stop(15%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
 }
 
 EOD;
@@ -148,13 +169,13 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ff000000,endColorstr=#661e321e);
-  background-image:linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
-  background-image:-moz-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
-  background-image:-webkit-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
-  background-image:-o-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
-  background-image:-ms-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
-  background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#ff000000,endColorstr=#661e321e);
+  background-image: linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image: -moz-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image: -webkit-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image: -o-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image: -ms-linear-gradient(top,#000000 0%,rgba(30,50,30,0.4) 100%);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#000000),color-stop(100%,rgba(30,50,30,0.4)));
 }
 
 EOD;
@@ -185,10 +206,12 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
-  background-color:rgba(1,1,1,0.5);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
+  background-color: rgba(1,1,1,0.5);
 }
-.bar { background-color:#010101; }
+.bar {
+  background-color: #010101;
+}
 
 EOD;
 		$css = new CM_Css($css);
@@ -203,8 +226,8 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  box-shadow:0 0 2px #dddddd;
-  -webkit-box-shadow:0 0 2px #dddddd;
+  box-shadow: 0 0 2px #dddddd;
+  -webkit-box-shadow: 0 0 2px #dddddd;
 }
 
 EOD;
@@ -220,9 +243,9 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  -webkit-box-sizing:border-box;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 
 EOD;
@@ -238,10 +261,10 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  -webkit-user-select:none;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 
 EOD;
@@ -257,11 +280,11 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  transform:matrix(0.866,0.5,-0.5,0.866,0,0);
-  -moz-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
-  -o-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
-  -ms-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
-  -webkit-transform:matrix(0.866,0.5,-0.5,0.866,0,0);
+  transform: matrix(0.866,0.5,-0.5,0.866,0,0);
+  -moz-transform: matrix(0.866,0.5,-0.5,0.866,0,0);
+  -o-transform: matrix(0.866,0.5,-0.5,0.866,0,0);
+  -ms-transform: matrix(0.866,0.5,-0.5,0.866,0,0);
+  -webkit-transform: matrix(0.866,0.5,-0.5,0.866,0,0);
 }
 
 EOD;
@@ -277,9 +300,9 @@ EOD;
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  transition:width 2s ease-in 2s;
-  -moz-transition:width 2s ease-in 2s;
-  -webkit-transition:width 2s ease-in 2s;
+  transition: width 2s ease-in 2s;
+  -moz-transition: width 2s ease-in 2s;
+  -webkit-transition: width 2s ease-in 2s;
 }
 
 EOD;
@@ -298,7 +321,9 @@ EOD;
 }
 EOD;
 		$expected = <<<'EOD'
-.foo { color:blue; }
+.foo {
+  color:blue;
+}
 @media (max-width: 767px) {
   .foo { color:red; }
 }

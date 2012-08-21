@@ -104,20 +104,13 @@ EOD;
 		$lessc = new lessc();
 		$lessc->registerFunction('image', function ($arg) use($render) {
 			/** @var CM_Render $render */
-			list($type, $path) = $arg;
-			return array($type, 'url(' . $render->getUrlResource('img', substr($path, 1, -1)) . ')');
+			list($type, $delimiter, $values) = $arg;
+			return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('img', $values[0]))));
 		});
 		$lessc->registerFunction('urlFont', function ($arg) use($render) {
 			/** @var CM_Render $render */
-			list($type, $path) = $arg;
-			return array($type, $render->getUrlStatic('/font/' . substr($path, 1, -1)));
-		});
-		$lessc->registerFunction('rgbahex', function($color, lessc $lessc) {
-			$color = $lessc->coerceColor($color);
-			if (is_null($color)) {
-				$lessc->throwError("color expected for rgbahex");
-			}
-			return sprintf("#%02x%02x%02x%02x", isset($color[4]) ? $color[4] * 255 : 255, $color[1], $color[2], $color[3]);
+			list($type, $delimiter, $values) = $arg;
+			return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
 		});
 		$css = $mixins . $this;
 		$cacheKey = CM_CacheConst::Css . '_md5:' . md5($css);
