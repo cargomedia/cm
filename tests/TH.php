@@ -199,16 +199,17 @@ class TH {
 	}
 
 	/**
-	 * @param CM_Model_StreamChannel_Video $streamChannel|null
+	 * @param CM_Model_StreamChannel_Video|null $streamChannel
+	 * @param CM_Model_User|null                $user
 	 * @return CM_Model_StreamChannelArchive_Video
 	 */
-	public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null) {
+	public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
 		if (is_null($streamChannel)) {
 			$streamChannel = TH::createStreamChannel();
-			TH::createStreamPublish(null, $streamChannel);
+			TH::createStreamPublish($user, $streamChannel);
 		}
 		if (!$streamChannel->hasStreamPublish()) {
-			TH::createStreamPublish(null, $streamChannel);
+			TH::createStreamPublish($user, $streamChannel);
 		}
 		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
 	}
