@@ -204,7 +204,13 @@ var CM_View_Abstract = Backbone.View.extend({
 		this.disable();
 		this.ajax(functionName, params, callbacks);
 	},
-	
+
+	/**
+	 * @param {String} className
+	 * @param {Object|Null} params
+	 * @param {Object|Null} options
+	 * @return jqXHR
+	 */
 	loadComponent: function(className, params, options) {
 		options = options || {};
 		params = params || {};
@@ -222,7 +228,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 	
 	/**
-	 * @param {int} actionVerbs
+	 * @param {int} actionVerb
 	 * @param {int} modelType
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */

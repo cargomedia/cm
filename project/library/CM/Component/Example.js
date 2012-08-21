@@ -52,12 +52,12 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 	},
 	
 	loadExample: function() {
-		this.loadComponent('CM_Component_Example', {foo:'value2'});
+		this.loadComponent('CM_Component_Example', {foo:'value2', site: this.getParams().site});
 	},
 	
 	loadExampleInline: function() {
 		var handler = this;
-		this.loadComponent('CM_Component_Example', {foo:'value3'}, {
+		this.loadComponent('CM_Component_Example', {foo:'value3', site: this.getParams().site}, {
 			success: function() {
 				this.$().hide()
 					.insertBefore(handler.$())
@@ -131,7 +131,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 		var $button = $opener.children('.panel');
 		var $window = $opener.children('.window');
 		$window.toggleModal(function() {
-			$(this).toggle();
+			$window.toggle();
 			$button.toggleClass('active');
 		});
 	}

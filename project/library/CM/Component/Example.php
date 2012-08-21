@@ -6,8 +6,6 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	public function prepare() {
 		$foo = $this->_params->getString('foo', 'value1');
-
-		$sections = $this->_getSections();
 		$colorStyles = $this->_getColorStyles();
 		$icons = $this->_getIcons();
 
@@ -16,7 +14,6 @@ class CM_Component_Example extends CM_Component_Abstract {
 		$this->setTplParam('foo', $foo);
 		$this->setTplParam('colorStyles', $colorStyles);
 		$this->setTplParam('icons', $icons);
-		$this->setTplParam('sections', $sections);
 	}
 
 	public function checkAccessible() {
@@ -57,28 +54,17 @@ class CM_Component_Example extends CM_Component_Abstract {
 	}
 
 	/**
-	 * @return array
-	 */
-	private function _getSections() {
-		$sections = array();
-		foreach (CM_Util::rglob('*.tpl', DIR_LAYOUT . 'CM/default/Component/Example') as $path) {
-			$file = new CM_File($path);
-			if ($file->getFileName() === 'default.tpl') {
-				continue;
-			}
-			$name = CM_Util::titleize(str_replace('.tpl', '', $file->getFileName()));
-			$sections[$name] = $file->getFileName();
-		}
-		return $sections;
-	}
-
-	/**
 	 * @return string[]
 	 */
 	private function _getIcons() {
 		$site = $this->getParams()->getSite('site');
 		$style = '';
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
+			$path = DIR_LAYOUT . $namespace . '/default/variables.less';
+			if (file_exists($path)) {
+				$file = new CM_File($path);
+				$style .= $file . PHP_EOL;
+			}
 			$path = DIR_LAYOUT . $namespace . '/default/css/icon.less';
 			if (file_exists($path)) {
 				$file = new CM_File($path);
