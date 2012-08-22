@@ -7,6 +7,10 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	/** @type String */
 	_class: 'CM_Form_ExampleIcon',
 
+	events: {
+		'click .iconBox': 'selectIcon'
+	},
+
 	ready: function() {
 		this.on('change', function() {
 			$('.iconBox').css('background-color', this.getField('colorBackground').getValue());
@@ -16,13 +20,12 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 			this.$('.iconCss').text('background-color: ' + $(".iconBox").css('background-color') + '; \n' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";\n"));
 		});
 		this.trigger('change');
+	},
 
-		$('.iconBox').click(function(){
-			var handler = $(this);
-			$('.iconBox').removeClass('active');
-			handler.addClass('active');
-			$('.iconMarkup').text('<span class="icon ' + handler.find('.label').html() + '"></span>');
-		})
+	selectIcon: function(event) {
+		var target = $(event.currentTarget);
+		target.addClass('active').siblings().removeClass('active');
+		this.$('.iconMarkup').text('<span class="icon ' + target.find('.label').html() + '"></span>');
 	},
 
 	_getShadowValue: function() {
