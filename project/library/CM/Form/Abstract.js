@@ -18,7 +18,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 			var $field = this.$("#"+name);
 			if ($field.length) {
 				var fieldClass = window[fieldInfo.className];
-				this._fields[name] = new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options});
+				this.registerField(name,  new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
 			}
 		}, this);
 	
@@ -43,6 +43,18 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		_.each(this.getChildren(), function(child) {
 			child._ready();
 		});
+	},
+
+	/**
+	 * @param {String} name
+	 * @param {CM_FormField_Abstract} field
+	 */
+	registerField: function(name, field) {
+		this._fields[name] = field;
+
+		field.on('change', function() {
+			this.trigger('change');
+		}, this);
 	},
 	
 	/**

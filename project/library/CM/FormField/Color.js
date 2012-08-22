@@ -22,7 +22,6 @@ var CM_FormField_Color = CM_FormField_Abstract.extend({
 		$("#mColorPicker").height(158);
 		this.$('input').change(function() {
 			field.trigger('change');
-			field.getForm().trigger('change');
 		});
 	}
 });

@@ -34,8 +34,5 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			$slider.slider("option", "value", $(this).val());
 			field.trigger('change');
 		});
-		this.on('change', function() {
-			this.getForm().trigger('change');
-		});
 	}
 });
