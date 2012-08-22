@@ -19,7 +19,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 			$('.iconBox .icon').css('text-shadow', this._getShadowValue());
 			$('.iconBox .icon').css('color', this.getField('color').getValue());
 			$('.iconBox .icon').css('font-size', this.getField('sizeSlider').getValue() + "px");
-			this.$('.iconCss').text('background-color: ' + $(".iconBox").css('background-color') + '; \n' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";\n"));
+			this.$('.iconCss').html('background-color: ' + $(".iconBox").css('background-color') + ';<br />' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";<br />"));
 		});
 		this.trigger('change');
 	},
