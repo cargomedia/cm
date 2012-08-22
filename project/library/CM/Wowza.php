@@ -252,11 +252,11 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @param string   $streamName
 	 * @param int      $thumbnailCount
-	 * @return int
+	 * @return bool
 	 */
 	public static function rpc_unpublish($streamName, $thumbnailCount) {
 		self::_getInstance()->unpublish($streamName, $thumbnailCount);
-		return 0;
+		return true;
 	}
 
 	/**
@@ -264,21 +264,21 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param string $clientKey
 	 * @param string $start
 	 * @param string $data
-	 * @return int
+	 * @return boolean
 	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
 		self::_getInstance()->subscribe($streamName, $clientKey, $start, $data);
-		return 0;
+		return true;
 	}
 
 	/**
 	 * @param string $streamName
 	 * @param string $clientKey
-	 * @return int
+	 * @return boolean
 	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
 		self::_getInstance()->unsubscribe($streamName, $clientKey);
-		return 0;
+		return true;
 	}
 
 	/**
