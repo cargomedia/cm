@@ -28,7 +28,8 @@
 	<p>Use this translation method for internal generated words, long texts, unique sentences.</p>
 	{code language="html5"}{ldelim}translate '.language.key'}{/code}
 
-	{code language="php"}<?php
+	{code language="php"}
+	<?php
 	$langauge = CM_Model_Language::findByAbbreviation('en');
 	$language->setTranslation('.language.key', 'Translation without variables');
 	{/code}
@@ -37,14 +38,16 @@
 	{code language="html5"}{ldelim}translate '.language.key' variable=$variable}{/code}
 
 	{code language="php"}
-	{literal}<?php
+	{literal}
+	<?php
 	$language = CM_Model_Language::findByAbbreviation('en');
 	$language->setTranslation('.language.key', 'Transalation with {$variable}');
 	{/literal}
 	{/code}
 
 	<h3>Delete Translation</h3>
-	{code language="php"}<?php
+	{code language="php"}
+	<?php
 	CM_Model_Language::deleteKey('Some cool phrase');
 	CM_Model_Language::deleteKey('Some cool phrase with {literal}{$variable}{/literal}');
 	CM_Model_Language::deleteKey('.language.key');
