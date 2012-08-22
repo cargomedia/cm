@@ -133,10 +133,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Paging_StreamChannelArchive_Video_User
+	 * @return CM_Paging_StreamChannelArchiveVideo_User
 	 */
-	public function getVideoStreamChannelArchives() {
-		return new CM_Paging_StreamChannelArchive_Video_User($this);
+	public function getStreamChannelArchiveVideoList() {
+		return new CM_Paging_StreamChannelArchiveVideo_User($this);
 	}
 
 	/**

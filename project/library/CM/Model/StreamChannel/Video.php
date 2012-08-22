@@ -79,24 +79,10 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
-	 * @param int $index
-	 * @return CM_File_UserContent
-	 * @throws CM_Exception_Invalid
-	 */
-	public function getThumbnail($index) {
-		$index = (int) $index;
-		if ($index < 1 || $index > $this->getThumbnailCount()) {
-			throw new CM_Exception_Invalid('Index `' . $index . '` out of bounds.');
-		}
-		$filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.jpg';
-		return new CM_File_UserContent('streamChannels', $filename, $this->getId());
-	}
-
-	/**
-	 * @return CM_Paging_File_StreamChannelVideoThumbnails
+	 * @return CM_Paging_FileUserContent_StreamChannelVideoThumbnails
 	 */
 	public function getThumbnails() {
-		return new CM_Paging_File_StreamChannelVideoThumbnails($this);
+		return new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($this);
 	}
 
 	protected function _onBeforeDelete() {

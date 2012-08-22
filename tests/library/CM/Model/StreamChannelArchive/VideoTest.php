@@ -48,7 +48,8 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 	public function testGetVideo() {
 		$archive = TH::createStreamChannelVideoArchive();
 		$videoFile = $archive->getVideo();
-		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() . '-original.mp4', $videoFile->getPathRelative());
+		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
+				'-original.mp4', $videoFile->getPathRelative());
 	}
 
 	public function testGetThumbnails() {
@@ -59,6 +60,10 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$streamChannel = TH::createStreamChannel();
 		$streamChannel->setThumbnailCount(2);
 		$archive = TH::createStreamChannelVideoArchive($streamChannel);
-		$this->assertEquals(array($archive->getThumbnail(1), $archive->getThumbnail(2)), $archive->getThumbnails()->getItems());
+		$thumb1 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/1.jpg', $streamChannel->getId());
+		$thumb2 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/2.jpg', $streamChannel->getId());
+		$this->assertEquals(array($thumb1, $thumb2), $archive->getThumbnails()->getItems());
 	}
+
+
 }
