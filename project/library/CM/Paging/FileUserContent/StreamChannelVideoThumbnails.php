@@ -26,7 +26,7 @@ class CM_Paging_FileUserContent_StreamChannelVideoThumbnails extends CM_Paging_F
 	}
 
 	protected function _getSequence($item) {
-		return $this->_streamChannel->getId();
+		return (int) $this->_streamChannel->getId();
 	}
 
 }
