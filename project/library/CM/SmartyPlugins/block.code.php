@@ -9,9 +9,13 @@ function smarty_block_code($params, $content, Smarty_Internal_Template $template
 	} else {
 		$language = isset($params['language']) ? (string) $params['language'] : null;
 
-		$class = '';
+		$classes = array();
 		if ($language) {
-			$class .= $language;
+			$classes[] = $language;
+		}
+
+		if (!empty($params['class'])) {
+			$classes[] = $params['class'];
 		}
 
 		$content = trim($content, "\n\r");
@@ -20,6 +24,6 @@ function smarty_block_code($params, $content, Smarty_Internal_Template $template
 		$geshi->set_tab_width(4);
 		$geshi->set_header_type(GESHI_HEADER_NONE);
 
-		return '<code class="' . $class . '">' . $geshi->parse_code() . '</code>';
+		return '<code class="' . implode(' ', $classes) . '">' . $geshi->parse_code() . '</code>';
 	}
 }

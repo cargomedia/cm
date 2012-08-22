@@ -18,7 +18,7 @@
 		{formField name='shadowY' label="{translate 'Shadow Y'}"}
 		{formField name='shadowBlur' label="{translate 'Shadow Blur'}"}
 		<h4>Grab Code</h4>
-		<code class="iconMarkup html5">Select icon to generate code!</code>
-		<code class="iconCss css"></code>
+		{code language='html5' class='iconMarkup'}Select icon to generate code!{/code}
+		{code language='css' class='iconCss'}{/code}
 	{/form}
 </div>
