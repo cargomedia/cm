@@ -331,11 +331,11 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return CM_Model_StreamChannel_Abstract
+	 * @return CM_Model_StreamChannel_Video
 	 * @throws CM_Exception_InvalidParam
 	 */
-	public function getStreamChannel($key) {
-		return $this->_getObject($key, 'CM_Model_StreamChannel_Abstract');
+	public function getStreamChannelVideo($key) {
+		return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
 	}
 
 	/**
