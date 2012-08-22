@@ -8,7 +8,9 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	_class: 'CM_Form_ExampleIcon',
 
 	events: {
-		'click .iconBox': 'selectIcon'
+		'click .iconBox': function(event) {
+			this.selectIcon($(event.currentTarget));
+		}
 	},
 
 	ready: function() {
@@ -22,10 +24,12 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 		this.trigger('change');
 	},
 
-	selectIcon: function(event) {
-		var target = $(event.currentTarget);
-		target.addClass('active').siblings().removeClass('active');
-		this.$('.iconMarkup').text('<span class="icon ' + target.find('.label').html() + '"></span>');
+	/**
+	 * @param {jQuery} $icon
+	 */
+	selectIcon: function($icon) {
+		$icon.addClass('active').siblings().removeClass('active');
+		this.$('.iconMarkup').text('<span class="icon ' + $icon.find('.label').text() + '"></span>');
 	},
 
 	_getShadowValue: function() {
