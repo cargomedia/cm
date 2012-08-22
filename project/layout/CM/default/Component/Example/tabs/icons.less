@@ -1,0 +1,33 @@
+.column {
+	.box-sizing(border-box);
+	padding: 10px 10px 10px 0;
+	width: 50%;
+	float: left;
+}
+
+.iconBox {
+	float: left;
+	text-align: center;
+	padding: 10px;
+	margin: 5px;
+	background-color: darken(@colorBg, 2);
+	border: 2px solid transparent;
+	cursor: pointer;
+
+	&.active {
+		border-color: @colorFg;
+	}
+
+	.icon {
+		font-size: 25px;
+	}
+
+	.label {
+		display: block;
+		color: lighten(@colorFgShy, 20);
+	}
+}
+
+code.css {
+	white-space: pre;
+}

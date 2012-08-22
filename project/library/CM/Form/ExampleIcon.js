@@ -10,7 +10,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	ready: function() {
 		this.on('change', function() {
 			$('.iconBox').css('background-color', this.getField('colorBackground').getValue());
-			$('.iconBox .icon').css('text-shadow', this.getShadowValue());
+			$('.iconBox .icon').css('text-shadow', this._getShadowValue());
 			$('.iconBox .icon').css('color', this.getField('color').getValue());
 			$('.iconBox .icon').css('font-size', this.getField('sizeSlider').getValue() + "px");
 			this.$('.iconCss').text('background-color: ' + $(".iconBox").css('background-color') + '; \n' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";\n"));
@@ -25,7 +25,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 		})
 	},
 
-	getShadowValue: function() {
+	_getShadowValue: function() {
 		return [
 			this.getField('shadowColor').getValue() || '#fff',
 			this.getField('shadowX').getValue() + 'px',
