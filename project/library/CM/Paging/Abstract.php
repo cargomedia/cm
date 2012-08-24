@@ -280,10 +280,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param $offset                 int
-	 * @param $length                 int
-	 * @param $returnNonexistentItems bool
-	 * @param $allowBackwardsLookup   bool
+	 * @param int  $offset
+	 * @param int  $length
+	 * @param bool $returnNonexistentItems
+	 * @param bool $allowBackwardsLookup
 	 * @return array
 	 */
 	private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
@@ -325,8 +325,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param $offset                 int
-	 * @param $length                 int
+	 * @param int $offset
+	 * @param int $length
 	 * @return array
 	 */
 	private function _getItemsInstantiable($offset, $length) {
