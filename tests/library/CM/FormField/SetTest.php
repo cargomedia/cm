@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../../../TestCase.php';
+require_once __DIR__ . '/../../../TestCaseRender.php';
 
-class CM_FormField_SetTest extends TestCase {
+class CM_FormField_SetTest extends TestCaseRender {
 
 	public static function setupBeforeClass() {
 	}
@@ -51,7 +51,7 @@ class CM_FormField_SetTest extends TestCase {
 		$field->setValue($values);
 		$cssWidth = '50%';
 		$field->setColumnSize($cssWidth);
-		$doc = TH::renderFormField($form, $field, array());
+		$doc = $this->_renderFormField($form, $field);
 		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));

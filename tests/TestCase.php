@@ -61,41 +61,18 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Checks a TH_Html content (html) with tidy
-	 *
-	 * Test is skipeed it tidy not installed
-	 *
-	 * @param TH_Html $page
-	 * @param bool	$warning If warnings should be checked (default = true)
+	 * @param array|null $namespaces
+	 * @return CM_Site_Abstract
 	 */
-	public static function assertTidy(TH_Html $page, $warnings = true) {
-
-		if (!extension_loaded('tidy')) {
-			self::markTestSkipped('The tidy extension is not available.');
+	protected function _getSite(array $namespaces = null) {
+		if (null === $namespaces) {
+			$namespaces = array('CM');
 		}
-
-		$html = $page->getHtml();
-		$tidy = new tidy();
-
-		$tidyConfig = array('show-errors' => 1, 'show-warnings' => $warnings);
-		$tidy->parseString($html, $tidyConfig, 'UTF8');
-
-		//$tidy->cleanRepair();
-		$tidy->diagnose();
-		$lines = array_reverse(explode("\n", $tidy->errorBuffer));
-		$content = '';
-
-		foreach ($lines as $line) {
-			if (empty($line) || $line == 'No warnings or errors were found.' || strpos($line, 'Info:') === 0 ||
-					strpos($line, 'errors were found!') > 0 || strpos($line, 'proprietary attribute') != false
-			) {
-				// ignore
-			} else {
-				$content .= $line . PHP_EOL;
-			}
-		}
-
-		self::assertEmpty($content, $content);
+		/** @var CM_Site_Abstract $site */
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
+		return $site;
 	}
 
 	/**
@@ -107,9 +84,14 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	 * @return mixed
 	 */
 	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null) {
-		$requestMock = $this->getMockBuilder('CM_Request_Post')->disableOriginalConstructor()->getMock();
+		$componentParams = array();
+
+		$site = $this->_getSite();
+
+		$requestArgs = array('uri' => '/form/' . $site->getId());
+		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer', 'getQuery'))->getMock();
 		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
-		$viewArray = array('className' => $componentClassName, 'params' => array(), 'id' => 'mockFormComponentId');
+		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
 		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'form' => $formArray,
 			'actionName' => $actionName, 'data' => $data)));
@@ -126,16 +108,5 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
 		$formMock->frontend_data['auto_id'] = 'formId';
 		return $formMock;
-	}
-
-	/**
-	 * @return CM_Render
-	 */
-	protected function _getRender() {
-		/** @var CM_Site_Abstract $siteMock */
-		$siteMock = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
-		$siteMock->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('TEST', 'CM')));
-		$siteMock->expects($this->any())->method('getId')->will($this->returnValue(1));
-		return new CM_Render($siteMock);
 	}
 }

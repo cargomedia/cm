@@ -1,27 +1,22 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
+require_once __DIR__ . '/../../TestCaseRender.php';
 
-class CM_MailTest extends TestCase {
-	public static function setUpBeforeClass() {
-	}
+class CM_MailTest extends TestCaseRender {
 
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		TH::clearEnv();
 	}
 
 	public function testWithTemplate() {
-		$user = $this->getMock('CM_Model_User', array('getEmail'), array(TH::createUser()->getId()));
+		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
+		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
 
-		try {
-			$msg = new CM_Mail_Welcome($user);
-			list($subject, $html, $text) = $msg->send();
-			$this->assertNotEmpty($subject);
-			$this->assertNotEmpty($html);
-			$this->assertNotEmpty($text);
-		} catch (Exception $e) {
-			$this->fail('Cannot send mail: ' . $e->getMessage());
-		}
+		$msg = new CM_Mail_Welcome($user);
+		list($subject, $html, $text) = $msg->send();
+		$this->assertNotEmpty($subject);
+		$this->assertNotEmpty($html);
+		$this->assertNotEmpty($text);
 	}
 
 	public function testNoTemplate() {
@@ -40,15 +35,17 @@ class CM_MailTest extends TestCase {
 			$this->assertTrue(true);
 		}
 		$msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
-		list($subject, $html, $text) = $msg->send();
+		list($subject, $html, $text) = $msg->send(null, $this->_getSite());
 		$this->assertEquals('blabla', $subject);
 		$this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
 		$this->assertEquals('Hello (http://www.foo.bar)', $text);
 	}
 
 	public function testQueue() {
-		$user = $this->getMock('CM_Model_User', array('getEmail'), array(TH::createUser()->getId()));
+		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
+		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
+
 		$msg = new CM_Mail($user, null, true);
 		$msg->setSubject('testSubject');
 		$msg->setHtml('<b>hallo</b>');
