@@ -61,17 +61,20 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return array
 	 */
 	public function getItemsEvenlyDistributed($countMax) {
-		$countMax = min((int) $countMax, $this->getCount());
+		$countMax = (int) $countMax;
+		$countMax = min($countMax, $this->getCount());
 		$count = $this->getCount();
 		$itemsRaw = $this->getItemsRaw();
 		$items = array();
-		$interval = ($count - 1) / ($countMax - 1);
-		$items[] = $this->getItem(0);
-		for($i = 1; $i < $countMax - 1; $i++) {
-			$index = (int) round($i * $interval);
-			$items[] = $this->getItem($index);
+		if ($countMax > 1) {
+			$interval = ($count - 1) / ($countMax - 1);
+			for($i = 0; $i < $countMax; $i++) {
+				$index = (int) round($i * $interval);
+				$items[] = $this->getItem($index);
+			}
+		} elseif ($countMax == 1) {
+			$items[] = $this->getItem(0);
 		}
-		$items[] = $this->getItem($count - 1);
 		return $items;
 	}
 

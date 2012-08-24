@@ -355,5 +355,17 @@ class CM_Paging_AbstractTest extends TestCase {
 		$items = $paging->getItemsEvenlyDistributed(6);
 		$this->assertSame(6, count($items));
 		$this->assertSame(array(1,7,13,18,24,30), $items);
+
+		$items = $paging->getItemsEvenlyDistributed(2);
+		$this->assertSame(2, count($items));
+		$this->assertSame(array(1,30), $items);
+
+		$items = $paging->getItemsEvenlyDistributed(1);
+		$this->assertSame(1, count($items));
+		$this->assertSame(array(1), $items);
+
+		$items = $paging->getItemsEvenlyDistributed(0);
+		$this->assertSame(0, count($items));
+		$this->assertSame(array(), $items);
 	}
 }
