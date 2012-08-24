@@ -344,4 +344,16 @@ class CM_Paging_AbstractTest extends TestCase {
 		$paging->_change();
 		$this->assertFalse($paging->valid());
 	}
+
+	public function testGetItemsEvenlyDistributed() {
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1,10));
+		$items = $paging->getItemsEvenlyDistributed(7);
+		$this->assertSame(7, count($items));
+		$this->assertSame(array(1,3,4,6,7,9,10), $items);
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1,30));
+		$items = $paging->getItemsEvenlyDistributed(6);
+		$this->assertSame(6, count($items));
+		$this->assertSame(array(1,7,13,18,24,30), $items);
+	}
 }
