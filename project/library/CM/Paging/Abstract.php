@@ -64,16 +64,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		$countMax = (int) $countMax;
 		$countMax = min($countMax, $this->getCount());
 		$count = $this->getCount();
-		$itemsRaw = $this->getItemsRaw();
 		$items = array();
-		if ($countMax > 1) {
-			$interval = ($count - 1) / ($countMax - 1);
+		if ($countMax > 0) {
+			$interval = ($countMax == 1) ? 1 : ($count - 1) / ($countMax - 1);
 			for($i = 0; $i < $countMax; $i++) {
 				$index = (int) round($i * $interval);
 				$items[] = $this->getItem($index);
 			}
-		} elseif ($countMax == 1) {
-			$items[] = $this->getItem(0);
 		}
 		return $items;
 	}
