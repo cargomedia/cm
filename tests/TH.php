@@ -1,5 +1,5 @@
 <?php
-require_once 'TH/Page.php';
+require_once 'TH/Html.php';
 
 /**
  * TH - TestHelper-class with static convenience-methods
@@ -116,7 +116,7 @@ class TH {
 	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User         $viewer OPTIONAL
-	 * @return TH_Page
+	 * @return TH_Html
 	 */
 	public static function renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
 		$render = new CM_Render();
@@ -125,7 +125,7 @@ class TH {
 		$component->prepare();
 		$componentHtml = $render->render($component);
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
-		return new TH_Page($html);
+		return new TH_Html($html);
 	}
 
 	/**
@@ -141,27 +141,27 @@ class TH {
 
 	/**
 	 * @param CM_Page_Abstract $page
-	 * @return TH_Page
+	 * @return TH_Html
 	 */
 	public static function renderPage(CM_Page_Abstract $page) {
 		$render = new CM_Render();
 		$response = new CM_Response_Page($page->getRequest());
 		$page->prepare($response);
 		$html = $render->render($page);
-		return new TH_Page($html);
+		return new TH_Html($html);
 	}
 
 	/**
 	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
 	 * @param array                 $params OPTIONAL
-	 * @return TH_Page
+	 * @return TH_Html
 	 */
 	public static function renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = array()) {
 		$render = new CM_Render();
 		$formField->prepare($params);
 		$html = $render->render($formField, array('form' => $form));
-		return new TH_Page($html);
+		return new TH_Html($html);
 	}
 
 	/**

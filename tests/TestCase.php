@@ -61,14 +61,14 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Checks a TH_Page content (html) with tidy
+	 * Checks a TH_Html content (html) with tidy
 	 *
 	 * Test is skipeed it tidy not installed
 	 *
-	 * @param TH_Page $page
+	 * @param TH_Html $page
 	 * @param bool	$warning If warnings should be checked (default = true)
 	 */
-	public static function assertTidy(TH_Page $page, $warnings = true) {
+	public static function assertTidy(TH_Html $page, $warnings = true) {
 
 		if (!extension_loaded('tidy')) {
 			self::markTestSkipped('The tidy extension is not available.');

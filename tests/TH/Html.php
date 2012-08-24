@@ -1,6 +1,6 @@
 <?php
 
-class TH_Page {
+class TH_Html {
 	private $_doc;
 	private $_xpath;
 	private $_html;
@@ -38,7 +38,7 @@ class TH_Page {
 	public function getAttr($css, $name) {
 		return $this->getText($css . ' @' . $name);
 	}
-	
+
 	/**
 	 * @param string $css
 	 * @return int
