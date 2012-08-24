@@ -3,23 +3,27 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_CssTest extends TestCase {
 
+	/** @var stdClass */
 	private static $_configBackup;
 
-	/**
-	 * @var CM_Render
-	 */
-	private static $_render;
+	/** @var CM_Render */
+	private $_render;
 
 	public static function setUpBeforeClass() {
 		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Render->cdnResource = false;
 		CM_Config::get()->CM_Render->cdnUsetContent = false;
-		self::$_render = new CM_Render();
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
 		CM_Config::set(self::$_configBackup);
+	}
+
+	public function setUp() {
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId'));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$this->_render = new CM_Render($site);
 	}
 
 	public function testToString() {
@@ -61,32 +65,29 @@ EOD;
 
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-		$render = new CM_Render();
-		$url = self::$_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
 		$expected = <<<EOD
 background: url('$url') no-repeat 66px 7px;
 EOD;
-		$this->assertEquals($expected, $css->compile($render));
+		$this->assertEquals($expected, $css->compile($this->_render));
 	}
 
 	public function testBackgroundImage() {
 		$css = new CM_Css("background-image: image('icon/mailbox_read.png');");
-		$render = new CM_Render();
-		$url = self::$_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
 		$expected = <<<EOD
 background-image: url('$url');
 EOD;
-		$this->assertEquals($expected, $css->compile($render));
+		$this->assertEquals($expected, $css->compile($this->_render));
 	}
 
 	public function testUrlFont() {
 		$css = new CM_Css("src: url(urlFont('file.eot'));");
-		$render = new CM_Render();
-		$url = $render->getUrlStatic('/font/file.eot');
+		$url = $this->_render->getUrlStatic('/font/file.eot');
 		$expected = <<<EOD
 src: url('$url');
 EOD;
-		$this->assertEquals($expected, $css->compile($render));
+		$this->assertEquals($expected, $css->compile($this->_render));
 	}
 
 	public function testMixin() {
@@ -115,7 +116,7 @@ EOD;
 }
 
 EOD;
-		$this->assertEquals($expected, $css->compile(self::$_render));
+		$this->assertEquals($expected, $css->compile($this->_render));
 	}
 
 	public function testOpacity() {
@@ -137,7 +138,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertEquals($expected, $css->compile(self::$_render));
+		$this->assertEquals($expected, $css->compile($this->_render));
 	}
 
 	public function testLinearGradient() {
@@ -160,7 +161,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 		//vertical
 		$css = <<<'EOD'
 .foo {
@@ -180,7 +181,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 		//illegal parameters
 		$css = <<<'EOD'
 .foo {
@@ -192,7 +193,7 @@ EOD;
 }
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame('', $css->compile(self::$_render));
+		$this->assertSame('', $css->compile($this->_render));
 	}
 
 	public function testBackgroundColor() {
@@ -215,7 +216,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testBoxShadow() {
@@ -232,7 +233,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testBoxSizing() {
@@ -250,7 +251,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testUserSelect() {
@@ -269,7 +270,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testTransform() {
@@ -289,7 +290,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testTransition() {
@@ -307,29 +308,30 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 
 	public function testMedia() {
-		$this->markTestIncomplete('Media query bubbling not working, see https://github.com/leafo/lessphp/issues/222');
 		$css = <<<'EOD'
 .foo {
 	color: blue;
-	@media (max-width: 767px) & {
+	@media (max-width : 767px) {
 		color: red;
 	}
 }
 EOD;
 		$expected = <<<'EOD'
 .foo {
-  color:blue;
+  color: blue;
 }
 @media (max-width: 767px) {
-  .foo { color:red; }
+  .foo {
+    color: red;
+  }
 }
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile(self::$_render));
+		$this->assertSame($expected, $css->compile($this->_render));
 	}
 }
