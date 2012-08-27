@@ -7,6 +7,11 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		TH::clearEnv();
 	}
 
+	public static function tearDownAfterClass() {
+		$streamChannelPath = DIR_USERFILES . 'streamChannels/';
+		CM_Util::rmDir($streamChannelPath);
+	}
+
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = TH::createStreamChannel();
@@ -63,6 +68,29 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$thumb1 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/1.jpg', $streamChannel->getId());
 		$thumb2 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/2.jpg', $streamChannel->getId());
 		$this->assertEquals(array($thumb1, $thumb2), $archive->getThumbnails()->getItems());
+	}
+
+	public function testOnDelete() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$streamChannel->setThumbnailCount(3);
+		$archive = TH::createStreamChannelVideoArchive($streamChannel);
+		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' . $archive->getHash() . '-thumbs';
+		CM_Util::mkDir($thumbPath);
+		$thumbs = array();
+		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
+			$file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
+			$this->assertTrue(file_exists($file->getPath()));
+		}
+		CM_File::create($archive->getVideo()->getPath());
+		$this->assertTrue(file_exists($archive->getVideo()->getPath()));
+		$this->assertTrue(file_exists($thumbPath));
+		$archive->delete();
+		$this->assertFalse(file_exists($archive->getVideo()->getPath()));
+		$this->assertFalse(file_exists($thumbPath));
+		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
+			$this->assertFalse(file_exists($file->getPath()));
+		}
 	}
 
 

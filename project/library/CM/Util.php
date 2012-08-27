@@ -123,6 +123,18 @@ class CM_Util {
 		}
 	}
 
+	public static function rmDir($path) {
+		$files = glob($path . '*');
+		foreach(glob($path . '*') as $file) {
+			if(is_dir($file)) {
+				self::rmDir($file . '/');
+			} else {
+				unlink($file);
+			}
+		}
+		return rmdir($path);
+	}
+
 	/**
 	 * @param string  $path
 	 * @param array   $params Query parameters

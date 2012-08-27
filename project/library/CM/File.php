@@ -135,7 +135,12 @@ class CM_File {
 		if (!file_exists($this->getPath())) {
 			return;
 		}
-		if (false === unlink($this->getPath())) {
+		if (is_dir($this->getPath())) {
+			$result = CM_Util::rmDir($this->getPath());
+		} else {
+			$result = unlink($this->getPath());
+		}
+		if (false === $result) {
 			throw new CM_Exception('Cannot delete `' . $this->getPath() . '`.');
 		}
 	}

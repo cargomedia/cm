@@ -86,6 +86,12 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		return CM_Mysql::select(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, '*', array('id' => $this->getId()))->fetchAssoc();
 	}
 
+	protected function _onDelete() {
+		$this->getVideo()->delete();
+		$thumbDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
+		$thumbDir->delete();
+	}
+
 	protected static function _create(array $data) {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = $data['streamChannel'];
