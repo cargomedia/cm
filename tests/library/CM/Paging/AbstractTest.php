@@ -368,4 +368,18 @@ class CM_Paging_AbstractTest extends TestCase {
 		$this->assertSame(0, count($items));
 		$this->assertSame(array(), $items);
 	}
+
+	public function testGetSum() {
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 1, 'type' => 1, 'amount' => 2),
+			array('id' => 1, 'type' => 1, 'amount' => 3), array('id' => 1, 'type' => 1, 'amount' => 4))));
+		$this->assertSame(10, $paging->getSum('amount'));
+		$this->assertSame(10, $paging->setPage(0,1)->getSum('amount'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 1, 'type' => 1, 'amount' => 2),
+			array('id' => 1, 'type' => 1, 'amount' => 3), array('id' => 1, 'type' => 1))));
+		try {
+			$paging->getSum('amount');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('CM_Paging_Mock has no field `amount`.', $ex->getMessage());
+		}
+	}
 }

@@ -116,6 +116,26 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @param string $field
+	 * @return float
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getSum($field) {
+		$field = (string) $field;
+		$sum = 0;
+		if ($this->_source) {
+			$itemsRaw = $this->_source->getItems();
+			foreach ($itemsRaw as $itemRaw) {
+				if (!array_key_exists('amount', $itemRaw)) {
+					throw new CM_Exception_Invalid(get_called_class() . ' has no field `amount`.');
+				}
+				$sum += $itemRaw[$field];
+			}
+		}
+		return (float) $sum;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getPage() {
