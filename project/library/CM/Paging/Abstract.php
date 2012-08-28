@@ -117,7 +117,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/**
 	 * @param string $field
-	 * @return float
+	 * @return int|float
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getSum($field) {
@@ -132,7 +132,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 				$sum += $itemRaw[$field];
 			}
 		}
-		return (float) $sum;
+		return $sum;
 	}
 
 	/**
