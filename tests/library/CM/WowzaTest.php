@@ -76,9 +76,7 @@ class CM_WowzaTest extends TestCase {
 	public function testCheckStreams() {
 		TH::clearEnv();
 		$configBackup = CM_Config::get();
-		$mockType = 19;
-		CM_Config::get()->CM_Model_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Video_Mock';
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[$mockType] = 'CM_Model_StreamChannel_Video_Mock';
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
 		$wowza = $wowza = $this->getMock('CM_Wowza', array('stop'));
 		$wowza->expects($this->exactly(2))->method('stop')->will($this->returnValue(1));
 		/** @var CM_Model_StreamChannel_Video_Mock $streamChannel */
@@ -130,8 +128,6 @@ class CM_WowzaTest extends TestCase {
 }
 
 class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
-
-	const TYPE = 19;
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
