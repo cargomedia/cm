@@ -295,6 +295,10 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return CM_Paging_StreamChannel_Type
 	 */
 	private static function _getStreamChannels() {
-		return new CM_Paging_StreamChannel_Type(self::_getConfig()->streamChannelTypes);
+		$types = array(CM_Model_StreamChannel_Video::TYPE);
+		foreach (CM_Model_StreamChannel_Video::getClassChildren() as $class) {
+			$types[] = $class::TYPE;
+		}
+		return new CM_Paging_StreamChannel_Type($types);
 	}
 }

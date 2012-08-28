@@ -118,7 +118,6 @@ $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wu
 $config->CM_Model_StreamChannel_Abstract = new stdClass();
 
 $config->CM_Wowza = new stdClass();
-$config->CM_Wowza->streamChannelTypes[] = CM_Model_StreamChannel_Video::TYPE;
 
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
