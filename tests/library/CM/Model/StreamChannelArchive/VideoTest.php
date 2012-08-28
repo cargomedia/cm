@@ -91,6 +91,12 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
 			$this->assertFalse(file_exists($file->getPath()));
 		}
+		try {
+			new CM_Model_StreamChannelArchive_Video($archive->getId());
+			$this->fail('StreamChannelArchive not deleted.');
+		} catch (CM_Exception_Nonexistent $ex) {
+			$this->assertTrue(true);
+		}
 	}
 
 
