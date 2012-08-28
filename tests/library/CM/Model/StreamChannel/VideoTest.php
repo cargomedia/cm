@@ -31,7 +31,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 
 	public function testCreateWithoutServerId() {
 		try {
-			CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2));
+			CM_Model_StreamChannel_Video::create(array('key' => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2));
 			$this->fail('Can create streamChannel without wowzaIp');
 		} catch (CM_Exception $ex) {
 			$this->assertContains("`Column 'serverId' cannot be null`", $ex->getMessage());
@@ -40,7 +40,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 
 	public function testNonexistentServerId() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'serverId' => 800,
+		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foobar', 'width' => 100, 'height' => 200, 'serverId' => 800,
 			'thumbnailCount' => 2));
 
 		try {
