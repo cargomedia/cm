@@ -81,15 +81,19 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
 			$file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
 			$this->assertTrue(file_exists($file->getPath()));
+			$thumbs[] = $file;
 		}
-		CM_File::create($archive->getVideo()->getPath());
-		$this->assertTrue(file_exists($archive->getVideo()->getPath()));
+		$video = $archive->getVideo();
+		$thumbnailCount = $archive->getThumbnailCount();
+		CM_File::create($video->getPath());
+		$this->assertTrue(file_exists($video->getPath()));
 		$this->assertTrue(file_exists($thumbPath));
 		$archive->delete();
-		$this->assertFalse(file_exists($archive->getVideo()->getPath()));
+		$this->assertFalse(file_exists($video->getPath()));
 		$this->assertFalse(file_exists($thumbPath));
-		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
-			$this->assertFalse(file_exists($file->getPath()));
+		/** @var CM_File $thumb */
+		foreach ($thumbs as $thumb) {
+			$this->assertFalse(file_exists($thumb->getPath()));
 		}
 		try {
 			new CM_Model_StreamChannelArchive_Video($archive->getId());
