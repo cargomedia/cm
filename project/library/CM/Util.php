@@ -125,7 +125,6 @@ class CM_Util {
 
 	/**
 	 * @param string $path
-	 * @return boolean
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function rmDir($path) {
@@ -142,7 +141,6 @@ class CM_Util {
 		if (!rmdir($path)) {
 			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
 		}
-		return true;
 	}
 
 	/**
