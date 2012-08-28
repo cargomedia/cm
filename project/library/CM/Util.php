@@ -123,16 +123,26 @@ class CM_Util {
 		}
 	}
 
+	/**
+	 * @param string $path
+	 * @return boolean
+	 * @throws CM_Exception_Invalid
+	 */
 	public static function rmDir($path) {
-		$files = glob($path . '*');
-		foreach(glob($path . '*') as $file) {
-			if(is_dir($file)) {
+		$path = (string) $path;
+		foreach (glob($path . '*') as $file) {
+			if (is_dir($file)) {
 				self::rmDir($file . '/');
 			} else {
-				unlink($file);
+				if (!unlink($file)) {
+					throw new CM_Exception_Invalid('Could not delete file `' . $file . '`');
+				}
 			}
 		}
-		return rmdir($path);
+		if (!rmdir($path)) {
+			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
+		}
+		return true;
 	}
 
 	/**
