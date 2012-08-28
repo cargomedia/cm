@@ -7,9 +7,7 @@ class CM_WowzaTest extends TestCase {
 
 	public static function setUpBeforeClass() {
 		self::$_configBackup = CM_Config::get();
-		CM_Config::get()->CM_Wowza->servers = array(
-			array('host' => 'localhost', 'hostPrivate' => '127.0.0.1'),
-		);
+		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
 	}
 
 	public static function tearDownAfterClass() {
@@ -86,7 +84,7 @@ class CM_WowzaTest extends TestCase {
 		/** @var CM_Model_StreamChannel_Video_Mock $streamChannel */
 		// allowedUntil will be updated, if stream has expired and it's user isn't $userUnchanged
 		$userUnchanged = TH::createUser();
-		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'wowzaIp' => '127.0.0.1'));
+		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1));
 		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
 			'allowedUntil' => 0));
 		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_4',
@@ -95,7 +93,7 @@ class CM_WowzaTest extends TestCase {
 			'allowedUntil' => 0));
 		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
-		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2', 'wowzaIp' => ip2long('127.0.0.1'))),
+		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2', 'serverId' => 1)),
 			'user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
 		$wowza->checkStreams();
 		$this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil(), $streamSubscribeUnchanged1->_change()->getAllowedUntil());
@@ -143,10 +141,48 @@ class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
 		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
 	}
 
+
 	/**
 	 * @return string
+	 * @throws CM_Exception
 	 */
-	public function getWowzaIp() {
-		return (string) long2ip($this->_get('wowzaIp'));
+	public function getPublicHost() {
+		try {
+			$serverArray = $this->getWowzaServer();
+		} catch (CM_Exceptiont $ex) {
+			throw $ex;
+		}
+
+		return $serverArray['publicHost'];
+	}
+
+	/**
+	 * @return int
+	 * @throws CM_Exception
+	 */
+	public function getPrivateIp() {
+		try {
+			$serverArray = $this->getWowzaServer();
+		} catch (CM_Exception $ex) {
+			throw $ex;
+		}
+
+		return ip2long($serverArray['privateIp']);
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Nonexistent
+	 */
+	private function getWowzaServer() {
+		$servers = CM_Wowza::_getConfig()->servers;
+		$serverId = (int) $this->_get('serverId');
+		$serverArray = $servers[$serverId];
+
+		if (!$serverArray) {
+			throw new CM_Exception_Nonexistent("No wowza server found with id: " . $serverId);
+		}
+
+		return $serverArray;
 	}
 }

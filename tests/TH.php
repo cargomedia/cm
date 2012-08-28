@@ -151,7 +151,7 @@ class TH {
 		if (CM_Model_StreamChannel_Video::TYPE == $type) {
 			$data['width'] = 480;
 			$data['height'] = 720;
-			$data['wowzaIp'] = ip2long('127.0.0.1');
+			$data['serverId'] = 1;
 			$data['thumbnailCount'] = 0;
 		}
 

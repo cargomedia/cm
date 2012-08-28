@@ -17,7 +17,8 @@ class CM_Wowza extends CM_Class_Abstract {
 		foreach (self::_getConfig()->servers as $wowzaServer) {
 			$singleStatus = CM_Params::decode($this->fetchStatus($wowzaServer['privateIp']), true);
 			foreach ($singleStatus as $key => $publish) {
-				$publish['wowzaIp'] = $wowzaServer['privateIp'];
+				$publish['serverId'] = $key;
+				$publish['privateIp'] = $wowzaServer['privateIp'];
 				$status[$key] = $publish;
 			}
 		}
@@ -28,9 +29,9 @@ class CM_Wowza extends CM_Class_Abstract {
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				try {
-					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['wowzaIp'], $publish['thumbnailCount'], $publish['data']);
+					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['serverId'], $publish['thumbnailCount'], $publish['data']);
 				} catch (CM_Exception $ex) {
-					$this->_stopClient($publish['clientId'], long2ip($publish['wowzaIp']));
+					$this->_stopClient($publish['clientId'], long2ip($publish['privateIp']));
 				}
 			}
 
@@ -75,20 +76,20 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param int     $start
 	 * @param int     $width
 	 * @param int     $height
-	 * @param string  $wowzaIp
+	 * @param string  $serverId
 	 * @param int     $thumbnailCount
 	 * @param string  $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 * @return int
 	 */
-	public function publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $thumbnailCount, $data) {
+	public function publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data) {
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		$start = (int) $start;
 		$width = (int) $width;
 		$height = (int) $height;
-		$wowzaIp = (string) $wowzaIp;
+		$serverId = (int) $serverId;
 		$thumbnailCount = (int) $thumbnailCount;
 		$data = (string) $data;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
@@ -97,7 +98,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params,
-			'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp, 'thumbnailCount' => $thumbnailCount));
+			'width' => $width, 'height' => $height, 'serverId' => $serverId, 'thumbnailCount' => $thumbnailCount));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
@@ -144,7 +145,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamChannel instanceof CM_Model_StreamChannel_Video) {
 			throw new CM_Exception_Invalid('Cannot stop stream of non-video channel');
 		}
-		$this->_stopClient($stream->getKey(), long2ip($streamChannel->getWowzaIp()));
+		$this->_stopClient($stream->getKey(), long2ip($streamChannel->getPrivateIp()));
 	}
 
 	/**

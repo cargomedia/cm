@@ -66,9 +66,46 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @return string
+	 * @throws CM_Exception
 	 */
-	public function getWowzaIp() {
-		return (string) $this->_get('wowzaIp');
+	public function getPublicHost() {
+		try {
+			$serverArray = $this->getWowzaServer();
+		} catch (CM_Exception $ex) {
+			throw $ex;
+		}
+
+		return $serverArray['publicHost'];
+	}
+
+	/**
+	 * @return int
+	 * @throws CM_Exception
+	 */
+	public function getPrivateIp() {
+		try {
+			$serverArray = $this->getWowzaServer();
+		} catch (CM_Exception $ex) {
+			throw $ex;
+		}
+
+		return ip2long($serverArray['privateIp']);
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Nonexistent
+	 */
+	private function getWowzaServer() {
+		$servers = CM_Wowza::_getConfig()->servers;
+		$serverId = (int) $this->_get('serverId');
+		$serverArray = $servers[$serverId];
+
+		if (!$serverArray) {
+			throw new CM_Exception_Nonexistent("No wowza server found with id: " . $serverId);
+		}
+
+		return $serverArray;
 	}
 
 	/**
@@ -104,11 +141,11 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		$key = (string) $data['key'];
 		$width = (int) $data['width'];
 		$height = (int) $data['height'];
-		$wowzaIp = $data['wowzaIp'];
+		$serverId = $data['serverId'];
 		$thumbnailCount = (int) $data['thumbnailCount'];
 		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
 		try {
-			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'wowzaIp' => $wowzaIp,
+			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
 			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
