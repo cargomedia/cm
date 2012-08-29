@@ -14,12 +14,12 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	public function synchronize() {
 		$status = array();
-		foreach (self::_getConfig()->servers as $wowzaServer) {
+		foreach (self::_getConfig()->servers as $serverId => $wowzaServer) {
 			$singleStatus = CM_Params::decode($this->fetchStatus($wowzaServer['privateIp']), true);
-			foreach ($singleStatus as $key => $publish) {
-				$publish['serverId'] = $key;
-				$publish['privateIp'] = $wowzaServer['privateIp'];
-				$status[$key] = $publish;
+			foreach ($singleStatus as $streamName => $publish) {
+				$publish['serverId'] = $serverId;
+				$publish['serverHost'] = long2ip( $wowzaServer['privateIp']);
+				$status[$streamName] = $publish;
 			}
 		}
 
@@ -31,7 +31,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				try {
 					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['serverId'], $publish['thumbnailCount'], $publish['data']);
 				} catch (CM_Exception $ex) {
-					$this->_stopClient($publish['clientId'], long2ip($publish['privateIp']));
+					$this->_stopClient($publish['clientId'], $publish['serverHost']);
 				}
 			}
 
@@ -76,7 +76,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @param int     $start
 	 * @param int     $width
 	 * @param int     $height
-	 * @param string  $serverId
+	 * @param int  	  $serverId
 	 * @param int     $thumbnailCount
 	 * @param string  $data
 	 * @throws CM_Exception

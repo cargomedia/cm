@@ -47,7 +47,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 			$channel->getPublicHost();
 			$this->fail('Found server with Id 800');
 		} catch (CM_Exception $ex) {
-			$this->assertSame("No wowza server found with id: 800", $ex->getMessage());
+			$this->assertSame("No wowza server with id `800` found", $ex->getMessage());
 		}
 	}
 

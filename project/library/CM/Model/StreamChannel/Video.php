@@ -66,15 +66,9 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @return string
-	 * @throws CM_Exception
 	 */
 	public function getPublicHost() {
-		try {
-			$serverArray = $this->getWowzaServer();
-		} catch (CM_Exception $ex) {
-			throw $ex;
-		}
-
+		$serverArray = $this->_getWowzaServer();
 		return $serverArray['publicHost'];
 	}
 
@@ -83,12 +77,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 * @throws CM_Exception
 	 */
 	public function getPrivateIp() {
-		try {
-			$serverArray = $this->getWowzaServer();
-		} catch (CM_Exception $ex) {
-			throw $ex;
-		}
-
+		$serverArray = $this->_getWowzaServer();
 		return ip2long($serverArray['privateIp']);
 	}
 
@@ -96,13 +85,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 * @return array
 	 * @throws CM_Exception_Nonexistent
 	 */
-	private function getWowzaServer() {
+	private function _getWowzaServer() {
 		$servers = CM_Wowza::_getConfig()->servers;
 		$serverId = (int) $this->_get('serverId');
 		$serverArray = $servers[$serverId];
 
 		if (!$serverArray) {
-			throw new CM_Exception_Nonexistent("No wowza server found with id: " . $serverId);
+			throw new CM_Exception_Invalid("No wowza server with id `$serverId` found");
 		}
 
 		return $serverArray;
