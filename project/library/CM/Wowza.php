@@ -234,6 +234,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 	}
 
+
 	/**
 	 * @param string  $streamName
 	 * @param string  $clientKey
@@ -246,18 +247,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$wowzaIp = long2ip(CM_Request_Abstract::getInstance()->getIp());
-		$servers = CM_Wowza::_getConfig()->servers;
-
-		$serverId = null;
-		foreach ($servers as $configServerId => $server) {
-			if ($server['privateIp'] == $wowzaIp) {
-				$serverId = $configServerId;
-			}
-		}
-
-		if ($serverId == null) {
-			throw new CM_Exception_Invalid("No wowza server with ip `$wowzaIp` found");
-		}
+		$serverId = CM_Wowza::_getServerId($wowzaIp);
 
 		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
@@ -295,6 +285,21 @@ class CM_Wowza extends CM_Class_Abstract {
 		return true;
 	}
 
+	public static function getServer($serverId = null) {
+		$servers = CM_Wowza::_getConfig()->servers;
+
+		if ($serverId === null) {
+			$servers[array_rand($servers)];
+		}
+
+		$serverId = (int) $serverId;
+		if (!array_key_exists($serverId, $servers)) {
+			throw new CM_Exception_Invalid("No wowza server with id `$serverId` found");
+		}
+
+		return $servers[$serverId];
+	}
+
 	/**
 	 * @return CM_Wowza
 	 */
@@ -314,5 +319,28 @@ class CM_Wowza extends CM_Class_Abstract {
 			$types[] = $class::TYPE;
 		}
 		return new CM_Paging_StreamChannel_Type($types);
+	}
+
+	/**
+	 * @param $host
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	private static function _getServerId($host) {
+		$host = (string) $host;
+		$servers = CM_Wowza::_getConfig()->servers;
+
+		$serverId = null;
+		foreach ($servers as $configServerId => $server) {
+			if ($server['privateIp'] == $host || $server['publicHost'] == $host) {
+				$serverId = $configServerId;
+			}
+		}
+
+		if ($serverId == null) {
+			throw new CM_Exception_Invalid("No wowza server with host `$host` found");
+		}
+
+		return $serverId;
 	}
 }
