@@ -294,7 +294,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$servers = CM_Wowza::_getConfig()->servers;
 
 		if ($serverId === null) {
-			$servers[array_rand($servers)];
+			return $servers[array_rand($servers)];
 		}
 
 		$serverId = (int) $serverId;
