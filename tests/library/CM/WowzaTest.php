@@ -103,6 +103,18 @@ class CM_WowzaTest extends TestCase {
 		CM_Config::set($configBackup);
 	}
 
+	public function testGetServer() {
+		$server = CM_Wowza::getServer(1);
+		$this->assertSame('10.0.3.108', $server['privateIp']);
+
+		try {
+			CM_Wowza::getServer(800);
+			$this->fail('Found server with id 800');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('No wowza server with id `800` found', $ex->getMessage());
+		}
+	}
+
 	private function _generateWowzaData(array $streamChannels) {
 		$jsonData = array();
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
