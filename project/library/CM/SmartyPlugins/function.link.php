@@ -42,7 +42,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	if (!empty($icon)) {
 		$html .= '<span class="icon ' . $icon . '"></span>';
 	}
-	if (!empty($icon) && !empty($label)) {
+	if (!empty($label)) {
 		$html .= '<span class="label">';
 	}
 	if (empty($title) && empty($label)) {
@@ -50,7 +50,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	$html .= CM_Util::htmlspecialchars($label);
 
-	if (!empty($icon) && !empty($label)) {
+	if (!empty($label)) {
 		$html .= '</span>';
 	}
 	$html .= '</a>';
