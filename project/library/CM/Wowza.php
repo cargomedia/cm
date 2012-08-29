@@ -245,8 +245,21 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
-		$wowzaIp = CM_Request_Abstract::getInstance()->getIp();
-		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $wowzaIp, $thumbnailCount, $data);
+		$wowzaIp = long2ip(CM_Request_Abstract::getInstance()->getIp());
+		$servers = CM_Wowza::_getConfig()->servers;
+
+		$serverId = null;
+		foreach ($servers as $configServerId => $server) {
+			if ($server['privateIp'] == $wowzaIp) {
+				$serverId = $configServerId;
+			}
+		}
+
+		if ($serverId == null) {
+			throw new CM_Exception_Invalid("No wowza server with ip `$wowzaIp` found");
+		}
+
+		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
 	}
 
