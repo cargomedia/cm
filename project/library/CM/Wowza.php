@@ -285,6 +285,11 @@ class CM_Wowza extends CM_Class_Abstract {
 		return true;
 	}
 
+	/**
+	 * @param int|null $serverId
+	 * @return int
+	 * @throws CM_Exception_Invalid
+	 */
 	public static function getServer($serverId = null) {
 		$servers = CM_Wowza::_getConfig()->servers;
 
