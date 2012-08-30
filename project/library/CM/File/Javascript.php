@@ -54,6 +54,9 @@ class CM_File_Javascript extends CM_File {
 		return $indentation . '/** ' . $doc . ' */';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function minify() {
 		return CM_Util::exec('uglifyjs ' . $this->getPath());
 	}
