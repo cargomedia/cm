@@ -407,6 +407,13 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isDebug() {
+		return IS_DEBUG;
+	}
+
+	/**
 	 * @return string
 	 */
 	private function _getLocale() {
@@ -427,7 +434,7 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
 			self::$_smarty->_file_perms = 0777;
 			self::$_smarty->_dir_perms = 0777;
-			self::$_smarty->compile_check = IS_DEBUG;
+			self::$_smarty->compile_check = $this->isDebug();
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
 		}
