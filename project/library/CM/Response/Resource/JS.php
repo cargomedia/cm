@@ -59,7 +59,10 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		foreach ($paths as $path) {
 			$content .= new CM_File($path);
 		}
-		return $content;
+
+		/** @var $file CM_File_Javascript */
+		$file = CM_File_Javascript::create(DIR_TMP . 'internal.js', $content);
+		return $file->minify();
 	}
 
 	public static function match(CM_Request_Abstract $request) {
