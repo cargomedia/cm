@@ -240,6 +240,13 @@ class CM_Util {
 		return self::_exec($command, $input);
 	}
 
+	/**
+	 * @static
+	 * @param $command
+	 * @param $stdin
+	 * @return string
+	 * @throws CM_Exception
+	 */
 	private static function _exec($command, $stdin) {
 		$descriptorSpec = array(
 			0 => array("pipe", "r"),
