@@ -75,7 +75,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function minify($content) {
-		return CM_Util::exec('uglifyjs --no-copyright', array(), $content);
+		return CM_Util::exec('uglifyjs --no-copyright', null, $content);
 	}
 
 }
