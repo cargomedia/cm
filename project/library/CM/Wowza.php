@@ -18,7 +18,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			$singleStatus = CM_Params::decode($this->fetchStatus($wowzaServer['privateIp']), true);
 			foreach ($singleStatus as $streamName => $publish) {
 				$publish['serverId'] = $serverId;
-				$publish['serverHost'] = long2ip($wowzaServer['privateIp']);
+				$publish['serverHost'] = $wowzaServer['privateIp'];
 				$status[$streamName] = $publish;
 			}
 		}
