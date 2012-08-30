@@ -23,7 +23,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
-		$this->assertSame('10.0.3.108', long2ip($channel->getPrivateIp()));
+		$this->assertSame('10.0.3.108', $channel->getPrivateHost());
 		$this->assertSame('wowza1.fuckbook.cat.cargomedia', $channel->getPublicHost());
 		$this->assertSame('foo', $channel->getKey());
 		$this->assertSame(2, $channel->getThumbnailCount());
