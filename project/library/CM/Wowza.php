@@ -214,7 +214,8 @@ class CM_Wowza extends CM_Class_Abstract {
 				/** @var CM_Model_Stream_Publish $streamPublish  */
 				$streamPublish = $streamChannel->getStreamPublish();
 				if ($streamPublish->getAllowedUntil() < time()) {
-					if ($allowedUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil())) {
+					$allowedUntil = $streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil());
+					if ($allowedUntil >= time()) {
 						$streamPublish->setAllowedUntil($allowedUntil);
 					} else {
 						$this->stop($streamPublish);
@@ -224,7 +225,8 @@ class CM_Wowza extends CM_Class_Abstract {
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe*/
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				if ($streamSubscribe->getAllowedUntil() < time()) {
-					if ($allowedUntil = $streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil())) {
+					$allowedUntil = $streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil());
+					if ($allowedUntil >= time()) {
 						$streamSubscribe->setAllowedUntil($allowedUntil);
 					} else {
 						$this->stop($streamSubscribe);
