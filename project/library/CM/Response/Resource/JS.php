@@ -19,13 +19,12 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		if ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
-				$content .= trim(new CM_File($path)) . ';' . PHP_EOL;
+				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			if ($this->getRender()->isDebug()) {
-				return $content;
-			} else {
-				return $this->minify($content);
+			if (!$this->getRender()->isDebug()) {
+				$content = $this->minify($content);
 			}
+			return $content;
 		}
 		if ($this->getRequest()->getPathPart(0) == 'translations') {
 			$language = $this->getRender()->getLanguage();
@@ -76,9 +75,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function minify($content) {
-		/** @var $file CM_File_Javascript */
-		$file = CM_File_Javascript::create(DIR_TMP . 'uglified.js', $content);
-		return $file->minify();
+		return CM_Util::exec('uglifyjs --no-copyright', array(), $content);
 	}
 
 }
