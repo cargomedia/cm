@@ -58,6 +58,6 @@ class CM_File_Javascript extends CM_File {
 	 * @return string
 	 */
 	public function minify() {
-		return CM_Util::exec('uglifyjs ' . $this->getPath());
+		return CM_Util::exec('uglifyjs --no-copyright ' . $this->getPath());
 	}
 }
