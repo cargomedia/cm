@@ -18,7 +18,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			$singleStatus = CM_Params::decode($this->fetchStatus($wowzaServer['privateIp']), true);
 			foreach ($singleStatus as $streamName => $publish) {
 				$publish['serverId'] = $serverId;
-				$publish['serverHost'] = long2ip( $wowzaServer['privateIp']);
+				$publish['serverHost'] = long2ip($wowzaServer['privateIp']);
 				$status[$streamName] = $publish;
 			}
 		}
@@ -71,14 +71,14 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string  $streamName
-	 * @param string  $clientKey
-	 * @param int     $start
-	 * @param int     $width
-	 * @param int     $height
-	 * @param int  	  $serverId
-	 * @param int     $thumbnailCount
-	 * @param string  $data
+	 * @param string     $streamName
+	 * @param string     $clientKey
+	 * @param int        $start
+	 * @param int        $width
+	 * @param int        $height
+	 * @param int        $serverId
+	 * @param int        $thumbnailCount
+	 * @param string     $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 * @return int
@@ -145,7 +145,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		if (!$streamChannel instanceof CM_Model_StreamChannel_Video) {
 			throw new CM_Exception_Invalid('Cannot stop stream of non-video channel');
 		}
-		$this->_stopClient($stream->getKey(), long2ip($streamChannel->getPrivateIp()));
+		$this->_stopClient($stream->getKey(), $streamChannel->getPrivateHost());
 	}
 
 	/**
@@ -234,7 +234,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 	}
 
-
 	/**
 	 * @param string  $streamName
 	 * @param string  $clientKey
@@ -287,14 +286,14 @@ class CM_Wowza extends CM_Class_Abstract {
 
 	/**
 	 * @param int|null $serverId
-	 * @return int
+	 * @return array
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function getServer($serverId = null) {
 		$servers = CM_Wowza::_getConfig()->servers;
 
-		if ($serverId === null) {
-			return $servers[array_rand($servers)];
+		if (null === $serverId) {
+			$serverId = array_rand($servers);
 		}
 
 		$serverId = (int) $serverId;
@@ -327,25 +326,20 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param $host
-	 * @return string
+	 * @param string $host
+	 * @return int
 	 * @throws CM_Exception_Invalid
 	 */
 	private static function _getServerId($host) {
 		$host = (string) $host;
 		$servers = CM_Wowza::_getConfig()->servers;
 
-		$serverId = null;
-		foreach ($servers as $configServerId => $server) {
+		foreach ($servers as $serverId => $server) {
 			if ($server['privateIp'] == $host || $server['publicHost'] == $host) {
-				$serverId = $configServerId;
+				return (int) $serverId;
 			}
 		}
 
-		if ($serverId == null) {
-			throw new CM_Exception_Invalid("No wowza server with host `$host` found");
-		}
-
-		return $serverId;
+		throw new CM_Exception_Invalid("No wowza server with host `$host` found");
 	}
 }

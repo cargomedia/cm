@@ -70,16 +70,16 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	public function getPublicHost() {
 		$serverId = (int) $this->_get('serverId');
 		$serverArray = CM_Wowza::getServer($serverId);
-		return $serverArray['publicHost'];
+		return (string) $serverArray['publicHost'];
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
-	public function getPrivateIp() {
+	public function getPrivateHost() {
 		$serverId = (int) $this->_get('serverId');
 		$serverArray = CM_Wowza::getServer($serverId);
-		return ip2long($serverArray['privateIp']);
+		return (string) $serverArray['privateIp'];
 	}
 
 	/**
