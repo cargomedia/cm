@@ -581,7 +581,7 @@ class CM_Mysql extends CM_Class_Abstract {
 		$args[] = '--user=' . $config->user;
 		$args[] = '--password=' . $config->pass;
 		$args[] = $dbName;
-		CM_Util::exec('mysql', $args, $dump->getPath());
+		CM_Util::exec('mysql', $args, null, $dump->getPath());
 	}
 
 	/**

@@ -56,34 +56,6 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string      $cmd
-	 * @param array|null  $args
-	 * @param string|null $inputPath
-	 * @return string Output
-	 * @throws CM_Exception If return-status != 0
-	 */
-	public static function exec($cmd, array $args = null, $inputPath = null) {
-		if (null === $args) {
-			$args = array();
-		}
-		foreach ($args as $arg) {
-			if (!strlen($arg)) {
-				throw new CM_Exception('Empty argument');
-			}
-			$cmd .= ' ' . escapeshellarg($arg);
-		}
-		if ($inputPath) {
-			$cmd .= ' <' . escapeshellarg($inputPath);
-		}
-		exec($cmd, $output, $returnStatus);
-		$output = implode(PHP_EOL, $output);
-		if ($returnStatus != 0) {
-			throw new CM_Exception('Command `' . $cmd . '` failed: `' . $output . '`');
-		}
-		return $output;
-	}
-
-	/**
 	 * @param string       $url
 	 * @param array|null   $params
 	 * @param boolean|null $methodPost
@@ -242,5 +214,58 @@ class CM_Util {
 			$namespaces = array_merge($namespaces, $site->getNamespaces());
 		}
 		return array_unique($namespaces);
+	}
+
+	/**
+	 * @param string      $command
+	 * @param array|null  $args
+	 * @param string|null $input
+	 * @param string|null $inputPath
+	 * @throws CM_Exception
+	 * @return string Output
+	 */
+	public static function exec($command, array $args = null, $input = null, $inputPath = null) {
+		if (null === $args) {
+			$args = array();
+		}
+		foreach ($args as $arg) {
+			if (!strlen($arg)) {
+				throw new CM_Exception('Empty argument');
+			}
+			$command .= ' ' . escapeshellarg($arg);
+		}
+		if ($inputPath) {
+			$command .= ' <' . escapeshellarg($inputPath);
+		}
+		return self::_exec($command, $input);
+	}
+
+	private static function _exec($command, $stdin) {
+		$descriptorSpec = array(
+			0 => array("pipe", "r"),
+			1 => array("pipe", "w"),
+			2 => array("pipe", "w")
+		);
+		$process = proc_open($command, $descriptorSpec, $pipes);
+		if (!is_resource($process)) {
+			throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
+		}
+
+		if ($stdin) {
+			fwrite($pipes[0], $stdin);
+		}
+		fclose($pipes[0]);
+
+		$output = stream_get_contents($pipes[1]);
+		fclose($pipes[1]);
+
+		$stderr = stream_get_contents($pipes[2]);
+		fclose($pipes[2]);
+
+		$returnStatus = proc_close($process);
+		if ($returnStatus != 0) {
+			throw new CM_Exception('Command `' . $command . '` failed: `' . trim($stderr) . '`');
+		}
+		return $output;
 	}
 }
