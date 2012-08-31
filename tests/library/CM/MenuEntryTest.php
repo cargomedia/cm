@@ -25,12 +25,10 @@ class CM_MenuEntryTest extends TestCase {
 		$pageName = 'CM_Page_Mock';
 		$label = 'helloworld';
 
-		$request = new CM_Request_Get('/test');
-		$entry = new CM_MenuEntry(array('label' => $label, 'page' => $pageName), $this->_getMenu($request));
+		$entry = new CM_MenuEntry(array('label' => $label, 'page' => $pageName), $this->_getMenu('/test'));
 		$this->assertFalse($entry->isActive());
 
-		$request = new CM_Request_Get('/mock');
-		$entry = new CM_MenuEntry(array('label' => $label, 'page' => $pageName), $this->_getMenu($request));
+		$entry = new CM_MenuEntry(array('label' => $label, 'page' => $pageName), $this->_getMenu('/mock'));
 		$this->assertTrue($entry->isActive());
 	}
 
@@ -74,18 +72,20 @@ class CM_MenuEntryTest extends TestCase {
 	}
 
 	/**
-	 * @param CM_Request_Abstract|null $request
+	 * @param string|null    $path
+	 * @param CM_Params|null $params
 	 * @return CM_Menu
 	 */
-	private function _getMenu(CM_Request_Abstract $request = null) {
-		$entriesData = array(
-			array('label' => 'Home', 'page' => 'CM_Page_Mock2'),
-			array('label' => 'Example', 'page' => 'CM_Page_Mock')
-		);
-		if (!$request) {
-			$request = new CM_Request_Get('/test');
+	private function _getMenu($path = null, CM_Params $params = null) {
+		if (is_null($path)) {
+			$path ='/test';
 		}
-		return new CM_Menu($entriesData, $request);
+		$path = (string) $path;
+		if (is_null($params)) {
+			$params = new CM_Params(array());
+		}
+		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock2'), array('label' => 'Example', 'page' => 'CM_Page_Mock'));
+		return new CM_Menu($entriesData, $path, $params);
 	}
 
 }

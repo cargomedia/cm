@@ -3,12 +3,13 @@
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
-	/** @var CM_Model_User $viewer */
-	$viewer = $template->smarty->getTemplateVars('viewer');
 	/** @var CM_Page_Abstract $page */
 	$page = $render->getStackLast('pages');
-	$request = $page ? $page->getRequest() : new CM_Request_Get($render->getSite()->getUrl(), array(), $viewer);
-
+	/** @var CM_Model_User $viewer */
+	$viewer = $page ? $page->getViewer() : $template->smarty->getTemplateVars('viewer');
+	$path = $page ? $page::getPath() : '';
+	/** @var CM_Params $pageParams */
+	$pageParams = $page ? $page->getParams() : CM_Params::factory(array());
 	$userId = $viewer ? $viewer->getId() : 0;
 
 
@@ -19,12 +20,12 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		if (($menu = CM_Cache_Runtime::get($cacheKey)) === false) {
 			$menuArr = include $render->getLayoutPath('menu.php', null, true);
 			if (isset($menuArr[$name])) {
-				$menu = new CM_Menu($menuArr[$name], $request);
+				$menu = new CM_Menu($menuArr[$name], $path, $pageParams, $viewer);
 			}
 			CM_Cache_Runtime::set($cacheKey, $menu);
 		}
 	} elseif (isset($params['data'])) {
-		$menu = new CM_Menu($params['data'], $request);
+		$menu = new CM_Menu($params['data'], $path, $pageParams, $viewer);
 	}
 	if (!$menu) {
 		return '';

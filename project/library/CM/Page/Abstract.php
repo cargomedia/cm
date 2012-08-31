@@ -2,18 +2,23 @@
 
 abstract class CM_Page_Abstract extends CM_View_Abstract {
 
+	/**
+	 * @var CM_Params
+	 */
 	protected $_params;
-	protected $_viewer = null;
-	protected $_path = null;
 
 	/**
-	 * @param CM_Request_Abstract $request
+	 * @var CM_Model_User|null
 	 */
-	public function __construct(CM_Request_Abstract $request) {
-		$params = $request->getQuery();
-		$this->_request = $request;
-		$this->_params = CM_Params::factory($params);
-		$this->_viewer = $request->getViewer();
+	protected $_viewer = null;
+
+	/**
+	 * @param CM_Params          $params
+	 * @param CM_Model_User|null $viewer
+	 */
+	public function __construct(CM_Params $params, CM_Model_User $viewer = null) {
+		$this->_params = $params;
+		$this->_viewer = $viewer;
 	}
 
 	/**
@@ -27,13 +32,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 */
 	public final function getParams() {
 		return $this->_params;
-	}
-
-	/**
-	 * @return CM_Request_Abstract
-	 */
-	public function getRequest() {
-		return $this->_request;
 	}
 
 	/**
@@ -84,7 +82,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 			throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`');
 		}
 
-		return new $className($request);
+		return new $className(CM_Params::factory($request->getQuery()), $request->getViewer());
 	}
 
 	/**

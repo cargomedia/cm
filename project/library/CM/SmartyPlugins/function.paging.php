@@ -7,7 +7,8 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	$viewer = $template->smarty->getTemplateVars('viewer');
 	/** @var CM_Page_Abstract $page */
 	$page = $render->getStackLast('pages');
-	$request = $page ? $page->getRequest() : new CM_Request_Get('/');
+	$path = $page ? $page::getPath() : '';
+	$query = $page ? $page->getParams()->getAll() : array();
 	$component = $render->getStackLast('components');
 
 	if (!isset($params['paging'])) {
@@ -32,20 +33,20 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 
 	if ($paging->getPage() > 1) {
 		if ($pageMin > 1) {
-			$html .= _smarty_function_paging_link($request, $component, 1, '1', $ajax, 'pagingFirst');
+			$html .= _smarty_function_paging_link($path, $query, $component, 1, '1', $ajax, 'pagingFirst');
 		}
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev icon');
+		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev icon');
 	}
 
 	for ($p = $pageMin; $p <= $pageMax; $p++) {
 		$classActive = ($p == $paging->getPage()) ? 'active' : '';
-		$html .= _smarty_function_paging_link($request, $component, $p, $p, $ajax, 'pagingNumber ' . $classActive);
+		$html .= _smarty_function_paging_link($path, $query, $component, $p, $p, $ajax, 'pagingNumber ' . $classActive);
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$html .= _smarty_function_paging_link($request, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon');
+		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon');
 		if ($pageMax < $paging->getPageCount()) {
-			$html .= _smarty_function_paging_link($request, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
+			$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
 		}
 	}
 
@@ -55,7 +56,8 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 }
 
 /**
- * @param CM_Request_Abstract   $request
+ * @param string                $path
+ * @param array                 $query
  * @param CM_Component_Abstract $component
  * @param int                   $page
  * @param string                $text
@@ -63,12 +65,13 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
  * @param string|null           $class
  * @return string
  */
-function _smarty_function_paging_link(CM_Request_Abstract $request, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
+function _smarty_function_paging_link($path, array $query, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
+	$path = (string) $path;
 	if ($ajax) {
 		$href = 'javascript:;';
 		$onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
 	} else {
-		$href = CM_Util::link($request->getPath(), array_merge($request->getQuery(), array('page' => $page)));
+		$href = CM_Util::link($path, array_merge($query, array('page' => $page)));
 		$onClick = null;
 	}
 	$html = '<a href="' . $href . '"';

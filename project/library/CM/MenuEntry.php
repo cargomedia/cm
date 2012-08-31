@@ -41,7 +41,7 @@ class CM_MenuEntry {
 		}
 
 		if (isset($data['submenu'])) {
-			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getRequest(), $this);
+			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getPath(), $this->_menu->getParams(), $this->_menu->getViewer(), $this);
 		}
 	}
 
@@ -115,14 +115,14 @@ class CM_MenuEntry {
 	 * @return CM_Page_Abstract Page object
 	 */
 	public final function getPage() {
-		$viewer = $this->_menu->getRequest()->getViewer();
+		$viewer = $this->_menu->getViewer();
 		$viewerId = $viewer ? $viewer->getId() : 0;
 		$className = $this->getPageName();
 
 		$cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
 
 		if (($page = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$page = new $className($this->_menu->getRequest());
+			$page = new $className($this->_menu->getParams(), $this->_menu->getViewer());
 			CM_Cache_Runtime::set($cacheKey, $page);
 		}
 
@@ -194,8 +194,8 @@ class CM_MenuEntry {
 	 * @return bool True if active
 	 */
 	public final function isActive() {
-		$requestQuery = $this->_menu->getRequest()->getQuery();
-		$requestPath = $this->_menu->getRequest()->getPath();
+		$requestQuery = $this->_menu->getParams()->getAll();
+		$requestPath = $this->_menu->getPath();
 
 		$active = false;
 

@@ -12,7 +12,7 @@ class CM_MenuTest extends TestCase {
 
 	public function testFindNull() {
 		$menu = $this->_getMenu();
-		$page = new CM_Page_Mock3($menu->getRequest());
+		$page = new CM_Page_Mock3($menu->getParams(), $menu->getViewer());
 
 		$entry = $menu->findEntry($page, 3, 3);
 		$this->assertNull($entry);
@@ -23,7 +23,7 @@ class CM_MenuTest extends TestCase {
 
 	public function testFindEntry() {
 		$menu = $this->_getMenu();
-		$page = new CM_Page_Mock3($menu->getRequest());
+		$page = new CM_Page_Mock3($menu->getParams(), $menu->getViewer());
 
 		$entry = $menu->findEntry($page);
 
@@ -40,18 +40,20 @@ class CM_MenuTest extends TestCase {
 	}
 
 	/**
-	 * @param CM_Request_Abstract|null $request
+	 * @param string|null    $path
+	 * @param CM_Params|null $params
 	 * @return CM_Menu
 	 */
-	private function _getMenu(CM_Request_Abstract $request = null) {
-		$entriesData = array(
-			array('label' => 'Home', 'page' => 'CM_Page_Mock4'),
-			array('label' => 'Example', 'page' => 'CM_Page_Mock3')
-		);
-		if (!$request) {
-			$request = new CM_Request_Get('/test');
+	private function _getMenu($path = null, CM_Params $params = null) {
+		if (is_null($path)) {
+			$path = '/test';
 		}
-		return new CM_Menu($entriesData, $request);
+		$path = (string) $path;
+		if (is_null($params)) {
+			$params = new CM_Params(array());
+		}
+		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock4'), array('label' => 'Example', 'page' => 'CM_Page_Mock3'));
+		return new CM_Menu($entriesData, $path, $params);
 	}
 
 }

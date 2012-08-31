@@ -21,14 +21,33 @@ class CM_Menu {
 	private $_request;
 
 	/**
+	 * @var string
+	 */
+	private $_path;
+
+	/**
+	 * @var CM_Params
+	 */
+	private $_params;
+
+	/**
+	 * @var CM_Model_User|null
+	 */
+	private $_viewer;
+
+	/**
 	 * Creates a new menu object with the given menu entries as array
 	 *
-	 * @param array               $menuEntries Menu entries
-	 * @param CM_Request_Abstract $request
-	 * @param CM_MenuEntry|null   $parent
+	 * @param array              $menuEntries Menu entries
+	 * @param string             $path
+	 * @param CM_Params          $params
+	 * @param CM_Model_User|null $viewer
+	 * @param CM_MenuEntry|null  $parent
 	 */
-	public final function __construct(array $menuEntries, CM_Request_Abstract $request, CM_MenuEntry $parent = null) {
-		$this->_request = $request;
+	public final function __construct(array $menuEntries, $path, CM_Params $params, CM_Model_User $viewer = null, CM_MenuEntry $parent = null) {
+		$this->_path = $path;
+		$this->_params = $params;
+		$this->_viewer = $viewer;
 
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
@@ -40,17 +59,31 @@ class CM_Menu {
 	}
 
 	/**
-	 * @return CM_Request_Abstract
+	 * @return string
 	 */
-	public function getRequest() {
-		return $this->_request;
+	public function getPath() {
+		return $this->_path;
+	}
+
+	/**
+	 * @return CM_Params
+	 */
+	public function getParams() {
+		return $this->_params;
+	}
+
+	/**
+	 * @return CM_Model_User|null
+	 */
+	public function getViewer() {
+		return $this->_viewer;
 	}
 
 	/**
 	 * @param CM_Page_Abstract $page
-	 * @param int			  $depthMin	  OPTIONAL
-	 * @param int			  $depthMax	  OPTIONAL
-	 * @param int			  $_currentDepth OPTIONAL
+	 * @param int              $depthMin      OPTIONAL
+	 * @param int              $depthMax      OPTIONAL
+	 * @param int              $_currentDepth OPTIONAL
 	 * @return CM_MenuEntry|null
 	 */
 	public final function findEntry(CM_Page_Abstract $page, $depthMin = 0, $depthMax = null, $_currentDepth = 0) {
