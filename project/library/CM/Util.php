@@ -248,11 +248,7 @@ class CM_Util {
 	 * @throws CM_Exception
 	 */
 	private static function _exec($command, $stdin) {
-		$descriptorSpec = array(
-			0 => array("pipe", "r"),
-			1 => array("pipe", "w"),
-			2 => array("pipe", "w")
-		);
+		$descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
 		$process = proc_open($command, $descriptorSpec, $pipes);
 		if (!is_resource($process)) {
 			throw new CM_Exception('Cannot open command file pointer to `' . $command . '`');
@@ -263,7 +259,7 @@ class CM_Util {
 		}
 		fclose($pipes[0]);
 
-		$output = stream_get_contents($pipes[1]);
+		$stdout = stream_get_contents($pipes[1]);
 		fclose($pipes[1]);
 
 		$stderr = stream_get_contents($pipes[2]);
@@ -271,8 +267,8 @@ class CM_Util {
 
 		$returnStatus = proc_close($process);
 		if ($returnStatus != 0) {
-			throw new CM_Exception('Command `' . $command . '` failed: `' . trim($stderr) . '`');
+			throw new CM_Exception('Command `' . $command . '` failed. STDERR: `' . trim($stderr) . '` STDOUT: `' . $stdout . '`.');
 		}
-		return $output;
+		return $stdout;
 	}
 }
