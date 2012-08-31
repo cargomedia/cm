@@ -267,7 +267,7 @@ class CM_Util {
 
 		$returnStatus = proc_close($process);
 		if ($returnStatus != 0) {
-			throw new CM_Exception('Command `' . $command . '` failed. STDERR: `' . trim($stderr) . '` STDOUT: `' . $stdout . '`.');
+			throw new CM_Exception('Command `' . $command . '` failed. STDERR: `' . trim($stderr) . '` STDOUT: `' . trim($stdout) . '`.');
 		}
 		return $stdout;
 	}
