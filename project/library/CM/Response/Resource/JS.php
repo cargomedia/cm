@@ -72,7 +72,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function _process($content) {
-		if (true || !$this->getRender()->isDebug()) {
+		if (!$this->getRender()->isDebug()) {
 			$md5 = md5($content);
 			$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . $md5;
 			$cacheKeyLock = CM_CacheConst::Response_Resource_JS_Lock . '_md5:' . $md5;
