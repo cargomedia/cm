@@ -53,11 +53,4 @@ class CM_File_Javascript extends CM_File {
 		$indentation = str_repeat("\t", (int) $indentation);
 		return $indentation . '/** ' . $doc . ' */';
 	}
-
-	/**
-	 * @return string
-	 */
-	public function minify() {
-		return CM_Util::exec('uglifyjs --no-copyright ' . $this->getPath());
-	}
 }

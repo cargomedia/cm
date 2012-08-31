@@ -21,9 +21,6 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			if (!$this->getRender()->isDebug()) {
-				$content = $this->_process($content);
-			}
 			return $this->_process($content);
 		}
 		if ($this->getRequest()->getPathPart(0) == 'translations') {
