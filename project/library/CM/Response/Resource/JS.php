@@ -72,12 +72,24 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function _process($content) {
-		if (!$this->getRender()->isDebug()) {
-			$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . md5($content);
-			if (($contentMinified = CM_CacheLocal::get($cacheKey)) === false) {
-				$contentMinified = CM_Util::exec('uglifyjs --no-copyright', null, $content);
-				CM_CacheLocal::set($cacheKey, $contentMinified);
+		if (true || !$this->getRender()->isDebug()) {
+			$md5 = md5($content);
+			$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . $md5;
+			$cacheKeyLock = CM_CacheConst::Response_Resource_JS_Lock . '_md5:' . $md5;
+
+			if (false === ($contentMinified = CM_CacheLocal::get($cacheKey))) {
+				while (CM_CacheLocal::get($cacheKeyLock)) {
+					sleep(1);
+				}
+
+				if (false === ($contentMinified = CM_CacheLocal::get($cacheKey))) {
+					CM_CacheLocal::set($cacheKeyLock, true, 10);
+					$contentMinified = CM_Util::exec('uglifyjs --no-copyright', null, $content);
+					CM_CacheLocal::set($cacheKey, $contentMinified);
+					CM_CacheLocal::delete($cacheKeyLock);
+				}
 			}
+
 			$content = $contentMinified;
 		}
 		return $content;
