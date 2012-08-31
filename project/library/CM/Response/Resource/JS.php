@@ -86,7 +86,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 					CM_CacheLocal::set($cacheKeyLock, true, 30);
 					$contentMinified = CM_Util::exec('uglifyjs --no-copyright', null, $content);
 					CM_CacheLocal::set($cacheKey, $contentMinified);
-					CM_CacheLocal::delete($cacheKeyLock);
+					CM_CacheLocal::set($cacheKeyLock, false);
 				}
 			}
 
