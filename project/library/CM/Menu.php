@@ -45,7 +45,7 @@ class CM_Menu {
 	 * @param CM_MenuEntry|null  $parent
 	 */
 	public final function __construct(array $menuEntries, $path, CM_Params $params, CM_Model_User $viewer = null, CM_MenuEntry $parent = null) {
-		$this->_path = $path;
+		$this->_path = (string) $path;
 		$this->_params = $params;
 		$this->_viewer = $viewer;
 
