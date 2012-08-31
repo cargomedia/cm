@@ -2,7 +2,7 @@
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
 	/**
-	 * @var CM_Model_User
+	 * @var CM_Model_User|null
 	 */
 	protected $_viewer;
 
@@ -23,8 +23,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param CM_Params|array|null $params
+	 * @param CM_Model_User|null   $viewer
 	 */
-	public function __construct($params = null) {
+	public function __construct($params = null, CM_Model_User $viewer = null) {
+		$this->_viewer = $viewer;
 		if (is_null($params)) {
 			$params = CM_Params::factory();
 		}
@@ -67,7 +69,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param bool $needed OPTIONAL Throw an CM_Exception_AuthRequired if not authenticated
+	 * @param boolean $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
 	 * @return CM_Model_User|null
 	 * @throws CM_Exception_AuthRequired
 	 */
@@ -79,15 +81,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 			return null;
 		}
 		return $this->_viewer;
-	}
-
-	/**
-	 * @param CM_Model_User $user
-	 * @return CM_Component_Abstract
-	 */
-	public function setViewer(CM_Model_User $user = null) {
-		$this->_viewer = $user;
-		return $this;
 	}
 
 	/**
@@ -147,16 +140,17 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string          $className
-	 * @param CM_Params|array $params
+	 * @param string             $className
+	 * @param CM_Params|array    $params
+	 * @param CM_Model_User|null $viewer
 	 * @return CM_Component_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory($className, $params) {
+	public static function factory($className, $params, CM_Model_User $viewer = null) {
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
 			throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
 		}
-		$component = new $className($params);
+		$component = new $className($params, $viewer);
 		return $component;
 	}
 }
