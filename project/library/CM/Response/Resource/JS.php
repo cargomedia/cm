@@ -7,14 +7,14 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		$this->enableCache();
 
 		if ($this->getRequest()->getPath() == '/internal.js') {
-			return $this->_getInternal();
+			return $this->_process($this->_getInternal());
 		}
 		if ($this->getRequest()->getPath() == '/init.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			return $content;
+			return $this->_process($content);
 		}
 		if ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
@@ -22,9 +22,9 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
 			if (!$this->getRender()->isDebug()) {
-				$content = $this->minify($content);
+				$content = $this->_process($content);
 			}
-			return $content;
+			return $this->_process($content);
 		}
 		if ($this->getRequest()->getPathPart(0) == 'translations') {
 			$language = $this->getRender()->getLanguage();
@@ -63,7 +63,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			$content .= new CM_File($path);
 		}
 
-		return $this->minify($content);
+		return $content;
 	}
 
 	public static function match(CM_Request_Abstract $request) {
@@ -74,8 +74,16 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @param string $content
 	 * @return string
 	 */
-	private function minify($content) {
-		return CM_Util::exec('uglifyjs --no-copyright', null, $content);
+	private function _process($content) {
+		if (!$this->getRender()->isDebug()) {
+			$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . md5($content);
+			if (($contentMinified = CM_CacheLocal::get($cacheKey)) === false) {
+				$contentMinified = CM_Util::exec('uglifyjs --no-copyright', null, $content);
+				CM_CacheLocal::set($cacheKey, $contentMinified);
+			}
+			$content = $contentMinified;
+		}
+		return $content;
 	}
 
 }

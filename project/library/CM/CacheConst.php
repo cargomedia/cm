@@ -38,6 +38,9 @@ class CM_CacheConst {
 	//_md5:X_languageId:X
 	const Css = 'Css';
 
+	//_md5:X
+	const Response_Resource_JS = 'Response_Resource_JS';
+
 	// _languageId:X
 	const Language_Translations = 'Language_Translations';
 
