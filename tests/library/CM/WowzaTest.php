@@ -84,16 +84,19 @@ class CM_WowzaTest extends TestCase {
 		$userUnchanged = TH::createUser();
 		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1));
 		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged, 'key' => 'foo1_2', 'start' => time(),
-			'allowedUntil' => 0));
+			'allowedUntil' => time()));
 		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_4',
 			'start' => time(), 'allowedUntil' => time() + 100));
 		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => TH::createUser(), 'key' => 'foo1_3', 'start' => time(),
-			'allowedUntil' => 0));
+			'allowedUntil' => time()));
 		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
-			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => 0));
+			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
 		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2', 'serverId' => 1)),
-			'user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => 0));
+			'user' => TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => time()));
+
+		TH::timeForward(5);
 		$wowza->checkStreams();
+
 		$this->assertEquals($streamSubscribeUnchanged1->getAllowedUntil(), $streamSubscribeUnchanged1->_change()->getAllowedUntil());
 		$this->assertEquals($streamSubscribeUnchanged2->getAllowedUntil(), $streamSubscribeUnchanged2->_change()->getAllowedUntil());
 		$this->assertEquals($streamSubscribeChanged1->getAllowedUntil() + 100, $streamSubscribeChanged1->_change()->getAllowedUntil());
