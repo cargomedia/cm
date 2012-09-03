@@ -26,12 +26,4 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
 		return CM_Cache_Redis::sFlush($key);
 	}
 
-	/**
-	 * @param string $key
-	 * @return string[]
-	 */
-	public function popAll($key) {
-		$members = CM_Cache_Redis::getInstance()->multi()->sMembers($key)->delete($key)->exec();
-		return $members[0];
-	}
 }
