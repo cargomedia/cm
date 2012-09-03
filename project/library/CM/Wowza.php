@@ -45,7 +45,7 @@ class CM_Wowza extends CM_Class_Abstract {
 					try {
 						$this->subscribe($streamName, $clientId, $subscribe['start'], $subscribe['data']);
 					} catch (CM_Exception $ex) {
-						$this->_stopClient($clientId, long2ip($publish['wowzaIp']));
+						$this->_stopClient($clientId, $publish['serverHost']);
 					}
 				}
 			}
@@ -215,7 +215,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				$streamPublish = $streamChannel->getStreamPublish();
 				if ($streamPublish->getAllowedUntil() < time()) {
 					$streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
-					if ($streamPublish->getAllowedUntil() < time() ) {
+					if ($streamPublish->getAllowedUntil() < time()) {
 						$this->stop($streamPublish);
 					}
 				}
