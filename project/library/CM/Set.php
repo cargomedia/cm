@@ -56,15 +56,4 @@ class CM_Set {
 		return $values;
 	}
 
-    /**
-     * @return array
-     */
-    public function popAll() {
-		$values = $this->_adapter->popAll($this->getKey());
-		foreach ($values as &$value) {
-			$value = unserialize($value);
-		}
-		return $values;
-    }
-
 }

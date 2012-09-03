@@ -96,8 +96,4 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		$this->_redis->flushAll();
 	}
 
-	public function multi() {
-		return $this->_redis->multi();
-	}
-
 }

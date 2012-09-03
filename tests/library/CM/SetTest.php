@@ -51,17 +51,4 @@ class CM_SetTest extends TestCase {
 		$this->assertContainsAll(array(1, 3), $values);
 		$this->assertNotContains(2, $values);
 	}
-
-    public function testPopAll() {
-        $set = new CM_Set('test_pop');
-        $valuesExpected = array('message1', 'message2', 'message3', 'message4', 'message1');
-        foreach ($valuesExpected as $value) {
-            $set->add($value);
-        }
-        $values = $set->popAll();
-        $this->assertContainsAll($valuesExpected, $values);
-
-        $values = $set->popAll();
-        $this->assertEmpty($values);
-    }
 }
