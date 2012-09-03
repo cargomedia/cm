@@ -19,4 +19,10 @@ abstract class CM_SetAdapter_Abstract {
 	 * @return string[]
 	 */
 	abstract public function flush($key);
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    abstract public function popAll($key);
 }
