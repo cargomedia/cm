@@ -21,6 +21,9 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 		$this->_viewer = $viewer;
 	}
 
+	public final function checkAccessible() {
+	}
+
 	/**
 	 * @return CM_Params
 	 */
