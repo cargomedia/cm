@@ -2,28 +2,7 @@
 
 abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
-	/**
-	 * @var CM_Params
-	 */
-	protected $_params;
-
-	/**
-	 * @param CM_Params          $params
-	 * @param CM_Model_User|null $viewer
-	 */
-	public function __construct(CM_Params $params, CM_Model_User $viewer = null) {
-		$this->_params = $params;
-		$this->_viewer = $viewer;
-	}
-
 	public final function checkAccessible() {
-	}
-
-	/**
-	 * @return CM_Params
-	 */
-	public final function getParams() {
-		return $this->_params;
 	}
 
 	/**
@@ -42,15 +21,14 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	}
 
 	/**
-	 * Creates a new page based on the given path (including params)
-	 *
-	 * @param CM_Site_Abstract    $site
-	 * @param CM_Request_Abstract $request
+	 * @param string $namespace
+	 * @param string $path
 	 * @return CM_Page_Abstract
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public static final function getByRequest(CM_Site_Abstract $site, CM_Request_Abstract $request) {
-		$path = $request->getPath();
+	public static final function getClassNameByPath($namespace, $path) {
+		$namespace = (string) $namespace;
+		$path = (string) $path;
 
 		$pathTokens = explode('/', $path);
 		array_shift($pathTokens);
@@ -60,12 +38,12 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			$pathToken = CM_Util::camelize($pathToken);
 		}
 
-		$className = $site->getNamespace() . '_Page_' . implode('_', $pathTokens);
+		$className = $namespace . '_Page_' . implode('_', $pathTokens);
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-			throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`');
+			throw new CM_Exception_Nonexistent('`' . $className . '` does not exist.');
 		}
 
-		return new $className(CM_Params::factory($request->getQuery()), $request->getViewer());
+		return $className;
 	}
 
 	/**

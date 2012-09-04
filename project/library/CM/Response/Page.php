@@ -16,7 +16,8 @@ class CM_Response_Page extends CM_Response_Abstract {
 		try {
 			CM_Tracking::getInstance()->trackPageview($this->getRequest());
 			$this->getSite()->rewrite($this->getRequest());
-			$page = CM_Page_Abstract::getByRequest($this->getSite(), $this->getRequest());
+			$className = CM_Page_Abstract::getClassNameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
+			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
 			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
 				$this->redirect($page);
 			}
@@ -29,7 +30,8 @@ class CM_Response_Page extends CM_Response_Abstract {
 			$path = $this->_getConfig()->catch[get_class($e)];
 			$this->getRequest()->setPath($path);
 			$this->getRender()->getJs()->clear();
-			$page = CM_Page_Abstract::getByRequest($this->getSite(), $this->getRequest());
+			$className = CM_Page_Abstract::getClassNameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
+			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
 			$page->prepareResponse($this);
 			$html = $this->getRender()->render($page);
 		}

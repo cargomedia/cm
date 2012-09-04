@@ -22,10 +22,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	protected $_params;
 
 	/**
-	 * @param CM_Params|array|null $params
+	 * @param CM_Params|null $params
 	 * @param CM_Model_User|null   $viewer
 	 */
-	public function __construct($params = null, CM_Model_User $viewer = null) {
+	public function __construct(CM_Params $params = null, CM_Model_User $viewer = null) {
 		$this->_viewer = $viewer;
 		if (is_null($params)) {
 			$params = CM_Params::factory();
@@ -140,13 +140,19 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string             $className
-	 * @param CM_Params|array    $params
-	 * @param CM_Model_User|null $viewer
+	 * @param string               $className
+	 * @param CM_Params|array|null $params
+	 * @param CM_Model_User|null   $viewer
 	 * @return CM_Component_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory($className, $params, CM_Model_User $viewer = null) {
+	public static function factory($className, $params = null, CM_Model_User $viewer = null) {
+		if (is_null($params)) {
+			$params = CM_Params::factory();
+		}
+		if (is_array($params)) {
+			$params = CM_Params::factory($params, true);
+		}
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
 			throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
 		}
