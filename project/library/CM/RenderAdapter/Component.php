@@ -17,8 +17,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$component->checkAccessible();
 		$component->prepare();
 
-
-
 		$this->getRender()->pushStack('components', $component);
 		$this->getRender()->pushStack('views', $component);
 
@@ -31,7 +29,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
 
 		$assign = $component->getTplParams();
-		$assign['viewer'] = $component->getViewer();
 		$html .= $this->_renderTemplate($component->getTplName(), $assign);
 
 		$html .= '</div>';

@@ -147,7 +147,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	public function getRender() {
 		if (!$this->_render) {
 			$languageRewrite = !$this->getViewer() && $this->getRequest()->getLanguageUrl();
-			$this->_render = new CM_Render($this->getSite(), $this->getRequest()->getLanguage(), $languageRewrite);
+			$this->_render = new CM_Render($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), $languageRewrite);
 		}
 		return $this->_render;
 	}

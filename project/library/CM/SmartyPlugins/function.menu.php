@@ -6,7 +6,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	/** @var CM_Page_Abstract $page */
 	$page = $render->getStackLast('pages');
 	/** @var CM_Model_User $viewer */
-	$viewer = $page ? $page->getViewer() : $template->smarty->getTemplateVars('viewer');
+	$viewer = $render->getViewer();
 	$path = $page ? $page::getPath() : '';
 	/** @var CM_Params $pageParams */
 	$pageParams = $page ? $page->getParams() : CM_Params::factory(array());

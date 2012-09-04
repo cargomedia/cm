@@ -69,34 +69,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param boolean $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
-	 * @return CM_Model_User|null
-	 * @throws CM_Exception_AuthRequired
-	 */
-	public function getViewer($needed = false) {
-		if (!$this->_viewer) {
-			if ($needed) {
-				throw new CM_Exception_AuthRequired();
-			}
-			return null;
-		}
-		return $this->_viewer;
-	}
-
-	/**
-	 * Checks if a user is set on the component
-	 *
-	 * @throws CM_Exception_AuthRequired If no user is set
-	 */
-	protected function _checkViewer() {
-		$this->getViewer(true);
-	}
-
-	protected function _isViewer() {
-		return (boolean) $this->getViewer();
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getTplName() {
@@ -123,6 +95,34 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	 */
 	final public function getTagAutoId($id_value) {
 		return $this->getAutoId() . '-' . $id_value;
+	}
+
+	/**
+	 * Checks if a user is set on the component
+	 *
+	 * @throws CM_Exception_AuthRequired If no user is set
+	 */
+	protected function _checkViewer() {
+		$this->_getViewer(true);
+	}
+
+	/**
+	 * @param boolean $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
+	 * @return CM_Model_User|null
+	 * @throws CM_Exception_AuthRequired
+	 */
+	protected function _getViewer($needed = false) {
+		if (!$this->_viewer) {
+			if ($needed) {
+				throw new CM_Exception_AuthRequired();
+			}
+			return null;
+		}
+		return $this->_viewer;
+	}
+
+	protected function _isViewer() {
+		return (boolean) $this->_getViewer();
 	}
 
 	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {

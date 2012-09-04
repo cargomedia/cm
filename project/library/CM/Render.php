@@ -39,6 +39,11 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	private $_languageRewrite;
 
+	/**
+	 * @var CM_Model_User
+	 */
+	private $_viewer;
+
 	public static $block_cap = '';
 
 	/**
@@ -57,10 +62,11 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_Site_Abstract|null          $site
+	 * @param CM_Model_User|null             $viewer
 	 * @param CM_Model_Language|null         $language
 	 * @param boolean|null                   $languageRewrite
 	 */
-	public function __construct(CM_Site_Abstract $site = null, CM_Model_Language $language = null, $languageRewrite = null) {
+	public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null) {
 		if (!$site) {
 			$site = CM_Site_Abstract::factory();
 		}
@@ -68,6 +74,7 @@ class CM_Render extends CM_Class_Abstract {
 			$language = CM_Model_Language::findDefault();
 		}
 		$this->_site = $site;
+		$this->_viewer = $viewer;
 		$this->_language = $language;
 		$this->_languageRewrite = (bool) $languageRewrite;
 	}
@@ -171,6 +178,7 @@ class CM_Render extends CM_Class_Abstract {
 			$template = $this->_getSmarty();
 		}
 		$template->assignGlobal('render', $this);
+		$template->assignGlobal('viewer', $this->getViewer());
 		if ($variables) {
 			$template->assign($variables);
 		}
@@ -358,6 +366,16 @@ class CM_Render extends CM_Class_Abstract {
 			return $this->getUrl('/userfiles', self::_getConfig()->cdnUserContent);
 		}
 		return $this->getUrl('/userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+	}
+
+	/**
+	 * @return CM_Model_User|null
+	 */
+	public function getViewer() {
+		if (!$this->_viewer) {
+			return null;
+		}
+		return $this->_viewer;
 	}
 
 	/**

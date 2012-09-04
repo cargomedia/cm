@@ -28,13 +28,13 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 			$options['stream']['adapter'] = CM_Stream::getAdapterClass();
 			$options['stream']['server'] = CM_Stream::getServer();
 		}
-		if ($viewer = $page->getViewer()) {
+		if ($viewer = $this->getRender()->getViewer()) {
 			$options['stream']['channel'] = CM_Stream::getStreamChannel($viewer);
 		}
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 
 		$js->onloadHeaderJs('WEB_SOCKET_SWF_LOCATION = "' . $this->getRender()->getUrlStatic('/swf/WebSocketMainInsecure.swf') . '"');
-		if ($viewer = $page->getViewer()) {
+		if ($viewer = $this->getRender()->getViewer()) {
 			$js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
 		}
 
@@ -45,7 +45,6 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 
 		$assign = $page->getTplParams();
 		$assign['pageObj'] = $page;
-		$assign['viewer'] = $page->getViewer();
 		$html = $this->_renderTemplate('default.tpl', $assign);
 
 		$this->getRender()->popStack('pages');

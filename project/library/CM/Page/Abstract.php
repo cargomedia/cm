@@ -8,11 +8,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	protected $_params;
 
 	/**
-	 * @var CM_Model_User|null
-	 */
-	protected $_viewer = null;
-
-	/**
 	 * @param CM_Params          $params
 	 * @param CM_Model_User|null $viewer
 	 */
@@ -29,21 +24,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 */
 	public final function getParams() {
 		return $this->_params;
-	}
-
-	/**
-	 * @param bool $needed OPTIONAL Throw an CM_Exception_AuthRequired if not authenticated
-	 * @return CM_Model_User|null
-	 * @throws CM_Exception_AuthRequired
-	 */
-	public final function getViewer($needed = false) {
-		if (!$this->_viewer) {
-			if ($needed) {
-				throw new CM_Exception_AuthRequired();
-			}
-			return null;
-		}
-		return $this->_viewer;
 	}
 
 	/**

@@ -69,21 +69,21 @@ class CM_RenderTest extends TestCase {
 		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
 		$baseUrl = CM_Config::get()->CM_Site_Abstract->url;
 
-		$render = new CM_Render($this->_getSite(), null, null);
+		$render = new CM_Render($this->_getSite(), null, null, null);
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-		$render = new CM_Render($this->_getSite(), null, true); // This should never happen in application, but lets test it
+		$render = new CM_Render($this->_getSite(), null, null, true); // This should never happen in application, but lets test it
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
 		$language = TH::createLanguage('en');
 
-		$render = new CM_Render($this->_getSite(), null, null);
+		$render = new CM_Render($this->_getSite(), null, null, null);
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-		$render = new CM_Render($this->_getSite(), null, true); // This should never happen in application, but lets test it
+		$render = new CM_Render($this->_getSite(), null, null, true); // This should never happen in application, but lets test it
 		$this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
 
-		$render = new CM_Render($this->_getSite(), $language, null);
+		$render = new CM_Render($this->_getSite(), null, $language, null);
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-		$render = new CM_Render($this->_getSite(), $language, true);
+		$render = new CM_Render($this->_getSite(), null, $language, true);
 		$this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
 
 	}
@@ -138,9 +138,18 @@ class CM_RenderTest extends TestCase {
 			'abbreviation' => 'test',
 			'enabled' => true
 		));
-		$render = new CM_Render($this->_getSite(), $language);
+		$render = new CM_Render($this->_getSite(), null, $language);
 		$language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
 		CM_Model_Language::flushCacheLocal();
 		$this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+	}
+
+	public function testGetViewer() {
+		$viewer = TH::createUser();
+		$render = new CM_Render($this->_getSite(), $viewer);
+		$this->assertModelEquals($viewer, $render->getViewer());
+
+		$render = new CM_Render($this->_getSite());
+		$this->assertNull($render->getViewer());
 	}
 }
