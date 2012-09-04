@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Page_Abstract extends CM_View_Abstract {
+abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
 	/**
 	 * @var CM_Params
@@ -20,12 +20,6 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 		$this->_params = $params;
 		$this->_viewer = $viewer;
 	}
-
-	/**
-	 * @param CM_Response_Abstract $response
-	 * @throws CM_Exception_Nonexistent
-	 */
-	abstract public function prepare(CM_Response_Abstract $response);
 
 	/**
 	 * @return CM_Params
@@ -59,6 +53,12 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	}
 
 	/**
+	 * @param CM_Response_Abstract $response
+	 */
+	public function prepareResponse(CM_Response_Abstract $response) {
+	}
+
+	/**
 	 * Creates a new page based on the given path (including params)
 	 *
 	 * @param CM_Site_Abstract    $site
@@ -66,7 +66,7 @@ abstract class CM_Page_Abstract extends CM_View_Abstract {
 	 * @return CM_Page_Abstract
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public static final function factory(CM_Site_Abstract $site, CM_Request_Abstract $request) {
+	public static final function getByRequest(CM_Site_Abstract $site, CM_Request_Abstract $request) {
 		$path = $request->getPath();
 
 		$pathTokens = explode('/', $path);

@@ -17,8 +17,5 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
 
-	$component->checkAccessible();
-	$component->prepare();
-
 	return $render->render($component);
 }

@@ -245,6 +245,7 @@ class CM_Mail extends CM_View_Abstract {
 	/**
 	 * @param boolean|null $delayed
 	 * @return array|null  ($subject, $html, $text)
+	 * @throws CM_Exception_Invalid
 	 */
 	public function send($delayed = null) {
 		$delayed = (boolean) $delayed;

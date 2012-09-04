@@ -5,6 +5,8 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Abstract {
 	public function fetch(array $params = array()) {
 		/** @var CM_Page_Abstract $page */
 		$page = $this->_getView();
+		$page->prepare();
+
 		$js = $this->getRender()->getJs();
 
 		$this->getRender()->pushStack('pages', $page);

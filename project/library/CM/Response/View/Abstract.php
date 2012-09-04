@@ -51,8 +51,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$component = CM_Component_Abstract::factory($componentInfo['className'], $componentParams, $this->getViewer());
 
-		$component->checkAccessible();
-		$component->prepare();
 		$html = $this->getRender()->render($component, array('parentId' => $componentInfo['parentId']));
 
 		$this->getRender()->getJs()->onloadHeaderJs('cm.views["' . $componentInfo['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
@@ -73,8 +71,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$viewInfo = $this->_getViewInfo();
 
 		$component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
-		$component->checkAccessible();
-		$component->prepare();
 
 		$html = $this->getRender()->render($component, array('parentId' => $viewInfo['id']));
 
