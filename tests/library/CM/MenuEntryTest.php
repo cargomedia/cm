@@ -91,19 +91,19 @@ class CM_MenuEntryTest extends TestCase {
 }
 
 class CM_Page_Mock extends CM_Page_Abstract {
-	/**
-	 * @throws CM_Exception_Nonexistent
-	 * @param CM_Response_Abstract $response
-	 */
-	public function prepare(CM_Response_Abstract $response) {
+
+	public function prepare() {
+	}
+
+	public function checkAccessible() {
 	}
 }
 
 class CM_Page_Mock2 extends CM_Page_Abstract {
-	/**
-	 * @throws CM_Exception_Nonexistent
-	 * @param CM_Response_Abstract $response
-	 */
-	public function prepare(CM_Response_Abstract $response) {
+
+	public function prepare() {
+	}
+
+	public function checkAccessible() {
 	}
 }
