@@ -16,11 +16,6 @@ class CM_Menu {
 	protected $_allEntries = array();
 
 	/**
-	 * @var CM_Request_Abstract
-	 */
-	private $_request;
-
-	/**
 	 * @var string
 	 */
 	private $_path;
