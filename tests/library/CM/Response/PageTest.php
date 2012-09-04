@@ -41,10 +41,4 @@ class CM_Response_PageTest extends TestCase {
 }
 
 class CM_Page_Mock5 extends CM_Page_Abstract {
-
-	public function prepare() {
-	}
-
-	public function checkAccessible() {
-	}
 }

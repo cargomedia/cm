@@ -91,19 +91,7 @@ class CM_MenuEntryTest extends TestCase {
 }
 
 class CM_Page_Mock extends CM_Page_Abstract {
-
-	public function prepare() {
-	}
-
-	public function checkAccessible() {
-	}
 }
 
 class CM_Page_Mock2 extends CM_Page_Abstract {
-
-	public function prepare() {
-	}
-
-	public function checkAccessible() {
-	}
 }
