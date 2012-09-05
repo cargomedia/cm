@@ -88,8 +88,11 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 			$csvFp = fopen($fileLocation, 'r');
 			//reading the first line from the csv
 			$csvHeader = fgetcsv($csvFp);
-			$csvHeader = array_fill_keys(array_keys(array_flip($csvHeader)), null);
 
+			/**
+			 * For merging later we need to transform this array from a scalar array to a assoc array with all the values null.
+			 */
+			$csvHeader = array_fill_keys($csvHeader, null);
 			$initialCsvHeaderCount = count($csvHeader);
 			$csvHeaderMerged = array_merge($csvHeader, $csvHeaderFinal);
 			$numberHeaderItemsAdded = count($csvHeaderMerged) - $initialCsvHeaderCount;
