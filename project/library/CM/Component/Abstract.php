@@ -121,10 +121,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 		return $this->_viewer;
 	}
 
-	protected function _isViewer() {
-		return (boolean) $this->_getViewer();
-	}
-
 	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		return $response->reloadComponent($params->getAll());
 	}

@@ -40,7 +40,7 @@ class CM_Render extends CM_Class_Abstract {
 	private $_languageRewrite;
 
 	/**
-	 * @var CM_Model_User
+	 * @var CM_Model_User|null
 	 */
 	private $_viewer;
 
@@ -372,9 +372,6 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return CM_Model_User|null
 	 */
 	public function getViewer() {
-		if (!$this->_viewer) {
-			return null;
-		}
 		return $this->_viewer;
 	}
 
