@@ -26,7 +26,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 * @return CM_Page_Abstract
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public static final function getClassNameByPath($namespace, $path) {
+	public static final function getClassnameByPath($namespace, $path) {
 		$namespace = (string) $namespace;
 		$path = (string) $path;
 
@@ -38,12 +38,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			$pathToken = CM_Util::camelize($pathToken);
 		}
 
-		$className = $namespace . '_Page_' . implode('_', $pathTokens);
-		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-			throw new CM_Exception_Nonexistent('`' . $className . '` does not exist.');
-		}
-
-		return $className;
+		return $namespace . '_Page_' . implode('_', $pathTokens);
 	}
 
 	/**

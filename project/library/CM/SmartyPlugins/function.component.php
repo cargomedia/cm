@@ -11,8 +11,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
 	if ($name instanceof CM_Component_Abstract) {
 		$component = $name;
 	} else {
-		$params = CM_Params::factory($params);
-		$component = CM_Component_Abstract::factory($name, $params, $render->getViewer());
+		$component = CM_Component_Abstract::factory($name, CM_Params::factory($params), $render->getViewer());
 	}
 
 	return $render->render($component);
