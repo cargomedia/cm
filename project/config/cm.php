@@ -125,4 +125,4 @@ $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
 
 
 $config->CM_KissTracking_Api = new stdClass();
-$config->CM_KissTracking_Api->csvFile = 'kissmetrics.csv';
+$config->CM_KissTracking_Api->csvFile = 'kisstracking.csv';
