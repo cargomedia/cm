@@ -124,7 +124,7 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	 * @return string
 	 */
 	protected function _getFile() {
-		return DIR_TEMP.self::_getConfig()->csvFile;
+		return DIR_TMP.self::_getConfig()->csvFile;
 	}
 
 	/**
