@@ -193,10 +193,11 @@
 }
 
 .input_button_alt() {
-	color: @colorFgButtonAltFont;
-	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
-	border: 1px solid @colorFgButtonAlt;
+	.gradient(vertical, @colorFgButtonAlt, darken(@colorFgButtonAlt, 20));
+	border: 1px solid darken(@colorFgButtonAlt, 20);
+	.box-shadow(none);
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+	color: @colorFgButtonAltFont;
 
 	.icon {
 		color: @colorFgButtonAltFont;
@@ -204,9 +205,8 @@
 }
 
 .input_button_alt_hover() {
-	.gradient(vertical, @colorFgButtonAlt, darken(@colorFgButtonAlt, 20));
-	border: 1px solid darken(@colorFgButtonAlt, 20);
-	.box-shadow(none);
+	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
+	border: 1px solid @colorFgButtonAlt;
 }
 
 .input_button_alt_active() {
