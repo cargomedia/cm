@@ -11,6 +11,12 @@ $config->CM_Language->autoCreate = true;
 
 $config->CM_Stream->enabled = true;
 
+$config->CM_KissTracking_Api->enabled = true;
+$config->CM_KissTracking_Api->awsAccessKey = '';
+$config->CM_KissTracking_Api->awsSecretKey = '';
+$config->CM_KissTracking_Api->awsBucketName = '';
+$config->CM_KissTracking_Api->s3FilePrefix = 'cargomedia';
+
 $config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_Socketio';
 $config->CM_StreamAdapter_Abstract->hostPrefix = false;
 $config->CM_StreamAdapter_Abstract->servers = array(
