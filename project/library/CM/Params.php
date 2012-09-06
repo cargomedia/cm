@@ -1,13 +1,14 @@
 <?php
 
 class CM_Params extends CM_Class_Abstract {
-	/**
-	 * @var array
-	 */
+
+	/**  @var array */
+	private $_paramsOriginal = array();
+
+	/**  @var array */
 	private $_params = array();
-	/**
-	 * @var bool
-	 */
+
+	/** @var bool */
 	private $_decode;
 
 	/**
@@ -16,12 +17,13 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function __construct(array $params = array(), $decode = true) {
 		$this->_decode = (bool) $decode;
+		$this->_paramsOriginal = $params;
+		$this->_params = $params;
 		if ($this->_decode) {
-			foreach ($params as $key => &$param) {
+			foreach ($this->_params as $key => &$param) {
 				$param = self::decode($param);
 			}
 		}
-		$this->_params = $params;
 	}
 
 	/**
@@ -76,12 +78,10 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Params $params
+	 * @return array
 	 */
-	public function merge(CM_Params $params) {
-		foreach ($params->getAll() as $key => $value) {
-			$this->set($key, $value);
-		}
+	public function getAllOriginal() {
+		return $this->_paramsOriginal;
 	}
 
 	private function _getFloat($param) {
