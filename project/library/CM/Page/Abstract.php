@@ -24,7 +24,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 * @param string $namespace
 	 * @param string $path
 	 * @return CM_Page_Abstract
-	 * @throws CM_Exception_Nonexistent
 	 */
 	public static final function getClassnameByPath($namespace, $path) {
 		$namespace = (string) $namespace;
