@@ -14,10 +14,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 		/** @var CM_Component_Abstract $component */
 		$component = $this->_getView();
-		$component->checkAccessible();
-		$component->prepare();
 
-		$this->getRender()->pushStack('components', $component);
+		$this->getRender()->pushStack($this->_getStackKey(), $component);
 		$this->getRender()->pushStack('views', $component);
 
 		$cssClass = implode(' ', $component->getClassHierarchy());
@@ -29,14 +27,22 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 		$html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
 
 		$assign = $component->getTplParams();
+		$assign['viewObj'] = $component;
 		$html .= $this->_renderTemplate($component->getTplName(), $assign);
 
 		$html .= '</div>';
 
 		$this->getRender()->getJs()->registerComponent($component, $parentViewId);
-		$this->getRender()->popStack('components');
+		$this->getRender()->popStack($this->_getStackKey());
 		$this->getRender()->popStack('views');
 
 		return $html;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _getStackKey() {
+		return 'components';
 	}
 }

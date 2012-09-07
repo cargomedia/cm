@@ -10,5 +10,5 @@ function smarty_function_id(array $params, Smarty_Internal_Template $template) {
 
 	$tag = $params['tag'];
 
-	return $render->getStackLast('components')->getTagAutoId($tag);
+	return $render->getStackLast('views')->getTagAutoId($tag);
 }

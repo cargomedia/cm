@@ -17,12 +17,16 @@ class CM_Response_Page extends CM_Response_Abstract {
 			CM_Tracking::getInstance()->trackPageview($this->getRequest());
 			$this->getSite()->rewrite($this->getRequest());
 			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
+			/** @var CM_Page_Abstract $page */
 			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
 			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
 				$this->redirect($page);
 			}
 			$page->prepareResponse($this);
-			$html = $this->getRender()->render($page);
+			$page->checkAccessible();
+			$page->prepare();
+			$layout = $page->getLayout();
+			$html = $this->getRender()->render($layout);
 		} catch (CM_Exception $e) {
 			if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
 				throw $e;
@@ -33,7 +37,10 @@ class CM_Response_Page extends CM_Response_Abstract {
 			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
 			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
 			$page->prepareResponse($this);
-			$html = $this->getRender()->render($page);
+			$page->checkAccessible();
+			$page->prepare();
+			$layout = $page->getLayout();
+			$html = $this->getRender()->render($layout);
 		}
 
 		return $html;

@@ -119,13 +119,13 @@ class CM_Frontend {
 	}
 
 	/**
-	 * @param CM_Page_Abstract $page
+	 * @param CM_Layout_Abstract $layout
 	 */
-	public function registerPage(CM_Page_Abstract $page) {
-		$auto_var = 'cm.views["' . $page->getAutoId() . '"]';
+	public function registerLayout(CM_Layout_Abstract $layout) {
+		$auto_var = 'cm.views["' . $layout->getAutoId() . '"]';
 		$js = '';
 		$js .= $auto_var . ' = new CM_View_Abstract({';
-		$js .= 'el:$("#' . $page->getAutoId() . '").get(0)';
+		$js .= 'el:$("#' . $layout->getAutoId() . '").get(0)';
 		$js .= '});' . PHP_EOL;
 		$this->onloadHeaderJs($js, true);
 	}

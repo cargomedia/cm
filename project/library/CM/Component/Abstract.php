@@ -31,7 +31,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 			$params = CM_Params::factory();
 		}
 		if (is_array($params)) {
-			$params = CM_Params::factory($params, true);
+			$params = CM_Params::factory($params);
 		}
 		$this->_params = $params;
 		$this->_js = new CM_ComponentFrontendHandler();

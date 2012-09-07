@@ -2,6 +2,12 @@
 
 abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
+	/** @var string|null */
+	protected $_title;
+
+	/** @var array|null */
+	protected  $_titleVariables;
+
 	public final function checkAccessible() {
 	}
 
@@ -12,6 +18,26 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 */
 	public function isViewable() {
 		return true;
+	}
+
+	/**
+	 * @param string     $title
+	 * @param array|null $variables
+	 */
+	public function setTitle($title, array $variables = null) {
+		$this->_title = (string) $title;
+		$this->_titleVariables = $variables;
+	}
+
+	/**
+	 * @param CM_Render $render
+	 * @return string|null
+	 */
+	public function getTitle(CM_Render $render) {
+		if (null === $this->_title) {
+			return null;
+		}
+		return $render->getTranslation($this->_title, $this->_titleVariables);
 	}
 
 	/**
@@ -66,5 +92,14 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			$path = '/';
 		}
 		return CM_Util::link($path, $params);
+	}
+
+	/**
+	 * @return CM_Layout_Abstract
+	 */
+	public function getLayout() {
+		$layoutname = 'Default';
+		$classname = self::_getNamespace() . '_Layout_' . $layoutname;
+		return new $classname($this);
 	}
 }

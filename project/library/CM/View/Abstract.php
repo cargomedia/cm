@@ -53,8 +53,8 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 	public static function getClasses(array $namespaces, $context) {
 		$contextTypes = array(
 			self::CONTEXT_ALL        => array('View', 'Page', 'Component', 'Form', 'FormField'),
-			self::CONTEXT_JAVASCRIPT => array('View', 'Component', 'Form', 'FormField'),
-			self::CONTEXT_CSS        => array('Page', 'Component', 'FormField'),
+			self::CONTEXT_JAVASCRIPT => array('View', 'Page', 'Component', 'Form', 'FormField'),
+			self::CONTEXT_CSS        => array('Layout', 'Page', 'Component', 'FormField'),
 		);
 		if (!array_key_exists($context, $contextTypes)) {
 			throw new CM_Exception_Invalid('Context needs to be one of: `CONTEXT_ALL`, `CONTEXT_JAVASCRIPT`, `CONTEXT_CSS`');
