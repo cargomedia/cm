@@ -68,11 +68,12 @@ class CM_Util {
 			$url .= '?' . http_build_query($params);
 		}
 
-		$context = null;
+		$options = array('http' => array());
+		$options['http']['header'] = 'Connection: close';
 		if ($methodPost) {
-			$opts = array('http' => array('method' => 'POST'));
-			$context = stream_context_create($opts);
+			$options['http']['method'] = 'POST';
 		}
+		$context = stream_context_create($options);
 
 		$contents = @file_get_contents($url, null, $context);
 		if ($contents === false) {
