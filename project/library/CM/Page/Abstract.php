@@ -21,23 +21,30 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	}
 
 	/**
+	 * @param CM_Render $render
+	 * @return string|null
+	 */
+	public function getTitle(CM_Render $render) {
+		if (!$this->hasTitle()) {
+			return null;
+		}
+		return $render->getTranslation($this->_title, $this->_titleVariables);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function hasTitle() {
+		return (!is_null($this->_title));
+	}
+
+	/**
 	 * @param string     $title
 	 * @param array|null $variables
 	 */
 	public function setTitle($title, array $variables = null) {
 		$this->_title = (string) $title;
 		$this->_titleVariables = $variables;
-	}
-
-	/**
-	 * @param CM_Render $render
-	 * @return string|null
-	 */
-	public function getTitle(CM_Render $render) {
-		if (null === $this->_title) {
-			return null;
-		}
-		return $render->getTranslation($this->_title, $this->_titleVariables);
 	}
 
 	/**
