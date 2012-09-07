@@ -12,7 +12,7 @@ abstract class CM_Paging_FileUserContent_Abstract extends CM_Paging_Abstract {
 	 * @param mixed $item
 	 * @return string
 	 */
-	abstract protected function _getNamespace($item);
+	abstract protected function _getFileNamespace($item);
 
 	/**
 	 * @param mixed $item
@@ -21,7 +21,7 @@ abstract class CM_Paging_FileUserContent_Abstract extends CM_Paging_Abstract {
 	abstract protected function _getSequence($item);
 
 	protected function _processItem($item) {
-		return new CM_File_UserContent($this->_getNamespace($item), $this->_getFilename($item), $this->_getSequence($item));
+		return new CM_File_UserContent($this->_getFileNamespace($item), $this->_getFilename($item), $this->_getSequence($item));
 	}
 
 }
