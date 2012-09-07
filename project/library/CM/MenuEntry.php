@@ -194,7 +194,7 @@ class CM_MenuEntry {
 	 * @return bool True if active
 	 */
 	public final function isActive() {
-		$requestQuery = $this->_menu->getParams()->getAll();
+		$requestQuery = $this->_menu->getParams()->getAllOriginal();
 		$requestPath = $this->_menu->getPath();
 
 		$active = false;
