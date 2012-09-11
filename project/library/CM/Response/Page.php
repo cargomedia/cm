@@ -17,8 +17,12 @@ class CM_Response_Page extends CM_Response_Abstract {
 			CM_Tracking::getInstance()->trackPageview($this->getRequest());
 			$this->getSite()->rewrite($this->getRequest());
 			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
-			/** @var CM_Page_Abstract $page */
-			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
+			try {
+				/** @var CM_Page_Abstract $page */
+				$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
+			} catch (CM_Exception $ex) {
+				throw new CM_Exception_Nonexistent($ex->getMessage());
+			}
 			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
 				$this->redirect($page);
 			}

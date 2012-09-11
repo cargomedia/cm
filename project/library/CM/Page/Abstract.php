@@ -2,12 +2,6 @@
 
 abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
-	/** @var string|null */
-	protected $_title;
-
-	/** @var array|null */
-	protected  $_titleVariables;
-
 	public final function checkAccessible() {
 	}
 
@@ -18,33 +12,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 */
 	public function isViewable() {
 		return true;
-	}
-
-	/**
-	 * @param CM_Render $render
-	 * @return string|null
-	 */
-	public function getTitle(CM_Render $render) {
-		if (!$this->hasTitle()) {
-			return null;
-		}
-		return $render->getTranslation($this->_title, $this->_titleVariables);
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function hasTitle() {
-		return (!is_null($this->_title));
-	}
-
-	/**
-	 * @param string     $title
-	 * @param array|null $variables
-	 */
-	public function setTitle($title, array $variables = null) {
-		$this->_title = (string) $title;
-		$this->_titleVariables = $variables;
 	}
 
 	/**
