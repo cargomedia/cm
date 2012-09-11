@@ -21,7 +21,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 				/** @var CM_Page_Abstract $page */
 				$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
 			} catch (CM_Exception $ex) {
-				throw new CM_Exception_Nonexistent($ex->getMessage());
+				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
 			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
 				$this->redirect($page);
