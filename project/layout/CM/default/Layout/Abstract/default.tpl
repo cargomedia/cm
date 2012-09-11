@@ -2,8 +2,8 @@
 <html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{block name='html-class'}{/block}">
 	<head>
 		<meta charset="utf-8">
-		<meta name="description" content="{"{block name='meta-description'}{$pageDescription}{/block}"|escape}">
-		<meta name="keywords" content="{"{block name='meta-keywords'}{$pageKeywords}{/block}"|escape}">
+		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
+		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
 		<title>{block name='title'}{$pageTitle|escape}{/block}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}
