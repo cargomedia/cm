@@ -31,12 +31,20 @@ button, input[type=submit], input[type=button] {
 		.input_button_active;
 	}
 
-	&.hasIcon.hasLabel {
-		padding: 0 8px 0 5px;
+	&.hasIcon{
+		padding: 0;
 
-		.icon {
-			margin-right: 3px;
+		&.hasLabel {
+			padding: 0 8px 0 5px;
+
+			.icon {
+				margin-right: 3px;
+			}
 		}
+	}
+
+	&.hasIconRight.hasLabel {
+		padding: 0 1px 0 8px;
 	}
 
 	&.large{
@@ -76,14 +84,10 @@ button, input[type=submit], input[type=button] {
 			font-size: @fontSizeButtonLarge;
 		}
 	}
-	&.hasIcon {
-		padding: 0;
-	}
+
 }
 
-button.hasIconRight.hasLabel {
-	padding: 0 1px 0 8px;
-}
+
 
 input[type=radio], input[type=checkbox] {
 	margin: 0 1px;
@@ -99,39 +103,39 @@ input[type=radio], input[type=checkbox] {
 	width: 600px;
 	max-width: 100%;
 	min-height: 24px;
-}
 
-.formField:first-child, .formField.first, .formField.submit {
-	border-width: 0;
-}
+	&:first-child, &.first, &.submit {
+		border-width: 0;
+	}
 
-.formField > label {
-	color: @colorFgLinkLight;
-	width: 95px;
-	float: left;
-	padding-top: 4px;
-	font-weight: bold;
-}
+	> label {
+		color: @colorFgLinkLight;
+		width: 95px;
+		float: left;
+		padding-top: 4px;
+		font-weight: bold;
 
-.formField > label:after {
-	content: ":";
-}
+		&:after {
+			content: ":";
+		}
 
-.formField > .input {
-	margin-left: 100px;
-}
+		.CM_FormField_Abstract {
+			float: left;
+			margin-right: 3px;
+		}
+	}
 
-.formField.noLabel > .input {
-	margin-left: 0;
-}
+	> .input {
+		margin-left: 100px;
+	}
 
-.formField > label .CM_FormField_Abstract {
-	float: left;
-	margin-right: 3px;
-}
+	&.noLabel > .input {
+		margin-left: 0;
+	}
 
-.formField.submit {
-	text-align: center;
+	&.submit {
+		text-align: center;
+	}
 }
 
 .form_field_error {
