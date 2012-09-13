@@ -128,7 +128,6 @@ class CM_Frontend {
 		$js .= 'el:$("#' . $layout->getAutoId() . '").get(0)';
 		$js .= '});' . PHP_EOL;
 		$this->onloadHeaderJs($js, true);
-		$this->onloadJs($auto_var . '.page = cm.views["' . $layout->getPage()->getAutoId() . '"]');
 	}
 
 	/**

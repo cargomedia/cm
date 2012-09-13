@@ -88,23 +88,20 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	 * @return string Auto-id
 	 */
 	public function loadPage(CM_Params $params) {
-		$pageInfo = $this->_getViewInfo();
+		$layoutInfo = $this->_getViewInfo();
 
-		if ($params->has('className')) {
-			$pageClass = $params->getString('className');
-		} else {
-			$pageClass = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $params->getString('path'));
-		}
+		$requestPage = new CM_Request_Get($params->getString('path'), null, $this->getRequest()->getViewer());
+		$this->getSite()->rewrite($requestPage);
+		$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $requestPage->getPath());
+		/** @var CM_Page_Abstract $page */
+		$page = CM_Page_Abstract::factory($className, $requestPage->getQuery(), $requestPage->getViewer());
 
-		$page = CM_Page_Abstract::factory($pageClass, $params->get('params', array()), $this->getRequest()->getViewer());
 		$page->checkAccessible();
 		$page->prepare();
 
-		$html = $this->getRender()->render($page, array('parentId' => $pageInfo['parentId']));
+		$html = $this->getRender()->render($page, array('parentId' => $layoutInfo['id']));
 
-		$this->getRender()->getJs()->onloadHeaderJs('cm.views["' . $pageInfo['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
-		$this->getRender()->getJs()->onloadPrepareJs('cm.views["' . $pageInfo['id'] . '"].remove(true);');
-		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $page->getAutoId() . '"]._ready();');
+		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
 
 		return $page->getAutoId();
 	}

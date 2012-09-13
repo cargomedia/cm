@@ -228,17 +228,20 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {String|Null} className
-	 * @param {String|Null} path
-	 * @param {Object|null} pageParams
+	 * @param {String} path
 	 * @return {jqXHR}
 	 */
-	loadPage: function (className, path, pageParams) {
-		className = className || null;
-		path = path || null;
-		pageParams = pageParams || null;
-		params = {className: className, path: path, params: pageParams};
-		return this.ajaxModal('loadPage', params);
+	loadPage: function (path, options) {
+		options = options || {};
+		var success = options.success || function() {};
+
+		return this.ajaxModal('loadPage', {path: path}, {
+			success: function(autoId) {
+				var page = cm.views[autoId];
+				success.call(page);
+				page._ready();
+			}
+		});
 	},
 	
 	/**
