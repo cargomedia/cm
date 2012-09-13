@@ -83,6 +83,32 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		return $component->getAutoId();
 	}
 
+	/**
+	 * @param CM_Params $params
+	 * @return string Auto-id
+	 */
+	public function loadPage(CM_Params $params) {
+		$pageInfo = $this->_getViewInfo();
+
+		if ($params->has('className')) {
+			$pageClass = $params->getString('className');
+		} else {
+			$pageClass = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $params->getString('path'));
+		}
+
+		$page = CM_Page_Abstract::factory($pageClass, $params->get('params', array()), $this->getRequest()->getViewer());
+		$page->checkAccessible();
+		$page->prepare();
+
+		$html = $this->getRender()->render($page, array('parentId' => $pageInfo['parentId']));
+
+		$this->getRender()->getJs()->onloadHeaderJs('cm.views["' . $pageInfo['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadPrepareJs('cm.views["' . $pageInfo['id'] . '"].remove(true);');
+		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $page->getAutoId() . '"]._ready();');
+
+		return $page->getAutoId();
+	}
+
 	public function popinComponent() {
 		$componentInfo = $this->_getViewInfo();
 		$this->getRender()->getJs()->onloadJs('cm.views["' . $componentInfo['id'] . '"].popIn();');

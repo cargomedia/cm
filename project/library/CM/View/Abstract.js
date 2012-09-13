@@ -226,6 +226,20 @@ var CM_View_Abstract = Backbone.View.extend({
 		};
 		return this.ajaxModal('loadComponent', params, options);
 	},
+
+	/**
+	 * @param {String|Null} className
+	 * @param {String|Null} path
+	 * @param {Object|null} pageParams
+	 * @return {jqXHR}
+	 */
+	loadPage: function (className, path, pageParams) {
+		className = className || null;
+		path = path || null;
+		pageParams = pageParams || null;
+		params = {className: className, path: path, params: pageParams};
+		return this.ajaxModal('loadPage', params);
+	},
 	
 	/**
 	 * @param {int} actionVerb

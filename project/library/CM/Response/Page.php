@@ -11,6 +11,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	/**
 	 * @return string html code of page
 	 * @throws CM_Exception
+	 * @throws CM_Exception_Nonexistent
 	 */
 	public function process() {
 		try {
