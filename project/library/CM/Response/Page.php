@@ -87,37 +87,37 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	private function _processPage(CM_Request_Abstract $request) {
 		try {
-			CM_Tracking::getInstance()->trackPageview($this->getRequest());
-			$this->getSite()->rewrite($this->getRequest());
-			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
+			$this->getSite()->rewrite($request);
+			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $request->getPath());
 			try {
 				/** @var CM_Page_Abstract $page */
 				$page = CM_Page_Abstract::factory($className, $request->getQuery(), $request->getViewer());
 			} catch (CM_Exception $ex) {
 				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
-			if ($this->getViewer() && $this->getRequest()->getLanguageUrl()) {
+			if ($this->getViewer() && $request->getLanguageUrl()) {
 				$this->redirect($page);
 			}
 			$page->prepareResponse($this);
+			if ($this->getRedirectUrl()) {
+				$request->setUri($this->getRedirectUrl());
+				return null;
+			}
 			$page->checkAccessible();
 			$page->prepare();
-			$layout = $page->getLayout();
-			$html = $this->getRender()->render($layout);
+			$html = $this->_renderPage($page);
+			$this->_page = $page;
+			return $html;
 		} catch (CM_Exception $e) {
 			if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
 				throw $e;
 			}
 			$this->getRender()->getJs()->clear();
-			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $this->getRequest()->getPath());
-			$page = CM_Page_Abstract::factory($className, $this->getRequest()->getQuery(), $this->getRequest()->getViewer());
-			$page->prepareResponse($this);
-			$page->checkAccessible();
-			$page->prepare();
-			$layout = $page->getLayout();
-			$html = $this->getRender()->render($layout);
+			$path = $this->_getConfig()->catch[get_class($e)];
+			$request->setPath($path);
+			$request->setQuery(array());
 		}
-
-		return $html;
+		return false;
 	}
+
 }
