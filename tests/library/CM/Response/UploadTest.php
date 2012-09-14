@@ -16,7 +16,8 @@ class CM_Response_UploadTest extends TestCase {
 
 		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertNotEmpty($data->success);
 
@@ -32,7 +33,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename . '&field=CM_FormField_FileImage', array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertNotEmpty($data->success);
 		$this->assertEquals(32, strlen($data->success->id));
@@ -49,7 +51,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertNotEmpty($data->success);
 		$this->assertEquals(32, strlen($data->success->id));
@@ -63,7 +66,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertEquals('CM_Exception_FormFieldValidation', $data->error->type);
 	}
@@ -75,7 +79,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertNotEmpty($data->success);
 	}
@@ -88,7 +93,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertEquals('CM_Exception_FormFieldValidation', $data->error->type);
 	}
@@ -104,7 +110,8 @@ class CM_Response_UploadTest extends TestCase {
 		// No field test
 		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
-		$data = json_decode($upload->process());
+		$upload->process();
+		$data = json_decode($upload->getContent());
 
 		$this->assertNotEmpty($data->success);
 	}

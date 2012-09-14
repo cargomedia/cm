@@ -53,7 +53,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 	public function hasErrors() {
 		return (bool) count($this->errors);
 	}
-	
+
 	public function reset() {
 		$this->exec('this.reset();');
 	}
@@ -68,8 +68,6 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 	}
 
 	public function process() {
-		$this->setHeader('Content-Type', 'application/json');
-
 		$output = array();
 		try {
 			$success = array();
@@ -79,16 +77,16 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 			$form = CM_Form_Abstract::factory($formInfo['className']);
 			$action = (string) $query['actionName'];
 			$data = (array) $query['data'];
-			
+
 			$form->setup();
-	
+
 			$output = array();
 			$success['data'] = CM_Params::encode($form->process($data, $action, $this));
-	
+
 			if (!empty($this->errors)) {
 				$success['errors'] = $this->errors;
 			}
-	
+
 			if ($trackingJs = CM_Tracking::getInstance()->getJs()) {
 				$this->exec($trackingJs);
 			}
@@ -98,7 +96,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 			if (!empty($this->_jsCode)) {
 				$success['exec'] = $this->_jsCode;
 			}
-	
+
 			if (!empty($this->messages)) {
 				$success['messages'] = $this->messages;
 			}
@@ -109,7 +107,9 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 			}
 			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
-		return json_encode($output);
+
+		$this->_setHeader('Content-Type', 'application/json');
+		$this->_setContent(json_encode($output));
 	}
 
 	public static function match(CM_Request_Abstract $request) {

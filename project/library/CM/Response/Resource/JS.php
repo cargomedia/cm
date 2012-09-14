@@ -3,27 +3,22 @@
 class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 
 	public function process() {
-		$this->setHeader('Content-Type', 'application/x-javascript');
-		$this->enableCache();
 
 		if ($this->getRequest()->getPath() == '/internal.js') {
-			return $this->_process($this->_getInternal());
-		}
-		if ($this->getRequest()->getPath() == '/init.js') {
+			$content = $this->_process($this->_getInternal());
+		} elseif ($this->getRequest()->getPath() == '/init.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			return $this->_process($content);
-		}
-		if ($this->getRequest()->getPath() == '/library.js') {
+			$content = $this->_process($content);
+		} elseif ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			return $this->_process($content);
-		}
-		if ($this->getRequest()->getPathPart(0) == 'translations') {
+			$content = $this->_process($content);
+		} elseif ($this->getRequest()->getPathPart(0) == 'translations') {
 			$language = $this->getRender()->getLanguage();
 			if (!$language) {
 				throw new CM_Exception_Invalid('Render has no language');
@@ -32,12 +27,16 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			foreach (new CM_Paging_Translation_Language($language, null, null, null, true) as $translation) {
 				$translations[$translation['key']] = $language->getTranslation($translation['key']);
 			}
-			return 'cm.language.setAll(' . CM_Params::encode($translations, true) . ');';
+			$content = 'cm.language.setAll(' . CM_Params::encode($translations, true) . ');';
+		} elseif (file_exists(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath())) {
+			$content = (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath());
+		} else {
+			throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 		}
-		if (file_exists(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath())) {
-			return (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath());
-		}
-		throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
+
+		$this->enableCache();
+		$this->_setHeader('Content-Type', 'application/x-javascript');
+		$this->_setContent($content);
 	}
 
 	/**

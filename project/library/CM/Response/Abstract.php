@@ -27,9 +27,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	private $_rawHeaders = array();
 
-	/**
-	 * @return string Response data
-	 */
+	/** @var null|string */
+	private $_content = null;
+
 	abstract public function process();
 
 	/**
@@ -67,18 +67,17 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key   Header key
-	 * @param string $value Header value
-	 */
-	public function setHeader($key, $value) {
-		$this->_headers[$key] = $value;
-	}
-
-	/**
 	 * Sets not found header (can be server specific)
 	 */
 	public function setHeaderNotfound() {
 		$this->addHeaderRaw('HTTP/1.0 404 Not Found');
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getContent() {
+		return $this->_content;
 	}
 
 	/**
@@ -92,7 +91,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * Processes all headers and sends them
 	 */
 	public function sendHeaders() {
-
 		if ($this->getRequest()->hasSession()) {
 			$session = $this->getRequest()->getSession();
 			if (!$session->isEmpty()) {
@@ -126,20 +124,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		header_remove('Expires');
 	}
 
-	/**
-	 * @param CM_Page_Abstract|string $page
-	 * @param array|null              $params
-	 * @throws CM_Exception_Redirect
-	 */
-	public function redirect($page, array $params = null) {
-		$url = $this->getRender()->getUrlPage($page, $params);
-		if (IS_TEST) {
-			throw new CM_Exception_Redirect($url);
-		}
-		$this->setHeader('Location', $url);
-		$this->sendHeaders();
-		exit();
-	}
 
 	/**
 	 * @return CM_Render
@@ -150,6 +134,22 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 			$this->_render = new CM_Render($this->getSite(), $this->getRequest()->getViewer(), $this->getRequest()->getLanguage(), $languageRewrite);
 		}
 		return $this->_render;
+	}
+
+	/**
+	 * @param string $content
+	 */
+	protected function _setContent($content) {
+		$this->_content = (string) $content;
+	}
+
+
+	/**
+	 * @param string $key   Header key
+	 * @param string $value Header value
+	 */
+	protected function _setHeader($key, $value) {
+		$this->_headers[$key] = $value;
 	}
 
 	/**

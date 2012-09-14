@@ -12,11 +12,10 @@ class CM_Response_EmailTracking extends CM_Response_Abstract {
 			$action->prepare();
 			$action->notify($user, $mailType);
 		} catch (CM_Exception_Nonexistent $e) {
-
 		}
 
-		$this->setHeader('Content-Type', 'image/gif');
-		return base64_decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+		$this->_setHeader('Content-Type', 'image/gif');
+		$this->_setContent(base64_decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='));
 	}
 
 	public static function match(CM_Request_Abstract $request) {

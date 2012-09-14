@@ -23,8 +23,8 @@ class CM_Response_Longpolling extends CM_Response_Abstract {
 			return null;
 		}
 
-		$this->setHeader('ETag', $data['id']);
-		return $data['data'];
+		$this->_setHeader('ETag', $data['id']);
+		$this->_setContent($data['data']);
 	}
 
 	public static function match(CM_Request_Abstract $request) {

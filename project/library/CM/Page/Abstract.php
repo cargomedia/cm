@@ -17,7 +17,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	/**
 	 * @param CM_Response_Abstract $response
 	 */
-	public function prepareResponse(CM_Response_Abstract $response) {
+	public function prepareResponse(CM_Response_Page $response) {
 	}
 
 	/**

@@ -73,7 +73,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
 			$return['error'] = array('type' => get_class($ex), 'msg' => $ex->getMessagePublic($this->getRender()));
 		}
 
-		return json_encode($return, JSON_HEX_TAG);	// JSON decoding in IE-iframe needs JSON_HEX_TAG
+		$this->_setContent(json_encode($return, JSON_HEX_TAG));	// JSON decoding in IE-iframe needs JSON_HEX_TAG
 	}
 
 	public static function match(CM_Request_Abstract $request) {

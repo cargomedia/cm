@@ -2,12 +2,7 @@
 
 class CM_Response_RPC extends CM_Response_Abstract {
 
-	/**
-	 * @return string json encoded string
-	 */
 	public function process() {
-		$this->setHeader('Content-Type', 'application/json');
-
 		$output = array();
 		try {
 			$query = $this->_request->getQuery();
@@ -26,7 +21,9 @@ class CM_Response_RPC extends CM_Response_Abstract {
 			}
 			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
-		return json_encode($output);
+
+		$this->_setHeader('Content-Type', 'application/json');
+		$this->_setContent(json_encode($output));
 	}
 
 	public static function match(CM_Request_Abstract $request) {

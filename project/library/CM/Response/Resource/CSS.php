@@ -3,17 +3,13 @@
 class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 
 	public function process() {
-		$this->setHeader('Content-Type', 'text/css');
-		$this->enableCache();
-
-
 		switch ($this->getRequest()->getPath()) {
 			case '/library.css':
 				$content = '';
 				foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 					$content .= new CM_File($path);
 				}
-				return $content;
+				break;
 			case '/internal.css':
 				$css = new CM_Css();
 
@@ -63,13 +59,18 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				$content = $css->compile($this->getRender());
 
 				$content .= $this->_getCssSmiley();
-				return $content;
+				break;
 			default:
 				if (!file_exists(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath())) {
 					throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 				}
-				return new CM_File(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath());
+				$content = new CM_File(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath());
+				break;
 		}
+
+		$this->enableCache();
+		$this->_setHeader('Content-Type', 'text/css');
+		$this->_setContent($content);
 	}
 
 	/**
@@ -79,7 +80,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$css = '';
 		foreach (new CM_Paging_Smiley_All() as $smiley) {
 			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
-			$css .= 'background-image: url('.$this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']).')';
+			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']) . ')';
 			$css .= '}' . PHP_EOL;
 		}
 		return $css;

@@ -96,7 +96,8 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'form' => $formArray,
 			'actionName' => $actionName, 'data' => $data)));
 		$response = new CM_Response_View_Form($requestMock);
-		$responseArray = json_decode($response->process(), true);
+		$response->process();
+		$responseArray = json_decode($response->getContent(), true);
 		return $responseArray['success'];
 	}
 

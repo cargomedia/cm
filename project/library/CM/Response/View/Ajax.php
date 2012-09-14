@@ -3,8 +3,6 @@
 class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 
 	public function process() {
-		$this->setHeader('Content-Type', 'application/json');
-
 		$output = array();
 		try {
 			$success = array();
@@ -33,7 +31,9 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			}
 			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
-		return json_encode($output);
+
+		$this->_setHeader('Content-Type', 'application/json');
+		$this->_setContent(json_encode($output));
 	}
 
 	public static function match(CM_Request_Abstract $request) {

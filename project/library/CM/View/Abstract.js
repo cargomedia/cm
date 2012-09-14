@@ -236,9 +236,12 @@ var CM_View_Abstract = Backbone.View.extend({
 		var success = options.success || function() {};
 
 		return this.ajaxModal('loadPage', {path: path}, {
-			success: function(autoId) {
-				var page = cm.views[autoId];
-				success.call(page);
+			success: function(response) {
+				cm.window.appendHidden(response.html);
+				var exec = new Function(response.js);
+				exec.call(this);
+				var page = cm.views[response.autoId];
+				success.call(page, response.title, response.path);
 				page._ready();
 			}
 		});

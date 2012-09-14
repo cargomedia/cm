@@ -61,17 +61,7 @@ abstract class CM_Request_Abstract {
 		if (is_null($headers)) {
 			$headers = array();
 		}
-		if (false === ($this->_path = parse_url($uri, PHP_URL_PATH))) {
-			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
-		}
-		if ($this->_path === null) {
-			$this->_path = '/';
-		}
-
-		if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
-			throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
-		}
-		parse_str($queryString, $this->_query);
+		$this->setUri($uri);
 
 		$this->_headers = array_change_key_case($headers);
 
@@ -210,6 +200,13 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @param array $query
+	 */
+	public function setQuery(array $query) {
+		$this->_query = $query;
+	}
+
+	/**
 	 * @param string $key
 	 * @param string $value
 	 */
@@ -217,6 +214,24 @@ abstract class CM_Request_Abstract {
 		$key = (string) $key;
 		$value = (string) $value;
 		$this->_query[$key] = $value;
+	}
+
+	/**
+	 * @param string $uri
+	 * @throws CM_Exception_Invalid
+	 */
+	public function setUri($uri) {
+		if (false === ($this->_path = parse_url($uri, PHP_URL_PATH))) {
+			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
+		}
+		if ($this->_path === null) {
+			$this->_path = '/';
+		}
+
+		if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
+			throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
+		}
+		parse_str($queryString, $this->_query);
 	}
 
 	/**

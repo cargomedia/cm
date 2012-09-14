@@ -3,8 +3,6 @@
 class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 
 	public function process() {
-		$this->enableCache();
-
 		$file = null;
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
 			if ($path = $this->getRender()->getLayoutPath('img/' . $this->getRequest()->getPath(), $namespace, true, false)) {
@@ -16,8 +14,9 @@ class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 		if (!$file) {
 			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 		}
-		$this->setHeader('Content-Type', $file->getMimeType());
-		return $file->read();
+		$this->enableCache();
+		$this->_setHeader('Content-Type', $file->getMimeType());
+		$this->_setContent($file->read());
 	}
 
 	public static function match(CM_Request_Abstract $request) {

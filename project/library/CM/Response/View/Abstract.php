@@ -90,20 +90,21 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	public function loadPage(CM_Params $params) {
 		$layoutInfo = $this->_getViewInfo();
 
-		$requestPage = new CM_Request_Get($params->getString('path'), null, $this->getRequest()->getViewer());
-		$this->getSite()->rewrite($requestPage);
-		$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $requestPage->getPath());
-		/** @var CM_Page_Abstract $page */
-		$page = CM_Page_Abstract::factory($className, $requestPage->getQuery(), $requestPage->getViewer());
+		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
 
-		$page->checkAccessible();
-		$page->prepare();
+		do {
+			$response = new CM_Response_Page_Embed($request, $layoutInfo['id']);
+			$response->process();
+		} while ($response->getRedirectUrl());
 
-		$html = $this->getRender()->render($page, array('parentId' => $layoutInfo['id']));
+		$page = $response->getPage();
 
-		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
+		$html = $response->getContent();
+		$js = $response->getRender()->getJs()->getJs();
+		$title = $response->getTitle();
+		$path = $page::getPath($page->getParams()->getAllOriginal());
 
-		return $page->getAutoId();
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'path' => $path);
 	}
 
 	public function popinComponent() {
