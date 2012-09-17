@@ -229,6 +229,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} path
+	 * @param {Object|Null} options
 	 * @return {jqXHR}
 	 */
 	loadPage: function (path, options) {
@@ -238,8 +239,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		return this.ajaxModal('loadPage', {path: path}, {
 			success: function(response) {
 				cm.window.appendHidden(response.html);
-				var exec = new Function(response.js);
-				exec.call(this);
+				new Function(response.js).call(this);
 				var page = cm.views[response.autoId];
 				success.call(page, response.title, response.path);
 				page._ready();
