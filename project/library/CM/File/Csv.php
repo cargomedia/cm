@@ -45,6 +45,9 @@ class CM_File_Csv extends CM_File {
 	 */
 	public function mergeHeader(array $header) {
 		$headerOld = $this->getHeader();
+		if (!$headerOld) {
+			$headerOld = array();
+		}
 		$header = array_values($header);
 
 		$header = array_merge($headerOld, $header);
