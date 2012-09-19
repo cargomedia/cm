@@ -106,6 +106,24 @@ class CM_File {
 	}
 
 	/**
+	 * @param $content
+	 * @throws CM_Exception
+	 */
+	public function append($content) {
+		$resource = fopen($this->getPath(), 'a');
+		if (false === fputs($resource, $content)) {
+			throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to `' . $this->getPath() . '`');
+		}
+		fclose($resource);
+	}
+
+	public function truncate() {
+		$resource = fopen($this->getPath(), 'r+');
+		ftruncate($resource, 0);
+		fclose($resource);
+	}
+
+	/**
 	 * @param string $path New file path
 	 * @throws CM_Exception
 	 */
