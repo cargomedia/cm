@@ -102,7 +102,7 @@ class CM_SVM {
 	private function _getPath() {
 		$basePath = DIR_DATA . 'svm' . DIRECTORY_SEPARATOR;
 		if (!is_dir($basePath)) {
-			mkdir($basePath);
+			CM_Util::mkDir($basePath);
 		}
 		return $basePath . $this->getId() . '.svm';
 	}

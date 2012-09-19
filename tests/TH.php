@@ -48,6 +48,7 @@ class TH {
 		self::clearDb();
 		self::clearCache();
 		self::timeReset();
+		self::clearTmp();
 	}
 
 	public static function clearCache() {
@@ -60,6 +61,11 @@ class TH {
 		foreach ($alltables as $table) {
 			CM_Mysql::truncate($table);
 		}
+	}
+
+	public static function clearTmp() {
+		$command = 'rm -rf ' . DIR_TMP . '*';
+		exec($command);
 	}
 
 	public static function timeInit() {

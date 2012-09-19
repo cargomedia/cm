@@ -7,11 +7,6 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		TH::clearEnv();
 	}
 
-	public static function tearDownAfterClass() {
-		$streamChannelPath = DIR_USERFILES . 'streamChannels/';
-		CM_Util::rmDir($streamChannelPath);
-	}
-
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = TH::createStreamChannel();
