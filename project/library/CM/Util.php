@@ -109,7 +109,7 @@ class CM_Util {
 		}
 	}
 	/**
-	 * @param $path
+	 * @param string $path
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function rmDirContents($path) {
