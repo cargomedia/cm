@@ -1,13 +1,13 @@
 <?php
 
-require_once 'AWSSDKforPHP/sdk.class.php';
-
 class CM_Amazon_S3 extends CM_Class_Abstract {
 
 	/** @var AmazonS3 */
 	private $_sdk;
 
 	public function __construct() {
+		require_once 'AWSSDKforPHP/sdk.class.php';
+
 		$accessKey = self::_getConfig()->accessKey;
 		if (!$accessKey) {
 			throw new CM_Exception_Invalid('Amazon S3 `accessKey` not set');
