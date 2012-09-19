@@ -49,18 +49,14 @@ $config->CM_Cache_Redis = new stdClass;
 $config->CM_Cache_Redis->enabled = true;
 $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
-$config->CM_Language = new stdClass();
-$config->CM_Language->idDefault = 1;
-$config->CM_Language->autoCreate = false;
-
 $config->CM_Stream = new stdClass();
 $config->CM_Stream->enabled = true;
 
 $config->CM_StreamAdapter_Abstract = new stdClass();
-$config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_Apache';
-$config->CM_StreamAdapter_Abstract->hostPrefix = false;
+$config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_Socketio';
+$config->CM_StreamAdapter_Abstract->hostPrefix = true;
 $config->CM_StreamAdapter_Abstract->servers = array(
-	array('host' => 'localhost', 'port' => 80),
+	array('host' => 'localhost', 'port' => 8090),
 );
 
 $config->CM_Mysql = new stdClass();
@@ -79,6 +75,8 @@ $config->CM_Model_ActionLimit_Abstract = new stdClass();
 $config->CM_Model_Entity_Abstract = new stdClass();
 
 $config->CM_Mail = new stdClass();
+$config->CM_Mail->siteName = 'Example';
+$config->CM_Mail->siteEmailAddress = 'example@example.dev';
 
 $config->CM_Paging_Log_Abstract = new stdClass();
 
@@ -118,13 +116,21 @@ $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wu
 $config->CM_Model_StreamChannel_Abstract = new stdClass();
 
 $config->CM_Wowza = new stdClass();
+$config->CM_Wowza->httpPort = '8086';
+$config->CM_Wowza->wowzaPort = '1935';
+$config->CM_Wowza->servers = array(
+	array('publicHost' => 'localhost', 'privateIp' => '127.0.0.1'),
+);
 
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
 $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
 
 $config->CM_Amazon_S3 = new stdClass();
+$config->CM_Amazon_S3->accessKey = '';
+$config->CM_Amazon_S3->secretKey = '';
 
 $config->CM_KissTracking_Api = new stdClass();
-
-
+$config->CM_KissTracking_Api->enabled = true;
+$config->CM_KissTracking_Api->awsBucketName = '';
+$config->CM_KissTracking_Api->awsFilePrefix = '';
