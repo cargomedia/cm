@@ -7,8 +7,16 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	/** @var CM_KissTracking_Api */
 	private static $_instance;
 
+	/** @var string */
+	private $_dirData;
+
 	/** @var CM_Set */
 	private $_set;
+
+	public function __construct() {
+		$this->_dirData = DIR_TMP . 'kisstracking/';
+		CM_Util::mkDir($this->_dirData);
+	}
 
 	/**
 	 * @param String        $event
@@ -47,8 +55,13 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	}
 
 	public function exportEvents() {
-		$csvFile = $this->generateCsv();
-		$this->_uploadCsv($csvFile);
+		$files = CM_Util::rglob('*.csv', $this->_dirData);
+		if (count($files) > 1) {
+			sort($files);
+			$file = new CM_File_Csv($files[0]);
+			$this->uploadCsv($file);
+			$file->delete();
+		}
 	}
 
 	/**
@@ -81,10 +94,22 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_File_Csv $file
+	 * @throws CM_Exception_Invalid
+	 */
+	public function uploadCsv(CM_File_Csv $file) {
+		$bucketName = self::_getConfig()->awsBucketName;
+		$targetFilename = self::_getConfig()->awsFilePrefix . '.' . date('YmdHis') . '.csv';
+
+		$amazonS3 = new CM_Amazon_S3();
+		$amazonS3->createObject($file, $bucketName, $targetFilename, array('6acb81d7742ac437833f51ecb2a40c74cd831ce26909e5f72354fa6af42cfb1f' => 'full-control'));
+	}
+
+	/**
 	 * @return string
 	 */
-	public function _getFileName() {
-		return DIR_TMP . self::_getConfig()->csvFile;
+	protected function _getFileName() {
+		return $this->_dirData . self::_getConfig()->awsFilePrefix . '.' . date('YmdH') . '.csv';
 	}
 
 	/**
@@ -102,20 +127,6 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	 */
 	private function _getEvents() {
 		return $this->_getSet()->flush();
-	}
-
-	/**
-	 * @param CM_File_Csv $file
-	 */
-	private function _uploadCsv(CM_File_Csv $file) {
-		$accessKey = self::_getConfig()->awsAccessKey;
-		$secretKey = self::_getConfig()->awsSecretKey;
-		$bucketName = self::_getConfig()->awsBucketName;
-		$targetFilename = self::_getConfig()->s3FilePrefix . '-' . date('YmdHis');
-
-		require_once DIR_LIBRARY . 'amazon-s3-php-class/S3.php';
-		$s3 = new S3($accessKey, $secretKey);
-		$s3->putObjectFile($file->getPath(), $bucketName, $targetFilename, S3::ACL_AUTHENTICATED_READ);
 	}
 
 	/**

@@ -9,7 +9,7 @@ class CM_KissTracking_ApiTest extends TestCase {
 	}
 
 	public function testProcess() {
-		$filePath = DIR_TMP . 'kiss-tracking.csv';
+		$filePath = DIR_TMP . 'kisstracking.csv';
 
 		/** @var CM_KissTracking_Api $kissTracking */
 		$kissTracking = $this->getMock('CM_KissTracking_Api', array('_uploadCsv', '_getFileName'));
