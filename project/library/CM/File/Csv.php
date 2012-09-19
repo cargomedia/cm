@@ -67,5 +67,6 @@ class CM_File_Csv extends CM_File {
 		$resource = fopen($this->getPath(), 'r');
 		$header = fgets($resource);
 		$this->write(substr($this->read(), strlen($header)));
+		fclose($resource);
 	}
 }
