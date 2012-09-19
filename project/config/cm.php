@@ -123,6 +123,8 @@ $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
 $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
 
+$config->CM_Amazon_S3 = new stdClass();
 
 $config->CM_KissTracking_Api = new stdClass();
-$config->CM_KissTracking_Api->csvFile = 'kisstracking.csv';
+
+
