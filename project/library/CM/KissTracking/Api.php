@@ -1,27 +1,14 @@
 <?php
 
 class CM_KissTracking_Api extends CM_Class_Abstract {
-	/**
-	 * constant to keep track of the set name to be used for storing the data
-	 */
+
 	const setName = 'kisstracking';
 
-	/**
-	 * @var CM_KissTracking_Api
-	 */
-	private static $_instance = null;
+	/** @var CM_KissTracking_Api */
+	private static $_instance;
 
-	/**
-	 * @var CM_Set
-	 */
+	/** @var CM_Set */
 	private $_set;
-
-	/**
-	 * @return boolean
-	 */
-	public function enabled() {
-		return (boolean) self::_getConfig()->enabled;
-	}
 
 	/**
 	 * @param String        $event
@@ -59,72 +46,45 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 		return $this;
 	}
 
-
-	public function process() {
-		$this->generateCsv();
-		$this->_uploadCsv();
+	public function exportEvents() {
+		$csvFile = $this->generateCsv();
+		$this->_uploadCsv($csvFile);
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return CM_File_Csv
 	 */
-	public function _getEvents() {
-		return $this->_getSet()->flush();
-	}
-
 	public function generateCsv() {
+		$filename = $this->_getFileName();
 		$records = $this->_getEvents();
-		$fileLocation = $this->_getFile();
-		$csvString = '';
-		$csvHeaderFinal = array();
-
+		$header = array();
 		foreach ($records as $record) {
 			foreach ($record as $key => $value) {
-				$csvHeaderFinal[$key] = '';
+				$header[$key] = $key;
 			}
 		}
 
-		if (file_exists($fileLocation) && is_readable($fileLocation)) {
-			$csvFp = fopen($fileLocation, 'r');
-			//reading the first line from the csv
-			$csvHeader = fgetcsv($csvFp);
-
-			/**
-			 * For merging later we need to transform this array from a scalar array to a assoc array with all the values null.
-			 */
-			$csvHeader = array_fill_keys($csvHeader, null);
-			$initialCsvHeaderCount = count($csvHeader);
-			$csvHeaderMerged = array_merge($csvHeader, $csvHeaderFinal);
-			$numberHeaderItemsAdded = count($csvHeaderMerged) - $initialCsvHeaderCount;
-
-			if ($numberHeaderItemsAdded) {
-				//we need to add additional , to each row
-				$stringToBeAdded = str_repeat(',', $numberHeaderItemsAdded);
-
-				$csvString = '';
-				while (($data = fgets($csvFp)) !== false) {
-					$csvString .= preg_replace('/[.]*(\n)/', '$2' . $stringToBeAdded . "\n", $data);
- 				}
-			}
-			fclose($csvFp);
-			$csvHeaderFinal = $csvHeaderMerged;
+		if (!file_exists($filename) || !is_readable($filename)) {
+			$file = CM_File_Csv::create($filename);
+			$file->appendRow($header);
+		} else {
+			$file = new CM_File_Csv($filename);
+			$file->mergeHeader($header);
 		}
 
-		$csvFpWrite = fopen($fileLocation, 'w');
-		fputcsv($csvFpWrite, array_keys($csvHeaderFinal));
-		fputs($csvFpWrite, $csvString);
+		$headerMap = array_fill_keys($file->getHeader(), null);
 		foreach ($records as $record) {
-			$record = array_merge($csvHeaderFinal, $record);
-			fputcsv($csvFpWrite, $record);
+			$record = array_merge($headerMap, $record);
+			$file->appendRow($record);
 		}
-		fclose($csvFpWrite);
+		return $file;
 	}
 
 	/**
 	 * @return string
 	 */
-	protected function _getFile() {
-		return DIR_TMP.self::_getConfig()->csvFile;
+	public function _getFileName() {
+		return DIR_TMP . self::_getConfig()->csvFile;
 	}
 
 	/**
@@ -138,29 +98,33 @@ class CM_KissTracking_Api extends CM_Class_Abstract {
 	}
 
 	/**
-	 * Uploads the csv file provided as in parameter
-	 * @param Resource $csvFP
+	 * @return mixed[]
 	 */
-	protected function _uploadCsv() {
-		require_once DIR_LIBRARY . 'amazon-s3-php-class'.DIRECTORY_SEPARATOR.'S3.php';
-		$accessKey = self::_getConfig()->awsAccessKey;
-		$secretKey = self::_getConfig()->awsSecretKey;
-		$bucketName = self::_getConfig()->awsBucketName;
-		$fileName = self::_getConfig()->s3FilePrefix. '-' . date('YmdHis');
-		$s3 = new S3($accessKey, $secretKey);
-		$s3->putObjectFile($this->_getFile(), $bucketName, $fileName, S3::ACL_PRIVATE);
+	private function _getEvents() {
+		return $this->_getSet()->flush();
 	}
 
 	/**
-	 * @static
+	 * @param CM_File_Csv $file
+	 */
+	private function _uploadCsv(CM_File_Csv $file) {
+		$accessKey = self::_getConfig()->awsAccessKey;
+		$secretKey = self::_getConfig()->awsSecretKey;
+		$bucketName = self::_getConfig()->awsBucketName;
+		$targetFilename = self::_getConfig()->s3FilePrefix . '-' . date('YmdHis');
+
+		require_once DIR_LIBRARY . 'amazon-s3-php-class/S3.php';
+		$s3 = new S3($accessKey, $secretKey);
+		$s3->putObjectFile($file->getPath(), $bucketName, $targetFilename, S3::ACL_AUTHENTICATED_READ);
+	}
+
+	/**
 	 * @return CM_KissTracking_Api
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {
-			$className = self::_getClassName();
-			self::$_instance = new $className();
+			self::$_instance = new static();
 		}
 		return self::$_instance;
 	}
-
 }
