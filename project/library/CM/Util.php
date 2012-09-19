@@ -108,6 +108,7 @@ class CM_Util {
 			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
 		}
 	}
+
 	/**
 	 * @param string $path
 	 * @throws CM_Exception_Invalid
