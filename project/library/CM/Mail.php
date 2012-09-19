@@ -4,54 +4,43 @@ class CM_Mail extends CM_View_Abstract {
 
 	const TYPE = 1;
 
-	/**
-	 * @var CM_Model_User
-	 */
+	/** @var CM_Model_User */
 	private $_recipient;
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_to = array();
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_replyTo = array();
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_cc = array();
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_bcc = array();
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_sender;
-	/**
-	 * @var string
-	 */
+
+	/** @var string */
 	private $_subject;
-	/**
-	 * @var string
-	 */
+
+	/** @var string */
 	private $_textBody;
-	/**
-	 * @var string
-	 */
+
+	/** @var string */
 	private $_htmlBody;
-	/**
-	 * @var boolean
-	 */
+
+	/** @var boolean */
 	private $_verificationRequired = true;
-	/**
-	 * @var boolean
-	 */
+
+	/** @var boolean */
 	private $_renderLayout = false;
 
 	/**
 	 * @param CM_Model_User|string|null $recipient
-	 * @param array|null				$tplParams
+	 * @param array|null                $tplParams
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($recipient = null, array $tplParams = null) {
 		if ($this->hasTemplate()) {
