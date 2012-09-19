@@ -103,6 +103,17 @@ class CM_Util {
 	 */
 	public static function rmDir($path) {
 		$path = (string) $path;
+		self::rmDirContents($path);
+		if (!rmdir($path)) {
+			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
+		}
+	}
+	/**
+	 * @param $path
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function rmDirContents($path) {
+		$path = (string) $path;
 		foreach (glob($path . '*') as $file) {
 			if (is_dir($file)) {
 				self::rmDir($file . '/');
@@ -111,9 +122,6 @@ class CM_Util {
 					throw new CM_Exception_Invalid('Could not delete file `' . $file . '`');
 				}
 			}
-		}
-		if (!rmdir($path)) {
-			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
 		}
 	}
 

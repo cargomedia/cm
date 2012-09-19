@@ -64,8 +64,7 @@ class TH {
 	}
 
 	public static function clearTmp() {
-		$command = 'rm -rf ' . DIR_TMP . '*';
-		exec($command);
+		CM_Util::rmDirContents(DIR_TMP);
 	}
 
 	public static function timeInit() {
