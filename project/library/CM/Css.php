@@ -118,6 +118,9 @@ EOD;
 			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
 		}
 		if (($parsedCss = CM_CacheLocal::get($cacheKey)) === false) {
+			if (!$render->isDebug()) {
+				$lessc->setFormatter('compressed');
+			}
 			$parsedCss = $lessc->parse($css);
 			CM_CacheLocal::set($cacheKey, $parsedCss);
 		}
