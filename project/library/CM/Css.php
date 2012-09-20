@@ -122,7 +122,7 @@ EOD;
 			if (!$skipCompression) {
 				$lessc->setFormatter('compressed');
 			}
-			$parsedCss = $lessc->parse($css);
+			$parsedCss = $lessc->compile($css);
 			CM_CacheLocal::set($cacheKey, $parsedCss);
 		}
 		return $parsedCss;

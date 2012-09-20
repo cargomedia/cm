@@ -72,7 +72,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 			}
 		}
 		$lessCompiler = new lessc();
-		$css = $lessCompiler->parse($style);
+		$css = $lessCompiler->compile($style);
 		preg_match_all('/\.icon\.([.\w-]+):before/', $css, $icons);
 		$icons = array_map(function ($s) {
 			return str_replace('.', ' ', $s);
@@ -99,7 +99,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 			$style .= '.' . $variableName . ' { background-color: @' . $variableName . '; }' . PHP_EOL;
 		}
 		$lessCompiler = new lessc();
-		$style = $lessCompiler->parse($style);
+		$style = $lessCompiler->compile($style);
 		preg_match_all('#.(color\w+)\s+\{([^}]+)\}#', $style, $matches);
 		return array_combine($matches[1], $matches[2]);
 	}
