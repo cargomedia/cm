@@ -2,6 +2,9 @@
 
 class CM_Lock extends CM_Class_Abstract {
 
+	/** @var string */
+	private $_key;
+
 	/**
 	 * @param string $name
 	 */
@@ -39,11 +42,11 @@ class CM_Lock extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	private function _isLocked() {
-		$lockTime = CM_CacheLocal::get($this->_key) ;
-		if (false === $lockTime) {
+		$expiration = CM_CacheLocal::get($this->_key) ;
+		if (false === $expiration) {
 			return false;
 		}
-		return $lockTime > time();
+		return $expiration > time();
 	}
 
 }
