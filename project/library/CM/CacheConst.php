@@ -43,6 +43,9 @@ class CM_CacheConst {
 	//_md5:X
 	const Response_Resource_JS_Lock = 'Response_Resource_JS_Lock';
 
+	//_lock:X
+	const Lock = 'Lock';
+
 	// _languageId:X
 	const Language_Translations = 'Language_Translations';
 
