@@ -91,9 +91,11 @@ class CM_Response_Page extends CM_Response_Abstract {
 		try {
 			$this->getSite()->rewrite($request);
 			$className = CM_Page_Abstract::getClassnameByPath($this->getSite()->getNamespace(), $request->getPath());
+			$query = $request->getQuery();
+			$viewer = $request->getViewer();
 			try {
 				/** @var CM_Page_Abstract $page */
-				$page = CM_Page_Abstract::factory($className, $request->getQuery(), $request->getViewer());
+				$page = CM_Page_Abstract::factory($className, $query, $viewer);
 			} catch (CM_Exception $ex) {
 				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
