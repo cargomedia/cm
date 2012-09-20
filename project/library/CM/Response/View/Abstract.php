@@ -85,16 +85,23 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 	/**
 	 * @param CM_Params $params
-	 * @return string Auto-id
+	 * @return array
+	 * @throws CM_Exception_Invalid
 	 */
 	public function loadPage(CM_Params $params) {
 		$layoutInfo = $this->_getViewInfo();
 
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
 
+		$count = 0;
+		$paths = array($request->getPath());
 		do {
+			if ($count++ > 10) {
+				throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
+			}
 			$response = new CM_Response_Page_Embed($request, $layoutInfo['id']);
 			$response->process();
+			$paths[] = $request->getPath();
 		} while ($response->getRedirectUrl());
 
 		$page = $response->getPage();

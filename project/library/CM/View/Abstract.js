@@ -161,8 +161,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		var xhr = cm.ajax('ajax', {view:this._getArray(), method:functionName, params:params}, {
 			success: function(response) {
 				if (response.exec) {
-					var exec = new Function(response.exec);
-					exec.call(handler);
+					new Function(response.exec).call(handler);
 				}
 				if (callbacks.success) {
 					return callbacks.success.call(handler, response.data);

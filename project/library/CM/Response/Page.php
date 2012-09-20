@@ -62,7 +62,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	protected function _processPageLoop(CM_Request_Abstract $request) {
 		$count = 0;
-		$paths = array();
+		$paths = array($request->getPath());
 		while (false === ($html = $this->_processPage($request))) {
 			$paths[] = $request->getPath();
 			if ($count++ > 10) {
