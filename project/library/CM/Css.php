@@ -38,10 +38,11 @@ class CM_Css {
 	}
 
 	/**
-	 * @param CM_Render $render
+	 * @param CM_Render      $render
+	 * @param boolean|null   $skipCompression
 	 * @return string
 	 */
-	public function compile(CM_Render $render) {
+	public function compile(CM_Render $render, $skipCompression = null) {
 		$mixins = <<< 'EOD'
 .opacity(@opacity) when (isnumber(@opacity)) {
 	opacity: @opacity;
@@ -118,7 +119,7 @@ EOD;
 			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
 		}
 		if (($parsedCss = CM_CacheLocal::get($cacheKey)) === false) {
-			if (!$render->isDebug()) {
+			if (!$skipCompression) {
 				$lessc->setFormatter('compressed');
 			}
 			$parsedCss = $lessc->parse($css);

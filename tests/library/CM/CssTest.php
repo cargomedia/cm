@@ -69,7 +69,7 @@ EOD;
 		$expected = <<<EOD
 background: url('$url') no-repeat 66px 7px;
 EOD;
-		$this->assertEquals($expected, $css->compile($this->_render));
+		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
 	public function testBackgroundImage() {
@@ -78,7 +78,7 @@ EOD;
 		$expected = <<<EOD
 background-image: url('$url');
 EOD;
-		$this->assertEquals($expected, $css->compile($this->_render));
+		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
 	public function testUrlFont() {
@@ -87,7 +87,7 @@ EOD;
 		$expected = <<<EOD
 src: url('$url');
 EOD;
-		$this->assertEquals($expected, $css->compile($this->_render));
+		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
 	public function testMixin() {
@@ -116,7 +116,7 @@ EOD;
 }
 
 EOD;
-		$this->assertEquals($expected, $css->compile($this->_render));
+		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
 	public function testOpacity() {
@@ -138,7 +138,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertEquals($expected, $css->compile($this->_render));
+		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
 	public function testLinearGradient() {
@@ -161,7 +161,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 		//vertical
 		$css = <<<'EOD'
 .foo {
@@ -181,7 +181,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 		//illegal parameters
 		$css = <<<'EOD'
 .foo {
@@ -193,7 +193,7 @@ EOD;
 }
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame('', $css->compile($this->_render));
+		$this->assertSame('', $css->compile($this->_render, true));
 	}
 
 	public function testBackgroundColor() {
@@ -216,7 +216,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testBoxShadow() {
@@ -233,7 +233,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testBoxSizing() {
@@ -251,7 +251,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testUserSelect() {
@@ -270,7 +270,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testTransform() {
@@ -290,7 +290,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testTransition() {
@@ -308,7 +308,7 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testMedia() {
@@ -332,6 +332,6 @@ EOD;
 
 EOD;
 		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render));
+		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 }
