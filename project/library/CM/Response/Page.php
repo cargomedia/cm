@@ -62,9 +62,11 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	protected function _processPageLoop(CM_Request_Abstract $request) {
 		$dispatchCount = 0;
+		$paths = array();
 		while (false === ($html = $this->_processPage($request))) {
+			$paths[] = $request->getPath();
 			if ($dispatchCount++ > 10) {
-				throw new CM_Exception_Invalid('Page dispatch loop detected.');
+				throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
 			}
 		}
 		return $html;
