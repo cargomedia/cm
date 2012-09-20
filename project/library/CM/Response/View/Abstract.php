@@ -97,7 +97,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$paths = array($request->getPath());
 		do {
 			if ($count++ > 10) {
-				throw new CM_Exception_Invalid('Page dispatch loop detected (' . implode(' -> ', $paths) . ').');
+				throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
 			}
 			$response = new CM_Response_Page_Embed($request, $layoutInfo['id']);
 			$response->process();
