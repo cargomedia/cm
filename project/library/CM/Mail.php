@@ -339,6 +339,11 @@ class CM_Mail extends CM_View_Abstract {
 				$mail->Body = $html ? $html : $text;
 				$mail->AltBody = $html ? $text : '';
 
+				$useDynect = false;
+				if ($useDynect) {
+					$mail->AddCustomHeader('X-Dynect: 1');
+				}
+
 				$mail->Send();
 			} catch (phpmailerException $e) {
 				throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
