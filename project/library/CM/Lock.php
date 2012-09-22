@@ -19,7 +19,7 @@ class CM_Lock extends CM_Class_Abstract {
 		if (!$interval) {
 			$interval = 0.1;
 		}
-		while ($this->_isLocked()) {
+		while ($this->isLocked()) {
 			usleep($interval * 1000000);
 		}
 	}
@@ -41,7 +41,7 @@ class CM_Lock extends CM_Class_Abstract {
 	/**
 	 * @return bool
 	 */
-	private function _isLocked() {
+	public function isLocked() {
 		$expiration = CM_CacheLocal::get($this->_key) ;
 		if (false === $expiration) {
 			return false;
