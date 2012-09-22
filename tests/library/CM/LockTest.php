@@ -12,7 +12,7 @@ class CM_LockTest extends TestCase {
 
 	public function testUnlock() {
 		$lock = new CM_Lock('unlock-test');
-		$lock->lock(1);
+		$lock->lock();
 		$this->assertTrue($lock->isLocked());
 		$lock->unlock();
 		$this->assertFalse($lock->isLocked());

@@ -42,7 +42,7 @@ class CM_Lock extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function isLocked() {
-		$expiration = CM_CacheLocal::get($this->_key) ;
+		$expiration = CM_CacheLocal::get($this->_key);
 		if (false === $expiration) {
 			return false;
 		}
