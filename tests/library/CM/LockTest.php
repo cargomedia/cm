@@ -21,8 +21,9 @@ class CM_LockTest extends TestCase {
 	public function testWaitUntilUnlocked() {
 		$lock = new CM_Lock('wait-test');
 		$lockedAt = time();
-		$lock->lock(1);
+		$lock->lock(30);
+		TH::timeForward(30);
 		$lock->waitUntilUnlocked();
-		$this->assertSame($lockedAt + 1, time());
+		$this->assertSame($lockedAt + 30, time());
 	}
 }
