@@ -47,6 +47,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_User $user
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
 	public function getVariationFixture(CM_Model_User $user) {
@@ -84,6 +85,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @throws CM_Exception
 	 * @return CM_Model_SplittestVariation
 	 */
 	public function getVariationBest() {
@@ -140,8 +142,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if (empty($variations)) {
 			throw new CM_Exception('Cannot create splittest without variations');
 		}
+
+		$id = CM_Mysql::insert(TBL_CM_SPLITTEST, array('name' => $name, 'createStamp' => time()));
 		try {
-			$id = CM_Mysql::insert(TBL_CM_SPLITTEST, array('name' => $name, 'createStamp' => time()));
 			foreach ($variations as $variation) {
 				CM_Mysql::insert(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id, 'name' => $variation));
 			}
