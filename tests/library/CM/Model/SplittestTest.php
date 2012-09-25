@@ -91,4 +91,18 @@ class CM_Model_SplittestTest extends TestCase {
 		}
 	}
 
+	public function testGetVariationFixtureMultiple() {
+		$user1 = TH::createUser();
+		/** @var CM_Model_Splittest $test1 */
+		$test1 = CM_Model_Splittest::create(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
+		/** @var CM_Model_Splittest $test2 */
+		$test2 = CM_Model_Splittest::create(array('name' => 'foo2', 'variations' => array('w1', 'w2')));
+
+		$this->assertContains($test1->getVariationFixture($user1), array('v1', 'v2'));
+		$this->assertContains($test2->getVariationFixture($user1), array('w1', 'w2'));
+
+		$test1->delete();
+		$test2->delete();
+	}
+
 }
