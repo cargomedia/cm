@@ -109,9 +109,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();
 		$title = $response->getTitle();
-		$path = $page::getPath($page->getParams()->getAllOriginal());
+		$url = $this->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'path' => $path);
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url);
 	}
 
 	public function popinComponent() {
