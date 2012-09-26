@@ -201,7 +201,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			}
 		};
 		this.disable();
-		this.ajax(functionName, params, callbacks);
+		return this.ajax(functionName, params, callbacks);
 	},
 
 	/**
