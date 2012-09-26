@@ -167,9 +167,9 @@ var CM_View_Abstract = Backbone.View.extend({
 					return callbacks.success.call(handler, response.data);
 				}
 			},
-			error: function(msg, type) {
+			error: function(msg, type, isPublic) {
 				if (callbacks.error) {
-					return callbacks.error.call(handler, msg, type);
+					return callbacks.error.call(handler, msg, type, isPublic);
 				}
 			},
 			complete: function() {
@@ -228,12 +228,12 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} path
-	 * @param {Object|Null} options
+	 * @param {Object|Null} callbacks
 	 * @return {jqXHR}
 	 */
-	loadPage: function (path, options) {
-		options = options || {};
-		var success = options.success || function() {};
+	loadPage: function (path, callbacks) {
+		callbacks = callbacks || {};
+		var success = callbacks.success || function() {};
 
 		return this.ajaxModal('loadPage', {path: path}, {
 			success: function(response) {
@@ -242,7 +242,9 @@ var CM_View_Abstract = Backbone.View.extend({
 				var page = cm.views[response.autoId];
 				success.call(page, response.title, response.path);
 				page._ready();
-			}
+			},
+			error: callbacks.error,
+			complete: callbacks.complete
 		});
 	},
 	
