@@ -80,6 +80,34 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
+	public function testGetVariationFixtureWithVariationName() {
+		$user1 = TH::createUser();
+
+		for ($i = 0; $i < 5; $i++) {
+			/** @var CM_Model_Splittest $test */
+			$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+			$this->assertSame('v1', $test->getVariationFixture($user1, 'v1'));
+			$this->assertSame('v1', $test->getVariationFixture($user1));
+
+			$test->delete();
+		}
+	}
+
+	public function testGetVariationFixtureWithVariationNameInvalid() {
+		$user1 = TH::createUser();
+
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		try {
+			$test->getVariationFixture($user1, 'v3');
+			$this->fail('Could get variation fixture with invalid variationName');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('has no variation `v3`', $e->getMessage());
+		}
+
+		$test->delete();
+	}
+
 	public function testDelete() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();

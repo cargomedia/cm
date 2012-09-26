@@ -47,10 +47,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 	/**
 	 * @param CM_Model_User $user
+	 * @param string|null   $variationName
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	public function getVariationFixture(CM_Model_User $user) {
+	public function getVariationFixture(CM_Model_User $user, $variationName = null) {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
 		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
@@ -64,10 +65,16 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $variationFixtures)) {
-			/** @var CM_Model_SplittestVariation $variation */
-			$variation = $this->getVariationsEnabled()->getItemRand();
-			if (!$variation) {
-				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+			if ($variationName) {
+				$variation = $this->getVariations()->findByName($variationName);
+				if (!$variation) {
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $variationName . '`.');
+				}
+			} else {
+				$variation = $this->getVariationsEnabled()->getItemRand();
+				if (!$variation) {
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+				}
 			}
 			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
 				'variationId' => $variation->getId(), 'createStamp' => time()));
