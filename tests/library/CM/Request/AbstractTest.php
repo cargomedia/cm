@@ -99,6 +99,21 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory('POST', '/test'));
 	}
 
+	public function testSetUri() {
+		$uri = '/foo/bar?foo1=bar1';
+		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+		/** @var CM_Request_Abstract $mock */
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertSame('/foo/bar', $mock->getPath());
+		$this->assertSame(array('foo', 'bar'), $mock->getPathParts());
+		$this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
+		$mock->setUri('/foo1/bar1?foo=bar');
+		$this->assertSame('/foo1/bar1', $mock->getPath());
+		$this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
+		$this->assertSame(array('foo' => 'bar'), $mock->getQuery());
+
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders

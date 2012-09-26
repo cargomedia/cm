@@ -312,7 +312,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	private function _send($subject, $text, $html = null) {
-		if (CM_Config::get()->debug) {
+		if (CM_Config::get()->debug || IS_TEST) {
 			$this->_log($subject, $text);
 		} else {
 			require_once DIR_PHPMAILER . 'class.phpmailer.php';

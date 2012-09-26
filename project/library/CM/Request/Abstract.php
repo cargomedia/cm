@@ -221,17 +221,19 @@ abstract class CM_Request_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setUri($uri) {
-		if (false === ($this->_path = parse_url($uri, PHP_URL_PATH))) {
+		if (false === ($path = parse_url($uri, PHP_URL_PATH))) {
 			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
 		}
-		if ($this->_path === null) {
-			$this->_path = '/';
+		if ($path === null) {
+			$path = '/';
 		}
+		$this->setPath($path);
 
 		if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
 			throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
 		}
-		parse_str($queryString, $this->_query);
+		parse_str($queryString, $query);
+		$this->setQuery($query);
 	}
 
 	/**
