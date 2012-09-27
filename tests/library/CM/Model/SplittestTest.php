@@ -93,6 +93,17 @@ class CM_Model_SplittestTest extends TestCase {
 		}
 	}
 
+	public function testGetVariationFixtureWithVariationNameEmpty() {
+		$user1 = TH::createUser();
+
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('0', '1', '2', '3')));
+		$this->assertSame('0', $test->getVariationFixture($user1, '0'));
+		$this->assertSame('0', $test->getVariationFixture($user1));
+
+		$test->delete();
+	}
+
 	public function testGetVariationFixtureWithVariationNameInvalid() {
 		$user1 = TH::createUser();
 

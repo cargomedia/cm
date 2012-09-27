@@ -65,7 +65,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $variationFixtures)) {
-			if ($variationName) {
+			if (null !== $variationName) {
 				$variation = $this->getVariations()->findByName($variationName);
 				if (!$variation) {
 					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $variationName . '`.');
