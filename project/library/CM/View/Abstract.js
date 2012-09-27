@@ -151,10 +151,9 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {String} functionName
 	 * @param {Array|Null} params
 	 * @param {Object|Null} callbacks
-	 * @param {Boolean|Null} cache
 	 * @return jqXHR
 	 */
-	ajax: function(functionName, params, callbacks, cache) {
+	ajax: function(functionName, params, callbacks) {
 		callbacks = callbacks || {};
 		params = params || {};
 		var handler = this;
@@ -177,7 +176,7 @@ var CM_View_Abstract = Backbone.View.extend({
 					return callbacks.complete.call(handler);
 				}
 			}
-		}, cache);
+		});
 		this.on('destruct', function() {
 			xhr.abort();
 		});
