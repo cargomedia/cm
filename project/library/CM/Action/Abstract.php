@@ -47,6 +47,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	abstract protected function _prepare();
 
 	public final function prepare() {
+		$role = null;
 		$actionLimit = $this->getActionLimit($role);
 		if ($actionLimit) {
 			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
