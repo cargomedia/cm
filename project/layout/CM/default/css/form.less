@@ -2,6 +2,7 @@
 	.input_text;
 	.input_text_height;
 	.border(@colorFgBorder);
+	.transition(.1s);
 
 	&:hover {
 		border-left: 1px solid lighten(@colorNotice, 15);
@@ -23,6 +24,7 @@ button:focus, .textinput:focus, .textinput.focus {
 button, input[type=submit], input[type=button] {
 	.input_button(@heightButton);
 	.input_button_color;
+	.transition(.1s);
 
 	&:hover {
 		.input_button_hover;
