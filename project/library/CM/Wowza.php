@@ -246,7 +246,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$wowzaIp = long2ip(CM_Request_Abstract::getInstance()->getIp());
 		$serverId = CM_Wowza::_getServerId($wowzaIp);
 
-		$channelId = self::_getInstance()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
+		$channelId = self::getInstance()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
 	}
 
@@ -256,7 +256,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public static function rpc_unpublish($streamName, $thumbnailCount) {
-		self::_getInstance()->unpublish($streamName, $thumbnailCount);
+		self::getInstance()->unpublish($streamName, $thumbnailCount);
 		return true;
 	}
 
@@ -268,7 +268,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
-		self::_getInstance()->subscribe($streamName, $clientKey, $start, $data);
+		self::getInstance()->subscribe($streamName, $clientKey, $start, $data);
 		return true;
 	}
 
@@ -278,7 +278,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
-		self::_getInstance()->unsubscribe($streamName, $clientKey);
+		self::getInstance()->unsubscribe($streamName, $clientKey);
 		return true;
 	}
 
@@ -305,7 +305,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	/**
 	 * @return CM_Wowza
 	 */
-	private static function _getInstance() {
+	public static function getInstance() {
 		if (!self::$_instance) {
 			self::$_instance = new self();
 		}
