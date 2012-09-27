@@ -126,12 +126,28 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$this->getRender()->getJs()->onloadJs('window.location.reload(true)');
 	}
 
-	public function redirect($page, array $params = null) {
+	/**
+	 * @param CM_Page_Abstract|string $page
+	 * @param array|null              $params
+	 * @param boolean|null            $forceReload
+	 *
+	 */
+	public function redirect($page, array $params = null, $forceReload = null) {
+		$forceReload = (boolean) $forceReload;
 		$url = $this->getRender()->getUrlPage($page, $params);
-		$this->redirectUrl($url);
+		$this->redirectUrl($url, $forceReload);
 	}
 
-	public function redirectUrl($url, array $params = null) {
-		$this->getRender()->getJs()->onloadPrepareJs('window.location.href = ' . json_encode($url));
+	/**
+	 * @param string       $url
+	 * @param boolean|null $forceReload
+	 */
+	public function redirectUrl($url, $forceReload = null) {
+		$url = (string) $url;
+		$forceReload = (boolean) $forceReload;
+		$js = 'cm.router.route(' . json_encode($url) . ', null, ';
+		$js .= $forceReload ? 'true' : 'false';
+		$js .= ');';
+		$this->getRender()->getJs()->onloadPrepareJs($js);
 	}
 }

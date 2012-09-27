@@ -53,12 +53,8 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 		$onclick = $params['onclick'];
 		unset($params['onclick']);
 	}
-	if (isset($params['path']) && $params['path']) {
-		$path = $params['path'];
-		unset($params['path']);
-		$onclick .= ' location.href=\'' . CM_Util::link($path, $params) . '\';';
-	} elseif (isset($params['page'])) {
-		$onclick .= ' location.href=\'' . smarty_function_linkUrl($params, $template) . '\';';
+	if (isset($params['page'])) {
+		$onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
 	}
 
 	if ($onclick) {
