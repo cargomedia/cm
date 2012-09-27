@@ -193,7 +193,7 @@
 }
 
 .input_button_alt() {
-	background: darken(@colorFgButtonAlt, 10);
+	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
 	.box-shadow(none);
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
@@ -205,7 +205,7 @@
 }
 
 .input_button_alt_hover() {
-	background: @colorBgButtonAlt;
+	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
 	border: 1px solid @colorFgButtonAlt;
 }
 
