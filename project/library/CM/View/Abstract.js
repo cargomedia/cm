@@ -6,14 +6,14 @@ var CM_View_Abstract = Backbone.View.extend({
 	_class: 'CM_View_Abstract',
 
 	_children: [],
-	
+
 	initialize: function() {
 		this._children = [];
-	
+
 		if (this.getParent()) {
 			this.getParent().registerChild(this);
 		}
-	
+
 		if (this.actions) {
 			this._bindActions(this.actions);
 		}
@@ -21,31 +21,31 @@ var CM_View_Abstract = Backbone.View.extend({
 			this._bindStreams(this.streams);
 		}
 	},
-	
+
 	ready: function() {
 	},
-	
+
 	_ready: function() {
 		this.ready();
 		_.each(this.getChildren(), function(child) {
 			child._ready();
 		});
 	},
-	
+
 	/**
 	 * @param {CM_View_Abstract} child
 	 */
 	registerChild: function(child) {
 		this._children.push(child);
 	},
-	
+
 	/**
 	 * @return CM_View_Abstract[]
 	 */
 	getChildren: function() {
 		return this._children;
 	},
-	
+
 	/**
 	 * @param {String} className
 	 * @return CM_View_Abstract|null
@@ -55,7 +55,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			return _.contains(child.getClasses(), className);
 		}) || null;
 	},
-	
+
 	/**
 	 * @return CM_View_Abstract|null
 	 */
@@ -65,7 +65,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		}
 		return null;
 	},
-	
+
 	/**
 	 * @param {String} className
 	 * @return CM_View_Abstract|null
@@ -80,21 +80,21 @@ var CM_View_Abstract = Backbone.View.extend({
 		}
 		return parent.findParent(className);
 	},
-	
+
 	/**
 	 * @return String
 	 */
 	getAutoId: function() {
 		return this.el.id;
 	},
-	
+
 	/**
 	 * @return Object
 	 */
 	getParams: function() {
 		return this.options.params || {};
 	},
-	
+
 	/**
 	 * @return string[]
 	 */
@@ -105,20 +105,20 @@ var CM_View_Abstract = Backbone.View.extend({
 		}
 		return classes;
 	},
-	
+
 	/**
 	 * @return String
 	 */
 	getClass: function() {
 		return this._class;
 	},
-	
+
 	/**
 	 * @param {Boolean} skipDomRemoval OPTIONAL
 	 */
 	remove: function(skipDomRemoval) {
 		this.trigger("destruct");
-	
+
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
 			for (var i = 0, sibling; sibling = siblings[i]; i++) {
@@ -127,26 +127,26 @@ var CM_View_Abstract = Backbone.View.extend({
 				}
 			}
 		}
-	
+
 		_.each(this.getChildren(), function(child) {
 			child.remove();
 		});
-	
+
 		delete cm.views[this.getAutoId()];
-	
+
 		if (!skipDomRemoval) {
 			this.$().remove();
 		}
 	},
-	
+
 	disable: function() {
 		this.$().disable();
 	},
-	
+
 	enable: function() {
 		this.$().enable();
 	},
-	
+
 	/**
 	 * @param {String} functionName
 	 * @param {Array|Null} params
@@ -183,7 +183,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		});
 		return xhr;
 	},
-	
+
 	/**
 	 * @param {String} functionName
 	 * @param {Array|Null} params
@@ -247,7 +247,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			complete: callbacks.complete
 		});
 	},
-	
+
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
@@ -259,7 +259,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			cm.action.unbind(actionVerb, modelType, callback, this);
 		});
 	},
-	
+
 	/**
 	 * @param {String} event
 	 * @param {Function} callback fn(array data)
@@ -271,7 +271,33 @@ var CM_View_Abstract = Backbone.View.extend({
 			cm.stream.unbind(namespace, callback, this);
 		});
 	},
-	
+
+	/**
+	 * @param {String|Function} callback
+	 * @param {int} interval
+	 * @return {int}
+	 */
+	setInterval: function(callback, interval) {
+		var id = window.setInterval(callback, interval);
+		this.on('destruct', function() {
+			window.clearInterval(id);
+		});
+		return id;
+	},
+
+	/**
+	 * @param {String|Function} callback
+	 * @param {int} timeout
+	 * @return {int}
+	 */
+	setTimeout: function(callback, timeout) {
+		var id = window.setTimeout(callback, timeout);
+		this.on('destruct', function() {
+			window.clearTimeout(id);
+		});
+		return id;
+	},
+
 	/**
 	 * @param {Object}
 	 */
@@ -287,7 +313,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			}, this);
 		}
 	},
-	
+
 	/**
 	 * @param {Object}
 	 */
@@ -297,7 +323,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.bindStream(key, callback);
 		}
 	},
-	
+
 	/**
 	 * @return Object
 	 */
