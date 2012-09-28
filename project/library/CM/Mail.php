@@ -76,7 +76,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string	  $address
+	 * @param string      $address
 	 * @param string|null $name
 	 */
 	public function addTo($address, $name = null) {
@@ -93,7 +93,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string	  $address
+	 * @param string      $address
 	 * @param string|null $name
 	 */
 	public function addReplyTo($address, $name = null) {
@@ -110,7 +110,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string	  $address
+	 * @param string      $address
 	 * @param string|null $name
 	 */
 	public function addCc($address, $name = null) {
@@ -127,7 +127,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string	  $address
+	 * @param string      $address
 	 * @param string|null $name
 	 */
 	public function addBcc($address, $name = null) {
@@ -165,7 +165,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string	  $address
+	 * @param string      $address
 	 * @param string|null $name
 	 */
 	public function setSender($address, $name = null) {
@@ -339,9 +339,11 @@ class CM_Mail extends CM_View_Abstract {
 				$mail->Body = $html ? $html : $text;
 				$mail->AltBody = $html ? $text : '';
 
-				$useDynect = false;
-				if ($useDynect) {
-					$mail->AddCustomHeader('X-Dynect: 1');
+				if ($recipient = $this->getRecipient()) {
+					$splittest = new CM_Model_Splittest('email-provider');
+					if ('dynect' == $splittest->getVariationFixture($recipient)) {
+						$mail->AddCustomHeader('X-Dynect: 1');
+					}
 				}
 
 				$mail->Send();
