@@ -145,9 +145,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	public function redirectUrl($url, $forceReload = null) {
 		$url = (string) $url;
 		$forceReload = (boolean) $forceReload;
-		$js = 'cm.router.route(' . json_encode($url) . ', null, ';
-		$js .= $forceReload ? 'true' : 'false';
-		$js .= ');';
+		$js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
 		$this->getRender()->getJs()->onloadPrepareJs($js);
 	}
 }
