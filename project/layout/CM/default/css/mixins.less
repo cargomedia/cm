@@ -147,7 +147,7 @@
 	min-width: @size;
 	height: @size;
 	margin: 1px;
-	padding: 0 @size / 3;
+	padding: 1px @size / 3;
 	border-radius: 2px;
 	font-weight: bold;
 	font-size: @fontSizeButton;
@@ -155,19 +155,16 @@
 	overflow: visible;
 	.nowrap;
 
-	.icon, .label {
-		display: inline-block;
-		vertical-align: middle;
-		line-height: @size;
-	}
 	.icon {
 		font-size: @iconSizeClickable;
-		top: -2px;
+		line-height: @size - 2px;
+		top: -1px;
+
 	}
-	&.hasLabel, &.hasIcon.hasLabel{
+	&.hasIcon.hasLabel{
 		.label {
-			position: relative;
-			top: -1px;
+			vertical-align: top;
+			line-height: @size - 2px;
 		}
 	}
 }
@@ -198,6 +195,7 @@
 	.box-shadow(none);
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 	color: @colorFgButtonAltFont;
+	font-size: @fontSizeButton + 1px;
 
 	.icon {
 		color: @colorFgButtonAltFont;
