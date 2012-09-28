@@ -234,6 +234,8 @@ abstract class CM_Request_Abstract {
 		}
 		parse_str($queryString, $query);
 		$this->setQuery($query);
+
+		$this->setLanguageUrl();
 	}
 
 	/**

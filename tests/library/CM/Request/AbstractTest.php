@@ -100,18 +100,21 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testSetUri() {
-		$uri = '/foo/bar?foo1=bar1';
+		$language = CM_Model_Language::create(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
+		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertModelEquals($language, $mock->popPathLanguage());
 		$this->assertSame('/foo/bar', $mock->getPath());
 		$this->assertSame(array('foo', 'bar'), $mock->getPathParts());
 		$this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
+		$this->assertModelEquals($language, $mock->getLanguageUrl());
 		$mock->setUri('/foo1/bar1?foo=bar');
 		$this->assertSame('/foo1/bar1', $mock->getPath());
 		$this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
 		$this->assertSame(array('foo' => 'bar'), $mock->getQuery());
-
+		$this->assertNull($mock->getLanguageUrl());
 	}
 
 	/**
