@@ -4,6 +4,11 @@ require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_KissTracking_ApiTest extends TestCase {
 
+	public function setUp() {
+		$set = new CM_Set(CM_KissTracking::setName);
+		$set->flush();
+	}
+
 	public function tearDown() {
 		TH::clearEnv();
 	}
@@ -12,13 +17,13 @@ class CM_KissTracking_ApiTest extends TestCase {
 		$filePath = DIR_TMP . 'kisstracking.csv';
 
 		/** @var CM_KissTracking_Api $kissTracking */
-		$kissTracking = $this->getMock('CM_KissTracking_Api', array('_uploadCsv', '_getFileName'));
+		$kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
 		$kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($filePath));
 
 		$testRecords1 = array(array('test_event_2', 1, null, array('Smart' => true, 'Hired' => 'yes')));
 		$time = time();
 		foreach ($testRecords1 as $testRecord) {
-			CM_KissTracking_Api::getInstance()->track($testRecord[0], $testRecord[1], $testRecord[2], $testRecord[3]);
+			CM_KissTracking::getInstance()->track($testRecord[0], $testRecord[1], $testRecord[2], $testRecord[3]);
 		}
 
 		$this->assertFileNotExists($filePath);
@@ -36,7 +41,7 @@ EOD;
 		$testRecords2 = array(array('test_event_4', 1, null, array('Smart' => true, 'PHP' => 'rocks')));
 		$time2 = time();
 		foreach ($testRecords2 as $testRecord) {
-			CM_KissTracking_Api::getInstance()->track($testRecord[0], $testRecord[1], $testRecord[2], $testRecord[3]);
+			CM_KissTracking::getInstance()->track($testRecord[0], $testRecord[1], $testRecord[2], $testRecord[3]);
 		}
 
 		$string2 = <<<EOD
