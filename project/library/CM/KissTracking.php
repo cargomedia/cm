@@ -14,7 +14,8 @@ class CM_KissTracking extends CM_Class_Abstract {
 	private $_set;
 
 	public function __construct() {
-		$this->_dirData = DIR_TMP;
+		$this->_dirData = DIR_DATA . 'kisstracking/';
+		CM_Util::mkDir($this->_dirData);
 	}
 
 	/**
@@ -22,10 +23,9 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 * @param CM_Model_User $user
 	 * @param null|string   $alias
 	 * @param array         $properties
-	 * @return CM_KissTracking
 	 */
 	public function trackUser($event, CM_Model_User $user, $alias = null, array $properties = null) {
-		return $this->track($event, $user->getId(), $alias, $properties);
+		$this->track($event, $user->getId(), $alias, $properties);
 	}
 
 	/**
