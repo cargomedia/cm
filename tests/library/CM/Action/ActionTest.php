@@ -195,6 +195,18 @@ class CM_Action_ActionTest extends TestCase {
 		$action->prepare();
 		$this->assertTrue(true);
 	}
+
+	public function testGetName() {
+		$actor = TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+		$this->assertSame('Mock', $action->getName());
+	}
+
+	public function testGetLabel() {
+		$actor = TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+		$this->assertSame('Mock Test', $action->getLabel());
+	}
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
@@ -204,6 +216,10 @@ class CM_Action_Mock extends CM_Action_Abstract {
 	}
 
 	protected function _prepare() {
+	}
+
+	public function getVerbName() {
+		return 'Test';
 	}
 }
 
