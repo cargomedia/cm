@@ -1,24 +1,12 @@
 <?php
 
-class CM_Amazon_S3 extends CM_Class_Abstract {
+class CM_Amazon_S3 extends CM_Amazon_Abstract {
 
 	/** @var AmazonS3 */
 	private $_sdk;
 
 	public function __construct() {
-		require_once 'AWSSDKforPHP/sdk.class.php';
-
-		$accessKey = self::_getConfig()->accessKey;
-		if (!$accessKey) {
-			throw new CM_Exception_Invalid('Amazon S3 `accessKey` not set');
-		}
-		$secretKey = self::_getConfig()->secretKey;
-		if (!$secretKey) {
-			throw new CM_Exception_Invalid('Amazon S3 `secretKey` not set');
-		}
-
-		CFCredentials::set(array('development' => array('key' => $accessKey, 'secret' => $secretKey, 'default_cache_config' => '',
-			'certificate_authority' => false), '@default' => 'development'));
+		parent::__construct();
 		$this->_sdk = new AmazonS3();
 	}
 
@@ -29,19 +17,19 @@ class CM_Amazon_S3 extends CM_Class_Abstract {
 	 * @param array   $permissions
 	 * @throws CM_Exception_Invalid
 	 */
-	public function createObject(CM_File $file, $bucketName, $targetFilename, array $permissions = null) {
+	public function upload(CM_File $file, $bucketName, $targetFilename, array $permissions = null) {
 		$bucketName = (string) $bucketName;
-		if (!$bucketName) {
+		if (!strlen($bucketName)) {
 			throw new CM_Exception_Invalid('Bucket name cannot be empty');
 		}
 		$targetFilename = (string) $targetFilename;
-		if (!$bucketName) {
+		if (!strlen($targetFilename)) {
 			throw new CM_Exception_Invalid('Target filename cannot be empty');
 		}
 		$permissions = (array) $permissions;
 		$acl = array();
 		foreach ($permissions as $user => $permission) {
-			$acl[] = array('id' => $user, 'permission' => $permission);
+			$acl[] = array('id' => (string) $user, 'permission' => (string) $permission);
 		}
 
 		$response = $this->_sdk->create_object($bucketName, $targetFilename, array('fileUpload' => $file->getPath(), 'headers' => array(),
