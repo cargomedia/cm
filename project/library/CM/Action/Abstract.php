@@ -276,4 +276,30 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			CM_Mysql::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getVerbName() {
+		$actionVerbs = self::_getConfig()->verbs;
+		if (!array_key_exists($this->getVerb(), $actionVerbs)) {
+			throw new CM_Exception_Invalid('The specified Action does not exist!');
+		}
+		return $actionVerbs[$this->getVerb()];
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return str_replace($this->_getNamespace() . '_Action_', '', $this->_getClassName());
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLabel() {
+		return $this->getName() . ' ' . $this->getVerbName();
+	}
 }
