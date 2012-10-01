@@ -208,6 +208,15 @@ class CM_MenuEntry {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getAutoId() {
+		$params = $this->getParams();
+		ksort($params);
+		return hash('crc32', $this->getPageName() . ':' . json_encode($params));
+	}
+
+	/**
 	 * @param CM_Model_User|null $viewer
 	 * @return bool
 	 */
