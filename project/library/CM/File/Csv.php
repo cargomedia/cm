@@ -67,8 +67,9 @@ class CM_File_Csv extends CM_File {
 		$resource = fopen('php://memory', 'w+');
 		fputcsv($resource, $row);
 		rewind($resource);
+		$line = fgets($resource);
 		fclose($resource);
-		return fgets($resource);
+		return $line;
 	}
 
 	/**
@@ -79,7 +80,8 @@ class CM_File_Csv extends CM_File {
 		$resource = fopen('php://memory', 'w+');
 		fputs($resource, $line);
 		rewind($resource);
+		$row = fgetcsv($resource);
 		fclose($resource);
-		return fgetcsv($resource);
+		return $row;
 	}
 }
