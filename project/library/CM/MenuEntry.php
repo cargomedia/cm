@@ -26,6 +26,7 @@ class CM_MenuEntry {
 	 * @param array              $data
 	 * @param CM_Menu|null       $menu
 	 * @param CM_MenuEntry|null  $parent
+	 * @throws CM_Exception_Invalid
 	 */
 	public final function __construct(array $data, CM_Menu $menu, CM_MenuEntry $parent = null) {
 		$this->_data = $data;
@@ -41,7 +42,7 @@ class CM_MenuEntry {
 		}
 
 		if (isset($data['submenu'])) {
-			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getPath(), $this->_menu->getParams(), $this->_menu->getViewer(), $this);
+			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getPath(), $this->_menu->getParams(), $this);
 		}
 	}
 
@@ -59,7 +60,7 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return CM_Menu Submenu/children of this entry
+	 * @return CM_Menu|null
 	 */
 	public final function getChildren() {
 		return $this->_submenu;
@@ -110,19 +111,16 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * Returns the specific page for this menu entry
-	 *
+	 * @param CM_Model_User|null $viewer
 	 * @return CM_Page_Abstract Page object
 	 */
-	public final function getPage() {
-		$viewer = $this->_menu->getViewer();
+	public final function getPage(CM_Model_User $viewer = null) {
 		$viewerId = $viewer ? $viewer->getId() : 0;
 		$className = $this->getPageName();
 
 		$cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
-
 		if (($page = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$page = new $className($this->_menu->getParams(), $this->_menu->getViewer());
+			$page = new $className($this->_menu->getParams(), $viewer);
 			CM_Cache_Runtime::set($cacheKey, $page);
 		}
 
@@ -175,23 +173,21 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return bool True if has submenu
+	 * @return bool
 	 */
 	public final function hasChildren() {
 		return !empty($this->_submenu);
 	}
 
 	/**
-	 * @return bool True if has parent
+	 * @return bool
 	 */
 	public final function hasParent() {
 		return (bool) $this->_parent;
 	}
 
 	/**
-	 * Checks if the given menu entry is active
-	 *
-	 * @return bool True if active
+	 * @return bool
 	 */
 	public final function isActive() {
 		$requestQuery = $this->_menu->getParams()->getAllOriginal();
@@ -209,12 +205,11 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * Checks if a menu is viewable to the current user (based on page)
-	 *
+	 * @param CM_Model_User|null $viewer
 	 * @return bool
 	 */
-	public final function isViewable() {
-		return $this->getPage()->isViewable();
+	public final function isViewable(CM_Model_User $viewer = null) {
+		return $this->getPage($viewer)->isViewable();
 	}
 
 	/**

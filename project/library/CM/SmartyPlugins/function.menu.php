@@ -10,22 +10,16 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	$path = $page ? $page::getPath() : '/';
 	/** @var CM_Params $pageParams */
 	$pageParams = $page ? $page->getParams() : CM_Params::factory();
-	$userId = $viewer ? $viewer->getId() : 0;
-
 
 	$menu = null;
 	if (isset($params['name'])) {
 		$name = $params['name'];
-		$cacheKey = CM_CacheConst::Menu . '_name:' . $name . '_siteId:' . $render->getSite()->getId() . '_userId:' . $userId;
-		if (($menu = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$menuArr = include $render->getLayoutPath('menu.php', null, true);
-			if (isset($menuArr[$name])) {
-				$menu = new CM_Menu($menuArr[$name], $path, $pageParams, $viewer);
-			}
-			CM_Cache_Runtime::set($cacheKey, $menu);
+		$menuArr = include $render->getLayoutPath('menu.php', null, true);
+		if (isset($menuArr[$name])) {
+			$menu = new CM_Menu($menuArr[$name], $path, $pageParams);
 		}
 	} elseif (isset($params['data'])) {
-		$menu = new CM_Menu($params['data'], $path, $pageParams, $viewer);
+		$menu = new CM_Menu($params['data'], $path, $pageParams);
 	}
 	if (!$menu) {
 		return '';
@@ -47,16 +41,16 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		$entry = $menu->findEntry($page, $depth, $depth);
 		if ($entry && $entry->hasChildren()) {
 			$menu = $entry->getChildren();
-			$menuEntries = $menu->getEntries();
+			$menuEntries = $menu->getEntries($viewer);
 		}
 	} elseif (!is_null($depth)) {
 		if ($entry = $menu->findEntry($page, $depth)) {
 			$parents = $entry->getParents();
 			$parents[] = $entry;
-			$menuEntries = $parents[$depth]->getSiblings()->getEntries();
+			$menuEntries = $parents[$depth]->getSiblings()->getEntries($viewer);
 		}
 	} else {
-		$menuEntries = $menu->getEntries();
+		$menuEntries = $menu->getEntries($viewer);
 	}
 
 	if (empty($menuEntries)) {

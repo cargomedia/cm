@@ -12,9 +12,6 @@ class CM_CacheConst {
 	// _class:X_userId:X
 	const Page = 'Page';
 
-	// _name:X_userId:X
-	const Menu = 'Menu';
-
 	const User_Asset_Preferences_Defaults = 'User_Asset_Preferences_Defaults';
 
 	const PagingSource = 'PagingSource';

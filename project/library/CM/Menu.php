@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Menu object class. Uses an array to create the object
- */
-
 class CM_Menu {
 	/**
 	 * @var CM_MenuEntry[]
@@ -26,30 +22,21 @@ class CM_Menu {
 	private $_params;
 
 	/**
-	 * @var CM_Model_User|null
-	 */
-	private $_viewer;
-
-	/**
 	 * Creates a new menu object with the given menu entries as array
 	 *
 	 * @param array              $menuEntries Menu entries
 	 * @param string             $path
 	 * @param CM_Params          $params
-	 * @param CM_Model_User|null $viewer
 	 * @param CM_MenuEntry|null  $parent
 	 */
-	public final function __construct(array $menuEntries, $path, CM_Params $params, CM_Model_User $viewer = null, CM_MenuEntry $parent = null) {
+	public final function __construct(array $menuEntries, $path, CM_Params $params, CM_MenuEntry $parent = null) {
 		$this->_path = (string) $path;
 		$this->_params = $params;
-		$this->_viewer = $viewer;
 
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
 			$this->_allEntries[] = $entry;
-			if ($entry->getPage()->isViewable()) {
-				$this->_entries[] = $entry;
-			}
+			$this->_entries[] = $entry;
 		}
 	}
 
@@ -65,13 +52,6 @@ class CM_Menu {
 	 */
 	public function getParams() {
 		return $this->_params;
-	}
-
-	/**
-	 * @return CM_Model_User|null
-	 */
-	public function getViewer() {
-		return $this->_viewer;
 	}
 
 	/**
@@ -114,11 +94,12 @@ class CM_Menu {
 	}
 
 	/**
-	 * Returns the list of available (viewable) menu entries
-	 *
+	 * @param CM_Model_User|null $viewer
 	 * @return CM_MenuEntry[]
 	 */
-	public final function getEntries() {
-		return $this->_entries;
+	public final function getEntries(CM_Model_User $viewer = null) {
+		return array_filter($this->_entries, function (CM_MenuEntry $entry) use ($viewer) {
+			return $entry->isViewable($viewer);
+		});
 	}
 }
