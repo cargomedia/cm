@@ -15,7 +15,6 @@ class CM_KissTracking extends CM_Class_Abstract {
 
 	public function __construct() {
 		$this->_dirData = DIR_DATA . 'kisstracking/';
-		CM_Util::mkDir($this->_dirData);
 	}
 
 	/**
@@ -71,6 +70,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 		}
 
 		if (!CM_File::exists($filename)) {
+			CM_Util::mkDir($this->_dirData);
 			/** @var $file CM_File_Csv */
 			$file = CM_File_Csv::create($filename);
 			$file->appendRow($header);

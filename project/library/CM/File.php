@@ -168,17 +168,20 @@ class CM_File {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	protected function _readFirstLine() {
 		$resource = $this->_openFileHandle('r');
 		$firstLine = fgets($resource);
 		fclose($resource);
+		if (false === $firstLine) {
+			return null;
+		}
 		return $firstLine;
 	}
 
 	/**
-	 * @param $mode
+	 * @param string $mode
 	 * @return resource
 	 * @throws CM_Exception
 	 */
