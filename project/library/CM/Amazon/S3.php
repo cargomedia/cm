@@ -11,10 +11,10 @@ class CM_Amazon_S3 extends CM_Amazon_Abstract {
 	}
 
 	/**
-	 * @param CM_File $file
-	 * @param string  $bucketName
-	 * @param string  $targetFilename
-	 * @param array   $permissions
+	 * @param CM_File      $file
+	 * @param string       $bucketName
+	 * @param string       $targetFilename
+	 * @param array|null   $permissions
 	 * @throws CM_Exception_Invalid
 	 */
 	public function upload(CM_File $file, $bucketName, $targetFilename, array $permissions = null) {
