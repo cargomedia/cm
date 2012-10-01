@@ -1,13 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../../../TestCase.php';
+require_once __DIR__ . '/../../TestCase.php';
 
-class CM_KissTracking_ApiTest extends TestCase {
-
-	public function setUp() {
-		$set = new CM_Set(CM_KissTracking::setName);
-		$set->flush();
-	}
+class CM_KissTrackingTest extends TestCase {
 
 	public function tearDown() {
 		TH::clearEnv();
@@ -16,7 +11,7 @@ class CM_KissTracking_ApiTest extends TestCase {
 	public function testProcess() {
 		$filePath = DIR_TMP . 'kisstracking.csv';
 
-		/** @var CM_KissTracking_Api $kissTracking */
+		/** @var CM_KissTracking $kissTracking */
 		$kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
 		$kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($filePath));
 

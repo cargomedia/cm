@@ -21,8 +21,8 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/**
 	 * @param string        $event
 	 * @param CM_Model_User $user
-	 * @param null|string   $alias
-	 * @param array         $properties
+	 * @param string|null   $alias
+	 * @param array|null    $properties
 	 */
 	public function trackUser($event, CM_Model_User $user, $alias = null, array $properties = null) {
 		$this->track($event, $user->getId(), $alias, $properties);
@@ -31,8 +31,8 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/**
 	 * @param string        $event
 	 * @param string        $identity
-	 * @param null|string   $alias
-	 * @param array         $properties
+	 * @param string|null   $alias
+	 * @param array|null    $properties
 	 */
 	public function track($event, $identity, $alias = null, array $properties = null) {
 		$event = (string) $event;
@@ -70,7 +70,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 			}
 		}
 
-		if (!file_exists($filename) || !is_readable($filename)) {
+		if (!CM_File::exists($filename)) {
 			/** @var $file CM_File_Csv */
 			$file = CM_File_Csv::create($filename);
 			$file->appendRow($header);
@@ -118,7 +118,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/**
 	 * @return mixed[]
 	 */
-	public function _getEvents() {
+	private function _getEvents() {
 		return $this->_getSet()->flush();
 	}
 

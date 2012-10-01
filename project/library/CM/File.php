@@ -183,4 +183,12 @@ class CM_File {
 		$file = new static($path);
 		return $file;
 	}
+
+	/**
+	 * @param $path
+	 * @return bool
+	 */
+	public static function exists($path) {
+		return is_file($path);
+	}
 }
