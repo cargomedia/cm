@@ -11,12 +11,13 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	/** @var CM_Params $activeParams */
 	$activeParams = $page ? $page->getParams() : CM_Params::factory();
 
+	/** @var CM_Menu $menu */
 	$menu = null;
 	if (isset($params['name'])) {
 		$name = $params['name'];
-		$menuArr = include $render->getLayoutPath('menu.php', null, true);
+		$menuArr = $render->getSite()->getMenus();
 		if (isset($menuArr[$name])) {
-			$menu = new CM_Menu($menuArr[$name]);
+			$menu = $menuArr[$name];
 		}
 	} elseif (isset($params['data'])) {
 		$menu = new CM_Menu($params['data']);

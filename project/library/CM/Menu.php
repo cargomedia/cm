@@ -12,7 +12,7 @@ class CM_Menu {
 	 * @param array              $menuEntries Menu entries
 	 * @param CM_MenuEntry|null  $parent
 	 */
-	public final function __construct(array $menuEntries, CM_MenuEntry $parent = null) {
+	public function __construct(array $menuEntries, CM_MenuEntry $parent = null) {
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
 			$this->_entries[] = $entry;

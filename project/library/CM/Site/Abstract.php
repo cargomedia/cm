@@ -48,6 +48,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getMenus() {
+		return array();
+	}
+
+	/**
 	 * @return string Theme
 	 */
 	public function getTheme() {
