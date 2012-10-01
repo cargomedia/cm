@@ -52,9 +52,9 @@ class CM_File_Csv extends CM_File {
 		$headerNew = array_diff($header, $headerOld);
 		if ($headerNew) {
 			$missingCommas = str_repeat(',', count($headerNew));
-			$content = preg_replace('/([.]*)(\n)/', '$1' . $missingCommas . '$2', $this->read());
+			$content = preg_replace('/\n/', $missingCommas . '$0', $this->read());
+			$content = preg_replace('/^.*\n/', $this->_convertRowToString($header), $content, 1);
 			$this->write($content);
-			$this->replaceHeader($header);
 		}
 		return $header;
 	}
