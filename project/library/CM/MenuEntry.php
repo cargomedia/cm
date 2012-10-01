@@ -42,7 +42,7 @@ class CM_MenuEntry {
 		}
 
 		if (isset($data['submenu'])) {
-			$this->_submenu = new CM_Menu($data['submenu'], $this->_menu->getPath(), $this->_menu->getParams(), $this);
+			$this->_submenu = new CM_Menu($data['submenu'], $this);
 		}
 	}
 
@@ -120,7 +120,7 @@ class CM_MenuEntry {
 
 		$cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
 		if (($page = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$page = new $className($this->_menu->getParams(), $viewer);
+			$page = new $className($this->getParams(), $viewer);
 			CM_Cache_Runtime::set($cacheKey, $page);
 		}
 
@@ -187,21 +187,24 @@ class CM_MenuEntry {
 	}
 
 	/**
+	 * @param string    $path
+	 * @param CM_Params $params
 	 * @return bool
 	 */
-	public final function isActive() {
-		$requestQuery = $this->_menu->getParams()->getAllOriginal();
-		$requestPath = $this->_menu->getPath();
-
-		$active = false;
-
-		if ($this->compare($requestPath, $requestQuery)) {
-			$active = true;
-		} elseif ($this->_isSubmenuActive()) {
-			$active = true;
+	public final function isActive($path, CM_Params $params) {
+		if ($this->compare($path, $params->getAllOriginal())) {
+			return true;
 		}
 
-		return $active;
+		if ($this->hasChildren()) {
+			foreach ($this->getChildren()->getAllEntries() as $entry) {
+				if ($entry->isActive($path, $params)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -210,22 +213,5 @@ class CM_MenuEntry {
 	 */
 	public final function isViewable(CM_Model_User $viewer = null) {
 		return $this->getPage($viewer)->isViewable();
-	}
-
-	/**
-	 * Checks if a submenu of the entry is active
-	 *
-	 * @return bool
-	 */
-	protected final function _isSubmenuActive() {
-		if ($this->hasChildren()) {
-			foreach ($this->getChildren()->getAllEntries() as $entry) {
-				if ($entry->isActive()) {
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 }

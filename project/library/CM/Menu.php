@@ -7,45 +7,16 @@ class CM_Menu {
 	protected $_entries = array();
 
 	/**
-	 * @var string
-	 */
-	private $_path;
-
-	/**
-	 * @var CM_Params
-	 */
-	private $_params;
-
-	/**
 	 * Creates a new menu object with the given menu entries as array
 	 *
 	 * @param array              $menuEntries Menu entries
-	 * @param string             $path
-	 * @param CM_Params          $params
 	 * @param CM_MenuEntry|null  $parent
 	 */
-	public final function __construct(array $menuEntries, $path, CM_Params $params, CM_MenuEntry $parent = null) {
-		$this->_path = (string) $path;
-		$this->_params = $params;
-
+	public final function __construct(array $menuEntries, CM_MenuEntry $parent = null) {
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
 			$this->_entries[] = $entry;
 		}
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getPath() {
-		return $this->_path;
-	}
-
-	/**
-	 * @return CM_Params
-	 */
-	public function getParams() {
-		return $this->_params;
 	}
 
 	/**

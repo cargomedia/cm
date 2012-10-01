@@ -71,6 +71,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	}
 
 	$tplPath = $render->getLayoutPath('menu/' . $tplName . '.tpl');
-	$assign = array('menu_entries' => $menuEntries, 'menu_class' => $class);
+	$assign = array('menu_entries' => $menuEntries, 'menu_class' => $class, 'activePath' => $path, 'activeParams' => $pageParams);
 	return $render->renderTemplate($tplPath, $assign, true);
 }
