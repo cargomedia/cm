@@ -185,7 +185,7 @@ class CM_File {
 	}
 
 	/**
-	 * @param $path
+	 * @param string $path
 	 * @return bool
 	 */
 	public static function exists($path) {
