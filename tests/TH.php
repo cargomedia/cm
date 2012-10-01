@@ -55,6 +55,7 @@ class TH {
 	public static function clearCache() {
 		CM_Cache::flush();
 		CM_CacheLocal::flush();
+		CM_Cache_Redis::flush();
 	}
 
 	public static function clearDb() {
