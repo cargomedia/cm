@@ -128,7 +128,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			}
 		}
 
-		_.each(this.getChildren(), function(child) {
+		_.each(_.clone(this.getChildren()), function(child) {
 			child.remove();
 		});
 
