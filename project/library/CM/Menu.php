@@ -7,11 +7,6 @@ class CM_Menu {
 	protected $_entries = array();
 
 	/**
-	 * @var CM_MenuEntry[]
-	 */
-	protected $_allEntries = array();
-
-	/**
 	 * @var string
 	 */
 	private $_path;
@@ -35,7 +30,6 @@ class CM_Menu {
 
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
-			$this->_allEntries[] = $entry;
 			$this->_entries[] = $entry;
 		}
 	}
@@ -85,12 +79,10 @@ class CM_Menu {
 	}
 
 	/**
-	 * Returns all menu entries independent of viewable or not
-	 *
 	 * @return CM_MenuEntry[]
 	 */
 	public final function getAllEntries() {
-		return $this->_allEntries;
+		return $this->_entries;
 	}
 
 	/**
