@@ -7,9 +7,6 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/** @var CM_KissTracking */
 	private static $_instance;
 
-	/** @var string */
-	private $_dirData;
-
 	/** @var CM_Set */
 	private $_set;
 
