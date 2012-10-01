@@ -3,40 +3,36 @@
 class CM_File_Csv extends CM_File {
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	public function getHeader() {
-		$resource = fopen($this->getPath(), 'r');
-		$header = fgetcsv($resource);
-		fclose($resource);
-		return $header;
+		return $this->_convertStringToRow($this->_readFirstLine());
 	}
 
 	/**
-	 * @param array $row
+	 * @param string[] $row
 	 */
 	public function prependRow(array $row) {
-		$content = $this->read();
-		$this->truncate();
-		$this->appendRow($row);
-		$this->append($content);
+		$content = $this->_convertRowToString($row) . $this->read();
+		$this->write($content);
 	}
 
 	/**
-	 * @param array         $row
+	 * @param string[] $row
 	 */
 	public function appendRow(array $row) {
-		$resource = fopen($this->getPath(), 'a');
-		fputcsv($resource, $row);
-		fclose($resource);
+		$line = $this->_convertRowToString($row);
+		$this->append($line);
 	}
 
 	/**
-	 * @param array $row
+	 * @param string[] $row
 	 */
 	public function replaceHeader(array $row) {
-		$this->_removeHeader();
-		$this->prependRow($row);
+		$content = $this->_convertRowToString($row);
+		$firstLine = $this->_readFirstLine();
+		$content .= substr($this->read(), strlen($firstLine));
+		$this->write($content);
 	}
 
 	/**
@@ -63,10 +59,25 @@ class CM_File_Csv extends CM_File {
 		return $header;
 	}
 
-	private function _removeHeader() {
-		$resource = fopen($this->getPath(), 'r');
-		$header = fgets($resource);
-		$this->write(substr($this->read(), strlen($header)));
-		fclose($resource);
+	/**
+	 * @param string[] $row
+	 * @return string
+	 */
+	private function _convertRowToString(array $row) {
+		$resource = fopen('php://memory', 'w+');
+		fputcsv($resource, $row);
+		rewind($resource);
+		return fgets($resource);
+	}
+
+	/**
+	 * @param string $line
+	 * @return string[]
+	 */
+	private function _convertStringToRow($line) {
+		$resource = fopen('php://memory', 'w+');
+		fputs($resource, $line);
+		rewind($resource);
+		return fgetcsv($resource);
 	}
 }

@@ -96,7 +96,7 @@ class CM_File {
 	}
 
 	/**
-	 * @param $content
+	 * @param string $content
 	 * @throws CM_Exception
 	 */
 	public function write($content) {
@@ -106,11 +106,11 @@ class CM_File {
 	}
 
 	/**
-	 * @param $content
+	 * @param string $content
 	 * @throws CM_Exception
 	 */
 	public function append($content) {
-		$resource = fopen($this->getPath(), 'a');
+		$resource = $this->_openFileHandle('a');
 		if (false === fputs($resource, $content)) {
 			throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to `' . $this->getPath() . '`');
 		}
@@ -118,9 +118,7 @@ class CM_File {
 	}
 
 	public function truncate() {
-		$resource = fopen($this->getPath(), 'r+');
-		ftruncate($resource, 0);
-		fclose($resource);
+		$this->write('');
 	}
 
 	/**
@@ -167,6 +165,29 @@ class CM_File {
 	 */
 	public function __toString() {
 		return $this->read();
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _readFirstLine() {
+		$resource = $this->_openFileHandle('r');
+		$firstLine = fgets($resource);
+		fclose($resource);
+		return $firstLine;
+	}
+
+	/**
+	 * @param $mode
+	 * @return resource
+	 * @throws CM_Exception
+	 */
+	private function _openFileHandle($mode) {
+		$resource = fopen($this->getPath(), $mode);
+		if (false === $resource) {
+			throw new CM_Exception('Could not open file in `' . $mode . '` mode. Path: `' . $this->getPath() . '`');
+		}
+		return $resource;
 	}
 
 	/**
