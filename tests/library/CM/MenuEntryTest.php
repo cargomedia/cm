@@ -71,7 +71,7 @@ class CM_MenuEntryTest extends TestCase {
 		$this->assertEquals($entry1, $parents[0]);
 	}
 
-	public function testGetAutoId() {
+	public function testGetTargetId() {
 		$menuArray = array();
 		$menuArray[] = array('label' => 'Home1', 'page' => 'CM_Page_Mock2', 'params' => array('foo' => 1));
 		$menuArray[] = array('label' => 'Home2', 'page' => 'CM_Page_Mock2', 'params' => array('foo' => 1));
@@ -80,7 +80,7 @@ class CM_MenuEntryTest extends TestCase {
 		$menu = new CM_Menu($menuArray);
 
 		$autoIds = array_map(function (CM_MenuEntry $entry) {
-			return $entry->getAutoId();
+			return $entry->getTargetId();
 		}, $menu->getAllEntries());
 
 		$this->assertInternalType('string', $autoIds[0]);
