@@ -26,16 +26,6 @@ class CM_File_Csv extends CM_File {
 	}
 
 	/**
-	 * @param string[] $row
-	 */
-	public function replaceHeader(array $row) {
-		$content = $this->_convertRowToString($row);
-		$firstLine = $this->_readFirstLine();
-		$content .= substr($this->read(), strlen($firstLine));
-		$this->write($content);
-	}
-
-	/**
 	 * @param string[] $header
 	 * @return string[]
 	 */

@@ -13,10 +13,6 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/** @var CM_Set */
 	private $_set;
 
-	public function __construct() {
-		$this->_dirData = DIR_DATA . 'kisstracking/';
-	}
-
 	/**
 	 * @param string        $event
 	 * @param CM_Model_User $user
@@ -47,12 +43,12 @@ class CM_KissTracking extends CM_Class_Abstract {
 	}
 
 	public function exportEvents() {
-		$files = CM_Util::rglob('*.csv', $this->_dirData);
-		if (count($files) > 1) {
-			sort($files);
-			$file = new CM_File_Csv($files[0]);
+		$file = $this->generateCsv();
+		$lastUploadAt = CM_Option::getInstance()->get('kisstracking');
+		if (time() - $lastUploadAt > 3600) {
 			$this->_uploadCsv($file);
 			$file->delete();
+			CM_Option::getInstance()->set('kisstracking', time());
 		}
 	}
 
@@ -70,7 +66,6 @@ class CM_KissTracking extends CM_Class_Abstract {
 		}
 
 		if (!CM_File::exists($filename)) {
-			CM_Util::mkDir($this->_dirData);
 			/** @var $file CM_File_Csv */
 			$file = CM_File_Csv::create($filename);
 			$file->appendRow($header);
@@ -91,7 +86,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 * @return string
 	 */
 	protected function _getFileName() {
-		return $this->_dirData . self::_getConfig()->awsFilePrefix . '.' . date('YmdH') . '.csv';
+		return DIR_DATA . 'kiss-tracking.csv';
 	}
 
 	/**
