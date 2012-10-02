@@ -9,11 +9,16 @@ class CM_Bootloader {
 	}
 
 	public function autoloader() {
-		spl_autoload_register(function($className) {
-			$path = DIR_ROOT . 'library/' . str_replace('_', '/', $className) . '.php';
-			if (is_file($path)) {
-				require_once $path;
-				return;
+		$includePaths = explode(PATH_SEPARATOR, ini_get('include_path'));
+		array_unshift($includePaths, DIR_ROOT . 'library/');
+		spl_autoload_register(function($className) use ($includePaths) {
+			$relativePath = str_replace('_', '/', $className) . '.php';
+			foreach ($includePaths as $includePath) {
+				$path = $includePath . $relativePath;
+				if (is_file($path)) {
+					require_once $path;
+					return;
+				}
 			}
 		});
 	}
