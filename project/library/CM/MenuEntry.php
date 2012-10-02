@@ -153,7 +153,7 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return CM_MenuEntry[] Parent menu entries
+	 * @return CM_MenuEntry[]
 	 */
 	public final function getParents() {
 		$parents = array();

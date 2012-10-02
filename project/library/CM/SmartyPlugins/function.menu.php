@@ -11,7 +11,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 	/** @var CM_Params $activeParams */
 	$activeParams = $page ? $page->getParams() : CM_Params::factory();
 
-	/** @var CM_Menu $menu */
 	$menu = null;
 	if (isset($params['name'])) {
 		$name = $params['name'];
@@ -48,7 +47,9 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		if ($entry = $menu->findEntry($page, $depth)) {
 			$parents = $entry->getParents();
 			$parents[] = $entry;
-			$menuEntries = $parents[$depth]->getSiblings()->getEntries($viewer);
+			/** @var CM_MenuEntry $menuEntry */
+			$menuEntry = $parents[$depth];
+			$menuEntries = $menuEntry->getSiblings()->getEntries($viewer);
 		}
 	} else {
 		$menuEntries = $menu->getEntries($viewer);
