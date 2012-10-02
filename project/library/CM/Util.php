@@ -282,4 +282,25 @@ class CM_Util {
 		}
 		return $stdout;
 	}
+
+	/**
+	 * @param string|null $namespace
+	 * @return string
+	 */
+	static public function benchmark($namespace = null) {
+		static $times;
+		if (!$times) {
+			$times = array();
+		}
+		$now = microtime(true) * 1000;
+		$previousValue = null;
+		if ($times[$namespace]) {
+			$difference = $now - $times[$namespace];
+		} else {
+			$difference = null;
+		}
+		$times[$namespace] = $now;
+		return sprintf('%.2f ms', $difference);
+
+	}
 }
