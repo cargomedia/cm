@@ -47,7 +47,7 @@ class CM_MenuTest extends TestCase {
 		$this->assertSame(2, count($entries));
 		$this->assertSame(array($menu->findEntry($page), $menu->findEntry($page, 1)), $entries);
 
-		$this->assertSame(array(), $menu->findEntries(new CM_Page_Mock5()));
+		$this->assertSame(array(), $menu->findEntries(new CM_Page_Mock6()));
 	}
 
 	/**
@@ -66,5 +66,5 @@ class CM_Page_Mock3 extends CM_Page_Abstract {
 class CM_Page_Mock4 extends CM_Page_Abstract {
 }
 
-class CM_Page_Mock5 extends CM_Page_Abstract {
+class CM_Page_Mock6 extends CM_Page_Abstract {
 }
