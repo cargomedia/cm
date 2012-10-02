@@ -4,8 +4,19 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_KissTrackingTest extends TestCase {
 
+	/** @var stdClass */
+	private static $_configBackup;
+
+	public static function setUpBeforeClass() {
+		self::$_configBackup = CM_Config::get();
+		CM_Config::get()->CM_KissTracking->enabled = true;
+		CM_Config::get()->CM_KissTracking->awsBucketName = 'foo';
+		CM_Config::get()->CM_KissTracking->awsFilePrefix = 'bar';
+	}
+
 	public function tearDown() {
 		TH::clearEnv();
+		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testProcess() {
