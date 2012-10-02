@@ -22,7 +22,7 @@
 	</li>
 </ul>
 
-<ul class="nav nav-pills">
+<ul class="pills">
 	<li>
 		<a href="javascript:;"><span class="icon home"></span><span class="label">Home</span></a>
 	</li>
