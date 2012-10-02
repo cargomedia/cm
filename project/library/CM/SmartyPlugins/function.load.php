@@ -10,7 +10,8 @@ function smarty_function_load(array $params, Smarty_Internal_Template $template)
 	$tplPath = $render->getLayoutPath($params['file'], $namespace);
 
 	if ($parse) {
-		return $render->renderTemplate($tplPath, $params);
+		$params = array_merge($template->getTemplateVars(), $params);
+		return $render->renderTemplate($tplPath, $params, true);
 	} else {
 		$file = new CM_File(DIR_LAYOUT . $tplPath);
 		return $file->read();
