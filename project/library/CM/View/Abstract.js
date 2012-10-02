@@ -239,7 +239,7 @@ var CM_View_Abstract = Backbone.View.extend({
 				cm.window.appendHidden(response.html);
 				new Function(response.js).call(this);
 				var page = cm.views[response.autoId];
-				success.call(page, response.title, response.url);
+				success.call(page, response.title, response.url, response.menuEntryIds);
 				page._ready();
 			},
 			error: callbacks.error,

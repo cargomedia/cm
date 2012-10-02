@@ -109,9 +109,19 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();
 		$title = $response->getTitle();
+		$menuEntryIds = array();
+		foreach ($this->getSite()->getMenus() as $menu) {
+			foreach ($menu->findEntries($page) as $menuEntry) {
+				$menuEntryIds[] = $menuEntry->getMenuEntryId();
+				foreach ($menuEntry->getParents() as $parentEntry) {
+					$menuEntryIds[] = $parentEntry->getMenuEntryId();
+				}
+			}
+		}
+		$menuEntryIds = array_unique($menuEntryIds);
 		$url = $this->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url);
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryIds' => $menuEntryIds);
 	}
 
 	public function popinComponent() {
