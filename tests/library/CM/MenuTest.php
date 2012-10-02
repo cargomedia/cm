@@ -17,7 +17,7 @@ class CM_MenuTest extends TestCase {
 		$entry = $menu->findEntry($page, 3, 3);
 		$this->assertNull($entry);
 
-		$entry = $menu->findEntry($page, 1, 1);
+		$entry = $menu->findEntry($page, 2);
 		$this->assertNull($entry);
 	}
 
@@ -39,11 +39,22 @@ class CM_MenuTest extends TestCase {
 		$this->assertCount(2, $menu->getAllEntries());
 	}
 
+	public function testFindEntries() {
+		$menu = $this->_getMenu();
+		$page = new CM_Page_Mock3();
+
+		$entries = $menu->findEntries($page);
+		$this->assertSame(2, count($entries));
+		$this->assertSame(array($menu->findEntry($page), $menu->findEntry($page, 1)), $entries);
+
+		$this->assertSame(array(), $menu->findEntries(new CM_Page_Mock5()));
+	}
+
 	/**
 	 * @return CM_Menu
 	 */
 	private function _getMenu() {
-		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock4'), array('label' => 'Example', 'page' => 'CM_Page_Mock3'));
+		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock4'), array('label' => 'Example', 'page' => 'CM_Page_Mock3', 'submenu' => array(array('label' => 'Example', 'page' => 'CM_Page_Mock3'))));
 		return new CM_Menu($entriesData);
 	}
 
@@ -53,4 +64,7 @@ class CM_Page_Mock3 extends CM_Page_Abstract {
 }
 
 class CM_Page_Mock4 extends CM_Page_Abstract {
+}
+
+class CM_Page_Mock5 extends CM_Page_Abstract {
 }

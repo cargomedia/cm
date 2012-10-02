@@ -21,32 +21,56 @@ class CM_Menu {
 
 	/**
 	 * @param CM_Page_Abstract $page
-	 * @param int              $depthMin      OPTIONAL
-	 * @param int              $depthMax      OPTIONAL
-	 * @param int              $_currentDepth OPTIONAL
-	 * @return CM_MenuEntry|null
+	 * @param int|null         $depthMin
+	 * @param int|null         $depthMax
+	 * @param boolean|null     $findAll
+	 * @param int              $_currentDepth
+	 * @return CM_MenuEntry|CM_MenuEntry[]|null
 	 */
-	public final function findEntry(CM_Page_Abstract $page, $depthMin = 0, $depthMax = null, $_currentDepth = 0) {
+	public final function findEntry(CM_Page_Abstract $page, $depthMin = null, $depthMax = null, $findAll = null, $_currentDepth = 0) {
+		if (is_null($depthMin)) {
+			$depthMin = 0;
+		}
+		if (is_null($findAll)) {
+			$findAll = false;
+		}
+		$entries = array();
 		foreach ($this->getAllEntries() as $entry) {
 			// Page found
-			if ($_currentDepth >= $depthMin) {
+			if ($findAll || $_currentDepth >= $depthMin) {
 				if ($entry->compare($page::getPath(), $page->getParams()->getAllOriginal())) {
-					return $entry;
+					if (!$findAll) {
+						return $entry;
+					}
+					$entries[] = $entry;
 				}
 			}
 
-			if ((null === $depthMax || $_currentDepth < $depthMax) && $entry->hasChildren()) {
+			if (($findAll || null === $depthMax || $_currentDepth < $depthMax) && $entry->hasChildren()) {
 				// Checks sub tree
-				$foundEntry = $entry->getChildren()->findEntry($page, $depthMin, $depthMax, $_currentDepth + 1);
+				$foundEntry = $entry->getChildren()->findEntry($page, $depthMin, $depthMax, $findAll, $_currentDepth + 1);
 
 				// Entry was found
 				if ($foundEntry) {
-					return $foundEntry;
+					if (!$findAll) {
+						return $foundEntry;
+					}
+					$entries = array_merge($entries, $foundEntry);
 				}
 			}
 		}
-
+		if ($findAll) {
+			return $entries;
+		}
 		return null;
+	}
+
+	/**
+	 * @param CM_Page_Abstract $page
+	 * @return CM_MenuEntry[]
+	 */
+	public final function findEntries(CM_Page_Abstract $page) {
+		return $this->findEntry($page, null, null, true);
 	}
 
 	/**
