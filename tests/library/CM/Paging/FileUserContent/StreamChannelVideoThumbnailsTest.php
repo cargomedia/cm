@@ -15,7 +15,7 @@ class CM_Paging_FileUserContent_StreamChannelVideoThumbnailsTest extends TestCas
 		$streamChannel->setThumbnailCount(4);
 		$paging = new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($streamChannel);
 		$this->assertSame(4, $paging->getCount());
-		$filename = $streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.jpg';
+		$filename = $streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.png';
 		$this->assertEquals(new CM_File_UserContent('streamChannels', $filename, $streamChannel->getId()), $paging->getItem(0));
 	}
 }

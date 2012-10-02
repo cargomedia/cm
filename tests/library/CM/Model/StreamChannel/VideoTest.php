@@ -126,9 +126,9 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		$this->assertSame(array(), $streamChannel->getThumbnails()->getItems());
 		$streamChannel->setThumbnailCount(2);
 		$thumb1 = new CM_File_UserContent('streamChannels',
-				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.jpg', $streamChannel->getId());
+				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.png', $streamChannel->getId());
 		$thumb2 = new CM_File_UserContent('streamChannels',
-				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/2.jpg', $streamChannel->getId());
+				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/2.png', $streamChannel->getId());
 		$this->assertEquals(array($thumb1, $thumb2), $streamChannel->getThumbnails()->getItems());
 	}
 }
