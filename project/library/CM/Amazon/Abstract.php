@@ -3,7 +3,7 @@
 abstract class CM_Amazon_Abstract extends CM_Class_Abstract {
 
 	public function __construct() {
-		require_once DIR_LIBRARY . 'AWSSDKforPHP/sdk.class.php';
+		require_once 'AWSSDKforPHP/sdk.class.php';
 
 		$accessKey = self::_getConfig()->accessKey;
 		if (!$accessKey) {

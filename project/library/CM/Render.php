@@ -452,14 +452,14 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->compile_check = $this->isDebug();
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
-
-			$pluginDirs = self::$_smarty->getPluginsDir();
-			foreach ($this->getSite()->getNamespaces() as $namespace) {
-				$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
-			}
-			self::$_smarty->setPluginsDir($pluginDirs);
-			self::$_smarty->loadFilter('pre', 'translate');
 		}
+
+		$pluginDirs = array(SMARTY_SYSPLUGINS_DIR);
+		foreach ($this->getSite()->getNamespaces() as $namespace) {
+			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
+		}
+		self::$_smarty->setPluginsDir($pluginDirs);
+		self::$_smarty->loadFilter('pre', 'translate');
 
 		return self::$_smarty;
 	}

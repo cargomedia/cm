@@ -1,5 +1,5 @@
 <?php
-require_once DIR_LIBRARY . 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
+require_once 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
 
 class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Abstract {
 
