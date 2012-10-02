@@ -27,6 +27,9 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 * @param array|null    $properties
 	 */
 	public function track($event, $identity, $alias = null, array $properties = null) {
+		if (!$this->_getEnabled()) {
+			return;
+		}
 		$event = (string) $event;
 		$identity = (string) $identity;
 		$alias = (string) $alias;
@@ -41,11 +44,11 @@ class CM_KissTracking extends CM_Class_Abstract {
 
 	public function exportEvents() {
 		$file = $this->generateCsv();
-		$lastUploadAt = CM_Option::getInstance()->get('kisstracking');
+		$lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
 		if (time() - $lastUploadAt > 3600) {
 			$this->_uploadCsv($file);
 			$file->delete();
-			CM_Option::getInstance()->set('kisstracking', time());
+			CM_Option::getInstance()->set('kissTracking.lastUpload', time());
 		}
 	}
 
@@ -112,6 +115,13 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 */
 	private function _getEvents() {
 		return $this->_getSet()->flush();
+	}
+
+	/**
+	 * @return boolean
+	 */
+	private function _getEnabled() {
+		return (bool) self::_getConfig()->enabled;
 	}
 
 	/**
