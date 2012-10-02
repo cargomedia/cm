@@ -1,6 +1,6 @@
 <?php
 
-require_once DIR_SMARTY . 'Smarty.class.php';
+require_once 'Smarty/Smarty.class.php';
 
 class CM_Render extends CM_Class_Abstract {
 
@@ -452,14 +452,14 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->compile_check = $this->isDebug();
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
-		}
 
-		$pluginDirs = array(DIR_SMARTY . 'plugins');
-		foreach ($this->getSite()->getNamespaces() as $namespace) {
-			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
+			$pluginDirs = self::$_smarty->getPluginsDir();
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
+				$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
+			}
+			self::$_smarty->setPluginsDir($pluginDirs);
+			self::$_smarty->loadFilter('pre', 'translate');
 		}
-		self::$_smarty->setPluginsDir($pluginDirs);
-		self::$_smarty->loadFilter('pre', 'translate');
 
 		return self::$_smarty;
 	}

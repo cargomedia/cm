@@ -9,8 +9,9 @@ class CM_Bootloader {
 	}
 
 	public function autoloader() {
-		$includePaths = explode(PATH_SEPARATOR, ini_get('include_path'));
-		array_unshift($includePaths, DIR_ROOT . 'library/');
+		$includePath =  DIR_ROOT . 'library/' . PATH_SEPARATOR . ini_get('include_path');
+		ini_set('include_path', $includePath);
+		$includePaths = explode(PATH_SEPARATOR, $includePath);
 		spl_autoload_register(function($className) use ($includePaths) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
 			foreach ($includePaths as $includePath) {
@@ -98,8 +99,6 @@ class CM_Bootloader {
 
 		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
-
-		define('DIR_SMARTY', DIR_LIBRARY . 'Smarty' . DIRECTORY_SEPARATOR);
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);

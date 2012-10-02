@@ -1,5 +1,5 @@
 <?php
-require_once DIR_LIBRARY . 'lessphp/lessc.inc.php';
+require_once 'lessphp/lessc.inc.php';
 
 class CM_Css {
 
