@@ -43,6 +43,9 @@ class CM_KissTracking extends CM_Class_Abstract {
 	}
 
 	public function exportEvents() {
+		if (!$this->_getEnabled()) {
+			return;
+		}
 		$file = $this->generateCsv();
 		$lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
 		if (time() - $lastUploadAt > 3600) {
