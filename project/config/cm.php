@@ -53,7 +53,7 @@ $config->CM_Stream = new stdClass();
 $config->CM_Stream->enabled = true;
 
 $config->CM_StreamAdapter_Abstract = new stdClass();
-$config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_Socketio';
+$config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_SockJS';
 $config->CM_StreamAdapter_Abstract->hostPrefix = true;
 $config->CM_StreamAdapter_Abstract->servers = array(
 	array('host' => 'localhost', 'port' => 8090),
