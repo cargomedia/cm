@@ -105,11 +105,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		} while ($response->getRedirectUrl());
 
 		$page = $response->getPage();
-		if ($params->has('currentLayoutClass')) {
-			if (get_class($page->getLayout()) != $params->getString('currentLayoutClass')) {
-				$this->redirect($page, $request->getQuery(), true);
-			}
-		}
 
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();
@@ -126,7 +121,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$menuEntryHashes = array_unique($menuEntryHashes);
 		$url = $this->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryHashes' => $menuEntryHashes);
+		$layoutClass = get_class($page->getLayout());
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryHashes' => $menuEntryHashes, 'layoutClass' => $layoutClass);
 	}
 
 	public function popinComponent() {
