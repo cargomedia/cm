@@ -4,4 +4,5 @@
 	{block name='content-main'}{/block}
 </div>
 {/block}
-{block name='footer'}{/block}
+
+{block name='after'}{/block}
