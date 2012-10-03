@@ -109,19 +109,19 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();
 		$title = $response->getTitle();
-		$menuEntryIds = array();
+		$menuEntryHashes = array();
 		foreach ($this->getSite()->getMenus() as $menu) {
 			foreach ($menu->findEntries($page) as $menuEntry) {
-				$menuEntryIds[] = $menuEntry->getMenuEntryId();
+				$menuEntryHashes[] = $menuEntry->getHash();
 				foreach ($menuEntry->getParents() as $parentEntry) {
-					$menuEntryIds[] = $parentEntry->getMenuEntryId();
+					$menuEntryHashes[] = $parentEntry->getHash();
 				}
 			}
 		}
-		$menuEntryIds = array_unique($menuEntryIds);
+		$menuEntryHashes = array_unique($menuEntryHashes);
 		$url = $this->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryIds' => $menuEntryIds);
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryHashes' => $menuEntryHashes);
 	}
 
 	public function popinComponent() {

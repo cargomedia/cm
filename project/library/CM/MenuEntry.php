@@ -210,7 +210,7 @@ class CM_MenuEntry {
 	/**
 	 * @return string
 	 */
-	public function getMenuEntryId() {
+	public function getHash() {
 		$params = $this->getParams();
 		ksort($params);
 		return hash('crc32', $this->getPageName() . ':' . $this->getDepth() . ':' . json_encode($params));
