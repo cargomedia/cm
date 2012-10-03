@@ -234,7 +234,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		callbacks = callbacks || {};
 		var success = callbacks.success || function() {};
 
-		return this.ajaxModal('loadPage', {path: path}, {
+		return this.ajaxModal('loadPage', {path: path, layoutClass: cm.findView('CM_Layout_Abstract')._class}, {
 			success: function(response) {
 				cm.window.appendHidden(response.html);
 				new Function(response.js).call(this);

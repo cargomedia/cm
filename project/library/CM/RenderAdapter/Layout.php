@@ -41,7 +41,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$js->onloadHeaderJs('cm.ready();');
 
 		$this->getRender()->getJs()->registerLayout($layout);
-		$js->onloadReadyJs('cm.findView()._ready();');
+		$js->onloadReadyJs('cm.findView("CM_Layout_Abstract")._ready();');
 		$js->onloadReadyJs('cm.router.start();');
 
 		$renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $layout->getPage());

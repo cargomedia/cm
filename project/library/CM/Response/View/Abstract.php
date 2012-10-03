@@ -90,6 +90,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	 */
 	public function loadPage(CM_Params $params) {
 		$layoutInfo = $this->_getViewInfo();
+		$layoutClass = $params->getString('layoutClass');
 
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
 
@@ -105,6 +106,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		} while ($response->getRedirectUrl());
 
 		$page = $response->getPage();
+		if (get_class($page->getLayout()) != $layoutClass) {
+			$this->redirect($page, $request->getQuery(), true);
+		}
 
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();

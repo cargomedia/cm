@@ -124,7 +124,7 @@ class CM_Frontend {
 	public function registerLayout(CM_Layout_Abstract $layout) {
 		$auto_var = 'cm.views["' . $layout->getAutoId() . '"]';
 		$js = '';
-		$js .= $auto_var . ' = new CM_View_Abstract({';
+		$js .= $auto_var . ' = new ' . get_class($layout) .'({';
 		$js .= 'el:$("#' . $layout->getAutoId() . '").get(0)';
 		$js .= '});' . PHP_EOL;
 		$this->onloadHeaderJs($js, true);
