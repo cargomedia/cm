@@ -454,7 +454,7 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
 		}
 
-		$pluginDirs = array(SMARTY_SYSPLUGINS_DIR);
+		$pluginDirs = array(SMARTY_PLUGINS_DIR);
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
 			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
 		}
