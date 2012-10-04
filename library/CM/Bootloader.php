@@ -9,7 +9,10 @@ class CM_Bootloader {
 	}
 
 	public function autoloader() {
-		require_once DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+		$composerAutoloader = DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+		if (is_file($composerAutoloader)) {
+			require_once $composerAutoloader;
+		}
 
 		spl_autoload_register(function($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
