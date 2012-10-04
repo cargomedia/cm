@@ -50,7 +50,7 @@ class CM_Util {
 	 * @return array
 	 */
 	public static function array_remove(array $array, $value) {
-		return array_filter($array, function($entry) use ($value) {
+		return array_filter($array, function ($entry) use ($value) {
 			return $value != $entry;
 		});
 	}
@@ -59,17 +59,23 @@ class CM_Util {
 	 * @param string       $url
 	 * @param array|null   $params
 	 * @param boolean|null $methodPost
-	 * @return string
+	 * @param int|null     $timeout
 	 * @throws CM_Exception_Invalid
+	 * @return string
 	 */
-	public static function getContents($url, array $params = null, $methodPost = null) {
+	public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
 		$url = (string) $url;
 		if (!empty($params)) {
 			$url .= '?' . http_build_query($params);
 		}
+		if (null === $timeout) {
+			$timeout = 10;
+		}
+		$timeout = (int) $timeout;
 
 		$options = array('http' => array());
 		$options['http']['header'] = 'Connection: close';
+		$options['http']['timeout'] = $timeout;
 		if ($methodPost) {
 			$options['http']['method'] = 'POST';
 		}
