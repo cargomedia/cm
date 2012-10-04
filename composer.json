@@ -18,6 +18,9 @@
 				"dist": {
 					"url": "http://phpmailer.apache-extras.org.codespot.com/files/PHPMailer_5.2.1.zip",
 					"type": "zip"
+				},
+				"autoload": {
+					"classmap": ["class.phpmailer.php"]
 				}
 			}
 		},
@@ -32,8 +35,5 @@
 				}
 			}
 		}
-	],
-	"autoload": {
-		"classmap": ["vendor/phpmailer/phpmailer"]
-	}
+	]
 }
