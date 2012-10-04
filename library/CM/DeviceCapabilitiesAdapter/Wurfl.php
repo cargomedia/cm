@@ -1,7 +1,21 @@
 <?php
-require_once 'Tera-Wurfl' . DIRECTORY_SEPARATOR . 'TeraWurfl.php';
 
 class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Abstract {
+
+	/** @var string|null */
+	private static $_dirWurfl;
+
+	public static function init() {
+		self::$_dirWurfl = DIR_VENDOR . 'johnalbin/tera-wurfl/';
+		require_once self::$_dirWurfl . 'TeraWurfl.php';
+		$config = CM_Config::get()->CM_Mysql;
+		TeraWurflConfig::$DB_HOST = implode(':', $config->server);
+		TeraWurflConfig::$DB_USER = $config->user;
+		TeraWurflConfig::$DB_PASS = $config->pass;
+		TeraWurflConfig::$DB_SCHEMA = $config->db;
+		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
+		TeraWurflConfig::$LOG_LEVEL = LOG_EMERG;
+	}
 
 	public function getCapabilities() {
 		self::init();
@@ -13,16 +27,6 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		return array('mobile' => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
 			'tablet' => (boolean) $wurfl->capabilities['product_info']['is_tablet'],
 			'hasTouschreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
-	}
-
-	public static function init() {
-		$config = CM_Config::get()->CM_Mysql;
-		TeraWurflConfig::$DB_HOST = implode(':', $config->server);
-		TeraWurflConfig::$DB_USER = $config->user;
-		TeraWurflConfig::$DB_PASS = $config->pass;
-		TeraWurflConfig::$DB_SCHEMA = $config->db;
-		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
-		TeraWurflConfig::$LOG_LEVEL = LOG_EMERG;
 	}
 
 	/**
@@ -44,7 +48,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		$zipArchive->extractTo($dataDir);
 		$zipFile->delete();
 		$xmlFile = new CM_File($dataDir . $zipArchive->getNameIndex(0));
-		require(DIR_LIBRARY . 'Tera-Wurfl/admin/updatedb.php');
+		require self::$_dirWurfl . 'admin/updatedb.php';
 		$xmlFile->delete();
 	}
 }

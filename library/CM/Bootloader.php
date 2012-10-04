@@ -9,17 +9,14 @@ class CM_Bootloader {
 	}
 
 	public function autoloader() {
-		$includePath =  DIR_ROOT . 'library/' . PATH_SEPARATOR . ini_get('include_path');
-		ini_set('include_path', $includePath);
-		$includePaths = explode(PATH_SEPARATOR, $includePath);
-		spl_autoload_register(function($className) use ($includePaths) {
+		require_once DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+		spl_autoload_register(function($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
-			foreach ($includePaths as $includePath) {
-				$path = $includePath . $relativePath;
-				if (is_file($path)) {
-					require_once $path;
-					return;
-				}
+			$path = DIR_ROOT . 'library' . DIRECTORY_SEPARATOR . $relativePath;
+			if (is_file($path)) {
+				require_once $path;
+				return;
 			}
 		});
 	}
@@ -90,6 +87,7 @@ class CM_Bootloader {
 
 		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
 		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
+		define('DIR_VENDOR', DIR_SITE_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_SITE_ROOT . 'public' . DIRECTORY_SEPARATOR);
 		define('DIR_LAYOUT', DIR_SITE_ROOT . 'layout' . DIRECTORY_SEPARATOR);
 

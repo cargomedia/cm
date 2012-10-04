@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Smarty/Smarty.class.php';
-
 class CM_Render extends CM_Class_Abstract {
 
 	/**

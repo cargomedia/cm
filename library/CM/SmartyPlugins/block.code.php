@@ -1,7 +1,5 @@
 <?php
 
-require_once 'geshi/geshi.php';
-
 function smarty_block_code($params, $content, Smarty_Internal_Template $template, $open) {
 
 	if ($open) {

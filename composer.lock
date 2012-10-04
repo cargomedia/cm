@@ -1,0 +1,41 @@
+{
+    "hash": "a1296e99767031e58fd43c92dba3a9e4",
+    "packages": [
+        {
+            "package": "amazonwebservices/aws-sdk-for-php",
+            "version": "1.5.15"
+        },
+        {
+            "package": "easybook/geshi",
+            "version": "1.0.8.11"
+        },
+        {
+            "package": "johnalbin/tera-wurfl",
+            "version": "2.1.5"
+        },
+        {
+            "package": "leafo/lessphp",
+            "version": "v0.3.8"
+        },
+        {
+            "package": "phpmailer/phpmailer",
+            "version": "5.2.1"
+        },
+        {
+            "package": "ruflin/Elastica",
+            "version": "v0.19.8.0"
+        },
+        {
+            "package": "smarty/smarty",
+            "version": "v3.1.12"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ]
+}

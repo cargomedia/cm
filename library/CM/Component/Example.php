@@ -1,7 +1,5 @@
 <?php
 
-require_once 'lessphp/lessc.inc.php';
-
 class CM_Component_Example extends CM_Component_Abstract {
 
 	public function prepare() {
