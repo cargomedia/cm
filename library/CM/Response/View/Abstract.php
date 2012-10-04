@@ -119,7 +119,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			}
 		}
 		$menuEntryHashes = array_unique($menuEntryHashes);
-		$url = $this->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
+		$url = $response->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 
 		$layoutClass = get_class($page->getLayout());
 		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryHashes' => $menuEntryHashes, 'layoutClass' => $layoutClass);
