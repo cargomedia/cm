@@ -7,7 +7,8 @@
 		"amazonwebservices/aws-sdk-for-php": "1.5.15",
 		"ruflin/Elastica": "v0.19.8.0",
 		"phpmailer/phpmailer": "5.2.1",
-		"johnalbin/tera-wurfl": "2.1.5"
+		"johnalbin/tera-wurfl": "2.1.5",
+		"composer/installers": "*"
 	},
 	"repositories": [
 		{
