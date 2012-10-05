@@ -92,7 +92,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$layoutInfo = $this->_getViewInfo();
 
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
-
 		$count = 0;
 		$paths = array($request->getPath());
 		do {
@@ -109,20 +108,14 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$html = $response->getContent();
 		$js = $response->getRender()->getJs()->getJs();
 		$title = $response->getTitle();
-		$menuEntryHashes = array();
-		foreach ($this->getSite()->getMenus() as $menu) {
-			foreach ($menu->findEntries($page) as $menuEntry) {
-				$menuEntryHashes[] = $menuEntry->getHash();
-				foreach ($menuEntry->getParents() as $parentEntry) {
-					$menuEntryHashes[] = $parentEntry->getHash();
-				}
-			}
-		}
-		$menuEntryHashes = array_unique($menuEntryHashes);
 		$url = $response->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
-
 		$layoutClass = get_class($page->getLayout());
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'menuEntryHashes' => $menuEntryHashes, 'layoutClass' => $layoutClass);
+		$menuEntryHashes = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
+			return $menuEntry->getHash();
+		}, $this->getSite()->getMenuEntriesActive($page)));
+
+		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'layoutClass' => $layoutClass,
+			'menuEntryHashes' => $menuEntryHashes);
 	}
 
 	public function popinComponent() {

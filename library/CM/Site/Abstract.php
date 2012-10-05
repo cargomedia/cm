@@ -55,6 +55,23 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Page_Abstract $page
+	 * @return CM_MenuEntry[]
+	 */
+	public function getMenuEntriesActive(CM_Page_Abstract $page) {
+		$menuEntries = array();
+		foreach ($this->getMenus() as $menu) {
+			foreach ($menu->findEntries($page) as $menuEntry) {
+				$menuEntries[] = $menuEntry;
+				foreach ($menuEntry->getParents() as $parentEntry) {
+					$menuEntries[] = $parentEntry;
+				}
+			}
+		}
+		return $menuEntries;
+	}
+
+	/**
 	 * @return string Theme
 	 */
 	public function getTheme() {
