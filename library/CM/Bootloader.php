@@ -104,8 +104,6 @@ class CM_Bootloader {
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 
-		define('DIR_PHPMAILER', DIR_LIBRARY . 'phpmailer' . DIRECTORY_SEPARATOR);
-
 		define('TBL_CM_SMILEY', 'cm_smiley');
 		define('TBL_CM_SMILEYSET', 'cm_smileySet');
 		define('TBL_CM_USER', 'cm_user');

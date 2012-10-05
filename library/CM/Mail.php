@@ -315,37 +315,36 @@ class CM_Mail extends CM_View_Abstract {
 		if (CM_Config::get()->debug || IS_TEST) {
 			$this->_log($subject, $text);
 		} else {
-			require_once DIR_PHPMAILER . 'class.phpmailer.php';
+			$mail = new PHPMailer(true);
+			$mail->CharSet = 'utf-8';
+
+			foreach ($this->_replyTo as $replyTo) {
+				$mail->AddReplyTo($replyTo['address'], $replyTo['name']);
+			}
+			foreach ($this->_to as $to) {
+				$mail->AddAddress($to['address'], $to['name']);
+			}
+			foreach ($this->_cc as $cc) {
+				$mail->AddCC($cc['address'], $cc['name']);
+			}
+			foreach ($this->_bcc as $bcc) {
+				$mail->AddBCC($bcc['address'], $bcc['name']);
+			}
+			$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
+
+			$mail->Subject = $subject;
+			$mail->IsHTML($html);
+			$mail->Body = $html ? $html : $text;
+			$mail->AltBody = $html ? $text : '';
+
+			if ($recipient = $this->getRecipient()) {
+				$splittest = new CM_Model_Splittest('email-provider');
+				if ('dynect' == $splittest->getVariationFixture($recipient)) {
+					$mail->AddCustomHeader('X-Dynect: 1');
+				}
+			}
+
 			try {
-				$mail = new PHPMailer(true);
-				$mail->CharSet = 'utf-8';
-
-				foreach ($this->_replyTo as $replyTo) {
-					$mail->AddReplyTo($replyTo['address'], $replyTo['name']);
-				}
-				foreach ($this->_to as $to) {
-					$mail->AddAddress($to['address'], $to['name']);
-				}
-				foreach ($this->_cc as $cc) {
-					$mail->AddCC($cc['address'], $cc['name']);
-				}
-				foreach ($this->_bcc as $bcc) {
-					$mail->AddBCC($bcc['address'], $bcc['name']);
-				}
-				$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
-
-				$mail->Subject = $subject;
-				$mail->IsHTML($html);
-				$mail->Body = $html ? $html : $text;
-				$mail->AltBody = $html ? $text : '';
-
-				if ($recipient = $this->getRecipient()) {
-					$splittest = new CM_Model_Splittest('email-provider');
-					if ('dynect' == $splittest->getVariationFixture($recipient)) {
-						$mail->AddCustomHeader('X-Dynect: 1');
-					}
-				}
-
 				$mail->Send();
 			} catch (phpmailerException $e) {
 				throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
