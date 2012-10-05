@@ -1,17 +1,17 @@
 {
-    "hash": "86c243e40cd26440d93bd10d4e349993",
+    "hash": "81a43d2ea4ec83c61a17ce74c53c9b04",
     "packages": [
         {
             "package": "amazonwebservices/aws-sdk-for-php",
             "version": "1.5.15"
         },
         {
-            "package": "easybook/geshi",
-            "version": "1.0.8.11"
+            "package": "composer/installers",
+            "version": "v1.0.0"
         },
         {
-            "package": "johnalbin/tera-wurfl",
-            "version": "2.1.5"
+            "package": "easybook/geshi",
+            "version": "1.0.8.11"
         },
         {
             "package": "leafo/lessphp",
@@ -28,6 +28,10 @@
         {
             "package": "smarty/smarty",
             "version": "v3.1.12"
+        },
+        {
+            "package": "wurfl/tera-wurfl",
+            "version": "2.1.5"
         }
     ],
     "packages-dev": null,
