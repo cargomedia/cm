@@ -25,6 +25,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$this->assertEquals(10, $archive->getDuration(), '', 1);
 		$this->assertSame($streamChannel->getThumbnailCount(), $archive->getThumbnailCount());
 		$this->assertSame(md5($streamPublish->getKey()), $archive->getHash());
+		$this->assertSame($streamChannel->getType(), $archive->getStreamChannelType());
 
 		$streamChannel = TH::createStreamChannel();
 		try {
@@ -70,7 +71,8 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$streamChannel = TH::createStreamChannel();
 		$streamChannel->setThumbnailCount(3);
 		$archive = TH::createStreamChannelVideoArchive($streamChannel);
-		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' . $archive->getHash() . '-thumbs';
+		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' .
+				$archive->getHash() . '-thumbs';
 		CM_Util::mkDir($thumbPath);
 		$thumbs = array();
 		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
@@ -98,5 +100,18 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		}
 	}
 
+	public function testDeleteOlder() {
+		$time = time();
+		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id', 'userId', 'width', 'height', 'duration', 'thumbnailCount', 'hash',
+			'streamChannelType', 'createStamp'), array(
+			array(1, 1, 1, 1, 1, 1, 1, 1, $time),
+			array(2, 1, 1, 1, 1, 1, 1, 1, $time),
+			array(3, 1, 1, 1, 1, 1, 1, 2, $time),
+			array(4, 1, 1, 1, 1, 1, 1, 1, $time + 100),
+			array(5, 1, 1, 1, 1, 1, 1, 2, $time + 100)));
+		TH::timeForward(50);
+		CM_Model_StreamChannelArchive_Video::deleteOlder(10, 1);
+		$this->assertSame(3, CM_Mysql::count(TBL_CM_STREAMCHANNELARCHIVE_VIDEO));
+	}
 
 }

@@ -43,6 +43,13 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	/**
 	 * @return int
 	 */
+	public function getStreamChannelType() {
+		return (int) $this->_get('streamChannelType');
+	}
+
+	/**
+	 * @return int
+	 */
 	public function getThumbnailCount() {
 		return (int) $this->_get('thumbnailCount');
 	}
@@ -102,7 +109,17 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		$end = time();
 		$duration = $end - $createStamp;
 		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $streamChannel->getId(), 'userId' => $streamPublish->getUser()->getId(), 'width' => $streamChannel->getWidth(), 'height' => $streamChannel->getHeight(),
-			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'hash' => $streamChannel->getHash(), 'createStamp' => $createStamp));
+			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'hash' => $streamChannel->getHash(), 'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp));
 		return new self($streamChannel->getId());
+	}
+
+	/**
+	 * @param int $age
+	 * @param int $streamChannelType
+	 */
+	public static function deleteOlder($age, $streamChannelType) {
+		$age = (int) $age;
+		$streamChannelType = (int) $streamChannelType;
+		CM_Mysql::exec('DELETE FROM `cm_streamChannelArchive_video` WHERE `streamChannelType` = ? AND `createStamp` < ?', $streamChannelType, time() - $age);
 	}
 }
