@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_ModelAsset_Abstract implements CM_Cacheable{
+abstract class CM_ModelAsset_Abstract extends CM_Class_Abstract implements CM_Cacheable {
 	/**
 	 * @var CM_Model_Abstract
 	 */
