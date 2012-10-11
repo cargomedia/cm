@@ -71,26 +71,14 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$streamChannel = TH::createStreamChannel();
 		$streamChannel->setThumbnailCount(3);
 		$archive = TH::createStreamChannelVideoArchive($streamChannel);
-		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' .
-				$archive->getHash() . '-thumbs';
-		CM_Util::mkDir($thumbPath);
-		$thumbs = array();
-		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
-			$file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
-			$this->assertTrue(file_exists($file->getPath()));
-			$thumbs[] = $file;
+		$files = $this->_createArchiveFiles($archive);
+		foreach ($files as $file) {
+			$this->assertFileExists($file->getPath());
 		}
-		$video = $archive->getVideo();
-		$thumbnailCount = $archive->getThumbnailCount();
-		CM_File::create($video->getPath());
-		$this->assertTrue(file_exists($video->getPath()));
-		$this->assertTrue(file_exists($thumbPath));
+
 		$archive->delete();
-		$this->assertFalse(file_exists($video->getPath()));
-		$this->assertFalse(file_exists($thumbPath));
-		/** @var CM_File $thumb */
-		foreach ($thumbs as $thumb) {
-			$this->assertFalse(file_exists($thumb->getPath()));
+		foreach ($files as $file) {
+			$this->assertFileNotExists($file->getPath());
 		}
 		try {
 			new CM_Model_StreamChannelArchive_Video($archive->getId());
@@ -102,16 +90,88 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 
 	public function testDeleteOlder() {
 		$time = time();
-		CM_Mysql::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id', 'userId', 'width', 'height', 'duration', 'thumbnailCount', 'hash',
-			'streamChannelType', 'createStamp'), array(
-			array(1, 1, 1, 1, 1, 1, 1, 1, $time),
-			array(2, 1, 1, 1, 1, 1, 1, 1, $time),
-			array(3, 1, 1, 1, 1, 1, 1, 2, $time),
-			array(4, 1, 1, 1, 1, 1, 1, 1, $time + 100),
-			array(5, 1, 1, 1, 1, 1, 1, 2, $time + 100)));
-		TH::timeForward(50);
-		CM_Model_StreamChannelArchive_Video::deleteOlder(10, 1);
-		$this->assertSame(3, CM_Mysql::count(TBL_CM_STREAMCHANNELARCHIVE_VIDEO));
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannelsDeleted = array();
+		$archivesDeleted = array();
+		/** @var $filesDeleted CM_File[] */
+		$filesDeleted = array();
+		for ($i = 0; $i < 2; $i++) {
+			$streamChannel = TH::createStreamChannel();
+			$streamChannel->setThumbnailCount(4);
+			$streamChannelsDeleted[] = $streamChannel;
+			$archive = TH::createStreamChannelVideoArchive($streamChannel);
+			$archivesDeleted[] = $archive;
+			$filesDeleted = array_merge($filesDeleted, $this->_createArchiveFiles($archive));
+		}
+
+		$streamChannelsNotDeleted = array();
+		$archivesNotDeleted = array();
+		/** @var $filesNotDeleted CM_File[] */
+		$filesNotDeleted = array();
+		$streamChannel = TH::createStreamChannel();
+		$streamChannel = $this->getMock('CM_Model_StreamChannel_Video', array('getType'), array($streamChannel->getId()));
+		$streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
+		$streamChannelsNotDeleted[] = $streamChannel;
+		$archive = TH::createStreamChannelVideoArchive($streamChannel);
+		$archivesNotDeleted[] = $archive;
+		$filesNotDeleted = array_merge($filesNotDeleted, $this->_createArchiveFiles($archive));
+
+		TH::timeForward(20);
+		for ($i = 0; $i < 3; $i++) {
+			$streamChannel = TH::createStreamChannel();
+			$streamChannel->setThumbnailCount(4);
+			$streamChannelsNotDeleted[] = $streamChannel;
+			$archive = TH::createStreamChannelVideoArchive($streamChannel);
+			$archivesNotDeleted[] = $archive;
+			$filesNotDeleted = array_merge($filesNotDeleted, $this->_createArchiveFiles($archive));
+		}
+
+		foreach ($filesNotDeleted as $file) {
+			$this->assertFileExists($file->getPath());
+		}
+		foreach ($filesDeleted as $file) {
+			$this->assertFileExists($file->getPath());
+		}
+		CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::TYPE);
+		foreach ($filesNotDeleted as $file) {
+			$this->assertFileExists($file->getPath());
+		}
+		foreach ($filesDeleted as $file) {
+			$this->assertFileNotExists($file->getPath());
+		}
+		foreach ($archivesNotDeleted as $archive) {
+			try {
+				TH::reinstantiateModel($archive);
+				$this->assertTrue(true);
+			} catch (CM_Exception_Nonexistent $ex) {
+				$this->fail('Young streamchannelArchive deleted');
+			}
+		}
+		foreach ($archivesDeleted as $archive) {
+			try {
+				TH::reinstantiateModel($archive);
+				$this->fail('Old streamchannelArchive not deleted');
+			} catch (CM_Exception_Nonexistent $ex) {
+				$this->assertTrue(true);
+			}
+		}
+	}
+
+	/**
+	 * @param CM_Model_StreamChannelArchive_Video $archive
+	 * @return CM_File[]
+	 */
+	private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
+		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' .
+				$archive->getHash() . '-thumbs';
+		CM_Util::mkDir($thumbPath);
+		$files = array();
+		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
+			$file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
+			$files[] = $file;
+		}
+		$files[] = CM_File::create($archive->getVideo()->getPath());
+		return $files;
 	}
 
 }

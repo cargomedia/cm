@@ -120,6 +120,11 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	public static function deleteOlder($age, $streamChannelType) {
 		$age = (int) $age;
 		$streamChannelType = (int) $streamChannelType;
-		CM_Mysql::exec('DELETE FROM `cm_streamChannelArchive_video` WHERE `streamChannelType` = ? AND `createStamp` < ?', $streamChannelType, time() - $age);
+		$ageMax = time() - $age - 1;
+		$streamChannelArchives = new CM_Paging_StreamChannelArchiveVideo_Type($streamChannelType, $ageMax);
+		/** @var CM_Model_StreamChannelArchive_Video $streamChannelArchive */
+		foreach ($streamChannelArchives as $streamChannelArchive) {
+			$streamChannelArchive->delete();
+		}
 	}
 }
