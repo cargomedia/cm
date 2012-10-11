@@ -12,7 +12,7 @@ class CM_Paging_StreamChannelArchiveVideo_TypeTest extends TestCase {
 
 	public function testPaging() {
 		TH::createStreamChannelVideoArchive();
-		TH::createStreamChannelVideoArchive();
+		$archive = TH::createStreamChannelVideoArchive();
 		TH::timeForward(30);
 		TH::createStreamChannelVideoArchive();
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
@@ -27,7 +27,7 @@ class CM_Paging_StreamChannelArchiveVideo_TypeTest extends TestCase {
 		$paging = new CM_Paging_StreamChannelArchiveVideo_Type($streamChannel->getType());
 		$this->assertSame(1, $paging->getCount());
 
-		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::TYPE, time() - 30);
+		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::TYPE, $archive->getCreated());
 		$this->assertSame(2, $paging->getCount());
 	}
 }
