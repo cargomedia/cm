@@ -100,6 +100,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Response_Page $response
+	 */
+	public function preprocessPageResponse(CM_Response_Page $response) {
+	}
+
+	/**
 	 * @param CM_Request_Abstract $request
 	 */
 	public function rewrite(CM_Request_Abstract $request) {

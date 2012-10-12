@@ -15,13 +15,13 @@ class CM_Response_Page extends CM_Response_Abstract {
 	}
 
 	public function process() {
+		$this->_site->preprocessPageResponse($this);
 		CM_Tracking::getInstance()->trackPageview($this->getRequest());
 
 		$html = $this->_processPageLoop($this->getRequest());
 
 		if ($redirectUrl = $this->getRedirectUrl()) {
-			$this->_setHeader('Location', $redirectUrl);
-			$this->sendHeaders();
+			$this->redirect($redirectUrl);
 			exit();
 		}
 
@@ -43,11 +43,19 @@ class CM_Response_Page extends CM_Response_Abstract {
 	}
 
 	/**
+	 * @param string $redirectUrl
+	 */
+	public function redirect($redirectUrl) {
+		$this->_setHeader('Location', (string) $redirectUrl);
+		$this->sendHeaders();
+	}
+
+	/**
 	 * @param CM_Page_Abstract|string $page
 	 * @param array|null              $params
 	 * @throws CM_Exception_Redirect
 	 */
-	public function redirect($page, array $params = null) {
+	public function setRedirectUrl($page, array $params = null) {
 		$url = $this->getRender()->getUrlPage($page, $params);
 		if (IS_TEST) {
 			throw new CM_Exception_Redirect($url);
@@ -100,7 +108,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
 			if ($this->getViewer() && $request->getLanguageUrl()) {
-				$this->redirect($page);
+				$this->setRedirectUrl($page);
 			}
 			$page->prepareResponse($this);
 			if ($this->getRedirectUrl()) {
