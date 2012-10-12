@@ -298,7 +298,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Object}
+	 * @param {Object} actions
 	 */
 	_bindActions: function(actions) {
 		for (key in actions) {
@@ -314,7 +314,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Object}
+	 * @param {Object} streams
 	 */
 	_bindStreams: function(streams) {
 		for (key in streams) {
