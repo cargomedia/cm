@@ -149,8 +149,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} functionName
-	 * @param {Array|Null} params
-	 * @param {Object|Null} callbacks
+	 * @param {Array|Null} [params]
+	 * @param {Object|Null} [callbacks]
 	 * @return jqXHR
 	 */
 	ajax: function(functionName, params, callbacks) {
