@@ -215,7 +215,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		params.className = className;
 		var successPopOut = options.successPopOut || function() {};
 		var successPre = options.success ? options.success :  function() { this.popOut(); };
-		var successPost = options.success ? function() {} : function() { successPopOut.call(this); }
+		var successPost = options.success ? function() {} : function() { successPopOut.call(this); };
 		options.success = function(autoId) {
 			var handlerNew = cm.views[autoId];
 			successPre.call(handlerNew);
@@ -228,7 +228,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} path
 	 * @param {Object|Null} callbacks
-	 * @return {jqXHR}
+	 * @return jqXHR
 	 */
 	loadPage: function (path, callbacks) {
 		callbacks = callbacks || {};
@@ -301,8 +301,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Object} actions
 	 */
 	_bindActions: function(actions) {
-		for (key in actions) {
-			var callback = actions[key];
+		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
@@ -310,17 +309,16 @@ var CM_View_Abstract = Backbone.View.extend({
 				var actionVerb = cm.action.verbs[actionName];
 				this.bindAction(actionVerb, modelType, callback);
 			}, this);
-		}
+		}, this);
 	},
 
 	/**
 	 * @param {Object} streams
 	 */
 	_bindStreams: function(streams) {
-		for (key in streams) {
-			var callback = streams[key];
+		_.each(streams, function(callback, key) {
 			this.bindStream(key, callback);
-		}
+		}, this);
 	},
 
 	/**
