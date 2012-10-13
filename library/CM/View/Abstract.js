@@ -20,6 +20,12 @@ var CM_View_Abstract = Backbone.View.extend({
 		if (this.streams) {
 			this._bindStreams(this.streams);
 		}
+		if (this.childrenEvents) {
+			this._bindChildrenEvents(this.childrenEvents);
+		}
+		this.on('all', function(eventName, data) {
+			cm.events.trigger(this, eventName, data);
+		});
 	},
 
 	ready: function() {
@@ -272,6 +278,18 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String} view
+	 * @param {String} event
+	 * @param {Function} callback fn(array data)
+	 */
+	bindChildrenEvent: function(view, event, callback) {
+		cm.events.bind(this, view, event, callback, this);
+		this.on('destruct', function() {
+			cm.events.unbind(this, view, event, callback, this);
+		});
+	},
+
+	/**
 	 * @param {String|Function} callback
 	 * @param {int} interval
 	 * @return {int}
@@ -319,6 +337,22 @@ var CM_View_Abstract = Backbone.View.extend({
 		_.each(streams, function(callback, key) {
 			this.bindStream(key, callback);
 		}, this);
+	},
+
+	/**
+	 * @param {Object} events
+	 */
+	_bindChildrenEvents: function(events) {
+		for (key in events) {
+			var callback = events[key];
+			var match = key.match(/^(\S+)\s+(.+)$/);
+			var viewName = match[1];
+			var eventNames = match[2].split(/\s*,\s*/)
+			_.each(eventNames, function(eventName) {
+				this.bindChildrenEvent(viewName, eventName, callback);
+			}, this);
+
+		}
 	},
 
 	/**
