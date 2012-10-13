@@ -149,7 +149,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} functionName
-	 * @param {Array|Null} [params]
+	 * @param {Object|Null} [params]
 	 * @param {Object|Null} [callbacks]
 	 * @return jqXHR
 	 */
@@ -185,8 +185,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} functionName
-	 * @param {Array|Null} params
-	 * @param {Object|Null} callbacks
+	 * @param {Object|Null} [params]
+	 * @param {Object|Null} [callbacks]
 	 * @return jqXHR
 	 */
 	ajaxModal: function(functionName, params, callbacks) {
@@ -205,8 +205,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} className
-	 * @param {Object|Null} params
-	 * @param {Object|Null} options
+	 * @param {Object|Null} [params]
+	 * @param {Object|Null} [options]
 	 * @return jqXHR
 	 */
 	loadComponent: function(className, params, options) {
