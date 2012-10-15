@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
-		<title>{block name='title'}{$title|escape}{/block}</title>
+		<title>{$title|escape}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}
 		{resource file='init.js'}
