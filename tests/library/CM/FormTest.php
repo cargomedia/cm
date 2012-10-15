@@ -3,17 +3,27 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_FormTest extends TestCase {
 
+	public static $formActionProcessCount = 0;
+
 	function testForm() {
 		$data = $this->_getData();
+		self::$formActionProcessCount = 0;
 		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
-		$this->assertTrue($response['data']['must_check'] == 'checked');
+		$this->assertSame(1, self::$formActionProcessCount);
+		$this->assertNotContains('errors', array_keys($response));
+	}
+
+	function testMissingField() {
+		$data = $this->_getData();
+		unset($data['data']['must_check']);
+		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
+		$this->assertContains('errors', array_keys($response));
 	}
 
 	function testAllowedMissingField() {
 		$data = $this->_getData();
 		unset($data['data']['color']);
 		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
-
 		$this->assertNotContains('errors', array_keys($response));
 	}
 
@@ -28,6 +38,8 @@ class CM_FormTest extends TestCase {
 }
 
 class CM_Form_FormTestExampleForm extends CM_Form_Abstract {
+	public $data;
+
 	public function __construct() {
 		parent::__construct('form_FormTestExampleForm');
 	}
@@ -47,6 +59,6 @@ class CM_formAction_FormTestExampleAction extends CM_FormAction_Abstract {
 		parent::setup($form);
 	}
 	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-		return $data;
+		CM_FormTest::$formActionProcessCount++;
 	}
 }
