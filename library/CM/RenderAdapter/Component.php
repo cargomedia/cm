@@ -4,9 +4,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
 	public function fetch(array $params = array()) {
 		$parentViewId = null;
-		if (isset($params['parentId'])) {
-			$parentViewId = $params['parentId'];
-		} elseif (count($this->getRender()->getStack('views'))) {
+		if (count($this->getRender()->getStack('views'))) {
 			/** @var CM_View_Abstract $parentView */
 			$parentView = $this->getRender()->getStackLast('views');
 			$parentViewId = $parentView->getAutoId();

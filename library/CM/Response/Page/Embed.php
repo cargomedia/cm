@@ -2,19 +2,14 @@
 
 class CM_Response_Page_Embed extends CM_Response_Page {
 
-	/** @var string */
-	private $_parentId;
-
 	/** @var string|null */
 	private $_title;
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param string              $parentId
 	 */
-	public function __construct(CM_Request_Abstract $request, $parentId) {
+	public function __construct(CM_Request_Abstract $request) {
 		parent::__construct($request);
-		$this->_parentId = (string) $parentId;
 	}
 
 	public function process() {
@@ -43,7 +38,7 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 		$renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page->getLayout());
 		$pageTitle = $renderAdapterPage->fetchTitle();
 		$this->_title = $renderAdapterLayout->fetchTitle($pageTitle);
-		return $renderAdapterPage->fetch(array('parentId' => $this->_parentId));
+		return $renderAdapterPage->fetch();
 	}
 
 }

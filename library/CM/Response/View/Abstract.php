@@ -53,12 +53,11 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$component->checkAccessible();
 		$component->prepare();
 
-		$html = $this->getRender()->render($component, array('parentId' => $componentInfo['parentId']));
+		$html = $this->getRender()->render($component);
 
-		$this->getRender()->getJs()->onloadHeaderJs('cm.views["' . $componentInfo['id'] . '"].$().replaceWith(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
 		$this->getRender()->getJs()->onloadPrepareJs(
-			'cm.views["' . $component->getAutoId() . '"]._callbacks=cm.views["' . $componentInfo['id'] . '"]._callbacks;');
-		$this->getRender()->getJs()->onloadPrepareJs('cm.views["' . $componentInfo['id'] . '"].remove(true);');
+			'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
 		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
 		$componentInfo['id'] = $component->getAutoId();
 
@@ -70,17 +69,13 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	 * @return string Auto-id
 	 */
 	public function loadComponent(CM_Params $params) {
-		$viewInfo = $this->_getViewInfo();
-
 		$component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
 		$component->checkAccessible();
 		$component->prepare();
 
-		$html = $this->getRender()->render($component, array('parentId' => $viewInfo['id']));
+		$html = $this->getRender()->render($component);
 
-		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
-
-		return $component->getAutoId();
+		return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $this->getRender()->getJs()->getJs());
 	}
 
 	/**
@@ -89,8 +84,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function loadPage(CM_Params $params) {
-		$layoutInfo = $this->_getViewInfo();
-
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
 		CM_Tracking::getInstance()->trackPageview($request);
 
@@ -100,7 +93,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			if ($count++ > 10) {
 				throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
 			}
-			$response = new CM_Response_Page_Embed($request, $layoutInfo['id']);
+			$response = new CM_Response_Page_Embed($request);
 			$response->process();
 			$paths[] = $request->getPath();
 		} while ($response->getRedirectUrl());
@@ -112,12 +105,12 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$title = $response->getTitle();
 		$url = $response->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 		$layoutClass = get_class($page->getLayout());
-		$menuEntryHashes = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
+		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
 			return $menuEntry->getHash();
 		}, $this->getSite()->getMenuEntriesActive($page)));
 
 		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'layoutClass' => $layoutClass,
-			'menuEntryHashes' => $menuEntryHashes);
+			'menuEntryHashList' => $menuEntryHashList);
 	}
 
 	public function popinComponent() {

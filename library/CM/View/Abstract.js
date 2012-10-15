@@ -56,6 +56,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	registerChild: function(child) {
 		this._children.push(child);
+		child.options.parent = this;
 	},
 
 	/**
@@ -158,6 +159,16 @@ var CM_View_Abstract = Backbone.View.extend({
 		}
 	},
 
+	/**
+	 * @param {CM_View_Abstract} view
+	 */
+	replaceWith: function(view) {
+		view._callbacks = this._callbacks;
+		this.getParent().registerChild(view);
+		this.$().replaceWith(view.$());
+		this.remove(true);
+	},
+
 	disable: function() {
 		this.$().disable();
 	},
@@ -232,45 +243,41 @@ var CM_View_Abstract = Backbone.View.extend({
 		options = options || {};
 		params = params || {};
 		params.className = className;
-		var successPopOut = options.successPopOut || function() {
-		};
-		var successPre = options.success ? options.success : function() {
-			this.popOut();
-		};
-		var successPost = options.success ? function() {
-		} : function() {
-			successPopOut.call(this);
-		};
-		options.success = function(autoId) {
-			var handlerNew = cm.views[autoId];
-			successPre.call(handlerNew);
-			handlerNew._ready();
-			successPost.call(handlerNew);
+		var success = options.success ? options.success : this.popOut;
+		options.success = function(response) {
+			this._injectView(response, success);
 		};
 		return this.ajaxModal('loadComponent', params, options);
 	},
 
 	/**
 	 * @param {String} path
-	 * @param {Object|Null} callbacks
+	 * @param {Object} [options]
 	 * @return jqXHR
 	 */
-	loadPage: function(path, callbacks) {
-		callbacks = callbacks || {};
-		var success = callbacks.success || function() {
+	loadPage: function(path, options) {
+		options = options || {};
+		var success = options.success;
+		options.success = function(response) {
+			this._injectView(response, success);
 		};
+		return this.ajaxModal('loadPage', {path: path}, options);
+	},
 
-		return this.ajaxModal('loadPage', {path: path}, {
-			success: function(response) {
-				cm.window.appendHidden(response.html);
-				new Function(response.js).call(this);
-				var page = cm.views[response.autoId];
-				success.call(page, response.title, response.url, response.menuEntryHashes, response.layoutClass);
-				page._ready();
-			},
-			error: callbacks.error,
-			complete: callbacks.complete
-		});
+	/**
+	 * @param {Object} response
+	 * @param {Function} [successPre]
+	 * @private
+	 */
+	_injectView: function(response, successPre) {
+		cm.window.appendHidden(response.html);
+		new Function(response.js).call(this);
+		var view = cm.views[response.autoId];
+		this.registerChild(view);
+		if (successPre) {
+			successPre.call(view, response);
+		}
+		view._ready();
 	},
 
 	/**

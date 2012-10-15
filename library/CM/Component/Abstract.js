@@ -55,7 +55,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	},
 	
 	/**
-	 * @return XMLHttpRequest
+	 * @return jqXHR
 	 */
 	reload: function(params) {
 		return this.ajaxModal('reload', params);
@@ -63,7 +63,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	
 	/**
 	 * @param {String} key
-	 * @param {mixed} key
+	 * @param {*} value
 	 */
 	storageSet: function(key, value) {
 		cm.storage.set(this.getClass() + '_' + key, value);
@@ -71,7 +71,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	
 	/**
 	 * @param {String} key
-	 * @return mixed
+	 * @return *
 	 */
 	storageGet: function(key) {
 		return cm.storage.get(this.getClass() + '_' + key);
