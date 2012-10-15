@@ -126,7 +126,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			'userId' => $user->getId()));
 	}
 
-	public function flushConversions() {
+	public function flush() {
 		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
 	}
 
