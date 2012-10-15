@@ -187,7 +187,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				}
 	
 				if (callbacks.success) {
-					callbacks.success(response.data);
+					callbacks.success();
 				}
 	
 				if (response.messages) {
@@ -197,7 +197,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				}
 	
 				if (!response.errors) {
-					handler.trigger('success success.' + actionName, response.data);
+					handler.trigger('success success.' + actionName);
 				}
 			},
 			complete: function() {

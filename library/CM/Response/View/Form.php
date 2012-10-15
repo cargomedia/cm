@@ -81,7 +81,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 			$form->setup();
 
 			$output = array();
-			$success['data'] = CM_Params::encode($form->process($data, $action, $this));
+			$form->process($data, $action, $this);
 
 			if (!empty($this->errors)) {
 				$success['errors'] = $this->errors;

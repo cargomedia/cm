@@ -181,7 +181,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @param array							 $data
 	 * @param string							$action_name
 	 * @param CM_Response_View_Form  $response
-	 * @return mixed|null Return-data
 	 */
 	public function process(array $data, $action_name, CM_Response_View_Form $response) {
 		$action = $this->getAction($action_name);
@@ -210,10 +209,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		}
 
 		if ($response->hasErrors()) {
-			return null;
+			return;
 		}
 
-		return $action->process($form_data, $response, $this);
+		$action->process($form_data, $response, $this);
 	}
 
 }
