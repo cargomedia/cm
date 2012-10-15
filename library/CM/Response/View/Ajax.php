@@ -19,7 +19,9 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			$componentHandler = new CM_ComponentFrontendHandler();
 			$success['data'] = CM_Params::encode(call_user_func($function, $params, $componentHandler, $this));
 
-			$exec = $componentHandler->compile_js('this');
+			$exec = CM_Tracking::getInstance()->getJs();
+
+			CM_Frontend::concat_js($componentHandler->compile_js('this'), $exec);
 			CM_Frontend::concat_js($this->getRender()->getJs()->getJs(), $exec);
 			if (strlen($exec)) {
 				$success['exec'] = $exec;

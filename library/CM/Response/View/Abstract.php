@@ -92,6 +92,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$layoutInfo = $this->_getViewInfo();
 
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
+		CM_Tracking::getInstance()->trackPageview($request);
+
 		$count = 0;
 		$paths = array($request->getPath());
 		do {
