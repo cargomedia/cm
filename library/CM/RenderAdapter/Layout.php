@@ -44,9 +44,11 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$js->onloadReadyJs('cm.router.start();');
 
 		$renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $layout->getPage());
-		$layout->setTplParam('pageTitle', $renderAdapterPage->fetchTitle());
+		$pageTitle = $renderAdapterPage->fetchTitle();
 		$layout->setTplParam('pageDescription', $renderAdapterPage->fetchDescription());
 		$layout->setTplParam('pageKeywords', $renderAdapterPage->fetchKeywords());
+
+		$layout->setTplParam('title', $this->fetchTitle($pageTitle));
 
 		$assign = $layout->getTplParams();
 		$assign['viewObj'] = $layout;
@@ -57,5 +59,13 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$this->getRender()->popStack('pages');
 
 		return $html;
+	}
+
+	/**
+	 * @param string $pageTitle
+	 * @return string
+	 */
+	public function fetchTitle($pageTitle) {
+		return $this->_renderTemplate('title.tpl', array('pageTitle' => $pageTitle));
 	}
 }

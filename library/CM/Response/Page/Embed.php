@@ -39,9 +39,11 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 	 * @return string
 	 */
 	protected function _renderPage(CM_Page_Abstract $page) {
-		$renderAdapter = new CM_RenderAdapter_Page($this->getRender(), $page);
-		$this->_title = $renderAdapter->fetchTitle();
-		return $renderAdapter->fetch(array('parentId' => $this->_parentId));
+		$renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
+		$renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page->getLayout());
+		$pageTitle = $renderAdapterPage->fetchTitle();
+		$this->_title = $renderAdapterLayout->fetchTitle($pageTitle);
+		return $renderAdapterPage->fetch(array('parentId' => $this->_parentId));
 	}
 
 }
