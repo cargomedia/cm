@@ -3,13 +3,21 @@
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
 	/**
-	 * @param string                $name     OPTIONAL
-	 * @param int                   $minLevel OPTIONAL
-	 * @param CM_FormField_Distance $distance OPTIONAL
+	 * @param string                     $name
+	 * @param int|null                   $minLevel
+	 * @param int|null                   $maxLevel
+	 * @param CM_FormField_Distance|null $distance
 	 */
-	public function __construct($name = 'location', $minLevel = CM_Model_Location::LEVEL_COUNTRY, CM_FormField_Distance $distance = null) {
+	public function __construct($name, $minLevel = null, $maxLevel = null, CM_FormField_Distance $distance = null) {
+		if (is_null($minLevel)) {
+			$minLevel = CM_Model_Location::LEVEL_COUNTRY;
+		}
+		if (is_null($maxLevel)) {
+			$maxLevel = CM_Model_Location::LEVEL_ZIP;
+		}
 		parent::__construct($name);
 		$this->_options['levelMin'] = (int) $minLevel;
+		$this->_options['levelMax'] = (int) $maxLevel;
 		if ($distance) {
 			$this->_options['distanceName'] = $distance->getName();
 			$this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
@@ -21,14 +29,14 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
 			$names[] = $location->getName($level);
 		}
-		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)), 'img' =>
-		$render->getUrlStatic('/img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
+		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)),
+			'img' => $render->getUrlStatic('/img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
 	}
 
 	protected function _getSuggestions($term, array $options, CM_Render $render) {
 		$ip = CM_Request_Abstract::getInstance()->getIp();
 		$requestLocation = CM_Model_Location::findByIp($ip);
-		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $requestLocation);
+		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $requestLocation);
 		$locations->setPage(1, 15);
 		$out = array();
 		foreach ($locations as $location) {
@@ -40,7 +48,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$value = parent::validate($userInput, $response);
 		list($level, $id) = explode('.', $value);
-		if ($level < $this->_options['levelMin']) {
+		if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
 			throw new CM_Exception_FormFieldValidation('Invalid location level.');
 		}
 		return new CM_Model_Location($level, $id);
