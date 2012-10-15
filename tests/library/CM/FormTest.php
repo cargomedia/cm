@@ -38,8 +38,6 @@ class CM_FormTest extends TestCase {
 }
 
 class CM_Form_FormTestExampleForm extends CM_Form_Abstract {
-	public $data;
-
 	public function __construct() {
 		parent::__construct('form_FormTestExampleForm');
 	}
