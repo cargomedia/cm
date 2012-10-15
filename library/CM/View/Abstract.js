@@ -13,6 +13,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		if (this.getParent()) {
 			this.getParent().registerChild(this);
 		}
+		this.events = this.collectEvents();
 
 		if (this.actions) {
 			this._bindActions(this.actions);
@@ -26,6 +27,18 @@ var CM_View_Abstract = Backbone.View.extend({
 		this.on('all', function(eventName, data) {
 			cm.viewEvents.trigger(this, eventName, data);
 		});
+	},
+
+	collectEvents: function() {
+		var eventsObjects = [], currentConstructor = this.constructor, currentProto = currentConstructor.prototype;
+
+		do {
+			if (currentProto.hasOwnProperty('events')) {
+				eventsObjects.unshift(currentProto.events);
+			}
+		} while (currentConstructor = ( currentProto = currentConstructor.__super__ ) && currentProto.constructor);
+		eventsObjects.unshift({});
+		return _.extend.apply(_, eventsObjects);
 	},
 
 	ready: function() {
@@ -163,7 +176,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		callbacks = callbacks || {};
 		params = params || {};
 		var handler = this;
-		var xhr = cm.ajax('ajax', {view:this._getArray(), method:functionName, params:params}, {
+		var xhr = cm.ajax('ajax', {view: this._getArray(), method: functionName, params: params}, {
 			success: function(response) {
 				if (response.exec) {
 					new Function(response.exec).call(handler);
@@ -219,9 +232,15 @@ var CM_View_Abstract = Backbone.View.extend({
 		options = options || {};
 		params = params || {};
 		params.className = className;
-		var successPopOut = options.successPopOut || function() {};
-		var successPre = options.success ? options.success :  function() { this.popOut(); };
-		var successPost = options.success ? function() {} : function() { successPopOut.call(this); };
+		var successPopOut = options.successPopOut || function() {
+		};
+		var successPre = options.success ? options.success : function() {
+			this.popOut();
+		};
+		var successPost = options.success ? function() {
+		} : function() {
+			successPopOut.call(this);
+		};
 		options.success = function(autoId) {
 			var handlerNew = cm.views[autoId];
 			successPre.call(handlerNew);
@@ -236,9 +255,10 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Object|Null} callbacks
 	 * @return jqXHR
 	 */
-	loadPage: function (path, callbacks) {
+	loadPage: function(path, callbacks) {
 		callbacks = callbacks || {};
-		var success = callbacks.success || function() {};
+		var success = callbacks.success || function() {
+		};
 
 		return this.ajaxModal('loadPage', {path: path}, {
 			success: function(response) {
@@ -343,14 +363,14 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Object} events
 	 */
 	_bindChildrenEvents: function(events) {
-		_.each(events, function (callback, key) {
+		_.each(events, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var viewName = match[1];
 			var eventNames = match[2].split(/\s*,\s*/);
 			_.each(eventNames, function(eventName) {
 				this.bindChildrenEvent(viewName, eventName, callback);
 			}, this);
-		});
+		}, this);
 	},
 
 	/**
