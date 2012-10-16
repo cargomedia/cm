@@ -16,6 +16,14 @@ class CM_ComponentFrontendHandler {
 	 * @param mixed $value
 	 */
 	public function __set($property, $value) {
+		$this->setParam($property, $value);
+	}
+
+	/**
+	 * @param string $property
+	 * @param mixed $value
+	 */
+	public function setParam($property, $value) {
 		$this->operations[] = "$property = " . CM_Params::encode($value, true);
 	}
 
