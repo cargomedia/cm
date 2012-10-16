@@ -26,7 +26,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	 * @param CM_Model_User|null   $viewer
 	 */
 	public function __construct($params = null, CM_Model_User $viewer = null) {
-
 		$this->_viewer = $viewer;
 		if (is_null($params)) {
 			$params = CM_Params::factory();
