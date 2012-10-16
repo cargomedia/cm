@@ -16,7 +16,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 
 	public function process() {
 		$this->_site->preprocessPageResponse($this);
-		CM_Tracking::getInstance()->trackPageview($this->getRequest());
+		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
 
 		$html = $this->_processPageLoop($this->getRequest());
 

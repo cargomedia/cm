@@ -22,7 +22,7 @@
 			{resource file="translations/{CM_Model_Language::getVersionJavascript()}.js"}
 		{/if}
 		{$render->getJs()->renderScripts()}
-		{CM_Tracking::getInstance()->getHtml()}
+		{$render->getJs()->getTracking()->getHtml()}
 		{block name='body-end'}{/block}
 	</body>
 </html>

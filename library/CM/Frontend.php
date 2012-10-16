@@ -1,10 +1,12 @@
 <?php
 
 class CM_Frontend {
+
 	protected $_onloadHeaderJs = '';
 	protected $_onloadPrepareJs = '';
 	protected $_onloadJs = '';
 	protected $_onloadReadyJs;
+	private $_tracking;
 
 	/**
 	 * Concatenate a javascript code $line with $var by reference.
@@ -34,6 +36,16 @@ class CM_Frontend {
 		$this->_onloadPrepareJs = '';
 		$this->_onloadJs = '';
 		$this->_onloadReadyJs = '';
+	}
+
+	/**
+	 * @return CM_Tracking
+	 */
+	public function getTracking() {
+		if (!$this->_tracking) {
+			$this->_tracking = CM_Tracking_Abstract::factory();
+		}
+		return $this->_tracking;
 	}
 
 	/**
@@ -139,6 +151,7 @@ class CM_Frontend {
 		self::concat_js($this->_onloadPrepareJs, $return);
 		self::concat_js($this->_onloadJs, $return);
 		self::concat_js($this->_onloadReadyJs, $return);
+		self::concat_js($this->getTracking()->getJs(), $return);
 		return $return;
 	}
 

@@ -110,14 +110,4 @@ EOT;
 		return $html;
 	}
 
-	/**
-	 * @return CM_Tracking
-	 */
-	public static function getInstance() {
-		if (!self::$_instance) {
-			$className = self::_getClassName();
-			self::$_instance = new $className();
-		}
-		return self::$_instance;
-	}
 }

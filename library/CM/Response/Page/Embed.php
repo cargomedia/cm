@@ -13,6 +13,7 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 	}
 
 	public function process() {
+		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
 		$html = $this->_processPageLoop($this->getRequest());
 
 		$this->_setContent($html);

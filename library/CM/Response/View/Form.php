@@ -87,10 +87,6 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 				$success['errors'] = $this->errors;
 			}
 
-			if ($trackingJs = CM_Tracking::getInstance()->getJs()) {
-				$this->exec($trackingJs);
-			}
-
 			$this->exec($this->getRender()->getJs()->getJs());
 
 			if (!empty($this->_jsCode)) {

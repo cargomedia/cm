@@ -25,4 +25,12 @@ abstract class CM_Tracking_Abstract extends CM_Class_Abstract {
 	public function getCode() {
 		return (string) self::_getConfig()->code;
 	}
+
+	/**
+	 * @return CM_Tracking
+	 */
+	public static function factory() {
+		$className = self::_getClassName();
+		return new $className;
+	}
 }
