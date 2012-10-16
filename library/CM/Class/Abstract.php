@@ -51,16 +51,19 @@ abstract class CM_Class_Abstract {
 	}
 
 	/**
-	 * @return string
+	 * @param string|null $className
 	 * @throws CM_Exception_Invalid
+	 * @return string
 	 */
-	protected static function _getNamespace() {
-		$pageClassName = get_called_class();
-		$position = strpos($pageClassName, '_');
-		if (false === $position || 0 === $position) {
-			throw new CM_Exception_Invalid('Could not detect namespace of `' . $pageClassName . '`.');
+	protected static function _getNamespace($className = null) {
+		if (!$className) {
+			$className = get_called_class();
 		}
-		$namespace = substr($pageClassName, 0, $position);
+		$position = strpos($className, '_');
+		if (false === $position || 0 === $position) {
+			throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
+		}
+		$namespace = substr($className, 0, $position);
 		return $namespace;
 	}
 
