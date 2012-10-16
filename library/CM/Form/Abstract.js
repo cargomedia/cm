@@ -145,10 +145,17 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 			var required = action.fields[fieldName];
 			if (required && _.isEmpty(data[fieldName])) {
 				var field = this.getField(fieldName);
-				var errorMessage = 'Required';
+				var label;
+				var errorMessage = cm.language.get('Required');
+				var $textInput = field.$('input, textarea');
 				var $labels = $('label[for="' + field.getAutoId() + '-input"]');
 				if ($labels.length) {
-					errorMessage = cm.language.get('{$label} is required.', {label: $labels.first().text()});
+					label = $labels.first().text();
+				} else if ($textInput.attr('placeholder')) {
+					label = $textInput.attr('placeholder');
+				}
+				if (label) {
+					errorMessage = cm.language.get('{$label} is required.', {label: label});
 				}
 				field.error(errorMessage);
 				hasErrors = true;
