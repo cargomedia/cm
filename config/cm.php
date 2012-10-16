@@ -19,6 +19,7 @@ $config->CM_Site_Abstract = new stdClass();
 $config->CM_Site_Abstract->class = 'CM_Site_CM';
 
 $config->CM_Tracking_Abstract = new stdClass();
+$config->CM_Tracking_Abstract->class = 'CM_Tracking';
 $config->CM_Tracking_Abstract->enabled = false;
 $config->CM_Tracking_Abstract->code = '';
 
