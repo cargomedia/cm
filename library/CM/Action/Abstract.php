@@ -28,7 +28,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private $_forceAllow = false;
 
 	/**
-	 * @param int			   $verb
+	 * @param int               $verb
 	 * @param CM_Model_User|int $actor
 	 */
 	public final function __construct($verb, $actor) {
@@ -119,8 +119,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract	 $actionLimit
-	 * @param int							   $role
+	 * @param CM_Model_ActionLimit_Abstract     $actionLimit
+	 * @param int                               $role
 	 * @return bool
 	 */
 	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
@@ -162,14 +162,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param int $actionLimitType OPTIONAL
-	 * @param int $period		  OPTIONAL
+	 * @param int $period          OPTIONAL
 	 * @return CM_Paging_Transgression_Ip|CM_Paging_Transgression_User
 	 * @throws CM_Exception_Invalid
 	 */
 	private final function _getTransgressions($actionLimitType = null, $period = null) {
 		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
-			throw new CM_Exception_Invalid('Looking for transgressions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() .
-					'` that is not being logged.');
+			throw new CM_Exception_Invalid(
+				'Looking for transgressions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
 			return $this->getActor()->getTransgressions($this->getType(), $this->getVerb(), $actionLimitType, $period);
@@ -180,7 +180,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_ActionLimit_Abstract $actionLimit OPTIONAL
-	 * @param int						   $role		OPTIONAL
+	 * @param int                           $role        OPTIONAL
 	 */
 	private final function _log(CM_Model_ActionLimit_Abstract $actionLimit = null, $role = null) {
 		if (!in_array($this->getVerb(), $this->_ignoreLogging)) {
@@ -210,8 +210,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int		   $verb
-	 * @param int		   $type
+	 * @param int           $verb
+	 * @param int           $type
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
@@ -263,8 +263,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$upperBound = (int) $upperBound;
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
-		$result = CM_Mysql::exec("SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where .
-				" GROUP BY `verb`, `type`");
+		$result = CM_Mysql::exec(
+			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `verb`, `type`");
 		$insert = array();
 		while ($row = $result->fetchAssoc()) {
 			if ($row['count'] >= 1) {
@@ -288,7 +288,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return string
 	 */
 	public function getName() {
-		return self::getNameByType($this->getType());
+		return self::getNameByType($this->getType(), $this->_getClassName());
 	}
 
 	/**
@@ -299,11 +299,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int $type
+	 * @param int         $type
+	 * @param string|null $className
 	 * @return string
 	 */
-	static public function getNameByType($type) {
-		$className = self::_getClassName($type);
+	static public function getNameByType($type, $className = null) {
+		if (!$className) {
+			$className = self::_getClassName($type);
+		}
 		return str_replace('_', ' ', str_replace(self::_getNamespace($className) . '_Action_', '', $className));
 	}
 
