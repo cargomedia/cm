@@ -18,7 +18,7 @@ class CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails extends CM_P
 	}
 
 	protected function _getFilename($item) {
-		return $this->_streamChannelArchive->getId() . '-' . $this->_streamChannelArchive->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $item . '.jpg';
+		return $this->_streamChannelArchive->getId() . '-' . $this->_streamChannelArchive->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $item . '.png';
 	}
 
 	protected function _getFileNamespace($item) {
