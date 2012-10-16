@@ -1,6 +1,8 @@
 <?php
 
 class CM_File {
+
+	/** @var string */
 	private $_path;
 
 	/**

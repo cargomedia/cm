@@ -2,7 +2,9 @@
 
 class CM_KissTracking extends CM_Class_Abstract {
 
-	const setName = 'kisstracking';
+	const SET_NAME = 'kisstracking';
+
+	const UPLOAD_INTERVAL = 7200;
 
 	/** @var CM_KissTracking */
 	private static $_instance;
@@ -48,7 +50,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 		}
 		$file = $this->generateCsv();
 		$lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
-		if (time() - $lastUploadAt > 7200) {
+		if (time() - $lastUploadAt > self::UPLOAD_INTERVAL && trim($file->read())) {
 			$this->_uploadCsv($file);
 			$file->delete();
 			CM_Option::getInstance()->set('kissTracking.lastUpload', time());
@@ -95,7 +97,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	/**
 	 * @param CM_File_Csv $file
 	 */
-	private function _uploadCsv(CM_File_Csv $file) {
+	protected function _uploadCsv(CM_File_Csv $file) {
 		$bucketName = self::_getConfig()->awsBucketName;
 		$targetFilename = self::_getConfig()->awsFilePrefix . '.' . date('YmdHis') . '.csv';
 
@@ -108,7 +110,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 */
 	private function _getSet() {
 		if (!$this->_set instanceof CM_Set) {
-			$this->_set = new CM_Set(self::setName);
+			$this->_set = new CM_Set(self::SET_NAME);
 		}
 		return $this->_set;
 	}
