@@ -48,7 +48,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 		}
 		$file = $this->generateCsv();
 		$lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
-		if (time() - $lastUploadAt > 3600) {
+		if (time() - $lastUploadAt > 7200) {
 			$this->_uploadCsv($file);
 			$file->delete();
 			CM_Option::getInstance()->set('kissTracking.lastUpload', time());
