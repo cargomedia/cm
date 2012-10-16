@@ -13,15 +13,22 @@ textarea.textinput {
 	.input_textarea;
 }
 
-::-webkit-input-placeholder {
-	color: lighten(@colorFgShy, 10);
+.placeholder(@color) {
+	::-webkit-input-placeholder {
+		color: @color;
+	}
+	:-moz-placeholder {
+		color: @color;
+	}
+	:-ms-input-placeholder {
+		color: @color;
+	}
+	label.placeholder {
+		color: @color;
+	}
 }
-:-moz-placeholder {
-	color: lighten(@colorFgShy, 10);
-}
-:-ms-input-placeholder {
-	color: lighten(@colorFgShy, 10);
-}
+
+.placeholder(lighten(@colorFgShy, 10));
 
 button:disabled, input:disabled {
 	.input_disabled;
