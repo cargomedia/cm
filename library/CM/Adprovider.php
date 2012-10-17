@@ -2,6 +2,9 @@
 
 class CM_Adprovider extends CM_Class_Abstract {
 
+	/** @var CM_Adprovider|null */
+	private static $_instance;
+
 	/** @var CM_AdproviderAdapter_Abstract[] */
 	private $_adapters = array();
 
@@ -56,5 +59,15 @@ class CM_Adprovider extends CM_Class_Abstract {
 	 */
 	private function _getEnabled() {
 		return (bool) self::_getConfig()->enabled;
+	}
+
+	/**
+	 * @return CM_Adprovider
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
 	}
 }
