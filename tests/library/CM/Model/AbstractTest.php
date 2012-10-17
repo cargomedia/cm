@@ -133,6 +133,12 @@ class CM_Model_AbstractTest extends TestCase{
 		$this->assertEquals('bar2', $modelMock->getModelAsset()->getBar());
 	}
 
+	public function testGetAsset() {
+		/** @var CM_ModelMock2 $modelMock */
+		$modelMock = new CM_ModelMock2(1);
+		$this->assertInstanceOf('CM_ModelAsset_ModelMock_ModelAssetMock', $modelMock->getModelAssetMock());
+	}
+
 	public function testLazyAsset() {
 		$modelMock = new CM_ModelMock2(1);
 		$this->assertFalse(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
@@ -311,7 +317,7 @@ class CM_ModelMock2 extends CM_Model_Abstract {
 	 * @return CM_ModelAsset_ModelMock2_ModelAssetMock
 	 */
 	public function getModelAssetMock() {
-		return $this->_getAsset('CM_ModelAsset_ModelMock_ModelAssetMock');
+		return $this->_getAsset('CM_ModelAsset_Abstract');
 	}
 
 }
