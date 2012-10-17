@@ -137,9 +137,7 @@ $config->CM_KissTracking->awsBucketName = '';
 $config->CM_KissTracking->awsFilePrefix = '';
 
 $config->CM_Adprovider->enabled = true;
-$config->CM_Adprovider->zones = array(
-	'foo' => array('adapter' => 'CM_AdproviderAdapter_Openx', 'zoneId' => 1),
-);
+$config->CM_Adprovider->zones = array();
 
 $config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
 $config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
