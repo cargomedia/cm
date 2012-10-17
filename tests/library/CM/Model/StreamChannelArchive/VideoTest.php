@@ -61,8 +61,8 @@ class CM_Model_StreamChannelArchive_VideoTest extends TestCase {
 		$streamChannel = TH::createStreamChannel();
 		$streamChannel->setThumbnailCount(2);
 		$archive = TH::createStreamChannelVideoArchive($streamChannel);
-		$thumb1 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/1.jpg', $streamChannel->getId());
-		$thumb2 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/2.jpg', $streamChannel->getId());
+		$thumb1 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/1.png', $streamChannel->getId());
+		$thumb2 = new CM_File_UserContent('streamChannels', $archive->getId() . '-' . $archive->getHash() . '-thumbs/2.png', $streamChannel->getId());
 		$this->assertEquals(array($thumb1, $thumb2), $archive->getThumbnails()->getItems());
 	}
 
