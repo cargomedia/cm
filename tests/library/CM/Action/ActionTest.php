@@ -3,15 +3,11 @@ require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Action_ActionTest extends TestCase {
 
-	private static $_configBackup;
-
 	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Config::set(self::$_configBackup);
 		TH::clearEnv();
 	}
 

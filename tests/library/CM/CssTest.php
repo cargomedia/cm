@@ -3,21 +3,16 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_CssTest extends TestCase {
 
-	/** @var stdClass */
-	private static $_configBackup;
-
 	/** @var CM_Render */
 	private $_render;
 
 	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Render->cdnResource = false;
 		CM_Config::get()->CM_Render->cdnUsetContent = false;
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
-		CM_Config::set(self::$_configBackup);
 	}
 
 	public function setUp() {

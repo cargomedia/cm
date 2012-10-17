@@ -3,12 +3,7 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_RenderTest extends TestCase {
 	
-	/** @var stdClass */
-	private static $_configBackup;
-
-
 	public function setUp() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
 		CM_Config::get()->TEST_Site_Test = new stdClass();
@@ -18,7 +13,6 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function tearDown() {
-		CM_Config::set(self::$_configBackup);
 		TH::clearEnv();
 	}
 

@@ -4,23 +4,17 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_KissTrackingTest extends TestCase {
 
-	/** @var stdClass */
-	private static $_configBackup;
-
 	/** @var CM_KissTracking $kissTracking */
 	private $_kissTracking;
 
 	/** @var string */
 	private $_filePath;
 
-	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
+	public function setUp() {
 		CM_Config::get()->CM_KissTracking->enabled = true;
 		CM_Config::get()->CM_KissTracking->awsBucketName = 'foo';
 		CM_Config::get()->CM_KissTracking->awsFilePrefix = 'bar';
-	}
 
-	public function setUp() {
 		$this->_filePath = DIR_TMP . 'kisstracking.csv';
 		$this->_kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
 		$this->_kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
@@ -28,7 +22,6 @@ class CM_KissTrackingTest extends TestCase {
 
 	public function tearDown() {
 		TH::clearEnv();
-		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testProcess() {

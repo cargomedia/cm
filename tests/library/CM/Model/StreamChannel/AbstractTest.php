@@ -3,16 +3,12 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Model_StreamChannel_AbstractTest extends TestCase {
 
-	static $_configBackup;
-
 	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[1] = 'CM_Model_StreamChannel_Mock';
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
-		CM_Config::set(self::$_configBackup);
 	}
 
 	public function setup() {

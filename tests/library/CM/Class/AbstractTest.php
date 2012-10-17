@@ -3,17 +3,14 @@
 require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Class_AbstractTest extends TestCase {
-	private static $_configBackup;
 
 	public static function setupBeforeClass() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Class_AbstractMock = new stdClass();
 		CM_Config::get()->CM_Class_AbstractMock->types[CM_Class_Implementation::TYPE] = 'CM_Class_Implementation';
 		CM_Config::get()->CM_Class_AbstractMock->foo = 'bar';
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Config::set(self::$_configBackup);
 		TH::clearEnv();
 	}
 

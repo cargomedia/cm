@@ -3,17 +3,12 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Model_StreamChannel_VideoTest extends TestCase {
 
-	/** @var stdClass */
-	private static $_configBackup;
-
 	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
 		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
 	}
 
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
-		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testCreate() {
