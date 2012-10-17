@@ -42,7 +42,7 @@ class CM_Adprovider extends CM_Class_Abstract {
 	private function _getAdapter($className) {
 		/** @var string $className */
 		$className = (string) $className;
-		if (!is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
+		if (!class_exists($className) || !is_subclass_of($className, 'CM_AdproviderAdapter_Abstract')) {
 			throw new CM_Exception_Invalid('Invalid ad adapter `' . $className . '`');
 		}
 		if (!array_key_exists($className, $this->_adapters)) {
