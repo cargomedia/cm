@@ -66,7 +66,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 	/**
 	 * @param CM_Params $params
-	 * @return string Auto-id
+	 * @return array
 	 */
 	public function loadComponent(CM_Params $params) {
 		$component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
