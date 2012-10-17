@@ -3,16 +3,12 @@ require_once __DIR__ . '/../../TestCase.php';
 
 class CM_WowzaTest extends TestCase {
 
-	private static $_configBackup;
-
-	public static function setUpBeforeClass() {
-		self::$_configBackup = CM_Config::get();
+	public function setUp() {
 		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
 	}
 
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		TH::clearEnv();
-		CM_Config::set(self::$_configBackup);
 	}
 
 	public function testSynchronize() {
@@ -74,8 +70,6 @@ class CM_WowzaTest extends TestCase {
 	}
 
 	public function testCheckStreams() {
-		TH::clearEnv();
-		$configBackup = CM_Config::get();
 		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
 		$wowza = $wowza = $this->getMock('CM_Wowza', array('stop'));
 		$wowza->expects($this->exactly(2))->method('stop')->will($this->returnValue(1));
@@ -102,8 +96,6 @@ class CM_WowzaTest extends TestCase {
 		$this->assertEquals($streamSubscribeChanged1->getAllowedUntil() + 100, $streamSubscribeChanged1->_change()->getAllowedUntil());
 		$this->assertEquals($streamPublishUnchanged1->getAllowedUntil(), $streamPublishUnchanged1->_change()->getAllowedUntil());
 		$this->assertEquals($streamPublishChanged1->getAllowedUntil() + 100, $streamPublishChanged1->_change()->getAllowedUntil());
-
-		CM_Config::set($configBackup);
 	}
 
 	public function testGetServer() {

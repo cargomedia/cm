@@ -8,6 +8,7 @@ require_once 'TH/Html.php';
 class TH {
 	private static $timeDelta = 0;
 	private static $initialized = false;
+	private static $_configBackup;
 
 	public static function init() {
 		if (self::$initialized) {
@@ -38,6 +39,8 @@ class TH {
 		CM_Mysql::selectDb($dbName);
 		CM_Mysql::runDump($dbName, new CM_File(DIR_TEST_DATA . 'db/dump.sql'));
 
+		self::$_configBackup = serialize(CM_Config::get());
+
 		// Reset environment
 		self::clearEnv();
 		self::timeInit();
@@ -50,6 +53,7 @@ class TH {
 		self::clearCache();
 		self::timeReset();
 		self::clearTmp();
+		self::clearConfig();
 	}
 
 	public static function clearCache() {
@@ -67,6 +71,10 @@ class TH {
 
 	public static function clearTmp() {
 		CM_Util::rmDirContents(DIR_TMP);
+	}
+
+	public static function clearConfig() {
+		CM_Config::set(unserialize(self::$_configBackup));
 	}
 
 	public static function timeInit() {
