@@ -135,3 +135,8 @@ $config->CM_KissTracking = new stdClass();
 $config->CM_KissTracking->enabled = false;
 $config->CM_KissTracking->awsBucketName = '';
 $config->CM_KissTracking->awsFilePrefix = '';
+
+$config->CM_Adprovider->enabled = true;
+
+$config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
+$config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
