@@ -99,7 +99,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public function unserialize($data) {
 		list($this->_id, $this->_data) = unserialize($data);
 		foreach ($this->_loadAssets() as $asset) {
-			$this->_assets[get_class($asset)] = $asset;
+			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
 		$this->_get(); // Make sure data can be loaded
 	}
