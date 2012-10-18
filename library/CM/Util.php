@@ -65,6 +65,9 @@ class CM_Util {
 	 */
 	public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
 		$url = (string) $url;
+		if (!empty($params)) {
+			$params = http_build_query($params);
+		}
 		if (null === $timeout) {
 			$timeout = 10;
 		}
@@ -75,10 +78,12 @@ class CM_Util {
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
-			curl_setopt($curlConnection, CURLOPT_POSTFIELDS, $params);
+			if (!empty($params)) {
+				curl_setopt($curlConnection, CURLOPT_POSTFIELDS, $params);
+			}
 		} else {
 			if (!empty($params)) {
-				$url .= '?' . http_build_query($params);
+				$url .= '?' . $params;
 			}
 		}
 		curl_setopt($curlConnection, CURLOPT_URL, $url);
