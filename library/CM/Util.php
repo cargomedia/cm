@@ -66,22 +66,24 @@ class CM_Util {
 	public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
 		$url = (string) $url;
 		if (!empty($params)) {
-			$url .= '?' . http_build_query($params);
+			$params = http_build_query($params);
 		}
 		if (null === $timeout) {
 			$timeout = 10;
 		}
 		$timeout = (int) $timeout;
 
-		$options = array('http' => array());
-		$options['http']['header'] = 'Connection: close';
-		$options['http']['timeout'] = $timeout;
+		$curlConnection = curl_init();
+		curl_setopt($curlConnection, CURLOPT_URL, $url);
+		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
-			$options['http']['method'] = 'POST';
+			curl_setopt($curlConnection, CURLOPT_POST, 1);
+			curl_setopt($curlConnection, CURLOPT_POSTFIELDS, $params);
 		}
-		$context = stream_context_create($options);
 
-		$contents = @file_get_contents($url, null, $context);
+		$contents = curl_exec($curlConnection);
+		curl_close($curlConnection);
 		if ($contents === false) {
 			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
 		}
