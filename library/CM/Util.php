@@ -74,13 +74,17 @@ class CM_Util {
 		$timeout = (int) $timeout;
 
 		$curlConnection = curl_init();
-		curl_setopt($curlConnection, CURLOPT_URL, $url);
 		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
 			curl_setopt($curlConnection, CURLOPT_POSTFIELDS, $params);
+		} else {
+			if (!empty($params)) {
+				$url .= '?' . http_build_query($params);
+			}
 		}
+		curl_setopt($curlConnection, CURLOPT_URL, $url);
 
 		$contents = curl_exec($curlConnection);
 		curl_close($curlConnection);
