@@ -65,9 +65,6 @@ class CM_Util {
 	 */
 	public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
 		$url = (string) $url;
-		if (!empty($params)) {
-			$params = http_build_query($params);
-		}
 		if (null === $timeout) {
 			$timeout = 10;
 		}
