@@ -1,0 +1,11 @@
+== Setup ==
+Checkout:
+{{{
+svn co https://svn.cargomedia.ch/cm/trunk ~/Projects/cm
+}}}
+
+Install dependencies:
+{{{
+cd ~/Projects/cm
+composer install
+}}}
