@@ -89,9 +89,13 @@ class CM_Util {
 		curl_setopt($curlConnection, CURLOPT_URL, $url);
 
 		$contents = curl_exec($curlConnection);
-		curl_close($curlConnection);
+		$curlError = null;
 		if ($contents === false) {
-			throw new CM_Exception_Invalid('Fetching contents from `' . $url . '` failed.');
+			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
+		}
+		curl_close($curlConnection);
+		if ($curlError) {
+			throw new CM_Exception_Invalid($curlError);
 		}
 		return $contents;
 	}
