@@ -12,7 +12,11 @@
 	}
 
 	.preloader {
-		background: image('preload.gif') center no-repeat;
+		background: image('preload.svg') center no-repeat;
+
+		html.no-svg & {
+			background: image('preload.gif') center no-repeat;
+		}
 		position: absolute;
 		top: 0;
 		right: 0;
