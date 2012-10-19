@@ -333,7 +333,7 @@ class CM_Wowza extends CM_Class_Abstract {
 		$servers = CM_Wowza::_getConfig()->servers;
 
 		foreach ($servers as $serverId => $server) {
-			if ($server['privateIp'] == $host || $server['publicHost'] == $host) {
+			if ($server['publicIp'] == $host || $server['privateIp'] == $host || $server['publicHost'] == $host) {
 				return (int) $serverId;
 			}
 		}
