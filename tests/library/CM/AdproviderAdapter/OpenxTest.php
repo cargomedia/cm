@@ -10,9 +10,7 @@ class CM_AdproviderAdapter_OpenxTest extends TestCase {
 		$openx = new CM_AdproviderAdapter_Openx();
 		$html = $openx->getHtml(array('zoneId' => 'zone1'));
 
-		$this->assertContains('https://www.foo.org/delivery/ajs.php', $html);
-		$this->assertContains('document.write ("?zoneid=zone1")', $html);
-		$this->assertContains('http://www.foo.org/delivery/avw.php?zoneid=zone1', $html);
+		$this->assertContains('<div class="openx-ad" data-zone-id="zone1" data-host="www.foo.org"', $html);
 
 		TH::clearConfig();
 	}
