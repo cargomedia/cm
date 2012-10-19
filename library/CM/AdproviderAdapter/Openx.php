@@ -15,10 +15,8 @@ class CM_AdproviderAdapter_Openx extends CM_AdproviderAdapter_Abstract {
 		}
 		$zoneId = $zoneData['zoneId'];
 		$host = $this->_getHost();
-		$html = <<<EOF
-<div class="adSpace" data-zone-id=$zoneId data-host=$host></div>
-
-EOF;
+		$html = '<div class="openx-ad" data-zone-id="' . CM_Util::htmlspecialchars($zoneId) . '" data-host="' . CM_Util::htmlspecialchars($host) .
+				'"></div>';
 		return $html;
 	}
 }
