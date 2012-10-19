@@ -111,12 +111,11 @@ class CM_WowzaTest extends TestCase {
 		}
 	}
 
-	public function testGetSeverId()
-	{
+	public function testGetSeverId() {
 		$method = new ReflectionMethod('CM_Wowza', '_getServerId');
-		$method->setAccessible(TRUE);
+		$method->setAccessible(true);
 		// Test get serverId over publicIp
-		$this->assertEquals(1 , $method->invoke(new CM_Wowza, '10.0.3.109'));
+		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.109'));
 		// Test get serverId over privateIp
 		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.108'));
 		// Test get serverId over host
