@@ -1,3 +1,11 @@
+.spinner {
+	background: image('spinner.svg') center no-repeat;
+
+	html.no-svg & {
+		background: image('spinner.gif') center no-repeat;
+	}
+}
+
 .router-placeholder {
 	position: absolute;
 	top: 0;
@@ -11,12 +19,7 @@
 		left: -2px;
 	}
 
-	.preloader {
-		background: image('preload.svg') center no-repeat;
-
-		html.no-svg & {
-			background: image('preload.gif') center no-repeat;
-		}
+	.spinner {
 		position: absolute;
 		top: 0;
 		right: 0;
