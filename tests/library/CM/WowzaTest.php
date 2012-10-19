@@ -114,13 +114,9 @@ class CM_WowzaTest extends TestCase {
 	public function testGetSeverId() {
 		$method = new ReflectionMethod('CM_Wowza', '_getServerId');
 		$method->setAccessible(true);
-		// Test get serverId over publicIp
 		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.109'));
-		// Test get serverId over privateIp
 		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.108'));
-		// Test get serverId over host
 		$this->assertEquals(1, $method->invoke(new CM_Wowza, 'wowza1.fuckbook.cat.cargomedia'));
-		// Test check if a you'll get the correct exception
 		try {
 			$method->invoke(new CM_Wowza, '66.66.66.66');
 			$this->fail('Found server with ip 66.66.66.66');
