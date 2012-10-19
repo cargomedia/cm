@@ -120,7 +120,7 @@ $config->CM_Wowza = new stdClass();
 $config->CM_Wowza->httpPort = '8086';
 $config->CM_Wowza->wowzaPort = '1935';
 $config->CM_Wowza->servers = array(
-	array('publicHost' => 'localhost', 'privateIp' => '127.0.0.1'),
+	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
 );
 
 $config->CM_Site_CM = new stdClass();
