@@ -42,6 +42,7 @@ class CM_Wowza extends CM_Class_Abstract {
 				}
 			}
 		}
+
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
 			$streamPublishs = $streamChannel->getStreamPublishs();
@@ -49,11 +50,21 @@ class CM_Wowza extends CM_Class_Abstract {
 				$streamChannel->delete();
 				continue;
 			}
+
+			/** @var CM_Model_Stream_Publish $streamPublish */
+			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
+			$ageMinForDeletion = 3;
+			if ($streamPublish->getStart() > time() - $ageMinForDeletion) {
+				continue;
+			}
 			if (!isset($status[$streamChannel->getKey()])) {
 				$this->unpublish($streamChannel->getKey());
 			} else {
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+					if ($streamSubscribe->getStart() > time() - $ageMinForDeletion) {
+						continue;
+					}
 					if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
 						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 					}
