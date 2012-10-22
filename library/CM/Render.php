@@ -445,7 +445,7 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty = new Smarty();
 			self::$_smarty->setTemplateDir(DIR_LAYOUT);
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
-			self::$_smarty->_file_perms = 0777;
+			self::$_smarty->_file_perms = 0666;
 			self::$_smarty->_dir_perms = 0777;
 			self::$_smarty->compile_check = $this->isDebug();
 			self::$_smarty->caching = false;

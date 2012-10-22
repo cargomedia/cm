@@ -32,13 +32,13 @@ class CM_File_Image extends CM_File {
 			// Copy image if no conversion necessary
 			if (isset($pathNew)) {
 				$this->copy($pathNew);
-				@chmod($pathNew, 0777);
+				@chmod($pathNew, 0666);
 			}
 			return;
 		}
 
 		$this->_writeResource($this->_resource, $pathNew, $type);
-		@chmod($pathNew, 0777);
+		@chmod($pathNew, 0666);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class CM_File_Image extends CM_File {
 			throw new CM_Exception_Invalid('Cannot resample image');
 		}
 		$this->_writeResource($resourceNew, $pathNew, $typeNew, $typeNew);
-		@chmod($pathNew, 0777);
+		@chmod($pathNew, 0666);
 	}
 
 	/**
