@@ -109,7 +109,6 @@ class CM_Util {
 		if (is_dir($path)) {
 			return;
 		}
-		self::mkDir(dirname($path));
 		if (false === mkdir($path, 0777, true)) {
 			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
 		}
