@@ -12,62 +12,39 @@ class CM_WowzaTest extends TestCase {
 		TH::clearEnv();
 	}
 
-	public function testSynchronize() {
+	public function testSynchronizeMissingInWowza() {
+		$streamChannel = TH::createStreamChannel();
+		$streamPublish = TH::createStreamPublish(null, $streamChannel);
+		$streamSubscribe = TH::createStreamSubscribe(null, $streamChannel);
+
 		/** @var CM_Wowza $wowza */
-		$wowza = $this->getMock('CM_Wowza', array('fetchStatus', 'stop'));
-		$streamChannels = array();
-		$streamChannel = TH::createStreamChannel();
-		$streamChannels[] = $streamChannel;
-		TH::createStreamPublish(null, $streamChannel);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		$streamChannel1 = TH::createStreamChannel();
-		$streamChannels[] = $streamChannel1;
-		TH::createStreamPublish(null, $streamChannel1);
-		TH::createStreamSubscribe(TH::createUser(), $streamChannel1);
-		$streamChannel = TH::createStreamChannel();
-		$streamChannels[] = $streamChannel;
-		$streamPublishToBeAdded = TH::createStreamPublish(null, $streamChannel);
-		$streamSubscribeToBeAdded1 = TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		$streamSubscribeToBeAdded2 = TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		$json = $this->_generateWowzaData($streamChannels);
+		$wowza = $this->getMock('CM_Wowza', array('fetchStatus'));
+		$json = $this->_generateWowzaData(array());
 		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
-		$streamChannelToBeAdded = clone($streamChannel);
-		$streamChannel->delete();
-		$streamSubscribeToBeRemoved3 = TH::createStreamSubscribe(TH::createUser(), $streamChannel1);
-		try {
-			new CM_Model_StreamChannel_Video($streamChannelToBeAdded->getId());
-			$this->fail();
-		} catch (CM_Exception_Nonexistent $ex) {
-			$this->assertTrue(true);
-		}
-		$streamChannelToBeRemoved = TH::createStreamChannel();
-		$streamPublishToBeRemoved = TH::createStreamPublish(null, $streamChannelToBeRemoved);
-		$streamSubscribeToBeRemoved1 = TH::createStreamSubscribe(TH::createUser(), $streamChannelToBeRemoved);
-		$streamSubscribeToBeRemoved2 = TH::createStreamSubscribe(TH::createUser(), $streamChannelToBeRemoved);
 
 		$wowza->synchronize();
 
-		//stuff that should have been added
-		$this->assertNotNull($streamChannelAdded = CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeAdded->getKey()));
-		$this->assertNotNull($streamPublishAdded = CM_Model_Stream_Publish::findKey($streamPublishToBeAdded->getKey()));
-		$this->assertNotNull($streamSubscribeAdded1 = CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeAdded1->getKey()));
-		$this->assertNotNull($streamSubscribeAdded2 = CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeAdded2->getKey()));
-		$this->assertTrue($streamChannelAdded->getStreamPublishs()->contains($streamPublishAdded));
-		$this->assertTrue($streamChannelAdded->getStreamSubscribes()->contains($streamSubscribeAdded1));
-		$this->assertTrue($streamChannelAdded->getStreamSubscribes()->contains($streamSubscribeAdded2));
-		$this->assertModelEquals($streamPublishToBeAdded->getUser(), $streamPublishAdded->getUser());
-		$this->assertModelEquals($streamSubscribeToBeAdded1->getUser(), $streamSubscribeAdded1->getUser());
-		$this->assertModelEquals($streamSubscribeToBeAdded2->getUser(), $streamSubscribeAdded2->getUser());
-		$this->assertEquals(2, $streamChannelAdded->getThumbnailCount());
+		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey()));
+		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
+		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+	}
 
-		//stuff that should have been removed
-		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannelToBeRemoved->getKey()));
-		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublishToBeRemoved->getKey()));
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved1->getKey()));
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved2->getKey()));
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribeToBeRemoved3->getKey()));
+	public function testSynchronizeMissingInPhp() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = TH::createStreamChannel();
+		$streamPublish = TH::createStreamPublish(null, $streamChannel);
+		$streamSubscribe = TH::createStreamSubscribe(null, $streamChannel);
+
+		/** @var CM_Wowza $wowza */
+		$wowza = $this->getMock('CM_Wowza', array('fetchStatus', '_stopClient'));
+		$json = $this->_generateWowzaData(array($streamChannel));
+		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
+		$wowza->expects($this->at(1))->method('_stopClient')->with($streamPublish->getKey(), $streamChannel->getPrivateHost());
+		$wowza->expects($this->at(2))->method('_stopClient')->with($streamSubscribe->getKey(), $streamChannel->getPrivateHost());
+		$wowza->expects($this->exactly(2))->method('_stopClient');
+		$streamChannel->delete();
+
+		$wowza->synchronize();
 	}
 
 	public function testCheckStreams() {

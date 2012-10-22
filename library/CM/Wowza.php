@@ -28,11 +28,7 @@ class CM_Wowza extends CM_Class_Abstract {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
-				try {
-					$this->publish($streamName, $publish['clientId'], $publish['startTimeStamp'], $publish['width'], $publish['height'], $publish['serverId'], $publish['thumbnailCount'], $publish['data']);
-				} catch (CM_Exception $ex) {
 					$this->_stopClient($publish['clientId'], $publish['serverHost']);
-				}
 			}
 
 			if ($streamChannel instanceof CM_Model_StreamChannel_Video) {
@@ -42,11 +38,7 @@ class CM_Wowza extends CM_Class_Abstract {
 
 			foreach ($publish['subscribers'] as $clientId => $subscribe) {
 				if (!$streamChannel || !$streamChannel->getStreamSubscribes()->findKey($clientId)) {
-					try {
-						$this->subscribe($streamName, $clientId, $subscribe['start'], $subscribe['data']);
-					} catch (CM_Exception $ex) {
-						$this->_stopClient($clientId, $publish['serverHost']);
-					}
+					$this->_stopClient($clientId, $publish['serverHost']);
 				}
 			}
 		}
@@ -199,14 +191,6 @@ class CM_Wowza extends CM_Class_Abstract {
 		}
 	}
 
-	/**
-	 * @param string $clientKey
-	 * @param string $wowzaHost
-	 */
-	private function _stopClient($clientKey, $wowzaHost) {
-		CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
-	}
-
 	public function checkStreams() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		foreach (self::_getStreamChannels() as $streamChannel) {
@@ -230,6 +214,14 @@ class CM_Wowza extends CM_Class_Abstract {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param string $clientKey
+	 * @param string $wowzaHost
+	 */
+	protected function _stopClient($clientKey, $wowzaHost) {
+		CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientKey), true);
 	}
 
 	/**
