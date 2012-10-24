@@ -32,13 +32,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @param CM_Model_User|int $actor
 	 */
 	public final function __construct($verb, $actor) {
-		if ($actor instanceof CM_Model_User) {
-			$this->_actor = $actor;
-		} elseif (is_int($actor) || ctype_digit($actor)) {
-			$this->_ip = $actor;
-		} else {
-			throw new CM_Exception_Invalid('Actor must be of type `CM_Model_User` or `int`');
-		}
+		$this->setActor($actor);
 		$this->_verb = (int) $verb;
 	}
 
@@ -102,6 +96,22 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public final function getActor() {
 		return $this->_actor;
+	}
+
+	/**
+	 * @param CM_Model_User|int $actor
+	 * @throws CM_Exception_Invalid
+	 */
+	public final function setActor($actor) {
+		if ($actor instanceof CM_Model_User) {
+			$this->_actor = $actor;
+			$this->_ip = null;
+		} elseif (is_int($actor) || ctype_digit($actor)) {
+			$this->_actor = null;
+			$this->_ip = $actor;
+		} else {
+			throw new CM_Exception_Invalid('Actor must be of type `CM_Model_User` or `int`');
+		}
 	}
 
 	/**
