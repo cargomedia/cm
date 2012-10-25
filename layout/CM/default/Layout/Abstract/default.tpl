@@ -2,6 +2,7 @@
 <html {if $render->getLanguage()}lang="{$render->getLanguage()->getAbbreviation()}"{/if} class="{block name='html-class'}{/block}">
 	<head>
 		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="requiresActiveX=true" />
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
 		<link rel="shortcut icon" href="{imgUrl path='favicon.ico'}">
