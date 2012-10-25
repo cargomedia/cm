@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
+		<link rel="shortcut icon" href="{imgUrl path='favicon.ico'}">
 		<title>{$title|escape}</title>
 		{resource file='library.css'}
 		{resource file='internal.css'}
