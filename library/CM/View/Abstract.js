@@ -243,7 +243,9 @@ var CM_View_Abstract = Backbone.View.extend({
 		options = options || {};
 		params = params || {};
 		params.className = className;
-		var success = options.success ? options.success : this.popOut;
+		var success = options.success ? options.success : function() {
+			this.popOut();
+		};
 		options.success = function(response) {
 			this._injectView(response, success);
 		};
