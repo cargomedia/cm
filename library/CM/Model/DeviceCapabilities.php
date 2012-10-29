@@ -42,12 +42,16 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
+		$default = array('mobile' => false, 'tablet' => false, 'hasTouchscreen' => false);
 		$adapterClass = self::_getConfig()->adapter;
+		if (!$adapterClass) {
+			return $default;
+		}
 		/** @var CM_DeviceCapabilitiesAdapter_Abstract $adapter */
 		$adapter = new $adapterClass($this->getUserAgent());
 		$capabilities = $adapter->getCapabilities();
-		if (is_null($capabilities)) {
-			$capabilities = array('mobile' => false, 'tablet' => false, 'hasTouchscreen' => false);
+		if (null === $capabilities) {
+			return $default;
 		}
 		return $capabilities;
 	}
