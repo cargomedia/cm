@@ -67,7 +67,7 @@ class CM_SessionTest extends TestCase {
 		}
 		$this->assertEquals('bar', $session->get('foo'));
 		$this->assertEquals(array('foo', 'bar'), $session->get('bar'));
-		$this->assertEquals($expiration + 10, $session->getExpiration());
+		$this->assertEquals($expiration + 10, $session->getExpiration(), null, 1);
 
 		//test that session is only persisted when data changed
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
