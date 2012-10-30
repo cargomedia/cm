@@ -267,22 +267,6 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Object} response
-	 * @param {Function} [successPre]
-	 * @private
-	 */
-	_injectView: function(response, successPre) {
-		cm.window.appendHidden(response.html);
-		new Function(response.js).call(this);
-		var view = cm.views[response.autoId];
-		this.registerChild(view);
-		if (successPre) {
-			successPre.call(view, response);
-		}
-		view._ready();
-	},
-
-	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
@@ -345,6 +329,54 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String} key
+	 * @param {*} value
+	 */
+	storageSet: function(key, value) {
+		cm.storage.set(this.getClass() + '_' + key, value);
+	},
+
+	/**
+	 * @param {String} key
+	 * @return *
+	 */
+	storageGet: function(key) {
+		return cm.storage.get(this.getClass() + '_' + key);
+	},
+
+	/**
+	 * @param {String} key
+	 */
+	storageDelete: function(key) {
+		cm.storage.del(this.getClass() + '_' + key);
+	},
+
+	/**
+	 * @param {String} key
+	 * @param {Function} getter
+	 * @return {*}
+	 */
+	cacheGet: function(key, getter) {
+		return cm.cache.get(this.getClass() + '_' + key, getter, this);
+	},
+
+	/**
+	 * @param {String} name
+	 * @param {Object} variables
+	 * @return {jQuery}
+	 */
+	renderTemplate: function (name, variables) {
+		var template = this.cacheGet('name', function () {
+			var $template = this.$('script[type="text/html"].' + name);
+			if (!$template.length) {
+				cm.error.triggerThrow('Template `' + name + '` does not exist in `' + this.getClass() + '`');
+			}
+			return $template.html();
+		});
+		return cm.template.render(template, variables);
+	},
+
+	/**
 	 * @param {Object} actions
 	 */
 	_bindActions: function(actions) {
@@ -392,5 +424,22 @@ var CM_View_Abstract = Backbone.View.extend({
 			params: this.getParams(),
 			parentId: this.getParent() ? this.getParent().getAutoId() : null
 		};
+	},
+
+	/**
+	 * @param {Object} response
+	 * @param {Function} [successPre]
+	 * @private
+	 */
+	_injectView: function(response, successPre) {
+		cm.window.appendHidden(response.html);
+		new Function(response.js).call(this);
+		var view = cm.views[response.autoId];
+		this.registerChild(view);
+		if (successPre) {
+			successPre.call(view, response);
+		}
+		view._ready();
+		return view;
 	}
 });

@@ -59,28 +59,5 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	 */
 	reload: function(params) {
 		return this.ajaxModal('reload', params);
-	},
-	
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 */
-	storageSet: function(key, value) {
-		cm.storage.set(this.getClass() + '_' + key, value);
-	},
-	
-	/**
-	 * @param {String} key
-	 * @return *
-	 */
-	storageGet: function(key) {
-		return cm.storage.get(this.getClass() + '_' + key);
-	},
-	
-	/**
-	 * @param {String} key
-	 */
-	storageDelete: function(key) {
-		cm.storage.del(this.getClass() + '_' + key);
 	}
 });
