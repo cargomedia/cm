@@ -206,13 +206,19 @@ class CM_Params extends CM_Class_Abstract {
 	 * @param string       $key
 	 * @param string       $className
 	 * @param mixed|null   $default
+	 * @param Closure|null $getter
 	 * @throws CM_Exception_InvalidParam
 	 * @return object
 	 */
-	protected function _getObject($key, $className, $default = null) {
+	protected function _getObject($key, $className, $default = null, Closure $getter = null) {
+		if (!$getter) {
+			$getter = function($className, $param) {
+				return new $className($param);
+			};
+		}
 		$param = $this->_get($key, $default);
 		if (ctype_digit($param) || is_int($param)) {
-			return new $className($param);
+			return $getter($className, $param);
 		}
 		if (!($param instanceof $className)) {
 			throw new CM_Exception_InvalidParam('Not a ' . $className);
