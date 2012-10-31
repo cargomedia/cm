@@ -367,7 +367,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	renderTemplate: function (name, variables) {
 		var template = this.cacheGet('name', function () {
-			var $template = this.$('script[type="text/html"].' + name);
+			var $template = this.$('script[type="text/html"].template.' + name);
 			if (!$template.length) {
 				cm.error.triggerThrow('Template `' + name + '` does not exist in `' + this.getClass() + '`');
 			}
