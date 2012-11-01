@@ -333,7 +333,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {*} value
 	 */
 	storageSet: function(key, value) {
-		cm.storage.set(this.getClass() + '_' + key, value);
+		cm.storage.set(this.getClass() + ':' + key, value);
 	},
 
 	/**
@@ -341,7 +341,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @return *
 	 */
 	storageGet: function(key) {
-		return cm.storage.get(this.getClass() + '_' + key);
+		return cm.storage.get(this.getClass() + ':' + key);
 	},
 
 	/**
