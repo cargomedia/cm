@@ -348,7 +348,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {String} key
 	 */
 	storageDelete: function(key) {
-		cm.storage.del(this.getClass() + '_' + key);
+		cm.storage.del(this.getClass() + ':' + key);
 	},
 
 	/**
@@ -357,7 +357,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @return {*}
 	 */
 	cacheGet: function(key, getter) {
-		return cm.cache.get(this.getClass() + '_' + key, getter, this);
+		return cm.cache.get(this.getClass() + ':' + key, getter, this);
 	},
 
 	/**
@@ -366,7 +366,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @return {jQuery}
 	 */
 	renderTemplate: function (name, variables) {
-		var template = this.cacheGet('name', function () {
+		var template = this.cacheGet('template-' + name, function () {
 			var $template = this.$('> script[type="text/html"].template.' + name);
 			if (!$template.length) {
 				cm.error.triggerThrow('Template `' + name + '` does not exist in `' + this.getClass() + '`');
