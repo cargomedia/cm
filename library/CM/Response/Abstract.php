@@ -107,8 +107,8 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		}
 
 		$requestClientId = $this->getRequest()->getClientId();
-		if ($this->getRequest()->getCookie('requestClientId') != $requestClientId) {
-			if (!setcookie('requestClientId', $requestClientId, time() + (20 * 365 * 24 * 60 * 60))) {
+		if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
+			if (!setcookie('clientId', $requestClientId, time() + (20 * 365 * 24 * 60 * 60))) {
 				throw new CM_Exception_Invalid('Unable to send requestCLient cookie');
 			}
 		}
