@@ -131,12 +131,12 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getClientId() {
 		if (null === $this->_clientId) {
-			if (!($this->_clientId = $this->getCookie('requestClientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+			if (!($this->_clientId = (int) $this->getCookie('requestClientId')) || !$this->_isValidClientId($this->_clientId)) {
+				$this->_clientId = (int) CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
 			}
 		}
 
-		return (int) $this->_clientId;
+		return $this->_clientId;
 	}
 
 	/**
@@ -411,7 +411,7 @@ abstract class CM_Request_Abstract {
 		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
 			$isValid = (bool) CM_Mysql::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
 			if ($isValid) {
-				CM_CacheLocal::set($cacheKey, $isValid);
+				CM_CacheLocal::set($cacheKey, true);
 			}
 		}
 

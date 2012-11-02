@@ -265,7 +265,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string|array|null $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @param array|null		$onDuplicateKeyValues
 	 * @param string			$statement
-	 * @return int Insert Id
+	 * @return string Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = self::STMT_INSERT) {
 		if ($value === null && is_array($attr)) {
