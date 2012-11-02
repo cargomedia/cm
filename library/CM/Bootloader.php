@@ -139,6 +139,7 @@ class CM_Bootloader {
 		define('TBL_CM_ACTIONLIMIT', 'cm_actionLimit');
 
 		define('TBL_CM_SESSION', 'cm_session');
+		define('TBL_CM_REQUESTCLIENT', 'cm_requestClient');
 
 		define('TBL_CM_MAIL', 'cm_mail');
 

@@ -91,6 +91,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * Processes all headers and sends them
 	 */
 	public function sendHeaders() {
+
 		if ($this->getRequest()->hasSession()) {
 			$session = $this->getRequest()->getSession();
 			if (!$session->isEmpty()) {
@@ -104,6 +105,13 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 				}
 			}
 
+		}
+
+		$requestClientId = $this->getRequest()->getClientId();
+		if ($this->getRequest()->getCookie('requestClientId') != $requestClientId) {
+			if (!setcookie('requestClientId', $requestClientId, time() + (20 * 365 * 24 * 60 * 60))) {
+				throw new CM_Exception_Invalid('Unable to send requestCLient cookie');
+			}
 		}
 
 		foreach ($this->_rawHeaders as $header) {
@@ -124,7 +132,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		header_remove('Expires');
 	}
 
-
 	/**
 	 * @return CM_Render
 	 */
@@ -142,7 +149,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	protected function _setContent($content) {
 		$this->_content = (string) $content;
 	}
-
 
 	/**
 	 * @param string $key   Header key

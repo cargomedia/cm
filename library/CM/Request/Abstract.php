@@ -122,6 +122,18 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getClientId() {
+
+		if (!($clientId = $this->getCookie('requestClientId')) || !$this->_isValidClientId($clientId)) {
+			$clientId = CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+		}
+
+		return $clientId;
+	}
+
+	/**
 	 * @param string $path
 	 * @return CM_Request_Abstract
 	 */
@@ -312,7 +324,7 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return string|null	very long number (string used)
+	 * @return string|null    very long number (string used)
 	 */
 	public function getIp() {
 		if (IS_TEST) {
@@ -380,6 +392,24 @@ abstract class CM_Request_Abstract {
 			return null;
 		}
 		return $this->getViewer(true)->getLanguage();
+	}
+
+	/**
+	 * @param int $clientId
+	 * @return bool
+	 */
+	private function _isValidClientId($clientId) {
+		$clientId = (int) $clientId;
+		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
+
+		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
+			$isValid = (bool) CM_Mysql::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+			if ($isValid) {
+				CM_CacheLocal::set($cacheKey, $isValid);
+			}
+		}
+
+		return $isValid;
 	}
 
 	/**

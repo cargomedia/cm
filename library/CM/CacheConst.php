@@ -22,6 +22,8 @@ class CM_CacheConst {
 
 	// _id:X
 	const Session = 'Session';
+	// _id:X
+	const Request_Client = 'Request_Client';
 	
 	// _class:X_id:X
 	const Model = 'Model';
