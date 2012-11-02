@@ -47,6 +47,11 @@ abstract class CM_Request_Abstract {
 	private $_languageUrl;
 
 	/**
+	 * @var int
+	 */
+	private $_clientId;
+
+	/**
 	 * @var CM_Request_Abstract
 	 */
 	private static $_instance;
@@ -125,12 +130,13 @@ abstract class CM_Request_Abstract {
 	 * @return int
 	 */
 	public function getClientId() {
-
-		if (!($clientId = $this->getCookie('requestClientId')) || !$this->_isValidClientId($clientId)) {
-			$clientId = CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+		if (null === $this->_clientId) {
+			if (!($this->_clientId = $this->getCookie('requestClientId')) || !$this->_isValidClientId($this->_clientId)) {
+				$this->_clientId = CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+			}
 		}
 
-		return $clientId;
+		return (int) $this->_clientId;
 	}
 
 	/**

@@ -117,6 +117,27 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertNull($mock->getLanguageUrl());
 	}
 
+	public function testGetClientId() {
+		$uri = '/en/foo/bar?foo1=bar1';
+		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
+		/** @var CM_Request_Abstract $mock */
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertSame(1, $mock->getClientId());
+
+		$uri = '/';
+		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=requestClientId=WRONG;');
+		/** @var CM_Request_Abstract $mock */
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertSame(2, $mock->getClientId());
+
+		$uri = '/';
+		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=requestClientId=2;');
+		/** @var CM_Request_Abstract $mock */
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertSame(2, $mock->getClientId());
+		$this->assertSame(2, $mock->getClientId());
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders

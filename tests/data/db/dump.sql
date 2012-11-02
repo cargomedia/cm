@@ -431,3 +431,9 @@ CREATE TABLE `cm_user_preferenceDefault` (
   PRIMARY KEY (`preferenceId`),
   UNIQUE KEY `section` (`section`,`key`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_requestClient`;
+CREATE TABLE IF NOT EXISTS `cm_requestClient` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
