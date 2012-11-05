@@ -122,20 +122,26 @@ class CM_Request_AbstractTest extends TestCase {
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(1, $mock->getClientId());
+		$this->assertTrue($mock->hasClientId());
 
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=WRONG;');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(2, $mock->getClientId());
+		$this->assertTrue($mock->hasClientId());
 
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=2;');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(2, $mock->getClientId());
 		$this->assertSame(2, $mock->getClientId());
+		$this->assertTrue($mock->hasClientId());
 	}
 
 	/**
