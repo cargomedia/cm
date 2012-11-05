@@ -27,4 +27,13 @@ class CM_Response_AbstractTest extends TestCase {
 		}
 	}
 
+	public function testSetCookie() {
+		$request = new CM_Request_Post('/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+		$clientId = $request->getClientId();
+		/** @var CM_Response_Abstract $response */
+		$response = $this->getMock('CM_Response_Abstract', array('process', '_setCookie'), array($request));
+		$response->expects($this->once())->method('_setCookie')->with('clientId', (string) $clientId);
+		$response->sendHeaders();
+	}
+
 }

@@ -95,13 +95,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 			$session = $this->getRequest()->getSession();
 			if (!$session->isEmpty()) {
 				$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
-				if (!setcookie('sessionId', $session->getId(), $sessionExpiration, '/')) {
-					throw new CM_Exception_Invalid('Unable to send session-cookie.');
-				}
+				$this->_setCookie('sessionId', $session->getId(), $sessionExpiration);
 			} elseif ($this->getRequest()->getCookie('sessionId')) {
-				if (!setcookie('sessionId', '', 1, '/')) {
-					throw new CM_Exception_Invalid('Unable to delete session-cookie.');
-				}
+				$this->_setCookie('sessionId', '', 1);
 			}
 
 		}
@@ -109,9 +105,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		if ($this->getRequest()->hasClientId()) {
 			$requestClientId = $this->getRequest()->getClientId();
 			if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
-				if (!setcookie('clientId', $requestClientId, time() + (20 * 365 * 24 * 60 * 60))) {
-					throw new CM_Exception_Invalid('Unable to send requestCLient cookie');
-				}
+				$this->_setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
 			}
 		}
 
@@ -157,6 +151,23 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	protected function _setHeader($key, $value) {
 		$this->_headers[$key] = $value;
+	}
+
+	/**
+	 * @param string       $name
+	 * @param string       $value
+	 * @param int          $expire
+	 * @param string|null  $path
+	 * @throws CM_Exception_Invalid
+	 */
+	protected function _setCookie($name, $value, $expire, $path = null) {
+		if (null === $path) {
+			$path = '/';
+		}
+
+		if (!setcookie($name, $value, $expire, $path)) {
+			throw new CM_Exception_Invalid('Unable to send ' . $name . ' cookie. Value: ' . $value . ' expire: ' . $expire);
+		}
 	}
 
 	/**
