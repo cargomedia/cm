@@ -303,12 +303,15 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {String|Function} callback
-	 * @param {int} interval
-	 * @return {int}
+	 * @param {Function} callback
+	 * @param {Integer} interval
+	 * @return {Number}
 	 */
 	setInterval: function(callback, interval) {
-		var id = window.setInterval(callback, interval);
+		var self = this;
+		var id = window.setInterval(function() {
+			callback.call(self);
+		}, interval);
 		this.on('destruct', function() {
 			window.clearInterval(id);
 		});
@@ -316,12 +319,15 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {String|Function} callback
-	 * @param {int} timeout
-	 * @return {int}
+	 * @param {Function} callback
+	 * @param {Integer} timeout
+	 * @return {Number}
 	 */
 	setTimeout: function(callback, timeout) {
-		var id = window.setTimeout(callback, timeout);
+		var self = this;
+		var id = window.setTimeout(function() {
+			callback.call(self);
+		}, timeout);
 		this.on('destruct', function() {
 			window.clearTimeout(id);
 		});
@@ -365,8 +371,8 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Object} variables
 	 * @return {jQuery}
 	 */
-	renderTemplate: function (name, variables) {
-		var template = this.cacheGet('template-' + name, function () {
+	renderTemplate: function(name, variables) {
+		var template = this.cacheGet('template-' + name, function() {
 			var $template = this.$('> script[type="text/template"].' + name);
 			if (!$template.length) {
 				cm.error.triggerThrow('Template `' + name + '` does not exist in `' + this.getClass() + '`');
