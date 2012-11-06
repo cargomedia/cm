@@ -312,7 +312,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	private function _send($subject, $text, $html = null) {
-		if (CM_Config::get()->debug || IS_TEST) {
+		if (!self::_getConfig()->send) {
 			$this->_log($subject, $text);
 		} else {
 			$mail = new PHPMailer(true);

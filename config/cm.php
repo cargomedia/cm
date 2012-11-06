@@ -12,6 +12,7 @@ $config->CM_Render->cdnResource = true;
 $config->CM_Render->cdnUserContent = true;
 
 $config->CM_Mail = new stdClass();
+$config->CM_Mail->send = true;
 $config->CM_Mail->siteName = 'CM';
 $config->CM_Mail->siteEmailAddress = 'noreply@example.com';
 
