@@ -6,7 +6,7 @@ class CM_Response_Captcha extends CM_Response_Abstract {
 		$params = $this->_request->getQuery();
 		$captcha = new CM_Captcha($params['id']);
 
-		$this->_setHeader('Content-Type', 'image/png');
+		$this->setHeader('Content-Type', 'image/png');
 		$this->_setContent($captcha->render(200, 40));
 	}
 

@@ -22,7 +22,7 @@ class CM_Response_RPC extends CM_Response_Abstract {
 			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
 
-		$this->_setHeader('Content-Type', 'application/json');
+		$this->setHeader('Content-Type', 'application/json');
 		$this->_setContent(json_encode($output));
 	}
 

@@ -14,7 +14,7 @@ class CM_Response_EmailTracking extends CM_Response_Abstract {
 		} catch (CM_Exception_Nonexistent $e) {
 		}
 
-		$this->_setHeader('Content-Type', 'image/gif');
+		$this->setHeader('Content-Type', 'image/gif');
 		$this->_setContent(base64_decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='));
 	}
 

@@ -69,7 +69,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		}
 
 		$this->enableCache();
-		$this->_setHeader('Content-Type', 'text/css');
+		$this->setHeader('Content-Type', 'text/css');
 		$this->_setContent($content);
 	}
 

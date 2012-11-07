@@ -46,7 +46,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 * @param string $url
 	 */
 	public function sendRedirectHeader($url) {
-		$this->_setHeader('Location', (string) $url);
+		$this->setHeader('Location', (string) $url);
 		$this->sendHeaders();
 	}
 

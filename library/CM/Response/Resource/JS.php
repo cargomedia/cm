@@ -35,7 +35,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		}
 
 		$this->enableCache();
-		$this->_setHeader('Content-Type', 'application/x-javascript');
+		$this->setHeader('Content-Type', 'application/x-javascript');
 		$this->_setContent($content);
 	}
 

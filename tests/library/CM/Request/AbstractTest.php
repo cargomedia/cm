@@ -144,6 +144,16 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertTrue($mock->hasClientId());
 	}
 
+
+	public function testGetClientIdSetCookie() {
+		$request = new CM_Request_Post('/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+		$clientId = $request->getClientId();
+		/** @var CM_Response_Abstract $response */
+		$response = $this->getMock('CM_Response_Abstract', array('process', 'setCookie'), array($request));
+		$response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
+		$response->sendHeaders();
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders

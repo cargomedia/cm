@@ -27,7 +27,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	private $_rawHeaders = array();
 
-	/** @var null|string */
+	/**
+	 * @var null|string
+	 */
 	private $_content = null;
 
 	abstract public function process();
@@ -67,64 +69,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * Sets not found header (can be server specific)
-	 */
-	public function setHeaderNotfound() {
-		$this->addHeaderRaw('HTTP/1.0 404 Not Found');
-	}
-
-	/**
 	 * @return string|null
 	 */
 	public function getContent() {
 		return $this->_content;
-	}
-
-	/**
-	 * @param string $header
-	 */
-	public function addHeaderRaw($header) {
-		$this->_rawHeaders[] = $header;
-	}
-
-	/**
-	 * Processes all headers and sends them
-	 */
-	public function sendHeaders() {
-		if ($this->getRequest()->hasSession()) {
-			$session = $this->getRequest()->getSession();
-			if (!$session->isEmpty()) {
-				$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
-				$this->_setCookie('sessionId', $session->getId(), $sessionExpiration);
-			} elseif ($this->getRequest()->getCookie('sessionId')) {
-				$this->_setCookie('sessionId', '', 1);
-			}
-
-		}
-
-		if ($this->getRequest()->hasClientId()) {
-			$requestClientId = $this->getRequest()->getClientId();
-			if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
-				$this->_setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
-			}
-		}
-
-		foreach ($this->_rawHeaders as $header) {
-			header($header);
-		}
-
-		foreach ($this->_headers as $key => $value) {
-			header($key . ': ' . $value);
-		}
-	}
-
-	/**
-	 * Enables caching by removing no-cache headers
-	 */
-	public function enableCache() {
-		header_remove('Cache-Control');
-		header_remove('Pragma');
-		header_remove('Expires');
 	}
 
 	/**
@@ -139,17 +87,36 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $content
+	 * @return array
 	 */
-	protected function _setContent($content) {
-		$this->_content = (string) $content;
+	public function getHeaders() {
+		$returnArray = array();
+
+		if (count($this->_rawHeaders)) {
+			$returnArray = $this->_rawHeaders;
+		}
+
+		if (!empty($this->_headers)) {
+			foreach ($this->_headers as $key => $value) {
+				$returnArray[] = $key . ': ' . $value;
+			}
+		}
+
+		return $returnArray;
+	}
+
+	/**
+	 * Sets not found header (can be server specific)
+	 */
+	public function setHeaderNotfound() {
+		$this->addHeaderRaw('HTTP/1.0 404 Not Found');
 	}
 
 	/**
 	 * @param string $key   Header key
 	 * @param string $value Header value
 	 */
-	protected function _setHeader($key, $value) {
+	public function setHeader($key, $value) {
 		$this->_headers[$key] = $value;
 	}
 
@@ -158,16 +125,79 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @param string       $value
 	 * @param int          $expire
 	 * @param string|null  $path
-	 * @throws CM_Exception_Invalid
 	 */
-	protected function _setCookie($name, $value, $expire, $path = null) {
+	public function setCookie($name, $value, $expire = null, $path = null) {
+		if (null !== $expire) {
+			$expire = (int) $expire;
+		}
 		if (null === $path) {
 			$path = '/';
 		}
 
-		if (!setcookie($name, $value, $expire, $path)) {
-			throw new CM_Exception_Invalid('Unable to send ' . $name . ' cookie. Value: ' . $value . ' expire: ' . $expire);
+		$cookie = $name . '=' . urlencode($value);
+		if (null !== $expire) {
+			$cookie .= '; Expires=' . date('D\, d\-M\-Y h:i:s e', $expire);
 		}
+		$cookie .= '; Path=' . $path;
+
+		$this->addHeaderRaw('Set-Cookie: ' . $cookie);
+	}
+
+	/**
+	 * @param string $header
+	 */
+	public function addHeaderRaw($header) {
+		$this->_rawHeaders[] = $header;
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function deleteCookie($name) {
+		$this->setCookie($name, '', 1);
+	}
+
+	/**
+	 * Processes all headers and sends them
+	 */
+	public function sendHeaders() {
+		if ($this->getRequest()->hasSession()) {
+			$session = $this->getRequest()->getSession();
+			if (!$session->isEmpty()) {
+				$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
+				$this->setCookie('sessionId', $session->getId(), $sessionExpiration);
+			} elseif ($this->getRequest()->getCookie('sessionId')) {
+				$this->deleteCookie('sessionId');
+			}
+
+		}
+
+		if ($this->getRequest()->hasClientId()) {
+			$requestClientId = $this->getRequest()->getClientId();
+			if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
+				$this->setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
+			}
+		}
+
+		foreach ($this->getHeaders() as $header) {
+			header($header);
+		}
+	}
+
+	/**
+	 * Enables caching by removing no-cache headers
+	 */
+	public function enableCache() {
+		header_remove('Cache-Control');
+		header_remove('Pragma');
+		header_remove('Expires');
+	}
+
+	/**
+	 * @param string $content
+	 */
+	protected function _setContent($content) {
+		$this->_content = (string) $content;
 	}
 
 	/**

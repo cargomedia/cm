@@ -27,13 +27,22 @@ class CM_Response_AbstractTest extends TestCase {
 		}
 	}
 
-	public function testSetCookie() {
-		$request = new CM_Request_Post('/' . CM_Site_CM::TYPE . '/timestamp', null, '');
-		$clientId = $request->getClientId();
-		/** @var CM_Response_Abstract $response */
-		$response = $this->getMock('CM_Response_Abstract', array('process', '_setCookie'), array($request));
-		$response->expects($this->once())->method('_setCookie')->with('clientId', (string) $clientId);
-		$response->sendHeaders();
+	public function testSetDeleteCookie() {
+		$request = new CM_Request_Post('/homepage/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+		$response = CM_Response_Abstract::factory($request);
+		$time = time();
+		$timeString = date('D\, d\-M\-Y h:i:s e', $time);
+
+		$response->setCookie('foo', 'bar', $time);
+		$response->deleteCookie('foo');
+		$response->setCookie('bar', 'bad!=();');
+		$headers = $response->getHeaders();
+
+		$this->assertContains('Set-Cookie: foo=bar', $headers[0]);
+		$this->assertContains($timeString, $headers[0]);
+		$this->assertContains('Set-Cookie: foo', $headers[1]);
+		$this->assertNotContains($timeString, $headers[1]);
+		$this->assertContains('Set-Cookie: bar=bad%21%3D%28%29%3B;', $headers[2]);
 	}
 
 }

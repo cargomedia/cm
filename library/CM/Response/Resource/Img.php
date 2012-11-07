@@ -15,7 +15,7 @@ class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 		}
 		$this->enableCache();
-		$this->_setHeader('Content-Type', $file->getMimeType());
+		$this->setHeader('Content-Type', $file->getMimeType());
 		$this->_setContent($file->read());
 	}
 

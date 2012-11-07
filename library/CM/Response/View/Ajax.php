@@ -33,7 +33,7 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			$output['error'] = array('type' => get_class($e), 'msg' => $e->getMessagePublic($this->getRender()), 'isPublic' => $e->isPublic());
 		}
 
-		$this->_setHeader('Content-Type', 'application/json');
+		$this->setHeader('Content-Type', 'application/json');
 		$this->_setContent(json_encode($output));
 	}
 
