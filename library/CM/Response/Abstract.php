@@ -100,8 +100,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @return array
 	 */
 	public function getHeaders() {
-		$headers = array();
-
 		$headers = $this->_rawHeaders;
 		foreach ($this->_headers as $key => $value) {
 			$headers[] = $key . ': ' . $value;
