@@ -2,10 +2,6 @@
 
 class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'img';
-	}
-
 	protected function _process() {
 		$file = null;
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
@@ -21,5 +17,9 @@ class CM_Response_Resource_Img extends CM_Response_Resource_Abstract {
 		$this->enableCache();
 		$this->setHeader('Content-Type', $file->getMimeType());
 		$this->_setContent($file->read());
+	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'img';
 	}
 }

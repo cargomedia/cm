@@ -34,6 +34,8 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	abstract protected function _process();
 
 	public function process() {
+		$this->_process();
+
 		if ($this->getRequest()->hasSession()) {
 			$session = $this->getRequest()->getSession();
 			if (!$session->isEmpty()) {
@@ -51,8 +53,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 				$this->setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
 			}
 		}
-
-		$this->_process();
 	}
 
 	/**

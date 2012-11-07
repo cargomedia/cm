@@ -74,6 +74,20 @@ class CM_Response_Page extends CM_Response_Abstract {
 		return $this->getRender()->render($page->getLayout());
 	}
 
+	protected function _process() {
+		$this->_site->preprocessPageResponse($this);
+		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
+
+		$html = $this->_processPageLoop($this->getRequest());
+
+		if ($redirectUrl = $this->getRedirectUrl()) {
+			$this->sendRedirectHeader($redirectUrl);
+			exit();
+		}
+
+		$this->_setContent($html);
+	}
+
 	/**
 	 * @param CM_Request_Abstract $request
 	 * @throws CM_Exception_Nonexistent
@@ -116,19 +130,5 @@ class CM_Response_Page extends CM_Response_Abstract {
 			$request->setQuery(array());
 		}
 		return false;
-	}
-
-	protected function _process() {
-		$this->_site->preprocessPageResponse($this);
-		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
-
-		$html = $this->_processPageLoop($this->getRequest());
-
-		if ($redirectUrl = $this->getRedirectUrl()) {
-			$this->sendRedirectHeader($redirectUrl);
-			exit();
-		}
-
-		$this->_setContent($html);
 	}
 }

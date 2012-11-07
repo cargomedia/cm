@@ -2,10 +2,6 @@
 
 class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'ajax';
-	}
-
 	protected function _process() {
 		$output = array();
 		try {
@@ -39,5 +35,9 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 
 		$this->setHeader('Content-Type', 'application/json');
 		$this->_setContent(json_encode($output));
+	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'ajax';
 	}
 }

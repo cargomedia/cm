@@ -24,10 +24,6 @@ class CM_Response_Upload extends CM_Response_Abstract {
 		parent::__construct($request, $siteId);
 	}
 
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'upload';
-	}
-
 	protected function _process() {
 		$query = $this->_request->getQuery();
 
@@ -78,5 +74,9 @@ class CM_Response_Upload extends CM_Response_Abstract {
 		}
 
 		$this->_setContent(json_encode($return, JSON_HEX_TAG));	// JSON decoding in IE-iframe needs JSON_HEX_TAG
+	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'upload';
 	}
 }
