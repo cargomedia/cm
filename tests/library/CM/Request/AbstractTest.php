@@ -149,9 +149,9 @@ class CM_Request_AbstractTest extends TestCase {
 		$request = new CM_Request_Post('/foo/bar');
 		$clientId = $request->getClientId();
 		/** @var CM_Response_Abstract $response */
-		$response = $this->getMock('CM_Response_Abstract', array('process', 'setCookie'), array($request));
+		$response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));
 		$response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
-		$response->sendHeaders();
+		$response->process();
 	}
 
 	/**
