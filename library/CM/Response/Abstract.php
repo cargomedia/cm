@@ -99,6 +99,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		return $this->_render;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getCookies() {
 		return $this->_cookies;
 	}
