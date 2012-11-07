@@ -28,7 +28,7 @@ class CM_Response_AbstractTest extends TestCase {
 	}
 
 	public function testSetDeleteCookie() {
-		$request = new CM_Request_Post('/homepage');
+		$request = new CM_Request_Post('/foo/bar');
 		$response = CM_Response_Abstract::factory($request);
 		$time = time();
 		$timeString = date('D\, d\-M\-Y h:i:s e', $time);
