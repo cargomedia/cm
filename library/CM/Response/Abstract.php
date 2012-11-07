@@ -17,6 +17,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	/** @var array */
 	private $_rawHeaders = array();
 
+	/** @var array */
+	private $_cookies = array();
+
 	/** @var null|string */
 	private $_content = null;
 
@@ -96,6 +99,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		return $this->_render;
 	}
 
+	public function getCookies() {
+		return $this->_cookies;
+	}
+
 	/**
 	 * @return array
 	 */
@@ -103,6 +110,15 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		$headers = $this->_rawHeaders;
 		foreach ($this->_headers as $key => $value) {
 			$headers[] = $key . ': ' . $value;
+		}
+		foreach ($this->_cookies as $name => $cookieParameter) {
+			$cookie = 'Set-Cookie: ' . $name . '=' . urlencode($cookieParameter['value']);
+			if (null !== $cookieParameter['expire']) {
+				$cookie .= '; Expires=' . date('D\, d\-M\-Y h:i:s e', (int) $cookieParameter['expire']);
+			}
+			$cookie .= '; Path=' . $cookieParameter['path'];
+
+			$headers[] = $cookie;
 		}
 
 		return $headers;
@@ -130,20 +146,15 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @param string|null  $path
 	 */
 	public function setCookie($name, $value, $expire = null, $path = null) {
-		if (null !== $expire) {
-			$expire = (int) $expire;
-		}
 		if (null === $path) {
 			$path = '/';
 		}
 
-		$cookie = $name . '=' . urlencode($value);
-		if (null !== $expire) {
-			$cookie .= '; Expires=' . date('D\, d\-M\-Y h:i:s e', $expire);
-		}
-		$cookie .= '; Path=' . $path;
-
-		$this->addHeaderRaw('Set-Cookie: ' . $cookie);
+		$this->_cookies[$name] = array(
+			'value' => $value,
+			'expire' => $expire,
+			'path' => $path
+		);
 	}
 
 	/**
@@ -165,7 +176,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	public function sendHeaders() {
 		foreach ($this->getHeaders() as $header) {
-			header($header);
+			header($header, false);
 		}
 	}
 

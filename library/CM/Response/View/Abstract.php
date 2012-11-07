@@ -83,7 +83,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	 * @return array
 	 * @throws CM_Exception_Invalid
 	 */
-	public function loadPage(CM_Params $params) {
+	public function loadPage(CM_Params $params, CM_Response_View_Ajax $response) {
 		$request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getViewer());
 
 		$count = 0;
@@ -92,17 +92,21 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			if ($count++ > 10) {
 				throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
 			}
-			$response = new CM_Response_Page_Embed($request);
-			$response->process();
+			$responsePage = new CM_Response_Page_Embed($request);
+			$responsePage->process();
 			$paths[] = $request->getPath();
-		} while ($response->getRedirectUrl());
+		} while ($responsePage->getRedirectUrl());
 
-		$page = $response->getPage();
+		foreach($responsePage->getCookies() as $name => $cookieParameters) {
+			$response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
+		}
 
-		$html = $response->getContent();
-		$js = $response->getRender()->getJs()->getJs();
-		$title = $response->getTitle();
-		$url = $response->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
+		$page = $responsePage->getPage();
+
+		$html = $responsePage->getContent();
+		$js = $responsePage->getRender()->getJs()->getJs();
+		$title = $responsePage->getTitle();
+		$url = $responsePage->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 		$layoutClass = get_class($page->getLayout());
 		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
 			return $menuEntry->getHash();
