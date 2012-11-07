@@ -34,13 +34,13 @@ class CM_Response_AbstractTest extends TestCase {
 		$timeString = date('D\, d\-M\-Y h:i:s e', $time);
 
 		$response->setCookie('foo', 'bar', $time);
-		$response->deleteCookie('foo');
 		$response->setCookie('bar', 'bad!=();');
 		$headers = $response->getHeaders();
-
 		$this->assertSame('Set-Cookie: foo=bar; Expires=' . $timeString . '; Path=/', $headers[0]);
-		$this->assertSame('Set-Cookie: foo=; Expires=Wed, 31-Dec-1969 06:00:01 US/Central; Path=/', $headers[1]);
-		$this->assertSame('Set-Cookie: bar=bad%21%3D%28%29%3B; Path=/', $headers[2]);
-	}
+		$this->assertSame('Set-Cookie: bar=bad%21%3D%28%29%3B; Path=/', $headers[1]);
 
+		$response->deleteCookie('foo');
+		$headers = $response->getHeaders();
+		$this->assertSame('Set-Cookie: foo=; Expires=Wed, 31-Dec-1969 06:00:01 US/Central; Path=/', $headers[0]);
+	}
 }

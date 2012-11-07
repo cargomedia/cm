@@ -111,12 +111,12 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		foreach ($this->_headers as $key => $value) {
 			$headers[] = $key . ': ' . $value;
 		}
-		foreach ($this->_cookies as $name => $cookieParameter) {
-			$cookie = 'Set-Cookie: ' . $name . '=' . urlencode($cookieParameter['value']);
-			if (null !== $cookieParameter['expire']) {
-				$cookie .= '; Expires=' . date('D\, d\-M\-Y h:i:s e', (int) $cookieParameter['expire']);
+		foreach ($this->_cookies as $name => $cookieParameters) {
+			$cookie = 'Set-Cookie: ' . $name . '=' . urlencode($cookieParameters['value']);
+			if (null !== $cookieParameters['expire']) {
+				$cookie .= '; Expires=' . date('D\, d\-M\-Y h:i:s e', (int) $cookieParameters['expire']);
 			}
-			$cookie .= '; Path=' . $cookieParameter['path'];
+			$cookie .= '; Path=' . $cookieParameters['path'];
 
 			$headers[] = $cookie;
 		}
@@ -149,12 +149,14 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		if (null === $path) {
 			$path = '/';
 		}
+		if (null !== $expire) {
+			$expire = (int) $expire;
+		}
+		$name = (string) $name;
+		$value = (string) $value;
+		$path = (string) $path;
 
-		$this->_cookies[$name] = array(
-			'value' => $value,
-			'expire' => $expire,
-			'path' => $path
-		);
+		$this->_cookies[$name] = array('value' => $value, 'expire' => $expire, 'path' => $path);
 	}
 
 	/**
