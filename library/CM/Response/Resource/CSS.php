@@ -2,7 +2,24 @@
 
 class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 
-	public function process() {
+	/**
+	 * @return string
+	 */
+	private function _getCssSmiley() {
+		$css = '';
+		foreach (new CM_Paging_Smiley_All() as $smiley) {
+			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
+			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']) . ')';
+			$css .= '}' . PHP_EOL;
+		}
+		return $css;
+	}
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'css';
+	}
+
+	protected function _process() {
 		switch ($this->getRequest()->getPath()) {
 			case '/library.css':
 				$content = '';
@@ -71,22 +88,5 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$this->enableCache();
 		$this->setHeader('Content-Type', 'text/css');
 		$this->_setContent($content);
-	}
-
-	/**
-	 * @return string
-	 */
-	private function _getCssSmiley() {
-		$css = '';
-		foreach (new CM_Paging_Smiley_All() as $smiley) {
-			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
-			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']) . ')';
-			$css .= '}' . PHP_EOL;
-		}
-		return $css;
-	}
-
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'css';
 	}
 }

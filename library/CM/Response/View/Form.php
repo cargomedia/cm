@@ -67,7 +67,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 		CM_Frontend::concat_js($jsCode, $this->_jsCode);
 	}
 
-	public function process() {
+	protected function _process() {
 		$output = array();
 		try {
 			$success = array();
@@ -111,6 +111,5 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 	public static function match(CM_Request_Abstract $request) {
 		return $request->getPathPart(0) === 'form';
 	}
-
 }
 

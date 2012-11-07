@@ -20,8 +20,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	/** @var null|string */
 	private $_content = null;
 
-	abstract public function process();
-
 	/**
 	 * @param CM_Request_Abstract $request
 	 */
@@ -31,6 +29,30 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		$language = $request->popPathLanguage();
 		$siteId = $request->popPathPart();
 		$this->_site = CM_Site_Abstract::factory($siteId);
+	}
+
+	abstract protected function _process();
+
+	public function process() {
+		if ($this->getRequest()->hasSession()) {
+			$session = $this->getRequest()->getSession();
+			if (!$session->isEmpty()) {
+				$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
+				$this->setCookie('sessionId', $session->getId(), $sessionExpiration);
+			} elseif ($this->getRequest()->getCookie('sessionId')) {
+				$this->deleteCookie('sessionId');
+			}
+
+		}
+
+		if ($this->getRequest()->hasClientId()) {
+			$requestClientId = $this->getRequest()->getClientId();
+			if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
+				$this->setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
+			}
+		}
+
+		$this->_process();
 	}
 
 	/**
@@ -144,24 +166,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * Processes all headers and sends them
 	 */
 	public function sendHeaders() {
-		if ($this->getRequest()->hasSession()) {
-			$session = $this->getRequest()->getSession();
-			if (!$session->isEmpty()) {
-				$sessionExpiration = $session->hasLifetime() ? time() + $session->getLifetime() : null;
-				$this->setCookie('sessionId', $session->getId(), $sessionExpiration);
-			} elseif ($this->getRequest()->getCookie('sessionId')) {
-				$this->deleteCookie('sessionId');
-			}
-
-		}
-
-		if ($this->getRequest()->hasClientId()) {
-			$requestClientId = $this->getRequest()->getClientId();
-			if ($this->getRequest()->getCookie('clientId') != $requestClientId) {
-				$this->setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
-			}
-		}
-
 		foreach ($this->getHeaders() as $header) {
 			header($header);
 		}

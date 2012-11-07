@@ -2,7 +2,11 @@
 
 class CM_Response_RPC extends CM_Response_Abstract {
 
-	public function process() {
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'rpc';
+	}
+
+	protected function _process() {
 		$output = array();
 		try {
 			$query = $this->_request->getQuery();
@@ -24,9 +28,5 @@ class CM_Response_RPC extends CM_Response_Abstract {
 
 		$this->setHeader('Content-Type', 'application/json');
 		$this->_setContent(json_encode($output));
-	}
-
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'rpc';
 	}
 }

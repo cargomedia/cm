@@ -2,22 +2,25 @@
 
 class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 
-	public function process() {
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'js';
+	}
 
+	protected function _process() {
 		if ($this->getRequest()->getPath() == '/internal.js') {
-			$content = $this->_process($this->_getInternal());
+			$content = $this->_processInternal($this->_getInternal());
 		} elseif ($this->getRequest()->getPath() == '/init.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			$content = $this->_process($content);
+			$content = $this->_processInternal($content);
 		} elseif ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
 			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
 				$content .= new CM_File($path) . ';' . PHP_EOL;
 			}
-			$content = $this->_process($content);
+			$content = $this->_processInternal($content);
 		} elseif ($this->getRequest()->getPathPart(0) == 'translations') {
 			$language = $this->getRender()->getLanguage();
 			if (!$language) {
@@ -62,15 +65,11 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		return $content;
 	}
 
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'js';
-	}
-
 	/**
 	 * @param string $content
 	 * @return string
 	 */
-	private function _process($content) {
+	private function _processInternal($content) {
 		if (!$this->getRender()->isDebug()) {
 			$md5 = md5($content);
 			$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . $md5;

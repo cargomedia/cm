@@ -12,13 +12,6 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 		parent::__construct($request);
 	}
 
-	public function process() {
-		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
-		$html = $this->_processPageLoop($this->getRequest());
-
-		$this->_setContent($html);
-	}
-
 	/**
 	 * @throws CM_Exception_Invalid
 	 * @return string
@@ -42,4 +35,10 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 		return $renderAdapterPage->fetch();
 	}
 
+	protected function _process() {
+		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
+		$html = $this->_processPageLoop($this->getRequest());
+
+		$this->_setContent($html);
+	}
 }

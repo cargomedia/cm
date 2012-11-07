@@ -1,11 +1,12 @@
 <?php
 
 class CM_Response_Longpolling extends CM_Response_Abstract {
-	
-	/**
-	 * @return string JSON
-	 */
-	public function process() {
+
+	public static function match(CM_Request_Abstract $request) {
+		return $request->getPathPart(0) === 'longpolling';
+	}
+
+	protected function _process() {
 		$params = CM_Params::factory($this->_request->getQuery());
 		$channel = $params->getString('channel');
 
@@ -25,9 +26,5 @@ class CM_Response_Longpolling extends CM_Response_Abstract {
 
 		$this->setHeader('ETag', $data['id']);
 		$this->_setContent($data['data']);
-	}
-
-	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'longpolling';
 	}
 }
