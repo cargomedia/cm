@@ -2,34 +2,22 @@
 
 abstract class CM_Response_Abstract extends CM_Class_Abstract {
 
-	/**
-	 * @var CM_Request_Abstract
-	 */
+	/** @var CM_Request_Abstract */
 	protected $_request;
 
-	/**
-	 * @var CM_Render
-	 */
+	/** @var CM_Render */
 	private $_render = null;
 
-	/**
-	 * @var CM_Site_Abstract
-	 */
+	/** @var CM_Site_Abstract */
 	protected $_site = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $_headers = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $_rawHeaders = array();
 
-	/**
-	 * @var null|string
-	 */
+	/** @var null|string */
 	private $_content = null;
 
 	abstract public function process();
@@ -90,19 +78,14 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 * @return array
 	 */
 	public function getHeaders() {
-		$returnArray = array();
+		$headers = array();
 
-		if (count($this->_rawHeaders)) {
-			$returnArray = $this->_rawHeaders;
+		$headers = $this->_rawHeaders;
+		foreach ($this->_headers as $key => $value) {
+			$headers[] = $key . ': ' . $value;
 		}
 
-		if (!empty($this->_headers)) {
-			foreach ($this->_headers as $key => $value) {
-				$returnArray[] = $key . ': ' . $value;
-			}
-		}
-
-		return $returnArray;
+		return $headers;
 	}
 
 	/**
@@ -113,8 +96,8 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key   Header key
-	 * @param string $value Header value
+	 * @param string $key
+	 * @param string $value
 	 */
 	public function setHeader($key, $value) {
 		$this->_headers[$key] = $value;

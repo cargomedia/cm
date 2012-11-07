@@ -28,7 +28,7 @@ class CM_Response_AbstractTest extends TestCase {
 	}
 
 	public function testSetDeleteCookie() {
-		$request = new CM_Request_Post('/homepage/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+		$request = new CM_Request_Post('/homepage');
 		$response = CM_Response_Abstract::factory($request);
 		$time = time();
 		$timeString = date('D\, d\-M\-Y h:i:s e', $time);
@@ -38,11 +38,9 @@ class CM_Response_AbstractTest extends TestCase {
 		$response->setCookie('bar', 'bad!=();');
 		$headers = $response->getHeaders();
 
-		$this->assertContains('Set-Cookie: foo=bar', $headers[0]);
-		$this->assertContains($timeString, $headers[0]);
-		$this->assertContains('Set-Cookie: foo', $headers[1]);
-		$this->assertNotContains($timeString, $headers[1]);
-		$this->assertContains('Set-Cookie: bar=bad%21%3D%28%29%3B;', $headers[2]);
+		$this->assertSame('Set-Cookie: foo=bar; Expires=' . $timeString . '; Path=/', $headers[0]);
+		$this->assertSame('Set-Cookie: foo=; Expires=Wed, 31-Dec-1969 06:00:01 US/Central; Path=/', $headers[1]);
+		$this->assertSame('Set-Cookie: bar=bad%21%3D%28%29%3B; Path=/', $headers[2]);
 	}
 
 }
