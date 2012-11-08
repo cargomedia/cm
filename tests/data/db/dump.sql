@@ -246,18 +246,17 @@ CREATE TABLE `cm_splittestVariation` (
   KEY `enabled` (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_splittestVariation_user`;
-CREATE TABLE `cm_splittestVariation_user` (
+CREATE TABLE IF NOT EXISTS `cm_splittestVariation_fixture` (
   `splittestId` int(10) unsigned NOT NULL,
-  `userId` int(10) unsigned NOT NULL,
+  `fixtureId` int(10) unsigned NOT NULL DEFAULT '0',
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
-  PRIMARY KEY (`splittestId`,`userId`),
+  PRIMARY KEY (`splittestId`,`fixtureId`),
   KEY `splittestId` (`splittestId`),
-  KEY `userId` (`userId`),
   KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`)
+  KEY `createStamp` (`createStamp`),
+  KEY `fixtureId` (`fixtureId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;
@@ -437,16 +436,3 @@ CREATE TABLE IF NOT EXISTS `cm_requestClient` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `cm_splittestVariation_fixture` (
-  `splittestId` int(10) unsigned NOT NULL,
-  `fixtureId` int(10) unsigned NOT NULL DEFAULT '0',
-  `variationId` int(10) unsigned NOT NULL,
-  `createStamp` int(10) unsigned NOT NULL,
-  `conversionStamp` int(11) DEFAULT NULL,
-  PRIMARY KEY (`splittestId`,`fixtureId`),
-  KEY `splittestId` (`splittestId`),
-  KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`),
-  KEY `fixtureId` (`fixtureId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;

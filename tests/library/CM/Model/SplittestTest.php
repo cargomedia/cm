@@ -53,6 +53,77 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
+	public function testGetVariationFixture() {
+		$fixtureId = rand(1, 99999999);
+		/** @var CM_Model_Splittest $test */
+		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+
+		for ($i = 0; $i < 2; $i++) {
+			$variationUser1 = $test->getVariationFixture($fixtureId);
+			$this->assertContains($variationUser1, array('v1', 'v2'));
+			$this->assertSame($variationUser1, $test->getVariationFixture($fixtureId));
+		}
+
+		$test->delete();
+	}
+
+	public function testGetVariationFixtureDisabledVariation() {
+		/** @var CM_Model_Splittest_Mock $test */
+		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		/** @var CM_Model_SplittestVariation $variation1 */
+		$variation1 = $test->getVariations()->getItem(0);
+		/** @var CM_Model_SplittestVariation $variation2 */
+		$variation2 = $test->getVariations()->getItem(1);
+
+		$variation1->setEnabled(false);
+		for ($i = 0; $i < 10; $i++) {
+			$fixtureId = rand(1, 99999999);
+			$this->assertSame($variation2->getName(), $test->getVariationFixture($fixtureId));
+		}
+
+		$test->delete();
+	}
+
+	public function testGetVariationFixtureWithVariationName() {
+		$fixtureId = rand(1, 99999999);
+
+		for ($i = 0; $i < 5; $i++) {
+			/** @var CM_Model_Splittest_Mock $test */
+			$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+			$this->assertSame('v1', $test->getVariationFixture($fixtureId, 'v1'));
+			$this->assertSame('v1', $test->getVariationFixture($fixtureId));
+
+			$test->delete();
+		}
+	}
+
+	public function testGetVariationFixtureWithVariationNameEmpty() {
+		$fixtureId = rand(1, 99999999);
+
+		/** @var CM_Model_Splittest_Mock $test */
+		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('0', '1', '2', '3')));
+		$this->assertSame('0', $test->getVariationFixture($fixtureId, '0'));
+		$this->assertSame('0', $test->getVariationFixture($fixtureId));
+
+		$test->delete();
+	}
+
+	public function testGetVariationFixtureWithVariationNameInvalid() {
+		$fixtureId = rand(1, 99999999);
+
+		/** @var CM_Model_Splittest_Mock $test */
+		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		try {
+			$test->getVariationFixture($fixtureId, 'v3');
+			$this->fail('Could get variation fixture with invalid variationName');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('has no variation `v3`', $e->getMessage());
+		}
+
+		$test->delete();
+	}
+
+
 	public function testDelete() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();
@@ -90,13 +161,13 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 	 * @return string
 	 */
 	public function getVariationFixture($fixtureId, $variationName = null) {
-		return $this->_getVariationFixture($fixtureId, $variationName);
+		return $this->_getVariationFixture((int) $fixtureId, $variationName);
 	}
 
 	/**
 	 * @param int $fixtureId
 	 */
 	public function setConversion($fixtureId) {
-		$this->_setConversion($fixtureId);
+		$this->_setConversion((int) $fixtureId);
 	}
 }

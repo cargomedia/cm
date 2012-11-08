@@ -68,62 +68,40 @@ class CM_Model_SplittestVariationTest extends TestCase {
 	}
 
 	public function testGetConversionCount() {
-		$fixtureId = rand(1, 99999999);
+		$user = TH::createUser();
 
-		/** @var CM_Model_Splittest_VariationMock $test */
-		$test = CM_Model_Splittest_VariationMock::create(array('name' => 'bar', 'variations' => array('v1')));
+		/** @var CM_Model_Splittest_User $test */
+		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
-		$test->getVariationFixture($fixtureId);
+		$test->getVariationFixture($user);
 		$this->assertSame(0, $variation->getConversionCount());
-		$test->setConversion($fixtureId);
+		$test->setConversion($user);
 		$this->assertSame(1, $variation->getConversionCount());
 
 		$test->delete();
 	}
 
 	public function testGetFixtureCount() {
-		$fixtureId = rand(1, 99999999);
-		$fixtureId2 = rand(1, 99999999);
+		$user1 = TH::createUser();
+		$user2 = TH::createUser();
 
-		/** @var CM_Model_Splittest_VariationMock $test */
-		$test = CM_Model_Splittest_VariationMock::create(array('name' => 'bar', 'variations' => array('v1')));
+		/** @var CM_Model_Splittest_User $test */
+		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
 
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
 		$this->assertSame(0, $variation->getFixtureCount());
 
-		$test->getVariationFixture($fixtureId);
+		$test->getVariationFixture($user1);
 		$this->assertSame(1, $variation->getFixtureCount());
-		$test->getVariationFixture($fixtureId);
+		$test->getVariationFixture($user1);
 		$this->assertSame(1, $variation->getFixtureCount());
-		$test->getVariationFixture($fixtureId2);
+		$test->getVariationFixture($user2);
 		$this->assertSame(2, $variation->getFixtureCount());
 
 		$test->delete();
-	}
-
-}
-
-class CM_Model_Splittest_VariationMock extends CM_Model_Splittest {
-
-	const TYPE = 1;
-
-	/**
-	 * @param  int            $fixtureId
-	 * @param  string|null    $variationName
-	 * @return string
-	 */
-	public function getVariationFixture($fixtureId, $variationName = null) {
-		return $this->_getVariationFixture($fixtureId, $variationName);
-	}
-
-	/**
-	 * @param int $fixtureId
-	 */
-	public function setConversion($fixtureId) {
-		$this->_setConversion($fixtureId);
 	}
 }
