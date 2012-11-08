@@ -338,7 +338,7 @@ class CM_Mail extends CM_View_Abstract {
 			$mail->AltBody = $html ? $text : '';
 
 			if ($recipient = $this->getRecipient()) {
-				$splittest = new CM_Model_Splittest('email-provider');
+				$splittest = new CM_Model_Splittest_User('email-provider');
 				if ('dynect' == $splittest->getVariationFixture($recipient)) {
 					$mail->AddCustomHeader('X-Dynect: 1');
 				}
