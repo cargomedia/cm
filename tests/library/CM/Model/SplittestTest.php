@@ -161,13 +161,13 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 	 * @return string
 	 */
 	public function getVariationFixture($fixtureId, $variationName = null) {
-		return $this->_getVariationFixture((int) $fixtureId, $variationName);
+		return $this->_getVariationFixture($fixtureId, $variationName);
 	}
 
 	/**
 	 * @param int $fixtureId
 	 */
 	public function setConversion($fixtureId) {
-		$this->_setConversion((int) $fixtureId);
+		$this->_setConversion($fixtureId);
 	}
 }

@@ -248,7 +248,7 @@ CREATE TABLE `cm_splittestVariation` (
 
 CREATE TABLE IF NOT EXISTS `cm_splittestVariation_fixture` (
   `splittestId` int(10) unsigned NOT NULL,
-  `fixtureId` int(10) unsigned NOT NULL DEFAULT '0',
+  `fixtureId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,

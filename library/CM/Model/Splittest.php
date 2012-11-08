@@ -131,6 +131,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @param int $fixtureId
 	 */
 	protected function _setConversion($fixtureId) {
+		$fixtureId = (int) $fixtureId;
 		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
 			'fixtureId' => $fixtureId));
 	}
@@ -142,6 +143,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @return string
 	 */
 	protected function _getVariationFixture($fixtureId, $variationName = null) {
+		$fixtureId = (int) $fixtureId;
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
 		$cacheWrite = false;
 		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
