@@ -46,55 +46,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_User $user
-	 * @param string|null   $variationName
-	 * @throws CM_Exception_Invalid
-	 * @return string
-	 */
-	public function getVariationFixture(CM_Model_User $user, $variationName = null) {
-		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_userId:' . $user->getId();
-		$cacheWrite = false;
-		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$variationFixtures = CM_Mysql::exec('
-				SELECT `variation`.`splittestId`, `variation`.`name`
-				FROM TBL_CM_SPLITTESTVARIATION_USER `fixture`
-				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-				WHERE `fixture`.`userId` = ?', $user->getId())->fetchAllTree();
-
-			$cacheWrite = true;
-		}
-
-		if (!array_key_exists($this->getId(), $variationFixtures)) {
-			if (null !== $variationName) {
-				$variation = $this->getVariations()->findByName($variationName);
-				if (!$variation) {
-					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $variationName . '`.');
-				}
-			} else {
-				$variation = $this->getVariationsEnabled()->getItemRand();
-				if (!$variation) {
-					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
-				}
-			}
-			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId(), 'userId' => $user->getId(),
-				'variationId' => $variation->getId(), 'createStamp' => time()));
-			$variationFixtures[$this->getId()] = $variation->getName();
-			$cacheWrite = true;
-		}
-
-		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $variationFixtures);
-		}
-
-		return $variationFixtures[$this->getId()];
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getVariationFixtureCreatedMin() {
 		return (int) CM_Mysql::exec(
-			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId` = ' . $this->getId())->fetchOne();
+			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ' . $this->getId())->fetchOne();
 	}
 
 	/**
@@ -118,16 +74,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $variationBest;
 	}
 
-	/**
-	 * @param CM_Model_User $user
-	 */
-	public function setConversion(CM_Model_User $user) {
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_USER, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
-			'userId' => $user->getId()));
-	}
-
 	public function flush() {
-		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
+		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
 	}
 
 	/**
@@ -176,6 +124,59 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_SPLITTEST, array('id' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->getId()));
+		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
 	}
+
+	/**
+	 * @param int $fixtureId
+	 */
+	protected function _setConversion($fixtureId) {
+		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
+			'fixtureId' => $fixtureId));
+	}
+
+	/**
+	 * @param int $fixtureId
+	 * @param string|null   $variationName
+	 * @throws CM_Exception_Invalid
+	 * @return string
+	 */
+	protected function _getVariationFixture($fixtureId, $variationName = null) {
+		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
+		$cacheWrite = false;
+		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
+			$variationFixtures = CM_Mysql::exec('
+				SELECT `variation`.`splittestId`, `variation`.`name`
+				FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
+				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
+				WHERE `fixture`.`fixtureId` = ?', $fixtureId)->fetchAllTree();
+
+			$cacheWrite = true;
+		}
+
+		if (!array_key_exists($this->getId(), $variationFixtures)) {
+			if (null !== $variationName) {
+				$variation = $this->getVariations()->findByName($variationName);
+				if (!$variation) {
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $variationName . '`.');
+				}
+			} else {
+				$variation = $this->getVariationsEnabled()->getItemRand();
+				if (!$variation) {
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+				}
+			}
+			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId,
+				'variationId' => $variation->getId(), 'createStamp' => time()));
+			$variationFixtures[$this->getId()] = $variation->getName();
+			$cacheWrite = true;
+		}
+
+		if ($cacheWrite) {
+			CM_CacheLocal::set($cacheKey, $variationFixtures);
+		}
+
+		return $variationFixtures[$this->getId()];
+	}
+
 }

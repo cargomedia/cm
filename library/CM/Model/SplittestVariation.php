@@ -36,7 +36,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getConversionCount() {
-		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_USER WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
 	}
 
 	/**
@@ -54,7 +54,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getFixtureCount() {
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_USER, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
+		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
 	}
 
 	/**

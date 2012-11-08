@@ -150,7 +150,7 @@ class CM_Bootloader {
 
 		define('TBL_CM_SPLITTEST', 'cm_splittest');
 		define('TBL_CM_SPLITTESTVARIATION', 'cm_splittestVariation');
-		define('TBL_CM_SPLITTESTVARIATION_USER', 'cm_splittestVariation_user');
+		define('TBL_CM_SPLITTESTVARIATION_FIXTURE', 'cm_splittestVariation_fixture');
 
 		define('TBL_CM_OPTION', 'cm_option');
 
