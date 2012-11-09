@@ -131,11 +131,13 @@ input[type=radio], input[type=checkbox] {
 	}
 
 	> label {
+		.box-sizing(border-box);
 		color: @colorFgLinkLight;
 		width: 95px;
 		float: left;
-		padding-top: 4px;
+		padding: 4px 4px 0 0;
 		font-weight: bold;
+		text-align: right;
 
 		&:after {
 			content: ":";
