@@ -148,6 +148,9 @@ class CM_Bootloader {
 		define('TBL_CM_SVM', 'cm_svm');
 		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
 
+		define('TBL_CM_SPLITFEATURE', 'cm_splitfeature');
+		define('TBL_CM_SPLITFEATURE_FIXTURE', 'cm_splitfeature_fixture');
+
 		define('TBL_CM_SPLITTEST', 'cm_splittest');
 		define('TBL_CM_SPLITTESTVARIATION', 'cm_splittestVariation');
 		define('TBL_CM_SPLITTESTVARIATION_FIXTURE', 'cm_splittestVariation_fixture');

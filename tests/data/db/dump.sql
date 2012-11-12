@@ -224,6 +224,23 @@ CREATE TABLE `cm_smileySet` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `cm_splitfeature` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `percentage` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cm_splitfeature_fixture` (
+  `splitfeatureId` int(10) unsigned NOT NULL,
+  `userId` int(10) unsigned NOT NULL,
+  `fixtureId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`splitfeatureId`,`fixtureId`),
+  UNIQUE KEY `userId_splitfeatureId` (`userId`,`splitfeatureId`),
+  KEY `userId` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_splittest`;
 CREATE TABLE `cm_splittest` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

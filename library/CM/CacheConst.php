@@ -30,6 +30,9 @@ class CM_CacheConst {
 
 	const Option = 'Option';
 
+	// _splitfeatureId:X_userId:X
+	const SplitFeature_Fixtures = 'SplitFeature_Fixtures';
+
 	// _userId:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 
