@@ -8,14 +8,14 @@ class CM_Model_SplitfeatureTest extends TestCase {
 	}
 
 	public function testCreate() {
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		$this->assertInstanceOf('CM_Model_SplitFeature', $splitFeature);
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$this->assertInstanceOf('CM_Model_Splitfeature', $splitfeature);
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testCreateDuplicate() {
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 
 		try {
 			CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
@@ -24,7 +24,7 @@ class CM_Model_SplitfeatureTest extends TestCase {
 			$this->assertContains("`Duplicate entry 'foo' for key 'name'`", $e->getMessage());
 		}
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testCreateNegativPercentage() {
@@ -46,97 +46,97 @@ class CM_Model_SplitfeatureTest extends TestCase {
 	}
 
 	public function testConstruct() {
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		$splitFeature2 = new CM_Model_Splitfeature('foo');
-		$this->assertModelEquals($splitFeature, $splitFeature2);
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature2 = new CM_Model_Splitfeature('foo');
+		$this->assertModelEquals($splitfeature, $splitfeature2);
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testGetId() {
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		$this->assertGreaterThanOrEqual(1, $splitFeature->getId());
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$this->assertGreaterThanOrEqual(1, $splitfeature->getId());
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testGetName() {
 		/** @var CM_Model_Splitfeature $splitFeature */
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		$this->assertSame('foo', $splitFeature->getName());
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$this->assertSame('foo', $splitfeature->getName());
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testGetPercentage() {
-		/** @var CM_Model_Splitfeature $splitFeature */
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		$this->assertSame(50, $splitFeature->getPercentage());
+		/** @var CM_Model_Splitfeature $splitfeature */
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$this->assertSame(50, $splitfeature->getPercentage());
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testSetPercentage() {
-		/** @var CM_Model_Splitfeature $splitFeature */
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		/** @var CM_Model_Splitfeature $splitfeature */
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 
-		$splitFeature->setPercentage(80);
-		$this->assertSame(80, $splitFeature->getPercentage());
+		$splitfeature->setPercentage(80);
+		$this->assertSame(80, $splitfeature->getPercentage());
 
 		try {
-			$splitFeature->setPercentage(110);
+			$splitfeature->setPercentage(110);
 			$this->fail('Could set percentage > 100%');
 		} catch (CM_Exception $e) {
 			$this->assertTrue(true);
 		}
 
-		$splitFeature->delete();
+		$splitfeature->delete();
 	}
 
 	public function testGetEnabled() {
-		/** @var CM_Model_Splitfeature $splitFeature */
-		$splitFeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		/** @var CM_Model_Splitfeature $splitfeature */
+		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 
-		/** @var CM_Model_Splitfeature $splitFeature2 */
-		$splitFeature2 = CM_Model_Splitfeature::create(array('name' => 'bar', 'percentage' => 10));
+		/** @var CM_Model_Splitfeature $splitfeature2 */
+		$splitfeature2 = CM_Model_Splitfeature::create(array('name' => 'bar', 'percentage' => 10));
 
 		$i = 0;
 		$userArray = array();
 		while($i < 200) {
 			$user = TH::createUser();
-			$splitFeature->getEnabled($user);
-			$splitFeature2->getEnabled($user);
+			$splitfeature->getEnabled($user);
+			$splitfeature2->getEnabled($user);
 			$userArray[] = $user;
 			$i++;
 		}
 
 		TH::clearCache();
-		$this->_checkEnabledFlag($userArray, $splitFeature);
-		$this->_checkEnabledFlag($userArray, $splitFeature2);
+		$this->_checkEnabledFlag($userArray, $splitfeature);
+		$this->_checkEnabledFlag($userArray, $splitfeature2);
 
-		$splitFeature->setPercentage(99);
-		$this->_checkEnabledFlag($userArray, $splitFeature);
+		$splitfeature->setPercentage(99);
+		$this->_checkEnabledFlag($userArray, $splitfeature);
 
-		$splitFeature2->getPercentage(2);
-		$this->_checkEnabledFlag($userArray, $splitFeature2);
+		$splitfeature2->getPercentage(2);
+		$this->_checkEnabledFlag($userArray, $splitfeature2);
 
-		$splitFeature->setPercentage(14);
-		$this->_checkEnabledFlag($userArray, $splitFeature);
+		$splitfeature->setPercentage(14);
+		$this->_checkEnabledFlag($userArray, $splitfeature);
 
-		$splitFeature2->setPercentage(66);
-		$this->_checkEnabledFlag($userArray, $splitFeature2);
+		$splitfeature->setPercentage(66);
+		$this->_checkEnabledFlag($userArray, $splitfeature2);
 	}
 
 	/**
 	 * @param CM_Model_User[]       $userList
-	 * @param CM_Model_Splitfeature $splitFeature
+	 * @param CM_Model_Splitfeature $splitfeature
 	 */
-	private function _checkEnabledFlag($userList, CM_Model_Splitfeature $splitFeature) {
+	private function _checkEnabledFlag($userList, CM_Model_Splitfeature $splitfeature) {
 		foreach($userList as $key => $user) {
-			if ($key % 100 < $splitFeature->getPercentage()) {
-				$this->assertTrue($splitFeature->getEnabled($user));
+			if ($key % 100 < $splitfeature->getPercentage()) {
+				$this->assertTrue($splitfeature->getEnabled($user));
 			} else {
-				$this->assertFalse($splitFeature->getEnabled($user));
+				$this->assertFalse($splitfeature->getEnabled($user));
 			}
 		}
 	}

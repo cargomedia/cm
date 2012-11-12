@@ -49,22 +49,22 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	public function getEnabled(CM_Model_User $user) {
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
-		if (($splitFeatureFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$splitFeatureFixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
+		if (($fixtures = CM_CacheLocal::get($cacheKey)) === false) {
+			$fixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
-		if (!array_key_exists($this->getId(), $splitFeatureFixtures)) {
+		if (!array_key_exists($this->getId(), $fixtures)) {
 			$fixtureId = CM_Mysql::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
-			$splitFeatureFixtures[$this->getId()] = $fixtureId;
+			$fixtures[$this->getId()] = $fixtureId;
 			$cacheWrite = true;
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $splitFeatureFixtures);
+			CM_CacheLocal::set($cacheKey, $fixtures);
 		}
 
-		return $this->_calculateEnabled($splitFeatureFixtures[$this->getId()]);
+		return $this->_calculateEnabled($fixtures[$this->getId()]);
 	}
 
 	/**
