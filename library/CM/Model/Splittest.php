@@ -78,6 +78,20 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
 	}
 
+	/**
+	 * @param int $id
+	 * @return CM_Model_Splittest
+	 * @throws CM_Exception_Nonexistent
+	 */
+	public static function findId($id) {
+		$id = (int) $id;
+		$name = CM_Mysql::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchOne();
+		if (false === $name) {
+			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
+		}
+		return new self($name);
+	}
+
 	protected function _loadData() {
 		$data = CM_Mysql::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetchAssoc();
 		if ($data) {
