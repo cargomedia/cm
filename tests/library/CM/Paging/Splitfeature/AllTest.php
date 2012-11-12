@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Paging_StreamChannelArchiveVideo_AllTest extends TestCase {
+class CM_Paging_Splitfeature_AllTest extends TestCase {
 
 	public static function setUpBeforeClass() {
 	}
