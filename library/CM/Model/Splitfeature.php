@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_SplitFeature extends CM_Model_Abstract {
+class CM_Model_Splitfeature extends CM_Model_Abstract {
 	CONST TYPE = 28;
 
 	/**
@@ -35,8 +35,7 @@ class CM_Model_SplitFeature extends CM_Model_Abstract {
 	 * @param int $percentage
 	 */
 	public function setPercentage($percentage) {
-		$percentage = (int) $percentage;
-		$this->_checkPercentage($percentage);
+		$percentage = $this->_checkPercentage($percentage);
 
 		CM_Mysql::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
 		$this->_change();
@@ -48,15 +47,10 @@ class CM_Model_SplitFeature extends CM_Model_Abstract {
 	 * @return boolean
 	 */
 	public function getEnabled(CM_Model_User $user) {
-
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
 		if (($splitFeatureFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$splitFeatureFixtures = array();
-			$allSplitFeatureFixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAll();
-			foreach($allSplitFeatureFixtures as $fixture) {
-				$splitFeatureFixtures['splitfeatureId'] = $fixture['fixtureId'];
-			}
+			$splitFeatureFixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
@@ -94,9 +88,7 @@ class CM_Model_SplitFeature extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		$name = (string) $data['name'];
-		$percentage = (int) $data['percentage'];
-
-		self::_checkPercentage($percentage);
+		$percentage = self::_checkPercentage($data['percentage']);
 
 		CM_Mysql::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
 
@@ -105,6 +97,7 @@ class CM_Model_SplitFeature extends CM_Model_Abstract {
 
 	/**
 	 * @param int $percentage
+	 * @return int
 	 * @throws CM_Exception_InvalidParam
 	 */
 	private static function _checkPercentage($percentage) {
@@ -113,5 +106,7 @@ class CM_Model_SplitFeature extends CM_Model_Abstract {
 		if ($percentage < 0 || $percentage > 100) {
 			throw new CM_Exception_InvalidParam('Percentage must be between 0 and 100 ' . $percentage . ' was given');
 		}
+
+		return $percentage;
 	}
 }

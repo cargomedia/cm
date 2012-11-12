@@ -227,7 +227,7 @@ CREATE TABLE `cm_smileySet` (
 CREATE TABLE IF NOT EXISTS `cm_splitfeature` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `percentage` int(10) unsigned NOT NULL DEFAULT '0',
+  `percentage` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
