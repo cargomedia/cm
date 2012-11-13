@@ -68,6 +68,13 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getFixtureCount() {
+		return CM_Mysql::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+	}
+
+	/**
 	 * @param int $fixtureId
 	 * @return bool
 	 */
