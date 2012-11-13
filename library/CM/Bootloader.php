@@ -14,7 +14,7 @@ class CM_Bootloader {
 			require_once $composerAutoloader;
 		}
 
-		spl_autoload_register(function($className) {
+		spl_autoload_register(function ($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
 			$path = DIR_ROOT . 'library' . DIRECTORY_SEPARATOR . $relativePath;
 			if (is_file($path)) {
@@ -25,14 +25,14 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		$exceptionFormatter = function(Exception $exception) {
+		$exceptionFormatter = function (Exception $exception) {
 			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
 			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
 			$text .= $exception->getTraceAsString() . PHP_EOL;
 			return $text;
 		};
 
-		set_exception_handler(function(Exception $exception) use($exceptionFormatter) {
+		set_exception_handler(function (Exception $exception) use ($exceptionFormatter) {
 			$showError = IS_DEBUG || IS_CRON || IS_TEST;
 
 			if (!IS_CRON && !IS_TEST) {
@@ -40,7 +40,11 @@ class CM_Bootloader {
 			}
 
 			try {
-				$log = new CM_Paging_Log_Error();
+				if ($exception instanceof CM_Exception) {
+					$log = $exception->getLog();
+				} else {
+					$log = new CM_Paging_Log_Error();
+				}
 				$log->add($exceptionFormatter($exception));
 			} catch (Exception $loggerException) {
 				$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
@@ -64,7 +68,7 @@ class CM_Bootloader {
 
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
-		set_error_handler(function($errno, $errstr, $errfile, $errline) {
+		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
 				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php

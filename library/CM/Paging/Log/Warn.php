@@ -1,7 +1,7 @@
 <?php
 
-class CM_Paging_Log_Error extends CM_Paging_Log_Abstract {
-	const TYPE = 1;
+class CM_Paging_Log_Warn extends CM_Paging_Log_Abstract {
+	const TYPE = 4;
 
 	/**
 	 * @param string $msg

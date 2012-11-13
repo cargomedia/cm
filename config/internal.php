@@ -68,8 +68,10 @@ if (!isset($config->CM_Paging_Log_Abstract)) {
 }
 $config->CM_Paging_Log_Abstract->types = array();
 $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Error::TYPE] = 'CM_Paging_Log_Error'; // #1
+$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Fatal::TYPE] = 'CM_Paging_Log_Fatal'; // #5
 $config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Mail::TYPE] = 'CM_Paging_Log_Mail'; // #3
-// Highest type used: #3
+$config->CM_Paging_Log_Abstract->types[CM_Paging_Log_Warn::TYPE] = 'CM_Paging_Log_Warn'; // #4
+// Highest type used: #5
 
 if (!isset($config->CM_Paging_ContentList_Abstract)) {
 	$config->CM_Paging_ContentList_Abstract = new StdClass();
