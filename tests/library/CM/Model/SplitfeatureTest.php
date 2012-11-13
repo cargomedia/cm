@@ -102,7 +102,7 @@ class CM_Model_SplitfeatureTest extends TestCase {
 
 		$i = 0;
 		$userArray = array();
-		while($i < 200) {
+		while ($i < 200) {
 			$user = TH::createUser();
 			$splitfeature->getEnabled($user);
 			$splitfeature2->getEnabled($user);
@@ -125,6 +125,9 @@ class CM_Model_SplitfeatureTest extends TestCase {
 
 		$splitfeature->setPercentage(66);
 		$this->_checkEnabledFlag($userArray, $splitfeature2);
+
+		$splitfeature->delete();
+		$splitfeature2->delete();
 	}
 
 	public function testGetFixtureCount() {
@@ -147,7 +150,7 @@ class CM_Model_SplitfeatureTest extends TestCase {
 	 * @param CM_Model_Splitfeature $splitfeature
 	 */
 	private function _checkEnabledFlag($userList, CM_Model_Splitfeature $splitfeature) {
-		foreach($userList as $key => $user) {
+		foreach ($userList as $key => $user) {
 			if ($key % 100 < $splitfeature->getPercentage()) {
 				$this->assertTrue($splitfeature->getEnabled($user));
 			} else {
