@@ -112,7 +112,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			}
 			$page->prepareResponse($this);
 			if ($this->getRedirectUrl()) {
-				$request->setPathAndQuery($this->getRedirectUrl());
+				$request->setUri($this->getRedirectUrl());
 				return null;
 			}
 			$page->checkAccessible();

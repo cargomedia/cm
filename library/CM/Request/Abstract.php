@@ -57,18 +57,18 @@ abstract class CM_Request_Abstract {
 	private static $_instance;
 
 	/**
-	 * @param string                   $pathAndQuery
+	 * @param string                   $uri
 	 * @param array|null               $headers OPTIONAL
 	 * @param CM_Model_User|null       $viewer
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($pathAndQuery, array $headers = null, CM_Model_User $viewer = null) {
+	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (is_null($headers)) {
 			$headers = array();
 		}
 		$this->_headers = array_change_key_case($headers);
 
-		$this->setPathAndQuery($pathAndQuery);
+		$this->setUri($uri);
 
 		if ($sessionId = $this->getCookie('sessionId')) {
 			try {
@@ -242,20 +242,23 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param string $pathAndQuery
+	 * @param string $uri
 	 * @throws CM_Exception_Invalid
 	 */
-	public function setPathAndQuery($pathAndQuery) {
-		if (false === ($path = parse_url($pathAndQuery, PHP_URL_PATH))) {
-			throw new CM_Exception_Invalid('Cannot detect path from `' . $pathAndQuery . '`.');
+	public function setUri($uri) {
+		if ('/' === substr($uri, 0, 1)) {
+			$uri = 'http://host' . $uri;
+		}
+		if (false === ($path = parse_url($uri, PHP_URL_PATH))) {
+			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
 		}
 		if ($path === null) {
 			$path = '/';
 		}
 		$this->setPath($path);
 
-		if (false === ($queryString = parse_url($pathAndQuery, PHP_URL_QUERY))) {
-			throw new CM_Exception_Invalid('Cannot detect query from `' . $pathAndQuery . '`.');
+		if (false === ($queryString = parse_url($uri, PHP_URL_QUERY))) {
+			throw new CM_Exception_Invalid('Cannot detect query from `' . $uri . '`.');
 		}
 		parse_str($queryString, $query);
 		$this->setQuery($query);
@@ -463,25 +466,25 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @param string               $method
-	 * @param string               $pathAndQuery
+	 * @param string               $uri
 	 * @param array|null           $headers
 	 * @param string|null          $body
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Get|CM_Request_Post
 	 */
-	public static function factory($method, $pathAndQuery, array $headers = null, $body = null) {
+	public static function factory($method, $uri, array $headers = null, $body = null) {
 		$method = strtolower($method);
 		if ($method === 'post') {
-			return new CM_Request_Post($pathAndQuery, $headers, $body);
+			return new CM_Request_Post($uri, $headers, $body);
 		}
 		if ($method === 'get') {
-			return new CM_Request_Get($pathAndQuery, $headers);
+			return new CM_Request_Get($uri, $headers);
 		}
 		if ($method === 'head') {
-			return new CM_Request_Head($pathAndQuery, $headers);
+			return new CM_Request_Head($uri, $headers);
 		}
 		if ($method === 'options') {
-			return new CM_Request_Options($pathAndQuery, $headers);
+			return new CM_Request_Options($uri, $headers);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}

@@ -9,13 +9,13 @@ class CM_Request_AbstractTest extends TestCase {
 
 	public function testGetViewer() {
 		$user = TH::createUser();
-		$pathAndQuery = '/';
+		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertNull($mock->getViewer());
 
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=a1d2726e5b3801226aafd12fd62496c8');
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		try {
 			$mock->getViewer(true);
 			$this->fail();
@@ -28,18 +28,18 @@ class CM_Request_AbstractTest extends TestCase {
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=' . $session->getId());
 		unset($session);
 
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertModelEquals($user, $mock->getViewer(true));
 
 		$user2 = TH::createUser();
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers, $user2));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, $user2));
 		$this->assertModelEquals($user2, $mock->getViewer(true));
 	}
 
 	public function testGetCookie() {
-		$pathAndQuery = '/';
+		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertEquals('hello', $mock->getCookie('foo'));
 		$this->assertEquals('tender', $mock->getCookie('bar'));
 		$this->assertNull($mock->getCookie('asdkf'));
@@ -99,18 +99,18 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertInstanceOf('CM_Request_Post', CM_Request_Abstract::factory('POST', '/test'));
 	}
 
-	public function testSetPathAndQuery() {
+	public function testSetUri() {
 		$language = CM_Model_Language::create(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
-		$pathAndQuery = '/en/foo/bar?foo1=bar1';
+		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertModelEquals($language, $mock->popPathLanguage());
 		$this->assertSame('/foo/bar', $mock->getPath());
 		$this->assertSame(array('foo', 'bar'), $mock->getPathParts());
 		$this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
 		$this->assertModelEquals($language, $mock->getLanguageUrl());
-		$mock->setPathAndQuery('/foo1/bar1?foo=bar');
+		$mock->setUri('/foo1/bar1?foo=bar');
 		$this->assertSame('/foo1/bar1', $mock->getPath());
 		$this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
 		$this->assertSame(array('foo' => 'bar'), $mock->getQuery());
@@ -118,26 +118,26 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testGetClientId() {
-		$pathAndQuery = '/en/foo/bar?foo1=bar1';
+		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(1, $mock->getClientId());
 		$this->assertTrue($mock->hasClientId());
 
-		$pathAndQuery = '/';
+		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=WRONG;');
 		/** @var CM_Request_Abstract $mock */
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(2, $mock->getClientId());
 		$this->assertTrue($mock->hasClientId());
 
-		$pathAndQuery = '/';
+		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=2;');
 		/** @var CM_Request_Abstract $mock */
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
 		$this->assertSame(2, $mock->getClientId());
 		$this->assertSame(2, $mock->getClientId());
@@ -155,18 +155,18 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	/**
-	 * @param string             $pathAndQuery
+	 * @param string             $uri
 	 * @param array|null         $additionalHeaders
 	 * @param CM_Model_User|null $user
 	 * @return CM_Request_Abstract
 	 */
-	private function _prepareRequest($pathAndQuery, array $additionalHeaders = null, CM_Model_User $user = null) {
+	private function _prepareRequest($uri, array $additionalHeaders = null, CM_Model_User $user = null) {
 		$headers = array('Host' => 'example.com', 'Connection' => 'keep-alive');
 		if ($additionalHeaders) {
 			$headers = array_merge($headers, $additionalHeaders);
 		}
 		/** @var CM_Request_Abstract $request */
-		$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($pathAndQuery, $headers), '', true, true, true, array('getViewer'));
+		$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers), '', true, true, true, array('getViewer'));
 		$request->expects($this->any())->method('getViewer')->will($this->returnValue($user));
 		$this->assertSame($request->getViewer(), $user);
 		return $request;
