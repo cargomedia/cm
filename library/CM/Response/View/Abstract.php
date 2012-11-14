@@ -13,7 +13,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		}
 		$query = $this->_request->getQuery();
 		if (!isset($query[$key])) {
-			throw new CM_Exception_Invalid('View `' . $key . '` not set.');
+			throw new CM_Exception_Invalid('View `' . $key . '` not set.', null, null, CM_Exception::WARN);
 		}
 		$viewInfo = $query[$key];
 		if (!is_array($viewInfo)) {

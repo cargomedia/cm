@@ -30,7 +30,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		} elseif (file_exists(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath())) {
 			$content = (string) new CM_File(DIR_PUBLIC . 'static/js/' . $this->getRequest()->getPath());
 		} else {
-			throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
+			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
 		}
 
 		$this->enableCache();
