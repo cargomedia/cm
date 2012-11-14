@@ -16,12 +16,12 @@ class CM_Request_Post extends CM_Request_Abstract {
 	private $_bodyEncoding = self::ENCODING_JSON;
 
 	/**
-	 * @param string             $uri
+	 * @param string             $pathAndQuery
 	 * @param array|null         $headers
 	 * @param string|null        $body
 	 */
-	public function __construct($uri, array $headers = null, $body = null) {
-		parent::__construct($uri, $headers);
+	public function __construct($pathAndQuery, array $headers = null, $body = null) {
+		parent::__construct($pathAndQuery, $headers);
 		$this->_body = (string) $body;
 	}
 
