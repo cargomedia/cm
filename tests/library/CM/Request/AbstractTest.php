@@ -117,6 +117,14 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertNull($mock->getLanguageUrl());
 	}
 
+	public function testSetUriRelativeAndColon() {
+		$uri = '/foo/bar?foo1=bar1:80';
+		/** @var CM_Request_Abstract $mock */
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri));
+		$this->assertSame('/foo/bar', $mock->getPath());
+		$this->assertSame(array('foo1' => 'bar1:80'), $mock->getQuery());
+	}
+
 	public function testGetClientId() {
 		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
