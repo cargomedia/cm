@@ -17,8 +17,8 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	 */
 	final public function run(array $params) {
 		$params = CM_Params::factory($params);
-		$config = CM_Config::get()->CM_Gearman;
-		if (!$config->enabled) {
+		$config = $this->_getConfig();
+		if (!$config->gearmanEnabled) {
 			return $this->_run($params);
 		}
 		$workload = serialize($params);
@@ -31,8 +31,8 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	 */
 	final public function queue(array $params) {
 		$params = CM_Params::factory($params);
-		$config = CM_Config::get()->CM_Gearman;
-		if (!$config->enabled) {
+		$config = $this->_getConfig();
+		if (!$config->gearmanEnabled) {
 			$this->_run($params);
 			return;
 		}
@@ -56,10 +56,13 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	}
 
 	final private function _init() {
-		$config = CM_Config::get()->CM_Gearman;
 		if (!$this->_gearmanClient) {
+			$config = $this->_getConfig();
 			$this->_gearmanClient = new GearmanClient();
-			$this->_gearmanClient->addServer($config->server['host'], $config->server['port']);
+			$servers = implode(',', array_map(function($server) {
+				return implode(':', $server);
+			}, $config->servers));
+			$this->_gearmanClient->addServers($servers);
 		}
 	}
 

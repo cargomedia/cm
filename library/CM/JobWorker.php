@@ -7,18 +7,21 @@ final class CM_JobWorker extends CM_Class_Abstract {
 
 	public function __construct() {
 		$this->_gearmanWorker = new GearmanWorker();
-		$config = CM_Config::get()->CM_Gearman;
-		$this->_gearmanWorker->addServer($config->server['host'], $config->server['port']);
+		$config = $this->_getConfig();
+		$servers = implode(',', array_map(function($server) {
+			return implode(':', $server);
+		}, $config->servers));
+		$this->_gearmanWorker->addServers($servers);
 		$this->_registerJobs();
+//		$this->_gearmanWorker->addOptions(GEARMAN_WORKER_NON_BLOCKING);
 	}
 
 	public function run() {
 		while ($this->_gearmanWorker->work()) {
-			echo 'lol' . posix_getpid() . PHP_EOL;
 			if ($this->_gearmanWorker->returnCode() == GEARMAN_SUCCESS) {
-//				echo 'Worker ' . posix_getpid() . ' completed Job.' . PHP_EOL;
+				echo 'Worker ' . posix_getpid() . ' completed Job.' . PHP_EOL;
 			} else {
-//				echo 'Worker ' . posix_getpid() . ' returnCode: ' . $this->_gearmanWorker->returnCode() . PHP_EOL;
+				echo 'Worker ' . posix_getpid() . ' returnCode: ' . $this->_gearmanWorker->returnCode() . PHP_EOL;
 			}
 		}
 	}
