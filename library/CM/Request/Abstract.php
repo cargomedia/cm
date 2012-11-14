@@ -66,9 +66,9 @@ abstract class CM_Request_Abstract {
 		if (is_null($headers)) {
 			$headers = array();
 		}
-		$this->setUri($uri);
-
 		$this->_headers = array_change_key_case($headers);
+
+		$this->setUri($uri);
 
 		if ($sessionId = $this->getCookie('sessionId')) {
 			try {
@@ -246,6 +246,9 @@ abstract class CM_Request_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setUri($uri) {
+		if ('/' === substr($uri, 0, 1)) {
+			$uri = 'http://' . $this->getHeader('host') . $uri;
+		}
 		if (false === ($path = parse_url($uri, PHP_URL_PATH))) {
 			throw new CM_Exception_Invalid('Cannot detect path from `' . $uri . '`.');
 		}
