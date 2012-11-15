@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../../TestCase.php';
 class CM_Model_SplittestTest extends TestCase {
 
 	public function setUp() {
-		CM_Config::get()->CM_Model_Splittest->forceAllVariations = false;
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
@@ -27,7 +27,7 @@ class CM_Model_SplittestTest extends TestCase {
 
 	public function testConstruct() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$test2 = CM_Model_Splittest::getInstance('foo');
+		$test2 = new CM_Model_Splittest('foo');
 		$this->assertModelEquals($test, $test2);
 
 		$test->delete();
@@ -131,7 +131,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();
 		try {
-			CM_Model_Splittest::getInstance($test->getId());
+			new CM_Model_Splittest($test->getId());
 			$this->fail('Splittest not deleted.');
 		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertTrue(true);
@@ -152,11 +152,49 @@ class CM_Model_SplittestTest extends TestCase {
 		$test1->delete();
 		$test2->delete();
 	}
+
+	public function testIsVariationFixture() {
+		$fixtureId = rand(1, 999999999);
+		$fixtureId2 = $fixtureId + 1;
+		$fixtureId3 = $fixtureId2 + 1;
+
+		/** @var CM_Model_Splittest_Mock $test */
+		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
+		$isVariationFixture = $test->isVariationFixture($fixtureId, 'v1');
+		$this->assertSame($isVariationFixture, $test->isVariationFixture($fixtureId, 'v1'));
+
+		$this->assertTrue($test->isVariationFixture($fixtureId2, 'v1', 'v1'));
+		$this->assertFalse($test->isVariationFixture($fixtureId3, 'v1', 'v2'));
+
+	}
+
+	public function testWithoutPersistence() {
+		$fixtureId = rand(1, 999999999);
+
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
+		$test = new CM_Model_Splittest_Mock('notExisting');
+
+		$this->assertTrue($test->isVariationFixture($fixtureId, 'bar'));
+		$test->setConversion($fixtureId);
+
+		TH::clearConfig();
+	}
+
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 
 	const TYPE = 1;
+
+	/**
+	 * @param int         $fixtureId
+	 * @param string      $variationName
+	 * @param string|null $forceVariationName
+	 * @return bool
+	 */
+	public function isVariationFixture($fixtureId, $variationName, $forceVariationName = null) {
+		return $this->_isVariationFixture($fixtureId, $variationName, $forceVariationName);
+	}
 
 	/**
 	 * @param  int            $fixtureId

@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../../../TestCase.php';
 class CM_Model_Splittest_RequestClientTest extends TestCase {
 
 	public function setUp() {
-		CM_Config::get()->CM_Model_Splittest->forceAllVariations = false;
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {

@@ -3,10 +3,14 @@
 class CM_Model_Splittest extends CM_Model_Abstract {
 	CONST TYPE = 16;
 
+	/** @var bool */
+	private $_withoutPersistence;
+
 	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
+		$this->_withoutPersistence = self::_getConfig()->withoutPersistence;
 		$this->_construct(array('name' => (string) $name));
 	}
 
@@ -93,6 +97,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
+		if($this->_withoutPersistence) {
+			return array();
+		}
 		$data = CM_Mysql::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetchAssoc();
 		if ($data) {
 			$data['variations'] = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, array('id',
@@ -131,13 +138,29 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @param int $fixtureId
 	 */
 	protected function _setConversion($fixtureId) {
+		if ($this->_withoutPersistence) {
+			return;
+		}
 		$fixtureId = (int) $fixtureId;
 		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time()), array('splittestId' => $this->getId(),
 			'fixtureId' => $fixtureId));
 	}
 
 	/**
-	 * @param int $fixtureId
+	 * @param int         $fixtureId
+	 * @param string      $variationName
+	 * @param string|null $forceVariationName
+	 * @return bool
+	 */
+	protected function _isVariationFixture($fixtureId, $variationName, $forceVariationName = null) {
+		if ($this->_withoutPersistence) {
+			return true;
+		}
+		return ($variationName == $this->_getVariationFixture($fixtureId, $forceVariationName));
+	}
+
+	/**
+	 * @param int           $fixtureId
 	 * @param string|null   $variationName
 	 * @throws CM_Exception_Invalid
 	 * @return string
@@ -179,13 +202,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		return $variationFixtures[$this->getId()];
-	}
-
-	public static function getInstance($name) {
-		if (self::_getConfig()->forceAllVariations) {
-			return new CM_Model_Splittest_Dummy();
-		}
-		return new self($name);
 	}
 
 }

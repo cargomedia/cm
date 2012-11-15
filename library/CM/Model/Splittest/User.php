@@ -10,7 +10,7 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
 	 * @return bool
 	 */
 	public function isVariationFixture(CM_Model_User $user, $variationName, $forceVariationName = null) {
-		return ($variationName == $this->_getVariationFixture($user->getId(), $forceVariationName));
+		return $this->_isVariationFixture($user->getId(), $variationName, $forceVariationName);
 	}
 
 	/**

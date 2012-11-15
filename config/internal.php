@@ -25,7 +25,6 @@ $config->CM_Model_Abstract->types[CM_Model_Location::TYPE] = 'CM_Model_Location'
 $config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet'; // #15
 $config->CM_Model_Abstract->types[CM_Model_Splitfeature::TYPE] = 'CM_Model_Splitfeature'; // #28
 $config->CM_Model_Abstract->types[CM_Model_Splittest::TYPE] = 'CM_Model_Splittest'; // #16
-$config->CM_Model_Abstract->types[CM_Model_Splittest_Dummy::TYPE] = 'CM_Model_Splittest_Dummy'; // #29
 $config->CM_Model_Abstract->types[CM_Model_Splittest_RequestClient::TYPE] = 'CM_Model_Splittest_RequestClient'; // #26
 $config->CM_Model_Abstract->types[CM_Model_Splittest_User::TYPE] = 'CM_Model_Splittest_User'; // #27
 $config->CM_Model_Abstract->types[CM_Model_SplittestVariation::TYPE] = 'CM_Model_SplittestVariation'; // #17
@@ -35,7 +34,7 @@ $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Mo
 $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video'; // #19
 $config->CM_Model_Abstract->types[CM_Model_StreamChannelArchive_Video::TYPE] = 'CM_Model_StreamChannelArchive_Video'; // #25
 $config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User'; // #13
-// Highest type used: #29
+// Highest type used: #28
 
 if (!isset($config->CM_Model_ActionLimit_Abstract)) {
 	$config->CM_Model_ActionLimit_Abstract = new StdClass();
