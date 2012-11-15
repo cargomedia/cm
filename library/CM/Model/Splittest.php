@@ -10,7 +10,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @param string $name
 	 */
 	public function __construct($name) {
-		$this->_withoutPersistence = self::_getConfig()->withoutPersistence;
+		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
 		$this->_construct(array('name' => (string) $name));
 	}
 
