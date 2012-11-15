@@ -161,11 +161,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 	/**
 	 * @param int           $fixtureId
-	 * @param string|null   $variationName
+	 * @param string|null   $forceVariationName
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	protected function _getVariationFixture($fixtureId, $variationName = null) {
+	protected function _getVariationFixture($fixtureId, $forceVariationName = null) {
 		if ($this->_withoutPersistence) {
 			return '';
 		}
@@ -183,10 +183,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $variationFixtures)) {
-			if (null !== $variationName) {
-				$variation = $this->getVariations()->findByName($variationName);
+			if (null !== $forceVariationName) {
+				$variation = $this->getVariations()->findByName($forceVariationName);
 				if (!$variation) {
-					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $variationName . '`.');
+					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $forceVariationName . '`.');
 				}
 			} else {
 				$variation = $this->getVariationsEnabled()->getItemRand();

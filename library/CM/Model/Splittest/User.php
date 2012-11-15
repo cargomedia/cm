@@ -15,11 +15,11 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
 
 	/**
 	 * @param CM_Model_User $user
-	 * @param string|null   $variationName
+	 * @param string|null   $forceVariationName
 	 * @return bool
 	 */
-	public function getVariationFixture(CM_Model_User $user, $variationName = null) {
-		return $this->_getVariationFixture($user->getId(), $variationName);
+	public function getVariationFixture(CM_Model_User $user, $forceVariationName = null) {
+		return $this->_getVariationFixture($user->getId(), $forceVariationName);
 	}
 
 	/**
