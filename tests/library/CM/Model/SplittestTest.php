@@ -175,6 +175,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$test = new CM_Model_Splittest_Mock('notExisting');
 
 		$this->assertTrue($test->isVariationFixture($fixtureId, 'bar'));
+		$this->assertSame('', $test->getVariationFixture($fixtureId));
 		$test->setConversion($fixtureId);
 
 		TH::clearConfig();

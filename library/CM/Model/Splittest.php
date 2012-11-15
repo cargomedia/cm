@@ -166,6 +166,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @return string
 	 */
 	protected function _getVariationFixture($fixtureId, $variationName = null) {
+		if ($this->_withoutPersistence) {
+			return '';
+		}
 		$fixtureId = (int) $fixtureId;
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
 		$cacheWrite = false;

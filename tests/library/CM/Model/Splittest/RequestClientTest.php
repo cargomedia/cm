@@ -11,7 +11,7 @@ class CM_Model_Splittest_RequestClientTest extends TestCase {
 		TH::clearEnv();
 	}
 
-	public function testGetVariationFixture() {
+	public function testIsVariationFixture() {
 		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
 		/** @var CM_Model_Splittest_RequestClient $test */
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
@@ -19,6 +19,19 @@ class CM_Model_Splittest_RequestClientTest extends TestCase {
 		for ($i = 0; $i < 2; $i++) {
 			$variationUser1 = $test->isVariationFixture($request, 'v1');
 			$this->assertSame($variationUser1, $test->isVariationFixture($request, 'v1'));
+		}
+
+		$test->delete();
+	}
+
+	public function testGetVariationFixture() {
+		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+		/** @var CM_Model_Splittest_RequestClient $test */
+		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+
+		for ($i = 0; $i < 2; $i++) {
+			$variationUser1 = $test->getVariationFixture($request, 'v1');
+			$this->assertSame($variationUser1, $test->getVariationFixture($request, 'v1'));
 		}
 
 		$test->delete();
