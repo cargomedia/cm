@@ -7,10 +7,10 @@ class CM_Response_RPC extends CM_Response_Abstract {
 		try {
 			$query = $this->_request->getQuery();
 			if (!isset($query['method']) || 1 != substr_count($query['method'], '.') || !preg_match('/^[\w_\.]+$/i', $query['method'])) {
-				throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`');
+				throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, null, CM_Exception::WARN);
 			}
 			if (!isset($query['params']) || !is_array($query['params'])) {
-				throw new CM_Exception_Invalid('Illegal params');
+				throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
 			}
 			$params = $query['params'];
 			list($class, $function) = explode('.', $query['method']);
