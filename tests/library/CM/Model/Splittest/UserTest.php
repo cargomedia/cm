@@ -3,6 +3,14 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Model_Splittest_UserTest extends TestCase {
 
+	public function setUp() {
+		CM_Config::get()->CM_Model_Splittest->forceAllVariations = false;
+	}
+
+	public static function tearDownAfterClass() {
+		TH::clearEnv();
+	}
+
 	public function testGetVariationFixture() {
 		$user = TH::createUser();
 

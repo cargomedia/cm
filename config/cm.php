@@ -152,3 +152,5 @@ $config->CM_JobWorker->servers = array(array('host' => 'localhost', 'port' => 47
 $config->CM_Job_Abstract = new stdClass();
 $config->CM_Job_Abstract->gearmanEnabled = true;
 $config->CM_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
+
+$config->CM_Model_Splittest->forceAllVariations = false;

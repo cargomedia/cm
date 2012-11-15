@@ -181,4 +181,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $variationFixtures[$this->getId()];
 	}
 
+	public static function getInstance($name) {
+		if (self::_getConfig()->forceAllVariations) {
+			return new CM_Model_Splittest_Dummy();
+		}
+		return new self($name);
+	}
+
 }

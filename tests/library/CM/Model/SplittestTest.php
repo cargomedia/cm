@@ -3,6 +3,10 @@ require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Model_SplittestTest extends TestCase {
 
+	public function setUp() {
+		CM_Config::get()->CM_Model_Splittest->forceAllVariations = false;
+	}
+
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
 	}
@@ -23,7 +27,7 @@ class CM_Model_SplittestTest extends TestCase {
 
 	public function testConstruct() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		$test2 = new CM_Model_Splittest('foo');
+		$test2 = CM_Model_Splittest::getInstance('foo');
 		$this->assertModelEquals($test, $test2);
 
 		$test->delete();
@@ -123,12 +127,11 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
-
 	public function testDelete() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();
 		try {
-			new CM_Model_Splittest($test->getId());
+			CM_Model_Splittest::getInstance($test->getId());
 			$this->fail('Splittest not deleted.');
 		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertTrue(true);
