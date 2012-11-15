@@ -9,9 +9,9 @@ class CM_Model_Splittest_RequestClientTest extends TestCase {
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
 		for ($i = 0; $i < 2; $i++) {
-			$variationUser1 = $test->getVariationFixture($request);
+			$variationUser1 = $test->isVariationFixture($request);
 			$this->assertContains($variationUser1, array('v1', 'v2'));
-			$this->assertSame($variationUser1, $test->getVariationFixture($request));
+			$this->assertSame($variationUser1, $test->isVariationFixture($request));
 		}
 
 		$test->delete();
@@ -24,7 +24,7 @@ class CM_Model_Splittest_RequestClientTest extends TestCase {
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
-		$test->getVariationFixture($request);
+		$test->isVariationFixture($request);
 		$this->assertSame(0, $variation->getConversionCount());
 		$test->setConversion($request);
 		$this->assertSame(1, $variation->getConversionCount());
