@@ -48,6 +48,13 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	final protected function _getJobName() {
+		return get_class($this);
+	}
+
+	/**
 	 * @param array        $params
 	 * @param boolean|null $asynchronous
 	 * @throws CM_Exception
@@ -60,19 +67,12 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 			$gearmanClient->doBackground($this->_getJobName(), $workload);
 			return null;
 		} else {
-			$result = CM_Params::decode($gearmanClient->doNormal($this->_getJobName(), $workload), true);
+			$result = $gearmanClient->doNormal($this->_getJobName(), $workload);
 			if ($gearmanClient->returnCode() === GEARMAN_WORK_FAIL) {
 				throw new CM_Exception('Job `' . $this->_getJobName() . '` failed.');
 			}
-			return $result;
+			return CM_Params::decode($result, true);
 		}
-	}
-
-	/**
-	 * @return string
-	 */
-	final protected function _getJobName() {
-		return get_class($this);
 	}
 
 	/**
@@ -85,7 +85,7 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	/**
 	 * @return GearmanClient
 	 */
-	final private function _getGearmanClient() {
+	protected function _getGearmanClient() {
 		if (!$this->_gearmanClient) {
 			$config = static::_getConfig();
 			$this->_gearmanClient = new GearmanClient();
