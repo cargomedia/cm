@@ -21,7 +21,8 @@ class CM_Job_AbstractTest extends TestCase {
 		$gearmanClientMock = $this->getMock('GearmanClient', array('doNormal', 'returnCode'));
 		$that = $this;
 		$gearmanClientMock->expects($this->any())->method('doNormal')->will($this->returnCallback(function($jobName, $workload) use ($job, $gearmanClientMock, $that) {
-			$gearmanJobMock = $that->getMock('GearmanJobMock', array('sendFail'), array($workload));
+			$gearmanJobMock = $that->getMock('GearmanJob', array('sendFail', 'workload'));
+			$gearmanJobMock->expects($that->any())->method('workload')->will($that->returnValue($workload));
 			$gearmanJobMock->expects($that->any())->method('sendFail')->will($that->returnCallback(function () use ($gearmanClientMock, $that) {
 				$gearmanClientMock->expects($that->any())->method('returnCode')->will($that->returnValue(GEARMAN_WORK_FAIL));
 			}));
@@ -48,17 +49,3 @@ class CM_Job_AbstractTest extends TestCase {
 	}
 
 }
-
-class GearmanJobMock extends GearmanJob {
-
-	private $_workload;
-
-	public function __construct($workload) {
-		$this->_workload = $workload;
-	}
-
-	public function workload() {
-		return $this->_workload;
-	}
-}
-
