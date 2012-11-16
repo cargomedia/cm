@@ -7,14 +7,14 @@ final class CM_JobManager extends CM_Class_Abstract {
 
 	public function __construct() {
 		declare(ticks = 1);
-		pcntl_signal(SIGTERM, array($this, '_handleSignal'));
-		pcntl_signal(SIGINT, array($this, '_handleSignal'));
 	}
 
 	public function start() {
+		pcntl_signal(SIGTERM, array($this, '_handleKill'));
+		pcntl_signal(SIGINT, array($this, '_handleKill'));
 		while (true) {
 			if (count($this->_children) == $this->_getConfig()->workerCount) {
-				if ($pid = pcntl_wait($status, WNOHANG) > 0) {
+				if (($pid = pcntl_wait($status, WNOHANG)) > 0) {
 					unset($this->_children[$pid]);
 					$this->_startWorker();
 				}
@@ -40,15 +40,11 @@ final class CM_JobManager extends CM_Class_Abstract {
 		}
 	}
 
-	private function _handleSignal($signal) {
-		switch ($signal) {
-			case SIGTERM:
-			case SIGINT:
-				foreach ($this->_children as $child) {
-					posix_kill($child, SIGKILL);
-				}
-				exit;
+	private function _handleKill($signal) {
+		foreach ($this->_children as $child) {
+			posix_kill($child, SIGKILL);
 		}
+		exit;
 	}
 
 }

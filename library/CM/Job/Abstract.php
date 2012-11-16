@@ -13,7 +13,7 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param array $params
-	 * @return string
+	 * @return mixed
 	 */
 	final public function run(array $params) {
 		if ($this->_getGearmanEnabled()) {
@@ -24,24 +24,23 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param array $params
-	 * @return string jobHandle
 	 */
 	final public function queue(array $params) {
 		if ($this->_getGearmanEnabled()) {
-			return $this->_dispatch($params, true);
+			$this->_dispatch($params, true);
 		}
-		return $this->_run(CM_Params::factory($params));
+		$this->_run(CM_Params::factory($params));
 	}
 
 	/**
 	 * @param GearmanJob $job
-	 * @return mixed
+	 * @return string|null
 	 */
 	final public function __run(GearmanJob $job) {
 		$workload = $job->workload();
 		$params = CM_Params::factory(CM_Params::decode($workload, true));
 		try {
-			return $this->_run($params);
+			return CM_Params::encode($this->_run($params), true);
 		} catch (Exception $ex) {
 			$job->sendFail();
 			return null;
@@ -52,20 +51,28 @@ abstract class CM_Job_Abstract extends CM_Class_Abstract {
 	 * @param array        $params
 	 * @param boolean|null $asynchronous
 	 * @throws CM_Exception
-	 * @return string
+	 * @return mixed|null
 	 */
 	final private function _dispatch(array $params, $asynchronous = false) {
 		$workload = CM_Params::encode($params, true);
 		$gearmanClient = $this->_getGearmanClient();
 		if ($asynchronous) {
-			return $gearmanClient->doBackground(get_class($this), $workload, $this->_getConfig()->timeout);
+			$gearmanClient->doBackground($this->_getJobName(), $workload);
+			return null;
 		} else {
-			$result = $gearmanClient->doNormal(get_class($this), $workload, $this->_getConfig()->timeout);
+			$result = CM_Params::decode($gearmanClient->doNormal($this->_getJobName(), $workload), true);
 			if ($gearmanClient->returnCode() === GEARMAN_WORK_FAIL) {
-				throw new CM_Exception('Job failed.');
+				throw new CM_Exception('Job `' . $this->_getJobName() . '` failed.');
 			}
 			return $result;
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	final protected function _getJobName() {
+		return get_class($this);
 	}
 
 	/**
