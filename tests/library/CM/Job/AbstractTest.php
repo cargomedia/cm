@@ -11,6 +11,11 @@ class CM_Job_AbstractTest extends TestCase {
 	}
 
 	public function testRun() {
+
+		if (!extension_loaded('gearman')) {
+			$this->markTestSkipped('Gearman Pecl Extension not installed.');
+		}
+
 		/** @var CM_Job_Abstract $job  */
 		$job = $this->getMockForAbstractClass('CM_Job_Abstract', array(), '', true, true, true, array('_getGearmanClient', '_run'));
 		$gearmanClientMock = $this->getMock('GearmanClient', array('doNormal', 'returnCode'));
