@@ -3,7 +3,8 @@ require_once __DIR__ . '/../../../../TestCase.php';
 
 class CM_Paging_Splitfeature_AllTest extends TestCase {
 
-	public static function setUpBeforeClass() {
+	public function setUp() {
+		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {

@@ -3,6 +3,10 @@ require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Model_SplitfeatureTest extends TestCase {
 
+	public function setUp() {
+		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
+	}
+
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
 	}
@@ -131,18 +135,15 @@ class CM_Model_SplitfeatureTest extends TestCase {
 	}
 
 	public function testGetFixtureCount() {
+		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = true;
 		$user = TH::createUser();
-		$user2 = TH::createUser();
-		/** @var CM_Model_Splitfeature $splitfeature */
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 
+		$splitfeature = new CM_Model_Splitfeature('NotExicting');
+		$this->assertTrue($splitfeature->getEnabled($user));
 		$this->assertSame(0, $splitfeature->getFixtureCount());
+		$splitfeature->setPercentage(50);
 
-		$splitfeature->getEnabled($user);
-		$splitfeature->getEnabled($user2);
-		$this->assertSame(2, $splitfeature->getFixtureCount());
-
-		$splitfeature->delete();
+		TH::clearConfig();
 	}
 
 	/**

@@ -9,3 +9,5 @@ $config->CM_Mail->send = false;
 $config->CM_Mysql->db = $config->CM_Mysql->db . '_test';
 
 $config->CM_Model_Splittest->withoutPersistence = true;
+
+$config->CM_Model_Splitfeature->withoutPersistence = true;
