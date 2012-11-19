@@ -11,7 +11,6 @@ class CM_Job_AbstractTest extends TestCase {
 	}
 
 	public function testRun() {
-
 		if (!extension_loaded('gearman')) {
 			$this->markTestSkipped('Gearman Pecl Extension not installed.');
 		}

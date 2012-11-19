@@ -12,7 +12,6 @@ final class CM_JobWorker extends CM_Class_Abstract {
 			$this->_gearmanWorker->addServer($server['host'], $server['port']);
 		}
 		$this->_registerJobs();
-		//		$this->_gearmanWorker->addOptions(GEARMAN_WORKER_NON_BLOCKING);
 	}
 
 	public function run() {
