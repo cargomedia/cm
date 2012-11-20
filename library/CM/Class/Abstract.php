@@ -83,26 +83,6 @@ abstract class CM_Class_Abstract {
 	 */
 	public static function getClassChildren($includeAbstracts = null) {
 		$className = get_called_class();
-		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
-		if (false === ($classNames = CM_CacheLocal::get($key))) {
-			$pathsFiltered = array();
-			$paths = CM_Util::rglob('*.php', DIR_LIBRARY);
-			sort($paths);
-			foreach ($paths as $path) {
-				$file = new CM_File($path);
-				$regexp = '#class\s+(?<name>.+?)\b#';
-				if (preg_match($regexp, $file->read(), $matches)) {
-					if (class_exists($matches['name'], true)) {
-						$reflectionClass = new ReflectionClass($matches['name']);
-						if ($reflectionClass->isSubclassOf($className) && (!$reflectionClass->isAbstract() || $includeAbstracts)) {
-							$pathsFiltered[] = $path;
-						}
-					}
-				}
-			}
-			$classNames = CM_Util::getClasses($pathsFiltered);
-			CM_CacheLocal::set($key, $classNames);
-		}
-		return $classNames;
+		return CM_Util::getClassChildren($className, $includeAbstracts);
 	}
 }

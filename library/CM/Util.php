@@ -177,7 +177,7 @@ class CM_Util {
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
-		$regexp = '#class\s+(?<name>.+?)\s+(extends\s+(?<parent>.+?))?\s*{#';
+		$regexp = '#class\s+(?<name>.+?)\s+#';
 
 		// Detect class names and parents
 		foreach ($paths as $path) {
@@ -304,7 +304,7 @@ class CM_Util {
 	 * @param string|null $namespace
 	 * @return string
 	 */
-	static public function benchmark($namespace = null) {
+	public static function benchmark($namespace = null) {
 		static $times;
 		if (!$times) {
 			$times = array();
@@ -318,6 +318,39 @@ class CM_Util {
 		}
 		$times[$namespace] = $now;
 		return sprintf('%.2f ms', $difference);
+
+	}
+
+	/**
+	 * @param string       $className
+	 * @param boolean|null $includeAbstracts
+	 * @return string[]
+	 */
+	public static function getClassChildren($className, $includeAbstracts = null) {
+		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
+		if (false === ($classNames = CM_CacheLocal::get($key))) {
+			$pathsFiltered = array();
+			$paths = CM_Util::rglob('*.php', DIR_LIBRARY);
+			sort($paths);
+			foreach ($paths as $path) {
+				$file = new CM_File($path);
+				$fileContents = $file->read();
+				$regexp = '#class\s+(?<name>.+?)\b#';
+				if (preg_match($regexp, $fileContents, $matches)) {
+					if (class_exists($matches['name'], true)) {
+						$reflectionClass = new ReflectionClass($matches['name']);
+						if (($reflectionClass->isSubclassOf($className) || interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
+								(!$reflectionClass->isAbstract() || $includeAbstracts)
+						) {
+							$pathsFiltered[] = $path;
+						}
+					}
+				}
+			}
+			$classNames = self::getClasses($pathsFiltered);
+			CM_CacheLocal::set($key, $classNames);
+		}
+		return $classNames;
 
 	}
 }
