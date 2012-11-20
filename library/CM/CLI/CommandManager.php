@@ -71,9 +71,12 @@ class CM_Cli_CommandManager {
 	 */
 	public function run(CM_Cli_Arguments $arguments) {
 		try {
-			$classMatch = $arguments->getNumeric()->shift();
-			$methodMatch = $arguments->getNumeric()->shift();
-			$command = $this->_getCommand($classMatch, $methodMatch);
+			$packageName = $arguments->getNumeric()->shift();
+			$methodName = $arguments->getNumeric()->shift();
+			if (!$packageName || !$methodName) {
+				return $this->getHelp();
+			}
+			$command = $this->_getCommand($packageName, $methodName);
 			return $command->run($arguments);
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$output = PHP_EOL . 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
@@ -87,18 +90,18 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
-	 * @param string $classMatch
-	 * @param string $methodMatch
+	 * @param string $packageName
+	 * @param string $methodName
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return CM_Cli_Command
 	 */
-	private function _getCommand($classMatch, $methodMatch) {
+	private function _getCommand($packageName, $methodName) {
 		foreach ($this->getCommands() as $command) {
-			if ($command->match($classMatch, $methodMatch)) {
+			if ($command->match($packageName, $methodName)) {
 				return $command;
 			}
 		}
-		throw new CM_Cli_Exception_InvalidArguments('Command `' . $classMatch . ' ' . $methodMatch . '` not found');
+		throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
 	}
 
 }

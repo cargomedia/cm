@@ -97,19 +97,20 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @param string $packageMatch
-	 * @param string $methodMatch
+	 * @param string $packageName
+	 * @param string $methodName
 	 * @return bool
 	 */
-	public function match($packageMatch, $methodMatch) {
-		$methodMatched = ($methodMatch === $this->_method->getName());
-		$packageMatched = ($packageMatch === $this->_getPackageName());
+	public function match($packageName, $methodName) {
+		$methodMatched = ($methodName === $this->_method->getName());
+		$packageMatched = ($packageName === $this->_getPackageName());
 		return ($packageMatched && $methodMatched);
 	}
 
 	/**
 	 * @param ReflectionParameter   $param
-	 * @param CM_Cli_Arguments $arguments
+	 * @param CM_Cli_Arguments      $arguments
+	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return mixed
 	 */
 	private function _getParamValue(ReflectionParameter $param, CM_Cli_Arguments $arguments) {
