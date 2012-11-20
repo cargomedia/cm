@@ -345,6 +345,17 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return mixed
+	 */
+	public function shift() {
+		return array_shift($this->_params);
+	}
+
+	public function remove($key) {
+		unset($this->_params[$key]);
+	}
+
+	/**
 	 * @param mixed   $value
 	 * @param boolean $json OPTIONAL
 	 * @return string
