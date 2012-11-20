@@ -40,6 +40,9 @@ final class CM_JobManager extends CM_Class_Abstract {
 		}
 	}
 
+	/**
+	 * @param int $signal
+	 */
 	private function _handleKill($signal) {
 		foreach ($this->_children as $child) {
 			posix_kill($child, SIGKILL);
