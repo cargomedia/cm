@@ -86,6 +86,8 @@ class CM_Cli_CommandManager {
 				$output .= $this->getHelp();
 			}
 			return $output;
+		} catch (Exception $e) {
+			return PHP_EOL . 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
 		}
 	}
 
