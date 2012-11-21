@@ -7,6 +7,5 @@ $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
 $manager = new CM_Cli_CommandManager();
-$manager->addScannedDir(DIR_LIBRARY);
 $arguments = new CM_Cli_Arguments($argv);
 echo $manager->run($arguments);
