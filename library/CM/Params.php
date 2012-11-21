@@ -12,13 +12,13 @@ class CM_Params extends CM_Class_Abstract {
 	private $_decode;
 
 	/**
-	 * @param array $params OPTIONAL
-	 * @param bool  $decode OPTIONAL
+	 * @param array|null $params
+	 * @param bool       $decode OPTIONAL
 	 */
-	public function __construct(array $params = array(), $decode = true) {
+	public function __construct(array $params = null, $decode = true) {
 		$this->_decode = (bool) $decode;
-		$this->_paramsOriginal = $params;
-		$this->_params = $params;
+		$this->_paramsOriginal = (array) $params;
+		$this->_params = (array) $params;
 		if ($this->_decode) {
 			foreach ($this->_params as $key => &$param) {
 				$param = self::decode($param);
@@ -27,22 +27,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param mixed  $default
-	 * @return mixed
-	 */
-	protected function _get($key, $default = null) {
-		if (!$this->has($key) && $default === null) {
-			throw new CM_Exception_InvalidParam("Param `$key` not set");
-		}
-		if (!$this->has($key) && $default !== null) {
-			return $default;
-		}
-		return $this->_params[$key];
-	}
-
-	/**
-	 * @param            $key
+	 * @param string     $key
 	 * @param mixed|null $default
 	 * @return mixed
 	 */
@@ -62,7 +47,6 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * Whether a param is set and not NULL
 	 * @param string $key
 	 * @return bool
 	 */
@@ -84,16 +68,6 @@ class CM_Params extends CM_Class_Abstract {
 		return $this->_paramsOriginal;
 	}
 
-	private function _getFloat($param) {
-		if (is_float($param)) {
-			return $param;
-		}
-		if (!preg_match('/^[\d]*?(\.[\d]*)?$/', $param)) {
-			throw new CM_Exception_InvalidParam('Not a float');
-		}
-		return (float) $param;
-	}
-
 	/**
 	 * @param string      $key
 	 * @param string|null $default
@@ -102,13 +76,6 @@ class CM_Params extends CM_Class_Abstract {
 	public function getFloat($key, $default = null) {
 		$param = $this->_get($key, $default);
 		return $this->_getFloat($param);
-	}
-
-	private function _getString($param) {
-		if (!is_string($param)) {
-			throw new CM_Exception_InvalidParam('Not a String');
-		}
-		return (string) $param;
 	}
 
 	/**
@@ -130,13 +97,6 @@ class CM_Params extends CM_Class_Abstract {
 		return array_map(array($this, '_getString'), $this->getArray($key, $default));
 	}
 
-	private function _getInt($param) {
-		if (!ctype_digit($param) && !is_int($param)) {
-			throw new CM_Exception_InvalidParam('Not an Integer');
-		}
-		return (int) $param;
-	}
-
 	/**
 	 * @param string      $key
 	 * @param string|null $default
@@ -148,8 +108,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param int[]  $default OPTIONAL
+	 * @param string      $key
+	 * @param int[]|null  $default
 	 * @return int[]
 	 */
 	public function getIntArray($key, array $default = null) {
@@ -191,11 +151,14 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
-	 * @param int    $default
+	 * @param string   $key
+	 * @param int|null $default
 	 * @return int
 	 */
-	public function getPage($key = 'page', $default = 1) {
+	public function getPage($key = 'page', $default = null) {
+		if (null === $default) {
+			$default = 1;
+		}
 		$page = $this->getInt($key, $default);
 		$page = min(1000, $page);
 		$page = max(1, $page);
@@ -212,7 +175,7 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	protected function _getObject($key, $className, $default = null, Closure $getter = null) {
 		if (!$getter) {
-			$getter = function($className, $param) {
+			$getter = function ($className, $param) {
 				return new $className($param);
 			};
 		}
@@ -351,16 +314,75 @@ class CM_Params extends CM_Class_Abstract {
 		return array_shift($this->_params);
 	}
 
+	/**
+	 * @param string $key
+	 */
 	public function remove($key) {
 		unset($this->_params[$key]);
 	}
 
 	/**
-	 * @param mixed   $value
-	 * @param boolean $json OPTIONAL
+	 * @param string $key
+	 * @param mixed  $default
+	 * @throws CM_Exception_InvalidParam
+	 * @return mixed
+	 */
+	protected function _get($key, $default = null) {
+		if (!$this->has($key) && $default === null) {
+			throw new CM_Exception_InvalidParam("Param `$key` not set");
+		}
+		if (!$this->has($key) && $default !== null) {
+			return $default;
+		}
+		return $this->_params[$key];
+	}
+
+	/**
+	 * @param mixed $param
+	 * @return float
+	 * @throws CM_Exception_InvalidParam
+	 */
+	private function _getFloat($param) {
+		if (is_float($param)) {
+			return $param;
+		}
+		if (!preg_match('/^[\d]*?(\.[\d]*)?$/', $param)) {
+			throw new CM_Exception_InvalidParam('Not a float');
+		}
+		return (float) $param;
+	}
+
+	/**
+	 * @param mixed $param
+	 * @return string
+	 * @throws CM_Exception_InvalidParam
+	 */
+	private function _getString($param) {
+		if (!is_string($param)) {
+			throw new CM_Exception_InvalidParam('Not a String');
+		}
+		return (string) $param;
+	}
+
+	/**
+	 * @param mixed $param
+	 * @return int
+	 * @throws CM_Exception_InvalidParam
+	 */
+	private function _getInt($param) {
+		if (!ctype_digit($param) && !is_int($param)) {
+			throw new CM_Exception_InvalidParam('Not an Integer');
+		}
+		return (int) $param;
+	}
+
+	/**
+	 * @param mixed        $value
+	 * @param boolean|null $json
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	public static function encode($value, $json = false) {
+	public static function encode($value, $json = null) {
 		if (is_array($value)) {
 			$value = array_map('self::encode', $value);
 		}
@@ -379,11 +401,12 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string  $value
-	 * @param boolean $json OPTIONAL
+	 * @param string       $value
+	 * @param boolean|null $json
+	 * @throws CM_Exception_Invalid
 	 * @return mixed|false
 	 */
-	public static function decode($value, $json = false) {
+	public static function decode($value, $json = null) {
 		if ($json) {
 			$value = json_decode($value, true);
 			if (json_last_error() > 0) {
