@@ -17,19 +17,6 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @param string $paramName
-	 * @return string
-	 */
-	private function _getParamDoc($paramName) {
-		$methodDocComment = $this->_method->getDocComment();
-		if (!preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches)) {
-			return null;
-		}
-		list($docBlock, $description) = $matches;
-		return trim($description);
-	}
-
-	/**
 	 * @param CM_Cli_Arguments $arguments
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return string
@@ -109,6 +96,19 @@ class CM_Cli_Command {
 			}
 		}
 		return $params;
+	}
+
+	/**
+	 * @param string $paramName
+	 * @return string
+	 */
+	private function _getParamDoc($paramName) {
+		$methodDocComment = $this->_method->getDocComment();
+		if (!preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches)) {
+			return null;
+		}
+		list($docBlock, $description) = $matches;
+		return trim($description);
 	}
 
 	/**
