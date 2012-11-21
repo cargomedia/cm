@@ -3,7 +3,7 @@
 class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null  $indexName
+	 * @param string|null  $indexName Index name, if not provided all application indexes will be created.
 	 */
 	public function create($indexName = null) {
 		if ($indexName) {
@@ -17,9 +17,9 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param string|null $indexName
-	 * @param string|null $host
-	 * @param int|null    $port
+	 * @param string|null $indexName Index name, if not provided all indexes will be updated.
+	 * @param string|null $host Elastic search server host.
+	 * @param int|null    $port Elastic search server port.
 	 * @throws CM_Exception_Invalid
 	 * @return void
 	 */
