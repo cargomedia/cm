@@ -2,24 +2,17 @@
 
 class CM_Cli_Arguments {
 
-	/** @var array */
-	private $_originalArguments;
-
 	/** @var CM_Params */
 	private $_numeric = array();
 
 	/** @var CM_Params */
 	private $_named = array();
 
-	/** @var string */
-	private $_invoker;
-
 	/**
 	 * @param array $argv
 	 */
 	public function __construct(array $argv) {
-		$this->_originalArguments = $argv;
-		$this->_invoker = array_shift($argv);
+		array_shift($argv);
 		$this->_numeric = new CM_Params(array(), false);
 		$this->_named = new CM_Params(array(), false);
 
@@ -37,10 +30,15 @@ class CM_Cli_Arguments {
 			if (!$argument) {
 				return;
 			}
-			list($name, $value) = explode('=', $argument, 2) + array(null, null);
-			$this->_addOption($name, $value);
+			$values = explode('=', $argument, 2);
+			$name = array_shift($values);
+			$value = true;
+			if (count($values)) {
+				$value = array_shift($values);
+			}
+			$this->_setNamed($name, $value);
 		} else {
-			$this->_addArgument($argument);
+			$this->_addNumeric($argument);
 		}
 	}
 
@@ -48,14 +46,14 @@ class CM_Cli_Arguments {
 	 * @param string $name
 	 * @param string $value
 	 */
-	private function _addOption($name, $value) {
+	private function _setNamed($name, $value) {
 		$this->_named->set($name, $value);
 	}
 
 	/**
 	 * @param string $value
 	 */
-	private function _addArgument($value) {
+	private function _addNumeric($value) {
 		$this->_numeric->set(count($this->_numeric->getAll()), $value);
 	}
 
