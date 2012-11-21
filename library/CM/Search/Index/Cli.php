@@ -57,10 +57,6 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 		$client->optimizeAll();
 	}
 
-	public static function getPackageName() {
-		return 'search-index';
-	}
-
 	/**
 	 * @param null $host
 	 * @param null $port
@@ -88,5 +84,9 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 			throw new CM_Exception_Invalid('No such index: ' . $indexName);
 		}
 		return current($indexes);
+	}
+
+	public static function getPackageName() {
+		return 'search-index';
 	}
 }
