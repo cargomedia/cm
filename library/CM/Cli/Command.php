@@ -22,7 +22,9 @@ class CM_Cli_Command {
 	 */
 	private function _getParamDoc($paramName) {
 		$methodDocComment = $this->_method->getDocComment();
-		preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches);
+		if (!preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches)) {
+			return null;
+		}
 		list($docBlock, $description) = $matches;
 		return trim($description);
 	}
@@ -50,13 +52,17 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	public function getHelp() {
-		$helpText = $this->_getName();
+		$helpText = $this->_getPackageName() . ' ' . $this->_method->getName();
 		foreach ($this->_getRequiredParameters() as $paramName) {
-			$helpText .= ' {$' . $paramName . '}';
+			$helpText .= ' <' . $paramName . '>';
 		}
 		$helpText .=  PHP_EOL;
-		foreach ($this->_getOptionalParameters() as $paramName => $defaultValue) {
-			$helpText .= '   --' . $paramName . '=' . $defaultValue . PHP_EOL;
+		$optionalParameters = $this->_getOptionalParameters();
+		if ($optionalParameters) {
+			$longestParam = max(array_map('strlen', array_keys($optionalParameters)));
+			foreach ($optionalParameters as $paramName => $defaultValue) {
+				$helpText .= '   --' . str_pad($paramName, max($longestParam + 5, 20), ' ') . $this->_getParamDoc($paramName) . PHP_EOL;
+			}
 		}
 		return $helpText;
 	}
@@ -65,9 +71,18 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	public function getHelpExtended() {
-		$helpText = 'Command usage:';
-		$helpText .= PHP_EOL . str_repeat('-', strlen($helpText)) . PHP_EOL;
-		return $helpText . $this->getHelp();
+		return 'Usage: ' . $this->getHelp();
+	}
+
+	/**
+	 * @param string $packageName
+	 * @param string $methodName
+	 * @return bool
+	 */
+	public function match($packageName, $methodName) {
+		$methodMatched = ($methodName === $this->_method->getName());
+		$packageMatched = ($packageName === $this->_getPackageName());
+		return ($packageMatched && $methodMatched);
 	}
 
 	/**
@@ -94,17 +109,6 @@ class CM_Cli_Command {
 			}
 		}
 		return $params;
-	}
-
-	/**
-	 * @param string $packageName
-	 * @param string $methodName
-	 * @return bool
-	 */
-	public function match($packageName, $methodName) {
-		$methodMatched = ($methodName === $this->_method->getName());
-		$packageMatched = ($packageName === $this->_getPackageName());
-		return ($packageMatched && $methodMatched);
 	}
 
 	/**
@@ -147,15 +151,8 @@ class CM_Cli_Command {
 		try {
 			return $param->getClass()->newInstance($value);
 		} catch (Exception $e) {
-			throw new CM_Cli_Exception_InvalidArguments('Invalid value for parameter `' . $param->getName() . '`. ' . $this->_getParamDoc($param->getName()));
+			throw new CM_Cli_Exception_InvalidArguments('Invalid value for parameter `' . $param->getName() . '`. ' . $e->getMessage());
 		}
-	}
-
-	/**
-	 * @return string
-	 */
-	private function _getName() {
-		return $this->_getPackageName() . ' ' . $this->_method->getName();
 	}
 
 	/**

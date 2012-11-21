@@ -2,37 +2,23 @@
 
 class CM_Cli_CommandManager {
 
-	/** @var array */
-	private $_scannedDirs = array();
-
-	/** @var bool */
-	private $_scanned = false;
-
-	/** @var CM_Cli_Command[] */
-	private $_commands = array();
-
-	/**
-	 * @param string $scannedDir
-	 */
-	public function addScannedDir($scannedDir) {
-		array_push($this->_scannedDirs, $scannedDir);
-	}
+	/** @var CM_Cli_Command[]|null */
+	private $_commands = null;
 
 	/**
 	 * @return CM_Cli_Command[]
 	 */
 	public function getCommands() {
-		if (!$this->_scanned) {
-			$classes = CM_Util::getClassChildren('CM_CLI_Runnable_Abstract', false, $this->_scannedDirs);
+		if (null === $this->_commands) {
+			$classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
 			foreach ($classes as $className) {
 				$class = new ReflectionClass($className);
 				foreach ($class->getMethods() as $method) {
 					if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-						$this->addCommand(new CM_Cli_Command($method));
+						$this->_addCommand(new CM_Cli_Command($method));
 					}
 				}
 			}
-			$this->_scanned = true;
 		}
 		return $this->_commands;
 	}
@@ -40,17 +26,8 @@ class CM_Cli_CommandManager {
 	/**
 	 * @param CM_Cli_Command $command
 	 */
-	public function addCommand(CM_Cli_Command $command) {
+	private function _addCommand(CM_Cli_Command $command) {
 		$this->_commands[] = $command;
-	}
-
-	/**
-	 * @param CM_Cli_Command[] $commands
-	 */
-	public function addCommands(array $commands) {
-		foreach ($commands as $command) {
-			$this->addCommand($command);
-		}
 	}
 
 	/**
@@ -60,7 +37,7 @@ class CM_Cli_CommandManager {
 		$help = 'Available commands:';
 		$help .= PHP_EOL . str_repeat('-', strlen($help)) . PHP_EOL;
 		foreach ($this->getCommands() as $command) {
-			$help .= $command->getHelp();
+			$help .= $command->getHelp() . PHP_EOL;
 		}
 		return $help;
 	}
@@ -79,7 +56,7 @@ class CM_Cli_CommandManager {
 			$command = $this->_getCommand($packageName, $methodName);
 			return $command->run($arguments);
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
-			$output = PHP_EOL . 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
+			$output = 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
 			if (isset($command)) {
 				$output .= $command->getHelpExtended();
 			} else {
