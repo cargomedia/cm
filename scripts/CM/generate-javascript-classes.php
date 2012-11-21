@@ -1,12 +1,12 @@
 <?php
 
 define("IS_CRON", true);
-define('DIR_ROOT', dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR);
-require_once DIR_ROOT . 'library/CM/Bootloader.php';
-CM_Bootloader::load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
-$namespaces = CM_Util::getNamespaces();
-$viewClasses = CM_View_Abstract::getClasses($namespaces, CM_View_Abstract::CONTEXT_JAVASCRIPT);
+require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
+$bootloader = new CM_Bootloader(dirname(dirname(__DIR__)) . '/', null);
+$bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
+
+$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
 foreach ($viewClasses as $path => $className) {
 	$jsPath = preg_replace('/\.php$/', '.js', $path);
 	if (!file_exists($jsPath)) {

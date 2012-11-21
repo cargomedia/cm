@@ -56,6 +56,21 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $className
+	 * @throws CM_Exception_Invalid
+	 * @return string
+	 */
+	public static function getNamespace($className) {
+		$className = (string) $className;
+		$position = strpos($className, '_');
+		if (false === $position || 0 === $position) {
+			throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
+		}
+		$namespace = substr($className, 0, $position);
+		return $namespace;
+	}
+
+	/**
 	 * @param string       $url
 	 * @param array|null   $params
 	 * @param boolean|null $methodPost
@@ -177,7 +192,7 @@ class CM_Util {
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
-		$regexp = '#class\s+(?<name>.+?)\s+#';
+		$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
 
 		// Detect class names and parents
 		foreach ($paths as $path) {
@@ -232,16 +247,20 @@ class CM_Util {
 	}
 
 	/**
-	 * @return string[]
+	 * @param string    $namespace
+	 * @param bool|null $relative
+	 * @return string
 	 */
-	public static function getNamespaces() {
-		$namespaces = array();
-		foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
-			/** @var $site CM_Site_Abstract */
-			$site = new $siteClassName();
-			$namespaces = array_merge($namespaces, $site->getNamespaces());
+	public static function getNamespacePath($namespace, $relative = null) {
+		$namespace = (string) $namespace;
+		$path = '';
+		if (null !== DIR_LIBRARY) {
+			$path = DIR_LIBRARY . $namespace . '/';
 		}
-		return array_unique($namespaces);
+		if (!$relative) {
+			$path = DIR_ROOT . $path;
+		}
+		return $path;
 	}
 
 	/**
@@ -330,12 +349,15 @@ class CM_Util {
 		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
 		if (false === ($classNames = CM_CacheLocal::get($key))) {
 			$pathsFiltered = array();
-			$paths = CM_Util::rglob('*.php', DIR_LIBRARY);
+			$paths = array();
+			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
+				$paths = array_merge($paths, CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/'));
+			}
 			sort($paths);
+			$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
 			foreach ($paths as $path) {
 				$file = new CM_File($path);
 				$fileContents = $file->read();
-				$regexp = '#class\s+(?<name>.+?)\b#';
 				if (preg_match($regexp, $fileContents, $matches)) {
 					if (class_exists($matches['name'], true)) {
 						$reflectionClass = new ReflectionClass($matches['name']);

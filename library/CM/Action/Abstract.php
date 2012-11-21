@@ -317,7 +317,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		if (!$className) {
 			$className = self::_getClassName($type);
 		}
-		return str_replace('_', ' ', str_replace(self::_getNamespace($className) . '_Action_', '', $className));
+		return str_replace('_', ' ', str_replace(CM_Util::getNamespace($className) . '_Action_', '', $className));
 	}
 
 	/**

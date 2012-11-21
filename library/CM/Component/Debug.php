@@ -18,7 +18,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		$this->setTplParam('clearCacheButtons', $cacheArray);
 		$errors = $debug->getErrors();
 		foreach ($errors as &$error) {
-			$error['file'] = str_replace(DIR_SITE_ROOT, '', $error['file']);
+			$error['file'] = str_replace(DIR_ROOT, '', $error['file']);
 		}
 		$this->setTplParam('errors', $errors);
 	}

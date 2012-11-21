@@ -1,6 +1,24 @@
 <?php
+require_once 'Util.php';
 
 class CM_Bootloader {
+
+	/** @var CM_Bootloader */
+	protected static $_instance;
+
+	/**
+	 * @param string $pathRoot
+	 * @param string|null $dirLibrary
+	 * @throws CM_Exception_Invalid
+	 */
+	final public function __construct($pathRoot, $dirLibrary) {
+		if (self::$_instance) {
+			throw new CM_Exception_Invalid('Bootloader already instantiated');
+		}
+		self::$_instance = $this;
+		define('DIR_ROOT', $pathRoot);
+		define('DIR_LIBRARY', $dirLibrary);
+	}
 
 	public function defaults() {
 		date_default_timezone_set(CM_Config::get()->timeZone);
@@ -16,7 +34,7 @@ class CM_Bootloader {
 
 		spl_autoload_register(function ($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
-			$path = DIR_ROOT . 'library' . DIRECTORY_SEPARATOR . $relativePath;
+			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . $relativePath;
 			if (is_file($path)) {
 				require_once $path;
 				return;
@@ -92,17 +110,15 @@ class CM_Bootloader {
 		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
-		define('DIR_SITE_ROOT', dirname(dirname(__DIR__)) . '/');
-		define('DIR_LIBRARY', DIR_SITE_ROOT . 'library' . DIRECTORY_SEPARATOR);
-		define('DIR_VENDOR', DIR_SITE_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
-		define('DIR_PUBLIC', DIR_SITE_ROOT . 'public' . DIRECTORY_SEPARATOR);
-		define('DIR_LAYOUT', DIR_SITE_ROOT . 'layout' . DIRECTORY_SEPARATOR);
+		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
+		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
+		define('DIR_LAYOUT', DIR_ROOT . 'layout' . DIRECTORY_SEPARATOR);
 
-		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_SITE_ROOT . 'data' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
 		define ('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
 
-		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_SITE_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
@@ -170,16 +186,33 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return string[]
+	 */
+	public function getNamespaces() {
+		return array('CM');
+	}
+
+	/**
 	 * @param string[] $functions
 	 * @throws Exception
 	 */
-	public static function load(array $functions) {
+	public function load(array $functions) {
 		foreach ($functions as $function) {
-			$instance = new static();
-			if (!method_exists($instance, $function)) {
+			if (!method_exists($this, $function)) {
 				throw new Exception('Non existent bootload function `' . $function . '`');
 			}
-			$instance->$function();
+			$this->$function();
 		}
+	}
+
+	/**
+	 * @return CM_Bootloader
+	 * @throws Exception
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			throw new Exception('No bootloader instance');
+		}
+		return self::$_instance;
 	}
 }

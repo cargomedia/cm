@@ -18,7 +18,7 @@ class CM_File_Javascript extends CM_File {
 		$content[] = self::_getDoc('@type String', 1);
 		$content[] = "\t_class: '" . $className . "'";
 		$content[] = '});';
-		$path = DIR_LIBRARY . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
+		$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
 		return CM_File_Javascript::create($path, implode(PHP_EOL, $content));
 	}
 

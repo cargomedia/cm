@@ -73,7 +73,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 */
 	public function getLayout() {
 		$layoutname = 'Default';
-		$classname = self::_getNamespace() . '_Layout_' . $layoutname;
+		$classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
 		return new $classname($this);
 	}
 }

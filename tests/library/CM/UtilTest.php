@@ -4,15 +4,18 @@ require_once __DIR__ . '/../../TestCase.php';
 class CM_UtilTest extends TestCase {
 
 	public function testGetClasses() {
-		$classesExpected = array();
-		$classesExpected[DIR_LIBRARY . 'CM/Class/Abstract.php'] = 'CM_Class_Abstract';
-		$classesExpected[DIR_LIBRARY . 'CM/Paging/Abstract.php'] = 'CM_Paging_Abstract';
-		$classesExpected[DIR_LIBRARY . 'CM/Paging/Action/Abstract.php'] = 'CM_Paging_Action_Abstract';
-		$classesExpected[DIR_LIBRARY . 'CM/Paging/Action/User.php'] = 'CM_Paging_Action_User';
+		$classPaths = array();
+		$classPaths['CM_Class_Abstract'] = 'CM/Class/Abstract.php';
+		$classPaths['CM_Paging_Abstract'] = 'CM/Paging/Abstract.php';
+		$classPaths['CM_Paging_Action_Abstract'] = 'CM/Paging/Action/Abstract.php';
+		$classPaths['CM_Paging_Action_User'] = 'CM/Paging/Action/User.php';
 
-		$paths = array_keys($classesExpected);
-		$paths = array_reverse($paths);
-		$this->assertSame($classesExpected, CM_Util::getClasses($paths));
+		foreach($classPaths as $className => &$path){
+			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . $path;
+		}
+
+		$paths = array_reverse($classPaths);
+		$this->assertSame(array_flip($classPaths), CM_Util::getClasses($paths));
 	}
 
 }

@@ -7,13 +7,14 @@ function smarty_function_load(array $params, Smarty_Internal_Template $template)
 	$namespace = isset($params['namespace']) ? $params['namespace'] : null;
 	$parse = isset($params['parse']) ? (bool) $params['parse'] : true;
 
-	$tplPath = $render->getLayoutPath($params['file'], $namespace);
 
 	if ($parse) {
+		$tplPath = $render->getLayoutPath($params['file'], $namespace);
 		$params = array_merge($template->getTemplateVars(), $params);
 		return $render->renderTemplate($tplPath, $params, true);
 	} else {
-		$file = new CM_File(DIR_LAYOUT . $tplPath);
+		$tplPath = $render->getLayoutPath($params['file'], $namespace, true);
+		$file = new CM_File($tplPath);
 		return $file->read();
 	}
 }

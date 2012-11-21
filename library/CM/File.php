@@ -1,6 +1,6 @@
 <?php
 
-class CM_File {
+class CM_File extends CM_Class_Abstract {
 
 	/** @var string */
 	private $_path;

@@ -65,8 +65,9 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		}
 		$paths = array();
 		foreach ($namespaces as $namespace) {
+			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
 			foreach ($contextTypes[$context] as $contextType) {
-				$paths = array_merge($paths, CM_Util::rglob('*.php', DIR_LIBRARY . $namespace . '/' . $contextType . '/'));
+				$paths = array_merge($paths, CM_Util::rglob('*.php', $libraryPath . $contextType . '/'));
 			}
 		}
 		return CM_Util::getClasses($paths);

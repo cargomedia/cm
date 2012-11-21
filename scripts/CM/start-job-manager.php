@@ -1,9 +1,9 @@
 <?php
 
 define("IS_CRON", true);
-define('DIR_ROOT', dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR);
-require_once DIR_ROOT . 'library/CM/Bootloader.php';
-CM_Bootloader::load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
+require_once dirname(dirname(__DIR__)) . '/library/CM/Bootloader.php';
+$bootloader = new CM_Bootloader(dirname(dirname(__DIR__)) . '/', null);
+$bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
 $jobManager = new CM_JobManager();
 $jobManager->start();

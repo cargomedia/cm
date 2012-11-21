@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../TestCase.php';
 
-require_once DIR_LIBRARY . 'CM/SmartyPlugins/prefilter.translate.php';
+require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/prefilter.translate.php';
 
 class smarty_prefilter_translateTest extends TestCase {
 

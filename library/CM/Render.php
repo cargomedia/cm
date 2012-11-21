@@ -188,26 +188,21 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param bool   $full      OPTIONAL True if full path required
+	 * @param bool   $absolute      OPTIONAL True if full path required
 	 * @param string $theme     OPTIONAL
 	 * @param string $namespace OPTIONAL
 	 * @return string Theme base path
 	 */
-	public function getThemeDir($full = false, $theme = null, $namespace = null) {
+	public function getThemeDir($absolute = false, $theme = null, $namespace = null) {
 		if (!$theme) {
 			$theme = $this->getSite()->getTheme();
 		}
-
 		if (!$namespace) {
 			$namespace = $this->getSite()->getNamespace();
 		}
 
-		$path = $namespace . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR;
-
-		if ($full) {
-			$path = DIR_LAYOUT . $path;
-		}
-		return $path;
+		$path = CM_Util::getNamespacePath($namespace, !$absolute);
+		return $path . 'layout/' . $theme . '/';
 	}
 
 	/**
@@ -443,7 +438,7 @@ class CM_Render extends CM_Class_Abstract {
 	private function _getSmarty() {
 		if (!isset(self::$_smarty)) {
 			self::$_smarty = new Smarty();
-			self::$_smarty->setTemplateDir(DIR_LAYOUT);
+			self::$_smarty->setTemplateDir(DIR_ROOT);
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
 			self::$_smarty->_file_perms = 0666;
 			self::$_smarty->_dir_perms = 0777;
@@ -454,7 +449,7 @@ class CM_Render extends CM_Class_Abstract {
 
 		$pluginDirs = array(SMARTY_PLUGINS_DIR);
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
-			$pluginDirs[] = DIR_LIBRARY . $namespace . '/SmartyPlugins';
+			$pluginDirs[] = CM_Util::getNamespacePath($namespace). 'library/' . $namespace . '/SmartyPlugins';
 		}
 		self::$_smarty->setPluginsDir($pluginDirs);
 		self::$_smarty->loadFilter('pre', 'translate');

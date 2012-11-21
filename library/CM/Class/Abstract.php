@@ -51,20 +51,11 @@ abstract class CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string|null $className
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	protected static function _getNamespace($className = null) {
-		if (!$className) {
-			$className = get_called_class();
-		}
-		$position = strpos($className, '_');
-		if (false === $position || 0 === $position) {
-			throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
-		}
-		$namespace = substr($className, 0, $position);
-		return $namespace;
+	protected static function _getClassNamespace() {
+		return CM_Util::getNamespace(get_called_class());
 	}
 
 	/**
