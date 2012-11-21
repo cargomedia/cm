@@ -3,10 +3,9 @@
 class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null $indexName
-	 * @param boolean|null $test
+	 * @param string|null  $indexName
 	 */
-	public function create($indexName = null, $test = null) {
+	public function create($indexName = null) {
 		if ($indexName) {
 			$indexes = array($this->_getIndex($indexName));
 		} else {
@@ -19,34 +18,35 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string|null $indexName
-	 * @param string|null $test
-	 * @param string|null $port
 	 * @param string|null $host
+	 * @param int|null    $port
 	 * @throws CM_Exception_Invalid
 	 * @return void
 	 */
-	public function update($indexName = null, $test = null, $port = null, $host = null) {
+	public function update($indexName = null, $host = null, $port = null) {
+		$server = array('host' => $host, 'port' => $port);
 		if ($indexName) {
-			$indexes = array($this->_getIndex($indexName));
+			$indexes = array($this->_getIndex($indexName, $host, $port));
 		} else {
-			$indexes = $this->_getIndexes();
+			$indexes = $this->_getIndexes($server);
 		}
 		foreach ($indexes as $index) {
-			$indexName = $index->getIndex()->getName();;
+			$indexName = $index->getIndex()->getName();
+			$key = 'Search.Updates_' . $index->getType()->getName();
 			try {
-				$key = 'Search.Updates_' . $indexName;
 				$ids = CM_Cache_Redis::sFlush($key);
 				$ids = array_filter(array_unique($ids));
 				$index->update($ids);
 			} catch (Exception $e) {
-				echo $indexName . '-updates failed.' . PHP_EOL;
+				$message = $indexName . '-updates failed. 	';
 				if (isset($ids)) {
-					echo 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
+					$message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
 					foreach ($ids as $id) {
-						CM_Cache_Redis::sAdd('Search.Updates_' . $indexName, $id);
+						CM_Cache_Redis::sAdd($key, $id);
 					}
 				}
-				throw new CM_Exception_Invalid('Update failed');
+				$message .= 'Reason: ' . $e->getMessage();
+				throw new CM_Exception_Invalid($message);
 			}
 		}
 	}
@@ -57,29 +57,31 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 		$client->optimizeAll();
 	}
 
-
-
 	public static function getPackageName() {
 		return 'search-index';
 	}
 
 	/**
+	 * @param null $host
+	 * @param null $port
 	 * @return CM_Elastica_Type_Abstract[]
 	 */
-	private function _getIndexes() {
+	private function _getIndexes($host = null, $port = null) {
 		$indexTypes = CM_Util::getClassChildren('CM_Elastica_Type_Abstract');
-		return array_map(function ($indexType) {
-			return new $indexType();
+		return array_map(function ($indexType) use ($host, $port) {
+			return new $indexType($host, $port);
 		}, $indexTypes);
 	}
 
 	/**
-	 * @param string $indexName
-	 * @return CM_Elastica_Type_Abstract
+	 * @param string      $indexName
+	 * @param string|null $host
+	 * @param int|null    $port
 	 * @throws CM_Exception_Invalid
+	 * @return CM_Elastica_Type_Abstract
 	 */
-	private function _getIndex($indexName) {
-		$indexes = array_filter($this->_getIndexes(), function (CM_Elastica_Type_Abstract $index) use ($indexName) {
+	private function _getIndex($indexName, $host = null, $port = null) {
+		$indexes = array_filter($this->_getIndexes($host, $port), function (CM_Elastica_Type_Abstract $index) use ($indexName) {
 			return $index->getIndex()->getName() == $indexName;
 		});
 		if (!$indexes) {
