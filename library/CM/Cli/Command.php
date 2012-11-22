@@ -39,7 +39,7 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	public function getHelp() {
-		$helpText = $this->_getPackageName() . ' ' . $this->_method->getName();
+		$helpText = $this->getPackageName() . ' ' . $this->_method->getName();
 		foreach ($this->_getRequiredParameters() as $paramName) {
 			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
 		}
@@ -61,7 +61,7 @@ class CM_Cli_Command {
 	 */
 	public function match($packageName, $methodName) {
 		$methodMatched = ($methodName === $this->_method->getName());
-		$packageMatched = ($packageName === $this->_getPackageName());
+		$packageMatched = ($packageName === $this->getPackageName());
 		return ($packageMatched && $methodMatched);
 	}
 
@@ -151,7 +151,7 @@ class CM_Cli_Command {
 	/**
 	 * @return string
 	 */
-	private function _getPackageName() {
+	public function getPackageName() {
 		return $this->_class->getMethod('getPackageName')->invoke(null);
 	}
 

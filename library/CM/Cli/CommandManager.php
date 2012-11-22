@@ -24,15 +24,23 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
+	 * @param string|null $packageName
+	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return string
 	 */
-	public function getHelp() {
-		$help = 'Available commands:';
-		$help .= PHP_EOL . str_repeat('-', strlen($help)) . PHP_EOL;
+	public function getHelp($packageName = null) {
+		$helpHeader = 'Available commands:';
+		$helpHeader .= PHP_EOL . str_repeat('-', strlen($helpHeader)) . PHP_EOL;
+		$help = '';
 		foreach ($this->getCommands() as $command) {
-			$help .= $command->getHelp() . PHP_EOL;
+			if (!$packageName || $packageName === $command->getPackageName()) {
+				$help .= $command->getHelp() . PHP_EOL;
+			}
 		}
-		return $help;
+		if ($packageName && !$help) {
+			throw new CM_Cli_Exception_InvalidArguments('Package `' . $packageName . '` not found.');
+		}
+		return $helpHeader . $help;
 	}
 
 	/**
@@ -43,8 +51,11 @@ class CM_Cli_CommandManager {
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
-			if (!$packageName || !$methodName) {
+			if (!$packageName) {
 				return $this->getHelp();
+			}
+			if (!$methodName) {
+				return $this->getHelp($packageName);
 			}
 			$command = $this->_getCommand($packageName, $methodName);
 			return $command->run($arguments);
