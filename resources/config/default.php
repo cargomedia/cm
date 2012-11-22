@@ -143,12 +143,12 @@ $config->CM_Adprovider->zones = array();
 $config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
 $config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
 
-$config->CM_JobManager = new stdClass();
-$config->CM_JobManager->workerCount = 5;
+$config->CM_Jobdistribution_JobManager = new stdClass();
+$config->CM_Jobdistribution_JobManager->workerCount = 5;
 
-$config->CM_JobWorker = new stdClass();
-$config->CM_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
+$config->CM_Jobdistribution_JobWorker = new stdClass();
+$config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
 
-$config->CM_Job_Abstract = new stdClass();
-$config->CM_Job_Abstract->gearmanEnabled = true;
-$config->CM_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
+$config->CM_Jobdistribution_Job_Abstract = new stdClass();
+$config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
+$config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));

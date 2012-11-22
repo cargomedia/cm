@@ -3,7 +3,7 @@
 class CM_Jobdistribution_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function startManager() {
-		$jobManager = new CM_JobManager();
+		$jobManager = new CM_Jobdistribution_JobManager();
 		$jobManager->start();
 	}
 

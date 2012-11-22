@@ -1,6 +1,6 @@
 <?php
 
-final class CM_JobManager extends CM_Class_Abstract {
+final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 
 	/** @var array */
 	private $_children;
@@ -29,7 +29,7 @@ final class CM_JobManager extends CM_Class_Abstract {
 		$pid = pcntl_fork();
 		switch ($pid) {
 			case 0: //child
-				$worker = new CM_JobWorker();
+				$worker = new CM_Jobdistribution_JobWorker();
 				$worker->run();
 				exit;
 				break;

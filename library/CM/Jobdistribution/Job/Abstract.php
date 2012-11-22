@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Job_Abstract extends CM_Class_Abstract {
+abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
 	/** @var GearmanClient|null */
 	private $_gearmanClient = null;

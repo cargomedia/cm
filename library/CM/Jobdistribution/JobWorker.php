@@ -1,6 +1,6 @@
 <?php
 
-final class CM_JobWorker extends CM_Class_Abstract {
+final class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 
 	/** @var GearmanWorker */
 	private $_gearmanWorker;
@@ -23,7 +23,7 @@ final class CM_JobWorker extends CM_Class_Abstract {
 	}
 
 	private function _registerJobs() {
-		foreach (CM_Job_Abstract::getClassChildren() as $jobClassName) {
+		foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
 			$job = new $jobClassName();
 			$this->_gearmanWorker->addFunction($jobClassName, array($job, '__run'));
 		}
