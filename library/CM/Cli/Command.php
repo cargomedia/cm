@@ -41,14 +41,14 @@ class CM_Cli_Command {
 	public function getHelp() {
 		$helpText = $this->_getPackageName() . ' ' . $this->_method->getName();
 		foreach ($this->_getRequiredParameters() as $paramName) {
-			$helpText .= ' <' . $paramName . '>';
+			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
 		}
 		$helpText .=  PHP_EOL;
 		$optionalParameters = $this->_getOptionalParameters();
 		if ($optionalParameters) {
-			$longestParam = max(array_map('strlen', array_keys($optionalParameters)));
 			foreach ($optionalParameters as $paramName => $defaultValue) {
-				$helpText .= '   --' . str_pad($paramName, max($longestParam + 5, 20), ' ') . $this->_getParamDoc($paramName) . PHP_EOL;
+				$paramName = CM_Util::uncamelize($paramName);
+				$helpText .= '   --' . str_pad($paramName, max(strlen($paramName) + 5, 20), ' ') . $this->_getParamDoc($paramName) . PHP_EOL;
 			}
 		}
 		return $helpText;
@@ -117,12 +117,13 @@ class CM_Cli_Command {
 			}
 			$value = $argumentsNumeric->shift();
 		} else {
+			$paramName = CM_Util::uncamelize($param->getName());
 			$argumentsNamed = $arguments->getNamed();
-			if (!$argumentsNamed->has($param->getName())) {
+			if (!$argumentsNamed->has($paramName)) {
 				return $param->getDefaultValue();
 			}
-			$value = $argumentsNamed->get($param->getName());
-			$argumentsNamed->remove($param->getName());
+			$value = $argumentsNamed->get($paramName);
+			$argumentsNamed->remove($paramName);
 		}
 		return $this->_forceType($value, $param);
 	}
