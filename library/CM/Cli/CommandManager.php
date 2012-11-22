@@ -15,19 +15,12 @@ class CM_Cli_CommandManager {
 				$class = new ReflectionClass($className);
 				foreach ($class->getMethods() as $method) {
 					if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-						$this->_addCommand(new CM_Cli_Command($method));
+						$this->_commands[] = new CM_Cli_Command($method);
 					}
 				}
 			}
 		}
 		return $this->_commands;
-	}
-
-	/**
-	 * @param CM_Cli_Command $command
-	 */
-	private function _addCommand(CM_Cli_Command $command) {
-		$this->_commands[] = $command;
 	}
 
 	/**
@@ -58,13 +51,13 @@ class CM_Cli_CommandManager {
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$output = 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
 			if (isset($command)) {
-				$output .= $command->getHelpExtended();
+				$output .= 'Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp();
 			} else {
 				$output .= $this->getHelp();
 			}
 			return $output;
 		} catch (Exception $e) {
-			return PHP_EOL . 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
+			return 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
 		}
 	}
 

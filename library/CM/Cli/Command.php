@@ -55,13 +55,6 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getHelpExtended() {
-		return 'Usage: ' . $this->getHelp();
-	}
-
-	/**
 	 * @param string $packageName
 	 * @param string $methodName
 	 * @return bool
@@ -100,15 +93,14 @@ class CM_Cli_Command {
 
 	/**
 	 * @param string $paramName
-	 * @return string
+	 * @return string|null
 	 */
 	private function _getParamDoc($paramName) {
 		$methodDocComment = $this->_method->getDocComment();
 		if (!preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches)) {
 			return null;
 		}
-		list($docBlock, $description) = $matches;
-		return trim($description);
+		return trim($matches[1]);
 	}
 
 	/**

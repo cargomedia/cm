@@ -2,6 +2,9 @@
 
 class CM_Cli_Arguments {
 
+	/** @var string */
+	private $_scriptName;
+
 	/** @var CM_Params */
 	private $_numeric = array();
 
@@ -12,13 +15,34 @@ class CM_Cli_Arguments {
 	 * @param array $argv
 	 */
 	public function __construct(array $argv) {
-		array_shift($argv);
+		$this->_scriptName = basename(array_shift($argv));
 		$this->_numeric = new CM_Params(array(), false);
 		$this->_named = new CM_Params(array(), false);
 
 		foreach ($argv as $argument) {
 			$this->_parseArgument($argument);
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getScriptName() {
+		return $this->_scriptName;
+	}
+
+	/**
+	 * @return CM_Params
+	 */
+	public function getNumeric() {
+		return $this->_numeric;
+	}
+
+	/**
+	 * @return CM_Params
+	 */
+	public function getNamed() {
+		return $this->_named;
 	}
 
 	/**
@@ -43,14 +67,6 @@ class CM_Cli_Arguments {
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $value
-	 */
-	private function _setNamed($name, $value) {
-		$this->_named->set($name, $value);
-	}
-
-	/**
 	 * @param string $value
 	 */
 	private function _addNumeric($value) {
@@ -58,17 +74,11 @@ class CM_Cli_Arguments {
 	}
 
 	/**
-	 * @return CM_Params
+	 * @param string $name
+	 * @param string $value
 	 */
-	public function getNumeric() {
-		return $this->_numeric;
-	}
-
-	/**
-	 * @return CM_Params
-	 */
-	public function getNamed() {
-		return $this->_named;
+	private function _setNamed($name, $value) {
+		$this->_named->set($name, $value);
 	}
 
 }
