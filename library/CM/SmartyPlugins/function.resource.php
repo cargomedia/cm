@@ -44,6 +44,6 @@ function smarty_helper_resource_internal(CM_Render $render) {
 	foreach ($paths as $path) {
 		$content .= '<script type="text/javascript" src="' . $path. '"></script>' . PHP_EOL;
 	}
-	$content .= '<script type="text/javascript">' . new CM_File(DIR_ROOT . 'config/js/internal.js') . '</script>' . PHP_EOL;
+	$content .= '<script type="text/javascript">' . new CM_File(DIR_ROOT . 'resources/config/js/internal.js') . '</script>' . PHP_EOL;
 	return $content;
 }

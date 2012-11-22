@@ -48,7 +48,7 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 				$paths[] = $path;
 			}
 		}
-		$paths[] = DIR_ROOT . 'config/js/internal.js';
+		$paths[] = DIR_ROOT . 'resources/config/js/internal.js';
 		foreach (CM_View_Abstract::getClasses($this->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT) as $path => $className) {
 			$paths[] = preg_replace('/\.php$/', '.js', $path);
 		}
