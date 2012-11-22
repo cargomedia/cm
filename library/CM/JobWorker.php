@@ -11,6 +11,9 @@ final class CM_JobWorker extends CM_Class_Abstract {
 		foreach ($config->servers as $server) {
 			$this->_gearmanWorker->addServer($server['host'], $server['port']);
 		}
+//		use non-blocking IO mode to enable signal processing in worker processes as soon as libgearman/pecl gearman is fixed
+//		see https://bugs.php.net/bug.php?id=60764
+//		$this->_gearmanWorker->addOptions(GEARMAN_WORKER_NON_BLOCKING);
 		$this->_registerJobs();
 	}
 
