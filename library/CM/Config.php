@@ -8,14 +8,11 @@ class CM_Config {
 	private static $_config = null;
 
 	/**
-	 * @param string $filename
+	 * @param string $path
 	 */
-	public static function load($filename) {
-		$path = DIR_ROOT . 'config' . DIRECTORY_SEPARATOR . $filename;
-		if (is_file($path)) {
-			$config = self::get();
-			require $path;
-		}
+	public static function load($path) {
+		$config = self::get();
+		require $path;
 	}
 
 	/**
@@ -37,12 +34,25 @@ class CM_Config {
 
 	private static function _init() {
 		self::$_config = new stdClass();
-		self::load('cm.php');
-		self::load('default.php');
+		self::_loadConfig('default.php');
 		if (IS_TEST) {
-			self::load('test.php');
+			self::_loadConfig('test.php');
 		}
-		self::load('local.php');
-		self::load('internal.php');
+		self::_loadConfig('local.php');
+		self::_loadConfig('internal.php');
+	}
+
+	/**
+	 * @param string $fileName
+	 */
+	private static function _loadConfig($fileName) {
+		$applicationConfigPath = DIR_ROOT . 'resources/config/';
+
+		foreach (CM_Util::getNamespaceFiles('resources/config/' . $fileName) as $config) {
+			self::load($config->getPath());
+		}
+		if (is_file($applicationConfigPath . $fileName)) {
+			self::load($applicationConfigPath . $fileName);
+		}
 	}
 }
