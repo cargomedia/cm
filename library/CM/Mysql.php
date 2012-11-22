@@ -16,10 +16,10 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	public static function connect($readOnly = false) {
 		$config = self::_getConfig();
-		$link = &self::$_link;
+		$link = & self::$_link;
 		$server = $config->server;
 		if ($readOnly) {
-			$link = &self::$_linkReadOnly;
+			$link = & self::$_linkReadOnly;
 			if (!empty($config->servers_read)) {
 				$server = $config->servers_read[array_rand($config->servers_read)];
 			}
@@ -223,10 +223,10 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Select fields from a table
 	 *
-	 * @param string			$table
-	 * @param string|array	  $attrs Column-name OR Column-names array
+	 * @param string            $table
+	 * @param string|array      $attrs Column-name OR Column-names array
 	 * @param string|array|null $where Associative array field=>value OR string
-	 * @param string|null	   $order
+	 * @param string|null       $order
 	 * @return CM_MysqlResult
 	 */
 	public static function select($table, $attrs, $where = null, $order = null) {
@@ -248,7 +248,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Select COUNT(*) from a table
 	 *
-	 * @param string			$table
+	 * @param string            $table
 	 * @param string|array|null $where Associative array field=>value OR string
 	 * @return int
 	 */
@@ -260,11 +260,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Insert one/multiple rows
 	 *
-	 * @param string			$table
-	 * @param string|array	  $attr		   Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array|null $value		  Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array|null		$onDuplicateKeyValues
-	 * @param string			$statement
+	 * @param string            $table
+	 * @param string|array      $attr           Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null        $onDuplicateKeyValues
+	 * @param string            $statement
 	 * @return string Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = self::STMT_INSERT) {
@@ -321,8 +321,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string			$table
-	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string            $table
+	 * @param string|array      $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -331,10 +331,10 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string			$table
-	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string            $table
+	 * @param string|array      $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
-	 * @param array|null		$onDuplicateKeyValues
+	 * @param array|null        $onDuplicateKeyValues
 	 * @return int Insert Id
 	 */
 	public static function insertDelayed($table, $attr, $value = null, array $onDuplicateKeyValues = null) {
@@ -346,8 +346,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string			$table
-	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string            $table
+	 * @param string|array      $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -356,8 +356,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string			$table
-	 * @param string|array	  $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string            $table
+	 * @param string|array      $attr  Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $value OPTIONAL Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return int Insert Id
 	 */
@@ -370,8 +370,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string			$table
-	 * @param array			 $values Associative array field=>value
+	 * @param string            $table
+	 * @param array             $values Associative array field=>value
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
@@ -393,7 +393,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	   $table
+	 * @param string       $table
 	 * @param string|array $where Associative array field=>value OR string
 	 * @return int Affected rows
 	 */
@@ -412,7 +412,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	  $table
+	 * @param string      $table
 	 * @param string|null $column OPTIONAL
 	 * @param string|null $index  OPTIONAL
 	 * @return bool
@@ -453,7 +453,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Returns column info object
 	 *
-	 * @param string	  $table
+	 * @param string      $table
 	 * @param string|null $column
 	 * @return CM_MysqlColumn
 	 */
@@ -531,14 +531,17 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	 $dbName
-	 * @param bool	   $skipStructure
-	 * @param bool	   $skipData
-	 * @param array|null $tables
-	 * @return mixed|string
+	 * @param array|null  $tables
+	 * @param bool|null   $skipData
+	 * @param bool|null   $skipStructure
+	 * @param string|null $dbName
+	 * @return string
 	 */
-	public static function getDump($dbName, $skipStructure = false, $skipData = false, array $tables = null) {
+	public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
 		$config = self::_getConfig();
+		if (null === $dbName) {
+			$dbName = $config->db;
+		}
 		$args = array();
 		$args[] = '--compact';
 		$args[] = '--add-drop-table';
