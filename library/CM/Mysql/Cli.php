@@ -3,14 +3,14 @@
 class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null $tablePrefix
+	 * @param string $namespace
 	 */
-	public function dump($tablePrefix = null) {
-		$tablePrefix = (string) $tablePrefix;
-		$tables = CM_Mysql::exec("SHOW TABLES LIKE '?'", $tablePrefix . '%')->fetchCol();
+	public function dump($namespace) {
+		$namespace = (string) $namespace;
+		$tables = CM_Mysql::exec("SHOW TABLES LIKE '?'", $namespace . '%')->fetchCol();
 		sort($tables);
 		$dump = CM_Mysql::getDump($tables, true);
-		CM_File::create(CM_Util::getNamespacePath('CM') . '/resources/db/structure.sql', $dump);
+		CM_File::create(CM_Util::getNamespacePath($namespace) . '/resources/db/structure.sql', $dump);
 	}
 
 	public static function getPackageName() {
