@@ -58,10 +58,10 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
 		// Converts upper case letters to dashes: CodeOfHonor => code-of-honor
 		foreach ($list as $index => $entry) {
-			$list[$index] = preg_replace('/([A-Z])/', '-\1', lcfirst($entry));
+			$list[$index] = CM_Util::uncamelize($entry);
 		}
 
-		$path = '/' . strtolower(implode('/', $list));
+		$path = '/' . implode('/', $list);
 		if ($path == '/index') {
 			$path = '/';
 		}

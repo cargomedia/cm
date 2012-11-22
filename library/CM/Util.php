@@ -239,6 +239,18 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string        $string
+	 * @param string|null   $separator
+	 * @return string
+	 */
+	public static function uncamelize($string, $separator = null) {
+		if (null === $separator) {
+			$separator = '-';
+		}
+		return strtolower(preg_replace('/([A-Z])/', $separator . '\1', lcfirst($string)));
+	}
+
+	/**
 	 * @param string $string
 	 * @return string
 	 */
@@ -377,7 +389,8 @@ class CM_Util {
 				if (preg_match($regexp, $fileContents, $matches)) {
 					if (class_exists($matches['name'], true)) {
 						$reflectionClass = new ReflectionClass($matches['name']);
-						if (($reflectionClass->isSubclassOf($className) || interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
+						if (($reflectionClass->isSubclassOf($className) ||
+								interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
 								(!$reflectionClass->isAbstract() || $includeAbstracts)
 						) {
 							$pathsFiltered[] = $path;
