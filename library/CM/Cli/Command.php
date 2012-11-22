@@ -40,7 +40,7 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	public function getHelp() {
-		$helpText = $this->getPackageName() . ' ' . $this->_method->getName();
+		$helpText = $this->getPackageName() . ' ' . $this->_getMethodName();
 		foreach ($this->_getRequiredParameters() as $paramName) {
 			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
 		}
@@ -61,7 +61,7 @@ class CM_Cli_Command {
 	 * @return bool
 	 */
 	public function match($packageName, $methodName) {
-		$methodMatched = ($methodName === $this->_method->getName());
+		$methodMatched = ($methodName === $this->_getMethodName());
 		$packageMatched = ($packageName === $this->getPackageName());
 		return ($packageMatched && $methodMatched);
 	}
@@ -71,6 +71,13 @@ class CM_Cli_Command {
 	 */
 	public function isAbstract() {
 		return $this->_method->getDeclaringClass()->isAbstract();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPackageName() {
+		return $this->_class->getMethod('getPackageName')->invoke(null);
 	}
 
 	/**
@@ -159,8 +166,8 @@ class CM_Cli_Command {
 	/**
 	 * @return string
 	 */
-	public function getPackageName() {
-		return $this->_class->getMethod('getPackageName')->invoke(null);
+	private function _getMethodName() {
+		return CM_Util::uncamelize($this->_method->getName());
 	}
 
 }
