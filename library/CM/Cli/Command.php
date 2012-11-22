@@ -10,10 +10,11 @@ class CM_Cli_Command {
 
 	/**
 	 * @param ReflectionMethod $method
+	 * @param ReflectionClass  $class
 	 */
-	public function __construct(ReflectionMethod $method) {
+	public function __construct(ReflectionMethod $method, ReflectionClass $class) {
 		$this->_method = $method;
-		$this->_class = $method->getDeclaringClass();
+		$this->_class = $class;
 	}
 
 	/**
@@ -63,6 +64,13 @@ class CM_Cli_Command {
 		$methodMatched = ($methodName === $this->_method->getName());
 		$packageMatched = ($packageName === $this->getPackageName());
 		return ($packageMatched && $methodMatched);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isAbstract() {
+		return $this->_method->getDeclaringClass()->isAbstract();
 	}
 
 	/**

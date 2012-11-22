@@ -13,9 +13,11 @@ class CM_Cli_CommandManager {
 			$classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
 			foreach ($classes as $className) {
 				$class = new ReflectionClass($className);
-				foreach ($class->getMethods() as $method) {
-					if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-						$this->_commands[] = new CM_Cli_Command($method);
+				if (!$class->isAbstract()) {
+					foreach ($class->getMethods() as $method) {
+						if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
+							$this->_commands[] = new CM_Cli_Command($method, $class);
+						}
 					}
 				}
 			}
@@ -33,7 +35,7 @@ class CM_Cli_CommandManager {
 		$helpHeader .= PHP_EOL . str_repeat('-', strlen($helpHeader)) . PHP_EOL;
 		$help = '';
 		foreach ($this->getCommands() as $command) {
-			if (!$packageName || $packageName === $command->getPackageName()) {
+			if (!$command->isAbstract() && (!$packageName || $packageName === $command->getPackageName())) {
 				$help .= $command->getHelp() . PHP_EOL;
 			}
 		}
