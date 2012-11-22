@@ -7,7 +7,6 @@ class CM_Config {
 	 */
 	private static $_config = null;
 
-
 	/**
 	 * @param string $path
 	 */
@@ -56,5 +55,4 @@ class CM_Config {
 			self::load($applicationConfigPath . $fileName);
 		}
 	}
-
 }
