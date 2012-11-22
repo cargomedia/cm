@@ -37,7 +37,9 @@ class TH {
 		}
 		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
 		CM_Mysql::selectDb($dbName);
-		CM_Mysql::runDump($dbName, new CM_File(CM_Util::getNamespacePath('CM') . '/resources/db/structure.sql'));
+		foreach (CM_Util::getNamespaceFiles('resources/db/structure.sql') as $dump) {
+			CM_Mysql::runDump($dbName, $dump);
+		}
 
 		self::$_configBackup = serialize(CM_Config::get());
 

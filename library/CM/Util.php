@@ -264,6 +264,22 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $pathRelative
+	 * @return CM_File[]
+	 */
+	public static function getNamespaceFiles($pathRelative) {
+		$pathRelative = (string) $pathRelative;
+		$files = array();
+		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
+			$path = CM_Util::getNamespacePath($namespace) . $pathRelative;
+			if (CM_File::exists($path)) {
+				$files[] = new CM_File($path);
+			}
+		}
+		return $files;
+	}
+
+	/**
 	 * @param string      $command
 	 * @param array|null  $args
 	 * @param string|null $input
