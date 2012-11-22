@@ -562,13 +562,16 @@ class CM_Mysql extends CM_Class_Abstract {
 				$args[] = $table;
 			}
 		}
-		$queries = CM_Util::exec('mysqldump', $args);
-		$queries = preg_replace('#(\s+)AUTO_INCREMENT\s*=\s*\d+\s+#', '$1', $queries);
-		$queries = preg_replace('#/\*.*?\*/;#', '', $queries);
 
 		$dump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
 		$dump .= '/*!40101 SET NAMES utf8 */;' . PHP_EOL;
-		$dump .= $queries;
+		if (array() !== $tables) {
+			$queries = CM_Util::exec('mysqldump', $args);
+			$queries = preg_replace('#(\s+)AUTO_INCREMENT\s*=\s*\d+\s+#', '$1', $queries);
+			$queries = preg_replace('#/\*.*?\*/;#', '', $queries);
+			$dump .= $queries;
+		}
+
 		return $dump;
 	}
 
