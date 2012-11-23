@@ -285,7 +285,7 @@ class CM_Util {
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
 			$paths[] = CM_Util::getNamespacePath($namespace) . 'resources/' . $pathRelative;
 		}
-		$paths[] = DIR_ROOT . 'resources/';
+		$paths[] = DIR_ROOT . 'resources/' . $pathRelative;
 
 		$files = array();
 		foreach (array_unique($paths) as $path) {
