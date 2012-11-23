@@ -279,11 +279,16 @@ class CM_Util {
 	 * @param string $pathRelative
 	 * @return CM_File[]
 	 */
-	public static function getNamespaceFiles($pathRelative) {
+	public static function getResourceFiles($pathRelative) {
 		$pathRelative = (string) $pathRelative;
-		$files = array();
+		$paths = array();
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-			$path = CM_Util::getNamespacePath($namespace) . $pathRelative;
+			$paths[] = CM_Util::getNamespacePath($namespace) . 'resources/' . $pathRelative;
+		}
+		$paths[] = DIR_ROOT . 'resources/';
+
+		$files = array();
+		foreach (array_unique($paths) as $path) {
 			if (CM_File::exists($path)) {
 				$files[] = new CM_File($path);
 			}

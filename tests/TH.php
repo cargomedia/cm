@@ -37,7 +37,7 @@ class TH {
 		}
 		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
 		CM_Mysql::selectDb($dbName);
-		foreach (CM_Util::getNamespaceFiles('resources/db/structure.sql') as $dump) {
+		foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 			CM_Mysql::runDump($dbName, $dump);
 		}
 

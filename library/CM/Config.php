@@ -46,13 +46,8 @@ class CM_Config {
 	 * @param string $fileName
 	 */
 	private static function _loadConfig($fileName) {
-		$applicationConfigPath = DIR_ROOT . 'resources/config/';
-
-		foreach (CM_Util::getNamespaceFiles('resources/config/' . $fileName) as $config) {
+		foreach (CM_Util::getResourceFiles('config/' . $fileName) as $config) {
 			self::load($config->getPath());
-		}
-		if (is_file($applicationConfigPath . $fileName)) {
-			self::load($applicationConfigPath . $fileName);
 		}
 	}
 }
