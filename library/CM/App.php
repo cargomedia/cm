@@ -17,18 +17,27 @@ class CM_App {
 	}
 
 	/**
+	 * @param string $namespace
 	 * @return int
 	 */
-	public function getVersion() {
-		return (int) CM_Option::getInstance()->get('app.version');
+	public function getVersion($namespace = null) {
+		$namespace = (string) $namespace;
+		if ($namespace) {
+			$namespace = '.' . $namespace;
+		}
+		return (int) CM_Option::getInstance()->get('app.version' . $namespace);
 	}
 
 	/**
 	 * @param int $version
 	 */
-	public function setVersion($version) {
+	public function setVersion($version, $namespace = null) {
 		$version = (int) $version;
-		CM_Option::getInstance()->set('app.version', $version);
+		$namespace = (string) $namespace;
+		if ($namespace) {
+			$namespace = '.' . $namespace;
+		}
+		CM_Option::getInstance()->set('app.version' . $namespace, $version);
 	}
 
 	/**
@@ -50,33 +59,33 @@ class CM_App {
 	}
 
 	/**
-	 * @param              $directory
 	 * @param Closure|null $callbackBefore fn($version)
 	 * @param Closure|null $callbackAfter  fn($version)
 	 * @return int Number of version bumps
 	 */
-	public function runUpdateScripts($directory, Closure $callbackBefore = null, Closure $callbackAfter = null) {
+	public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
 		CM_Cache::flush();
 		CM_CacheLocal::flush();
-		$version = $versionStart = $this->getVersion();
-		while (true) {
-			$updateScript = $directory . ($version + 1) . '.php';
-			if (!file_exists($updateScript)) {
-				break;
-			}
-			$version++;
-			if ($callbackBefore) {
-				$callbackBefore($version);
-			}
-			require $updateScript;
-			$this->setVersion($version);
-			if ($callbackAfter) {
-				$callbackAfter($version);
+		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+			$version = $versionStart = $this->getVersion($namespace);
+			while (true) {
+				$updateScript = $path . ($version + 1) . '.php';
+				if (!file_exists($updateScript)) {
+					break;
+				}
+				$version++;
+				if ($callbackBefore) {
+					$callbackBefore($version);
+				}
+				require $updateScript;
+				$this->setVersion($version, $namespace);
+				if ($callbackAfter) {
+					$callbackAfter($version);
+				}
 			}
 		}
 		return ($version - $versionStart);
 	}
-
 
 	public function generateConfigActionVerbs() {
 		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
@@ -165,6 +174,23 @@ class CM_App {
 			}
 		}
 		return $classTypes;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private function _getUpdateScriptPaths() {
+		$paths = array();
+		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
+			$paths[$namespace] = CM_Util::getNamespacePath($namespace) . 'resources/db/update/';
+		}
+
+		$rootPath = DIR_ROOT . 'resources/db/update/';
+		if (!in_array($rootPath, $paths)) {
+			$paths[null] = $rootPath;
+		}
+
+		return $paths;
 	}
 
 	/**
