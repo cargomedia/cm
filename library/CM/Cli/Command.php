@@ -125,14 +125,14 @@ class CM_Cli_Command {
 	 * @return mixed
 	 */
 	private function _getParamValue(ReflectionParameter $param, CM_Cli_Arguments $arguments) {
+		$paramName = CM_Util::uncamelize($param->getName());
 		if (!$param->isOptional()) {
 			$argumentsNumeric = $arguments->getNumeric();
 			if (!$argumentsNumeric->getAll()) {
-				throw new CM_Cli_Exception_InvalidArguments('Missing argument `' . $param->getName() . '`');
+				throw new CM_Cli_Exception_InvalidArguments('Missing argument `' . $paramName . '`');
 			}
 			$value = $argumentsNumeric->shift();
 		} else {
-			$paramName = CM_Util::uncamelize($param->getName());
 			$argumentsNamed = $arguments->getNamed();
 			if (!$argumentsNamed->has($paramName)) {
 				return $param->getDefaultValue();
