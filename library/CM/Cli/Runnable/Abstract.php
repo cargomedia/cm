@@ -7,7 +7,7 @@ abstract class CM_Cli_Runnable_Abstract {
 	 * @return string
 	 */
 	public static function getPackageName() {
-		throw new CM_Exception_NotImplemented();
+		throw new CM_Exception_NotImplemented('Package `' . get_called_class() . '` has no `getPackageName` implemented.');
 	}
 
 	/**
@@ -23,5 +23,13 @@ abstract class CM_Cli_Runnable_Abstract {
 			$output .= str_pad($name . ':', 20) . $value . PHP_EOL;
 		}
 		return $output;
+	}
+
+	/**
+	 * @param string $value
+	 */
+	protected function _echo($value) {
+		// TODO: Implement more complex CM_OutputStream_Abstract related echoing
+		echo $value . PHP_EOL;
 	}
 }
