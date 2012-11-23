@@ -7,34 +7,15 @@
 		"amazonwebservices/aws-sdk-for-php": "1.5.15",
 		"ruflin/Elastica": "v0.19.8.0",
 		"phpmailer/phpmailer": "5.2.1",
-		"wurfl/tera-wurfl": "2.1.5",
-		"composer/installers": "*"
+		"wurfl/tera-wurfl": "2.1.5"
 	},
-	"repositories": [
+	"repositories":[
 		{
-			"type": "package",
-			"package": {
-				"name": "phpmailer/phpmailer",
-				"version": "5.2.1",
-				"dist": {
-					"url": "http://phpmailer.apache-extras.org.codespot.com/files/PHPMailer_5.2.1.zip",
-					"type": "zip"
-				},
-				"autoload": {
-					"classmap": ["class.phpmailer.php"]
-				}
-			}
+			"packagist": false
 		},
 		{
-			"type": "package",
-			"package": {
-				"name": "wurfl/tera-wurfl",
-				"version": "2.1.5",
-				"dist": {
-					"url": "http://sourceforge.net/projects/wurfl/files/WURFL%20Database/1.4.2/wurfl-dbapi-1.4.2.0.zip/download",
-					"type": "zip"
-				}
-			}
+			"type": "composer",
+			"url": "http://broker.cargomedia.ch/repositories/cm"
 		}
 	]
 }

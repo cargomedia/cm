@@ -1,13 +1,9 @@
 {
-    "hash": "81a43d2ea4ec83c61a17ce74c53c9b04",
+    "hash": "7abd33ce3d84d82ba3b0ec053c48e942",
     "packages": [
         {
             "package": "amazonwebservices/aws-sdk-for-php",
             "version": "1.5.15"
-        },
-        {
-            "package": "composer/installers",
-            "version": "v1.0.0"
         },
         {
             "package": "easybook/geshi",
