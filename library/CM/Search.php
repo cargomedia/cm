@@ -8,14 +8,6 @@ class CM_Search extends CM_Class_Abstract {
 	private static $_client = null;
 
 	/**
-	 * @param CM_Elastica_Type_Abstract $type
-	 * @param integer $id
-	 */
-	public static function update(CM_Elastica_Type_Abstract $type, $id) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . $type->getIndex()->getName(), $id);
-	}
-
-	/**
 	 * @return bool
 	 */
 	public static function getEnabled() {
