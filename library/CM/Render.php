@@ -208,17 +208,17 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @param string      $tpl  Template file name
 	 * @param string|null $namespace
-	 * @param bool|null   $full
+	 * @param bool|null   $absolute
 	 * @param bool|null   $needed
 	 * @return string Layout path based on theme
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getLayoutPath($tpl, $namespace = null, $full = null, $needed = true) {
+	public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
 			if (file_exists($file)) {
-				if ($full) {
+				if ($absolute) {
 					return $file;
 				} else {
 					return $this->getThemeDir(false, $theme, $namespace) . $tpl;
