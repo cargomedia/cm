@@ -214,9 +214,6 @@ class CM_Render extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getLayoutPath($tpl, $namespace = null, $full = null, $needed = true) {
-		if (is_null($full)) {
-			$full = false;
-		}
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
