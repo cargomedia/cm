@@ -30,6 +30,7 @@ class CM_App {
 
 	/**
 	 * @param int $version
+	 * @param string|null $namespace
 	 */
 	public function setVersion($version, $namespace = null) {
 		$version = (int) $version;
