@@ -34,7 +34,7 @@ function smarty_helper_resource_internal(CM_Render $render) {
 	// Sorts all classes according to inheritance order, pairs them with path
 	$phpClasses = CM_View_Abstract::getClasses($render->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
 	foreach ($phpClasses as $path => $className) {
-		$path = str_replace(DIR_ROOT, '', $path);
+		$path = str_replace(DIR_ROOT, '/', $path);
 		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
 		$paths[] = preg_replace('#\.php$#', '.js', $path);
 	}
