@@ -22,7 +22,10 @@ select {
 	::-webkit-input-placeholder {
 		color: @color;
 	}
-	:-moz-placeholder {
+	:-moz-placeholder { // < FF 19
+		color: @color;
+	}
+	::-moz-placeholder {
 		color: @color;
 	}
 	:-ms-input-placeholder {
