@@ -1,9 +1,14 @@
 <?php
 
 abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
+
+	const INDEX_NAME = '';
+
 	protected $_source = false; // Don't store json-source
 
 	public function __construct($host = null, $port = null, $version = null) {
+		$this->_indexName = static::INDEX_NAME;
+		$this->_typeName = static::INDEX_NAME;
 
 		$servers = CM_Config::get()->CM_Search->servers;
 		$server = $servers[array_rand($servers)];
@@ -128,4 +133,11 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	 * @return string SQL-query
 	 */
 	abstract protected function _getQuery($ids = null, $limit = null);
+
+	/**
+	 * @param string $id
+	 */
+	protected static function _updateItem($id) {
+		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, $id);
+	}
 }

@@ -1,15 +1,18 @@
 <?php
 
 class CM_Search extends CM_Class_Abstract {
-	const INDEX_LOCATION = 'location';
 
 	/**
 	 * @var Elastica_Client
 	 */
 	private static $_client = null;
 
-	public static function update($index, $id) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . $index, $id);
+	/**
+	 * @param CM_Elastica_Type_Abstract $type
+	 * @param integer $id
+	 */
+	public static function update(CM_Elastica_Type_Abstract $type, $id) {
+		CM_Cache_Redis::sAdd('Search.Updates_' . $type->getIndex()->getName(), $id);
 	}
 
 	/**
