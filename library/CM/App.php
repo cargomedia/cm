@@ -66,6 +66,7 @@ class CM_App {
 	public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
 		CM_Cache::flush();
 		CM_CacheLocal::flush();
+		$versionBumps = 0;
 		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
 			$version = $versionStart = $this->getVersion($namespace);
 			while (true) {
@@ -83,8 +84,9 @@ class CM_App {
 					$callbackAfter($version);
 				}
 			}
+			$versionBumps += ($version - $versionStart);
 		}
-		return ($version - $versionStart);
+		return $versionBumps;
 	}
 
 	public function generateConfigActionVerbs() {
