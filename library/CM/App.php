@@ -17,7 +17,7 @@ class CM_App {
 	}
 
 	/**
-	 * @param string $namespace
+	 * @param string|null $namespace
 	 * @return int
 	 */
 	public function getVersion($namespace = null) {
