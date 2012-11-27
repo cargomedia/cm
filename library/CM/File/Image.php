@@ -13,7 +13,7 @@ class CM_File_Image extends CM_File {
 	 */
 	private $_resource;
 
-	public function __construct($file) {
+	public function 	__construct($file) {
 		parent::__construct($file);
 
 		$this->_getResource(); // Make sure resource can be created
