@@ -181,12 +181,25 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {String} functionName
 	 * @param {Object|Null} [params]
 	 * @param {Object|Null} [callbacks]
+	 * @param {Boolean|Null} [modal]
 	 * @return jqXHR
 	 */
-	ajax: function(functionName, params, callbacks) {
+	ajax: function(functionName, params, callbacks, modal) {
 		callbacks = callbacks || {};
 		params = params || {};
 		var handler = this;
+
+		if (modal) {
+			var callbackComplete = callbacks.complete;
+			callbacks.complete = function() {
+				handler.enable();
+				if (callbackComplete) {
+					return callbackComplete(handler);
+				}
+			};
+			this.disable();
+		}
+
 		var xhr = cm.ajax('ajax', {view: this._getArray(), method: functionName, params: params}, {
 			success: function(response) {
 				if (response.exec) {
@@ -220,26 +233,17 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @return jqXHR
 	 */
 	ajaxModal: function(functionName, params, callbacks) {
-		callbacks = callbacks || {};
-		var handler = this;
-		var callbackComplete = callbacks.complete;
-		callbacks.complete = function() {
-			handler.enable();
-			if (callbackComplete) {
-				return callbackComplete(handler);
-			}
-		};
-		this.disable();
-		return this.ajax(functionName, params, callbacks);
+		return this.ajax(functionName, params, callbacks, true);
 	},
 
 	/**
 	 * @param {String} className
 	 * @param {Object|Null} [params]
 	 * @param {Object|Null} [options]
+	 * @param {Boolean|Null} [skipModal]
 	 * @return jqXHR
 	 */
-	loadComponent: function(className, params, options) {
+	loadComponent: function(className, params, options, skipModal) {
 		options = options || {};
 		params = params || {};
 		params.className = className;
@@ -249,7 +253,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		options.success = function(response) {
 			this._injectView(response, success);
 		};
-		return this.ajaxModal('loadComponent', params, options);
+		return this.ajax('loadComponent', params, options, !skipModal);
 	},
 
 	/**
