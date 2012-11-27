@@ -67,6 +67,14 @@ class CM_SearchQuery_Abstract {
 	}
 
 	/**
+	 * @param string       $field
+	 * @param boolean|null $skipEmpty
+	 */
+	public function filterMissing($field, $skipEmpty = null) {
+		$this->_filter(array('missing' => array('field' => $field, 'existence' => !$skipEmpty, 'null_value' => true)));
+	}
+
+	/**
 	 * @param string            $field
 	 * @param CM_Model_Location $location
 	 * @param int               $distance
