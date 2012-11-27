@@ -89,7 +89,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		}
 
 		$query = $this->_getQuery($ids, $limit);
-		$result = CM_Mysql::query($query);
+		$result = CM_Mysql::exec($query);
 
 		$docs = array();
 		$responses = array();
