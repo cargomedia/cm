@@ -67,11 +67,10 @@ class CM_SearchQuery_Abstract {
 	}
 
 	/**
-	 * @param string       $field
-	 * @param boolean|null $skipEmpty
+	 * @param string $field
 	 */
-	public function filterMissing($field, $skipEmpty = null) {
-		$this->_filter(array('missing' => array('field' => $field, 'existence' => !$skipEmpty, 'null_value' => true)));
+	public function filterMissing($field) {
+		$this->_filter(array('missing' => array('field' => (string) $field, 'existence' => true, 'null_value' => true)));
 	}
 
 	/**
