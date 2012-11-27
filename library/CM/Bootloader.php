@@ -112,7 +112,6 @@ class CM_Bootloader {
 
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
-		define('DIR_LAYOUT', DIR_ROOT . 'layout' . DIRECTORY_SEPARATOR);
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
