@@ -18,17 +18,15 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string|null $indexName Index name, if not provided all indexes will be updated.
-	 * @param string|null $host Elastic search server host.
-	 * @param int|null    $port Elastic search server port.
+	 * @param string|null $host      Elastic search server host.
+	 * @param int|null    $port      Elastic search server port.
 	 * @throws CM_Exception_Invalid
-	 * @return void
 	 */
 	public function update($indexName = null, $host = null, $port = null) {
-		$server = array('host' => $host, 'port' => $port);
 		if ($indexName) {
 			$indexes = array($this->_getIndex($indexName, $host, $port));
 		} else {
-			$indexes = $this->_getIndexes($server);
+			$indexes = $this->_getIndexes($host, $port);
 		}
 		foreach ($indexes as $index) {
 			$indexName = $index->getIndex()->getName();
