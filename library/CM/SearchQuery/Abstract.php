@@ -19,6 +19,7 @@ class CM_SearchQuery_Abstract {
 		}
 		$this->_mode = (string) $mode;
 		$this->_filterMode = (string) $filterMode;
+		$this->_setUp();
 	}
 
 	public function query($query) {
@@ -89,13 +90,6 @@ class CM_SearchQuery_Abstract {
 		$this->_sort(array('_geo_distance' => array($field => $location->getCoordinates())));
 	}
 
-	protected function _sort(array $sort) {
-		$this->_sorts[] = $sort;
-	}
-
-	protected function _sortDefault() {
-	}
-
 	public function sortScore() {
 		$this->_sort(array('_score' => 'desc'));
 	}
@@ -119,6 +113,16 @@ class CM_SearchQuery_Abstract {
 			$this->_sortDefault();
 		}
 		return $this->_sorts;
+	}
+
+	protected function _sort(array $sort) {
+		$this->_sorts[] = $sort;
+	}
+
+	protected function _sortDefault() {
+	}
+
+	protected function _setUp() {
 	}
 
 	/**
