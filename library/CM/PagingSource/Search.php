@@ -1,23 +1,28 @@
 <?php
 
 class CM_PagingSource_Search extends CM_PagingSource_Abstract {
-	private $_indexName, $_typeName, $_query, $_fields;
+	/** @var CM_SearchQuery_Abstract */
+	private $_query;
+
+	/** @var array|null */
+	private $_fields;
+
+	/** @var CM_Elastica_Type_Abstract */
+	private $_type;
 
 	/**
-	 * @param string                  $indexName
-	 * @param string                  $typeName
-	 * @param CM_SearchQuery_Abstract $query
-	 * @param array                   $fields OPTIONAL
+	 * @param CM_Elastica_Type_Abstract $type
+	 * @param CM_SearchQuery_Abstract   $query
+	 * @param array|null                $fields
 	 */
-	function __construct($indexName, $typeName, CM_SearchQuery_Abstract $query, array $fields = null) {
-		$this->_indexName = $indexName;
-		$this->_typeName = $typeName;
+	function __construct(CM_Elastica_Type_Abstract $type, CM_SearchQuery_Abstract $query, array $fields = null) {
+		$this->_type = $type;
 		$this->_query = $query;
 		$this->_fields = $fields;
 	}
 
 	protected function _cacheKeyBase() {
-		return array($this->_indexName, $this->_typeName, $this->_query->getQuery());
+		return array($this->_type->getIndex()->getName(), $this->_type->getType()->getName(), $this->_query->getQuery());
 	}
 
 	private function _getResult($offset = null, $count = null) {
@@ -33,7 +38,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 			if ($count !== null) {
 				$data['size'] = $count;
 			}
-			$searchResult = CM_Search::getInstance()->query($this->_indexName, $this->_typeName, $data);
+			$searchResult = CM_Search::getInstance()->query($this->_type, $data);
 			$result = array('items' => array(), 'total' => 0);
 			if (isset($searchResult['hits'])) {
 				foreach ($searchResult['hits']['hits'] as $hit) {

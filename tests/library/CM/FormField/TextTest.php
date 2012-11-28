@@ -3,9 +3,6 @@ require_once __DIR__ . '/../../../TestCaseRender.php';
 
 class CM_FormField_TextTest extends TestCaseRender {
 
-	public static function setUpBeforeClass() {
-	}
-
 	public static function tearDownAfterClass() {
 		TH::clearEnv();
 	}

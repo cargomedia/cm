@@ -20,21 +20,19 @@ class CM_Search extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $indexName
-	 * @param string $typeName
-	 * @param array  $data
+	 * @param CM_Elastica_Type_Abstract $type
+	 * @param array|null                $data
 	 * @return array
 	 */
-	public function query($indexName, $typeName, array $data = null) {
+	public function query(CM_Elastica_Type_Abstract $type, array $data = null) {
 		if (!$this->getEnabled()) {
 			return array();
 		}
 		CM_Debug::get()->incStats('search', json_encode($data));
 
-		$type = new Elastica_Type(new Elastica_Index($this->_client, $indexName), $typeName);
 		$search = new Elastica_Search($this->_client);
 		$search->addIndex($type->getIndex());
-		$search->addType($type);
+		$search->addType($type->getType());
 		$response = $this->_client->request($search->getPath(), 'GET', $data);
 		return $response->getData();
 	}

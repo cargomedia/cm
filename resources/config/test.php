@@ -6,6 +6,8 @@ $config->dirUserfiles = DIR_TESTS . 'tmp' . DIRECTORY_SEPARATOR . 'userfiles' . 
 
 $config->CM_Mail->send = false;
 
+$config->CM_Search->enabled = false;
+
 $config->CM_Mysql->db = $config->CM_Mysql->db . '_test';
 
 $config->CM_Model_DeviceCapabilities->adapter = null;
