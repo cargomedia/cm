@@ -4,10 +4,6 @@
  * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
  */
 
-/**
- * @method static sAdd(string $key, string $value)
- * @method static sFlush(string $key)
- */
 class CM_Cache_Redis extends CM_Cache_Abstract {
 	protected static $_instance;
 	private $_redis = null;
