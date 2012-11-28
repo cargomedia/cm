@@ -76,16 +76,19 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	/**
 	 * Update the complete index
 	 *
-	 * @param array $ids               Only update given IDs
-	 * @param int   $limit             Limit query
-	 * @param int   $maxDocsPerRequest Number of docs per bulk-request
+	 * @param mixed[] $ids               Only update given IDs
+	 * @param int     $limit             Limit query
+	 * @param int     $maxDocsPerRequest Number of docs per bulk-request
 	 */
 	public function update($ids = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
 		if (is_array($ids) && empty($ids)) {
 			return;
 		}
 		if (is_array($ids)) {
-			$idsDelete = array_flip($ids);
+			$idsDelete = array();
+			foreach ($ids as $id) {
+				$idsDelete[$id] = true;
+			}
 		}
 
 		$query = $this->_getQuery($ids, $limit);
@@ -135,9 +138,20 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	abstract protected function _getQuery($ids = null, $limit = null);
 
 	/**
+	 * @param mixed $id
+	 * @return string
+	 */
+	protected static function _getIdSerialized($id) {
+		if (is_scalar($id)) {
+			return $id;
+		}
+		return CM_Params::encode($id, true);
+	}
+
+	/**
 	 * @param string $id
 	 */
 	protected static function _updateItem($id) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, $id);
+		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, self::_getIdSerialized($id));
 	}
 }
