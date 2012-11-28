@@ -2,39 +2,50 @@
 
 class CM_Search extends CM_Class_Abstract {
 
-	/**
-	 * @var Elastica_Client
-	 */
-	private static $_client = null;
+	/** @var Elastica_Client */
+	private $_client;
+
+	/** @var CM_Search */
+	private static $_instance;
+
+	public function __construct() {
+		$this->_client = new Elastica_Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10));
+	}
 
 	/**
 	 * @return bool
 	 */
-	public static function getEnabled() {
+	public function getEnabled() {
 		return (bool) self::_getConfig()->enabled;
 	}
 
 	/**
-	 * Elasticsearch request
-	 *
-	 * @param string $path   Path to call
-	 * @param string $method HTTP method (GET, POST, DELETE, PUT)
-	 * @param array  $data   Arguments as array
+	 * @param string $indexName
+	 * @param string $typeName
+	 * @param array  $data
 	 * @return array
 	 */
-	public static function call($path, $method = 'GET', array $data = null) {
-		if (!self::getEnabled()) {
+	public function query($indexName, $typeName, array $data = null) {
+		if (!$this->getEnabled()) {
 			return array();
 		}
-
-		if (!self::$_client) {
-			self::$_client = new Elastica_Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10,));
-		}
-
 		CM_Debug::get()->incStats('search', json_encode($data));
 
-		$response = self::$_client->request($path, $method, $data);
-
+		$type = new Elastica_Type(new Elastica_Index($this->_client, $indexName), $typeName);
+		$search = new Elastica_Search($this->_client);
+		$search->addIndex($type->getIndex());
+		$search->addType($type);
+		$response = $this->_client->request($search->getPath(), 'GET', $data);
 		return $response->getData();
+	}
+
+	/**
+	 * @return CM_Search
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
 	}
 }

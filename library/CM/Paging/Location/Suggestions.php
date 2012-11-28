@@ -11,7 +11,7 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
 	function __construct($term, $minLevel, $maxLevel, CM_Model_Location $location = null) {
 		$minLevel = (int) $minLevel;
 		$maxLevel = (int) $maxLevel;
-		if (CM_Search::getEnabled()) {
+		if (CM_Search::getInstance()->getEnabled()) {
 			$query = new CM_SearchQuery_Location();
 			$query->filterLevel($minLevel, $maxLevel);
 			$query->filterNamePrefix($term);
