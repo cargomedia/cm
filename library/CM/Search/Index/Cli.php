@@ -14,6 +14,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 		foreach ($indexes as $index) {
 			$this->_echo('Creating search index `' . $index->getIndex()->getName() . '`...');
 			$index->createVersioned();
+			$index->getIndex()->refresh();
 		}
 	}
 
@@ -36,6 +37,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 				$ids = CM_Cache_Redis::sFlush($key);
 				$ids = array_filter(array_unique($ids));
 				$index->update($ids);
+				$index->getIndex()->refresh();
 			} catch (Exception $e) {
 				$message = $indexName . '-updates failed. 	';
 				if (isset($ids)) {
