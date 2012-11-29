@@ -12,7 +12,6 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 			$indexes = $this->_getIndexes();
 		}
 		foreach ($indexes as $index) {
-			$this->_echo('Creating search index `' . $index->getIndex()->getName() . '`...');
 			$index->createVersioned();
 			$index->getIndex()->refresh();
 		}
