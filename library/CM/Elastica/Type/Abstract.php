@@ -95,7 +95,6 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		$result = CM_Mysql::exec($query);
 
 		$docs = array();
-		$responses = array();
 		$i = 0;
 		// Loops through all results. Write every $maxDocsPerRequest docs to the server
 		while ($row = $result->fetchAssoc()) {
