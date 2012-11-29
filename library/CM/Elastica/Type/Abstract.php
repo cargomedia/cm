@@ -137,12 +137,29 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	abstract protected function _getQuery($ids = null, $limit = null);
 
 	/**
+	 * @param mixed $item
+	 * @return string
+	 */
+	public static function getIdForItem($item) {
+		return static::_getIdSerialized(static::_getIdForItem($item));
+	}
+
+	/**
+	 * @param $item
+	 * @return mixed
+	 * @throws CM_Exception_NotImplemented
+	 */
+	protected static function _getIdForItem($item) {
+		throw new CM_Exception_NotImplemented();
+	}
+
+	/**
 	 * @param mixed $id
 	 * @return string
 	 */
 	protected static function _getIdSerialized($id) {
 		if (is_scalar($id)) {
-			return $id;
+			return (string) $id;
 		}
 		return CM_Params::encode($id, true);
 	}
