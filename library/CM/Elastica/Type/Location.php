@@ -64,7 +64,7 @@ class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
 	/**
 	 * @throws CM_Exception_NotImplemented
 	 */
-	public static function updateItem() {
+	public static function updateItem($item) {
 		throw new CM_Exception_NotImplemented();
 	}
 }

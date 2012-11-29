@@ -145,7 +145,14 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	}
 
 	/**
-	 * @param $item
+	 * @param mixed $entity
+	 */
+	public static function updateItem($entity) {
+		self::_updateItem(self::getIdForItem($entity));
+	}
+
+	/**
+	 * @param mixed $item
 	 * @return mixed
 	 * @throws CM_Exception_NotImplemented
 	 */
