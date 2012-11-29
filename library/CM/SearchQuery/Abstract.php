@@ -7,10 +7,11 @@ class CM_SearchQuery_Abstract {
 	private $_mode, $_filterMode;
 
 	/**
-	 * @param string|null $mode       must,must_not,should
-	 * @param string|null $filterMode or, and, not
+	 * @param string|null         $mode       must,must_not,should
+	 * @param string|null         $filterMode or, and, not
+	 * @param boolean|null        $isSubQuery
 	 */
-	function __construct($mode = null, $filterMode = null) {
+	function __construct($mode = null, $filterMode = null, $isSubQuery = null) {
 		if (is_null($mode)) {
 			$mode = 'must';
 		}
@@ -19,7 +20,9 @@ class CM_SearchQuery_Abstract {
 		}
 		$this->_mode = (string) $mode;
 		$this->_filterMode = (string) $filterMode;
-		$this->_setUp();
+		if (!$isSubQuery) {
+			$this->_setUp();
+		}
 	}
 
 	public function query($query) {
