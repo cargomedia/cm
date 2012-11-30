@@ -53,8 +53,10 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function optimize() {
 		$servers = CM_Config::get()->CM_Search->servers;
-		$client = new Elastica_Client($servers);
-		$client->optimizeAll();
+		foreach ($servers as $server) {
+			$client = new Elastica_Client($server);
+			$client->optimizeAll();
+		}
 	}
 
 	/**
