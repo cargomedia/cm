@@ -9,7 +9,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param boolean|null $ignoreNonexistent
-	 * @return CM_Model_User
+	 * @return CM_Model_User|null
 	 * @throws CM_Exception_Nonexistent
 	 */
 	public function getUser($ignoreNonexistent = null) {
