@@ -8,17 +8,18 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 	abstract public function getPath();
 
 	/**
-	 * @param boolean $throwNonexistent OPTIONAL
+	 * @param boolean|null $ignoreNonexistent
 	 * @return CM_Model_User
+	 * @throws CM_Exception_Nonexistent
 	 */
-	public function getUser($throwNonexistent = true) {
+	public function getUser($ignoreNonexistent = null) {
 		try {
 			return CM_Model_User::factory($this->getUserId());
 		} catch (CM_Exception_Nonexistent $ex) {
-			if ($throwNonexistent) {
-				throw $ex;
+			if ($ignoreNonexistent) {
+				return null;
 			}
-			return null;
+			throw $ex;
 		}
 	}
 
