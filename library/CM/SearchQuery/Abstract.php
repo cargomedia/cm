@@ -20,9 +20,6 @@ class CM_SearchQuery_Abstract {
 		}
 		$this->_mode = (string) $mode;
 		$this->_filterMode = (string) $filterMode;
-		if (!$isSubQuery) {
-			$this->_setUp();
-		}
 	}
 
 	public function query($query) {
@@ -130,9 +127,6 @@ class CM_SearchQuery_Abstract {
 	}
 
 	protected function _sortDefault() {
-	}
-
-	protected function _setUp() {
 	}
 
 	/**
