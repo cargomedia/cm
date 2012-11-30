@@ -37,7 +37,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 	 */
 	final public function isOwner(CM_Model_User $user = null) {
 		try {
-			return $this->getUser(true)->equals($user);
+			return $this->getUser()->equals($user);
 		} catch (CM_Exception_Nonexistent $ex) {
 			return false;
 		}
