@@ -115,7 +115,7 @@ $config->CM_Response_RPC->catch = array(
 $config->CM_Model_DeviceCapabilities = new stdClass();
 $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
-$config->CM_Model_StreamChannel_Abstract = new stdClass();
+$config->CM_Model_Location->loadFromSlave = true;
 
 $config->CM_Wowza = new stdClass();
 $config->CM_Wowza->httpPort = '8086';

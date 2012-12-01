@@ -15,3 +15,5 @@ $config->CM_Model_DeviceCapabilities->adapter = null;
 $config->CM_Model_Splittest->withoutPersistence = true;
 
 $config->CM_Model_Splitfeature->withoutPersistence = true;
+
+$config->CM_Model_Location->loadFromSlave = false;
