@@ -1,5 +1,5 @@
 #!/bin/bash -e
-cd $(dirname $0)/../..
+cd $(dirname $0)
 
 USER="root"
 HOST="172.10.1.100"
