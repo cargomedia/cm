@@ -3,6 +3,8 @@ cd $(dirname $0)
 
 USER="root"
 HOST="172.10.1.100"
+
+ssh -o StrictHostKeyChecking=no ${USER}@${HOST} echo -n
 DIR=$(ssh ${USER}@${HOST} "mktemp -d /tmp/build.XXXXXX")
 
 scp -qr . ${USER}@${HOST}:${DIR}
