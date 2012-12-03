@@ -71,20 +71,10 @@ class CM_App {
 		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
 			$version = $versionStart = $this->getVersion($namespace);
 			while (true) {
-				try {
-					$version++;
-					$updateScript = $this->_getUpdateScriptPath($namespace, $version);
-				} catch (CM_Exception_Invalid $e) {
+				$version++;
+				if (!$this->runUpdateScript($namespace, $version, $callbackBefore, $callbackAfter)) {
 					$version--;
 					break;
-				}
-				if ($callbackBefore) {
-					$callbackBefore($version);
-				}
-				require $updateScript;
-				$this->setVersion($version, $namespace);
-				if ($callbackAfter) {
-					$callbackAfter($version);
 				}
 			}
 			$versionBumps += ($version - $versionStart);
@@ -93,13 +83,27 @@ class CM_App {
 	}
 
 	/**
-	 * @param string $namespace
-	 * @param int    $version
-	 * @throws CM_Exception_Invalid
+	 * @param string       $namespace
+	 * @param int          $version
+	 * @param Closure|null $callbackBefore
+	 * @param Closure|null $callbackAfter
+	 * @return int
 	 */
-	public function runUpdateScript($namespace, $version) {
-		$updateScript = $this->_getUpdateScriptPath($namespace, $version);
+	public function runUpdateScript($namespace, $version, $callbackBefore = null, $callbackAfter = null) {
+		try {
+			$updateScript = $this->_getUpdateScriptPath($version, $namespace);
+		} catch (CM_Exception_Invalid $e) {
+			return 0;
+		}
+		if ($callbackBefore) {
+			$callbackBefore($version);
+		}
 		require $updateScript;
+		$this->setVersion($version, $namespace);
+		if ($callbackAfter) {
+			$callbackAfter($version);
+		}
+		return 1;
 	}
 
 	public function generateConfigActionVerbs() {
@@ -109,7 +113,8 @@ class CM_App {
 		$content .= '$config->CM_Action_Abstract->verbs = array();';
 		foreach ($this->getActionVerbs() as $actionVerb) {
 			$content .= PHP_EOL;
-			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' . CM_Util::camelize($actionVerb['name']) . '\';';
+			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' .
+					CM_Util::camelize($actionVerb['name']) . '\';';
 		}
 		return $content;
 	}
@@ -119,17 +124,8 @@ class CM_App {
 	 */
 	public function generateConfigClassTypes() {
 		$content = '';
-		$typeNamespaces = array(
-			'CM_Site_Abstract',
-			'CM_Action_Abstract',
-			'CM_Model_Abstract',
-			'CM_Model_ActionLimit_Abstract',
-			'CM_Model_Entity_Abstract',
-			'CM_Model_StreamChannel_Abstract',
-			'CM_Mail',
-			'CM_Paging_Log_Abstract',
-			'CM_Paging_ContentList_Abstract',
-		);
+		$typeNamespaces = array('CM_Site_Abstract', 'CM_Action_Abstract', 'CM_Model_Abstract', 'CM_Model_ActionLimit_Abstract',
+			'CM_Model_Entity_Abstract', 'CM_Model_StreamChannel_Abstract', 'CM_Mail', 'CM_Paging_Log_Abstract', 'CM_Paging_ContentList_Abstract',);
 		foreach ($typeNamespaces as $typeNamespace) {
 			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typeNamespace));
 		}
@@ -150,18 +146,18 @@ class CM_App {
 			unset($constants['TYPE']);
 			foreach ($constants as $constant => $value) {
 				if (array_key_exists($constant, $actionVerbsValues) && $actionVerbsValues[$constant] !== $value) {
-					throw new CM_Exception_Invalid('Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' . $actionVerbsValues[$constant] . '`.');
+					throw new CM_Exception_Invalid(
+						'Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' .
+								$actionVerbsValues[$constant] . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues) && in_array($value, $actionVerbsValues)) {
-					throw new CM_Exception_Invalid('Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className . '::' . array_search($value, $actionVerbsValues) . '`.');
+					throw new CM_Exception_Invalid(
+						'Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className .
+								'::' . array_search($value, $actionVerbsValues) . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues)) {
 					$actionVerbsValues[$constant] = $value;
-					$actionVerbs[] = array(
-						'name' => $constant,
-						'value' => $value,
-						'className' => $className,
-					);
+					$actionVerbs[] = array('name' => $constant, 'value' => $value, 'className' => $className,);
 				}
 			}
 		}
@@ -181,7 +177,9 @@ class CM_App {
 			if ($reflectionClass->hasConstant('TYPE')) {
 				$type = $className::TYPE;
 				if (in_array($type, $classTypes)) {
-					throw new CM_Exception_Invalid('Duplicate `TYPE` constant for `' . $className . '` and `' . $classTypes[$type] . '`. Both equal `' . $type . '` (within `' . $className . '` type namespace).');
+					throw new CM_Exception_Invalid(
+						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classTypes[$type] . '`. Both equal `' . $type . '` (within `' .
+								$className . '` type namespace).');
 				}
 				$classTypes[$className] = $type;
 			} elseif (!$reflectionClass->isAbstract()) {
@@ -209,12 +207,12 @@ class CM_App {
 	}
 
 	/**
-	 * @param string $namespace
-	 * @param int    $version
+	 * @param int         $version
+	 * @param string|null $namespace
 	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	private function _getUpdateScriptPath($namespace, $version) {
+	private function _getUpdateScriptPath($version, $namespace = null) {
 		$path = DIR_ROOT;
 		if ($namespace) {
 			$path = CM_Util::getNamespacePath($namespace);
