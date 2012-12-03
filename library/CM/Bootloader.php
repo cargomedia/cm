@@ -109,7 +109,6 @@ class CM_Bootloader {
 	}
 
 	public function constants() {
-
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
 
@@ -252,7 +251,7 @@ class CM_Bootloader {
 		}
 		foreach ((array) $composerJson->require as $path => $version) {
 			$parts = explode('/', $path);
-			$namespace = CM_Util::camelize($parts[1]);
+			$namespace = $parts[1];
 			$namespacePaths[$namespace] = $vendorDir . $path . '/';
 		}
 		return $namespacePaths;
