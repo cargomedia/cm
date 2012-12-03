@@ -20,7 +20,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			$jsPath = preg_replace('/\.php$/', '.js', $path);
 			if (!file_exists($jsPath)) {
 				$jsFile = CM_File_Javascript::createLibraryClass($className);
-				echo 'create  ' . $jsFile->getPath() . PHP_EOL;
+				$this->_echo('create  ' . $jsFile->getPath());
 			}
 		}
 	}
@@ -81,8 +81,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		}
 		throw new CM_Exception_Invalid('No abstract class found for `' . $type . '` type within `' . implode(', ', $namespaces) . '` mamespaces.');
 	}
-
-
 
 	public static function getPackageName() {
 		return 'generator';
