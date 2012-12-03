@@ -1,17 +1,17 @@
 <?php
 
-class CM_Scaffold_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string $className
+	 * @param string $viewClassName
 	 * @throws CM_Exception_Invalid
 	 */
-	public function generate($className) {
-		if (class_exists($className)) {
-			throw new CM_Exception_Invalid('`' . $className . '` already exists');
+	public function scaffold($viewClassName) {
+		if (class_exists($viewClassName)) {
+			throw new CM_Exception_Invalid('`' . $viewClassName . '` already exists');
 		}
-		$this->_generateClasses($className);
-		$this->_generateLayouts($className);
+		$this->_generateClasses($viewClassName);
+		$this->_generateLayouts($viewClassName);
 	}
 
 	/**
@@ -72,7 +72,7 @@ class CM_Scaffold_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public static function getPackageName() {
-		return 'scaffold';
+		return 'generator';
 	}
 
 }
