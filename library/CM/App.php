@@ -29,7 +29,7 @@ class CM_App {
 	}
 
 	/**
-	 * @param int $version
+	 * @param int         $version
 	 * @param string|null $namespace
 	 */
 	public function setVersion($version, $namespace = null) {
@@ -71,11 +71,13 @@ class CM_App {
 		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
 			$version = $versionStart = $this->getVersion($namespace);
 			while (true) {
-				$updateScript = $path . ($version + 1) . '.php';
-				if (!file_exists($updateScript)) {
+				try {
+					$version++;
+					$updateScript = $this->_getUpdateScriptPath($namespace, $version);
+				} catch (CM_Exception_Invalid $e) {
+					$version--;
 					break;
 				}
-				$version++;
 				if ($callbackBefore) {
 					$callbackBefore($version);
 				}
@@ -88,6 +90,16 @@ class CM_App {
 			$versionBumps += ($version - $versionStart);
 		}
 		return $versionBumps;
+	}
+
+	/**
+	 * @param string $namespace
+	 * @param int    $version
+	 * @throws CM_Exception_Invalid
+	 */
+	public function runUpdateScript($namespace, $version) {
+		$updateScript = $this->_getUpdateScriptPath($namespace, $version);
+		require $updateScript;
 	}
 
 	public function generateConfigActionVerbs() {
@@ -194,6 +206,24 @@ class CM_App {
 		}
 
 		return $paths;
+	}
+
+	/**
+	 * @param string $namespace
+	 * @param int    $version
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	private function _getUpdateScriptPath($namespace, $version) {
+		$path = DIR_ROOT;
+		if ($namespace) {
+			$path = CM_Util::getNamespacePath($namespace);
+		}
+		$updateScript = $path . 'resources/db/update/' . $version . '.php';
+		if (!file_exists($updateScript)) {
+			throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
+		}
+		return $updateScript;
 	}
 
 	/**
