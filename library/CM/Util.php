@@ -264,11 +264,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function getNamespacePath($namespace, $relative = null) {
-		$namespace = (string) $namespace;
-		$path = '';
-		if (null !== DIR_LIBRARY) {
-			$path = DIR_LIBRARY . $namespace . '/';
-		}
+		$path = CM_Bootloader::getInstance()->getNamespacePath($namespace);
 		if (!$relative) {
 			$path = DIR_ROOT . $path;
 		}

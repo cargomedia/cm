@@ -3,6 +3,8 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
+	private $_namespacePaths = array();
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -18,6 +20,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
+		$this->_loadNamespacePaths();
 	}
 
 	public function defaults() {
@@ -106,12 +109,13 @@ class CM_Bootloader {
 	}
 
 	public function constants() {
-		defined('IS_TEST') || define('IS_TEST', false);
-		defined('IS_CRON') || define('IS_CRON', false);
-		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
+
+		defined('IS_TEST') || define('IS_TEST', false);
+		defined('IS_CRON') || define('IS_CRON', false);
+		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
@@ -202,6 +206,63 @@ class CM_Bootloader {
 			}
 			$this->$function();
 		}
+	}
+
+	private function _loadNamespacePaths() {
+		$key = 'namespacesPaths';
+		if (false == ($namespacePaths = apc_fetch($key))) {
+			$namespacePaths = array();
+			$namespacePaths = array_merge($namespacePaths, $this->_getComposerNamespacePaths());
+			$namespacePaths = array_merge($namespacePaths, $this->_getLibraryNamespacePaths());
+			apc_store($key, $namespacePaths);
+		}
+		$this->_namespacePaths = $namespacePaths;
+	}
+
+	/**
+	 * @return array
+	 */
+	private function _getLibraryNamespacePaths() {
+		$namespacePaths = array();
+		if (DIR_LIBRARY) {
+			$directory = dir(DIR_ROOT . DIR_LIBRARY);
+			while (false !== ($entry = $directory->read())) {
+				if (!in_array($entry, array('.', '..', '.svn', '.git'))) {
+					$namespacePaths[$entry] = DIR_LIBRARY . $entry . '/';
+				}
+			}
+		}
+		return $namespacePaths;
+	}
+
+	/**
+	 * @return array
+	 */
+	private function _getComposerNamespacePaths() {
+		$namespacePaths = array();
+		$composerFilePath = DIR_ROOT . 'composer.json';
+		if (!file_exists($composerFilePath)) {
+			return $namespacePaths;
+		}
+		$composerJson = file_get_contents($composerFilePath);
+		$composerJson = json_decode($composerJson);
+		$vendorDir = 'vendor/';
+		if (isset($composerJson->config) && isset($composerJson->config['vendor-dir'])) {
+			$vendorDir = preg_replace('#/?$#', '/', $composerJson->config['vendor-dir']);
+		}
+		foreach ((array) $composerJson->require as $path => $version) {
+			$parts = explode('/', $path);
+			$namespace = CM_Util::camelize($parts[1]);
+			$namespacePaths[$namespace] = $vendorDir . $path . '/';
+		}
+		return $namespacePaths;
+	}
+
+	public function getNamespacePath($namespace) {
+		if (isset($this->_namespacePaths[$namespace])) {
+			return $this->_namespacePaths[$namespace];
+		}
+		return '';
 	}
 
 	/**
