@@ -14,6 +14,17 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_generateLayouts($viewClassName);
 	}
 
+	public function createJavascriptFiles() {
+		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
+		foreach ($viewClasses as $path => $className) {
+			$jsPath = preg_replace('/\.php$/', '.js', $path);
+			if (!file_exists($jsPath)) {
+				$jsFile = CM_File_Javascript::createLibraryClass($className);
+				echo 'create  ' . $jsFile->getPath() . PHP_EOL;
+			}
+		}
+	}
+
 	/**
 	 * @param string $className
 	 */
@@ -70,6 +81,8 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		}
 		throw new CM_Exception_Invalid('No abstract class found for `' . $type . '` type within `' . implode(', ', $namespaces) . '` mamespaces.');
 	}
+
+
 
 	public static function getPackageName() {
 		return 'generator';
