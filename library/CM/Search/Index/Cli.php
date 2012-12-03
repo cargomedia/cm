@@ -38,7 +38,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 				$index->update($ids);
 				$index->getIndex()->refresh();
 			} catch (Exception $e) {
-				$message = $indexName . '-updates failed. 	';
+				$message = $indexName . '-updates failed.' . PHP_EOL;
 				if (isset($ids)) {
 					$message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
 					foreach ($ids as $id) {
