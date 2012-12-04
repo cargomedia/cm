@@ -41,6 +41,10 @@ class CM_SearchQuery_Abstract {
 		$this->_filters[] = $filter;
 	}
 
+	protected function _filterNot(array $filter) {
+		$this->_filters[] = array('not' => array('filter' => $filter));
+	}
+
 	public function filterPrefix($field, $value) {
 		$this->_filter(array('prefix' => array($field => $value)));
 	}
@@ -50,6 +54,14 @@ class CM_SearchQuery_Abstract {
 			$this->_filter(array('terms' => array($field => $value)));
 		} else {
 			$this->_filter(array('term' => array($field => $value)));
+		}
+	}
+
+	public function filterTermNot($field, $value) {
+		if (is_array($value)) {
+			$this->_filterNot(array('terms' => array($field => $value)));
+		} else {
+			$this->_filterNot(array('term' => array($field => $value)));
 		}
 	}
 
