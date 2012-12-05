@@ -76,6 +76,7 @@ class CM_App {
 					$version--;
 					break;
 				}
+				$this->setVersion($version, $namespace);
 			}
 			$versionBumps += ($version - $versionStart);
 		}
@@ -89,7 +90,7 @@ class CM_App {
 	 * @param Closure|null $callbackAfter
 	 * @return int
 	 */
-	public function runUpdateScript($namespace, $version, $callbackBefore = null, $callbackAfter = null) {
+	public function runUpdateScript($namespace, $version, Closure $callbackBefore = null, Closure $callbackAfter = null) {
 		try {
 			$updateScript = $this->_getUpdateScriptPath($version, $namespace);
 		} catch (CM_Exception_Invalid $e) {
@@ -99,7 +100,6 @@ class CM_App {
 			$callbackBefore($version);
 		}
 		require $updateScript;
-		$this->setVersion($version, $namespace);
 		if ($callbackAfter) {
 			$callbackAfter($version);
 		}
