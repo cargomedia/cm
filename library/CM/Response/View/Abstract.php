@@ -89,6 +89,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$count = 0;
 		$paths = array($request->getPath());
 		do {
+			$url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
 			if ($count++ > 10) {
 				throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
 			}
@@ -106,7 +107,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$html = $responsePage->getContent();
 		$js = $responsePage->getRender()->getJs()->getJs();
 		$title = $responsePage->getTitle();
-		$url = $responsePage->getRender()->getUrlPage($page, $page->getParams()->getAllOriginal());
 		$layoutClass = get_class($page->getLayout());
 		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
 			return $menuEntry->getHash();
