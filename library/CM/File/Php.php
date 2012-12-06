@@ -29,23 +29,27 @@ class CM_File_Php extends CM_File {
 	 * @param string|null  $body
 	 */
 	public function addMethod($access, $name, array $parameters = null, $body = null) {
-		$parameters = (array) $parameters;
+		$parametersCode = null;
+		if ($parameters) {
+			foreach ($parameters as $name => $type) {
+				if (!in_array(strtolower($type), array(null, 'integer', 'string', 'float', 'boolean'))) {
+					$parametersCode .= $type . ' ';
+				}
+				$parametersCode .= '$' . $name . ', ';
+			}
+			$parametersCode = trim($parametersCode, ' ,');
+		}
+		if ($body) {
+			$body = preg_replace(array('/[\n\r]/', '/^/'), "$0\t\t", $body);
+		}
+		$code = "\t" . $access . ' function ' . $name . ' (' . $parametersCode . ') {' . PHP_EOL;
+		$code .= $body . PHP_EOL;
+		$code .= "\t}" . PHP_EOL . PHP_EOL;
+
 		$content = $this->read();
 		$position = strripos($content, '}');
-		$content = substr($content, 0, $position);
-
-		$code = "\t" . $access . ' function ' . $name . ' (';
-		foreach ($parameters as $type => $name) {
-			if ($type) {
-				$code .= $type . ' ';
-			}
-			$code .= '$' . $name . ', ';
-		}
-		$code = trim($code, ' ,');
-		$code .= ') {' . PHP_EOL;
-		$code .= $body . PHP_EOL;
-		$code .= "\t}" . PHP_EOL;
-		$this->write($content . $code . PHP_EOL . '}');
+		$content = substr($content, 0, $position) . $code . substr($content, $position);
+		$this->write($content);
 	}
 
 	/**
@@ -62,15 +66,14 @@ class CM_File_Php extends CM_File {
 
 		$parameters = array();
 		foreach ($method->getParameters() as $parameter) {
-			echo $parameter->getName() . PHP_EOL;
-			$type = count($parameters);
+			$type = null;
 			if ($parameter->isArray()) {
 				$type = 'array';
 			}
 			if ($parameter->getClass()) {
 				$type = $parameter->getClass()->getName();
 			}
-			$parameters[$type] = $parameter->getName();
+			$parameters[$parameter->getName()] = $type;
 		}
 		$this->addMethod($visibility, $method->getName(), $parameters);
 	}
