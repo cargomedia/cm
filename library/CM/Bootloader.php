@@ -3,7 +3,8 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
-	private $_namespacePaths = array();
+	/** @var array|null */
+	private $_namespacePaths;
 
 	/** @var CM_Bootloader */
 	protected static $_instance;
@@ -20,7 +21,6 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
-		$this->_loadNamespacePaths();
 	}
 
 	public function defaults() {
@@ -207,26 +207,27 @@ class CM_Bootloader {
 		}
 	}
 
-	private function _loadNamespacePaths() {
-		$key = 'namespacesPaths';
-		if (false == ($namespacePaths = apc_fetch($key))) {
-			$namespacePaths = array();
-			$namespacePaths = array_merge($namespacePaths, $this->_getComposerNamespacePaths());
-			$namespacePaths = array_merge($namespacePaths, $this->_getLibraryNamespacePaths());
-			apc_store($key, $namespacePaths);
+	/**
+	 * @return array
+	 */
+	private function _getNamespacePaths() {
+		$key = 'CM_NamespacesPaths';
+		if (!$this->_namespacePaths && false == ($this->_namespacePaths = apc_fetch($key))) {
+			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
+			apc_store($key, $this->_namespacePaths);
 		}
-		$this->_namespacePaths = $namespacePaths;
+		return $this->_namespacePaths;
 	}
 
 	/**
 	 * @return array
 	 */
-	private function _getLibraryNamespacePaths() {
+	private function _getNamespacePathsLibrary() {
 		$namespacePaths = array();
 		if (DIR_LIBRARY) {
 			$directory = dir(DIR_ROOT . DIR_LIBRARY);
 			while (false !== ($entry = $directory->read())) {
-				if (!in_array($entry, array('.', '..', '.svn', '.git'))) {
+				if (substr($entry, 0, 1) !== '.') {
 					$namespacePaths[$entry] = DIR_LIBRARY . $entry . '/';
 				}
 			}
@@ -237,7 +238,7 @@ class CM_Bootloader {
 	/**
 	 * @return array
 	 */
-	private function _getComposerNamespacePaths() {
+	private function _getNamespacePathsComposer() {
 		$namespacePaths = array();
 		$composerFilePath = DIR_ROOT . 'composer.json';
 		if (!file_exists($composerFilePath)) {
@@ -257,11 +258,17 @@ class CM_Bootloader {
 		return $namespacePaths;
 	}
 
+	/**
+	 * @param string $namespace
+	 * @return string
+	 * @throws Exception
+	 */
 	public function getNamespacePath($namespace) {
-		if (isset($this->_namespacePaths[$namespace])) {
-			return $this->_namespacePaths[$namespace];
+		$namespacePaths = $this->_getNamespacePaths();
+		if (!isset($namespacePaths[$namespace])) {
+			throw new Exception('No path found for `' . $namespace . '`');
 		}
-		return '';
+		return $namespacePaths[$namespace];
 	}
 
 	/**
