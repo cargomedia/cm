@@ -16,20 +16,21 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	 * @return mixed
 	 */
 	final public function run(array $params) {
-		if ($this->_getGearmanEnabled()) {
-			return $this->_dispatch($params);
+		if (!$this->_getGearmanEnabled()) {
+			return $this->_run(CM_Params::factory($params));
 		}
-		return $this->_run(CM_Params::factory($params));
+		return $this->_dispatch($params);
 	}
 
 	/**
 	 * @param array $params
 	 */
 	final public function queue(array $params) {
-		if ($this->_getGearmanEnabled()) {
-			$this->_dispatch($params, true);
+		if (!$this->_getGearmanEnabled()) {
+			$this->_run(CM_Params::factory($params));
+			return;
 		}
-		$this->_run(CM_Params::factory($params));
+		$this->_dispatch($params, true);
 	}
 
 	/**
