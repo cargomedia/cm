@@ -17,3 +17,5 @@ $config->CM_Model_Splittest->withoutPersistence = true;
 $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Model_Location->loadFromSlave = false;
+
+$config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
