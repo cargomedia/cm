@@ -9,9 +9,8 @@ class CM_SearchQuery_Abstract {
 	/**
 	 * @param string|null         $mode       must,must_not,should
 	 * @param string|null         $filterMode or, and, not
-	 * @param boolean|null        $isSubQuery
 	 */
-	function __construct($mode = null, $filterMode = null, $isSubQuery = null) {
+	function __construct($mode = null, $filterMode = null) {
 		if (is_null($mode)) {
 			$mode = 'must';
 		}
