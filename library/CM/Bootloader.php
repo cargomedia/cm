@@ -266,6 +266,8 @@ class CM_Bootloader {
 	public function getNamespacePath($namespace) {
 		$namespacePaths = $this->_getNamespacePaths();
 		if (!isset($namespacePaths[$namespace])) {
+			// @todo: DIR_ROOT is possible
+			return '';
 			throw new Exception('No path found for `' . $namespace . '`');
 		}
 		return $namespacePaths[$namespace];
