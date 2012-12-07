@@ -212,7 +212,7 @@ class CM_Bootloader {
 	 */
 	private function _getNamespacePaths() {
 		$key = 'CM_NamespacesPaths';
-		if (!$this->_namespacePaths && false == ($this->_namespacePaths = apc_fetch($key))) {
+		if (null !== $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($key))) {
 			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
 			apc_store($key, $this->_namespacePaths);
 		}
