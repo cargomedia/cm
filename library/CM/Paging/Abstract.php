@@ -88,12 +88,21 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		return $itemsRaw;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getItemsRawTree() {
-		$itemsRawTree = $this->_getItemsRawTree();
-		if (null !== $this->_pageSize && count($itemsRawTree) > $this->_pageSize) {
-			$itemsRawTree = array_slice($itemsRawTree, 0, $this->_pageSize);
+		if (null === $this->_itemsRawTree) {
+			$this->_itemsRawTree = array();
+			foreach ($this->getItemsRaw() as $itemRaw) {
+				$key = array_shift($itemRaw);
+				if (count($itemRaw) <= 1) {
+					$itemRaw = reset($itemRaw);
+				}
+				$this->_itemsRawTree[$key] = $itemRaw;
+			}
 		}
-		return $itemsRawTree;
+		return $this->_itemsRawTree;
 	}
 
 	/**
@@ -303,23 +312,6 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			}
 		}
 		return $this->_itemsRaw;
-	}
-
-	private function _getItemsRawTree() {
-		if (null === $this->_itemsRawTree) {
-			$this->_itemsRawTree = array();
-			$itemsRaw = $this->_getItemsRaw();
-			$result = array();
-			foreach ($itemsRaw as $itemRaw) {
-				$key = array_shift($itemRaw);
-				if (count($itemRaw) <= 1) {
-					$itemRaw = reset($itemRaw);
-				}
-				$result[$key] = $itemRaw;
-			}
-			$this->_itemsRawTree = $result;
-		}
-		return $this->_itemsRawTree;
 	}
 
 	/**
