@@ -1,7 +1,11 @@
 <?php
 
 abstract class CM_Cache_Abstract extends CM_Class_Abstract {
-	protected $_runtimeCache = array();
+
+	const RUNTIME_LIFETIME = 3;
+
+	/** @var array */
+	protected $_runtimeStore = array();
 
 	/**
 	 * @return CM_Cache_Abstract
@@ -23,7 +27,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return;
 		}
 		$cache = static::getInstance();
-		$cache->_runtimeCache[$key] = $value;
+		$cache->_setRuntime($key, $value);
 		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-set', $key);
 		$cache->_set($key, $value, $lifeTime);
 	}
@@ -37,12 +41,12 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return false;
 		}
 		$cache = static::getInstance();
-		if (array_key_exists($key, $cache->_runtimeCache)) {
-			return $cache->_runtimeCache[$key];
+		if (false !== ($value = $cache->_getRuntime($key))) {
+			return $value;
 		}
 		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-get', $key);
-		if (($value = $cache->_get($key)) !== false) {
-			$cache->_runtimeCache[$key] = $value;
+		if (false !== ($value = $cache->_get($key))) {
+			$cache->_setRuntime($key, $value);
 		}
 		return $value;
 	}
@@ -55,7 +59,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return;
 		}
 		$cache = static::getInstance();
-		unset($cache->_runtimeCache[$key]);
+		$cache->_deleteRuntime($key);
 		$cache->_delete($key);
 	}
 
@@ -64,7 +68,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			return;
 		}
 		$cache = static::getInstance();
-		$cache->_runtimeCache = array();
+		$cache->_flushRuntime();
 		$cache->_flush();
 	}
 
@@ -111,6 +115,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param string $name
 	 * @param array  $arguments
+	 * @return mixed
 	 */
 	public static final function __callStatic($name, $arguments) {
 		return static::_callInstance($name, $arguments, true);
@@ -209,6 +214,42 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	protected final function _deleteTag($tag) {
 		return static::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
+	}
+
+	/**
+	 * @param string $key
+	 * @return mixed|bool
+	 */
+	private function _getRuntime($key) {
+		if (!array_key_exists($key, $this->_runtimeStore)) {
+			return false;
+		}
+		$entry = $this->_runtimeStore[$key];
+		if (time() > $entry['expirationStamp']) {
+			$this->_deleteRuntime($key);
+			return false;
+		}
+		return $entry['value'];
+	}
+
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	private function _setRuntime($key, $value) {
+		$expirationStamp = time() + self::RUNTIME_LIFETIME;
+		$this->_runtimeStore[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
+	}
+
+	/**
+	 * @param string $key
+	 */
+	private function _deleteRuntime($key) {
+		unset($this->_runtimeStore[$key]);
+	}
+
+	private function _flushRuntime() {
+		$this->_runtimeStore = array();
 	}
 
 	/**

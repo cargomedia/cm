@@ -23,10 +23,11 @@ class CM_Cache_AbstractTest extends TestCase {
 	}
 
 	public function testGetSetInvalidateRuntimeCache() {
-		$this->markTestIncomplete('Runtime cache should invalidate after a (very short) time period');
 		CM_Cache_Mock::set('foo', 13);
 		$this->assertSame(13, CM_Cache_Mock::get('foo'));
 		CM_Cache_Mock::simulateForgetting('foo');
+		$this->assertSame(13, CM_Cache_Mock::get('foo'));
+		TH::timeForward(CM_Cache_Abstract::RUNTIME_LIFETIME + 1);
 		$this->assertSame(false, CM_Cache_Mock::get('foo'));
 	}
 
