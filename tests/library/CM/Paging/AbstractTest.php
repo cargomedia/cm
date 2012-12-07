@@ -382,4 +382,12 @@ class CM_Paging_AbstractTest extends TestCase {
 			$this->assertContains('CM_Paging_Mock has no field `amount`.', $ex->getMessage());
 		}
 	}
+
+	public function testGetItemsRawTree() {
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 2, 'type' => 1, 'amount' => 2),
+			array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4))));
+		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2), 3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
+		$paging->setPage(2, 2);
+		$this->assertSame(array(3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
+	}
 }

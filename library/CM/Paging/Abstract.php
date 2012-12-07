@@ -2,7 +2,7 @@
 
 abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable {
 	private $_count = null;
-	private $_itemsRaw = null, $_items = array();
+	private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
 	private $_pageOffset = 0;
 	private $_pageSize = null;
 	private $_source = null;
@@ -86,6 +86,14 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			$itemsRaw = array_slice($itemsRaw, 0, $this->_pageSize);
 		}
 		return $itemsRaw;
+	}
+
+	public function getItemsRawTree() {
+		$itemsRawTree = $this->_getItemsRawTree();
+		if (null !== $this->_pageSize && count($itemsRawTree) > $this->_pageSize) {
+			$itemsRawTree = array_slice($itemsRawTree, 0, $this->_pageSize);
+		}
+		return $itemsRawTree;
 	}
 
 	/**
@@ -297,6 +305,23 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		return $this->_itemsRaw;
 	}
 
+	private function _getItemsRawTree() {
+		if (null === $this->_itemsRawTree) {
+			$this->_itemsRawTree = array();
+			$itemsRaw = $this->_getItemsRaw();
+			$result = array();
+			foreach ($itemsRaw as $itemRaw) {
+				$key = array_shift($itemRaw);
+				if (count($itemRaw) <= 1) {
+					$itemRaw = reset($itemRaw);
+				}
+				$result[$key] = $itemRaw;
+			}
+			$this->_itemsRawTree = $result;
+		}
+		return $this->_itemsRawTree;
+	}
+
 	/**
 	 * @return int OR null if no pageSize set
 	 */
@@ -310,6 +335,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	private function _clearItems() {
 		$this->_items = array();
 		$this->_itemsRaw = null;
+		$this->_itemsRawTree = null;
 		$this->_iteratorPosition = 0;
 		$this->_iteratorItems = null;
 	}
