@@ -16,7 +16,7 @@ class CM_Cache_AbstractTest extends TestCase {
 	}
 
 	public function testGetSet() {
-		$this->assertSame(false, CM_Cache_Mock::get('foo'));
+		$this->assertFalse(CM_Cache_Mock::get('foo'));
 
 		CM_Cache_Mock::set('foo', 12);
 		$this->assertSame(12, CM_Cache_Mock::get('foo'));
@@ -28,7 +28,7 @@ class CM_Cache_AbstractTest extends TestCase {
 		CM_Cache_Mock::simulateForgetting('foo');
 		$this->assertSame(13, CM_Cache_Mock::get('foo'));
 		TH::timeForward(CM_Cache_Abstract::RUNTIME_LIFETIME + 1);
-		$this->assertSame(false, CM_Cache_Mock::get('foo'));
+		$this->assertFalse(CM_Cache_Mock::get('foo'));
 	}
 
 	/**
@@ -39,7 +39,7 @@ class CM_Cache_AbstractTest extends TestCase {
 		CM_Cache_Mock::set('foo', 14, $lifeTime);
 		$this->assertSame(14, CM_Cache_Mock::get('foo'));
 		TH::timeForward($lifeTime + 1);
-		$this->assertSame(false, CM_Cache_Mock::get('foo'));
+		$this->assertFalse(CM_Cache_Mock::get('foo'));
 	}
 }
 
