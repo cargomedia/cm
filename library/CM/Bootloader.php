@@ -212,7 +212,7 @@ class CM_Bootloader {
 	 */
 	private function _getNamespacePaths() {
 		$key = 'CM_NamespacesPaths';
-		if (null !== $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($key))) {
+		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($key))) {
 			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
 			apc_store($key, $this->_namespacePaths);
 		}
@@ -261,16 +261,13 @@ class CM_Bootloader {
 	/**
 	 * @param string $namespace
 	 * @return string
-	 * @throws Exception
 	 */
 	public function getNamespacePath($namespace) {
 		$namespacePaths = $this->_getNamespacePaths();
-		if (!isset($namespacePaths[$namespace])) {
-			// @todo: DIR_ROOT is possible
-			return '';
-			throw new Exception('No path found for `' . $namespace . '`');
+		if (isset($namespacePaths[$namespace])) {
+			return $namespacePaths[$namespace];
 		}
-		return $namespacePaths[$namespace];
+		return '';
 	}
 
 	/**
