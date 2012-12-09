@@ -32,7 +32,7 @@ class CM_File_Php extends CM_File {
 		$parametersCode = null;
 		if ($parameters) {
 			foreach ($parameters as $name => $type) {
-				if (!in_array(strtolower($type), array(null, 'integer', 'string', 'float', 'boolean'))) {
+				if (!in_array(strtolower($type), array(null, 'int', 'integer', 'string', 'float', 'bool', 'boolean'))) {
 					$parametersCode .= $type . ' ';
 				}
 				$parametersCode .= '$' . $name . ', ';

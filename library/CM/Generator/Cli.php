@@ -41,8 +41,8 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/library/' . $namespace;
 		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/layout/default';
 		foreach ($paths as $path) {
+			$this->_echo('Creating `'  . $path . '`...');
 			CM_Util::mkDir($path);
-			$this->_echo('create ' . $path);
 		}
 	}
 
@@ -59,13 +59,13 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			$parentClass = $this->_getParentClass($namespace, $type);
 		}
 		$file = CM_File_Php::createLibraryClass($className, $parentClass);
+		$this->_echo('Creating `'  . $file->getPath() . '`...');
 		$reflectionClass = new ReflectionClass($parentClass);
 		foreach ($reflectionClass->getMethods() as $method) {
 			if ($method->isAbstract()) {
 				$file->copyMethod($method);
 			}
 		}
-		$this->_echo('create ' . $file->getPath());
 		return $file;
 	}
 
@@ -75,7 +75,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	private function _generateClassFileJavascript($className) {
 		$file = CM_File_Javascript::createLibraryClass($className);
-		$this->_echo('create ' . $file->getPath());
+		$this->_echo('Creating `'  . $file->getPath() . '`...');
 		return $file;
 	}
 
@@ -88,10 +88,10 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$pathRelative = implode('_', $parts);
 		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/' . $pathRelative . '/';
 		CM_Util::mkDir($layoutPath);
-		$file = CM_File::create($layoutPath . 'default.tpl');
-		$this->_echo('create ' . $file->getPath());
-		$file = CM_File::create($layoutPath . 'default.less');
-		$this->_echo('create ' . $file->getPath());
+		$this->_echo('Creating `'  . $layoutPath . 'default.tpl' . '`...');
+		CM_File::create($layoutPath . 'default.tpl');
+		$this->_echo('Creating `'  . $layoutPath . 'default.less' . '`...');
+		CM_File::create($layoutPath . 'default.less');
 	}
 
 	/**
@@ -101,28 +101,20 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	private function _getParentClass($viewNamespace, $type) {
-		$viewNamespaceQualified = false;
-		$namespaces = CM_Bootloader::getInstance()->getNamespaces();
-		$classNameMatched = null;
+		$namespaces = array_reverse(CM_Bootloader::getInstance()->getNamespaces());
+		if (!in_array($viewNamespace, $namespaces)) {
+			throw new CM_Exception_Invalid('Namespace `' . $viewNamespace . '` not found within `' . implode(', ', $namespaces) . '` namespaces.');
+		}
+		$position = array_search($viewNamespace, $namespaces);
+		$namespaces = array_splice($namespaces, $position);
 		foreach ($namespaces as $namespace) {
-			if ($namespace === $viewNamespace) {
-				$viewNamespaceQualified = true;
-			}
 			$className = $namespace . '_' . $type . '_Abstract';
 			if (class_exists($className)) {
-				$classNameMatched = $className;
-			}
-			if ($viewNamespaceQualified) {
-				break;
+				return $className;
 			}
 		}
-		if (!$classNameMatched) {
-			throw new CM_Exception_Invalid('No abstract class found for `' . $type . '` type within `' . implode(', ', $namespaces) . '` namespaces.');
-		}
-		return $classNameMatched;
+		throw new CM_Exception_Invalid('No abstract class found for `' . $type . '` type within `' . implode(', ', $namespaces) . '` namespaces.');
 	}
-
-
 
 	public static function getPackageName() {
 		return 'generator';
