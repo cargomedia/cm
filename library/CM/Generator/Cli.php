@@ -59,7 +59,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			$parentClass = $this->_getParentClass($namespace, $type);
 		}
 		$file = CM_File_Php::createLibraryClass($className, $parentClass);
-		$this->_echo('Creating `'  . $file->getPath() . '`...');
 		$reflectionClass = new ReflectionClass($parentClass);
 		foreach ($reflectionClass->getMethods() as $method) {
 			if ($method->isAbstract()) {
@@ -75,7 +74,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	private function _generateClassFileJavascript($className) {
 		$file = CM_File_Javascript::createLibraryClass($className);
-		$this->_echo('Creating `'  . $file->getPath() . '`...');
 		return $file;
 	}
 
@@ -88,9 +86,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$pathRelative = implode('_', $parts);
 		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/' . $pathRelative . '/';
 		CM_Util::mkDir($layoutPath);
-		$this->_echo('Creating `'  . $layoutPath . 'default.tpl' . '`...');
 		CM_File::create($layoutPath . 'default.tpl');
-		$this->_echo('Creating `'  . $layoutPath . 'default.less' . '`...');
 		CM_File::create($layoutPath . 'default.less');
 	}
 

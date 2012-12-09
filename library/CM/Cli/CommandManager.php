@@ -51,6 +51,7 @@ class CM_Cli_CommandManager {
 	 * @return string
 	 */
 	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
+		CM_Filesystem::getInstance()->setOutput($output);
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
