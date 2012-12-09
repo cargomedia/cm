@@ -1,33 +1,230 @@
 {
-    "hash": "7abd33ce3d84d82ba3b0ec053c48e942",
+    "hash": "706174067ed762666a4ad894e92af1ea",
     "packages": [
         {
-            "package": "amazonwebservices/aws-sdk-for-php",
-            "version": "1.5.15"
+            "name": "amazonwebservices/aws-sdk-for-php",
+            "version": "1.5.15",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/amazonwebservices_aws-sdk-for-php.zip",
+                "reference": "1.5.15",
+                "shasum": "d3139b0d0df46403b3edf04e9150ceb14a099b1c"
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "time": "2012-10-31 04:28:50",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "authentication/",
+                    "extensions/",
+                    "lib/",
+                    "services/",
+                    "utilities/",
+                    "sdk.class.php"
+                ]
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP",
+            "homepage": "http://aws.amazon.com/sdkforphp/",
+            "keywords": [
+                "amazon",
+                "s3",
+                "sdk",
+                "aws",
+                "dynamodb",
+                "ec2"
+            ]
         },
         {
-            "package": "easybook/geshi",
-            "version": "1.0.8.11"
+            "name": "easybook/geshi",
+            "version": "1.0.8.11",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/easybook_geshi.zip",
+                "reference": "1.0.8.11",
+                "shasum": "e31d81bff52bce8a4c5801ff4c391813387579a8"
+            },
+            "require": {
+                "php": ">4.3.0"
+            },
+            "time": "2012-09-28 08:14:18",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "./"
+                ]
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Benny Baumann",
+                    "email": "BenBE@geshi.org"
+                },
+                {
+                    "name": "Nigel McNie",
+                    "email": "nigel@geshi.org"
+                }
+            ],
+            "description": "GeSHi - Generic Syntax Highlighter. This is an unmodified port of GeSHi project code found on SourceForge.",
+            "homepage": "http://qbnz.com/highlighter",
+            "keywords": [
+                "syntax",
+                "highlight",
+                "highlighter"
+            ]
         },
         {
-            "package": "leafo/lessphp",
-            "version": "v0.3.8"
+            "name": "leafo/lessphp",
+            "version": "v0.3.8",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/leafo_lessphp.zip",
+                "reference": "v0.3.8",
+                "shasum": "b1c09d0816364b3bb09fca5f96ae8e4ae0486cb7"
+            },
+            "time": "2012-08-19 00:16:09",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "lessc.inc.php"
+                ]
+            },
+            "license": [
+                "MIT",
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Leaf Corcoran",
+                    "email": "leafot@gmail.com",
+                    "homepage": "http://leafo.net"
+                }
+            ],
+            "description": "lessphp is a compiler for LESS written in PHP.",
+            "homepage": "http://leafo.net/lessphp/"
         },
         {
-            "package": "phpmailer/phpmailer",
-            "version": "5.2.1"
+            "name": "phpmailer/phpmailer",
+            "version": "5.2.1",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/phpmailer_phpmailer.zip",
+                "reference": "",
+                "shasum": "cf729e245b3e617dbe629e80a63586b83c5e1300"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "class.phpmailer.php"
+                ]
+            }
         },
         {
-            "package": "ruflin/Elastica",
-            "version": "v0.19.8.0"
+            "name": "ruflin/Elastica",
+            "version": "v0.19.8.0",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/ruflin_elastica.zip",
+                "reference": "v0.19.8.0",
+                "shasum": "1c83a6e8cba813325f4b48c01fe8f1496701dd4f"
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "2012-08-12 14:51:36",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Elastica": "lib/"
+                }
+            },
+            "license": [
+                "Apache 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Ruflin",
+                    "homepage": "http://ruflin.com/"
+                }
+            ],
+            "description": "Elasticsearch Client",
+            "homepage": "http://ruflin.github.com/Elastica/",
+            "keywords": [
+                "client",
+                "search"
+            ]
         },
         {
-            "package": "smarty/smarty",
-            "version": "v3.1.12"
+            "name": "smarty/smarty",
+            "version": "v3.1.12",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/smarty_smarty.zip",
+                "reference": "/tags/v3.1.12/@4664",
+                "shasum": "0f4a9076cd393ddd9e5ccc99a1f3ad41e5f81682"
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "time": "2012-09-26 03:13:16",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "distribution/libs/Smarty.class.php"
+                ]
+            },
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Monte Ohrt",
+                    "email": "monte@ohrt.com"
+                },
+                {
+                    "name": "Uwe Tews",
+                    "email": "uwe.tews@googlemail.com"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "rodney.rehm@medialize.de"
+                }
+            ],
+            "description": "Smarty - the compiling PHP template engine",
+            "homepage": "http://www.smarty.net",
+            "keywords": [
+                "templating"
+            ]
         },
         {
-            "package": "wurfl/tera-wurfl",
-            "version": "2.1.5"
+            "name": "wurfl/tera-wurfl",
+            "version": "2.1.5",
+            "dist": {
+                "type": "zip",
+                "url": "http://broker.cargomedia.ch/repositories/cm/dists/wurfl_tera-wurfl.zip",
+                "reference": "",
+                "shasum": "47911af71073ce54caeabb06fc6912298ee3e64e"
+            },
+            "type": "library",
+            "installation-source": "dist"
         }
     ],
     "packages-dev": null,
