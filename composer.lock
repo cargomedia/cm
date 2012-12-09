@@ -8,12 +8,12 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/amazonwebservices_aws-sdk-for-php.zip",
                 "reference": "1.5.15",
-                "shasum": "d3139b0d0df46403b3edf04e9150ceb14a099b1c"
+                "shasum": "9aae7de45b9b2c03147eb06d8af987924c9b2df0"
             },
             "require": {
                 "php": ">=5.2.0"
             },
-            "time": "2012-10-31 04:28:50",
+            "time": "2012-10-30 23:28:50",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -53,12 +53,12 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/easybook_geshi.zip",
                 "reference": "1.0.8.11",
-                "shasum": "e31d81bff52bce8a4c5801ff4c391813387579a8"
+                "shasum": "cbc2418cfb4aeefd5517a5ffca2cf014130f244c"
             },
             "require": {
                 "php": ">4.3.0"
             },
-            "time": "2012-09-28 08:14:18",
+            "time": "2012-09-28 03:14:18",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -94,9 +94,9 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/leafo_lessphp.zip",
                 "reference": "v0.3.8",
-                "shasum": "b1c09d0816364b3bb09fca5f96ae8e4ae0486cb7"
+                "shasum": "d740be18e670c0b490d1db7cb5a952fc27bccabd"
             },
-            "time": "2012-08-19 00:16:09",
+            "time": "2012-08-18 19:16:09",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -125,7 +125,7 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/phpmailer_phpmailer.zip",
                 "reference": "",
-                "shasum": "cf729e245b3e617dbe629e80a63586b83c5e1300"
+                "shasum": "e6d39a8ec9a396d3ae7309970381ca988b92384e"
             },
             "type": "library",
             "installation-source": "dist",
@@ -142,12 +142,12 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/ruflin_elastica.zip",
                 "reference": "v0.19.8.0",
-                "shasum": "1c83a6e8cba813325f4b48c01fe8f1496701dd4f"
+                "shasum": "6fea518a333c6b262cd101132b4fa2a2d657610e"
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "2012-08-12 14:51:36",
+            "time": "2012-08-12 09:51:36",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -178,12 +178,12 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/smarty_smarty.zip",
                 "reference": "/tags/v3.1.12/@4664",
-                "shasum": "0f4a9076cd393ddd9e5ccc99a1f3ad41e5f81682"
+                "shasum": "a3c0b1d13b7503a1ce1a1e8791d8fc6c836614ec"
             },
             "require": {
                 "php": ">=5.2"
             },
-            "time": "2012-09-26 03:13:16",
+            "time": "2012-09-25 22:13:16",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -221,7 +221,7 @@
                 "type": "zip",
                 "url": "http://broker.cargomedia.ch/repositories/cm/dists/wurfl_tera-wurfl.zip",
                 "reference": "",
-                "shasum": "47911af71073ce54caeabb06fc6912298ee3e64e"
+                "shasum": "bcd4614ed832a7588b5b89a9d0ae16df0db5a47f"
             },
             "type": "library",
             "installation-source": "dist"
