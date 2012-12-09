@@ -2,6 +2,19 @@
 
 abstract class CM_Cli_Runnable_Abstract {
 
+	/** @var CM_Output_Interface */
+	private $_output;
+
+	/**
+	 * @param CM_Output_Interface|null $output
+	 */
+	public function __construct(CM_Output_Interface $output = null) {
+		if (null === $output) {
+			$output = new CM_Output_Null();
+		}
+		$this->_output = $output;
+	}
+
 	/**
 	 * @throws CM_Exception_NotImplemented
 	 * @return string
@@ -10,26 +23,20 @@ abstract class CM_Cli_Runnable_Abstract {
 		throw new CM_Exception_NotImplemented('Package `' . get_called_class() . '` has no `getPackageName` implemented.');
 	}
 
-	/**
-	 * @return string
-	 */
 	public function info() {
 		$details = array(
 			'Package name' => static::getPackageName(),
 			'Class name' => get_class($this),
 		);
-		$output = '';
 		foreach ($details as $name => $value) {
-			$output .= str_pad($name . ':', 20) . $value . PHP_EOL;
+			$this->_echo(str_pad($name . ':', 20) . $value);
 		}
-		return $output;
 	}
 
 	/**
 	 * @param string $value
 	 */
 	protected function _echo($value) {
-		// TODO: Implement more complex CM_OutputStream_Abstract related echoing
-		echo $value . PHP_EOL;
+		$this->_output->writeln($value);
 	}
 }

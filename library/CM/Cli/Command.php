@@ -18,11 +18,11 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @param CM_Cli_Arguments $arguments
+	 * @param CM_Cli_Arguments    $arguments
+	 * @param CM_Output_Interface $output
 	 * @throws CM_Cli_Exception_InvalidArguments
-	 * @return string
 	 */
-	public function run(CM_Cli_Arguments $arguments) {
+	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
 		$parameters = array();
 		foreach ($this->_method->getParameters() as $param) {
 			$parameters[] = $this->_getParamValue($param, $arguments);
@@ -33,7 +33,7 @@ class CM_Cli_Command {
 		if ($named = $arguments->getNamed()->getAll()) {
 			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
 		}
-		return call_user_func_array(array($this->_class->newInstance(), $this->_method->getName()), $parameters);
+		call_user_func_array(array($this->_class->newInstance($output), $this->_method->getName()), $parameters);
 	}
 
 	/**

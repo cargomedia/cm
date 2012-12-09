@@ -46,31 +46,37 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
-	 * @param CM_Cli_Arguments $arguments
+	 * @param CM_Cli_Arguments    $arguments
+	 * @param CM_Output_Interface $output
 	 * @return string
 	 */
-	public function run(CM_Cli_Arguments $arguments) {
+	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
 			if (!$packageName) {
-				return $this->getHelp();
+				$output->writeln($this->getHelp());
+				return 1;
 			}
 			if (!$methodName) {
-				return $this->getHelp($packageName);
+				$output->writeln($this->getHelp($packageName));
+				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			return $command->run($arguments);
+			$command->run($arguments, $output);
+			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
-			$output = 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
+			$output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			if (isset($command)) {
-				$output .= 'Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp();
+				$output->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
 			} else {
-				$output .= $this->getHelp();
+				$output->writeln($this->getHelp());
 			}
-			return $output;
+			return 1;
 		} catch (Exception $e) {
-			return 'ERROR: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
+			$output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$output->writeln($e->getTraceAsString());
+			return 1;
 		}
 	}
 
