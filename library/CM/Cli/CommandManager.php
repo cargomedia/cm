@@ -5,6 +5,13 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
+	/** @var CM_Output_Interface */
+	private $_output;
+
+	public function __construct() {
+		$this->_setOutput(new CM_Output_Console());
+	}
+
 	/**
 	 * @return CM_Cli_Command[]
 	 */
@@ -47,37 +54,46 @@ class CM_Cli_CommandManager {
 
 	/**
 	 * @param CM_Cli_Arguments    $arguments
-	 * @param CM_Output_Interface $output
 	 * @return string
 	 */
-	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
-		CM_Filesystem::getInstance()->setOutput($output);
+	public function run(CM_Cli_Arguments $arguments) {
+		$method = new ReflectionMethod($this, 'configure');
+		$parameters = $arguments->extractMethodParameters($method);
+		$method->invokeArgs($this, $parameters);
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
 			if (!$packageName) {
-				$output->writeln($this->getHelp());
+				$this->_output->writeln($this->getHelp());
 				return 1;
 			}
 			if (!$methodName) {
-				$output->writeln($this->getHelp($packageName));
+				$this->_output->writeln($this->getHelp($packageName));
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			$command->run($arguments, $output);
+			$command->run($arguments, $this->_output);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
-			$output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$this->_output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			if (isset($command)) {
-				$output->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+				$this->_output->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
 			} else {
-				$output->writeln($this->getHelp());
+				$this->_output->writeln($this->getHelp());
 			}
 			return 1;
 		} catch (Exception $e) {
-			$output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
-			$output->writeln($e->getTraceAsString());
+			$this->_output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
+		}
+	}
+
+	/**
+	 * @param boolean|null $quiet
+	 */
+	public function configure($quiet = null) {
+		if ($quiet) {
+			$this->_setOutput(new CM_Output_Null());
 		}
 	}
 
@@ -94,6 +110,14 @@ class CM_Cli_CommandManager {
 			}
 		}
 		throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
+	}
+
+	/**
+	 * @param CM_Output_Interface $output
+	 */
+	private function _setOutput($output) {
+		$this->_output = $output;
+		CM_Filesystem::getInstance()->setOutput($output);
 	}
 
 }

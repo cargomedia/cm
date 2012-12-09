@@ -23,10 +23,7 @@ class CM_Cli_Command {
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 */
 	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
-		$parameters = array();
-		foreach ($this->_method->getParameters() as $param) {
-			$parameters[] = $this->_getParamValue($param, $arguments);
-		}
+		$parameters = $arguments->extractMethodParameters($this->_method);
 		if ($arguments->getNumeric()->getAll()) {
 			throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
 		}
@@ -118,49 +115,9 @@ class CM_Cli_Command {
 		return trim($matches[1]);
 	}
 
-	/**
-	 * @param ReflectionParameter   $param
-	 * @param CM_Cli_Arguments      $arguments
-	 * @throws CM_Cli_Exception_InvalidArguments
-	 * @return mixed
-	 */
-	private function _getParamValue(ReflectionParameter $param, CM_Cli_Arguments $arguments) {
-		$paramName = CM_Util::uncamelize($param->getName());
-		if (!$param->isOptional()) {
-			$argumentsNumeric = $arguments->getNumeric();
-			if (!$argumentsNumeric->getAll()) {
-				throw new CM_Cli_Exception_InvalidArguments('Missing argument `' . $paramName . '`');
-			}
-			$value = $argumentsNumeric->shift();
-		} else {
-			$argumentsNamed = $arguments->getNamed();
-			if (!$argumentsNamed->has($paramName)) {
-				return $param->getDefaultValue();
-			}
-			$value = $argumentsNamed->get($paramName);
-			$argumentsNamed->remove($paramName);
-		}
-		return $this->_forceType($value, $param);
-	}
-
-	/**
-	 * @param mixed               $value
-	 * @param ReflectionParameter $param
-	 * @throws CM_Cli_Exception_InvalidArguments
-	 * @return array|mixed
-	 */
-	private function _forceType($value, ReflectionParameter $param) {
-		if ($param->isArray()) {
-			return explode(',', $value);
-		}
-		if (!$param->getClass()) {
-			return $value;
-		}
-		try {
-			return $param->getClass()->newInstance($value);
-		} catch (Exception $e) {
-			throw new CM_Cli_Exception_InvalidArguments('Invalid value for parameter `' . $param->getName() . '`. ' . $e->getMessage());
-		}
+	private function _setOutput(CM_Output_Interface $output) {
+		$this->_output = $output;
+		CM_Filesystem::getInstance()->setOutput($output);
 	}
 
 	/**

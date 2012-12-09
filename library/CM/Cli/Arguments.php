@@ -46,6 +46,18 @@ class CM_Cli_Arguments {
 	}
 
 	/**
+	 * @param ReflectionMethod $method
+	 * @return array
+	 */
+	public function extractMethodParameters(ReflectionMethod $method) {
+		$params = array();
+		foreach ($method->getParameters() as $param) {
+			$params[] = $this->_getParamValue($param);
+		}
+		return $params;
+	}
+
+	/**
 	 * @param string $argument
 	 */
 	private function _parseArgument($argument) {
@@ -79,6 +91,50 @@ class CM_Cli_Arguments {
 	 */
 	private function _setNamed($name, $value) {
 		$this->_named->set($name, $value);
+	}
+
+	/**
+	 * @param ReflectionParameter   $param
+	 * @throws CM_Cli_Exception_InvalidArguments
+	 * @return mixed
+	 */
+	private function _getParamValue(ReflectionParameter $param) {
+		$paramName = CM_Util::uncamelize($param->getName());
+		if (!$param->isOptional()) {
+			$argumentsNumeric = $this->getNumeric();
+			if (!$argumentsNumeric->getAll()) {
+				throw new CM_Cli_Exception_InvalidArguments('Missing argument `' . $paramName . '`');
+			}
+			$value = $argumentsNumeric->shift();
+		} else {
+			$argumentsNamed = $this->getNamed();
+			if (!$argumentsNamed->has($paramName)) {
+				return $param->getDefaultValue();
+			}
+			$value = $argumentsNamed->get($paramName);
+			$argumentsNamed->remove($paramName);
+		}
+		return $this->_forceType($value, $param);
+	}
+
+	/**
+	 * @param mixed               $value
+	 * @param ReflectionParameter $param
+	 * @throws CM_Cli_Exception_InvalidArguments
+	 * @return array|mixed
+	 */
+	private function _forceType($value, ReflectionParameter $param) {
+		if ($param->isArray()) {
+			return explode(',', $value);
+		}
+		if (!$param->getClass()) {
+			return $value;
+		}
+		try {
+			return $param->getClass()->newInstance($value);
+		} catch (Exception $e) {
+			throw new CM_Cli_Exception_InvalidArguments('Invalid value for parameter `' . $param->getName() . '`. ' . $e->getMessage());
+		}
 	}
 
 }
