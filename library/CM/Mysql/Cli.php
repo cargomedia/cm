@@ -16,7 +16,7 @@ class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
 	public function runUpdates() {
 		$app = CM_App::getInstance();
 		$versionBumps = $app->runUpdateScripts(function ($version) {
-			echo 'Running update ' . $version . '...' . PHP_EOL;
+			$this->_echo('Running update ' . $version . '...');
 		});
 		if ($versionBumps > 0) {
 			$db = CM_Config::get()->CM_Mysql->db;
