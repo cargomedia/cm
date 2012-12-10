@@ -102,10 +102,10 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	private function _getParentClass($viewNamespace, $type) {
 		$namespaces = array_reverse(CM_Bootloader::getInstance()->getNamespaces());
-		if (!in_array($viewNamespace, $namespaces)) {
+		$position = array_search($viewNamespace, $namespaces);
+		if (false === $position) {
 			throw new CM_Exception_Invalid('Namespace `' . $viewNamespace . '` not found within `' . implode(', ', $namespaces) . '` namespaces.');
 		}
-		$position = array_search($viewNamespace, $namespaces);
 		$namespaces = array_splice($namespaces, $position);
 		foreach ($namespaces as $namespace) {
 			$className = $namespace . '_' . $type . '_Abstract';
