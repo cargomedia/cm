@@ -4,7 +4,7 @@
 		"smarty/smarty": "3.1.*",
 		"leafo/lessphp": "0.3.*",
 		"easybook/geshi": "1.0.8.11",
-		"amazonwebservices/aws-sdk-for-php": "1.5.15",
+		"amazonwebservices/aws-sdk-for-php": "1.5.*",
 		"ruflin/Elastica": "v0.19.8.0",
 		"phpmailer/phpmailer": "5.2.1",
 		"wurfl/tera-wurfl": "2.1.5"
