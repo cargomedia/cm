@@ -54,7 +54,7 @@ class CM_Cli_CommandManager {
 
 	/**
 	 * @param CM_Cli_Arguments    $arguments
-	 * @return string
+	 * @return int
 	 */
 	public function run(CM_Cli_Arguments $arguments) {
 		$method = new ReflectionMethod($this, 'configure');

@@ -39,4 +39,11 @@ abstract class CM_Cli_Runnable_Abstract {
 	protected function _echo($value) {
 		$this->_output->writeln($value);
 	}
+
+	/**
+	 * @return CM_Output_Interface
+	 */
+	protected function _getOutput() {
+		return $this->_output;
+	}
 }
