@@ -125,14 +125,14 @@ class CM_Cli_CommandManager {
 	/**
 	 * @param CM_Output_Interface $output
 	 */
-	private function _setStreamOutput($output) {
+	private function _setStreamOutput(CM_Output_Interface $output) {
 		$this->_streamOutput = $output;
 	}
 
 	/**
 	 * @param CM_Output_Interface $output
 	 */
-	private function _setStreamError($output) {
+	private function _setStreamError(CM_Output_Interface $output) {
 		$this->_streamError = $output;
 	}
 
