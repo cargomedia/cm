@@ -6,10 +6,14 @@ class CM_Cli_CommandManager {
 	private $_commands = null;
 
 	/** @var CM_Output_Interface */
-	private $_output;
+	private $_streamOutput;
+
+	/** @var CM_Output_Interface */
+	private $_streamError;
 
 	public function __construct() {
-		$this->_setOutput(new CM_Output_Console());
+		$this->_setStreamOutput(new CM_Output_ConsoleOutput());
+		$this->_setStreamError(new CM_Output_ConsoleError());
 	}
 
 	/**
@@ -70,26 +74,26 @@ class CM_Cli_CommandManager {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
 			if (!$packageName) {
-				$this->_output->writeln($this->getHelp());
+				$this->_streamOutput->writeln($this->getHelp());
 				return 1;
 			}
 			if (!$methodName) {
-				$this->_output->writeln($this->getHelp($packageName));
+				$this->_streamOutput->writeln($this->getHelp($packageName));
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			$command->run($arguments, $this->_output);
+			$command->run($arguments, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
-			$this->_output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			if (isset($command)) {
-				$this->_output->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+				$this->_streamError->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
 			} else {
-				$this->_output->writeln($this->getHelp());
+				$this->_streamError->writeln($this->getHelp());
 			}
 			return 1;
 		} catch (Exception $e) {
-			$this->_output->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
 		}
 	}
@@ -99,7 +103,7 @@ class CM_Cli_CommandManager {
 	 */
 	public function configure($quiet = null) {
 		if ($quiet) {
-			$this->_setOutput(new CM_Output_Null());
+			$this->_setStreamOutput(new CM_Output_Null());
 		}
 	}
 
@@ -121,8 +125,15 @@ class CM_Cli_CommandManager {
 	/**
 	 * @param CM_Output_Interface $output
 	 */
-	private function _setOutput($output) {
-		$this->_output = $output;
+	private function _setStreamOutput($output) {
+		$this->_streamOutput = $output;
+	}
+
+	/**
+	 * @param CM_Output_Interface $output
+	 */
+	private function _setStreamError($output) {
+		$this->_streamError = $output;
 	}
 
 }
