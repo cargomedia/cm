@@ -12,10 +12,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	abstract protected function _run(CM_Params $params);
 
 	/**
-	 * @param array $params
+	 * @param array|null $params
 	 * @return mixed
 	 */
-	final public function run(array $params) {
+	final public function run(array $params = null) {
+		if (null === $params) {
+			$params = array();
+		}
 		if (!$this->_getGearmanEnabled()) {
 			return $this->_run(CM_Params::factory($params));
 		}
@@ -23,9 +26,12 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param array $params
+	 * @param array|null $params
 	 */
-	final public function queue(array $params) {
+	final public function queue(array $params = null) {
+		if (null === $params) {
+			$params = array();
+		}
 		if (!$this->_getGearmanEnabled()) {
 			$this->_run(CM_Params::factory($params));
 			return;
