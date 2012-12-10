@@ -19,8 +19,8 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string|null $indexName Index name, if not provided all indexes will be updated.
-	 * @param string|null $host      Elastic search server host.
-	 * @param int|null    $port      Elastic search server port.
+	 * @param string|null $host      Elasticsearch host
+	 * @param int|null    $port      Elasticsearch port
 	 * @throws CM_Exception_Invalid
 	 */
 	public function update($indexName = null, $host = null, $port = null) {

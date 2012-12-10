@@ -41,12 +41,15 @@ class CM_Cli_Command {
 		foreach ($this->_getRequiredParameters() as $paramName) {
 			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
 		}
-		$helpText .=  PHP_EOL;
 		$optionalParameters = $this->_getOptionalParameters();
 		if ($optionalParameters) {
 			foreach ($optionalParameters as $paramName => $defaultValue) {
 				$paramName = CM_Util::uncamelize($paramName);
-				$helpText .= '   --' . str_pad($paramName, max(strlen($paramName) + 5, 20), ' ') . $this->_getParamDoc($paramName) . PHP_EOL;
+				$valueDoc = $this->_getParamDoc($paramName);
+				if (empty($valueDoc)) {
+					$valueDoc = 'value';
+				}
+				$helpText .= ' [--' . $paramName . '=<' . $valueDoc . '>]';
 			}
 		}
 		return $helpText;

@@ -38,12 +38,18 @@ class CM_Cli_CommandManager {
 	 * @return string
 	 */
 	public function getHelp($packageName = null) {
-		$helpHeader = 'Available commands:';
-		$helpHeader .= PHP_EOL . str_repeat('-', strlen($helpHeader)) . PHP_EOL;
+		$helpHeader = '';
+		$helpHeader .= 'Usage:' . PHP_EOL;
+		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
+		$helpHeader .= PHP_EOL;
+		$helpHeader .= 'Options:' . PHP_EOL;
+		$helpHeader .= ' --quiet' . PHP_EOL;
+		$helpHeader .= PHP_EOL;
+		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
 		foreach ($this->getCommands() as $command) {
 			if (!$command->isAbstract() && (!$packageName || $packageName === $command->getPackageName())) {
-				$help .= $command->getHelp() . PHP_EOL;
+				$help .= ' ' . $command->getHelp() . PHP_EOL;
 			}
 		}
 		if ($packageName && !$help) {
