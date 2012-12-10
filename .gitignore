@@ -1,0 +1,6 @@
+.idea
+.vagrant
+vendor
+composer.lock
+
+tests/tmp
