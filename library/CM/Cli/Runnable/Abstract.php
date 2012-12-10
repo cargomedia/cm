@@ -29,15 +29,8 @@ abstract class CM_Cli_Runnable_Abstract {
 			'Class name' => get_class($this),
 		);
 		foreach ($details as $name => $value) {
-			$this->_echo(str_pad($name . ':', 20) . $value);
+			$this->_getOutput()->writeln(str_pad($name . ':', 20) . $value);
 		}
-	}
-
-	/**
-	 * @param string $value
-	 */
-	protected function _echo($value) {
-		$this->_output->writeln($value);
 	}
 
 	/**

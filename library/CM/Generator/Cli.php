@@ -41,7 +41,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/library/' . $namespace;
 		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/layout/default';
 		foreach ($paths as $path) {
-			$this->_echo('Creating `'  . $path . '`...');
+			$this->_getOutput()->writeln('Creating `'  . $path . '`...');
 			CM_Util::mkDir($path);
 		}
 	}
