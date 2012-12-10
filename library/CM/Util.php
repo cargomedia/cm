@@ -62,11 +62,11 @@ class CM_Util {
 	 */
 	public static function getNamespace($className) {
 		$className = (string) $className;
-		$position = strpos($className, '_');
-		if (false === $position || 0 === $position) {
+		$tail = strpbrk($className, '_\\');
+		$namespace = substr($className, 0, -strlen($tail));
+		if (!$namespace) {
 			throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
 		}
-		$namespace = substr($className, 0, $position);
 		return $namespace;
 	}
 
