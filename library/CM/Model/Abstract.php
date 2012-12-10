@@ -172,6 +172,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected function _onChange() {
 	}
 
+	protected function _onCreate() {
+	}
+
 	protected function _onDelete() {
 	}
 
@@ -251,6 +254,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($model->_getContainingCacheables() as $cacheable) {
 			$cacheable->_change();
 		}
+		$model->_onCreate();
 		return $model;
 	}
 

@@ -108,7 +108,15 @@ class CM_Model_AbstractTest extends TestCase{
 		$this->assertEquals(0, $modelMock->onChangeCounter);
 		$modelMock->_change();
 		$this->assertEquals(1, $modelMock->onChangeCounter);
+	}
 
+	public function testOnCreate() {
+		/** @var CM_ModelMock $modelMock  */
+		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$this->assertEquals(1, $modelMock->onCreateCounter);
+
+		$modelMock = new CM_ModelMock($modelMock->getId());
+		$this->assertEquals(0, $modelMock->onCreateCounter);
 	}
 
 	public function testSerializable () {
@@ -180,6 +188,7 @@ class CM_Model_AbstractTest extends TestCase{
 class CM_ModelMock extends CM_Model_Abstract {
 
 	public $onChangeCounter = 0;
+	public $onCreateCounter = 0;
 
 	public function getFoo() {
 		return (string) $this->_get('foo');
@@ -199,6 +208,10 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 	protected function _onChange() {
 		$this->onChangeCounter++;
+	}
+
+	protected function _onCreate() {
+		$this->onCreateCounter++;
 	}
 
 	protected function _onDelete() {
