@@ -81,9 +81,9 @@
 }
 
 .message() {
-	color: white;
-	background: #f5c400;
-	border-color: #fcad66;
+	color: @colorFg;
+	.border(@colorBgButtonAlt);
+	.background-color(lighten(@colorNotice, 48));
 }
 
 .error() {
