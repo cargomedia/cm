@@ -202,7 +202,12 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 */
 	public static function create($path, $content = null) {
-		return new static(CM_Filesystem::getInstance()->createFile($path, $content));
+		$content = (string) $content;
+		if (false === file_put_contents($path, $content)) {
+			throw new CM_Exception('Cannot write to `' . $path . '`.');
+		}
+		$file = new static($path);
+		return $file;
 	}
 
 	/**

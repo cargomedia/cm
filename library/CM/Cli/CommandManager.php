@@ -117,7 +117,6 @@ class CM_Cli_CommandManager {
 	 */
 	private function _setOutput($output) {
 		$this->_output = $output;
-		CM_Filesystem::getInstance()->setOutput($output);
 	}
 
 }

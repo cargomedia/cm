@@ -115,11 +115,6 @@ class CM_Cli_Command {
 		return trim($matches[1]);
 	}
 
-	private function _setOutput(CM_Output_Interface $output) {
-		$this->_output = $output;
-		CM_Filesystem::getInstance()->setOutput($output);
-	}
-
 	/**
 	 * @return string
 	 */
