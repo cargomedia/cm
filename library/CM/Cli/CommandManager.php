@@ -74,11 +74,11 @@ class CM_Cli_CommandManager {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
 			if (!$packageName) {
-				$this->_streamOutput->writeln($this->getHelp());
+				$this->_streamError->writeln($this->getHelp());
 				return 1;
 			}
 			if (!$methodName) {
-				$this->_streamOutput->writeln($this->getHelp($packageName));
+				$this->_streamError->writeln($this->getHelp($packageName));
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
