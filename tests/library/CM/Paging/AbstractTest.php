@@ -384,9 +384,11 @@ class CM_Paging_AbstractTest extends TestCase {
 	}
 
 	public function testGetItemsRawTree() {
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 2, 'type' => 1, 'amount' => 2),
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1),
+			array('id' => 2, 'type' => 1, 'amount' => 2),
 			array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4))));
-		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2), 3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
+		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
+			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
 
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1,2)));
 		try {
