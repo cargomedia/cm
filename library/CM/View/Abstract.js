@@ -185,7 +185,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	ajax: function(functionName, params, options) {
 		options = _.defaults(options || {}, {
-			'modal': true
+			'modal': false
 		});
 		params = params || {};
 		var handler = this;
@@ -230,11 +230,14 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} functionName
 	 * @param {Object|Null} [params]
-	 * @param {Object|Null} [callbacks]
+	 * @param {Object|Null} [options]
 	 * @return jqXHR
 	 */
-	ajaxModal: function(functionName, params, callbacks) {
-		return this.ajax(functionName, params, callbacks, true);
+	ajaxModal: function(functionName, params, options) {
+		options = _.defaults(options || {}, {
+			'modal': true
+		});
+		return this.ajax(functionName, params, options);
 	},
 
 	/**
@@ -247,7 +250,8 @@ var CM_View_Abstract = Backbone.View.extend({
 		options = _.defaults(options || {}, {
 			'success': function() {
 				this.popOut();
-			}
+			},
+			'modal': true
 		});
 		params = params || {};
 		params.className = className;
