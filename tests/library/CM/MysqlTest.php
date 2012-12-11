@@ -16,6 +16,7 @@ class CM_MysqlTest extends TestCase {
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`foo` VARCHAR(100) NOT NULL,
 						`bar` VARCHAR(100) NULL,
+						`sequence` INT UNSIGNED NOT NULL,
 						PRIMARY KEY (`id`)
 						) ENGINE=MyISAM DEFAULT CHARSET=utf8;');
 	}
@@ -183,5 +184,62 @@ class CM_MysqlTest extends TestCase {
 		$affectedRows = CM_Mysql::delete(TBL_TEST, array('foo' => 'foo4'));
 		$this->assertInternalType('int', $affectedRows);
 		$this->assertEquals(2, $affectedRows);
+	}
+
+	public function testUpdateSequence() {
+		$id1 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 1));
+		$id2 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 2));
+		$id3 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 3));
+		$id4 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 1));
+		$id5 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 2));
+		$id6 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 3));
+		CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), 2, array('id' => $id1));
+		$this->assertRow(TBL_TEST, array('id' => $id1, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id2, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id3, 'sequence' => 3));
+		$this->assertRow(TBL_TEST, array('id' => $id4, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id5, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id6, 'sequence' => 3));
+		CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), 1, array('id' => $id3));
+		$this->assertRow(TBL_TEST, array('id' => $id1, 'sequence' => 3));
+		$this->assertRow(TBL_TEST, array('id' => $id2, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id3, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id4, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id5, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id6, 'sequence' => 3));
+
+	}
+
+	public function testUpdateSequenceOutOfBounds() {
+		$id = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 1));
+		try {
+			CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), 2, array('id' => $id));
+			$this->fail('Sequence not out of bounds.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Sequence out of bounds.', $ex->getMessage());
+		}
+		try {
+			CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), 0, array('id' => $id));
+			$this->fail('Sequence not out of bounds.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Sequence out of bounds.', $ex->getMessage());
+		}
+	}
+
+	public function testUpdateSequenceInvalidWhere() {
+		$id = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 1));
+		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 1));
+		try {
+			CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo2'), 1, array('id' => $id));
+			$this->fail('Able to retrieve original sequence number.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Could not retrieve original sequence number.', $ex->getMessage());
+		}
+		try {
+			CM_Mysql::updateSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), 1, array('id' => 2));
+			$this->fail('Able to retrieve original sequence number.');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Could not retrieve original sequence number.', $ex->getMessage());
+		}
 	}
 }

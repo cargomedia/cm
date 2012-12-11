@@ -393,6 +393,41 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @param array  $where
+	 * @param int    $value
+	 * @param array  $whereRow
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function updateSequence($table, $column, array $where, $value, array $whereRow) {
+		$table = (string) $table;
+		$column = (string) $column;
+		$value = (int) $value;
+		if ($value <= 0 || $value > self::count($table, $where)) {
+			throw new CM_Exception_Invalid('Sequence out of bounds.');
+		}
+		$valueOld = self::select($table, $column, array_merge($whereRow, $where))->fetchOne();
+		if (false === $valueOld) {
+			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
+		}
+		$valueOld = (int) $valueOld;
+
+		if ($value > $valueOld) {
+			$upperBound = $value;
+			$lowerBound = $valueOld;
+			$direction = -1;
+		} else {
+			$upperBound = $valueOld;
+			$lowerBound = $value;
+			$direction = 1;
+		}
+		$queryWhere = self::_queryWhere($where);
+		CM_Mysql::exec("UPDATE `?` SET `?` = `?` + ? " . $queryWhere . " AND `?` BETWEEN ? AND ?", $table, $column, $column, $direction, $column, $lowerBound, $upperBound);
+		CM_Mysql::update($table, array($column => $value), array_merge($whereRow, $where));
+	}
+
+	/**
 	 * @param string       $table
 	 * @param string|array $where Associative array field=>value OR string
 	 * @return int Affected rows
