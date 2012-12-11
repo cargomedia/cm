@@ -242,4 +242,21 @@ class CM_MysqlTest extends TestCase {
 			$this->assertContains('Could not retrieve original sequence number.', $ex->getMessage());
 		}
 	}
+
+	public function testDeleteSequence() {
+		CM_Mysql::deleteSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), array('id' => 1));
+		$id1 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 1));
+		$id2 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 2));
+		$id3 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 3));
+		$id4 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 1));
+		$id5 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 2));
+		$id6 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 3));
+		CM_Mysql::deleteSequence(TBL_TEST, 'sequence', array('foo' => 'foo1'), array('id' => $id1));
+		$this->assertRow(TBL_TEST, array('id' => $id2, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id3, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id4, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id5, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id6, 'sequence' => 3));
+		$this->assertNotRow(TBL_TEST, array('id' => $id1));
+	}
 }

@@ -423,8 +423,25 @@ class CM_Mysql extends CM_Class_Abstract {
 			$direction = 1;
 		}
 		$queryWhere = self::_queryWhere($where);
-		CM_Mysql::exec("UPDATE `?` SET `?` = `?` + ? " . $queryWhere . " AND `?` BETWEEN ? AND ?", $table, $column, $column, $direction, $column, $lowerBound, $upperBound);
+		CM_Mysql::exec("UPDATE `?` SET `?` = `?` + ? " . $queryWhere .
+				" AND `?` BETWEEN ? AND ?", $table, $column, $column, $direction, $column, $lowerBound, $upperBound);
 		CM_Mysql::update($table, array($column => $value), array_merge($whereRow, $where));
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $column
+	 * @param array  $where
+	 * @param array  $whereRow
+	 */
+	public static function deleteSequence($table, $column, array $where, array $whereRow) {
+		$table = (string) $table;
+		$column = (string) $column;
+		$sequenceMax = self::count($table, $where);
+		if ($sequenceMax) {
+			self::updateSequence($table, $column, $where, $sequenceMax, $whereRow);
+			self::delete($table, array_merge($whereRow, $where));
+		}
 	}
 
 	/**
