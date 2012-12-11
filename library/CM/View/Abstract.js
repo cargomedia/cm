@@ -180,18 +180,19 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} functionName
 	 * @param {Object|Null} [params]
-	 * @param {Object|Null} [callbacks]
-	 * @param {Boolean|Null} [modal]
+	 * @param {Object|Null} [options]
 	 * @return jqXHR
 	 */
-	ajax: function(functionName, params, callbacks, modal) {
-		callbacks = callbacks || {};
+	ajax: function(functionName, params, options) {
+		options = _.defaults(options || {}, {
+			'modal': true
+		});
 		params = params || {};
 		var handler = this;
 
-		if (modal) {
-			var callbackComplete = callbacks.complete;
-			callbacks.complete = function() {
+		if (options.modal) {
+			var callbackComplete = options.complete;
+			options.complete = function() {
 				handler.enable();
 				if (callbackComplete) {
 					return callbackComplete(handler);
@@ -205,18 +206,18 @@ var CM_View_Abstract = Backbone.View.extend({
 				if (response.exec) {
 					new Function(response.exec).call(handler);
 				}
-				if (callbacks.success) {
-					return callbacks.success.call(handler, response.data);
+				if (options.success) {
+					return options.success.call(handler, response.data);
 				}
 			},
 			error: function(msg, type, isPublic) {
-				if (callbacks.error) {
-					return callbacks.error.call(handler, msg, type, isPublic);
+				if (options.error) {
+					return options.error.call(handler, msg, type, isPublic);
 				}
 			},
 			complete: function() {
-				if (callbacks.complete) {
-					return callbacks.complete.call(handler);
+				if (options.complete) {
+					return options.complete.call(handler);
 				}
 			}
 		});
@@ -240,20 +241,21 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {String} className
 	 * @param {Object|Null} [params]
 	 * @param {Object|Null} [options]
-	 * @param {Boolean|Null} [skipModal]
 	 * @return jqXHR
 	 */
-	loadComponent: function(className, params, options, skipModal) {
-		options = options || {};
+	loadComponent: function(className, params, options) {
+		options = _.defaults(options || {}, {
+			'success': function() {
+				this.popOut();
+			}
+		});
 		params = params || {};
 		params.className = className;
-		var success = options.success ? options.success : function() {
-			this.popOut();
-		};
+		var success = options.success;
 		options.success = function(response) {
 			this._injectView(response, success);
 		};
-		return this.ajax('loadComponent', params, options, !skipModal);
+		return this.ajax('loadComponent', params, options);
 	},
 
 	/**
