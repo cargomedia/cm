@@ -30,6 +30,7 @@ abstract class CM_ModelAsset_Abstract extends CM_Class_Abstract implements CM_Ca
 	 */
 	public function _change() {
 		$this->_model->_change();
+		$this->_onChange();
 		return $this;
 	}
 
@@ -51,5 +52,8 @@ abstract class CM_ModelAsset_Abstract extends CM_Class_Abstract implements CM_Ca
 	 */
 	protected function _cacheSet($key, $value) {
 		$this->_model->_set(get_class($this) . ':' . $key, $value);
+	}
+
+	protected function _onChange() {
 	}
 }
