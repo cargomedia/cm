@@ -119,7 +119,8 @@ class CM_Usertext extends CM_Class_Abstract {
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwords = array('search' => array(), 'replace' => '…');
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {
-				$badword = str_replace('*', '[^\s]*', $badword);
+				$badword = preg_quote($badword, '#');
+				$badword = str_replace('\*', '[^\s]*', $badword);
 				$badwords['search'][] = '#(\b' . $badword . '\b)#i';
 			}
 

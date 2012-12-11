@@ -171,4 +171,42 @@ EOD;
 		$actual = new CM_Usertext("a\n\n\n\nb\nc\n");
 		$this->assertEquals("a<br /><br /><br />\nb<br />\nc", $actual->getFormat());
 	}
+
+	public function testCensor() {
+		$replace = '…';
+		$badwords = new CM_Paging_ContentList_Badwords();
+		$badwords->add('foo');
+		$badwords->add('f(o-].)o');
+		$badwords->add('bar*');
+		$badwords->add('*foobar*');
+		TH::clearCache();
+
+		$actual = new CM_Usertext("hello foo there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello foot there");
+		$this->assertEquals("hello foot there", $actual->getPlain());
+
+		$actual = new CM_Usertext("hello f(o-].)o there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+
+		$actual = new CM_Usertext("hello bar there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello bart there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello bar3 there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello bartender there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello bar.de there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello bar. there");
+		$this->assertEquals("hello ${replace}. there", $actual->getPlain());
+
+		$actual = new CM_Usertext("hello foobar there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello XfoobarX there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello mayo.foobar.ran there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+	}
 }
