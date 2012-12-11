@@ -242,8 +242,8 @@ class CM_Paging_AbstractTest extends TestCase {
 		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10), $paging->getItems(0, 7));
 		$this->assertSame(array(10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(10));
 		$this->assertSame(array(13, 14, 16, 17, 19, 20), $paging->getItems(-6));
-		$this->assertSame(array(1,2,4,5,7,8,10,11,13,14,16,17,19,20), $paging->getItems(-30));
-		$this->assertSame(array(1,2,4,5,7,8,10,11,13,14,16,17,19,20), $paging->getItems(-17));
+		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(-30));
+		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20), $paging->getItems(-17));
 
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(0, 20));
 
@@ -346,19 +346,19 @@ class CM_Paging_AbstractTest extends TestCase {
 	}
 
 	public function testGetItemsEvenlyDistributed() {
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1,10));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1, 10));
 		$items = $paging->getItemsEvenlyDistributed(7);
 		$this->assertSame(7, count($items));
-		$this->assertSame(array(1,3,4,6,7,9,10), $items);
+		$this->assertSame(array(1, 3, 4, 6, 7, 9, 10), $items);
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1,30));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Mock(1, 30));
 		$items = $paging->getItemsEvenlyDistributed(6);
 		$this->assertSame(6, count($items));
-		$this->assertSame(array(1,7,13,18,24,30), $items);
+		$this->assertSame(array(1, 7, 13, 18, 24, 30), $items);
 
 		$items = $paging->getItemsEvenlyDistributed(2);
 		$this->assertSame(2, count($items));
-		$this->assertSame(array(1,30), $items);
+		$this->assertSame(array(1, 30), $items);
 
 		$items = $paging->getItemsEvenlyDistributed(1);
 		$this->assertSame(1, count($items));
@@ -370,12 +370,13 @@ class CM_Paging_AbstractTest extends TestCase {
 	}
 
 	public function testGetSum() {
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 1, 'type' => 1, 'amount' => 2),
-			array('id' => 1, 'type' => 1, 'amount' => 3), array('id' => 1, 'type' => 1, 'amount' => 4))));
-		$this->assertSame(10, $paging->getSum('amount') );
-		$this->assertSame(10, $paging->setPage(0,1)->getSum('amount'));
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1), array('id' => 1, 'type' => 1, 'amount' => 2),
-			array('id' => 1, 'type' => 1, 'amount' => 3), array('id' => 1, 'type' => 1))));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1),
+			array('id' => 1, 'type' => 1, 'amount' => 2), array('id' => 1, 'type' => 1, 'amount' => 3),
+			array('id' => 1, 'type' => 1, 'amount' => 4))));
+		$this->assertSame(10, $paging->getSum('amount'));
+		$this->assertSame(10, $paging->setPage(0, 1)->getSum('amount'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1),
+			array('id' => 1, 'type' => 1, 'amount' => 2), array('id' => 1, 'type' => 1, 'amount' => 3), array('id' => 1, 'type' => 1))));
 		try {
 			$paging->getSum('amount');
 		} catch (CM_Exception_Invalid $ex) {
@@ -385,12 +386,12 @@ class CM_Paging_AbstractTest extends TestCase {
 
 	public function testGetItemsRawTree() {
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array('id' => 1, 'type' => 1, 'amount' => 1),
-			array('id' => 2, 'type' => 1, 'amount' => 2),
-			array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4))));
+			array('id' => 2, 'type' => 1, 'amount' => 2), array('id' => 3, 'type' => 1, 'amount' => 3),
+			array('id' => 4, 'type' => 1, 'amount' => 4))));
 		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
 			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1,2)));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1, 2)));
 		try {
 			$paging->getItemsRawTree();
 			$this->fail('Raw item is not an array.');
@@ -398,7 +399,7 @@ class CM_Paging_AbstractTest extends TestCase {
 			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
 		}
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array(1),array(2))));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array(1), array(2))));
 		try {
 			$paging->getItemsRawTree();
 			$this->fail('Raw item has less than two elements.');
