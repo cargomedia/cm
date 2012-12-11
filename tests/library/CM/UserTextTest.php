@@ -179,9 +179,12 @@ EOD;
 		$badwords->add('f(o-].)o');
 		$badwords->add('bar*');
 		$badwords->add('*foobar*');
+		$badwords->add('*zoo*far*');
 		TH::clearCache();
 
 		$actual = new CM_Usertext("hello foo there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello Foo there");
 		$this->assertEquals("hello ${replace} there", $actual->getPlain());
 		$actual = new CM_Usertext("hello foot there");
 		$this->assertEquals("hello foot there", $actual->getPlain());
@@ -208,5 +211,13 @@ EOD;
 		$this->assertEquals("hello ${replace} there", $actual->getPlain());
 		$actual = new CM_Usertext("hello mayo.foobar.ran there");
 		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+
+		$actual = new CM_Usertext("hello zoofar there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+
+		$actual = new CM_Usertext("hello zoo!!far there");
+		$this->assertEquals("hello ${replace} there", $actual->getPlain());
+		$actual = new CM_Usertext("hello zoo far there");
+		$this->assertEquals("hello zoo far there", $actual->getPlain());
 	}
 }
