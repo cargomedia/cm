@@ -1,5 +1,5 @@
 {
-	"name": "cargomedia/cm",
+	"name": "cargomedia/CM",
 	"require": {
 		"smarty/smarty": "3.1.*",
 		"leafo/lessphp": "0.3.*",
