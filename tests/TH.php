@@ -38,7 +38,7 @@ class TH {
 		}
 
 		try {
-			CM_Mysql::exec('SELECT 1');
+			CM_Mysql::selectDb($dbName);
 		} catch (CM_Mysql_DbSelectException $e) {
 			CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
 
