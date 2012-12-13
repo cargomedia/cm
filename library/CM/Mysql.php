@@ -217,7 +217,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 */
 	public static function execRead() {
 		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
-		return self::query($query, true);
+		return self::query($query, self::_getConfig()->loadFromSlave);
 	}
 
 	/**
