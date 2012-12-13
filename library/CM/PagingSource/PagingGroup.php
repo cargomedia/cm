@@ -2,10 +2,10 @@
 
 class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 
-	/** @var array */
+	/** @var array|null */
 	private $_groupedItems;
 
-	/**    @var CM_Paging_Abstract */
+	/** @var CM_Paging_Abstract */
 	private $_paging;
 
 	/** @var Closure */
@@ -37,12 +37,13 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	 */
 	private function _getGroupedItems() {
 		if (null === $this->_groupedItems) {
-			$this->_groupedItems = array();
+			$groupedItems = array();
 			$getGroupKey = $this->_getGroupKey;
 			foreach ($this->_paging as $item) {
-				$this->_groupedItems[$getGroupKey($item)][] = $item;
+				$groupedItems[$getGroupKey($item)][] = $item;
 			}
+			$this->_groupedItems = array_values($groupedItems);
 		}
-		return array_values($this->_groupedItems);
+		return $this->_groupedItems;
 	}
 }
