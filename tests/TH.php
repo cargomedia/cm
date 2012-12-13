@@ -30,15 +30,18 @@ class TH {
 
 		// Import db
 		$dbName = CM_Config::get()->CM_Mysql->db;
-		try {
-			CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
-		} catch (CM_Mysql_DbSelectException $e) {
-			// Database does not exist
-		}
-		CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
-		CM_Mysql::selectDb($dbName);
-		foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-			CM_Mysql::runDump($dbName, $dump);
+		if (CM_Config::get()->TH->dropDatabase) {
+			try {
+				CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
+			} catch (CM_Mysql_DbSelectException $e) {
+				// Database does not exist
+			}
+			CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
+
+			CM_Mysql::selectDb($dbName);
+			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
+				CM_Mysql::runDump($dbName, $dump);
+			}
 		}
 
 		self::$_configBackup = serialize(CM_Config::get());
