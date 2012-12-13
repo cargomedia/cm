@@ -28,7 +28,6 @@ class TH {
 		!is_dir(DIR_DATA) ? mkdir(DIR_DATA) : null;
 		!is_dir(DIR_USERFILES) ? mkdir(DIR_USERFILES) : null;
 
-		// Import db
 		$dbName = CM_Config::get()->CM_Mysql->db;
 		if (CM_Config::get()->TH->dropDatabase) {
 			try {
@@ -36,6 +35,11 @@ class TH {
 			} catch (CM_Mysql_DbSelectException $e) {
 				// Database does not exist
 			}
+		}
+
+		try {
+			CM_Mysql::exec('SELECT 1');
+		} catch (CM_Mysql_DbSelectException $e) {
 			CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
 
 			CM_Mysql::selectDb($dbName);
