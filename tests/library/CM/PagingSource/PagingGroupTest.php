@@ -25,7 +25,7 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 	private function _getPagingSource() {
 		$paging = $this->getMockForAbstractClass('CM_Paging_Abstract', array(new CM_PagingSource_Array(range(0, 100))));
 		$pagingSource = new CM_PagingSource_PagingGroup($paging, function($value) {
-			return $value % 20;
+			return $value % 20 . 'keyValue';
 		});
 
 		return $pagingSource;

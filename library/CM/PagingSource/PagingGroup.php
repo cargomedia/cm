@@ -43,6 +43,6 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 				$this->_groupedItems[$getGroupKey($item)][] = $item;
 			}
 		}
-		return $this->_groupedItems;
+		return array_values($this->_groupedItems);
 	}
 }
