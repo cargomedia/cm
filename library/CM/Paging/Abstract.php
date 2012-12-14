@@ -9,6 +9,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	private $_iteratorItems, $_iteratorPosition = 0;
 	private $_filters = array();
 
+	/** @var boolean */
+	private $_flattenItems = true;
+
 	/**
 	 * @param CM_PagingSource_Abstract $source
 	 */
@@ -67,7 +70,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		$items = array();
 		if ($countMax > 0) {
 			$interval = ($countMax == 1) ? 1 : ($count - 1) / ($countMax - 1);
-			for($i = 0; $i < $countMax; $i++) {
+			for ($i = 0; $i < $countMax; $i++) {
 				$index = (int) round($i * $interval);
 				$items[] = $this->getItem($index);
 			}
@@ -253,6 +256,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @param boolean $state
+	 */
+	public function setFlattenItems($state){
+		$this->_flattenItems = (bool) $state;
+	}
+
+	/**
 	 * @return int Multiple of items per page to load from CM_PagingSource_Abstract
 	 */
 	protected function _getPageFillRate() {
@@ -308,8 +318,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 				$count = ($this->_pageSize === null) ? null : ceil($this->_pageSize * $this->_getPageFillRate());
 				$itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
 				foreach ($itemsRaw as &$itemRaw) {
-					if (is_array($itemRaw) && count($itemRaw) == 1) {
-						$itemRaw = reset($itemRaw);
+					if ($this->_flattenItems) {
+						if (is_array($itemRaw) && count($itemRaw) == 1) {
+							$itemRaw = reset($itemRaw);
+						}
 					}
 					$this->_itemsRaw[] = $itemRaw;
 				}
