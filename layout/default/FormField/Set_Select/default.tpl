@@ -21,14 +21,16 @@
 	{if $placeholder}
 		<option value="">- {translate 'Select'} -</option>
 	{/if}
-	{foreach $optionList as $itemValue => $itemLabel}
-		<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>
-			{if $translate}
-					{translate "{$translatePrefix}{$itemLabel}"|escape}
-				{else}
-					{$itemLabel|escape}
-				{/if}
-		</option>
-	{/foreach}
+	{block name='values'}
+		{foreach $optionList as $itemValue => $itemLabel}
+			<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>
+				{if $translate}
+						{translate "{$translatePrefix}{$itemLabel}"|escape}
+					{else}
+						{$itemLabel|escape}
+					{/if}
+			</option>
+		{/foreach}
+	{/block}
 </select>
 {/if}
