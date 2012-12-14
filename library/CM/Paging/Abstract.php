@@ -180,6 +180,13 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @return int|null
+	 */
+	public function getPageSize() {
+		return $this->_pageSize;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getPageCount() {
