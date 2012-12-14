@@ -256,15 +256,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param boolean $flattenItems
-	 * @throws CM_Exception_InvalidParam
+	 * @param boolean $state
 	 */
-	public function setFlattenItems($flattenItems){
-		if (!is_bool($flattenItems)) {
-			throw new CM_Exception_InvalidParam('FlattenItems must be of type boolean ' . gettype($flattenItems) . ' was given');
-		}
-
-		$this->_flattenItems = $flattenItems;
+	public function setFlattenItems($state){
+		$this->_flattenItems = (bool) $state;
 	}
 
 	/**

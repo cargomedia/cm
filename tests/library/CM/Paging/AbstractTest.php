@@ -424,12 +424,5 @@ class CM_Paging_AbstractTest extends TestCase {
 		$pagingGroup = $this->getMockForAbstractClass('CM_Paging_Abstract', array($pagingSource));
 		$pagingGroup->setFlattenItems(false);
 		$this->assertSame(array(10), $pagingGroup->getItem(10));
-
-		try {
-			$pagingGroup->setFlattenItems(134);
-			$this->fail('Could setFlattenItems with integer');
-		} catch (CM_Exception_InvalidParam $e) {
-			$this->assertTrue(true);
-		}
 	}
 }
