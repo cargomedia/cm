@@ -425,4 +425,11 @@ class CM_Paging_AbstractTest extends TestCase {
 		$pagingGroup->setFlattenItems(false);
 		$this->assertSame(array(10), $pagingGroup->getItem(10));
 	}
+
+	public function testGetPageSize() {
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1, 2)));
+		$this->assertNull($paging->getPageSize());
+		$paging->setPage(1, 10);
+		$this->assertSame(10, $paging->getPageSize());
+	}
 }
