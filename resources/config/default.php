@@ -67,7 +67,7 @@ $config->CM_Mysql->user = 'root';
 $config->CM_Mysql->pass = 'root';
 $config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Mysql->servers_read = array();
-$config->CM_Mysql->loadFromSlave = true;
+$config->CM_Mysql->serversReadEnabled = true;
 
 $config->CM_Action_Abstract = new stdClass();
 
