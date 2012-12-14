@@ -141,11 +141,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 		}
 
-		if (self::_getConfig()->loadFromSlave) {
-			$row = CM_Mysql::execRead($query, $this->getId())->fetchAssoc();
-		} else {
-			$row = CM_Mysql::exec($query, $this->getId())->fetchAssoc();
-		}
+		$row = CM_Mysql::execRead($query, $this->getId())->fetchAssoc();
 		if (!$row) {
 			throw new CM_Exception_Invalid('Cannot load location `' . $this->getId() . '` on level `' . $this->getLevel() . '`.');
 		}

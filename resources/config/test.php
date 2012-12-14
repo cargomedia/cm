@@ -9,14 +9,13 @@ $config->CM_Mail->send = false;
 $config->CM_Search->enabled = false;
 
 $config->CM_Mysql->db = $config->CM_Mysql->db . '_test';
+$config->CM_Mysql->serversReadEnabled = false;
 
 $config->CM_Model_DeviceCapabilities->adapter = null;
 
 $config->CM_Model_Splittest->withoutPersistence = true;
 
 $config->CM_Model_Splitfeature->withoutPersistence = true;
-
-$config->CM_Model_Location->loadFromSlave = false;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
