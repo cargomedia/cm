@@ -4,11 +4,13 @@
 		<li class="list_label {$name}_value_{$itemValue}" {if $colSize}style="width:{$colSize};"{/if}>
 			<input id="{$id}-{$itemValue}" name="{$name}" type="radio" value="{$itemValue|escape}" {if $itemValue==$value}checked="checked"{/if} />
 			<label for="{$id}-{$itemValue}" class="{$name}_label_{$itemValue}">
-				{if $translate}
-					{translate "{$translatePrefix}{$itemLabel}"|escape}
-				{else}
-					{$itemLabel|escape}
-				{/if}
+				{block name='label'}
+					{if $translate}
+						{translate "{$translatePrefix}{$itemLabel}"|escape}
+					{else}
+						{$itemLabel|escape}
+					{/if}
+				{/block}
 			</label>
 		</li>
 	{/foreach}
@@ -21,16 +23,16 @@
 	{if $placeholder}
 		<option value="">- {translate 'Select'} -</option>
 	{/if}
-	{block name='values'}
-		{foreach $optionList as $itemValue => $itemLabel}
-			<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>
+	{foreach $optionList as $itemValue => $itemLabel}
+		<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>
+			{block name='label'}
 				{if $translate}
-						{translate "{$translatePrefix}{$itemLabel}"|escape}
-					{else}
-						{$itemLabel|escape}
-					{/if}
-			</option>
-		{/foreach}
-	{/block}
+					{translate "{$translatePrefix}{$itemLabel}"|escape}
+				{else}
+					{$itemLabel|escape}
+				{/if}
+			{/block}
+		</option>
+	{/foreach}
 </select>
 {/if}
