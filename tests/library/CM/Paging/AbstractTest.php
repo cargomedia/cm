@@ -407,4 +407,22 @@ class CM_Paging_AbstractTest extends TestCase {
 			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
 		}
 	}
+
+	public function testFlattenItems() {
+		$paging = $this->getMockForAbstractClass('CM_Paging_Abstract', array(new CM_PagingSource_Array(range(0, 20))));
+		$pagingSource = new CM_PagingSource_PagingGroup($paging, function ($value) {
+			if (10 == $value) {
+				return 'keyValue';
+			}
+			return $value % 10 . 'keyValue';
+		});
+
+		/** @var CM_Paging_Abstract $pagingGroup  */
+		$pagingGroup = $this->getMockForAbstractClass('CM_Paging_Abstract', array($pagingSource));
+		$this->assertSame(10, $pagingGroup->getItem(10));
+
+		$pagingGroup = $this->getMockForAbstractClass('CM_Paging_Abstract', array($pagingSource));
+		$pagingGroup->setFlattenItems(false);
+		$this->assertSame(array(10), $pagingGroup->getItem(10));
+	}
 }
