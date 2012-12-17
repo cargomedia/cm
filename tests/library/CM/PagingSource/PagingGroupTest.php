@@ -18,9 +18,17 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 		$this->assertSame(array(1,21,41,61,81), $itemList[1]);
 		$this->assertSame(array(10), $itemList[10]);
 
-		$itemList = $pagingSource->getItems(5);
-		$this->assertSame(16, count($itemList));
-		$this->assertSame(array(5,25,45,65,85), $itemList[0]);
+		$itemList = $pagingSource->getItems(40, 40);
+		$this->assertSame(20, count($itemList));
+		$this->assertSame(array(40, 60), $itemList[0]);
+
+		try {
+			$pagingSource->getItems(20, 40);
+			$this->fail('Could set Offset which is not a multiple of count');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertTrue(true);
+		}
+
 	}
 
 	private function _getPagingSource() {

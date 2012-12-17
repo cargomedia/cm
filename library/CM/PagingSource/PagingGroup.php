@@ -2,9 +2,6 @@
 
 class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 
-	/** @var array|null */
-	private $_groupedItems;
-
 	/** @var CM_Paging_Abstract */
 	private $_paging;
 
@@ -21,11 +18,18 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	}
 
 	public function getCount($offset = null, $count = null) {
+		$this->_setPage($offset, $count);
 		return $this->_paging->getCount();
 	}
 
 	public function getItems($offset = null, $count = null) {
-		return array_slice($this->_getGroupedItems(), $offset, $count);
+		$this->_setPage($offset, $count);
+		$groupedItems = array();
+		$getGroupKey = $this->_getGroupKey;
+		foreach ($this->_paging->getItems() as $item) {
+			$groupedItems[$getGroupKey($item)][] = $item;
+		}
+		return array_values($groupedItems);
 	}
 
 	protected function _cacheKeyBase() {
@@ -33,17 +37,15 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	}
 
 	/**
-	 * return array
+	 * @param int|null $offset
+	 * @param int|null $count
 	 */
-	private function _getGroupedItems() {
-		if (null === $this->_groupedItems) {
-			$groupedItems = array();
-			$getGroupKey = $this->_getGroupKey;
-			foreach ($this->_paging as $item) {
-				$groupedItems[$getGroupKey($item)][] = $item;
+	private function _setPage($offset = null, $count = null) {
+		if (null !== $offset && null !== $count) {
+			if (0 !== $offset % $count) {
+				throw new CM_Exception_Invalid('Offset (' . $offset . ') is not a multiple of count (' . $count . ')');
 			}
-			$this->_groupedItems = array_values($groupedItems);
+			$this->_paging->setPage(($offset / $count) + 1, $count);
 		}
-		return $this->_groupedItems;
 	}
 }
