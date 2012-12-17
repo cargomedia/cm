@@ -88,45 +88,6 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
-	public function testGetVariationFixtureWithVariationName() {
-		$fixtureId = rand(1, 99999999);
-
-		for ($i = 0; $i < 5; $i++) {
-			/** @var CM_Model_Splittest_Mock $test */
-			$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-			$this->assertSame('v1', $test->getVariationFixture($fixtureId, 'v1'));
-			$this->assertSame('v1', $test->getVariationFixture($fixtureId));
-
-			$test->delete();
-		}
-	}
-
-	public function testGetVariationFixtureWithVariationNameEmpty() {
-		$fixtureId = rand(1, 99999999);
-
-		/** @var CM_Model_Splittest_Mock $test */
-		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('0', '1', '2', '3')));
-		$this->assertSame('0', $test->getVariationFixture($fixtureId, '0'));
-		$this->assertSame('0', $test->getVariationFixture($fixtureId));
-
-		$test->delete();
-	}
-
-	public function testGetVariationFixtureWithVariationNameInvalid() {
-		$fixtureId = rand(1, 99999999);
-
-		/** @var CM_Model_Splittest_Mock $test */
-		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-		try {
-			$test->getVariationFixture($fixtureId, 'v3');
-			$this->fail('Could get variation fixture with invalid variationName');
-		} catch (CM_Exception_Invalid $e) {
-			$this->assertContains('has no variation `v3`', $e->getMessage());
-		}
-
-		$test->delete();
-	}
-
 	public function testDelete() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test->delete();
@@ -155,17 +116,11 @@ class CM_Model_SplittestTest extends TestCase {
 
 	public function testIsVariationFixture() {
 		$fixtureId = rand(1, 999999999);
-		$fixtureId2 = $fixtureId + 1;
-		$fixtureId3 = $fixtureId2 + 1;
 
 		/** @var CM_Model_Splittest_Mock $test */
 		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
-		$isVariationFixture = $test->isVariationFixture($fixtureId, 'v1');
-		$this->assertSame($isVariationFixture, $test->isVariationFixture($fixtureId, 'v1'));
-
-		$this->assertTrue($test->isVariationFixture($fixtureId2, 'v1', 'v1'));
-		$this->assertFalse($test->isVariationFixture($fixtureId3, 'v1', 'v2'));
-
+		$this->assertTrue($test->isVariationFixture($fixtureId, $test->getVariationFixture($fixtureId)));
+		$this->assertFalse($test->isVariationFixture($fixtureId, 'noVariation'));
 	}
 
 	public function testWithoutPersistence() {
@@ -190,20 +145,18 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 	/**
 	 * @param int         $fixtureId
 	 * @param string      $variationName
-	 * @param string|null $forceVariationName
 	 * @return bool
 	 */
-	public function isVariationFixture($fixtureId, $variationName, $forceVariationName = null) {
-		return $this->_isVariationFixture($fixtureId, $variationName, $forceVariationName);
+	public function isVariationFixture($fixtureId, $variationName) {
+		return $this->_isVariationFixture($fixtureId, $variationName);
 	}
 
 	/**
 	 * @param  int            $fixtureId
-	 * @param  string|null    $forceVariationName
 	 * @return string
 	 */
-	public function getVariationFixture($fixtureId, $forceVariationName = null) {
-		return $this->_getVariationFixture($fixtureId, $forceVariationName);
+	public function getVariationFixture($fixtureId) {
+		return $this->_getVariationFixture($fixtureId);
 	}
 
 	/**

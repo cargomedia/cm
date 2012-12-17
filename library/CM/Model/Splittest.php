@@ -97,7 +97,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		if($this->_withoutPersistence) {
+		if ($this->_withoutPersistence) {
 			return array();
 		}
 		$data = CM_Mysql::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetchAssoc();
@@ -149,23 +149,21 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	/**
 	 * @param int         $fixtureId
 	 * @param string      $variationName
-	 * @param string|null $forceVariationName
 	 * @return bool
 	 */
-	protected function _isVariationFixture($fixtureId, $variationName, $forceVariationName = null) {
+	protected function _isVariationFixture($fixtureId, $variationName) {
 		if ($this->_withoutPersistence) {
 			return true;
 		}
-		return ($variationName == $this->_getVariationFixture($fixtureId, $forceVariationName));
+		return ($variationName == $this->_getVariationFixture($fixtureId));
 	}
 
 	/**
 	 * @param int           $fixtureId
-	 * @param string|null   $forceVariationName
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	protected function _getVariationFixture($fixtureId, $forceVariationName = null) {
+	protected function _getVariationFixture($fixtureId) {
 		if ($this->_withoutPersistence) {
 			return '';
 		}
@@ -183,16 +181,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $variationFixtures)) {
-			if (null !== $forceVariationName) {
-				$variation = $this->getVariations()->findByName($forceVariationName);
-				if (!$variation) {
-					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no variation `' . $forceVariationName . '`.');
-				}
-			} else {
-				$variation = $this->getVariationsEnabled()->getItemRand();
-				if (!$variation) {
-					throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
-				}
+			$variation = $this->getVariationsEnabled()->getItemRand();
+			if (!$variation) {
+				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
 			}
 			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId,
 				'variationId' => $variation->getId(), 'createStamp' => time()));
