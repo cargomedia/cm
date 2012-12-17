@@ -11,7 +11,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	private static $_linkReadOnly;
 
 	/**
-	 * @param bool $readOnly OPTIONAL
+	 * @param bool|null $readOnly
+	 * @throws CM_Exception
 	 * @return resource
 	 */
 	public static function connect($readOnly = false) {
@@ -37,11 +38,11 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $db
-	 * @param bool   $readOnly
-	 * @throws CM_Exception
+	 * @param string    $db
+	 * @param bool|null $readOnly
+	 * @throws CM_Mysql_DbSelectException
 	 */
-	public static function selectDb($db, $readOnly = false) {
+	public static function selectDb($db, $readOnly = null) {
 		$link = self::_getLink($readOnly);
 		if (!$link->select_db($db)) {
 			throw new CM_Mysql_DbSelectException('Cannot select database `' . $db . '`');
@@ -103,9 +104,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * Generates a query string for execution.
 	 *
 	 * @param string $query_tpl
-	 * @param mixed  $arg1
-	 * @param mixed  $arg2
-	 * @param mixed  $arg3...
+	 * @param mixed  $arg,...
 	 * @return string
 	 */
 	public static function placeholder() {
@@ -165,12 +164,12 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Sends query to a database server.
 	 *
-	 * @param string $query
-	 * @param bool   $readOnly
+	 * @param string    $query
+	 * @param bool|null $readOnly
 	 * @throws CM_Exception
-	 * @return CM_MysqlResult|true
+	 * @return CM_MysqlResult|bool Mysql-result or TRUE
 	 */
-	public static function query($query, $readOnly = false) {
+	public static function query($query, $readOnly = null) {
 		$readOnly ? CM_Debug::get()->incStats('mysql-read', $query) : CM_Debug::get()->incStats('mysql', $query);
 
 		$link = self::_getLink($readOnly);
@@ -189,10 +188,9 @@ class CM_Mysql extends CM_Class_Abstract {
 	/**
 	 * Compile and execute a query.
 	 *
-	 * @param string $query Can contain ?, @? as placeholders
-	 * @param mixed  $arg1
-	 * @param mixed  $arg2  ...
-	 * @return CM_MysqlResult|int|false Either a CM_MysqlResult, last insert id or affected rows.
+	 * @param string $query
+	 * @param mixed  $arg1,...
+	 * @return CM_MysqlResult|int|bool Mysql-result, last insert id, affected rows or FALSE if none affected
 	 */
 	public static function exec() {
 		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
@@ -211,9 +209,8 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * This might return somewhat stale data
 	 *
 	 * @param string $query Can contain ?, @? as placeholders
-	 * @param mixed  $arg1
-	 * @param mixed  $arg2  ...
-	 * @return CM_MysqlResult
+	 * @param mixed  $arg1,...
+	 * @return CM_MysqlResult|bool
 	 */
 	public static function execRead() {
 		$query = call_user_func_array(array('self', 'placeholder'), func_get_args());
@@ -227,7 +224,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string|array      $attrs Column-name OR Column-names array
 	 * @param string|array|null $where Associative array field=>value OR string
 	 * @param string|null       $order
-	 * @return CM_MysqlResult
+	 * @return CM_MysqlResult|bool
 	 */
 	public static function select($table, $attrs, $where = null, $order = null) {
 		$attrs = (array) $attrs;
@@ -265,6 +262,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @param array|null        $onDuplicateKeyValues
 	 * @param string            $statement
+	 * @throws CM_Exception
 	 * @return string Insert Id
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = self::STMT_INSERT) {
@@ -338,7 +336,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return int Insert Id
 	 */
 	public static function insertDelayed($table, $attr, $value = null, array $onDuplicateKeyValues = null) {
-		if (self::_delayedEnabled()) {
+		if (self::_getConfig()->delayedEnabled) {
 			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT_DELAYED);
 		} else {
 			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT);
@@ -362,7 +360,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return int Insert Id
 	 */
 	public static function replaceDelayed($table, $attr, $value = null) {
-		if (self::_delayedEnabled()) {
+		if (self::_getConfig()->delayedEnabled) {
 			return self::insert($table, $attr, $value, null, self::STMT_REPLACE_DELAYED);
 		} else {
 			return self::insert($table, $attr, $value, null, self::STMT_REPLACE);
@@ -481,7 +479,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return int|false The number of affected rows
+	 * @return int|bool Number of affected rows or FALSE on error
 	 */
 	public static function getAffectedRows() {
 		$affectedRows = self::_getLink()->affected_rows;
@@ -492,7 +490,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return string|false Last insert query autoincrement id.
+	 * @return string|bool Last insert query autoincrement id or FALSE if none available
 	 */
 	public static function getInsertId() {
 		$insertId = self::_getLink()->insert_id;
@@ -545,6 +543,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @param string $table
 	 * @param string $column
 	 * @param string $where OPTIONAL
+	 * @throws CM_Exception
 	 * @return int
 	 */
 	public static function getRandId($table, $column, $where = '1') {
@@ -675,9 +674,4 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 		return 'WHERE ' . $where;
 	}
-
-	private static function _delayedEnabled() {
-		return !IS_TEST;
-	}
-
 }
