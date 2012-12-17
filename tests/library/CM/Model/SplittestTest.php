@@ -116,15 +116,11 @@ class CM_Model_SplittestTest extends TestCase {
 
 	public function testIsVariationFixture() {
 		$fixtureId = rand(1, 999999999);
-		$fixtureId2 = $fixtureId + 1;
-		$fixtureId3 = $fixtureId2 + 1;
 
 		/** @var CM_Model_Splittest_Mock $test */
 		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo1', 'variations' => array('v1', 'v2')));
-		$isVariationFixture = $test->isVariationFixture($fixtureId, 'v1');
-		$this->assertSame($isVariationFixture, $test->isVariationFixture($fixtureId, 'v1'));
-		$this->assertTrue($test->isVariationFixture($fixtureId2, $test->getVariationFixture($fixtureId2)));
-		$this->assertFalse($test->isVariationFixture($fixtureId3, 'noVariation'));
+		$this->assertTrue($test->isVariationFixture($fixtureId, $test->getVariationFixture($fixtureId)));
+		$this->assertFalse($test->isVariationFixture($fixtureId, 'noVariation'));
 	}
 
 	public function testWithoutPersistence() {
