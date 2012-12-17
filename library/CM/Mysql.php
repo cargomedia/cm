@@ -336,7 +336,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return int Insert Id
 	 */
 	public static function insertDelayed($table, $attr, $value = null, array $onDuplicateKeyValues = null) {
-		if (self::_delayedEnabled()) {
+		if (self::_getConfig()->delayedEnabled) {
 			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT_DELAYED);
 		} else {
 			return self::insert($table, $attr, $value, $onDuplicateKeyValues, self::STMT_INSERT);
@@ -360,7 +360,7 @@ class CM_Mysql extends CM_Class_Abstract {
 	 * @return int Insert Id
 	 */
 	public static function replaceDelayed($table, $attr, $value = null) {
-		if (self::_delayedEnabled()) {
+		if (self::_getConfig()->delayedEnabled) {
 			return self::insert($table, $attr, $value, null, self::STMT_REPLACE_DELAYED);
 		} else {
 			return self::insert($table, $attr, $value, null, self::STMT_REPLACE);
@@ -674,9 +674,4 @@ class CM_Mysql extends CM_Class_Abstract {
 		}
 		return 'WHERE ' . $where;
 	}
-
-	private static function _delayedEnabled() {
-		return !IS_TEST;
-	}
-
 }
