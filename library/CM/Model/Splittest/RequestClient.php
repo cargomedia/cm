@@ -6,20 +6,18 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 	/**
 	 * @param CM_Request_Abstract $request
 	 * @param string              $variationName
-	 * @param string|null         $forceVariationName
 	 * @return bool
 	 */
-	public function isVariationFixture(CM_Request_Abstract $request, $variationName, $forceVariationName = null) {
-		return $this->_isVariationFixture($request->getClientId(), $variationName, $forceVariationName);
+	public function isVariationFixture(CM_Request_Abstract $request, $variationName) {
+		return $this->_isVariationFixture($request->getClientId(), $variationName);
 	}
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @param string|null         $forceVariationName
 	 * @return string
 	 */
-	public function getVariationFixture(CM_Request_Abstract $request, $forceVariationName = null) {
-		return $this->_getVariationFixture($request->getClientId(), $forceVariationName);
+	public function getVariationFixture(CM_Request_Abstract $request) {
+		return $this->_getVariationFixture($request->getClientId());
 	}
 
 	/**
