@@ -28,7 +28,6 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
 		}
-
 	}
 
 	private function _getPagingSource() {
