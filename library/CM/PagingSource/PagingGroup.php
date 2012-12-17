@@ -21,7 +21,7 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	}
 
 	public function getCount($offset = null, $count = null) {
-		return count($this->_getGroupedItems());
+		return $this->_paging->getCount();
 	}
 
 	public function getItems($offset = null, $count = null) {

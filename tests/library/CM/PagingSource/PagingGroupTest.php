@@ -6,8 +6,8 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 	public function testGetCount() {
 		$pagingSource = $this->_getPagingSource();
 
-		$this->assertSame(21, $pagingSource->getCount());
-		$this->assertSame(21, $pagingSource->getCount(5));
+		$this->assertSame(101, $pagingSource->getCount());
+		$this->assertSame(101, $pagingSource->getCount(5));
 	}
 
 	public function testGetItems() {
