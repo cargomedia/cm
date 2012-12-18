@@ -337,7 +337,8 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   KEY `splittestId` (`splittestId`),
   KEY `conversionStamp` (`conversionStamp`),
   KEY `createStamp` (`createStamp`),
-  KEY `fixtureId` (`fixtureId`)
+  KEY `fixtureId` (`fixtureId`),
+  KEY `conversionWeight` (`conversionWeight`),
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;
