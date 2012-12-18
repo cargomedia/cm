@@ -331,14 +331,13 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   `fixtureId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `conversionWeight` float(10, 2) DEFAULT 1 NOT NULL,
+  `conversionWeight` decimal(10,2) DEFAULT 1 NOT NULL,
   `conversionStamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`splittestId`,`fixtureId`),
   KEY `splittestId` (`splittestId`),
   KEY `conversionStamp` (`conversionStamp`),
   KEY `createStamp` (`createStamp`),
-  KEY `fixtureId` (`fixtureId`),
-  KEY `conversionWeight` (`conversionWeight`),
+  KEY `fixtureId` (`fixtureId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream`;
