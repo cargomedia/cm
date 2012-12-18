@@ -53,7 +53,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	public function getConversionRate() {
 		$fixtureCount = $this->getFixtureCount();
 		if (0 == $fixtureCount) {
-			return 0;k
+			return 0;
 		}
 		return $this->getConversionWeight() / $fixtureCount;
 	}
