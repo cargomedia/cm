@@ -41,6 +41,7 @@ class CM_Model_Splittest_UserTest extends TestCase {
 
 	public function testSetConversion() {
 		$user = TH::createUser();
+		$user2 = TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
@@ -48,9 +49,12 @@ class CM_Model_Splittest_UserTest extends TestCase {
 		$variation = $test->getVariations()->getItem(0);
 
 		$test->isVariationFixture($user, 'v1');
+		$test->isVariationFixture($user2, 'v1');
 		$this->assertSame(0, $variation->getConversionCount());
 		$test->setConversion($user);
 		$this->assertSame(1, $variation->getConversionCount());
+		$test->setConversion($user2, 2.5);
+		$this->assertSame(1.75, $variation->getConversionRate());
 
 		$test->delete();
 	}
