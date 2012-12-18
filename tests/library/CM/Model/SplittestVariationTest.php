@@ -84,6 +84,35 @@ class CM_Model_SplittestVariationTest extends TestCase {
 		$test->delete();
 	}
 
+	public function testGetConversionWeight() {
+		$user = TH::createUser();
+		$user2 = TH::createUser();
+		$user3 = TH::createUser();
+
+		/** @var CM_Model_Splittest_User $test */
+		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
+		/** @var CM_Model_SplittestVariation $variation */
+		$variation = $test->getVariations()->getItem(0);
+
+		$test->isVariationFixture($user, 'v1');
+		$test->isVariationFixture($user2, 'v1');
+		$test->isVariationFixture($user3, 'v1');
+		$this->assertSame(0.0, $variation->getConversionWeight());
+		$test->setConversion($user, 3.75);
+		$test->setConversion($user2, 3.29);
+		$this->assertSame(7.04, $variation->getConversionWeight());
+		$this->assertSame(2.3466666666667, $variation->getConversionRate());
+
+		try {
+			$test->setConversion($user, -2);
+			$this->fail('Could set Conversion with negative weight');
+		} catch (CM_Exception_InvalidParam $e) {
+			$this->assertTrue(true);
+		}
+
+		$test->delete();
+	}
+
 	public function testGetFixtureCount() {
 		$user1 = TH::createUser();
 		$user2 = TH::createUser();

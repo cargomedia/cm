@@ -40,14 +40,22 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getConversionWeight() {
+		return (float) CM_Mysql::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
+		AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+	}
+
+	/**
 	 * @return float
 	 */
 	public function getConversionRate() {
 		$fixtureCount = $this->getFixtureCount();
 		if (0 == $fixtureCount) {
-			return 0;
+			return 0;k
 		}
-		return $this->getConversionCount() / $fixtureCount;
+		return $this->getConversionWeight() / $fixtureCount;
 	}
 
 	/**
@@ -62,9 +70,9 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return float|null P-value
 	 */
 	public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
-		$conversionsA = $this->getConversionCount();
+		$conversionsA = $this->getConversionWeight();
 		$fixturesA = $this->getFixtureCount();
-		$conversionsB = $variationWorse->getConversionCount();
+		$conversionsB = $variationWorse->getConversionWeight();
 		$fixturesB = $variationWorse->getFixtureCount();
 		if (0 == $fixturesA || 0 == $fixturesB) {
 			return null;
