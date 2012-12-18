@@ -135,7 +135,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int  $fixtureId
+	 * @param int        $fixtureId
 	 * @param float|null $weight
 	 */
 	protected function _setConversion($fixtureId, $weight = null) {
@@ -146,13 +146,13 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			$weight = 1;
 		}
 		if ($weight <= 0) {
-			throw new CM_Exception_InvalidParam('Weight must be positive or null ' . $weight . ' given');
+			throw new CM_Exception_InvalidParam('Weight must be positive or null, `' . $weight . '` given');
 		}
 
 		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(), 'conversionWeight' => $weight), array('splittestId' => $this->getId(),
-			'fixtureId' => $fixtureId));
+		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
+			'conversionWeight' => $weight), array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
 	}
 
 	/**

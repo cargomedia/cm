@@ -40,7 +40,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return float
 	 */
 	public function getConversionWeight() {
 		return (float) CM_Mysql::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
