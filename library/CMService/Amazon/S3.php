@@ -1,6 +1,6 @@
 <?php
 
-class CM_Amazon_S3 extends CM_Amazon_Abstract {
+class CMService_Amazon_S3 extends CMService_Amazon_Abstract {
 
 	/** @var AmazonS3 */
 	private $_sdk;

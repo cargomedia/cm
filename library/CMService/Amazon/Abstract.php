@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Amazon_Abstract extends CM_Class_Abstract {
+abstract class CMService_Amazon_Abstract extends CM_Class_Abstract {
 
 	public function __construct() {
 		$accessKey = self::_getConfig()->accessKey;
