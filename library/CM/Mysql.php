@@ -393,19 +393,16 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $table
-	 * @param string      $column
-	 * @param array|null  $where
-	 * @param int         $value
-	 * @param array       $whereRow
+	 * @param string $table
+	 * @param string $column
+	 * @param array  $where
+	 * @param int    $value
+	 * @param array  $whereRow
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function updateSequence($table, $column, array $where = null, $value, array $whereRow) {
+	public static function updateSequence($table, $column, array $where, $value, array $whereRow) {
 		$table = (string) $table;
 		$column = (string) $column;
-		if (null === $where) {
-			$where = array();
-		}
 		$value = (int) $value;
 		if ($value <= 0 || $value > self::count($table, $where)) {
 			throw new CM_Exception_Invalid('Sequence out of bounds.');
@@ -436,12 +433,12 @@ class CM_Mysql extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $table
-	 * @param string      $column
-	 * @param array|null  $where
-	 * @param array       $whereRow
+	 * @param string $table
+	 * @param string $column
+	 * @param array  $where
+	 * @param array  $whereRow
 	 */
-	public static function deleteSequence($table, $column, array $where = null, array $whereRow) {
+	public static function deleteSequence($table, $column, array $where, array $whereRow) {
 		$table = (string) $table;
 		$column = (string) $column;
 		$sequenceMax = self::count($table, $where);
