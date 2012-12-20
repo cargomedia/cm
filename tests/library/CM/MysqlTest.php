@@ -207,7 +207,18 @@ class CM_MysqlTest extends TestCase {
 		$this->assertRow(TBL_TEST, array('id' => $id4, 'sequence' => 1));
 		$this->assertRow(TBL_TEST, array('id' => $id5, 'sequence' => 2));
 		$this->assertRow(TBL_TEST, array('id' => $id6, 'sequence' => 3));
+	}
 
+	public function testUpdateSequenceWithoutWhere() {
+		$id1 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 1));
+		$id2 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1', 'sequence' => 2));
+		$id3 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 3));
+		$id4 = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo2', 'sequence' => 4));
+		CM_Mysql::updateSequence(TBL_TEST, 'sequence', array(), 4, array('id' => $id1));
+		$this->assertRow(TBL_TEST, array('id' => $id1, 'sequence' => 4));
+		$this->assertRow(TBL_TEST, array('id' => $id2, 'sequence' => 1));
+		$this->assertRow(TBL_TEST, array('id' => $id3, 'sequence' => 2));
+		$this->assertRow(TBL_TEST, array('id' => $id4, 'sequence' => 3));
 	}
 
 	public function testUpdateSequenceOutOfBounds() {

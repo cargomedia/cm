@@ -420,7 +420,11 @@ class CM_Mysql extends CM_Class_Abstract {
 			$lowerBound = $value;
 			$direction = 1;
 		}
-		$queryWhere = self::_queryWhere($where);
+		if (empty($where)) {
+			$queryWhere = 'WHERE 1';
+		} else {
+			$queryWhere = self::_queryWhere($where);
+		}
 		CM_Mysql::exec("UPDATE `?` SET `?` = `?` + ? " . $queryWhere .
 				" AND `?` BETWEEN ? AND ?", $table, $column, $column, $direction, $column, $lowerBound, $upperBound);
 		CM_Mysql::update($table, array($column => $value), array_merge($whereRow, $where));
