@@ -1,12 +1,5 @@
 <?php
 
-class CM_FormField_Money extends CM_FormField_Text {
+class CM_FormField_Money extends CM_FormField_Float {
 
-	public function validate($userInput, CM_Response_Abstract $response) {
-		$userInput = parent::validate($userInput, $response);
-		if (!is_numeric($userInput)) {
-			throw new CM_Exception_FormFieldValidation('Not numeric');
-		}
-		return (float) $userInput;
-	}
 }
