@@ -30,6 +30,11 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 		}
 	}
 
+	public function testStalenessChance(){
+		$pagingSource = $this->_getPagingSource();
+		$this->assertSame(0.1, $pagingSource->getStalenessChance());
+	}
+
 	private function _getPagingSource() {
 		$paging = $this->getMockForAbstractClass('CM_Paging_Abstract', array(new CM_PagingSource_Array(range(0, 100))));
 		$pagingSource = new CM_PagingSource_PagingGroup($paging, function($value) {
