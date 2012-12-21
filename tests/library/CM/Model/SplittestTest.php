@@ -57,21 +57,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$test->delete();
 	}
 
-	public function testGetVariationFixture() {
-		$fixtureId = rand(1, 99999999);
-		/** @var CM_Model_Splittest $test */
-		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-
-		for ($i = 0; $i < 2; $i++) {
-			$variationUser1 = $test->getVariationFixture($fixtureId);
-			$this->assertContains($variationUser1, array('v1', 'v2'));
-			$this->assertSame($variationUser1, $test->getVariationFixture($fixtureId));
-		}
-
-		$test->delete();
-	}
-
-	public function testGetVariationFixtureDisabledVariation() {
+	public function testIsVariationFixtureDisabledVariation() {
 		/** @var CM_Model_Splittest_Mock $test */
 		$test = CM_Model_Splittest_Mock::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		/** @var CM_Model_SplittestVariation $variation1 */
@@ -82,7 +68,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$variation1->setEnabled(false);
 		for ($i = 0; $i < 10; $i++) {
 			$fixtureId = rand(1, 99999999);
-			$this->assertSame($variation2->getName(), $test->getVariationFixture($fixtureId));
+			$this->assertTrue($test->isVariationFixture($fixtureId, $variation2->getName()));
 		}
 
 		$test->delete();
