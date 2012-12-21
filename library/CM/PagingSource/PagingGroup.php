@@ -46,9 +46,6 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	 */
 	private function _setPage($offset = null, $count = null) {
 		if (null !== $offset && null !== $count) {
-			if (0 !== $offset % $count) {
-				throw new CM_Exception_Invalid('Offset (' . $offset . ') is not a multiple of count (' . $count . ')');
-			}
 			$this->_paging->setPage(($offset / $count) + 1, $count);
 		}
 	}
