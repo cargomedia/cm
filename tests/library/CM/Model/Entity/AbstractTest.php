@@ -29,7 +29,7 @@ class CM_Model_Entity_AbstractTest extends TestCase{
 		$user = CM_Model_User::create();
 		CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'bar1'));
 		$entityMock = new CM_Model_Entity_Mock(1);
-		$this->assertEquals($user->getId(), $entityMock->getUserId());
+		$this->assertSame($user->getId(), $entityMock->getUserId());
 	}
 
 	public function testGetUser() {
