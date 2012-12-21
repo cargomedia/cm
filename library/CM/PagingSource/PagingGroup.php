@@ -46,7 +46,7 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 	 */
 	private function _setPage($offset = null, $count = null) {
 		if (null !== $offset && null !== $count) {
-			$this->_paging->setPage(($offset / $count) + 1, $count);
+			$this->_paging->setPage(ceil($offset / $count) + 1, $count);
 		}
 	}
 }
