@@ -32,6 +32,10 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
 		return array_values($groupedItems);
 	}
 
+	public function getStalenessChance() {
+		return 0.1;
+	}
+
 	protected function _cacheKeyBase() {
 		throw new CM_Exception_Invalid('`' . __CLASS__ . '` does not support caching.');
 	}
