@@ -21,13 +21,6 @@ class CM_PagingSource_PagingGroupTest extends TestCase {
 		$itemList = $pagingSource->getItems(40, 40);
 		$this->assertSame(20, count($itemList));
 		$this->assertSame(array(40, 60), $itemList[0]);
-
-		try {
-			$pagingSource->getItems(20, 40);
-			$this->fail('Could set Offset which is not a multiple of count');
-		} catch (CM_Exception_Invalid $e) {
-			$this->assertTrue(true);
-		}
 	}
 
 	public function testStalenessChance(){
