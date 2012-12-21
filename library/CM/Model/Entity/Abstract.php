@@ -27,7 +27,7 @@ abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 	 * @return int User-ID (owner, creator)
 	 */
 	public function getUserId() {
-		return $this->_get('userId');
+		return (int) $this->_get('userId');
 	}
 
 	/**
