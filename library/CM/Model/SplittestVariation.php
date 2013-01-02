@@ -92,10 +92,10 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		$d4 = 0.0000380036;
 		$d5 = 0.0000488906;
 		$d6 = 0.0000053830;
+		$a = abs($x);
 		$p = 1 -
-				0.5 * pow((1 + $d1 * pow($x, 1) + $d2 * pow($x, 2) + $d3 * pow($x, 3) + $d4 * pow($x, 4) + $d5 * pow($x, 5) + $d6 * pow($x, 6)), -16);
+				0.5 * pow((1 + $d1 * pow($a, 1) + $d2 * pow($a, 2) + $d3 * pow($a, 3) + $d4 * pow($a, 4) + $d5 * pow($a, 5) + $d6 * pow($a, 6)), -16);
 		return $p;
-
 	}
 
 	/**
