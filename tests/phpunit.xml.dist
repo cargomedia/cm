@@ -16,6 +16,7 @@
 	<filter>
 		<whitelist>
 			<directory suffix=".php">../library/CM</directory>
+			<directory suffix=".php">../library/CMService</directory>
 		</whitelist>
 	</filter>
 	<logging>
