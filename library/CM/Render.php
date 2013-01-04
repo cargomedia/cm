@@ -20,6 +20,9 @@ class CM_Render extends CM_Class_Abstract {
 	/* @var IntlDateFormatter */
 	private $_formatterDateTime;
 
+	/** @var NumberFormatter */
+	private $_formatterCurrency;
+
 	/* @var bool */
 	private $_languageRewrite;
 
@@ -385,6 +388,16 @@ class CM_Render extends CM_Class_Abstract {
 			$this->_formatterDateTime = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
 		}
 		return $this->_formatterDateTime;
+	}
+
+	/**
+	 * @return NumberFormatter
+	 */
+	public function getFormatterCurrency() {
+		if (!$this->_formatterCurrency) {
+			$this->_formatterCurrency = new NumberFormatter($this->_getLocale(), NumberFormatter::CURRENCY);
+		}
+		return $this->_formatterCurrency;
 	}
 
 	/**
