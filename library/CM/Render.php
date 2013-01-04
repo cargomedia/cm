@@ -270,6 +270,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!in_array($namespace, $site->getNamespaces())) {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
+		/** @var CM_Page_Abstract $pageClassName */
 		$path = $pageClassName::getPath($params);
 
 		$languageRewrite = $this->_languageRewrite || $language;
