@@ -2,60 +2,36 @@
 
 class CM_Render extends CM_Class_Abstract {
 
-	/**
-	 * @var Smarty
-	 */
+	/* @var Smarty */
 	private static $_smarty = null;
 
-	/**
-	 * @var CM_Frontend
-	 */
+	/* @var CM_Frontend */
 	protected $_js = null;
 
-	/**
-	 * @var CM_Site_Abstract
-	 */
+	/* @var CM_Site_Abstract */
 	protected $_site = null;
 
-	/**
-	 * @var CM_Model_Language|null
-	 */
+	/* @var CM_Model_Language|null */
 	private $_language;
 
-	/**
-	 * @var IntlDateFormatter
-	 */
+	/* @var IntlDateFormatter */
 	private $_formatterDate;
 
-	/**
-	 * @var IntlDateFormatter
-	 */
+	/* @var IntlDateFormatter */
 	private $_formatterDateTime;
 
-	/**
-	 * @var bool
-	 */
+	/* @var bool */
 	private $_languageRewrite;
 
-	/**
-	 * @var CM_Model_User|null
-	 */
+	/* @var CM_Model_User|null */
 	private $_viewer;
 
 	public static $block_cap = '';
 
-	/**
-	 * Currently opened blocks stack.
-	 *
-	 * @var array
-	 */
+	/* @var array */
 	public static $block_stack = array();
 
-	/**
-	 * Stack for rendering processes
-	 *
-	 * @var array
-	 */
+	/* @var array */
 	protected $_stack = array();
 
 	/**
