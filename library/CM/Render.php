@@ -25,12 +25,12 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @var IntlDateFormatter
 	 */
-	private $_dateFormatter;
+	private $_formatterDate;
 
 	/**
 	 * @var IntlDateFormatter
 	 */
-	private $_dateTimeFormatter;
+	private $_formatterDateTime;
 
 	/**
 	 * @var bool
@@ -394,21 +394,21 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @return IntlDateFormatter
 	 */
-	public function getDateFormatter() {
-		if (!$this->_dateFormatter) {
-			$this->_dateFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+	public function getFormatterDate() {
+		if (!$this->_formatterDate) {
+			$this->_formatterDate = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 		}
-		return $this->_dateFormatter;
+		return $this->_formatterDate;
 	}
 
 	/**
 	 * @return IntlDateFormatter
 	 */
-	public function getDateTimeFormatter() {
-		if (!$this->_dateTimeFormatter) {
-			$this->_dateTimeFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+	public function getFormatterDateTime() {
+		if (!$this->_formatterDateTime) {
+			$this->_formatterDateTime = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
 		}
-		return $this->_dateTimeFormatter;
+		return $this->_formatterDateTime;
 	}
 
 	/**
