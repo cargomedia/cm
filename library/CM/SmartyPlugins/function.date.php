@@ -7,9 +7,9 @@ function smarty_function_date($params, Smarty_Internal_Template $template) {
 	$time = (int) $params['time'];
 	$showTime = !empty($params['showTime']);
 	if ($showTime) {
-		$formatter = $render->getDateTimeFormatter();
+		$formatter = $render->getFormatterDateTime();
 	} else {
-		$formatter = $render->getDateFormatter();
+		$formatter = $render->getFormatterDate();
 	}
 	return $formatter->format($time);
 }
