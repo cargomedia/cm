@@ -8,8 +8,8 @@ function smarty_function_date_period(array $params, Smarty_Internal_Template $te
 	if (($seconds / (365 * 86400)) >= 1) {
 		$count = floor($seconds / (365 * 86400));
 		$periodName = 'year';
-	} elseif (($seconds / (31 * 86400)) >= 1) {
-		$count = floor($seconds / (31 * 86400));
+	} elseif (($seconds / (30 * 86400)) >= 1) {
+		$count = floor($seconds / (30 * 86400));
 		$periodName = 'month';
 	} elseif (($seconds / (7 * 86400)) >= 1) {
 		$count = floor($seconds / (7 * 86400));
