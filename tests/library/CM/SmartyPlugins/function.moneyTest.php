@@ -27,6 +27,14 @@ class smarty_function_moneyTest extends TestCase {
 		$this->_assertSame("£23.33", array('amount' => 23.33333, 'currency' => 'GBP'));
 	}
 
+	public function testNiceDiscount() {
+		$this->_assertSame("$99.95", array('amount' => 96, 'format' => 'discount'));
+		$this->_assertSame("$16.95", array('amount' => 17, 'format' => 'discount'));
+		$this->_assertSame("$12.95", array('amount' => 13, 'format' => 'discount'));
+		$this->_assertSame("$1.50", array('amount' => 1.5, 'format' => 'discount'));
+		$this->_assertSame("$2.95", array('amount' => 3.1, 'format' => 'discount'));
+	}
+
 	/**
 	 * @param string $expected
 	 * @param array  $params
