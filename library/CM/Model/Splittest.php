@@ -137,6 +137,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	/**
 	 * @param int        $fixtureId
 	 * @param float|null $weight
+	 * @throws CM_Exception_Invalid
 	 */
 	protected function _setConversion($fixtureId, $weight = null) {
 		if ($this->_withoutPersistence) {
@@ -146,7 +147,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			$weight = 1;
 		}
 		if ($weight <= 0) {
-			throw new CM_Exception_InvalidParam('Weight must be positive or null, `' . $weight . '` given');
+			throw new CM_Exception_Invalid('Weight must be positive or null, `' . $weight . '` given');
 		}
 
 		$fixtureId = (int) $fixtureId;
