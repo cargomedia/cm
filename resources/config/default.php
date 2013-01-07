@@ -128,10 +128,6 @@ $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
 $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
 
-$config->CM_Amazon_Abstract = new stdClass();
-$config->CM_Amazon_Abstract->accessKey = '';
-$config->CM_Amazon_Abstract->secretKey = '';
-
 $config->CM_KissTracking = new stdClass();
 $config->CM_KissTracking->enabled = false;
 $config->CM_KissTracking->awsBucketName = '';
@@ -152,3 +148,7 @@ $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhos
 $config->CM_Jobdistribution_Job_Abstract = new stdClass();
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
+
+$config->CMService_Amazon_Abstract = new stdClass();
+$config->CMService_Amazon_Abstract->accessKey = '';
+$config->CMService_Amazon_Abstract->secretKey = '';

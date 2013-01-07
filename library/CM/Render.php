@@ -2,60 +2,39 @@
 
 class CM_Render extends CM_Class_Abstract {
 
-	/**
-	 * @var Smarty
-	 */
+	/* @var Smarty */
 	private static $_smarty = null;
 
-	/**
-	 * @var CM_Frontend
-	 */
+	/* @var CM_Frontend */
 	protected $_js = null;
 
-	/**
-	 * @var CM_Site_Abstract
-	 */
+	/* @var CM_Site_Abstract */
 	protected $_site = null;
 
-	/**
-	 * @var CM_Model_Language|null
-	 */
+	/* @var CM_Model_Language|null */
 	private $_language;
 
-	/**
-	 * @var IntlDateFormatter
-	 */
-	private $_dateFormatter;
+	/* @var IntlDateFormatter */
+	private $_formatterDate;
 
-	/**
-	 * @var IntlDateFormatter
-	 */
-	private $_dateTimeFormatter;
+	/* @var IntlDateFormatter */
+	private $_formatterDateTime;
 
-	/**
-	 * @var bool
-	 */
+	/** @var NumberFormatter */
+	private $_formatterCurrency;
+
+	/* @var bool */
 	private $_languageRewrite;
 
-	/**
-	 * @var CM_Model_User|null
-	 */
+	/* @var CM_Model_User|null */
 	private $_viewer;
 
 	public static $block_cap = '';
 
-	/**
-	 * Currently opened blocks stack.
-	 *
-	 * @var array
-	 */
+	/* @var array */
 	public static $block_stack = array();
 
-	/**
-	 * Stack for rendering processes
-	 *
-	 * @var array
-	 */
+	/* @var array */
 	protected $_stack = array();
 
 	/**
@@ -291,6 +270,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!in_array($namespace, $site->getNamespaces())) {
 			throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
 		}
+		/** @var CM_Page_Abstract $pageClassName */
 		$path = $pageClassName::getPath($params);
 
 		$languageRewrite = $this->_languageRewrite || $language;
@@ -394,21 +374,31 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @return IntlDateFormatter
 	 */
-	public function getDateFormatter() {
-		if (!$this->_dateFormatter) {
-			$this->_dateFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+	public function getFormatterDate() {
+		if (!$this->_formatterDate) {
+			$this->_formatterDate = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 		}
-		return $this->_dateFormatter;
+		return $this->_formatterDate;
 	}
 
 	/**
 	 * @return IntlDateFormatter
 	 */
-	public function getDateTimeFormatter() {
-		if (!$this->_dateTimeFormatter) {
-			$this->_dateTimeFormatter = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+	public function getFormatterDateTime() {
+		if (!$this->_formatterDateTime) {
+			$this->_formatterDateTime = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
 		}
-		return $this->_dateTimeFormatter;
+		return $this->_formatterDateTime;
+	}
+
+	/**
+	 * @return NumberFormatter
+	 */
+	public function getFormatterCurrency() {
+		if (!$this->_formatterCurrency) {
+			$this->_formatterCurrency = new NumberFormatter($this->_getLocale(), NumberFormatter::CURRENCY);
+		}
+		return $this->_formatterCurrency;
 	}
 
 	/**
