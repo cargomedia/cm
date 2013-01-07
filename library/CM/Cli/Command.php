@@ -169,7 +169,7 @@ class CM_Cli_Command {
 		CM_File::create($this->_getPidFilePath(), $pid);
 	}
 
-	public function _deletePidFile() {
+	private function _deletePidFile() {
 		$file = new CM_File($this->_getPidFilePath());
 		$file->delete();
 	}
