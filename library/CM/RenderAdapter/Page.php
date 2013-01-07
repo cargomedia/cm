@@ -26,7 +26,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 	 * @return string
 	 */
 	public function fetchTitle() {
-		return $this->_fetchTpl('title.tpl');
+		return trim($this->_fetchTpl('title.tpl'));
 	}
 
 	protected function _getStackKey() {
