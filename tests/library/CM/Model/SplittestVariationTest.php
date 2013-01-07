@@ -106,7 +106,7 @@ class CM_Model_SplittestVariationTest extends TestCase {
 		try {
 			$test->setConversion($user, -2);
 			$this->fail('Could set Conversion with negative weight');
-		} catch (CM_Exception_InvalidParam $e) {
+		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
 		}
 
