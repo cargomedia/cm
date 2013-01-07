@@ -142,7 +142,7 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @return CM_File
+	 * @return string
 	 */
 	private function _getPidFilePath() {
 		return DIR_DATA_LOCKS . $this->_class->getName() . ':' . $this->_method->getName();
