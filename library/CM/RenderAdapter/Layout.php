@@ -66,6 +66,6 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 	 * @return string
 	 */
 	public function fetchTitle($pageTitle) {
-		return $this->_renderTemplate('title.tpl', array('pageTitle' => $pageTitle));
+		return trim($this->_renderTemplate('title.tpl', array('pageTitle' => $pageTitle)));
 	}
 }
