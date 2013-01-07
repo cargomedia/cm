@@ -35,7 +35,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			$text = preg_replace('#\n#', ' ', $text);
 			$text = preg_replace('#<br\s*/?>#', "\n", $text);
 			$text = preg_replace('#</?p>#', "\n", $text);
-			$text = preg_replace('#<a .*?href="(.+?)".*?>(.+?)</a>#s', '$2 ($1)', $text);
+			$text = preg_replace('#<a .*?href=(["\'])(.+?)\1.*?>(.+?)</a>#s', '$3 ($2)', $text);
 			$text = preg_replace('#<li.*?>\s*(.+?)</li>#s', "* \$1\n", $text);
 			$text = strip_tags($text);
 			$text = preg_replace('#(\n)\s+#', '$1', $text);
