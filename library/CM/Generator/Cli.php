@@ -85,8 +85,9 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	private function _generateViewLayout($className) {
 		$parts = explode('_', $className);
 		$namespace = array_shift($parts);
+		$viewType = array_shift($parts);
 		$pathRelative = implode('_', $parts);
-		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/' . $pathRelative . '/';
+		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/' . $viewType . '/' . $pathRelative . '/';
 		CM_Util::mkDir($layoutPath);
 		$file = CM_File::create($layoutPath . 'default.tpl');
 		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
