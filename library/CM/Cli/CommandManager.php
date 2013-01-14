@@ -94,6 +94,7 @@ class CM_Cli_CommandManager {
 			return 1;
 		} catch (Exception $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$this->_streamError->writeln($e->getTraceAsString());
 			return 1;
 		}
 	}
