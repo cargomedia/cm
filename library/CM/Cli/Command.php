@@ -81,6 +81,13 @@ class CM_Cli_Command {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getName() {
+		return $this->getPackageName() . ' ' . $this->_getMethodName();
+	}
+
+	/**
 	 * @return string[]
 	 */
 	protected function _getRequiredParameters() {
