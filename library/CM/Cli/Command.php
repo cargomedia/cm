@@ -37,7 +37,7 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	public function getHelp() {
-		$helpText = $this->getPackageName() . ' ' . $this->_getMethodName();
+		$helpText = $this->getName();
 		foreach ($this->_getRequiredParameters() as $paramName) {
 			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
 		}
