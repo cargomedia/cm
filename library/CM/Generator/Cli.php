@@ -37,9 +37,9 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
 		foreach ($viewClasses as $path => $className) {
 			$jsPath = preg_replace('/\.php$/', '.js', $path);
-			if (!file_exists($jsPath)) {
+			if (!CM_File::exists($jsPath)) {
 				$jsFile = CM_File_Javascript::createLibraryClass($className);
-				$this->_getOutput()->writeln('Created ' . $jsFile->getPath());
+				$this->_getOutput()->writeln('Created `' . $jsFile->getPath() . '`');
 			}
 		}
 	}
