@@ -24,11 +24,12 @@ class CM_Cli_Command {
 	 * @throws CM_Exception
 	 */
 	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
+		$pidFile = null;
 		if ($this->_getSynchronized()) {
 			if ($this->_isRunning()) {
 				throw new CM_Exception('Process `' . $this->_getMethodName() . '` still running.');
 			}
-			$this->_createPidFile();
+			$pidFile = $this->_createPidFile();
 		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
 		if ($arguments->getNumeric()->getAll()) {
@@ -38,7 +39,9 @@ class CM_Cli_Command {
 			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
 		}
 		call_user_func_array(array($this->_class->newInstance($output), $this->_method->getName()), $parameters);
-		$this->_deletePidFile();
+		if ($pidFile) {
+			$pidFile->delete();
+		}
 	}
 
 	/**
@@ -153,25 +156,23 @@ class CM_Cli_Command {
 	 */
 	private function _isRunning() {
 		$path = $this->_getPidFilePath();
-		if (!file_exists($path)) {
+		if (!CM_File::exists($path)) {
 			return false;
 		}
 		$file = new CM_File($path);
-		$pid = (int) $file->read();
+		$pid = $file->read();
 		if (!ctype_digit($pid) || posix_getsid($pid) === false) {
 			return false;
 		}
 		return true;
 	}
 
+	/**
+	 * @return CM_File
+	 */
 	private function _createPidFile() {
 		$pid = posix_getpid();
-		CM_File::create($this->_getPidFilePath(), $pid);
-	}
-
-	private function _deletePidFile() {
-		$file = new CM_File($this->_getPidFilePath());
-		$file->delete();
+		return CM_File::create($this->_getPidFilePath(), $pid);
 	}
 
 }
