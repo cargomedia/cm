@@ -27,7 +27,8 @@ class CM_Cli_CommandManager {
 				if (!$class->isAbstract()) {
 					foreach ($class->getMethods() as $method) {
 						if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-							$this->_commands[] = new CM_Cli_Command($method, $class);
+							$command = new CM_Cli_Command($method, $class);
+							$this->_commands[$command->getName()] = $command;
 						}
 					}
 				}

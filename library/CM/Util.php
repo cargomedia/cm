@@ -380,9 +380,10 @@ class CM_Util {
 			$pathsFiltered = array();
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-				$paths = array_merge($paths, CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/'));
+				$namespacePaths = CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/');
+				sort($namespacePaths);
+				$paths = array_merge($paths, $namespacePaths);
 			}
-			sort($paths);
 			$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
 			foreach ($paths as $path) {
 				$file = new CM_File($path);
