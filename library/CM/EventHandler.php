@@ -3,9 +3,9 @@
 final class CM_EventHandler {
 
 	/**
-	 * @var array $_jobs
+	 * @var array $_callbacks
 	 */
-	private $_jobs = array();
+	private $_callbacks = array();
 
 	/**
 	 * @param string                          $event
@@ -14,7 +14,7 @@ final class CM_EventHandler {
 	 */
 	public function bind($event, CM_Jobdistribution_Job_Abstract $job, array $params = null) {
 		$event = (string) $event;
-		$this->_jobs[$event][] = array('job' => $job, 'params' => $params);
+		$this->_callbacks[$event][] = array('job' => $job, 'params' => $params);
 	}
 
 	/**
@@ -22,7 +22,7 @@ final class CM_EventHandler {
 	 */
 	public function unbind($event) {
 		$event = (string) $event;
-		unset($this->_jobs[$event]);
+		unset($this->_callbacks[$event]);
 	}
 
 	/**
@@ -34,14 +34,14 @@ final class CM_EventHandler {
 		if (!$params) {
 			$params = array();
 		}
-		if (!empty($this->_jobs[$event])) {
-			foreach ($this->_jobs[$event] as $job) {
+		if (!empty($this->_callbacks[$event])) {
+			foreach ($this->_callbacks[$event] as $callback) {
 				$jobParams = $params;
-				if (!empty($job['params'])) {
-					$jobParams = array_merge($job['params'], $jobParams);
+				if (!empty($callback['params'])) {
+					$jobParams = array_merge($callback['params'], $jobParams);
 				}
 				/** @var CM_Jobdistribution_Job_Abstract $job */
-				$job = $job['job'];
+				$job = $callback['job'];
 				$job->queue($jobParams);
 			}
 		}
