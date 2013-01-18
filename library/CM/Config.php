@@ -47,9 +47,6 @@ class CM_Config {
 		if (IS_TEST) {
 			self::loadConfig('test.php');
 		}
-		if (IS_CRON) {
-			self::loadConfig('cron.php');
-		}
 		self::loadConfig('local.php');
 		self::loadConfig('internal.php');
 	}
