@@ -14,7 +14,7 @@ class CM_EventHandlerTest extends TestCase {
 	}
 
 	public function test() {
-		$eventHandler = new CM_EventHandler();
+		$eventHandler = new CM_Event_Handler();
 		self::$_foo = '';
 		$eventHandler->bind('foo', new CM_JobMock_1(), array('text' => 'bar'));
 		$eventHandler->trigger('foo');

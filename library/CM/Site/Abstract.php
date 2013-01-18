@@ -5,7 +5,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	protected $_themes = array();
 	protected $_namespaces = array();
 	/**
-	 * @var CM_EventHandler
+	 * @var CM_Event_Handler
 	 */
 	protected $_eventHandler = null;
 
@@ -17,20 +17,20 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_EventHandler
+	 * @return CM_Event_Handler
 	 */
 	public function getEventHandler() {
 		if (!$this->_eventHandler) {
-			$this->_eventHandler = new CM_EventHandler();
+			$this->_eventHandler = new CM_Event_Handler();
 			$this->bindEvents($this->_eventHandler);
 		}
 		return $this->_eventHandler;
 	}
 
 	/**
-	 * @param CM_EventHandler $eventHandler
+	 * @param CM_Event_Handler $eventHandler
 	 */
-	public function bindEvents(CM_EventHandler $eventHandler) {
+	public function bindEvents(CM_Event_Handler $eventHandler) {
 	}
 
 	/**

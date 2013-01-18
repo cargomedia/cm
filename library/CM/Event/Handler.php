@@ -1,6 +1,6 @@
 <?php
 
-final class CM_EventHandler {
+final class CM_Event_Handler {
 
 	/**
 	 * @var array $_callbacks
