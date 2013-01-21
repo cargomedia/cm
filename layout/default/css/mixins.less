@@ -1,14 +1,7 @@
-.clearfix {
-	*zoom: 1;
-	display: block;
-	&:before,
-	&:after {
-		display: table;
-		content: "";
-	}
-	&:after {
-		clear: both;
-	}
+.clearfix:after {
+	content: "";
+	display: table;
+	clear: both;
 }
 
 .nowrap {
@@ -70,7 +63,6 @@
 .bg_select() {
 	.background-color(@colorBgSelect);
 }
-
 
 .border(@color) {
 	border: 1px solid @color;
@@ -213,5 +205,3 @@
 	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
 }
-
-
