@@ -3,6 +3,13 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
+	const MODE_NORMAL = 1;
+	const MODE_TEST = 2;
+	const MODE_CLI = 3;
+
+	/** @var int */
+	private $_mode;
+
 	/** @var array|null */
 	private $_namespacePaths;
 
@@ -14,7 +21,11 @@ class CM_Bootloader {
 	 * @param string|null $dirLibrary
 	 * @throws CM_Exception_Invalid
 	 */
-	final public function __construct($pathRoot, $dirLibrary) {
+	final public function __construct($pathRoot, $dirLibrary, $mode = null) {
+		if (null === $mode) {
+			$mode = self::MODE_NORMAL;
+		}
+		$this->_mode = (int) $mode;
 		if (self::$_instance) {
 			throw new CM_Exception_Invalid('Bootloader already instantiated');
 		}
@@ -192,6 +203,17 @@ class CM_Bootloader {
 	 */
 	public function getNamespaces() {
 		return array('CM');
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isCli() {
+		return self::MODE_CLI === $this->_mode;
+	}
+
+	public function isTest() {
+		return self::MODE_TEST === $this->_mode;
 	}
 
 	/**
