@@ -3,7 +3,7 @@
 class CM_OutputStream_Stream extends CM_OutputStream_Abstract {
 
 	/** @var string */
-	protected $_stream;
+	private $_stream;
 
 	/**
 	 * @param string $stream
