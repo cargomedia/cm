@@ -32,6 +32,58 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param mixed         $needle
+	 * @param Traversable   $haystack
+	 * @param string        $message
+	 * @param boolean       $ignoreCase
+	 * @param boolean       $checkForObjectIdentity
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+		if ($needle instanceof CM_Comparable) {
+			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
+				throw new CM_Exception_Invalid('Haystack is not traversable.');
+			}
+			$match = false;
+			foreach ($haystack as $hay) {
+				if ($needle->equals($hay)) {
+					$match = true;
+					break;
+				}
+			}
+			self::assertFalse($match, 'Needle contained.');
+		} else {
+			parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+		}
+	}
+
+	/**
+	 * @param CM_Comparable $needle
+	 * @param Traversable   $haystack
+	 * @param string        $message
+	 * @param boolean       $ignoreCase
+	 * @param boolean       $checkForObjectIdentity
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+		if ($needle instanceof CM_Comparable) {
+			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
+				throw new CM_Exception_Invalid('Haystack is not traversable.');
+			}
+			$match = false;
+			foreach ($haystack as $hay) {
+				if ($needle->equals($hay)) {
+					$match = true;
+					break;
+				}
+			}
+			self::assertTrue($match, 'Needle not contained.');
+		} else {
+			parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+		}
+	}
+
+	/**
 	 * @param array $needles
 	 * @param mixed $haystack
 	 */
