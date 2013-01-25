@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Output_Abstract implements CM_Output_Interface {
+abstract class CM_OutputStream_Abstract implements CM_OutputStream_Interface {
 
 	/**
 	 * @param string $message

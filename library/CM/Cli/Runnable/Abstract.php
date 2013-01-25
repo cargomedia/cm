@@ -2,15 +2,15 @@
 
 abstract class CM_Cli_Runnable_Abstract {
 
-	/** @var CM_Output_Interface */
+	/** @var CM_OutputStream_Interface */
 	private $_output;
 
 	/**
-	 * @param CM_Output_Interface|null $output
+	 * @param CM_OutputStream_Interface|null $output
 	 */
-	public function __construct(CM_Output_Interface $output = null) {
+	public function __construct(CM_OutputStream_Interface $output = null) {
 		if (null === $output) {
-			$output = new CM_Output_Null();
+			$output = new CM_OutputStream_Null();
 		}
 		$this->_output = $output;
 	}
@@ -34,7 +34,7 @@ abstract class CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @return CM_Output_Interface
+	 * @return CM_OutputStream_Interface
 	 */
 	protected function _getOutput() {
 		return $this->_output;

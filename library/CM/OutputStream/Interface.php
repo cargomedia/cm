@@ -1,6 +1,6 @@
 <?php
 
-interface CM_Output_Interface {
+interface CM_OutputStream_Interface {
 
 	/**
 	 * @param string $message
