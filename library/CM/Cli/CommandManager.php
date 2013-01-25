@@ -12,8 +12,8 @@ class CM_Cli_CommandManager {
 	private $_streamError;
 
 	public function __construct() {
-		$this->_setStreamOutput(new CM_OutputStream_StandardOutputStream());
-		$this->_setStreamError(new CM_OutputStream_StandardErrorStream());
+		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
+		$this->_setStreamError(new CM_OutputStream_Stream_StandardError());
 	}
 
 	/**

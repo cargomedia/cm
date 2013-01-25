@@ -1,6 +1,6 @@
 <?php
 
-class CM_OutputStream_Stream extends CM_OutputStream_Abstract {
+abstract class CM_OutputStream_Stream_Abstract extends CM_OutputStream_Abstract {
 
 	/** @var string */
 	private $_stream;
