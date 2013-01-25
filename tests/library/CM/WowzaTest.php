@@ -56,8 +56,9 @@ class CM_WowzaTest extends CMTest_TestCase {
 		$wowza = $wowza = $this->getMock('CM_Wowza', array('stop'));
 		$wowza->expects($this->exactly(2))->method('stop')->will($this->returnValue(1));
 		/** @var CM_Model_StreamChannel_Video_Mock $streamChannel */
-		// allowedUntil will be updated, if stream has expired and it's user isn't $userUnchanged
+		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
 		$userUnchanged = CMTest_TH::createUser();
+		$userUnchanged->setOnline();
 		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1));
 		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
@@ -133,10 +134,10 @@ class CM_WowzaTest extends CMTest_TestCase {
 class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
-		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
+		return $user->getOnline() ? $allowedUntil : $allowedUntil + 100;
 	}
 
 	public function canSubscribe(CM_Model_User $user, $allowedUntil) {
-		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
+		return $user->getOnline() ? $allowedUntil : $allowedUntil + 100;
 	}
 }
