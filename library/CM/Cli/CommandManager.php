@@ -5,6 +5,9 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
+	/** @var CM_InputStream_Interface */
+	private $_streamInput;
+
 	/** @var CM_OutputStream_Interface */
 	private $_streamOutput;
 
@@ -12,6 +15,7 @@ class CM_Cli_CommandManager {
 	private $_streamError;
 
 	public function __construct() {
+		$this->_setStreamInput(new CM_InputStream_Stream_StandardInput());
 		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
 		$this->_setStreamError(new CM_OutputStream_Stream_StandardError());
 	}
@@ -49,6 +53,7 @@ class CM_Cli_CommandManager {
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
 		$helpHeader .= ' --quiet' . PHP_EOL;
+		$helpHeader .= ' --non-interactive' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
@@ -83,7 +88,7 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			$command->run($arguments, $this->_streamOutput);
+			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
@@ -102,10 +107,14 @@ class CM_Cli_CommandManager {
 
 	/**
 	 * @param boolean|null $quiet
+	 * @param boolean|null $nonInteractive
 	 */
-	public function configure($quiet = null) {
+	public function configure($quiet = null, $nonInteractive = null) {
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
+		}
+		if ($nonInteractive) {
+			$this->_setStreamInput(new CM_InputStream_Null());
 		}
 	}
 
@@ -122,6 +131,13 @@ class CM_Cli_CommandManager {
 			}
 		}
 		throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
+	}
+
+	/**
+	 * @param CM_InputStream_Interface $input
+	 */
+	private function _setStreamInput(CM_InputStream_Interface $input) {
+		$this->_streamInput = $input;
 	}
 
 	/**
