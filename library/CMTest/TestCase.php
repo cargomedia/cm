@@ -118,6 +118,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param number          $expected
+	 * @param number          $actual
+	 * @param number|null
+	 */
+	public static function assertSameTime($expected, $actual, $delta = null) {
+		if (null === $delta) {
+			$delta = 1;
+		}
+		self::assertEquals($expected, $actual, '', $delta);
+	}
+
+	/**
 	 * @param array|null $namespaces
 	 * @return CM_Site_Abstract
 	 */
