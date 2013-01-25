@@ -207,6 +207,10 @@ class CM_Bootloader {
 		}
 	}
 
+	public function resetNamespacePaths() {
+		$this->_namespacePaths = null;
+	}
+
 	/**
 	 * @return array
 	 */
