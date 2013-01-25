@@ -3,7 +3,7 @@
 interface CM_InputStream_Interface {
 
 	/**
-	 * @param $hint
+	 * @param string $hint
 	 * @return string
 	 */
 	public function read($hint);
