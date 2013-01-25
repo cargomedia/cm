@@ -19,10 +19,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 		CM_Wowza::getInstance()->synchronize();
 		CM_Wowza::getInstance()->checkStreams();
 		CM_KissTracking::getInstance()->exportEvents();
-		CM_Mysql::exec("DELETE FROM TBL_SK_USER_INVITATIONCODE WHERE `createStamp` < ?", (time() - 30 * 86400));
-		CM_Mysql::exec("DELETE FROM TBL_SK_USER_EMAILVERIFICATION WHERE `createStamp` < ?", (time() - 7 * 86400));
-		CM_Mysql::exec("DELETE FROM TBL_SK_USER_PASSWORDRESET WHERE `createStamp` < ?", (time() - 1 * 86400));
-		CM_Mysql::exec("DELETE FROM TBL_SK_USER_VIEWHISTORY WHERE `timeStamp` < ?", (time() - 31 * 86400));
 	}
 
 	/**
