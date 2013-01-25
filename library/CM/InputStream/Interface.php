@@ -8,4 +8,10 @@ interface CM_InputStream_Interface {
 	 */
 	public function read($hint);
 
+	/**
+	 * @param string $hint
+	 * @return boolean
+	 */
+	public function confirm($hint);
+
 }
