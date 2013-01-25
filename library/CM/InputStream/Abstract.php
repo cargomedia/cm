@@ -9,17 +9,28 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 		$this->_outputStream = new CM_OutputStream_Null();
 	}
 
-	public function confirm($hint) {
+	public function confirm($hint, $default = null) {
 		$allowedValues = array('y' => true, 'n' => false);
+		$options = array();
+		foreach ($allowedValues as $label => $value) {
+			if ($label === $default) {
+				$label = strtoupper($label);
+			}
+			$options[] = $label;
+		}
 		do {
-			$value = $this->read($hint . ' (' . implode('/', array_keys($allowedValues)) . ')');
-		} while (!array_key_exists($value, $allowedValues));
-		return $allowedValues[$value];
+			$label = $this->read($hint . ' (' . implode('/', $options) . ')', $default);
+		} while (!array_key_exists($label, $allowedValues));
+		return $allowedValues[$label];
 	}
 
-	public function read($hint) {
+	public function read($hint, $default = null) {
 		$this->_getOutputStream()->write($hint . ' ');
-		return $this->_read();
+		$value = $this->_read();
+		if (!$value && null !== $default) {
+			$value = $default;
+		}
+		return $value;
 	}
 
 	/**
