@@ -1,5 +1,4 @@
 <?php
-require_once 'TH/Html.php';
 
 class CMTest_TH {
 

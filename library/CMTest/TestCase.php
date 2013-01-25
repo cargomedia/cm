@@ -1,5 +1,4 @@
 <?php
-require_once 'PHPUnit/Autoload.php';
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
