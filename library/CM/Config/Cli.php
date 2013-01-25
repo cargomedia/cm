@@ -10,7 +10,7 @@ class CM_Config_Cli extends CM_Cli_Runnable_Abstract {
 		$path = DIR_ROOT . 'resources/config/internal.php';
 		$classTypesConfig  = CM_App::getInstance()->generateConfigClassTypes();
 		$actionVerbsConfig = CM_App::getInstance()->generateConfigActionVerbs();
-		CM_File::create($path, $fileHeader . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig);
+		CM_File::create($path, $fileHeader . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 
 		// Create model class types and action verbs config JS
@@ -21,7 +21,7 @@ class CM_Config_Cli extends CM_Cli_Runnable_Abstract {
 			$actionVerbs[$verb['name']] = $verb['value'];
 		}
 		$actionVerbsConfig = 'cm.action.verbs = ' . CM_Params::encode($actionVerbs, true) . ';';
-		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionVerbsConfig);
+		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionVerbsConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
 

@@ -5,15 +5,19 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
-	/** @var CM_Output_Interface */
+	/** @var CM_InputStream_Interface */
+	private $_streamInput;
+
+	/** @var CM_OutputStream_Interface */
 	private $_streamOutput;
 
-	/** @var CM_Output_Interface */
+	/** @var CM_OutputStream_Interface */
 	private $_streamError;
 
 	public function __construct() {
-		$this->_setStreamOutput(new CM_Output_ConsoleOutput());
-		$this->_setStreamError(new CM_Output_ConsoleError());
+		$this->_setStreamInput(new CM_InputStream_Stream_StandardInput());
+		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
+		$this->_setStreamError(new CM_OutputStream_Stream_StandardError());
 	}
 
 	/**
@@ -27,7 +31,8 @@ class CM_Cli_CommandManager {
 				if (!$class->isAbstract()) {
 					foreach ($class->getMethods() as $method) {
 						if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-							$this->_commands[] = new CM_Cli_Command($method, $class);
+							$command = new CM_Cli_Command($method, $class);
+							$this->_commands[$command->getName()] = $command;
 						}
 					}
 				}
@@ -48,6 +53,7 @@ class CM_Cli_CommandManager {
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
 		$helpHeader .= ' --quiet' . PHP_EOL;
+		$helpHeader .= ' --non-interactive' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
@@ -82,7 +88,7 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			$command->run($arguments, $this->_streamOutput);
+			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
@@ -94,16 +100,21 @@ class CM_Cli_CommandManager {
 			return 1;
 		} catch (Exception $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			$this->_streamError->writeln($e->getTraceAsString());
 			return 1;
 		}
 	}
 
 	/**
 	 * @param boolean|null $quiet
+	 * @param boolean|null $nonInteractive
 	 */
-	public function configure($quiet = null) {
+	public function configure($quiet = null, $nonInteractive = null) {
 		if ($quiet) {
-			$this->_setStreamOutput(new CM_Output_Null());
+			$this->_setStreamOutput(new CM_OutputStream_Null());
+		}
+		if ($nonInteractive) {
+			$this->_setStreamInput(new CM_InputStream_Null());
 		}
 	}
 
@@ -123,16 +134,23 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
-	 * @param CM_Output_Interface $output
+	 * @param CM_InputStream_Interface $input
 	 */
-	private function _setStreamOutput(CM_Output_Interface $output) {
+	private function _setStreamInput(CM_InputStream_Interface $input) {
+		$this->_streamInput = $input;
+	}
+
+	/**
+	 * @param CM_OutputStream_Interface $output
+	 */
+	private function _setStreamOutput(CM_OutputStream_Interface $output) {
 		$this->_streamOutput = $output;
 	}
 
 	/**
-	 * @param CM_Output_Interface $output
+	 * @param CM_OutputStream_Interface $output
 	 */
-	private function _setStreamError(CM_Output_Interface $output) {
+	private function _setStreamError(CM_OutputStream_Interface $output) {
 		$this->_streamError = $output;
 	}
 

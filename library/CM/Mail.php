@@ -4,7 +4,7 @@ class CM_Mail extends CM_View_Abstract {
 
 	const TYPE = 1;
 
-	/** @var CM_Model_User */
+	/** @var CM_Model_User|null */
 	private $_recipient;
 
 	/** @var array */
@@ -238,6 +238,12 @@ class CM_Mail extends CM_View_Abstract {
 	 */
 	public function send($delayed = null) {
 		$delayed = (boolean) $delayed;
+		if (empty($this->_to)) {
+			throw new CM_Exception_Invalid('No recipient specified.');
+		}
+		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
+			return null;
+		}
 		if ($this->_recipient) {
 			$site = $this->_recipient->getSite();
 			$language = $this->_recipient->getLanguage();
@@ -245,13 +251,7 @@ class CM_Mail extends CM_View_Abstract {
 			$site = null;
 			$language = null;
 		}
-		if (empty($this->_to)) {
-			throw new CM_Exception_Invalid('No recipient specified.');
-		}
-		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
-			return null;
-		}
-		$render = new CM_Render($site, null, $language);
+		$render = new CM_Render($site, $this->_recipient, $language);
 		list($subject, $html, $text) = $render->render($this);
 		if ($delayed) {
 			$this->_queue($subject, $text, $html);

@@ -33,6 +33,17 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$bootloaderFile->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
 	}
 
+	public function createJavascriptFiles() {
+		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
+		foreach ($viewClasses as $path => $className) {
+			$jsPath = preg_replace('/\.php$/', '.js', $path);
+			if (!CM_File::exists($jsPath)) {
+				$jsFile = CM_File_Javascript::createLibraryClass($className);
+				$this->_getOutput()->writeln('Created `' . $jsFile->getPath() . '`');
+			}
+		}
+	}
+
 	/**
 	 * @param string $namespace
 	 */
@@ -85,8 +96,9 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	private function _generateViewLayout($className) {
 		$parts = explode('_', $className);
 		$namespace = array_shift($parts);
+		$viewType = array_shift($parts);
 		$pathRelative = implode('_', $parts);
-		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/' . $pathRelative . '/';
+		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/default/' . $viewType . '/' . $pathRelative . '/';
 		CM_Util::mkDir($layoutPath);
 		$file = CM_File::create($layoutPath . 'default.tpl');
 		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
