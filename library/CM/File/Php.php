@@ -17,6 +17,7 @@ class CM_File_Php extends CM_File {
 		$content[] = 'class ' . $className . ' extends ' . $parentClass . ' {';
 		$content[] = '';
 		$content[] = '}';
+		$content[] = '';
 		$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		CM_Util::mkDir(dirname($path));
 		return CM_File_Php::create($path, implode(PHP_EOL, $content));
