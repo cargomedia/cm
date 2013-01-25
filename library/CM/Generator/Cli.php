@@ -30,7 +30,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		CM_Bootloader::getInstance()->resetNamespacePaths();
 		$this->_generateClassFilePhp($namespace . '_Site', 'CM_Site_Abstract');
 		$bootloaderFile = $this->_generateClassFilePhp($namespace . '_Bootloader', 'CM_Bootloader');
-		$namespaces = array_merge(array($namespace), CM_Bootloader::getInstance()->getNamespaces());
+		$namespaces = array_merge(CM_Bootloader::getInstance()->getNamespaces(), array($namespace));
 		$bootloaderFile->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
 	}
 
