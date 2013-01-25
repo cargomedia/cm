@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../../TestCase.php';
-
-class CM_Class_AbstractTest extends TestCase {
+class CM_Class_AbstractTest extends CMTest_TestCase {
 
 	public static function setupBeforeClass() {
 		CM_Config::get()->CM_Class_AbstractMock = new stdClass();
@@ -11,7 +9,7 @@ class CM_Class_AbstractTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetConfig() {

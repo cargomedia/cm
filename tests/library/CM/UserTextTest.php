@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_UsertextTest extends TestCase {
+class CM_UsertextTest extends CMTest_TestCase {
 
 	private $_text = <<<EOD
 smilies: :-)
@@ -23,11 +22,11 @@ EOD;
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
 		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
 
-		TH::clearCache();
+		CMTest_TH::clearCache();
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testFormat() {
@@ -180,7 +179,7 @@ EOD;
 		$badwords->add('bar*');
 		$badwords->add('*foobar*');
 		$badwords->add('*zoo*far*');
-		TH::clearCache();
+		CMTest_TH::clearCache();
 
 		$actual = new CM_Usertext("hello foo there");
 		$this->assertEquals("hello ${replace} there", $actual->getPlain());

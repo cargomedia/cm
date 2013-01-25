@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../TestCase.php';
-
-class CM_KissTrackingTest extends TestCase {
+class CM_KissTrackingTest extends CMTest_TestCase {
 
 	/** @var CM_KissTracking $kissTracking */
 	private $_kissTracking;
@@ -21,7 +19,7 @@ class CM_KissTrackingTest extends TestCase {
 	}
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testProcess() {
@@ -72,7 +70,7 @@ EOD;
 		$this->_kissTracking->expects($this->exactly(2))->method('_uploadCsv')->will($this->returnValue(true));
 		$this->_kissTracking->exportEvents();
 
-		TH::timeForward(CM_KissTracking::UPLOAD_INTERVAL + 1);
+		CMTest_TH::timeForward(CM_KissTracking::UPLOAD_INTERVAL + 1);
 		CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
 		$this->_kissTracking->exportEvents();
 	}

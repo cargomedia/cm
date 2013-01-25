@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_Entity_AbstractTest extends TestCase{
+class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 
 	public static function setupBeforeClass() {
 		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `entityMock` (
@@ -22,7 +21,7 @@ class CM_Model_Entity_AbstractTest extends TestCase{
 
 	public function tearDown() {
 		CM_Mysql::exec("TRUNCATE TABLE `entityMock`");
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetUserId() {
@@ -42,7 +41,7 @@ class CM_Model_Entity_AbstractTest extends TestCase{
 
 		$this->assertModelNotEquals($user2, $entityMock->getUser());
 		CM_Mysql::delete(TBL_CM_USER, array('userId' => $user->getId()));
-		TH::clearCache();
+		CMTest_TH::clearCache();
 		try {
 			$entityMock->getUser();
 			$this->fail('User not deleted');

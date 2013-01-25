@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_ParamsTest extends TestCase {
+class CM_ParamsTest extends CMTest_TestCase {
 
 	public function testHas() {
 		$params = new CM_Params(array('1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false));

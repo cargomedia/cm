@@ -1,13 +1,12 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_QueueTest extends TestCase {
+class CM_QueueTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 		CM_Cache_Redis::flush();
 	}
 

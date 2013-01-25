@@ -1,14 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../../../../TestCase.php';
-
-class CM_File_UserContent_TempTest extends TestCase {
+class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructorInvalid() {
@@ -70,7 +68,7 @@ class CM_File_UserContent_TempTest extends TestCase {
 		CM_File_UserContent_Temp::deleteOlder(100);
 		$this->assertTrue($file->getExists());
 
-		TH::timeForward(1000);
+		CMTest_TH::timeForward(1000);
 		CM_File_UserContent_Temp::deleteOlder(100);
 		$this->assertFalse($file->getExists());
 	}

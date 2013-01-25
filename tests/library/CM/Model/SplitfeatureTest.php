@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_SplitfeatureTest extends TestCase {
+class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testCreate() {
@@ -107,14 +106,14 @@ class CM_Model_SplitfeatureTest extends TestCase {
 		$i = 0;
 		$userArray = array();
 		while ($i < 200) {
-			$user = TH::createUser();
+			$user = CMTest_TH::createUser();
 			$splitfeature->getEnabled($user);
 			$splitfeature2->getEnabled($user);
 			$userArray[] = $user;
 			$i++;
 		}
 
-		TH::clearCache();
+		CMTest_TH::clearCache();
 		$this->_checkEnabledFlag($userArray, $splitfeature);
 		$this->_checkEnabledFlag($userArray, $splitfeature2);
 
@@ -136,14 +135,14 @@ class CM_Model_SplitfeatureTest extends TestCase {
 
 	public function testGetFixtureCount() {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = true;
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 
 		$splitfeature = new CM_Model_Splitfeature('NotExicting');
 		$this->assertTrue($splitfeature->getEnabled($user));
 		$this->assertSame(0, $splitfeature->getFixtureCount());
 		$splitfeature->setPercentage(50);
 
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 	/**

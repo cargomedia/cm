@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_PagingSource_PagingsTest extends TestCase {
+class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		define('TBL_TEST_A', 'test_a');

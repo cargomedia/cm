@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_CssTest extends TestCase {
+class CM_CssTest extends CMTest_TestCase {
 
 	/** @var CM_Render */
 	private $_render;
@@ -12,7 +11,7 @@ class CM_CssTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function setUp() {

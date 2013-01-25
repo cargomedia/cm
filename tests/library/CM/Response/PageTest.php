@@ -1,16 +1,15 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Response_PageTest extends TestCase {
+class CM_Response_PageTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testProcessLanguageRedirect() {
-		TH::createLanguage('en');
-		$user = TH::createUser();
-		$response = TH::createResponsePage('/en/mock5', null, $user);
+		CMTest_TH::createLanguage('en');
+		$user = CMTest_TH::createUser();
+		$response = CMTest_TH::createResponsePage('/en/mock5', null, $user);
 		try {
 			$response->process();
 			$this->fail('Language redirect doesn\'t work');
@@ -20,18 +19,18 @@ class CM_Response_PageTest extends TestCase {
 	}
 
 	public function testProcessLanguageNoRedirect() {
-		$language = TH::createLanguage('en');
-		$user = TH::createUser();
+		$language = CMTest_TH::createLanguage('en');
+		$user = CMTest_TH::createUser();
 		try {
-			$response = TH::createResponsePage('/en/mock5');
+			$response = CMTest_TH::createResponsePage('/en/mock5');
 			$response->process();
 			$this->assertModelEquals($language, $response->getRequest()->getLanguageUrl());
 
-			$response = TH::createResponsePage('/mock5');
+			$response = CMTest_TH::createResponsePage('/mock5');
 			$response->process();
 			$this->assertNull($response->getRequest()->getLanguageUrl());
 			
-			$response = TH::createResponsePage('/mock5', null, $user);
+			$response = CMTest_TH::createResponsePage('/mock5', null, $user);
 			$response->process();
 			$this->assertNull($response->getRequest()->getLanguageUrl());
 		} catch (CM_Exception_Redirect $e) {

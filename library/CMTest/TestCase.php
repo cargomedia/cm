@@ -1,13 +1,11 @@
 <?php
 require_once 'PHPUnit/Autoload.php';
-require_once 'TH.php';
-TH::init();
 
-abstract class TestCase extends PHPUnit_Framework_TestCase {
+abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param string $table
 	 * @param array  $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
-	 * @param int	$rowCount
+	 * @param int    $rowCount
 	 */
 	public static function assertRow($table, $where = null, $rowCount = 1) {
 		$result = CM_Mysql::select($table, '*', $where);
@@ -76,11 +74,11 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param string				   $formClassName
-	 * @param string				   $actionName
-	 * @param array					$data
-	 * @param string|null			  $componentClassName Component that uses that form
-	 * @param CM_Model_User|null	   $viewer
+	 * @param string             $formClassName
+	 * @param string             $actionName
+	 * @param array              $data
+	 * @param string|null        $componentClassName Component that uses that form
+	 * @param CM_Model_User|null $viewer
 	 * @return mixed
 	 */
 	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null) {
@@ -89,7 +87,8 @@ abstract class TestCase extends PHPUnit_Framework_TestCase {
 		$site = $this->_getSite();
 
 		$requestArgs = array('uri' => '/form/' . $site->getId());
-		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer', 'getQuery'))->getMock();
+		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer',
+			'getQuery'))->getMock();
 		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
 		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');

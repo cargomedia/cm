@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCaseRender.php';
 
-class CM_FormField_FloatTest extends TestCaseRender {
+class CM_FormField_FloatTest extends CMTest_TestCaseRender {
 
 	public function testValidate() {
 		$field = new CM_FormField_Float('foo');

@@ -1,8 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-
-class CM_Jobdistribution_Job_AbstractTest extends TestCase {
+class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
 	public function testRun() {
 		if (!extension_loaded('gearman')) {
@@ -41,7 +39,7 @@ class CM_Jobdistribution_Job_AbstractTest extends TestCase {
 			$this->assertContains('Job `' . get_class($job) . '` failed', $ex->getMessage());
 		}
 
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 	public function testRunGearmanDisabled() {
@@ -58,7 +56,7 @@ class CM_Jobdistribution_Job_AbstractTest extends TestCase {
 
 		$job->queue(array('foo' => 'bar'));
 
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 	public function testRunGearmanDisabledThrows() {
@@ -77,7 +75,7 @@ class CM_Jobdistribution_Job_AbstractTest extends TestCase {
 			$this->assertSame('Job failed', $ex->getMessage());
 		}
 
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 }

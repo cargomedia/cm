@@ -1,14 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../../TestCase.php';
-
-class CM_MenuEntryTest extends TestCase {
+class CM_MenuEntryTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetters() {

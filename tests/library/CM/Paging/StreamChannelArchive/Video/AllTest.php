@@ -1,24 +1,23 @@
 <?php
-require_once __DIR__ . '/../../../../../TestCase.php';
 
-class CM_Paging_StreamChannelArchiveVideo_AllTest extends TestCase {
+class CM_Paging_StreamChannelArchiveVideo_AllTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testPaging() {
-		$archive = TH::createStreamChannelVideoArchive();
-		TH::createStreamChannelVideoArchive();
-		TH::createStreamChannelVideoArchive();
+		$archive = CMTest_TH::createStreamChannelVideoArchive();
+		CMTest_TH::createStreamChannelVideoArchive();
+		CMTest_TH::createStreamChannelVideoArchive();
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamChannel = $this->getMock('CM_Model_StreamChannel_Video', array('getType'), array($streamChannel->getId()));
 		$streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
-		TH::createStreamChannelVideoArchive($streamChannel);
+		CMTest_TH::createStreamChannelVideoArchive($streamChannel);
 
 		$paging = new CM_Paging_StreamChannelArchiveVideo_All();
 		$this->assertSame(4, $paging->getCount());

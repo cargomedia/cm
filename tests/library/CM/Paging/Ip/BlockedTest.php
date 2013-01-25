@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Paging_Ip_BlockedTest extends TestCase {
+class CM_Paging_Ip_BlockedTest extends CMTest_TestCase {
 	
 	public static function setUpBeforeClass() {	
 	}
@@ -19,17 +18,17 @@ class CM_Paging_Ip_BlockedTest extends TestCase {
 		$this->assertEquals(1, $paging->getCount());
 		$entry = $paging->getItem(0);
 		$this->assertTrue($paging->contains(ip2long($ip)));
-		TH::timeDaysForward(2);
+		CMTest_TH::timeDaysForward(2);
 		$paging->add(ip2long($ip2));
 		CM_CacheLocal::flush();
 		$paging->_change();
 		$this->assertEquals(2, $paging->getCount());
-		TH::timeDaysForward(2);
+		CMTest_TH::timeDaysForward(2);
 		CM_Paging_Ip_Blocked::deleteOlder(3 * 86400);
 		CM_CacheLocal::flush();
 		$paging->_change();
 		$this->assertEquals(1, $paging->getCount());
-		TH::timeDaysForward(2);
+		CMTest_TH::timeDaysForward(2);
 		CM_Paging_Ip_Blocked::deleteOlder(3 * 86400);
 		CM_CacheLocal::flush();
 		$this->assertEquals(1, $paging->getCount());

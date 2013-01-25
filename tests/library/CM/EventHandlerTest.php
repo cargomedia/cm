@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_EventHandlerTest extends TestCase{
+class CM_EventHandlerTest extends CMTest_TestCase{
 
 	public static $_foo;
 	public static $_counter;
@@ -10,7 +9,7 @@ class CM_EventHandlerTest extends TestCase{
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function test() {

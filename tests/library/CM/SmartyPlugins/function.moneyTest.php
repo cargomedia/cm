@@ -1,9 +1,8 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.money.php';
 
-class smarty_function_moneyTest extends TestCase {
+class smarty_function_moneyTest extends CMTest_TestCase {
 
 	/**
 	 * @var Smarty_Internal_Template

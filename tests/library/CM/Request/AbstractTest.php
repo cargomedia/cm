@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Request_AbstractTest extends TestCase {
+class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetViewer() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
@@ -31,7 +30,7 @@ class CM_Request_AbstractTest extends TestCase {
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertModelEquals($user, $mock->getViewer(true));
 
-		$user2 = TH::createUser();
+		$user2 = CMTest_TH::createUser();
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, $user2));
 		$this->assertModelEquals($user2, $mock->getViewer(true));
 	}
@@ -46,17 +45,17 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testGetLanguageLoggedUser() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$request = $this->_prepareRequest('/', null, $user);
 		// No language at all
 		$this->assertSame($request->getLanguage(), null);
 
 		// Getting default language, user has no language
-		$defaultLanguage = TH::createLanguage();
+		$defaultLanguage = CMTest_TH::createLanguage();
 		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
 
 		// Getting user language
-		$anotherUserLanguage = TH::createLanguage();
+		$anotherUserLanguage = CMTest_TH::createLanguage();
 		$user->setLanguage($anotherUserLanguage);
 		$this->assertModelEquals($request->getLanguage(), $anotherUserLanguage);
 	}
@@ -67,7 +66,7 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertSame($request->getLanguage(), null);
 
 		// Getting default language (guest has no language)
-		$defaultLanguage = TH::createLanguage();
+		$defaultLanguage = CMTest_TH::createLanguage();
 		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
 	}
 
@@ -76,8 +75,8 @@ class CM_Request_AbstractTest extends TestCase {
 		CM_Response_Abstract::factory($request);
 		$this->assertNull($request->getLanguage());
 
-		TH::createLanguage('en'); // default language
-		$urlLanguage = TH::createLanguage('de');
+		CMTest_TH::createLanguage('en'); // default language
+		$urlLanguage = CMTest_TH::createLanguage('de');
 		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
 		CM_Response_Abstract::factory($request);
@@ -85,8 +84,8 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testGetLanguageByBrowser() {
-		$defaultLanguage = TH::createLanguage('en');
-		$browserLanguage = TH::createLanguage('de');
+		$defaultLanguage = CMTest_TH::createLanguage('en');
+		$browserLanguage = CMTest_TH::createLanguage('de');
 		$this->assertModelEquals(CM_Model_Language::findDefault(), $defaultLanguage);
 		$request = $this->_prepareRequest('/', array('Accept-Language' => 'de'));
 		$this->assertModelEquals($request->getLanguage(), $browserLanguage);

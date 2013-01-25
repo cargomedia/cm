@@ -1,10 +1,9 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Response_AbstractTest extends TestCase {
+class CM_Response_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testFactory() {

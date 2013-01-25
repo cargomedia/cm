@@ -1,20 +1,19 @@
 <?php
-require_once __DIR__ . '/../../../../../TestCase.php';
 
-class CM_Paging_StreamChannelArchive_Video_UserTest extends TestCase {
+class CM_Paging_StreamChannelArchive_Video_UserTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testPaging() {
-		$user = TH::createUser();
-		TH::createStreamChannelVideoArchive(null, $user);
-		TH::createStreamChannelVideoArchive(null, $user);
-		TH::timeForward(1);
-		$streamChannel3 = TH::createStreamChannelVideoArchive(null, $user);
-		TH::createStreamChannelVideoArchive();
-		TH::createStreamChannelVideoArchive();
+		$user = CMTest_TH::createUser();
+		CMTest_TH::createStreamChannelVideoArchive(null, $user);
+		CMTest_TH::createStreamChannelVideoArchive(null, $user);
+		CMTest_TH::timeForward(1);
+		$streamChannel3 = CMTest_TH::createStreamChannelVideoArchive(null, $user);
+		CMTest_TH::createStreamChannelVideoArchive();
+		CMTest_TH::createStreamChannelVideoArchive();
 		$paging = new CM_Paging_StreamChannelArchiveVideo_User($user);
 		$this->assertSame(3, $paging->getCount());
 		$this->assertModelEquals($streamChannel3, $paging->getItem(0));

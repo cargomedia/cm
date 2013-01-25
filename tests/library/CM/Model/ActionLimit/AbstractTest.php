@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_ActionLimit_AbstractTest extends TestCase {
+class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 
 	private $_actionType = 1;
 	private $_actionVerb = 2;
@@ -13,11 +12,11 @@ class CM_Model_ActionLimit_AbstractTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function setup() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 		CM_Mysql::replace(TBL_CM_ACTIONLIMIT, array('actionType', 'actionVerb', 'type', 'role', 'limit', 'period'), array(array($this->_actionType,
 			$this->_actionVerb, $this->_type, $this->_role, 2, 3), array($this->_actionType, $this->_actionVerb, $this->_type, null, 10, 11)));
 	}
