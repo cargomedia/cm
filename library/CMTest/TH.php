@@ -140,7 +140,7 @@ class CMTest_TH {
 	 */
 	public static function createSession(CM_Model_User $user = null) {
 		if (is_null($user)) {
-			$user = CMTest_TH::createUser();
+			$user = self::createUser();
 		}
 		$session = new CM_Session();
 		$session->setUser($user);
@@ -175,11 +175,11 @@ class CMTest_TH {
 	 */
 	public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
 		if (is_null($streamChannel)) {
-			$streamChannel = CMTest_TH::createStreamChannel();
-			CMTest_TH::createStreamPublish($user, $streamChannel);
+			$streamChannel = self::createStreamChannel();
+			self::createStreamPublish($user, $streamChannel);
 		}
 		if (!$streamChannel->hasStreamPublish()) {
-			CMTest_TH::createStreamPublish($user, $streamChannel);
+			self::createStreamPublish($user, $streamChannel);
 		}
 		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
 	}
@@ -191,10 +191,10 @@ class CMTest_TH {
 	 */
 	public static function createStreamPublish(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (!$user) {
-			$user = CMTest_TH::createUser();
+			$user = self::createUser();
 		}
 		if (is_null($streamChannel)) {
-			$streamChannel = CMTest_TH::createStreamChannel();
+			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
@@ -207,7 +207,7 @@ class CMTest_TH {
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (is_null($streamChannel)) {
-			$streamChannel = CMTest_TH::createStreamChannel();
+			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
@@ -257,8 +257,4 @@ class CMTest_TH {
 		return $str;
 	}
 
-	public static function getBootloader() {
-		require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
-		return new CM_Bootloader(dirname(__DIR__) . '/', null);
-	}
 }
