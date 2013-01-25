@@ -19,11 +19,11 @@ class CM_Cli_Command {
 
 	/**
 	 * @param CM_Cli_Arguments    $arguments
-	 * @param CM_Output_Interface $output
+	 * @param CM_OutputStream_Interface $output
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @throws CM_Exception
 	 */
-	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
+	public function run(CM_Cli_Arguments $arguments, CM_OutputStream_Interface $output) {
 		$pidFile = null;
 		if ($this->_getSynchronized()) {
 			if ($this->_isRunning()) {

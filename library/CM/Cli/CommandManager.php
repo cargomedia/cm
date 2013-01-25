@@ -5,15 +5,15 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
-	/** @var CM_Output_Interface */
+	/** @var CM_OutputStream_Interface */
 	private $_streamOutput;
 
-	/** @var CM_Output_Interface */
+	/** @var CM_OutputStream_Interface */
 	private $_streamError;
 
 	public function __construct() {
-		$this->_setStreamOutput(new CM_Output_ConsoleOutput());
-		$this->_setStreamError(new CM_Output_ConsoleError());
+		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
+		$this->_setStreamError(new CM_OutputStream_Stream_StandardError());
 	}
 
 	/**
@@ -105,7 +105,7 @@ class CM_Cli_CommandManager {
 	 */
 	public function configure($quiet = null) {
 		if ($quiet) {
-			$this->_setStreamOutput(new CM_Output_Null());
+			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
 	}
 
@@ -125,16 +125,16 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
-	 * @param CM_Output_Interface $output
+	 * @param CM_OutputStream_Interface $output
 	 */
-	private function _setStreamOutput(CM_Output_Interface $output) {
+	private function _setStreamOutput(CM_OutputStream_Interface $output) {
 		$this->_streamOutput = $output;
 	}
 
 	/**
-	 * @param CM_Output_Interface $output
+	 * @param CM_OutputStream_Interface $output
 	 */
-	private function _setStreamError(CM_Output_Interface $output) {
+	private function _setStreamError(CM_OutputStream_Interface $output) {
 		$this->_streamError = $output;
 	}
 
