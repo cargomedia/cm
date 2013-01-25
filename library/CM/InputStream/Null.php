@@ -1,8 +1,8 @@
 <?php
 
-class CM_InputStream_Null implements CM_InputStream_Interface {
+class CM_InputStream_Null extends CM_InputStream_Abstract {
 
-	public function read() {
+	protected function _read() {
 		throw new CM_Exception_Invalid('Cannot read input stream');
 	}
 
