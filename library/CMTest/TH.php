@@ -29,7 +29,6 @@ class CMTest_TH {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Mysql::runDump($dbName, $dump);
 			}
-			self::clearDb();
 		}
 
 		self::$_configBackup = serialize(CM_Config::get());
