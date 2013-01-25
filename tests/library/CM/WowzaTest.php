@@ -22,9 +22,9 @@ class CM_WowzaTest extends CMTest_TestCase {
 		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
 
 		$wowza->synchronize();
-		$this->assertModelEquals($streamChannel, CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey()));
-		$this->assertModelEquals($streamPublish, CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
-		$this->assertModelEquals($streamSubscribe, CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey()));
+		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
+		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
 
 		CMTest_TH::timeForward(5);
 		$wowza->synchronize();

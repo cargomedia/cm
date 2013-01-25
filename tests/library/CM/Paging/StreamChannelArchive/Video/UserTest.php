@@ -16,6 +16,6 @@ class CM_Paging_StreamChannelArchive_Video_UserTest extends CMTest_TestCase {
 		CMTest_TH::createStreamChannelVideoArchive();
 		$paging = new CM_Paging_StreamChannelArchiveVideo_User($user);
 		$this->assertSame(3, $paging->getCount());
-		$this->assertModelEquals($streamChannel3, $paging->getItem(0));
+		$this->assertEquals($streamChannel3, $paging->getItem(0));
 	}
 }

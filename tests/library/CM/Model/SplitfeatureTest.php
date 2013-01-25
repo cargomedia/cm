@@ -51,7 +51,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 	public function testConstruct() {
 		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 		$splitfeature2 = new CM_Model_Splitfeature('foo');
-		$this->assertModelEquals($splitfeature, $splitfeature2);
+		$this->assertEquals($splitfeature, $splitfeature2);
 
 		$splitfeature->delete();
 	}

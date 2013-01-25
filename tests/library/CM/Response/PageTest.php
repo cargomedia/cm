@@ -24,7 +24,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
 		try {
 			$response = CMTest_TH::createResponsePage('/en/mock5');
 			$response->process();
-			$this->assertModelEquals($language, $response->getRequest()->getLanguageUrl());
+			$this->assertEquals($language, $response->getRequest()->getLanguageUrl());
 
 			$response = CMTest_TH::createResponsePage('/mock5');
 			$response->process();

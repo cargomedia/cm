@@ -39,7 +39,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 		$this->assertEquals($user->getId(), $entityMock->getUser()->getId());
 		$this->assertInstanceOf('CM_Model_User', $user);
 
-		$this->assertModelNotEquals($user2, $entityMock->getUser());
+		$this->assertNotEquals($user2, $entityMock->getUser());
 		CM_Mysql::delete(TBL_CM_USER, array('userId' => $user->getId()));
 		CMTest_TH::clearCache();
 		try {

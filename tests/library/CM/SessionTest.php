@@ -147,7 +147,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session = new CM_Session();
 
 		$session->setUser($user);
-		$this->assertModelEquals($user, $session->getUser(true));
+		$this->assertEquals($user, $session->getUser(true));
 		$this->assertTrue($session->getUser(true)->getOnline());
 	}
 
@@ -175,7 +175,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		/** @var CM_Model_User $user */
 		$user = CM_Model_User::create();
 		$session->setUser($user);
-		$this->assertModelEquals($user, $session->getUser(true));
+		$this->assertEquals($user, $session->getUser(true));
 	}
 
 	public function testStart() {

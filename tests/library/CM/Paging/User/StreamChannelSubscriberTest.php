@@ -24,7 +24,7 @@ class CM_Paging_User_StreamChannelSubscriberTest extends CMTest_TestCase {
 		$this->assertEquals(3, $usersActual->getCount());
 		$i = 0;
 		foreach ($usersActual as $user) {
-			$this->assertModelEquals($usersExpected[$i++], $user);
+			$this->assertEquals($usersExpected[$i++], $user);
 		}
 	}
 }

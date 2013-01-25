@@ -27,7 +27,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 	public function testConstruct() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test2 = new CM_Model_Splittest('foo');
-		$this->assertModelEquals($test, $test2);
+		$this->assertEquals($test, $test2);
 
 		$test->delete();
 	}

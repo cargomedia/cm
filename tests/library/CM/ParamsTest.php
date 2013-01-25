@@ -110,8 +110,8 @@ class CM_ParamsTest extends CMTest_TestCase {
 	public function testGetObject() {
 		$language = CM_Model_Language::create(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
 		$params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
-		$this->assertModelEquals($language, $params->getLanguage('language'));
-		$this->assertModelEquals($language, $params->getLanguage('languageId'));
+		$this->assertEquals($language, $params->getLanguage('language'));
+		$this->assertEquals($language, $params->getLanguage('languageId'));
 		try {
 			$params->getLanguage('no-object-param');
 			$this->fail('getObject should fail and throw exception');

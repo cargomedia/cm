@@ -116,7 +116,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	}
 
 	public function testFindByAbbreviation() {
-		$this->assertModelEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
+		$this->assertEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
 		$this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
 	}
 
@@ -164,10 +164,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	}
 
 	public function testFindDefault() {
-		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
 		$this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
-		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
 		CM_CacheLocal::flush();
 		$this->assertNull(CM_Model_Language::findDefault());

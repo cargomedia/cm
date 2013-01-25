@@ -140,7 +140,7 @@ class CM_RenderTest extends CMTest_TestCase {
 	public function testGetViewer() {
 		$viewer = CMTest_TH::createUser();
 		$render = new CM_Render($this->_getSite(), $viewer);
-		$this->assertModelEquals($viewer, $render->getViewer());
+		$this->assertEquals($viewer, $render->getViewer());
 
 		$render = new CM_Render($this->_getSite());
 		$this->assertNull($render->getViewer());

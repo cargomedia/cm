@@ -17,7 +17,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
 		$this->assertSame($streamChannel->getId(), $archive->getId());
 		$this->assertSame($user->getId(), $archive->getUserId());
-		$this->assertModelEquals($user, $archive->getUser());
+		$this->assertEquals($user, $archive->getUser());
 		$this->assertSame($streamChannel->getWidth(), $archive->getWidth());
 		$this->assertSame($streamChannel->getHeight(), $archive->getHeight());
 		$this->assertSame($streamPublish->getStart(), $archive->getCreated());
@@ -40,7 +40,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$streamChannel = CMTest_TH::createStreamChannel();
 		CMTest_TH::createStreamPublish($user, $streamChannel);
 		$archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
-		$this->assertModelEquals($user, $archive->getUser());
+		$this->assertEquals($user, $archive->getUser());
 		$user->delete();
 		$this->assertNull($archive->getUser());
 	}

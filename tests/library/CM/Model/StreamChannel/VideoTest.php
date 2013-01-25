@@ -55,7 +55,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 			$this->assertContains('has no StreamPublish.', $ex->getMessage());
 		}
 		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
-		$this->assertModelEquals($streamPublish, $streamChannel->getStreamPublish());
+		$this->assertEquals($streamPublish, $streamChannel->getStreamPublish());
 	}
 
 	public function testHasStreamPublish() {

@@ -62,7 +62,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_3'));
-		$this->assertModelEquals($user, $streamSubscribe->getUser());
+		$this->assertEquals($user, $streamSubscribe->getUser());
 	}
 
 	public function testDelete() {
@@ -83,7 +83,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 	public function testFindKey() {
 		$videoStreamSubscribeOrig = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey($videoStreamSubscribeOrig->getKey());
-		$this->assertModelEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
+		$this->assertEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
 		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey('doesnotexist');
 		$this->assertNull($videoStreamSubscribe);
 	}
@@ -91,7 +91,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 	public function testGetChannel() {
 		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamPublish = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser(), $streamChannel);
-		$this->assertModelEquals($streamChannel, $streamPublish->getStreamChannel());
+		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
 
 	}
 }

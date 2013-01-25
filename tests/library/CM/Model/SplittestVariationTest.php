@@ -40,7 +40,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 	public function testGetSplittest() {
 		/** @var CM_Model_SplittestVariation $variation */
 		foreach ($this->_test->getVariations() as $variation) {
-			$this->assertModelEquals($this->_test, $variation->getSplittest());
+			$this->assertEquals($this->_test, $variation->getSplittest());
 		}
 	}
 

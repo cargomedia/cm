@@ -15,12 +15,20 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		self::assertRow($table, $columns, 0);
 	}
 
-	public static function assertModelEquals(CM_Model_Abstract $expected, CM_Model_Abstract $actual) {
-		self::assertTrue($expected->equals($actual), 'Models differ');
+	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
+		if ($expected instanceof CM_Comparable) {
+			self::assertTrue($expected->equals($actual), 'Models differ');
+		} else {
+			parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		}
 	}
 
-	public static function assertModelNotEquals(CM_Model_Abstract $expected, CM_Model_Abstract $actual) {
-		self::assertFalse($expected->equals($actual), 'Models do not differ');
+	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE) {
+		if ($expected instanceof CM_Comparable) {
+			self::assertFalse($expected->equals($actual), 'Models do not differ');
+		} else {
+			parent::assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		}
 	}
 
 	/**
