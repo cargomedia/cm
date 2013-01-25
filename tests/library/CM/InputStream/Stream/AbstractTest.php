@@ -9,7 +9,7 @@ class CM_InputStream_Stream_AbstractTest extends TestCase {
 		$stream = fopen($streamPath, 'w');
 		fwrite($stream, 'foo');
 		$stream = new CM_InputStream_Stream_Abstract($streamPath);
-		$this->assertSame('foo', $stream->read());
+		$this->assertSame('foo', $stream->read('hint'));
 	}
 
 }
