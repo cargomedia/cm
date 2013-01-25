@@ -18,12 +18,13 @@ class CM_Cli_Command {
 	}
 
 	/**
-	 * @param CM_Cli_Arguments    $arguments
-	 * @param CM_Output_Interface $output
+	 * @param CM_Cli_Arguments          $arguments
+	 * @param CM_InputStream_Interface  $input
+	 * @param CM_OutputStream_Interface $output
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @throws CM_Exception
 	 */
-	public function run(CM_Cli_Arguments $arguments, CM_Output_Interface $output) {
+	public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output) {
 		$pidFile = null;
 		if ($this->_getSynchronized()) {
 			if ($this->_isRunning()) {
@@ -38,7 +39,7 @@ class CM_Cli_Command {
 		if ($named = $arguments->getNamed()->getAll()) {
 			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
 		}
-		call_user_func_array(array($this->_class->newInstance($output), $this->_method->getName()), $parameters);
+		call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
 		if ($pidFile) {
 			$pidFile->delete();
 		}
