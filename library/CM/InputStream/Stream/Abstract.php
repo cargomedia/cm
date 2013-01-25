@@ -1,6 +1,6 @@
 <?php
 
-class CM_InputStream_Stream implements CM_InputStream_Interface {
+class CM_InputStream_Stream_Abstract implements CM_InputStream_Interface {
 
 	/** @var string */
 	private $_stream;
