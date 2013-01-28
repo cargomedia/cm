@@ -6,9 +6,12 @@ class CM_Console_Cli extends CM_Cli_Runnable_Abstract {
 		while ('exit' !== ($code = $this->_getInput()->read('php >'))) {
 			$result = null;
 			try {
-				$code = '$result = ' . $code . ';';
-				if (false !== eval($code)) {
-					$this->_getOutput()->writeln(print_r($result, true));
+				ob_start();
+				eval($code . ';');
+				$result = ob_get_contents();
+				ob_end_clean();
+				if ($result) {
+					$this->_getOutput()->writeln($result);
 				}
 			} catch (Exception $e) {
 				$this->_getOutput()->writeln($e->getMessage());
