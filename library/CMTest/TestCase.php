@@ -152,12 +152,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param CM_Model_User|null $viewer
 	 * @return mixed
 	 */
-	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null) {
-		$componentParams = array();
+	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$requestMock = null, $siteId = null) {
+		if (null === $componentParams) {
+			$componentParams = array();
+		}
+		if (null === $siteId) {
+			$siteId = $this->_getSite()->getId();
+		}
 
-		$site = $this->_getSite();
-
-		$requestArgs = array('uri' => '/form/' . $site->getId());
+		$requestArgs = array('uri' => '/form/' . $siteId);
 		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer',
 			'getQuery'))->getMock();
 		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
