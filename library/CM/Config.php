@@ -5,49 +5,57 @@ class CM_Config {
 	/**
 	 * @var stdClass
 	 */
-	private static $_config = null;
+	private $_config = null;
+
+	private function _init() {
+		$this->_config = new stdClass();
+		$this->_loadConfig('default.php');
+		foreach (CM_Bootloader::getInstance()->getEnvironments() as $environment) {
+			$this->_loadConfig($environment . '.php');
+		}
+		$this->_loadConfig('local.php');
+		$this->_loadConfig('internal.php');
+	}
 
 	/**
 	 * @param string $path
 	 */
-	public static function load($path) {
-		$config = self::get();
+	private function _load($path) {
+		$config = $this->_config;
 		require $path;
+	}
+
+	/**
+	 * @param string $fileName
+	 */
+	private function _loadConfig($fileName) {
+		foreach (CM_Util::getResourceFiles('config/' . $fileName) as $config) {
+			$this->_load($config->getPath());
+		}
 	}
 
 	/**
 	 * @return stdClass
 	 */
 	public static function get() {
-		if (!self::$_config) {
-			self::_init();
+		$config = self::_getInstance();
+		if (!$config->_config) {
+			$config->_init();
 		}
-		return self::$_config;
+		return $config->_config;
 	}
 
 	/**
 	 * @param stdClass $config
 	 */
-	public static function set($config) {
-		self::$_config = $config;
-	}
-
-	private static function _init() {
-		self::$_config = new stdClass();
-		self::_loadConfig('default.php');
-		if (IS_TEST) {
-			self::_loadConfig('test.php');
-		}
-		self::_loadConfig('local.php');
-		self::_loadConfig('internal.php');
+	public static function set(stdClass $config) {
+		self::_getInstance()->_config = $config;
 	}
 
 	/**
-	 * @param string $fileName
+	 * @return CM_Config
 	 */
-	private static function _loadConfig($fileName) {
-		foreach (CM_Util::getResourceFiles('config/' . $fileName) as $config) {
-			self::load($config->getPath());
-		}
+	private static function _getInstance() {
+		return CM_Bootloader::getInstance()->getConfig();
 	}
 }

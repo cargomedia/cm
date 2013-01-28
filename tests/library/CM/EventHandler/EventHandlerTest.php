@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
+require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_EventHandlerTest extends TestCase {
+class CM_EventHandler_EventHandlerTest extends TestCase {
 
 	public static $_foo;
 	public static $_counter;
@@ -14,7 +14,7 @@ class CM_EventHandlerTest extends TestCase {
 	}
 
 	public function test() {
-		$eventHandler = new CM_EventHandler();
+		$eventHandler = new CM_EventHandler_EventHandler();
 		self::$_foo = '';
 		$eventHandler->bind('foo', new CM_JobMock_1(), array('text' => 'bar'));
 		$eventHandler->trigger('foo');
@@ -46,7 +46,7 @@ class CM_EventHandlerTest extends TestCase {
 class CM_JobMock_1 extends CM_Jobdistribution_Job_Abstract {
 
 	protected function _run(CM_Params $params) {
-		CM_EventHandlerTest::$_foo .= $params->getString('text');
+		CM_EventHandler_EventHandlerTest::$_foo .= $params->getString('text');
 	}
 
 }
@@ -54,7 +54,7 @@ class CM_JobMock_1 extends CM_Jobdistribution_Job_Abstract {
 class CM_JobMock_2 extends CM_Jobdistribution_Job_Abstract {
 
 	protected function _run(CM_Params $params) {
-		CM_EventHandlerTest::$_counter++;
+		CM_EventHandler_EventHandlerTest::$_counter++;
 	}
 
 }
@@ -62,7 +62,7 @@ class CM_JobMock_2 extends CM_Jobdistribution_Job_Abstract {
 class CM_JobMock_3 extends CM_Jobdistribution_Job_Abstract {
 
 	protected function _run(CM_Params $params) {
-		CM_EventHandlerTest::$_counter += $params->getInt('i');
+		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('i');
 	}
 
 }
@@ -70,7 +70,7 @@ class CM_JobMock_3 extends CM_Jobdistribution_Job_Abstract {
 class CM_JobMock_4 extends CM_Jobdistribution_Job_Abstract {
 
 	protected function _run(CM_Params $params) {
-		CM_EventHandlerTest::$_counter += $params->getInt('a');
+		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('a');
 	}
 
 }
