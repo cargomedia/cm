@@ -17,6 +17,6 @@ class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 		$stream = fopen($this->_stream, 'r');
 		$value = fgets($stream);
 		fclose($stream);
-		return (string) $value;
+		return (string) rtrim($value, "\n");
 	}
 }
