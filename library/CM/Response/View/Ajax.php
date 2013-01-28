@@ -7,7 +7,10 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 		try {
 			$success = array();
 			$query = $this->_request->getQuery();
-			if (!isset($query['method']) || !preg_match('/^[\w_]+$/i', $query['method'])) {
+			if (!isset($query['method'])) {
+				throw new CM_Exception_Invalid('No method specified', null, null, CM_Exception::WARN);
+			}
+			if (!preg_match('/^[\w_]+$/i', $query['method'])) {
 				throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, null, CM_Exception::WARN);
 			}
 			if (!isset($query['params']) || !is_array($query['params'])) {

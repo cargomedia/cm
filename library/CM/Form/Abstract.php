@@ -189,7 +189,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		foreach ($action->getFields() as $field_name => $required) {
 			$field = $this->getField($field_name);
 
-			if (!$field->isEmpty($data[$field_name])) {
+			if (array_key_exists($field_name, $data) && !$field->isEmpty($data[$field_name])) {
 				try {
 					$form_data[$field_name] = $field->validate($data[$field_name], $response);
 				} catch (CM_Exception_FormFieldValidation $e) {

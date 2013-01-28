@@ -445,7 +445,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param              $phrase
+	 * @param string       $phrase
 	 * @param array        $variables
 	 * @return string
 	 */

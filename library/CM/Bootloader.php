@@ -229,16 +229,28 @@ class CM_Bootloader {
 		}
 	}
 
+	public function reloadNamespacePaths() {
+		$this->_namespacePaths = null;
+		apc_delete($this->_getNamespacePathsCacheKey());
+	}
+
 	/**
 	 * @return array
 	 */
 	private function _getNamespacePaths() {
-		$key = 'CM_NamespacesPaths';
-		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($key))) {
+		$cacheKey = $this->_getNamespacePathsCacheKey();
+		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($cacheKey))) {
 			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
-			apc_store($key, $this->_namespacePaths);
+			apc_store($cacheKey, $this->_namespacePaths);
 		}
 		return $this->_namespacePaths;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getNamespacePathsCacheKey() {
+		return DIR_ROOT . '_CM_NamespacesPaths';
 	}
 
 	/**
