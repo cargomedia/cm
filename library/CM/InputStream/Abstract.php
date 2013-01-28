@@ -9,7 +9,7 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 		$this->_outputStream = new CM_OutputStream_Null();
 	}
 
-	public function confirm($hint, $default = null) {
+	public function confirm($hint = null, $default = null) {
 		$allowedValues = array('y' => true, 'n' => false);
 		$options = array();
 		foreach ($allowedValues as $label => $value) {
@@ -24,7 +24,7 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 		return $allowedValues[$label];
 	}
 
-	public function read($hint, $default = null) {
+	public function read($hint = null, $default = null) {
 		$this->_getOutputStream()->write($hint . ' ');
 		$value = $this->_read();
 		if (!$value && null !== $default) {
