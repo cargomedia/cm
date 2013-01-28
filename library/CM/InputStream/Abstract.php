@@ -12,7 +12,9 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 	abstract protected function _read($hint = null);
 
 	public function __construct() {
-		$this->_outputStream = new CM_OutputStream_Null();
+		if (null === $this->_outputStream) {
+			$this->_outputStream = new CM_OutputStream_Null();
+		}
 	}
 
 	public function confirm($hint = null, $default = null) {

@@ -10,7 +10,7 @@ abstract class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 	 */
 	public function __construct($stream) {
 		$this->_stream = (string) $stream;
-		$this->_outputStream = new CM_OutputStream_Stream_StandardError();
+		parent::__construct();
 	}
 
 	protected function _read($hint = null) {
