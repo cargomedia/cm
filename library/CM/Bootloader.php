@@ -3,7 +3,7 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
-	/** @var stdClass|null */
+	/** @var CM_Config|null */
 	private $_config = null;
 
 	/** @var array|null */
@@ -197,17 +197,13 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return stdClass
+	 * @return CM_Config
 	 */
 	public function getConfig() {
+		if (null === $this->_config) {
+			$this->_config = new CM_Config();
+		}
 		return $this->_config;
-	}
-
-	/**
-	 * @param stdClass $config
-	 */
-	public function setConfig(stdClass $config) {
-		$this->_config = $config;
 	}
 
 	/**
