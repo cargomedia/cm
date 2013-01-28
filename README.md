@@ -59,3 +59,9 @@ CM_Paging_User_Country                         # All users from a given country
 ```
 composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
 ```
+
+Change into your newly created project and install the dependencies:
+```
+cd <project-name>
+composer install
+```
