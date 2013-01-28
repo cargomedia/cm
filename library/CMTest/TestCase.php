@@ -145,11 +145,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param string             $formClassName
-	 * @param string             $actionName
-	 * @param array              $data
-	 * @param string|null        $componentClassName Component that uses that form
-	 * @param CM_Model_User|null $viewer
+	 * @param string               $formClassName
+	 * @param string               $actionName
+	 * @param array                $data
+	 * @param string|null          $componentClassName Component that uses that form
+	 * @param CM_Model_User|null   $viewer
+	 * @param array|null           $componentParams
+	 * @param CM_Request_Post|null $requestMock
+	 * @param int|null             $siteId
 	 * @return mixed
 	 */
 	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$requestMock = null, $siteId = null) {
