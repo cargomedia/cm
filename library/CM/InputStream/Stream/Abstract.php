@@ -13,7 +13,11 @@ class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 		$this->_outputStream = new CM_OutputStream_Stream_StandardError();
 	}
 
-	protected function _read() {
+	public function read($hint = null) {
+		if (null !== $hint) {
+			$hint .= ' ';
+		}
+		$this->_getOutputStream()->write($hint);
 		$stream = fopen($this->_stream, 'r');
 		$value = fgets($stream);
 		fclose($stream);
