@@ -1,6 +1,6 @@
 <?php
 
-class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
+abstract class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 
 	/** @var string */
 	private $_stream;
@@ -13,14 +13,11 @@ class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 		$this->_outputStream = new CM_OutputStream_Stream_StandardError();
 	}
 
-	public function read($hint = null) {
-		if (null !== $hint) {
-			$hint .= ' ';
-		}
+	protected function _read($hint = null) {
 		$this->_getOutputStream()->write($hint);
 		$stream = fopen($this->_stream, 'r');
 		$value = fgets($stream);
 		fclose($stream);
-		return (string) $value;
+		return (string) rtrim($value, "\n");
 	}
 }
