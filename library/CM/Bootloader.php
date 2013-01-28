@@ -224,6 +224,9 @@ class CM_Bootloader {
 		return $this->_isCli;
 	}
 
+	/**
+	 * @throws CM_Exception_Invalid
+	 */
 	public function setCli() {
 		if (null !== $this->_config) {
 			throw new CM_Exception_Invalid('Config already loaded.');
@@ -231,15 +234,21 @@ class CM_Bootloader {
 		$this->_isCli = true;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function isTest() {
+		return $this->_isTest;
+	}
+
+	/**
+	 * @throws CM_Exception_Invalid
+	 */
 	public function setTest() {
 		if (null !== $this->_config) {
 			throw new CM_Exception_Invalid('Config already loaded.');
 		}
 		$this->_isTest = true;
-	}
-
-	public function isTest() {
-		return $this->_isTest;
 	}
 
 	/**
