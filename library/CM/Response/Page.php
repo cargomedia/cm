@@ -43,7 +43,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	public function redirect($page, array $params = null) {
 		$url = $this->getRender()->getUrlPage($page, $params);
-		if (IS_TEST) {
+		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
 			throw new CM_Exception_Redirect($url);
 		}
 		$this->_redirectUrl = $url;

@@ -6,20 +6,20 @@ class CM_Bootloader {
 	/** @var CM_Config|null */
 	private $_config = null;
 
+	/** @var string[] */
+	private $_environments = array();
+
+	/** @var boolean */
+	private $_loaded = false;
+
 	/** @var array|null */
 	private $_namespacePaths;
-
-	/** @var boolean */
-	private $_isCli = false;
-
-	/** @var boolean */
-	private $_isTest = false;
 
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
 	/**
-	 * @param string $pathRoot
+	 * @param string      $pathRoot
 	 * @param string|null $dirLibrary
 	 * @throws CM_Exception_Invalid
 	 */
@@ -63,9 +63,9 @@ class CM_Bootloader {
 		};
 
 		set_exception_handler(function (Exception $exception) use ($exceptionFormatter) {
-			$showError = IS_DEBUG || IS_CRON || IS_TEST;
+			$showError = IS_DEBUG || IS_CRON || CM_Bootloader::getInstance()->isEnvironment('test');
 
-			if (!IS_CRON && !IS_TEST) {
+			if (!IS_CRON && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 				header('HTTP/1.1 500 Internal Server Error');
 			}
 
@@ -121,9 +121,8 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
 
-		defined('IS_TEST') || define('IS_TEST', false);
 		defined('IS_CRON') || define('IS_CRON', false);
-		define('IS_DEBUG', (bool) CM_Config::get()->debug && !IS_TEST);
+		define('IS_DEBUG', (bool) CM_Config::get()->debug && !CM_Bootloader::getInstance()->isEnvironment('test'));
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
@@ -214,37 +213,32 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return string[]
+	 */
+	public function getEnvironments() {
+		return $this->_environments;
+	}
+
+	/**
+	 * @param string $environment
 	 * @return boolean
 	 */
-	public function isCli() {
-		return $this->_isCli;
+	public function isEnvironment($environment) {
+		return in_array((string) $environment, $this->_environments);
 	}
 
 	/**
+	 * @param string $environment
 	 * @throws CM_Exception_Invalid
 	 */
-	public function setCli() {
-		if (null !== $this->_config) {
-			throw new CM_Exception_Invalid('Config already loaded.');
+	public function setEnvironment($environment) {
+		if ($this->_loaded) {
+			throw new CM_Exception_Invalid('Bootloader already loaded.');
 		}
-		$this->_isCli = true;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isTest() {
-		return $this->_isTest;
-	}
-
-	/**
-	 * @throws CM_Exception_Invalid
-	 */
-	public function setTest() {
-		if (null !== $this->_config) {
-			throw new CM_Exception_Invalid('Config already loaded.');
+		$environment = (string) $environment;
+		if (!in_array($environment, $this->_environments)) {
+			$this->_environments[] = $environment;
 		}
-		$this->_isTest = true;
 	}
 
 	/**
@@ -252,6 +246,7 @@ class CM_Bootloader {
 	 * @throws Exception
 	 */
 	public function load(array $functions) {
+		$this->_loaded = true;
 		foreach ($functions as $function) {
 			if (!method_exists($this, $function)) {
 				throw new Exception('Non existent bootload function `' . $function . '`');

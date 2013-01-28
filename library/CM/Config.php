@@ -10,11 +10,8 @@ class CM_Config {
 	private function _init() {
 		$this->_config = new stdClass();
 		$this->_loadConfig('default.php');
-		if (CM_Bootloader::getInstance()->isTest()) {
-			$this->_loadConfig('test.php');
-		}
-		if (CM_Bootloader::getInstance()->isCli()) {
-			$this->_loadConfig('cli.php');
+		foreach (CM_Bootloader::getInstance()->getEnvironments() as $environment) {
+			$this->_loadConfig($environment . '.php');
 		}
 		$this->_loadConfig('local.php');
 		$this->_loadConfig('internal.php');
