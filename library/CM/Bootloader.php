@@ -63,9 +63,9 @@ class CM_Bootloader {
 		};
 
 		set_exception_handler(function (Exception $exception) use ($exceptionFormatter) {
-			$showError = IS_DEBUG || IS_CRON || CM_Bootloader::getInstance()->isEnvironment('test');
+			$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
 
-			if (!IS_CRON && !CM_Bootloader::getInstance()->isEnvironment('test')) {
+			if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 				header('HTTP/1.1 500 Internal Server Error');
 			}
 
@@ -121,7 +121,6 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
 
-		defined('IS_CRON') || define('IS_CRON', false);
 		define('IS_DEBUG', (bool) CM_Config::get()->debug && !CM_Bootloader::getInstance()->isEnvironment('test'));
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
