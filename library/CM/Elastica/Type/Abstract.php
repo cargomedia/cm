@@ -23,7 +23,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		if ($version) {
 			$this->_indexName .= '.' . $version;
 		}
-		if (defined('IS_TEST') && IS_TEST) {
+		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
 			$this->_indexName .= '.test';
 		}
 

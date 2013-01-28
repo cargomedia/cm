@@ -3,9 +3,9 @@
 interface CM_InputStream_Interface {
 
 	/**
-	 * @param string $hint
+	 * @param string|null $hint
 	 * @return string
 	 */
-	public function read($hint);
+	public function read($hint = null);
 
 }

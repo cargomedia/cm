@@ -343,7 +343,7 @@ abstract class CM_Request_Abstract {
 	 * @return string|null    very long number (string used)
 	 */
 	public function getIp() {
-		if (IS_TEST) {
+		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
 			$ip = CM_Config::get()->testIp;
 		} else {
 			if (!isset($_SERVER['REMOTE_ADDR'])) {
