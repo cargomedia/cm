@@ -1,14 +1,7 @@
-.clearfix {
-	*zoom: 1;
-	display: block;
-	&:before,
-	&:after {
-		display: table;
-		content: "";
-	}
-	&:after {
-		clear: both;
-	}
+.clearfix:after {
+	content: "";
+	display: table;
+	clear: both;
 }
 
 .nowrap {
