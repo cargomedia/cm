@@ -71,7 +71,6 @@
 	.background-color(@colorBgSelect);
 }
 
-
 .border(@color) {
 	border: 1px solid @color;
 }
@@ -214,4 +213,8 @@
 	border: 1px solid darken(@colorFgButtonAlt, 10);
 }
 
-
+.appearance(@value) {
+	-webkit-appearance: @value;
+	-moz-appearance: @value;
+	appearance: @value;
+}
