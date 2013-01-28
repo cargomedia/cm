@@ -3,15 +3,17 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
-	const MODE_NORMAL = 1;
-	const MODE_TEST = 2;
-	const MODE_CLI = 3;
-
-	/** @var int */
-	private $_mode;
+	/** @var stdClass|null */
+	private $_config = null;
 
 	/** @var array|null */
 	private $_namespacePaths;
+
+	/** @var boolean */
+	private $_isCli = false;
+
+	/** @var boolean */
+	private $_isTest = false;
 
 	/** @var CM_Bootloader */
 	protected static $_instance;
@@ -21,11 +23,7 @@ class CM_Bootloader {
 	 * @param string|null $dirLibrary
 	 * @throws CM_Exception_Invalid
 	 */
-	final public function __construct($pathRoot, $dirLibrary, $mode = null) {
-		if (null === $mode) {
-			$mode = self::MODE_NORMAL;
-		}
-		$this->_mode = (int) $mode;
+	final public function __construct($pathRoot, $dirLibrary) {
 		if (self::$_instance) {
 			throw new CM_Exception_Invalid('Bootloader already instantiated');
 		}
@@ -199,6 +197,20 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return stdClass
+	 */
+	public function getConfig() {
+		return $this->_config;
+	}
+
+	/**
+	 * @param stdClass $config
+	 */
+	public function setConfig(stdClass $config) {
+		$this->_config = $config;
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getNamespaces() {
@@ -209,11 +221,25 @@ class CM_Bootloader {
 	 * @return boolean
 	 */
 	public function isCli() {
-		return self::MODE_CLI === $this->_mode;
+		return $this->_isCli;
+	}
+
+	public function setCli() {
+		if (null !== $this->_config) {
+			throw new CM_Exception_Invalid('Config already loaded.');
+		}
+		$this->_isCli = true;
+	}
+
+	public function setTest() {
+		if (null !== $this->_config) {
+			throw new CM_Exception_Invalid('Config already loaded.');
+		}
+		$this->_isTest = true;
 	}
 
 	public function isTest() {
-		return self::MODE_TEST === $this->_mode;
+		return $this->_isTest;
 	}
 
 	/**

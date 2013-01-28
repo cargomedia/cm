@@ -19,21 +19,21 @@ class CM_Config {
 	 * @return stdClass
 	 */
 	public static function get() {
-		if (!self::$_config) {
+		if (!CM_Bootloader::getInstance()->getConfig()) {
 			self::_init();
 		}
-		return self::$_config;
+		return CM_Bootloader::getInstance()->getConfig();
 	}
 
 	/**
 	 * @param stdClass $config
 	 */
-	public static function set($config) {
-		self::$_config = $config;
+	public static function set(stdClass $config) {
+		CM_Bootloader::getInstance()->setConfig($config);
 	}
 
 	private static function _init() {
-		self::$_config = new stdClass();
+		self::set(new stdClass());
 		self::_loadConfig('default.php');
 		if (CM_Bootloader::getInstance()->isTest()) {
 			self::_loadConfig('test.php');

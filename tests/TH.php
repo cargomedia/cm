@@ -21,7 +21,8 @@ class TH {
 		define('IS_TEST', true);
 
 		require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
-		$bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null, CM_Bootloader::MODE_TEST);
+		$bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
+		$bootloader->setTest();
 		$bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
 		!is_dir(DIR_TMP) ? mkdir(DIR_TMP) : null;
