@@ -5,8 +5,16 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 	/** @var CM_OutputStream_Interface */
 	protected $_outputStream;
 
+	/**
+	 * @param string|null $hint
+	 * @return string
+	 */
+	abstract protected function _read($hint = null);
+
 	public function __construct() {
-		$this->_outputStream = new CM_OutputStream_Null();
+		if (null === $this->_outputStream) {
+			$this->_outputStream = new CM_OutputStream_Null();
+		}
 	}
 
 	public function confirm($hint = null, $default = null) {
@@ -25,8 +33,10 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 	}
 
 	public function read($hint = null, $default = null) {
-		$this->_getOutputStream()->write($hint . ' ');
-		$value = $this->_read();
+		if (null !== $hint) {
+			$hint .= ' ';
+		}
+		$value = $this->_read($hint);
 		if (!$value && null !== $default) {
 			$value = $default;
 		}
@@ -39,10 +49,5 @@ abstract class CM_InputStream_Abstract implements CM_InputStream_Interface {
 	protected function _getOutputStream() {
 		return $this->_outputStream;
 	}
-
-	/**
-	 * @return string
-	 */
-	abstract protected function _read();
 
 }
