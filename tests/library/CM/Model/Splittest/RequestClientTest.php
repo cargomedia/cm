@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_Splittest_RequestClientTest extends TestCase {
+class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testIsVariationFixture() {

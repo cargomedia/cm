@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_RenderTest extends TestCase {
+class CM_RenderTest extends CMTest_TestCase {
 	
 	public function setUp() {
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
@@ -13,7 +12,7 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetUrl() {
@@ -68,7 +67,7 @@ class CM_RenderTest extends TestCase {
 		$render = new CM_Render($this->_getSite(), null, null, true); // This should never happen in application, but lets test it
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
-		$language = TH::createLanguage('en');
+		$language = CMTest_TH::createLanguage('en');
 
 		$render = new CM_Render($this->_getSite(), null, null, null);
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
@@ -139,9 +138,9 @@ class CM_RenderTest extends TestCase {
 	}
 
 	public function testGetViewer() {
-		$viewer = TH::createUser();
+		$viewer = CMTest_TH::createUser();
 		$render = new CM_Render($this->_getSite(), $viewer);
-		$this->assertModelEquals($viewer, $render->getViewer());
+		$this->assertEquals($viewer, $render->getViewer());
 
 		$render = new CM_Render($this->_getSite());
 		$this->assertNull($render->getViewer());

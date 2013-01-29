@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../../TestCase.php';
-
-class CM_Model_LanguageTest extends TestCase {
+class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	/** @var CM_Model_Language $_language */
 	protected $_language;
@@ -13,7 +11,7 @@ class CM_Model_LanguageTest extends TestCase {
 	}
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testSetGetTranslation() {
@@ -92,7 +90,7 @@ class CM_Model_LanguageTest extends TestCase {
 		} catch (CM_Exception_Nonexistent $e) {
 			$this->assertContains('CM_Model_Language', $e->getMessage());
 		}
-		TH::reinstantiateModel($backedUpLanguage);
+		CMTest_TH::reinstantiateModel($backedUpLanguage);
 		$this->assertNull($backedUpLanguage->getBackup());
 	}
 
@@ -118,7 +116,7 @@ class CM_Model_LanguageTest extends TestCase {
 	}
 
 	public function testFindByAbbreviation() {
-		$this->assertModelEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
+		$this->assertEquals($this->_language, CM_Model_Language::findByAbbreviation($this->_language->getAbbreviation()));
 		$this->assertNull(CM_Model_Language::findByAbbreviation('random-not-existing-abbreviation'));
 	}
 
@@ -166,10 +164,10 @@ class CM_Model_LanguageTest extends TestCase {
 	}
 
 	public function testFindDefault() {
-		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
 		$this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
-		$this->assertModelEquals($this->_language, CM_Model_Language::findDefault());
+		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
 		CM_CacheLocal::flush();
 		$this->assertNull(CM_Model_Language::findDefault());

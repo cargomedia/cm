@@ -1,13 +1,12 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_SessionTest extends TestCase {
+class CM_SessionTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructor() {
@@ -56,7 +55,7 @@ class CM_SessionTest extends TestCase {
 		$session->set('foobar', 'foobar');
 		$expiration = $session->getExpiration();
 		$sessionId = $session->getId();
-		TH::timeForward(10);
+		CMTest_TH::timeForward(10);
 		unset($session);
 
 		try {
@@ -71,7 +70,7 @@ class CM_SessionTest extends TestCase {
 
 		//test that session is only persisted when data changed
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
-		TH::clearCache();
+		CMTest_TH::clearCache();
 		unset($session);
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
@@ -132,7 +131,7 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session();
 		$sessionId = $session->getId();
 		unset($session);
-		TH::timeForward(4000);
+		CMTest_TH::timeForward(4000);
 		CM_Session::deleteExpired();
 		try {
 			new CM_Session($sessionId);
@@ -148,7 +147,7 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session();
 
 		$session->setUser($user);
-		$this->assertModelEquals($user, $session->getUser(true));
+		$this->assertEquals($user, $session->getUser(true));
 		$this->assertTrue($session->getUser(true)->getOnline());
 	}
 
@@ -176,7 +175,7 @@ class CM_SessionTest extends TestCase {
 		/** @var CM_Model_User $user */
 		$user = CM_Model_User::create();
 		$session->setUser($user);
-		$this->assertModelEquals($user, $session->getUser(true));
+		$this->assertEquals($user, $session->getUser(true));
 	}
 
 	public function testStart() {
@@ -191,27 +190,27 @@ class CM_SessionTest extends TestCase {
 		$session = new CM_Session($sessionId);
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
-		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 10);
+		CMTest_TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 10);
 		$session = new CM_Session($sessionId);
 		$session->start();
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
 		unset($session);
-		TH::clearCache();
+		CMTest_TH::clearCache();
 
-		TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 2);
+		CMTest_TH::timeForward(CM_Session::ACTIVITY_EXPIRATION / 2);
 		$activityStamp2 = time();
 		$session = new CM_Session($sessionId);
 		$session->start();
 		$this->assertEquals($activityStamp2, $session->getUser(true)->getLatestactivity(), null, 1);
-		TH::timeForward($session->getLifetime() / 2);
+		CMTest_TH::timeForward($session->getLifetime() / 2);
 		$session->start();
 
 		$this->assertEquals('bar', $session->get('foo'));
 		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
 		unset($session);
-		TH::clearCache();
+		CMTest_TH::clearCache();
 
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('bar', $session->get('foo'));

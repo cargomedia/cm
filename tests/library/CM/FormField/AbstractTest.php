@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../../TestCase.php';
-
-class CM_FormField_AbstractTest extends TestCase {
+class CM_FormField_AbstractTest extends CMTest_TestCase {
 	
 	public static function setUpBeforeClass() {
 	}

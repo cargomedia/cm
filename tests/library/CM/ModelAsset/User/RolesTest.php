@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_ModelAsset_User_RolesTest extends TestCase {
+class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 	
 	const ROLE_A = 10;
 	const ROLE_B = 11;
@@ -11,11 +10,11 @@ class CM_ModelAsset_User_RolesTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testAdd() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$user->getRoles()->add(self::ROLE_A, 1000);
 		$this->assertTrue($user->getRoles()->contains(self::ROLE_A));
 		$user->getRoles()->add(self::ROLE_A, 1000);
@@ -30,7 +29,7 @@ class CM_ModelAsset_User_RolesTest extends TestCase {
 	}
 	
 	public function testDelete() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$user->getRoles()->add(self::ROLE_A, 1000);
 		$this->assertTrue($user->getRoles()->contains(self::ROLE_A));
 		$user->getRoles()->add(self::ROLE_B, 1000);
@@ -40,16 +39,16 @@ class CM_ModelAsset_User_RolesTest extends TestCase {
 	}
 	
 	public function testClean() {
-		TH::clearEnv();
-		$user1 = TH::createUser();
-		$user2 = TH::createUser();
+		CMTest_TH::clearEnv();
+		$user1 = CMTest_TH::createUser();
+		$user2 = CMTest_TH::createUser();
 		$user1->getRoles()->add(self::ROLE_A, 2000);
 		$user1->getRoles()->add(self::ROLE_C);
 		$user1->getRoles()->add(self::ROLE_B, 1000);
 		$user2->getRoles()->add(self::ROLE_A, 2000);
 		$user2->getRoles()->add(self::ROLE_B, 1000);
 		$this->assertTrue($user1->getRoles()->contains(self::ROLE_B));
-		TH::timeForward(1500);
+		CMTest_TH::timeForward(1500);
 		CM_ModelAsset_User_Roles::deleteOld($user1);
 		$user1->_change();
 		$user2->_change();
@@ -69,7 +68,7 @@ class CM_ModelAsset_User_RolesTest extends TestCase {
 	}
 	
 	public function test_Get() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$user->getRoles()->add(self::ROLE_A, 2000);
 		$stamps = CM_Mysql::select(TBL_CM_ROLE, array('startStamp', 'expirationStamp'), array('userId' => $user->getId()))->fetchAssoc();
 		$this->assertEquals($stamps['startStamp'], $user->getRoles()->getStartStamp(self::ROLE_A));

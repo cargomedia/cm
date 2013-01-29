@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_MysqlTest extends TestCase {
+class CM_MysqlTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		define('TBL_TEST', 'test');
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function setUp() {

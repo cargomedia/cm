@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../TestCaseRender.php';
 
-class CM_MailTest extends TestCaseRender {
+class CM_MailTest extends CMTest_TestCaseRender {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testWithTemplate() {
-		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(TH::createUser()->getId()));
+		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
 		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
 
@@ -42,7 +41,7 @@ class CM_MailTest extends TestCaseRender {
 	}
 
 	public function testQueue() {
-		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(TH::createUser()->getId()));
+		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
 		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
 

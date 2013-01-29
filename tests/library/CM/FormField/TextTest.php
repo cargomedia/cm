@@ -1,10 +1,9 @@
 <?php
-require_once __DIR__ . '/../../../TestCaseRender.php';
 
-class CM_FormField_TextTest extends TestCaseRender {
+class CM_FormField_TextTest extends CMTest_TestCaseRender {
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testRender() {

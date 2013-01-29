@@ -1,17 +1,16 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_StreamAdapter_ApacheTest extends TestCase {
+class CM_StreamAdapter_ApacheTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testPublishSubscribe() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$channel = CM_Stream::getStreamChannel($user);
 		$message = "what up?";
 
@@ -24,7 +23,7 @@ class CM_StreamAdapter_ApacheTest extends TestCase {
 	}
 
 	public function testPublishSubscribeArray() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$channel = CM_Stream::getStreamChannel($user);
 		$message = array('my' => 'arrays', 'are' => 'cool');
 

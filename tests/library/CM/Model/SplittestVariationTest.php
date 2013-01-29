@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_SplittestVariationTest extends TestCase {
+class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 	/** @var CM_Model_Splittest */
 	private $_test;
 
@@ -41,7 +40,7 @@ class CM_Model_SplittestVariationTest extends TestCase {
 	public function testGetSplittest() {
 		/** @var CM_Model_SplittestVariation $variation */
 		foreach ($this->_test->getVariations() as $variation) {
-			$this->assertModelEquals($this->_test, $variation->getSplittest());
+			$this->assertEquals($this->_test, $variation->getSplittest());
 		}
 	}
 
@@ -69,7 +68,7 @@ class CM_Model_SplittestVariationTest extends TestCase {
 	}
 
 	public function testGetConversionCount() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
@@ -85,9 +84,9 @@ class CM_Model_SplittestVariationTest extends TestCase {
 	}
 
 	public function testGetConversionWeight() {
-		$user = TH::createUser();
-		$user2 = TH::createUser();
-		$user3 = TH::createUser();
+		$user = CMTest_TH::createUser();
+		$user2 = CMTest_TH::createUser();
+		$user3 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
@@ -114,8 +113,8 @@ class CM_Model_SplittestVariationTest extends TestCase {
 	}
 
 	public function testGetFixtureCount() {
-		$user1 = TH::createUser();
-		$user2 = TH::createUser();
+		$user1 = CMTest_TH::createUser();
+		$user2 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));

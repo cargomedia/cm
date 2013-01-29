@@ -1,11 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../../TestCase.php';
-
-class CM_AdproviderTest extends TestCase {
+class CM_AdproviderTest extends CMTest_TestCase {
 
 	protected function tearDown() {
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 	public function testGetHtml() {

@@ -1,11 +1,7 @@
 <?php
-require_once 'TH/Html.php';
 
-/**
- * TH - TestHelper-class with static convenience-methods
- */
+class CMTest_TH {
 
-class TH {
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
@@ -14,22 +10,8 @@ class TH {
 		if (self::$initialized) {
 			return;
 		}
-
-		// Setup
-		define('DIR_TESTS', __DIR__ . DIRECTORY_SEPARATOR);
-		define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
-
-		require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
-		$bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
-		$bootloader->setEnvironment('test');
-		$bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
-
-		!is_dir(DIR_TMP) ? mkdir(DIR_TMP) : null;
-		!is_dir(DIR_DATA) ? mkdir(DIR_DATA) : null;
-		!is_dir(DIR_USERFILES) ? mkdir(DIR_USERFILES) : null;
-
 		$dbName = CM_Config::get()->CM_Mysql->db;
-		if (CM_Config::get()->TH->dropDatabase) {
+		if (CM_Config::get()->CMTest_TH->dropDatabase) {
 			try {
 				CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
 			} catch (CM_Mysql_DbSelectException $e) {
@@ -52,6 +34,7 @@ class TH {
 
 		// Reset environment
 		self::clearEnv();
+		self::randomizeAutoincrement();
 		self::timeInit();
 
 		self::$initialized = true;
@@ -68,13 +51,15 @@ class TH {
 	public static function clearCache() {
 		CM_Cache::flush();
 		CM_CacheLocal::flush();
-		CM_Cache_Redis::flush();
 	}
 
 	public static function clearDb() {
 		$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
 		foreach ($alltables as $table) {
-			CM_Mysql::truncate($table);
+			CM_Mysql::delete($table, 1);
+		}
+		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
+			CM_Mysql::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
@@ -88,7 +73,7 @@ class TH {
 
 	public static function timeInit() {
 		runkit_function_copy('time', 'time_original');
-		runkit_function_redefine('time', '', 'return TH::time();');
+		runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 	}
 
 	public static function time() {
@@ -154,7 +139,7 @@ class TH {
 	 */
 	public static function createSession(CM_Model_User $user = null) {
 		if (is_null($user)) {
-			$user = TH::createUser();
+			$user = self::createUser();
 		}
 		$session = new CM_Session();
 		$session->setUser($user);
@@ -189,11 +174,11 @@ class TH {
 	 */
 	public static function createStreamChannelVideoArchive(CM_Model_StreamChannel_Video $streamChannel = null, CM_Model_User $user = null) {
 		if (is_null($streamChannel)) {
-			$streamChannel = TH::createStreamChannel();
-			TH::createStreamPublish($user, $streamChannel);
+			$streamChannel = self::createStreamChannel();
+			self::createStreamPublish($user, $streamChannel);
 		}
 		if (!$streamChannel->hasStreamPublish()) {
-			TH::createStreamPublish($user, $streamChannel);
+			self::createStreamPublish($user, $streamChannel);
 		}
 		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
 	}
@@ -205,10 +190,10 @@ class TH {
 	 */
 	public static function createStreamPublish(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (!$user) {
-			$user = TH::createUser();
+			$user = self::createUser();
 		}
 		if (is_null($streamChannel)) {
-			$streamChannel = TH::createStreamChannel();
+			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
@@ -221,7 +206,7 @@ class TH {
 	 */
 	public static function createStreamSubscribe(CM_Model_User $user = null, CM_Model_StreamChannel_Abstract $streamChannel = null) {
 		if (is_null($streamChannel)) {
-			$streamChannel = TH::createStreamChannel();
+			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
@@ -239,6 +224,15 @@ class TH {
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	public static function randomizeAutoincrement() {
+		$tables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		foreach ($tables as $table) {
+			if (CM_Mysql::exec("SHOW COLUMNS FROM `?` WHERE `Extra` = 'auto_increment'", $table)->numRows() > 0) {
+				CM_Mysql::exec("ALTER TABLE `?` AUTO_INCREMENT = ?", $table, rand(1, 1000));
+			}
+		}
 	}
 
 	/**
@@ -261,4 +255,5 @@ class TH {
 		}
 		return $str;
 	}
+
 }

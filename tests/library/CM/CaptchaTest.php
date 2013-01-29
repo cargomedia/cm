@@ -1,13 +1,12 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_CaptchaTest extends TestCase {
+class CM_CaptchaTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testCreate() {
@@ -51,7 +50,7 @@ class CM_CaptchaTest extends TestCase {
 	public function testDeleteOlder() {
 		$captcha = CM_Captcha::create();
 		$id = $captcha->getId();
-		TH::timeForward(200);
+		CMTest_TH::timeForward(200);
 		CM_Captcha::deleteOlder(100);
 		try {
 			new CM_Captcha($id);

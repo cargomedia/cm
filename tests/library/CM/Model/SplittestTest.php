@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_SplittestTest extends TestCase {
+class CM_Model_SplittestTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testCreate() {
@@ -28,7 +27,7 @@ class CM_Model_SplittestTest extends TestCase {
 	public function testConstruct() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$test2 = new CM_Model_Splittest('foo');
-		$this->assertModelEquals($test, $test2);
+		$this->assertEquals($test, $test2);
 
 		$test->delete();
 	}
@@ -119,7 +118,7 @@ class CM_Model_SplittestTest extends TestCase {
 		$this->assertSame('', $test->getVariationFixture($fixtureId));
 		$test->setConversion($fixtureId);
 
-		TH::clearConfig();
+		CMTest_TH::clearConfig();
 	}
 
 }

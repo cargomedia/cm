@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_UtilTest extends TestCase {
+class CM_UtilTest extends CMTest_TestCase {
 
 	public function testGetClasses() {
 		$classPaths = array();

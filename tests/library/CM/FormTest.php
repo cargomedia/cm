@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_FormTest extends TestCase {
+class CM_FormTest extends CMTest_TestCase {
 
 	public static $formActionProcessCount = 0;
 

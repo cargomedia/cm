@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../../../TestCase.php';
-
-class CM_InputStream_Stream_AbstractTest extends TestCase {
+class CM_InputStream_Stream_AbstractTest extends CMTest_TestCase {
 
 	public function testRead() {
 		$streamPath = DIR_TMP . 'bar';

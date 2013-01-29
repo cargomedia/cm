@@ -223,9 +223,9 @@ class CM_Usertext extends CM_Class_Abstract {
 
 				} elseif ($domNode->nodeType == XML_ELEMENT_NODE) {
 					if (null === $lengthMax || $lengthMax > 0) {
-						$childNodeResult = $this->_collapseDomTree($domNode, $allowedTags, $visibleTags, $lengthMax, $level + 1);
 
 						if (in_array($domNode->nodeName, $this->_internalTags)) {
+							$childNodeResult = $domNode->nodeValue;
 							$result .= '<' . $domNode->nodeName . '>' . $childNodeResult . '</' . $domNode->nodeName . '>';
 
 						} else {
@@ -265,6 +265,7 @@ class CM_Usertext extends CM_Class_Abstract {
 								$endTag = $this->_escape($endTag);
 							}
 
+							$childNodeResult = $this->_collapseDomTree($domNode, $allowedTags, $visibleTags, $lengthMax, $level + 1);
 							$result .= $startTag . $childNodeResult . $endTag;
 						}
 					}

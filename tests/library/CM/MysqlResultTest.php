@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_MysqlResultTest extends TestCase {
+class CM_MysqlResultTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		define('TBL_TEST', 'test');

@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../TestCase.php';
-
-class CM_FileTest extends TestCase {
+class CM_FileTest extends CMTest_TestCase {
 
 	protected static $_backupContent;
 	
