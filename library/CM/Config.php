@@ -10,7 +10,7 @@ class CM_Config {
 	private function _init() {
 		$this->_config = new stdClass();
 		$this->_loadConfig('default.php');
-		foreach (CM_Bootloader::getInstance()->getEnvironments() as $environment) {
+		foreach (CM_Bootloader::getInstance()->getEnvironment() as $environment) {
 			$this->_loadConfig($environment . '.php');
 		}
 		$this->_loadConfig('local.php');
