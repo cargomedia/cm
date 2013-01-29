@@ -156,10 +156,16 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 	}
 
 	public function testCollapse() {
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), array(array(1, null, 1, 1,
-				null, 1, 1), array(1, null, 1, 1, null, 1, 2), array(1, null, 1, 1, null, 2, 1), array(1, null, 1, 1, null, 3, 1),
-				array(1, null, 1, 1, null, 4, 10), array(1, null, 1, 1, 1, 4, 10), array(1, null, 2, 1, null, 4, 100),
-				array(1, null, 1, 2, null, 4, 100), array(1, null, 1, 1, null, 5, 100),));
+		$values[] = array(1, null, 1, 1, null, 1, 1);
+		$values[] = array(1, null, 1, 1, null, 1, 2);
+		$values[] = array(1, null, 1, 1, null, 2, 1);
+		$values[] = array(1, null, 1, 1, null, 3, 1);
+		$values[] = array(1, null, 1, 1, null, 4, 10);
+		$values[] = array(1, null, 1, 1, 1, 4, 10);
+		$values[] = array(1, null, 2, 1, null, 4, 100);
+		$values[] = array(1, null, 1, 2, null, 4, 100);
+		$values[] = array(1, null, 1, 1, null, 5, 100);
+		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
 		CM_Action_Abstract::collapse(1, 4);
 		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'createStamp' => 2, 'count' => 5));
