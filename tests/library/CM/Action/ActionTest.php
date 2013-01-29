@@ -68,22 +68,52 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		CMTest_TH::timeForward(-(time() % 30)); // Make sure time() is a multiple of 30
 
 		$time = time() - 86400;
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), array(array(1, null, 1, 1,
-				null, time() - 10000, 1), array(1, null, 1, 1, null, $time - 1, 2), array(1, null, 1, 1, null, $time - 2, 1),
-				array(1, null, 1, 1, null, $time - 5, 1), array(1, null, 1, 1, null, $time - 6, 1), array(1, null, 1, 1, null, $time - 7, 1),
-				array(1, null, 1, 1, null, $time - 8, 1), array(1, null, 1, 1, null, $time - 9, 1), array(1, null, 1, 1, null, $time - 10, 4),
-				array(null, 1, 1, 1, null, $time - 11, 1), array(null, 1, 1, 1, null, $time - 14, 1), array(null, 1, 1, 1, null, $time - 15, 1),
-				array(null, 1, 1, 1, null, $time - 18, 1), array(null, 1, 1, 1, null, $time - 20, 1), array(null, 1, 1, 1, null, $time - 21, 1),
-				array(null, 1, 1, 1, null, $time - 25, 1), array(null, 1, 1, 1, null, $time - 27, 1), array(null, 1, 1, 1, null, $time - 30, 1),
-				array(null, 1, 1, 1, null, $time - 40, 1), array(null, 1, 1, 1, null, $time - 50, 1), array(null, 1, 1, 1, null, $time - 60, 10),
-				array(null, 1, 2, 1, null, $time - 9, 1), array(null, 1, 2, 1, null, $time - 9, 1), array(null, 1, 2, 1, null, $time - 10, 2),
-				array(null, 1, 2, 1, null, $time - 11, 1), array(null, 1, 2, 1, null, $time - 12, 1), array(null, 1, 2, 1, null, $time - 13, 1),
-				array(null, 1, 2, 1, null, $time - 14, 1), array(null, 1, 2, 1, null, $time - 15, 1), array(null, 1, 2, 1, null, $time - 16, 1),
-				array(null, 1, 2, 1, 1, $time - 6, 1), array(null, 1, 2, 1, 1, $time - 6, 2), array(null, 1, 2, 1, 2, $time - 6, 3),
-				array(null, 1, 2, 1, 2, $time - 7, 4), array(null, 1, 2, 1, 2, $time - 1, 5), array(null, 1, 2, 1, 2, $time - 1, 6),
-				array(null, 1, 1, 2, null, $time - 17, 1), array(null, 1, 1, 2, null, $time - 18, 1), array(null, 1, 1, 2, null, $time - 19, 1),
-				array(null, 1, 1, 2, null, $time - 20, 1), array(null, 1, 1, 2, null, $time - 21, 1), array(null, 1, 1, 2, null, $time - 22, 1),
-				array(null, 1, 1, 2, null, $time - 23, 1), array(null, 1, 1, 2, null, $time - 24, 4),));
+		$values = array();
+		$values[] = array(1, null, 1, 1, null, time() - 10000, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 1, 2);
+		$values[] = array(1, null, 1, 1, null, $time - 2, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 5, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 6, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 7, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 8, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 9, 1);
+		$values[] = array(1, null, 1, 1, null, $time - 10, 4);
+		$values[] = array(null, 1, 1, 1, null, $time - 11, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 14, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 15, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 18, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 20, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 21, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 25, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 27, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 30, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 40, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 50, 1);
+		$values[] = array(null, 1, 1, 1, null, $time - 60, 10);
+		$values[] = array(null, 1, 2, 1, null, $time - 9, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 9, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 10, 2);
+		$values[] = array(null, 1, 2, 1, null, $time - 11, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 12, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 13, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 14, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 15, 1);
+		$values[] = array(null, 1, 2, 1, null, $time - 16, 1);
+		$values[] = array(null, 1, 2, 1, 1, $time - 6, 1);
+		$values[] = array(null, 1, 2, 1, 1, $time - 6, 2);
+		$values[] = array(null, 1, 2, 1, 2, $time - 6, 3);
+		$values[] = array(null, 1, 2, 1, 2, $time - 7, 4);
+		$values[] = array(null, 1, 2, 1, 2, $time - 1, 5);
+		$values[] = array(null, 1, 2, 1, 2, $time - 1, 6);
+		$values[] = array(null, 1, 1, 2, null, $time - 17, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 18, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 19, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 20, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 21, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 22, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 23, 1);
+		$values[] = array(null, 1, 1, 2, null, $time - 24, 4);
+		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
 		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 86400), array('interval' => 10, 'limit' => 86400 + 20),
 			array('interval' => 30, 'limit' => 86400 + 30)));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 1, 'count' => 1));
