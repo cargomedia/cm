@@ -130,7 +130,8 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
-		$this->assertInternalType('int', $mock->getClientId());
+		$clientId = $mock->getClientId();
+		$this->assertInternalType('int', $clientId);
 		$this->assertTrue($mock->hasClientId());
 
 		$uri = '/';
@@ -138,9 +139,10 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
-		$this->assertInternalType('int', $mock->getClientId());
+		$this->assertSame($clientId + 1, $mock->getClientId());
 		$this->assertTrue($mock->hasClientId());
 		$id = $mock->getClientId();
+		$this->assertSame($id, $mock->getClientId());
 
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=' . $id . ';');
