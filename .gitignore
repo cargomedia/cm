@@ -1,6 +1,5 @@
-.idea
-.vagrant
 vendor
 composer.lock
 
+tmp
 tests/tmp
