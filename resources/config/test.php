@@ -20,4 +20,4 @@ $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
-$config->TH->dropDatabase = true;
+$config->CMTest_TH->dropDatabase = true;

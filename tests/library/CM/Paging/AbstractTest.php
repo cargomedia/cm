@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
 class CM_Paging_Mock extends CM_Paging_Abstract {
 	protected function _processItem($itemRaw) {
@@ -64,7 +63,7 @@ class CM_Paging_Mock_Comparable extends CM_Paging_Mock {
 	}
 }
 
-class CM_Paging_AbstractTest extends TestCase {
+class CM_Paging_AbstractTest extends CMTest_TestCase {
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
@@ -91,7 +90,7 @@ class CM_Paging_AbstractTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 		CM_Mysql::exec('DROP TABLE TBL_TEST');
 		CM_Mysql::exec('DROP TABLE TBL_TEST2');
 	}

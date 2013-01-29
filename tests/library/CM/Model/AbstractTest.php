@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_AbstractTest extends TestCase{
+class CM_Model_AbstractTest extends CMTest_TestCase{
 
 	public static function setupBeforeClass() {
 		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `modelMock` (
@@ -30,7 +29,7 @@ class CM_Model_AbstractTest extends TestCase{
 	public function tearDown() {
 		CM_Mysql::exec("TRUNCATE TABLE `modelMock`");
 		CM_Mysql::exec("TRUNCATE TABLE `modelThasIsAnAssetMock`");
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 

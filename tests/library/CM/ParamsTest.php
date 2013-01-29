@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_ParamsTest extends TestCase {
+class CM_ParamsTest extends CMTest_TestCase {
 
 	public function testHas() {
 		$params = new CM_Params(array('1' => 0, '2' => 'ababa', '3' => new stdClass(), '4' => null, '5' => false));
@@ -111,8 +110,8 @@ class CM_ParamsTest extends TestCase {
 	public function testGetObject() {
 		$language = CM_Model_Language::create(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
 		$params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
-		$this->assertModelEquals($language, $params->getLanguage('language'));
-		$this->assertModelEquals($language, $params->getLanguage('languageId'));
+		$this->assertEquals($language, $params->getLanguage('language'));
+		$this->assertEquals($language, $params->getLanguage('languageId'));
 		try {
 			$params->getLanguage('no-object-param');
 			$this->fail('getObject should fail and throw exception');

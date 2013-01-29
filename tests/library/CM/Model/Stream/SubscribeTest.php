@@ -1,18 +1,17 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_Stream_SubscribeTest extends TestCase {
+class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructor() {
-		$id = CM_Model_Stream_Subscribe::create(array('user' => TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
-			'streamChannel' => TH::createStreamChannel(), 'key' => '13215231_1'))->getId();
+		$id = CM_Model_Stream_Subscribe::create(array('user' => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+			'streamChannel' => CMTest_TH::createStreamChannel(), 'key' => '13215231_1'))->getId();
 		$streamSubscribe = new CM_Model_Stream_Subscribe($id);
 		$this->assertGreaterThan(0, $streamSubscribe->getId());
 		try {
@@ -24,7 +23,7 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	}
 
 	public function testSetAllowedUntil() {
-		$videoStreamSubscribe = TH::createStreamSubscribe(TH::createUser());
+		$videoStreamSubscribe = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe->setAllowedUntil(234234);
 		$this->assertEquals(234234, $videoStreamSubscribe->getAllowedUntil());
 		$videoStreamSubscribe->setAllowedUntil(2342367);
@@ -32,8 +31,8 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	}
 
 	public function testCreate() {
-		$user = TH::createUser();
-		$streamChannel = TH::createStreamChannel();
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_2'));
@@ -43,7 +42,7 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	}
 
 	public function testCreateWithoutUser() {
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user' => null, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_2'));
@@ -53,22 +52,22 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	}
 
 	public function testGetUser() {
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribeWithoutUser */
 		$streamSubscribeWithoutUser = CM_Model_Stream_Subscribe::create(array('user' => null, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_2'));
 		$this->assertNull($streamSubscribeWithoutUser->getUser());
 
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_3'));
-		$this->assertModelEquals($user, $streamSubscribe->getUser());
+		$this->assertEquals($user, $streamSubscribe->getUser());
 	}
 
 	public function testDelete() {
-		$streamChannel = TH::createStreamChannel();
-		$videoStreamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
 			'streamChannel' => $streamChannel, 'key' => '13215231_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStreamSubscribe->delete();
@@ -82,17 +81,17 @@ class CM_Model_Stream_SubscribeTest extends TestCase {
 	}
 
 	public function testFindKey() {
-		$videoStreamSubscribeOrig = TH::createStreamSubscribe(TH::createUser());
+		$videoStreamSubscribeOrig = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey($videoStreamSubscribeOrig->getKey());
-		$this->assertModelEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
+		$this->assertEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
 		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey('doesnotexist');
 		$this->assertNull($videoStreamSubscribe);
 	}
 
 	public function testGetChannel() {
-		$streamChannel = TH::createStreamChannel();
-		$streamPublish = TH::createStreamSubscribe(TH::createUser(), $streamChannel);
-		$this->assertModelEquals($streamChannel, $streamPublish->getStreamChannel());
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$streamPublish = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser(), $streamChannel);
+		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
 
 	}
 }

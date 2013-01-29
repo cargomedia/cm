@@ -1,18 +1,17 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_Splittest_UserTest extends TestCase {
+class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testIsVariationFixture() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
@@ -26,8 +25,8 @@ class CM_Model_Splittest_UserTest extends TestCase {
 	}
 
 	public function testSetConversion() {
-		$user = TH::createUser();
-		$user2 = TH::createUser();
+		$user = CMTest_TH::createUser();
+		$user2 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
 		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));

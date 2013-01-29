@@ -1,13 +1,12 @@
 <?php
-require_once __DIR__ . '/TestCase.php';
 
-abstract class TestCaseRender extends TestCase {
+abstract class CMTest_TestCaseRender extends CMTest_TestCase {
 
 	/** @var CM_Render */
 	private $_render;
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	/**
@@ -24,7 +23,7 @@ abstract class TestCaseRender extends TestCase {
 	 * @param CM_Form_Abstract           $form
 	 * @param CM_FormField_Abstract      $formField
 	 * @param array|null                 $params
-	 * @return TH_Html
+	 * @return CMTest_TH_Html
 	 */
 	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null) {
 		if (null === $params) {
@@ -32,6 +31,6 @@ abstract class TestCaseRender extends TestCase {
 		}
 		$formField->prepare($params);
 		$html = $this->_getRender()->render($formField, array('form' => $form));
-		return new TH_Html($html);
+		return new CMTest_TH_Html($html);
 	}
 }

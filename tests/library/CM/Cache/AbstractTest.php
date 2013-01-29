@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Cache_AbstractTest extends TestCase {
+class CM_Cache_AbstractTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Cache_Mock = new StdClass();
@@ -27,7 +26,7 @@ class CM_Cache_AbstractTest extends TestCase {
 		$this->assertSame(13, CM_Cache_Mock::get('foo'));
 		CM_Cache_Mock::simulateForgetting('foo');
 		$this->assertSame(13, CM_Cache_Mock::get('foo'));
-		TH::timeForward(CM_Cache_Abstract::RUNTIME_LIFETIME + 1);
+		CMTest_TH::timeForward(CM_Cache_Abstract::RUNTIME_LIFETIME + 1);
 		$this->assertFalse(CM_Cache_Mock::get('foo'));
 	}
 
@@ -38,7 +37,7 @@ class CM_Cache_AbstractTest extends TestCase {
 		$lifeTime = 5;
 		CM_Cache_Mock::set('foo', 14, $lifeTime);
 		$this->assertSame(14, CM_Cache_Mock::get('foo'));
-		TH::timeForward($lifeTime + 1);
+		CMTest_TH::timeForward($lifeTime + 1);
 		$this->assertFalse(CM_Cache_Mock::get('foo'));
 	}
 }

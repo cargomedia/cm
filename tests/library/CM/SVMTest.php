@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_SVMTest extends TestCase {
+class CM_SVMTest extends CMTest_TestCase {
 	/**
 	 * @var CM_SVM
 	 */

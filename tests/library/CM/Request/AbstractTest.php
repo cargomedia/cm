@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Request_AbstractTest extends TestCase {
+class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetViewer() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
@@ -29,11 +28,11 @@ class CM_Request_AbstractTest extends TestCase {
 		unset($session);
 
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
-		$this->assertModelEquals($user, $mock->getViewer(true));
+		$this->assertEquals($user, $mock->getViewer(true));
 
-		$user2 = TH::createUser();
+		$user2 = CMTest_TH::createUser();
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, $user2));
-		$this->assertModelEquals($user2, $mock->getViewer(true));
+		$this->assertEquals($user2, $mock->getViewer(true));
 	}
 
 	public function testGetCookie() {
@@ -46,19 +45,19 @@ class CM_Request_AbstractTest extends TestCase {
 	}
 
 	public function testGetLanguageLoggedUser() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$request = $this->_prepareRequest('/', null, $user);
 		// No language at all
 		$this->assertSame($request->getLanguage(), null);
 
 		// Getting default language, user has no language
-		$defaultLanguage = TH::createLanguage();
-		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
+		$defaultLanguage = CMTest_TH::createLanguage();
+		$this->assertEquals($request->getLanguage(), $defaultLanguage);
 
 		// Getting user language
-		$anotherUserLanguage = TH::createLanguage();
+		$anotherUserLanguage = CMTest_TH::createLanguage();
 		$user->setLanguage($anotherUserLanguage);
-		$this->assertModelEquals($request->getLanguage(), $anotherUserLanguage);
+		$this->assertEquals($request->getLanguage(), $anotherUserLanguage);
 	}
 
 	public function testGetLanguageGuest() {
@@ -67,8 +66,8 @@ class CM_Request_AbstractTest extends TestCase {
 		$this->assertSame($request->getLanguage(), null);
 
 		// Getting default language (guest has no language)
-		$defaultLanguage = TH::createLanguage();
-		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
+		$defaultLanguage = CMTest_TH::createLanguage();
+		$this->assertEquals($request->getLanguage(), $defaultLanguage);
 	}
 
 	public function testGetLanguageByUrl() {
@@ -76,22 +75,22 @@ class CM_Request_AbstractTest extends TestCase {
 		CM_Response_Abstract::factory($request);
 		$this->assertNull($request->getLanguage());
 
-		TH::createLanguage('en'); // default language
-		$urlLanguage = TH::createLanguage('de');
+		CMTest_TH::createLanguage('en'); // default language
+		$urlLanguage = CMTest_TH::createLanguage('de');
 		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
 		CM_Response_Abstract::factory($request);
-		$this->assertModelEquals($request->getLanguage(), $urlLanguage);
+		$this->assertEquals($request->getLanguage(), $urlLanguage);
 	}
 
 	public function testGetLanguageByBrowser() {
-		$defaultLanguage = TH::createLanguage('en');
-		$browserLanguage = TH::createLanguage('de');
-		$this->assertModelEquals(CM_Model_Language::findDefault(), $defaultLanguage);
+		$defaultLanguage = CMTest_TH::createLanguage('en');
+		$browserLanguage = CMTest_TH::createLanguage('de');
+		$this->assertEquals(CM_Model_Language::findDefault(), $defaultLanguage);
 		$request = $this->_prepareRequest('/', array('Accept-Language' => 'de'));
-		$this->assertModelEquals($request->getLanguage(), $browserLanguage);
+		$this->assertEquals($request->getLanguage(), $browserLanguage);
 		$request = $this->_prepareRequest('/', array('Accept-Language' => 'pl'));
-		$this->assertModelEquals($request->getLanguage(), $defaultLanguage);
+		$this->assertEquals($request->getLanguage(), $defaultLanguage);
 	}
 
 	public function testFactory() {
@@ -105,11 +104,11 @@ class CM_Request_AbstractTest extends TestCase {
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
-		$this->assertModelEquals($language, $mock->popPathLanguage());
+		$this->assertEquals($language, $mock->popPathLanguage());
 		$this->assertSame('/foo/bar', $mock->getPath());
 		$this->assertSame(array('foo', 'bar'), $mock->getPathParts());
 		$this->assertSame(array('foo1' => 'bar1'), $mock->getQuery());
-		$this->assertModelEquals($language, $mock->getLanguageUrl());
+		$this->assertEquals($language, $mock->getLanguageUrl());
 		$mock->setUri('/foo1/bar1?foo=bar');
 		$this->assertSame('/foo1/bar1', $mock->getPath());
 		$this->assertSame(array('foo1', 'bar1'), $mock->getPathParts());
@@ -131,7 +130,8 @@ class CM_Request_AbstractTest extends TestCase {
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
-		$this->assertSame(1, $mock->getClientId());
+		$clientId = $mock->getClientId();
+		$this->assertInternalType('int', $clientId);
 		$this->assertTrue($mock->hasClientId());
 
 		$uri = '/';
@@ -139,16 +139,17 @@ class CM_Request_AbstractTest extends TestCase {
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
-		$this->assertSame(2, $mock->getClientId());
+		$this->assertSame($clientId + 1, $mock->getClientId());
 		$this->assertTrue($mock->hasClientId());
+		$id = $mock->getClientId();
+		$this->assertSame($id, $mock->getClientId());
 
 		$uri = '/';
-		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=2;');
+		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=clientId=' . $id . ';');
 		/** @var CM_Request_Abstract $mock */
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertFalse($mock->hasClientId());
-		$this->assertSame(2, $mock->getClientId());
-		$this->assertSame(2, $mock->getClientId());
+		$this->assertSame($id, $mock->getClientId());
 		$this->assertTrue($mock->hasClientId());
 	}
 

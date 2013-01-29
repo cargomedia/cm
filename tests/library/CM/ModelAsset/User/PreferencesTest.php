@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_ModelAsset_User_PreferencesTest extends TestCase {
+class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Mysql::insert(TBL_CM_USER_PREFERENCEDEFAULT, array('section' => 'test', 'key' => 'foo', 'defaultValue' => 0, 'configurable' => 1));
@@ -13,7 +12,7 @@ class CM_ModelAsset_User_PreferencesTest extends TestCase {
 	}
 
 	public function testGetSet() {
-		$preferences = TH::createUser()->getPreferences();
+		$preferences = CMTest_TH::createUser()->getPreferences();
 		$defaults = $preferences->getDefaults();
 		$section = reset(array_keys($defaults));
 		$key = reset(array_keys($defaults[$section]));
@@ -27,7 +26,7 @@ class CM_ModelAsset_User_PreferencesTest extends TestCase {
 	}
 
 	public function testReset() {
-		$preferences = TH::createUser()->getPreferences();
+		$preferences = CMTest_TH::createUser()->getPreferences();
 		$defaults = $preferences->getDefaults();
 		$section = reset(array_keys($defaults));
 		$key = reset(array_keys($defaults[$section]));
@@ -40,7 +39,7 @@ class CM_ModelAsset_User_PreferencesTest extends TestCase {
 	}
 
 	public function testInvalidatedModel() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$user->_change();
 		$user->getPreferences()->getAll();
 		$user->getLatestactivity();

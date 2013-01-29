@@ -1,17 +1,16 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_Stream_PublishTest extends TestCase {
+class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructor() {
-		$videoStreamPublish = TH::createStreamPublish();
+		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$this->assertGreaterThan(0, $videoStreamPublish->getId());
 		try {
 			new CM_Model_Stream_Publish(22123);
@@ -22,7 +21,7 @@ class CM_Model_Stream_PublishTest extends TestCase {
 	}
 
 	public function testSetAllowedUntil() {
-		$videoStreamPublish = TH::createStreamPublish();
+		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$videoStreamPublish->setAllowedUntil(234234);
 		$this->assertEquals(234234, $videoStreamPublish->getAllowedUntil());
 		$videoStreamPublish->setAllowedUntil(2342367);
@@ -30,8 +29,8 @@ class CM_Model_Stream_PublishTest extends TestCase {
 	}
 
 	public function testCreate() {
-		$user = TH::createUser();
-		$streamChannel = TH::createStreamChannel();
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
 		$videoStream = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_2', 'streamChannel' => $streamChannel));
@@ -41,8 +40,8 @@ class CM_Model_Stream_PublishTest extends TestCase {
 	}
 
 	public function testDelete() {
-		$streamChannel = TH::createStreamChannel();
-		$videoStreamPublish = TH::createStreamPublish(null, $streamChannel);
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 		$videoStreamPublish->delete();
 		try {
@@ -55,17 +54,17 @@ class CM_Model_Stream_PublishTest extends TestCase {
 	}
 
 	public function testFindKey() {
-		$videoStreamPublishOrig = TH::createStreamPublish();
+		$videoStreamPublishOrig = CMTest_TH::createStreamPublish();
 		$videoStreamPublish = CM_Model_Stream_Publish::findKey($videoStreamPublishOrig->getKey());
-		$this->assertModelEquals($videoStreamPublish, $videoStreamPublishOrig);
+		$this->assertEquals($videoStreamPublish, $videoStreamPublishOrig);
 		$videoStreamPublish = CM_Model_Stream_Publish::findKey('doesnotexist');
 		$this->assertNull($videoStreamPublish);
 	}
 
 	public function testGetChannel() {
-		$streamChannel = TH::createStreamChannel();
-		$streamPublish = TH::createStreamPublish(null, $streamChannel);
-		$this->assertModelEquals($streamChannel, $streamPublish->getStreamChannel());
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
+		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
 
 	}
 }

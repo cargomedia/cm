@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Paging_Splitfeature_AllTest extends TestCase {
+class CM_Paging_Splitfeature_AllTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testPaging() {

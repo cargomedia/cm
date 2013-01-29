@@ -1,7 +1,10 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_UsertextTest extends TestCase {
+class CM_UsertextTest extends CMTest_TestCase {
+
+	private static $_smileySetId;
+
+	private static $_smileyIds = array();
 
 	private $_text = <<<EOD
 smilies: :-)
@@ -16,24 +19,26 @@ EOD;
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
 
-		$setId = CM_Mysql::insert(TBL_CM_SMILEYSET, array('label' => 'testSet'));
-		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
-		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
-		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
-		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
-		CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
+		self::$_smileySetId = $setId = CM_Mysql::insert(TBL_CM_SMILEYSET, array('label' => 'testSet'));
+		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
+		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
+		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
+		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
+		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
 
-		TH::clearCache();
+		CMTest_TH::clearCache();
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testFormat() {
+		$smileyId = self::$_smileyIds[0];
+		$setId = self::$_smileySetId;
 		$splitChar = CM_Usertext::getSplitChar();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span><br />
+smilies: <span class="smiley smiley-{$smileyId} smileySet-{$setId}" title=":)"></span><br />
 allowed tags: <b class="italic">bold</b><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br />
 badwords: hallo…<br />
@@ -53,9 +58,11 @@ EOD;
 	}
 
 	public function testFormatPlain() {
+		$smileyId = self::$_smileyIds[0];
+		$setId = self::$_smileySetId;
 		$splitChar = CM_Usertext::getSplitChar();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-1 smileySet-1" title=":)"></span>
+smilies: <span class="smiley smiley-{$smileyId} smileySet-{$setId}" title=":)"></span>
 allowed tags: bold
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
 badwords: hallo…
@@ -89,7 +96,7 @@ EOD;
 
 	public function testFormatPlainTruncate() {
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
-		$expectedEmoticon = '<span class="smiley smiley-1 smileySet-1" title=":)"></span>';
+		$expectedEmoticon = '<span class="smiley smiley-' . self::$_smileyIds[0] . ' smileySet-' . self::$_smileySetId . '" title=":)"></span>';
 
 		$this->assertEquals('Ein Gespenst geht um in Europa ' . $expectedEmoticon . ' test', $actual->getFormatPlain(1000));
 		$this->assertEquals('Ein Gespenst geht um in…', $actual->getFormatPlain(29));
@@ -104,7 +111,7 @@ EOD;
 	public function testFormatPlainTruncateSmiley() {
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
-		$expected = 'Yo <span class="smiley smiley-4 smileySet-1" title="*PLAYMATE*"></span>';
+		$expected = 'Yo <span class="smiley smiley-' . self::$_smileyIds[3] . ' smileySet-' . self::$_smileySetId . '" title="*PLAYMATE*"></span>';
 		$this->assertEquals($expected, $actual->getFormatPlain(1000));
 		$this->assertEquals($expected, $actual->getFormatPlain(4));
 		$this->assertEquals('Yo ', $actual->getFormatPlain(3));
@@ -125,7 +132,7 @@ EOD;
 
 	public function testFormatUnallowedTagsFiltering() {
 		$expected =
-				'<span class="smiley smiley-5 smileySet-1" title="&lt;3"></span> love<br />' . PHP_EOL .
+				'<span class="smiley smiley-' . self::$_smileyIds[4]. ' smileySet-' . self::$_smileySetId . '" title="&lt;3"></span> love<br />' . PHP_EOL .
 						'you';
 
 		$actual = new CM_Usertext('<3 love' . PHP_EOL . 'you');
@@ -180,7 +187,7 @@ EOD;
 		$badwords->add('bar*');
 		$badwords->add('*foobar*');
 		$badwords->add('*zoo*far*');
-		TH::clearCache();
+		CMTest_TH::clearCache();
 
 		$actual = new CM_Usertext("hello foo there");
 		$this->assertEquals("hello ${replace} there", $actual->getPlain());

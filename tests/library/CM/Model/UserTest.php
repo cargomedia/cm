@@ -1,30 +1,29 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_UserTest extends TestCase {
+class CM_Model_UserTest extends CMTest_TestCase {
 	public static function setupBeforeClass() {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testGetCreated() {
 		$time = time();
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$this->assertGreaterThanOrEqual($time, $user->getCreated());
 	}
 
 	public function testGetLatestactivity() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$time = $user->getLatestactivity();
-		TH::timeForward(1);
+		CMTest_TH::timeForward(1);
 		$user->updateLatestactivity();
 		$this->assertGreaterThan($time, $user->getLatestactivity());
 	}
 
 	public function testGetSetOnline() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$this->assertFalse($user->getOnline());
 		$user->setOnline();
 		$this->assertTrue($user->getOnline());
@@ -33,17 +32,17 @@ class CM_Model_UserTest extends TestCase {
 	}
 
 	public function testGetPreferences() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$this->assertInstanceOf('CM_ModelAsset_User_Preferences', $user->getPreferences());
 	}
 
 	public function testGetRoles() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$this->assertInstanceOf('CM_ModelAsset_User_Roles', $user->getRoles());
 	}
 
 	public function testGetSetVisible() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		try {
 			$user->setVisible();
 			$this->fail('Able to modify visibility of a user that is offline.');
@@ -64,7 +63,7 @@ class CM_Model_UserTest extends TestCase {
 	}
 
 	public function testDelete() {
-		$user = TH::createUser();
+		$user = CMTest_TH::createUser();
 		$user->delete();
 		try {
 			new CM_Model_User($user->getId());

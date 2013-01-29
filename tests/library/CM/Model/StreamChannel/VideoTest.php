@@ -1,14 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../../TestCase.php';
 
-class CM_Model_StreamChannel_VideoTest extends TestCase {
+class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testCreate() {
@@ -48,35 +47,35 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 
 	public function testGetStreamPublish() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		try {
 			$streamChannel->getStreamPublish();
 			$this->fail();
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('has no StreamPublish.', $ex->getMessage());
 		}
-		$streamPublish = TH::createStreamPublish(null, $streamChannel);
-		$this->assertModelEquals($streamPublish, $streamChannel->getStreamPublish());
+		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
+		$this->assertEquals($streamPublish, $streamChannel->getStreamPublish());
 	}
 
 	public function testHasStreamPublish() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertFalse($streamChannel->hasStreamPublish());
-		TH::createStreamPublish(null, $streamChannel);
+		CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertTrue($streamChannel->hasStreamPublish());
 
 	}
 
 	public function testThumbnailCount() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamChannel->setThumbnailCount(15);
 		$this->assertSame(15, $streamChannel->getThumbnailCount());
 	}
 
 	public function testOnDelete() {
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamChannel->delete();
 		try {
 			new CM_Model_StreamChannel_Video($streamChannel->getId());
@@ -87,8 +86,8 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 	}
 
 	public function testOnBeforeDelete() {
-		$streamChannel = TH::createStreamChannel();
-		TH::createStreamPublish(null, $streamChannel);
+		$streamChannel = CMTest_TH::createStreamChannel();
+		CMTest_TH::createStreamPublish(null, $streamChannel);
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
 			$this->fail('Archive exists before StreamChannel deleted.');
@@ -104,7 +103,7 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 		}
 
 		//without streamPublish
-		$streamChannel = TH::createStreamChannel();
+		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamChannel->delete();
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
@@ -116,8 +115,8 @@ class CM_Model_StreamChannel_VideoTest extends TestCase {
 
 	public function testGetThumbnails() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		$streamChannel = TH::createStreamChannel();
-		TH::createStreamPublish(null, $streamChannel);
+		$streamChannel = CMTest_TH::createStreamChannel();
+		CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertSame(array(), $streamChannel->getThumbnails()->getItems());
 		$streamChannel->setThumbnailCount(2);
 		$thumb1 = new CM_File_UserContent('streamChannels',

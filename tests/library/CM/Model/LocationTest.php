@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_Model_LocationTest extends TestCase {
+class CM_Model_LocationTest extends CMTest_TestCase {
 	private static $_fields;
 
 	public static function setUpBeforeClass() {
@@ -36,7 +35,7 @@ class CM_Model_LocationTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		TH::clearEnv();
+		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructor() {

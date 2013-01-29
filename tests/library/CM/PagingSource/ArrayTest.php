@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../TestCase.php';
 
-class CM_PagingSource_ArrayTest extends TestCase {
+class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 
 	public function testGetCount() {
 		$pagingSource = new CM_PagingSource_Array(range(1, 10));

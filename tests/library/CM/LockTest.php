@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/../../TestCase.php';
 
-class CM_LockTest extends TestCase {
+class CM_LockTest extends CMTest_TestCase {
 
 	public function testLock() {
 		$lock = new CM_Lock('lock-test');
@@ -22,7 +21,7 @@ class CM_LockTest extends TestCase {
 		$lock = new CM_Lock('wait-test');
 		$lockedAt = time();
 		$lock->lock(30);
-		TH::timeForward(30);
+		CMTest_TH::timeForward(30);
 		$lock->waitUntilUnlocked();
 		$this->assertSame($lockedAt + 30, time());
 	}
