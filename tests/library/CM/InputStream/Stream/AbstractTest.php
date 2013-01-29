@@ -8,7 +8,7 @@ class CM_InputStream_Stream_AbstractTest extends TestCase {
 		$streamPath = DIR_TMP . 'bar';
 		$stream = fopen($streamPath, 'w');
 		fwrite($stream, 'foo');
-		/** @var $stream CM_InputStream_Stream_Abstract */
+		/** @var CM_InputStream_Stream_Abstract $stream */
 		$stream = $this->getMockForAbstractClass('CM_InputStream_Stream_Abstract', array($streamPath));
 		$this->assertSame('foo', $stream->read('hint'));
 	}
