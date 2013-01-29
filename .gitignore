@@ -1,5 +1,5 @@
-vendor/
+vendor
 composer.lock
 
-tmp/
-tests/tmp/
+tmp
+tests/tmp
