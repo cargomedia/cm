@@ -234,9 +234,10 @@ class CM_Bootloader {
 		if ($this->_loaded) {
 			throw new CM_Exception_Invalid('Bootloader already loaded.');
 		}
-		if (!is_array($environments)) {
-			$environments = array((string) $environments);
-		}
+		$environments = (array) $environments;
+		array_walk($environments, function(&$environment) {
+			$environment = (string) $environment;
+		});
 		$this->_environments = $environments;
 	}
 
