@@ -6,7 +6,7 @@
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
 		<meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
-		<meta name="msapplication-TileImage" content="{imgUrl path='tileIcon.png'}">
+		<meta name="msapplication-TileImage" content="{imgUrl path='tileImage.png'}">
 		<link rel="shortcut icon" href="{imgUrl path='favicon.ico'}">
 		<title>{$title|escape}</title>
 		{resource file='library.css'}
