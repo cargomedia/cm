@@ -1,6 +1,6 @@
 <?php
 
-class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
+abstract class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 
 	/** @var string */
 	private $_stream;
@@ -10,10 +10,11 @@ class CM_InputStream_Stream_Abstract extends CM_InputStream_Abstract {
 	 */
 	public function __construct($stream) {
 		$this->_stream = (string) $stream;
-		$this->_outputStream = new CM_OutputStream_Stream_StandardError();
+		parent::__construct();
 	}
 
-	protected function _read() {
+	protected function _read($hint = null) {
+		$this->_getOutputStream()->write($hint);
 		$stream = fopen($this->_stream, 'r');
 		$value = fgets($stream);
 		fclose($stream);
