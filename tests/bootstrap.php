@@ -1,8 +1,8 @@
 <?php
+
 require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
 define('DIR_TESTS', __DIR__ . DIRECTORY_SEPARATOR);
 define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
-define('IS_TEST', true);
 
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->setEnvironment('test');
