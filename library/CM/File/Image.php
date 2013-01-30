@@ -152,7 +152,7 @@ class CM_File_Image extends CM_File {
 	 */
 	private function _getImageType() {
 		if (!isset($this->_imageType)) {
-			$imageType = exif_imagetype($this->getPath());
+			$imageType = @exif_imagetype($this->getPath());
 			if (false === $imageType) {
 				throw new CM_Exception_Invalid('Cannot detect image type of `' . $this->getPath() . '`.');
 			}
