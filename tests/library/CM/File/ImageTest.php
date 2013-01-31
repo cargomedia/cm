@@ -40,6 +40,17 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testConstructorEmptyFile() {
+		$path = DIR_TEST_DATA . 'img/empty.jpg';
+
+		try {
+			$image = new CM_File_Image($path);
+			$this->fail('Should throw exception because of no exif data');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertTrue(true);
+		}
+	}
+
 	public function testConstructJpgNoExtension() {
 		$path = DIR_TEST_DATA . 'img/jpg-no-extension';
 

@@ -46,7 +46,7 @@ class CM_Bootloader {
 
 		spl_autoload_register(function ($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
-			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . $relativePath;
+			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className, true)) . 'library/' . $relativePath;
 			if (is_file($path)) {
 				require_once $path;
 				return;
