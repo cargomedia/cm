@@ -56,15 +56,23 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string $className
+	 * @param string       $className
+	 * @param boolean|null $ignoreInvalid
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	public static function getNamespace($className) {
+	public static function getNamespace($className, $ignoreInvalid = null) {
+		if (null === $ignoreInvalid) {
+			$ignoreInvalid = false;
+		}
+		$ignoreInvalid = (boolean) $ignoreInvalid;
 		$className = (string) $className;
 		$tail = strpbrk($className, '_\\');
 		$namespace = substr($className, 0, -strlen($tail));
 		if (!$namespace) {
+			if ($ignoreInvalid) {
+				return null;
+			}
 			throw new CM_Exception_Invalid('Could not detect namespace of `' . $className . '`.');
 		}
 		return $namespace;
