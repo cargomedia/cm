@@ -17,7 +17,7 @@ class CM_UtilTest extends CMTest_TestCase {
 		$this->assertSame(array_flip($classPaths), CM_Util::getClasses($paths));
 	}
 
-	public function testGetNameSpace() {
+	public function testGetNamespace() {
 		$this->assertInternalType('string', CM_Util::getNamespace('CM_Util'));
 
 		$this->assertNull(CM_Util::getNamespace('NoNamespace', true));
