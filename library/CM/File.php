@@ -217,4 +217,22 @@ class CM_File extends CM_Class_Abstract {
 	public static function exists($path) {
 		return is_file($path);
 	}
+
+	/**
+	 * @param string $filename
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function sanitizeFilename($filename) {
+		$filename = (string) $filename;
+
+		$strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]", "}", "\\", "|", ";", ":", "\"", "'",
+			"&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;", "â€”", "â€“", ",", "<", ">", "/", "?");
+		$clean = trim(str_replace($strip, '', $filename));
+		$clean = preg_replace('/\s+/', "-", $clean);
+		if (empty($clean)) {
+			throw new CM_Exception_Invalid('Invalid filename.');
+		}
+		return $clean;
+	}
 }
