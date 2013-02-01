@@ -50,7 +50,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	abstract protected function _loadData();
 
-	public function delete() {
+	final public function delete() {
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
@@ -84,7 +84,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param CM_Comparable|null $model
 	 * @return boolean
 	 */
-	public function equals(CM_Comparable $model = null) {
+	final public function equals(CM_Comparable $model = null) {
 		if (empty($model)) {
 			return false;
 		}
@@ -92,11 +92,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return (get_class($this) == get_class($model) && $this->_getId() === $model->_getId());
 	}
 
-	public function serialize() {
+	final public function serialize() {
 		return serialize(array($this->_id, $this->_data));
 	}
 
-	public function unserialize($data) {
+	final public function unserialize($data) {
 		list($id, $this->_data) = unserialize($data);
 		$this->_construct($id);
 	}
@@ -104,7 +104,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_Abstract
 	 */
-	public function _change() {
+	final public function _change() {
 		$cacheClass = $this->_cacheClass;
 		$cacheClass::delete($this->_getCacheKey());
 		$this->_data = null;
