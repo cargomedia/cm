@@ -74,27 +74,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		$fixturesA = $this->getFixtureCount();
 		$conversionsB = $variationWorse->getConversionWeight();
 		$fixturesB = $variationWorse->getFixtureCount();
-		if (0 == $fixturesA || 0 == $fixturesB) {
-			return null;
-		}
-		$rateA = $conversionsA / $fixturesA;
-		$rateB = $conversionsB / $fixturesB;
-		$error = sqrt(($rateA * (1 - $rateA) / $fixturesA) + ($rateB * (1 - $rateB) / $fixturesB));
-		if (0 == $error) {
-			return null;
-		}
-		$x = ($rateB - $rateA) / $error;
 
-		// Abramowitz & Stegun - Handbook of Mathematical Functions: 26.2.19
-		$d1 = 0.0498673470;
-		$d2 = 0.0211410061;
-		$d3 = 0.0032776263;
-		$d4 = 0.0000380036;
-		$d5 = 0.0000488906;
-		$d6 = 0.0000053830;
-		$p = 1 -
-				0.5 * pow((1 + $d1 * pow($x, 1) + $d2 * pow($x, 2) + $d3 * pow($x, 3) + $d4 * pow($x, 4) + $d5 * pow($x, 5) + $d6 * pow($x, 6)), -16);
-		$p = max($p, 0);
+		// See http://math.hws.edu/javamath/ryan/ChiSquare.html
+		$nominator = (($conversionsA + $conversionsB + $fixturesA + $fixturesB) * pow($fixturesA * $conversionsB - $fixturesB * $conversionsA, 2));
+		$denominator = (($fixturesA + $fixturesB) * ($conversionsA + $conversionsB) * ($fixturesB + $conversionsB) * ($fixturesA + $conversionsA));
+		if (0 == $denominator) {
+			return null;
+		}
+		$chiSquare = $nominator / $denominator;
+
+		$p = 1 - stats_cdf_chisquare($chiSquare, 1, 1);
 		return $p;
 	}
 
