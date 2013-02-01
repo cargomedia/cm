@@ -46,6 +46,17 @@ class CM_FileTest extends CMTest_TestCase {
 		$file->delete();
 	}
 
+	public function testSanitizeFilename() {
+		$filename = "~foo@! <}\   b\0a=r.tar.(gz";
+		$this->assertSame("foo-bar.tar.gz", CM_File::sanitizeFilename($filename));
+
+		try {
+			CM_File::sanitizeFilename('&/&*<');
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Invalid filename.', $ex->getMessage());
+		}
+	}
+
 	public function testWrite() {
 		$file = new CM_File($this->_testFilePath);
 		$this->assertNotEquals('foo', $file->read());
