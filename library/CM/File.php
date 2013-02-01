@@ -219,6 +219,8 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * taken from http://stackoverflow.com/a/2668953
+	 *
 	 * @param string $filename
 	 * @return string
 	 * @throws CM_Exception_Invalid
@@ -227,7 +229,7 @@ class CM_File extends CM_Class_Abstract {
 		$filename = (string) $filename;
 
 		$strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]", "}", "\\", "|", ";", ":", "\"", "'",
-			"&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;", "â€”", "â€“", ",", "<", ">", "/", "?");
+			"&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;", "â€”", "â€“", ",", "<", ">", "/", "?", "\0");
 		$clean = trim(str_replace($strip, '', $filename));
 		$clean = preg_replace('/\s+/', "-", $clean);
 		if (empty($clean)) {

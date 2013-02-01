@@ -47,8 +47,8 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testSanitizeFilename() {
-		$filename = '~foo@! <}\   ba=r.tar.(gz';
-		$this->assertSame('foo-bar.tar.gz', CM_File::sanitizeFilename($filename));
+		$filename = "~foo@! <}\   b\0a=r.tar.(gz";
+		$this->assertSame("foo-bar.tar.gz", CM_File::sanitizeFilename($filename));
 
 		try {
 			CM_File::sanitizeFilename('&/&*<');
