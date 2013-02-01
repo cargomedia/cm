@@ -133,4 +133,39 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 
 		$test->delete();
 	}
+
+	public function testGetSignificance() {
+		/** @var CM_Model_Splittest_RequestClient $test */
+		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'bar', 'variations' => array('v1', 'v2')));
+		$variation1 = $test->getVariations()->findByName('v1');
+		$variation2 = $test->getVariations()->findByName('v2');
+
+		$fixtureId = 0;
+
+		for ($i = 0; $i < 1000; $i++) {
+			$fixture = array('splittestId' => $test->getId(), 'fixtureId' => $fixtureId++, 'variationId' => $variation1->getId(),
+				'createStamp' => time());
+			if ($i < 200) {
+				$fixture['conversionStamp'] = time();
+				$fixture['conversionWeight'] = 1;
+			}
+			CM_Mysql::insert(TBL_CM_SPLITTESTVARIATION_FIXTURE, $fixture);
+		}
+
+		for ($i = 0; $i < 1000; $i++) {
+			$fixture = array('splittestId' => $test->getId(), 'fixtureId' => $fixtureId++, 'variationId' => $variation2->getId(),
+				'createStamp' => time());
+			if ($i < 250) {
+				$fixture['conversionStamp'] = time();
+				$fixture['conversionWeight'] = 1;
+			}
+			CM_Mysql::insert(TBL_CM_SPLITTESTVARIATION_FIXTURE, $fixture);
+		}
+
+		// See e.g. http://in-silico.net/tools/statistics/chi2test
+		$this->assertSame(0.033168957692078, $variation2->getSignificance($variation1));
+		$this->assertSame(0.033168957692078, $variation1->getSignificance($variation2));
+
+		$test->delete();
+	}
 }
