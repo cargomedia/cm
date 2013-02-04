@@ -31,9 +31,8 @@ class CM_Response_Page extends CM_Response_Abstract {
 	/**
 	 * @param string $url
 	 */
-	public function sendRedirectHeader($url) {
+	public function setRedirectHeader($url) {
 		$this->setHeader('Location', (string) $url);
-		$this->sendHeaders();
 	}
 
 	/**
@@ -43,10 +42,18 @@ class CM_Response_Page extends CM_Response_Abstract {
 	 */
 	public function redirect($page, array $params = null) {
 		$url = $this->getRender()->getUrlPage($page, $params);
+		$this->redirectUrl($url);
+	}
+
+	/**
+	 * @param string $url
+	 * @throws CM_Exception_Redirect
+	 */
+	public function redirectUrl($url) {
 		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
 			throw new CM_Exception_Redirect($url);
 		}
-		$this->_redirectUrl = $url;
+		$this->_redirectUrl = (string) $url;
 	}
 
 	/**
@@ -81,8 +88,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 		$html = $this->_processPageLoop($this->getRequest());
 
 		if ($redirectUrl = $this->getRedirectUrl()) {
-			$this->sendRedirectHeader($redirectUrl);
-			exit();
+			$this->setRedirectHeader($redirectUrl);
 		}
 
 		$this->_setContent($html);

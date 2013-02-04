@@ -97,7 +97,13 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			$responsePage = new CM_Response_Page_Embed($request);
 			$responsePage->process();
 			$paths[] = $request->getPath();
-		} while ($responsePage->getRedirectUrl());
+
+			$redirectUrl = $responsePage->getRedirectUrl();
+			$redirectExternal = (0 !== mb_stripos($redirectUrl, $this->getRender()->getUrl()));
+			if ($redirectExternal) {
+				return array('redirectExternal' => $redirectUrl);
+			}
+		} while ($redirectUrl);
 
 		foreach($responsePage->getCookies() as $name => $cookieParameters) {
 			$response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
