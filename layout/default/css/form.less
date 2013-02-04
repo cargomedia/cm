@@ -111,36 +111,48 @@ button, input[type=submit], input[type=button] {
 			font-size: @fontSizeButtonLarge;
 		}
 	}
-
 }
 
 input[type=radio], input[type=checkbox] {
 	margin: 0 1px;
 	padding: 0;
-	width: 1em;
-	vertical-align: middle;
 }
 
 .formField {
-	.border(@colorFgBorderShy);
-	padding: 5px 0;
-	border-width: 1px 0 0 0;
-	width: 600px;
+	.box-sizing(border-box);
+	width: 660px;
 	max-width: 100%;
 	min-height: 24px;
+	padding: 12px;
+	border: 1px solid darken(@colorFgBorder, 3);
+	border-bottom-width: 0;
+	.background-color(darken(@colorBg, 3));
+	border-top-color: lighten(@colorFgBorder, 3);
 
-	&:first-child, &.first, &.submit {
-		border-width: 0;
+	&:first-child{
+		border-top: 1px solid @colorFgBorder;
+	}
+
+	&.submit {
+		border-top-width: 0;
+		border-bottom-width: 1px;
 	}
 
 	> label {
 		.box-sizing(border-box);
 		color: @colorFgLinkLight;
-		width: 95px;
+		width: 100px;
 		float: left;
 		padding: 4px 4px 0 0;
 		font-weight: bold;
 		text-align: right;
+
+		@media (max-width: 600px) {
+			width: auto;
+			float: none;
+			text-align: left;
+			padding-left: 2px;
+		}
 
 		&:after {
 			content: ":";
@@ -153,7 +165,12 @@ input[type=radio], input[type=checkbox] {
 	}
 
 	> .input {
-		margin-left: 100px;
+		margin-left: 110px;
+
+		@media (max-width: 600px) {
+			margin-left: 0;
+			margin-top: 2px;
+		}
 	}
 
 	&.noLabel > .input {
