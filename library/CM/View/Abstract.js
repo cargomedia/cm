@@ -273,6 +273,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		options.success = function(response) {
 			if (response.redirectExternal) {
 				cm.router.route(response.redirectExternal);
+				return;
 			}
 			this._injectView(response, success);
 		};
