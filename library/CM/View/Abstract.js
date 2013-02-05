@@ -155,7 +155,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		delete cm.views[this.getAutoId()];
 
 		if (!skipDomRemoval) {
-			this.$().remove();
+			this.$el.remove();
 		}
 	},
 
