@@ -83,15 +83,14 @@ class CM_Response_Page extends CM_Response_Abstract {
 
 	protected function _process() {
 		$this->_site->preprocessPageResponse($this);
-		$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
-
-		$html = $this->_processPageLoop($this->getRequest());
-
+		if (!$this->getRedirectUrl()) {
+			$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
+			$html = $this->_processPageLoop($this->getRequest());
+			$this->_setContent($html);
+		}
 		if ($redirectUrl = $this->getRedirectUrl()) {
 			$this->setRedirectHeader($redirectUrl);
 		}
-
-		$this->_setContent($html);
 	}
 
 	/**
