@@ -1,5 +1,4 @@
 <ul class="tabs menu-tabs">
-	<li><a href="javascript:;">Code Styles</a></li>
 	<li><a href="javascript:;">Components</a></li>
 	<li><a href="javascript:;">Menus</a></li>
 	<li><a href="javascript:;">Buttons</a></li>
@@ -7,14 +6,9 @@
 	<li><a href="javascript:;">Flyouts</a></li>
 	<li><a href="javascript:;">Variables</a></li>
 	<li><a href="javascript:;">Icons</a></li>
-	<li><a href="javascript:;">Translations</a></li>
 </ul>
 
 <div class="tabs-content">
-	<div>
-	{load file='Component/Example/tabs/code_styles.tpl' namespace='CM'}
-	</div>
-
 	<div>
 	{load file='Component/Example/tabs/example.tpl' namespace='CM'}
 	</div>
@@ -46,9 +40,5 @@
 
 	<div>
 		{load file='Component/Example/tabs/icons.tpl' namespace='CM'}
-	</div>
-
-	<div>
-		{load file='Component/Example/tabs/translations.tpl' namespace='CM'}
 	</div>
 </div>
