@@ -349,6 +349,22 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {Function} fn
+	 * @return {String}
+	 */
+	registerGlobalFunction: function(fn) {
+		var self = this;
+		var functionName = 'cm_global_' + cm.getUuid().replace(/-/g, '_');
+		window[functionName] = function() {
+			fn.apply(self, arguments);
+		};
+		this.on('destruct', function() {
+			delete window[functionName];
+		});
+		return functionName;
+	},
+
+	/**
 	 * @param {String} key
 	 * @param {*} value
 	 */
