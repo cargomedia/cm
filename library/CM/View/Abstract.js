@@ -402,7 +402,11 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Function} [callbackFailure]
 	 */
 	createFlash: function($element, url, flashvars, flashparams, callbackSuccess, callbackFailure) {
-		flashvars = _.extend({'debug': cm.options.debug}, flashvars);
+		var eventCallbackName = this.createGlobalFunction(function(event) {
+			event = JSON.parse(event);
+			this.trigger(event.type, event.data);
+		});
+		flashvars = _.extend({'debug': cm.options.debug, 'eventCallback': eventCallbackName}, flashvars);
 		flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true'}, flashparams);
 		callbackSuccess = callbackSuccess || new Function();
 		callbackFailure = callbackFailure || new Function();
