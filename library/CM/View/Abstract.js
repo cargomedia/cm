@@ -365,6 +365,35 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String} mp3Path
+	 * @param {Object} [params]
+	 * @return {jQuery}
+	 */
+	getAudioPlayer: function(mp3Path, params) {
+		params = _.extend({loop: false, autoplay: false}, params);
+		var $player = $('<div class="jplayer"></div>').appendTo($('body'));
+		var options = {
+			'swfPath': cm.getUrlStatic('/swf/Jplayer.swf'),
+			ready: function() {
+				$player.jPlayer('setMedia', {
+					'mp3': cm.getUrlStatic('/audio/' + mp3Path)
+				});
+				if (params.autoplay) {
+					$player.jPlayer('play');
+				}
+			}
+		};
+		if (params.loop) {
+			options.loop = true;
+		}
+		this.on('destruct', function() {
+			$player.jPlayer('destroy');
+			$player.remove();
+		});
+		return $player.jPlayer(options);
+	},
+
+	/**
 	 * @param {String} key
 	 * @param {*} value
 	 */
