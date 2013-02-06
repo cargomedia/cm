@@ -352,7 +352,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Function} fn
 	 * @return {String}
 	 */
-	registerGlobalFunction: function(fn) {
+	createGlobalFunction: function(fn) {
 		var self = this;
 		var functionName = 'cm_global_' + cm.getUuid().replace(/-/g, '_');
 		window[functionName] = function() {
@@ -369,7 +369,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Object} [params]
 	 * @return {jQuery}
 	 */
-	getAudioPlayer: function(mp3Path, params) {
+	createAudioPlayer: function(mp3Path, params) {
 		params = _.extend({loop: false, autoplay: false}, params);
 		var $player = $('<div class="jplayer"></div>').appendTo($('body'));
 		var options = {
