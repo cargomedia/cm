@@ -32,10 +32,10 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
-		$videoStream = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
-			'key' => '123123_2', 'streamChannel' => $streamChannel));
-		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234,
-			'key' => '123123_2', 'channelId' => $streamChannel->getId()));
+		$videoStream = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
+			'streamChannel' => $streamChannel));
+		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
+			'channelId' => $streamChannel->getId()));
 		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 	}
 
@@ -57,8 +57,29 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$videoStreamPublishOrig = CMTest_TH::createStreamPublish();
 		$videoStreamPublish = CM_Model_Stream_Publish::findKey($videoStreamPublishOrig->getKey());
 		$this->assertEquals($videoStreamPublish, $videoStreamPublishOrig);
+	}
+
+	public function testFindKeyNonexistent() {
 		$videoStreamPublish = CM_Model_Stream_Publish::findKey('doesnotexist');
 		$this->assertNull($videoStreamPublish);
+	}
+
+	public function testGetKey() {
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
+		/** @var CM_Model_Stream_Publish $streamPublish */
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'key' => 'foo'));
+		$this->assertSame('foo', $streamPublish->getKey());
+	}
+
+	public function testGetKeyMaxLength() {
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
+		/** @var CM_Model_Stream_Publish $streamPublish */
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
+			'key' => str_repeat('a', 100)));
+		$this->assertSame(str_repeat('a', 36), $streamPublish->getKey());
 	}
 
 	public function testGetChannel() {
