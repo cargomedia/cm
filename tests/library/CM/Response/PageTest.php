@@ -10,32 +10,25 @@ class CM_Response_PageTest extends CMTest_TestCase {
 		CMTest_TH::createLanguage('en');
 		$user = CMTest_TH::createUser();
 		$response = CMTest_TH::createResponsePage('/en/mock5', null, $user);
-		try {
-			$response->process();
-			$this->fail('Language redirect doesn\'t work');
-		} catch (CM_Exception_Redirect $e) {
-			$this->assertSame(CM_Config::get()->CM_Site_CM->url . '/mock5', $e->getUri());
-		}
+		$response->process();
+		$this->assertContains('Location: ' . CM_Config::get()->CM_Site_CM->url . '/mock5', $response->getHeaders());
 	}
 
 	public function testProcessLanguageNoRedirect() {
 		$language = CMTest_TH::createLanguage('en');
 		$user = CMTest_TH::createUser();
-		try {
-			$response = CMTest_TH::createResponsePage('/en/mock5');
-			$response->process();
-			$this->assertEquals($language, $response->getRequest()->getLanguageUrl());
+		$response = CMTest_TH::createResponsePage('/en/mock5');
+		$response->process();
+		$this->assertEquals($language, $response->getRequest()->getLanguageUrl());
 
-			$response = CMTest_TH::createResponsePage('/mock5');
-			$response->process();
-			$this->assertNull($response->getRequest()->getLanguageUrl());
-			
-			$response = CMTest_TH::createResponsePage('/mock5', null, $user);
-			$response->process();
-			$this->assertNull($response->getRequest()->getLanguageUrl());
-		} catch (CM_Exception_Redirect $e) {
-			$this->fail('Should not be redirected');
-		}
+		$response = CMTest_TH::createResponsePage('/mock5');
+		$response->process();
+		$this->assertNull($response->getRequest()->getLanguageUrl());
+
+		$response = CMTest_TH::createResponsePage('/mock5', null, $user);
+		$response->process();
+		$this->assertNull($response->getRequest()->getLanguageUrl());
+		$this->assertEmpty($response->getHeaders());
 	}
 }
 
