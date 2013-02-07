@@ -27,6 +27,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 
 	/**
 	 * @param string $key
+	 * @return CM_Model_Stream_Subscribe|null
 	 */
 	public static function findKey($key) {
 		$id = CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key))->fetchOne();
