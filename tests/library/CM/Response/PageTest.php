@@ -28,7 +28,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
 		$response = CMTest_TH::createResponsePage('/mock5', null, $user);
 		$response->process();
 		$this->assertNull($response->getRequest()->getLanguageUrl());
-		$this->assertEmpty($response->getHeaders());
+		$this->assertNotContains('Location: ' . CM_Config::get()->CM_Site_CM->url . '/mock5', $response->getHeaders());
 	}
 }
 
