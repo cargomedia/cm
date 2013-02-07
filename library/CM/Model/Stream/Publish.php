@@ -27,6 +27,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 
 	/**
 	 * @param string $key
+	 * @return CM_Model_Stream_Publish|null
 	 */
 	public static function findKey($key) {
 		$id = CM_Mysql::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key))->fetchOne();
