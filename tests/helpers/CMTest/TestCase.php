@@ -136,7 +136,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	public static function assertAjaxResponseSuccess(CM_Response_View_Ajax $response, array $data = null) {
 		$responseContent = json_decode($response->getContent(), true);
 		self::assertArrayHasKey('success', $responseContent, 'AjaxCall not successful');
-		if (null  !== $data) {
+		if (null !== $data) {
 			self::assertSame($data, $responseContent['success']['data']);
 		}
 	}
@@ -188,6 +188,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		return $site;
 	}
 
+	/**
+	 * @param string             $methodName
+	 * @param string             $viewClassName
+	 * @param array|null         $params
+	 * @param CM_Model_User|null $viewer
+	 * @param array|null         $viewParams
+	 * @param int|null           $siteId
+	 * @return CM_Response_View_Ajax
+	 */
 	public function getMockAjaxResponse($methodName, $viewClassName, array $params = null, $viewer = null, array $viewParams = null, $siteId = null) {
 		if (null === $viewParams) {
 			$viewParams = array();
