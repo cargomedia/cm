@@ -51,13 +51,13 @@ $config->CM_Cache_Redis = new stdClass;
 $config->CM_Cache_Redis->enabled = true;
 $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
-$config->CM_Stream = new stdClass();
-$config->CM_Stream->enabled = true;
+$config->CM_Stream_Stream = new stdClass();
+$config->CM_Stream_Stream->enabled = true;
 
-$config->CM_StreamAdapter_Abstract = new stdClass();
-$config->CM_StreamAdapter_Abstract->class = 'CM_StreamAdapter_SocketRedis';
-$config->CM_StreamAdapter_Abstract->hostPrefix = true;
-$config->CM_StreamAdapter_Abstract->servers = array(
+$config->CM_Stream_Adapter_Abstract = new stdClass();
+$config->CM_Stream_Adapter_Abstract->class = 'CM_Stream_Adapter_SocketRedis';
+$config->CM_Stream_Adapter_Abstract->hostPrefix = true;
+$config->CM_Stream_Adapter_Abstract->servers = array(
 	array('host' => 'localhost', 'port' => 8090),
 );
 
