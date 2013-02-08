@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable {
+abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable, CM_ArrayConvertible {
 	private $_count = null;
 	private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
 	private $_pageOffset = 0;
@@ -267,6 +267,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 */
 	public function setFlattenItems($state){
 		$this->_flattenItems = (bool) $state;
+	}
+
+	public function toArray() {
+		return $this->getItems();
 	}
 
 	/**
