@@ -1,7 +1,6 @@
 <?php
 
 class CM_Stream extends CM_Class_Abstract {
-	const SALT = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
 
 	/**
 	 * @var CM_Stream
@@ -73,15 +72,7 @@ class CM_Stream extends CM_Class_Abstract {
 		if (!$user->getOnline()) {
 			return;
 		}
-		self::publish(self::getStreamChannel($user), $data);
-	}
-
-	/**
-	 * @param CM_Model_User $user
-	 * @return string hash
-	 */
-	public static function getStreamChannel(CM_Model_User $user) {
-		return hash('md5', self::SALT . ':' . $user->getId());
+		self::publish(CM_Model_StreamChannel_Message_User::getKeyByUser($user), $data);
 	}
 
 	/**
