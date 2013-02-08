@@ -82,6 +82,14 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return (string) $serverArray['privateIp'];
 	}
 
+	public function toArray() {
+		$array = parent::toArray();
+		if ($this->hasStreamPublish()) {
+			$array['user'] = $this->getStreamPublish()->getUser();
+		}
+		return $array;
+	}
+
 	/**
 	 * @return int
 	 */
