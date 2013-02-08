@@ -30,10 +30,4 @@ abstract class CM_StreamAdapter_Abstract extends CM_Class_Abstract {
 	 * @param mixed  $data
 	 */
 	abstract public function publish($channel, $data);
-
-	/**
-	 * @param string $channel
-	 * @return string
-	 */
-	abstract public function subscribe($channel);
 }
