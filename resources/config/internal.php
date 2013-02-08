@@ -31,10 +31,11 @@ $config->CM_Model_Abstract->types[CM_Model_SplittestVariation::TYPE] = 'CM_Model
 $config->CM_Model_Abstract->types[CM_Model_Stream_Publish::TYPE] = 'CM_Model_Stream_Publish'; // #21
 $config->CM_Model_Abstract->types[CM_Model_Stream_Subscribe::TYPE] = 'CM_Model_Stream_Subscribe'; // #22
 $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message'; // #18
+$config->CM_Model_Abstract->types[CM_Model_StreamChannel_Message_User::TYPE] = 'CM_Model_StreamChannel_Message_User'; // #29
 $config->CM_Model_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video'; // #19
 $config->CM_Model_Abstract->types[CM_Model_StreamChannelArchive_Video::TYPE] = 'CM_Model_StreamChannelArchive_Video'; // #25
 $config->CM_Model_Abstract->types[CM_Model_User::TYPE] = 'CM_Model_User'; // #13
-// Highest type used: #28
+// Highest type used: #29
 
 if (!isset($config->CM_Model_ActionLimit_Abstract)) {
 	$config->CM_Model_ActionLimit_Abstract = new StdClass();
@@ -53,8 +54,9 @@ if (!isset($config->CM_Model_StreamChannel_Abstract)) {
 }
 $config->CM_Model_StreamChannel_Abstract->types = array();
 $config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Message::TYPE] = 'CM_Model_StreamChannel_Message'; // #18
+$config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Message_User::TYPE] = 'CM_Model_StreamChannel_Message_User'; // #29
 $config->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video::TYPE] = 'CM_Model_StreamChannel_Video'; // #19
-// Highest type used: #19
+// Highest type used: #29
 
 if (!isset($config->CM_Mail)) {
 	$config->CM_Mail = new StdClass();
