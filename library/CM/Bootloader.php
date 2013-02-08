@@ -160,8 +160,6 @@ class CM_Bootloader {
 
 		define('TBL_CM_CAPTCHA', 'cm_captcha');
 
-		define('TBL_CM_STREAM', 'cm_stream');
-
 		define('TBL_CM_STRING', 'cm_string');
 
 		define('TBL_CM_ACTION', 'cm_action');

@@ -340,17 +340,6 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   KEY `fixtureId` (`fixtureId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_stream`;
-
-
-CREATE TABLE `cm_stream` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `createStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `channel` varchar(32) NOT NULL,
-  `data` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `cm_streamChannel`;
 
 
