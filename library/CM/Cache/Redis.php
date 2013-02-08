@@ -6,7 +6,12 @@
 
 class CM_Cache_Redis extends CM_Cache_Abstract {
 	protected static $_instance;
+
+	/** @var Redis */
 	private $_redis = null;
+
+	/** @var Closure|null */
+	private $_subscribeCallback;
 
 	public function __construct() {
 		$this->_redis = new Redis();
@@ -16,6 +21,14 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		} catch (RedisException $e) {
 			throw new CM_Exception('Cannot connect to redis server `' . $server['host'] . '` on port `' . $server['port'] . '`: ' . $e->getMessage());
 		}
+	}
+
+	/**
+	 * @param string|string[] $channels
+	 * @param Closure $callback fn($channel, $message)
+	 */
+	public static function subscribe($channels, Closure $callback) {
+		static::_callInstance('subscribe', array($channels, $callback), false);
 	}
 
 	protected function _getName() {
@@ -93,8 +106,27 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		$this->_redis->publish($channel, $msg);
 	}
 
+	/**
+	 * @param string|string[] $channels
+	 * @param Closure $callback
+	 */
+	protected function _subscribe($channels, Closure $callback) {
+		$channels = (array) $channels;
+		$this->_subscribeCallback = $callback;
+		$this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
+	}
+
+	/**
+	 * @param Redis $redis
+	 * @param string $channel
+	 * @param string $message
+	 */
+	public function _subscribeCallback($redis, $channel, $message) {
+		$callback = $this->_subscribeCallback;
+		$callback($channel, $message);
+	}
+
 	protected function _flush() {
 		$this->_redis->flushAll();
 	}
-
 }
