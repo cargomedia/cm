@@ -1,6 +1,7 @@
 vendor
 composer.lock
 
+data
 resources/config/local.php
 tmp
 tests/tmp

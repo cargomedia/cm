@@ -10,7 +10,6 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 		$responses = array();
 		$responses['/captcha'] = 'CM_Response_Captcha';
 		$responses['/emailtracking'] = 'CM_Response_EmailTracking';
-		$responses['/longpolling'] = 'CM_Response_Longpolling';
 		$responses['/rpc'] = 'CM_Response_RPC';
 		$responses['/upload'] = 'CM_Response_Upload';
 		$responses['/css'] = 'CM_Response_Resource_CSS';
