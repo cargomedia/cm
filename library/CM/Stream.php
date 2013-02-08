@@ -43,15 +43,6 @@ class CM_Stream extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string   $channel
-	 * @param int|null $idMin
-	 * @return array|null
-	 */
-	public static function subscribe($channel, $idMin = null) {
-		return self::_getInstance()->_subscribe($channel, $idMin);
-	}
-
-	/**
 	 * @param CM_Model_User			$recipient
 	 * @param CM_Action_Abstract	   $action
 	 * @param CM_Model_Abstract        $model
@@ -113,18 +104,6 @@ class CM_Stream extends CM_Class_Abstract {
 			return;
 		}
 		$this->_getAdapter()->publish($channel, CM_Params::encode($data));
-	}
-
-	/**
-	 * @param string   $channel
-	 * @param int|null $idMin
-	 * @return array|null
-	 */
-	private function _subscribe($channel, $idMin = null) {
-		if (!self::getEnabled()) {
-			return;
-		}
-		return $this->_getAdapter()->subscribe($channel, $idMin);
 	}
 
 }
