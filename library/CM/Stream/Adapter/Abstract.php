@@ -1,8 +1,8 @@
 <?php
 
-abstract class CM_StreamAdapter_Abstract extends CM_Class_Abstract {
+abstract class CM_Stream_Adapter_Abstract extends CM_Class_Abstract {
 	/**
-	 * @return CM_StreamAdapter_Abstract
+	 * @return CM_Stream_Adapter_Abstract
 	 */
 	public static function factory() {
 		$className = self::_getClassName();
@@ -10,6 +10,7 @@ abstract class CM_StreamAdapter_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @throws CM_Exception_Invalid
 	 * @return array ('host', 'port')
 	 */
 	public static function getServer() {
@@ -30,4 +31,6 @@ abstract class CM_StreamAdapter_Abstract extends CM_Class_Abstract {
 	 * @param mixed  $data
 	 */
 	abstract public function publish($channel, $data);
+
+	abstract public function runSynchronization();
 }

@@ -1,6 +1,7 @@
-vendor
-composer.lock
+/vendor
+/composer.lock
 
-resources/config/local.php
-tmp
-tests/tmp
+/data
+/resources/config/local.php
+/tmp
+/tests/tmp

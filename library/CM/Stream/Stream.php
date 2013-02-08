@@ -1,16 +1,23 @@
 <?php
 
-class CM_Stream extends CM_Class_Abstract {
+class CM_Stream_Stream extends CM_Class_Abstract {
 
 	/**
-	 * @var CM_Stream
+	 * @var CM_Stream_Stream
 	 */
 	private static $_instance;
 
 	/**
-	 * @var CM_StreamAdapter_Abstract
+	 * @var CM_Stream_Adapter_Abstract
 	 */
 	private $_adapter;
+
+	public function runSynchronization() {
+		if (!$this->getEnabled()) {
+			throw new CM_Exception('Stream is not enabled');
+		}
+		$this->_getAdapter()->runSynchronization();
+	}
 
 	/**
 	 * @return bool
@@ -23,14 +30,14 @@ class CM_Stream extends CM_Class_Abstract {
 	 * @return string
 	 */
 	public static function getAdapterClass() {
-		return get_class(self::_getInstance()->_getAdapter());
+		return get_class(self::getInstance()->_getAdapter());
 	}
 
 	/**
 	 * @return array ('host', 'port')
 	 */
 	public static function getServer() {
-		return self::_getInstance()->_getAdapter()->getServer();
+		return self::getInstance()->_getAdapter()->getServer();
 	}
 
 	/**
@@ -38,7 +45,7 @@ class CM_Stream extends CM_Class_Abstract {
 	 * @param mixed  $data
 	 */
 	public static function publish($channel, $data) {
-		self::_getInstance()->_publish($channel, $data);
+		self::getInstance()->_publish($channel, $data);
 	}
 
 	/**
@@ -67,9 +74,9 @@ class CM_Stream extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Stream
+	 * @return CM_Stream_Stream
 	 */
-	private static function _getInstance() {
+	public static function getInstance() {
 		if (self::$_instance === null) {
 			self::$_instance = new self();
 		}
@@ -77,11 +84,11 @@ class CM_Stream extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_StreamAdapter_Abstract
+	 * @return CM_Stream_Adapter_Abstract
 	 */
 	private function _getAdapter() {
 		if (!$this->_adapter) {
-			$this->_adapter = CM_StreamAdapter_Abstract::factory();
+			$this->_adapter = CM_Stream_Adapter_Abstract::factory();
 		}
 		return $this->_adapter;
 	}
