@@ -476,4 +476,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		return isset($this->_iteratorItems[$this->_iteratorPosition]);
 	}
 
+	public static function fromArray(array $array) {
+		throw new CM_Exception_NotImplemented();
+	}
+
 }
