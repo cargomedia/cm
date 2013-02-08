@@ -9,21 +9,21 @@ class CM_FormTest extends CMTest_TestCase {
 		self::$formActionProcessCount = 0;
 		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
 		$this->assertSame(1, self::$formActionProcessCount);
-		$this->assertNotContains('errors', array_keys($response));
+		$this->assertFormResponseSuccess($response);
 	}
 
 	function testMissingField() {
 		$data = $this->_getData();
 		unset($data['data']['must_check']);
 		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
-		$this->assertContains('errors', array_keys($response));
+		$this->assertFormResponseError($response);
 	}
 
 	function testAllowedMissingField() {
 		$data = $this->_getData();
 		unset($data['data']['color']);
 		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
-		$this->assertNotContains('errors', array_keys($response));
+		$this->assertFormResponseSuccess($response);
 	}
 
 	/**
