@@ -7,6 +7,7 @@
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
 		<meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
 		<meta name="msapplication-TileImage" content="{imgUrl path='tileImage.png'}">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<link rel="apple-touch-icon" href="{imgUrl path='touch-icon-57.png'}" />
 		<link rel="apple-touch-icon" sizes="72x72" href="{imgUrl path='touch-icon-72.png'}" />
 		<link rel="apple-touch-icon" sizes="114x114" href="{imgUrl path='touch-icon-114.png'}" />
