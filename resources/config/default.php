@@ -118,11 +118,15 @@ $config->CM_Model_DeviceCapabilities = new stdClass();
 $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
 $config->CM_Stream_Video = new stdClass();
-$config->CM_Stream_Video->httpPort = '8086';
-$config->CM_Stream_Video->wowzaPort = '1935';
+$config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
 $config->CM_Stream_Video->servers = array(
 	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
 );
+
+$config->CM_Stream_Adapter_Video_Wowza = new stdClass();
+$config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
+$config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
+
 
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';

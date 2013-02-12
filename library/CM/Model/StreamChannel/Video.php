@@ -69,7 +69,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPublicHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Stream_Video::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['publicHost'];
 	}
 
@@ -78,7 +78,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPrivateHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Stream_Video::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['privateIp'];
 	}
 

@@ -13,7 +13,7 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 		if (!$this->getEnabled()) {
 			throw new CM_Exception('Stream is not enabled');
 		}
-		$this->_getAdapter()->runSynchronization();
+		$this->_getAdapter()->startSynchronization();
 	}
 
 	/**

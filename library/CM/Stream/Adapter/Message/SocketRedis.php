@@ -19,7 +19,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		CM_Cache_Redis::publish('socket-redis-down', json_encode($event));
 	}
 
-	public function runSynchronization() {
+	public function startSynchronization() {
 		CM_Cache_Redis::subscribe('socket-redis-up', function($channel, $message) {
 			$message = CM_Params::decode($message, true);
 		});
