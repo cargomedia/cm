@@ -1,8 +1,9 @@
 <?php
 
-class CM_Stream_Video extends CM_Class_Abstract {
+class CM_Stream_Video extends CM_Stream_Abstract {
 
-	private static $_instance = null;
+	/** @var CM_Stream_Video */
+	private static $_instance;
 
 	/**
 	 * @param string $wowzaHost
@@ -236,6 +237,13 @@ class CM_Stream_Video extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return CM_Stream_Adapter_Video_Abstract
+	 */
+	protected function _getAdapter() {
+		return parent::_getAdapter();
+	}
+
+	/**
 	 * @param string  $streamName
 	 * @param string  $clientKey
 	 * @param int     $start
@@ -306,16 +314,6 @@ class CM_Stream_Video extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Stream_Video
-	 */
-	public static function getInstance() {
-		if (!self::$_instance) {
-			self::$_instance = new self();
-		}
-		return self::$_instance;
-	}
-
-	/**
 	 * @return CM_Paging_StreamChannel_Type
 	 */
 	private static function _getStreamChannels() {
@@ -343,4 +341,15 @@ class CM_Stream_Video extends CM_Class_Abstract {
 
 		throw new CM_Exception_Invalid("No wowza server with host `$host` found");
 	}
+
+	/**
+	 * @return CM_Stream_Video
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+
 }
