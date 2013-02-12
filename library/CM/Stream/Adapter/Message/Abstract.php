@@ -1,8 +1,8 @@
 <?php
 
-abstract class CM_Stream_Adapter_Abstract extends CM_Class_Abstract {
+abstract class CM_Stream_Adapter_Message_Abstract extends CM_Class_Abstract {
 	/**
-	 * @return CM_Stream_Adapter_Abstract
+	 * @return CM_Stream_Adapter_Message_Abstract
 	 */
 	public static function factory() {
 		$className = self::_getClassName();

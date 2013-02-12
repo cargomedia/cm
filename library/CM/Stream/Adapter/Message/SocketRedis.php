@@ -1,6 +1,6 @@
 <?php
 
-class CM_Stream_Adapter_SocketRedis extends CM_Stream_Adapter_Abstract {
+class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
 
 	public function publish($channel, $data) {
 		$event = array('type' => 'message', 'data' => array('channel' => $channel, 'data' => $data));

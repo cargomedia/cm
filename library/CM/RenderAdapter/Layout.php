@@ -23,10 +23,10 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$options['language'] = $this->getRender()->getLanguage();
 		$options['debug'] = $this->getRender()->isDebug();
 		$options['stream'] = array();
-		$options['stream']['enabled'] = CM_Stream_Stream::getEnabled();
-		if (CM_Stream_Stream::getEnabled()) {
-			$options['stream']['adapter'] = CM_Stream_Stream::getAdapterClass();
-			$options['stream']['server'] = CM_Stream_Stream::getServer();
+		$options['stream']['enabled'] = CM_Stream_Message::getEnabled();
+		if (CM_Stream_Message::getEnabled()) {
+			$options['stream']['adapter'] = CM_Stream_Message::getAdapterClass();
+			$options['stream']['server'] = CM_Stream_Message::getServer();
 		}
 		if ($viewer = $this->getRender()->getViewer()) {
 			$options['stream']['channel'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);

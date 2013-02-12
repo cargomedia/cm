@@ -1,14 +1,14 @@
 <?php
 
-class CM_Stream_Stream extends CM_Class_Abstract {
+class CM_Stream_Message extends CM_Class_Abstract {
 
 	/**
-	 * @var CM_Stream_Stream
+	 * @var CM_Stream_Message
 	 */
 	private static $_instance;
 
 	/**
-	 * @var CM_Stream_Adapter_Abstract
+	 * @var CM_Stream_Adapter_Message_Abstract
 	 */
 	private $_adapter;
 
@@ -74,7 +74,7 @@ class CM_Stream_Stream extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Stream_Stream
+	 * @return CM_Stream_Message
 	 */
 	public static function getInstance() {
 		if (self::$_instance === null) {
@@ -84,11 +84,11 @@ class CM_Stream_Stream extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Stream_Adapter_Abstract
+	 * @return CM_Stream_Adapter_Message_Abstract
 	 */
 	private function _getAdapter() {
 		if (!$this->_adapter) {
-			$this->_adapter = CM_Stream_Adapter_Abstract::factory();
+			$this->_adapter = CM_Stream_Adapter_Message_Abstract::factory();
 		}
 		return $this->_adapter;
 	}
