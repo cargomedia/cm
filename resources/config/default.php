@@ -54,10 +54,10 @@ $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 $config->CM_Stream_Message = new stdClass();
 $config->CM_Stream_Message->enabled = true;
 
-$config->CM_Stream_Message_Adapter_Abstract = new stdClass();
-$config->CM_Stream_Message_Adapter_Abstract->class = 'CM_Stream_Adapter_Message_SocketRedis';
-$config->CM_Stream_Message_Adapter_Abstract->hostPrefix = true;
-$config->CM_Stream_Message_Adapter_Abstract->servers = array(
+$config->CM_Stream_Adapter_Message_Abstract = new stdClass();
+$config->CM_Stream_Adapter_Message_Abstract->class = 'CM_Stream_Adapter_Message_SocketRedis';
+$config->CM_Stream_Adapter_Message_Abstract->hostPrefix = true;
+$config->CM_Stream_Adapter_Message_Abstract->servers = array(
 	array('host' => 'localhost', 'port' => 8090),
 );
 
