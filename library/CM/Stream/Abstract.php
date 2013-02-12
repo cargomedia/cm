@@ -21,13 +21,6 @@ abstract class CM_Stream_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getOptions() {
-		return $this->_getAdapter()->getOptions();
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getAdapterClass() {

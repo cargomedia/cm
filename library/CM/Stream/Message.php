@@ -17,6 +17,13 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getOptions() {
+		return $this->_getAdapter()->getOptions();
+	}
+
+	/**
 	 * @param string $channel
 	 * @param mixed  $data
 	 */
