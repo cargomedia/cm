@@ -2,10 +2,6 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
-	public function getOptions() {
-		return array();
-	}
-
 	public function synchronize() {
 		$status = array();
 		foreach (CM_Stream_Video::getInstance()->getServers() as $serverId => $wowzaServer) {
