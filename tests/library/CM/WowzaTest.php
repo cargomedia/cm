@@ -16,8 +16,8 @@ class CM_WowzaTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		$streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
-		/** @var CM_Wowza $wowza */
-		$wowza = $this->getMock('CM_Wowza', array('fetchStatus'));
+		/** @var CM_Stream_Video $wowza */
+		$wowza = $this->getMock('CM_Stream_Video', array('fetchStatus'));
 		$json = $this->_generateWowzaData(array());
 		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
 
@@ -39,8 +39,8 @@ class CM_WowzaTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		$streamSubscribe = CMTest_TH::createStreamSubscribe(null, $streamChannel);
 
-		/** @var CM_Wowza $wowza */
-		$wowza = $this->getMock('CM_Wowza', array('fetchStatus', '_stopClient'));
+		/** @var CM_Stream_Video $wowza */
+		$wowza = $this->getMock('CM_Stream_Video', array('fetchStatus', '_stopClient'));
 		$json = $this->_generateWowzaData(array($streamChannel));
 		$wowza->expects($this->any())->method('fetchStatus')->will($this->returnValue($json));
 		$wowza->expects($this->at(1))->method('_stopClient')->with($streamPublish->getKey(), $streamChannel->getPrivateHost());
@@ -53,7 +53,7 @@ class CM_WowzaTest extends CMTest_TestCase {
 
 	public function testCheckStreams() {
 		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
-		$wowza = $wowza = $this->getMock('CM_Wowza', array('stop'));
+		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('stop'));
 		$wowza->expects($this->exactly(2))->method('stop')->will($this->returnValue(1));
 		/** @var CM_Model_StreamChannel_Video_Mock $streamChannel */
 		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
@@ -82,11 +82,11 @@ class CM_WowzaTest extends CMTest_TestCase {
 	}
 
 	public function testGetServer() {
-		$server = CM_Wowza::getServer(1);
+		$server = CM_Stream_Video::getServer(1);
 		$this->assertSame('10.0.3.108', $server['privateIp']);
 
 		try {
-			CM_Wowza::getServer(800);
+			CM_Stream_Video::getServer(800);
 			$this->fail('Found server with id 800');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('No wowza server with id `800` found', $ex->getMessage());
@@ -94,13 +94,13 @@ class CM_WowzaTest extends CMTest_TestCase {
 	}
 
 	public function testGetSeverId() {
-		$method = new ReflectionMethod('CM_Wowza', '_getServerId');
+		$method = new ReflectionMethod('CM_Stream_Video', '_getServerId');
 		$method->setAccessible(true);
-		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.109'));
-		$this->assertEquals(1, $method->invoke(new CM_Wowza, '10.0.3.108'));
-		$this->assertEquals(1, $method->invoke(new CM_Wowza, 'wowza1.fuckbook.cat.cargomedia'));
+		$this->assertEquals(1, $method->invoke(new CM_Stream_Video, '10.0.3.109'));
+		$this->assertEquals(1, $method->invoke(new CM_Stream_Video, '10.0.3.108'));
+		$this->assertEquals(1, $method->invoke(new CM_Stream_Video, 'wowza1.fuckbook.cat.cargomedia'));
 		try {
-			$method->invoke(new CM_Wowza, '66.66.66.66');
+			$method->invoke(new CM_Stream_Video, '66.66.66.66');
 			$this->fail('Found server with ip 66.66.66.66');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('No wowza server with host `66.66.66.66` found', $ex->getMessage());

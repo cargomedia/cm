@@ -1,6 +1,6 @@
 <?php
 
-class CM_Wowza extends CM_Class_Abstract {
+class CM_Stream_Video extends CM_Class_Abstract {
 
 	private static $_instance = null;
 
@@ -247,7 +247,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$wowzaIp = long2ip(CM_Request_Abstract::getInstance()->getIp());
-		$serverId = CM_Wowza::_getServerId($wowzaIp);
+		$serverId = CM_Stream_Video::_getServerId($wowzaIp);
 
 		$channelId = self::getInstance()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
@@ -291,7 +291,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function getServer($serverId = null) {
-		$servers = CM_Wowza::_getConfig()->servers;
+		$servers = CM_Stream_Video::_getConfig()->servers;
 
 		if (null === $serverId) {
 			$serverId = array_rand($servers);
@@ -306,7 +306,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Wowza
+	 * @return CM_Stream_Video
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {
@@ -333,7 +333,7 @@ class CM_Wowza extends CM_Class_Abstract {
 	 */
 	private static function _getServerId($host) {
 		$host = (string) $host;
-		$servers = CM_Wowza::_getConfig()->servers;
+		$servers = CM_Stream_Video::_getConfig()->servers;
 
 		foreach ($servers as $serverId => $server) {
 			if ($server['publicIp'] == $host || $server['privateIp'] == $host || $server['publicHost'] == $host) {
