@@ -3,7 +3,7 @@
 class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
+		CM_Config::get()->CM_Stream_Video->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
 	}
 
 	public static function tearDownAfterClass() {

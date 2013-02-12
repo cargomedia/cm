@@ -117,10 +117,10 @@ $config->CM_Response_RPC->catch = array(
 $config->CM_Model_DeviceCapabilities = new stdClass();
 $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
-$config->CM_Wowza = new stdClass();
-$config->CM_Wowza->httpPort = '8086';
-$config->CM_Wowza->wowzaPort = '1935';
-$config->CM_Wowza->servers = array(
+$config->CM_Stream_Video = new stdClass();
+$config->CM_Stream_Video->httpPort = '8086';
+$config->CM_Stream_Video->wowzaPort = '1935';
+$config->CM_Stream_Video->servers = array(
 	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
 );
 

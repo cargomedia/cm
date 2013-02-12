@@ -1,9 +1,9 @@
 <?php
 
-class CM_WowzaTest extends CMTest_TestCase {
+class CM_VideoTest extends CMTest_TestCase {
 
 	public function setUp() {
-		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'publicIp' => '10.0.3.109',
+		CM_Config::get()->CM_Stream_Video->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'publicIp' => '10.0.3.109',
 			'privateIp' => '10.0.3.108'));
 	}
 
