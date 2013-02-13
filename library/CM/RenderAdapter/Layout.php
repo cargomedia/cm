@@ -26,7 +26,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$options['stream']['enabled'] = CM_Stream_Message::getInstance()->getEnabled();
 		if (CM_Stream_Message::getInstance()->getEnabled()) {
 			$options['stream']['adapter'] = CM_Stream_Message::getInstance()->getAdapterClass();
-			$options['stream']['server'] = CM_Stream_Message::getInstance()->getOptions();
+			$options['stream']['options'] = CM_Stream_Message::getInstance()->getOptions();
 		}
 		if ($viewer = $this->getRender()->getViewer()) {
 			$options['stream']['channel'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);

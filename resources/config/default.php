@@ -127,7 +127,6 @@ $config->CM_Stream_Adapter_Video_Wowza = new stdClass();
 $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
 $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
 
-
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
 $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';

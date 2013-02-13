@@ -73,6 +73,15 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 		return CM_Util::getContents('http://' . $wowzaHost . ':' . self::_getConfig()->httpPort . '/status');
 	}
 
+	/**
+	 * @param CM_Model_Stream_Abstract $stream
+	 */
+	protected function _stopStream(CM_Model_Stream_Abstract $stream) {
+		/** @var $streamChannel CM_Model_StreamChannel_Video */
+		$streamChannel = $stream->getStreamChannel();
+		$this->_stopClient($stream->getKey(), $streamChannel->getPrivateHost());
+	}
+
 	protected function _stopClient($clientId, $serverHost) {
 		CM_Util::getContents('http://' . $serverHost . ':' . self::_getConfig()->httpPort . '/stop', array('clientId' => (string) $clientId), true);
 	}

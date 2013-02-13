@@ -1,15 +1,11 @@
 <?php
 
-/**
- * @method CM_Stream_Adapter_Message_Abstract _getAdapter()
- */
-
 class CM_Stream_Message extends CM_Stream_Abstract {
 
 	/** @var CM_Stream_Message */
 	private static $_instance;
 
-	public function runSynchronization() {
+	public function startSynchronization() {
 		if (!$this->getEnabled()) {
 			throw new CM_Exception('Stream is not enabled');
 		}
@@ -67,6 +63,13 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * @return CM_Stream_Adapter_Message_Abstract
+	 */
+	protected function _getAdapter() {
+		return parent::_getAdapter();
 	}
 
 }

@@ -5,10 +5,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	abstract public function synchronize();
 
 	/**
-	 * @param string $clientId
-	 * @param string $serverHost
+	 * @param CM_Model_Stream_Abstract $stream
 	 */
-	abstract protected function _stopClient($clientId, $serverHost);
+	abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
 
 	public function checkStreams() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
@@ -19,7 +18,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 				if ($streamPublish->getAllowedUntil() < time()) {
 					$streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
 					if ($streamPublish->getAllowedUntil() < time()) {
-						$this->stop($streamPublish);
+						$this->stopStream($streamPublish);
 					}
 				}
 			}
@@ -28,7 +27,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 				if ($streamSubscribe->getAllowedUntil() < time()) {
 					$streamSubscribe->setAllowedUntil($streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil()));
 					if ($streamSubscribe->getAllowedUntil() < time()) {
-						$this->stop($streamSubscribe);
+						$this->stopStream($streamSubscribe);
 					}
 				}
 			}
@@ -39,13 +38,13 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	 * @param CM_Model_Stream_Abstract $stream
 	 * @throws CM_Exception_Invalid
 	 */
-	public function stop(CM_Model_Stream_Abstract $stream) {
+	public function stopStream(CM_Model_Stream_Abstract $stream) {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = $stream->getStreamChannel();
 		if (!$streamChannel instanceof CM_Model_StreamChannel_Video) {
 			throw new CM_Exception_Invalid('Cannot stop stream of non-video channel');
 		}
-		$this->_stopClient($stream->getKey(), $streamChannel->getPrivateHost());
+		$this->_stopStream($stream);
 	}
 
 	/**

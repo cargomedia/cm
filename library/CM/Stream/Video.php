@@ -17,8 +17,8 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @param CM_Model_Stream_Abstract $stream
 	 * @throws CM_Exception_Invalid
 	 */
-	public function stop(CM_Model_Stream_Abstract $stream) {
-		$this->_getAdapter()->stop($stream);
+	public function stopStream(CM_Model_Stream_Abstract $stream) {
+		$this->_getAdapter()->stopStream($stream);
 	}
 
 	/**
