@@ -5,6 +5,12 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	abstract public function synchronize();
 
 	/**
+	 * @param CM_Request_Abstract $request
+	 * return int
+	 */
+	abstract public function getServerId(CM_Request_Abstract $request);
+
+	/**
 	 * @param CM_Model_Stream_Abstract $stream
 	 */
 	abstract protected function _stopStream(CM_Model_Stream_Abstract $stream);
@@ -160,24 +166,6 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		if ($streamSubscribe) {
 			$streamSubscribe->delete();
 		}
-	}
-
-	/**
-	 * @param CM_Request_Abstract $request
-	 * @throws CM_Exception_Invalid
-	 * @return int
-	 */
-	public function getServerId(CM_Request_Abstract $request) {
-		$ipAddress = long2ip($request->getIp());
-		$host = $request->getHost();
-
-		$servers = CM_Stream_Video::_getConfig()->servers;
-		foreach ($servers as $serverId => $server) {
-			if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress|| $server['publicHost'] == $host) {
-				return (int) $serverId;
-			}
-		}
-		throw new CM_Exception_Invalid('No video server with host `' . $host . '` or ipAddress `' . $ipAddress . '` found');
 	}
 
 	/**

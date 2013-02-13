@@ -66,6 +66,23 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 	}
 
 	/**
+	 * @param CM_Request_Abstract $request
+	 * @throws CM_Exception_Invalid
+	 * @return int
+	 */
+	public function getServerId(CM_Request_Abstract $request) {
+		$ipAddress = long2ip($request->getIp());
+
+		$servers = CM_Stream_Video::_getConfig()->servers;
+		foreach ($servers as $serverId => $server) {
+			if ($server['publicIp'] == $ipAddress || $server['privateIp'] == $ipAddress) {
+				return (int) $serverId;
+			}
+		}
+		throw new CM_Exception_Invalid('No video server with ipAddress `' . $ipAddress . '` found');
+	}
+
+	/**
 	 * @param string $wowzaHost
 	 * @return string
 	 */

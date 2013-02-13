@@ -73,4 +73,24 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		}
 		return json_encode($jsonData);
 	}
+
+	public function testGetSeverId() {
+		$adapter = new CM_Stream_Adapter_Video_Wowza();
+		$ipAddresses = array('10.0.3.109', '10.0.3.108');
+		foreach ($ipAddresses as $ipAddress) {
+			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp', 'getHost'));
+			$request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
+			$this->assertEquals(1, $adapter->getServerId($request));
+		}
+		try {
+			$ipAddress = '66.66.66.66';
+			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp', 'getHost'));
+			$request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
+			$adapter->getServerId($request);
+			$this->fail('Found server with incorrect ipAddress');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('No video server', $e->getMessage());
+			$this->assertContains('`66.66.66.66`', $e->getMessage());
+		}
+	}
 }
