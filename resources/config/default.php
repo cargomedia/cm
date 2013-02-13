@@ -51,13 +51,13 @@ $config->CM_Cache_Redis = new stdClass;
 $config->CM_Cache_Redis->enabled = true;
 $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
-$config->CM_Stream_Stream = new stdClass();
-$config->CM_Stream_Stream->enabled = true;
+$config->CM_Stream_Message = new stdClass();
+$config->CM_Stream_Message->enabled = true;
+$config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 
-$config->CM_Stream_Adapter_Abstract = new stdClass();
-$config->CM_Stream_Adapter_Abstract->class = 'CM_Stream_Adapter_SocketRedis';
-$config->CM_Stream_Adapter_Abstract->hostPrefix = true;
-$config->CM_Stream_Adapter_Abstract->servers = array(
+$config->CM_Stream_Adapter_Message_SocketRedis = new stdClass();
+$config->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
+$config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
 	array('host' => 'localhost', 'port' => 8090),
 );
 
@@ -117,12 +117,15 @@ $config->CM_Response_RPC->catch = array(
 $config->CM_Model_DeviceCapabilities = new stdClass();
 $config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
-$config->CM_Wowza = new stdClass();
-$config->CM_Wowza->httpPort = '8086';
-$config->CM_Wowza->wowzaPort = '1935';
-$config->CM_Wowza->servers = array(
+$config->CM_Stream_Video = new stdClass();
+$config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
+$config->CM_Stream_Video->servers = array(
 	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
 );
+
+$config->CM_Stream_Adapter_Video_Wowza = new stdClass();
+$config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
+$config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
 
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';

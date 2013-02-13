@@ -48,6 +48,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getAdapterType() {
+		return (int) $this->_get('adapterType');
+	}
+
+	/**
 	 * @return CM_Paging_User_StreamChannelPublisher
 	 */
 	public function getPublishers() {
@@ -114,10 +121,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
 	 * @param string $key
+	 * @param int    $adapterType
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
-	public static function findKey($key) {
-		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => (string) $key))->fetchAssoc();
+	public static function findKey($key, $adapterType) {
+		$key = (string) $key;
+		$adapterType = (int) $adapterType;
+		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetchAssoc();
 		if (!$result) {
 			return null;
 		}
@@ -134,7 +144,8 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
+		$adapterType = (int) $data['adapterType'];
+		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		return new static($id);
 	}
 }
