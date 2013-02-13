@@ -2,7 +2,7 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
-	const TYPE = 11;
+	const TYPE = 2;
 
 	public function synchronize() {
 		$status = array();
