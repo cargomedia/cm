@@ -340,6 +340,16 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return string|null
+	 */
+	public function getHost() {
+		if (!isset($_SERVER['SERVER_NAME'])) {
+			return null;
+		}
+		return $_SERVER['SERVER_NAME'];
+	}
+
+	/**
 	 * @return string|null    very long number (string used)
 	 */
 	public function getIp() {
