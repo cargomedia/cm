@@ -148,12 +148,16 @@ class CMTest_TH {
 
 	/**
 	 * @param int|null $type
+	 * @param int|null $adapterType
 	 * @return CM_Model_StreamChannel_Abstract
-	 * @throws CM_Exception_Invalid
 	 */
-	public static function createStreamChannel($type = null) {
-		if (is_null($type)) {
+	public static function createStreamChannel($type = null, $adapterType = null) {
+		if (null === $type) {
 			$type = CM_Model_StreamChannel_Video::TYPE;
+		}
+
+		if (null === $adapterType) {
+			$adapterType = CM_Stream_Adapter_Video_Wowza::TYPE;
 		}
 
 		$data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
@@ -162,6 +166,7 @@ class CMTest_TH {
 			$data['height'] = 720;
 			$data['serverId'] = 1;
 			$data['thumbnailCount'] = 0;
+			$data['adapterType'] = $adapterType;
 		}
 
 		return CM_Model_StreamChannel_Abstract::createType($type, $data);

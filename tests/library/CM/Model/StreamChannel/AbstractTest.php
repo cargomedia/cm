@@ -27,31 +27,32 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetKey() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo'));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo', 'adapterType' => 1));
 		$this->assertEquals('foo', $streamChannel->getKey());
 	}
 
 	public function testFactory() {
-		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'serverId' => 1));
+		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1));
 		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
 
-		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss'));
+		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
 		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 	}
 
 	public function testFindKey() {
+		$adapterType = 1;
 		/** @var CM_Model_StreamChannel_Video $streamChannelOriginal */
-		$streamChannelOriginal = CMTest_TH::createStreamChannel(CM_Model_StreamChannel_Video::TYPE);
-		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamChannelOriginal->getKey());
+		$streamChannelOriginal = CMTest_TH::createStreamChannel(null, $adapterType);
+		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamChannelOriginal->getKey(), $adapterType);
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
 		$this->assertEquals($streamChannelOriginal->getId(), $streamChannel->getId());
 	}
 
 	public function testDelete() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar'));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar', 'adapterType' => 1));
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '123123_1',));
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
@@ -77,7 +78,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetSubscribers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar'));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getSubscribers()->getCount());
 		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
@@ -93,7 +94,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetPublishers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar1'));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar1', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
 		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123, 'allowedUntil' => 324234,
 			'key' => '111_1'));
@@ -109,7 +110,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetUsers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar2'));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar2', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getUsers()->getCount());
 		$user = CMTest_TH::createUser();
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,

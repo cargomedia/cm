@@ -2,6 +2,8 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
+	const TYPE = 11;
+
 	public function synchronize() {
 		$status = array();
 		foreach (CM_Stream_Video::getInstance()->getServers() as $serverId => $wowzaServer) {
@@ -16,7 +18,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 		$streamChannels = self::_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName);
+			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				$this->_stopClient($publish['clientId'], $publish['serverHost']);
 			}

@@ -13,19 +13,20 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $channel */
 		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'serverId' => 1,
-			'thumbnailCount' => 2));
+			'thumbnailCount' => 2, 'adapterType' => 1));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
 		$this->assertSame('10.0.3.108', $channel->getPrivateHost());
 		$this->assertSame('video.example.com', $channel->getPublicHost());
 		$this->assertSame('foo', $channel->getKey());
+		$this->assertSame(1, $channel->getAdapterType());
 		$this->assertSame(2, $channel->getThumbnailCount());
 	}
 
 	public function testCreateWithoutServerId() {
 		try {
-			CM_Model_StreamChannel_Video::create(array('key' => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2));
+			CM_Model_StreamChannel_Video::create(array('key' => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2, 'adapterType' => 1));
 			$this->fail('Can create streamChannel without serverId');
 		} catch (CM_Exception $ex) {
 			$this->assertContains("`Column 'serverId' cannot be null`", $ex->getMessage());
@@ -35,7 +36,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 	public function testNonexistentServerId() {
 		/** @var CM_Model_StreamChannel_Video $channel */
 		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foobar', 'width' => 100, 'height' => 200, 'serverId' => 800,
-			'thumbnailCount' => 2));
+			'thumbnailCount' => 2, 'adapterType' => 1));
 
 		try {
 			$channel->getPublicHost();

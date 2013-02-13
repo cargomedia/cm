@@ -2,6 +2,8 @@
 
 class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
 
+	const TYPE = 1;
+
 	public function getOptions() {
 		$servers = self::_getConfig()->servers;
 		if (empty($servers)) {
