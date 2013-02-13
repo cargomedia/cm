@@ -69,7 +69,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPublicHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Wowza::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['publicHost'];
 	}
 
@@ -78,7 +78,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPrivateHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Wowza::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['privateIp'];
 	}
 
@@ -125,7 +125,8 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		$height = (int) $data['height'];
 		$serverId = $data['serverId'];
 		$thumbnailCount = (int) $data['thumbnailCount'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
+		$adapterType = (int) $data['adapterType'];
+		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		try {
 			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));

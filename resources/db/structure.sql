@@ -331,7 +331,7 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   `fixtureId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `conversionWeight` decimal(10,2) DEFAULT 1 NOT NULL,
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
   `conversionStamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`splittestId`,`fixtureId`),
   KEY `splittestId` (`splittestId`),
@@ -347,8 +347,11 @@ CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
   `type` int(10) unsigned NOT NULL,
+  `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`)
+  UNIQUE KEY `key` (`key`),
+  UNIQUE KEY `key-adapterType` (`key`,`adapterType`),
+  KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
