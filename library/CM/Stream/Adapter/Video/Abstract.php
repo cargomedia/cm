@@ -6,6 +6,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 
 	/**
 	 * @param CM_Request_Abstract $request
+	 * @throws CM_Exception_Invalid
 	 * return int
 	 */
 	abstract public function getServerId(CM_Request_Abstract $request);
