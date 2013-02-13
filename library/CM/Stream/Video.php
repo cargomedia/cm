@@ -64,8 +64,8 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return bool
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
-		$ipAddress = long2ip(CM_Request_Abstract::getInstance()->getIp());
-		$serverId = self::getInstance()->_getAdapter()->getServerId($ipAddress);
+		$request = CM_Request_Abstract::getInstance();
+		$serverId = self::getInstance()->_getAdapter()->getServerId($request);
 
 		$channelId = self::getInstance()->_getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
@@ -77,6 +77,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return bool
 	 */
 	public static function rpc_unpublish($streamName, $thumbnailCount) {
+		self::getInstance()->_getAdapter()->getServerId(CM_Request_Abstract::getInstance());
 		self::getInstance()->_getAdapter()->unpublish($streamName, $thumbnailCount);
 		return true;
 	}
@@ -89,6 +90,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
+		self::getInstance()->_getAdapter()->getServerId(CM_Request_Abstract::getInstance());
 		self::getInstance()->_getAdapter()->subscribe($streamName, $clientKey, $start, $data);
 		return true;
 	}
@@ -99,6 +101,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
+		self::getInstance()->_getAdapter()->getServerId(CM_Request_Abstract::getInstance());
 		self::getInstance()->_getAdapter()->unsubscribe($streamName, $clientKey);
 		return true;
 	}
