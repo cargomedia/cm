@@ -20,7 +20,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		foreach (self::_getStreamChannels() as $streamChannel) {
 			if ($streamChannel->hasStreamPublish()) {
-				/** @var CM_Model_Stream_Publish $streamPublish  */
+				/** @var CM_Model_Stream_Publish $streamPublish */
 				$streamPublish = $streamChannel->getStreamPublish();
 				if ($streamPublish->getAllowedUntil() < time()) {
 					$streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
@@ -29,7 +29,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 					}
 				}
 			}
-			/** @var CM_Model_Stream_Subscribe $streamSubscribe*/
+			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				if ($streamSubscribe->getAllowedUntil() < time()) {
 					$streamSubscribe->setAllowedUntil($streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil()));
@@ -81,8 +81,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName, 'params' => $params,
-			'width' => $width, 'height' => $height, 'serverId' => $serverId, 'thumbnailCount' => $thumbnailCount));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName,
+			'adapterType' => $this->getType(), 'params' => $params, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
+			'thumbnailCount' => $thumbnailCount));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
@@ -105,14 +106,14 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	public function unpublish($streamName, $thumbnailCount = null) {
 		$streamName = (string) $streamName;
 		$thumbnailCount = (int) $thumbnailCount;
-		/** @var CM_Model_StreamChannel_Abstract $streamChannel  */
+		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
 		if (!$streamChannel) {
 			return;
 		}
 
 		if (null !== $thumbnailCount && $streamChannel instanceof CM_Model_StreamChannel_Video) {
-			/** @var CM_Model_StreamChannel_Video $streamChannel  */
+			/** @var CM_Model_StreamChannel_Video $streamChannel */
 			$streamChannel->setThumbnailCount($thumbnailCount);
 		}
 		$streamChannel->delete();
