@@ -15,7 +15,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 			}
 		}
 
-		$streamChannels = self::_getStreamChannels();
+		$streamChannels = $this->_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
