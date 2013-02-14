@@ -3,7 +3,6 @@
 	<li><a href="javascript:;">Menus</a></li>
 	<li><a href="javascript:;">Buttons</a></li>
 	<li><a href="javascript:;">Forms</a></li>
-	<li><a href="javascript:;">Flyouts</a></li>
 	<li><a href="javascript:;">Variables</a></li>
 	<li><a href="javascript:;">Icons</a></li>
 </ul>
@@ -26,12 +25,6 @@
 	<div>
 		{code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
 		{load file='Component/Example/tabs/forms.tpl' namespace='CM'}
-	</div>
-
-	<div>
-	{code language="html5"}{load file='Component/Example/tabs/flyout.tpl' namespace='CM' parse=false}{/code}
-		{code language="css"}{load file='Component/Example/tabs/flyout.less' namespace='CM' parse=false}{/code}
-		{load file='Component/Example/tabs/flyout.tpl' namespace='CM'}
 	</div>
 
 	<div>
