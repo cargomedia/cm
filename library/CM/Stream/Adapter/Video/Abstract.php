@@ -18,7 +18,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 
 	public function checkStreams() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
-		foreach (self::_getStreamChannels() as $streamChannel) {
+		foreach ($this->_getStreamChannels() as $streamChannel) {
 			if ($streamChannel->hasStreamPublish()) {
 				/** @var CM_Model_Stream_Publish $streamPublish */
 				$streamPublish = $streamChannel->getStreamPublish();
@@ -171,13 +171,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	}
 
 	/**
-	 * @return CM_Paging_StreamChannel_Type
+	 * @return CM_Paging_StreamChannel_AdapterType
 	 */
-	protected static function _getStreamChannels() {
-		$types = array(CM_Model_StreamChannel_Video::TYPE);
-		foreach (CM_Model_StreamChannel_Video::getClassChildren() as $class) {
-			$types[] = $class::TYPE;
-		}
-		return new CM_Paging_StreamChannel_Type($types);
+	protected function _getStreamChannels() {
+		return new CM_Paging_StreamChannel_AdapterType($this->getType());
 	}
 }
