@@ -11,7 +11,8 @@ class CM_AdproviderTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Adprovider->zones = array('foo' => array('adapter' => 'CM_AdproviderAdapter_Mock', 'zoneId' => 1),);
 		$adprovider = new CM_Adprovider();
 
-		$this->assertSame('{"zoneId":1}', $adprovider->getHtml('foo'));
+		$this->assertSame('{"zoneData":{"zoneId":1},"variables":[]}', $adprovider->getHtml('foo'));
+		$this->assertSame('{"zoneData":{"zoneId":1},"variables":{"foo":"bar"}}', $adprovider->getHtml('foo', array('foo' => 'bar')));
 
 		CM_Config::get()->CM_Adprovider->enabled = false;
 		$this->assertSame('', $adprovider->getHtml('foo'));
@@ -33,7 +34,7 @@ class CM_AdproviderTest extends CMTest_TestCase {
 
 class CM_AdproviderAdapter_Mock extends CM_AdproviderAdapter_Abstract {
 
-	public function getHtml($zoneData) {
-		return json_encode($zoneData);
+	public function getHtml($zoneData, array $variables) {
+		return json_encode(array('zoneData' => $zoneData, 'variables' => $variables));
 	}
 }
