@@ -9,7 +9,7 @@ class CM_AdproviderAdapter_Openx extends CM_AdproviderAdapter_Abstract {
 		return self::_getConfig()->host;
 	}
 
-	public function getHtml($zoneData) {
+	public function getHtml($zoneData, array $variables) {
 		if (!array_key_exists('zoneId', $zoneData)) {
 			throw new CM_Exception_Invalid('Missing `zoneId`');
 		}
