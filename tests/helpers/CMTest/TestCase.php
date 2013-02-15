@@ -32,11 +32,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param mixed         $needle
-	 * @param Traversable   $haystack
-	 * @param string        $message
-	 * @param boolean       $ignoreCase
-	 * @param boolean       $checkForObjectIdentity
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
@@ -58,11 +58,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Comparable $needle
-	 * @param Traversable   $haystack
-	 * @param string        $message
-	 * @param boolean       $ignoreCase
-	 * @param boolean       $checkForObjectIdentity
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
