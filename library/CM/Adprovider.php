@@ -16,12 +16,14 @@ class CM_Adprovider extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $zoneName
-	 * @return string
+	 * @param string          $zoneName
+	 * @param string[]|null   $variables
 	 * @throws CM_Exception_Invalid
+	 * @return string
 	 */
-	public function getHtml($zoneName) {
+	public function getHtml($zoneName, $variables = null) {
 		$zoneName = (string) $zoneName;
+		$variables = (array) $variables;
 		if (!$this->_getEnabled()) {
 			return '';
 		}
@@ -34,7 +36,7 @@ class CM_Adprovider extends CM_Class_Abstract {
 		}
 		$adapterClassName = (string) $zoneData['adapter'];
 		unset($zoneData['adapter']);
-		return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneData);
+		return (string) $this->_getAdapter($adapterClassName)->getHtml($zoneData, $variables);
 	}
 
 	/**
