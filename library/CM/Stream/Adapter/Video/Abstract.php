@@ -107,7 +107,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$streamName = (string) $streamName;
 		$thumbnailCount = (int) $thumbnailCount;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
+		$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
 		if (!$streamChannel) {
 			return;
 		}
@@ -138,7 +138,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			$user = $session->getUser();
 		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
+		$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
 		if (!$streamChannel) {
 			throw new CM_Exception_NotAllowed();
 		}
@@ -160,7 +160,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$streamName = (string) $streamName;
 		$clientKey = (string) $clientKey;
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
+		$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
 		if (!$streamChannel) {
 			return;
 		}

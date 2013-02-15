@@ -22,13 +22,13 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		/** @var $wowza CM_Stream_Video */
 
 		$wowza->synchronize();
-		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey(), $wowza->getType()));
+		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
 		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
 		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
 
 		CMTest_TH::timeForward(5);
 		$wowza->synchronize();
-		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey(), $wowza->getType()));
+		$this->assertNull(CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
 		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
 		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
 	}

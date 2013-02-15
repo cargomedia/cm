@@ -122,8 +122,13 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $message
 	 */
 	public function _subscribeCallback($redis, $channel, $message) {
-		$callback = $this->_subscribeCallback;
-		$callback($channel, $message);
+		try {
+			$callback = $this->_subscribeCallback;
+			$callback($channel, $message);
+		} catch (Exception $e) {
+			echo $e->getMessage() . PHP_EOL;
+			exit(1);
+		}
 	}
 
 	protected function _flush() {
