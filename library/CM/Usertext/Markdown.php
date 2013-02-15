@@ -1,6 +1,6 @@
 <?php
 
-class CM_Markdown extends Michelf\Markdown {
+class CM_Usertext_Markdown extends Michelf\Markdown {
 
 	function formParagraphs($text) {
 
