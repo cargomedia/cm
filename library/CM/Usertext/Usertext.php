@@ -12,9 +12,9 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
 		$text = $this->_escape($text);
 
-		$text = $this->_getEmoji($text, $stripEmoji);
+		$text = $this->_replaceEmoji($text, $stripEmoji);
 
-		$markdownParser = new CM_Markdown();
+		$markdownParser = new CM_Usertext_Markdown();
 		$text = $markdownParser::defaultTransform($text);
 
 		if ($lengthMax) {
@@ -46,7 +46,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		return $text;
 	}
 
-	private function _getEmoji($text, $stripEmoji) {
+	private function _replaceEmoji($text, $stripEmoji) {
 		if ($stripEmoji) {
 			$text = preg_replace('/(:.*:)/U', '', $text);
 		} else {
