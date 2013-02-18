@@ -242,10 +242,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$session->setUser($viewer);
 		}
 		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
 
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
 		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-		$body = json_encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data));
+		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
 		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
 
 		$response = new CM_Response_View_Form($request);
