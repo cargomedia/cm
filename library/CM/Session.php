@@ -28,9 +28,10 @@ class CM_Session {
 
 	/**
 	 * @param string|null $id
+	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($id = null) {
-		if ($id) {
+		if (null !== $id) {
 			$this->_id = (string) $id;
 			$cacheKey = $this->_getCacheKey();
 			if (($data = CM_Cache::get($cacheKey)) === false) {

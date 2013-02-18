@@ -126,8 +126,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 			$callback = $this->_subscribeCallback;
 			$callback($channel, $message);
 		} catch (Exception $e) {
-			echo $e->getMessage() . PHP_EOL;
-			exit(1);
+			CM_Bootloader::handleException($e);
 		}
 	}
 
