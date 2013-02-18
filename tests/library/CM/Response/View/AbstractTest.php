@@ -3,7 +3,7 @@
 class CM_Response_View_AbstractTest extends CMTest_TestCase {
 
 	public function testLoadPage() {
-		$response = $this->getMockAjaxResponse('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()));
+		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()));
 		$this->assertAjaxResponseSuccess($response);
 		$responseContent = CM_Params::decode($response->getContent(), true);
 		$this->assertArrayHasKey('js', $responseContent['success']['data']);
@@ -16,7 +16,7 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testLoadPageRedirectExternal() {
-		$response = $this->getMockAjaxResponse('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
+		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
 		$this->assertAjaxResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
 	}
 }
