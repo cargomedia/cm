@@ -137,7 +137,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param string $key
 	 * @param int    $adapterType
-	 * @return CM_Model_Abstract|CM_Model_StreamChannel_Abstract|null
+	 * @return CM_Model_StreamChannel_Abstract
 	 */
 	public static function getByKey($key, $adapterType) {
 		$streamChannel = static::findByKey($key, $adapterType);

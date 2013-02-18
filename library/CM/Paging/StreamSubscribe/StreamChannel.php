@@ -2,14 +2,10 @@
 
 class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_Abstract {
 
-	/** @var CM_Model_StreamChannel_Abstract */
-	private $_streamChannel;
-
 	/**
 	 * @param CM_Model_StreamChannel_Abstract $streamChannel
 	 */
 	public function __construct(CM_Model_StreamChannel_Abstract $streamChannel) {
-		$this->_streamChannel = $streamChannel;
 		$source = new CM_PagingSource_Sql('`id`', TBL_CM_STREAM_SUBSCRIBE, '`channelId` = ' . $streamChannel->getId());
 		$source->enableCache();
 		return parent::__construct($source);
@@ -28,16 +24,5 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * @param CM_Model_User $user
-	 * @param int           $start
-	 * @param int           $allowedUntil
-	 * @param string        $key
-	 */
-	public function add(CM_Model_User $user, $start, $allowedUntil, $key) {
-		CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'streamChannel' => $this->_streamChannel, 'key' => $key));
 	}
 }
