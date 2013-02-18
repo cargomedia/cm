@@ -197,7 +197,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param int|null           $siteId
 	 * @return CM_Response_View_Ajax
 	 */
-	public function getMockAjaxResponse($methodName, $viewClassName, array $params = null, $viewer = null, array $viewParams = null, $siteId = null) {
+	public function getResponseAjax($methodName, $viewClassName, array $params = null, CM_Model_User $viewer = null, array $viewParams = null, $siteId = null) {
 		if (null === $viewParams) {
 			$viewParams = array();
 		}
@@ -207,14 +207,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		if (null === $siteId) {
 			$siteId = $this->_getSite()->getId();
 		}
+		$session = new CM_Session();
+		if ($viewer) {
+			$session->setUser($viewer);
+		}
+		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
+
 		$viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
-		$requestArgs = array('uri' => '/ajax/' . $siteId);
-		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer',
-			'getQuery'))->getMock();
-		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
-		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'method' => $methodName,
-			'params' => $params)));
-		$response = new CM_Response_View_Ajax($requestMock);
+		$body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
+		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, $body);
+
+		$response = new CM_Response_View_Ajax($request);
 		$response->process();
 		return $response;
 	}
