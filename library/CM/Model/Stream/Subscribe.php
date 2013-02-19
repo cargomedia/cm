@@ -26,11 +26,12 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string                          $key
+	 * @param CM_Model_StreamChannel_Abstract $channel
 	 * @return CM_Model_Stream_Subscribe|null
 	 */
-	public static function findKey($key) {
-		$id = CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key))->fetchOne();
+	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
+		$id = CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchOne();
 		if (!$id) {
 			return null;
 		}

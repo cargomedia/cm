@@ -55,12 +55,13 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public function testFindKey() {
 		$videoStreamPublishOrig = CMTest_TH::createStreamPublish();
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey($videoStreamPublishOrig->getKey());
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel($videoStreamPublishOrig->getKey(), $videoStreamPublishOrig->getStreamChannel());
 		$this->assertEquals($videoStreamPublish, $videoStreamPublishOrig);
 	}
 
 	public function testFindKeyNonexistent() {
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey('doesnotexist');
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel('doesnotexist', $streamChannel);
 		$this->assertNull($videoStreamPublish);
 	}
 

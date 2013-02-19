@@ -80,14 +80,15 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 	}
 
-	public function testFindKey() {
+	public function testFindByKeyAndChannel() {
 		$videoStreamSubscribeOrig = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
-		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey($videoStreamSubscribeOrig->getKey());
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($videoStreamSubscribeOrig->getKey(), $videoStreamSubscribeOrig->getStreamChannel());
 		$this->assertEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
 	}
 
 	public function testFindKeyNonexistent() {
-		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey('doesnotexist');
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('doesnotexist', $streamChannel);
 		$this->assertNull($videoStreamSubscribe);
 	}
 

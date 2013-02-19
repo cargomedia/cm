@@ -23,14 +23,14 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 
 		$wowza->synchronize();
 		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
-		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
-		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
+		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
 
 		CMTest_TH::timeForward(5);
 		$wowza->synchronize();
 		$this->assertNull(CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
-		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+		$this->assertNull(CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
+		$this->assertNull(CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
 	}
 
 	public function testSynchronizeMissingInPhp() {
