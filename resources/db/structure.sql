@@ -396,9 +396,8 @@ CREATE TABLE `cm_stream_publish` (
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
+  UNIQUE KEY `channelId-key` (`channelId`, `key`),
+  KEY `userId` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_subscribe`;
@@ -412,9 +411,8 @@ CREATE TABLE `cm_stream_subscribe` (
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
+  UNIQUE KEY `channelId-key` (`channelId`, `key`),
+  KEY `userId` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;

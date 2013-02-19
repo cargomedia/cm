@@ -22,6 +22,19 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testDuplicateKeys() {
+		$data = array('user' => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+			'streamChannel' => CMTest_TH::createStreamChannel(), 'key' => '13215231_1');
+		CM_Model_Stream_Subscribe::create($data);
+		try {
+			CM_Model_Stream_Subscribe::create($data);
+			$this->fail('Should not be able to create duplicate key instance');
+		} catch (Exception $e) {
+		}
+		$data['streamChannel'] = CMTest_TH::createStreamChannel();
+		CM_Model_Stream_Subscribe::create($data);
+	}
+
 	public function testSetAllowedUntil() {
 		$videoStreamSubscribe = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe->setAllowedUntil(234234);

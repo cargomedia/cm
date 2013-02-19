@@ -24,7 +24,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	public function startSynchronization() {
-		CM_Cache_Redis::subscribe('socket-redis-up', function ($channel, $message) {
+		$adapter = $this;
+		CM_Cache_Redis::subscribe('socket-redis-up', function ($channel, $message) use ($adapter) {
 			$message = CM_Params::decode($message, true);
 			$type = $message['type'];
 			$data = $message['data'];
@@ -40,12 +41,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 						$session = new CM_Session($data->getString('sessionId'));
 						$user = $session->getUser(true);
 					}
-					$this->_subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
+					$adapter->subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
 					break;
 				case 'unsubscribe':
 					$channelKey = $data['channel'];
 					$clientKey = $data['clientKey'];
-					$this->_unsubscribe($channelKey, $clientKey);
+					$adapter->unsubscribe($channelKey, $clientKey);
 
 					break;
 				case 'message':
@@ -89,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					}
 					$start = (int) $subscriber['subscribeStamp'];
 					$allowedUntil = $start;
-					$this->_subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
+					$this->subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
 				}
 			}
 		}
@@ -102,7 +103,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param int                $start
 	 * @param int                $allowedUntil
 	 */
-	private function _subscribe($channelKey, $clientKey, CM_Model_User $user = null, $start, $allowedUntil) {
+	public function subscribe($channelKey, $clientKey, CM_Model_User $user = null, $start, $allowedUntil) {
 		$streamChannel = CM_Model_StreamChannel_Message::getByKey($channelKey, $this->getType());
 		$streamChannelSubscribes = $streamChannel->getStreamSubscribes();
 		if ($streamChannelSubscribes->findKey($clientKey)) {
@@ -116,7 +117,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param string $channelKey
 	 * @param string $clientKey
 	 */
-	private function _unsubscribe($channelKey, $clientKey) {
+	public function unsubscribe($channelKey, $clientKey) {
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
 		if (!$streamChannel) {
 			return;
