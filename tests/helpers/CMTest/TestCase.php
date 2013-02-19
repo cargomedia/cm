@@ -157,8 +157,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			self::assertTrue(true);
 		} catch (CM_Exception_AuthRequired $e) {
 			self::fail('should be accessible');
-		} catch (SK_Exception_PremiumRequired $e) {
-			self::fail('should be accessible');
 		} catch (CM_Exception_Nonexistent $e) {
 			self::fail('should be accessible');
 		}
@@ -172,8 +170,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$cmp->checkAccessible();
 			self::fail('checkAccessible should throw exception');
 		} catch (CM_Exception_AuthRequired $e) {
-			self::assertTrue(true);
-		} catch (SK_Exception_PremiumRequired $e) {
 			self::assertTrue(true);
 		} catch (CM_Exception_Nonexistent $e) {
 			self::assertTrue(true);
