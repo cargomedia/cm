@@ -23,6 +23,6 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 				$grafs[$key] = $graf;
 			}
 		}
-		return implode("\n\n", $grafs);
+		return implode("\n", $grafs);
 	}
 }
