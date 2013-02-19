@@ -7,7 +7,7 @@ class CM_FormTest extends CMTest_TestCase {
 	function testForm() {
 		$data = $this->_getData();
 		self::$formActionProcessCount = 0;
-		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
+		$response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
 		$this->assertSame(1, self::$formActionProcessCount);
 		$this->assertFormResponseSuccess($response);
 	}
@@ -15,14 +15,14 @@ class CM_FormTest extends CMTest_TestCase {
 	function testMissingField() {
 		$data = $this->_getData();
 		unset($data['data']['must_check']);
-		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
+		$response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
 		$this->assertFormResponseError($response);
 	}
 
 	function testAllowedMissingField() {
 		$data = $this->_getData();
 		unset($data['data']['color']);
-		$response = $this->getMockFormResponse($data['classname'], $data['action'], $data['data']);
+		$response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
 		$this->assertFormResponseSuccess($response);
 	}
 
