@@ -24,14 +24,10 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		$counter = 0;
 		foreach ($smileys as $smiley) {
 			$counter++;
-			$insertSmileys[] = "(':" . $smiley['name'] . ":',  '" . $smiley['name'] . "." . $smiley['extension'] . "')";
-
+			$insertSmileys[] = array($smiley['name'], $smiley['name'] . "." . $smiley['extension']);
 		}
 
-		$sql = "INSERT INTO " . TBL_CM_SMILEY . " (`code` ,`file`) VALUES " . implode(',', $insertSmileys) . " ON DUPLICATE KEY UPDATE code=code;";
-		CM_Mysql::exec($sql);
-
-		$this->_getOutput()->writeln('Created emoji Table');
+		CM_Mysql::insertIgnore(TBL_CM_SMILEY, array('code', 'file'), $insertSmileys);
 		$this->_getOutput()->writeln('Insert ' . $counter . ' smileys');
 	}
 
