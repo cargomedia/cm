@@ -6,6 +6,86 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	private $_render;
 
 	/**
+	 * @return CM_Form_Abstract
+	 */
+	public function getMockForm() {
+		$formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
+		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
+		$formMock->frontend_data['auto_id'] = 'formId';
+		return $formMock;
+	}
+
+	/**
+	 * @param string             $methodName
+	 * @param string             $viewClassName
+	 * @param array|null         $params
+	 * @param CM_Model_User|null $viewer
+	 * @param array|null         $viewParams
+	 * @param int|null           $siteId
+	 * @return CM_Response_View_Ajax
+	 */
+	public function getResponseAjax($methodName, $viewClassName, array $params = null, CM_Model_User $viewer = null, array $viewParams = null, $siteId = null) {
+		if (null === $viewParams) {
+			$viewParams = array();
+		}
+		if (null === $params) {
+			$params = array();
+		}
+		if (null === $siteId) {
+			$siteId = $this->_getSite()->getId();
+		}
+		$session = new CM_Session();
+		if ($viewer) {
+			$session->setUser($viewer);
+		}
+		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
+
+		$viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
+		$body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
+		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, $body);
+
+		$response = new CM_Response_View_Ajax($request);
+		$response->process();
+		return $response;
+	}
+
+	/**
+	 * @param string               $formClassName
+	 * @param string               $actionName
+	 * @param array                $data
+	 * @param string|null          $componentClassName Component that uses that form
+	 * @param CM_Model_User|null   $viewer
+	 * @param array|null           $componentParams
+	 * @param CM_Request_Post|null $request
+	 * @param int|null             $siteId
+	 * @return CM_Response_View_Form
+	 */
+	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null) {
+		if (null === $componentParams) {
+			$componentParams = array();
+		}
+		if (null === $siteId) {
+			$siteId = $this->_getSite()->getId();
+		}
+		$session = new CM_Session();
+		if ($viewer) {
+			$session->setUser($viewer);
+		}
+		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
+
+		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
+		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
+		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
+		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
+
+		$response = new CM_Response_View_Form($request);
+		$response->process();
+		return $response;
+	}
+
+	/**
 	 * @return CM_Render
 	 */
 	protected function _getRender() {
@@ -217,83 +297,4 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		return $site;
 	}
 
-	/**
-	 * @param string             $methodName
-	 * @param string             $viewClassName
-	 * @param array|null         $params
-	 * @param CM_Model_User|null $viewer
-	 * @param array|null         $viewParams
-	 * @param int|null           $siteId
-	 * @return CM_Response_View_Ajax
-	 */
-	public function getResponseAjax($methodName, $viewClassName, array $params = null, CM_Model_User $viewer = null, array $viewParams = null, $siteId = null) {
-		if (null === $viewParams) {
-			$viewParams = array();
-		}
-		if (null === $params) {
-			$params = array();
-		}
-		if (null === $siteId) {
-			$siteId = $this->_getSite()->getId();
-		}
-		$session = new CM_Session();
-		if ($viewer) {
-			$session->setUser($viewer);
-		}
-		$headers = array('Cookie' => 'sessionId=' . $session->getId());
-		unset($session); // Make sure session is stored persistently
-
-		$viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
-		$body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
-		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, $body);
-
-		$response = new CM_Response_View_Ajax($request);
-		$response->process();
-		return $response;
-	}
-
-	/**
-	 * @param string               $formClassName
-	 * @param string               $actionName
-	 * @param array                $data
-	 * @param string|null          $componentClassName Component that uses that form
-	 * @param CM_Model_User|null   $viewer
-	 * @param array|null           $componentParams
-	 * @param CM_Request_Post|null $request
-	 * @param int|null             $siteId
-	 * @return CM_Response_View_Form
-	 */
-	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null) {
-		if (null === $componentParams) {
-			$componentParams = array();
-		}
-		if (null === $siteId) {
-			$siteId = $this->_getSite()->getId();
-		}
-		$session = new CM_Session();
-		if ($viewer) {
-			$session->setUser($viewer);
-		}
-		$headers = array('Cookie' => 'sessionId=' . $session->getId());
-		unset($session); // Make sure session is stored persistently
-
-		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
-		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
-
-		$response = new CM_Response_View_Form($request);
-		$response->process();
-		return $response;
-	}
-
-	/**
-	 * @return CM_Form_Abstract
-	 */
-	public function getMockForm() {
-		$formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
-		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
-		$formMock->frontend_data['auto_id'] = 'formId';
-		return $formMock;
-	}
 }
