@@ -2,8 +2,8 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
-	/** @var CM_Render */
-	private $_render;
+	/** @var int */
+	protected $_siteType = null;
 
 	/**
 	 * @return CM_Form_Abstract
@@ -86,13 +86,34 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param string             $pageClass
+	 * @param CM_Model_User|null $viewer OPTIONAL
+	 * @param array              $params OPTIONAL
+	 * @return CM_Page_Abstract
+	 */
+	protected function _createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
+		return new $pageClass(CM_Params::factory($params), $viewer);
+	}
+
+	/**
+	 * @param CM_Model_User|null $viewer
 	 * @return CM_Render
 	 */
-	protected function _getRender() {
-		if (!$this->_render) {
-			$this->_render = new CM_Render($this->_getSite());
-		}
-		return $this->_render;
+	protected function _getRender(CM_Model_User $viewer = null) {
+		return new CM_Render($this->_getSite(), $viewer);
+	}
+
+	/**
+	 * @param CM_Component_Abstract $component
+	 * @param CM_Model_User|null    $viewer
+	 * @return CMTest_TH_Html
+	 */
+	protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
+		$component->checkAccessible();
+		$component->prepare();
+		$componentHtml = $this->_getRender($viewer)->render($component);
+		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
+		return new CMTest_TH_Html($html);
 	}
 
 	/**
@@ -111,6 +132,111 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param CM_Page_Abstract   $page
+	 * @param CM_Model_User|null $viewer
+	 * @return CMTest_TH_Html
+	 */
+	protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null) {
+		$host = parse_url($this->_getRender()->getUrl(), PHP_URL_HOST);
+		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
+		$response = new CM_Response_Page($request);
+		$page->prepareResponse($response);
+		$page->checkAccessible();
+		$page->prepare();
+		$html = $this->_getRender($viewer)->render($page);
+		return new CMTest_TH_Html($html);
+	}
+
+	/**
+	 * @param CM_Component_Abstract $cmp
+	 * @throws CM_Exception_AuthRequired
+	 */
+	public static function assertComponentAccessible(CM_Component_Abstract $cmp) {
+		try {
+			$cmp->checkAccessible();
+			self::assertTrue(true);
+		} catch (CM_Exception_AuthRequired $e) {
+			self::fail('should be accessible');
+		} catch (SK_Exception_PremiumRequired $e) {
+			self::fail('should be accessible');
+		} catch (CM_Exception_Nonexistent $e) {
+			self::fail('should be accessible');
+		}
+	}
+
+	/**
+	 * @param CM_Component_Abstract $cmp
+	 */
+	public static function assertComponentNotAccessible(CM_Component_Abstract $cmp) {
+		try {
+			$cmp->checkAccessible();
+			self::fail('checkAccessible should throw exception');
+		} catch (CM_Exception_AuthRequired $e) {
+			self::assertTrue(true);
+		} catch (SK_Exception_PremiumRequired $e) {
+			self::assertTrue(true);
+		} catch (CM_Exception_Nonexistent $e) {
+			self::assertTrue(true);
+		}
+	}
+
+	/**
+	 * @param CM_Component_Abstract $component
+	 * @param string|null           $expectedExceptionClass
+	 * @param CM_Model_User|null    $viewer
+	 */
+	public function assertComponentNotRenderable(CM_Component_Abstract $component, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
+		if (null === $expectedExceptionClass) {
+			$expectedExceptionClass = 'CM_Exception';
+		}
+		try {
+			$this->_renderComponent($component, $viewer);
+			$this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
+		} catch (Exception $e) {
+			$this->assertInstanceOf($expectedExceptionClass, $e);
+		}
+	}
+
+	/**
+	 * @param CMTest_TH_Html $html
+	 * @param string  $css
+	 */
+	public static function assertHtmlExists(CMTest_TH_Html $html, $css) {
+		self::assertTrue($html->exists($css), 'HTML does not contain `' . $css . '`.');
+	}
+
+	/**
+	 * @param CM_Page_Abstract $page
+	 */
+	public static function assertPageViewable(CM_Page_Abstract $page) {
+		self::assertTrue($page->isViewable());
+	}
+
+	/**
+	 * @param CM_Page_Abstract $page
+	 */
+	public static function assertPageNotViewable(CM_Page_Abstract $page) {
+		self::assertFalse($page->isViewable());
+	}
+
+	/**
+	 * @param CM_Page_Abstract   $page
+	 * @param string|null        $expectedExceptionClass
+	 * @param CM_Model_User|null $viewer
+	 */
+	public function assertPageNotRenderable(CM_Page_Abstract $page, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
+		if (null === $expectedExceptionClass) {
+			$expectedExceptionClass = 'CM_Exception';
+		}
+		try {
+			$this->_renderPage($page, $viewer);
+			$this->fail('Rendering page `' . get_class($page) . '` did not throw an exception');
+		} catch (Exception $e) {
+			$this->assertInstanceOf($expectedExceptionClass, $e);
+		}
+	}
+
+	/**
 	 * @param string $table
 	 * @param array  $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
 	 * @param int    $rowCount
@@ -122,6 +248,39 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	public static function assertNotRow($table, $columns) {
 		self::assertRow($table, $columns, 0);
+	}
+
+	/**
+	 * @param CMTest_TH_Html  $page
+	 * @param bool     $warnings
+	 */
+	public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
+		if (!extension_loaded('tidy')) {
+			self::markTestSkipped('The tidy extension is not available.');
+		}
+
+		$html = $page->getHtml();
+		$tidy = new tidy();
+
+		$tidyConfig = array('show-errors' => 1, 'show-warnings' => $warnings);
+		$tidy->parseString($html, $tidyConfig, 'UTF8');
+
+		//$tidy->cleanRepair();
+		$tidy->diagnose();
+		$lines = array_reverse(explode("\n", $tidy->errorBuffer));
+		$content = '';
+
+		foreach ($lines as $line) {
+			if (empty($line) || $line == 'No warnings or errors were found.' || strpos($line, 'Info:') === 0 ||
+					strpos($line, 'errors were found!') > 0 || strpos($line, 'proprietary attribute') != false
+			) {
+				// ignore
+			} else {
+				$content .= $line . PHP_EOL;
+			}
+		}
+
+		self::assertEmpty($content, $content);
 	}
 
 	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
@@ -287,6 +446,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @return CM_Site_Abstract
 	 */
 	protected function _getSite(array $namespaces = null) {
+		if (isset($this->_siteType)) {
+			return CM_Site_Abstract::factory($this->_siteType);
+		}
 		if (null === $namespaces) {
 			$namespaces = array('CM');
 		}
