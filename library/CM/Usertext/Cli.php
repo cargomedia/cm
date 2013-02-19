@@ -8,15 +8,11 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
 			$smileyPath = CM_Util::getNamespacePath($namespace) . 'layout/default/img/smiley/';
-
-			if ($handle = opendir($smileyPath)) {
-				while (false !== ($entry = readdir($handle))) {
-					if (strpos($entry, '.') > 1) {
-						$name = explode('.', $entry);
-						$smileys[$name[0]] = array('name' => $name[0], 'extension' => $name[1]);
-					}
-				}
-				closedir($handle);
+			$files = glob($smileyPath . '*');
+			foreach($files as $file){
+				$file = str_replace($smileyPath,'',$file);
+				$file = explode('.', $file);
+				$smileys[$file[0]] = array('name' => $file[0], 'extension' => $file[1]);
 			}
 		}
 
@@ -24,7 +20,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		$counter = 0;
 		foreach ($smileys as $smiley) {
 			$counter++;
-			$insertSmileys[] = array($smiley['name'], $smiley['name'] . "." . $smiley['extension']);
+			$insertSmileys[] = array(':'.$smiley['name'].':', $smiley['name'] . "." . $smiley['extension']);
 		}
 
 		CM_Mysql::insertIgnore(TBL_CM_SMILEY, array('code', 'file'), $insertSmileys);
