@@ -41,7 +41,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 						$session = new CM_Session($data->getString('sessionId'));
 						$user = $session->getUser(true);
 					}
-					$adapter->subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
+					$adapter->subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
 					break;
 				case 'unsubscribe':
 					$channelKey = $data['channel'];
@@ -90,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					}
 					$start = (int) $subscriber['subscribeStamp'];
 					$allowedUntil = $start;
-					$this->subscribe($channelKey, $clientKey, $user, $start, $allowedUntil);
+					$this->subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
 				}
 			}
 		}
@@ -99,11 +99,11 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	/**
 	 * @param string             $channelKey
 	 * @param string             $clientKey
-	 * @param CM_Model_User|null $user
 	 * @param int                $start
 	 * @param int                $allowedUntil
+	 * @param CM_Model_User|null $user
 	 */
-	public function subscribe($channelKey, $clientKey, CM_Model_User $user = null, $start, $allowedUntil) {
+	public function subscribe($channelKey, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
 		$streamChannel = CM_Model_StreamChannel_Message::getByKey($channelKey, $this->getType());
 		$streamChannelSubscribes = $streamChannel->getStreamSubscribes();
 		if ($streamChannelSubscribes->findKey($clientKey)) {

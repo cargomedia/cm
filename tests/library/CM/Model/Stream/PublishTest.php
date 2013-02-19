@@ -27,7 +27,8 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		try {
 			CM_Model_Stream_Publish::create($data);
 			$this->fail('Should not be able to create duplicate key instance');
-		} catch (Exception $e) {
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
 		}
 		$data['streamChannel'] = CMTest_TH::createStreamChannel();
 		CM_Model_Stream_Publish::create($data);
