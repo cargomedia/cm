@@ -53,6 +53,7 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 
 	protected function _processItem($item) {
 		$item['variables'] = ($item['variables']) ? explode(',', $item['variables']) : array();
+		sort($item['variables']);
 		return $item;
 	}
 
