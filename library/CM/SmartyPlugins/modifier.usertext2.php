@@ -9,7 +9,7 @@
  * @param boolean $preserveEmoji
  */
 
-function smarty_modifier_usertext($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null, $preserveEmoji = null) {
+function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null, $preserveEmoji = null) {
 
 	$userText = new CM_Usertext_Usertext($text);
 
