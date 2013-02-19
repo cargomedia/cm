@@ -32,7 +32,7 @@ EOD;
 
 	public function testMarkdown() {
 		$expected = <<<EOD
-<p>smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/emoji/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/emoji/1.png" /></p>
+<p>smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" /></p>
 <p>badwords: hallo…</p>
 <h1>Headline</h1>
 EOD;
@@ -86,7 +86,7 @@ EOD;
 
 	public function testPlainsPreserveEmoji() {
 		$expected = <<<EOD
-smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/emoji/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/emoji/1.png" />
+smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" />
 badwords: hallo…
 Headline
 EOD;
@@ -106,7 +106,7 @@ EOD;
 		$expected = '繁體字';
 		$actual = new CM_Usertext_Usertext('繁體字');
 		$this->assertEquals($expected, $actual->getPlain());
-		$this->assertEquals('<p>'.$expected.'</p>', $actual->getMarkdown());
+		$this->assertEquals('<p>' . $expected . '</p>', $actual->getMarkdown());
 	}
 
 	public function testCensor() {
