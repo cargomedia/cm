@@ -28,7 +28,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 
 		}
 
-		$sql = "INSERT INTO " . TBL_CM_SMILEY . " (`code` ,`file`) VALUES " . implode(',', $insertSmileys) . ";";
+		$sql = "INSERT INTO " . TBL_CM_SMILEY . " (`code` ,`file`) VALUES " . implode(',', $insertSmileys) . " ON DUPLICATE KEY UPDATE code=code;";
 		CM_Mysql::exec($sql);
 
 		$this->_getOutput()->writeln('Created emoji Table');
