@@ -258,10 +258,20 @@ DROP TABLE IF EXISTS `cm_smiley`;
 
 CREATE TABLE `cm_smiley` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `setId` int(10) NOT NULL,
   `code` varchar(50) NOT NULL,
   `file` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `cm_smileySet`;
+
+CREATE TABLE `cm_smileySet` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
