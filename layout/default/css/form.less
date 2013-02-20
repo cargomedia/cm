@@ -129,6 +129,10 @@ input[type=radio], input[type=checkbox] {
 	.background-color(darken(@colorBg, 3));
 	border-top-color: lighten(@colorFgBorder, 3);
 
+	@media (max-width: 600px) {
+		padding: 6px 12px;
+	}
+
 	&:first-child{
 		border-top: 1px solid @colorFgBorder;
 	}
