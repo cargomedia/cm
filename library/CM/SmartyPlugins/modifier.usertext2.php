@@ -6,10 +6,9 @@
  * @param int|null     $lengthMax
  * @param boolean|null $stripEmoji          cutout all emoji
  * @param boolean|null $preserveParagraph   allow <p> in plain
- * @param boolean|null $preserveEmoji
  */
 
-function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null, $preserveEmoji = null) {
+function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null) {
 
 	$userText = new CM_Usertext_Usertext($text);
 
@@ -19,7 +18,7 @@ function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stri
 
 	switch ($mode) {
 		case 'plain':
-			$text = $userText->getPlain($lengthMax, $preserveParagraph, $preserveEmoji);
+			$text = $userText->getPlain($lengthMax, $preserveParagraph, $stripEmoji);
 			break;
 		case 'markdown':
 		default:

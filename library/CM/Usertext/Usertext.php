@@ -33,7 +33,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 	 * @param boolean $preserveEmoji
 	 * @return string
 	 */
-	public function getPlain($lengthMax = null, $preserveParagraph = null, $preserveEmoji = null) {
+	public function getPlain($lengthMax = null, $preserveParagraph = null, $stripEmoji = null) {
 		$text = $this->_text;
 		$text = $this->_escape($text);
 
@@ -53,13 +53,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		}
 
 		$text = strip_tags($text, $allowedTags);
-
-		if ($preserveEmoji) {
-			$text = $this->_applyEmoji($text, null);
-		} else {
-			$text = $this->_applyEmoji($text, true);
-		}
-
+		$text = $this->_applyEmoji($text, $stripEmoji);
 		$text = $this->_cutWhitespace($text);
 
 		return $text;
@@ -121,9 +115,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		if (null === $stripEmoji) {
 			$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
 		} else {
-			if (true === $stripEmoji) {
-				$text = str_replace($emoticons['codes'], '', $text);
-			}
+			$text = str_replace($emoticons['codes'], '', $text);
 		}
 		return $text;
 	}
