@@ -1,64 +1,66 @@
-@fontUsertextH1Size: 28px;
-@fontUsertextH2Size: 24px;
-@fontUsertextH3Size: 18px;
-@fontUsertextH4Size: 16px;
-@fontUsertextH5Size: 14px;
-@fontUsertextH6Size: 14px;
-@fontUsertextPSize: 13px;
-
-@colorUsertextH1: #000000;
-@colorUsertextH2: #000000;
-@colorUsertextH2Border: #cccccc;
-@colorUsertextH3: #333333;
-@colorUsertextH4: #333333;
-@colorUsertextH5: #333333;
-@colorUsertextH6: #777777;
+.emoji {
+	width: @emoji-size;
+	height: @emoji-size;
+	display: inline-block;
+	margin-bottom: -0.25em;
+	vertical-align: middle;
+}
 
 .usertext2 {
 	h1, h2, h3, h4, h5, h6 {
-		margin-bottom: 10px;
 		font-weight: bold;
 		font-style: normal;
 	}
 	h1 {
-		font-size: @fontUsertextH1Size;
-		color: @colorUsertextH1;
-		line-height: 44px;
+		font-size: @fontSizeUsertextH1;
+		color: @colorFgUsertextH1;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH1;
+		line-height: @fontSizeUsertextH1*1.3;
+		margin: 0 0 @fontSizeUsertextH1*1.5 0;
 	}
 	h2 {
-		font-size: @fontUsertextH2Size;
-		color: @colorUsertextH2;
-		line-height: 38px;
-		border-bottom: 1px solid @colorUsertextH2Border;
+		font-size: @fontSizeUsertextH2;
+		color: @colorFgUsertextH2;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH2;
+		line-height: @fontSizeUsertextH2*1.3;
+		margin: 0 0 @fontSizeUsertextH2*1.5 0;
 	}
 	h3 {
-		font-size: @fontUsertextH3Size;
-		color: @colorUsertextH3;
-		line-height: 28px;
+		font-size: @fontSizeUsertextH3;
+		color: @colorFgUsertextH3;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH3;
+		line-height: @fontSizeUsertextH3*1.3;
+		margin: 0 0 @fontSizeUsertextH3*1.5 0;
 	}
 	h4 {
-		font-size: @fontUsertextH4Size;
-		color: @colorUsertextH4;
-		line-height: 25px;
+		font-size: @fontSizeUsertextH4;
+		color: @colorFgUsertextH4;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH4;
+		line-height: @fontSizeUsertextH4*1.3;
+		margin: 0 0 @fontSizeUsertextH4*1.5 0;
 	}
 	h5 {
-		font-size: @fontUsertextH5Size;
-		color: @colorUsertextH5;
-		line-height: 22px;
+		font-size: @fontSizeUsertextH5;
+		color: @colorFgUsertextH6;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH5;
+		line-height: @fontSizeUsertextH5*1.3;
+		margin: 0 0 @fontSizeUsertextH5*1.5 0;
 	}
 	h6 {
-		font-size: @fontUsertextH6Size;
-		color: @colorUsertextH6;
-		line-height: 22px;
+		font-size: @fontSizeUsertextH6;
+		color: @colorFgUsertextH6;
+		text-shadow: 1px 1px 1px @colorFgShadowUsertextH6;
+		line-height: @fontSizeUsertextH6*1.3;
+		margin: 0 0 @fontSizeUsertextH6*1.5 0;
 	}
 	p {
-		font-size: @fontUsertextPSize;
-		line-height: 20px;
-		margin-bottom: 15px;
+		font-size: @fontSizeUsertextP;
+		line-height: @fontSizeUsertextP*1.3;
+		margin-bottom: @fontSizeUsertextP*1.5;
 	}
 	ul, ol {
-		font-size: @fontUsertextPSize;
-		margin: 0 0 0 20px;
+		font-size: @fontSizeUsertextP;
+		margin: 0 0 0 @fontSizeUsertextP*1.5;
 	}
 	ul {
 		list-style: disc;
@@ -67,6 +69,6 @@
 		list-style: decimal;
 	}
 	li {
-		padding: 2px 0;
+		padding: @fontSizeUsertextP*0.2 0;
 	}
 }
