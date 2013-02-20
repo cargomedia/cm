@@ -112,8 +112,12 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function factory($id, $type = null) {
-		if (is_null($type)) {
-			$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+		if (null === $type) {
+			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
+			if (false === ($type = CM_Cache::get($cacheKey))) {
+				$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+				CM_Cache::set($cacheKey, $type);
+			}
 		}
 		$class = self::_getClassName($type);
 		return new $class($id);
