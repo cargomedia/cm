@@ -27,8 +27,8 @@ class smarty_modifier_usertext2 extends CMTest_TestCase {
 		$text = $params['text'] ? $params['text'] : null;
 		$mode = $params['mode'] ? $params['mode'] : null;
 		$lengthMax = $params['lengthMax'] ? $params['lengthMax'] : null;
-		$stripEmoji = $params['stripEmoji'] ? $params['stripEmoji'] : null;
+		$stripEmoticon = $params['stripEmoticon'] ? $params['stripEmoticon'] : null;
 		$preserveParagraph = $params['preserveParagraph'] ? $params['preserveParagraph'] : null;
-		$this->assertSame($expected, smarty_modifier_usertext2($text, $mode, $lengthMax, $stripEmoji, $preserveParagraph));
+		$this->assertSame($expected, smarty_modifier_usertext2($text, $mode, $lengthMax, $stripEmoticon, $preserveParagraph));
 	}
 }

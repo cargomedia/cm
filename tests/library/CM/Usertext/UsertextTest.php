@@ -32,7 +32,7 @@ EOD;
 
 	public function testMarkdown() {
 		$expected = <<<EOD
-<p>smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" /></p>
+<p>smilies: <img class="emoticon" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoticon" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" /></p>
 <p>badwords: hallo…</p>
 <h1>Headline</h1>
 EOD;
@@ -47,7 +47,7 @@ EOD;
 		$this->assertEquals('<p>Hello World</p>', $actual->getMarkdown(12));
 	}
 
-	public function testMarkdownStripEmoji() {
+	public function testMarkdownStripEmoticon() {
 		$expected = <<<EOD
 <p>smilies:</p>
 <p>badwords: hallo…</p>
@@ -84,9 +84,9 @@ EOD;
 		$this->assertEquals($expected, $actual->getPlain(null, true));
 	}
 
-	public function testPlainsPreserveEmoji() {
+	public function testPlainsPreserveEmoticon() {
 		$expected = <<<EOD
-smilies: <img class="emoji" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoji" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" />
+smilies: <img class="emoticon" title=":-)" alt=":-)" src="/img/smiley/1.png" /> <img class="emoticon" title=":smiley:" alt=":smiley:" src="/img/smiley/1.png" />
 badwords: hallo…
 Headline
 EOD;

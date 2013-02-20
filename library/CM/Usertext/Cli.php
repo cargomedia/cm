@@ -2,7 +2,7 @@
 
 class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 
-	public function emojiUpdate() {
+	public function emoticonUpdate() {
 
 		$smileys = array();
 
