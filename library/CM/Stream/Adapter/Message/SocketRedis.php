@@ -169,8 +169,6 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @return array
 	 */
 	protected function _fetchStatus(array $server) {
-		$file = new CM_File('/tmp/status.json');
-		return CM_Params::decode($file->read(), true);
 		return CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true);
 	}
 }
