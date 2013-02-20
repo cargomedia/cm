@@ -35,59 +35,50 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		foreach ($servers as $server) {
 			$channelsStatus = $this->_fetchStatus($server);
 
-			$channelsPersistence = new CM_Paging_StreamChannel_AdapterType($this->getType());
-			$channelsPersistence->_change();
-			/** @var $channelsPersistenceItems CM_Model_StreamChannel_Abstract[] */
-			$channelsPersistenceItems = array();
+			/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
+			$channelsPersistenceArray = array();
 			/** @var $channel CM_Model_StreamChannel_Message */
-			foreach ($channelsPersistence->getItems() as $channel) {
-				$channelsPersistenceItems[$channel->getKey()] = $channel;
-			}
-
-			$streamsPersistence = new CM_Paging_StreamSubscribe_AdapterType($this->getType());
-			$streamsPersistence->_change();
-			/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
-			$streamsPersistenceItems = array();
-			/** @var $stream CM_Model_Stream_Subscribe */
-			foreach ($streamsPersistence->getItems() as $stream) {
-				$streamsPersistenceItems[$stream->getStreamChannel()->getKey() . '/' . $stream->getKey()] = $stream;
-			}
-
-			foreach ($channelsPersistenceItems as $channel) {
+			foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
 				if (!isset($channelsStatus[$channel->getKey()])) {
 					$channel->delete();
-					continue;
+				} else {
+					$channelsPersistenceArray[$channel->getKey()] = $channel;
 				}
 			}
-			foreach ($streamsPersistenceItems as $stream) {
+
+			/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
+			$streamsPersistenceArray = array();
+			/** @var $stream CM_Model_Stream_Subscribe */
+			foreach (new CM_Paging_StreamSubscribe_AdapterType($this->getType()) as $stream) {
 				$streamChannelKey = $stream->getStreamChannel()->getKey();
 				if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
 					/** @var $subscriber CM_Model_Stream_Subscribe */
 					$stream->delete();
+				} else {
+					$streamsPersistenceArray[$streamChannelKey . '/' . $stream->getKey()] = $stream;
 				}
 			}
 
 			foreach ($channelsStatus as $channelKey => $channel) {
-				if (isset($channelsPersistenceItems[$channelKey])) {
-					$streamChannel = $channelsPersistenceItems[$channelKey];
+				if (isset($channelsPersistenceArray[$channelKey])) {
+					$streamChannel = $channelsPersistenceArray[$channelKey];
 				} else {
 					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
 				}
 				foreach ($channel['subscribers'] as $subscriber) {
 					$clientKey = (string) $subscriber['clientKey'];
-					if (isset($streamsPersistenceItems[$streamChannel->getKey() . '/' . $clientKey])) {
-						continue;
+					if (!isset($streamsPersistenceArray[$streamChannel->getKey() . '/' . $clientKey])) {
+						$data = CM_Params::factory($subscriber['data']);
+						$user = null;
+						if ($data->has('sessionId')) {
+							$session = new CM_Session($data->getString('sessionId'));
+							$user = $session->getUser(true);
+						}
+						$start = (int) $subscriber['subscribeStamp'];
+						$allowedUntil = $start;
+						CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+							'streamChannel' => $streamChannel, 'key' => $clientKey));
 					}
-					$data = CM_Params::factory($subscriber['data']);
-					$user = null;
-					if ($data->has('sessionId')) {
-						$session = new CM_Session($data->getString('sessionId'));
-						$user = $session->getUser(true);
-					}
-					$start = (int) $subscriber['subscribeStamp'];
-					$allowedUntil = $start;
-					CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-						'streamChannel' => $streamChannel, 'key' => $clientKey));
 				}
 			}
 		}
