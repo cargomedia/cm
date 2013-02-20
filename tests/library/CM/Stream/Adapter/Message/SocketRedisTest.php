@@ -77,35 +77,38 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
 				)),
 			);
-			$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
-			$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-			/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
-			$adapter->synchronize();
-
-			$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
-			$this->assertSame($streamChannels->getCount(), 2);
-			/** @var $streamChannel CM_Model_StreamChannel_Message */
-			foreach ($streamChannels as $streamChannel) {
-				$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
-				$this->assertSame($streamChannel->getStreamSubscribes()->getCount(), 2);
-			}
+			$this->_testSynchronize($status);
 		}
 		$status = array(
 			'channel-foo' => array('subscribers' => array(
 				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
 			))
 		);
+		$this->_testSynchronize($status);
+	}
+
+	/**
+	 * @param array $status
+	 */
+	private function _testSynchronize($status) {
 		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
 		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
 		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
 		$adapter->synchronize();
 
 		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
-		$this->assertSame($streamChannels->getCount(), 1);
+		$this->assertSame(count($status), $streamChannels->getCount());
 		/** @var $streamChannel CM_Model_StreamChannel_Message */
 		foreach ($streamChannels as $streamChannel) {
 			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
-			$this->assertSame($streamChannel->getStreamSubscribes()->getCount(), 1);
+			$this->assertSame(count($status[$streamChannel->getKey()]['subscribers']), $streamChannel->getStreamSubscribes()->getCount());
+		}
+		foreach ($status as $channelKey => $channelData) {
+			$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $adapter->getType());
+			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
+				$this->assertInstanceOf('CM_Model_Stream_Subscribe', CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel));
+			}
 		}
 	}
 }
