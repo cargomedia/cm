@@ -51,7 +51,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		$wowza->synchronize();
 	}
 
-	public function testGetSeverId() {
+	public function testGetServerId() {
 		$adapter = new CM_Stream_Adapter_Video_Wowza();
 		$ipAddresses = array('10.0.3.109', '10.0.3.108');
 		foreach ($ipAddresses as $ipAddress) {
