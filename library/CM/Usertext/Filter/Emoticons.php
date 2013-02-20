@@ -2,22 +2,9 @@
 
 class CM_Usertext_Filter_Emoticons extends CM_Usertext_Filter_Abstract {
 
-	private $_strip;
-
-	/**
-	 * @param boolean|null $strip
-	 */
-	function __construct($strip = null) {
-		$strip = $strip ? (boolean) $strip : null;
-		$this->_strip = (boolean) $strip;
-	}
-
 	public function transform($text) {
 		$text = (string) $text;
 		$emoticons = $this->_getEmoticonData();
-		if ($this->_strip) {
-			$emoticons['htmls'] = '';
-		}
 		$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
 		return $text;
 	}
