@@ -26,35 +26,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	public function startSynchronization() {
 		$adapter = $this;
 		CM_Cache_Redis::subscribe('socket-redis-up', function ($channel, $message) use ($adapter) {
-			$message = CM_Params::decode($message, true);
-			$type = $message['type'];
-			$data = $message['data'];
-			switch ($type) {
-				case 'subscribe':
-					$channelKey = $data['channel'];
-					$clientKey = $data['clientKey'];
-					$start = time();
-					$allowedUntil = time();
-					$data = CM_Params::factory($data);
-					$user = null;
-					if ($data->has('sessionId')) {
-						$session = new CM_Session($data->getString('sessionId'));
-						$user = $session->getUser(true);
-					}
-					$adapter->subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
-					break;
-				case 'unsubscribe':
-					$channelKey = $data['channel'];
-					$clientKey = $data['clientKey'];
-					$adapter->unsubscribe($channelKey, $clientKey);
-
-					break;
-				case 'message':
-
-					break;
-				default:
-					throw new CM_Exception_Invalid('Invalid socket-redis event type');
-			}
+			$adapter->onRedisMessage($message);
 		});
 	}
 
@@ -62,26 +34,50 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$servers = self::_getConfig()->servers;
 		foreach ($servers as $server) {
 			$channelsStatus = $this->_fetchStatus($server);
+
 			$channelsPersistence = new CM_Paging_StreamChannel_AdapterType($this->getType());
+			$channelsPersistence->_change();
+			/** @var $channelsPersistenceItems CM_Model_StreamChannel_Abstract[] */
+			$channelsPersistenceItems = array();
 			/** @var $channel CM_Model_StreamChannel_Message */
-			foreach ($channelsPersistence as $channel) {
+			foreach ($channelsPersistence->getItems() as $channel) {
+				$channelsPersistenceItems[$channel->getKey()] = $channel;
+			}
+
+			$streamsPersistence = new CM_Paging_StreamSubscribe_AdapterType($this->getType());
+			$streamsPersistence->_change();
+			/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
+			$streamsPersistenceItems = array();
+			/** @var $stream CM_Model_Stream_Subscribe */
+			foreach ($streamsPersistence->getItems() as $stream) {
+				$streamsPersistenceItems[$stream->getStreamChannel()->getKey() . '/' . $stream->getKey()] = $stream;
+			}
+
+			foreach ($channelsPersistenceItems as $channel) {
 				if (!isset($channelsStatus[$channel->getKey()])) {
 					$channel->delete();
 					continue;
 				}
-				$streamSubscribes = $channelsStatus[$channel->getKey()]['subscribers'];
-				/** @var $subscriber CM_Model_Stream_Subscribe */
-				foreach ($channel->getStreamSubscribes() as $subscriber) {
-					if (!isset($streamSubscribes[$subscriber->getKey()])) {
-						$subscriber->delete();
-					}
+			}
+			foreach ($streamsPersistenceItems as $stream) {
+				$streamChannelKey = $stream->getStreamChannel()->getKey();
+				if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
+					/** @var $subscriber CM_Model_Stream_Subscribe */
+					$stream->delete();
 				}
 			}
 
-			$channelsStatus = $this->_fetchStatus($server);
 			foreach ($channelsStatus as $channelKey => $channel) {
+				if (isset($channelsPersistenceItems[$channelKey])) {
+					$streamChannel = $channelsPersistenceItems[$channelKey];
+				} else {
+					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+				}
 				foreach ($channel['subscribers'] as $subscriber) {
 					$clientKey = (string) $subscriber['clientKey'];
+					if (isset($streamsPersistenceItems[$streamChannel->getKey() . '/' . $clientKey])) {
+						continue;
+					}
 					$data = CM_Params::factory($subscriber['data']);
 					$user = null;
 					if ($data->has('sessionId')) {
@@ -90,9 +86,46 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					}
 					$start = (int) $subscriber['subscribeStamp'];
 					$allowedUntil = $start;
-					$this->subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
+					CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+						'streamChannel' => $streamChannel, 'key' => $clientKey));
 				}
 			}
+		}
+	}
+
+	/**
+	 * @param string $message
+	 * @throws CM_Exception_Invalid
+	 */
+	public function onRedisMessage($message) {
+		$message = CM_Params::decode($message, true);
+		$type = $message['type'];
+		$data = $message['data'];
+		switch ($type) {
+			case 'subscribe':
+				$channelKey = $data['channel'];
+				$clientKey = $data['clientKey'];
+				$start = time();
+				$allowedUntil = time();
+				$data = CM_Params::factory($data['data']);
+				$user = null;
+				if ($data->has('sessionId')) {
+					$session = new CM_Session($data->getString('sessionId'));
+					$user = $session->getUser(true);
+				}
+				$this->_subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
+				break;
+			case 'unsubscribe':
+				$channelKey = $data['channel'];
+				$clientKey = $data['clientKey'];
+				$this->_unsubscribe($channelKey, $clientKey);
+
+				break;
+			case 'message':
+
+				break;
+			default:
+				throw new CM_Exception_Invalid('Invalid socket-redis event type');
 		}
 	}
 
@@ -103,7 +136,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param int                $allowedUntil
 	 * @param CM_Model_User|null $user
 	 */
-	public function subscribe($channelKey, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
+	protected function _subscribe($channelKey, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
 		$streamChannel = CM_Model_StreamChannel_Message::getByKey($channelKey, $this->getType());
 		$streamChannelSubscribes = $streamChannel->getStreamSubscribes();
 		if ($streamChannelSubscribes->findKey($clientKey)) {
@@ -117,7 +150,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param string $channelKey
 	 * @param string $clientKey
 	 */
-	public function unsubscribe($channelKey, $clientKey) {
+	protected function _unsubscribe($channelKey, $clientKey) {
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
 		if (!$streamChannel) {
 			return;
@@ -135,7 +168,9 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param array $server
 	 * @return array
 	 */
-	private function _fetchStatus(array $server) {
+	protected function _fetchStatus(array $server) {
+		$file = new CM_File('/tmp/status.json');
+		return CM_Params::decode($file->read(), true);
 		return CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true);
 	}
 }

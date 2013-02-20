@@ -39,9 +39,11 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 	public function testSetAllowedUntil() {
 		$videoStreamSubscribe = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe->setAllowedUntil(234234);
-		$this->assertEquals(234234, $videoStreamSubscribe->getAllowedUntil());
+		$this->assertSame(234234, $videoStreamSubscribe->getAllowedUntil());
 		$videoStreamSubscribe->setAllowedUntil(2342367);
-		$this->assertEquals(2342367, $videoStreamSubscribe->getAllowedUntil());
+		$this->assertSame(2342367, $videoStreamSubscribe->getAllowedUntil());
+		$videoStreamSubscribe->setAllowedUntil(null);
+		$this->assertNull($videoStreamSubscribe->getAllowedUntil());
 	}
 
 	public function testCreate() {

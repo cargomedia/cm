@@ -37,9 +37,11 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 	public function testSetAllowedUntil() {
 		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$videoStreamPublish->setAllowedUntil(234234);
-		$this->assertEquals(234234, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(234234, $videoStreamPublish->getAllowedUntil());
 		$videoStreamPublish->setAllowedUntil(2342367);
-		$this->assertEquals(2342367, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(2342367, $videoStreamPublish->getAllowedUntil());
+		$videoStreamPublish->setAllowedUntil(null);
+		$this->assertNull($videoStreamPublish->getAllowedUntil());
 	}
 
 	public function testCreate() {

@@ -3,15 +3,19 @@
 abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @param int $timeStamp
+	 * @param int|null $timeStamp
 	 */
 	abstract public function setAllowedUntil($timeStamp);
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
 	public function getAllowedUntil() {
-		return (int) $this->_get('allowedUntil');
+		$allowedUntil = $this->_get('allowedUntil');
+		if (null === $allowedUntil) {
+			return null;
+		}
+		return (int) $allowedUntil;
 	}
 
 	/**
@@ -19,6 +23,13 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	 */
 	public function getKey() {
 		return (string) $this->_get('key');
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getChannelId() {
+		return (int) $this->_get('channelId');
 	}
 
 	/**
