@@ -115,7 +115,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 * @return mixed
 	 */
 	private function _censor($text) {
-		$cacheKey = CM_CacheConst::Usertext_Badwords;
+		$cacheKey = CM_CacheConst::Usertext_Filter_Badwords;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwords = array('search' => array(), 'replace' => '…');
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {
