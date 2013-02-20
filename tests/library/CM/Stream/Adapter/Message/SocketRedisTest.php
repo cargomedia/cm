@@ -66,17 +66,46 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
+		for ($i = 0; $i < 2; $i++) {
+			$status = array(
+				'channel-foo' => array('subscribers' => array(
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
+				)),
+				'channel-bar' => array('subscribers' => array(
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
+				)),
+			);
+			$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+			$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+			/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+			$adapter->synchronize();
+
+			$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
+			$this->assertSame($streamChannels->getCount(), 2);
+			/** @var $streamChannel CM_Model_StreamChannel_Message */
+			foreach ($streamChannels as $streamChannel) {
+				$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+				$this->assertSame($streamChannel->getStreamSubscribes()->getCount(), 2);
+			}
+		}
 		$status = array(
 			'channel-foo' => array('subscribers' => array(
-				array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
-				array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
-			)),
-			'channel-bar' => array('subscribers' => array(
-				array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
-				array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
-			)),
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
+			))
 		);
 		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
-		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue(json_encode($status)));
+		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+		$adapter->synchronize();
+
+		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
+		$this->assertSame($streamChannels->getCount(), 1);
+		/** @var $streamChannel CM_Model_StreamChannel_Message */
+		foreach ($streamChannels as $streamChannel) {
+			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+			$this->assertSame($streamChannel->getStreamSubscribes()->getCount(), 1);
+		}
 	}
 }
