@@ -33,7 +33,7 @@ class CM_Usertext_Filter_Emoticons extends CM_Usertext_Filter_Abstract {
 				foreach ($smiley['codes'] as $code) {
 					$emoticons['codes'][] = $code;
 					$emoticons['htmls'][] =
-							'<img class="emoticon" title="' . $code . '" alt="' . $code . '" src="/img/emoticon/' . $smiley['path'] . '" />';
+							'<img class="emoticon" title="' . $code . '" alt="' . $code . '" src="/img/emoticons/' . $smiley['path'] . '" />';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
