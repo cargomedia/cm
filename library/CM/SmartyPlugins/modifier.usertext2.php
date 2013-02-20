@@ -9,12 +9,7 @@
  */
 
 function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null) {
-
 	$userText = new CM_Usertext_Usertext($text);
-
-	if (null === $mode) {
-		$mode = 'markdown';
-	}
 
 	switch ($mode) {
 		case 'plain':
