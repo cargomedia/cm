@@ -18,7 +18,7 @@ class CM_CacheConst {
 
 	const Usertext_Filter_Badwords = 'Usertext_Filter_Badwords';
 
-	const Usertext_Emoticons = 'Usertext_Emoticons';
+	const Usertext_Filter_Emoticons = 'Usertext_Filter_Emoticons';
 
 	// _id:X
 	const Session = 'Session';

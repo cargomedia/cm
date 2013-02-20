@@ -75,7 +75,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 * @return array
 	 */
 	private function _getEmoticonData() {
-		$cacheKey = CM_CacheConst::Usertext_Emoticons;
+		$cacheKey = CM_CacheConst::Usertext_Filter_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'tags' => array(), 'htmls' => array());
 			foreach (new CM_Paging_Smiley_All() as $smiley) {

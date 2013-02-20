@@ -1,24 +1,24 @@
 <?php
 
-class CM_Usertext_Filter_Emoji extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_Emoticons extends CM_Usertext_Filter_Abstract {
 
-	private $_stripEmoji;
+	private $_strip;
 
 	/**
-	 * @param boolean $stripEmoji
+	 * @param boolean|null $strip
 	 */
-	function __construct($stripEmoji = null) {
-		$this->_stripEmoji = (boolean) $stripEmoji;
+	function __construct($strip = null) {
+		$strip = $strip ? (boolean) $strip : null;
+		$this->_strip = (boolean) $strip;
 	}
 
 	public function transform($text) {
 		$text = (string) $text;
 		$emoticons = $this->_getEmoticonData();
-		if (null === $this->_stripEmoji) {
-			$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
-		} else {
-			$text = str_replace($emoticons['codes'], '', $text);
+		if ($this->_strip) {
+			$emoticons['htmls'] = '';
 		}
+		$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
 		return $text;
 	}
 
@@ -26,7 +26,7 @@ class CM_Usertext_Filter_Emoji extends CM_Usertext_Filter_Abstract {
 	 * @return array
 	 */
 	private function _getEmoticonData() {
-		$cacheKey = CM_CacheConst::Usertext_Emoticons;
+		$cacheKey = CM_CacheConst::Usertext_Filter_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'htmls' => array());
 			foreach (new CM_Paging_Smiley_All() as $smiley) {
