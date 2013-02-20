@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @param string  $text
- * @param string  $mode                markdown | plain
- * @param int     $lengthMax
- * @param boolean $stripEmoji          cutout all emoji
- * @param boolean $preserveParagraph   allow <p> in plain
- * @param boolean $preserveEmoji
+ * @param string       $text
+ * @param string|null  $mode                markdown | plain
+ * @param int|null     $lengthMax
+ * @param boolean|null $stripEmoji          cutout all emoji
+ * @param boolean|null $preserveParagraph   allow <p> in plain
+ * @param boolean|null $preserveEmoji
  */
 
 function smarty_modifier_usertext2($text, $mode = null, $lengthMax = null, $stripEmoji = null, $preserveParagraph = null, $preserveEmoji = null) {
