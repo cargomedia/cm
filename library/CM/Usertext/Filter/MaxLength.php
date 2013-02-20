@@ -11,10 +11,6 @@ class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
 		$this->_lengthMax = (int) $lengthMax;
 	}
 
-	/**
-	 * @param string $text
-	 * @return string
-	 */
 	public function transform($text) {
 		$text = (string) $text;
 		if (strlen($text) > $this->_lengthMax) {

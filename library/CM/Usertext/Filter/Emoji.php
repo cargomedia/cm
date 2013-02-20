@@ -11,10 +11,6 @@ class CM_Usertext_Filter_Emoji extends CM_Usertext_Filter_Abstract {
 		$this->_stripEmoji = (boolean) $stripEmoji;
 	}
 
-	/**
-	 * @param string $text
-	 * @return string
-	 */
 	public function transform($text) {
 		$text = (string) $text;
 		$emoticons = $this->_getEmoticonData();

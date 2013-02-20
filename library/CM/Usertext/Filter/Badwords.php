@@ -2,10 +2,6 @@
 
 class CM_Usertext_Filter_Badwords extends CM_Usertext_Filter_Abstract {
 
-	/**
-	 * @param string $text
-	 * @return string
-	 */
 	public function transform($text) {
 		$text = (string) $text;
 		$cacheKey = CM_CacheConst::Usertext_Badwords;

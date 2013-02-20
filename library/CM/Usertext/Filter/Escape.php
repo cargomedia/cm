@@ -11,13 +11,9 @@ class CM_Usertext_Filter_Escape extends CM_Usertext_Filter_Abstract {
 		$this->_char_set = (string) $char_set;
 	}
 
-	/**
-	 * @param string $text
-	 * @return string
-	 */
 	public function transform($text) {
 		$text = (string) $text;
 		return htmlspecialchars($text, ENT_QUOTES, $this->_char_set);
 	}
-	
+
 }
