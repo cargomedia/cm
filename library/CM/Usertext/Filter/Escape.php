@@ -19,4 +19,5 @@ class CM_Usertext_Filter_Escape extends CM_Usertext_Filter_Abstract {
 		$text = (string) $text;
 		return htmlspecialchars($text, ENT_QUOTES, $this->_char_set);
 	}
+	
 }
