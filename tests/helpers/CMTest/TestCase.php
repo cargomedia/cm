@@ -104,6 +104,23 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param array|null $namespaces
+	 * @return CM_Site_Abstract
+	 */
+	protected function _getSite(array $namespaces = null) {
+		if (isset($this->_siteType)) {
+			return CM_Site_Abstract::factory($this->_siteType);
+		}
+		if (null === $namespaces) {
+			$namespaces = array('CM');
+		}
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
+		return $site;
+	}
+
+	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User|null    $viewer
 	 * @return CMTest_TH_Html
@@ -145,6 +162,32 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		$page->prepare();
 		$html = $this->_getRender($viewer)->render($page);
 		return new CMTest_TH_Html($html);
+	}
+
+	/**
+	 * @param CM_Response_View_Ajax $response
+	 * @param array|null            $data
+	 */
+	public static function assertAjaxResponseSuccess(CM_Response_View_Ajax $response, array $data = null) {
+		$responseContent = json_decode($response->getContent(), true);
+		self::assertArrayHasKey('success', $responseContent, 'AjaxCall not successful');
+		if (null !== $data) {
+			self::assertSame($data, $responseContent['success']['data']);
+		}
+	}
+
+	/**
+	 *
+	 * @param array $needles
+	 * @param array $haystacks
+	 */
+	public static function assertArrayContains(array $needles, array $haystacks) {
+		if (count($haystacks) < count($needles)) {
+			self::fail('not enough elements to compare each');
+		}
+		for ($i = 0; $i < count($needles); $i++) {
+			self::assertContains($needles[$i], $haystacks[$i]);
+		}
 	}
 
 	/**
@@ -190,6 +233,126 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
 		} catch (Exception $e) {
 			$this->assertInstanceOf($expectedExceptionClass, $e);
+		}
+	}
+
+	/**
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+		if ($needle instanceof CM_Comparable) {
+			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
+				throw new CM_Exception_Invalid('Haystack is not traversable.');
+			}
+			$match = false;
+			foreach ($haystack as $hay) {
+				if ($needle->equals($hay)) {
+					$match = true;
+					break;
+				}
+			}
+			self::assertTrue($match, 'Needle not contained.');
+		} else {
+			parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+		}
+	}
+
+	/**
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
+		if ($needle instanceof CM_Comparable) {
+			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
+				throw new CM_Exception_Invalid('Haystack is not traversable.');
+			}
+			$match = false;
+			foreach ($haystack as $hay) {
+				if ($needle->equals($hay)) {
+					$match = true;
+					break;
+				}
+			}
+			self::assertFalse($match, 'Needle contained.');
+		} else {
+			parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+		}
+	}
+
+	/**
+	 * @param array $needles
+	 * @param mixed $haystack
+	 */
+	public static function assertContainsAll(array $needles, $haystack) {
+		foreach ($needles as $needle) {
+			self::assertContains($needle, $haystack);
+		}
+	}
+
+	/**
+	 * @param array $needles
+	 * @param mixed $haystack
+	 */
+	public static function assertNotContainsAll(array $needles, $haystack) {
+		foreach ($needles as $needle) {
+			self::assertNotContains($needle, $haystack);
+		}
+	}
+
+	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
+		if ($expected instanceof CM_Comparable) {
+			self::assertTrue($expected->equals($actual), 'Models differ');
+		} else {
+			parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		}
+	}
+
+	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE) {
+		if ($expected instanceof CM_Comparable) {
+			self::assertFalse($expected->equals($actual), 'Models do not differ');
+		} else {
+			parent::assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		}
+	}
+
+	/**
+	 * @param CM_Response_View_Form $response
+	 * @param string|null           $msg
+	 */
+	public static function assertFormResponseSuccess(CM_Response_View_Form $response, $msg = null) {
+		$responseContent = json_decode($response->getContent(), true);
+		self::assertFalse($response->hasErrors(), 'Response has errors.');
+		if (null !== $msg) {
+			$msg = (string) $msg;
+			self::assertContains($msg, $responseContent['success']['messages'], 'Response has no message `' . $msg . '`.');
+		}
+	}
+
+	/**
+	 * @param CM_Response_View_Form $response
+	 * @param string|null           $errorMsg
+	 * @param string|null           $formFieldName
+	 */
+	public static function assertFormResponseError(CM_Response_View_Form $response, $errorMsg = null, $formFieldName = null) {
+		$responseContent = json_decode($response->getContent(), true);
+		self::assertTrue($response->hasErrors());
+		if (null !== $errorMsg) {
+			$errorMsg = (string) $errorMsg;
+			$error = $errorMsg;
+			if (null !== $formFieldName) {
+				$formFieldName = (string) $formFieldName;
+				$error = array($errorMsg, $formFieldName);
+			}
+			self::assertContains($error, $responseContent['success']['errors']);
 		}
 	}
 
@@ -247,6 +410,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param number          $expected
+	 * @param number          $actual
+	 * @param number|null
+	 */
+	public static function assertSameTime($expected, $actual, $delta = null) {
+		if (null === $delta) {
+			$delta = 1;
+		}
+		self::assertEquals($expected, $actual, '', $delta);
+	}
+
+	/**
 	 * @param CMTest_TH_Html  $page
 	 * @param bool     $warnings
 	 */
@@ -278,181 +453,4 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 		self::assertEmpty($content, $content);
 	}
-
-	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
-		if ($expected instanceof CM_Comparable) {
-			self::assertTrue($expected->equals($actual), 'Models differ');
-		} else {
-			parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-		}
-	}
-
-	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE) {
-		if ($expected instanceof CM_Comparable) {
-			self::assertFalse($expected->equals($actual), 'Models do not differ');
-		} else {
-			parent::assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-		}
-	}
-
-	/**
-	 * @param mixed|CM_Comparable $needle
-	 * @param Traversable         $haystack
-	 * @param string              $message
-	 * @param boolean             $ignoreCase
-	 * @param boolean             $checkForObjectIdentity
-	 * @throws CM_Exception_Invalid
-	 */
-	public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
-		if ($needle instanceof CM_Comparable) {
-			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
-				throw new CM_Exception_Invalid('Haystack is not traversable.');
-			}
-			$match = false;
-			foreach ($haystack as $hay) {
-				if ($needle->equals($hay)) {
-					$match = true;
-					break;
-				}
-			}
-			self::assertFalse($match, 'Needle contained.');
-		} else {
-			parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
-		}
-	}
-
-	/**
-	 * @param mixed|CM_Comparable $needle
-	 * @param Traversable         $haystack
-	 * @param string              $message
-	 * @param boolean             $ignoreCase
-	 * @param boolean             $checkForObjectIdentity
-	 * @throws CM_Exception_Invalid
-	 */
-	public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
-		if ($needle instanceof CM_Comparable) {
-			if (!(is_array($haystack) || $haystack instanceof Traversable)) {
-				throw new CM_Exception_Invalid('Haystack is not traversable.');
-			}
-			$match = false;
-			foreach ($haystack as $hay) {
-				if ($needle->equals($hay)) {
-					$match = true;
-					break;
-				}
-			}
-			self::assertTrue($match, 'Needle not contained.');
-		} else {
-			parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
-		}
-	}
-
-	/**
-	 * @param array $needles
-	 * @param mixed $haystack
-	 */
-	public static function assertContainsAll(array $needles, $haystack) {
-		foreach ($needles as $needle) {
-			self::assertContains($needle, $haystack);
-		}
-	}
-
-	/**
-	 * @param array $needles
-	 * @param mixed $haystack
-	 */
-	public static function assertNotContainsAll(array $needles, $haystack) {
-		foreach ($needles as $needle) {
-			self::assertNotContains($needle, $haystack);
-		}
-	}
-
-	/**
-	 *
-	 * @param array $needles
-	 * @param array $haystacks
-	 */
-	public static function assertArrayContains(array $needles, array $haystacks) {
-		if (count($haystacks) < count($needles)) {
-			self::fail('not enough elements to compare each');
-		}
-		for ($i = 0; $i < count($needles); $i++) {
-			self::assertContains($needles[$i], $haystacks[$i]);
-		}
-	}
-
-	/**
-	 * @param number          $expected
-	 * @param number          $actual
-	 * @param number|null
-	 */
-	public static function assertSameTime($expected, $actual, $delta = null) {
-		if (null === $delta) {
-			$delta = 1;
-		}
-		self::assertEquals($expected, $actual, '', $delta);
-	}
-
-	/**
-	 * @param CM_Response_View_Ajax $response
-	 * @param array|null            $data
-	 */
-	public static function assertAjaxResponseSuccess(CM_Response_View_Ajax $response, array $data = null) {
-		$responseContent = json_decode($response->getContent(), true);
-		self::assertArrayHasKey('success', $responseContent, 'AjaxCall not successful');
-		if (null !== $data) {
-			self::assertSame($data, $responseContent['success']['data']);
-		}
-	}
-
-	/**
-	 * @param CM_Response_View_Form $response
-	 * @param string|null           $msg
-	 */
-	public static function assertFormResponseSuccess(CM_Response_View_Form $response, $msg = null) {
-		$responseContent = json_decode($response->getContent(), true);
-		self::assertFalse($response->hasErrors(), 'Response has errors.');
-		if (null !== $msg) {
-			$msg = (string) $msg;
-			self::assertContains($msg, $responseContent['success']['messages'], 'Response has no message `' . $msg . '`.');
-		}
-	}
-
-	/**
-	 * @param CM_Response_View_Form $response
-	 * @param string|null           $errorMsg
-	 * @param string|null           $formFieldName
-	 */
-	public static function assertFormResponseError(CM_Response_View_Form $response, $errorMsg = null, $formFieldName = null) {
-		$responseContent = json_decode($response->getContent(), true);
-		self::assertTrue($response->hasErrors());
-		if (null !== $errorMsg) {
-			$errorMsg = (string) $errorMsg;
-			$error = $errorMsg;
-			if (null !== $formFieldName) {
-				$formFieldName = (string) $formFieldName;
-				$error = array($errorMsg, $formFieldName);
-			}
-			self::assertContains($error, $responseContent['success']['errors']);
-		}
-	}
-
-	/**
-	 * @param array|null $namespaces
-	 * @return CM_Site_Abstract
-	 */
-	protected function _getSite(array $namespaces = null) {
-		if (isset($this->_siteType)) {
-			return CM_Site_Abstract::factory($this->_siteType);
-		}
-		if (null === $namespaces) {
-			$namespaces = array('CM');
-		}
-		/** @var CM_Site_Abstract $site */
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
-		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
-		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
-		return $site;
-	}
-
 }
