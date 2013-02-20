@@ -5,7 +5,7 @@ class CM_Usertext_Filter_Striptags extends CM_Usertext_Filter_Abstract {
 	private $_allowedTags;
 
 	/**
-	 * @param array $allowedTags
+	 * @param array|null $allowedTags
 	 */
 	function __construct($allowedTags = null) {
 		$this->_allowedTags = (array) $allowedTags;

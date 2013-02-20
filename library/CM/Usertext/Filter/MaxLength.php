@@ -5,7 +5,7 @@ class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
 	private $_lengthMax;
 
 	/**
-	 * @param int $lengthMax
+	 * @param int|null $lengthMax
 	 */
 	function __construct($lengthMax = null) {
 		$this->_lengthMax = (int) $lengthMax;
