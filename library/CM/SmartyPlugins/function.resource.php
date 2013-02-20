@@ -22,6 +22,11 @@ function smarty_function_resource(array $params, Smarty_Internal_Template $templ
  */
 function smarty_helper_resource_internal(CM_Render $render) {
 	$paths = array();
+	foreach (CM_Util::getJavascriptLibraries() as $path) {
+		$path = str_replace(DIR_ROOT, '/', $path);
+		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+		$paths[] = $path;
+	}
 
 	// Get all static javascript files
 	foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
@@ -29,14 +34,6 @@ function smarty_helper_resource_internal(CM_Render $render) {
 		if (file_exists(DIR_PUBLIC . $publicPath)) {
 			$paths[] = '/' . $publicPath;
 		}
-	}
-
-	// Sorts all classes according to inheritance order, pairs them with path
-	$phpClasses = CM_View_Abstract::getClasses($render->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
-	foreach ($phpClasses as $path => $className) {
-		$path = str_replace(DIR_ROOT, '/', $path);
-		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-		$paths[] = preg_replace('#\.php$#', '.js', $path);
 	}
 
 	// Include all classes
