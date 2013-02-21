@@ -24,13 +24,24 @@ class CM_FileTest extends CMTest_TestCase {
 
 	public function testConstruct() {
 		$file = new CM_File($this->_testFilePath);
-		
+
 		$this->assertEquals($this->_testFilePath, $file->getPath());
 		$this->assertEquals('image/jpeg', $file->getMimeType());
 		$this->assertEquals('jpg', $file->getExtension());
+		$this->assertEquals('37b1b8cb44ed126b0cd2fa25565b844b', $file->getHash());
 		$this->assertEquals('test.jpg', $file->getFileName());
 		$this->assertEquals(filesize($this->_testFilePath), $file->getSize());
 		$this->assertEquals(file_get_contents($this->_testFilePath), $file->read());
+		$this->assertEquals(file_get_contents($this->_testFilePath), '' . $file);
+	}
+
+	public function testConstructNonExistent() {
+		try {
+			new CM_File(DIR_TEST_DATA . '/nonexistent-file');
+			$this->fail('Could instantiate non-existing file');
+		} catch (Exception $e) {
+			$this->assertContains('does not exist or is not a file', $e->getMessage());
+		}
 	}
 	
 	public function testDelete() {
@@ -79,5 +90,47 @@ class CM_FileTest extends CMTest_TestCase {
 		$file = CM_File::create($path, 'bar');
 		$this->assertEquals('bar', $file->read());
 		$file->delete();
+	}
+
+	public function testTruncate() {
+		$file = new CM_File($this->_testFilePath);
+		$file->write('foo');
+		$this->assertNotSame('', $file->read());
+		$file->truncate();
+		$this->assertSame('', $file->read());
+	}
+
+	public function testCopy() {
+		$path = DIR_TEST_DATA . 'filecopytest.txt';
+		$file = new CM_File($this->_testFilePath);
+		$this->assertFileNotExists($path);
+		$file->copy($path);
+		$this->assertFileExists($path);
+		unlink($path);
+
+		try {
+			$file->copy('/non-existent-path/not-existent-file');
+			$this->fail('Should not be able to copy');
+		} catch (Exception $e) {
+			$this->assertContains('Cannot copy', $e->getMessage());
+		}
+	}
+
+	public function testMove() {
+		$newPath = DIR_TEST_DATA . 'filemovetest.txt';
+		$file = new CM_File($this->_testFilePath);
+		$oldPath = $file->getPath();
+
+		$file->move($newPath);
+		$this->assertFileNotExists($oldPath);
+		$this->assertFileExists($newPath);
+		unlink($newPath);
+		try {
+			$file->move('/non-existent-path/not-existent-file');
+			$this->assertFileExists($oldPath);
+			$this->fail('Should not be able to copy');
+		} catch (Exception $e) {
+			$this->assertContains('Cannot move', $e->getMessage());
+		}
 	}
 }
