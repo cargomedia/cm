@@ -265,8 +265,6 @@ CREATE TABLE `cm_emoticon` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-
-
 DROP TABLE IF EXISTS `cm_splitfeature`;
 
 CREATE TABLE `cm_splitfeature` (
