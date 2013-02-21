@@ -47,7 +47,7 @@ class CM_Util {
 	/**
 	 * @param string $pattern
 	 * @param CM_Site_Abstract $site
-	 * @return array
+	 * @return string[]
 	 */
 	public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
 		$paths = array();
@@ -210,7 +210,7 @@ class CM_Util {
 	/**
 	 * @param string[] $paths
 	 * @throws CM_Exception_Invalid
-	 * @return array[]
+	 * @return array
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
@@ -219,7 +219,7 @@ class CM_Util {
 			if (!$file instanceof CM_File_ClassInterface) {
 				throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
 			}
-			$meta = $file->getMeta();
+			$meta = $file->getClassDeclaration();
 			$classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
 		}
 

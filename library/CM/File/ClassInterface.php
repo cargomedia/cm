@@ -2,7 +2,7 @@
 
 interface CM_File_ClassInterface {
 
-	public function getMeta();
+	public function getClassDeclaration();
 
 	public function getClassName();
 

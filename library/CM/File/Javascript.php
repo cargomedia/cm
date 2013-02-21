@@ -6,7 +6,7 @@ class CM_File_Javascript extends CM_File implements CM_File_ClassInterface {
 	 * @return string
 	 */
 	public function getClassName() {
-		$meta = $this->getMeta();
+		$meta = $this->getClassDeclaration();
 		return $meta['class'];
 	}
 
@@ -14,7 +14,7 @@ class CM_File_Javascript extends CM_File implements CM_File_ClassInterface {
 	 * @return string
 	 */
 	public function getParentClassName() {
-		$meta = $this->getMeta();
+		$meta = $this->getClassDeclaration();
 		return $meta['parent'];
 	}
 
@@ -22,7 +22,7 @@ class CM_File_Javascript extends CM_File implements CM_File_ClassInterface {
 	 * @return array
 	 * @throws CM_Exception
 	 */
-	public function getMeta() {
+	public function getClassDeclaration() {
 		$classRegexp = '\*\s+@class\s+(?<class>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
 		$parentRegexp = '(?:\s+\*\s+@extends\s+(?<parent>[a-zA-Z_\x7f-\xff][.a-zA-Z0-9_\x7f-\xff]*)\s+)?';
 		$regexp = '#' . $classRegexp . '[\s\n+]' . $parentRegexp . '#';
