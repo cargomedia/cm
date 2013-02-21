@@ -37,7 +37,9 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 			throw new CM_Exception_Invalid('Must define `mode` in Usertext.');
 	}
 	$usertext->addFilter(new CM_Usertext_Filter_Emoticons());
-	$usertext->addFilter(new CM_Usertext_Filter_CutWhitespace());
+	if ('plain' != $mode) {
+		$usertext->addFilter(new CM_Usertext_Filter_CutWhitespace());
+	}
 
 	$text = $usertext->transform($text);
 
