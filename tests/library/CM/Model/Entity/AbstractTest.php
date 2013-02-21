@@ -48,10 +48,35 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
+		$this->assertNull($entityMock->getUser(true));
+	}
+
+	public function testIsOwner() {
+		$user = CMTest_TH::createUser();
+		$entity = $this->getMockBuilder('CM_Model_Entity_Abstract')->setMethods(array('getUser'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$entity->expects($this->any())->method('getUser')->will($this->returnValue($user));
+		/** @var $entity CM_Model_Entity_Abstract */
+		$this->assertTrue($entity->isOwner($user));
+
+		$stranger = CMTest_TH::createUser();
+		$this->assertFalse($entity->isOwner($stranger));
+		$stranger->delete();
+		$this->assertFalse($entity->isOwner($stranger));
+	}
+
+	public function testToArray() {
+		$user = CMTest_TH::createUser();
+		$id = CM_Model_Entity_Mock::create(array('userId' => $user->getId()));
+		$entity = new CM_Model_Entity_Mock($id);
+		$data = $entity->toArray();
+		$this->assertArrayHasKey('path', $data);
+		$this->assertNull($data['path']);
 	}
 }
 
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
+
+	const TYPE = 1;
 
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
