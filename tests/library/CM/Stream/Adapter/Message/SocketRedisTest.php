@@ -6,6 +6,17 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		CMTest_TH::clearEnv();
 	}
 
+	public function testGetOptions() {
+		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
+		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
+			array('httpHost' => 'foo', 'httpPort' => 8086, 'sockjsUrls' => array('http://stream:8090'))
+		);
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$options = $adapter->getOptions();
+		$this->assertArrayHasKey('sockjsUrl', $options);
+		$this->assertRegExp('#http://[0-9]+.stream:8090#', $options['sockjsUrl']);
+	}
+
 	public function testOnRedisMessageSubscribe() {
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
 		$message = array('type' => 'subscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array()));
@@ -38,7 +49,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$session->setUser($user);
 		$session->write();
 		$message = array('type' => 'subscribe',
-			'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array('sessionId' => $session->getId())));
+						 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array('sessionId' => $session->getId())));
 		$adapter->onRedisMessage(json_encode($message));
 
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
