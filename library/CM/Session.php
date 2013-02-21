@@ -28,9 +28,10 @@ class CM_Session {
 
 	/**
 	 * @param string|null $id
+	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($id = null) {
-		if ($id) {
+		if (null !== $id) {
 			$this->_id = (string) $id;
 			$cacheKey = $this->_getCacheKey();
 			if (($data = CM_Cache::get($cacheKey)) === false) {
@@ -56,7 +57,7 @@ class CM_Session {
 
 	public function __destruct() {
 		if ($this->_write) {
-			$this->_write();
+			$this->write();
 		}
 	}
 
@@ -219,17 +220,7 @@ class CM_Session {
 		}
 	}
 
-	private function _change() {
-		if ($this->_isPersistent) {
-			CM_Cache::delete($this->_getCacheKey());
-		}
-	}
-
-	private function _getCacheKey() {
-		return CM_CacheConst::Session . '_id:' . $this->getId();
-	}
-
-	private function _write() {
+	public function write() {
 		if (!$this->isEmpty()) {
 			CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
 				'expires' => time() + $this->getLifetime()));
@@ -238,6 +229,16 @@ class CM_Session {
 			CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
 			$this->_change();
 		}
+	}
+
+	private function _change() {
+		if ($this->_isPersistent) {
+			CM_Cache::delete($this->_getCacheKey());
+		}
+	}
+
+	private function _getCacheKey() {
+		return CM_CacheConst::Session . '_id:' . $this->getId();
 	}
 
 	public static function deleteExpired() {

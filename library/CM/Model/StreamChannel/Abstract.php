@@ -112,8 +112,12 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function factory($id, $type = null) {
-		if (is_null($type)) {
-			$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+		if (null === $type) {
+			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
+			if (false === ($type = CM_Cache::get($cacheKey))) {
+				$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+				CM_Cache::set($cacheKey, $type);
+			}
 		}
 		$class = self::_getClassName($type);
 		return new $class($id);
@@ -124,7 +128,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @param int    $adapterType
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
-	public static function findKey($key, $adapterType) {
+	public static function findByKey($key, $adapterType) {
 		$key = (string) $key;
 		$adapterType = (int) $adapterType;
 		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetchAssoc();
@@ -132,6 +136,19 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			return null;
 		}
 		return self::factory($result['id'], $result['type']);
+	}
+
+	/**
+	 * @param string $key
+	 * @param int    $adapterType
+	 * @return CM_Model_StreamChannel_Abstract
+	 */
+	public static function getByKey($key, $adapterType) {
+		$streamChannel = static::findByKey($key, $adapterType);
+		if (!$streamChannel) {
+			$streamChannel = static::create(array('key' => $key, 'adapterType' => $adapterType));
+		}
+		return $streamChannel;
 	}
 
 	/**

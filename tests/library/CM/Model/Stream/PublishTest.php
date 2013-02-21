@@ -20,12 +20,28 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testDuplicateKeys() {
+		$data = array('user' => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+			'streamChannel' => CMTest_TH::createStreamChannel(), 'key' => '13215231_1');
+		CM_Model_Stream_Publish::create($data);
+		try {
+			CM_Model_Stream_Publish::create($data);
+			$this->fail('Should not be able to create duplicate key instance');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
+		$data['streamChannel'] = CMTest_TH::createStreamChannel();
+		CM_Model_Stream_Publish::create($data);
+	}
+
 	public function testSetAllowedUntil() {
 		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$videoStreamPublish->setAllowedUntil(234234);
-		$this->assertEquals(234234, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(234234, $videoStreamPublish->getAllowedUntil());
 		$videoStreamPublish->setAllowedUntil(2342367);
-		$this->assertEquals(2342367, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(2342367, $videoStreamPublish->getAllowedUntil());
+		$videoStreamPublish->setAllowedUntil(null);
+		$this->assertNull($videoStreamPublish->getAllowedUntil());
 	}
 
 	public function testCreate() {
@@ -55,12 +71,13 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public function testFindKey() {
 		$videoStreamPublishOrig = CMTest_TH::createStreamPublish();
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey($videoStreamPublishOrig->getKey());
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel($videoStreamPublishOrig->getKey(), $videoStreamPublishOrig->getStreamChannel());
 		$this->assertEquals($videoStreamPublish, $videoStreamPublishOrig);
 	}
 
 	public function testFindKeyNonexistent() {
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey('doesnotexist');
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel('doesnotexist', $streamChannel);
 		$this->assertNull($videoStreamPublish);
 	}
 
