@@ -15,11 +15,11 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		$insertList = array();
-		foreach ($emoticonList as $smiley) {
-			$insertList[] = array(':' . $smiley['name'] . ':', $smiley['fileName']);
+		foreach ($emoticonList as $emoticon) {
+			$insertList[] = array(':' . $emoticon['name'] . ':', $emoticon['fileName']);
 		}
 
-		CM_Mysql::insertIgnore(TBL_CM_SMILEY, array('code', 'file'), $insertList);
+		CM_Mysql::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
 		$this->_getOutput()->writeln('Insert ' . count($insertList) . ' emoticons.');
 	}
 

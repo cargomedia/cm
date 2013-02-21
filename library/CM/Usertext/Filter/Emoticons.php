@@ -16,11 +16,11 @@ class CM_Usertext_Filter_Emoticons extends CM_Usertext_Filter_Abstract {
 		$cacheKey = CM_CacheConst::Usertext_Filter_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'htmls' => array());
-			foreach (new CM_Paging_Smiley_All() as $smiley) {
-				foreach ($smiley['codes'] as $code) {
+			foreach (new CM_Paging_Emoticon_All() as $emoticon) {
+				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
 					$emoticons['htmls'][] =
-							'<img class="emoticon" title="' . $code . '" alt="' . $code . '" src="/img/emoticons/' . $smiley['path'] . '" />';
+							'<img class="emoticon" title="' . $code . '" alt="' . $code . '" src="/img/emoticons/' . $emoticon['path'] . '" />';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);

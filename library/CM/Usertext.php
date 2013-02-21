@@ -78,12 +78,12 @@ class CM_Usertext extends CM_Class_Abstract {
 		$cacheKey = CM_CacheConst::Usertext_Filter_Emoticons;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'tags' => array(), 'htmls' => array());
-			foreach (new CM_Paging_Smiley_All() as $smiley) {
-				foreach ($smiley['codes'] as $code) {
+			foreach (new CM_Paging_Emoticon_All() as $emoticon) {
+				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
-					$emoticons['tags'][] = '<emoticon>' . $smiley['id'] . '</emoticon>';
+					$emoticons['tags'][] = '<emoticon>' . $emoticon['id'] . '</emoticon>';
 					$emoticons['htmls'][] =
-							'<span class="smiley smiley-' . $smiley['id'] . ' smileySet-' . $smiley['setId'] . '" title="' . $this->_escape($code) .
+							'<span class="emoticon emoticon-' . $emoticon['id'] . ' emoticonSet-' . $emoticon['setId'] . '" title="' . $this->_escape($code) .
 									'"></span>';
 				}
 			}

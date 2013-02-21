@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_Smiley_Abstract extends CM_Paging_Abstract {
+abstract class CM_Paging_Emoticon_Abstract extends CM_Paging_Abstract {
 
 	protected function _processItem($itemRaw) {
 		$item = array();

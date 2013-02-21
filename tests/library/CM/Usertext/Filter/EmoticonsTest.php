@@ -8,7 +8,7 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 
 	public function testProcess() {
 
-		CM_Mysql::insert(TBL_CM_SMILEY, array('code' => ':),:-),:smiley:', 'file' => '1.png'));
+		CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':),:-),:smiley:', 'file' => '1.png'));
 
 		$text = 'foo :) bar :smiley:';
 		$expected = 'foo <img class="emoticon" title=":)" alt=":)" src="/img/emoticons/1.png" /> bar <img class="emoticon" title=":smiley:" alt=":smiley:" src="/img/emoticons/1.png" />';

@@ -58,7 +58,7 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				}
 				$content = $css->compile($this->getRender());
 
-				$content .= $this->_getCssSmiley();
+				$content .= $this->_getCssEmoticon();
 				break;
 			default:
 				if (!file_exists(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath())) {
@@ -76,11 +76,11 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 	/**
 	 * @return string
 	 */
-	private function _getCssSmiley() {
+	private function _getCssEmoticon() {
 		$css = '';
-		foreach (new CM_Paging_Smiley_All() as $smiley) {
-			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
-			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']) . ')';
+		foreach (new CM_Paging_Emoticon_All() as $emoticon) {
+			$css .= '.emoticon.emoticon-' . $emoticon['id'] . '{';
+			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/emoticon/' . $emoticon['path']) . ')';
 			$css .= '}' . PHP_EOL;
 		}
 		return $css;
