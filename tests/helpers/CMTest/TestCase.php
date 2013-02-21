@@ -32,11 +32,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param mixed         $needle
-	 * @param Traversable   $haystack
-	 * @param string        $message
-	 * @param boolean       $ignoreCase
-	 * @param boolean       $checkForObjectIdentity
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
@@ -58,11 +58,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Comparable $needle
-	 * @param Traversable   $haystack
-	 * @param string        $message
-	 * @param boolean       $ignoreCase
-	 * @param boolean       $checkForObjectIdentity
+	 * @param mixed|CM_Comparable $needle
+	 * @param Traversable         $haystack
+	 * @param string              $message
+	 * @param boolean             $ignoreCase
+	 * @param boolean             $checkForObjectIdentity
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true) {
@@ -197,7 +197,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param int|null           $siteId
 	 * @return CM_Response_View_Ajax
 	 */
-	public function getMockAjaxResponse($methodName, $viewClassName, array $params = null, $viewer = null, array $viewParams = null, $siteId = null) {
+	public function getResponseAjax($methodName, $viewClassName, array $params = null, CM_Model_User $viewer = null, array $viewParams = null, $siteId = null) {
 		if (null === $viewParams) {
 			$viewParams = array();
 		}
@@ -207,14 +207,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		if (null === $siteId) {
 			$siteId = $this->_getSite()->getId();
 		}
+		$session = new CM_Session();
+		if ($viewer) {
+			$session->setUser($viewer);
+		}
+		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
+
 		$viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
-		$requestArgs = array('uri' => '/ajax/' . $siteId);
-		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer',
-			'getQuery'))->getMock();
-		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
-		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'method' => $methodName,
-			'params' => $params)));
-		$response = new CM_Response_View_Ajax($requestMock);
+		$body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
+		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, $body);
+
+		$response = new CM_Response_View_Ajax($request);
 		$response->process();
 		return $response;
 	}
@@ -226,27 +230,30 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param string|null          $componentClassName Component that uses that form
 	 * @param CM_Model_User|null   $viewer
 	 * @param array|null           $componentParams
-	 * @param CM_Request_Post|null $requestMock
+	 * @param CM_Request_Post|null $request
 	 * @param int|null             $siteId
 	 * @return CM_Response_View_Form
 	 */
-	public function getMockFormResponse($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$requestMock = null, $siteId = null) {
+	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null) {
 		if (null === $componentParams) {
 			$componentParams = array();
 		}
 		if (null === $siteId) {
 			$siteId = $this->_getSite()->getId();
 		}
+		$session = new CM_Session();
+		if ($viewer) {
+			$session->setUser($viewer);
+		}
+		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		unset($session); // Make sure session is stored persistently
 
-		$requestArgs = array('uri' => '/form/' . $siteId);
-		$requestMock = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs($requestArgs)->setMethods(array('getViewer',
-			'getQuery'))->getMock();
-		$requestMock->expects($this->any())->method('getViewer')->will($this->returnValue($viewer));
-		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-		$requestMock->expects($this->any())->method('getQuery')->will($this->returnValue(array('view' => $viewArray, 'form' => $formArray,
-			'actionName' => $actionName, 'data' => $data)));
-		$response = new CM_Response_View_Form($requestMock);
+		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
+		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
+		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
+
+		$response = new CM_Response_View_Form($request);
 		$response->process();
 		return $response;
 	}

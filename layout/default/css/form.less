@@ -43,7 +43,7 @@ button:disabled, input:disabled {
 	.input_disabled;
 }
 
-button:focus, .textinput:focus, .textinput.focus, select:focus {
+button:focus, input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
 	.input_focus;
 }
 
@@ -128,6 +128,10 @@ input[type=radio], input[type=checkbox] {
 	border-bottom-width: 0;
 	.background-color(darken(@colorBg, 3));
 	border-top-color: lighten(@colorFgBorder, 3);
+
+	@media (max-width: 600px) {
+		padding: 6px 12px;
+	}
 
 	&:first-child{
 		border-top: 1px solid @colorFgBorder;
