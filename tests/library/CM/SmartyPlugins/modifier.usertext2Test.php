@@ -2,7 +2,7 @@
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/modifier.usertext2.php';
 
-class smarty_modifier_usertext2 extends CMTest_TestCase {
+class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	/**
 	 * @var Smarty_Internal_Template
 	 */
@@ -15,20 +15,34 @@ class smarty_modifier_usertext2 extends CMTest_TestCase {
 		$this->_template->assignGlobal('render', $render);
 	}
 
-	public function testGetPlain() {
-		$this->_assertSame('<span class="usertext2">foo</span>', array('text' => 'foo', 'mode'=>'plain'));
+	public function testModeOneline() {
+		$this->_assertSame('foo', array('text' => 'foo', 'mode' => 'oneline'));
 	}
 
-	public function testGetMarkdown() {
-		$this->_assertSame('<span class="usertext2"><p>foo</p></span>', array('text' => 'foo', 'mode'=>'markdown'));
+	public function testModeSimple() {
+		$this->_assertSame("foo<br />\nbar", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
+	}
+
+	public function testModeFormat() {
+		$this->_assertSame("<span class=\"usertext2\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n", 'mode' => 'format'));
+	}
+
+	public function testModePlain() {
+		$this->_assertSame("Headline\nfoo\n", array('text' => "#Headline#\nfoo\n", 'mode' => 'plain'));
+	}
+
+	public function testModeNo() {
+		try {
+			$this->_assertSame('xxx', array('text' => 'foo'));
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertSame('Must define mode in Usertext.',$ex->getMessage());
+		}
 	}
 
 	private function _assertSame($expected, array $params) {
 		$text = $params['text'] ? $params['text'] : null;
 		$mode = $params['mode'] ? $params['mode'] : null;
-		$lengthMax = $params['lengthMax'] ? $params['lengthMax'] : null;
-		$stripEmoticon = $params['stripEmoticon'] ? $params['stripEmoticon'] : null;
-		$preserveParagraph = $params['preserveParagraph'] ? $params['preserveParagraph'] : null;
-		$this->assertSame($expected, smarty_modifier_usertext2($text, $mode, $lengthMax, $stripEmoticon, $preserveParagraph));
+		$maxLength = $params['maxLength'] ? $params['maxLength'] : null;
+		$this->assertSame($expected, smarty_modifier_usertext2($text, $mode, $maxLength));
 	}
 }
