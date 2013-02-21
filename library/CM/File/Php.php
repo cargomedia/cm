@@ -1,6 +1,6 @@
 <?php
 
-class CM_File_Php extends CM_File {
+class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 
 	/**
 	 * @return string

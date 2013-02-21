@@ -209,13 +209,16 @@ class CM_Util {
 
 	/**
 	 * @param string[] $paths
+	 * @throws CM_Exception_Invalid
 	 * @return array[]
-	 * @throws CM_Exception
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
 		foreach ($paths as $path) {
 			$file = CM_File::factory($path);
+			if (!$file instanceof CM_File_ClassInterface) {
+				throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
+			}
 			$meta = $file->getMeta();
 			$classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
 		}
