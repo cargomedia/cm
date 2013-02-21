@@ -5,15 +5,15 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	const TYPE = 1;
 
 	public function getOptions() {
-		$servers = self::_getConfig()->servers;
+		$servers = static::_getConfig()->servers;
 		if (empty($servers)) {
 			throw new CM_Exception_Invalid('No servers configured');
 		}
 		$server = $servers[array_rand($servers)];
 		$sockjsUrls = $server['sockjsUrls'];
 		$sockjsUrl = $sockjsUrls[array_rand($sockjsUrls)];
-		if (self::_getConfig()->hostPrefix) {
-			$sockjsUrl = preg_replace('~^https?://~', '$0' . rand(1, 9999), $sockjsUrl);
+		if (static::_getConfig()->hostPrefix) {
+			$sockjsUrl = preg_replace('~^https?://~', '${0}' . rand(1, 9999) . '.', $sockjsUrl);
 		}
 		return array('sockjsUrl' => $sockjsUrl);
 	}
@@ -76,7 +76,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 						$start = (int) $subscriber['subscribeStamp'];
 						$allowedUntil = $start;
 						CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-							'streamChannel' => $streamChannel, 'key' => $clientKey));
+																'streamChannel' => $streamChannel, 'key' => $clientKey));
 					}
 				}
 			}
@@ -133,7 +133,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			return;
 		}
 		CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'streamChannel' => $streamChannel, 'key' => $clientKey));
+												'streamChannel' => $streamChannel, 'key' => $clientKey));
 	}
 
 	/**
