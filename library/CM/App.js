@@ -16,7 +16,7 @@ CM_App.prototype = {
 	options: {},
 
 	ready: function() {
- 		this.dom.ready();
+		this.dom.ready();
 		this.window.ready();
 		this.date.ready();
 		this.template.ready();
@@ -236,6 +236,10 @@ CM_App.prototype = {
 				}
 				_cleanData(elems);
 			};
+
+			window.addEventListener('load', function() {
+				new FastClick(document.body);
+			}, false);
 		},
 		/**
 		 * @param {jQuery} $dom
@@ -628,11 +632,9 @@ CM_App.prototype = {
 			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
 				var socketRedis = new SocketRedis(options.sockjsUrl);
 				socketRedis.onopen = function() {
-					for (var i = 0; i < 3000; i++) {
-						socketRedis.subscribe(channel + i, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function(data) {
-							callback(data);
-						});
-					}
+					socketRedis.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function(data) {
+						callback(data);
+					});
 				};
 			} else {
 				cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
