@@ -69,6 +69,10 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($actionLimit->getPeriod($this->_role));
 		$this->assertFalse($actionLimit->hasLimit());
 	}
+
+	public function testGetAll() {
+		$this->assertInstanceOf('CM_Paging_ActionLimit_All', CM_Model_ActionLimit_Abstract::getAll(1));
+	}
 }
 
 class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
