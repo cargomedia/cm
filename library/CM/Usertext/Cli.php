@@ -24,7 +24,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		CM_Mysql::insertIgnore(TBL_CM_SMILEY, array('code', 'file'), $insertSmileys);
-		$this->_getOutput()->writeln('Insert ' . $counter . ' smileys');
+		$this->_getOutput()->writeln('Insert ' . $counter . ' emoticons.');
 	}
 
 	public static function getPackageName() {
