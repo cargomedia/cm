@@ -15,4 +15,11 @@ class CM_Usertext_Filter_EscapeTest extends CMTest_TestCase {
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testMultibyte() {
+		$expected = '繁體字';
+		$filter = new CM_Usertext_Filter_Escape();
+		$actual = $filter->transform('繁體字');
+		$this->assertEquals($expected, $actual);
+	}
+
 }
