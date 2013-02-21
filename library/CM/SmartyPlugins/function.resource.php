@@ -21,8 +21,8 @@ function smarty_function_resource(array $params, Smarty_Internal_Template $templ
  * @return string
  */
 function smarty_helper_resource_internal(CM_Render $render) {
-	$paths = array();
-	foreach (CM_Util::getJavascriptLibraries() as $path) {
+	$pathsUnsorted = CM_Util::rglobLibraries('*.js', $render->getSite());
+	foreach (CM_Util::getClasses($pathsUnsorted) as $path => $className) {
 		$path = str_replace(DIR_ROOT, '/', $path);
 		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
 		$paths[] = $path;

@@ -237,4 +237,21 @@ class CM_File extends CM_Class_Abstract {
 		}
 		return $clean;
 	}
+
+	/**
+	 * @param string $path
+	 * @return CM_File_Javascript|CM_File_Php
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function factory($path) {
+		$extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+		switch ($extension) {
+			case 'php':
+				return new CM_File_Php($path);
+			case 'js':
+				return new CM_File_Javascript($path);
+			default:
+				throw new CM_Exception_Invalid('Cannot detect instance type for extension `' . $extension . '` from `' . $path . '`');
+		}
+	}
 }

@@ -42,7 +42,9 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function _getInternal() {
-		$paths = array_values(CM_Util::getJavascriptLibraries());
+		$pathsUnsorted = CM_Util::rglobLibraries('*.js', $this->getSite());
+		$paths = array_keys(CM_Util::getClasses($pathsUnsorted));
+
 		foreach (array_reverse(self::getSite()->getNamespaces()) as $namespace) {
 			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
 				$paths[] = $path;

@@ -45,6 +45,20 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $pattern
+	 * @param CM_Site_Abstract $site
+	 * @return array
+	 */
+	public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
+		$paths = array();
+		foreach ($site->getNamespaces() as $namespace) {
+			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
+			$paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
+		}
+		return $paths;
+	}
+
+	/**
 	 * @param array $array
 	 * @param mixed $value
 	 * @return array
@@ -200,73 +214,17 @@ class CM_Util {
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
-		$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
-
-		// Detect class names and parents
 		foreach ($paths as $path) {
-			$file = new CM_File($path);
-
-			if (!preg_match($regexp, $file->read(), $match)) {
-				throw new CM_Exception('Cannot detect php-class inheritance of `' . $path . '`');
-			}
-
-			$classHierarchy = array_values(class_parents($match['name']));
-			array_unshift($classHierarchy, $match['name']);
-
-			$classes[] = array('classNames' => $classHierarchy, 'path' => $path);
-		}
-
-		// Order classes by inheritance
-		for ($i1 = 0; $i1 < count($classes); $i1++) {
-			$class1 = $classes[$i1];
-			for ($i2 = $i1 + 1; $i2 < count($classes); $i2++) {
-				$class2 = $classes[$i2];
-				if (isset($class1['classNames'][1]) && $class1['classNames'][1] == $class2['classNames'][0]) {
-					$tmp = $classes[$i1];
-					$classes[$i1] = $classes[$i2];
-					$classes[$i2] = $tmp;
-					$i1--;
-					break;
-				}
-			}
-		}
-
-		$classesAssociative = array();
-		foreach ($classes as $classInfo) {
-			$classesAssociative[$classInfo['path']] = $classInfo['classNames'][0];
-		}
-		return $classesAssociative;
-	}
-
-	/**
-	 * @return array
-	 * @throws CM_Exception
-	 */
-	public static function getJavascriptLibraries() {
-		$absolutePaths = array();
-		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
-			$absolutePaths = array_merge($absolutePaths, CM_Util::rglob('*.js', $libraryPath));
-		}
-		$classRegexp = '\*\s+@class\s+(?<class>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
-		$parentRegexp = '(?:\s+\*\s+@extends\s+(?<parent>[a-zA-Z_\x7f-\xff][.a-zA-Z0-9_\x7f-\xff]*)\s+)?';
-		$regexp = '#' . $classRegexp . '[\s\n+]' . $parentRegexp . '#';
-
-		$classes = array();
-		foreach ($absolutePaths as $path) {
-			$file = new CM_File($path);
-
-			if (!preg_match($regexp, $file->read(), $match)) {
-				throw new CM_Exception('Cannot detect class of `' . $path . '`');
-			}
-			$classes[$match['class']] = array('parent' => $match['parent'], 'path' => $path);
+			$file = CM_File::factory($path);
+			$meta = $file->getMeta();
+			$classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
 		}
 
 		$paths = array();
 		while (count($classes)) {
 			foreach ($classes as $class => $data) {
 				if (!isset($classes[$data['parent']])) {
-					$paths[$class] = $data['path'];
+					$paths[$data['path']] = $class;
 					unset($classes[$class]);
 				}
 			}

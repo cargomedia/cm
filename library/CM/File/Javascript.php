@@ -3,6 +3,36 @@
 class CM_File_Javascript extends CM_File {
 
 	/**
+	 * @return string
+	 */
+	public function getClassName() {
+		$meta = $this->getMeta();
+		return $meta['class'];
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getParentClassName() {
+		$meta = $this->getMeta();
+		return $meta['parent'];
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception
+	 */
+	public function getMeta() {
+		$classRegexp = '\*\s+@class\s+(?<class>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)';
+		$parentRegexp = '(?:\s+\*\s+@extends\s+(?<parent>[a-zA-Z_\x7f-\xff][.a-zA-Z0-9_\x7f-\xff]*)\s+)?';
+		$regexp = '#' . $classRegexp . '[\s\n+]' . $parentRegexp . '#';
+		if (!preg_match($regexp, $this->read(), $match)) {
+			throw new CM_Exception('Cannot detect class');
+		}
+		return array('class' => $match['class'], 'parent' => $match['parent']);
+	}
+
+	/**
 	 * @param $className
 	 * @return CM_File_Javascript
 	 */
