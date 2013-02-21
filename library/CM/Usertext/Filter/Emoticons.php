@@ -19,8 +19,7 @@ class CM_Usertext_Filter_Emoticons extends CM_Usertext_Filter_Abstract {
 			foreach (new CM_Paging_Emoticon_All() as $emoticon) {
 				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
-					$emoticons['htmls'][] =
-							'<img class="emoticon" title="' . $code . '" alt="' . $code . '" src="/img/emoticons/' . $emoticon['path'] . '" />';
+					$emoticons['htmls'][] = '<span class="emoticon emoticon-' . $emoticon['id'] . '" title="' . $code . '"></span>';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
