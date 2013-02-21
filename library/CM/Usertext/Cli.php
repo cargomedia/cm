@@ -7,7 +7,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		$smileys = array();
 
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-			$smileyPath = CM_Util::getNamespacePath($namespace) . 'layout/default/img/smiley/';
+			$smileyPath = CM_Util::getNamespacePath($namespace) . 'layout/default/img/emoticons/';
 			$files = glob($smileyPath . '*');
 			foreach($files as $file){
 				$file = str_replace($smileyPath,'',$file);
