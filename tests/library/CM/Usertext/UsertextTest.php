@@ -8,7 +8,7 @@ class CM_Usertext_UsertextTest extends CMTest_TestCase {
 
 	public function testProcess() {
 		$usertext = new CM_Usertext_Usertext();
-		$this->assertEquals('foo bar',$usertext->transform('foo bar'));
+		$this->assertSame('foo bar',$usertext->transform('foo bar'));
 	}
 
 }

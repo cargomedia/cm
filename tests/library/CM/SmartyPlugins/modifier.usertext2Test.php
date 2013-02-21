@@ -24,7 +24,8 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	}
 
 	public function testModeFormat() {
-		$this->_assertSame("<span class=\"usertext2\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n", 'mode' => 'format'));
+		$this->_assertSame("<span class=\"usertext2\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n",
+			'mode' => 'format'));
 	}
 
 	public function testModePlain() {
@@ -35,7 +36,7 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 		try {
 			$this->_assertSame('xxx', array('text' => 'foo'));
 		} catch (CM_Exception_Invalid $ex) {
-			$this->assertSame('Must define mode in Usertext.',$ex->getMessage());
+			$this->assertSame('Must define mode in Usertext.', $ex->getMessage());
 		}
 	}
 

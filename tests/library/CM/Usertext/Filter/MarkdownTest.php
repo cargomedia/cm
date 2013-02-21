@@ -12,7 +12,7 @@ class CM_Usertext_Filter_MarkdownTest extends CMTest_TestCase {
 		$filter = new CM_Usertext_Filter_Markdown();
 		$actual = $filter->transform($text);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 }

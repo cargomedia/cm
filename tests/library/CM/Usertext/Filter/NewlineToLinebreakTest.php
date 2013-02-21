@@ -11,7 +11,7 @@ class CM_Usertext_Filter_NewlineToLinebreakeTest extends CMTest_TestCase {
 		$expected = "foo<br />\nbar<br />\n<br />\n<br />\nfoo<br />\n<br />\nbar";
 		$filter = new CM_Usertext_Filter_NewlineToLinebreak(3);
 
-		$this->assertEquals($expected,$filter->transform($text));
+		$this->assertSame($expected,$filter->transform($text));
 	}
 
 }

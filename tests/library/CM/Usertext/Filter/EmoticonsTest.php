@@ -15,7 +15,7 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 		$filter = new CM_Usertext_Filter_Emoticons();
 		$actual = $filter->transform($text);
 
-		$this->assertEquals($expected, $actual);
+		$this->assertSame($expected, $actual);
 	}
 
 }
