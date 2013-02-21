@@ -265,7 +265,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	/**
 	 * @param boolean $state
 	 */
-	public function setFlattenItems($state){
+	public function setFlattenItems($state) {
 		$this->_flattenItems = (bool) $state;
 	}
 

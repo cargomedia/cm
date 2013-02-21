@@ -626,7 +626,7 @@ CM_App.prototype = {
 			};
 
 			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-				var socketRedis = new SocketRedis('http://' + options.host + ':' + options.port);
+				var socketRedis = new SocketRedis(options.sockjsUrl);
 				socketRedis.onopen = function() {
 					for (var i = 0; i < 3000; i++) {
 						socketRedis.subscribe(channel + i, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function(data) {

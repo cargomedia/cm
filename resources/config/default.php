@@ -58,7 +58,9 @@ $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 $config->CM_Stream_Adapter_Message_SocketRedis = new stdClass();
 $config->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
 $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-	array('host' => 'localhost', 'port' => 8090),
+	array('httpHost' => 'localhost', 'httpPort' => 8086, 'sockjsUrls' => array(
+		'http://localhost:8090',
+	)),
 );
 
 $config->CM_Mysql = new stdClass();
