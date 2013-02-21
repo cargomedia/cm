@@ -2,9 +2,7 @@
 
 class CM_UsertextTest extends CMTest_TestCase {
 
-	private static $_smileySetId;
-
-	private static $_smileyIds = array();
+	private static $_emoticonIds = array();
 
 	private $_text = <<<EOD
 smilies: :-)
@@ -19,12 +17,11 @@ EOD;
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
 
-		self::$_smileySetId = $setId = CM_Mysql::insert(TBL_CM_SMILEYSET, array('label' => 'testSet'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
+		self::$_emoticonIds[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':),:-)', 'file' => '1.png'));
+		self::$_emoticonIds[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ';)', 'file' => '2.png'));
+		self::$_emoticonIds[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':(,:-(', 'file' => '3.png'));
+		self::$_emoticonIds[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => '*PLAYMATE*', 'file' => '4.png'));
+		self::$_emoticonIds[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => '<3', 'file' => '5.png'));
 
 		CMTest_TH::clearCache();
 	}
@@ -34,11 +31,10 @@ EOD;
 	}
 
 	public function testFormat() {
-		$smileyId = self::$_smileyIds[0];
-		$setId = self::$_smileySetId;
+		$emoticonId = self::$_emoticonIds[0];
 		$splitChar = CM_Usertext::getSplitChar();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-{$smileyId} smileySet-{$setId}" title=":)"></span><br />
+smilies: <span class="emoticon emoticon-{$emoticonId}" title=":)"></span><br />
 allowed tags: <b class="italic">bold</b><br />
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;<br />
 badwords: hallo…<br />
@@ -58,11 +54,10 @@ EOD;
 	}
 
 	public function testFormatPlain() {
-		$smileyId = self::$_smileyIds[0];
-		$setId = self::$_smileySetId;
+		$emoticonId = self::$_emoticonIds[0];
 		$splitChar = CM_Usertext::getSplitChar();
 		$expected = <<<EOD
-smilies: <span class="smiley smiley-{$smileyId} smileySet-{$setId}" title=":)"></span>
+smilies: <span class="emoticon emoticon-{$emoticonId}" title=":)"></span>
 allowed tags: bold
 un-allowed tags: &lt;foo&gt;{$splitChar}foo&lt;/foo&gt; &lt;big-grin&gt; Lorem ipsum &lt;aver{$splitChar}ylongunall{$splitChar}owedtag&gt;hi{$splitChar}ho&lt;/averyl{$splitChar}ongunallow{$splitChar}edtag&gt;
 badwords: hallo…
@@ -96,7 +91,7 @@ EOD;
 
 	public function testFormatPlainTruncate() {
 		$actual = new CM_Usertext('Ein Gespenst <b>geht</b> um in Europa :) test');
-		$expectedEmoticon = '<span class="smiley smiley-' . self::$_smileyIds[0] . ' smileySet-' . self::$_smileySetId . '" title=":)"></span>';
+		$expectedEmoticon = '<span class="emoticon emoticon-' . self::$_emoticonIds[0] . '" title=":)"></span>';
 
 		$this->assertEquals('Ein Gespenst geht um in Europa ' . $expectedEmoticon . ' test', $actual->getFormatPlain(1000));
 		$this->assertEquals('Ein Gespenst geht um in…', $actual->getFormatPlain(29));
@@ -108,10 +103,10 @@ EOD;
 		$this->assertEquals('Ein Gespenst geht um in…', $actual->getFormatPlain(25));
 	}
 
-	public function testFormatPlainTruncateSmiley() {
+	public function testFormatPlainTruncateEmoticon() {
 		$actual = new CM_Usertext('Yo *PLAYMATE*');
 
-		$expected = 'Yo <span class="smiley smiley-' . self::$_smileyIds[3] . ' smileySet-' . self::$_smileySetId . '" title="*PLAYMATE*"></span>';
+		$expected = 'Yo <span class="emoticon emoticon-' . self::$_emoticonIds[3] . '" title="*PLAYMATE*"></span>';
 		$this->assertEquals($expected, $actual->getFormatPlain(1000));
 		$this->assertEquals($expected, $actual->getFormatPlain(4));
 		$this->assertEquals('Yo ', $actual->getFormatPlain(3));
@@ -132,7 +127,7 @@ EOD;
 
 	public function testFormatUnallowedTagsFiltering() {
 		$expected =
-				'<span class="smiley smiley-' . self::$_smileyIds[4]. ' smileySet-' . self::$_smileySetId . '" title="&lt;3"></span> love<br />' . PHP_EOL .
+				'<span class="emoticon emoticon-' . self::$_emoticonIds[4]. '" title="&lt;3"></span> love<br />' . PHP_EOL .
 						'you';
 
 		$actual = new CM_Usertext('<3 love' . PHP_EOL . 'you');

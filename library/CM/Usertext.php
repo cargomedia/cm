@@ -83,7 +83,7 @@ class CM_Usertext extends CM_Class_Abstract {
 					$emoticons['codes'][] = $code;
 					$emoticons['tags'][] = '<emoticon>' . $emoticon['id'] . '</emoticon>';
 					$emoticons['htmls'][] =
-							'<span class="emoticon emoticon-' . $emoticon['id'] . ' emoticonSet-' . $emoticon['setId'] . '" title="' . $this->_escape($code) .
+							'<span class="emoticon emoticon-' . $emoticon['id'] . '" title="' . $this->_escape($code) .
 									'"></span>';
 				}
 			}
