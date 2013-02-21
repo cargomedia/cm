@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_NewlineToLinebreakeTest extends CMTest_TestCase {
+class CM_Usertext_Filter_NewlineToLinebreakTest extends CMTest_TestCase {
 
 	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();
