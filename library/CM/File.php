@@ -34,7 +34,7 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return string File name
+	 * @return string
 	 */
 	public function getFileNameWithoutExtension() {
 		return pathinfo($this->getPath(), PATHINFO_FILENAME);

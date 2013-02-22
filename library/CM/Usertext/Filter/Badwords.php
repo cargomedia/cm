@@ -4,7 +4,7 @@ class CM_Usertext_Filter_Badwords extends CM_Usertext_Filter_Abstract {
 
 	public function transform($text) {
 		$text = (string) $text;
-		$cacheKey = CM_CacheConst::Usertext_Filter_Badwords;
+		$cacheKey = CM_CacheConst::Usertext_Filter_BadwordList;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwords = array('search' => array(), 'replace' => '…');
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {

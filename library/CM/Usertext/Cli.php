@@ -20,7 +20,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		CM_Mysql::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
-		$this->_getOutput()->writeln('Insert ' . count($insertList) . ' emoticons.');
+		$this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 	}
 
 	public static function getPackageName() {

@@ -75,7 +75,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 * @return array
 	 */
 	private function _getEmoticonData() {
-		$cacheKey = CM_CacheConst::Usertext_Filter_Emoticons;
+		$cacheKey = CM_CacheConst::Usertext_Filter_EmoticonList;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'tags' => array(), 'htmls' => array());
 			foreach (new CM_Paging_Emoticon_All() as $emoticon) {
@@ -115,7 +115,7 @@ class CM_Usertext extends CM_Class_Abstract {
 	 * @return mixed
 	 */
 	private function _censor($text) {
-		$cacheKey = CM_CacheConst::Usertext_Filter_Badwords;
+		$cacheKey = CM_CacheConst::Usertext_Filter_BadwordList;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwords = array('search' => array(), 'replace' => '…');
 			foreach (new CM_Paging_ContentList_Badwords() as $badword) {
