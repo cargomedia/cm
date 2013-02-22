@@ -5,8 +5,8 @@
  * =====================================================
  * oneline = escape, remove badwords, add emoticons
  * simple = escape, remove badwords, nl2br, add emoticons
- * format = escape, remove badwords, create html markdown, add emoticons
- * plain = escape, remove badwords, create html markdown, strip all tags, add emoticons
+ * markdown = escape, remove badwords, create html markdown, add emoticons
+ * markdownPlain = escape, remove badwords, create html markdown, strip all tags, add emoticons
  *
  * @param string   $text
  * @param string   $mode
@@ -26,10 +26,10 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 		case 'simple':
 			$usertext->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
 			break;
-		case 'format':
+		case 'markdown':
 			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
 			break;
-		case 'plain':
+		case 'markdownPlain':
 			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
 			$usertext->addFilter(new CM_Usertext_Filter_Striptags());
 			break;
@@ -37,13 +37,13 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 			throw new CM_Exception_Invalid('Must define mode in Usertext.');
 	}
 	$usertext->addFilter(new CM_Usertext_Filter_Emoticons());
-	if ('plain' != $mode) {
+	if ('markdownPlain' != $mode) {
 		$usertext->addFilter(new CM_Usertext_Filter_CutWhitespace());
 	}
 
 	$text = $usertext->transform($text);
 
-	if ('format' == $mode) {
+	if ('markdown' == $mode) {
 		$text = '<span class="usertext2">' . $text . '</span>';
 	}
 	return $text;

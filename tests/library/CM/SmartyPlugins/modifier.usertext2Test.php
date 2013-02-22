@@ -23,13 +23,13 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 		$this->_assertSame("foo<br />\nbar", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
 	}
 
-	public function testModeFormat() {
+	public function testModeMarkdown() {
 		$this->_assertSame("<span class=\"usertext2\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n",
-			'mode' => 'format'));
+			'mode' => 'markdown'));
 	}
 
-	public function testModePlain() {
-		$this->_assertSame("Headline\nfoo\n", array('text' => "#Headline#\nfoo\n", 'mode' => 'plain'));
+	public function testModeMarkdownPlain() {
+		$this->_assertSame("Headline\nfoo\n", array('text' => "#Headline#\nfoo\n", 'mode' => 'markdownPlain'));
 	}
 
 	public function testModeNo() {
