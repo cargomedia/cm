@@ -31,6 +31,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertNotNull($streamSubscribe);
 		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
 		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
+		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
 		$this->assertNull($streamSubscribe->getUser());
 
 		CMTest_TH::timeForward(10);
@@ -40,6 +41,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
 		CMTest_TH::reinstantiateModel($streamSubscribe);
 		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
+		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
 	}
 
 	public function testOnRedisMessageSubscribeUser() {
@@ -77,15 +79,16 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
+		$jsTime =  time() * 1000;
 		for ($i = 0; $i < 2; $i++) {
 			$status = array(
 				'channel-foo' => array('subscribers' => array(
-					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
-					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => $jsTime, 'data' => array()),
 				)),
 				'channel-bar' => array('subscribers' => array(
-					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
-					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => time(), 'data' => array()),
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => $jsTime, 'data' => array()),
 				)),
 			);
 			$this->_testSynchronize($status);
@@ -118,7 +121,10 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 			$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $adapter->getType());
 			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
-				$this->assertInstanceOf('CM_Model_Stream_Subscribe', CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel));
+				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
+				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
+				$this->assertSameTime(time(), $subscribe->getStart());
+				$this->assertNull($subscribe->getAllowedUntil());
 			}
 		}
 	}
