@@ -92,24 +92,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @param string|null $keyName
 	 * @return array
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getItemsRawTree() {
-		if (null === $this->_itemsRawTree) {
-			$this->_itemsRawTree = array();
-			foreach ($this->getItemsRaw() as $itemRaw) {
-				if (!is_array($itemRaw) || count($itemRaw) < 2) {
-					throw new CM_Exception_Invalid('Raw item is not an array or has less than two elements.');
-				}
-				$key = array_shift($itemRaw);
-				if (count($itemRaw) <= 1) {
-					$itemRaw = reset($itemRaw);
-				}
-				$this->_itemsRawTree[$key] = $itemRaw;
-			}
-		}
-		return $this->_itemsRawTree;
+	public function getItemsRawTree($keyName = null) {
+		return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);
 	}
 
 	/**

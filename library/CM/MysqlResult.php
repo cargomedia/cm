@@ -93,38 +93,12 @@ class CM_MysqlResult {
 	}
 
 	/**
-	 * A tree with $level tiers. The children of the rootnode have the distinct value of the first column as key and contain all the rows
-	 * with this key as first value. The children of such a node have the distinct values of the second column as key and contain all the
-	 * rows which have the the key of their grandparent as first value and the key of their parent as second value. And so on.
-	 * The amount of leaf nodes corresponds to the amount of rows in the resultset.
-	 * Each leaf node contains an array consisting of the $rowcount - $level last entries of the row it represents. Or a scalar in the
-	 * case of $level = $rowcount -1.
-	 *
-	 * @param integer $level          the amount of columns that are used as indexes.
-	 * @param bool    $distinctLeaves wether or not the leaves are unique given the specified indexes
+	 * @param int|null     $level
+	 * @param bool|null    $distinctLeaves
 	 * @return array
 	 */
-	public function fetchAllTree($level = 1, $distinctLeaves = true) {
-		$result = array();
-		while ($row = $this->_result->fetch_assoc()) {
-			$resultEntry = &$result;
-			for ($i = 0; $i < $level; $i++) {
-				if (!is_array($resultEntry)) {
-					$resultEntry = array();
-				}
-				$value = array_shift($row);
-				$resultEntry = &$resultEntry[$value];
-			}
-			if (count($row) <= 1) {
-				$row = reset($row);
-			}
-			if ($distinctLeaves) {
-				$resultEntry = $row;
-			} else {
-				$resultEntry[] = $row;
-			}
-		}
-		return $result;
+	public function fetchAllTree($level = null, $distinctLeaves = null) {
+		return CM_Util::getArrayTree($this->fetchAll(), $level, $distinctLeaves);
 	}
 
 	/**

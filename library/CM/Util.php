@@ -45,7 +45,7 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string $pattern
+	 * @param string           $pattern
 	 * @param CM_Site_Abstract $site
 	 * @return string[]
 	 */
@@ -411,4 +411,59 @@ class CM_Util {
 		return $classNames;
 
 	}
+
+	/**
+	 * A tree with $level tiers. The children of the rootnode have the distinct value of the first column as key and contain all the rows
+	 * with this key as first value. The children of such a node have the distinct values of the second column as key and contain all the
+	 * rows which have the the key of their grandparent as first value and the key of their parent as second value. And so on.
+	 * The amount of leaf nodes corresponds to the amount of rows in the resultset.
+	 * Each leaf node contains an array consisting of the $rowcount - $level last entries of the row it represents. Or a scalar in the
+	 * case of $level = $rowcount -1.
+	 *
+	 * @param array[]               $items
+	 * @param int|null              $level           The number of columns that are used as indexes.
+	 * @param bool|null             $distinctLeaves  Whether or not the leaves are unique given the specified indexes
+	 * @param string[]|string|null  $keyNames
+	 * @throws CM_Exception_Invalid
+	 * @return array
+	 */
+	public static function getArrayTree(array $items, $level = null, $distinctLeaves = null, $keyNames = null) {
+		if (null === $level) {
+			$level = 1;
+		}
+		if (null === $distinctLeaves) {
+			$distinctLeaves = true;
+		}
+		$keyNames = (array) $keyNames;
+		$result = array();
+		foreach ($items as $item) {
+			if (!is_array($item) || count($item) < ($level + 1)) {
+				throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
+			}
+			$resultEntry = & $result;
+			for ($i = 0; $i < $level; $i++) {
+				if (isset($keyNames[$i])) {
+					$keyName = $keyNames[$i];
+					if (!array_key_exists($keyName, $item)) {
+						throw new CM_Exception_Invalid('Item has no key `' . $keyName . '`.');
+					}
+					$value = $item[$keyName];
+					unset($item[$keyName]);
+				} else {
+					$value = array_shift($item);
+				}
+				$resultEntry = & $resultEntry[$value];
+			}
+			if (count($item) <= 1) {
+				$item = reset($item);
+			}
+			if ($distinctLeaves) {
+				$resultEntry = $item;
+			} else {
+				$resultEntry[] = $item;
+			}
+		}
+		return $result;
+	}
+
 }
