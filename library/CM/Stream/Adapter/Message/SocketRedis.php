@@ -73,8 +73,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 							$session = new CM_Session($data->getString('sessionId'));
 							$user = $session->getUser(true);
 						}
-						$start = (int) $subscriber['subscribeStamp'];
-						$allowedUntil = $start;
+						$start = (int) ($subscriber['subscribeStamp'] / 1000);
+						$allowedUntil = null;
 						CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 																'streamChannel' => $streamChannel, 'key' => $clientKey));
 					}
@@ -96,7 +96,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$channelKey = $data['channel'];
 				$clientKey = $data['clientKey'];
 				$start = time();
-				$allowedUntil = time();
+				$allowedUntil = null;
 				$data = CM_Params::factory($data['data']);
 				$user = null;
 				if ($data->has('sessionId')) {
