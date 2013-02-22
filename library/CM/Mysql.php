@@ -477,7 +477,7 @@ class CM_Mysql extends CM_Class_Abstract {
 			$exists = (bool) CM_Mysql::exec("SHOW COLUMNS FROM `?` LIKE '?'", $table, $column)->numRows();
 		}
 		if ($exists && $index) {
-			$exists = (bool) CM_Mysql::exec("SHOW INDEX FROM `?` WHERE key_name = '?'", $table, $index, $index)->numRows();
+			$exists = (bool) CM_Mysql::exec("SHOW INDEX FROM `?` WHERE key_name = '?'", $table, $index)->numRows();
 		}
 		return $exists;
 	}
