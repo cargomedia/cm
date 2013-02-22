@@ -10,7 +10,8 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 			$paths = glob($emoticonPath . '*');
 			foreach ($paths as $path) {
 				$file = new CM_File($path);
-				$emoticonList[$path[0]] = array('name' => $file->getFileNameWithoutExtension(), 'fileName' => $file->getFileName());
+				$name = $file->getFileNameWithoutExtension();
+				$emoticonList[$name] = array('name' => $name, 'fileName' => $file->getFileName());
 			}
 		}
 
