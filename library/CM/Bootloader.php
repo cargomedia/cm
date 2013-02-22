@@ -61,19 +61,18 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+			$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+				E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+				E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
+				E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+				E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+			$errstr = $errorCodes[$errno] . ': ' . $errstr;
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
 				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-				if (!$atSign && IS_DEBUG) {
-					$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-						E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-						E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-						E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-						E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
-					$errstr = $errorCodes[$errno] . ': ' . $errstr;
-					CM_Debug::get()->addError($errfile, $errline, $errstr);
+				if ($atSign) {
+					return true;
 				}
-				return true;
 			}
 			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 		});
