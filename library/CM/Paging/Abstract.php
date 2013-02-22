@@ -150,8 +150,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		if ($this->_source) {
 			$itemsRaw = $this->_source->getItems();
 			foreach ($itemsRaw as $itemRaw) {
-				if (!array_key_exists('amount', $itemRaw)) {
-					throw new CM_Exception_Invalid(get_called_class() . ' has no field `amount`.');
+				if (!array_key_exists($field, $itemRaw)) {
+					throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
 				}
 				$sum += $itemRaw[$field];
 			}
@@ -265,7 +265,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	/**
 	 * @param boolean $state
 	 */
-	public function setFlattenItems($state){
+	public function setFlattenItems($state) {
 		$this->_flattenItems = (bool) $state;
 	}
 

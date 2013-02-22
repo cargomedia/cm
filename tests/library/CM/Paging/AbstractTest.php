@@ -381,6 +381,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('CM_Paging_Mock has no field `amount`.', $ex->getMessage());
 		}
+		$this->assertSame(4, $paging->getSum('id'));
 	}
 
 	public function testGetItemsRawTree() {

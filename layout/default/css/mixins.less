@@ -140,6 +140,7 @@
 .input_button(@size) {
 	width: auto;
 	min-width: @size;
+	max-width: 100%;
 	height: @size;
 	margin: 1px;
 	padding: 1px @size / 3;
@@ -149,7 +150,12 @@
 	cursor: pointer;
 	overflow: visible;
 	vertical-align: top;
-	.nowrap;
+
+	.label {
+		display: inline-block;
+		max-width: 100%;
+		.nowrap;
+	}
 
 	.icon {
 		font-size: @iconSizeClickable;
@@ -213,4 +219,10 @@
 	-webkit-appearance: @value;
 	-moz-appearance: @value;
 	appearance: @value;
+}
+
+.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0, @iteration-count: 1, @direction: normal, @fill-mode: none) {
+	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }

@@ -55,45 +55,7 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		$exceptionFormatter = function (Exception $exception) {
-			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
-			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
-			$text .= $exception->getTraceAsString() . PHP_EOL;
-			return $text;
-		};
-
-		set_exception_handler(function (Exception $exception) use ($exceptionFormatter) {
-			$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
-
-			if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
-				header('HTTP/1.1 500 Internal Server Error');
-			}
-
-			try {
-				if ($exception instanceof CM_Exception) {
-					$log = $exception->getLog();
-				} else {
-					$log = new CM_Paging_Log_Error();
-				}
-				$log->add($exceptionFormatter($exception));
-			} catch (Exception $loggerException) {
-				$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
-				$logEntry .= '### Cannot log error: ' . PHP_EOL;
-				$logEntry .= $exceptionFormatter($loggerException);
-				$logEntry .= '### Original Exception: ' . PHP_EOL;
-				$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
-				file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
-			}
-
-			if ($showError) {
-				echo get_class($exception) . ' (' . $exception->getCode() . '): <b>' . $exception->getMessage() . '</b><br/>';
-				echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
-				echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
-			} else {
-				echo 'Internal server error';
-			}
-			exit(1);
-		});
+		set_exception_handler(array(__CLASS__, 'handleException'));
 	}
 
 	public function errorHandler() {
@@ -232,7 +194,7 @@ class CM_Bootloader {
 			throw new CM_Exception_Invalid('Bootloader already loaded.');
 		}
 		$environments = (array) $environments;
-		array_walk($environments, function(&$environment) {
+		array_walk($environments, function (&$environment) {
 			$environment = (string) $environment;
 		});
 		$this->_environments = $environments;
@@ -336,5 +298,47 @@ class CM_Bootloader {
 			throw new Exception('No bootloader instance');
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * @param Exception $exception
+	 */
+	public static function handleException(Exception $exception) {
+		$exceptionFormatter = function (Exception $exception) {
+			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
+			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
+			$text .= $exception->getTraceAsString() . PHP_EOL;
+			return $text;
+		};
+
+		$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
+		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
+			header('HTTP/1.1 500 Internal Server Error');
+		}
+
+		try {
+			if ($exception instanceof CM_Exception) {
+				$log = $exception->getLog();
+			} else {
+				$log = new CM_Paging_Log_Error();
+			}
+			$log->add($exceptionFormatter($exception));
+		} catch (Exception $loggerException) {
+			$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
+			$logEntry .= '### Cannot log error: ' . PHP_EOL;
+			$logEntry .= $exceptionFormatter($loggerException);
+			$logEntry .= '### Original Exception: ' . PHP_EOL;
+			$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
+			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+		}
+
+		if ($showError) {
+			echo get_class($exception) . ' (' . $exception->getCode() . '): <b>' . $exception->getMessage() . '</b><br/>';
+			echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
+			echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
+		} else {
+			echo 'Internal server error';
+		}
+		exit(1);
 	}
 }

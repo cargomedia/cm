@@ -26,11 +26,12 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string                          $key
+	 * @param CM_Model_StreamChannel_Abstract $channel
 	 * @return CM_Model_Stream_Publish|null
 	 */
-	public static function findKey($key) {
-		$id = CM_Mysql::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key))->fetchOne();
+	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
+		$id = CM_Mysql::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchOne();
 		if (!$id) {
 			return null;
 		}
@@ -43,7 +44,10 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$start = (int) $data['start'];
-		$allowedUntil = (int) $data['allowedUntil'];
+		$allowedUntil = null;
+		if (null !== $data['allowedUntil']) {
+			$allowedUntil = (int) $data['allowedUntil'];
+		}
 		$key = (string) $data['key'];
 		$id = CM_Mysql::insert(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $key, 'channelId' => $streamChannel->getId()));

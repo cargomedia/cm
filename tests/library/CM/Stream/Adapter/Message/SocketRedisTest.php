@@ -1,0 +1,131 @@
+<?php
+
+class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
+
+	public function tearDown() {
+		CMTest_TH::clearEnv();
+	}
+
+	public function testGetOptions() {
+		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
+		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
+			array('httpHost' => 'foo', 'httpPort' => 8086, 'sockjsUrls' => array('http://stream:8090'))
+		);
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$options = $adapter->getOptions();
+		$this->assertArrayHasKey('sockjsUrl', $options);
+		$this->assertRegExp('#http://[0-9]+.stream:8090#', $options['sockjsUrl']);
+	}
+
+	public function testOnRedisMessageSubscribe() {
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$message = array('type' => 'subscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array()));
+		$adapter->onRedisMessage(json_encode($message));
+		$timeStarted = time();
+
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$this->assertNotNull($streamChannel);
+		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
+		$this->assertSame(1, $streamChannels->getCount());
+		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
+		$this->assertNotNull($streamSubscribe);
+		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
+		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
+		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
+		$this->assertNull($streamSubscribe->getUser());
+
+		CMTest_TH::timeForward(10);
+		$adapter->onRedisMessage(json_encode($message));
+		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
+		$this->assertSame(1, $streamChannels->getCount());
+		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
+		CMTest_TH::reinstantiateModel($streamSubscribe);
+		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
+		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
+	}
+
+	public function testOnRedisMessageSubscribeUser() {
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$user = CMTest_TH::createUser();
+		$session = new CM_Session();
+		$session->setUser($user);
+		$session->write();
+		$message = array('type' => 'subscribe',
+						 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array('sessionId' => $session->getId())));
+		$adapter->onRedisMessage(json_encode($message));
+
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
+		$this->assertEquals($user, $streamSubscribe->getUser());
+	}
+
+	public function testOnRedisMessageUnsubscribe() {
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'foo', 'adapterType' => $adapter->getType()));
+		CM_Model_Stream_Subscribe::create(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time()));
+		CM_Model_Stream_Subscribe::create(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time()));
+
+		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'foo'));
+		$adapter->onRedisMessage(json_encode($message));
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$this->assertNotNull($streamChannel);
+		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('foo', $streamChannel);
+		$this->assertNull($streamSubscribe);
+
+		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'bar'));
+		$adapter->onRedisMessage(json_encode($message));
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$this->assertNull($streamChannel);
+	}
+
+	public function testSynchronize() {
+		$jsTime =  time() * 1000;
+		for ($i = 0; $i < 2; $i++) {
+			$status = array(
+				'channel-foo' => array('subscribers' => array(
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => $jsTime, 'data' => array()),
+				)),
+				'channel-bar' => array('subscribers' => array(
+					'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+					'bar' => array('clientKey' => 'bar', 'subscribeStamp' => $jsTime, 'data' => array()),
+				)),
+			);
+			$this->_testSynchronize($status);
+		}
+		$status = array(
+			'channel-foo' => array('subscribers' => array(
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
+			))
+		);
+		$this->_testSynchronize($status);
+	}
+
+	/**
+	 * @param array $status
+	 */
+	private function _testSynchronize($status) {
+		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+		$adapter->synchronize();
+
+		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
+		$this->assertSame(count($status), $streamChannels->getCount());
+		/** @var $streamChannel CM_Model_StreamChannel_Message */
+		foreach ($streamChannels as $streamChannel) {
+			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+			$this->assertSame(count($status[$streamChannel->getKey()]['subscribers']), $streamChannel->getStreamSubscribes()->getCount());
+		}
+		foreach ($status as $channelKey => $channelData) {
+			$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $adapter->getType());
+			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
+				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
+				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
+				$this->assertSameTime(time(), $subscribe->getStart());
+				$this->assertNull($subscribe->getAllowedUntil());
+			}
+		}
+	}
+}

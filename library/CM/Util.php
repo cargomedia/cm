@@ -45,6 +45,20 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $pattern
+	 * @param CM_Site_Abstract $site
+	 * @return string[]
+	 */
+	public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
+		$paths = array();
+		foreach ($site->getNamespaces() as $namespace) {
+			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
+			$paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
+		}
+		return $paths;
+	}
+
+	/**
 	 * @param array $array
 	 * @param mixed $value
 	 * @return array
@@ -195,47 +209,30 @@ class CM_Util {
 
 	/**
 	 * @param string[] $paths
-	 * @return array[]
-	 * @throws CM_Exception
+	 * @throws CM_Exception_Invalid
+	 * @return array
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
-		$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
-
-		// Detect class names and parents
 		foreach ($paths as $path) {
-			$file = new CM_File($path);
-
-			if (!preg_match($regexp, $file->read(), $match)) {
-				throw new CM_Exception('Cannot detect php-class inheritance of `' . $path . '`');
+			$file = CM_File::factory($path);
+			if (!$file instanceof CM_File_ClassInterface) {
+				throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
 			}
-
-			$classHierarchy = array_values(class_parents($match['name']));
-			array_unshift($classHierarchy, $match['name']);
-
-			$classes[] = array('classNames' => $classHierarchy, 'path' => $path);
+			$meta = $file->getClassDeclaration();
+			$classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
 		}
 
-		// Order classes by inheritance
-		for ($i1 = 0; $i1 < count($classes); $i1++) {
-			$class1 = $classes[$i1];
-			for ($i2 = $i1 + 1; $i2 < count($classes); $i2++) {
-				$class2 = $classes[$i2];
-				if (isset($class1['classNames'][1]) && $class1['classNames'][1] == $class2['classNames'][0]) {
-					$tmp = $classes[$i1];
-					$classes[$i1] = $classes[$i2];
-					$classes[$i2] = $tmp;
-					$i1--;
-					break;
+		$paths = array();
+		while (count($classes)) {
+			foreach ($classes as $class => $data) {
+				if (!isset($classes[$data['parent']])) {
+					$paths[$data['path']] = $class;
+					unset($classes[$class]);
 				}
 			}
 		}
-
-		$classesAssociative = array();
-		foreach ($classes as $classInfo) {
-			$classesAssociative[$classInfo['path']] = $classInfo['classNames'][0];
-		}
-		return $classesAssociative;
+		return $paths;
 	}
 
 	/**
