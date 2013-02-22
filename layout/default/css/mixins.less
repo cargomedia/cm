@@ -140,6 +140,7 @@
 .input_button(@size) {
 	width: auto;
 	min-width: @size;
+	max-width: 100%;
 	height: @size;
 	margin: 1px;
 	padding: 1px @size / 3;
@@ -149,7 +150,12 @@
 	cursor: pointer;
 	overflow: visible;
 	vertical-align: top;
-	.nowrap;
+
+	.label {
+		display: inline-block;
+		max-width: 100%;
+		.nowrap;
+	}
 
 	.icon {
 		font-size: @iconSizeClickable;
