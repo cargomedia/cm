@@ -425,7 +425,7 @@ class CM_Util {
 	 * @param bool|null             $distinctLeaves  Whether or not the leaves are unique given the specified indexes
 	 * @param string[]|string|null  $keyNames
 	 * @throws CM_Exception_Invalid
-	 * @return array
+	 * @return array[]
 	 */
 	public static function getArrayTree(array $items, $level = null, $distinctLeaves = null, $keyNames = null) {
 		if (null === $level) {

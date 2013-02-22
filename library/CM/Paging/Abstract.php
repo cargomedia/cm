@@ -93,8 +93,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/**
 	 * @param string|null $keyName
-	 * @return array
-	 * @throws CM_Exception_Invalid
+	 * @return array[]
 	 */
 	public function getItemsRawTree($keyName = null) {
 		return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);

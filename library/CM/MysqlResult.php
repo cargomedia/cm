@@ -95,7 +95,7 @@ class CM_MysqlResult {
 	/**
 	 * @param int|null     $level
 	 * @param bool|null    $distinctLeaves
-	 * @return array
+	 * @return array[]
 	 */
 	public function fetchAllTree($level = null, $distinctLeaves = null) {
 		return CM_Util::getArrayTree($this->fetchAll(), $level, $distinctLeaves);
