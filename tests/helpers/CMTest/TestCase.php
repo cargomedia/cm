@@ -182,9 +182,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$namespaces = array('CM');
 		}
 		/** @var CM_Site_Abstract $site */
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
 		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
+		CM_Config::get()->CM_Site_Mock = new stdClass;
+		CM_Config::get()->CM_Site_Mock->url = 'http://www.example.dev';
+		CM_Config::get()->CM_Site_Mock->urlCdn = 'http://cdn.example.dev';
 		return $site;
 	}
 

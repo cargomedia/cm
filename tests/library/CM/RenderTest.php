@@ -1,7 +1,7 @@
 <?php
 
 class CM_RenderTest extends CMTest_TestCase {
-	
+
 	public function setUp() {
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
@@ -144,5 +144,16 @@ class CM_RenderTest extends CMTest_TestCase {
 
 		$render = new CM_Render($this->_getSite());
 		$this->assertNull($render->getViewer());
+	}
+
+	protected function _getSite(array $namespaces = null) {
+		if (null === $namespaces) {
+			$namespaces = array('CM');
+		}
+		/** @var CM_Site_Abstract $site */
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock1' . md5(uniqid()), true, true, true, array('getId', 'getNamespaces'));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
+		return $site;
 	}
 }

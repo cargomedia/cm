@@ -67,7 +67,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
-		define('TBL_TEST', 'test');
+		defined('TBL_TEST') || define('TBL_TEST', 'test');
 		CM_Mysql::exec('CREATE TABLE TBL_TEST (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
