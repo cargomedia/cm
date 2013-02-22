@@ -390,22 +390,6 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			array('id' => 4, 'type' => 1, 'amount' => 4))));
 		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
 			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
-
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1, 2)));
-		try {
-			$paging->getItemsRawTree();
-			$this->fail('Raw item is not an array.');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
-		}
-
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array(1), array(2))));
-		try {
-			$paging->getItemsRawTree();
-			$this->fail('Raw item has less than two elements.');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
-		}
 	}
 
 	public function testFlattenItems() {
@@ -417,7 +401,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			return $value % 10 . 'keyValue';
 		});
 
-		/** @var CM_Paging_Abstract $pagingGroup  */
+		/** @var CM_Paging_Abstract $pagingGroup */
 		$pagingGroup = $this->getMockForAbstractClass('CM_Paging_Abstract', array($pagingSource));
 		$this->assertSame(10, $pagingGroup->getItem(10));
 
