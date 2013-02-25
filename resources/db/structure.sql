@@ -259,6 +259,7 @@ DROP TABLE IF EXISTS `cm_emoticon`;
 CREATE TABLE `cm_emoticon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(50) NOT NULL,
+  `codeAdditional` varchar(50),
   `file` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`code`)
