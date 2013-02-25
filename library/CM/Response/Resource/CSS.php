@@ -78,9 +78,10 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 	 */
 	private function _getCssEmoticon() {
 		$css = '';
+		$url = $this->getRender()->getThemeDir();
 		foreach (new CM_Paging_Emoticon_All() as $emoticon) {
 			$css .= '.emoticon.emoticon-' . $emoticon['id'] . '{';
-			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/emoticon/' . $emoticon['file']) . ')';
+			$css .= 'background-image: url(' . $this->getRender()->getUrlResource('img', 'emoticon/' . $emoticon['file']) . ');';
 			$css .= '}' . PHP_EOL;
 		}
 		return $css;
