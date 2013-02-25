@@ -1,6 +1,6 @@
 <?php
 
-class CM_MailTest extends CMTest_TestCaseRender {
+class CM_MailTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CMTest_TH::clearEnv();
