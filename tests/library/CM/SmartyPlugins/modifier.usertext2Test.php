@@ -16,20 +16,20 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	}
 
 	public function testModeOneline() {
-		$this->_assertSame('foo', array('text' => 'foo', 'mode' => 'oneline'));
+		$this->_assertSame('<span class="usertext2 oneline">foo</span>', array('text' => 'foo', 'mode' => 'oneline'));
 	}
 
 	public function testModeSimple() {
-		$this->_assertSame("foo<br />\nbar", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
+		$this->_assertSame("<span class=\"usertext2 simple\">foo<br />\nbar</span>", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
 	}
 
 	public function testModeMarkdown() {
-		$this->_assertSame("<span class=\"usertext2\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n",
+		$this->_assertSame("<span class=\"usertext2 markdown\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n",
 			'mode' => 'markdown'));
 	}
 
 	public function testModeMarkdownPlain() {
-		$this->_assertSame("Headline\nfoo\n", array('text' => "#Headline#\nfoo\n", 'mode' => 'markdownPlain'));
+		$this->_assertSame("<span class=\"usertext2 markdownPlain\">Headline\nfoo\n</span>", array('text' => "#Headline#\nfoo\n", 'mode' => 'markdownPlain'));
 	}
 
 	public function testModeNo() {
