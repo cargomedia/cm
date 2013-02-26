@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
 
 	/** @var int|null */
 	private $_lengthMax = null;

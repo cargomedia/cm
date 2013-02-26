@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Striptags extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_Striptags implements CM_Usertext_Filter_Interface {
 
 	/** @var string[] */
 	private $_allowedTags;
