@@ -44,6 +44,16 @@ class smarty_function_linkTest extends CMTest_TestCase {
 		$this->_assertSame('<a href="/test" class="link testClass" title="Title"><span class="icon delete"></span></a>', array('page' => 'CM_Page_Test', 'class' => 'testClass', 'icon' => 'delete', 'title' => 'Title'));
 	}
 
+	protected function _getSite(array $namespaces = null) {
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
+		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('CM')));
+		CM_Config::get()->CM_Site_Mock = new stdClass;
+		CM_Config::get()->CM_Site_Mock->url = '';
+		CM_Config::get()->CM_Site_Mock->urlCdn = '';
+		return $site;
+	}
+
 	/**
 	 * @param string $expected
 	 * @param array  $params
