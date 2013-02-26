@@ -2,7 +2,7 @@
 
 class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 
-	public function emoticonUpdate() {
+	public function emoticonRefresh() {
 		$emoticonList = array();
 
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
