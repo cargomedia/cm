@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Layout_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function emoticonRefresh() {
 		$emoticonList = array();
@@ -25,7 +25,7 @@ class CM_Usertext_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public static function getPackageName() {
-		return 'usertext';
+		return 'layout';
 	}
 
 }
