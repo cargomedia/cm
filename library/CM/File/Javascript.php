@@ -29,7 +29,10 @@ class CM_File_Javascript extends CM_File implements CM_File_ClassInterface {
 		if (!preg_match($regexp, $this->read(), $match)) {
 			throw new CM_Exception('Cannot detect class');
 		}
-		return array('class' => $match['class'], 'parent' => $match['parent']);
+		$declaration = array();
+		$declaration['class'] = $match['class'];
+		$declaration['parent'] = isset($match['parent']) ? $match['parent'] : null;
+		return $declaration;
 	}
 
 	/**
