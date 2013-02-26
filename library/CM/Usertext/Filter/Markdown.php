@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Markdown extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_Markdown implements CM_Usertext_Filter_Interface {
 
 	public function transform($text) {
 		$text = (string) $text;

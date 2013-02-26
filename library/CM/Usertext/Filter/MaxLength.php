@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
+class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
 
 	/** @var int|null */
 	private $_lengthMax = null;
@@ -23,7 +23,7 @@ class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
 			$text = substr($text, 0, $this->_lengthMax);
 			$lastBlank = strrpos($text, ' ');
 			if ($lastBlank > 0) {
-				$text = substr($text, 0, $lastBlank);
+				$text = substr($text, 0, $lastBlank+1);
 			}
 			$text = $text . '…';
 		}

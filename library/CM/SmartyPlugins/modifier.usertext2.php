@@ -43,9 +43,6 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 
 	$text = $usertext->transform($text);
 
-	if ('markdown' == $mode) {
-		$text = '<span class="usertext2">' . $text . '</span>';
-	}
+	$text = '<span class="usertext2 ' . $mode . '">' . $text . '</span>';
 	return $text;
-
 }
