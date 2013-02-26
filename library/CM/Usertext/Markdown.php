@@ -2,8 +2,18 @@
 
 class CM_Usertext_Markdown extends Michelf\Markdown {
 
-	function formParagraphs($text) {
+	/** @var bool $_skipAnchors */
+	private $_skipAnchors;
 
+	/**
+	 * @param bool|null $skipAnchors
+	 */
+	function __construct($skipAnchors = null) {
+		$this->skipAnchors = (boolean) $skipAnchors;
+		parent::__construct();
+	}
+
+	function formParagraphs($text) {
 		$text = preg_replace('/\A\n+|\n+\z/', '', $text);
 		$grafs = preg_split('/\n{1,}/', $text, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -27,11 +37,17 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 	}
 
 	function _doAnchors_inline_callback($matches) {
+		if (!$this->_skipAnchors) {
+			return parent::_doAnchors_inline_callback($matches);
+		}
 		$link_text = $this->runSpanGamut($matches[2]);
 		return $this->hashPart($link_text);
 	}
 
 	function _doAnchors_reference_callback($matches) {
+		if (!$this->_skipAnchors) {
+			return parent::_doAnchors_inline_callback($matches);
+		}
 		$link_text = $matches[2];
 		return $link_text;
 	}
