@@ -2,13 +2,13 @@
 
 class CM_Usertext_Usertext {
 
-	/** @var CM_Usertext_Filter_Abstract[] */
+	/** @var CM_Usertext_Filter_Interface[] */
 	private $_filterList = array();
 
 	/**
-	 * @param CM_Usertext_Filter_Abstract $filter
+	 * @param CM_Usertext_Filter_Interface $filter
 	 */
-	public function addFilter(CM_Usertext_Filter_Abstract $filter) {
+	public function addFilter(CM_Usertext_Filter_Interface $filter) {
 		$this->_filterList[] = $filter;
 	}
 
@@ -24,7 +24,7 @@ class CM_Usertext_Usertext {
 	}
 
 	/**
-	 * @return CM_Usertext_Filter_Abstract[]
+	 * @return CM_Usertext_Filter_Interface[]
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
