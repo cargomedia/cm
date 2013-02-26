@@ -27,5 +27,4 @@ class CM_Layout_Cli extends CM_Cli_Runnable_Abstract {
 	public static function getPackageName() {
 		return 'layout';
 	}
-
 }
