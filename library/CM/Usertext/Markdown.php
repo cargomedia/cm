@@ -25,4 +25,14 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 		}
 		return implode("\n", $grafs);
 	}
+
+	function _doAnchors_inline_callback($matches) {
+		$link_text = $this->runSpanGamut($matches[2]);
+		return $this->hashPart($link_text);
+	}
+
+	function _doAnchors_reference_callback($matches) {
+		$link_text = $matches[2];
+		return $link_text;
+	}
 }
