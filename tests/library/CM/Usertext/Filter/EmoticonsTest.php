@@ -6,7 +6,7 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		self::$_emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
-		self::$_emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':<', 'codeAdditional' => '',  'file' => '2.png'));
+		self::$_emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':<', 'file' => '2.png'));
 
 		CMTest_TH::clearCache();
 	}
@@ -36,5 +36,4 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 
 		$this->assertSame($expected, $actual);
 	}
-
 }
