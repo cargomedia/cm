@@ -71,7 +71,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 						$user = null;
 						if ($data->has('sessionId')) {
 							if ($session = CM_Session::findById($data->getString('sessionId'))) {
-								$user = $session->getUser(true);
+								$user = $session->getUser(false);
 							}
 						}
 						$start = (int) ($subscriber['subscribeStamp'] / 1000);
@@ -102,7 +102,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$user = null;
 				if ($data->has('sessionId')) {
 					if ($session = CM_Session::findById($data->getString('sessionId'))) {
-						$user = $session->getUser(true);
+						$user = $session->getUser(false);
 					}
 				}
 				$this->_subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
