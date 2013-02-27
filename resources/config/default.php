@@ -8,8 +8,8 @@ $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
 
 $config->CM_Render = new stdClass();
-$config->CM_Render->cdnResource = true;
-$config->CM_Render->cdnUserContent = true;
+$config->CM_Render->cdnResource = false;
+$config->CM_Render->cdnUserContent = false;
 
 $config->CM_Mail = new stdClass();
 $config->CM_Mail->send = true;
