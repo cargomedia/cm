@@ -9,7 +9,7 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 	 * @param bool|null $skipAnchors
 	 */
 	function __construct($skipAnchors = null) {
-		$this->skipAnchors = (boolean) $skipAnchors;
+		$this->_skipAnchors = (boolean) $skipAnchors;
 		parent::__construct();
 	}
 
@@ -37,7 +37,7 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 	}
 
 	function _doAnchors_inline_callback($matches) {
-		if (!$this->_skipAnchors) {
+		if ($this->_skipAnchors) {
 			return parent::_doAnchors_inline_callback($matches);
 		}
 		$link_text = $this->runSpanGamut($matches[2]);
@@ -45,7 +45,7 @@ class CM_Usertext_Markdown extends Michelf\Markdown {
 	}
 
 	function _doAnchors_reference_callback($matches) {
-		if (!$this->_skipAnchors) {
+		if ($this->_skipAnchors) {
 			return parent::_doAnchors_inline_callback($matches);
 		}
 		$link_text = $matches[2];
