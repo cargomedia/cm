@@ -345,7 +345,7 @@ class CM_Bootloader {
 
 		if ($showError) {
 			$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
-			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine() . '');
+			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
 			$output->writeln($exception->getTraceAsString());
 		} else {
 			$output->writeln('Internal server error');
