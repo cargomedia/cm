@@ -592,13 +592,11 @@ CM_App.prototype = {
 	stream: {
 		connection: null,
 		_dispatcher: _.clone(Backbone.Events),
-		/**
-		 * @type {Boolean}
-		 */
+
+		/** @type {Boolean} */
 		_connected: false,
-		/**
-		 * @type {Array}
-		 */
+
+		/** @type {Array} */
 		subscribes: [],
 		/**
 		 * @param {String} channel
@@ -607,12 +605,10 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		bind: function(channel, namespace, callback, context) {
-			if (!channel) {
-				return;
-			}
-			this.subscribe(channel);
+			this._subscribe(channel);
 			this._dispatcher.on(channel + ':' + namespace, callback, context);
 		},
+
 		/**
 		 * @param {String} channel
 		 * @param {String} namespace
@@ -622,7 +618,8 @@ CM_App.prototype = {
 		unbind: function(channel, namespace, callback, context) {
 			this._dispatcher.off(channel + ':' + namespace, callback, context);
 		},
-		connect: function() {
+
+		_connect: function() {
 			if (!cm.options.stream.enabled) {
 				return;
 			}
@@ -632,7 +629,7 @@ CM_App.prototype = {
 				this.connection = new SocketRedis(options.sockjsUrl);
 				this.connection.onopen = function() {
 					_.each(handler.subscribes, function(channel) {
-						handler._subscribe(channel);
+						handler._subscribeConnected(channel);
 					});
 					handler._connected = true;
 				};
@@ -640,25 +637,27 @@ CM_App.prototype = {
 				cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
 			}
 		},
+
 		/**
 		 * @param {String} channel
 		 */
-		subscribe: function(channel) {
+		_subscribe: function(channel) {
 			if (_.indexOf(this.subscribes, channel) >= 0) {
 				return;
 			}
 			this.subscribes.push(channel);
 			if (this._connected ) {
-				this._subscribe();
+				this._subscribeConnected();
 			}
 			if (!this.connection) {
-				this.connect();
+				this._connect();
 			}
 		},
+
 		/**
 		 * @param {String} channel
 		 */
-		_subscribe: function(channel) {
+		_subscribeConnected: function(channel) {
 			var handler = this;
 			this.connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
 				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
@@ -668,9 +667,9 @@ CM_App.prototype = {
 		/**
 		 * @param {String} channel
 		 */
-		unsubscribe: function(channel) {
+		_unsubscribe: function(channel) {
 			this.subscribes = _.without(this.subscribes, channel);
-			this.connection.unsubscribe(channel);
+			this.connection._unsubscribe(channel);
 		}
 	},
 

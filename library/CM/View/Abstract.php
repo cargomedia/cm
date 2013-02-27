@@ -49,6 +49,16 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param CM_Model_User $user
+	 * @param string        $event
+	 * @param mixed         $data
+	 */
+	public static function stream(CM_Model_User $user, $event, $data) {
+		$namespace = get_called_class() . ':' . $event;
+		CM_Stream_Message::publishUser($user, array('namespace' => $namespace, 'data' => $data));
+	}
+
+	/**
 	 * @param string[] $namespaces
 	 * @param int      $context
 	 * @throws CM_Exception_Invalid
@@ -71,15 +81,5 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 			}
 		}
 		return CM_Util::getClasses($paths);
-	}
-
-	/**
-	 * @param string $channel
-	 * @param string $event
-	 * @param mixed  $data
-	 */
-	public static function streamMessage($channel, $event, $data) {
-		$namespace = get_called_class() . ':' . $event;
-		CM_Stream_Message::publish($channel, array('namespace' => $namespace, 'data' => $data));
 	}
 }
