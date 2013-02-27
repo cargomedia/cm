@@ -59,6 +59,17 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertEquals($user, $streamSubscribe->getUser());
 	}
 
+	public function testOnRedisMessageSubscribeSessionInvalid() {
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$message = array('type' => 'subscribe',
+						 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array('sessionId' => 'foo')));
+		$adapter->onRedisMessage(json_encode($message));
+
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
+		$this->assertNull($streamSubscribe->getUser());
+	}
+
 	public function testOnRedisMessageUnsubscribe() {
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
 		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'foo', 'adapterType' => $adapter->getType()));
