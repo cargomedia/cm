@@ -611,7 +611,7 @@ CM_App.prototype = {
 				return;
 			}
 			this.subscribe(channel);
-			this._dispatcher.on(channel + '_' + namespace, callback, context);
+			this._dispatcher.on(channel + ':' + namespace, callback, context);
 		},
 		/**
 		 * @param {String} channel
@@ -620,7 +620,7 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		unbind: function(channel, namespace, callback, context) {
-			this._dispatcher.off(channel + '_' + namespace, callback, context);
+			this._dispatcher.off(channel + ':' + namespace, callback, context);
 		},
 		connect: function() {
 			if (!cm.options.stream.enabled) {
@@ -661,7 +661,7 @@ CM_App.prototype = {
 		_subscribe: function(channel) {
 			var handler = this;
 			this.connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
-				handler._dispatcher.trigger(channel + '_' + message.namespace, message.data);
+				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
 			});
 		},
 
