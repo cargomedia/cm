@@ -83,13 +83,11 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 				$session = CMTest_TH::createSession($streamSubscribe->getUser());
 				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(),
 					'clientId' => $streamSubscribe->getKey(), 'data' => json_encode(array('sessionId' => $session->getId())));
-				unset($session);
 			}
 			$session = CMTest_TH::createSession($streamPublish->getUser());
 			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
 				'data' => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
 				'subscribers' => $subscribes, 'thumbnailCount' => 2, 'width' => 480, 'height' => 720, 'wowzaIp' => ip2long('192.168.0.1'));
-			unset($session);
 		}
 		return json_encode($jsonData);
 	}
