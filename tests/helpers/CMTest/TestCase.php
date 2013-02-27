@@ -104,7 +104,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param array|null $namespaces
+	 * @param array|null  $namespaces
+	 * @param string|null $url
+	 * @param string|null $urlCdn
 	 * @return CM_Site_Abstract
 	 */
 	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
