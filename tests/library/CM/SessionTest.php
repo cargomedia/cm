@@ -238,7 +238,9 @@ class CM_SessionTest extends CMTest_TestCase {
 
 	public function testFindById() {
 		$session = new CM_Session();
-		$this->assertSame($session, CM_Session::findById($session->getId()));
+		$session->set('foo', 'bar');
+		$session->write();
+		$this->assertEquals($session, CM_Session::findById($session->getId()));
 
 		$this->assertNull(CM_Session::findById('foo'));
 		$this->assertNull(CM_Session::findById(''));
