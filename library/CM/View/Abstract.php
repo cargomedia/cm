@@ -72,4 +72,14 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		}
 		return CM_Util::getClasses($paths);
 	}
+
+	/**
+	 * @param string $channel
+	 * @param string $event
+	 * @param mixed  $data
+	 */
+	public static function streamMessage($channel, $event, $data) {
+		$namespace = get_called_class() . ':' . $event;
+		CM_Stream_Message::publish($channel, array('namespace' => $namespace, 'data' => $data));
+	}
 }
