@@ -31,10 +31,10 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 			if (null !== $maxLength) {
 				throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
 			}
-			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
+			$usertext->addFilter(new CM_Usertext_Filter_Markdown(true));
 			break;
 		case 'markdownPlain':
-			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
+			$usertext->addFilter(new CM_Usertext_Filter_Markdown(true));
 			$usertext->addFilter(new CM_Usertext_Filter_Striptags());
 			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 			break;

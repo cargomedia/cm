@@ -25,8 +25,8 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	}
 
 	public function testModeMarkdown() {
-		$this->_assertSame("<span class=\"usertext2 markdown\"><h1>Headline</h1>\n<p>foo</p></span>", array('text' => "#Headline#\nfoo\n\n",
-																											'mode' => 'markdown'));
+		$this->_assertSame("<span class=\"usertext2 markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></span>", array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n",
+																															   'mode' => 'markdown'));
 	}
 
 	public function testModeMarkdownPlain() {
@@ -35,12 +35,10 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	}
 
 	public function testMaxLength() {
-
 		$this->_assertSame("<span class=\"usertext2 oneline\">Hello…</span>", array('text' => "Hello World", 'mode' => 'oneline', 'maxLength' => 10));
 		$this->_assertSame("<span class=\"usertext2 simple\">Hello…</span>", array('text' => "Hello World", 'mode' => 'simple', 'maxLength' => 10));
 		$this->_assertSame("<span class=\"usertext2 markdownPlain\">Hello…</span>", array('text' => "Hello \n\n* World",
 																						  'mode' => 'markdownPlain', 'maxLength' => 10));
-
 		try {
 			smarty_modifier_usertext2('foo', 'markdown', 1);
 		} catch (CM_Exception_Invalid $ex) {
