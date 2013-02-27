@@ -8,8 +8,8 @@ class CM_CssTest extends CMTest_TestCase {
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Render->cdnResource = false;
 		CM_Config::get()->CM_Render->cdnUserContent = false;
-		CM_Config::get()->CM_Site_Mock = new stdClass;
-		CM_Config::get()->CM_Site_Mock->url = 'http://www.example.dev';
+		CM_Config::get()->CM_Site_MockCss = new stdClass;
+		CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
 	}
 
 	public static function tearDownAfterClass() {
@@ -17,7 +17,7 @@ class CM_CssTest extends CMTest_TestCase {
 	}
 
 	public function setUp() {
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId'));
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_MockCss', true, true, true, array('getId'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
 		$this->_render = new CM_Render($site);
 	}
