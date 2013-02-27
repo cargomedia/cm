@@ -23,11 +23,10 @@ class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
 			$text = substr($text, 0, $this->_lengthMax);
 			$lastBlank = strrpos($text, ' ');
 			if ($lastBlank > 0) {
-				$text = substr($text, 0, $lastBlank+1);
+				$text = substr($text, 0, $lastBlank);
 			}
 			$text = $text . '…';
 		}
 		return $text;
 	}
-
 }

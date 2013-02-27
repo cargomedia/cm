@@ -8,7 +8,7 @@ class CM_Usertext_Filter_MaxLengthTest extends CMTest_TestCase {
 
 	public function testProcess() {
 		$filter = new CM_Usertext_Filter_MaxLength(10);
-		$this->assertSame('Hello …', $filter->transform('Hello World'));
+		$this->assertSame('Hello…', $filter->transform('Hello World'));
 
 		$filter = new CM_Usertext_Filter_MaxLength(11);
 		$this->assertSame('Hello World', $filter->transform('Hello World'));
@@ -16,5 +16,4 @@ class CM_Usertext_Filter_MaxLengthTest extends CMTest_TestCase {
 		$filter = new CM_Usertext_Filter_MaxLength(12);
 		$this->assertSame('Hello World', $filter->transform('Hello World'));
 	}
-
 }
