@@ -590,55 +590,87 @@ CM_App.prototype = {
 	},
 
 	stream: {
-		_connected: false,
+		connection: null,
 		_dispatcher: _.clone(Backbone.Events),
-
 		/**
+		 * @type {Boolean}
+		 */
+		_connected: false,
+		/**
+		 * @type {Array}
+		 */
+		subscribes: [],
+		/**
+		 * @param {String} channel
 		 * @param {String} namespace for which callback should be used
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(namespace, callback, context) {
-			if (!this._connected) {
-				if (typeof cm.options.stream.channel == 'undefined') {
-					return;	// No viewer
-				}
-				this.connect(cm.options.stream.channel);
-				this._connected = true;
+		bind: function(channel, namespace, callback, context) {
+			if (!channel) {
+				return;
 			}
-			this._dispatcher.on(namespace, callback, context);
+			this.subscribe(channel);
+			this._dispatcher.on(channel + '_' + namespace, callback, context);
 		},
 		/**
+		 * @param {String} channel
 		 * @param {String} namespace
 		 * @param {Function} callback
 		 * @param {Object} [context]
 		 */
-		unbind: function(namespace, callback, context) {
-			this._dispatcher.off(namespace, callback, context);
+		unbind: function(channel, namespace, callback, context) {
+			this._dispatcher.off(channel + '_' + namespace, callback, context);
 		},
-		/**
-		 * @param {String} channel
-		 */
-		connect: function(channel) {
+		connect: function() {
 			if (!cm.options.stream.enabled) {
 				return;
 			}
 			var handler = this;
 			var options = cm.options.stream.options;
-			var callback = function(message) {
-				handler._dispatcher.trigger(message.namespace, message.data);
-			};
-
 			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-				var socketRedis = new SocketRedis(options.sockjsUrl);
-				socketRedis.onopen = function() {
-					socketRedis.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function(data) {
-						callback(data);
+				this.connection = new SocketRedis(options.sockjsUrl);
+				this.connection.onopen = function() {
+					_.each(handler.subscribes, function(channel) {
+						handler._subscribe(channel);
 					});
+					handler._connected = true;
 				};
 			} else {
 				cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
 			}
+		},
+		/**
+		 * @param {String} channel
+		 */
+		subscribe: function(channel) {
+			if (_.indexOf(this.subscribes, channel) >= 0) {
+				return;
+			}
+			this.subscribes.push(channel);
+			if (this._connected ) {
+				this._subscribe();
+			}
+			if (!this.connection) {
+				this.connect();
+			}
+		},
+		/**
+		 * @param {String} channel
+		 */
+		_subscribe: function(channel) {
+			var handler = this;
+			this.connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
+				handler._dispatcher.trigger(channel + '_' + message.namespace, message.data);
+			});
+		},
+
+		/**
+		 * @param {String} channel
+		 */
+		unsubscribe: function(channel) {
+			this.subscribes = _.without(this.subscribes, channel);
+			this.connection.unsubscribe(channel);
 		}
 	},
 
@@ -712,7 +744,7 @@ CM_App.prototype = {
 		 */
 		bind: function(actionVerb, modelType, callback, context) {
 			if (!this._registered) {
-				cm.stream.bind('CM_Action_Abstract', function(response) {
+				cm.stream.bind(cm.options.stream.channel, 'CM_Action_Abstract', function(response) {
 					this._dispatcher.trigger(response.action.verb + ':' + response.model._type, response.action, response.model, response.data);
 				}, this);
 				this._registered = true;

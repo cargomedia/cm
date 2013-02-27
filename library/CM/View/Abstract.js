@@ -293,14 +293,15 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String} channel
 	 * @param {String} event
 	 * @param {Function} callback fn(array data)
 	 */
-	bindStream: function(event, callback) {
+	bindStream: function(channel, event, callback) {
 		var namespace = this.getClass() + ':' + event;
-		cm.stream.bind(namespace, callback, this);
+		cm.stream.bind(channel, namespace, callback, this);
 		this.on('destruct', function() {
-			cm.stream.unbind(namespace, callback, this);
+			cm.stream.unbind(channel, namespace, callback, this);
 		});
 	},
 
@@ -500,7 +501,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	_bindStreams: function(streams) {
 		_.each(streams, function(callback, key) {
-			this.bindStream(key, callback);
+			this.bindStream(cm.options.stream.channel, key, callback);
 		}, this);
 	},
 
