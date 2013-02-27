@@ -134,8 +134,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$user = null;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		if ($params->has('sessionId')) {
-			$session = new CM_Session($params->getString('sessionId'));
-			$user = $session->getUser();
+			if ($session = CM_Session::findById($params->getString('sessionId'))) {
+				$user = $session->getUser();
+			}
 		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
