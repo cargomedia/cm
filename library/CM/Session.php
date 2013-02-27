@@ -248,14 +248,6 @@ class CM_Session implements CM_Comparable {
 
 	/**
 	 * @param string $id
-	 * @return string
-	 */
-	private static function _getCacheKey($id) {
-		return CM_CacheConst::Session . '_id:' . $id;
-	}
-
-	/**
-	 * @param string $id
 	 * @return CM_Session|null
 	 */
 	public static function findById($id) {
@@ -283,6 +275,14 @@ class CM_Session implements CM_Comparable {
 			CM_Cache::set($cacheKey, $data, self::LIFETIME_DEFAULT);
 		}
 		return $data;
+	}
+
+	/**
+	 * @param string $id
+	 * @return string
+	 */
+	private static function _getCacheKey($id) {
+		return CM_CacheConst::Session . '_id:' . $id;
 	}
 
 	/**
