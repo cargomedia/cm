@@ -79,8 +79,8 @@ class CM_Bootloader {
 					$errstr = $errorCodes[$errno] . ': ' . $errstr;
 					CM_Debug::get()->addError($errfile, $errline, $errstr);
 				}
-					return true;
-				}
+				return true;
+			}
 			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 		});
 	}
