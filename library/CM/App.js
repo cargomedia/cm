@@ -812,7 +812,7 @@ CM_App.prototype = {
 							cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
 						},
 						error: function(msg, type, isPublic) {
-							$placeholder.addClass('error').html(msg);
+							$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
 							cm.router.onError();
 							return false;
 						},
