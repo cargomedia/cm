@@ -2,19 +2,18 @@
 
 class CM_Paging_Emoticon_AllTest extends CMTest_TestCase {
 
-	private static $_emoticonIdList = array();
-
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		CMTest_TH::clearEnv();
 	}
 
 	public function testAll() {
-		self::$_emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
-		self::$_emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':<', 'file' => '2.png'));
+		$emoticonIdList = array();
+		$emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
+		$emoticonIdList[] = CM_Mysql::insert(TBL_CM_EMOTICON, array('code' => ':<', 'file' => '2.png'));
 
 		$paging = new CM_Paging_Emoticon_All();
 		$emoticonList = $paging->getItems();
-		$this->assertEquals(array(':smiley:',':)',':-)'), $emoticonList[0]['codes']);
+		$this->assertEquals(array(':smiley:', ':)', ':-)'), $emoticonList[0]['codes']);
 		$this->assertEquals(array(':<'), $emoticonList[1]['codes']);
 	}
 
