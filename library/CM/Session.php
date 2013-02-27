@@ -5,25 +5,19 @@ class CM_Session implements CM_Comparable {
 	const ACTIVITY_EXPIRATION = 240; // 4 mins
 	const LIFETIME_DEFAULT = 3600;
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	private $_id;
-	/**
-	 * @var array
-	 */
+
+	/** @var array */
 	private $_data;
-	/**
-	 * @var int
-	 */
+
+	/** @var int */
 	private $_expires;
-	/**
-	 * @var boolean
-	 */
+
+	/** @var boolean */
 	private $_write = false;
-	/**
-	 * @var boolean
-	 */
+
+	/** @var boolean */
 	private $_isPersistent = false;
 
 	/**
@@ -132,10 +126,11 @@ class CM_Session implements CM_Comparable {
 	}
 
 	/**
-	 * @param bool $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
-	 * @return CM_Model_User Session-user OR null
+	 * @param bool|null $needed
+	 * @throws CM_Exception_AuthRequired
+	 * @return CM_Model_User|null
 	 */
-	public function getUser($needed = false) {
+	public function getUser($needed = null) {
 		if ($this->has('userId')) {
 			try {
 				return CM_Model_User::factory($this->get('userId'));
@@ -219,14 +214,13 @@ class CM_Session implements CM_Comparable {
 	public function write() {
 		if (!$this->isEmpty()) {
 			CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
-				'expires' => time() + $this->getLifetime()));
+													'expires'   => time() + $this->getLifetime()));
 			$this->_change();
 		} elseif ($this->_isPersistent) {
 			CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 	}
-
 
 	/**
 	 * @param CM_Comparable $other
