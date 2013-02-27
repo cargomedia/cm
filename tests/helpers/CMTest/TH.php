@@ -143,6 +143,7 @@ class CMTest_TH {
 		}
 		$session = new CM_Session();
 		$session->setUser($user);
+		$session->write();
 		return $session;
 	}
 

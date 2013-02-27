@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Request_Abstract {
+
 	/**
 	 * @var string
 	 */
@@ -37,7 +38,7 @@ abstract class CM_Request_Abstract {
 	private $_capabilities;
 
 	/**
-	 * @var CM_Session
+	 * @var CM_Session|null
 	 */
 	private $_session;
 
@@ -71,10 +72,8 @@ abstract class CM_Request_Abstract {
 		$this->setUri($uri);
 
 		if ($sessionId = $this->getCookie('sessionId')) {
-			try {
-				$this->_session = new CM_Session($sessionId);
+			if ($this->_session = CM_Session::findById($sessionId)) {
 				$this->_session->start();
-			} catch (CM_Exception_Nonexistent $ex) {
 			}
 		}
 
