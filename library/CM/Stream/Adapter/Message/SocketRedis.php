@@ -31,6 +31,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	public function synchronize() {
+		$startStampLimit = time() - 3;
 		$channelsStatus = $this->_fetchStatus();
 		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
 		$channelsPersistenceArray = array();
@@ -59,7 +60,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			if (isset($channelsPersistenceArray[$channelKey])) {
 				$streamChannel = $channelsPersistenceArray[$channelKey];
 			} else {
-				$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+				$newEntries = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
+					return $subscriber['subscribeStamp'] / 1000 > $startStampLimit;
+				});
+				if (!count($newEntries)) {
+					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+				}
 			}
 			foreach ($channel['subscribers'] as $subscriber) {
 				$clientKey = (string) $subscriber['clientKey'];
@@ -73,8 +79,10 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					}
 					$start = (int) ($subscriber['subscribeStamp'] / 1000);
 					$allowedUntil = null;
-					CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
-															'streamChannel' => $streamChannel, 'key' => $clientKey));
+					if ($start <= $startStampLimit) {
+						CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+																'streamChannel' => $streamChannel, 'key' => $clientKey));
+					}
 				}
 			}
 		}
