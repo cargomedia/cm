@@ -241,6 +241,14 @@ class CM_Session {
 		return CM_CacheConst::Session . '_id:' . $this->getId();
 	}
 
+	/**
+	 * @param string $id
+	 * @return CM_Session|null
+	 */
+	public static function findById($id) {
+
+	}
+
 	public static function deleteExpired() {
 		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
 	}
