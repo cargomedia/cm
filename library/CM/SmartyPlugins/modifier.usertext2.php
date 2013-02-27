@@ -19,19 +19,24 @@ function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
 
 	$usertext->addFilter(new CM_Usertext_Filter_Escape());
 	$usertext->addFilter(new CM_Usertext_Filter_Badwords());
-	$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 	switch ($mode) {
 		case 'oneline':
+			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 			break;
 		case 'simple':
+			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 			$usertext->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
 			break;
 		case 'markdown':
+			if (null !== $maxLength) {
+				throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
+			}
 			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
 			break;
 		case 'markdownPlain':
 			$usertext->addFilter(new CM_Usertext_Filter_Markdown());
 			$usertext->addFilter(new CM_Usertext_Filter_Striptags());
+			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 			break;
 		default:
 			throw new CM_Exception_Invalid('Must define mode in Usertext.');
