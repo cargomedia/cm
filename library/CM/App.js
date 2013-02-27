@@ -237,9 +237,11 @@ CM_App.prototype = {
 				_cleanData(elems);
 			};
 
-			window.addEventListener('load', function() {
-				new FastClick(document.body);
-			}, false);
+			if (window.addEventListener) {
+				window.addEventListener('load', function() {
+					new FastClick(document.body);
+				}, false);
+			}
 		},
 		/**
 		 * @param {jQuery} $dom
