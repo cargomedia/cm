@@ -235,4 +235,14 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session = new CM_Session($sessionId);
 		$this->assertEquals(time() + CM_Session::LIFETIME_DEFAULT, $session->getExpiration(), null, 1);
 	}
+
+	public function testFindById() {
+		$session = new CM_Session();
+		$session->set('foo', 'bar');
+		$session->write();
+		$this->assertEquals($session, CM_Session::findById($session->getId()));
+
+		$this->assertNull(CM_Session::findById('foo'));
+		$this->assertNull(CM_Session::findById(''));
+	}
 }
