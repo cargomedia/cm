@@ -60,7 +60,7 @@ class CM_MysqlResult {
 	/**
 	 * Next row as associative Field=>Value array
 	 *
-	 * @return array|false
+	 * @return array|null
 	 */
 	public function fetchAssoc() {
 		return $this->_result->fetch_assoc();
