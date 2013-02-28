@@ -138,6 +138,22 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $xml
+	 * @throws CM_Exception_Invalid
+	 * @return SimpleXMLElement
+	 */
+	public static function parseXml($xml) {
+		$xml = (string) $xml;
+
+		$xml = @simplexml_load_string($xml);
+		if (false === $xml) {
+			throw new CM_Exception_Invalid('Could not parse xml');
+		}
+
+		return $xml;
+	}
+
+	/**
 	 * @param string $path
 	 * @throws CM_Exception
 	 */

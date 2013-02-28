@@ -65,4 +65,17 @@ class CM_UtilTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testParseXml() {
+		$xml = CM_Util::parseXml('<?xml version="1.0" encoding="utf-8"?><document><foo>bar</foo></document>');
+		$this->assertInstanceOf('SimpleXMLElement', $xml);
+		$this->assertSame('bar', (string) $xml->foo);
+
+		try {
+			CM_Util::parseXml('invalid xml');
+			$this->fail('No exception for invalid xml');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertTrue(true);
+		}
+	}
+
 }
