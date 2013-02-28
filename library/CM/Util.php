@@ -153,6 +153,14 @@ class CM_Util {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function mkDirTmp() {
+		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		return self::mkDir($path);
+	}
+
+	/**
 	 * @param string $path
 	 * @throws CM_Exception_Invalid
 	 */
@@ -323,9 +331,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @static
-	 * @param $command
-	 * @param $stdin
+	 * @param string $command
+	 * @param string $stdin
 	 * @return string
 	 * @throws CM_Exception
 	 */
