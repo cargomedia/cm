@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Emoticons implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 
 	public function transform($text) {
 		$text = (string) $text;

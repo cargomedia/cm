@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
+class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
 	private static $_emoticonIdList = array();
 
@@ -21,7 +21,7 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 		$expected =
 				'foo <span class="emoticon emoticon-' . $emoticonId . '" title="smiley"></span> bar <span class="emoticon emoticon-' .
 						$emoticonId . '" title="smiley"></span>';
-		$filter = new CM_Usertext_Filter_Emoticons();
+		$filter = new CM_Usertext_Filter_Emoticon();
 		$actual = $filter->transform($text);
 
 		$this->assertSame($expected, $actual);
