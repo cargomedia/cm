@@ -2,7 +2,7 @@
 	.appearance(none);
 	.input_text;
 	.input_text_height;
-	.border(@colorFgBorder);
+	.border(@colorFgBorderEmphasize2);
 	.transition(.1s);
 
 	&:hover {
@@ -15,7 +15,7 @@ textarea.textinput {
 }
 
 select {
-	.border(@colorFgBorderEmphasize);
+	.border(@colorFgBorderEmphasize3);
 	max-width: 100%;
 }
 
@@ -124,17 +124,17 @@ input[type=radio], input[type=checkbox] {
 	max-width: 100%;
 	min-height: 24px;
 	padding: 12px;
-	border: 1px solid darken(@colorFgBorder, 3);
+	border: 1px solid darken(@colorFgBorderEmphasize2, 3);
 	border-bottom-width: 0;
 	.background-color(darken(@colorBg, 3));
-	border-top-color: lighten(@colorFgBorder, 3);
+	border-top-color: lighten(@colorFgBorderEmphasize2, 3);
 
 	@media (max-width: 600px) {
 		padding: 6px 12px;
 	}
 
 	&:first-child{
-		border-top: 1px solid @colorFgBorder;
+		border-top: 1px solid @colorFgBorderEmphasize2;
 	}
 
 	&.submit {
