@@ -139,16 +139,17 @@ class CM_Util {
 
 	/**
 	 * @param string $path
+	 * @return string
 	 * @throws CM_Exception
 	 */
 	public static function mkDir($path) {
 		$path = (string) $path;
-		if (is_dir($path)) {
-			return;
+		if (!is_dir($path)) {
+			if (false === mkdir($path, 0777, true)) {
+				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+			}
 		}
-		if (false === mkdir($path, 0777, true)) {
-			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
-		}
+		return $path;
 	}
 
 	/**
@@ -371,7 +372,6 @@ class CM_Util {
 		}
 		$times[$namespace] = $now;
 		return sprintf('%.2f ms', $difference);
-
 	}
 
 	/**
@@ -409,7 +409,6 @@ class CM_Util {
 			CM_CacheLocal::set($key, $classNames);
 		}
 		return $classNames;
-
 	}
 
 	/**
@@ -465,5 +464,4 @@ class CM_Util {
 		}
 		return $result;
 	}
-
 }
