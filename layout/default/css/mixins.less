@@ -25,7 +25,10 @@
 .fontface(@fontname, @fontfile) {
 	font-family: '@{fontname}';
 	src: url(urlFont('icons-webfont.eot'));
-	src: url(urlFont('icons-webfont.eot') + "?#iefix") format('embedded-opentype'), url(urlFont('icons-webfont.woff')) format('woff'), url(urlFont('icons-webfont.ttf')) format('truetype'), url(urlFont('icons-webfont.svg') + "#@{fontname}") format('svg');
+	src: url(urlFont('icons-webfont.eot') + "?#iefix") format('embedded-opentype'),
+	url(urlFont('icons-webfont.woff')) format('woff'),
+	url(urlFont('icons-webfont.ttf')) format('truetype'),
+	url(urlFont('icons-webfont.svg') + "#@{fontname}") format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
