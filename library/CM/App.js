@@ -590,14 +590,11 @@ CM_App.prototype = {
 	},
 
 	stream: {
-		/** @type {SocketRedis|Null} */
-		_connection: null,
+		/** @type {CM_Stream_Adapter_Message_Abstract} */
+		_adapter: null,
 
 		/** @type {Backbone.Events} */
 		_dispatcher: _.clone(Backbone.Events),
-
-		/** @type {Boolean} */
-		_connected: false,
 
 		/** @type {Object} */
 		_subscribes: {},
@@ -608,7 +605,9 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		bind: function(channel, namespace, callback, context) {
-			this._subscribe(channel);
+			if (!this._subscribes[channel]) {
+				this._subscribe(channel);
+			}
 			this._dispatcher.on(channel + ':' + namespace, callback, context);
 			this._subscribes[channel]++;
 		},
@@ -627,20 +626,10 @@ CM_App.prototype = {
 			}
 		},
 
-		_connect: function() {
-			if (!cm.options.stream.enabled) {
-				return;
-			}
-			var handler = this;
+		_setup: function() {
 			var options = cm.options.stream.options;
 			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-				this._connection = new SocketRedis(options.sockjsUrl);
-				this._connection.onopen = function() {
-					_.each(handler._subscribes, function(binds, channel) {
-						handler._subscribeConnected(channel);
-					});
-					handler._connected = true;
-				};
+				this._adapter = new 	CM_Stream_Adapter_Message_SocketRedis(options.sockjsUrl);
 			} else {
 				cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
 			}
@@ -650,24 +639,12 @@ CM_App.prototype = {
 		 * @param {String} channel
 		 */
 		_subscribe: function(channel) {
-			if (this._subscribes[channel]) {
-				return;
-			}
-			this._subscribes[channel] = 0;
-			if (this._connected ) {
-				this._subscribeConnected();
-			}
-			if (!this._connection) {
-				this._connect();
-			}
-		},
-
-		/**
-		 * @param {String} channel
-		 */
-		_subscribeConnected: function(channel) {
 			var handler = this;
-			this._connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
+			this._subscribes[channel] = 0;
+			if (!this._adapter) {
+				this._setup();
+			}
+			this._adapter.subscribe(channel, function (message) {
 				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
 			});
 		},
@@ -679,7 +656,7 @@ CM_App.prototype = {
 			if (this._subscribes[channel]) {
 				delete this._subscribes[channel];
 			}
-			this._connection._unsubscribe(channel);
+			this._adapter.unsubscribe(channel);
 		}
 	},
 
