@@ -60,16 +60,13 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			if (isset($channelsPersistenceArray[$channelKey])) {
 				$streamChannel = $channelsPersistenceArray[$channelKey];
 			} else {
-				$oldEntries = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
+				$oldSubscribers = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
 					return $subscriber['subscribeStamp'] / 1000 <= $startStampLimit;
 				});
-				$streamChannel = null;
-				if (!count($oldEntries)) {
-					$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
+				if (!count($oldSubscribers)) {
+					continue;
 				}
-				if (!$streamChannel) {
-					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
-				}
+				$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
 			}
 			foreach ($channel['subscribers'] as $subscriber) {
 				$clientKey = (string) $subscriber['clientKey'];
@@ -78,7 +75,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					$user = null;
 					if ($data->has('sessionId')) {
 						if ($session = CM_Session::findById($data->getString('sessionId'))) {
-							$user = $session->getUser(true);
+							$user = $session->getUser(false);
 						}
 					}
 					$start = (int) ($subscriber['subscribeStamp'] / 1000);
@@ -110,7 +107,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$user = null;
 				if ($data->has('sessionId')) {
 					if ($session = CM_Session::findById($data->getString('sessionId'))) {
-						$user = $session->getUser(true);
+						$user = $session->getUser(false);
 					}
 				}
 				$this->_subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);

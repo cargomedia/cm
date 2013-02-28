@@ -112,6 +112,23 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->_testSynchronize($status);
 	}
 
+	public function testSynchronizeIgnoreNewSubscribers() {
+		$jsTime =  time() * 1000;
+		$status = array(
+			'channel-foo' => array('subscribers' => array(
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+			))
+		);
+		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+		$adapter->synchronize();
+
+		$this->assertNull(CM_Model_StreamChannel_Message::findByKey('channel-foo', $adapter->getType()));
+		$subscribes = new CM_Paging_StreamSubscribe_AdapterType($adapter->getType());
+		$this->assertSame(0, $subscribes->getCount());
+	}
+
 	/**
 	 * @param array $status
 	 */
