@@ -144,14 +144,12 @@ class CM_Util {
 	 */
 	public static function parseXml($xml) {
 		$xml = (string) $xml;
-		try {
-			$xml = simplexml_load_string($xml);
-			if (false === $xml) {
-				throw new CM_Exception_Invalid('Could not parse xml');
-			}
-		} catch (Exception $e) {
-			throw new CM_Exception_Invalid($e->getMessage());
+
+		$xml = @simplexml_load_string($xml);
+		if (false === $xml) {
+			throw new CM_Exception_Invalid('Could not parse xml');
 		}
+
 		return $xml;
 	}
 
