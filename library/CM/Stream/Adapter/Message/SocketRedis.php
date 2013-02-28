@@ -31,51 +31,57 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	public function synchronize() {
-		$servers = self::_getConfig()->servers;
-		foreach ($servers as $server) {
-			$channelsStatus = $this->_fetchStatus($server);
-
-			/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
-			$channelsPersistenceArray = array();
-			/** @var $channel CM_Model_StreamChannel_Message */
-			foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
-				if (!isset($channelsStatus[$channel->getKey()])) {
-					$channel->delete();
-				} else {
-					$channelsPersistenceArray[$channel->getKey()] = $channel;
-				}
+		$startStampLimit = time() - 3;
+		$channelsStatus = $this->_fetchStatus();
+		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
+		$channelsPersistenceArray = array();
+		/** @var $channel CM_Model_StreamChannel_Message */
+		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
+			if (!isset($channelsStatus[$channel->getKey()])) {
+				$channel->delete();
+			} else {
+				$channelsPersistenceArray[$channel->getKey()] = $channel;
 			}
+		}
 
-			/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
-			$streamsPersistenceArray = array();
-			/** @var $stream CM_Model_Stream_Subscribe */
-			foreach (new CM_Paging_StreamSubscribe_AdapterType($this->getType()) as $stream) {
-				$streamChannelKey = $stream->getStreamChannel()->getKey();
-				if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
-					$stream->delete();
-				} else {
-					$streamsPersistenceArray[$streamChannelKey . '/' . $stream->getKey()] = $stream;
-				}
+		/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
+		$streamsPersistenceArray = array();
+		/** @var $stream CM_Model_Stream_Subscribe */
+		foreach (new CM_Paging_StreamSubscribe_AdapterType($this->getType()) as $stream) {
+			$streamChannelKey = $stream->getStreamChannel()->getKey();
+			if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
+				$stream->delete();
+			} else {
+				$streamsPersistenceArray[$streamChannelKey . '/' . $stream->getKey()] = $stream;
 			}
+		}
 
-			foreach ($channelsStatus as $channelKey => $channel) {
-				if (isset($channelsPersistenceArray[$channelKey])) {
-					$streamChannel = $channelsPersistenceArray[$channelKey];
-				} else {
-					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+		foreach ($channelsStatus as $channelKey => $channel) {
+			if (isset($channelsPersistenceArray[$channelKey])) {
+				$streamChannel = $channelsPersistenceArray[$channelKey];
+			} else {
+				$oldSubscribers = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
+					return $subscriber['subscribeStamp'] / 1000 <= $startStampLimit;
+				});
+				if (!count($oldSubscribers)) {
+					continue;
 				}
-				foreach ($channel['subscribers'] as $subscriber) {
-					$clientKey = (string) $subscriber['clientKey'];
-					if (!isset($streamsPersistenceArray[$streamChannel->getKey() . '/' . $clientKey])) {
-						$data = CM_Params::factory($subscriber['data']);
-						$user = null;
-						if ($data->has('sessionId')) {
-							$session = new CM_Session($data->getString('sessionId'));
-							$user = $session->getUser(true);
+				$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+			}
+			foreach ($channel['subscribers'] as $subscriber) {
+				$clientKey = (string) $subscriber['clientKey'];
+				if (!isset($streamsPersistenceArray[$streamChannel->getKey() . '/' . $clientKey])) {
+					$data = CM_Params::factory($subscriber['data']);
+					$user = null;
+					if ($data->has('sessionId')) {
+						if ($session = CM_Session::findById($data->getString('sessionId'))) {
+							$user = $session->getUser(false);
 						}
-						$start = (int) ($subscriber['subscribeStamp'] / 1000);
-						$allowedUntil = null;
-						CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+					}
+					$start = (int) ($subscriber['subscribeStamp'] / 1000);
+					$allowedUntil = null;
+					if ($start <= $startStampLimit) {
+						CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 																'streamChannel' => $streamChannel, 'key' => $clientKey));
 					}
 				}
@@ -100,8 +106,9 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$data = CM_Params::factory($data['data']);
 				$user = null;
 				if ($data->has('sessionId')) {
-					$session = new CM_Session($data->getString('sessionId'));
-					$user = $session->getUser(true);
+					if ($session = CM_Session::findById($data->getString('sessionId'))) {
+						$user = $session->getUser(false);
+					}
 				}
 				$this->_subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
 				break;
@@ -132,7 +139,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		if ($streamChannelSubscribes->findKey($clientKey)) {
 			return;
 		}
-		CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 												'streamChannel' => $streamChannel, 'key' => $clientKey));
 	}
 
@@ -155,10 +162,14 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	/**
-	 * @param array $server
 	 * @return array
 	 */
-	protected function _fetchStatus(array $server) {
-		return CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true);
+	protected function _fetchStatus() {
+		$servers = self::_getConfig()->servers;
+		$statusData = array();
+		foreach ($servers as $server) {
+			$statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
+		}
+		return $statusData;
 	}
 }

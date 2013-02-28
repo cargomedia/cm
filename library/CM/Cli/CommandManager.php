@@ -99,8 +99,7 @@ class CM_Cli_CommandManager {
 			}
 			return 1;
 		} catch (Exception $e) {
-			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
-			$this->_streamError->writeln($e->getTraceAsString());
+			CM_Bootloader::handleException($e, $this->_streamError);
 			return 1;
 		}
 	}

@@ -81,16 +81,22 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$session = new CM_Session($params->getString('sessionId'));
 		$user = $session->getUser(true);
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array('key' => $streamName,
-			'adapterType' => $this->getType(), 'params' => $params, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
-			'thumbnailCount' => $thumbnailCount));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType($streamChannelType, array(
+			'key'            => $streamName,
+			'adapterType'    => $this->getType(),
+			'params'         => $params,
+			'width'          => $width,
+			'height'         => $height,
+			'serverId'       => $serverId,
+			'thumbnailCount' => $thumbnailCount,
+		));
 		try {
 			$allowedUntil = $streamChannel->canPublish($user, time());
 			if ($allowedUntil <= time()) {
 				throw new CM_Exception_NotAllowed();
 			}
 			CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
-				'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+												  'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
 		} catch (CM_Exception $ex) {
 			$streamChannel->delete();
 			throw $ex;
@@ -134,8 +140,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$user = null;
 		$params = CM_Params::factory(CM_Params::decode($data, true));
 		if ($params->has('sessionId')) {
-			$session = new CM_Session($params->getString('sessionId'));
-			$user = $session->getUser();
+			if ($session = CM_Session::findById($params->getString('sessionId'))) {
+				$user = $session->getUser(false);
+			}
 		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
@@ -149,7 +156,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		}
 
 		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
-			'allowedUntil' => $allowedUntil, 'key' => $clientKey));
+												'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
 	}
 
 	/**

@@ -55,7 +55,13 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		set_exception_handler(array(__CLASS__, 'handleException'));
+		set_exception_handler(function(Exception $exception) {
+			if (!headers_sent()) {
+				header('Content-Type: text/plain');
+			}
+			CM_Bootloader::handleException($exception);
+			exit(1);
+		});
 	}
 
 	public function errorHandler() {
@@ -301,9 +307,13 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @param Exception $exception
+	 * @param Exception                      $exception
+	 * @param CM_OutputStream_Interface|null $output
 	 */
-	public static function handleException(Exception $exception) {
+	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
+		if (null === $output) {
+			$output = new CM_OutputStream_Stream_Output();
+		}
 		$exceptionFormatter = function (Exception $exception) {
 			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
 			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
@@ -333,12 +343,11 @@ class CM_Bootloader {
 		}
 
 		if ($showError) {
-			echo get_class($exception) . ' (' . $exception->getCode() . '): <b>' . $exception->getMessage() . '</b><br/>';
-			echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
-			echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
+			$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
+			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
+			$output->writeln($exception->getTraceAsString());
 		} else {
-			echo 'Internal server error';
+			$output->writeln('Internal server error');
 		}
-		exit(1);
 	}
 }
