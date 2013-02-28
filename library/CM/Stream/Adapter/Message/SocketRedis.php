@@ -60,10 +60,14 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			if (isset($channelsPersistenceArray[$channelKey])) {
 				$streamChannel = $channelsPersistenceArray[$channelKey];
 			} else {
-				$newEntries = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
-					return $subscriber['subscribeStamp'] / 1000 > $startStampLimit;
+				$oldEntries = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
+					return $subscriber['subscribeStamp'] / 1000 <= $startStampLimit;
 				});
-				if (!count($newEntries)) {
+				$streamChannel = null;
+				if (!count($oldEntries)) {
+					$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
+				}
+				if (!$streamChannel) {
 					$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
 				}
 			}
