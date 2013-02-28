@@ -18,19 +18,10 @@ class CM_Usertext_Filter_EmoticonsTest extends CMTest_TestCase {
 	public function testProcess() {
 		$emoticonId = self::$_emoticonIdList[0];
 		$text = 'foo :) bar :smiley:';
-		$expected = 'foo <span class="emoticon emoticon-' . $emoticonId . '" title=":)"></span> bar <span class="emoticon emoticon-' . $emoticonId .
-				'" title=":smiley:"></span>';
-		$filter = new CM_Usertext_Filter_Emoticons();
-		$actual = $filter->transform($text);
-
-		$this->assertSame($expected, $actual);
-	}
-
-	public function testTitleEscape() {
-		$emoticonId = self::$_emoticonIdList[1];
-
-		$text = 'foo :<';
-		$expected = 'foo <span class="emoticon emoticon-' . $emoticonId . '" title=":&lt;"></span>';
+		$expected =
+				'foo <span class="emoticon emoticon-' . $emoticonId . ' emoticon-smiley" title="smiley"></span> bar <span class="emoticon emoticon-' .
+						$emoticonId .
+						' emoticon-smiley" title="smiley"></span>';
 		$filter = new CM_Usertext_Filter_Emoticons();
 		$actual = $filter->transform($text);
 

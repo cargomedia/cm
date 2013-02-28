@@ -20,12 +20,12 @@ class CM_Usertext_Filter_Emoticons implements CM_Usertext_Filter_Interface {
 				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
 					$emoticons['htmls'][] =
-							'<span class="emoticon emoticon-' . $emoticon['id'] . '" title="' . CM_Util::htmlspecialchars($code) . '"></span>';
+							'<span class="emoticon emoticon-' . $emoticon['id'] . ' emoticon-' . $emoticon['name'] . '" title="' .
+									CM_Util::htmlspecialchars($emoticon['name']) . '"></span>';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
 		}
 		return $emoticons;
 	}
-
 }
