@@ -590,14 +590,17 @@ CM_App.prototype = {
 	},
 
 	stream: {
-		connection: null,
+		/** @type {SocketRedis|Null} */
+		_connection: null,
+
+		/** @type {Backbone.Events} */
 		_dispatcher: _.clone(Backbone.Events),
 
 		/** @type {Boolean} */
 		_connected: false,
 
-		/** @type {Array} */
-		subscribes: [],
+		/** @type {Object} */
+		_subscribes: {},
 		/**
 		 * @param {String} channel
 		 * @param {String} namespace for which callback should be used
@@ -607,6 +610,7 @@ CM_App.prototype = {
 		bind: function(channel, namespace, callback, context) {
 			this._subscribe(channel);
 			this._dispatcher.on(channel + ':' + namespace, callback, context);
+			this._subscribes[channel]++;
 		},
 
 		/**
@@ -617,6 +621,10 @@ CM_App.prototype = {
 		 */
 		unbind: function(channel, namespace, callback, context) {
 			this._dispatcher.off(channel + ':' + namespace, callback, context);
+			this._subscribes[channel]--;
+			if (this._subscribes[channel] === 0) {
+				this._unsubscribe(channel);
+			}
 		},
 
 		_connect: function() {
@@ -626,9 +634,9 @@ CM_App.prototype = {
 			var handler = this;
 			var options = cm.options.stream.options;
 			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-				this.connection = new SocketRedis(options.sockjsUrl);
-				this.connection.onopen = function() {
-					_.each(handler.subscribes, function(channel) {
+				this._connection = new SocketRedis(options.sockjsUrl);
+				this._connection.onopen = function() {
+					_.each(handler._subscribes, function(binds, channel) {
 						handler._subscribeConnected(channel);
 					});
 					handler._connected = true;
@@ -642,14 +650,14 @@ CM_App.prototype = {
 		 * @param {String} channel
 		 */
 		_subscribe: function(channel) {
-			if (_.indexOf(this.subscribes, channel) >= 0) {
+			if (this._subscribes[channel]) {
 				return;
 			}
-			this.subscribes.push(channel);
+			this._subscribes[channel] = 0;
 			if (this._connected ) {
 				this._subscribeConnected();
 			}
-			if (!this.connection) {
+			if (!this._connection) {
 				this._connect();
 			}
 		},
@@ -659,7 +667,7 @@ CM_App.prototype = {
 		 */
 		_subscribeConnected: function(channel) {
 			var handler = this;
-			this.connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
+			this._connection.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, function (message) {
 				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
 			});
 		},
@@ -668,8 +676,10 @@ CM_App.prototype = {
 		 * @param {String} channel
 		 */
 		_unsubscribe: function(channel) {
-			this.subscribes = _.without(this.subscribes, channel);
-			this.connection._unsubscribe(channel);
+			if (this._subscribes[channel]) {
+				delete this._subscribes[channel];
+			}
+			this._connection._unsubscribe(channel);
 		}
 	},
 
