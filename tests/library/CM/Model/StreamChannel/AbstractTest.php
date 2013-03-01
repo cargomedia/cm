@@ -32,13 +32,13 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFactory() {
-		$streamChannel = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1));
-		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
-		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $streamChannel);
+		$streamChannel1 = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1, 'width' => 100, 'height' => 100, 'thumbnailCount' => 0));
+		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
+		$this->assertEquals($streamChannel1, $streamChannel2);
 
-		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
-		$streamChannel = CM_Model_StreamChannel_Abstract::factory($streamChannel->getId());
-		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
+		$streamChannel1 = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
+		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
+		$this->assertEquals($streamChannel1, $streamChannel2);
 	}
 
 	public function testFindKey() {
@@ -65,7 +65,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals(2, $streamChannel->getStreamSubscribes()->getCount());
 		$streamChannel->delete();
 		try {
-			new CM_Model_StreamChannel_Mock($id);
+			new CM_Model_StreamChannel_Mock($streamChannel->getId());
 			$this->fail('streamChannel not deleted.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
@@ -126,7 +126,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCreate() {
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1'));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1', 'adapterType' => 1));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 	}
 }

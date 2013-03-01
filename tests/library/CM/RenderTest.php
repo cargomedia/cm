@@ -1,10 +1,8 @@
 <?php
 
 class CM_RenderTest extends CMTest_TestCase {
-	
+
 	public function setUp() {
-		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
-		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
 		CM_Config::get()->TEST_Site_Test = new stdClass();
 		CM_Config::get()->TEST_Site_Test->url = 'http://www.test.com';
 		CM_Config::get()->CM_Render->cdnResource = false;
@@ -60,7 +58,7 @@ class CM_RenderTest extends CMTest_TestCase {
 
 	public function testGetUrlPageLanguageRewrite() {
 		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
-		$baseUrl = CM_Config::get()->CM_Site_Abstract->url;
+		$baseUrl = 'http://www.foo.com';
 
 		$render = new CM_Render($this->_getSite(), null, null, null);
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
@@ -145,4 +143,9 @@ class CM_RenderTest extends CMTest_TestCase {
 		$render = new CM_Render($this->_getSite());
 		$this->assertNull($render->getViewer());
 	}
+
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
+		return parent::_getSite($namespaces, 'http://www.foo.com', 'http://www.cdn.com');
+	}
+
 }

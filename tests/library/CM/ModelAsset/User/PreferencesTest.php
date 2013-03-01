@@ -14,8 +14,10 @@ class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 	public function testGetSet() {
 		$preferences = CMTest_TH::createUser()->getPreferences();
 		$defaults = $preferences->getDefaults();
-		$section = reset(array_keys($defaults));
-		$key = reset(array_keys($defaults[$section]));
+		$sections = array_keys($defaults);
+		$section = reset($sections);
+		$keys = array_keys($defaults[$section]);
+		$key = reset($keys);
 
 		$this->assertEquals($defaults[$section][$key]['value'], $preferences->get($section, $key));
 
@@ -28,8 +30,10 @@ class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 	public function testReset() {
 		$preferences = CMTest_TH::createUser()->getPreferences();
 		$defaults = $preferences->getDefaults();
-		$section = reset(array_keys($defaults));
-		$key = reset(array_keys($defaults[$section]));
+		$sections = array_keys($defaults);
+		$section = reset($sections);
+		$keys = array_keys($defaults[$section]);
+		$key = reset($keys);
 
 		$preferences->set($section, $key, !$preferences->get($section, $key));
 		$this->assertNotEquals($preferences->getAll(), $defaults);

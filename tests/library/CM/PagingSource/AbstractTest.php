@@ -8,7 +8,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 	}
 
 	public function setUp() {
-		define('TBL_TEST', 'test');
+		defined('TBL_TEST') || define('TBL_TEST', 'test');
 		CM_Mysql::exec('CREATE TABLE TBL_TEST (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
@@ -27,7 +27,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$source->enableCacheLocal();
 		$this->assertEquals(100, $source->getCount());
 
-		CM_Mysql::delete(TBL_TEST, array(num => 0));
+		CM_Mysql::delete(TBL_TEST, array('num' => 0));
 		$this->assertEquals(100, $source->getCount());
 		$source->clearCache();
 		$this->assertEquals(100, $source->getCount());
@@ -40,7 +40,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$this->assertEquals(100, $source->getCount());
 		$this->assertEquals(100, $sourceNocache->getCount());
 
-		CM_Mysql::delete(TBL_TEST, array(num => 0));
+		CM_Mysql::delete(TBL_TEST, array('num' => 0));
 		$this->assertEquals(100, $source->getCount());
 		$this->assertEquals(99, $sourceNocache->getCount());
 		$source->clearCache();
