@@ -16,6 +16,9 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 			}
 		}
 
+		if (0 === count($svgFileList)) {
+			throw new CM_Exception_Invalid('Cannot process `0` icons');
+		}
 		$this->_getOutput()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
 
 		$dirWork = CM_Util::mkDirTmp();
