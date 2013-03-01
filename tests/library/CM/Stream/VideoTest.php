@@ -12,7 +12,8 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 	}
 
 	public function testCheckStreams() {
-		$mockAdapter = $this->getMockForAbstractClass('CM_Stream_Adapter_Video_Abstract', array(), 'CM_Stream_Adapter_Video_Mock', true, true, true, array('_stopStream', 'getType'));
+		$mockAdapter = $this->getMockForAbstractClass('CM_Stream_Adapter_Video_Abstract', array(), 'CM_Stream_Adapter_Video_Mock', true, true, true, array('_stopStream',
+			'getType'));
 		$mockAdapter->expects($this->exactly(2))->method('_stopStream')->will($this->returnValue(1));
 		$mockAdapter->expects($this->any())->method('getType')->will($this->returnValue(1));
 
@@ -24,7 +25,8 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
 		$userUnchanged = CMTest_TH::createUser();
 		$userUnchanged->setOnline();
-		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1, 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
+			'height' => 100, 'thumbnailCount' => 0));
 		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
 		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
@@ -34,7 +36,8 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
 		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2',
-			'serverId' => 1, 'adapterType' => 1)), 'user' => CMTest_TH::createUser(), 'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => time()));
+			'serverId' => 1, 'adapterType' => 1, 'width' => 100, 'height' => 100, 'thumbnailCount' => 0)), 'user' => CMTest_TH::createUser(),
+			'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => time()));
 
 		CMTest_TH::timeForward(5);
 		$wowza->checkStreams();
