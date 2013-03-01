@@ -7,11 +7,10 @@ class CM_Usertext_Filter_CutWhitespaceTest extends CMTest_TestCase {
 	}
 
 	public function testProcess() {
-		$render = $this->_getRender();
 		$text = "\n\n \t   foo  \nbar     \n \r \t";
 		$expected = "foo\nbar";
 		$filter = new CM_Usertext_Filter_CutWhitespace();
-		$actual = $filter->transform($text, $render);
+		$actual = $filter->transform($text, $this->_getRender());
 
 		$this->assertSame($expected, $actual);
 	}
