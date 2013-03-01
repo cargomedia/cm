@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/modifier.usertext2.php';
+require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext2.php';
 
 class smarty_modifier_usertext2Test extends CMTest_TestCase {
 
@@ -40,7 +40,7 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 		$this->_assertSame("<span class=\"usertext2 markdownPlain\">Hello…</span>", array('text' => "Hello \n\n* World",
 																						  'mode' => 'markdownPlain', 'maxLength' => 10));
 		try {
-			smarty_function_usertext2('foo', 'markdown', 1);
+			smarty_function_usertext2(array('text' => 'foo', 'mode' => 'markdown', 'maxLength' => 1), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('MaxLength is not allowed in mode markdown.', $ex->getMessage());
 		}
@@ -48,7 +48,7 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 
 	public function testModeNo() {
 		try {
-			smarty_function_usertext2('foo', null);
+			smarty_function_usertext2(array('text' => 'foo'), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('Must define mode in Usertext.', $ex->getMessage());
 		}
@@ -58,6 +58,6 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 		$text = $params['text'] ? $params['text'] : null;
 		$mode = $params['mode'] ? $params['mode'] : null;
 		$maxLength = $params['maxLength'] ? $params['maxLength'] : null;
-		$this->assertSame($expected, smarty_function_usertext2($text, $mode, $maxLength));
+		$this->assertSame($expected, smarty_function_usertext2(array('text' => $text, 'mode' => $mode, 'maxLength' => $maxLength), $this->_template));
 	}
 }

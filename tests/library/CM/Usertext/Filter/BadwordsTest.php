@@ -17,43 +17,44 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		CMTest_TH::clearCache();
 
 		$filter = new CM_Usertext_Filter_Badwords();
+		$render = $this->_getRender();
 
-		$actual = $filter->transform("hello foo there");
+		$actual = $filter->transform("hello foo there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello Foo there");
+		$actual = $filter->transform("hello Foo there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello foot there");
+		$actual = $filter->transform("hello foot there", $render);
 		$this->assertSame("hello foot there", $actual);
 
-		$actual = $filter->transform("hello f(o-].)o there");
+		$actual = $filter->transform("hello f(o-].)o there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 
-		$actual = $filter->transform("hello bar there");
+		$actual = $filter->transform("hello bar there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello bart there");
+		$actual = $filter->transform("hello bart there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello bar3 there");
+		$actual = $filter->transform("hello bar3 there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello bartender there");
+		$actual = $filter->transform("hello bartender there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello bar.de there");
+		$actual = $filter->transform("hello bar.de there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello bar. there");
+		$actual = $filter->transform("hello bar. there", $render);
 		$this->assertSame("hello ${replace}. there", $actual);
 
-		$actual = $filter->transform("hello foobar there");
+		$actual = $filter->transform("hello foobar there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello XfoobarX there");
+		$actual = $filter->transform("hello XfoobarX there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello mayo.foobar.ran there");
-		$this->assertSame("hello ${replace} there", $actual);
-
-		$actual = $filter->transform("hello zoofar there");
+		$actual = $filter->transform("hello mayo.foobar.ran there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 
-		$actual = $filter->transform("hello zoo!!far there");
+		$actual = $filter->transform("hello zoofar there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
-		$actual = $filter->transform("hello zoo far there");
+
+		$actual = $filter->transform("hello zoo!!far there", $render);
+		$this->assertSame("hello ${replace} there", $actual);
+		$actual = $filter->transform("hello zoo far there", $render);
 		$this->assertSame("hello zoo far there", $actual);
 	}
 
