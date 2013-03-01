@@ -12,7 +12,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 			$iconPath = CM_Util::getNamespacePath($namespace) . 'layout/default/img/icon/';
 			foreach (glob($iconPath . '*.svg') as $svgPath) {
 				$svgFile = new CM_File($svgPath);
-				$svgFileList[$svgFile->getFileName()] = $svgFile;
+				$svgFileList[strtolower($svgFile->getFileName())] = $svgFile;
 			}
 		}
 
