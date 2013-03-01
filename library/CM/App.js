@@ -229,14 +229,6 @@ CM_App.prototype = {
 	dom: {
 		_swfId: 0,
 		ready: function() {
-			var _cleanData = $.cleanData;
-			$.cleanData = function(elems) {
-				for (var i = 0, elem; (elem = elems[i]) != null; i++) {
-					cm.dom.teardown($(elem));
-				}
-				_cleanData(elems);
-			};
-
 			if (window.addEventListener) {
 				window.addEventListener('load', function() {
 					new FastClick(document.body);
@@ -255,12 +247,6 @@ CM_App.prototype = {
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
-		},
-		/**
-		 * @param {jQuery} $dom
-		 */
-		teardown: function($dom) {
-			$dom.find('[data-original-title]').tooltip('hide');
 		}
 	},
 
