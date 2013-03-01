@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @synchronized
@@ -40,6 +40,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public static function getPackageName() {
-		return 'app';
+		return 'css';
 	}
 }
