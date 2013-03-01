@@ -19,7 +19,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 		CM_Stream_Video::getInstance()->synchronize();
 		CM_Stream_Video::getInstance()->checkStreams();
 		CM_KissTracking::getInstance()->exportEvents();
-		CM_Stream_Message::getInstance()->synchronize();
+//		CM_Stream_Message::getInstance()->synchronize();
 	}
 
 	/**
