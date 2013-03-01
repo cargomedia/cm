@@ -14,7 +14,7 @@ class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
 		}
 	}
 
-	public function transform($text) {
+	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		if (null === $this->_lengthMax) {
 			return $text;

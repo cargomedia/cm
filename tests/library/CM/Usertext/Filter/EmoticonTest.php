@@ -13,7 +13,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 				'foo <span class="emoticon emoticon-' . $emoticonId . '" title=":smiley:"></span> bar <span class="emoticon emoticon-' .
 						$emoticonId . '" title=":smiley:"></span>';
 		$filter = new CM_Usertext_Filter_Emoticon();
-		$actual = $filter->transform($text);
+		$actual = $filter->transform($text, $this->_getRender());
 
 		$this->assertSame($expected, $actual);
 	}

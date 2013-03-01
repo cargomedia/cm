@@ -2,6 +2,16 @@
 
 class CM_Usertext_Usertext {
 
+	/** @var CM_Render */
+	private $_render;
+
+	/**
+	 * @param CM_Render $render
+	 */
+	function __construct(CM_Render $render) {
+		$this->_render = $render;
+	}
+
 	/** @var CM_Usertext_Filter_Interface[] */
 	private $_filterList = array();
 
@@ -18,7 +28,7 @@ class CM_Usertext_Usertext {
 	 */
 	public function transform($text) {
 		foreach ($this->_getFilters() as $filter) {
-			$text = $filter->transform($text);
+			$text = $filter->transform($text, $this->_render);
 		}
 		return $text;
 	}

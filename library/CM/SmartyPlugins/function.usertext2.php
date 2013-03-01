@@ -7,15 +7,15 @@
  * simple = escape, remove badwords, nl2br, add emoticons
  * markdown = escape, remove badwords, create html markdown, add emoticons
  * markdownPlain = escape, remove badwords, create html markdown, strip all tags, add emoticons
- *
- * @param string   $text
- * @param string   $mode
- * @param int|null $maxLength
- * @return string
- * @throws CM_Exception_Invalid
  */
-function smarty_modifier_usertext2($text, $mode, $maxLength = null) {
-	$usertext = new CM_Usertext_Usertext();
+function smarty_function_usertext2($params, Smarty_Internal_Template $template) {
+	/** @var CM_Render $render */
+	$render = $template->smarty->getTemplateVars('render');
+	$text = (string) $params['text'];
+	$mode = (string) $params['mode'];
+	$maxLength = (isset($params['maxLength'])) ? (int) $params['maxLength'] : null;
+
+	$usertext = new CM_Usertext_Usertext($render);
 
 	$usertext->addFilter(new CM_Usertext_Filter_Escape());
 	$usertext->addFilter(new CM_Usertext_Filter_Badwords());

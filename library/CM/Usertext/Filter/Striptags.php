@@ -12,7 +12,7 @@ class CM_Usertext_Filter_Striptags implements CM_Usertext_Filter_Interface {
 		$this->_allowedTags = (array) $allowedTags;
 	}
 
-	public function transform($text) {
+	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		$allowedTags = '';
 		foreach ($this->_allowedTags as $tag) {

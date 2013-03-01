@@ -2,7 +2,7 @@
 
 class CM_Usertext_Filter_Badwords implements CM_Usertext_Filter_Interface {
 
-	public function transform($text) {
+	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		$cacheKey = CM_CacheConst::Usertext_Filter_BadwordList;
 		if (($badwords = CM_CacheLocal::get($cacheKey)) === false) {

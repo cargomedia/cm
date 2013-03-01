@@ -2,7 +2,7 @@
 
 class CM_Usertext_Filter_CutWhitespace implements CM_Usertext_Filter_Interface {
 
-	public function transform($text) {
+	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		$text = str_replace("\r", '', $text);
 		$text = str_replace("\t", " ", $text);
