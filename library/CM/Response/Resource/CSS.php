@@ -63,7 +63,6 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				}
 				$content = $css->compile($this->getRender());
 
-				$content .= $this->_getCssEmoticon();
 				break;
 			default:
 				if (!file_exists(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath())) {
@@ -76,19 +75,6 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 		$this->enableCache();
 		$this->setHeader('Content-Type', 'text/css');
 		$this->_setContent($content);
-	}
-
-	/**
-	 * @return string
-	 */
-	private function _getCssEmoticon() {
-		$css = '';
-//		foreach (new CM_Paging_Emoticon_All() as $emoticon) {
-//			$css .= '.emoticon.emoticon-' . $emoticon['id'] . '{';
-//			$css .= 'background-image: url(' . $this->getRender()->getUrlResource('img', 'emoticon/' . $emoticon['file']) . ');';
-//			$css .= '}' . PHP_EOL;
-//		}
-		return $css;
 	}
 
 	public static function match(CM_Request_Abstract $request) {
