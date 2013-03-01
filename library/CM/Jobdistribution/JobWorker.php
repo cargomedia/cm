@@ -31,6 +31,9 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 		}
 	}
 
+	/**
+	 * @return GearmanWorker
+	 */
 	protected function _getGearmanWorker() {
 		if (!$this->_gearmanWorker) {
 			$this->_gearmanWorker = new GearmanWorker();
