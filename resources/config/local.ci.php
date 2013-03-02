@@ -19,8 +19,8 @@ $config->CM_Mysql->servers_read = array(
 );
 
 $config->CM_Db_Db->db = 'skadate_test';
-$config->CM_Db_Db->user = 'skadate';
-$config->CM_Db_Db->pass = 'k290DSkjsfiE02sDjj';
+$config->CM_Db_Db->username = 'skadate';
+$config->CM_Db_Db->password = 'k290DSkjsfiE02sDjj';
 $config->CM_Db_Db->server = array('host' => '172.10.1.101', 'port' => 3306);
 $config->CM_Db_Db->servers_read = array(
 	array('host' => '127.0.0.1', 'port' => 4040),
