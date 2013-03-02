@@ -12,6 +12,10 @@ $config->CM_Mysql->db = $config->CM_Mysql->db . '_test';
 $config->CM_Mysql->serversReadEnabled = false;
 $config->CM_Mysql->delayedEnabled = false;
 
+$config->CM_Db_Db->db = $config->CM_Db_Db->db . '_test';
+$config->CM_Db_Db->serversReadEnabled = false;
+$config->CM_Db_Db->delayedEnabled = false;
+
 $config->CM_Model_DeviceCapabilities->adapter = null;
 
 $config->CM_Model_Splittest->withoutPersistence = true;
