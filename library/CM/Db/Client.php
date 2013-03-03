@@ -90,4 +90,15 @@ class CM_Db_Client {
 		$statement = $this->_link->prepare($sqlTemplate);
 		return new CM_Db_Statement($statement, $this);
 	}
+
+	/**
+	 * @return string|false
+	 */
+	public function getLastInsertId() {
+		$lastInsertId = $this->_link->lastInsertId();
+		if (!$lastInsertId) {
+			return false;
+		}
+		return $lastInsertId;
+	}
 }

@@ -37,4 +37,17 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		$client->connect();
 		$this->assertTrue($client->isConnected());
 	}
+
+	public function testGetLastInsertId() {
+		$config = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+		$client->createStatement('CREATE TABLE `test` (`id` INT(10) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
+		$this->assertSame(false, $client->getLastInsertId());
+
+		$client->createStatement('INSERT INTO `test` VALUES()')->execute();
+		$this->assertSame('1', $client->getLastInsertId());
+
+		$client->createStatement('SELECT * FROM `test`')->execute();
+		$this->assertSame(false, $client->getLastInsertId());
+	}
 }
