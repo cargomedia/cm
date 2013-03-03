@@ -17,8 +17,8 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		try {
 			new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, 'nonexistent');
 			$this->fail('Could select nonexistent DB');
-		} catch (CM_Exception $e) {
-			$this->assertContains('Unknown database', $e->getMessage());
+		} catch (CM_Db_Exception $e) {
+			$this->assertContains('nonexistent', $e->getMessage());
 		}
 	}
 
