@@ -14,6 +14,9 @@ class CM_Db_Client {
 	/** @var string */
 	private $_password;
 
+	/** @var string|null */
+	private $_db;
+
 	/** @var PDO */
 	private $_link;
 
@@ -29,26 +32,28 @@ class CM_Db_Client {
 		$this->_port = (int) $port;
 		$this->_username = (string) $username;
 		$this->_password = (string) $password;
-		$this->connect($db);
+		if (null !== $db) {
+			$this->_db = (string) $db;
+		}
+		$this->connect();
 	}
 
 	/**
-	 * @param string|null $db
 	 * @throws CM_Db_Exception
 	 */
-	public function connect($db = null) {
+	public function connect() {
 		if ($this->isConnected()) {
 			return;
 		}
 		$dsnOptions = array('host=' . $this->_host, 'port=' . $this->_port);
-		if (null !== $db) {
-			$dsnOptions[] = 'dbname=' . $db;
+		if (null !== $this->_db) {
+			$dsnOptions[] = 'dbname=' . $this->_db;
 		}
 		$dsn = 'mysql:' . implode(';', $dsnOptions);
 		try {
 			$this->_link = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
 			$this->_link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		} catch(PDOException $e) {
+		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
 		}
 	}
@@ -79,7 +84,10 @@ class CM_Db_Client {
 	 * @return CM_Db_Statement
 	 */
 	public function createStatement($sqlTemplate) {
+		if (!$this->isConnected()) {
+			$this->connect();
+		}
 		$statement = $this->_link->prepare($sqlTemplate);
-		return new CM_Db_Statement($statement);
+		return new CM_Db_Statement($statement, $this);
 	}
 }
