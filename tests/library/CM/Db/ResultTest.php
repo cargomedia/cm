@@ -13,7 +13,7 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 	}
 
 	public function setUp() {
-		CM_Mysql::exec(
+		CM_Db_Db::exec(
 			'CREATE TABLE `test` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`foo` VARCHAR(100) NOT NULL,
@@ -21,13 +21,13 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 					PRIMARY KEY (`id`)
 				)');
 
-		CM_Mysql::insert('test', array('foo' => 'foo1', 'bar' => 'bar1'));
-		CM_Mysql::insert('test', array('foo' => 'foo2', 'bar' => 'bar2'));
-		CM_Mysql::insert('test', array('foo' => 'foo3', 'bar' => 'bar3'));
+		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo1", "bar1")');
+		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo2", "bar2")');
+		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo3", "bar3")');
 	}
 
 	public function tearDown() {
-		CM_Mysql::exec('DROP TABLE `test`');
+		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
 	public function testFetchAssoc() {

@@ -9,11 +9,11 @@ class CM_Db_StatementTest extends CMTest_TestCase {
 		$config = CM_Config::get()->CM_Db_Db;
 		self::$_client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
 
-		CM_Mysql::exec('CREATE TABLE `test` (`id` INT(10) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))');
+		CM_Db_Db::exec('CREATE TABLE `test` (`id` INT(10) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))');
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::exec('DROP TABLE `test`');
+		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
 	public function testExecute() {
