@@ -47,9 +47,6 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		$client->createStatement('INSERT INTO `test` VALUES()')->execute();
 		$this->assertSame('1', $client->getLastInsertId());
 
-		$client->createStatement('SELECT * FROM `test`')->execute();
-		$this->assertSame(false, $client->getLastInsertId());
-
 		$client->createStatement('DROP TABLE `test`')->execute();
 	}
 }
