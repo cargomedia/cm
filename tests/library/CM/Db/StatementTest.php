@@ -30,7 +30,7 @@ class CM_Db_StatementTest extends CMTest_TestCase {
 			$this->assertInstanceOf('CM_Db_Result', $statement->execute());
 			$this->fail('Could select from nonexistent table');
 		} catch (CM_Db_Exception $e) {
-			$this->assertContains('Query execution failed', $e->getMessage());
+			$this->assertContains('Cannot execute statement', $e->getMessage());
 		}
 	}
 
@@ -40,7 +40,7 @@ class CM_Db_StatementTest extends CMTest_TestCase {
 			$this->assertInstanceOf('CM_Db_Result', $statement->execute());
 			$this->fail('Could select from nonexistent table');
 		} catch (CM_Db_Exception $e) {
-			$this->assertContains('Query execution failed', $e->getMessage());
+			$this->assertContains('Cannot execute statement', $e->getMessage());
 		}
 	}
 }
