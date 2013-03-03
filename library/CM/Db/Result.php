@@ -3,41 +3,41 @@
 class CM_Db_Result {
 
 	/** @var PDOStatement */
-	private $_statement;
+	private $_pdoStatement;
 
 	/**
-	 * @param PDOStatement $statement
+	 * @param PDOStatement $pdoStatement
 	 */
-	public function __construct(PDOStatement $statement) {
-		$this->_statement = $statement;
+	public function __construct(PDOStatement $pdoStatement) {
+		$this->_pdoStatement = $pdoStatement;
 	}
 
 	/**
 	 * @return array|false
 	 */
 	public function fetchAssoc() {
-		return $this->_statement->fetch(PDO::FETCH_ASSOC);
+		return $this->_pdoStatement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * @return mixed|false
 	 */
 	public function fetchOne() {
-		return $this->_statement->fetchColumn(0);
+		return $this->_pdoStatement->fetchColumn(0);
 	}
 
 	/**
 	 * @return array
 	 */
 	public function fetchCol() {
-		return $this->_statement->fetchAll(PDO::FETCH_COLUMN, 0);
+		return $this->_pdoStatement->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
 	/**
 	 * @return array[]
 	 */
 	public function fetchAll() {
-		return $this->_statement->fetchAll(PDO::FETCH_ASSOC);
+		return $this->_pdoStatement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -53,6 +53,6 @@ class CM_Db_Result {
 	 * @return int
 	 */
 	public function getAffectedRows() {
-		return $this->_statement->rowCount();
+		return $this->_pdoStatement->rowCount();
 	}
 }

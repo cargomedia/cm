@@ -18,7 +18,7 @@ class CM_Db_Client {
 	private $_db;
 
 	/** @var PDO */
-	private $_link;
+	private $_pdo;
 
 	/**
 	 * @param string      $host
@@ -51,8 +51,8 @@ class CM_Db_Client {
 		}
 		$dsn = 'mysql:' . implode(';', $dsnOptions);
 		try {
-			$this->_link = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
-			$this->_link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
+			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
 		}
@@ -62,21 +62,21 @@ class CM_Db_Client {
 		if (!$this->isConnected()) {
 			return;
 		}
-		unset($this->_link);
+		unset($this->_pdo);
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function isConnected() {
-		return isset($this->_link);
+		return isset($this->_pdo);
 	}
 
 	/**
 	 * @param string $db
 	 */
 	public function setDb($db) {
-		$this->_link->exec('USE ' . $db);
+		$this->_pdo->exec('USE ' . $db);
 	}
 
 	/**
@@ -84,21 +84,62 @@ class CM_Db_Client {
 	 * @return CM_Db_Statement
 	 */
 	public function createStatement($sqlTemplate) {
+		return new CM_Db_Statement($this->createPdoStatement($sqlTemplate), $this);
+	}
+
+	/**
+	 * @param $sqlTemplate
+	 * @throws CM_Db_Exception
+	 * @return PDOStatement
+	 */
+	public function createPdoStatement($sqlTemplate) {
 		if (!$this->isConnected()) {
 			$this->connect();
 		}
-		$statement = $this->_link->prepare($sqlTemplate);
-		return new CM_Db_Statement($statement, $this);
+
+		$retryCount = 1;
+		for ($try = 0; true; $try++) {
+			try {
+				return @$this->_pdo->prepare($sqlTemplate);
+			} catch (PDOException $e) {
+				if ($try < $retryCount && $this->isConnectionLossError($e)) {
+					$this->disconnect();
+					$this->connect();
+					continue;
+				}
+				throw new CM_Db_Exception('Cannot prepare statement: ' . $e->getMessage());
+			}
+		}
+		throw new CM_Db_Exception('Line should never be reached');
 	}
 
 	/**
 	 * @return string|false
 	 */
 	public function getLastInsertId() {
-		$lastInsertId = $this->_link->lastInsertId();
+		$lastInsertId = $this->_pdo->lastInsertId();
 		if (!$lastInsertId) {
 			return false;
 		}
 		return $lastInsertId;
+	}
+
+	/**
+	 * @param PDOException $exception
+	 * @return bool
+	 */
+	public function isConnectionLossError(PDOException $exception) {
+		$sqlState = $exception->errorInfo[0];
+		$driverCode = $exception->errorInfo[1];
+		$driverMessage = $exception->errorInfo[2];
+
+		if (1317 === $driverCode && false !== stripos('Query execution was interrupted', $driverMessage)) {
+			return true;
+		}
+		if (2006 === $driverCode && false !== stripos('MySQL server has gone away', $driverMessage)) {
+			return true;
+		}
+
+		return false;
 	}
 }
