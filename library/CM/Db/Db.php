@@ -43,4 +43,14 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$client = self::_getClient(false);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
 	}
+
+	/**
+	 * @param string     $sqlTemplate
+	 * @param array|null $parameters
+	 * @return CM_Db_Result
+	 */
+	public static function execRead($sqlTemplate, array $parameters = null) {
+		$client = self::_getClient(true);
+		return $client->createStatement($sqlTemplate)->execute($parameters);
+	}
 }
