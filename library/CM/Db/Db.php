@@ -40,6 +40,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return CM_Db_Result
 	 */
 	public static function exec($sqlTemplate, array $parameters = null) {
+		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
 		$client = self::_getClient(false);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
 	}
@@ -50,7 +51,30 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return CM_Db_Result
 	 */
 	public static function execRead($sqlTemplate, array $parameters = null) {
+		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
 		$client = self::_getClient(true);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
+	}
+
+	/**
+	 * @param string            $table
+	 * @param string|array      $fields Column-name OR Column-names array
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @param string|null       $order
+	 * @return CM_MysqlResult|bool
+	 */
+	public static function select($table, $fields, $where = null, $order = null) {
+		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
+		return $query->execute(self::_getClient(false));
+	}
+
+	/**
+	 * @param string $query
+	 * @return string
+	 */
+	private static function _replaceTableConsts($query) {
+		return preg_replace_callback('/(TBL_.+?)\b/', function ($matches) {
+			return '`' . constant($matches[1]) . '`';
+		}, $query);
 	}
 }
