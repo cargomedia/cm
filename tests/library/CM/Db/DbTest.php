@@ -16,5 +16,4 @@ class CM_Db_DbTest extends CMTest_TestCase {
 		CM_Mysql::exec('DROP TABLE test');
 	}
 
-
 }

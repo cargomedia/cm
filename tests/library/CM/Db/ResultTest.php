@@ -9,6 +9,10 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 		$config = CM_Config::get()->CM_Db_Db;
 		self::$_client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
 
+
+	}
+
+	public function setUp() {
 		CM_Mysql::exec(
 			'CREATE TABLE `test` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -22,7 +26,7 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 		CM_Mysql::insert('test', array('foo' => 'foo3', 'bar' => 'bar3'));
 	}
 
-	public static function tearDownAfterClass() {
+	public function tearDown() {
 		CM_Mysql::exec('DROP TABLE `test`');
 	}
 
@@ -61,6 +65,17 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 			array('id' => '3', 'foo' => 'foo3', 'bar' => 'bar3'),
 		), $result->fetchAll());
 		$this->assertSame(array(), $result->fetchAll());
+	}
+
+	public function testGetAffectedRows() {
+		$result = self::$_client->createStatement('DELETE FROM `test` WHERE `foo`="foo1" OR `foo`="foo2"')->execute();
+		$this->assertSame(2, $result->getAffectedRows());
+	}
+
+	public function testGetAffectedRowsForSelect() {
+		// True with mysql-driver
+		$result = self::$_client->createStatement('SELECT * FROM `test`')->execute();
+		$this->assertSame(3, $result->getAffectedRows());
 	}
 
 	public function testFetchNotFetchedResult() {

@@ -50,9 +50,9 @@ class CM_Db_Result {
 	}
 
 	/**
-	 * Free result memory.
+	 * @return int
 	 */
-	public function free() {
-		$this->_result->free();
+	public function getAffectedRows() {
+		return $this->_statement->rowCount();
 	}
 }
