@@ -18,9 +18,9 @@ class smarty_function_gravatarTest extends CMTest_TestCase {
 
 	public function testRender() {
 		$this->_assertSame('<img src="https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0" />', array('email' => 'test@example.com'));
-		$this->_assertSame('<img src="https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0?s=140&d=http%3A%2F%2Fexample.com%2Fdefault.jpg" />', array('email' => 'test@example.com',
+		$this->_assertSame('<img src="https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0?s=140&amp;d=http%3A%2F%2Fexample.com%2Fdefault.jpg" />', array('email' => 'test@example.com',
 			'size' => 140, 'default' => 'http://example.com/default.jpg'));
-		$this->_assertSame('<img src="https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0?s=140&d=http%3A%2F%2Fexample.com%2Fdefault.jpg" class="TestClass" title="TestTitle" alt="TestTitle" width="20" height="20" />', array('email' => 'test@example.com',
+		$this->_assertSame('<img src="https://secure.gravatar.com/avatar/55502f40dc8b7c769880b10874abc9d0?s=140&amp;d=http%3A%2F%2Fexample.com%2Fdefault.jpg" class="TestClass" title="TestTitle" alt="TestTitle" width="20" height="20" />', array('email' => 'test@example.com',
 			'size' => 140, 'default' => 'http://example.com/default.jpg', 'class' => 'TestClass', 'title' => 'TestTitle', 'width' => 20,
 			'height' => 20));
 	}

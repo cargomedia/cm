@@ -3,21 +3,20 @@
 require_once 'function.gravatarUrl.php';
 
 function smarty_function_gravatar(array $params) {
-	$params = array_merge(array('width' => null, 'height' => null, 'title' => null, 'class' => null), $params);
 	$url = smarty_function_gravatarUrl($params);
 
-	$html = '<img src="' . $url . '"';
-	if ($params['class']) {
-		$html .= ' class="' . $params['class'] . '"';
+	$html = '<img src="' . CM_Util::htmlspecialchars($url) . '"';
+	if (!empty($params['class'])) {
+		$html .= ' class="' . CM_Util::htmlspecialchars($params['class']) . '"';
 	}
-	if ($params['title']) {
-		$html .= ' title="' . $params['title'] . '" alt="' . $params['title'] . '"';
+	if (!empty($params['title'])) {
+		$html .= ' title="' . CM_Util::htmlspecialchars($params['title']) . '" alt="' . CM_Util::htmlspecialchars($params['title']) . '"';
 	}
-	if ($params['width']) {
-		$html .= ' width="' . $params['width'] . '"';
+	if (!empty($params['width'])) {
+		$html .= ' width="' . CM_Util::htmlspecialchars($params['width']) . '"';
 	}
-	if ($params['height']) {
-		$html .= ' height="' . $params['height'] . '"';
+	if (!empty($params['height'])) {
+		$html .= ' height="' . CM_Util::htmlspecialchars($params['height']) . '"';
 	}
 	$html .= ' />';
 	return $html;
