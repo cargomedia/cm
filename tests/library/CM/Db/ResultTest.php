@@ -19,9 +19,7 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 					PRIMARY KEY (`id`)
 				)');
 
-		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo1", "bar1")');
-		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo2", "bar2")');
-		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo3", "bar3")');
+		CM_Db_Db::exec('INSERT INTO `test` (`foo`, `bar`) VALUES("foo1", "bar1"),("foo2", "bar2"),("foo3", "bar3")');
 	}
 
 	public function tearDown() {
