@@ -104,19 +104,27 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param array|null $namespaces
+	 * @param array|null  $namespaces
+	 * @param string|null $url
+	 * @param string|null $urlCdn
 	 * @return CM_Site_Abstract
 	 */
-	protected function _getSite(array $namespaces = null) {
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
 		if (isset($this->_siteType)) {
 			return CM_Site_Abstract::factory($this->_siteType);
 		}
 		if (null === $namespaces) {
 			$namespaces = array('CM');
 		}
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId', 'getNamespaces'));
+		$url = is_null($url) ? null : (string) $url;
+		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
+		/** @var CM_Site_Abstract $site */
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
 		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
+		CM_Config::get()->CM_Site_Mock = new stdClass;
+		CM_Config::get()->CM_Site_Mock->url = $url;
+		CM_Config::get()->CM_Site_Mock->urlCdn = $urlCdn;
 		return $site;
 	}
 
@@ -316,7 +324,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE) {
+	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
 		if ($expected instanceof CM_Comparable) {
 			self::assertFalse($expected->equals($actual), 'Comparables do not differ');
 		} else {
@@ -358,7 +366,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @param CMTest_TH_Html $html
-	 * @param string  $css
+	 * @param string         $css
 	 */
 	public static function assertHtmlExists(CMTest_TH_Html $html, $css) {
 		self::assertTrue($html->exists($css), 'HTML does not contain `' . $css . '`.');
@@ -423,7 +431,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @param CMTest_TH_Html  $page
-	 * @param bool     $warnings
+	 * @param bool            $warnings
 	 */
 	public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
 		if (!extension_loaded('tidy')) {
