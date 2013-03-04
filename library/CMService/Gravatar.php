@@ -8,18 +8,23 @@ class CMService_Gravatar extends CM_Class_Abstract {
 	 * @param string|null $default
 	 * @return string
 	 */
-	public static function getUrl($email, $size = null, $default = null) {
+	public function getUrl($email, $size = null, $default = null) {
+		if (null !== $email) {
+			$email = (string) $email;
+		}
 		if (null !== $size) {
 			$size = (int) $size;
 		}
 		if (null !== $default) {
 			$default = (string) $default;
 		}
-		if (empty($email)) {
-			return (string) $default;
+		if ((null === $email) && (null !== $default)) {
+			return $default;
 		}
-		$email = (string) $email;
-		$url = 'https://secure.gravatar.com/avatar/' . md5(strtolower(trim($email)));
+		$url = 'https://secure.gravatar.com/avatar';
+		if (null !== $email) {
+			$url .= '/' . md5(strtolower(trim($email)));
+		}
 		$params = array();
 		if (null !== $size) {
 			$params['s'] = $size;

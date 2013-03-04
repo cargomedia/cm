@@ -1,5 +1,14 @@
 <?php
 
 function smarty_function_gravatarUrl(array $params) {
-	return CMService_Gravatar::getUrl($params['email'], $params['size'], $params['default']);
+	$gravatar = new CMService_Gravatar();
+	$size = null;
+	if (isset($params['size'])) {
+		$size = $params['size'];
+	}
+	$default = null;
+	if (isset($params['default'])) {
+		$default = $params['default'];
+	}
+	return $gravatar->getUrl($params['email'], $size, $default);
 }
