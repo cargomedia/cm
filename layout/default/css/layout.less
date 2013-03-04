@@ -1,39 +1,45 @@
-/*  Basic elements  */
+html {
+	font-family: @fontFamily;
+	font-size: @fontSize;
+	line-height: 1.5;
+	color: @colorFg;
+}
+
 body {
-	.background-color(@colorBg);
+	background-color: @colorBg;
 }
 
 a:link, a:visited  {
 	.link;
 }
 
-a:hover {
-	.link_hover;
+h1, h2, h3 {
+	font-family: @fontFamilyHeading;
+	font-weight: normal;
+	color: @colorFgHeading;
 }
 
 h1 {
 	margin: 7px 0;
-	.font( 18px, @fontFamilyHeading, @colorFgHeading );
+	font-size: 18px;
+	line-height: 1.8;
 	letter-spacing: 1px;
-	.nowrap;
 }
 
 h2 {
 	margin: 0;
-	.font( 15px, @fontFamilyHeading, @colorFgHeading );
-	.nowrap;
+	font-size: 15px;
+	line-height: 1.7;
 }
 
 h3 {
 	margin: 0;
-	.font( 13px, @fontFamilyHeading, @colorFgHeading );
-	.nowrap;
+	font-size: 13px;
+	line-height: 1.6;
 }
 
 h4 {
 	margin: 8px 0 2px 0;
-	.font(@fontSize, @fontFamily, @colorFg );
-	.nowrap;
 }
 
 h5 {
@@ -46,10 +52,6 @@ hr {
 	height: 1px;
 	.border(@colorFgBorderEmphasize1);
 	border-width: 1px 0 0 0;
-}
-
-body, p, input, table, textarea, select {
-	.font(@fontSize, @fontFamily, @colorFg );
 }
 
 strong {
