@@ -55,9 +55,6 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	}
 
 	private function _assertSame($expected, array $params) {
-		$text = $params['text'] ? $params['text'] : null;
-		$mode = $params['mode'] ? $params['mode'] : null;
-		$maxLength = (isset($params['maxLength'])) ? $params['maxLength'] : null;
-		$this->assertSame($expected, smarty_function_usertext2(array('text' => $text, 'mode' => $mode, 'maxLength' => $maxLength), $this->_template));
+		$this->assertSame($expected, smarty_function_usertext2($params, $this->_template));
 	}
 }
