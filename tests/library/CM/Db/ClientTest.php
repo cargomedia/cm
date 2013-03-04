@@ -11,8 +11,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 	public function testConstructSelectDb() {
 		$config = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
-		$this->assertInstanceOf('CM_Db_Client', $client);
-		$this->assertTrue(true);
+		$this->assertTrue($client->isConnected());
 
 		try {
 			new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, 'nonexistent');
