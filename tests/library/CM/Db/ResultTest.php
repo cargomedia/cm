@@ -84,6 +84,7 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 
 	public function testFetchNotFetchedResult() {
 		self::$_client->createStatement('SELECT `bar` FROM `test` WHERE `foo`="foo1"')->execute();
+		// The above statement is not fetched, still the new statement should fetch fine
 		$result = self::$_client->createStatement('SELECT `bar` FROM `test` WHERE `foo`="foo2"')->execute();
 		$this->assertSame(array('bar' => 'bar2'), $result->fetch());
 	}
