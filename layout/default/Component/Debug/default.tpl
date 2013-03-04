@@ -1,4 +1,4 @@
-<div class="panel" style="display: none">
+<div class="panel">
 	<ul class="alerts"></ul>
 	<div class="buttons">
 		<a href="javascript:;" class="actions">{{translate 'Actions'}|strtoupper}</a> ·
