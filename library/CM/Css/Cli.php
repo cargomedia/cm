@@ -63,10 +63,10 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		CM_Mysql::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
 		$this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 
-		$this->_checkEmoticonNoIntersection();
+		$this->_checkEmoticonValidity();
 	}
 
-	private function _checkEmoticonNoIntersection() {
+	private function _checkEmoticonValidity() {
 		$paging = new CM_Paging_Emoticon_All();
 		$codes = array();
 		foreach ($paging as $emoticon) {
