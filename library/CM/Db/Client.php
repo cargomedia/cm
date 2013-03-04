@@ -114,12 +114,12 @@ class CM_Db_Client {
 	}
 
 	/**
-	 * @return string|false
+	 * @return string|null
 	 */
 	public function getLastInsertId() {
 		$lastInsertId = $this->_pdo->lastInsertId();
 		if (!$lastInsertId) {
-			return false;
+			return null;
 		}
 		return $lastInsertId;
 	}

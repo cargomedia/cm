@@ -15,22 +15,15 @@ class CM_Db_Result {
 	/**
 	 * @return array|false
 	 */
-	public function fetchAssoc() {
+	public function fetch() {
 		return $this->_pdoStatement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * @return mixed|false
 	 */
-	public function fetchOne() {
+	public function fetchColumn() {
 		return $this->_pdoStatement->fetchColumn(0);
-	}
-
-	/**
-	 * @return array
-	 */
-	public function fetchCol() {
-		return $this->_pdoStatement->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
 	/**
@@ -38,6 +31,13 @@ class CM_Db_Result {
 	 */
 	public function fetchAll() {
 		return $this->_pdoStatement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function fetchAllColumn() {
+		return $this->_pdoStatement->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
 	/**

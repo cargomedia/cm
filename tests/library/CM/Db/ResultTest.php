@@ -30,31 +30,31 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
-	public function testFetchAssoc() {
+	public function testFetch() {
 		$result = self::$_client->createStatement('SELECT * FROM `test`')->execute();
-		$this->assertSame(array('id' => '1', 'foo' => 'foo1', 'bar' => 'bar1'), $result->fetchAssoc());
-		$this->assertSame(array('id' => '2', 'foo' => 'foo2', 'bar' => 'bar2'), $result->fetchAssoc());
-		$this->assertSame(array('id' => '3', 'foo' => 'foo3', 'bar' => 'bar3'), $result->fetchAssoc());
-		$this->assertSame(false, $result->fetchAssoc());
+		$this->assertSame(array('id' => '1', 'foo' => 'foo1', 'bar' => 'bar1'), $result->fetch());
+		$this->assertSame(array('id' => '2', 'foo' => 'foo2', 'bar' => 'bar2'), $result->fetch());
+		$this->assertSame(array('id' => '3', 'foo' => 'foo3', 'bar' => 'bar3'), $result->fetch());
+		$this->assertSame(false, $result->fetch());
 	}
 
-	public function testFetchOne() {
+	public function testFetchColumn() {
 		$result = self::$_client->createStatement('SELECT `bar` FROM `test`')->execute();
-		$this->assertSame('bar1', $result->fetchOne());
-		$this->assertSame('bar2', $result->fetchOne());
-		$this->assertSame('bar3', $result->fetchOne());
-		$this->assertSame(false, $result->fetchOne());
+		$this->assertSame('bar1', $result->fetchColumn());
+		$this->assertSame('bar2', $result->fetchColumn());
+		$this->assertSame('bar3', $result->fetchColumn());
+		$this->assertSame(false, $result->fetchColumn());
 	}
 
-	public function testFetchOneMultipleColumns() {
+	public function testFetchColumnMultipleColumns() {
 		$result = self::$_client->createStatement('SELECT * FROM `test` WHERE `foo`="foo2"')->execute();
-		$this->assertSame('2', $result->fetchOne());
+		$this->assertSame('2', $result->fetchColumn());
 	}
 
-	public function testFetchCol() {
+	public function testFetchAllColumn() {
 		$result = self::$_client->createStatement('SELECT `bar` FROM `test`')->execute();
-		$this->assertSame(array('bar1', 'bar2', 'bar3'), $result->fetchCol());
-		$this->assertSame(array(), $result->fetchCol());
+		$this->assertSame(array('bar1', 'bar2', 'bar3'), $result->fetchAllColumn());
+		$this->assertSame(array(), $result->fetchAllColumn());
 	}
 
 	public function testFetchAll() {
@@ -81,6 +81,6 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 	public function testFetchNotFetchedResult() {
 		self::$_client->createStatement('SELECT `bar` FROM `test` WHERE `foo`="foo1"')->execute();
 		$result = self::$_client->createStatement('SELECT `bar` FROM `test` WHERE `foo`="foo2"')->execute();
-		$this->assertSame(array('bar' => 'bar2'), $result->fetchAssoc());
+		$this->assertSame(array('bar' => 'bar2'), $result->fetch());
 	}
 }
