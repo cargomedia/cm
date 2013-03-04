@@ -49,6 +49,14 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 	public function testModeNo() {
 		try {
 			smarty_function_usertext2(array('text' => 'foo'), $this->_template);
+		} catch (ErrorException $ex) {
+			$this->assertSame('E_NOTICE: Undefined index: mode', $ex->getMessage());
+		}
+	}
+
+	public function testModeWrong() {
+		try {
+			smarty_function_usertext2(array('text' => 'foo', 'mode'=>'foo'), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('Must define mode in Usertext.', $ex->getMessage());
 		}
