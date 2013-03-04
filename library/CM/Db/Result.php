@@ -20,10 +20,12 @@ class CM_Db_Result {
 	}
 
 	/**
+	 * @param int|null $index
 	 * @return mixed|false
 	 */
-	public function fetchColumn() {
-		return $this->_pdoStatement->fetchColumn(0);
+	public function fetchColumn($index = null) {
+		$index = (int) $index;
+		return $this->_pdoStatement->fetchColumn($index);
 	}
 
 	/**
@@ -34,10 +36,12 @@ class CM_Db_Result {
 	}
 
 	/**
+	 * @param int|null $index
 	 * @return array
 	 */
-	public function fetchAllColumn() {
-		return $this->_pdoStatement->fetchAll(PDO::FETCH_COLUMN, 0);
+	public function fetchAllColumn($index = null) {
+		$index = (int) $index;
+		return $this->_pdoStatement->fetchAll(PDO::FETCH_COLUMN, $index);
 	}
 
 	/**

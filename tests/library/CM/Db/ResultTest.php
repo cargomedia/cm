@@ -46,14 +46,22 @@ class CM_Db_ResultTest extends CMTest_TestCase {
 		$this->assertSame(false, $result->fetchColumn());
 	}
 
-	public function testFetchColumnMultipleColumns() {
-		$result = self::$_client->createStatement('SELECT * FROM `test` WHERE `foo`="foo2"')->execute();
-		$this->assertSame('2', $result->fetchColumn());
+	public function testFetchColumnIndex() {
+		$result = self::$_client->createStatement('SELECT * FROM `test`')->execute();
+		$this->assertSame('1', $result->fetchColumn(0));
+		$this->assertSame('foo2', $result->fetchColumn(1));
+		$this->assertSame('bar3', $result->fetchColumn(2));
 	}
 
 	public function testFetchAllColumn() {
 		$result = self::$_client->createStatement('SELECT `bar` FROM `test`')->execute();
 		$this->assertSame(array('bar1', 'bar2', 'bar3'), $result->fetchAllColumn());
+		$this->assertSame(array(), $result->fetchAllColumn());
+	}
+
+	public function testFetchAllColumnIndex() {
+		$result = self::$_client->createStatement('SELECT * FROM `test`')->execute();
+		$this->assertSame(array('foo1', 'foo2', 'foo3'), $result->fetchAllColumn(1));
 		$this->assertSame(array(), $result->fetchAllColumn());
 	}
 
