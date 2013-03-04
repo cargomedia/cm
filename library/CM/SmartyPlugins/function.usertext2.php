@@ -12,8 +12,8 @@ function smarty_function_usertext2($params, Smarty_Internal_Template $template) 
 	/** @var CM_Render $render */
 	$render = $template->smarty->getTemplateVars('render');
 	$text = (string) $params['text'];
-	$mode = (isset($params['mode'])) ? (string) $params['mode'] : null;
-	$maxLength = (isset($params['maxLength'])) ? (int) $params['maxLength'] : null;
+	$mode = isset($params['mode']) ? (string) $params['mode'] : null;
+	$maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
 
 	$usertext = new CM_Usertext_Usertext($render);
 
