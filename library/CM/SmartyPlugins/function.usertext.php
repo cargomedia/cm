@@ -16,7 +16,6 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
 
 	$usertext = new CM_Usertext_Usertext($render);
-	$usertext->setMaxLength($maxLength);
 	$usertext->setMode($mode, $maxLength);
 
 	$text = $usertext->transform($text);

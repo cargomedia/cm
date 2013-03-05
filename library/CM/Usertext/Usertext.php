@@ -4,7 +4,6 @@ class CM_Usertext_Usertext {
 
 	/** @var CM_Render */
 	private $_render;
-	private $_maxLength = null;
 
 	/**
 	 * @param CM_Render $render
@@ -21,16 +20,6 @@ class CM_Usertext_Usertext {
 	 */
 	public function addFilter(CM_Usertext_Filter_Interface $filter) {
 		$this->_filterList[] = $filter;
-	}
-
-	/**
-	 * @param (int) $maxLength
-	 */
-	public function setMaxLength($maxLength) {
-		if (null === $maxLength) {
-			return;
-		}
-		$this->_maxLength = (int) $maxLength;
 	}
 
 	/**
@@ -52,7 +41,7 @@ class CM_Usertext_Usertext {
 				$this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
 				break;
 			case 'markdown':
-				if (null !== $this->_maxLength) {
+				if (null !== $maxLength) {
 					throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
 				}
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
