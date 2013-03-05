@@ -16,7 +16,7 @@ CM_Stream_Adapter_Message_SocketRedis.prototype = _.extend(CM_Stream_Adapter_Mes
 	 * @param {Function} onmessage
 	 */
 	subscribe: function (channel, onmessage) {
-		this._socketRedis.subscribe(channel, {sessionId: $.cookie('sessionId')}, onmessage);
+		this._socketRedis.subscribe(channel, cm.options.renderStamp, {sessionId: $.cookie('sessionId')}, onmessage);
 	},
 
 	/**

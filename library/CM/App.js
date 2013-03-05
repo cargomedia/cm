@@ -605,6 +605,9 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		bind: function(channel, namespace, callback, context) {
+			if (!cm.options.stream.enabled) {
+				return;
+			}
 			if (!this._getBindCount(channel)) {
 				this._subscribe(channel);
 			}
@@ -636,7 +639,7 @@ CM_App.prototype = {
 			if (!this._dispatcher._callbacks) {
 				return 0;
 			}
-			return _.size(_.filter(this._dispatcher._callbacks, function (callback, event) {
+			return _.size(_.filter(this._dispatcher._callbacks, function(callback, event) {
 				return event.split(':')[0] === channel;
 			}));
 		},
@@ -647,7 +650,7 @@ CM_App.prototype = {
 		_getAdapter: function() {
 			if (!this._adapter) {
 				if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-					this._adapter = new 	CM_Stream_Adapter_Message_SocketRedis(cm.options.stream.options);
+					this._adapter = new CM_Stream_Adapter_Message_SocketRedis(cm.options.stream.options);
 				} else {
 					cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
 				}
@@ -660,7 +663,7 @@ CM_App.prototype = {
 		 */
 		_subscribe: function(channel) {
 			var handler = this;
-			this._getAdapter().subscribe(channel, function (message) {
+			this._getAdapter().subscribe(channel, function(message) {
 				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
 			});
 		},
