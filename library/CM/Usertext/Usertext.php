@@ -86,7 +86,7 @@ class CM_Usertext_Usertext {
 	}
 
 	private function _clearFilters() {
-		unset($this->_filterList);
+		$this->_filterList = array();
 	}
 
 	/**
