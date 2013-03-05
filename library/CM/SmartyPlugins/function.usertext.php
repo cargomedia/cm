@@ -16,39 +16,8 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
 
 	$usertext = new CM_Usertext_Usertext($render);
-
-	$usertext->addFilter(new CM_Usertext_Filter_Escape());
-	$usertext->addFilter(new CM_Usertext_Filter_Badwords());
-	switch ($mode) {
-		case 'oneline':
-			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-			break;
-		case 'simple':
-			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-			$usertext->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
-			break;
-		case 'markdown':
-			if (null !== $maxLength) {
-				throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
-			}
-			$usertext->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-			$usertext->addFilter(new CM_Usertext_Filter_Markdown(true));
-			$usertext->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-			break;
-		case 'markdownPlain':
-			$usertext->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-			$usertext->addFilter(new CM_Usertext_Filter_Markdown(true));
-			$usertext->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-			$usertext->addFilter(new CM_Usertext_Filter_Striptags());
-			$usertext->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-			break;
-		default:
-			throw new CM_Exception_Invalid('Must define mode in Usertext.');
-	}
-	$usertext->addFilter(new CM_Usertext_Filter_Emoticon());
-	if ('markdownPlain' != $mode) {
-		$usertext->addFilter(new CM_Usertext_Filter_CutWhitespace());
-	}
+	$usertext->setMaxLength($maxLength);
+	$usertext->setMode($mode);
 
 	$text = $usertext->transform($text);
 
