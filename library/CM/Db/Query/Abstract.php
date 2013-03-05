@@ -65,11 +65,11 @@ abstract class CM_Db_Query_Abstract {
 		}
 		if (is_array($where)) {
 			$sqlParts = array();
-			foreach ($where as $attr => $value) {
+			foreach ($where as $field => $value) {
 				if (null === $value) {
-					$sqlParts[] = $this->_quoteIdentifier($attr) . ' IS NULL';
+					$sqlParts[] = $this->_quoteIdentifier($field) . ' IS NULL';
 				} else {
-					$sqlParts[] = $this->_quoteIdentifier($attr) . ' = ?';
+					$sqlParts[] = $this->_quoteIdentifier($field) . ' = ?';
 					$this->_addParameters($value);
 				}
 			}
