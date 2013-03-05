@@ -52,6 +52,6 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 
 	$text = $usertext->transform($text);
 
-	$text = '<span class="usertext2 ' . $mode . '">' . $text . '</span>';
+	$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
 	return $text;
 }
