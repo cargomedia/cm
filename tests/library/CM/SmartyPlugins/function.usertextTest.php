@@ -1,8 +1,8 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext2.php';
+require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext.php';
 
-class smarty_modifier_usertext2Test extends CMTest_TestCase {
+class smarty_modifier_usertextTest extends CMTest_TestCase {
 
 	/**
 	 * @var Smarty_Internal_Template
@@ -40,7 +40,7 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 		$this->_assertSame("<span class=\"usertext2 markdownPlain\">Hello…</span>", array('text' => "Hello \n\n* World",
 																						  'mode' => 'markdownPlain', 'maxLength' => 10));
 		try {
-			smarty_function_usertext2(array('text' => 'foo', 'mode' => 'markdown', 'maxLength' => 1), $this->_template);
+			smarty_function_usertext(array('text' => 'foo', 'mode' => 'markdown', 'maxLength' => 1), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('MaxLength is not allowed in mode markdown.', $ex->getMessage());
 		}
@@ -48,7 +48,7 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 
 	public function testModeNo() {
 		try {
-			smarty_function_usertext2(array('text' => 'foo'), $this->_template);
+			smarty_function_usertext(array('text' => 'foo'), $this->_template);
 		} catch (ErrorException $ex) {
 			$this->assertSame('E_NOTICE: Undefined index: mode', $ex->getMessage());
 		}
@@ -56,13 +56,13 @@ class smarty_modifier_usertext2Test extends CMTest_TestCase {
 
 	public function testModeWrong() {
 		try {
-			smarty_function_usertext2(array('text' => 'foo', 'mode'=>'foo'), $this->_template);
+			smarty_function_usertext(array('text' => 'foo', 'mode'=>'foo'), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('Must define mode in Usertext.', $ex->getMessage());
 		}
 	}
 
 	private function _assertSame($expected, array $params) {
-		$this->assertSame($expected, smarty_function_usertext2($params, $this->_template));
+		$this->assertSame($expected, smarty_function_usertext($params, $this->_template));
 	}
 }
