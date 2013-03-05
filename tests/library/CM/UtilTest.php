@@ -3,8 +3,8 @@
 class CM_UtilTest extends CMTest_TestCase {
 
 	public function testBenchmark() {
-		$this->assertSame(0, (float) CM_Util::benchmark());
-		$this->assertSame(0, (float) CM_Util::benchmark('CM'));
+		$this->assertSame(0.0, (float) CM_Util::benchmark());
+		$this->assertSame(0.0, (float) CM_Util::benchmark('CM'));
 
 		$this->assertGreaterThan(0, (float) CM_Util::benchmark());
 		$this->assertGreaterThan(0, (float) CM_Util::benchmark('CM'));
