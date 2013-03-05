@@ -605,34 +605,54 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		bind: function(channel, namespace, callback, context) {
-			if (!this._subscribes[channel]) {
+			if (!this._getBindCount(channel)) {
 				this._subscribe(channel);
 			}
 			this._dispatcher.on(channel + ':' + namespace, callback, context);
-			this._subscribes[channel]++;
 		},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} [channel]
 		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
 		unbind: function(channel, namespace, callback, context) {
-			this._dispatcher.off(channel + ':' + namespace, callback, context);
-			this._subscribes[channel]--;
-			if (this._subscribes[channel] === 0) {
+			var event = null;
+			if (channel || namespace) {
+				event = channel + ':' + namespace;
+			}
+			this._dispatcher.off(event, callback, context);
+			if (this.this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
 		},
 
-		_setup: function() {
-			var options = cm.options.stream.options;
-			if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-				this._adapter = new 	CM_Stream_Adapter_Message_SocketRedis(options.sockjsUrl);
-			} else {
-				cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
+		/**
+		 * @param {String} channel
+		 * @return {Integer}
+		 */
+		_getBindCount: function(channel) {
+			if (!this._dispatcher._callbacks) {
+				return 0;
 			}
+			return _.size(_.filter(this._dispatcher._callbacks, function (callback, event) {
+				return event.split(':')[0] === channel;
+			}));
+		},
+
+		/**
+		 * @return {CM_Stream_Adapter_Message_Abstract}
+		 */
+		_getAdapter: function() {
+			if (!this._adapter) {
+				if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
+					this._adapter = new 	CM_Stream_Adapter_Message_SocketRedis(cm.options.stream.options);
+				} else {
+					cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
+				}
+			}
+			return this._adapter;
 		},
 
 		/**
@@ -640,11 +660,7 @@ CM_App.prototype = {
 		 */
 		_subscribe: function(channel) {
 			var handler = this;
-			this._subscribes[channel] = 0;
-			if (!this._adapter) {
-				this._setup();
-			}
-			this._adapter.subscribe(channel, function (message) {
+			this._getAdapter().subscribe(channel, function (message) {
 				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
 			});
 		},
