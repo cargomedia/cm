@@ -24,6 +24,13 @@ class CM_Usertext_Usertext {
 	}
 
 	/**
+	 * @param (int) $maxLength
+	 */
+	public function setMaxLength($maxLength) {
+		$this->_maxLength = (int) $maxLength;
+	}
+
+	/**
 	 * @param (string) $mode
 	 * @throws CM_Exception_Invalid
 	 */
@@ -84,12 +91,5 @@ class CM_Usertext_Usertext {
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
-	}
-
-	/**
-	 * @param (int) $maxLength
-	 */
-	private function setMaxLength($maxLength) {
-		$this->_maxLength = (int) $maxLength;
 	}
 }
