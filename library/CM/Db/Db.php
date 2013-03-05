@@ -35,6 +35,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string            $table
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function count($table, $where = null) {
+		$query = new CM_Db_Query_Count($table, $where);
+		return $query->execute(self::_getClient(false))->fetchColumn();
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
@@ -59,7 +69,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/**
 	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
-	 * @param string|array|null $where Associative array field=>value OR string
+	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
 	 * @return CM_MysqlResult
 	 */
