@@ -26,19 +26,19 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 
 	public function testModeMarkdown() {
 		$this->_assertSame("<span class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></span>", array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n",
-																															   'mode' => 'markdown'));
+																															  'mode' => 'markdown'));
 	}
 
 	public function testModeMarkdownPlain() {
 		$this->_assertSame("<span class=\"usertext markdownPlain\">Headline\nfoo\n</span>", array('text' => "#Headline#\nfoo\n",
-																								   'mode' => 'markdownPlain'));
+																								  'mode' => 'markdownPlain'));
 	}
 
 	public function testMaxLength() {
 		$this->_assertSame("<span class=\"usertext oneline\">Hello…</span>", array('text' => "Hello World", 'mode' => 'oneline', 'maxLength' => 10));
 		$this->_assertSame("<span class=\"usertext simple\">Hello…</span>", array('text' => "Hello World", 'mode' => 'simple', 'maxLength' => 10));
 		$this->_assertSame("<span class=\"usertext markdownPlain\">Hello…</span>", array('text' => "Hello \n\n* World",
-																						  'mode' => 'markdownPlain', 'maxLength' => 10));
+																						 'mode' => 'markdownPlain', 'maxLength' => 10));
 		try {
 			smarty_function_usertext(array('text' => 'foo', 'mode' => 'markdown', 'maxLength' => 1), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
@@ -56,9 +56,9 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 
 	public function testModeWrong() {
 		try {
-			smarty_function_usertext(array('text' => 'foo', 'mode'=>'foo'), $this->_template);
+			smarty_function_usertext(array('text' => 'foo', 'mode' => 'foo'), $this->_template);
 		} catch (CM_Exception_Invalid $ex) {
-			$this->assertSame('Must define mode in Usertext.', $ex->getMessage());
+			$this->assertSame('Invalid mode `foo`', $ex->getMessage());
 		}
 	}
 

@@ -28,6 +28,10 @@ class CM_Usertext_Usertext {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setMode($mode, $maxLength = null) {
+		$acceptedModes = array('oneline', 'simple', 'markdown', 'markdownPlain');
+		if (!in_array($mode, $acceptedModes)) {
+			throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
+		}
 		$mode = (string) $mode;
 		$this->_clearFilters();
 		$this->addFilter(new CM_Usertext_Filter_Escape());
@@ -55,8 +59,6 @@ class CM_Usertext_Usertext {
 				$this->addFilter(new CM_Usertext_Filter_Striptags());
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 				break;
-			default:
-				throw new CM_Exception_Invalid('Must define mode in Usertext.');
 		}
 		$this->addFilter(new CM_Usertext_Filter_Emoticon());
 		if ('markdownPlain' != $mode) {
