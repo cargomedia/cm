@@ -4,6 +4,7 @@ class CM_Usertext_Usertext {
 
 	/** @var CM_Render */
 	private $_render;
+	private $_maxLenght = null;
 
 	/**
 	 * @param CM_Render $render
@@ -42,5 +43,12 @@ class CM_Usertext_Usertext {
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
+	}
+
+	/**
+	 * @param (int) $maxLength
+	 */
+	private function setMaxLength($maxLength){
+		$this->_maxLenght = (int) $maxLength;
 	}
 }
