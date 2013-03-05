@@ -4,7 +4,7 @@ class CM_Usertext_Usertext {
 
 	/** @var CM_Render */
 	private $_render;
-	private $_maxLenght = null;
+	private $_maxLength = null;
 
 	/**
 	 * @param CM_Render $render
@@ -48,7 +48,7 @@ class CM_Usertext_Usertext {
 	/**
 	 * @param (int) $maxLength
 	 */
-	private function setMaxLength($maxLength){
-		$this->_maxLenght = (int) $maxLength;
+	private function setMaxLength($maxLength) {
+		$this->_maxLength = (int) $maxLength;
 	}
 }
