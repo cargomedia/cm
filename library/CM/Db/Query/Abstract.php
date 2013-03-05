@@ -63,9 +63,6 @@ abstract class CM_Db_Query_Abstract {
 		if (!is_string($where) && !is_array($where)) {
 			throw new CM_Exception_Invalid('Invalid where type');
 		}
-		if (null === $where) {
-			return;
-		}
 		if (is_array($where)) {
 			$sqlParts = array();
 			foreach ($where as $attr => $value) {
