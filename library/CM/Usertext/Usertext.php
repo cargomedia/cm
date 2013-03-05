@@ -33,11 +33,14 @@ class CM_Usertext_Usertext {
 		return $text;
 	}
 
+	private function _clearFilters() {
+		unset($this->_filterList);
+	}
+
 	/**
 	 * @return CM_Usertext_Filter_Interface[]
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
 	}
-
 }
