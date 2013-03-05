@@ -600,7 +600,7 @@ CM_App.prototype = {
 		_subscribes: {},
 		/**
 		 * @param {String} channel
-		 * @param {String} namespace for which callback should be used
+		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
@@ -614,8 +614,8 @@ CM_App.prototype = {
 
 		/**
 		 * @param {String} channel
-		 * @param {String} namespace
-		 * @param {Function} callback
+		 * @param {String} [namespace]
+		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
 		unbind: function(channel, namespace, callback, context) {

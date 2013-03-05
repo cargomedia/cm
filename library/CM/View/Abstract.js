@@ -306,8 +306,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {String} channel
-	 * @param {String} event
-	 * @param {Function} callback
+	 * @param {String} [event]
+	 * @param {Function} [callback]
 	 */
 	unbindStream: function(channel, event, callback) {
 		cm.stream.unbind(channel, event, callback, this);
