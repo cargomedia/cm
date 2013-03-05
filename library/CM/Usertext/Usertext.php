@@ -27,6 +27,9 @@ class CM_Usertext_Usertext {
 	 * @param (int) $maxLength
 	 */
 	public function setMaxLength($maxLength) {
+		if (null === $maxLength) {
+			return;
+		}
 		$this->_maxLength = (int) $maxLength;
 	}
 
