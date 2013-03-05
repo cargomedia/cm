@@ -32,7 +32,7 @@ class CM_Db_Statement {
 				if ($try < $retryCount && $this->_client->isConnectionLossError($e)) {
 					$this->_client->disconnect();
 					$this->_client->connect();
-					$this->_pdoStatement = $this->_client->createPdoStatement($this->getQueryString());
+					$this->_reCreatePdoStatement();
 					continue;
 				}
 				throw new CM_Db_Exception('Cannot execute statement: ' . $e->getMessage() . ' (query: `' . $this->_pdoStatement->queryString . '`)');
@@ -46,5 +46,9 @@ class CM_Db_Statement {
 	 */
 	public function getQueryString() {
 		return $this->_pdoStatement->queryString;
+	}
+
+	private function _reCreatePdoStatement() {
+		$this->_pdoStatement = $this->_client->createPdoStatement($this->getQueryString());
 	}
 }
