@@ -35,11 +35,11 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $table
-	 * @param string|array $where
+	 * @param string            $table
+	 * @param string|array|null $where
 	 * @return int
 	 */
-	public static function delete($table, $where) {
+	public static function delete($table, $where = null) {
 		$query = new CM_Db_Query_Delete($table, $where);
 		return $query->execute(self::_getClient(false))->getAffectedRows();
 	}
