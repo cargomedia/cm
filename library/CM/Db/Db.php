@@ -58,6 +58,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string $table
+	 * @param string $column
+	 * @return bool
+	 */
+	public static function existsColumn($table, $column) {
+		$query = new CM_Db_Query_ExistsColumn($table, $column);
+		return (bool) $query->execute(self::_getClient(false));
+	}
+
+	/**
+	 * @param string $table
 	 * @return bool
 	 */
 	public static function existsTable($table) {
