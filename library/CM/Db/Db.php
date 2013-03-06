@@ -65,9 +65,10 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return int|null
 	 */
 	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = 'INSERT') {
+		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Insert($table, $attr, $value, $onDuplicateKeyValues, $statement);
-		$query->execute(self::_getClient(false));
-		return self::_getClient(false)->getLastInsertId();
+		$query->execute($client);
+		return $client->getLastInsertId();
 	}
 
 	/**
