@@ -59,13 +59,21 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/**
 	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
-	 * @param string|array|null $where Associative array field=>value OR string
+	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
 	 * @return CM_MysqlResult
 	 */
 	public static function select($table, $fields, $where = null, $order = null) {
 		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
 		return $query->execute(self::_getClient(false));
+	}
+
+	/**
+	 * @param string $table
+	 */
+	public static function truncate($table) {
+		$query = new CM_Db_Query_Truncate($table);
+		$query->execute(self::_getClient(false));
 	}
 
 	/**
