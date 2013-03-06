@@ -4,62 +4,65 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 
 	/**
 	 * @param string            $table
-	 * @param string|array      $attr                 Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array|null $value                Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string|array      $fields                 Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $values                 Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @param array|null        $onDuplicateKeyValues
 	 * @param string            $statement
 	 * @throws CM_Exception
 	 */
-	public function __construct($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = 'INSERT') {
-		if ($value === null && is_array($attr)) {
-			$value = array_values($attr);
-			$attr = array_keys($attr);
+	public function __construct($table, $fields, $values = null, array $onDuplicateKeyValues = null, $statement = 'INSERT') {
+		if ($values === null && is_array($fields)) {
+			$values = array_values($fields);
+			$fields = array_keys($fields);
 		}
-		$values = (array) $value;
-		$attrs = (array) $attr;
-		if (!is_array(reset($values))) {
-			if (count($attrs) == 1) {
-				foreach ($values as &$value) {
-					$value = array($value);
+		$valueList = (array) $values;
+		$fieldList = (array) $fields;
+		if (!is_array(reset($valueList))) {
+			if (count($fieldList) == 1) {
+				foreach ($valueList as &$values) {
+					$values = array($values);
 				}
 			} else {
-				$values = array($values);
+				$valueList = array($valueList);
 			}
 		}
-		$attrsEscaped = array();
-		foreach ($attrs as $attr) {
-			$attrsEscaped[] = $this->_quoteIdentifier($attr);
+		foreach ($fieldList as &$fields) {
+			$fields = $this->_quoteIdentifier($fields);
 		}
-		$rowsEscaped = array();
-		foreach ($values as &$value) {
-			$row = (array) $value;
-			if (count($row) != count($attrs)) {
+		$rowsList = array();
+		foreach ($valueList as &$values) {
+			$row = (array) $values;
+			if (count($row) != count($fieldList)) {
 				throw new CM_Exception('Row size does not match number of fields');
 			}
-			$rowEscaped = array();
+			$rowList = array();
 			foreach ($row as $rowValue) {
 				if ($rowValue === null) {
-					$rowEscaped[] = 'NULL';
+					$rowList[] = 'NULL';
 				} else {
-					$rowEscaped[] = '?';
+					$rowList[] = '?';
 					$this->_addParameters($rowValue);
 				}
 			}
-			$rowsEscaped[] = '(' . implode(',', $rowEscaped) . ')';
+			$rowsList[] = '(' . implode(',', $rowList) . ')';
 		}
 
-		$this->_addSql($statement . ' INTO `' . $table . '` (' . implode(',', $attrsEscaped) . ') VALUES ' . implode(',', $rowsEscaped));
+		$this->_addSql($statement . ' INTO ' . $this->_quoteIdentifier($table));
+		$this->_addSql('(' . implode(',', $fieldList) . ')');
+		$this->_addSql('VALUES ' . implode(',', $rowsList));
+
 		if ($onDuplicateKeyValues) {
-			$valuesEscaped = array();
-			foreach ($onDuplicateKeyValues as $attr => $value) {
-				if ($value === null) {
-					$valuesEscaped[] = $this->_quoteIdentifier($attr) . ' = NULL';
+			$valuesList = array();
+			foreach ($onDuplicateKeyValues as $fields => $values) {
+				if ($values === null) {
+					$valuesList[] = $this->_quoteIdentifier($fields) . ' = NULL';
 				} else {
-					$valuesEscaped[] = $this->_quoteIdentifier($attr) . ' = ?';
-					$this->_addParameters($value);
+					$valuesList[] = $this->_quoteIdentifier($fields) . ' = ?';
+					$this->_addParameters($values);
 				}
 			}
-			$this->_addSql('ON DUPLICATE KEY UPDATE ' . implode(',', $valuesEscaped));
+
+			$this->_addSql('ON DUPLICATE KEY UPDATE ' . implode(',', $valuesList));
 		}
 	}
 }
