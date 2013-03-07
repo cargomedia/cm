@@ -35,6 +35,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string            $table
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function count($table, $where = null) {
+		$query = new CM_Db_Query_Count($table, $where);
+		return $query->execute(self::_getClient(false))->fetchColumn();
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
@@ -74,6 +84,17 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function truncate($table) {
 		$query = new CM_Db_Query_Truncate($table);
 		$query->execute(self::_getClient(false));
+	}
+
+	/**
+	 * @param string            $table
+	 * @param array             $values Associative array field=>value
+	 * @param string|array|null $where  Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function update($table, array $values, $where = null) {
+		$query = new CM_Db_Query_Update($table, $values, $where);
+		return $query->execute(self::_getClient(false))->getAffectedRows();
 	}
 
 	/**
