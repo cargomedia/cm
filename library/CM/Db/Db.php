@@ -89,6 +89,14 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 */
+	public static function truncate($table) {
+		$query = new CM_Db_Query_Truncate($table);
+		$query->execute(self::_getClient(false));
+	}
+
+	/**
 	 * @param string            $table
 	 * @param array             $values Associative array field=>value
 	 * @param string|array|null $where  Associative array field=>value OR string
