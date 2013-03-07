@@ -56,25 +56,15 @@ class CM_Component_Example extends CM_Component_Abstract {
 	 */
 	private function _getIcons() {
 		$site = $this->getParams()->getSite('site');
-		$style = '';
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
-			$path = CM_Util::getNamespacePath($namespace) . 'layout/default/variables.less';
+			$path = CM_Util::getNamespacePath($namespace) . 'layout/default/img/icon';
 			if (file_exists($path)) {
-				$file = new CM_File($path);
-				$style .= $file . PHP_EOL;
-			}
-			$path = CM_Util::getNamespacePath($namespace) . 'layout/default/css/icon.less';
-			if (file_exists($path)) {
-				$file = new CM_File($path);
-				$style .= $file . PHP_EOL;
+				$icons = scandir($path);
 			}
 		}
-		$lessCompiler = new lessc();
-		$css = $lessCompiler->compile($style);
-		preg_match_all('/\.icon\.([.\w-]+):before/', $css, $icons);
 		$icons = array_map(function ($s) {
-			return str_replace('.', ' ', $s);
-		}, $icons[1]);
+			return str_replace('.svg', ' ', $s);
+		}, $icons);
 		return $icons;
 	}
 
