@@ -71,7 +71,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
-	 * @return CM_MysqlResult
+	 * @return CM_Db_Result
 	 */
 	public static function select($table, $fields, $where = null, $order = null) {
 		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
@@ -87,6 +87,47 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function update($table, array $values, $where = null) {
 		$query = new CM_Db_Query_Update($table, $values, $where);
 		return $query->execute(self::_getClient(false))->getAffectedRows();
+	}
+
+	/**
+	 * @param string       $table
+	 * @param array        $update   Associative array field=>value
+	 * @param string|array $whereRow Associative array field=>value OR string
+	 * @param string|array $where    Associative array field=>value OR string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function updateSequence($table, $update, array $whereRow, array $where) {
+
+		if (1 < count($update)) {
+			throw new CM_Exception_Invalid('Only one column can be updated.');
+		}
+
+		$value = (int) reset($update);
+		$field = key($update);
+
+		if ($value <= 0 || $value > CM_Db_Db::count($table, $where)) {
+			throw new CM_Exception_Invalid('Sequence out of bounds.');
+		}
+
+		$valueOld = CM_Db_Db::select($table, $field, array_merge($whereRow, $where))->fetch();
+		if (false === $valueOld) {
+			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
+		}
+		$valueOld = (int) $valueOld;
+
+		if ($value > $valueOld) {
+			$upperBound = $value;
+			$lowerBound = $valueOld;
+			$direction = -1;
+		} else {
+			$upperBound = $valueOld;
+			$lowerBound = $value;
+			$direction = 1;
+		}
+		$query = new CM_Db_Query_UpdateSequence($table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query->execute(self::_getClient(false));
+
+		self::update($table, array($field => $value), array_merge($whereRow, $where));
 	}
 
 	/**
