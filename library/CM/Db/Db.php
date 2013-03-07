@@ -36,6 +36,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array|null $where Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function count($table, $where = null) {
+		$query = new CM_Db_Query_Count($table, $where);
+		return $query->execute(self::_getClient(false))->fetchColumn();
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array|null $where
 	 * @return int
 	 */
@@ -76,6 +86,17 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function select($table, $fields, $where = null, $order = null) {
 		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
 		return $query->execute(self::_getClient(false));
+	}
+
+	/**
+	 * @param string            $table
+	 * @param array             $values Associative array field=>value
+	 * @param string|array|null $where  Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function update($table, array $values, $where = null) {
+		$query = new CM_Db_Query_Update($table, $values, $where);
+		return $query->execute(self::_getClient(false))->getAffectedRows();
 	}
 
 	/**
