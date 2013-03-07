@@ -63,7 +63,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function existsColumn($table, $column) {
 		$query = new CM_Db_Query_ExistsColumn($table, $column);
-		return (bool) $query->execute(self::_getClient(false));
+		return (bool) $query->execute(self::_getClient(false))->getAffectedRows();
 	}
 
 	/**
@@ -73,7 +73,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function existsIndex($table, $index) {
 		$query = new CM_Db_Query_ExistsIndex($table, $index);
-		return (bool) $query->execute(self::_getClient(false));
+		return (bool) $query->execute(self::_getClient(false))->getAffectedRows();
 	}
 
 	/**
