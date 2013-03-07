@@ -45,6 +45,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string            $table
+	 * @param string|array|null $where
+	 * @return int
+	 */
+	public static function delete($table, $where = null) {
+		$query = new CM_Db_Query_Delete($table, $where);
+		return $query->execute(self::_getClient(false))->getAffectedRows();
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
