@@ -81,8 +81,9 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public static function existsTable($table) {
-		$query = new CM_Db_Query_ExistsTable($table);
-		return (bool) $query->execute(self::_getClient(false));
+		$client = self::_getClient(false);
+		$statement = $client->createStatement('SHOW TABLES LIKE ?');
+		return (bool) $statement->execute(array($table))->getAffectedRows();
 	}
 
 	/**
