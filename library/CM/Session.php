@@ -184,7 +184,7 @@ class CM_Session implements CM_Comparable {
 	public function regenerateId() {
 		$newId = self::_generateId();
 		if ($this->_isPersistent) {
-			CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
+			CM_Db_Db::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 		$this->_id = $newId;

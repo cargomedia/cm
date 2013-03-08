@@ -43,7 +43,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
-		CM_Mysql::update('modelMock', array('foo' => 'bar2'), array('id' => $modelMock->getId()));
+		CM_Db_Db::update('modelMock', array('foo' => 'bar2'), array('id' => $modelMock->getId()));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$modelMock->_change();
@@ -244,7 +244,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 	public function setBar($bar) {
 		$bar = (string) $bar;
-		CM_Mysql::update('modelThasIsAnAssetMock', array('bar' => $bar), array('id' => $this->getId()));
+		CM_Db_Db::update('modelThasIsAnAssetMock', array('bar' => $bar), array('id' => $this->getId()));
 		$this->_change();
 	}
 

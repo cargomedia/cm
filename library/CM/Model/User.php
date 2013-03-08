@@ -180,7 +180,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param CM_Model_Language $language
 	 */
 	public function setLanguage(CM_Model_Language $language) {
-		CM_Mysql::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
 		$this->_change();
 	}
 
@@ -188,7 +188,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	public function updateLatestactivity() {
-		CM_Mysql::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
 		return $this->_change();
 	}
 

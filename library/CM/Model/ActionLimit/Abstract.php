@@ -64,7 +64,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
-			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('actionType' => $this->getActionType(),
+			CM_Db_Db::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('actionType' => $this->getActionType(),
 				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		} else {
 			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('limit' => $limit, 'actionType' => $this->getActionType(),
@@ -99,7 +99,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
-			CM_Mysql::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('actionType' => $this->getActionType(),
+			CM_Db_Db::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('actionType' => $this->getActionType(),
 				'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		} else {
 			CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('period' => $period, 'actionType' => $this->getActionType(),

@@ -44,7 +44,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 		$percentage = $this->_checkPercentage($percentage);
 
-		CM_Mysql::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
 		$this->_change();
 	}
 
