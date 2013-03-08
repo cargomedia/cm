@@ -269,7 +269,7 @@ class CM_Mail extends CM_View_Abstract {
 	 * @return int
 	 */
 	public static function getQueueSize() {
-		return CM_Mysql::count(TBL_CM_MAIL);
+		return CM_Db_Db::count(TBL_CM_MAIL);
 	}
 
 	/**

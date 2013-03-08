@@ -84,7 +84,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return 0;
 		}
-		return CM_Mysql::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		return CM_Db_Db::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
 	}
 
 	/**

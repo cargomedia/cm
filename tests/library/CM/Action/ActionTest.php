@@ -135,7 +135,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 5, 'count' => 4));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 10, 'count' => 7));
 
-		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
+		$this->assertEquals(18, CM_Db_Db::count(TBL_CM_ACTION));
 	}
 
 	public function testAggregateInvalidIntervals() {
@@ -167,7 +167,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$values[] = array(1, null, 1, 1, null, 5, 100);
 		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
 		CM_Action_Abstract::collapse(1, 4);
-		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
+		$this->assertEquals(6, CM_Db_Db::count(TBL_CM_ACTION));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'createStamp' => 2, 'count' => 5));
 	}
 

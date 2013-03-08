@@ -134,7 +134,7 @@ class CM_SVM {
 		$trainingsMax = (int) $trainingsMax;
 		$ids = CM_Mysql::select(TBL_CM_SVM, 'id')->fetchCol();
 		foreach ($ids as $id) {
-			$trainingsCount = CM_Mysql::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
+			$trainingsCount = CM_Db_Db::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
 			if ($trainingsCount > $trainingsMax) {
 				$deletedCount = CM_Mysql::exec(
 						'DELETE FROM TBL_CM_SVMTRAINING WHERE `svmId`=' . $id . ' ORDER BY `createStamp` LIMIT ' . ($trainingsCount - $trainingsMax));
