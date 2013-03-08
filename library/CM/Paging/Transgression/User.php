@@ -1,9 +1,9 @@
 <?php
 
 class CM_Paging_Transgression_User extends CM_Paging_Transgression_Abstract {
-	
+
 	private $_user;
-	
+
 	/**
 	 * @param CM_Model_User $user
 	 * @param int $actionType OPTIONAL
@@ -36,14 +36,14 @@ class CM_Paging_Transgression_User extends CM_Paging_Transgression_Abstract {
 		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
-	
+
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
 		CM_Mysql::insertDelayed(TBL_CM_ACTION,
 				array('actorId' => $this->_user->getId(), 'verb' => $action->getVerb(), 'type' => $action->getType(), 'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
-	
+
 	public function deleteAll() {
-		CM_Mysql::delete(TBL_CM_ACTION, '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
+		CM_Db_Db::delete(TBL_CM_ACTION, '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
 	}
 }

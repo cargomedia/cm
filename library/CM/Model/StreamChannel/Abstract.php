@@ -102,7 +102,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
-		CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
 	}
 
 	/**

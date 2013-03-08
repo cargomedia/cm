@@ -34,10 +34,10 @@ class CM_MysqlTest extends CMTest_TestCase {
 
 		$result = CM_Mysql::select(TBL_TEST, array('foo', 'bar'), array('id' => 2, 'foo' => 2));
 		$this->assertEquals(array('foo' => '2', 'bar' => 'bar2'), $result->fetchAssoc());
-		
+
 		$result = CM_Mysql::select(TBL_TEST, array('foo', 'bar'), array('id' => 2, 'foo' => 3));
 		$this->assertEquals(0, $result->numRows());
-		
+
 		$result = CM_Mysql::select(TBL_TEST, 'foo', array('id' => 'nonexistent'));
 		$this->assertEquals(0, $result->numRows());
 	}
@@ -46,12 +46,12 @@ class CM_MysqlTest extends CMTest_TestCase {
 		// No values
 		$id = CM_Mysql::insert(TBL_TEST, array());
 		$this->assertRow(TBL_TEST, array('id' => $id));
-		CM_Mysql::delete(TBL_TEST, array('id' => $id));
-		
+		CM_Db_Db::delete(TBL_TEST, array('id' => $id));
+
 		// Null value insertion
 		CM_Mysql::insert(TBL_TEST, array('bar' => null));
 		$this->assertRow(TBL_TEST, array('bar' => null));
-		
+
 		// Associative array
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo1'));
@@ -97,21 +97,21 @@ class CM_MysqlTest extends CMTest_TestCase {
 		$insertId = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo19'));
 		$this->assertInternalType('int', $insertId);
 		$this->assertRow(TBL_TEST, array('id' => $insertId, 'foo' => 'foo19'));
-		
+
 		// IGNORE
 		$insertId = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo20'));
 		$rowCount = CM_Mysql::count(TBL_TEST);
 		CM_Mysql::insertIgnore(TBL_TEST, array('id' => $insertId, 'foo' => 'foo21'));
 		$this->assertSame($rowCount, CM_Mysql::count(TBL_TEST));
-		
+
 		// DELAYED
 		$insertId = CM_Mysql::insertDelayed(TBL_TEST, array('foo' => 'foo22'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo22'));
-		
+
 		// ON DUPLICATE KEY UPDATE
 		$insertId = CM_Mysql::insert(TBL_TEST, array('foo' => 'foo23', 'bar' => 5));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo23', 'bar' => 5));
-		
+
 		CM_Mysql::insert(TBL_TEST, array('id' => $insertId, 'foo' => 'foo24'), null, array('foo' => 'foo25', 'bar' => 'bar25'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo25', 'bar' => 'bar25'));
 
@@ -148,13 +148,13 @@ class CM_MysqlTest extends CMTest_TestCase {
 
 		CM_Mysql::update(TBL_TEST, array('foo' => 'foo7', 'bar' => 'bar7'), array());
 		$this->assertRow(TBL_TEST, array('foo' => 'foo7', 'bar' => 'bar7'));
-		
+
 		CM_Mysql::update(TBL_TEST, array('bar' => null), array());
 		$this->assertRow(TBL_TEST, array('bar' => null));
-		
+
 		CM_Mysql::update(TBL_TEST, array('bar' => ''), array());
 		$this->assertRow(TBL_TEST, array('bar' => ''));
-		
+
 		CM_Mysql::update(TBL_TEST, array('bar' => 0), array());
 		$this->assertRow(TBL_TEST, array('bar' => '0'));
 
@@ -166,21 +166,21 @@ class CM_MysqlTest extends CMTest_TestCase {
 
 	public function testDelete() {
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1'));
-		CM_Mysql::delete(TBL_TEST, array('foo' => 'foo1'));
+		CM_Db_Db::delete(TBL_TEST, array('foo' => 'foo1'));
 		$this->assertNotRow(TBL_TEST, array('foo' => 'foo1'));
 
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1'));
-		CM_Mysql::delete(TBL_TEST, "`foo`='foo1'");
+		CM_Db_Db::delete(TBL_TEST, "`foo`='foo1'");
 		$this->assertNotRow(TBL_TEST, array('foo' => 'foo1'));
 
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo3'));
-		CM_Mysql::delete(TBL_TEST, array('foo' => 'nonexistent'));
+		CM_Db_Db::delete(TBL_TEST, array('foo' => 'nonexistent'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo3'));
 
 		// Return value
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo4'));
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo4'));
-		$affectedRows = CM_Mysql::delete(TBL_TEST, array('foo' => 'foo4'));
+		$affectedRows = CM_Db_Db::delete(TBL_TEST, array('foo' => 'foo4'));
 		$this->assertInternalType('int', $affectedRows);
 		$this->assertEquals(2, $affectedRows);
 	}

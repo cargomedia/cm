@@ -90,7 +90,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public function unsetTranslation($key) {
 		$languageKeyId = static::_setKey($key);
-		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->getId()));
 		$this->_change();
 	}
 
@@ -155,8 +155,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
 		CM_Mysql::update(TBL_CM_LANGUAGE, array('backupId' => null), array('backupId' => $this->getId()));
 		CM_Mysql::update(TBL_CM_USER, array('languageId' => null), array('languageId' => $this->getId()));
 		/** @var CM_Model_Language $language */
@@ -206,8 +206,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 		if (!$languageKeyId) {
 			return;
 		}
-		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId));
-		CM_Mysql::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyId));
+		CM_Db_Db::delete(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId));
+		CM_Db_Db::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyId));
 		/** @var CM_Model_Language $language */
 		foreach (new CM_Paging_Language_All() as $language) {
 			$language->_change();
@@ -326,7 +326,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
 		}
 
-		CM_Mysql::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
+		CM_Db_Db::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
 		foreach ($variableNames as $variableName) {
 			CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
 		}

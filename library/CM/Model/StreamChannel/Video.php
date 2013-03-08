@@ -111,7 +111,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
 		parent::_onDelete();
 	}
 
@@ -131,7 +131,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
-			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
+			CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
 			throw $ex;
 		}
 		return new static($id);

@@ -6,7 +6,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function _onModelDelete() {
-		CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
 	}
 
 	/**
@@ -36,7 +36,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 			throw new CM_Exception("Invalid preference ($section.$key)");
 		}
 		if ($value == $defaults[$section][$key]['value']) {
-			CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
+			CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
 		} else {
 			CM_Mysql::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
 					'value' => $value));
@@ -65,7 +65,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function reset() {
-		CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
 		$this->_change();
 	}
 

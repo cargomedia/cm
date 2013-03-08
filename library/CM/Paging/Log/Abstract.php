@@ -24,7 +24,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	}
 
 	public function flush() {
-		CM_Mysql::delete(TBL_CM_LOG, array('type' => $this->getType()));
+		CM_Db_Db::delete(TBL_CM_LOG, array('type' => $this->getType()));
 	}
 
 	/**

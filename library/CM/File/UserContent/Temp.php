@@ -55,7 +55,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	}
 
 	public function delete() {
-		CM_Mysql::delete(TBL_CM_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
+		CM_Db_Db::delete(TBL_CM_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
 		parent::delete();
 	}
 

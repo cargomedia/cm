@@ -27,7 +27,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$source->enableCacheLocal();
 		$this->assertEquals(100, $source->getCount());
 
-		CM_Mysql::delete(TBL_TEST, array('num' => 0));
+		CM_Db_Db::delete(TBL_TEST, array('num' => 0));
 		$this->assertEquals(100, $source->getCount());
 		$source->clearCache();
 		$this->assertEquals(100, $source->getCount());
@@ -40,7 +40,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$this->assertEquals(100, $source->getCount());
 		$this->assertEquals(100, $sourceNocache->getCount());
 
-		CM_Mysql::delete(TBL_TEST, array('num' => 0));
+		CM_Db_Db::delete(TBL_TEST, array('num' => 0));
 		$this->assertEquals(100, $source->getCount());
 		$this->assertEquals(99, $sourceNocache->getCount());
 		$source->clearCache();

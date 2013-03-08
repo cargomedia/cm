@@ -123,7 +123,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$this->assertEquals('bar1', unserialize(serialize($modelMock))->getFoo());
-		
+
 		$modelMock->_set('foo', 'bar2');
 		$this->assertEquals('bar2', unserialize(serialize($modelMock))->getFoo());
 	}
@@ -214,7 +214,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete('modelMock', array('id' => $this->getId()));
+		CM_Db_Db::delete('modelMock', array('id' => $this->getId()));
 	}
 
 	protected function _loadAssets() {
@@ -273,13 +273,13 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
+		CM_Db_Db::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
 	}
 
 	protected static function _create(array $data) {
 		return new self(CM_Mysql::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
 	}
-	
+
 }
 
 class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstract {
