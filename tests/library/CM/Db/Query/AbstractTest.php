@@ -31,6 +31,30 @@ class CM_Db_Query_AbstractTest extends CMTest_TestCase {
 		$this->assertSame('ORDER BY hello world', $query->getSqlTemplate());
 		$this->assertSame(array(), $query->getParameters());
 	}
+
+	public function testOrderByArray() {
+		$query = new CM_Db_Query_AbstractMockOrderBy(array('foo' => 'ASC', 'bar' => 'DESC'));
+		$this->assertSame('ORDER BY `foo` ASC, `bar` DESC', $query->getSqlTemplate());
+		$this->assertSame(array(), $query->getParameters());
+	}
+
+	public function testOrderByArrayInvalidDirection() {
+		try {
+			new CM_Db_Query_AbstractMockOrderBy(array('foo' => 'NONEXISTENT'));
+			$this->fail();
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('Invalid order direction', $e->getMessage());
+		}
+	}
+
+	public function testOrderByArrayInvalidField() {
+		try {
+			new CM_Db_Query_AbstractMockOrderBy(array('foo'));
+			$this->fail();
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('Order field name is not string', $e->getMessage());
+		}
+	}
 }
 
 class CM_Db_Query_AbstractMockWhere extends CM_Db_Query_Abstract {

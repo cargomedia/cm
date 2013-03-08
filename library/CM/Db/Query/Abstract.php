@@ -65,11 +65,11 @@ abstract class CM_Db_Query_Abstract {
 		}
 		if (is_array($where)) {
 			$sqlParts = array();
-			foreach ($where as $attr => $value) {
+			foreach ($where as $field => $value) {
 				if (null === $value) {
-					$sqlParts[] = $this->_quoteIdentifier($attr) . ' IS NULL';
+					$sqlParts[] = $this->_quoteIdentifier($field) . ' IS NULL';
 				} else {
-					$sqlParts[] = $this->_quoteIdentifier($attr) . ' = ?';
+					$sqlParts[] = $this->_quoteIdentifier($field) . ' = ?';
 					$this->_addParameters($value);
 				}
 			}
@@ -80,17 +80,32 @@ abstract class CM_Db_Query_Abstract {
 	}
 
 	/**
-	 * @param string|null $orderBy
+	 * @param string|array|null $orderBy
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _addOrderBy($orderBy) {
-		if (!is_string($orderBy) && !is_null($orderBy)) {
-			throw new CM_Exception_Invalid('Invalid order type');
-		}
 		if (null === $orderBy) {
 			return;
 		}
-		$this->_addSql('ORDER BY ' . $orderBy);
+		if (!is_string($orderBy) && !is_array($orderBy)) {
+			throw new CM_Exception_Invalid('Invalid order type');
+		}
+		if (is_array($orderBy)) {
+			$sqlParts = array();
+			foreach ($orderBy as $field => $direction) {
+				$direction = strtoupper($direction);
+				if (!is_string($field)) {
+					throw new CM_Exception_Invalid('Order field name is not string');
+				}
+				if ('ASC' !== $direction && 'DESC' !== $direction) {
+					throw new CM_Exception_Invalid('Invalid order direction `' . $direction . '`.');
+				}
+				$sqlParts[] = $this->_quoteIdentifier($field) . ' ' . $direction;
+			}
+			$this->_addSql('ORDER BY ' . implode(', ', $sqlParts));
+		} elseif (is_string($orderBy)) {
+			$this->_addSql('ORDER BY ' . $orderBy);
+		}
 	}
 
 	/**
