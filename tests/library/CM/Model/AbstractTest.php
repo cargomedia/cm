@@ -123,7 +123,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$this->assertEquals('bar1', unserialize(serialize($modelMock))->getFoo());
-		
+
 		$modelMock->_set('foo', 'bar2');
 		$this->assertEquals('bar2', unserialize(serialize($modelMock))->getFoo());
 	}
@@ -202,7 +202,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelMock', array('foo'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelMock', array('foo'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -265,7 +265,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -279,7 +279,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		return new self(CM_Mysql::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
 	}
-	
+
 }
 
 class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstract {
@@ -290,7 +290,7 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 	public function get() {
 		if (($modelMock = $this->_cacheGet('modelMock')) === false) {
 			try {
-				$modelMockId = CM_Mysql::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchOne();
+				$modelMockId = CM_Db_Db::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchColumn();
 				$modelMock = new CM_ModelThasIsAnAssetMock($modelMockId);
 				$this->_cacheSet('modelMock', $modelMock);
 			} catch (CM_Exception_Nonexistent $ex) {

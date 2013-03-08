@@ -11,7 +11,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($uniqid) {
-		$data = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetch();
 		if (!$data) {
 			throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
 		}

@@ -50,7 +50,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	public function getAll() {
 		if (($values = $this->_cacheGet('values')) === false) {
 			$values = self::getDefaults();
-			$valuesSpecific = CM_Mysql::select(TBL_CM_USER_PREFERENCE, array('preferenceId',
+			$valuesSpecific = CM_Db_Db::select(TBL_CM_USER_PREFERENCE, array('preferenceId',
 				'value'), array('userId' => $this->_model->getId()))->fetchAllTree();
 			foreach ($values as &$section) {
 				foreach ($section as &$key) {
@@ -76,7 +76,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		$cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
 		if (($defaults = CM_CacheLocal::get($cacheKey)) === false) {
 			$defaults = array();
-			$rows = CM_Mysql::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue',
+			$rows = CM_Db_Db::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue',
 				'configurable'))->fetchAll();
 			foreach ($rows as $default) {
 				if (!isset($defaults[$default['section']])) {

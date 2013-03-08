@@ -66,7 +66,7 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('entityMock', array('userId', 'foo'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('entityMock', array('userId', 'foo'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {

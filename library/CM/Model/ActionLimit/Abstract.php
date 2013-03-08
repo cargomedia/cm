@@ -128,7 +128,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return array('roles' => CM_Mysql::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('actionType' => $this->getActionType(),
+		return array('roles' => CM_Db_Db::select(TBL_CM_ACTIONLIMIT, array('role', 'limit', 'period'), array('actionType' => $this->getActionType(),
 			'actionVerb' => $this->getActionVerb(), 'type' => $this->getType()))->fetchAllTree());
 	}
 

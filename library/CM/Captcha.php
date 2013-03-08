@@ -11,7 +11,7 @@ class CM_Captcha {
 	 */
 	public function __construct($id) {
 		$this->_id = (int) $id;
-		$this->_text = CM_Mysql::select(TBL_CM_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchOne();
+		$this->_text = CM_Db_Db::select(TBL_CM_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchColumn();
 		if (!$this->_text) {
 			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
 		}

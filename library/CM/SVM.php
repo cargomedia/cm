@@ -59,7 +59,7 @@ class CM_SVM {
 	 */
 	public function train($autoWeight = true) {
 		$svm = new SVM();
-		$trainings = CM_Mysql::select(TBL_CM_SVMTRAINING, array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
+		$trainings = CM_Db_Db::select(TBL_CM_SVMTRAINING, array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
 		$classTrainings = array();
 		foreach ($trainings as $training) {
 			if (!isset($classTrainings[$training['class']])) {
@@ -132,7 +132,7 @@ class CM_SVM {
 	 */
 	public static function deleteOldTrainings($trainingsMax) {
 		$trainingsMax = (int) $trainingsMax;
-		$ids = CM_Mysql::select(TBL_CM_SVM, 'id')->fetchCol();
+		$ids = CM_Db_Db::select(TBL_CM_SVM, 'id')->fetchAllColumn();
 		foreach ($ids as $id) {
 			$trainingsCount = CM_Mysql::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
 			if ($trainingsCount > $trainingsMax) {
@@ -146,7 +146,7 @@ class CM_SVM {
 	}
 
 	public static function trainChanged() {
-		$ids = CM_Mysql::select(TBL_CM_SVM, 'id', array('trainingChanges' => 1))->fetchCol();
+		$ids = CM_Db_Db::select(TBL_CM_SVM, 'id', array('trainingChanges' => 1))->fetchAllColumn();
 		foreach ($ids as $id) {
 			$svm = new self($id);
 			$svm->train();

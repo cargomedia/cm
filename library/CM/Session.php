@@ -262,7 +262,7 @@ class CM_Session implements CM_Comparable {
 	private static function _findDataById($id) {
 		$cacheKey = self::_getCacheKey($id);
 		if (($data = CM_Cache::get($cacheKey)) === false) {
-			$data = CM_Mysql::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $id))->fetchAssoc();
+			$data = CM_Db_Db::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $id))->fetch();
 			if (!$data) {
 				return null;
 			}

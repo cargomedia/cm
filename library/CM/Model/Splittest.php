@@ -89,7 +89,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public static function findId($id) {
 		$id = (int) $id;
-		$name = CM_Mysql::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchOne();
+		$name = CM_Db_Db::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchColumn();
 		if (false === $name) {
 			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
 		}
@@ -100,9 +100,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return array();
 		}
-		$data = CM_Mysql::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetch();
 		if ($data) {
-			$data['variations'] = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, array('id',
+			$data['variations'] = CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, array('id',
 				'name'), array('splittestId' => $data['id']))->fetchAllTree();
 		}
 		return $data;
