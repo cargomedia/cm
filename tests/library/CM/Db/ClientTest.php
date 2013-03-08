@@ -53,6 +53,6 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		$config = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
 		$this->assertSame(true, $client->setDb($config->db));
-		$this->assertSame(false, $client->setDb('marian'));
+		$this->assertSame(false, $client->setDb('foo'));
 	}
 }
