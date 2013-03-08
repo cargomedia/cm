@@ -81,7 +81,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
-	 * @return CM_MysqlResult
+	 * @return CM_Db_Result
 	 */
 	public static function select($table, $fields, $where = null, $order = null) {
 		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
