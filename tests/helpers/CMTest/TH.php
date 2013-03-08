@@ -56,7 +56,7 @@ class CMTest_TH {
 	public static function clearDb() {
 		$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
 		foreach ($alltables as $table) {
-			CM_Mysql::delete($table, 1);
+			CM_Db_Db::truncate($table);
 		}
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Mysql::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
