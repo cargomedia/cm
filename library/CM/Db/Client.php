@@ -74,9 +74,17 @@ class CM_Db_Client {
 
 	/**
 	 * @param string $db
+	 * @return bool
 	 */
 	public function setDb($db) {
-		$this->_pdo->exec('USE ' . $db);
+		$this->disconnect();
+		$this->_db = (string) $db;
+		try {
+			$this->connect();
+			return true;
+		} catch (CM_Db_Exception $e) {
+			return false;
+		}
 	}
 
 	/**
