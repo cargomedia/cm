@@ -46,7 +46,7 @@ class CM_MysqlTest extends CMTest_TestCase {
 		// No values
 		$id = CM_Mysql::insert(TBL_TEST, array());
 		$this->assertRow(TBL_TEST, array('id' => $id));
-		CM_Db_Db::delete(TBL_TEST, array('id' => $id));
+		CM_Mysql::delete(TBL_TEST, array('id' => $id));
 
 		// Null value insertion
 		CM_Mysql::insert(TBL_TEST, array('bar' => null));
@@ -166,21 +166,21 @@ class CM_MysqlTest extends CMTest_TestCase {
 
 	public function testDelete() {
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1'));
-		CM_Db_Db::delete(TBL_TEST, array('foo' => 'foo1'));
+		CM_Mysql::delete(TBL_TEST, array('foo' => 'foo1'));
 		$this->assertNotRow(TBL_TEST, array('foo' => 'foo1'));
 
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo1'));
-		CM_Db_Db::delete(TBL_TEST, "`foo`='foo1'");
+		CM_Mysql::delete(TBL_TEST, "`foo`='foo1'");
 		$this->assertNotRow(TBL_TEST, array('foo' => 'foo1'));
 
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo3'));
-		CM_Db_Db::delete(TBL_TEST, array('foo' => 'nonexistent'));
+		CM_Mysql::delete(TBL_TEST, array('foo' => 'nonexistent'));
 		$this->assertRow(TBL_TEST, array('foo' => 'foo3'));
 
 		// Return value
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo4'));
 		CM_Mysql::insert(TBL_TEST, array('foo' => 'foo4'));
-		$affectedRows = CM_Db_Db::delete(TBL_TEST, array('foo' => 'foo4'));
+		$affectedRows = CM_Mysql::delete(TBL_TEST, array('foo' => 'foo4'));
 		$this->assertInternalType('int', $affectedRows);
 		$this->assertEquals(2, $affectedRows);
 	}

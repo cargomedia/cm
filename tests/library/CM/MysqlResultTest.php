@@ -24,7 +24,7 @@ class CM_MysqlResultTest extends CMTest_TestCase {
 	public function testFetchAssoc() {
 		$result = CM_Mysql::select(TBL_TEST, 'bar', array('foo' => 'foo1'));
 		$this->assertEquals(array('bar' => 'bar1'), $result->fetchAssoc());
-		
+
 		$result = CM_Mysql::select(TBL_TEST, 'bar', array('foo' => 'nonexistent'));
 		$this->assertEquals(false, $result->fetchAssoc());
 	}
