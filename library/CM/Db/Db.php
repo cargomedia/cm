@@ -40,8 +40,9 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return int
 	 */
 	public static function count($table, $where = null) {
-		$query = new CM_Db_Query_Count($table, $where);
-		return $query->execute(self::_getClient(false))->fetchColumn();
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Count($client, $table, $where);
+		return $query->execute($client)->fetchColumn();
 	}
 
 	/**
