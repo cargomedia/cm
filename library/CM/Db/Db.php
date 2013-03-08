@@ -89,6 +89,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $db
+	 * @param bool $readOnly
+	 * @return bool
+	 */
+	public static function selectDb($db, $readOnly) {
+		$client = self::_getClient($readOnly);
+		return $client->setDb($db);
+	}
+
+	/**
 	 * @param string $table
 	 */
 	public static function truncate($table) {
