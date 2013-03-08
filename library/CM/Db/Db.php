@@ -41,7 +41,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function count($table, $where = null) {
 		$query = new CM_Db_Query_Count($table, $where);
-		return $query->execute(self::_getClient(false))->fetchColumn();
+		return (int) $query->execute(self::_getClient(false))->fetchColumn();
 	}
 
 	/**
