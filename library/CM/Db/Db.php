@@ -85,7 +85,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function existsColumn($table, $column) {
 		$client = self::_getClient(true);
-		return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->getAffectedRows();
+		return (bool) count(self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetchAll());
 	}
 
 	/**
@@ -95,7 +95,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function existsIndex($table, $index) {
 		$client = self::_getClient(true);
-		return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->getAffectedRows();
+		return (bool) count(self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetchAll());
 	}
 
 	/**
