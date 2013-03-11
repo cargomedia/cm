@@ -53,7 +53,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function delete($table, $where = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Delete($client, $table, $where);
-		return $query->execute(self::_getClient(false))->getAffectedRows();
+		return $query->execute()->getAffectedRows();
 	}
 
 	/**
@@ -88,7 +88,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function select($table, $fields, $where = null, $order = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Select($client, $table, $fields, $where, $order);
-		return $query->execute(self::_getClient(false));
+		return $query->execute();
 	}
 
 	/**
@@ -97,7 +97,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function truncate($table) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Truncate($client, $table);
-		$query->execute(self::_getClient(false));
+		$query->execute();
 	}
 
 	/**
@@ -109,7 +109,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function update($table, array $values, $where = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Update($client, $table, $values, $where);
-		return $query->execute(self::_getClient(false))->getAffectedRows();
+		return $query->execute()->getAffectedRows();
 	}
 
 	/**
