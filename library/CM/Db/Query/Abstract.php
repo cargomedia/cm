@@ -14,15 +14,8 @@ abstract class CM_Db_Query_Abstract {
 	/**
 	 * @param CM_Db_Client $client
 	 */
-	public function __construct($client) {
+	public function __construct(CM_Db_Client $client) {
 		$this->_client = $client;
-	}
-
-	/**
-	 * @return CM_Db_Client
-	 */
-	public function getClient() {
-		return $this->_client;
 	}
 
 	/**
@@ -43,8 +36,15 @@ abstract class CM_Db_Query_Abstract {
 	 * @return CM_Db_Result
 	 */
 	public function execute() {
-		$statement = $this->_client->createStatement($this->getSqlTemplate());
+		$statement = $this->_getClient()->createStatement($this->getSqlTemplate());
 		return $statement->execute($this->getParameters());
+	}
+
+	/**
+	 * @return CM_Db_Client
+	 */
+	protected function _getClient() {
+		return $this->_client;
 	}
 
 	/**
