@@ -5,7 +5,11 @@ class CMTest_TH {
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
-	private static $_dbClient = null;
+
+	/**
+	 * @var CM_Db_Client
+	 */
+	private static $_dbClient;
 
 	public static function init() {
 		if (self::$initialized) {
@@ -233,6 +237,9 @@ class CMTest_TH {
 		return new CM_Response_Page($request);
 	}
 
+	/**
+	 * @return CM_Db_Client
+	 */
 	public static function getDbClient() {
 		if (null !== self::$_dbClient) {
 			return self::$_dbClient;
