@@ -3,6 +3,7 @@
 class CM_Db_Query_UpdateSequence extends CM_Db_Query_Abstract {
 
 	/**
+	 * @param CM_Db_Client     $client
 	 * @param string           $table
 	 * @param string           $field
 	 * @param string           $direction
@@ -11,9 +12,10 @@ class CM_Db_Query_UpdateSequence extends CM_Db_Query_Abstract {
 	 * @param int              $upperBound
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($table, $field, $direction, array $where, $lowerBound, $upperBound) {
-		$this->_addSql('UPDATE ' . $this->_quoteIdentifier($table));
-		$this->_addSql('SET ' . $this->_quoteIdentifier($field) . ' = ' . $this->_quoteIdentifier($field) . ' + ?');
+	public function __construct($client, $table, $field, $direction, array $where, $lowerBound, $upperBound) {
+		parent::__construct($client);
+		$this->_addSql('UPDATE ' . $this->_getClient()->quoteIdentifier($table));
+		$this->_addSql('SET ' . $this->_getClient()->quoteIdentifier($field) . ' = ' . $this->_getClient()->quoteIdentifier($field) . ' + ?');
 		$this->_addParameters($direction);
 		$this->_addWhere($where);
 		$this->_addSql('AND `?` BETWEEN ? AND ?');

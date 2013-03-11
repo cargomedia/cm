@@ -175,8 +175,10 @@ class CM_Db_Db extends CM_Class_Abstract {
 			$lowerBound = $value;
 			$direction = 1;
 		}
-		$query = new CM_Db_Query_UpdateSequence($table, $field, $direction, $where, $lowerBound, $upperBound);
-		$query->execute(self::_getClient(false));
+
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_UpdateSequence($client, $table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query->execute();
 
 		self::update($table, array($field => $value), array_merge($whereRow, $where));
 	}
