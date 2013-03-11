@@ -98,6 +98,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array      $attr           Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return string|null
+	 */
+	public static function replace($table, $attr, $value = null) {
+		return self::insert($table, $attr, $value, null, 'REPLACE');
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
