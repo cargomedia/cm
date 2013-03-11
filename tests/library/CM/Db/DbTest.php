@@ -30,5 +30,8 @@ class CM_Db_DbTest extends CMTest_TestCase {
 		CM_Db_Db::insert('test', array('foo', 'bar'), array(array('foo1', 'bar1'), array('foo2', 'bar2'), array('foo3', 'bar3')));
 		$id = CM_Db_Db::getRandId('test', 'id');
 		$this->assertGreaterThanOrEqual(1, $id);
+
+		$id = CM_Db_Db::getRandId('test', 'id', '`id` = 2');
+		$this->assertEquals(2, $id);
 	}
 }
