@@ -100,6 +100,18 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null        $onDuplicateKeyValues
+	 * @return string|null
+	 */
+	public static function insertDelayed($table, $fields, $values = null, array $onDuplicateKeyValues = null) {
+		$statement = (self::_getConfig()->delayedEnabled) ? 'INSERT DELAYED' : 'INSERT';
+		return self::insert($table, $fields, $values, $onDuplicateKeyValues, $statement);
+	}
+
+	/**
+	 * @param string            $table
+	 * @param string|array      $fields Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @return string|null
 	 */
 	public static function replace($table, $fields, $values = null) {
