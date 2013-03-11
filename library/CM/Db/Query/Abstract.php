@@ -8,6 +8,23 @@ abstract class CM_Db_Query_Abstract {
 	/** @var string[] */
 	private $_parameters = array();
 
+	/** @var CM_Db_Client */
+	private $_client;
+
+	/**
+	 * @param CM_Db_Client $client
+	 */
+	public function __construct($client) {
+		$this->_client = $client;
+	}
+
+	/**
+	 * @return CM_Db_Client
+	 */
+	public function getClient() {
+		return $this->_client;
+	}
+
 	/**
 	 * @return string
 	 */
@@ -23,11 +40,10 @@ abstract class CM_Db_Query_Abstract {
 	}
 
 	/**
-	 * @param CM_Db_Client $client
 	 * @return CM_Db_Result
 	 */
-	public function execute(CM_Db_Client $client) {
-		$statement = $client->createStatement($this->getSqlTemplate());
+	public function execute() {
+		$statement = $this->_client->createStatement($this->getSqlTemplate());
 		return $statement->execute($this->getParameters());
 	}
 

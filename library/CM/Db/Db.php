@@ -42,7 +42,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function count($table, $where = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Count($client, $table, $where);
-		return $query->execute($client)->fetchColumn();
+		return $query->execute()->fetchColumn();
 	}
 
 	/**
