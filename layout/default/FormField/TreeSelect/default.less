@@ -36,12 +36,12 @@
 		padding: 4px;
 		position: relative;
 
-		.toggle {
+		.icon-arrow-right {
 			position: absolute;
 			display: none;
 			left: -10px;
-			top: 5px;
-			font-size: 11px;
+			top: 4px;
+			font-size: .8em;
 		}
 
 		.node {
@@ -69,12 +69,11 @@
 	}
 
 	li.hasChildren {
-		> .toggle,
-		> .node .count {
+		> .icon-arrow-right, > .node .count {
 			display: inline-block;
 		}
 
-		.icon {
+		.icon-arrow-right {
 			cursor: pointer;
 
 			&:hover {
@@ -88,7 +87,9 @@
 			display: block;
 		}
 
-		> .toggle {
+		> .icon-arrow-right {
+			.transform(rotate(90deg));
+			color: @colorFgIconHover;
 		}
 	}
 }

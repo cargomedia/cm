@@ -40,8 +40,9 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return int
 	 */
 	public static function count($table, $where = null) {
-		$query = new CM_Db_Query_Count($table, $where);
-		return $query->execute(self::_getClient(false))->fetchColumn();
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Count($client, $table, $where);
+		return $query->execute()->fetchColumn();
 	}
 
 	/**
@@ -50,8 +51,9 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return int
 	 */
 	public static function delete($table, $where = null) {
-		$query = new CM_Db_Query_Delete($table, $where);
-		return $query->execute(self::_getClient(false))->getAffectedRows();
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Delete($client, $table, $where);
+		return $query->execute()->getAffectedRows();
 	}
 
 	/**
@@ -78,19 +80,19 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
-	 * @param string|array      $attr           Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string|array      $fields               Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $values               Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @param array|null        $onDuplicateKeyValues
 	 * @param string|null       $statement
 	 * @return string|null
 	 */
-	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = null) {
+	public static function insert($table, $fields, $values = null, array $onDuplicateKeyValues = null, $statement = null) {
 		if (null === $statement) {
 			$statement = 'INSERT';
 		}
 		$client = self::_getClient(false);
-		$query = new CM_Db_Query_Insert($table, $attr, $value, $onDuplicateKeyValues, $statement);
-		$query->execute($client);
+		$query = new CM_Db_Query_Insert($client, $table, $fields, $values, $onDuplicateKeyValues, $statement);
+		$query->execute();
 		return $client->getLastInsertId();
 	}
 
@@ -108,22 +110,34 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array      $fields Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return string|null
+	 */
+	public static function replace($table, $fields, $values = null) {
+		return self::insert($table, $fields, $values, null, 'REPLACE');
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
 	 * @return CM_Db_Result
 	 */
 	public static function select($table, $fields, $where = null, $order = null) {
-		$query = new CM_Db_Query_Select($table, $fields, $where, $order);
-		return $query->execute(self::_getClient(false));
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Select($client, $table, $fields, $where, $order);
+		return $query->execute();
 	}
 
 	/**
 	 * @param string $table
 	 */
 	public static function truncate($table) {
-		$query = new CM_Db_Query_Truncate($table);
-		$query->execute(self::_getClient(false));
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Truncate($client, $table);
+		$query->execute();
 	}
 
 	/**
@@ -133,8 +147,9 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return int
 	 */
 	public static function update($table, array $values, $where = null) {
-		$query = new CM_Db_Query_Update($table, $values, $where);
-		return $query->execute(self::_getClient(false))->getAffectedRows();
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Update($client, $table, $values, $where);
+		return $query->execute()->getAffectedRows();
 	}
 
 	/**
