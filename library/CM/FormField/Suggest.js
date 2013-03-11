@@ -53,7 +53,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			tokenLimit: field.getOption("cardinality"),
 			prePopulate: prePopulate,
 			classes: {
-				tokenDelete: 'token-input-delete-token icon-close icon-small',
+				tokenDelete: 'token-input-delete-token icon-close',
 				focused: 'focus'
 			}
 		});
