@@ -55,17 +55,14 @@ class CM_Component_Example extends CM_Component_Abstract {
 	 * @return string[]
 	 */
 	private function _getIcons() {
-		$site = $this->getParams()->getSite('site');
-		foreach (array_reverse($site->getNamespaces()) as $namespace) {
-			$path = CM_Util::getNamespacePath($namespace) . 'layout/default/img/icon';
-			if (file_exists($path)) {
-				$icons = scandir($path);
-			}
+		$path = DIR_PUBLIC . '/static/css/library/icon.less';
+		if (!CM_File::exists($path)) {
+			return array();
 		}
-		$icons = array_map(function ($s) {
-			return str_replace('.svg', ' ', $s);
-		}, $icons);
-		return $icons;
+
+		$file = new CM_File($path);
+		preg_match_all('#\.icon-(.+?):before { content:#', $file->read(), $icons);
+		return $icons[1];
 	}
 
 	/**
