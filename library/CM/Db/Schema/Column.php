@@ -86,8 +86,8 @@ class CM_Db_Schema_Column {
 
 	private function _loadData() {
 		if (!isset($this->_data)) {
-			$query = new CM_Db_Query_Describe($this->_table, $this->_column);
-			$result = $query->execute($this->_client);
+			$query = new CM_Db_Query_Describe($this->_client, $this->_table, $this->_column);
+			$result = $query->execute();
 			$columns = $result->fetch();
 			if (false === $columns) {
 				throw new CM_Db_Exception();
