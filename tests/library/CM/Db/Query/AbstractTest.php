@@ -67,7 +67,7 @@ class CM_Db_Query_AbstractTest extends CMTest_TestCase {
 
 class CM_Db_Query_AbstractMockWhere extends CM_Db_Query_Abstract {
 
-	public function __construct($client, $where) {
+	public function __construct(CM_Db_Client $client, $where) {
 		parent::__construct($client);
 		$this->_addWhere($where);
 	}
@@ -75,7 +75,7 @@ class CM_Db_Query_AbstractMockWhere extends CM_Db_Query_Abstract {
 
 class CM_Db_Query_AbstractMockOrderBy extends CM_Db_Query_Abstract {
 
-	public function __construct($client, $orderBy) {
+	public function __construct(CM_Db_Client $client, $orderBy) {
 		parent::__construct($client);
 		$this->_addOrderBy($orderBy);
 	}
