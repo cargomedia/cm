@@ -96,6 +96,16 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array      $attr
+	 * @param string|array|null $value
+	 * @return string|null
+	 */
+	public static function insertIgnore($table, $attr, $value = null) {
+		return self::insert($table, $attr, $value, null, 'INSERT IGNORE');
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
