@@ -96,6 +96,17 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array      $attr  Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @return string|null
+	 */
+	public static function replaceDelayed($table, $attr, $value = null) {
+		$statement = (self::_getConfig()->delayedEnabled) ? 'REPLACE DELAYED' : 'REPLACE';
+		return self::insert($table, $attr, $value, null, $statement);
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
