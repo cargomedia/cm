@@ -6,10 +6,8 @@ class CMTest_TH {
 	private static $initialized = false;
 	private static $_configBackup;
 
-	/**
-	 * @var CM_Db_Client
-	 */
-	private static $_dbClient;
+	/** @var CM_Db_Client|null */
+	private static $_dbClient = null;
 
 	public static function init() {
 		if (self::$initialized) {
