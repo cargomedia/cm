@@ -43,7 +43,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	}
 	$html .= '>';
 	if ($icon) {
-		$html .= '<span class="icon ' . $icon . '"></span>';
+		$html .= '<span class="icon icon-' . $icon . '"></span>';
 	}
 	if ($label) {
 		$html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
