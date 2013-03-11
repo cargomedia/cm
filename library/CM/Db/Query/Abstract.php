@@ -8,6 +8,16 @@ abstract class CM_Db_Query_Abstract {
 	/** @var string[] */
 	private $_parameters = array();
 
+	/** @var CM_Db_Client */
+	private $_client;
+
+	/**
+	 * @param CM_Db_Client $client
+	 */
+	public function __construct(CM_Db_Client $client) {
+		$this->_client = $client;
+	}
+
 	/**
 	 * @return string
 	 */
@@ -23,12 +33,18 @@ abstract class CM_Db_Query_Abstract {
 	}
 
 	/**
-	 * @param CM_Db_Client $client
 	 * @return CM_Db_Result
 	 */
-	public function execute(CM_Db_Client $client) {
-		$statement = $client->createStatement($this->getSqlTemplate());
+	public function execute() {
+		$statement = $this->_getClient()->createStatement($this->getSqlTemplate());
 		return $statement->execute($this->getParameters());
+	}
+
+	/**
+	 * @return CM_Db_Client
+	 */
+	protected function _getClient() {
+		return $this->_client;
 	}
 
 	/**
@@ -67,9 +83,9 @@ abstract class CM_Db_Query_Abstract {
 			$sqlParts = array();
 			foreach ($where as $field => $value) {
 				if (null === $value) {
-					$sqlParts[] = $this->_quoteIdentifier($field) . ' IS NULL';
+					$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' IS NULL';
 				} else {
-					$sqlParts[] = $this->_quoteIdentifier($field) . ' = ?';
+					$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' = ?';
 					$this->_addParameters($value);
 				}
 			}
@@ -100,19 +116,11 @@ abstract class CM_Db_Query_Abstract {
 				if ('ASC' !== $direction && 'DESC' !== $direction) {
 					throw new CM_Exception_Invalid('Invalid order direction `' . $direction . '`.');
 				}
-				$sqlParts[] = $this->_quoteIdentifier($field) . ' ' . $direction;
+				$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' ' . $direction;
 			}
 			$this->_addSql('ORDER BY ' . implode(', ', $sqlParts));
 		} elseif (is_string($orderBy)) {
 			$this->_addSql('ORDER BY ' . $orderBy);
 		}
-	}
-
-	/**
-	 * @param string $name
-	 * @return string
-	 */
-	protected function _quoteIdentifier($name) {
-		return '`' . str_replace('`', '``', $name) . '`';
 	}
 }
