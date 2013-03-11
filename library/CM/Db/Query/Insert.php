@@ -3,6 +3,7 @@
 class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 
 	/**
+	 * @param CM_Db_Client      $client
 	 * @param string            $table
 	 * @param string|array      $fields                 Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $values                 Column-value OR Column-values array OR Multiple Column-values array(array)
@@ -10,7 +11,8 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 	 * @param string            $statement
 	 * @throws CM_Exception
 	 */
-	public function __construct($table, $fields, $values = null, array $onDuplicateKeyValues = null, $statement = 'INSERT') {
+	public function __construct(CM_Db_Client $client, $table, $fields, $values = null, array $onDuplicateKeyValues = null, $statement = 'INSERT') {
+		parent::__construct($client);
 		if ($values === null && is_array($fields)) {
 			$values = array_values($fields);
 			$fields = array_keys($fields);
@@ -27,7 +29,7 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 			}
 		}
 		foreach ($fieldList as &$fields) {
-			$fields = $this->_quoteIdentifier($fields);
+			$fields = $this->_getClient()->quoteIdentifier($fields);
 		}
 		$rowsList = array();
 		foreach ($valueList as &$values) {
@@ -47,7 +49,7 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 			$rowsList[] = '(' . implode(',', $rowList) . ')';
 		}
 
-		$this->_addSql($statement . ' INTO ' . $this->_quoteIdentifier($table));
+		$this->_addSql($statement . ' INTO ' . $this->_getClient()->quoteIdentifier($table));
 		$this->_addSql('(' . implode(',', $fieldList) . ')');
 		$this->_addSql('VALUES ' . implode(',', $rowsList));
 
@@ -55,9 +57,9 @@ class CM_Db_Query_Insert extends CM_Db_Query_Abstract {
 			$valuesList = array();
 			foreach ($onDuplicateKeyValues as $fields => $values) {
 				if ($values === null) {
-					$valuesList[] = $this->_quoteIdentifier($fields) . ' = NULL';
+					$valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = NULL';
 				} else {
-					$valuesList[] = $this->_quoteIdentifier($fields) . ' = ?';
+					$valuesList[] = $this->_getClient()->quoteIdentifier($fields) . ' = ?';
 					$this->_addParameters($values);
 				}
 			}
