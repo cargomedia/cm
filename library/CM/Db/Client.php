@@ -142,4 +142,12 @@ class CM_Db_Client {
 
 		return false;
 	}
+
+	/**
+	 * @param string $name
+	 * @return string
+	 */
+	public function quoteIdentifier($name) {
+		return '`' . str_replace('`', '``', $name) . '`';
+	}
 }
