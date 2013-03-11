@@ -5,6 +5,7 @@ class CMTest_TH {
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
+	private static $_dbClient = null;
 
 	public static function init() {
 		if (self::$initialized) {
@@ -230,6 +231,15 @@ class CMTest_TH {
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	public static function getDbClient() {
+		if (null !== self::$_dbClient) {
+			return self::$_dbClient;
+		}
+		$config = CM_Config::get()->CM_Db_Db;
+		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+		return self::$_dbClient;
 	}
 
 	public static function randomizeAutoincrement() {
