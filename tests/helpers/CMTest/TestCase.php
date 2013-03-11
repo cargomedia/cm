@@ -410,7 +410,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 */
 	public static function assertRow($table, $where = null, $rowCount = 1) {
 		$result = CM_Db_Db::select($table, '*', $where);
-		self::assertEquals($rowCount, $result->getAffectedRows());
+		$rowCountActual = count($result->fetchAll());
+		self::assertEquals($rowCount, $rowCountActual);
 	}
 
 	public static function assertNotRow($table, $columns) {
