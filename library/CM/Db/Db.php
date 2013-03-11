@@ -164,6 +164,49 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string       $table
+	 * @param array        $update   Associative array field=>value
+	 * @param string|array $whereRow Associative array field=>value OR string
+	 * @param string|array $where    Associative array field=>value OR string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function updateSequence($table, $update, array $whereRow, array $where) {
+
+		if (1 < count($update)) {
+			throw new CM_Exception_Invalid('Only one column can be updated.');
+		}
+
+		$value = (int) reset($update);
+		$field = key($update);
+
+		if ($value <= 0 || $value > CM_Db_Db::count($table, $where)) {
+			throw new CM_Exception_Invalid('Sequence out of bounds.');
+		}
+
+		$valueOld = CM_Db_Db::select($table, $field, array_merge($whereRow, $where))->fetch();
+		if (false === $valueOld) {
+			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
+		}
+		$valueOld = (int) $valueOld;
+
+		if ($value > $valueOld) {
+			$upperBound = $value;
+			$lowerBound = $valueOld;
+			$direction = -1;
+		} else {
+			$upperBound = $valueOld;
+			$lowerBound = $value;
+			$direction = 1;
+		}
+
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_UpdateSequence($client, $table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query->execute();
+
+		self::update($table, array($field => $value), array_merge($whereRow, $where));
+	}
+
+	/**
 	 * @param string $query
 	 * @return string
 	 */
