@@ -76,6 +76,5 @@ class CM_Db_Query_InsertTest extends CMTest_TestCase {
 		// Statement
 		$query = new CM_Db_Query_Insert('t`est', array('foo' => 'foo2', 'bar' => 'bar2'), null, null, 'INSERT IGNORE');
 		$this->assertSame('INSERT IGNORE INTO `t``est` (`foo`,`bar`) VALUES (?,?)', $query->getSqlTemplate());
-
 	}
 }
