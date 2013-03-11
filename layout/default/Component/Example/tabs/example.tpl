@@ -2,7 +2,7 @@
 	{if $viewer}{translate 'Hello {$user}!' user=$viewer->getDisplayName()|escape}{/if}<br />	foo={$foo|usertext}<br />	time={$now}<br />
 <hr />
 
-	{button_link class="reload" label="reload()" icon="icon-reload"}
+	{button_link class="reload" label="reload()" icon="reload"}
 	{button_link class="popout" label="popOut()"}
 	{button_link class="popin" label="popIn()"}
 	{button_link class="load" label="load()"}

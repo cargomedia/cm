@@ -14,7 +14,7 @@
 {/function}
 
 {tag el="input" name=$name id=$id type="hidden" value=$value}
-{button_link icon="icon-arrow-down" iconPosition='right' label={translate 'Select...'} class='selector'}
+{button_link icon="arrow-down" iconPosition='right' label={translate 'Select...'} class='selector'}
 <ul class="options">
 	<li class="unselect">None</li>
 	{renderNode node=$tree->getRoot()}
