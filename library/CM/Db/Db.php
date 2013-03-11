@@ -91,8 +91,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 			$statement = 'INSERT';
 		}
 		$client = self::_getClient(false);
-		$query = new CM_Db_Query_Insert($table, $attr, $value, $onDuplicateKeyValues, $statement);
-		$query->execute($client);
+		$query = new CM_Db_Query_Insert($client, $table, $attr, $value, $onDuplicateKeyValues, $statement);
+		$query->execute();
 		return $client->getLastInsertId();
 	}
 
