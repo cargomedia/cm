@@ -6,6 +6,9 @@ class CMTest_TH {
 	private static $initialized = false;
 	private static $_configBackup;
 
+	/** @var CM_Db_Client|null */
+	private static $_dbClient = null;
+
 	public static function init() {
 		if (self::$initialized) {
 			return;
@@ -230,6 +233,18 @@ class CMTest_TH {
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	/**
+	 * @return CM_Db_Client
+	 */
+	public static function getDbClient() {
+		if (null !== self::$_dbClient) {
+			return self::$_dbClient;
+		}
+		$config = CM_Config::get()->CM_Db_Db;
+		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+		return self::$_dbClient;
 	}
 
 	public static function randomizeAutoincrement() {
