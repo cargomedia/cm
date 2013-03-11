@@ -78,6 +78,24 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
+	 * @param string|array      $attr           Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $value          Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param array|null        $onDuplicateKeyValues
+	 * @param string|null       $statement
+	 * @return string|null
+	 */
+	public static function insert($table, $attr, $value = null, array $onDuplicateKeyValues = null, $statement = null) {
+		if (null === $statement) {
+			$statement = 'INSERT';
+		}
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Insert($table, $attr, $value, $onDuplicateKeyValues, $statement);
+		$query->execute($client);
+		return $client->getLastInsertId();
+	}
+
+	/**
+	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
 	 * @param string|array|null $where  Associative array field=>value OR string
 	 * @param string|null       $order
