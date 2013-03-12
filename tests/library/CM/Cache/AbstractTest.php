@@ -40,11 +40,27 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		CMTest_TH::timeForward($lifeTime + 1);
 		$this->assertFalse(CM_Cache_Mock::get('foo'));
 	}
+
+	public function testRuntimeDeleteExpired() {
+		CM_Cache_Mock::set('foo', 1);
+		$this->assertArrayHasKey('foo', CM_Cache_Mock::getRuntimeStore());
+		CMTest_TH::timeForward(305);
+		CM_Cache_Mock::simulateForgetting('foo');
+		CM_Cache_Mock::set('bar', 1);
+		$this->assertArrayNotHasKey('foo', CM_Cache_Mock::getRuntimeStore());
+	}
 }
 
 class CM_Cache_Mock extends CM_Cache_Abstract {
 	protected static $_instance;
 	private $_store = array();
+
+	/**
+	 * @return array
+	 */
+	public static function getRuntimeStore() {
+		return static::getInstance()->_runtimeStore;
+	}
 
 	public static function simulateForgetting($key) {
 		/** @var CM_Cache_Mock $cache */
