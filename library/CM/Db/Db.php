@@ -57,6 +57,15 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return CM_Db_Schema_Column
+	 */
+	public static function describeColumn($table, $column) {
+		return new CM_Db_Schema_Column(self::_getClient(false), $table, $column);
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
