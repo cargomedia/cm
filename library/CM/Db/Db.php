@@ -88,6 +88,34 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return bool
+	 */
+	public static function existsColumn($table, $column) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $index
+	 * @return bool
+	 */
+	public static function existsIndex($table, $index) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @return bool
+	 */
+	public static function existsTable($table) {
+		return (bool) self::exec('SHOW TABLES LIKE ?', array($table))->getAffectedRows();
+	}
+
+	/**
 	 * @param string            $table
 	 * @param string|array      $fields               Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $values               Column-value OR Column-values array OR Multiple Column-values array(array)
@@ -180,6 +208,51 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Update($client, $table, $values, $where);
 		return $query->execute()->getAffectedRows();
+	}
+
+	/**
+	 * @param string     $table
+	 * @param array      $update   Associative array field=>value
+	 * @param array      $whereRow Associative array field=>value
+	 * @param array|null $where    Associative array field=>value
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function updateSequence($table, $update, array $whereRow, array $where = null) {
+		if (1 < count($update)) {
+			throw new CM_Exception_Invalid('Only one column can be updated.');
+		}
+		if (null !== $where) {
+			$where = (array) $where;
+		}
+		$value = (int) reset($update);
+		$field = key($update);
+
+		if ($value <= 0 || $value > CM_Db_Db::count($table, $where)) {
+			throw new CM_Exception_Invalid('Sequence out of bounds.');
+		}
+
+		$whereMerged = is_array($where) ? array_merge($whereRow, $where) : $whereRow;
+		$valueOld = CM_Db_Db::select($table, $field, $whereMerged)->fetchColumn();
+		if (false === $valueOld) {
+			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
+		}
+		$valueOld = (int) $valueOld;
+
+		if ($value > $valueOld) {
+			$upperBound = $value;
+			$lowerBound = $valueOld;
+			$direction = -1;
+		} else {
+			$upperBound = $valueOld;
+			$lowerBound = $value;
+			$direction = 1;
+		}
+
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_UpdateSequence($client, $table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query->execute();
+
+		self::update($table, array($field => $value), $whereMerged);
 	}
 
 	/**
