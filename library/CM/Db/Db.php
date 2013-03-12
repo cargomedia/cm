@@ -63,14 +63,13 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param array|null $where
 	 */
 	public static function deleteSequence($table, $column, array $whereRow, array $where = null) {
-		if (null !== $where) {
-			$where = (array) $where;
+		if (null === $where) {
+			$where = array();
 		}
 		$sequenceMax = self::count($table, $where);
 		if ($sequenceMax) {
 			self::updateSequence($table, array($column => $sequenceMax), $whereRow, $where);
-			$whereMerged = is_array($where) ? array_merge($whereRow, $where) : $whereRow;
-			self::delete($table, $whereMerged);
+			self::delete($table, array_merge($whereRow, $where));
 		}
 	}
 
@@ -230,8 +229,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		if (1 < count($update)) {
 			throw new CM_Exception_Invalid('Only one column can be updated.');
 		}
-		if (null !== $where) {
-			$where = (array) $where;
+		if (null === $where) {
+			$where = array();
 		}
 		$value = (int) reset($update);
 		$field = key($update);
@@ -240,7 +239,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Sequence out of bounds.');
 		}
 
-		$whereMerged = is_array($where) ? array_merge($whereRow, $where) : $whereRow;
+		$whereMerged = array_merge($whereRow, $where);
 		$valueOld = CM_Db_Db::select($table, $field, $whereMerged)->fetchColumn();
 		if (false === $valueOld) {
 			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');

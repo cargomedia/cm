@@ -17,7 +17,7 @@ class CM_Db_Query_UpdateSequence extends CM_Db_Query_Abstract {
 		$this->_addSql('SET ' . $this->_getClient()->quoteIdentifier($field) . ' = ' . $this->_getClient()->quoteIdentifier($field) . ' + ?');
 		$this->_addParameters($direction);
 		$this->_addWhere($where);
-		$combinationStatement = ($where) ? 'AND' : 'WHERE';
+		$combinationStatement = empty($where) ? 'WHERE' : 'AND';
 		$this->_addSql($combinationStatement . ' ' . $this->_getClient()->quoteIdentifier($field) . ' BETWEEN ? AND ?');
 		$this->_addParameters(array($lowerBound, $upperBound));
 	}
