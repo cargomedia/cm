@@ -23,6 +23,6 @@ class CM_LockTest extends CMTest_TestCase {
 		$lock->lock(30);
 		CMTest_TH::timeForward(30);
 		$lock->waitUntilUnlocked();
-		$this->assertSame($lockedAt + 30, time());
+		$this->assertSameTime($lockedAt + 30, time());
 	}
 }
