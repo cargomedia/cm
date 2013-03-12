@@ -18,6 +18,70 @@ class CM_Db_DbTest extends CMTest_TestCase {
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
+	public function testDeleteSequence() {
+		$id1 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 1));
+		$id2 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 2));
+		$id3 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 3));
+		$id4 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 4));
+		CM_Db_Db::deleteSequence('test', 'sequence', array('id' => $id2));
+		$this->assertRow('test', array('id' => $id1, 'sequence' => 1));
+		$this->assertRow('test', array('id' => $id3, 'sequence' => 2));
+		$this->assertRow('test', array('id' => $id4, 'sequence' => 3));
+	}
+
+	public function testDeleteSequenceWithWhere() {
+		$id1 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 1));
+		$id2 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 2));
+		$id3 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 1));
+		$id4 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 2));
+		$id5 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 3));
+		CM_Db_Db::deleteSequence('test', 'sequence', array('id' => $id4), array('bar' => 'bar2'));
+		$this->assertRow('test', array('id' => $id1, 'sequence' => 1));
+		$this->assertRow('test', array('id' => $id2, 'sequence' => 2));
+		$this->assertRow('test', array('id' => $id3, 'sequence' => 1));
+		$this->assertRow('test', array('id' => $id5, 'sequence' => 2));
+	}
+
+	public function testDescribeColumn() {
+		CM_Db_Db::exec('
+			CREATE TABLE `test2` (
+				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				PRIMARY KEY (`id`)
+			)');
+		$column = CM_Db_Db::describeColumn('test2', 'id');
+		$this->assertSame('id', $column->getName());
+		$this->assertSame('int', $column->getType());
+		$this->assertSame(12, $column->getSize());
+		$this->assertNull($column->getEnum());
+		$this->assertTrue($column->getUnsigned());
+		$this->assertFalse($column->getAllowNull());
+		$this->assertNull($column->getDefaultValue());
+		CM_Db_Db::exec('DROP TABLE `test2`');
+	}
+
+	public function testDescribeColumnThrowsException() {
+		CM_Db_Db::exec('
+			CREATE TABLE `test2` (
+				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+				PRIMARY KEY (`id`)
+			)');
+		try {
+			CM_Db_Db::describeColumn('test2', 'id');
+			CM_Db_Db::describeColumn('test2', 'id1');
+			$this->fail('Column doesn\'t exist');
+		} catch (CM_Db_Exception $e) {
+			$this->assertContains('`id1`', $e->getMessage());
+		}
+
+		try {
+			CM_Db_Db::describeColumn('test_', 'id');
+			$this->fail('Table doesn\'t exist');
+		} catch (CM_Db_Exception $e) {
+			$this->assertContains('`id`', $e->getMessage());
+		}
+		CM_Db_Db::exec('DROP TABLE `test2`');
+	}
+
 	public function testExistsColumn() {
 		$this->assertSame(true, CM_Db_Db::existsColumn('test', 'foo'));
 		$this->assertSame(false, CM_Db_Db::existsColumn('test', 'test'));
@@ -117,45 +181,5 @@ class CM_Db_DbTest extends CMTest_TestCase {
 
 		$id = CM_Db_Db::getRandId('test', 'id', '`id` = 2');
 		$this->assertEquals(2, $id);
-	}
-
-	public function testDescribeColumn() {
-		CM_Db_Db::exec('
-			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
-				PRIMARY KEY (`id`)
-			)');
-		$column = CM_Db_Db::describeColumn('test2', 'id');
-		$this->assertSame('id', $column->getName());
-		$this->assertSame('int', $column->getType());
-		$this->assertSame(12, $column->getSize());
-		$this->assertNull($column->getEnum());
-		$this->assertTrue($column->getUnsigned());
-		$this->assertFalse($column->getAllowNull());
-		$this->assertNull($column->getDefaultValue());
-		CM_Db_Db::exec('DROP TABLE `test2`');
-	}
-
-	public function testDescribeColumnThrowsException() {
-		CM_Db_Db::exec('
-			CREATE TABLE `test2` (
-				`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
-				PRIMARY KEY (`id`)
-			)');
-		try {
-			CM_Db_Db::describeColumn('test2', 'id');
-			CM_Db_Db::describeColumn('test2', 'id1');
-			$this->fail('Column doesn\'t exist');
-		} catch (CM_Db_Exception $e) {
-			$this->assertContains('`id1`', $e->getMessage());
-		}
-
-		try {
-			CM_Db_Db::describeColumn('test_', 'id');
-			$this->fail('Table doesn\'t exist');
-		} catch (CM_Db_Exception $e) {
-			$this->assertContains('`id`', $e->getMessage());
-		}
-		CM_Db_Db::exec('DROP TABLE `test2`');
 	}
 }
