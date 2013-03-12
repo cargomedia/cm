@@ -79,6 +79,34 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return bool
+	 */
+	public static function existsColumn($table, $column) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $index
+	 * @return bool
+	 */
+	public static function existsIndex($table, $index) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @return bool
+	 */
+	public static function existsTable($table) {
+		return (bool) self::exec('SHOW TABLES LIKE ?', array($table))->getAffectedRows();
+	}
+
+	/**
 	 * @param string            $table
 	 * @param string|array      $fields               Column-name OR Column-names array OR associative field=>value pair
 	 * @param string|array|null $values               Column-value OR Column-values array OR Multiple Column-values array(array)
