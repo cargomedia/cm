@@ -31,7 +31,7 @@ class CM_Captcha {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		CM_Mysql::exec('DELETE FROM TBL_CM_CAPTCHA WHERE `create_time` < ?', (time() - (int) $age));
+		CM_Db_Db::delete(TBL_CM_CAPTCHA, '`create_time` < '.(time() - (int) $age));
 	}
 
 	/**

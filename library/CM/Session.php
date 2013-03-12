@@ -252,7 +252,7 @@ class CM_Session implements CM_Comparable {
 	}
 
 	public static function deleteExpired() {
-		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
+		CM_Db_Db::delete(TBL_CM_SESSION, '`expires` < '.time());
 	}
 
 	/**

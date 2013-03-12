@@ -1,6 +1,7 @@
 <?php
 
 class CM_SVM {
+
 	/**
 	 * @var SVMModel
 	 */
@@ -33,14 +34,14 @@ class CM_SVM {
 	}
 
 	/**
-	 * @param int $class
+	 * @param int   $class
 	 * @param array $values Feature=>Value pairs
 	 */
 	public function addTraining($class, array $values) {
 		$class = (int) $class;
 		$values = $this->_parseValues($values);
 		CM_Mysql::insert(TBL_CM_SVMTRAINING,
-				array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
+			array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
 		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
 	}
 
@@ -136,8 +137,9 @@ class CM_SVM {
 		foreach ($ids as $id) {
 			$trainingsCount = CM_Mysql::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
 			if ($trainingsCount > $trainingsMax) {
-				$deletedCount = CM_Mysql::exec(
-						'DELETE FROM TBL_CM_SVMTRAINING WHERE `svmId`=' . $id . ' ORDER BY `createStamp` LIMIT ' . ($trainingsCount - $trainingsMax));
+				$limit = (int) ($trainingsCount - $trainingsMax);
+				$deletedCount = CM_Db_Db::exec(
+					'DELETE FROM TBL_CM_SVMTRAINING WHERE `svmId` = ? ORDER BY `createStamp` LIMIT ' . $limit, array($id))->getAffectedRows();
 				if ($deletedCount > 0) {
 					CM_Mysql::replace(TBL_CM_SVM, array('id' => $id, 'trainingChanges' => 1));
 				}
@@ -152,5 +154,4 @@ class CM_SVM {
 			$svm->train();
 		}
 	}
-
 }

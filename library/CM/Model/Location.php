@@ -206,8 +206,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	public static function dumpToTable() {
-		CM_Mysql::exec('TRUNCATE TABLE `' . TBL_CM_TMP_LOCATION . '`');
-		CM_Mysql::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
+		CM_Db_Db::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`

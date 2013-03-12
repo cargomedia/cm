@@ -92,12 +92,12 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		}
 
 		$query = $this->_getQuery($ids, $limit);
-		$result = CM_Mysql::exec($query);
+		$result = CM_Db_Db::exec($query);
 
 		$docs = array();
 		$i = 0;
 		// Loops through all results. Write every $maxDocsPerRequest docs to the server
-		while ($row = $result->fetchAssoc()) {
+		while ($row = $result->fetch()) {
 			$doc = $this->_getDocument($row);
 			$docs[] = $doc;
 			if (!empty($idsDelete)) {

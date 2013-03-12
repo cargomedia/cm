@@ -53,8 +53,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getVariationFixtureCreatedMin() {
-		return (int) CM_Mysql::exec(
-			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ' . $this->getId())->fetchOne();
+		return (int) CM_Db_Db::exec(
+			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ' . $this->getId())->fetchColumn();
 	}
 
 	/**
@@ -181,11 +181,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
 		$cacheWrite = false;
 		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$variationFixtures = CM_Mysql::exec('
+			$variationFixtures = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 				FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
 				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-				WHERE `fixture`.`fixtureId` = ?', $fixtureId)->fetchAllTree();
+				WHERE `fixture`.`fixtureId` = ?', array($fixtureId))->fetchAllTree();
 
 			$cacheWrite = true;
 		}
