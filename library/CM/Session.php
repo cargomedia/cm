@@ -213,7 +213,7 @@ class CM_Session implements CM_Comparable {
 
 	public function write() {
 		if (!$this->isEmpty()) {
-			CM_Mysql::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
+			CM_Db_Db::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
 													'expires'   => time() + $this->getLifetime()));
 			$this->_change();
 		} elseif ($this->_isPersistent) {
