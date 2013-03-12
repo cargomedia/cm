@@ -18,6 +18,17 @@ class CM_Db_DbTest extends CMTest_TestCase {
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
+	public function testDeleteSequence(){
+		$id1 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 1));
+		$id2 = CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 2));
+		$id3 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 3));
+		$id4 = CM_Db_Db::insert('test', array('bar' => 'bar2', 'sequence' => 4));
+		CM_Db_Db::deleteSequence('test', 'sequence', array('id' => $id2));
+		$this->assertRow('test', array('id' => $id1, 'sequence' => 1));
+		$this->assertRow('test', array('id' => $id3, 'sequence' => 2));
+		$this->assertRow('test', array('id' => $id4, 'sequence' => 3));
+	}
+
 	public function testExistsColumn() {
 		$this->assertSame(true, CM_Db_Db::existsColumn('test', 'foo'));
 		$this->assertSame(false, CM_Db_Db::existsColumn('test', 'test'));

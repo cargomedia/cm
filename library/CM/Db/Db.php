@@ -57,6 +57,24 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string     $table
+	 * @param string     $column
+	 * @param array      $whereRow
+	 * @param array|null $where
+	 */
+	public static function deleteSequence($table, $column, array $whereRow, array $where = null) {
+		if (null !== $where) {
+			$where = (array) $where;
+		}
+		$sequenceMax = self::count($table, $where);
+		if ($sequenceMax) {
+			self::updateSequence($table, array($column => $sequenceMax), $whereRow, $where);
+			$whereMerged = is_array($where) ? array_merge($whereRow, $where) : $whereRow;
+			self::delete($table, $whereMerged);
+		}
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
