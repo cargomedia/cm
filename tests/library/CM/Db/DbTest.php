@@ -57,14 +57,14 @@ class CM_Db_DbTest extends CMTest_TestCase {
 			CM_Db_Db::describeColumn('cm_db_db_describe_column_test', 'id1');
 			$this->fail("Column doesn't exist");
 		} catch (CM_Db_Exception $e) {
-			$this->assertTrue(true);
+			$this->assertContains('id1', $e->getMessage());
 		}
 
 		try {
 			CM_Db_Db::describeColumn('cm_db_db_describe_column_test1', 'id');
 			$this->fail("Table doesn't exist");
 		} catch (CM_Db_Exception $e) {
-			$this->assertTrue(true);
+			$this->assertContains('id', $e->getMessage());
 		}
 	}
 }

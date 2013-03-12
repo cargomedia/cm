@@ -2,19 +2,16 @@
 
 class CM_Db_Schema_Column {
 
-	/**
-	 * @var CM_Db_Client
-	 */
+	/** @var CM_Db_Client */
 	private $_client;
 
-	/**
-	 * @var string
-	 */
-	private $_table, $_column;
+	/** @var string */
+	private $_table;
 
-	/**
-	 * @var array
-	 */
+	/** @var string */
+	private $_column;
+
+	/** @var array */
 	private $_data;
 
 	/**
@@ -24,9 +21,9 @@ class CM_Db_Schema_Column {
 	 */
 	public function __construct(CM_Db_Client $client, $table, $column) {
 		$this->_client = $client;
-		$this->_table = $table;
-		$this->_column = $column;
-		$this->_loadData();
+		$this->_table = (string) $table;
+		$this->_column = (string) $column;
+		$this->_data = $this->_getData();
 	}
 
 	/**
@@ -84,31 +81,37 @@ class CM_Db_Schema_Column {
 		return $this->_data['Default'];
 	}
 
-	private function _loadData() {
-		if (!isset($this->_data)) {
-			$query = new CM_Db_Query_Describe($this->_client, $this->_table, $this->_column);
-			$result = $query->execute();
-			$columns = $result->fetch();
-			if (false === $columns) {
-				throw new CM_Db_Exception();
-			}
-			foreach ($columns as $var => $value) {
-				if ($var === 'Type') {
-					preg_match_all("/^(\\w++)(?:\\((\\d+|'[^']*(?:''[^']*)*'(?:,'[^']*(?:''[^']*)*')*)\\))?(?: (\\w++))?$/", $value, $matches);
-					$this->_data['type'] = $matches[1][0];
-					if (preg_match('/\\d+/', $matches[2][0])) {
-						$this->_data['size'] = (int) $matches[2][0];
-					} elseif (strlen($matches[2][0])) {
-						preg_match_all("/,'([^']*(?:''[^']*)*)'/", ',' . $matches[2][0], $enumMatches);
-						$this->_data['enum'] = array_map(function ($value) {
-							return str_replace("''", "'", $value);
-						}, $enumMatches[1]);
+	private function _getData() {
+		if (isset($this->_data)) {
+			return $this->_data;
+		}
+		$data = array();
+		$query = new CM_Db_Query_Describe($this->_client, $this->_table, $this->_column);
+		$result = $query->execute();
+		$columns = $result->fetch();
+		if (false === $columns) {
+			throw new CM_Db_Exception('Column ' .$this->_column. ' not found!');
+		}
+		foreach ($columns as $var => $value) {
+			if ($var === 'Type') {
+				if (preg_match("/^(\\w++)(?:\\((\\d+|'[^']*(?:''[^']*)*'(?:,'[^']*(?:''[^']*)*')*)\\))?(?: (\\w++))?$/", $value, $matches)) {
+					$data['type'] = $matches[1];
+					if (isset($matches[2])) {
+						if (preg_match('/\\d+/', $matches[2])) {
+							$data['size'] = (int) $matches[2];
+						} elseif (strlen($matches[2])) {
+							preg_match_all("/,'([^']*(?:''[^']*)*)'/", ',' . $matches[2], $enumMatches);
+							$data['enum'] = array_map(function ($value) {
+								return str_replace("''", "'", $value);
+							}, $enumMatches[1]);
+						}
 					}
-					$this->_data['unsigned'] = ($matches[3][0] === 'unsigned');
-				} else {
-					$this->_data[$var] = $value;
+					$data['unsigned'] = isset($matches[3]) && ($matches[3] === 'unsigned');
 				}
+			} else {
+				$data[$var] = $value;
 			}
 		}
+		return $data;
 	}
 }
