@@ -80,7 +80,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		if ($metaInfo) {
 			$values['metaInfo'] = serialize($metaInfo);
 		}
-		CM_Mysql::insertDelayed(TBL_CM_LOG, $values);
+		CM_Db_Db::insertDelayed(TBL_CM_LOG, $values);
 	}
 
 	protected function _processItem($item) {
