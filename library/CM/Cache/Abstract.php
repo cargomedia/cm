@@ -3,9 +3,17 @@
 abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	const RUNTIME_LIFETIME = 3;
+	const RUNTIME_CLEAR_INTERVAL = 300;
 
 	/** @var array */
 	protected $_runtimeStore = array();
+
+	/** @var int */
+	private $_lastClearTimestamp;
+
+	public function __construct() {
+		$this->_lastClearTimestamp = time();
+	}
 
 	/**
 	 * @return CM_Cache_Abstract
@@ -19,7 +27,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string   $key
-	 * @param mixed	$value
+	 * @param mixed    $value
 	 * @param int|null $lifeTime
 	 */
 	public static final function set($key, $value, $lifeTime = null) {
@@ -75,7 +83,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param string   $tag
 	 * @param string   $key
-	 * @param mixed	$value
+	 * @param mixed    $value
 	 * @param int|null $lifetime
 	 */
 	public static final function setTagged($tag, $key, $value, $lifetime = null) {
@@ -122,8 +130,8 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string	$functionName
-	 * @param array	 $arguments
+	 * @param string    $functionName
+	 * @param array     $arguments
 	 * @param bool|null $log
 	 * @return mixed
 	 */
@@ -162,9 +170,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	abstract protected function _getName();
 
 	/**
-	 * @param string	  $key
-	 * @param mixed	   $data
-	 * @param int|null	$lifeTime
+	 * @param string      $key
+	 * @param mixed       $data
+	 * @param int|null    $lifeTime
 	 * @return boolean
 	 */
 	abstract protected function _set($key, $data, $lifeTime = null);
@@ -190,7 +198,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param string $tag
 	 * @param string $key
 	 * @param mixed  $data
-	 * @param int	$lifeTime
+	 * @param int    $lifeTime
 	 * @return boolean
 	 */
 	protected final function _setTagged($tag, $key, $data, $lifeTime = null) {
@@ -234,11 +242,24 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	private function _setRuntime($key, $value) {
 		$expirationStamp = time() + self::RUNTIME_LIFETIME;
 		$this->_runtimeStore[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
+		if($this->_lastClearTimestamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
+			$this->_freeMemory();
+		}
+	}
+
+	private function _freeMemory() {
+		$currentTime = time();
+		foreach ($this->_runtimeStore as $key => $data) {
+			if ($currentTime > $data['expirationStamp']) {
+				$this->_deleteRuntime($key);
+			}
+		}
+		$this->_lastClearTimestamp = time();
 	}
 
 	/**
@@ -264,5 +285,4 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		}
 		return $tagVersion;
 	}
-
 }
