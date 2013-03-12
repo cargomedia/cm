@@ -45,7 +45,6 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		CM_Cache_Mock::set('foo', 1);
 		$this->assertArrayHasKey('foo', CM_Cache_Mock::getRuntimeStore());
 		CMTest_TH::timeForward(305);
-		CM_Cache_Mock::simulateForgetting('foo');
 		CM_Cache_Mock::set('bar', 1);
 		$this->assertArrayNotHasKey('foo', CM_Cache_Mock::getRuntimeStore());
 	}

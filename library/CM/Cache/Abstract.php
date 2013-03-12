@@ -247,12 +247,12 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	private function _setRuntime($key, $value) {
 		$expirationStamp = time() + self::RUNTIME_LIFETIME;
 		$this->_runtimeStore[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
-		if($this->_runtimeLastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
+		if ($this->_runtimeLastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
 			$this->_runtimeDeleteExpired();
 		}
 	}
 
-	public function _runtimeDeleteExpired() {
+	private function _runtimeDeleteExpired() {
 		$currentTime = time();
 		foreach ($this->_runtimeStore as $key => $data) {
 			if ($currentTime > $data['expirationStamp']) {
