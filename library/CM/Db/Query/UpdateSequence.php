@@ -11,7 +11,7 @@ class CM_Db_Query_UpdateSequence extends CM_Db_Query_Abstract {
 	 * @param int          $lowerBound
 	 * @param int          $upperBound
 	 */
-	public function __construct($client, $table, $field, $direction, $where = null, $lowerBound, $upperBound) {
+	public function __construct($client, $table, $field, $direction, $where, $lowerBound, $upperBound) {
 		parent::__construct($client);
 		$this->_addSql('UPDATE ' . $this->_getClient()->quoteIdentifier($table));
 		$this->_addSql('SET ' . $this->_getClient()->quoteIdentifier($field) . ' = ' . $this->_getClient()->quoteIdentifier($field) . ' + ?');
