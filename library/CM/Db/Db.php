@@ -74,6 +74,15 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return CM_Db_Schema_Column
+	 */
+	public static function describeColumn($table, $column) {
+		return new CM_Db_Schema_Column(self::_getClient(false), $table, $column);
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
@@ -261,6 +270,66 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$query->execute();
 
 		self::update($table, array($field => $value), $whereMerged);
+	}
+
+	/**
+	 * @param array|null  $tables
+	 * @param bool|null   $skipData
+	 * @param bool|null   $skipStructure
+	 * @param string|null $dbName
+	 * @return string
+	 */
+	public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
+		$config = self::_getConfig();
+		if (null === $dbName) {
+			$dbName = $config->db;
+		}
+		$args = array();
+		$args[] = '--compact';
+		$args[] = '--add-drop-table';
+		$args[] = '--extended-insert';
+		if ($skipData) {
+			$args[] = '--no-data';
+		}
+		if ($skipStructure) {
+			$args[] = '--no-create-info';
+		}
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->user;
+		$args[] = '--password=' . $config->pass;
+		$args[] = $dbName;
+		if ($tables) {
+			foreach ($tables as $table) {
+				$args[] = $table;
+			}
+		}
+
+		$dump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
+		$dump .= '/*!40101 SET NAMES utf8 */;' . PHP_EOL;
+		if (array() !== $tables) {
+			$queries = CM_Util::exec('mysqldump', $args);
+			$queries = preg_replace('#(\s+)AUTO_INCREMENT\s*=\s*\d+\s+#', '$1', $queries);
+			$queries = preg_replace('#/\*.*?\*/;#', '', $queries);
+			$dump .= $queries;
+		}
+
+		return $dump;
+	}
+
+	/**
+	 * @param string  $dbName
+	 * @param CM_File $dump
+	 */
+	public static function runDump($dbName, CM_File $dump) {
+		$config = self::_getConfig();
+		$args = array();
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->user;
+		$args[] = '--password=' . $config->pass;
+		$args[] = $dbName;
+		CM_Util::exec('mysql', $args, null, $dump->getPath());
 	}
 
 	/**
