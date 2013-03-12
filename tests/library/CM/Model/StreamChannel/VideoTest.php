@@ -29,7 +29,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 			CM_Model_StreamChannel_Video::create(array('key' => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2, 'adapterType' => 1));
 			$this->fail('Can create streamChannel without serverId');
 		} catch (CM_Exception $ex) {
-			$this->assertContains("`Column 'serverId' cannot be null`", $ex->getMessage());
+			$this->assertContains("Column 'serverId' cannot be null", $ex->getMessage());
 		}
 	}
 
