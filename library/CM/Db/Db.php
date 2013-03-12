@@ -57,6 +57,15 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return CM_Db_Schema_Column
+	 */
+	public static function describeColumn($table, $column) {
+		return new CM_Db_Schema_Column(self::_getClient(false), $table, $column);
+	}
+
+	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
 	 * @return CM_Db_Result
@@ -184,7 +193,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$client = self::_getClient(false);
 		$idGuess = self::_getRandIdGuess($table, $column, $where);
 		$columnQuoted = $client->quoteIdentifier($column);
-		$whereGuessId = (null === $where ? '': $where . ' AND ') . $columnQuoted . " <= $idGuess";
+		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
 		$id = CM_Db_Db::select($table, $column, $whereGuessId)->fetchColumn();
 
 		if (!$id) {
@@ -211,15 +220,6 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$idBounds = CM_Db_Db::exec($sql)->fetch();
 		return rand($idBounds['min'], $idBounds['max']);
-	}
-
-	/**
-	 * @param string $table
-	 * @param string $column
-	 * @return CM_Db_Schema_Column
-	 */
-	public static function describeColumn($table, $column) {
-		return new CM_Db_Schema_Column(self::_getClient(false), $table, $column);
 	}
 
 	/**

@@ -90,7 +90,7 @@ class CM_Db_Schema_Column {
 		$result = $query->execute();
 		$columns = $result->fetch();
 		if (false === $columns) {
-			throw new CM_Db_Exception('Column ' .$this->_column. ' not found!');
+			throw new CM_Db_Exception('Column `' . $this->_column . '` not found');
 		}
 		foreach ($columns as $var => $value) {
 			if ($var === 'Type') {
