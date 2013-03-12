@@ -180,7 +180,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param array|null $where    Associative array field=>value
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function updateSequence($table, $update, array $whereRow, $where = null) {
+	public static function updateSequence($table, $update, array $whereRow, array $where = null) {
 		if (1 < count($update)) {
 			throw new CM_Exception_Invalid('Only one column can be updated.');
 		}
