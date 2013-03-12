@@ -11,7 +11,7 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <= 10; $i++) {
-			CM_Mysql::insert(TBL_TEST_A, array('num' => $i % 5));
+			CM_Db_Db::insert(TBL_TEST_A, array('num' => $i % 5));
 		}
 		CM_Mysql::exec('CREATE TABLE TBL_TEST_B (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -19,7 +19,7 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <=5; $i++) {
-			CM_Mysql::insert(TBL_TEST_B, array('num' => $i % 5));
+			CM_Db_Db::insert(TBL_TEST_B, array('num' => $i % 5));
 		}
 	}
 

@@ -39,7 +39,7 @@ class CM_SVM {
 	public function addTraining($class, array $values) {
 		$class = (int) $class;
 		$values = $this->_parseValues($values);
-		CM_Mysql::insert(TBL_CM_SVMTRAINING,
+		CM_Db_Db::insert(TBL_CM_SVMTRAINING,
 				array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
 		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
 	}

@@ -4,19 +4,19 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	private static $_fields;
 
 	public static function setUpBeforeClass() {
-		$switzerland = CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'CH', 'name' => 'Switzerland'));
-		$germany = CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'DE', 'name' => 'Germany'));
+		$switzerland = CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'CH', 'name' => 'Switzerland'));
+		$germany = CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'DE', 'name' => 'Germany'));
 
-		$baselStadt = CM_Mysql::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
-		$zuerich = CM_Mysql::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Zürich'));
+		$baselStadt = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
+		$zuerich = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Zürich'));
 
-		$basel = CM_Mysql::insert(TBL_CM_LOCATIONCITY, array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
+		$basel = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
 			'lat' => 47.569535, 'lon' => 7.574063));
-		$winterthur = CM_Mysql::insert(TBL_CM_LOCATIONCITY, array('stateId' => $zuerich, 'countryId' => $switzerland, 'name' => 'Winterthur',
+		$winterthur = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $zuerich, 'countryId' => $switzerland, 'name' => 'Winterthur',
 			'lat' => 47.502315, 'lon' => 8.724947));
 
-		CM_Mysql::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
-		CM_Mysql::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
+		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
+		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
 
 		$location = CM_Mysql::exec('SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
 				`2`.`id` `2.id`, `2`.`name` `2.name`,
@@ -125,13 +125,13 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 
 	public function testFindByIp() {
 		$cityId1 = CM_Mysql::getRandId(TBL_CM_LOCATIONCITY, 'id');
-		CM_Mysql::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
+		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
 		$cityId2 = CM_Mysql::getRandId(TBL_CM_LOCATIONCITY, 'id');
-		CM_Mysql::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
+		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
 		$countryId1 = CM_Mysql::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
-		CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
+		CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
 		$countryId2 = CM_Mysql::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
-		CM_Mysql::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
+		CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
 
 		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId1), CM_Model_Location::findByIp(3));
 		$this->assertNull(CM_Model_Location::findByIp(6));

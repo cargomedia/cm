@@ -229,7 +229,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	protected static function _create(array $data) {
-		$userId = CM_Mysql::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time()));
+		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time()));
 		return new static($userId);
 	}
 

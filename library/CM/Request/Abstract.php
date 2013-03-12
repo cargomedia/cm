@@ -131,7 +131,7 @@ abstract class CM_Request_Abstract {
 	public function getClientId() {
 		if (!$this->hasClientId()) {
 			if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = (int) CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+				$this->_clientId = (int) CM_Db_Db::insert(TBL_CM_REQUESTCLIENT, array());
 			}
 		}
 

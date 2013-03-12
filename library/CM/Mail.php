@@ -299,7 +299,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	private function _queue($subject, $text, $html) {
-		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
+		CM_Db_Db::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
 			'sender' => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()), 'to' => serialize($this->getTo()),
 			'cc' => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
 	}

@@ -126,9 +126,9 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		$serverId = $data['serverId'];
 		$thumbnailCount = (int) $data['thumbnailCount'];
 		$adapterType = (int) $data['adapterType'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		try {
-			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
+			CM_Db_Db::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
 			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));

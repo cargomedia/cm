@@ -30,7 +30,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 			$filename = substr($filename, -100, 100);
 		}
 		$uniqid = md5(rand() . uniqid());
-		CM_Mysql::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
+		CM_Db_Db::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
 		$file = new self($uniqid);
 		$file->mkDir();
