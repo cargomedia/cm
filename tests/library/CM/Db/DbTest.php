@@ -3,19 +3,25 @@
 class CM_Db_DbTest extends CMTest_TestCase {
 
 	public function setUp() {
-		CM_Db_Db::exec(
-			'CREATE TABLE `test` (
-					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
-					`foo` VARCHAR(100) NULL,
-					`bar` VARCHAR(100) NULL,
-					`sequence` INT UNSIGNED NOT NULL,
-					PRIMARY KEY (`id`),
-					UNIQUE KEY (`foo`)
-				)');
+		CM_Db_Db::exec('
+			CREATE TABLE `test` (
+				`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+				`foo` VARCHAR(100) NULL,
+				`bar` VARCHAR(100) NULL,
+				`sequence` INT UNSIGNED NOT NULL,
+				PRIMARY KEY (`id`),
+				UNIQUE KEY (`foo`)
+			)');
 	}
 
 	public function tearDown() {
 		CM_Db_Db::exec('DROP TABLE `test`');
+	}
+
+	public function testCount() {
+		$this->assertSame(0, CM_Db_Db::count('test'));
+		CM_Db_Db::insert('test', array('bar' => 'bar1', 'sequence' => 1));
+		$this->assertSame(1, CM_Db_Db::count('test'));
 	}
 
 	public function testDeleteSequence() {
