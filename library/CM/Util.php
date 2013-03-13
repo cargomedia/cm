@@ -138,17 +138,42 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $xml
+	 * @throws CM_Exception_Invalid
+	 * @return SimpleXMLElement
+	 */
+	public static function parseXml($xml) {
+		$xml = (string) $xml;
+
+		$xml = @simplexml_load_string($xml);
+		if (false === $xml) {
+			throw new CM_Exception_Invalid('Could not parse xml');
+		}
+
+		return $xml;
+	}
+
+	/**
 	 * @param string $path
+	 * @return string
 	 * @throws CM_Exception
 	 */
 	public static function mkDir($path) {
 		$path = (string) $path;
-		if (is_dir($path)) {
-			return;
+		if (!is_dir($path)) {
+			if (false === mkdir($path, 0777, true)) {
+				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+			}
 		}
-		if (false === mkdir($path, 0777, true)) {
-			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
-		}
+		return $path;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function mkDirTmp() {
+		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		return self::mkDir($path);
 	}
 
 	/**
@@ -322,9 +347,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @static
-	 * @param $command
-	 * @param $stdin
+	 * @param string $command
+	 * @param string $stdin
 	 * @return string
 	 * @throws CM_Exception
 	 */
@@ -364,14 +388,13 @@ class CM_Util {
 		}
 		$now = microtime(true) * 1000;
 		$previousValue = null;
-		if ($times[$namespace]) {
+		if (array_key_exists($namespace, $times)) {
 			$difference = $now - $times[$namespace];
 		} else {
 			$difference = null;
 		}
 		$times[$namespace] = $now;
 		return sprintf('%.2f ms', $difference);
-
 	}
 
 	/**
@@ -409,7 +432,6 @@ class CM_Util {
 			CM_CacheLocal::set($key, $classNames);
 		}
 		return $classNames;
-
 	}
 
 	/**
@@ -465,5 +487,4 @@ class CM_Util {
 		}
 		return $result;
 	}
-
 }

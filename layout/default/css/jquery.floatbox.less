@@ -1,0 +1,22 @@
+.floatbox-body {
+	.background-color(@colorBg);
+	.border(lighten(@colorFg, 20));
+	.box-shadow(0 0 15px @colorFg);
+}
+
+.floatbox-controls {
+	right: 1px;
+	top: 1px;
+}
+
+.floatbox-controls .icon-close {
+	display: inline-block;
+	line-height: 1;
+	padding: 4px;
+	float: right;
+	color: @colorFgIcon;
+
+	&:hover {
+		color: @colorClose;
+	}
+}

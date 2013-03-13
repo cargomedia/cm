@@ -6,27 +6,25 @@ class CMTest_TH {
 	private static $initialized = false;
 	private static $_configBackup;
 
+	/** @var CM_Db_Client|null */
+	private static $_dbClient = null;
+
 	public static function init() {
 		if (self::$initialized) {
 			return;
 		}
-		$dbName = CM_Config::get()->CM_Mysql->db;
+		$config = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password);
+
 		if (CM_Config::get()->CMTest_TH->dropDatabase) {
-			try {
-				CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
-			} catch (CM_Mysql_DbSelectException $e) {
-				// Database does not exist
-			}
+			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($config->db))->execute();
 		}
 
-		try {
-			CM_Mysql::selectDb($dbName);
-		} catch (CM_Mysql_DbSelectException $e) {
-			CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
-
-			CM_Mysql::selectDb($dbName);
+		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($config->db))->fetch();
+		if (!$databaseExists) {
+			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config->db))->execute();
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Mysql::runDump($dbName, $dump);
+				CM_Mysql::runDump($config->db, $dump);
 			}
 		}
 
@@ -143,6 +141,7 @@ class CMTest_TH {
 		}
 		$session = new CM_Session();
 		$session->setUser($user);
+		$session->write();
 		return $session;
 	}
 
@@ -229,6 +228,18 @@ class CMTest_TH {
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	/**
+	 * @return CM_Db_Client
+	 */
+	public static function getDbClient() {
+		if (null !== self::$_dbClient) {
+			return self::$_dbClient;
+		}
+		$config = CM_Config::get()->CM_Db_Db;
+		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+		return self::$_dbClient;
 	}
 
 	public static function randomizeAutoincrement() {

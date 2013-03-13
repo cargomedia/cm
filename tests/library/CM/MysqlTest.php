@@ -3,7 +3,7 @@
 class CM_MysqlTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		define('TBL_TEST', 'test');
+		defined('TBL_TEST') || define('TBL_TEST', 'test');
 	}
 
 	public static function tearDownAfterClass() {

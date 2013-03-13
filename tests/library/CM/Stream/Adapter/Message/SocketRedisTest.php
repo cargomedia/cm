@@ -59,11 +59,22 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertEquals($user, $streamSubscribe->getUser());
 	}
 
+	public function testOnRedisMessageSubscribeSessionInvalid() {
+		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
+		$message = array('type' => 'subscribe',
+						 'data' => array('channel' => 'foo', 'clientKey' => 'bar', 'data' => array('sessionId' => 'foo')));
+		$adapter->onRedisMessage(json_encode($message));
+
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
+		$this->assertNull($streamSubscribe->getUser());
+	}
+
 	public function testOnRedisMessageUnsubscribe() {
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
 		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'foo', 'adapterType' => $adapter->getType()));
-		CM_Model_Stream_Subscribe::create(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time()));
-		CM_Model_Stream_Subscribe::create(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time()));
+		CM_Model_Stream_Subscribe::create(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
+		CM_Model_Stream_Subscribe::create(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
 
 		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'foo'));
 		$adapter->onRedisMessage(json_encode($message));
@@ -79,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
-		$jsTime =  time() * 1000;
+		$jsTime =  (time() - 3) * 1000;
 		for ($i = 0; $i < 2; $i++) {
 			$status = array(
 				'channel-foo' => array('subscribers' => array(
@@ -95,10 +106,27 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		}
 		$status = array(
 			'channel-foo' => array('subscribers' => array(
-				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => time(), 'data' => array()),
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
 			))
 		);
 		$this->_testSynchronize($status);
+	}
+
+	public function testSynchronizeIgnoreNewSubscribers() {
+		$jsTime =  time() * 1000;
+		$status = array(
+			'channel-foo' => array('subscribers' => array(
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+			))
+		);
+		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+		$adapter->synchronize();
+
+		$this->assertNull(CM_Model_StreamChannel_Message::findByKey('channel-foo', $adapter->getType()));
+		$subscribes = new CM_Paging_StreamSubscribe_AdapterType($adapter->getType());
+		$this->assertSame(0, $subscribes->getCount());
 	}
 
 	/**
@@ -123,7 +151,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
 				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
 				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
-				$this->assertSameTime(time(), $subscribe->getStart());
+				$this->assertSameTime(time() - 3, $subscribe->getStart());
 				$this->assertNull($subscribe->getAllowedUntil());
 			}
 		}

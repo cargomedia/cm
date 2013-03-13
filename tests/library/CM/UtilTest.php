@@ -2,6 +2,14 @@
 
 class CM_UtilTest extends CMTest_TestCase {
 
+	public function testBenchmark() {
+		$this->assertSame(0.0, (float) CM_Util::benchmark());
+		$this->assertSame(0.0, (float) CM_Util::benchmark('CM'));
+
+		$this->assertGreaterThan(0, (float) CM_Util::benchmark());
+		$this->assertGreaterThan(0, (float) CM_Util::benchmark('CM'));
+	}
+
 	public function testGetClasses() {
 		$classPaths = array();
 		$classPaths['CM_Class_Abstract'] = 'CM/Class/Abstract.php';
@@ -35,13 +43,13 @@ class CM_UtilTest extends CMTest_TestCase {
 			array('id' => 3, 'type' => 1, 'amount' => 3), array('id' => 4, 'type' => 1, 'amount' => 4));
 
 		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
-			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), CM_Util::getArrayTree($array));
+								3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), CM_Util::getArrayTree($array));
 
 		$this->assertSame(array(1 => array('id' => 1, 'type' => 1), 2 => array('id' => 2, 'type' => 1), 3 => array('id' => 3, 'type' => 1),
-			4 => array('id' => 4, 'type' => 1)), CM_Util::getArrayTree($array, 1, true, 'amount'));
+								4 => array('id' => 4, 'type' => 1)), CM_Util::getArrayTree($array, 1, true, 'amount'));
 
 		$this->assertSame(array(1 => array(1 => 1), 2 => array(1 => 2), 3 => array(1 => 3),
-			4 => array(1 => 4)), CM_Util::getArrayTree($array, 2, true, array('amount', 'type')));
+								4 => array(1 => 4)), CM_Util::getArrayTree($array, 2, true, array('amount', 'type')));
 
 		try {
 			CM_Util::getArrayTree($array, 1, true, 'foo');
@@ -65,4 +73,16 @@ class CM_UtilTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testParseXml() {
+		$xml = CM_Util::parseXml('<?xml version="1.0" encoding="utf-8"?><document><foo>bar</foo></document>');
+		$this->assertInstanceOf('SimpleXMLElement', $xml);
+		$this->assertSame('bar', (string) $xml->foo);
+
+		try {
+			CM_Util::parseXml('invalid xml');
+			$this->fail('No exception for invalid xml');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertTrue(true);
+		}
+	}
 }

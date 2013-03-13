@@ -229,17 +229,11 @@ CM_App.prototype = {
 	dom: {
 		_swfId: 0,
 		ready: function() {
-			var _cleanData = $.cleanData;
-			$.cleanData = function(elems) {
-				for (var i = 0, elem; (elem = elems[i]) != null; i++) {
-					cm.dom.teardown($(elem));
-				}
-				_cleanData(elems);
-			};
-
-			window.addEventListener('load', function() {
-				new FastClick(document.body);
-			}, false);
+			if (window.addEventListener) {
+				window.addEventListener('load', function() {
+					new FastClick(document.body);
+				}, false);
+			}
 		},
 		/**
 		 * @param {jQuery} $dom
@@ -253,12 +247,6 @@ CM_App.prototype = {
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
-		},
-		/**
-		 * @param {jQuery} $dom
-		 */
-		teardown: function($dom) {
-			$dom.find('[data-original-title]').tooltip('hide');
 		}
 	},
 
@@ -849,7 +837,7 @@ CM_App.prototype = {
 							cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
 						},
 						error: function(msg, type, isPublic) {
-							$placeholder.addClass('error').html(msg);
+							$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
 							cm.router.onError();
 							return false;
 						},
