@@ -581,11 +581,9 @@ CM_App.prototype = {
 		/** @type {CM_Stream_Adapter_Message_Abstract} */
 		_adapter: null,
 
-		/** @type {Backbone.Events} */
-		_dispatcher: _.clone(Backbone.Events),
-
 		/** @type {Object} */
 		_subscribes: {},
+
 		/**
 		 * @param {String} channel
 		 * @param {String} namespace
@@ -596,25 +594,24 @@ CM_App.prototype = {
 			if (!cm.options.stream.enabled) {
 				return;
 			}
-			if (!this._getBindCount(channel)) {
+			if (!this._subscribes[channel]) {
 				this._subscribe(channel);
 			}
-			this._dispatcher.on(channel + ':' + namespace, callback, context);
+			this._subscribes[channel].on(namespace, callback, context);
 		},
 
 		/**
-		 * @param {String} [channel]
-		 * @param {String} [namespace]
+		 * @param {String} channel
+		 * @param {String} [event]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channel, namespace, callback, context) {
-			var event = null;
-			if (channel || namespace) {
-				event = channel + ':' + namespace;
+		unbind: function(channel, event, callback, context) {
+			if (!this._subscribes[channel]) {
+				return;
 			}
-			this._dispatcher.off(event, callback, context);
-			if (this.this._getBindCount(channel) === 0) {
+			this._subscribes[channel].off(event, callback, context);
+			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
 		},
@@ -624,12 +621,10 @@ CM_App.prototype = {
 		 * @return {Integer}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._dispatcher._callbacks) {
+			if (!this._subscribes[channel]._callbacks) {
 				return 0;
 			}
-			return _.size(_.filter(this._dispatcher._callbacks, function(callback, event) {
-				return event.split(':')[0] === channel;
-			}));
+			return _.size(this._subscribes[channel]._callbacks);
 		},
 
 		/**
@@ -651,8 +646,11 @@ CM_App.prototype = {
 		 */
 		_subscribe: function(channel) {
 			var handler = this;
+			this._subscribes[channel] = _.clone(Backbone.Events);
 			this._getAdapter().subscribe(channel, function(message) {
-				handler._dispatcher.trigger(channel + ':' + message.namespace, message.data);
+				if (handler._subscribes[channel]) {
+					handler._subscribes[channel].trigger(message.namespace, message.data);
+				}
 			});
 		},
 
