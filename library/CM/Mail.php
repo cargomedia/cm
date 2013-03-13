@@ -276,7 +276,8 @@ class CM_Mail extends CM_View_Abstract {
 	 * @param int $limit
 	 */
 	public static function processQueue($limit) {
-		$result = CM_Db_Db::execRead("SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ?", array((int) $limit));
+		$limit = (int) $limit;
+		$result = CM_Db_Db::execRead('SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ' . $limit);
 		while ($row = $result->fetch()) {
 			$mail = new CM_Mail();
 			foreach (unserialize($row['to']) as $to) {
