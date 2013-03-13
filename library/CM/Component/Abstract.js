@@ -19,6 +19,17 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	 */
 	repaint: function() {
 	},
+
+	bindRepaintOnWindowResize: function() {
+		var self = this;
+		var callback = function() {
+			self.repaint();
+		};
+		$(window).on('resize', callback);
+		this.on('destruct', function() {
+			$(window).off('resize', callback);
+		});
+	},
 	
 	/**
 	 * @return jQuery
@@ -32,6 +43,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	},
 	
 	popOut: function(options) {
+		this.repaint();
 		this.$().floatOut(options);
 		this.repaint();
 	},
