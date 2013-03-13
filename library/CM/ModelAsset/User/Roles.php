@@ -57,12 +57,14 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 		}
 		self::deleteOld($this->_model);
 		if ($duration) {
-			CM_Db_Db::exec("INSERT INTO TBL_CM_ROLE (`userId`, `role`, `startStamp`, `expirationStamp`) VALUES(?, ?, ?, ?)
-							ON DUPLICATE KEY UPDATE `expirationStamp` = `expirationStamp` + ?", array($this->_model->getId(), $role, time(),
-				time() + $duration, $duration));
+			CM_Db_Db::exec('
+				INSERT INTO TBL_CM_ROLE (`userId`, `role`, `startStamp`, `expirationStamp`)
+				VALUES(?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE `expirationStamp` = `expirationStamp` + ?',
+				array($this->_model->getId(), $role, time(), time() + $duration, $duration));
 		} else {
-			CM_Db_Db::insert(TBL_CM_ROLE, array('userId', 'role', 'startStamp'), array($this->_model->getId(), $role,
-				time()), array('expirationStamp' => null));
+			CM_Db_Db::insert(TBL_CM_ROLE, array('userId', 'role', 'startStamp'),
+				array($this->_model->getId(), $role, time()), array('expirationStamp' => null));
 		}
 		$this->_change();
 	}
