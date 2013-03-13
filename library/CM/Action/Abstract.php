@@ -206,7 +206,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @param int $age Seconds
 	 */
 	public static final function deleteOlder($age) {
-		CM_Db_Db::delete(TBL_CM_ACTION, '`createStamp` < ' . (time() - (int) $age));
+		$age = (int) $age;
+		CM_Db_Db::delete(TBL_CM_ACTION, '`createStamp` < ' . (time() - $age));
 	}
 
 	public final function toArray() {
