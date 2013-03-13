@@ -197,9 +197,12 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::exec("SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible` FROM TBL_CM_USER AS `main`
-								LEFT JOIN TBL_CM_USER_ONLINE AS `online` USING (`userId`)
-								WHERE `main`.`userId`=?", array($this->getId()))->fetch();
+		return CM_Db_Db::exec('
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
+			FROM TBL_CM_USER AS `main`
+			LEFT JOIN TBL_CM_USER_ONLINE AS `online` USING (`userId`)
+			WHERE `main`.`userId`=?',
+			array($this->getId()))->fetch();
 	}
 
 	/**
@@ -212,8 +215,12 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	public static function offlineOld() {
-		$res = CM_Db_Db::exec('SELECT `o`.`userId` FROM TBL_CM_USER_ONLINE `o` LEFT JOIN TBL_CM_USER `u` USING(`userId`)
-								WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',array(time() - CM_Session::ACTIVITY_EXPIRATION));
+		$res = CM_Db_Db::exec('
+			SELECT `o`.`userId`
+			FROM TBL_CM_USER_ONLINE `o`
+			LEFT JOIN TBL_CM_USER `u` USING(`userId`)
+			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
+			array(time() - CM_Session::ACTIVITY_EXPIRATION));
 		while ($userId = $res->fetchColumn()) {
 			try {
 				$user = CM_Model_User::factory($userId);
