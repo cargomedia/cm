@@ -245,7 +245,7 @@ class CMTest_TH {
 	public static function randomizeAutoincrement() {
 		$tables = CM_Mysql::query('SHOW TABLES')->fetchCol();
 		foreach ($tables as $table) {
-			if (CM_Db_Db::exec("SHOW COLUMNS FROM `" . $table . "` WHERE `Extra` = 'auto_increment'")->fetchColumn()) {
+			if (CM_Db_Db::exec("SHOW COLUMNS FROM `" . $table . "` WHERE `Extra` = 'auto_increment'")->fetch()) {
 				CM_Db_Db::exec("ALTER TABLE `" . $table . "` AUTO_INCREMENT = " . rand(1, 1000));
 			}
 		}
