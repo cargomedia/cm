@@ -579,7 +579,7 @@ var CM_App = CM_Class_Abstract.extend({
 		_adapter: null,
 
 		/** @type {Object} */
-		_subscribes: {},
+		_channelDispatchers: {},
 
 		/**
 		 * @param {String} channel
@@ -591,10 +591,10 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!cm.options.stream.enabled) {
 				return;
 			}
-			if (!this._subscribes[channel]) {
+			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
 			}
-			this._subscribes[channel].on(namespace, callback, context);
+			this._channelDispatchers[channel].on(namespace, callback, context);
 		},
 
 		/**
@@ -604,10 +604,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		unbind: function(channel, event, callback, context) {
-			if (!this._subscribes[channel]) {
+			if (!this._channelDispatchers[channel]) {
 				return;
 			}
-			this._subscribes[channel].off(event, callback, context);
+			this._channelDispatchers[channel].off(event, callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
@@ -618,10 +618,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {Integer}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._subscribes[channel]._events) {
+			if (!this._channelDispatchers[channel]._events) {
 				return 0;
 			}
-			return _.size(this._subscribes[channel]._events);
+			return _.size(this._channelDispatchers[channel]._events);
 		},
 
 		/**
@@ -639,10 +639,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		_subscribe: function(channel) {
 			var handler = this;
-			this._subscribes[channel] = _.clone(Backbone.Events);
+			this._channelDispatchers[channel] = _.clone(Backbone.Events);
 			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
-				if (handler._subscribes[channel]) {
-					handler._subscribes[channel].trigger(message.namespace, message.data);
+				if (handler._channelDispatchers[channel]) {
+					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
 				}
 			});
 		},
@@ -651,8 +651,8 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String} channel
 		 */
 		_unsubscribe: function(channel) {
-			if (this._subscribes[channel]) {
-				delete this._subscribes[channel];
+			if (this._channelDispatchers[channel]) {
+				delete this._channelDispatchers[channel];
 			}
 			this._adapter.unsubscribe(channel);
 		}
