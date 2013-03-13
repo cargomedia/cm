@@ -64,8 +64,9 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		$query = CM_Db_Db::exec('SELECT `uniqid` FROM TBL_CM_TMP_USERFILE WHERE `createStamp` < ?', array(time() - (int) $age));
-		foreach ($query->fetchAllColumn() as $uniqid) {
+		$age = (int) $age;
+		$result = CM_Db_Db::select(TBL_CM_TMP_USERFILE, 'uniqid', '`createStamp` < ' . (time() - $age));
+		foreach ($result->fetchAllColumn() as $uniqid) {
 			$tmpFile = new CM_File_UserContent_Temp($uniqid);
 			$tmpFile->delete();
 		}
