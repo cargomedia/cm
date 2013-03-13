@@ -14,7 +14,7 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	public function add($ip) {
 		CM_Mysql::replace(TBL_CM_IPBLOCKED, array('ip' => (int) $ip, 'createStamp' => time()));
 	}
-	
+
 	/**
 	 * @param int $ip
 	 */
@@ -26,6 +26,6 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		CM_Mysql::exec("DELETE FROM TBL_CM_IPBLOCKED WHERE `createStamp` < ?", time() - (int) $age);
+		CM_Db_Db::delete(TBL_CM_IPBLOCKED, '`createStamp` < '.(time() - (int) $age));
 	}
 }
