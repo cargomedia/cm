@@ -1,17 +1,22 @@
 /**
  * @class CM_Stream_Adapter_Message_Abstract
- * @constructor
+ * @extends CM_Class_Abstract
  */
-function CM_Stream_Adapter_Message_Abstract(options) {
-}
+var CM_Stream_Adapter_Message_Abstract = CM_Class_Abstract.extend({
+	/**
+	 * @constructor
+	 * @param {Object} options
+	 */
+	initialize: function(options) {
 
-CM_Stream_Adapter_Message_Abstract.prototype = {
+	},
 
 	/**
 	 * @param {String} channel
+	 * @param {Object|Null} data
 	 * @param {Function} onmessage
 	 */
-	subscribe: function(channel, onmessage) {
+	subscribe: function(channel, data, onmessage) {
 		throw 'Not implemented';
 	},
 
@@ -21,4 +26,4 @@ CM_Stream_Adapter_Message_Abstract.prototype = {
 	unsubscribe: function(channel) {
 		throw 'Not implemented';
 	}
-};
+});

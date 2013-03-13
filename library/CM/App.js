@@ -1,11 +1,8 @@
 /**
  * @class CM_App
- * @constructor
+ * @extends CM_Class_Abstract
  */
-function CM_App() {
-}
-
-CM_App.prototype = {
+var CM_App = CM_Class_Abstract.extend({
 	/** @type Object **/
 	views: {},
 
@@ -632,7 +629,7 @@ CM_App.prototype = {
 		 */
 		_getAdapter: function() {
 			if (!this._adapter) {
-				this._adapter = eval('new ' + cm.options.stream.adapter + '(cm.options.stream.options);');
+				this._adapter = new window[cm.options.stream.adapter](cm.options.stream.options);
 			}
 			return this._adapter;
 		},
@@ -916,4 +913,4 @@ CM_App.prototype = {
 			$('[data-menu-entry-hash]').removeClass('active');
 		}
 	}
-};
+});
