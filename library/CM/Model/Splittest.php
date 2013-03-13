@@ -54,7 +54,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public function getVariationFixtureCreatedMin() {
 		return (int) CM_Db_Db::exec(
-			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ' . $this->getId())->fetchColumn();
+			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ?', array($this->getId()))->fetchColumn();
 	}
 
 	/**
