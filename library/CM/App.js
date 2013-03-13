@@ -621,10 +621,10 @@ CM_App.prototype = {
 		 * @return {Integer}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._subscribes[channel]._callbacks) {
+			if (!this._subscribes[channel]._events) {
 				return 0;
 			}
-			return _.size(this._subscribes[channel]._callbacks);
+			return _.size(this._subscribes[channel]._events);
 		},
 
 		/**
@@ -632,11 +632,7 @@ CM_App.prototype = {
 		 */
 		_getAdapter: function() {
 			if (!this._adapter) {
-				if (cm.options.stream.adapter == 'CM_Stream_Adapter_Message_SocketRedis') {
-					this._adapter = new CM_Stream_Adapter_Message_SocketRedis(cm.options.stream.options);
-				} else {
-					cm.error.trigger('Cannot understand stream adapter `' + cm.options.stream.adapter + '`')
-				}
+				this._adapter = eval('new ' + cm.options.stream.adapter + '(cm.options.stream.options);');
 			}
 			return this._adapter;
 		},
@@ -647,7 +643,7 @@ CM_App.prototype = {
 		_subscribe: function(channel) {
 			var handler = this;
 			this._subscribes[channel] = _.clone(Backbone.Events);
-			this._getAdapter().subscribe(channel, function(message) {
+			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
 				if (handler._subscribes[channel]) {
 					handler._subscribes[channel].trigger(message.namespace, message.data);
 				}

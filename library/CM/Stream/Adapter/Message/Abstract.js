@@ -1,5 +1,6 @@
 /**
  * @class CM_Stream_Adapter_Message_Abstract
+ * @constructor
  */
 function CM_Stream_Adapter_Message_Abstract(options) {
 }
