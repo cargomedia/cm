@@ -734,6 +734,9 @@ CM_App.prototype = {
 		 * @param {Object} [context]
 		 */
 		bind: function(actionVerb, modelType, callback, context) {
+			if (!cm.options.stream.channel) {
+				return;
+			}
 			if (!this._registered) {
 				cm.stream.bind(cm.options.stream.channel, 'CM_Action_Abstract', function(response) {
 					this._dispatcher.trigger(response.action.verb + ':' + response.model._type, response.action, response.model, response.data);
