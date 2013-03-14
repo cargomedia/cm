@@ -21,7 +21,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function setThumbnailCount($thumbnailCount) {
 		$thumbnailCount = (int) $thumbnailCount;
-		CM_Mysql::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
 		$this->_change();
 	}
 
