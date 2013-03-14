@@ -3,21 +3,23 @@
 class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 
 	/**
-	 * @param CM_Model_Language              $language
-	 * @param string|null                    $searchPhrase
-	 * @param string|null                    $section
-	 * @param bool|null                      $translated
-	 * @param bool|null                      $javascriptOnly
+	 * @param CM_Model_Language $language
+	 * @param string|null       $searchPhrase
+	 * @param string|null       $section
+	 * @param bool|null         $translated
+	 * @param bool|null         $javascriptOnly
 	 */
 	public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null, $javascriptOnly = null) {
 		$where = array();
+		$parameter = array();
 		if ($searchPhrase) {
-			$whereName = CM_Mysql::placeholder("k.name LIKE '?'", '%' . $searchPhrase . '%');
-			$whereValue = CM_Mysql::placeholder("v.value LIKE '?'", '%' . $searchPhrase . '%');
-			$where[] = '(' . $whereName . ' OR ' . $whereValue . ')';
+			$where[] = '(k.name LIKE ? OR v.value LIKE ?)';
+			$parameter[] = '%' . $searchPhrase . '%';
+			$parameter[] = '%' . $searchPhrase . '%';
 		}
 		if ($section) {
-			$where[] = CM_Mysql::placeholder("k.name LIKE '?'", $section . '%');
+			$where[] = 'k.name LIKE ?';
+			$parameter[] = $section . '%';
 		}
 		if ($translated === true) {
 			$where[] = 'v.value IS NOT NULL';
@@ -28,13 +30,18 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		if ($javascriptOnly) {
 			$where[] = 'k.javascript = 1';
 		}
-		$where = ($where) ? join(' AND ', $where) : null;
+		if (!$where) {
+			$where = null;
+			$parameter = null;
+		} else {
+			$where = join(' AND ', $where);
+		}
 		$orderBy = 'k.name ASC';
 		$join = 'LEFT JOIN ' . TBL_CM_LANGUAGEVALUE . ' AS v ON k.id = v.languageKeyId AND v.languageId = ' . $language->getId() . ' ';
 		$join .= 'LEFT JOIN ' . TBL_CM_LANGUAGEKEY_VARIABLE . ' AS kv ON k.id = kv.languageKeyId';
 		$groupBy = 'k.name';
 		$source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, GROUP_CONCAT(kv.name SEPARATOR ",") as variables',
-				TBL_CM_LANGUAGEKEY . '` as `k', $where, $orderBy, $join, $groupBy);
+				TBL_CM_LANGUAGEKEY . '` as `k', $where, $orderBy, $join, $groupBy, $parameter);
 		parent::__construct($source);
 	}
 
@@ -56,5 +63,4 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		sort($item['variables']);
 		return $item;
 	}
-
 }

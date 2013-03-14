@@ -1,16 +1,19 @@
 <?php
 
 class CM_Paging_ActionLimit_All extends CM_Paging_ActionLimit_Abstract {
-	
+
 	/**
 	 * @param int $type OPTIONAL
 	 */
 	public function __construct($type = null) {
 		$where = null;
+		$parameter = null;
 		if ($type) {
-			$where = '`type` = ' . $type;
+			$where = '`type` = ?';
+			$parameter = array($type);
 		}
-		$source = new CM_PagingSource_Sql('DISTINCT `actionType`, `actionVerb`, `type`', TBL_CM_ACTIONLIMIT, $where, '`type`, `actionType`, `actionVerb`');
+		$source = new CM_PagingSource_Sql('DISTINCT `actionType`, `actionVerb`, `type`', TBL_CM_ACTIONLIMIT,
+			$where, '`type`, `actionType`, `actionVerb`', null, null, $parameter);
 		$source->enableCacheLocal();
 		parent::__construct($source);
 	}
