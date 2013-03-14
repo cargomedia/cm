@@ -21,6 +21,6 @@ class CM_Paging_Useragent_User extends CM_Paging_Useragent_Abstract {
 	 */
 	public function add($useragent) {
 		$useragent = (string) $useragent;
-		CM_Mysql::replaceDelayed(TBL_CM_USERAGENT, array('userId' => $this->_user->getId(), 'useragent' => $useragent, 'createStamp' => time()));
+		CM_Db_Db::replaceDelayed(TBL_CM_USERAGENT, array('userId' => $this->_user->getId(), 'useragent' => $useragent, 'createStamp' => time()));
 	}
 }
