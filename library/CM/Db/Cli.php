@@ -1,6 +1,6 @@
 <?php
 
-class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string $namespace
@@ -20,7 +20,7 @@ class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
 			$output->writeln('Running update ' . $version . '...');
 		});
 		if ($versionBumps > 0) {
-			$db = CM_Config::get()->CM_Mysql->db;
+			$db = CM_Config::get()->CM_Db_Db->db;
 			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
 		}
 		$app->setReleaseStamp();
@@ -33,7 +33,7 @@ class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
 	public function runUpdate($version, $namespace = null) {
 		$versionBumps = CM_App::getInstance()->runUpdateScript($namespace, $version);
 		if ($versionBumps > 0) {
-			$db = CM_Config::get()->CM_Mysql->db;
+			$db = CM_Config::get()->CM_Db_Db->db;
 			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
 		}
 	}

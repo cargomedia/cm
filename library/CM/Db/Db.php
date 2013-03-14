@@ -295,8 +295,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$args[] = '--host=' . $config->server['host'];
 		$args[] = '--port=' . $config->server['port'];
-		$args[] = '--user=' . $config->user;
-		$args[] = '--password=' . $config->pass;
+		$args[] = '--user=' . $config->username;
+		$args[] = '--password=' . $config->password;
 		$args[] = $dbName;
 		if ($tables) {
 			foreach ($tables as $table) {
