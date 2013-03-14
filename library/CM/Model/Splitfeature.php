@@ -65,7 +65,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $fixtures)) {
-			$fixtureId = CM_Mysql::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
+			$fixtureId = CM_Db_Db::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
 			$fixtures[$this->getId()] = $fixtureId;
 			$cacheWrite = true;
 		}
@@ -113,7 +113,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		$name = (string) $data['name'];
 		$percentage = self::_checkPercentage($data['percentage']);
 
-		CM_Mysql::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
+		CM_Db_Db::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
 
 		return new static($name);
 	}

@@ -80,7 +80,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public function setTranslation($key, $value, array $variables = null) {
 		$languageKeyId = static::_setKey($key, $variables);
 
-		CM_Mysql::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
+		CM_Db_Db::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
 			'languageId' => $this->getId()), null, array('value' => $value));
 		$this->_change();
 	}
@@ -279,7 +279,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		$params = CM_Params::factory($data);
 		$backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
-		$id = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
+		$id = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name' => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
 			'enabled' => $params->getBoolean('enabled'), 'backupId' => $backupId));
 		return new static($id);
 	}
@@ -293,7 +293,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		$name = (string) $name;
 		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn();
 		if (!$languageKeyId) {
-			$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name), null, array());
+			$languageKeyId = CM_Db_Db::insert(TBL_CM_LANGUAGEKEY, array('name' => $name));
 			/** @var CM_Model_Language $language */
 			foreach (new CM_Paging_Language_All() as $language) {
 				$language->_change();
@@ -328,7 +328,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 		CM_Db_Db::delete(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId));
 		foreach ($variableNames as $variableName) {
-			CM_Mysql::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
+			CM_Db_Db::insert(TBL_CM_LANGUAGEKEY_VARIABLE, array('languageKeyId' => $languageKeyId, 'name' => $variableName));
 		}
 		self::flushCacheLocal();
 	}

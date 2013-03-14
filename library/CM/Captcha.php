@@ -24,7 +24,7 @@ class CM_Captcha {
 	 */
 	public static function create() {
 		$number = rand(10000, 99999);
-		$id = CM_Mysql::insert(TBL_CM_CAPTCHA, array('number' => $number, 'create_time' => time()));
+		$id = CM_Db_Db::insert(TBL_CM_CAPTCHA, array('number' => $number, 'create_time' => time()));
 		return new self($id);
 	}
 

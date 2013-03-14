@@ -222,7 +222,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 	}
 
 	protected static function _create(array $data) {
-		return new self(CM_Mysql::insert('modelMock', array('foo' => $data['foo'])));
+		return new self(CM_Db_Db::insert('modelMock', array('foo' => $data['foo'])));
 	}
 
 }
@@ -277,7 +277,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 	}
 
 	protected static function _create(array $data) {
-		return new self(CM_Mysql::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
+		return new self(CM_Db_Db::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
 	}
 
 }

@@ -6,7 +6,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	protected $_language;
 
 	public function setUp() {
-		$languageId = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
+		$languageId = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
 		$this->_language = new CM_Model_Language($languageId);
 	}
 

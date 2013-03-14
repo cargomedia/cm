@@ -3,8 +3,8 @@
 class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Mysql::insert(TBL_CM_USER_PREFERENCEDEFAULT, array('section' => 'test', 'key' => 'foo', 'defaultValue' => 0, 'configurable' => 1));
-		CM_Mysql::insert(TBL_CM_USER_PREFERENCEDEFAULT, array('section' => 'test', 'key' => 'bar', 'defaultValue' => 1, 'configurable' => 1));
+		CM_Db_Db::insert(TBL_CM_USER_PREFERENCEDEFAULT, array('section' => 'test', 'key' => 'foo', 'defaultValue' => 0, 'configurable' => 1));
+		CM_Db_Db::insert(TBL_CM_USER_PREFERENCEDEFAULT, array('section' => 'test', 'key' => 'bar', 'defaultValue' => 1, 'configurable' => 1));
 	}
 
 	public static function tearDownAfterClass() {

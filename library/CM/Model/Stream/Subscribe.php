@@ -63,7 +63,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$key = (string) $data['key'];
-		$id = CM_Mysql::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$id = CM_Db_Db::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'channelId' => $streamChannel->getId(), 'key' => $key));
 		$streamSubscribe = new self($id);
 		$streamChannel->onSubscribe($streamSubscribe);
