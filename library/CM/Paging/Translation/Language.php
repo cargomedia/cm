@@ -11,15 +11,15 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 	 */
 	public function __construct(CM_Model_Language $language, $searchPhrase = null, $section = null, $translated = null, $javascriptOnly = null) {
 		$where = array();
-		$parameter = array();
+		$parameters = array();
 		if ($searchPhrase) {
 			$where[] = '(k.name LIKE ? OR v.value LIKE ?)';
-			$parameter[] = '%' . $searchPhrase . '%';
-			$parameter[] = '%' . $searchPhrase . '%';
+			$parameters[] = '%' . $searchPhrase . '%';
+			$parameters[] = '%' . $searchPhrase . '%';
 		}
 		if ($section) {
 			$where[] = 'k.name LIKE ?';
-			$parameter[] = $section . '%';
+			$parameters[] = $section . '%';
 		}
 		if ($translated === true) {
 			$where[] = 'v.value IS NOT NULL';
@@ -30,18 +30,13 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 		if ($javascriptOnly) {
 			$where[] = 'k.javascript = 1';
 		}
-		if (!$where) {
-			$where = null;
-			$parameter = null;
-		} else {
-			$where = join(' AND ', $where);
-		}
+
 		$orderBy = 'k.name ASC';
 		$join = 'LEFT JOIN ' . TBL_CM_LANGUAGEVALUE . ' AS v ON k.id = v.languageKeyId AND v.languageId = ' . $language->getId() . ' ';
 		$join .= 'LEFT JOIN ' . TBL_CM_LANGUAGEKEY_VARIABLE . ' AS kv ON k.id = kv.languageKeyId';
 		$groupBy = 'k.name';
 		$source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, GROUP_CONCAT(kv.name SEPARATOR ",") as variables',
-				TBL_CM_LANGUAGEKEY . '` as `k', $where, $orderBy, $join, $groupBy, $parameter);
+				TBL_CM_LANGUAGEKEY . '` as `k', implode(' AND ', $where), $orderBy, $join, $groupBy, $parameters);
 		parent::__construct($source);
 	}
 
