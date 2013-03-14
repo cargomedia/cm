@@ -8,10 +8,10 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	public static function init() {
 		self::$_dirWurfl = DIR_VENDOR . 'wurfl/tera-wurfl/';
 		require_once self::$_dirWurfl . 'TeraWurfl.php';
-		$config = CM_Config::get()->CM_Mysql;
+		$config = CM_Config::get()->CM_Db_Db;
 		TeraWurflConfig::$DB_HOST = implode(':', $config->server);
-		TeraWurflConfig::$DB_USER = $config->user;
-		TeraWurflConfig::$DB_PASS = $config->pass;
+		TeraWurflConfig::$DB_USER = $config->username;
+		TeraWurflConfig::$DB_PASS = $config->password;
 		TeraWurflConfig::$DB_SCHEMA = $config->db;
 		TeraWurflConfig::$TABLE_PREFIX = 'wurfl';
 		TeraWurflConfig::$LOG_LEVEL = LOG_EMERG;

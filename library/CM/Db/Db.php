@@ -85,11 +85,13 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
+	 * @param bool|null  $readOnly
 	 * @return CM_Db_Result
 	 */
-	public static function exec($sqlTemplate, array $parameters = null) {
+	public static function exec($sqlTemplate, array $parameters = null, $readOnly = null) {
+		$readOnly = (bool) $readOnly;
 		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
-		$client = self::_getClient(false);
+		$client = self::_getClient($readOnly);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
 	}
 
@@ -99,9 +101,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return CM_Db_Result
 	 */
 	public static function execRead($sqlTemplate, array $parameters = null) {
-		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
-		$client = self::_getClient(true);
-		return $client->createStatement($sqlTemplate)->execute($parameters);
+		return self::exec($sqlTemplate, $parameters, true);
 	}
 
 	/**
