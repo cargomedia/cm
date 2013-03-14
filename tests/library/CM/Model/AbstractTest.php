@@ -202,7 +202,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelMock', array('foo'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelMock', array('foo'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -265,7 +265,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -290,7 +290,7 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 	public function get() {
 		if (($modelMock = $this->_cacheGet('modelMock')) === false) {
 			try {
-				$modelMockId = CM_Mysql::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchOne();
+				$modelMockId = CM_Db_Db::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchColumn();
 				$modelMock = new CM_ModelThasIsAnAssetMock($modelMockId);
 				$this->_cacheSet('modelMock', $modelMock);
 			} catch (CM_Exception_Nonexistent $ex) {

@@ -96,7 +96,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	/**

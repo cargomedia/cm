@@ -103,7 +103,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 
 	private function _getAll() {
 		if (($values = $this->_cacheGet('roles')) === false) {
-			$values = CM_Mysql::select(TBL_CM_ROLE, array('role', 'startStamp', 'expirationStamp'),
+			$values = CM_Db_Db::select(TBL_CM_ROLE, array('role', 'startStamp', 'expirationStamp'),
 					'`userId`=' . $this->_model->getId() . ' AND (`expirationStamp` > ' . time() . ' OR `expirationStamp` IS NULL)')
 					->fetchAllTree();
 			$this->_cacheSet('roles', $values);
