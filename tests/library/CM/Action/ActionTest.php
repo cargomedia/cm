@@ -11,7 +11,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
-		CM_Mysql::truncate(TBL_CM_ACTION);
+		CM_Db_Db::truncate(TBL_CM_ACTION);
 	}
 
 	public function testConstruct() {
