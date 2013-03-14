@@ -9,7 +9,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 
 	public function setUp() {
 		defined('TBL_TEST') || define('TBL_TEST', 'test');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
@@ -19,7 +19,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		}
 	}
 	public function tearDown() {
-		CM_Mysql::exec('DROP TABLE TBL_TEST');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST');
 	}
 
 	public function testCacheLocal() {

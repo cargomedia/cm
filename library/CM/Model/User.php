@@ -104,7 +104,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param int $actionType OPTIONAL
 	 * @param int $actionVerb OPTIONAL
 	 * @param int $limitType  OPTIONAL
-	 * @param int $period	 OPTIONAL
+	 * @param int $period     OPTIONAL
 	 * @return CM_Paging_Transgression_User
 	 */
 	public function getTransgressions($actionType = null, $actionVerb = null, $limitType = null, $period = null) {
@@ -180,7 +180,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param CM_Model_Language $language
 	 */
 	public function setLanguage(CM_Model_Language $language) {
-		CM_Mysql::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
 		$this->_change();
 	}
 
@@ -188,7 +188,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	public function updateLatestactivity() {
-		CM_Mysql::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
 		return $this->_change();
 	}
 
@@ -197,9 +197,12 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::exec("SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible` FROM TBL_CM_USER AS `main`
-								LEFT JOIN TBL_CM_USER_ONLINE AS `online` USING (`userId`)
-								WHERE `main`.`userId`=?", $this->getId())->fetchAssoc();
+		return CM_Db_Db::exec('
+			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
+			FROM TBL_CM_USER AS `main`
+			LEFT JOIN TBL_CM_USER_ONLINE AS `online` USING (`userId`)
+			WHERE `main`.`userId`=?',
+			array($this->getId()))->fetch();
 	}
 
 	/**
@@ -212,17 +215,21 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	public static function offlineOld() {
-			$res = CM_Mysql::exec('SELECT `o`.`userId` FROM TBL_CM_USER_ONLINE `o` LEFT JOIN TBL_CM_USER `u` USING(`userId`) WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
-					time() - CM_Session::ACTIVITY_EXPIRATION);
-			while ($userId = $res->fetchOne()) {
-				try {
-					$user = CM_Model_User::factory($userId);
-					$user->setOnline(false);
-				} catch (CM_Exception_Nonexistent $e) {
-					CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
-				}
+		$res = CM_Db_Db::exec('
+			SELECT `o`.`userId`
+			FROM TBL_CM_USER_ONLINE `o`
+			LEFT JOIN TBL_CM_USER `u` USING(`userId`)
+			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
+			array(time() - CM_Session::ACTIVITY_EXPIRATION));
+		while ($userId = $res->fetchColumn()) {
+			try {
+				$user = CM_Model_User::factory($userId);
+				$user->setOnline(false);
+			} catch (CM_Exception_Nonexistent $e) {
+				CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
 			}
 		}
+	}
 
 	/**
 	 * @param array $data

@@ -184,7 +184,7 @@ class CM_Session implements CM_Comparable {
 	public function regenerateId() {
 		$newId = self::_generateId();
 		if ($this->_isPersistent) {
-			CM_Mysql::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
+			CM_Db_Db::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 		$this->_id = $newId;
@@ -213,7 +213,8 @@ class CM_Session implements CM_Comparable {
 
 	public function write() {
 		if (!$this->isEmpty()) {
-			CM_Db_Db::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(), 'data' => serialize($this->_data),
+			CM_Db_Db::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(),
+													'data'      => serialize($this->_data),
 													'expires'   => time() + $this->getLifetime()));
 			$this->_change();
 		} elseif ($this->_isPersistent) {
@@ -252,7 +253,7 @@ class CM_Session implements CM_Comparable {
 	}
 
 	public static function deleteExpired() {
-		CM_Mysql::exec("DELETE FROM TBL_CM_SESSION WHERE `expires` < ?", time());
+		CM_Db_Db::delete(TBL_CM_SESSION, '`expires` < ' . time());
 	}
 
 	/**
@@ -262,7 +263,7 @@ class CM_Session implements CM_Comparable {
 	private static function _findDataById($id) {
 		$cacheKey = self::_getCacheKey($id);
 		if (($data = CM_Cache::get($cacheKey)) === false) {
-			$data = CM_Mysql::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $id))->fetchAssoc();
+			$data = CM_Db_Db::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $id))->fetch();
 			if (!$data) {
 				return null;
 			}

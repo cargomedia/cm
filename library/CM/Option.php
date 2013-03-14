@@ -23,7 +23,7 @@ class CM_Option {
 	public function get($key) {
 		$cacheKey = CM_CacheConst::Option;
 		if (($options = CM_Cache::get($cacheKey)) === false) {
-			$options = CM_Mysql::select(TBL_CM_OPTION, array('key', 'value'))->fetchAllTree();
+			$options = CM_Db_Db::select(TBL_CM_OPTION, array('key', 'value'))->fetchAllTree();
 			CM_Cache::set($cacheKey, $options);
 		}
 		if (!isset($options[$key])) {
