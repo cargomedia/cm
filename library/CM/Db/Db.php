@@ -8,12 +8,18 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/** @var CM_Db_Client */
 	private static $_clientReadOnly;
 
+	/** @var bool|null */
+	private static $_readOnlyAvailable;
+
 	/**
 	 * @param bool $readOnly
 	 * @throws CM_Db_Exception
 	 * @return CM_Db_Client
 	 */
 	private static function _getClient($readOnly) {
+		if ($readOnly && !self::_getReadOnlyAvailable()) {
+			$readOnly = false;
+		}
 		if ($readOnly) {
 			$client = & self::$_clientReadOnly;
 		} else {
@@ -21,14 +27,24 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		if (!$client) {
 			$config = self::_getConfig();
-			if ($readOnly && $config->serversReadEnabled && !empty($config->serversRead)) {
+			$server = $config->server;
+			if ($readOnly) {
 				$server = $config->serversRead[array_rand($config->serversRead)];
-			} else {
-				$server = $config->server;
 			}
 			$client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db);
 		}
 		return $client;
+	}
+
+	/**
+	 * @return bool
+	 */
+	private static function _getReadOnlyAvailable() {
+		if (null === self::$_readOnlyAvailable) {
+			$config = self::_getConfig();
+			self::$_readOnlyAvailable = $config->serversReadEnabled && !empty($config->serversRead);
+		}
+		return self::$_readOnlyAvailable;
 	}
 
 	/**
