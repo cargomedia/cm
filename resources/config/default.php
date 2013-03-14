@@ -63,15 +63,6 @@ $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
 	)),
 );
 
-$config->CM_Mysql = new stdClass();
-$config->CM_Mysql->db = 'cm';
-$config->CM_Mysql->user = 'root';
-$config->CM_Mysql->pass = 'root';
-$config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
-$config->CM_Mysql->servers_read = array();
-$config->CM_Mysql->serversReadEnabled = true;
-$config->CM_Mysql->delayedEnabled = true;
-
 $config->CM_Db_Db = new stdClass();
 $config->CM_Db_Db->db = 'cm';
 $config->CM_Db_Db->username = 'root';
