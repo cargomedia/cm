@@ -123,7 +123,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	 */
 	public function unsetLimit($role = null) {
 		$role = $role ? (int) $role: null;
-		CM_Mysql::delete(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
+		CM_Db_Db::delete(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(), 'type' => $this->getType(), 'role' => $role));
 		$this->_change();
 	}
 

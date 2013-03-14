@@ -21,7 +21,7 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 */
 	public function remove($ip) {
 		$ip = (int) $ip;
-		CM_Mysql::delete(TBL_CM_IPBLOCKED, array('ip' => $ip));
+		CM_Db_Db::delete(TBL_CM_IPBLOCKED, array('ip' => $ip));
 	}
 
 	/**

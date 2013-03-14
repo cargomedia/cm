@@ -61,7 +61,7 @@ class CM_Captcha {
 	}
 
 	private function _delete() {
-		CM_Mysql::delete(TBL_CM_CAPTCHA, array('captcha_id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_CAPTCHA, array('captcha_id' => $this->getId()));
 	}
 
 	/**
