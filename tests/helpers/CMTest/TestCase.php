@@ -409,8 +409,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param int    $rowCount
 	 */
 	public static function assertRow($table, $where = null, $rowCount = 1) {
-		$result = CM_Mysql::select($table, '*', $where);
-		self::assertEquals($rowCount, $result->numRows());
+		$result = CM_Db_Db::select($table, '*', $where);
+		$rowCountActual = count($result->fetchAll());
+		self::assertEquals($rowCount, $rowCountActual);
 	}
 
 	public static function assertNotRow($table, $columns) {

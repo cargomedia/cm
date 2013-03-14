@@ -68,7 +68,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$sequenceMax = self::count($table, $where);
 		if ($sequenceMax) {
-			self::updateSequence($table, array($column => $sequenceMax), $whereRow, $where);
+			self::updateSequence($table, $column, $sequenceMax, $whereRow, $where);
 			self::delete($table, array_merge($whereRow, $where));
 		}
 	}
@@ -229,47 +229,46 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string     $table
-	 * @param array      $update   Associative array field=>value
+	 * @param string     $column
+	 * @param int        $position
 	 * @param array      $whereRow Associative array field=>value
 	 * @param array|null $where    Associative array field=>value
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function updateSequence($table, $update, array $whereRow, array $where = null) {
-		if (1 < count($update)) {
-			throw new CM_Exception_Invalid('Only one column can be updated.');
-		}
+	public static function updateSequence($table, $column, $position, array $whereRow, array $where = null) {
+		$table = (string) $table;
+		$column = (string) $column;
+		$position = (int) $position;
 		if (null === $where) {
 			$where = array();
 		}
-		$value = (int) reset($update);
-		$field = key($update);
 
-		if ($value <= 0 || $value > CM_Db_Db::count($table, $where)) {
+		if ($position <= 0 || $position > CM_Db_Db::count($table, $where)) {
 			throw new CM_Exception_Invalid('Sequence out of bounds.');
 		}
 
 		$whereMerged = array_merge($whereRow, $where);
-		$valueOld = CM_Db_Db::select($table, $field, $whereMerged)->fetchColumn();
-		if (false === $valueOld) {
+		$positionOld = CM_Db_Db::select($table, $column, $whereMerged)->fetchColumn();
+		if (false === $positionOld) {
 			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
 		}
-		$valueOld = (int) $valueOld;
+		$positionOld = (int) $positionOld;
 
-		if ($value > $valueOld) {
-			$upperBound = $value;
-			$lowerBound = $valueOld;
+		if ($position > $positionOld) {
+			$upperBound = $position;
+			$lowerBound = $positionOld;
 			$direction = -1;
 		} else {
-			$upperBound = $valueOld;
-			$lowerBound = $value;
+			$upperBound = $positionOld;
+			$lowerBound = $position;
 			$direction = 1;
 		}
 
 		$client = self::_getClient(false);
-		$query = new CM_Db_Query_UpdateSequence($client, $table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query = new CM_Db_Query_UpdateSequence($client, $table, $column, $direction, $where, $lowerBound, $upperBound);
 		$query->execute();
 
-		self::update($table, array($field => $value), $whereMerged);
+		self::update($table, array($column => $position), $whereMerged);
 	}
 
 	/**
@@ -326,8 +325,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$args = array();
 		$args[] = '--host=' . $config->server['host'];
 		$args[] = '--port=' . $config->server['port'];
-		$args[] = '--user=' . $config->user;
-		$args[] = '--password=' . $config->pass;
+		$args[] = '--user=' . $config->username;
+		$args[] = '--password=' . $config->password;
 		$args[] = $dbName;
 		CM_Util::exec('mysql', $args, null, $dump->getPath());
 	}
