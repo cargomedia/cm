@@ -3,12 +3,12 @@
 class CM_Model_AbstractTest extends CMTest_TestCase{
 
 	public static function setupBeforeClass() {
-		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `modelMock` (
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `modelMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 		");
-		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `modelThasIsAnAssetMock` (
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `modelThasIsAnAssetMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`modelMockId` INT UNSIGNED NOT NULL,
 				`bar` VARCHAR(32),
@@ -18,8 +18,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::exec("DROP TABLE `modelMock`");
-		CM_Mysql::exec("DROP TABLE `modelThasIsAnAssetMock`");
+		CM_Db_Db::exec("DROP TABLE `modelMock`");
+		CM_Db_Db::exec("DROP TABLE `modelThasIsAnAssetMock`");
 	}
 
 	public function setup() {
@@ -27,8 +27,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 	}
 
 	public function tearDown() {
-		CM_Mysql::exec("TRUNCATE TABLE `modelMock`");
-		CM_Mysql::exec("TRUNCATE TABLE `modelThasIsAnAssetMock`");
+		CM_Db_Db::truncate('modelMock');
+		CM_Db_Db::truncate('modelThasIsAnAssetMock');
 		CMTest_TH::clearEnv();
 	}
 
@@ -123,7 +123,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$this->assertEquals('bar1', unserialize(serialize($modelMock))->getFoo());
-		
+
 		$modelMock->_set('foo', 'bar2');
 		$this->assertEquals('bar2', unserialize(serialize($modelMock))->getFoo());
 	}
@@ -279,7 +279,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		return new self(CM_Mysql::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
 	}
-	
+
 }
 
 class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstract {

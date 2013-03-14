@@ -94,6 +94,6 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	 * @return array
 	 */
 	public static function getStats() {
-		return CM_Mysql::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM TBL_CM_USER_PREFERENCE GROUP BY `preferenceId`, `value`")->fetchAllTree();
+		return CM_Db_Db::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM TBL_CM_USER_PREFERENCE GROUP BY `preferenceId`, `value`")->fetchAllTree();
 	}
 }

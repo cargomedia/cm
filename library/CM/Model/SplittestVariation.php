@@ -36,15 +36,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getConversionCount() {
-		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+		return (int) CM_Db_Db::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
+		AND `variationId`=? AND `conversionStamp` IS NOT NULL', array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 	}
 
 	/**
 	 * @return float
 	 */
 	public function getConversionWeight() {
-		return (float) CM_Mysql::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
-		AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+		return (float) CM_Db_Db::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
+		AND `variationId`=? AND `conversionStamp` IS NOT NULL', array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 	}
 
 	/**

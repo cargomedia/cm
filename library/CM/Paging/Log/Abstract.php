@@ -32,7 +32,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Mysql::exec("DELETE FROM TBL_CM_LOG WHERE `timeStamp` < ?", time() - $age);
+		CM_Db_Db::delete(TBL_CM_LOG, '`timeStamp` < ' . (time() - $age));
 	}
 
 	/**
