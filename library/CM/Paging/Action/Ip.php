@@ -1,9 +1,9 @@
 <?php
 
 class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
-	
+
 	private $_ip;
-	
+
 	/**
 	 * @param int $ip
 	 * @param int $actionType OPTIONAL
@@ -29,9 +29,9 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
-	
+
 	public function add(CM_Action_Abstract $action) {
-		CM_Mysql::insertDelayed(TBL_CM_ACTION,
+		CM_Db_Db::insertDelayed(TBL_CM_ACTION,
 				array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(), 'createStamp' => time()));
 	}
 }
