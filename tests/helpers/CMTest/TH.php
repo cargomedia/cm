@@ -57,7 +57,7 @@ class CMTest_TH {
 			CM_Db_Db::delete($table);
 		}
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
-			CM_Db_Db::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
+			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
