@@ -12,42 +12,6 @@ class CM_Db_Db extends CM_Class_Abstract {
 	private static $_readOnlyAvailable;
 
 	/**
-	 * @param bool $readOnly
-	 * @throws CM_Db_Exception
-	 * @return CM_Db_Client
-	 */
-	private static function _getClient($readOnly) {
-		if ($readOnly && !self::_getReadOnlyAvailable()) {
-			$readOnly = false;
-		}
-		if ($readOnly) {
-			$client = & self::$_clientReadOnly;
-		} else {
-			$client = & self::$_client;
-		}
-		if (!$client) {
-			$config = self::_getConfig();
-			$server = $config->server;
-			if ($readOnly) {
-				$server = $config->serversRead[array_rand($config->serversRead)];
-			}
-			$client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db);
-		}
-		return $client;
-	}
-
-	/**
-	 * @return bool
-	 */
-	private static function _getReadOnlyAvailable() {
-		if (null === self::$_readOnlyAvailable) {
-			$config = self::_getConfig();
-			self::$_readOnlyAvailable = $config->serversReadEnabled && !empty($config->serversRead);
-		}
-		return self::$_readOnlyAvailable;
-	}
-
-	/**
 	 * @param string            $table
 	 * @param string|array|null $where Associative array field=>value OR string
 	 * @return int
@@ -365,6 +329,42 @@ class CM_Db_Db extends CM_Class_Abstract {
 			throw new CM_Db_Exception('Cannot find random id');
 		}
 		return $id;
+	}
+
+	/**
+	 * @param bool $readOnly
+	 * @throws CM_Db_Exception
+	 * @return CM_Db_Client
+	 */
+	private static function _getClient($readOnly) {
+		if ($readOnly && !self::_getReadOnlyAvailable()) {
+			$readOnly = false;
+		}
+		if ($readOnly) {
+			$client = & self::$_clientReadOnly;
+		} else {
+			$client = & self::$_client;
+		}
+		if (!$client) {
+			$config = self::_getConfig();
+			$server = $config->server;
+			if ($readOnly) {
+				$server = $config->serversRead[array_rand($config->serversRead)];
+			}
+			$client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db);
+		}
+		return $client;
+	}
+
+	/**
+	 * @return bool
+	 */
+	private static function _getReadOnlyAvailable() {
+		if (null === self::$_readOnlyAvailable) {
+			$config = self::_getConfig();
+			self::$_readOnlyAvailable = $config->serversReadEnabled && !empty($config->serversRead);
+		}
+		return self::$_readOnlyAvailable;
 	}
 
 	/**
