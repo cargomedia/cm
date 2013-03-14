@@ -24,7 +24,7 @@ class CMTest_TH {
 		if (!$databaseExists) {
 			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config->db))->execute();
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Mysql::runDump($config->db, $dump);
+				CM_Db_Db::runDump($config->db, $dump);
 			}
 		}
 
@@ -57,7 +57,7 @@ class CMTest_TH {
 			CM_Mysql::delete($table, 1);
 		}
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
-			CM_Mysql::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
+			CM_Db_Db::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
