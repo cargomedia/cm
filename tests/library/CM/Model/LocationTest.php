@@ -124,13 +124,13 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	}
 
 	public function testFindByIp() {
-		$cityId1 = CM_Mysql::getRandId(TBL_CM_LOCATIONCITY, 'id');
+		$cityId1 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCITY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
-		$cityId2 = CM_Mysql::getRandId(TBL_CM_LOCATIONCITY, 'id');
+		$cityId2 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCITY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
-		$countryId1 = CM_Mysql::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
+		$countryId1 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
-		$countryId2 = CM_Mysql::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
+		$countryId2 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
 
 		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId1), CM_Model_Location::findByIp(3));
