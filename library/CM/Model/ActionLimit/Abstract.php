@@ -61,7 +61,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public function setLimit($role, $limit) {
 		$role = $role ? (int) $role : null;
 		$limit = !isset($limit) ? null : (int) $limit;
-		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
+		if (CM_Db_Db::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
 			CM_Db_Db::update(TBL_CM_ACTIONLIMIT, array('limit' => $limit), array('actionType' => $this->getActionType(),
@@ -96,7 +96,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	public function setPeriod($role, $period) {
 		$role = $role ? (int) $role : null;
 		$period = (int) $period;
-		if (CM_Mysql::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
+		if (CM_Db_Db::count(TBL_CM_ACTIONLIMIT, array('actionType' => $this->getActionType(), 'actionVerb' => $this->getActionVerb(),
 			'type' => $this->getType(), 'role' => $role))
 		) {
 			CM_Db_Db::update(TBL_CM_ACTIONLIMIT, array('period' => $period), array('actionType' => $this->getActionType(),

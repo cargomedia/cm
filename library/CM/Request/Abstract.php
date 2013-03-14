@@ -418,7 +418,7 @@ abstract class CM_Request_Abstract {
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
 
 		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
-			$isValid = (bool) CM_Mysql::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+			$isValid = (bool) CM_Db_Db::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
 			if ($isValid) {
 				CM_CacheLocal::set($cacheKey, true);
 			}
