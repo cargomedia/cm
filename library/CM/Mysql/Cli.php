@@ -9,7 +9,7 @@ class CM_Mysql_Cli extends CM_Cli_Runnable_Abstract {
 		$namespace = (string) $namespace;
 		$tables = CM_Db_Db::exec("SHOW TABLES LIKE ?", array(strtolower($namespace) . '_%'))->fetchAllColumn();
 		sort($tables);
-		$dump = CM_Mysql::getDump($tables, true);
+		$dump = CM_Db_Db::getDump($tables, true);
 		CM_File::create(CM_Util::getNamespacePath($namespace) . '/resources/db/structure.sql', $dump);
 	}
 
