@@ -18,7 +18,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
 		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
 
-		$location = CM_Mysql::exec('SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
+		$location = CM_Db_Db::exec('SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
 				`2`.`id` `2.id`, `2`.`name` `2.name`,
 				`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 				`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
@@ -26,7 +26,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 			JOIN TBL_CM_LOCATIONCITY AS `3` ON(`4`.`cityId`=`3`.`id`)
 			JOIN TBL_CM_LOCATIONSTATE AS `2` ON(`3`.`stateId`=`2`.`id`)
 			JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
-			LIMIT 1')->fetchAssoc();
+			LIMIT 1')->fetch();
 
 		self::$_fields[CM_Model_Location::LEVEL_COUNTRY] = array('id' => (int) $location['1.id'], 'name' => $location['1.name']);
 		self::$_fields[CM_Model_Location::LEVEL_STATE] = array('id' => (int) $location['2.id'], 'name' => $location['2.name']);

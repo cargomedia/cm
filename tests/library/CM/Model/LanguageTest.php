@@ -123,7 +123,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testDeleteKey() {
 		$key = 'languageKey';
 		$this->_language->setTranslation($key, 'abc');
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchColumn();
 		$this->assertSame(array($key => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
 		CM_Model_Language::deleteKey($key);

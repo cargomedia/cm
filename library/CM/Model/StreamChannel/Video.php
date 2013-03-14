@@ -21,7 +21,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function setThumbnailCount($thumbnailCount) {
 		$thumbnailCount = (int) $thumbnailCount;
-		CM_Mysql::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -116,7 +116,8 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`) WHERE `id` = ?", $this->getId())->fetchAssoc();
+		return CM_Db_Db::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`)
+								WHERE `id` = ?", array($this->getId()))->fetch();
 	}
 
 	protected static function _create(array $data) {

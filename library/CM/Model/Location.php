@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_Location extends CM_Model_Abstract {
+
 	const TYPE = 24;
 	const LEVEL_COUNTRY = 1;
 	const LEVEL_STATE = 2;
@@ -17,7 +18,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int	$level
+	 * @param int    $level
 	 * @param string $key
 	 * @return mixed|null
 	 */
@@ -141,7 +142,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 		}
 
-		$row = CM_Mysql::execRead($query, $this->getId())->fetchAssoc();
+		$row = CM_Db_Db::execRead($query, array($this->getId()))->fetch();
 		if (!$row) {
 			throw new CM_Exception_Invalid('Cannot load location `' . $this->getId() . '` on level `' . $this->getLevel() . '`.');
 		}
@@ -180,14 +181,14 @@ class CM_Model_Location extends CM_Model_Abstract {
 	/**
 	 * @param string $db_table
 	 * @param string $db_column
-	 * @param int	$ip
+	 * @param int    $ip
 	 * @return int|false
 	 */
 	private static function _getLocationIdByIp($db_table, $db_column, $ip) {
-		$result = CM_Mysql::execRead("SELECT `ipStart`, `?` FROM `?`
+		$result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
 			WHERE `ipEnd` >= ?
 			ORDER BY `ipEnd` ASC
-			LIMIT 1", $db_column, $db_table, $ip)->fetchAssoc();
+			LIMIT 1", array($ip))->fetch();
 		if ($result) {
 			if ($result['ipStart'] <= $ip) {
 				return (int) $result[$db_column];
@@ -205,8 +206,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	public static function dumpToTable() {
-		CM_Mysql::exec('TRUNCATE TABLE `' . TBL_CM_TMP_LOCATION . '`');
-		CM_Mysql::exec('INSERT `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
+		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
@@ -222,7 +223,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
-			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`, 
+			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`,
 					`4`.`name`, NULL, `4`.`lat`, `4`.`lon`
 			FROM `' . TBL_CM_LOCATIONZIP . '` AS `4`
 			LEFT JOIN `' . TBL_CM_LOCATIONCITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)

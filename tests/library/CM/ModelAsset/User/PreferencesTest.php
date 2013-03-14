@@ -8,7 +8,7 @@ class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::truncate(TBL_CM_USER_PREFERENCEDEFAULT);
+		CM_Db_Db::truncate(TBL_CM_USER_PREFERENCEDEFAULT);
 	}
 
 	public function testGetSet() {

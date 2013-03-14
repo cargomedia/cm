@@ -24,7 +24,7 @@ class CMTest_TH {
 		if (!$databaseExists) {
 			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config->db))->execute();
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Mysql::runDump($config->db, $dump);
+				CM_Db_Db::runDump($config->db, $dump);
 			}
 		}
 
@@ -57,7 +57,7 @@ class CMTest_TH {
 			CM_Mysql::delete($table, 1);
 		}
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
-			CM_Mysql::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
+			CM_Db_Db::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
@@ -200,7 +200,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -213,7 +213,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -245,8 +245,8 @@ class CMTest_TH {
 	public static function randomizeAutoincrement() {
 		$tables = CM_Mysql::query('SHOW TABLES')->fetchCol();
 		foreach ($tables as $table) {
-			if (CM_Mysql::exec("SHOW COLUMNS FROM `?` WHERE `Extra` = 'auto_increment'", $table)->numRows() > 0) {
-				CM_Mysql::exec("ALTER TABLE `?` AUTO_INCREMENT = ?", $table, rand(1, 1000));
+			if (CM_Db_Db::exec("SHOW COLUMNS FROM `" . $table . "` WHERE `Extra` = 'auto_increment'")->fetch()) {
+				CM_Db_Db::exec("ALTER TABLE `" . $table . "` AUTO_INCREMENT = " . rand(1, 1000));
 			}
 		}
 	}
@@ -271,5 +271,4 @@ class CMTest_TH {
 		}
 		return $str;
 	}
-
 }

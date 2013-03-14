@@ -3,12 +3,12 @@
 class CM_Model_AbstractTest extends CMTest_TestCase{
 
 	public static function setupBeforeClass() {
-		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `modelMock` (
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `modelMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 		");
-		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `modelThasIsAnAssetMock` (
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `modelThasIsAnAssetMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`modelMockId` INT UNSIGNED NOT NULL,
 				`bar` VARCHAR(32),
@@ -18,8 +18,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::exec("DROP TABLE `modelMock`");
-		CM_Mysql::exec("DROP TABLE `modelThasIsAnAssetMock`");
+		CM_Db_Db::exec("DROP TABLE `modelMock`");
+		CM_Db_Db::exec("DROP TABLE `modelThasIsAnAssetMock`");
 	}
 
 	public function setup() {
@@ -27,8 +27,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 	}
 
 	public function tearDown() {
-		CM_Mysql::exec("TRUNCATE TABLE `modelMock`");
-		CM_Mysql::exec("TRUNCATE TABLE `modelThasIsAnAssetMock`");
+		CM_Db_Db::truncate('modelMock');
+		CM_Db_Db::truncate('modelThasIsAnAssetMock');
 		CMTest_TH::clearEnv();
 	}
 
@@ -43,7 +43,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase{
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
-		CM_Mysql::update('modelMock', array('foo' => 'bar2'), array('id' => $modelMock->getId()));
+		CM_Db_Db::update('modelMock', array('foo' => 'bar2'), array('id' => $modelMock->getId()));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$modelMock->_change();
@@ -202,7 +202,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelMock', array('foo'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelMock', array('foo'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -244,7 +244,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 	public function setBar($bar) {
 		$bar = (string) $bar;
-		CM_Mysql::update('modelThasIsAnAssetMock', array('bar' => $bar), array('id' => $this->getId()));
+		CM_Db_Db::update('modelThasIsAnAssetMock', array('bar' => $bar), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -265,7 +265,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('modelThasIsAnAssetMock', array('bar', 'modelMockId'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -290,7 +290,7 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 	public function get() {
 		if (($modelMock = $this->_cacheGet('modelMock')) === false) {
 			try {
-				$modelMockId = CM_Mysql::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchOne();
+				$modelMockId = CM_Db_Db::select('modelThasIsAnAssetMock', 'id', array('modelMockId' => $this->_model->getId()))->fetchColumn();
 				$modelMock = new CM_ModelThasIsAnAssetMock($modelMockId);
 				$this->_cacheSet('modelMock', $modelMock);
 			} catch (CM_Exception_Nonexistent $ex) {

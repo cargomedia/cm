@@ -42,7 +42,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function count($table, $where = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Count($client, $table, $where);
-		return $query->execute()->fetchColumn();
+		return (int) $query->execute()->fetchColumn();
 	}
 
 	/**
@@ -54,6 +54,32 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Delete($client, $table, $where);
 		return $query->execute()->getAffectedRows();
+	}
+
+	/**
+	 * @param string     $table
+	 * @param string     $column
+	 * @param array      $whereRow
+	 * @param array|null $where
+	 */
+	public static function deleteSequence($table, $column, array $whereRow, array $where = null) {
+		if (null === $where) {
+			$where = array();
+		}
+		$sequenceMax = self::count($table, $where);
+		if ($sequenceMax) {
+			self::updateSequence($table, $column, $sequenceMax, $whereRow, $where);
+			self::delete($table, array_merge($whereRow, $where));
+		}
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return CM_Db_Schema_Column
+	 */
+	public static function describeColumn($table, $column) {
+		return new CM_Db_Schema_Column(self::_getClient(false), $table, $column);
 	}
 
 	/**
@@ -76,6 +102,34 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
 		$client = self::_getClient(true);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $column
+	 * @return bool
+	 */
+	public static function existsColumn($table, $column) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $index
+	 * @return bool
+	 */
+	public static function existsIndex($table, $index) {
+		$client = self::_getClient(true);
+		return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetch();
+	}
+
+	/**
+	 * @param string $table
+	 * @return bool
+	 */
+	public static function existsTable($table) {
+		return (bool) self::exec('SHOW TABLES LIKE ?', array($table))->getAffectedRows();
 	}
 
 	/**
@@ -175,47 +229,106 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string     $table
-	 * @param array      $update   Associative array field=>value
+	 * @param string     $column
+	 * @param int        $position
 	 * @param array      $whereRow Associative array field=>value
 	 * @param array|null $where    Associative array field=>value
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function updateSequence($table, $update, array $whereRow, array $where = null) {
-		if (1 < count($update)) {
-			throw new CM_Exception_Invalid('Only one column can be updated.');
+	public static function updateSequence($table, $column, $position, array $whereRow, array $where = null) {
+		$table = (string) $table;
+		$column = (string) $column;
+		$position = (int) $position;
+		if (null === $where) {
+			$where = array();
 		}
-		if (null !== $where) {
-			$where = (array) $where;
-		}
-		$value = (int) reset($update);
-		$field = key($update);
 
-		if ($value <= 0 || $value > CM_Db_Db::count($table, $where)) {
+		if ($position <= 0 || $position > CM_Db_Db::count($table, $where)) {
 			throw new CM_Exception_Invalid('Sequence out of bounds.');
 		}
 
-		$whereMerged = is_array($where) ? array_merge($whereRow, $where) : $whereRow;
-		$valueOld = CM_Db_Db::select($table, $field, $whereMerged)->fetchColumn();
-		if (false === $valueOld) {
+		$whereMerged = array_merge($whereRow, $where);
+		$positionOld = CM_Db_Db::select($table, $column, $whereMerged)->fetchColumn();
+		if (false === $positionOld) {
 			throw new CM_Exception_Invalid('Could not retrieve original sequence number.');
 		}
-		$valueOld = (int) $valueOld;
+		$positionOld = (int) $positionOld;
 
-		if ($value > $valueOld) {
-			$upperBound = $value;
-			$lowerBound = $valueOld;
+		if ($position > $positionOld) {
+			$upperBound = $position;
+			$lowerBound = $positionOld;
 			$direction = -1;
 		} else {
-			$upperBound = $valueOld;
-			$lowerBound = $value;
+			$upperBound = $positionOld;
+			$lowerBound = $position;
 			$direction = 1;
 		}
 
 		$client = self::_getClient(false);
-		$query = new CM_Db_Query_UpdateSequence($client, $table, $field, $direction, $where, $lowerBound, $upperBound);
+		$query = new CM_Db_Query_UpdateSequence($client, $table, $column, $direction, $where, $lowerBound, $upperBound);
 		$query->execute();
 
-		self::update($table, array($field => $value), $whereMerged);
+		self::update($table, array($column => $position), $whereMerged);
+	}
+
+	/**
+	 * @param array|null  $tables
+	 * @param bool|null   $skipData
+	 * @param bool|null   $skipStructure
+	 * @param string|null $dbName
+	 * @return string
+	 */
+	public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
+		$config = self::_getConfig();
+		if (null === $dbName) {
+			$dbName = $config->db;
+		}
+		$args = array();
+		$args[] = '--compact';
+		$args[] = '--add-drop-table';
+		$args[] = '--extended-insert';
+		if ($skipData) {
+			$args[] = '--no-data';
+		}
+		if ($skipStructure) {
+			$args[] = '--no-create-info';
+		}
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->user;
+		$args[] = '--password=' . $config->pass;
+		$args[] = $dbName;
+		if ($tables) {
+			foreach ($tables as $table) {
+				$args[] = $table;
+			}
+		}
+
+		$dump = 'SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";' . PHP_EOL;
+		$dump .= '/*!40101 SET NAMES utf8 */;' . PHP_EOL;
+		if (array() !== $tables) {
+			$queries = CM_Util::exec('mysqldump', $args);
+			$queries = preg_replace('#(\s+)AUTO_INCREMENT\s*=\s*\d+\s+#', '$1', $queries);
+			$queries = preg_replace('#/\*.*?\*/;#', '', $queries);
+			$dump .= $queries;
+		}
+
+		return $dump;
+	}
+
+	/**
+	 * @param string  $dbName
+	 * @param CM_File $dump
+	 */
+	public static function runDump($dbName, CM_File $dump) {
+		$config = self::_getConfig();
+		$args = array();
+		$args[] = '--host=' . $config->server['host'];
+		$args[] = '--port=' . $config->server['port'];
+		$args[] = '--user=' . $config->username;
+		$args[] = '--password=' . $config->password;
+		$args[] = $dbName;
+		CM_Util::exec('mysql', $args, null, $dump->getPath());
 	}
 
 	/**

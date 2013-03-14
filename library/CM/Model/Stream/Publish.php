@@ -5,7 +5,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	const TYPE = 21;
 
 	public function setAllowedUntil($timeStamp) {
-		CM_Mysql::update(TBL_CM_STREAM_PUBLISH, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_STREAM_PUBLISH, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -17,7 +17,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_STREAM_PUBLISH, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_STREAM_PUBLISH, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
@@ -31,7 +31,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	 * @return CM_Model_Stream_Publish|null
 	 */
 	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
-		$id = CM_Mysql::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchOne();
+		$id = CM_Db_Db::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
 		if (!$id) {
 			return null;
 		}

@@ -44,7 +44,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 		$percentage = $this->_checkPercentage($percentage);
 
-		CM_Mysql::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -60,7 +60,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
 		if (($fixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$fixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
+			$fixtures = CM_Db_Db::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
@@ -100,7 +100,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if($this->_withoutPersistence) {
 			return array();
 		}
-		$data = CM_Mysql::select(TBL_CM_SPLITFEATURE, '*', array('name' => $this->getName()))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_SPLITFEATURE, '*', array('name' => $this->getName()))->fetch();
 		return $data;
 	}
 

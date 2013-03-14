@@ -80,6 +80,9 @@ abstract class CM_Db_Query_Abstract {
 			throw new CM_Exception_Invalid('Invalid where type');
 		}
 		if (is_array($where)) {
+			if (empty($where)) {
+				return;
+			}
 			$sqlParts = array();
 			foreach ($where as $field => $value) {
 				if (null === $value) {
