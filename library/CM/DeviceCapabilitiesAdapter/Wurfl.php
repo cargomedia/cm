@@ -37,7 +37,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	public static function setup() {
 		self::init();
 		if (CM_Mysql::exists('wurflCache')) {
-			CM_Mysql::truncate('wurflCache');
+			CM_Db_Db::truncate('wurflCache');
 		}
 		$zip = CM_Util::getContents('http://heanet.dl.sourceforge.net/project/wurfl/WURFL/2.3.2/wurfl-2.3.2.zip');
 		$dataDir = self::$_dirWurfl . 'data' . DIRECTORY_SEPARATOR;

@@ -71,7 +71,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			foreach ($channel['subscribers'] as $subscriber) {
 				$clientKey = (string) $subscriber['clientKey'];
 				if (!isset($streamsPersistenceArray[$streamChannel->getKey() . '/' . $clientKey])) {
-					$data = CM_Params::factory($subscriber['data']);
+					$data = CM_Params::factory((array) $subscriber['data']);
 					$user = null;
 					if ($data->has('sessionId')) {
 						if ($session = CM_Session::findById($data->getString('sessionId'))) {
@@ -103,7 +103,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$clientKey = $data['clientKey'];
 				$start = time();
 				$allowedUntil = null;
-				$data = CM_Params::factory($data['data']);
+				$data = CM_Params::factory((array) $data['data']);
 				$user = null;
 				if ($data->has('sessionId')) {
 					if ($session = CM_Session::findById($data->getString('sessionId'))) {

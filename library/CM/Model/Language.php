@@ -105,7 +105,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		$abbreviation = (string) $abbreviation;
 		$enabled = (bool) $enabled;
 		$backupId = ($backup) ? $backup->getId() : null;
-		CM_Mysql::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled,
+		CM_Db_Db::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled,
 			'backupId' => $backupId), array('id' => $this->getId()));
 		$this->_change();
 	}
@@ -141,7 +141,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_LANGUAGE, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_LANGUAGE, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
@@ -157,8 +157,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 	protected function _onDelete() {
 		CM_Mysql::delete(TBL_CM_LANGUAGE, array('id' => $this->getId()));
 		CM_Mysql::delete(TBL_CM_LANGUAGEVALUE, array('languageId' => $this->getId()));
-		CM_Mysql::update(TBL_CM_LANGUAGE, array('backupId' => null), array('backupId' => $this->getId()));
-		CM_Mysql::update(TBL_CM_USER, array('languageId' => null), array('languageId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_LANGUAGE, array('backupId' => null), array('backupId' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_USER, array('languageId' => null), array('languageId' => $this->getId()));
 		/** @var CM_Model_Language $language */
 		foreach (new CM_Paging_Language_All() as $language) {
 			$language->_change();
@@ -175,7 +175,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function findByAbbreviation($abbreviation) {
 		$abbreviation = (string) $abbreviation;
-		$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchOne();
+		$languageId = CM_Db_Db::select(TBL_CM_LANGUAGE, 'id', array('abbreviation' => $abbreviation))->fetchColumn();
 		if (!$languageId) {
 			return null;
 		}
@@ -188,7 +188,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public static function findDefault() {
 		$cacheKey = CM_CacheConst::Language_Default;
 		if (false === ($languageId = CM_CacheLocal::get($cacheKey))) {
-			$languageId = CM_Mysql::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true, 'backupId' => null))->fetchOne();
+			$languageId = CM_Db_Db::select(TBL_CM_LANGUAGE, 'id', array('enabled' => true, 'backupId' => null))->fetchColumn();
 			CM_CacheLocal::set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
@@ -202,7 +202,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function deleteKey($name) {
 		$name = (string) $name;
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn();
 		if (!$languageKeyId) {
 			return;
 		}
@@ -238,13 +238,13 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::_setKeyVariables($name, $variableNamesNew);
 		}
 		if ($nameNew !== null) {
-			if (!CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne()) {
+			if (!CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn()) {
 				throw new CM_Exception_Nonexistent('LanguageKey `' . $name . '` does not exist');
 			}
-			if (CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchOne()) {
+			if (CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchColumn()) {
 				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
 			}
-			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
+			CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
 			self::flushCacheLocal();
 		}
 
@@ -266,12 +266,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public static function rpc_requestTranslationJs($languageKey) {
-		$javascript = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'javascript', array('name' => $languageKey))->fetchOne();
+		$javascript = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'javascript', array('name' => $languageKey))->fetchColumn();
 		if ($javascript === false) {
 			throw new CM_Exception_Invalid('Language key `' . $languageKey . '` not found');
 		}
 		if ($javascript == 0) {
-			CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey));
+			CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('javascript' => 1), array('name' => $languageKey));
 			self::updateVersionJavascript();
 		}
 	}
@@ -291,7 +291,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	private static function _setKey($name, array $variableNames = null) {
 		$name = (string) $name;
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchOne();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn();
 		if (!$languageKeyId) {
 			$languageKeyId = CM_Mysql::insert(TBL_CM_LANGUAGEKEY, array('name' => $name), null, array());
 			/** @var CM_Model_Language $language */
@@ -312,7 +312,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	private static function _setKeyVariables($name, array $variableNames) {
-		$languageKeyParams = CM_Mysql::select(TBL_CM_LANGUAGEKEY, array('id', 'accessStamp', 'updateCount'), array('name' => $name))->fetchAssoc();
+		$languageKeyParams = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, array('id', 'accessStamp', 'updateCount'), array('name' => $name))->fetch();
 		if (!$languageKeyParams) {
 			throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
 		}
@@ -321,7 +321,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		if (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) {
 			$updateCount = 1;
 		}
-		CM_Mysql::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
+		CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
 		if ($updateCount > 10) {
 			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
 		}
