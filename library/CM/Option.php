@@ -41,7 +41,7 @@ class CM_Option {
 	 * @param mixed  $value
 	 */
 	public function set($key, $value) {
-		CM_Mysql::replace(TBL_CM_OPTION, array('key' => $key, 'value' => serialize($value)));
+		CM_Db_Db::replace(TBL_CM_OPTION, array('key' => $key, 'value' => serialize($value)));
 		$this->_clearCache();
 	}
 

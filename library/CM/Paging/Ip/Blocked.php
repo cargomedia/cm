@@ -13,7 +13,7 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 */
 	public function add($ip) {
 		$ip = (int) $ip;
-		CM_Mysql::replace(TBL_CM_IPBLOCKED, array('ip' => $ip, 'createStamp' => time()));
+		CM_Db_Db::replace(TBL_CM_IPBLOCKED, array('ip' => $ip, 'createStamp' => time()));
 	}
 
 	/**

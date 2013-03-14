@@ -21,7 +21,7 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 * @param string $string
 	 */
 	public function add($string) {
-		CM_Mysql::replace(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
+		CM_Db_Db::replace(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
 		$this->_change();
 	}
 

@@ -195,7 +195,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			if (!$variation) {
 				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
 			}
-			CM_Mysql::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId,
+			CM_Db_Db::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId,
 				'variationId' => $variation->getId(), 'createStamp' => time()));
 			$variationFixtures[$this->getId()] = $variation->getName();
 			$cacheWrite = true;

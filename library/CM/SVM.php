@@ -42,7 +42,7 @@ class CM_SVM {
 		$values = $this->_parseValues($values);
 		CM_Mysql::insert(TBL_CM_SVMTRAINING,
 			array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
-		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
+		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
 	}
 
 	/**
@@ -86,12 +86,12 @@ class CM_SVM {
 
 		$this->_model = $svm->train($problem);
 		$this->_model->save($this->_getPath());
-		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 0));
+		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 0));
 	}
 
 	public function flush() {
 		CM_Db_Db::delete(TBL_CM_SVMTRAINING, array('svmId' => $this->getId()));
-		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
+		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
 		$file = new CM_File($this->_getPath());
 		$file->delete();
 		$this->__construct($this->_id);
@@ -141,7 +141,7 @@ class CM_SVM {
 				$deletedCount = CM_Db_Db::exec(
 					'DELETE FROM TBL_CM_SVMTRAINING WHERE `svmId` = ? ORDER BY `createStamp` LIMIT ' . $limit, array($id))->getAffectedRows();
 				if ($deletedCount > 0) {
-					CM_Mysql::replace(TBL_CM_SVM, array('id' => $id, 'trainingChanges' => 1));
+					CM_Db_Db::replace(TBL_CM_SVM, array('id' => $id, 'trainingChanges' => 1));
 				}
 			}
 		}
