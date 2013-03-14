@@ -97,7 +97,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		$this->getVideo()->delete();
 		$thumbDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
 		$thumbDir->delete();
-		CM_Mysql::delete(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $this->getId()));
 	}
 
 	protected static function _create(array $data) {

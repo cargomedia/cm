@@ -29,7 +29,7 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 	 * @param string $string
 	 */
 	public function remove($string) {
-		CM_Mysql::delete(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
+		CM_Db_Db::delete(TBL_CM_STRING, array('type' => $this->_type, 'string' => $string));
 		$this->_change();
 	}
 

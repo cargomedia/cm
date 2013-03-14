@@ -90,7 +90,7 @@ class CM_SVM {
 	}
 
 	public function flush() {
-		CM_Mysql::delete(TBL_CM_SVMTRAINING, array('svmId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SVMTRAINING, array('svmId' => $this->getId()));
 		CM_Mysql::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
 		$file = new CM_File($this->_getPath());
 		$file->delete();
@@ -135,7 +135,7 @@ class CM_SVM {
 		$trainingsMax = (int) $trainingsMax;
 		$ids = CM_Db_Db::select(TBL_CM_SVM, 'id')->fetchAllColumn();
 		foreach ($ids as $id) {
-			$trainingsCount = CM_Mysql::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
+			$trainingsCount = CM_Db_Db::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
 			if ($trainingsCount > $trainingsMax) {
 				$limit = (int) ($trainingsCount - $trainingsMax);
 				$deletedCount = CM_Db_Db::exec(

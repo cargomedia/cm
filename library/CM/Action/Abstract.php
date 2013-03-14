@@ -281,7 +281,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			}
 		}
 		if (!empty($insert)) {
-			CM_Mysql::delete(TBL_CM_ACTION, $where);
+			CM_Db_Db::delete(TBL_CM_ACTION, $where);
 			CM_Db_Db::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}

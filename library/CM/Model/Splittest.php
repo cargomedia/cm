@@ -79,7 +79,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	public function flush() {
-		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
 	}
 
 	/**
@@ -121,17 +121,17 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 				CM_Db_Db::insert(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id, 'name' => $variation));
 			}
 		} catch (CM_Exception $e) {
-			CM_Mysql::delete(TBL_CM_SPLITTEST, array('id' => $id));
-			CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id));
+			CM_Db_Db::delete(TBL_CM_SPLITTEST, array('id' => $id));
+			CM_Db_Db::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id));
 			throw $e;
 		}
 		return new static($name);
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_SPLITTEST, array('id' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITTEST, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId()));
 	}
 
 	/**

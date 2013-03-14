@@ -269,7 +269,7 @@ class CM_Mail extends CM_View_Abstract {
 	 * @return int
 	 */
 	public static function getQueueSize() {
-		return CM_Mysql::count(TBL_CM_MAIL);
+		return CM_Db_Db::count(TBL_CM_MAIL);
 	}
 
 	/**
@@ -295,7 +295,7 @@ class CM_Mail extends CM_View_Abstract {
 			$sender = unserialize($row['sender']);
 			$mail->setSender($sender['address'], $sender['name']);
 			$mail->_send($row['subject'], $row['text'], $row['html']);
-			CM_Mysql::delete(TBL_CM_MAIL, array('id' => $row['id']));
+			CM_Db_Db::delete(TBL_CM_MAIL, array('id' => $row['id']));
 		}
 	}
 
