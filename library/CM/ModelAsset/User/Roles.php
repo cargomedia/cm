@@ -6,7 +6,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function _onModelDelete() {
-		CM_Mysql::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId()));
 	}
 
 	/**
@@ -73,7 +73,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	 * @param int $role
 	 */
 	public function delete($role) {
-		CM_Mysql::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId(), 'role' => $role));
+		CM_Db_Db::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId(), 'role' => $role));
 		$this->_change();
 	}
 
