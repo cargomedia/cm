@@ -39,6 +39,11 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
 	}
 	if (!empty($icon)) {
+
+		if (empty($label)) {
+			$icon = $icon . ' standalone';
+		}
+
 		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
 	}
 	$titleAttr = '';
