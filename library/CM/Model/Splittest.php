@@ -152,7 +152,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
+		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
 			'conversionWeight' => $weight), array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
 	}
 
