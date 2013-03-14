@@ -61,6 +61,6 @@ class CM_MailTest extends CMTest_TestCase {
 											'bcc'     => serialize($msg->getBcc())));
 		$this->assertEquals(1, CM_Db_Db::count(TBL_CM_MAIL, 'id'));
 		CM_Mail::processQueue(1);
-		$this->assertFalse(CM_Db_Db::select(TBL_CM_MAIL, 'id')->fetch());
+		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_MAIL, 'id'));
 	}
 }
