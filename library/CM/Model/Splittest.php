@@ -53,8 +53,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getVariationFixtureCreatedMin() {
-		return (int) CM_Mysql::exec(
-			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ' . $this->getId())->fetchOne();
+		return (int) CM_Db_Db::exec(
+			'SELECT MIN(`createStamp`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId` = ?', array($this->getId()))->fetchColumn();
 	}
 
 	/**
@@ -89,7 +89,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public static function findId($id) {
 		$id = (int) $id;
-		$name = CM_Mysql::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchOne();
+		$name = CM_Db_Db::select(TBL_CM_SPLITTEST, 'name', array('id' => $id))->fetchColumn();
 		if (false === $name) {
 			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
 		}
@@ -100,9 +100,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return array();
 		}
-		$data = CM_Mysql::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetch();
 		if ($data) {
-			$data['variations'] = CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, array('id',
+			$data['variations'] = CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, array('id',
 				'name'), array('splittestId' => $data['id']))->fetchAllTree();
 		}
 		return $data;
@@ -152,7 +152,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
+		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
 			'conversionWeight' => $weight), array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
 	}
 
@@ -181,11 +181,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
 		$cacheWrite = false;
 		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$variationFixtures = CM_Mysql::exec('
+			$variationFixtures = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 				FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
 				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-				WHERE `fixture`.`fixtureId` = ?', $fixtureId)->fetchAllTree();
+				WHERE `fixture`.`fixtureId` = ?', array($fixtureId))->fetchAllTree();
 
 			$cacheWrite = true;
 		}

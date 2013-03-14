@@ -1,6 +1,7 @@
 <?php
 
 class CM_Captcha {
+
 	private $_id;
 	private $_text;
 	private $_fontPath;
@@ -11,7 +12,7 @@ class CM_Captcha {
 	 */
 	public function __construct($id) {
 		$this->_id = (int) $id;
-		$this->_text = CM_Mysql::select(TBL_CM_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchOne();
+		$this->_text = CM_Db_Db::select(TBL_CM_CAPTCHA, 'number', array('captcha_id' => $this->getId()))->fetchColumn();
 		if (!$this->_text) {
 			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
 		}
@@ -31,7 +32,8 @@ class CM_Captcha {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		CM_Mysql::exec('DELETE FROM TBL_CM_CAPTCHA WHERE `create_time` < ?', (time() - (int) $age));
+		$age = (int) $age;
+		CM_Db_Db::delete(TBL_CM_CAPTCHA, '`create_time` < ' . (time() - $age));
 	}
 
 	/**

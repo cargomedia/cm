@@ -39,7 +39,7 @@ class CM_Paging_Transgression_User extends CM_Paging_Transgression_Abstract {
 
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
-		CM_Mysql::insertDelayed(TBL_CM_ACTION,
+		CM_Db_Db::insertDelayed(TBL_CM_ACTION,
 				array('actorId' => $this->_user->getId(), 'verb' => $action->getVerb(), 'type' => $action->getType(), 'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
 

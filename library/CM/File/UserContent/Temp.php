@@ -1,6 +1,7 @@
 <?php
 
 class CM_File_UserContent_Temp extends CM_File_UserContent {
+
 	/**
 	 * @var string
 	 */
@@ -11,7 +12,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($uniqid) {
-		$data = CM_Mysql::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetch();
 		if (!$data) {
 			throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
 		}
@@ -63,8 +64,9 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 * @param int $age
 	 */
 	public static function deleteOlder($age) {
-		$query = CM_Mysql::exec('SELECT `uniqid` FROM TBL_CM_TMP_USERFILE WHERE `createStamp`<?', time() - $age);
-		foreach ($query->fetchCol() as $uniqid) {
+		$age = (int) $age;
+		$result = CM_Db_Db::select(TBL_CM_TMP_USERFILE, 'uniqid', '`createStamp` < ' . (time() - $age));
+		foreach ($result->fetchAllColumn() as $uniqid) {
 			$tmpFile = new CM_File_UserContent_Temp($uniqid);
 			$tmpFile->delete();
 		}

@@ -90,7 +90,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	 * @return array
 	 */
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
