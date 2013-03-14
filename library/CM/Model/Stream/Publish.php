@@ -49,7 +49,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 			$allowedUntil = (int) $data['allowedUntil'];
 		}
 		$key = (string) $data['key'];
-		$id = CM_Mysql::insert(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$id = CM_Db_Db::insert(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $key, 'channelId' => $streamChannel->getId()));
 		$streamPublish = new self($id);
 		$streamChannel->onPublish($streamPublish);

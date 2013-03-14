@@ -115,10 +115,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			throw new CM_Exception('Cannot create splittest without variations');
 		}
 
-		$id = CM_Mysql::insert(TBL_CM_SPLITTEST, array('name' => $name, 'createStamp' => time()));
+		$id = CM_Db_Db::insert(TBL_CM_SPLITTEST, array('name' => $name, 'createStamp' => time()));
 		try {
 			foreach ($variations as $variation) {
-				CM_Mysql::insert(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id, 'name' => $variation));
+				CM_Db_Db::insert(TBL_CM_SPLITTESTVARIATION, array('splittestId' => $id, 'name' => $variation));
 			}
 		} catch (CM_Exception $e) {
 			CM_Db_Db::delete(TBL_CM_SPLITTEST, array('id' => $id));

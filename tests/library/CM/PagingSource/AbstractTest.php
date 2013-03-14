@@ -15,7 +15,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Mysql::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
 		}
 	}
 	public function tearDown() {

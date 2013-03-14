@@ -74,7 +74,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Mysql::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
 		}
 		self::$_source = new CM_PagingSource_Sql('`num`', TBL_TEST);
 		define('TBL_TEST2', 'test2');
@@ -84,8 +84,8 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 50; $i++) {
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
 		}
 	}
 
