@@ -21,10 +21,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		if (!$client) {
 			$config = self::_getConfig();
-			if ($readOnly && $config->serversReadEnabled) {
-				if (empty($config->serversRead)) {
-					throw new CM_Db_Exception('No read servers configured');
-				}
+			if ($readOnly && $config->serversReadEnabled && !empty($config->serversRead)) {
 				$server = $config->serversRead[array_rand($config->serversRead)];
 			} else {
 				$server = $config->server;
