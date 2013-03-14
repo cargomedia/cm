@@ -17,7 +17,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
@@ -31,7 +31,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	 * @return CM_Model_Stream_Subscribe|null
 	 */
 	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
-		$id = CM_Mysql::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchOne();
+		$id = CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
 		if (!$id) {
 			return null;
 		}
