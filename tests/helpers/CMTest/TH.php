@@ -52,7 +52,7 @@ class CMTest_TH {
 	}
 
 	public static function clearDb() {
-		$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
@@ -243,7 +243,7 @@ class CMTest_TH {
 	}
 
 	public static function randomizeAutoincrement() {
-		$tables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		$tables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
 		foreach ($tables as $table) {
 			if (CM_Db_Db::exec("SHOW COLUMNS FROM `" . $table . "` WHERE `Extra` = 'auto_increment'")->fetch()) {
 				CM_Db_Db::exec("ALTER TABLE `" . $table . "` AUTO_INCREMENT = " . rand(1, 1000));
