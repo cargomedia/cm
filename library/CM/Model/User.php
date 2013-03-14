@@ -73,7 +73,7 @@ class CM_Model_User extends CM_Model_Abstract {
 		if ($state) {
 			CM_Db_Db::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => $visible));
 		} else {
-			CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
+			CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		}
 		$this->_change();
 	}
@@ -226,7 +226,7 @@ class CM_Model_User extends CM_Model_Abstract {
 				$user = CM_Model_User::factory($userId);
 				$user->setOnline(false);
 			} catch (CM_Exception_Nonexistent $e) {
-				CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
+				CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
 			}
 		}
 	}
@@ -250,8 +250,8 @@ class CM_Model_User extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
-		CM_Mysql::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_USER, array('userId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $this->getId()));
 	}
 
 	public function toArray() {

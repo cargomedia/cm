@@ -63,7 +63,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getFixtureCount() {
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
+		return CM_Db_Db::count(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
 	}
 
 	/**

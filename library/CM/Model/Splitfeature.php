@@ -84,7 +84,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return 0;
 		}
-		return CM_Mysql::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		return CM_Db_Db::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
 	}
 
 	/**
@@ -105,8 +105,8 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_SPLITFEATURE, array('id' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITFEATURE, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
 	}
 
 	protected static function _create(array $data) {

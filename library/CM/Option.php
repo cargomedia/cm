@@ -49,7 +49,7 @@ class CM_Option {
 	 * @param string $key
 	 */
 	public function delete($key) {
-		CM_Mysql::delete(TBL_CM_OPTION, array('key' => $key));
+		CM_Db_Db::delete(TBL_CM_OPTION, array('key' => $key));
 		$this->_clearCache();
 	}
 

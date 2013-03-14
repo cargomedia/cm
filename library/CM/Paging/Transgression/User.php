@@ -44,6 +44,6 @@ class CM_Paging_Transgression_User extends CM_Paging_Transgression_Abstract {
 	}
 
 	public function deleteAll() {
-		CM_Mysql::delete(TBL_CM_ACTION, '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
+		CM_Db_Db::delete(TBL_CM_ACTION, '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
 	}
 }

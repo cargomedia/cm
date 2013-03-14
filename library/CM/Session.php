@@ -218,7 +218,7 @@ class CM_Session implements CM_Comparable {
 													'expires'   => time() + $this->getLifetime()));
 			$this->_change();
 		} elseif ($this->_isPersistent) {
-			CM_Mysql::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+			CM_Db_Db::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 	}

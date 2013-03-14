@@ -214,7 +214,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete('modelMock', array('id' => $this->getId()));
+		CM_Db_Db::delete('modelMock', array('id' => $this->getId()));
 	}
 
 	protected function _loadAssets() {
@@ -273,7 +273,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
+		CM_Db_Db::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
 	}
 
 	protected static function _create(array $data) {
