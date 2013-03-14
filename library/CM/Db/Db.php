@@ -326,8 +326,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$args = array();
 		$args[] = '--host=' . $config->server['host'];
 		$args[] = '--port=' . $config->server['port'];
-		$args[] = '--user=' . $config->user;
-		$args[] = '--password=' . $config->pass;
+		$args[] = '--user=' . $config->username;
+		$args[] = '--password=' . $config->password;
 		$args[] = $dbName;
 		CM_Util::exec('mysql', $args, null, $dump->getPath());
 	}
