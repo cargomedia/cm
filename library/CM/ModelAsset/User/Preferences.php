@@ -38,7 +38,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		if ($value == $defaults[$section][$key]['value']) {
 			CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
 		} else {
-			CM_Mysql::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
+			CM_Db_Db::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
 					'value' => $value));
 		}
 		$this->_change();
