@@ -7,14 +7,20 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 			$content = $this->_processInternal($this->_getInternal());
 		} elseif ($this->getRequest()->getPath() == '/init.js') {
 			$content = '';
-			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/init/') as $path) {
-				$content .= new CM_File($path) . ';' . PHP_EOL;
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
+				$path = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/init';
+				foreach (CM_Util::rglob('*.js', $path) as $path) {
+					$content .= new CM_File($path) . ';' . PHP_EOL;
+				}
 			}
 			$content = $this->_processInternal($content);
 		} elseif ($this->getRequest()->getPath() == '/library.js') {
 			$content = '';
-			foreach (CM_Util::rglob('*.js', DIR_PUBLIC . 'static/js/library/') as $path) {
-				$content .= new CM_File($path) . ';' . PHP_EOL;
+			foreach ($this->getSite()->getNamespaces() as $namespace) {
+				$path = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/library';
+				foreach (CM_Util::rglob('*.js', $path) as $path) {
+					$content .= new CM_File($path) . ';' . PHP_EOL;
+				}
 			}
 			$content = $this->_processInternal($content);
 		} elseif ($this->getRequest()->getPathPart(0) == 'translations') {
@@ -46,7 +52,8 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 		$paths = array_keys(CM_Util::getClasses($pathsUnsorted));
 
 		foreach (array_reverse(self::getSite()->getNamespaces()) as $namespace) {
-			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
+			$path = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/' . $namespace . '.js';
+			if (is_file($path)) {
 				$paths[] = $path;
 			}
 		}
