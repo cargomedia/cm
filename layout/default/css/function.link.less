@@ -1,7 +1,17 @@
-.link:hover {
+.link {
 	text-decoration: none;
 
-	> .label {
-		text-decoration: underline;
+	&:hover {
+		> .label {
+			text-decoration: underline;
+		}
+	}
+
+	> .icon {
+		margin-right: 4px;
+
+		&.standalone {
+			margin: 0;
+		}
 	}
 }
