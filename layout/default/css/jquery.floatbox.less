@@ -1,7 +1,5 @@
 .floatbox-body {
 	.background-color(@colorBg);
-	.border(lighten(@colorFg, 20));
-	.box-shadow(0 0 15px @colorFg);
 }
 
 .floatbox-controls {
@@ -18,5 +16,15 @@
 
 	&:hover {
 		color: @colorClose;
+	}
+}
+
+.floatbox.fullscreen {
+	width: 100%;
+	height: 100%;
+
+	.floatbox-body {
+		height: 100%;
+		padding: 0;
 	}
 }
