@@ -40,7 +40,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$class .= ' hasLabel';
 	}
 	if (!empty($icon)) {
-		$html = '<span class="icon-' . $icon . '"></span>' . $html;
+		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
 		$class .= ' hasIcon';
 	}
 	$titleAttr = '';
