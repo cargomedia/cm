@@ -856,19 +856,24 @@ var CM_App = CM_Class_Abstract.extend({
 
 			var hash = window.location.hash.substr(1);
 			var path = window.location.pathname + window.location.search;
-			if (hash) {
-				if (pushState) {
+			if (pushState) {
+				if (hash) {
 					// Hash-URL copied into a PushState-browser
 					if (hash != path) {
 						// Replace state from Hash -> this will trigger "popstate"
 						window.history.replaceState(null, null, hash);
 					}
-				} else {
+				}
+			} else {
+				if (hash) {
 					// Hash-URL copied into a Hash-browser
 					if (hash == path) {
 						// Prevent initial "popstate"
 						skipInitialFire = true;
 					}
+				} else {
+					// Replace state from path if no hash provided
+					window.history.replaceState(null, null, path);
 				}
 			}
 
