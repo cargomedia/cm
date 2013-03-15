@@ -37,14 +37,11 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	$html = '';
 	if (!empty($label)) {
 		$html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+		$class .= ' hasLabel';
 	}
 	if (!empty($icon)) {
-
-		if (empty($label)) {
-			$icon = $icon . ' standalone';
-		}
-
-		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
+		$html = '<span class="icon-' . $icon . '"></span>' . $html;
+		$class .= ' hasIcon';
 	}
 	$titleAttr = '';
 	if (!empty($title)) {
