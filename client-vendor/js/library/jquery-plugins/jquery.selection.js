@@ -4,7 +4,7 @@ jQuery.fn.selection = function(replace, move_to){
 	move_to = move_to || false;
 	// Need to focus the given element to extract the selection
 	element.focus();
-	
+
 	if (element.setSelectionRange) {
 		var s = element.selectionStart;
 		var e = element.selectionEnd;
