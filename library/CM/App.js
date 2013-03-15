@@ -791,73 +791,87 @@ var CM_App = CM_Class_Abstract.extend({
 			var request;
 			var urlBase = cm.getUrl();
 			var pushState = Modernizr.history;
-			var Router = Backbone.Router.extend({
-				routes: {
-					'*path': 'page'
-				},
-				page: function(url) {
-					url = '/' + url;
-					if (!$placeholder) {
-						$placeholder = $('<div class="router-placeholder" />');
-						var page = cm.findView('CM_Page_Abstract');
-						page.$().replaceWith($placeholder);
-						page.remove(true);
-						cm.router.onTeardown();
-					} else {
-						$placeholder.removeClass('error').html('');
-					}
-					var timeoutLoading = window.setTimeout(function() {
-						$placeholder.html('<div class="spinner" />')
-					}, 750);
-					if (request) {
-						request.abort();
-					}
-					request = cm.findView().loadPage(url, {
-						success: function(response) {
-							var fragment = response.url.substr(urlBase.length);
-							var currentLayout = cm.findView('CM_Layout_Abstract');
-							var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-							if (reload) {
-								var reloadUrl = response.url;
-								if (!pushState) {
-									reloadUrl += '#' + fragment.substr(1);
-								}
-								window.location.replace(reloadUrl);
-								return;
+
+			/**
+			 * @param {String} path
+			 */
+			var navigate = function(path) {
+				console.log('navigate: ' + path);
+				if (!$placeholder) {
+					$placeholder = $('<div class="router-placeholder" />');
+					var page = cm.findView('CM_Page_Abstract');
+					page.$().replaceWith($placeholder);
+					page.remove(true);
+					cm.router.onTeardown();
+				} else {
+					$placeholder.removeClass('error').html('');
+				}
+				var timeoutLoading = window.setTimeout(function() {
+					$placeholder.html('<div class="spinner" />')
+				}, 750);
+				if (request) {
+					request.abort();
+				}
+				request = cm.findView().loadPage(path, {
+					success: function(response) {
+						var fragment = response.url.substr(urlBase.length);
+						var currentLayout = cm.findView('CM_Layout_Abstract');
+						var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
+						if (reload) {
+							var reloadUrl = response.url;
+							if (!pushState) {
+								reloadUrl += '#' + fragment;
 							}
-							$placeholder.replaceWith(this.$());
-							$placeholder = null;
-							cm.router._router.navigate(fragment, {trigger: false, replace: true});
-							cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-						},
-						error: function(msg, type, isPublic) {
-							$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-							cm.router.onError();
-							return false;
-						},
-						complete: function() {
-							window.clearTimeout(timeoutLoading);
+							console.log('reload: ' + reloadUrl);
+							window.location.replace(reloadUrl);
+							return;
 						}
-					});
+						$placeholder.replaceWith(this.$());
+						$placeholder = null;
+						window.history.replaceState(null, null, fragment);
+						cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
+					},
+					error: function(msg, type, isPublic) {
+						$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
+						cm.router.onError();
+						return false;
+					},
+					complete: function() {
+						window.clearTimeout(timeoutLoading);
+					}
+				});
+			};
+
+			var skipInitialFire = false;
+			$(window).bind('popstate', function(event) {
+				if (skipInitialFire) {
+					skipInitialFire = false;
+					console.log("skip initial fire");
+					return;
 				}
+				var url = window.history.location || document.location;
+				console.log('popstate: ' + url.pathname + url.search);
+				navigate(url.pathname + url.search);
 			});
-			this._router = new Router();
+
 			var hash = window.location.hash.substr(1);
-			var path = window.location.pathname.substr(1) + window.location.search;
-			var fragment = path;
-			var trigger = false;
+			var path = window.location.pathname + window.location.search;
 			if (hash) {
-				fragment = hash;
-				if (hash != path) {
-					trigger = true;
+				if (pushState) {
+					// Hash-URL copied into a PushState-browser
+					if (hash != path) {
+						// Replace state from Hash -> this will trigger "popstate"
+						window.history.replaceState(null, null, hash);
+					}
+				} else {
+					// Hash-URL copied into a Hash-browser
+					if (hash == path) {
+						// Prevent initial "popstate"
+						skipInitialFire = true;
+					}
 				}
 			}
-			Backbone.history.start({pushState: pushState, silent: true});
-			Backbone.history.fragment = path;
-			if (!pushState && !hash && path) {
-				Backbone.history.fragment = '';	// Force navigation to add hash to URL field
-			}
-			this._router.navigate(fragment, {trigger: trigger, replace: true});
+
 			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
 				if (0 === this.href.indexOf(urlBase)) {
 					var fragment = this.href.substr(urlBase.length);
@@ -873,6 +887,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Boolean} [forceReload]
 		 */
 		route: function(url, forceReload) {
+			console.log('route: ' + url);
 			forceReload = forceReload || false;
 			var urlBase = cm.getUrl();
 			var fragment = url;
@@ -881,11 +896,12 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				fragment = url.substr(urlBase.length);
 			}
-			if (!this._router || forceReload || 0 !== url.indexOf(urlBase)) {
+			if (forceReload || 0 !== url.indexOf(urlBase)) {
 				window.location.assign(url);
 				return;
 			}
-			this._router.navigate(fragment, {trigger: true});
+			window.history.pushState(null, null, fragment);
+			$(window).trigger('popstate');
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
 		},
 
