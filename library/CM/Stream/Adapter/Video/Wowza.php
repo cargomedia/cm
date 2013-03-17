@@ -5,6 +5,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 	const TYPE = 2;
 
 	public function synchronize() {
+		$startStampLimit = time() - 3;
 		$status = array();
 		foreach (CM_Stream_Video::getInstance()->getServers() as $serverId => $wowzaServer) {
 			$singleStatus = CM_Params::decode($this->_fetchStatus($wowzaServer['privateIp']), true);
@@ -18,7 +19,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 		$streamChannels = $this->_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-			$streamChannel = CM_Model_StreamChannel_Abstract::findKey($streamName, $this->getType());
+			$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				$this->_stopClient($publish['clientId'], $publish['serverHost']);
 			}
@@ -45,8 +46,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
 			/** @var CM_Model_Stream_Publish $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-			$ageMinForDeletion = 3;
-			if ($streamPublish->getStart() > time() - $ageMinForDeletion) {
+			if ($streamPublish->getStart() > $startStampLimit) {
 				continue;
 			}
 			if (!isset($status[$streamChannel->getKey()])) {
@@ -54,7 +54,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 			} else {
 				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-					if ($streamSubscribe->getStart() > time() - $ageMinForDeletion) {
+					if ($streamSubscribe->getStart() > $startStampLimit) {
 						continue;
 					}
 					if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {

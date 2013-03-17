@@ -22,15 +22,15 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		/** @var $wowza CM_Stream_Video */
 
 		$wowza->synchronize();
-		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey(), $wowza->getType()));
-		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
-		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+		$this->assertEquals($streamChannel, CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
+		$this->assertEquals($streamPublish, CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
+		$this->assertEquals($streamSubscribe, CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
 
 		CMTest_TH::timeForward(5);
 		$wowza->synchronize();
-		$this->assertNull(CM_Model_StreamChannel_Abstract::findKey($streamChannel->getKey(), $wowza->getType()));
-		$this->assertNull(CM_Model_Stream_Publish::findKey($streamPublish->getKey()));
-		$this->assertNull(CM_Model_Stream_Subscribe::findKey($streamSubscribe->getKey()));
+		$this->assertNull(CM_Model_StreamChannel_Abstract::findByKey($streamChannel->getKey(), $wowza->getType()));
+		$this->assertNull(CM_Model_Stream_Publish::findByKeyAndChannel($streamPublish->getKey(), $streamChannel));
+		$this->assertNull(CM_Model_Stream_Subscribe::findByKeyAndChannel($streamSubscribe->getKey(), $streamChannel));
 	}
 
 	public function testSynchronizeMissingInPhp() {
@@ -51,7 +51,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		$wowza->synchronize();
 	}
 
-	public function testGetSeverId() {
+	public function testGetServerId() {
 		$adapter = new CM_Stream_Adapter_Video_Wowza();
 		$ipAddresses = array('10.0.3.109', '10.0.3.108');
 		foreach ($ipAddresses as $ipAddress) {
@@ -83,13 +83,11 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 				$session = CMTest_TH::createSession($streamSubscribe->getUser());
 				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(),
 					'clientId' => $streamSubscribe->getKey(), 'data' => json_encode(array('sessionId' => $session->getId())));
-				unset($session);
 			}
 			$session = CMTest_TH::createSession($streamPublish->getUser());
 			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
 				'data' => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
 				'subscribers' => $subscribes, 'thumbnailCount' => 2, 'width' => 480, 'height' => 720, 'wowzaIp' => ip2long('192.168.0.1'));
-			unset($session);
 		}
 		return json_encode($jsonData);
 	}

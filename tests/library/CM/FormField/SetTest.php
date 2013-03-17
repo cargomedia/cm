@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_SetTest extends CMTest_TestCaseRender {
+class CM_FormField_SetTest extends CMTest_TestCase {
 
 	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();

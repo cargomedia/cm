@@ -9,6 +9,11 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 				foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
 					$content .= new CM_File($path);
 				}
+
+				foreach (CM_Util::rglob('*.less', DIR_PUBLIC . 'static/css/library/') as $path) {
+					$css = new CM_Css(new CM_File($path));
+					$content .= $css->compile($this->getRender());
+				}
 				break;
 			case '/internal.css':
 				$css = new CM_Css();

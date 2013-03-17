@@ -19,12 +19,12 @@ EOD;
 		$badwords = new CM_Paging_ContentList_Badwords();
 		$badwords->add('@yahoo.com');
 
-		self::$_smileySetId = $setId = CM_Mysql::insert(TBL_CM_SMILEYSET, array('label' => 'testSet'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
-		self::$_smileyIds[] = CM_Mysql::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
+		self::$_smileySetId = $setId = CM_Db_Db::insert(TBL_CM_SMILEYSET, array('label' => 'testSet'));
+		self::$_smileyIds[] = CM_Db_Db::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':),:-)', 'file' => '1.png'));
+		self::$_smileyIds[] = CM_Db_Db::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ';)', 'file' => '2.png'));
+		self::$_smileyIds[] = CM_Db_Db::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => ':(,:-(', 'file' => '3.png'));
+		self::$_smileyIds[] = CM_Db_Db::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '*PLAYMATE*', 'file' => '4.png'));
+		self::$_smileyIds[] = CM_Db_Db::insert(TBL_CM_SMILEY, array('setId' => $setId, 'code' => '<3', 'file' => '5.png'));
 
 		CMTest_TH::clearCache();
 	}

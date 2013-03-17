@@ -92,24 +92,11 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @return array
-	 * @throws CM_Exception_Invalid
+	 * @param string|null $keyName
+	 * @return array[]
 	 */
-	public function getItemsRawTree() {
-		if (null === $this->_itemsRawTree) {
-			$this->_itemsRawTree = array();
-			foreach ($this->getItemsRaw() as $itemRaw) {
-				if (!is_array($itemRaw) || count($itemRaw) < 2) {
-					throw new CM_Exception_Invalid('Raw item is not an array or has less than two elements.');
-				}
-				$key = array_shift($itemRaw);
-				if (count($itemRaw) <= 1) {
-					$itemRaw = reset($itemRaw);
-				}
-				$this->_itemsRawTree[$key] = $itemRaw;
-			}
-		}
-		return $this->_itemsRawTree;
+	public function getItemsRawTree($keyName = null) {
+		return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);
 	}
 
 	/**
@@ -150,8 +137,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		if ($this->_source) {
 			$itemsRaw = $this->_source->getItems();
 			foreach ($itemsRaw as $itemRaw) {
-				if (!array_key_exists('amount', $itemRaw)) {
-					throw new CM_Exception_Invalid(get_called_class() . ' has no field `amount`.');
+				if (!array_key_exists($field, $itemRaw)) {
+					throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
 				}
 				$sum += $itemRaw[$field];
 			}
@@ -265,7 +252,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	/**
 	 * @param boolean $state
 	 */
-	public function setFlattenItems($state){
+	public function setFlattenItems($state) {
 		$this->_flattenItems = (bool) $state;
 	}
 

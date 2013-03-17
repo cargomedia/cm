@@ -21,9 +21,11 @@
 	</head>
 	<body id="{$viewObj->getAutoId()}" class="{$viewObj->getClassHierarchy()|implode:' '}">
 		{block name='body-start'}{/block}
-		{block name='body'}
-			{component name=$viewObj->getPage()}
-		{/block}
+		<div id="body-container">
+			{block name='body'}
+				{component name=$viewObj->getPage()}
+			{/block}
+		</div>
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
 		{resource file='library.js'}
 		{resource file='internal.js'}

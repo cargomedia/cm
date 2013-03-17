@@ -18,7 +18,7 @@ class CM_Paging_StreamSubscribe_StreamChannel extends CM_Paging_StreamSubscribe_
 	public function findKey($key) {
 		$key = (string) $key;
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-		foreach($this as $streamSubscribe) {
+		foreach ($this as $streamSubscribe) {
 			if ($streamSubscribe->getKey() == $key) {
 				return $streamSubscribe;
 			}

@@ -237,4 +237,22 @@ class CM_File extends CM_Class_Abstract {
 		}
 		return $clean;
 	}
+
+	/**
+	 * @param string $path
+	 * @return CM_File
+	 */
+	public static function factory($path) {
+		$extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+		switch ($extension) {
+			case 'php':
+				return new CM_File_Php($path);
+			case 'js':
+				return new CM_File_Javascript($path);
+			case 'csv':
+				return new CM_File_Csv($path);
+			default:
+				return new CM_File($path);
+		}
+	}
 }

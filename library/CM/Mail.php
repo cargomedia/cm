@@ -268,15 +268,16 @@ class CM_Mail extends CM_View_Abstract {
 	 * @return int
 	 */
 	public static function getQueueSize() {
-		return CM_Mysql::count(TBL_CM_MAIL);
+		return CM_Db_Db::count(TBL_CM_MAIL);
 	}
 
 	/**
 	 * @param int $limit
 	 */
 	public static function processQueue($limit) {
-		$result = CM_Mysql::execRead("SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ?", (int) $limit);
-		while ($row = $result->fetchAssoc()) {
+		$limit = (int) $limit;
+		$result = CM_Db_Db::execRead('SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ' . $limit);
+		while ($row = $result->fetch()) {
 			$mail = new CM_Mail();
 			foreach (unserialize($row['to']) as $to) {
 				$mail->addTo($to['address'], $to['name']);
@@ -293,12 +294,12 @@ class CM_Mail extends CM_View_Abstract {
 			$sender = unserialize($row['sender']);
 			$mail->setSender($sender['address'], $sender['name']);
 			$mail->_send($row['subject'], $row['text'], $row['html']);
-			CM_Mysql::delete(TBL_CM_MAIL, array('id' => $row['id']));
+			CM_Db_Db::delete(TBL_CM_MAIL, array('id' => $row['id']));
 		}
 	}
 
 	private function _queue($subject, $text, $html) {
-		CM_Mysql::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
+		CM_Db_Db::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
 			'sender' => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()), 'to' => serialize($this->getTo()),
 			'cc' => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
 	}

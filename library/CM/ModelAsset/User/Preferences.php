@@ -6,7 +6,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function _onModelDelete() {
-		CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
 	}
 
 	/**
@@ -36,9 +36,9 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 			throw new CM_Exception("Invalid preference ($section.$key)");
 		}
 		if ($value == $defaults[$section][$key]['value']) {
-			CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
+			CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
 		} else {
-			CM_Mysql::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
+			CM_Db_Db::replace(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
 					'value' => $value));
 		}
 		$this->_change();
@@ -50,7 +50,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	public function getAll() {
 		if (($values = $this->_cacheGet('values')) === false) {
 			$values = self::getDefaults();
-			$valuesSpecific = CM_Mysql::select(TBL_CM_USER_PREFERENCE, array('preferenceId',
+			$valuesSpecific = CM_Db_Db::select(TBL_CM_USER_PREFERENCE, array('preferenceId',
 				'value'), array('userId' => $this->_model->getId()))->fetchAllTree();
 			foreach ($values as &$section) {
 				foreach ($section as &$key) {
@@ -65,7 +65,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function reset() {
-		CM_Mysql::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete(TBL_CM_USER_PREFERENCE, array('userId' => $this->_model->getId()));
 		$this->_change();
 	}
 
@@ -76,7 +76,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		$cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
 		if (($defaults = CM_CacheLocal::get($cacheKey)) === false) {
 			$defaults = array();
-			$rows = CM_Mysql::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue',
+			$rows = CM_Db_Db::select(TBL_CM_USER_PREFERENCEDEFAULT, array('section', 'key', 'preferenceId', 'defaultValue',
 				'configurable'))->fetchAll();
 			foreach ($rows as $default) {
 				if (!isset($defaults[$default['section']])) {
@@ -94,6 +94,6 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	 * @return array
 	 */
 	public static function getStats() {
-		return CM_Mysql::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM TBL_CM_USER_PREFERENCE GROUP BY `preferenceId`, `value`")->fetchAllTree();
+		return CM_Db_Db::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM TBL_CM_USER_PREFERENCE GROUP BY `preferenceId`, `value`")->fetchAllTree();
 	}
 }

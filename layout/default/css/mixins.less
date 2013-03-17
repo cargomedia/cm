@@ -12,66 +12,13 @@
 	text-overflow: ellipsis;
 }
 
-.quote {
-	font-style: italic;
-	&:before {
-		content: "«";
-	}
-	&:after {
-		content: "»";
-	}
-}
-
-.fontface(@fontname, @fontfile) {
-	font-family: '@{fontname}';
-	src: url(urlFont('icons-webfont.eot'));
-	src: url(urlFont('icons-webfont.eot') + "?#iefix") format('embedded-opentype'),
-	url(urlFont('icons-webfont.woff')) format('woff'),
-	url(urlFont('icons-webfont.ttf')) format('truetype'),
-	url(urlFont('icons-webfont.svg') + "#@{fontname}") format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-// TODO: Variables are hardcoded to 'icons-webfont' for now; https://github.com/leafo/lessphp/issues/293
-//.fontface(@fontname, @fontfile) {
-//	font-family: '@{fontname}';
-//	src: url(urlFont('@{fontfile}.eot'));
-//	src: url(urlFont('@{fontfile}.eot') + "?#iefix") format('embedded-opentype'),
-//	url(urlFont('@{fontfile}.woff')) format('woff'),
-//	url(urlFont('@{fontfile}.ttf')) format('truetype'),
-//	url(urlFont('@{fontfile}.svg') + "#@{fontname}") format('svg');
-//	font-weight: normal;
-//	font-style: normal;
-//}
-
 .link() {
 	color: @colorFgLink;
 	text-decoration: none;
 }
 
-.link_hover() {
-	text-decoration: underline;
-}
-
-.bg_emphasize() {
-	.background-color(darken(@colorBg, 6));
-}
-
-.bg_emphasize_light() {
-	.background-color(darken(@colorBg, 3));
-}
-
-.bg_select() {
-	.background-color(@colorBgSelect);
-}
-
 .border(@color) {
 	border: 1px solid @color;
-}
-
-.border_shy() {
-	border: 1px solid lighten(@colorFgBorder, 5);
 }
 
 .message() {
@@ -93,11 +40,6 @@
 }
 
 /* Fonts */
-.font(@size, @family, @color) {
-	font: normal @size ~"/" 1.5 @family;
-	color: @color;
-}
-
 .font_placeholder() {
 	font-style: italic;
 	color: @colorFgShy;
@@ -110,17 +52,16 @@
 
 .input_disabled() {
 	.opacity(.5);
-	.box-shadow(none);
 }
 
 .input_text() {
-	border-radius: 2px;
+	border-radius: 0;
 	padding-left: 6px;
 	padding-right: 6px;
 	background: white;
 	width: 100%;
 	overflow: hidden;
-	line-height: 16px;
+	line-height: 14px;
 }
 
 .input_text_height() {
@@ -140,22 +81,26 @@
 .input_button(@size) {
 	width: auto;
 	min-width: @size;
+	max-width: 100%;
 	height: @size;
 	margin: 1px;
 	padding: 1px @size / 3;
-	border-radius: 2px;
 	font-weight: bold;
 	font-size: @fontSizeButton;
 	cursor: pointer;
 	overflow: visible;
 	vertical-align: top;
-	.nowrap;
+	white-space: nowrap;
+
+	.label {
+		display: inline-block;
+		max-width: 100%;
+		.nowrap;
+	}
 
 	.icon {
 		font-size: @iconSizeClickable;
 		line-height: @size - 2px;
-		top: -1px;
-
 	}
 	&.hasIcon.hasLabel{
 		.label {
@@ -167,28 +112,24 @@
 
 .input_button_color() {
 	color: @colorFgButtonFont;
-	.box-shadow(0 0 2px darken(@colorBgButton, 15));
 	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
 	border: 1px solid lighten(@colorFgButton, 60);
 }
 
 .input_button_hover() {
 	border: 1px solid lighten(@colorFgButton, 50);
-	.box-shadow(0 1px 3px darken(@colorBgButton, 15));
 	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 12));
 	color: @colorFgButton;
 }
 
 .input_button_active() {
 	background: darken(@colorBg, 12);
-	border: 1px solid darken(@colorFgBorder, 30);
-	.box-shadow(inset 0 0 5px 1px darken(@colorBg, 25));
+	border: 1px solid darken(@colorFgBorderEmphasize2, 30);
 }
 
 .input_button_alt() {
 	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
-	.box-shadow(none);
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 	color: @colorFgButtonAltFont;
 	font-size: @fontSizeButton + 1px;
@@ -204,7 +145,6 @@
 }
 
 .input_button_alt_active() {
-	.box-shadow(inset -1px -1px 5px @colorBgButtonAlt, inset 1px 1px 5px @colorBgButtonAlt);
 	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
 }
@@ -213,4 +153,10 @@
 	-webkit-appearance: @value;
 	-moz-appearance: @value;
 	appearance: @value;
+}
+
+.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0, @iteration-count: 1, @direction: normal, @fill-mode: none) {
+	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }

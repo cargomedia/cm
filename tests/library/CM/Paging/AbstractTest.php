@@ -67,32 +67,32 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
-		define('TBL_TEST', 'test');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST (
+		defined('TBL_TEST') || define('TBL_TEST', 'test');
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Mysql::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
 		}
 		self::$_source = new CM_PagingSource_Sql('`num`', TBL_TEST);
 		define('TBL_TEST2', 'test2');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST2 (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST2 (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 50; $i++) {
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
 		}
 	}
 
 	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();
-		CM_Mysql::exec('DROP TABLE TBL_TEST');
-		CM_Mysql::exec('DROP TABLE TBL_TEST2');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST2');
 	}
 
 	public function testGetCount() {
@@ -381,6 +381,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('CM_Paging_Mock has no field `amount`.', $ex->getMessage());
 		}
+		$this->assertSame(4, $paging->getSum('id'));
 	}
 
 	public function testGetItemsRawTree() {
@@ -389,22 +390,6 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			array('id' => 4, 'type' => 1, 'amount' => 4))));
 		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
 			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
-
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1, 2)));
-		try {
-			$paging->getItemsRawTree();
-			$this->fail('Raw item is not an array.');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
-		}
-
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(array(1), array(2))));
-		try {
-			$paging->getItemsRawTree();
-			$this->fail('Raw item has less than two elements.');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Raw item is not an array or has less than two elements.', $ex->getMessage());
-		}
 	}
 
 	public function testFlattenItems() {
@@ -416,7 +401,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			return $value % 10 . 'keyValue';
 		});
 
-		/** @var CM_Paging_Abstract $pagingGroup  */
+		/** @var CM_Paging_Abstract $pagingGroup */
 		$pagingGroup = $this->getMockForAbstractClass('CM_Paging_Abstract', array($pagingSource));
 		$this->assertSame(10, $pagingGroup->getItem(10));
 

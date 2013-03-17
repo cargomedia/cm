@@ -24,7 +24,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	}
 
 	public function flush() {
-		CM_Mysql::delete(TBL_CM_LOG, array('type' => $this->getType()));
+		CM_Db_Db::delete(TBL_CM_LOG, array('type' => $this->getType()));
 	}
 
 	/**
@@ -32,7 +32,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Mysql::exec("DELETE FROM TBL_CM_LOG WHERE `timeStamp` < ?", time() - $age);
+		CM_Db_Db::delete(TBL_CM_LOG, '`timeStamp` < ' . (time() - $age));
 	}
 
 	/**
@@ -80,7 +80,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		if ($metaInfo) {
 			$values['metaInfo'] = serialize($metaInfo);
 		}
-		CM_Mysql::insertDelayed(TBL_CM_LOG, $values);
+		CM_Db_Db::insertDelayed(TBL_CM_LOG, $values);
 	}
 
 	protected function _processItem($item) {

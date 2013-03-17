@@ -42,22 +42,19 @@ class CM_Response_Resource_JS extends CM_Response_Resource_Abstract {
 	 * @return string
 	 */
 	private function _getInternal() {
-		$paths = array();
+		$pathsUnsorted = CM_Util::rglobLibraries('*.js', $this->getSite());
+		$paths = array_keys(CM_Util::getClasses($pathsUnsorted));
+
 		foreach (array_reverse(self::getSite()->getNamespaces()) as $namespace) {
 			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
 				$paths[] = $path;
 			}
 		}
 		$paths[] = DIR_ROOT . 'resources/config/js/internal.js';
-		foreach (CM_View_Abstract::getClasses($this->getSite()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT) as $path => $className) {
-			$paths[] = preg_replace('/\.php$/', '.js', $path);
-		}
-
 		$content = '';
 		foreach ($paths as $path) {
 			$content .= new CM_File($path);
 		}
-
 		return $content;
 	}
 

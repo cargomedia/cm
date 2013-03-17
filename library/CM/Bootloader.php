@@ -55,43 +55,11 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		$exceptionFormatter = function (Exception $exception) {
-			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
-			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
-			$text .= $exception->getTraceAsString() . PHP_EOL;
-			return $text;
-		};
-
-		set_exception_handler(function (Exception $exception) use ($exceptionFormatter) {
-			$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
-
-			if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
-				header('HTTP/1.1 500 Internal Server Error');
+		set_exception_handler(function(Exception $exception) {
+			if (!headers_sent()) {
+				header('Content-Type: text/plain');
 			}
-
-			try {
-				if ($exception instanceof CM_Exception) {
-					$log = $exception->getLog();
-				} else {
-					$log = new CM_Paging_Log_Error();
-				}
-				$log->add($exceptionFormatter($exception));
-			} catch (Exception $loggerException) {
-				$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
-				$logEntry .= '### Cannot log error: ' . PHP_EOL;
-				$logEntry .= $exceptionFormatter($loggerException);
-				$logEntry .= '### Original Exception: ' . PHP_EOL;
-				$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
-				file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
-			}
-
-			if ($showError) {
-				echo get_class($exception) . ' (' . $exception->getCode() . '): <b>' . $exception->getMessage() . '</b><br/>';
-				echo 'Thrown in: <b>' . $exception->getFile() . '</b> on line <b>' . $exception->getLine() . '</b>:<br/>';
-				echo '<div style="margin: 2px 6px;">' . nl2br($exception->getTraceAsString()) . '</div>';
-			} else {
-				echo 'Internal server error';
-			}
+			CM_Bootloader::handleException($exception);
 			exit(1);
 		});
 	}
@@ -99,19 +67,18 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+			$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+				E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+				E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
+				E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+				E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+			$errstr = $errorCodes[$errno] . ': ' . $errstr;
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
 				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-				if (!$atSign && IS_DEBUG) {
-					$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-						E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-						E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-						E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-						E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
-					$errstr = $errorCodes[$errno] . ': ' . $errstr;
-					CM_Debug::get()->addError($errfile, $errline, $errstr);
+				if ($atSign) {
+					return true;
 				}
-				return true;
 			}
 			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 		});
@@ -233,7 +200,7 @@ class CM_Bootloader {
 			throw new CM_Exception_Invalid('Bootloader already loaded.');
 		}
 		$environments = (array) $environments;
-		array_walk($environments, function(&$environment) {
+		array_walk($environments, function (&$environment) {
 			$environment = (string) $environment;
 		});
 		$this->_environments = $environments;
@@ -337,5 +304,50 @@ class CM_Bootloader {
 			throw new Exception('No bootloader instance');
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * @param Exception                      $exception
+	 * @param CM_OutputStream_Interface|null $output
+	 */
+	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
+		if (null === $output) {
+			$output = new CM_OutputStream_Stream_Output();
+		}
+		$exceptionFormatter = function (Exception $exception) {
+			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
+			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
+			$text .= $exception->getTraceAsString() . PHP_EOL;
+			return $text;
+		};
+
+		$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
+		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
+			header('HTTP/1.1 500 Internal Server Error');
+		}
+
+		try {
+			if ($exception instanceof CM_Exception) {
+				$log = $exception->getLog();
+			} else {
+				$log = new CM_Paging_Log_Error();
+			}
+			$log->add($exceptionFormatter($exception));
+		} catch (Exception $loggerException) {
+			$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
+			$logEntry .= '### Cannot log error: ' . PHP_EOL;
+			$logEntry .= $exceptionFormatter($loggerException);
+			$logEntry .= '### Original Exception: ' . PHP_EOL;
+			$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
+			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+		}
+
+		if ($showError) {
+			$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
+			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
+			$output->writeln($exception->getTraceAsString());
+		} else {
+			$output->writeln('Internal server error');
+		}
 	}
 }

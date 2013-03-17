@@ -12,6 +12,13 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 		$this->_getAdapter()->startSynchronization();
 	}
 
+	public function synchronize() {
+		if (!$this->getEnabled()) {
+			throw new CM_Exception('Stream is not enabled');
+		}
+		$this->_getAdapter()->synchronize();
+	}
+
 	/**
 	 * @return array
 	 */
@@ -31,22 +38,30 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_User			$recipient
-	 * @param CM_Action_Abstract	   $action
+	 * @param string $streamChannel
+	 * @param array  $data
+	 */
+	public static function publish($streamChannel, array $data) {
+		self::getInstance()->_publish($streamChannel, $data);
+	}
+
+	/**
+	 * @param CM_Model_User            $recipient
+	 * @param CM_Action_Abstract       $action
 	 * @param CM_Model_Abstract        $model
-	 * @param array|null			   $data
+	 * @param array|null               $data
 	 */
 	public static function publishAction(CM_Model_User $recipient, CM_Action_Abstract $action, CM_Model_Abstract $model, array $data = null) {
 		if (!is_array($data)) {
 			$data = array();
 		}
 		self::publishUser($recipient, array('namespace' => 'CM_Action_Abstract',
-			'data' => array('action' => $action, 'model' => $model, 'data' => $data)));
+											'data'      => array('action' => $action, 'model' => $model, 'data' => $data)));
 	}
 
 	/**
 	 * @param CM_Model_User $user
-	 * @param array		 $data
+	 * @param array         $data
 	 */
 	public static function publishUser(CM_Model_User $user, array $data) {
 		if (!$user->getOnline()) {
@@ -71,5 +86,4 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 	protected function _getAdapter() {
 		return parent::_getAdapter();
 	}
-
 }

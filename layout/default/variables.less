@@ -6,25 +6,32 @@
 @colorBrand: 			#2d78e2;
 
 // Basic Color
-@colorBg:				#ffffff;
 @colorFg: 				#333333;
 @colorFgShy: 			lighten(@colorFg, 25);
-@colorBgShy: 			darken(@colorBg, 10);
-@colorBgStrong:			@colorBrand;
-@colorFgStrong:			#ffffff;
+
+@colorBgTheme:			@colorBrand;
+@colorFgTheme:			#ffffff;
+
 @colorFgHeading:		@colorBrand;
 @colorFgIcon:			@colorFgShy;
 @colorFgIconHover:		@colorBrand;
+
+// Backgrounds
+@colorBg:					#ffffff;
+@colorBgEmphasize1: 		darken(@colorBg, 3);
+@colorBgEmphasize2:			darken(@colorBg, 6);
+@colorBgEmphasize3: 		darken(@colorBg, 10);
+
+//Border
+@colorFgBorder: 			#f1f1f1;
+@colorFgBorderEmphasize1:	darken(@colorFgBorder, 3);
+@colorFgBorderEmphasize2:	darken(@colorFgBorder, 6);
+@colorFgBorderEmphasize3:	darken(@colorFgBorder, 10);
 
 //Links
 @colorFgLink:			#0a7bc3;
 @colorFgLinkLight:		#6d6e71;
 @colorBgSelect:			mix(@colorBrand, @colorBg, 10);
-
-//Border
-@colorFgBorder:			#E8E8E8;
-@colorFgBorderEmphasize:darken(@colorFgBorder, 15);
-@colorFgBorderShy:		lighten(@colorFgBorder, 5);
 
 //Buttons
 @colorBgButton:			@colorBg;
@@ -36,8 +43,8 @@
 @colorFgButtonAltFont:	white;
 
 // Tooltip
-@colorFgTooltip: @colorBg;
-@colorBgTooltip: lighten(@colorFg, 20);
+@colorFgTooltip: 		@colorBg;
+@colorBgTooltip: 		lighten(@colorFg, 20);
 
 //Font
 @fontFamily:			"Lucida Grande", Verdana, Arial, sans-serif;
@@ -50,7 +57,8 @@
 //Buttons
 @heightButton:			30px;
 @fontSizeButton:		11px;
-@iconSizeClickable: 	14px;
+@iconSize:				1.25em;
+@iconSizeClickable: 	1.25em;
 
 @heightButtonLarge:		56px;
 @fontSizeButtonLarge:	25px;

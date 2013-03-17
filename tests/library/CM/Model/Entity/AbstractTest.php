@@ -3,7 +3,7 @@
 class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 
 	public static function setupBeforeClass() {
-		CM_Mysql::exec("CREATE TABLE IF NOT EXISTS `entityMock` (
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `entityMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`userId` INT UNSIGNED NOT NULL,
 				`foo` VARCHAR(32),
@@ -13,14 +13,14 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::exec("DROP TABLE `entityMock`");
+		CM_Db_Db::exec("DROP TABLE `entityMock`");
 	}
 
 	public function setup() {
 	}
 
 	public function tearDown() {
-		CM_Mysql::exec("TRUNCATE TABLE `entityMock`");
+		CM_Db_Db::truncate('entityMock');
 		CMTest_TH::clearEnv();
 	}
 
@@ -40,7 +40,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 		$this->assertInstanceOf('CM_Model_User', $user);
 
 		$this->assertNotEquals($user2, $entityMock->getUser());
-		CM_Mysql::delete(TBL_CM_USER, array('userId' => $user->getId()));
+		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $user->getId()));
 		CMTest_TH::clearCache();
 		try {
 			$entityMock->getUser();
@@ -66,8 +66,8 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 
 	public function testToArray() {
 		$user = CMTest_TH::createUser();
-		$id = CM_Model_Entity_Mock::create(array('userId' => $user->getId()));
-		$entity = new CM_Model_Entity_Mock($id);
+		$id = CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'boo'));
+		$entity = new CM_Model_Entity_Mock($id->getId());
 		$data = $entity->toArray();
 		$this->assertArrayHasKey('path', $data);
 		$this->assertNull($data['path']);
@@ -91,21 +91,21 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
 
 	protected function _loadData() {
-		return CM_Mysql::select('entityMock', array('userId', 'foo'), array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select('entityMock', array('userId', 'foo'), array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onChange() {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete('entityMock', array('id' => $this->getId()));
+		CM_Db_Db::delete('entityMock', array('id' => $this->getId()));
 	}
 
 	protected function _onLoad() {
 	}
 
 	protected static function _create(array $data) {
-		return new self(CM_Mysql::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
+		return new self(CM_Db_Db::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
 	}
 
 }

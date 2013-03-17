@@ -46,12 +46,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	final public function __run(GearmanJob $job) {
 		$workload = $job->workload();
 		$params = CM_Params::factory(CM_Params::decode($workload, true));
-		try {
-			return CM_Params::encode($this->_run($params), true);
-		} catch (Exception $ex) {
-			$job->sendFail();
-			return null;
-		}
+		return CM_Params::encode($this->_run($params), true);
 	}
 
 	/**

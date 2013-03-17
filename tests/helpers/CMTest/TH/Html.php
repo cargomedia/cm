@@ -25,6 +25,9 @@ class CMTest_TH_Html {
 	 */
 	public function getText($css = '*') {
 		$element = $this->_find($css);
+		if (null === $element) {
+			return '';
+		}
 		$text = $element->textContent;
 		$text = preg_replace('/' . CM_Usertext::getSplitChar() . '/u', '', $text);
 		return $text;
@@ -93,7 +96,7 @@ class CMTest_TH_Html {
 
 	/**
 	 * @param string $css
-	 * @return DOMNode
+	 * @return DOMNode|null
 	 */
 	private function _find($css) {
 		$elements = $this->_findAll($css);

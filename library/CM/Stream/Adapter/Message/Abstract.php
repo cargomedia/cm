@@ -15,4 +15,6 @@ abstract class CM_Stream_Adapter_Message_Abstract extends CM_Stream_Adapter_Abst
 	abstract public function publish($channel, $data);
 
 	abstract public function startSynchronization();
+
+	abstract public function synchronize();
 }

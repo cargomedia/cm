@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Request_Abstract {
+
 	/**
 	 * @var string
 	 */
@@ -37,7 +38,7 @@ abstract class CM_Request_Abstract {
 	private $_capabilities;
 
 	/**
-	 * @var CM_Session
+	 * @var CM_Session|null
 	 */
 	private $_session;
 
@@ -71,10 +72,8 @@ abstract class CM_Request_Abstract {
 		$this->setUri($uri);
 
 		if ($sessionId = $this->getCookie('sessionId')) {
-			try {
-				$this->_session = new CM_Session($sessionId);
+			if ($this->_session = CM_Session::findById($sessionId)) {
 				$this->_session->start();
-			} catch (CM_Exception_Nonexistent $ex) {
 			}
 		}
 
@@ -132,7 +131,7 @@ abstract class CM_Request_Abstract {
 	public function getClientId() {
 		if (!$this->hasClientId()) {
 			if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = (int) CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+				$this->_clientId = (int) CM_Db_Db::insert(TBL_CM_REQUESTCLIENT, array());
 			}
 		}
 
@@ -419,7 +418,7 @@ abstract class CM_Request_Abstract {
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
 
 		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
-			$isValid = (bool) CM_Mysql::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+			$isValid = (bool) CM_Db_Db::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
 			if ($isValid) {
 				CM_CacheLocal::set($cacheKey, true);
 			}

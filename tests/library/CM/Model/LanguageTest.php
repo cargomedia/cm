@@ -6,7 +6,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	protected $_language;
 
 	public function setUp() {
-		$languageId = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
+		$languageId = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
 		$this->_language = new CM_Model_Language($languageId);
 	}
 
@@ -123,13 +123,13 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testDeleteKey() {
 		$key = 'languageKey';
 		$this->_language->setTranslation($key, 'abc');
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchColumn();
 		$this->assertSame(array($key => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
 		CM_Model_Language::deleteKey($key);
 		$this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
-		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
-		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+		$this->assertSame(0, CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
+		$this->assertSame(0, CM_Db_Db::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
 	}
 
 	public function testUnsetTranslation() {

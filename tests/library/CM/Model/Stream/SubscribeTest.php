@@ -22,12 +22,28 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testDuplicateKeys() {
+		$data = array('user' => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+			'streamChannel' => CMTest_TH::createStreamChannel(), 'key' => '13215231_1');
+		CM_Model_Stream_Subscribe::create($data);
+		try {
+			CM_Model_Stream_Subscribe::create($data);
+			$this->fail('Should not be able to create duplicate key instance');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
+		$data['streamChannel'] = CMTest_TH::createStreamChannel();
+		CM_Model_Stream_Subscribe::create($data);
+	}
+
 	public function testSetAllowedUntil() {
 		$videoStreamSubscribe = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
 		$videoStreamSubscribe->setAllowedUntil(234234);
-		$this->assertEquals(234234, $videoStreamSubscribe->getAllowedUntil());
+		$this->assertSame(234234, $videoStreamSubscribe->getAllowedUntil());
 		$videoStreamSubscribe->setAllowedUntil(2342367);
-		$this->assertEquals(2342367, $videoStreamSubscribe->getAllowedUntil());
+		$this->assertSame(2342367, $videoStreamSubscribe->getAllowedUntil());
+		$videoStreamSubscribe->setAllowedUntil(null);
+		$this->assertNull($videoStreamSubscribe->getAllowedUntil());
 	}
 
 	public function testCreate() {
@@ -80,14 +96,15 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 	}
 
-	public function testFindKey() {
+	public function testFindByKeyAndChannel() {
 		$videoStreamSubscribeOrig = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser());
-		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey($videoStreamSubscribeOrig->getKey());
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($videoStreamSubscribeOrig->getKey(), $videoStreamSubscribeOrig->getStreamChannel());
 		$this->assertEquals($videoStreamSubscribe, $videoStreamSubscribeOrig);
 	}
 
 	public function testFindKeyNonexistent() {
-		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findKey('doesnotexist');
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('doesnotexist', $streamChannel);
 		$this->assertNull($videoStreamSubscribe);
 	}
 

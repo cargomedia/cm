@@ -3,7 +3,7 @@
 		<h3>Icon Generator</h3>
 		{foreach $icons as $icon}
 			<div class="iconBox">
-				<span class="icon {$icon}"></span>
+				<span class="icon icon-{$icon}"></span>
 				<span class="label">{$icon}</span>
 			</div>
 		{/foreach}
