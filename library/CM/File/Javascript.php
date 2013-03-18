@@ -29,7 +29,7 @@ class CM_File_Javascript extends CM_File implements CM_File_ClassInterface {
 	 * @param $className
 	 * @return CM_File_Javascript
 	 */
-	public static function createLibraryClass($className) {
+	public static function createViewClass($className) {
 		$parentClass = get_parent_class($className);
 		if (!$parentClass || $parentClass === 'CM_Class_Abstract') {
 			$parentClass = 'Backbone.View';
