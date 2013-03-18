@@ -107,7 +107,7 @@ class CM_Db_Client {
 					$this->connect();
 					continue;
 				}
-				throw new CM_Db_Exception('Cannot prepare statement: ' . $e->getMessage());
+				throw new CM_Db_Exception('Cannot prepare statement (retried ' . $try . 'x): ' . $e->getMessage());
 			}
 		}
 		throw new CM_Db_Exception('Line should never be reached');
