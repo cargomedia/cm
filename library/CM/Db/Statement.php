@@ -35,9 +35,8 @@ class CM_Db_Statement {
 					$this->_reCreatePdoStatement();
 					continue;
 				}
-				throw new CM_Db_Exception(
-					'Cannot execute statement (retried ' . $try . 'x): ' . $e->getMessage() .
-							' (query: `' . $this->_pdoStatement->queryString . '`)');
+				throw new CM_Db_Exception('Cannot execute statement (retried ' . $try . 'x): ' . $e->getMessage() .
+						' (query: `' . $this->_pdoStatement->queryString . '`)');
 			}
 		}
 		throw new CM_Db_Exception('Line should never be reached');
