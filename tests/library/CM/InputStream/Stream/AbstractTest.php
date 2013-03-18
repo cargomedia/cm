@@ -2,6 +2,10 @@
 
 class CM_InputStream_Stream_AbstractTest extends CMTest_TestCase {
 
+	public function tearDown() {
+		CMTest_TH::clearEnv();
+	}
+
 	public function testRead() {
 		$streamPath = DIR_TMP . 'bar';
 		$stream = fopen($streamPath, 'w');
@@ -10,5 +14,4 @@ class CM_InputStream_Stream_AbstractTest extends CMTest_TestCase {
 		$stream = $this->getMockForAbstractClass('CM_InputStream_Stream_Abstract', array($streamPath));
 		$this->assertSame('foo', $stream->read('hint'));
 	}
-
 }
