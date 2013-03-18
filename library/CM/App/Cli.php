@@ -106,7 +106,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$json = json_encode($composerOptions);
 		$json = str_replace('\\/', '/', $json);
 		$composerFile->write($json);
-		exec('cd ' . escapeshellarg(DIR_ROOT) . ' && composer dump-autoload');
+		CM_Util::exec('cd ' . escapeshellarg(DIR_ROOT) . ' && composer dump-autoload');
 	}
 
 	public static function getPackageName() {
