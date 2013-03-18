@@ -388,7 +388,7 @@ class CM_Util {
 		}
 		$now = microtime(true) * 1000;
 		$previousValue = null;
-		if ($times[$namespace]) {
+		if (array_key_exists($namespace, $times)) {
 			$difference = $now - $times[$namespace];
 		} else {
 			$difference = null;

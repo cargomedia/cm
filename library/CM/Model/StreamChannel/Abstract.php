@@ -90,7 +90,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
@@ -102,7 +102,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
-		CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
 	}
 
 	/**
@@ -115,7 +115,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		if (null === $type) {
 			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
 			if (false === ($type = CM_Cache::get($cacheKey))) {
-				$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+				$type = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchColumn();
 				CM_Cache::set($cacheKey, $type);
 			}
 		}
@@ -131,7 +131,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	public static function findByKey($key, $adapterType) {
 		$key = (string) $key;
 		$adapterType = (int) $adapterType;
-		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetchAssoc();
+		$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
 		if (!$result) {
 			return null;
 		}
@@ -162,7 +162,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		return new static($id);
 	}
 }

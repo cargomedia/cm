@@ -58,6 +58,14 @@ EOD;
 		$this->assertSame($string2, $generatedFile->read());
 	}
 
+	public function testTrackUser() {
+		$user = CMTest_TH::createUser();
+		$tracking = $this->getMockBuilder('CM_KissTracking')->setMethods(array('track'))->getMock();
+		$tracking->expects($this->once())->method('track')->with($this->equalTo('foo'), $this->equalTo($user->getId()));
+		/** @var $tracking CM_KissTracking */
+		$tracking->trackUser('foo', $user);
+	}
+
 	public function testExportEvents() {
 		CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
 		$this->_kissTracking->expects($this->once())->method('_uploadCsv')->will($this->returnValue(true));

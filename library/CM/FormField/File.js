@@ -43,7 +43,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			}
 		});
 		
-		this.$(".previews").on("click", ".delete", function() {
+		this.$(".previews").on("click", ".deleteFile", function() {
 			$(this).closest("li").remove();
 		});
 	},

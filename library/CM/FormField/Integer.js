@@ -28,7 +28,6 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 		$slider.children(".ui-slider-handle").text($input.val());
 		$input.watch("disabled", function (propName, oldVal, newVal) {
 			$slider.slider("option", "disabled", newVal);
-			$slider.toggleClass("disabled", newVal);
 		});
 		$input.changetext(function() {
 			$slider.slider("option", "value", $(this).val());

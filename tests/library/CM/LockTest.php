@@ -7,6 +7,9 @@ class CM_LockTest extends CMTest_TestCase {
 		$this->assertFalse($lock->isLocked());
 		$lock->lock(1);
 		$this->assertTrue($lock->isLocked());
+
+		CMTest_TH::timeForward(2);
+		$this->assertFalse($lock->isLocked());
 	}
 
 	public function testUnlock() {
@@ -23,6 +26,6 @@ class CM_LockTest extends CMTest_TestCase {
 		$lock->lock(30);
 		CMTest_TH::timeForward(30);
 		$lock->waitUntilUnlocked();
-		$this->assertSame($lockedAt + 30, time());
+		$this->assertSameTime($lockedAt + 30, time());
 	}
 }

@@ -5,27 +5,27 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 	public static function setUpBeforeClass() {
 		define('TBL_TEST_A', 'test_a');
 		define('TBL_TEST_B', 'test_b');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST_A (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST_A (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <= 10; $i++) {
-			CM_Mysql::insert(TBL_TEST_A, array('num' => $i % 5));
+			CM_Db_Db::insert(TBL_TEST_A, array('num' => $i % 5));
 		}
-		CM_Mysql::exec('CREATE TABLE TBL_TEST_B (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST_B (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <=5; $i++) {
-			CM_Mysql::insert(TBL_TEST_B, array('num' => $i % 5));
+			CM_Db_Db::insert(TBL_TEST_B, array('num' => $i % 5));
 		}
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Mysql::exec('DROP TABLE TBL_TEST_A');
-		CM_Mysql::exec('DROP TABLE TBL_TEST_B');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST_A');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST_B');
 	}
 
 	public function testCaching() {

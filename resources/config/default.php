@@ -58,19 +58,19 @@ $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 $config->CM_Stream_Adapter_Message_SocketRedis = new stdClass();
 $config->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
 $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-	array('httpHost' => 'localhost', 'httpPort' => 8086, 'sockjsUrls' => array(
+	array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
 		'http://localhost:8090',
 	)),
 );
 
-$config->CM_Mysql = new stdClass();
-$config->CM_Mysql->db = 'cm';
-$config->CM_Mysql->user = 'root';
-$config->CM_Mysql->pass = 'root';
-$config->CM_Mysql->server = array('host' => 'localhost', 'port' => 3306);
-$config->CM_Mysql->servers_read = array();
-$config->CM_Mysql->serversReadEnabled = true;
-$config->CM_Mysql->delayedEnabled = true;
+$config->CM_Db_Db = new stdClass();
+$config->CM_Db_Db->db = 'cm';
+$config->CM_Db_Db->username = 'root';
+$config->CM_Db_Db->password = 'root';
+$config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
+$config->CM_Db_Db->serversRead = array();
+$config->CM_Db_Db->serversReadEnabled = true;
+$config->CM_Db_Db->delayedEnabled = true;
 
 $config->CM_Action_Abstract = new stdClass();
 

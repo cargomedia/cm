@@ -39,7 +39,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 		$html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
 	}
 	if (!empty($icon)) {
-		$html = '<span class="icon ' . $icon . '"></span>' . $html;
+		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
 	}
 	$titleAttr = '';
 	if (!empty($title)) {

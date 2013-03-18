@@ -1,0 +1,30 @@
+.floatbox-body {
+	.background-color(@colorBg);
+}
+
+.floatbox-controls {
+	right: 1px;
+	top: 1px;
+}
+
+.floatbox-controls .icon-close {
+	display: inline-block;
+	line-height: 1;
+	padding: 4px;
+	float: right;
+	color: @colorFgIcon;
+
+	&:hover {
+		color: @colorClose;
+	}
+}
+
+.floatbox.fullscreen {
+	width: 100%;
+	height: 100%;
+
+	.floatbox-body {
+		height: 100%;
+		padding: 0;
+	}
+}

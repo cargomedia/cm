@@ -68,31 +68,31 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		defined('TBL_TEST') || define('TBL_TEST', 'test');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Mysql::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
 		}
 		self::$_source = new CM_PagingSource_Sql('`num`', TBL_TEST);
 		define('TBL_TEST2', 'test2');
-		CM_Mysql::exec('CREATE TABLE TBL_TEST2 (
+		CM_Db_Db::exec('CREATE TABLE TBL_TEST2 (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 50; $i++) {
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
-			CM_Mysql::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
 		}
 	}
 
 	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();
-		CM_Mysql::exec('DROP TABLE TBL_TEST');
-		CM_Mysql::exec('DROP TABLE TBL_TEST2');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST');
+		CM_Db_Db::exec('DROP TABLE TBL_TEST2');
 	}
 
 	public function testGetCount() {

@@ -6,27 +6,25 @@ class CMTest_TH {
 	private static $initialized = false;
 	private static $_configBackup;
 
+	/** @var CM_Db_Client|null */
+	private static $_dbClient = null;
+
 	public static function init() {
 		if (self::$initialized) {
 			return;
 		}
-		$dbName = CM_Config::get()->CM_Mysql->db;
+		$config = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password);
+
 		if (CM_Config::get()->CMTest_TH->dropDatabase) {
-			try {
-				CM_Mysql::exec('DROP DATABASE IF EXISTS `' . $dbName . '`');
-			} catch (CM_Mysql_DbSelectException $e) {
-				// Database does not exist
-			}
+			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($config->db))->execute();
 		}
 
-		try {
-			CM_Mysql::selectDb($dbName);
-		} catch (CM_Mysql_DbSelectException $e) {
-			CM_Mysql::exec('CREATE DATABASE `' . $dbName . '`');
-
-			CM_Mysql::selectDb($dbName);
+		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($config->db))->fetch();
+		if (!$databaseExists) {
+			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config->db))->execute();
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Mysql::runDump($dbName, $dump);
+				CM_Db_Db::runDump($config->db, $dump);
 			}
 		}
 
@@ -54,12 +52,12 @@ class CMTest_TH {
 	}
 
 	public static function clearDb() {
-		$alltables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
 		foreach ($alltables as $table) {
-			CM_Mysql::delete($table, 1);
+			CM_Db_Db::delete($table);
 		}
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
-			CM_Mysql::runDump(CM_Config::get()->CM_Mysql->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
+			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
@@ -202,7 +200,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -215,7 +213,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-			'allowedUntil' => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -232,11 +230,23 @@ class CMTest_TH {
 		return new CM_Response_Page($request);
 	}
 
+	/**
+	 * @return CM_Db_Client
+	 */
+	public static function getDbClient() {
+		if (null !== self::$_dbClient) {
+			return self::$_dbClient;
+		}
+		$config = CM_Config::get()->CM_Db_Db;
+		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+		return self::$_dbClient;
+	}
+
 	public static function randomizeAutoincrement() {
-		$tables = CM_Mysql::query('SHOW TABLES')->fetchCol();
+		$tables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
 		foreach ($tables as $table) {
-			if (CM_Mysql::exec("SHOW COLUMNS FROM `?` WHERE `Extra` = 'auto_increment'", $table)->numRows() > 0) {
-				CM_Mysql::exec("ALTER TABLE `?` AUTO_INCREMENT = ?", $table, rand(1, 1000));
+			if (CM_Db_Db::exec("SHOW COLUMNS FROM `" . $table . "` WHERE `Extra` = 'auto_increment'")->fetch()) {
+				CM_Db_Db::exec("ALTER TABLE `" . $table . "` AUTO_INCREMENT = " . rand(1, 1000));
 			}
 		}
 	}
@@ -261,5 +271,4 @@ class CMTest_TH {
 		}
 		return $str;
 	}
-
 }

@@ -17,7 +17,7 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 
 	public function setup() {
 		CMTest_TH::clearEnv();
-		CM_Mysql::replace(TBL_CM_ACTIONLIMIT, array('actionType', 'actionVerb', 'type', 'role', 'limit', 'period'), array(array($this->_actionType,
+		CM_Db_Db::replace(TBL_CM_ACTIONLIMIT, array('actionType', 'actionVerb', 'type', 'role', 'limit', 'period'), array(array($this->_actionType,
 			$this->_actionVerb, $this->_type, $this->_role, 2, 3), array($this->_actionType, $this->_actionVerb, $this->_type, null, 10, 11)));
 	}
 
@@ -68,6 +68,10 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($actionLimit->getLimit($this->_role));
 		$this->assertNull($actionLimit->getPeriod($this->_role));
 		$this->assertFalse($actionLimit->hasLimit());
+	}
+
+	public function testGetAll() {
+		$this->assertInstanceOf('CM_Paging_ActionLimit_All', CM_Model_ActionLimit_Abstract::getAll(1));
 	}
 }
 

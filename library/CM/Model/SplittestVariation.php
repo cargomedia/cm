@@ -27,7 +27,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		if (!$state && $state != $this->getEnabled() && $variationsEnabled->getCount() <= 1) {
 			throw new CM_Exception('No variations for Splittest', 'At least one variation needs to be enabled');
 		}
-		CM_Mysql::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
 		$this->_change();
 		$variationsEnabled->_change();
 	}
@@ -36,15 +36,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getConversionCount() {
-		return (int) CM_Mysql::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+		return (int) CM_Db_Db::exec('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
+		AND `variationId`=? AND `conversionStamp` IS NOT NULL', array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 	}
 
 	/**
 	 * @return float
 	 */
 	public function getConversionWeight() {
-		return (float) CM_Mysql::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
-		AND `variationId`=? AND `conversionStamp` IS NOT NULL', $this->_getSplittestId(), $this->getId())->fetchOne();
+		return (float) CM_Db_Db::exec('SELECT SUM(`conversionWeight`) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE WHERE `splittestId`=?
+		AND `variationId`=? AND `conversionStamp` IS NOT NULL', array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 	}
 
 	/**
@@ -62,7 +63,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getFixtureCount() {
-		return CM_Mysql::count(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
+		return CM_Db_Db::count(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->_getSplittestId(), 'variationId' => $this->getId()));
 	}
 
 	/**
@@ -95,7 +96,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetchAssoc();
+		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
 	}
 
 	/**
