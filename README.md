@@ -48,7 +48,7 @@ Caching can be enabled optionally with `enableCache()`.
 Items within a paging can be post-processed before being returned. For example one can instantiate an object for the id returned from the database.
 
 Naming convention:
-```
+```php
 CM_Paging_<Type of item>_<Lookup description>
 CM_Paging_Photo_User                           # All photos of a given user
 CM_Paging_User_Country                         # All users from a given country
@@ -56,24 +56,66 @@ CM_Paging_User_Country                         # All users from a given country
 
 
 ## Creating a new project
-```
+
+### Cloning the CM skeleton application
+
+In your projects directory `/Users/<user-name>/Projects/`, run:
+```bash
 composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
+```
+
+### Setting up a virtual host
+
+The Apache configuration of the virtual host for you project should be defined in `/usr/local/etc/apache2/cargomedia/vhosts/<project-name>.conf` and read as follows:
+
+```conf
+<VirtualHost *>
+  ServerName ‹project-name›.‹host-name›.cargomedia
+  RedirectPermanent / http://www.‹project-name›.‹host-name›.cargomedia/
+</VirtualHost>
+
+<VirtualHost *>
+  ServerName www.‹project-name›.‹host-name›.cargomedia
+  ServerAlias admin.‹project-name›.‹host-name›.cargomedia
+  DocumentRoot /Users/‹user-name›/Projects/‹project-name›
+
+  <Directory /Users/‹user-name›/Projects/‹project-name›/>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/$1
+  </Directory>
+
+  <Directory /Users/‹user-name›/Projects/‹project-name›/public/>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php
+    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:%{HTTP:X-Requested-With}]
+  </Directory>
+</VirtualHost>
 ```
 
 ### Project configuration
 
-```
+In your project directory `/Users/<user-name>/Projects/<project-name>`, run:
+```bash
 ./scripts/cm.php config generate
 ```
 
 ### Namespace creation, site setup
-CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run.
+
+CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
 ```
 ./scripts/cm.php generator create-namespace <namespace>
 ```
 Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
 ```
 require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
+```
+Create then a local configuration file `resources/config/local.php` to define the URL of your website:
+```php
+<?php
+
+$config-><namespace>_Site->url = 'http://www.<project-name>.<host-name>.cargomedia';
 ```
 
 ### Adding new modules
