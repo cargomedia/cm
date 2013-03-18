@@ -12,7 +12,6 @@ class CM_OutputStream_Stream_AbstractTest extends CMTest_TestCase {
 
 		/** @var CM_OutputStream_Stream_Abstract $outputStream */
 		$outputStream->write('foo');
-		$stream = fopen($streamPath, 'r');
-		$this->assertSame('foo', fgets($stream));
+		$this->assertSame('foo', file_get_contents($streamPath));
 	}
 }

@@ -17,7 +17,7 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
 
 	public function testConfirm() {
 		$input = $this->getMockBuilder('CM_InputStream_Abstract')->setMethods(array('read'))->getMockForAbstractClass();
-		$input->expects($this->exactly(3))->method('read')->with($this->equalTo('Hint (y/n)'), $this->equalTo('default'))->will($this->onConsecutiveCalls('', 'y', 'n'));
+		$input->expects($this->exactly(3))->method('read')->with('Hint (y/n)', 'default')->will($this->onConsecutiveCalls('invalid value', 'y', 'n'));
 
 		/** @var $input CM_InputStream_Abstract */
 		$this->assertTrue($input->confirm('Hint', 'default'));

@@ -3,21 +3,21 @@
 class CM_FileTest extends CMTest_TestCase {
 
 	protected static $_backupContent;
-	
+
 	public static function setUpBeforeClass() {
 	}
 
 
 	public static function tearDownAfterClass() {
 	}
-	
+
 	protected $_testFilePath = '';
-	
+
 	public function setUp() {
 		$this->_testFilePath = DIR_TEST_DATA . 'img/test.jpg';
 		self::$_backupContent = file_get_contents($this->_testFilePath);
 	}
-	
+
 	public function tearDown() {
 		file_put_contents($this->_testFilePath, self::$_backupContent);
 	}
@@ -43,16 +43,16 @@ class CM_FileTest extends CMTest_TestCase {
 			$this->assertContains('does not exist or is not a file', $e->getMessage());
 		}
 	}
-	
+
 	public function testDelete() {
 		$file = new CM_File($this->_testFilePath);
-		
+
 		$this->assertTrue(file_exists($this->_testFilePath));
-		
+
 		$file->delete();
-		
+
 		$this->assertFalse(file_exists($this->_testFilePath));
-		
+
 		// Should do nothing if already deleted
 		$file->delete();
 	}
@@ -101,12 +101,12 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testCopy() {
-		$path = DIR_TEST_DATA . 'filecopytest.txt';
+		$path = DIR_TMP. 'filecopytest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$this->assertFileNotExists($path);
 		$file->copy($path);
-		$this->assertFileExists($path);
-		unlink($path);
+		$copiedFile = new CM_File($path);
+		$copiedFile->delete();
 
 		try {
 			$file->copy('/non-existent-path/not-existent-file');
@@ -117,14 +117,15 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testMove() {
-		$newPath = DIR_TEST_DATA . 'filemovetest.txt';
+		$newPath = DIR_TMP. 'filemovetest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$oldPath = $file->getPath();
 
 		$file->move($newPath);
 		$this->assertFileNotExists($oldPath);
 		$this->assertFileExists($newPath);
-		unlink($newPath);
+		$this->assertSame($newPath, $file->getPath());
+		$file->delete();
 		try {
 			$file->move('/non-existent-path/not-existent-file');
 			$this->assertFileExists($oldPath);

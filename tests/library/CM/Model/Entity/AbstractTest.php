@@ -54,29 +54,34 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 	public function testIsOwner() {
 		$user = CMTest_TH::createUser();
 		$entity = $this->getMockBuilder('CM_Model_Entity_Abstract')->setMethods(array('getUser'))->disableOriginalConstructor()->getMockForAbstractClass();
-		$entity->expects($this->any())->method('getUser')->will($this->returnValue($user));
+		$entity->expects($this->any())->method('getUser')->will(
+			$this->onConsecutiveCalls($this->returnValue($user),
+			$this->onConsecutiveCalls($this->returnValue($user)),
+			$this->throwException(new CM_Exception_Nonexistent()))
+		);
 		/** @var $entity CM_Model_Entity_Abstract */
 		$this->assertTrue($entity->isOwner($user));
 
 		$stranger = CMTest_TH::createUser();
 		$this->assertFalse($entity->isOwner($stranger));
-		$stranger->delete();
 		$this->assertFalse($entity->isOwner($stranger));
 	}
 
 	public function testToArray() {
 		$user = CMTest_TH::createUser();
 		$id = CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'boo'));
-		$entity = new CM_Model_Entity_Mock($id->getId());
-		$data = $entity->toArray();
+		$mock = $this->getMockBuilder('CM_Model_Entity_Mock')->setConstructorArgs(array($id->getId()))->setMethods(array('getType'))->getMock();
+		$mock->expects($this->any())->method('getType')->will($this->returnValue(null));
+		/** @var $mock CM_Model_Entity_Abstract */
+		$data = $mock->toArray();
 		$this->assertArrayHasKey('path', $data);
 		$this->assertNull($data['path']);
+		$this->assertArrayHasKey('_type', $data);
+		$this->assertNull($data['_type']);
 	}
 }
 
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
-
-	const TYPE = 1;
 
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
