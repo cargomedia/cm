@@ -26,11 +26,11 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			}
 		});
 		$slider.children(".ui-slider-handle").text($input.val());
-		$input.watch("disabled", function (propName, oldVal, newVal) {
+		$input.watch("disabled", function(propName, oldVal, newVal) {
 			$slider.slider("option", "disabled", newVal);
 		});
-		$input.changetext(function() {
-			$slider.slider("option", "value", $(this).val());
+		$input.watch("value", function(propName, oldVal, newVal) {
+			$slider.slider("option", "value", newVal);
 			field.trigger('change');
 		});
 	}
