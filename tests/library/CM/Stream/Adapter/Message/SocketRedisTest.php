@@ -9,7 +9,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	public function testGetOptions() {
 		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
 		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-			array('httpHost' => 'foo', 'httpPort' => 8086, 'sockjsUrls' => array('http://stream:8090'))
+			array('httpHost' => 'foo', 'httpPort' => 8085, 'sockjsUrls' => array('http://stream:8090'))
 		);
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
 		$options = $adapter->getOptions();
