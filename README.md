@@ -111,11 +111,24 @@ Once completed you need to manually adjust entry points (`public/index.php`, `sc
 ```
 require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
 ```
-Create then a local configuration file `resources/config/local.php` to define the URL of your website:
+
+### Local configuration
+
+Create then a local configuration file `resources/config/local.php` where you will define:
+* The URL of your website
+* The HTTP and WebSocket URLs at which your Socket-Redis WebSocket emulation server is listening to
+
+It should read as follows:
 ```php
 <?php
 
 $config-><namespace>_Site->url = 'http://www.<project-name>.<host-name>.cargomedia';
+
+$config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
+  array('httpHost' => 'stream.<project-name>.<host-name>.cargomedia', 'httpPort' => 8085, 'sockjsUrls' => array(
+      'http://stream.ideahub.chick.cargomedia:8090',
+  )),
+);
 ```
 
 ### Adding new modules
