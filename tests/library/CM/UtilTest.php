@@ -11,16 +11,15 @@ class CM_UtilTest extends CMTest_TestCase {
 	}
 
 	public function testGetClasses() {
-		$classPaths = array();
-		$classPaths['CM_Class_Abstract'] = 'CM/Class/Abstract.php';
-		$classPaths['CM_Paging_Abstract'] = 'CM/Paging/Abstract.php';
-		$classPaths['CM_Paging_Action_Abstract'] = 'CM/Paging/Action/Abstract.php';
-		$classPaths['CM_Paging_Action_User'] = 'CM/Paging/Action/User.php';
-
+		$classPaths = array(
+			'CM_Class_Abstract'         => 'CM/Class/Abstract.php',
+			'CM_Paging_Abstract'        => 'CM/Paging/Abstract.php',
+			'CM_Paging_Action_Abstract' => 'CM/Paging/Action/Abstract.php',
+			'CM_Paging_Action_User'     => 'CM/Paging/Action/User.php',
+		);
 		foreach ($classPaths as $className => &$path) {
 			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className)) . 'library/' . $path;
 		}
-
 		$paths = array_reverse($classPaths);
 		$this->assertSame(array_flip($classPaths), CM_Util::getClasses($paths));
 	}
@@ -35,6 +34,30 @@ class CM_UtilTest extends CMTest_TestCase {
 			$this->fail('Namespace detected in a className without namespace.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('Could not detect namespace of `NoNamespace`.', $ex->getMessage());
+		}
+	}
+
+	public function testTitleize() {
+		$testCases = array(
+			'foo'     => 'Foo',
+			'Foo'     => 'Foo',
+			'foo bar' => 'Foo bar',
+			'foo-bar' => 'Foo Bar',
+			'foo.bar' => 'Foo.bar',
+		);
+		foreach ($testCases as $actual => $expected) {
+			$this->assertSame($expected, CM_Util::titleize($actual));
+		}
+	}
+
+	public function testGetResourceFiles() {
+		$files = CM_Util::getResourceFiles('config/default.php');
+		if (!count($files)) {
+			$this->markTestSkipped('There are no files to test this functionality');
+		}
+		foreach ($files as $file) {
+			$this->assertInstanceOf('CM_File', $file);
+			$this->assertSame('default.php', $file->getFileName());
 		}
 	}
 

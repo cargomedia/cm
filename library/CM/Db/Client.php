@@ -107,7 +107,7 @@ class CM_Db_Client {
 					$this->connect();
 					continue;
 				}
-				throw new CM_Db_Exception('Cannot prepare statement: ' . $e->getMessage());
+				throw new CM_Db_Exception('Cannot prepare statement (retried ' . $try . 'x): ' . $e->getMessage());
 			}
 		}
 		throw new CM_Db_Exception('Line should never be reached');
@@ -132,14 +132,15 @@ class CM_Db_Client {
 		$sqlState = $exception->errorInfo[0];
 		$driverCode = $exception->errorInfo[1];
 		$driverMessage = $exception->errorInfo[2];
-
-		if (1317 === $driverCode && false !== stripos('Query execution was interrupted', $driverMessage)) {
+		if (
+			(1053 === $driverCode && false !== stripos('Server shutdown in progress', $driverMessage)) ||
+			(1317 === $driverCode && false !== stripos('Query execution was interrupted', $driverMessage)) ||
+			(2006 === $driverCode && false !== stripos('MySQL server has gone away', $driverMessage)) ||
+			(2013 === $driverCode && false !== stripos('Lost connection to MySQL server', $driverMessage)) ||
+			(2055 === $driverCode && false !== stripos('Lost connection to MySQL server', $driverMessage))
+		) {
 			return true;
 		}
-		if (2006 === $driverCode && false !== stripos('MySQL server has gone away', $driverMessage)) {
-			return true;
-		}
-
 		return false;
 	}
 
