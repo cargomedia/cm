@@ -133,11 +133,11 @@ class CM_Db_Client {
 		$driverCode = $exception->errorInfo[1];
 		$driverMessage = $exception->errorInfo[2];
 		if (
-			(1053 === $driverCode && false !== stripos('Server shutdown in progress', $driverMessage)) ||
-			(1317 === $driverCode && false !== stripos('Query execution was interrupted', $driverMessage)) ||
-			(2006 === $driverCode && false !== stripos('MySQL server has gone away', $driverMessage)) ||
-			(2013 === $driverCode && false !== stripos('Lost connection to MySQL server', $driverMessage)) ||
-			(2055 === $driverCode && false !== stripos('Lost connection to MySQL server', $driverMessage))
+			(1053 === $driverCode && false !== stripos($driverMessage, 'Server shutdown in progress')) ||
+			(1317 === $driverCode && false !== stripos($driverMessage, 'Query execution was interrupted')) ||
+			(2006 === $driverCode && false !== stripos($driverMessage, 'MySQL server has gone away')) ||
+			(2013 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server')) ||
+			(2055 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server'))
 		) {
 			return true;
 		}
