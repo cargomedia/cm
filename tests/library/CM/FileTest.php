@@ -106,6 +106,7 @@ class CM_FileTest extends CMTest_TestCase {
 		$this->assertFileNotExists($path);
 		$file->copy($path);
 		$copiedFile = new CM_File($path);
+		$this->assertTrue($copiedFile->getExists());
 		$copiedFile->delete();
 
 		try {
@@ -125,13 +126,13 @@ class CM_FileTest extends CMTest_TestCase {
 		$this->assertFileNotExists($oldPath);
 		$this->assertFileExists($newPath);
 		$this->assertSame($newPath, $file->getPath());
-		$file->delete();
 		try {
 			$file->move('/non-existent-path/not-existent-file');
-			$this->assertFileExists($oldPath);
 			$this->fail('Should not be able to copy');
 		} catch (Exception $e) {
+			$this->assertFileExists($newPath);
 			$this->assertContains('Cannot move', $e->getMessage());
 		}
+		$file->delete();
 	}
 }
