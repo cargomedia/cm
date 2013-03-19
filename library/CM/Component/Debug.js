@@ -27,7 +27,7 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	
 		_.each(cm.model.types, function(modelType, modelName) {
 			_.each(cm.action.verbs, function(actionVerb, actionName) {
-				handler.bindAction(actionVerb, modelType, function(action, model, data) {
+				handler.bindAction(actionVerb, modelType, null, function(action, model, data) {
 					var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
 					msg += " (" + JSON.stringify(data) + ")";
 					handler.alert(msg);

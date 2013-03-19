@@ -283,12 +283,16 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
+	 * @param {String} [streamChannel]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, callback) {
-		cm.action.bind(actionVerb, modelType, callback, this);
+	bindAction: function(actionVerb, modelType, streamChannel, callback) {
+		var callbackResponse = function(response) {
+			callback.call(this, response.action, response.model, response.data);
+		};
+		cm.action.bind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, callback, this);
+			cm.action.unbind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		});
 	},
 
@@ -491,15 +495,16 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
+ 	 * @param {String} [streamChannel]
 	 */
-	_bindActions: function(actions) {
+	_bindActions: function(actions, streamChannel) {
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, callback);
+				this.bindAction(actionVerb, modelType, streamChannel, callback);
 			}, this);
 		}, this);
 	},
