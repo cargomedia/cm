@@ -59,14 +59,16 @@ CM_Paging_User_Country                         # All users from a given country
 
 ### Cloning the CM skeleton application
 
-In your projects directory `/Users/<user-name>/Projects/`, run:
+In your workspace, run:
 ```bash
 composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
 ```
+This will create a new directory `<project-name>` containing a project based on CM.
 
 ### Setting up a virtual host
 
-The Apache configuration of the virtual host for you project should be defined in `/usr/local/etc/apache2/cargomedia/vhosts/<project-name>.conf` and read as follows:
+The only entry point of your application should be `public/index.php`.
+A typical Apache virtual host configuration for this purpose were:
 
 ```conf
 <VirtualHost *>
@@ -76,16 +78,15 @@ The Apache configuration of the virtual host for you project should be defined i
 
 <VirtualHost *>
   ServerName www.‹project-name›.‹host-name›.cargomedia
-  ServerAlias admin.‹project-name›.‹host-name›.cargomedia
-  DocumentRoot /Users/‹user-name›/Projects/‹project-name›
+  DocumentRoot ‹project-dir›
 
-  <Directory /Users/‹user-name›/Projects/‹project-name›/>
+  <Directory ‹project-dir›/>
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ public/$1
   </Directory>
 
-  <Directory /Users/‹user-name›/Projects/‹project-name›/public/>
+  <Directory ‹project-dir›/public/>
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php
@@ -96,7 +97,7 @@ The Apache configuration of the virtual host for you project should be defined i
 
 ### Project configuration
 
-In your project directory `/Users/<user-name>/Projects/<project-name>`, run:
+In your project directory, run:
 ```bash
 ./scripts/cm.php config generate
 ```
@@ -126,7 +127,7 @@ $config-><namespace>_Site->url = 'http://www.<project-name>.<host-name>.cargomed
 
 $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
   array('httpHost' => 'stream.<project-name>.<host-name>.cargomedia', 'httpPort' => 8085, 'sockjsUrls' => array(
-      'http://stream.ideahub.chick.cargomedia:8090',
+      'http://stream.<project-name>.<host-name>.cargomedia:8090',
   )),
 );
 ```
