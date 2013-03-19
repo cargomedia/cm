@@ -203,7 +203,7 @@ class CM_File extends CM_Class_Abstract {
 	 */
 	public static function create($path, $content = null) {
 		$content = (string) $content;
-		if (false === file_put_contents($path, $content)) {
+		if (false === @file_put_contents($path, $content)) {
 			throw new CM_Exception('Cannot write to `' . $path . '`.');
 		}
 		$file = new static($path);
