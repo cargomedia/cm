@@ -72,12 +72,12 @@ A typical Apache virtual host configuration for this purpose were:
 
 ```conf
 <VirtualHost *>
-  ServerName ‹project-name›.‹host-name›.cargomedia
-  RedirectPermanent / http://www.‹project-name›.‹host-name›.cargomedia/
+  ServerName ‹hostname›
+  RedirectPermanent / http://www.‹hostname›/
 </VirtualHost>
 
 <VirtualHost *>
-  ServerName www.‹project-name›.‹host-name›.cargomedia
+  ServerName www.‹hostname›
   DocumentRoot ‹project-dir›
 
   <Directory ‹project-dir›/>
@@ -111,25 +111,6 @@ CM framework provides a base which should be extended. Our own libraries should 
 Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
 ```php
 require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
-```
-
-### Local configuration
-
-Create then a local configuration file `resources/config/local.php` where you will define:
-* The URL of your website
-* The HTTP and WebSocket URLs at which your Socket-Redis WebSocket emulation server is listening to
-
-It should read as follows:
-```php
-<?php
-
-$config-><namespace>_Site->url = 'http://www.<project-name>.<host-name>.cargomedia';
-
-$config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-  array('httpHost' => 'stream.<project-name>.<host-name>.cargomedia', 'httpPort' => 8085, 'sockjsUrls' => array(
-      'http://stream.<project-name>.<host-name>.cargomedia:8090',
-  )),
-);
 ```
 
 ### Adding new modules
