@@ -287,12 +287,12 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
 	bindAction: function(actionVerb, modelType, streamChannel, callback) {
-		var callback = function(response) {
+		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
 		};
-		cm.action.bind(actionVerb, modelType, callback, streamChannel, this);
+		cm.action.bind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, callback, streamChannel, this);
+			cm.action.unbind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		});
 	},
 
