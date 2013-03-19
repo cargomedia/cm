@@ -380,30 +380,21 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} mp3Path
 	 * @param {Object} [params]
-	 * @return {jQuery}
+	 * @return {audio}
 	 */
 	createAudioPlayer: function(mp3Path, params) {
 		params = _.extend({loop: false, autoplay: false}, params);
-		var $player = $('<div class="jplayer"></div>').appendTo($('body'));
-		var options = {
-			'swfPath': cm.getUrlStatic('/swf/Jplayer.swf'),
-			ready: function() {
-				$player.jPlayer('setMedia', {
-					'mp3': cm.getUrlStatic('/audio/' + mp3Path)
-				});
-				if (params.autoplay) {
-					$player.jPlayer('play');
-				}
-			}
-		};
-		if (params.loop) {
-			options.loop = true;
-		}
-		this.on('destruct', function() {
-			$player.jPlayer('destroy');
-			$player.remove();
+
+		var $element = $('<audio />').appendTo(this.$el);
+		$element.attr('src', cm.getUrlStatic('/audio/' + mp3Path));
+		$element.attr('autoplay', params.autoplay);
+		$element.attr('loop', params.loop);
+
+		return new MediaElement($element.get(0), {
+			startVolume: 1,
+			flashName: cm.getUrlStatic('/swf/flashmediaelement.swf'),
+			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap')
 		});
-		return $player.jPlayer(options);
 	},
 
 	/**
