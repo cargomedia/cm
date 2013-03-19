@@ -389,8 +389,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		return new MediaElement($element.get(0), {
 			startVolume: 1,
 			flashName: cm.getUrlStatic('/swf/flashmediaelement.swf'),
-			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap'),
-			features: []
+			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap')
 		});
 	},
 
