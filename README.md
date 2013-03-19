@@ -105,11 +105,11 @@ In your project directory, run:
 ### Namespace creation, site setup
 
 CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
-```
+```bash
 ./scripts/cm.php generator create-namespace <namespace>
 ```
 Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
-```
+```php
 require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
 ```
 
@@ -135,12 +135,12 @@ $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
 
-```
+```bash
 generator create-view <class-name>
 ```
 Creates new view based on the <class-name> provided. It will create php class, javascript class, empty html template and less file. It will also look for most appropriate abstract class to extend.
 
-```
+```bash
 generator create-class <class-name>
 ```
 Creates new <class-name> class.
