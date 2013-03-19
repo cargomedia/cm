@@ -51,11 +51,11 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param CM_Model_User $user
 	 * @param string        $event
-	 * @param mixed         $data
+	 * @param mixed|null         $data
 	 */
-	public static function stream(CM_Model_User $user, $event, $data) {
+	public static function stream(CM_Model_User $user, $event, $data = null) {
 		$namespace = get_called_class() . ':' . $event;
-		CM_Stream_Message::publishUser($user, array('namespace' => $namespace, 'data' => $data));
+		CM_Stream_Message::publish($user, $namespace, $data);
 	}
 
 	/**
