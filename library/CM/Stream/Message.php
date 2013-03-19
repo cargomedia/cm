@@ -39,9 +39,11 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 
 	/**
 	 * @param CM_Model_User|string $streamChannel
-	 * @param array  $data
+	 * @param string               $namespace
+	 * @param array                $data
 	 */
-	public static function publish($streamChannel, array $data) {
+	public static function publish($streamChannel, $namespace, array $data) {
+		$namespace = (string) $namespace;
 		if ($streamChannel instanceof CM_Model_User) {
 			$user = $streamChannel;
 			if (!$user->getOnline()) {
@@ -50,7 +52,7 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 			$streamChannel = CM_Model_StreamChannel_Message_User::getKeyByUser($user);
 		}
 
-		self::getInstance()->_publish($streamChannel, $data);
+		self::getInstance()->_publish($streamChannel, array('namespace' => $namespace, 'data' => $data));
 	}
 
 	/**
@@ -63,8 +65,8 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 		if (!is_array($data)) {
 			$data = array();
 		}
-		self::publish($streamChannel, array('namespace' => 'CM_Action_Abstract',
-											'data'      => array('action' => $action, 'model' => $model, 'data' => $data)));
+		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerb() .  ':' . $model->getType();
+		self::publish($streamChannel, $namespace, array('action' => $action, 'model' => $model, 'data' => $data));
 	}
 
 	/**
