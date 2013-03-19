@@ -382,7 +382,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		params = _.extend({loop: false, autoplay: false}, params);
 
 		var $element = $('<audio />').appendTo(this.$el);
-		$element.attr('src', 'http://mediaelementjs.com/media/AirReview-Landmarks-02-ChasingCorporate.mp3');
+		$element.attr('src', cm.getUrlStatic('/audio/' + mp3Path));
 		$element.attr('autoplay', params.autoplay);
 		$element.attr('loop', params.loop);
 
