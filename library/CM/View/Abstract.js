@@ -386,14 +386,12 @@ var CM_View_Abstract = Backbone.View.extend({
 		$element.attr('autoplay', params.autoplay);
 		$element.attr('loop', params.loop);
 
-		var mediaelement = new MediaElement($element.get(0), {
+		return new MediaElement($element.get(0), {
 			startVolume: 1,
 			flashName: cm.getUrlStatic('/swf/flashmediaelement.swf'),
 			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap'),
 			features: []
 		});
-
-		return mediaelement;
 	},
 
 	/**
