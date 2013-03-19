@@ -20,14 +20,21 @@ class CM_Db_Client {
 	/** @var PDO */
 	private $_pdo;
 
+	/** @var int */
+	private $_lastConnect;
+
+	/** @var int|null */
+	private $_reconnectTimeout;
+
 	/**
 	 * @param string      $host
 	 * @param int         $port
 	 * @param string      $username
 	 * @param string      $password
 	 * @param string|null $db
+	 * @param int|null    $reconnectTimeout
 	 */
-	public function __construct($host, $port, $username, $password, $db = null) {
+	public function __construct($host, $port, $username, $password, $db = null, $reconnectTimeout = null) {
 		$this->_host = (string) $host;
 		$this->_port = (int) $port;
 		$this->_username = (string) $username;
@@ -35,6 +42,10 @@ class CM_Db_Client {
 		if (null !== $db) {
 			$this->_db = (string) $db;
 		}
+		if (null !== $reconnectTimeout) {
+			$this->_reconnectTimeout = (int) $reconnectTimeout;
+		}
+		$this->setLastConnectTime(time());
 		$this->connect();
 	}
 
@@ -84,6 +95,11 @@ class CM_Db_Client {
 	 * @return CM_Db_Statement
 	 */
 	public function createStatement($sqlTemplate) {
+		if (null !== $this->_reconnectTimeout && ($this->getLastConnectTime() + $this->_reconnectTimeout) < time()) {
+			$this->disconnect();
+			$this->connect();
+			$this->setLastConnectTime(time());
+		}
 		return new CM_Db_Statement($this->createPdoStatement($sqlTemplate), $this);
 	}
 
@@ -122,6 +138,20 @@ class CM_Db_Client {
 			return null;
 		}
 		return $lastInsertId;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getLastConnectTime() {
+		return $this->_lastConnect;
+	}
+
+	/**
+	 * @param int $time
+	 */
+	public function setLastConnectTime($time) {
+		$this->_lastConnect = (int) $time;
 	}
 
 	/**
