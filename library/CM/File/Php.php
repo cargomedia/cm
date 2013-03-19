@@ -155,6 +155,7 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 		$content = preg_replace('#class\s+' . $className . '#', '\0' . $id, $content);
 		$file = CM_File_Php::create($path, $content);
 		require $file->getPath();
+		$file->delete();
 		return new ReflectionClass($className . $id);
 	}
 }
