@@ -65,7 +65,6 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 	public static function publishAction($streamChannel, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
 		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerb() . ':' . $model->getType();
 		self::publish($streamChannel, $namespace, array('action' => $action, 'model' => $model, 'data' => $data));
-
 	}
 
 	/**
