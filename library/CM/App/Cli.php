@@ -55,9 +55,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 			$this->_createBootloader($namespace);
 
 		} elseif ($this->_getInput()->confirm('Would you like to include newly created namespace in current Bootloader')) {
-			// TODO: Change bootloader
-			$currentBootloaderClass = get_class(CM_Bootloader::getInstance());
-			$this->_getOutput()->writeln($currentBootloaderClass . ' has been changed.');
+			$this->_addBootloaderNamespace($namespace);
 		}
 	}
 
@@ -97,6 +95,17 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$json = str_replace('\\/', '/', $json);
 		$composerFile->write($json);
 		CM_Util::exec('cd ' . escapeshellarg(DIR_ROOT) . ' && composer dump-autoload');
+	}
+
+	private function _addBootloaderNamespace($namespace) {
+		$currentBootloaderClass = get_class(CM_Bootloader::getInstance());
+		$reflection = new ReflectionClass($currentBootloaderClass);
+		$file = new CM_File_Php($reflection->getFileName());
+		$namespaces = CM_Bootloader::getInstance()->getNamespaces();
+		$namespaces[] = $namespace;
+
+		$file->replaceMethod('public', 'getNamespaces', null, 'return array(\'' . implode($namespaces, '\', \'') . '\');');
+		$this->_getOutput()->writeln($currentBootloaderClass . ' has been changed.');
 	}
 
 	public static function getPackageName() {
