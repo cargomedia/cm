@@ -721,25 +721,29 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
+		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, callback, context) {
-			if (!cm.options.stream.channel) {
+		bind: function(actionVerb, modelType, callback, streamChannel, context) {
+			streamChannel = streamChannel || cm.options.stream.channel;
+			if (!streamChannel) {
 				return;
 			}
-			cm.stream.bind(cm.options.stream.channel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.bind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
 		 * @param {Function} [callback]
+		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback, context) {
-			if (!cm.options.stream.channel) {
+		unbind: function(actionVerb, modelType, callback,streamChannel, context) {
+			streamChannel = streamChannel || cm.options.stream.channel;
+			if (!streamChannel) {
 				return;
 			}
-			cm.stream.unbind(cm.options.stream.channel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.unbind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 
