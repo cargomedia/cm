@@ -47,11 +47,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 			CM_Util::mkDir($path);
 			$this->_logCreate($path);
 		}
-		$this->_addComposerOption('autoload.psr-0.' . $namespace . '_', $subpath . 'library/');
+		$this->_addComposerAutoload($namespace, $subpath . 'library/');
 		$this->_getOutput()->writeln('Added `' . $namespace . '` namespace to composer.json');
 
 		CM_Bootloader::getInstance()->reloadNamespacePaths();
-		if ($this->_getInput()->confirm('Would you like to create new bootloader?')) {
+		if (is_a(CM_Bootloader::getInstance(), 'CM_Booloader') || $this->_getInput()->confirm('Would you like to create new bootloader?')) {
 			$this->_createBootloader($namespace);
 
 		} elseif ($this->_getInput()->confirm('Would you like to include newly created namespace in current Bootloader')) {
@@ -68,7 +68,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$bootloader = $this->_generator->createClassFilePhp($bootloaderClassName, 'CM_Bootloader');
 		$bootloader->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
 		$this->_logCreate($bootloader);
-		if ($this->_getInput()->confirm('Would you like to replace current Bootloader within entry points?')) {
+		if (is_a(CM_Bootloader::getInstance(), 'CM_Booloader') || $this->_getInput()->confirm('Would you like to replace current Bootloader within entry points?')) {
 			$this->_logCreate($this->_generator->createHttpEntryPoint($bootloaderClassName));
 			$this->_logCreate($this->_generator->createScriptEntryPoint($bootloaderClassName));
 		}
@@ -85,24 +85,14 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $value
+	 * @param string $namespace
+	 * @param string $path
 	 * @throws CM_Exception_Invalid
 	 */
-	private function _addComposerOption($name, $value) {
-		$keys = explode('.', $name);
+	private function _addComposerAutoload($namespace, $path) {
 		$composerFile = new CM_File(DIR_ROOT . 'composer.json');
-		$composerOptions = json_decode($composerFile->read());
-		$node = $composerOptions;
-		foreach ($keys as $key) {
-			if (!isset($node->$key)) {
-				$node->$key = new stdClass();
-			} elseif (!is_object($node->$key)) {
-				throw new CM_Exception_Invalid('Key `' . $key . '` is not empty or object type');
-			}
-			$node =& $node->$key;
-		}
-		$node = $value;
+		$composerOptions = json_decode($composerFile->read(), true);
+		$composerOptions['autoload']['psr-0'][$namespace . '_'] = $path;
 		$json = json_encode($composerOptions);
 		$json = str_replace('\\/', '/', $json);
 		$composerFile->write($json);

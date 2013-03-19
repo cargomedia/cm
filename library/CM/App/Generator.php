@@ -69,7 +69,7 @@ class CM_App_Generator {
 <?php
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-$bootloader = new ${BOOTLOADER_CLASS}(dirname(__DIR__) . '/', 'library/');
+$bootloader = new ${BOOTLOADER_CLASS}(dirname(__DIR__) . '/', ${DIR_LIBRARY});
 $bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -87,6 +87,7 @@ exit;
 
 EOD;
 		$body = str_replace('${BOOTLOADER_CLASS}', $bootloaderClass, $body);
+		$body = str_replace('${DIR_LIBRARY}', var_export(DIR_LIBRARY, true), $body);
 		CM_Util::mkDir(DIR_ROOT . 'public/');
 		return CM_File_Php::create(DIR_ROOT . 'public/index.php', $body);
 	}
@@ -101,7 +102,7 @@ EOD;
 <?php
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-$bootloader = new ${BOOTLOADER_CLASS}(dirname(__DIR__) . '/', 'library/');
+$bootloader = new ${BOOTLOADER_CLASS}(dirname(__DIR__) . '/', ${DIR_LIBRARY});
 $bootloader->setEnvironment('cli');
 $bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
@@ -111,6 +112,7 @@ exit($returnCode);
 
 EOD;
 		$body = str_replace('${BOOTLOADER_CLASS}', $bootloaderClass, $body);
+		$body = str_replace('${DIR_LIBRARY}', var_export(DIR_LIBRARY, true), $body);
 		CM_Util::mkDir(DIR_ROOT . 'scripts/');
 		return CM_File_Php::create(DIR_ROOT . 'scripts/cm.php', $body);
 	}
