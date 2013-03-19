@@ -738,7 +738,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback,streamChannel, context) {
+		unbind: function(actionVerb, modelType, callback, streamChannel, context) {
 			streamChannel = streamChannel || cm.options.stream.channel;
 			if (!streamChannel) {
 				return;
