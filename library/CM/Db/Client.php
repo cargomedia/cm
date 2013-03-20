@@ -63,10 +63,10 @@ class CM_Db_Client {
 		try {
 			$this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$this->_lastConnect = time();
 		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
 		}
+		$this->_lastConnect = time();
 	}
 
 	public function disconnect() {
