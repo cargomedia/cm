@@ -60,10 +60,15 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return string File extension
+	 * @return string|null
 	 */
 	public function getExtension() {
-		return strtolower(pathinfo($this->getFileName(), PATHINFO_EXTENSION));
+		$fileName = $this->getFileName();
+		if (false === strpos($fileName, '.')) {
+			return null;
+		}
+
+		return strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 	}
 
 	/**
@@ -216,10 +221,10 @@ class CM_File extends CM_Class_Abstract {
 	 * @return CM_File
 	 */
 	public static function createTmp($extension = null, $content = null) {
-		$extension = (string) $extension;
-		if ('' !== $extension) {
+		if (null !== $extension) {
 			$extension = '.' . $extension;
 		}
+		$extension = (string) $extension;
 		return static::create(DIR_TMP . uniqid() . $extension, $content);
 	}
 
