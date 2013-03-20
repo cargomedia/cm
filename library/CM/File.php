@@ -217,10 +217,9 @@ class CM_File extends CM_Class_Abstract {
 	 */
 	public static function createTmp($extension = null, $content = null) {
 		$extension = (string) $extension;
-		if ($extension) {
+		if ('' !== $extension) {
 			$extension = '.' . $extension;
 		}
-		$content = (string) $content;
 		return self::create(DIR_TMP . uniqid() . $extension, $content);
 	}
 
