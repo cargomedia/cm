@@ -7,7 +7,6 @@ class CM_FileTest extends CMTest_TestCase {
 	public static function setUpBeforeClass() {
 	}
 
-
 	public static function tearDownAfterClass() {
 	}
 
@@ -90,6 +89,13 @@ class CM_FileTest extends CMTest_TestCase {
 		$file = CM_File::create($path, 'bar');
 		$this->assertEquals('bar', $file->read());
 		$file->delete();
+
+		try {
+			CM_File::create(DIR_TEST_DATA);
+			$this->fail('Could create file with invalid path');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Cannot write to', $e->getMessage());
+		}
 	}
 
 	public function testTruncate() {
@@ -101,7 +107,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testCopy() {
-		$path = DIR_TMP. 'filecopytest.txt';
+		$path = DIR_TMP . 'filecopytest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$this->assertFileNotExists($path);
 		$file->copy($path);
@@ -118,7 +124,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testMove() {
-		$newPath = DIR_TMP. 'filemovetest.txt';
+		$newPath = DIR_TMP . 'filemovetest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$oldPath = $file->getPath();
 
