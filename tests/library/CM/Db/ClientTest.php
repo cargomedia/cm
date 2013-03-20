@@ -52,13 +52,13 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 	public function testReconnectTimeout() {
 		$config = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db, 5);
-		$firstTime = $client->getLastConnected();
+		$firstTime = $client->getLastConnect();
 		$timeForward = 100;
 		CMTest_TH::timeForward($timeForward);
 		$client->createStatement('SELECT 1')->execute();
-		$this->assertSameTime($firstTime + $timeForward, $client->getLastConnected());
+		$this->assertSameTime($firstTime + $timeForward, $client->getLastConnect());
 		CMTest_TH::timeForward($timeForward);
 		$client->createStatement('SELECT 1')->execute();
-		$this->assertSameTime($firstTime + (2 * $timeForward), $client->getLastConnected());
+		$this->assertSameTime($firstTime + (2 * $timeForward), $client->getLastConnect());
 	}
 }

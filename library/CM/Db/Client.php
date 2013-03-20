@@ -142,7 +142,7 @@ class CM_Db_Client {
 	/**
 	 * @return int
 	 */
-	public function getLastConnected() {
+	public function getLastConnect() {
 		return $this->_lastConnect;
 	}
 
@@ -180,7 +180,7 @@ class CM_Db_Client {
 	private function _getShouldReconnect() {
 		if (
 			null !== $this->_reconnectTimeout &&
-			($this->getLastConnected() + $this->_reconnectTimeout) < time()
+			($this->getLastConnect() + $this->_reconnectTimeout) < time()
 		) {
 			return true;
 		}
