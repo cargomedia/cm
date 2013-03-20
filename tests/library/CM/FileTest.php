@@ -104,8 +104,7 @@ class CM_FileTest extends CMTest_TestCase {
 		$file->delete();
 
 		$file = CM_File::createTmp('testExtension', 'bar');
-		$extension = explode('.', $file->getPath());
-		$this->assertSame('testExtension', $extension[1]);
+		$this->assertContains('.testExtension', $file->getPath());
 		$this->assertEquals('bar', $file->read());
 		$file->delete();
 	}
