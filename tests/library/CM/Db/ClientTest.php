@@ -55,10 +55,10 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		$firstTime = $client->getLastConnectTime();
 		$timeForward = 100;
 		CMTest_TH::timeForward($timeForward);
-		$client->createStatement('CREATE TABLE `test` (`id` INT(10))')->execute();
-		$this->assertGreaterThanOrEqual($firstTime+$timeForward, $client->getLastConnectTime());
+		$client->createStatement('SELECT 1')->execute();
+		$this->assertSameTime($firstTime+$timeForward, $client->getLastConnectTime());
 		CMTest_TH::timeForward($timeForward);
-		$client->createStatement('DROP TABLE `test`')->execute();
-		$this->assertGreaterThanOrEqual($firstTime+(2*$timeForward), $client->getLastConnectTime());
+		$client->createStatement('SELECT 1')->execute();
+		$this->assertSameTime($firstTime+(2*$timeForward), $client->getLastConnectTime());
 	}
 }
