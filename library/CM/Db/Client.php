@@ -178,12 +178,9 @@ class CM_Db_Client {
 	 * @return bool
 	 */
 	private function _getShouldReconnect() {
-		if (
-			null !== $this->_reconnectTimeout &&
-			($this->getLastConnect() + $this->_reconnectTimeout) < time()
-		) {
-			return true;
+		if (null === $this->_reconnectTimeout) {
+			return false;
 		}
-		return false;
+		return ($this->getLastConnect() + $this->_reconnectTimeout) < time();
 	}
 }
