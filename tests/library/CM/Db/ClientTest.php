@@ -40,12 +40,25 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 	public function testGetLastInsertId() {
 		$config = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
-		$client->createStatement('CREATE TABLE `test` (`id` INT(10) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
+		$client->createStatement('CREATE TABLE `test` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
 		$this->assertSame(null, $client->getLastInsertId());
 
 		$client->createStatement('INSERT INTO `test` VALUES()')->execute();
 		$this->assertSame('1', $client->getLastInsertId());
 
 		$client->createStatement('DROP TABLE `test`')->execute();
+	}
+
+	public function testReconnectTimeout() {
+		$config = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db, 5);
+		$firstTime = $client->getLastConnect();
+		$timeForward = 100;
+		CMTest_TH::timeForward($timeForward);
+		$client->createStatement('SELECT 1')->execute();
+		$this->assertSameTime($firstTime + $timeForward, $client->getLastConnect());
+		CMTest_TH::timeForward($timeForward);
+		$client->createStatement('SELECT 1')->execute();
+		$this->assertSameTime($firstTime + (2 * $timeForward), $client->getLastConnect());
 	}
 }

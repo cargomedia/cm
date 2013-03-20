@@ -71,6 +71,7 @@ $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Db_Db->serversRead = array();
 $config->CM_Db_Db->serversReadEnabled = true;
 $config->CM_Db_Db->delayedEnabled = true;
+$config->CM_Db_Db->reconnectTimeout = 300;
 
 $config->CM_Action_Abstract = new stdClass();
 

@@ -351,7 +351,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 			if ($readOnly) {
 				$server = $config->serversRead[array_rand($config->serversRead)];
 			}
-			$client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db);
+			$client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db, $config->reconnectTimeout);
 		}
 		return $client;
 	}
