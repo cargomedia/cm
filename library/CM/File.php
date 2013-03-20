@@ -156,7 +156,7 @@ class CM_File extends CM_Class_Abstract {
 		if (is_dir($this->getPath())) {
 			CM_Util::rmDir($this->getPath());
 		} else {
-			if (!unlink($this->getPath())) {
+			if (!@unlink($this->getPath())) {
 				throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
 			}
 		}
