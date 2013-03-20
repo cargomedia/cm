@@ -101,6 +101,8 @@ class CM_FileTest extends CMTest_TestCase {
 	public function testCreateTmp() {
 		$file = CM_File::createTmp();
 		$this->assertTrue(file_exists($file->getPath()));
+		$this->assertEmpty($file->getExtension());
+		$this->assertEmpty($file->read());
 		$file->delete();
 
 		$file = CM_File::createTmp('testExtension', 'bar');

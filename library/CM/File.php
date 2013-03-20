@@ -220,7 +220,7 @@ class CM_File extends CM_Class_Abstract {
 		if ('' !== $extension) {
 			$extension = '.' . $extension;
 		}
-		return self::create(DIR_TMP . uniqid() . $extension, $content);
+		return static::create(DIR_TMP . uniqid() . $extension, $content);
 	}
 
 	/**
