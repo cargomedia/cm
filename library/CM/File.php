@@ -211,6 +211,20 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string|null $content
+	 * @param string|null $extension
+	 * @return CM_File
+	 */
+	public static function createTmp($extension = null, $content = null) {
+		$extension = (string) $extension;
+		if ($extension) {
+			$extension = '.' . $extension;
+		}
+		$content = (string) $content;
+		return self::create(DIR_TMP . uniqid() . $extension, $content);
+	}
+
+	/**
 	 * @param string $path
 	 * @return bool
 	 */
