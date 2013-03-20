@@ -52,7 +52,6 @@ class CM_Db_Client {
 	 * @throws CM_Db_Exception
 	 */
 	public function connect() {
-		$this->_lastConnect = time();
 		if ($this->isConnected()) {
 			return;
 		}
@@ -64,6 +63,7 @@ class CM_Db_Client {
 		try {
 			$this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$this->_lastConnect = time();
 		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
 		}
@@ -95,7 +95,7 @@ class CM_Db_Client {
 	 * @return CM_Db_Statement
 	 */
 	public function createStatement($sqlTemplate) {
-		if (null !== $this->_reconnectTimeout && ($this->getLastConnectTime() + $this->_reconnectTimeout) < time()) {
+		if ($this->_getShouldReconnect()) {
 			$this->disconnect();
 			$this->connect();
 		}
@@ -142,7 +142,7 @@ class CM_Db_Client {
 	/**
 	 * @return int
 	 */
-	public function getLastConnectTime() {
+	public function getLastConnected() {
 		return $this->_lastConnect;
 	}
 
@@ -172,5 +172,18 @@ class CM_Db_Client {
 	 */
 	public function quoteIdentifier($name) {
 		return '`' . str_replace('`', '``', $name) . '`';
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function _getShouldReconnect() {
+		if (
+			null !== $this->_reconnectTimeout &&
+			($this->getLastConnected() + $this->_reconnectTimeout) < time()
+		) {
+			return true;
+		}
+		return false;
 	}
 }
