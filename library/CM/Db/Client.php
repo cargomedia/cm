@@ -45,7 +45,6 @@ class CM_Db_Client {
 		if (null !== $reconnectTimeout) {
 			$this->_reconnectTimeout = (int) $reconnectTimeout;
 		}
-		$this->setLastConnectTime(time());
 		$this->connect();
 	}
 
@@ -53,6 +52,7 @@ class CM_Db_Client {
 	 * @throws CM_Db_Exception
 	 */
 	public function connect() {
+		$this->_lastConnect = time();
 		if ($this->isConnected()) {
 			return;
 		}
@@ -98,7 +98,6 @@ class CM_Db_Client {
 		if (null !== $this->_reconnectTimeout && ($this->getLastConnectTime() + $this->_reconnectTimeout) < time()) {
 			$this->disconnect();
 			$this->connect();
-			$this->setLastConnectTime(time());
 		}
 		return new CM_Db_Statement($this->createPdoStatement($sqlTemplate), $this);
 	}
@@ -145,13 +144,6 @@ class CM_Db_Client {
 	 */
 	public function getLastConnectTime() {
 		return $this->_lastConnect;
-	}
-
-	/**
-	 * @param int $time
-	 */
-	public function setLastConnectTime($time) {
-		$this->_lastConnect = (int) $time;
 	}
 
 	/**
