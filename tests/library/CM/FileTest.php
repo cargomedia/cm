@@ -98,6 +98,23 @@ class CM_FileTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testCreateTmp() {
+		$file = CM_File::createTmp();
+		$this->assertTrue(file_exists($file->getPath()));
+		$this->assertNull($file->getExtension());
+		$this->assertEmpty($file->read());
+		$file->delete();
+
+		$file = CM_File::createTmp('');
+		$this->assertSame('', $file->getExtension());
+		$file->delete();
+
+		$file = CM_File::createTmp('testExtension', 'bar');
+		$this->assertContains('testextension', $file->getExtension());
+		$this->assertEquals('bar', $file->read());
+		$file->delete();
+	}
+
 	public function testTruncate() {
 		$file = new CM_File($this->_testFilePath);
 		$file->write('foo');
