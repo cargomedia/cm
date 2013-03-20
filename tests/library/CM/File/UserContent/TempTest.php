@@ -33,7 +33,7 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
 	public function testCreateNoExtension() {
 		$file = CM_File_UserContent_Temp::create('foo');
-		$this->assertSame('', $file->getExtension());
+		$this->assertNull($file->getExtension());
 	}
 
 	public function testCreateContent() {
