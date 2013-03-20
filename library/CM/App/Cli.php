@@ -64,7 +64,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$namespaces[] = $namespace;
 		$bootloaderClassName = $namespace . '_Bootloader';
 		$bootloader = $this->_generator->createClassFilePhp($bootloaderClassName, 'CM_Bootloader');
-		$bootloader->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
+		$bootloader->setMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
 		$this->_logCreate($bootloader);
 		if (is_a(CM_Bootloader::getInstance(), 'CM_Booloader') || $this->_getInput()->confirm('Would you like to replace current Bootloader within entry points?')) {
 			$this->_logCreate($this->_generator->createHttpEntryPoint($bootloaderClassName));

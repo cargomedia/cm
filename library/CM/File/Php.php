@@ -50,41 +50,31 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 	 * @param array|null  $parameters
 	 * @param string|null $body
 	 */
-	public function replaceMethod($access, $name, array $parameters = null, $body = null) {
-		$currentReflection = $this->_getCurrentReflection();
-		if ($currentReflection->hasMethod($name) && $currentReflection->getMethod($name)->getDeclaringClass() === $this->getClassName()) {
-			$code = $this->_generateMethodCode($access, $name, $parameters, $body);
-			$method = $currentReflection->getMethod($name);
-			$start = $method->getStartLine() - 1;
-			$end = $method->getEndLine() - $start;
-			$delimiter = "\n";
-			$lines = preg_split('#' . $delimiter . '#', $this->read());
-			array_splice($lines, $start, $end, $code);
-			$this->write(implode($delimiter, $lines));
-		} else {
-			$this->addMethod($access, $name, $parameters, $body);
+	public function setMethod($access, $name, array $parameters = null, $body = null) {
+		$reflection = $this->_getReflection();
+		$code = $this->_generateMethodCode($access, $name, $parameters, $body);
+		$lines = preg_split('#[\n\r]#', $this->read());
+		if ($reflection->hasMethod($name)) {
+			$method = $reflection->getMethod($name);
 		}
-	}
 
-	/**
-	 * @param string      $access
-	 * @param string|null $name
-	 * @param array|null  $parameters
-	 * @param string|null $body
-	 */
-	public function addMethod($access, $name, array $parameters = null, $body = null) {
-		$code = $this->_generateMethodCode($access, $name, $parameters, $body) . PHP_EOL;
-		$content = $this->read();
-		$position = strripos($content, '}');
-		$content = substr($content, 0, $position) . $code . substr($content, $position);
-		$this->write($content);
+		if (isset($method) && $method->getDeclaringClass() == $reflection) {
+			$start = $method->getStartLine() - 1;
+			$length = $method->getEndLine() - $start;
+		} else {
+			$code = PHP_EOL . $code;
+			$start = array_search('}', $lines);
+			$length = 0;
+		}
+		array_splice($lines, $start, $length, $code);
+		$this->write(implode("\n", $lines));
 	}
 
 	/**
 	 * @param string $className
 	 * @param string $methodName
 	 */
-	public function copyMethod($className, $methodName) {
+	public function setMethodFrom($className, $methodName) {
 		$method = new ReflectionMethod($className, $methodName);
 		$visibility = 'public';
 		if ($method->isPrivate()) {
@@ -105,7 +95,7 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 			}
 			$parameters[$parameter->getName()] = $type;
 		}
-		$this->addMethod($visibility, $method->getName(), $parameters);
+		$this->setMethod($visibility, $method->getName(), $parameters);
 	}
 
 	/**
@@ -118,16 +108,20 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 
 	/**
 	 * @param string      $access
-	 * @param string      $name
+	 * @param string      $methodName
 	 * @param array|null  $parameters
 	 * @param string|null $body
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	private function _generateMethodCode($access, $name, array $parameters = null, $body = null) {
+	private function _generateMethodCode($access, $methodName, array $parameters = null, $body = null) {
 		$parametersCode = null;
 		if ($parameters) {
 			foreach ($parameters as $name => $type) {
-				if (!in_array(strtolower($type), array(null, 'int', 'integer', 'string', 'float', 'bool', 'boolean'))) {
+				if (!is_string($name)) {
+					throw new CM_Exception_Invalid('Parameter name needs to be string type');
+				}
+				if (!in_array(strtolower($type), array('null', 'int', 'integer', 'string', 'float', 'bool', 'boolean'))) {
 					$parametersCode .= $type . ' ';
 				}
 				$parametersCode .= '$' . $name . ', ';
@@ -137,7 +131,7 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 		if ($body) {
 			$body = preg_replace(array('/[\n\r]/', '/^/'), "$0\t\t", $body);
 		}
-		$code = "\t" . $access . ' function ' . $name . ' (' . $parametersCode . ') {' . PHP_EOL;
+		$code = "\t" . $access . ' function ' . $methodName . ' (' . $parametersCode . ') {' . PHP_EOL;
 		$code .= $body . PHP_EOL;
 		$code .= "\t}";
 
@@ -147,15 +141,18 @@ class CM_File_Php extends CM_File implements CM_File_ClassInterface {
 	/**
 	 * @return ReflectionClass
 	 */
-	private function _getCurrentReflection() {
+	private function _getReflection() {
 		$className = $this->getClassName();
 		$content = $this->read();
 		$id = md5($content);
-		$path = DIR_TMP . $id;
-		$content = preg_replace('#class\s+' . $className . '#', '\0' . $id, $content);
-		$file = CM_File_Php::create($path, $content);
-		require $file->getPath();
-		$file->delete();
-		return new ReflectionClass($className . $id);
+		$tmpClassName = $className . $id;
+		if (!class_exists($tmpClassName, false)) {
+			$path = DIR_TMP . $id;
+			$content = preg_replace('#class\s+' . $className . '#', '\0' . $id, $content);
+			$file = CM_File_Php::create($path, $content);
+			require $file->getPath();
+			$file->delete();
+		}
+		return new ReflectionClass($tmpClassName);
 	}
 }

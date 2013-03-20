@@ -17,7 +17,7 @@ class CM_App_Generator {
 		$file = CM_File_Php::createLibraryClass($className, $parentClass);
 		$reflectionClass = new ReflectionClass($parentClass);
 		foreach ($reflectionClass->getMethods(ReflectionMethod::IS_ABSTRACT) as $method) {
-			$file->copyMethod($parentClass, $method->getName());
+			$file->setMethodFrom($parentClass, $method->getName());
 		}
 		return $file;
 	}
