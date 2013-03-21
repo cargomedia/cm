@@ -5,7 +5,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 	/** @var GearmanWorker */
 	private $_gearmanWorker;
 
-	final public function __construct() {
+	public function __construct() {
 		if (!extension_loaded('gearman')) {
 			throw new CM_Exception('Missing `gearman` extension');
 		}
@@ -21,7 +21,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 		$this->_registerJobs();
 	}
 
-	final public function run() {
+	public function run() {
 		while (true) {
 			$workFailed = false;
 			try {
@@ -45,7 +45,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 		return $this->_gearmanWorker;
 	}
 
-	final private function _registerJobs() {
+	private function _registerJobs() {
 		foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
 			$job = new $jobClassName();
 			$this->_gearmanWorker->addFunction($jobClassName, array($job, '__run'));
