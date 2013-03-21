@@ -142,9 +142,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Form_Abstract           $form
-	 * @param CM_FormField_Abstract      $formField
-	 * @param array|null                 $params
+	 * @param CM_Form_Abstract      $form
+	 * @param CM_FormField_Abstract $formField
+	 * @param array|null            $params
 	 * @return CMTest_TH_Html
 	 */
 	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null) {
@@ -317,6 +317,20 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
+		if ($expected instanceof CM_ArrayConvertible) {
+			$expected = $expected->toArray();
+		}
+		if ($actual instanceof CM_ArrayConvertible) {
+			$actual = $actual->toArray();
+		}
+		if (is_array($expected) && is_array($actual)) {
+			self::assertSame(count($expected), count($actual), $message);
+			foreach ($expected as $expectedKey => $expectedValue) {
+				self::assertArrayHasKey($expectedKey, $actual, $message);
+				self::assertEquals($expectedValue, $actual[$expectedKey], $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+			}
+			return;
+		}
 		if ($expected instanceof CM_Comparable) {
 			self::assertTrue($expected->equals($actual), 'Comparables differ');
 		} else {
@@ -419,8 +433,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param number          $expected
-	 * @param number          $actual
+	 * @param number $expected
+	 * @param number $actual
 	 * @param number|null
 	 */
 	public static function assertSameTime($expected, $actual, $delta = null) {
@@ -431,8 +445,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CMTest_TH_Html  $page
-	 * @param bool            $warnings
+	 * @param CMTest_TH_Html $page
+	 * @param bool           $warnings
 	 */
 	public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
 		if (!extension_loaded('tidy')) {
