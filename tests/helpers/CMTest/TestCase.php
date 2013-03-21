@@ -338,11 +338,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
-		if ($expected instanceof CM_Comparable) {
-			self::assertFalse($expected->equals($actual), 'Comparables do not differ');
-		} else {
-			parent::assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		try {
+			self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		} catch (PHPUnit_Framework_AssertionFailedError $exception) {
+			self::assertTrue(true);
+			return;
 		}
+		self::fail($message);
 	}
 
 	/**
