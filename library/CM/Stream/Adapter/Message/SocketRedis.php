@@ -31,7 +31,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	public function synchronize() {
-		$startStampLimit = time() - 3;
+		$startStampLimit = time() - 10;
 		$channelsStatus = $this->_fetchStatus();
 		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
 		$channelsPersistenceArray = array();
