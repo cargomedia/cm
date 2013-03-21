@@ -324,9 +324,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$actual = $actual->toArray();
 		}
 		if (is_array($expected) && is_array($actual)) {
-			self::assertSame(count($expected), count($actual), $message);
+			self::assertSame(array_keys($expected), array_keys($actual), $message);
 			foreach ($expected as $expectedKey => $expectedValue) {
-				self::assertArrayHasKey($expectedKey, $actual, $message);
 				self::assertEquals($expectedValue, $actual[$expectedKey], $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 			}
 			return;
