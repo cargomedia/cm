@@ -12,16 +12,15 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 	public function start() {
 		pcntl_signal(SIGTERM, array($this, '_handleKill'));
 		pcntl_signal(SIGINT, array($this, '_handleKill'));
+		while (count($this->_children) < $this->_getConfig()->workerCount) {
+			$this->_startWorker();
+		}
 		while (true) {
-			if (count($this->_children) == $this->_getConfig()->workerCount) {
-				if (($pid = pcntl_wait($status, WNOHANG)) > 0) {
-					unset($this->_children[$pid]);
-					$this->_startWorker();
-				}
-				usleep(50000);
-			} else {
+			if (($pid = pcntl_wait($status, WNOHANG)) > 0) {
+				unset($this->_children[$pid]);
 				$this->_startWorker();
 			}
+			usleep(50000);
 		}
 	}
 
@@ -49,5 +48,4 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 		}
 		exit;
 	}
-
 }
