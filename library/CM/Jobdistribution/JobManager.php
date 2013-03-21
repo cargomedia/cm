@@ -2,6 +2,8 @@
 
 final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 
+	const RESPAWN_TIMEOUT = 0.2;
+
 	/** @var array */
 	private $_children;
 
@@ -20,7 +22,7 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 				unset($this->_children[$pid]);
 				$this->_startWorker();
 			}
-			usleep(50000);
+			usleep(self::RESPAWN_TIMEOUT * 1000000);
 		}
 	}
 
