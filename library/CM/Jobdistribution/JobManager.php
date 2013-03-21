@@ -18,11 +18,13 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 			$this->_startWorker();
 		}
 		while (true) {
-			if (($pid = pcntl_wait($status, WNOHANG)) > 0) {
-				unset($this->_children[$pid]);
-				$this->_startWorker();
+			$pid = pcntl_wait($status);
+			if (-1 === $pid) {
+				throw new CM_Exception('Waiting on child processes failed');
 			}
+			unset($this->_children[$pid]);
 			usleep(self::RESPAWN_TIMEOUT * 1000000);
+			$this->_startWorker();
 		}
 	}
 
