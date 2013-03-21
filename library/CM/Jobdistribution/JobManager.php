@@ -1,6 +1,6 @@
 <?php
 
-final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
+class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 
 	const RESPAWN_TIMEOUT = 0.2;
 
