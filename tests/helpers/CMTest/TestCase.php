@@ -341,7 +341,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		try {
 			self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 		} catch (PHPUnit_Framework_AssertionFailedError $exception) {
-			self::assertTrue(true);
 			return;
 		}
 		self::fail($message);
