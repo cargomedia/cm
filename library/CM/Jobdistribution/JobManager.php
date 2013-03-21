@@ -31,7 +31,6 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 				$worker = new CM_Jobdistribution_JobWorker();
 				$worker->run();
 				exit;
-				break;
 			case -1: //failure
 				throw new CM_Exception('Could not fork Gearman Job Manager');
 			default: //parent
