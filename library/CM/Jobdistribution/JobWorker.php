@@ -6,6 +6,10 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 	private $_gearmanWorker;
 
 	final public function __construct() {
+		if (!extension_loaded('gearman')) {
+			throw new CM_Exception('Missing `gearman` extension');
+		}
+
 		$worker = $this->_getGearmanWorker();
 		$config = self::_getConfig();
 		foreach ($config->servers as $server) {
