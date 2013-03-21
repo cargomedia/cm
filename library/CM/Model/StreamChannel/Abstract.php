@@ -138,27 +138,6 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return self::factory($result['id'], $result['type']);
 	}
 
-	/**
-	 * @param string $key
-	 * @param int    $adapterType
-	 * @return CM_Model_StreamChannel_Abstract
-	 */
-	public static function getByKey($key, $adapterType) {
-		$streamChannel = static::findByKey($key, $adapterType);
-		if (!$streamChannel) {
-			$streamChannel = static::create(array('key' => $key, 'adapterType' => $adapterType));
-		}
-		return $streamChannel;
-	}
-
-	/**
-	 * @param int $type
-	 * @return CM_Paging_StreamChannel_Type
-	 */
-	public static function getAllByType($type) {
-		return new CM_Paging_StreamChannel_Type(array($type));
-	}
-
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];

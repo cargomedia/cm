@@ -292,14 +292,14 @@ var CM_App = CM_Class_Abstract.extend({
 			return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		$timeago: function(timestamp) {
 			return $(this.timeago(timestamp)).timeago();
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		timeago: function(timestamp) {
@@ -582,12 +582,14 @@ var CM_App = CM_Class_Abstract.extend({
 		_channelDispatchers: {},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} channelName
+		 * @param {Number} channelType
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(channel, namespace, callback, context) {
+		bind: function(channelName, channelType, namespace, callback, context) {
+			var channel = channelName + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
 			}
@@ -598,12 +600,14 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} channelName
+		 * @param {Number} channelType
 		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channel, namespace, callback, context) {
+		unbind: function(channelName, channelType, namespace, callback, context) {
+			var channel = channelName + ':' + channelType;
 			if (!this._channelDispatchers[channel]) {
 				return;
 			}
@@ -615,7 +619,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} channel
-		 * @return {Integer}
+		 * @return {Number}
 		 */
 		_getBindCount: function(channel) {
 			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._events) {
@@ -720,30 +724,30 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
+		 * @param {String} streamChannelKey
+		 * @param {Number} streamChannelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
-		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, callback, streamChannel, context) {
-			streamChannel = streamChannel || cm.options.stream.channel;
-			if (!streamChannel) {
+		bind: function(actionVerb, modelType, streamChannelKey, streamChannelType, callback, context) {
+			if (!streamChannelKey || !streamChannelType) {
 				return;
 			}
-			cm.stream.bind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.bind(streamChannelKey, streamChannelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
+		 * @param {String} streamChannelKey
+		 * @param {Number} streamChannelType
 		 * @param {Function} [callback]
-		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback, streamChannel, context) {
-			streamChannel = streamChannel || cm.options.stream.channel;
-			if (!streamChannel) {
+		unbind: function(actionVerb, modelType, streamChannelKey, streamChannelType, callback, context) {
+			if (!streamChannelKey || !streamChannelType) {
 				return;
 			}
-			cm.stream.unbind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.unbind(streamChannelKey, streamChannelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 

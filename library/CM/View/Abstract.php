@@ -55,7 +55,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 	 */
 	public static function stream(CM_Model_User $user, $event, $data = null) {
 		$namespace = get_called_class() . ':' . $event;
-		CM_Stream_Message::publish($user, $namespace, $data);
+		CM_Model_StreamChannel_Message_User::publish($user, $namespace, $data);
 	}
 
 	/**

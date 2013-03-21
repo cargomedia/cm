@@ -35,12 +35,13 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$channelsStatus = $this->_fetchStatus();
 		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
 		$channelsPersistenceArray = array();
-		/** @var $channel CM_Model_StreamChannel_Message */
-		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
-			if (!isset($channelsStatus[$channel->getKey()])) {
-				$channel->delete();
+		/** @var $channelData CM_Model_StreamChannel_Message */
+		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channelData) {
+			$channel = $channelData->getKey() . ':' . $channelData->getType();
+			if (!isset($channelsStatus[$channel])) {
+				$channelData->delete();
 			} else {
-				$channelsPersistenceArray[$channel->getKey()] = $channel;
+				$channelsPersistenceArray[$channel] = $channelData;
 			}
 		}
 
@@ -48,29 +49,31 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$streamsPersistenceArray = array();
 		/** @var $stream CM_Model_Stream_Subscribe */
 		foreach (new CM_Paging_StreamSubscribe_AdapterType($this->getType()) as $stream) {
-			$streamChannelKey = $stream->getStreamChannel()->getKey();
-			if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
+			$channelData = $stream->getStreamChannel();
+			$channel = $channelData->getKey() . ':' . $channelData->getType();
+			if (!isset($channelsStatus[$channel]) || !isset($channelsStatus[$channel]['subscribers'][$stream->getKey()])) {
 				$stream->delete();
 			} else {
-				$streamsPersistenceArray[$streamChannelKey . '/' . $stream->getKey()] = $stream;
+				$streamsPersistenceArray[$channel . '/' . $stream->getKey()] = $stream;
 			}
 		}
 
-		foreach ($channelsStatus as $channelKey => $channel) {
-			if (isset($channelsPersistenceArray[$channelKey])) {
-				$streamChannel = $channelsPersistenceArray[$channelKey];
+		foreach ($channelsStatus as $channel => $channelData) {
+			if (isset($channelsPersistenceArray[$channel])) {
+				$streamChannel = $channelsPersistenceArray[$channel];
 			} else {
-				$oldSubscribers = array_filter($channel['subscribers'], function ($subscriber) use ($startStampLimit) {
+				$oldSubscribers = array_filter($channelData['subscribers'], function ($subscriber) use ($startStampLimit) {
 					return $subscriber['subscribeStamp'] / 1000 <= $startStampLimit;
 				});
 				if (!count($oldSubscribers)) {
 					continue;
 				}
-				$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => $channelKey, 'adapterType' => $this->getType()));
+				list($channelKey, $channelType) = explode(':', $channel, 2);
+				$streamChannel = CM_Model_StreamChannel_Message::createType($channelType, array('key' => $channelKey, 'adapterType' => $this->getType()));
 			}
-			foreach ($channel['subscribers'] as $subscriber) {
+			foreach ($channelData['subscribers'] as $subscriber) {
 				$clientKey = (string) $subscriber['clientKey'];
-				if (!isset($streamsPersistenceArray[$streamChannel->getKey() . '/' . $clientKey])) {
+				if (!isset($streamsPersistenceArray[$channel . '/' . $clientKey])) {
 					$data = CM_Params::factory((array) $subscriber['data']);
 					$user = null;
 					if ($data->has('sessionId')) {
@@ -127,14 +130,24 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	/**
-	 * @param string             $channelKey
+	 * @param string             $channel
 	 * @param string             $clientKey
 	 * @param int                $start
 	 * @param int                $allowedUntil
 	 * @param CM_Model_User|null $user
+	 * @throws CM_Exception_Invalid
+	 * @internal param int $channelType
 	 */
-	protected function _subscribe($channelKey, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
-		$streamChannel = CM_Model_StreamChannel_Message::getByKey($channelKey, $this->getType());
+	protected function _subscribe($channel, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
+		list($channelKey, $channelType) = explode(':', $channel, 2);
+		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
+		if ($streamChannel && $streamChannel->getType() != $channelType) {
+			throw new CM_Exception_Invalid('streamChannel\'s `type` doesn\'t match excpected value');
+		}
+		if (!$streamChannel) {
+			/** @var $streamChannel CM_Model_StreamChannel_Message */
+			$streamChannel = CM_Model_StreamChannel_Message::createType($channelType, array('key' => $channelKey, 'adapterType' => $this->getType()));
+		}
 		$streamChannelSubscribes = $streamChannel->getStreamSubscribes();
 		if ($streamChannelSubscribes->findKey($clientKey)) {
 			return;
