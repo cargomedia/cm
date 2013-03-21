@@ -32,7 +32,7 @@ final class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 				$worker->run();
 				exit;
 			case -1: //failure
-				throw new CM_Exception('Could not fork Gearman Job Manager');
+				throw new CM_Exception('Could not fork');
 			default: //parent
 				$this->_children[$pid] = $pid;
 		}
