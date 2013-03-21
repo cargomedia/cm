@@ -90,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
-		$jsTime =  (time() - 3) * 1000;
+		$jsTime =  (time() - 10) * 1000;
 		for ($i = 0; $i < 2; $i++) {
 			$status = array(
 				'channel-foo' => array('subscribers' => array(
@@ -151,7 +151,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
 				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
 				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
-				$this->assertSameTime(time() - 3, $subscribe->getStart());
+				$this->assertSameTime(time() - 10, $subscribe->getStart());
 				$this->assertNull($subscribe->getAllowedUntil());
 			}
 		}
