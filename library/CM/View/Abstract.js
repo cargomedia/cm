@@ -385,7 +385,8 @@ var CM_View_Abstract = Backbone.View.extend({
 	createAudioPlayer: function(mp3Path, params) {
 		params = _.extend({loop: false, autoplay: false}, params);
 
-		var $element = $('<audio />').appendTo(this.$el);
+		var $element = $('<audio />');
+		$element.wrap('<div />');	// MediaElement needs a parent to show error msgs
 		$element.attr('src', cm.getUrlStatic('/audio/' + mp3Path));
 		$element.attr('autoplay', params.autoplay);
 		$element.attr('loop', params.loop);
@@ -393,7 +394,11 @@ var CM_View_Abstract = Backbone.View.extend({
 		return new MediaElement($element.get(0), {
 			startVolume: 1,
 			flashName: cm.getUrlStatic('/swf/flashmediaelement.swf'),
-			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap')
+			silverlightName: cm.getUrlStatic('/swf/silverlightmediaelement.xap'),
+			error: function() {
+				this.play = new Function();
+				this.pause = new Function();
+			}
 		});
 	},
 
