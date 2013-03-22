@@ -134,7 +134,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Boolean} skipDomRemoval OPTIONAL
+	 * @param {Boolean} [skipDomRemoval]
 	 */
 	remove: function(skipDomRemoval) {
 		this.trigger("destruct");
