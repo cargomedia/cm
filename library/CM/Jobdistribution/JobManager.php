@@ -5,15 +5,15 @@ class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 	const RESPAWN_TIMEOUT = 0.2;
 
 	/** @var array */
-	private $_children;
+	private $_children = array();
 
 	public function __construct() {
 		declare(ticks = 1);
 	}
 
 	public function start() {
-		pcntl_signal(SIGTERM, array($this, '_handleKill'));
-		pcntl_signal(SIGINT, array($this, '_handleKill'));
+		pcntl_signal(SIGTERM, array($this, '_handleKill'), false);
+		pcntl_signal(SIGINT, array($this, '_handleKill'), false);
 		while (count($this->_children) < $this->_getConfig()->workerCount) {
 			$this->_startWorker();
 		}
@@ -45,9 +45,9 @@ class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 	/**
 	 * @param int $signal
 	 */
-	private function _handleKill($signal) {
+	public function _handleKill($signal) {
 		foreach ($this->_children as $child) {
-			posix_kill($child, SIGKILL);
+			posix_kill($child, $signal);
 		}
 		exit;
 	}
