@@ -25,6 +25,11 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	unset($params['icon']);
 
+	if (isset($params['data'])) {
+		$data= (array) $params['data'];
+	}
+	unset($params['data']);
+
 	$href = 'javascript:;';
 	if (isset($params['page'])) {
 		$href = smarty_function_linkUrl($params, $template);
@@ -47,7 +52,13 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	if (!empty($title)) {
 		$titleAttr = ' title="' . $title . '"';
 	}
-	$html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . '>' . $html . '</a>';
+	$dataAttr = '';
+	if (!empty($data)) {
+		foreach ($data as $name => $value) {
+			$dataAttr .= ' data-'. $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+		}
+	}
+	$html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
 
 	return $html;
 }
