@@ -318,10 +318,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
 		if ($expected instanceof CM_Paging_Abstract) {
-			$expected = $expected->toArray();
+			$expected = $expected->getItems();
 		}
 		if ($actual instanceof CM_Paging_Abstract) {
-			$actual = $actual->toArray();
+			$actual = $actual->getItems();
 		}
 		if (is_array($expected) && is_array($actual)) {
 			self::assertSame(array_keys($expected), array_keys($actual), $message);
