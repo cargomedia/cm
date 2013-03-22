@@ -349,8 +349,7 @@ CREATE TABLE `cm_streamChannel` (
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  UNIQUE KEY `key-adapterType` (`key`,`adapterType`),
+  UNIQUE KEY `adapterType-key` (`adapterType`, `key`),
   KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
