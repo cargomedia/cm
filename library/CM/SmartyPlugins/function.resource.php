@@ -30,8 +30,8 @@ function smarty_helper_resource_internal(CM_Render $render) {
 
 	// Get all static javascript files
 	foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
-		$publicPath = 'static/js/' . $namespace . '.js';
-		if (file_exists(DIR_PUBLIC . $publicPath)) {
+		$publicPath = CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/' . $namespace . '.js';
+		if (file_exists(DIR_ROOT . $publicPath)) {
 			$paths[] = '/' . $publicPath;
 		}
 	}
