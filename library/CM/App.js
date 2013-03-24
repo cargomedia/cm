@@ -618,10 +618,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {Integer}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._events) {
+			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._callbacks) {
 				return 0;
 			}
-			return _.size(this._channelDispatchers[channel]._events);
+			return _.size(this._channelDispatchers[channel]._callbacks);
 		},
 
 		/**
