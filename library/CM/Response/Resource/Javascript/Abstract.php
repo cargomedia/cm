@@ -18,7 +18,6 @@ abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Reso
 	protected function _minify($content) {
 		$md5 = md5($content);
 		$cacheKey = CM_CacheConst::Response_Resource_JS . '_md5:' . $md5;
-
 		if (false === ($contentMinified = CM_CacheLocal::get($cacheKey))) {
 			$lock = new CM_Lock($cacheKey);
 			$lock->waitUntilUnlocked();
