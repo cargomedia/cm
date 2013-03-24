@@ -39,7 +39,7 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	$html = implode(', ', $parts);
 
 	if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
-		$html .= ' <img class="flag" src="' . $render->getUrlStatic('/img/flags/' . strtolower($country->getAbbreviation()) . '.png') . '" />';
+		$html .= ' <img class="flag" src="' . $render->getUrlResource('layout', 'flags/' . strtolower($country->getAbbreviation()) . '.png') . '" />';
 	}
 	return $html;
 }
