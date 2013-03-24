@@ -1,21 +1,10 @@
 <?php
 
-class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
+class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract {
 
 	protected function _process() {
 		switch ($this->getRequest()->getPath()) {
-			case '/library.css':
-				$content = '';
-				foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
-					$content .= new CM_File($path);
-				}
-
-				foreach (CM_Util::rglob('*.less', DIR_PUBLIC . 'static/css/library/') as $path) {
-					$css = new CM_Css(new CM_File($path));
-					$content .= $css->compile($this->getRender());
-				}
-				break;
-			case '/internal.css':
+			case '/all.css':
 				$css = new CM_Css();
 
 				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
@@ -62,20 +51,12 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 					}
 				}
 				$content = $css->compile($this->getRender());
-
 				$content .= $this->_getCssSmiley();
+				$this->_setContent($content);
 				break;
 			default:
-				if (!file_exists(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath())) {
-					throw new CM_Exception_Invalid('Invalid filename: `' . $this->getRequest()->getPath() . '`');
-				}
-				$content = new CM_File(DIR_PUBLIC . 'static/css' . $this->getRequest()->getPath());
-				break;
+				throw new CM_Exception_Invalid();
 		}
-
-		$this->enableCache();
-		$this->setHeader('Content-Type', 'text/css');
-		$this->_setContent($content);
 	}
 
 	/**
@@ -92,6 +73,6 @@ class CM_Response_Resource_CSS extends CM_Response_Resource_Abstract {
 	}
 
 	public static function match(CM_Request_Abstract $request) {
-		return $request->getPathPart(0) === 'css';
+		return $request->getPathPart(0) === 'library-css';
 	}
 }
