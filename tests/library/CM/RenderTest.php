@@ -83,15 +83,15 @@ class CM_RenderTest extends CMTest_TestCase {
 		$render = new CM_Render($this->_getSite());
 		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
 		$this->assertSame('http://www.foo.com', $render->getUrlResource());
-		$this->assertSame('http://www.foo.com', $render->getUrlResource('img'));
+		$this->assertSame('http://www.foo.com', $render->getUrlResource('layout'));
 		$this->assertSame('http://www.foo.com', $render->getUrlResource(null, 'foo/bar.jpg'));
-		$this->assertSame('http://www.foo.com/img/1/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('img', 'foo/bar.jpg'));
+		$this->assertSame('http://www.foo.com/img/1/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
 		CM_Config::get()->CM_Render->cdnResource = true;
 		$this->assertSame('http://www.cdn.com', $render->getUrlResource());
-		$this->assertSame('http://www.cdn.com', $render->getUrlResource('img'));
+		$this->assertSame('http://www.cdn.com', $render->getUrlResource('layout'));
 		$this->assertSame('http://www.cdn.com', $render->getUrlResource(null, 'foo/bar.jpg'));
-		$this->assertSame('http://www.cdn.com/img/1/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('img', 'foo/bar.jpg'));
-		$this->assertSame('http://www.cdn.com/img/1/' . $releaseStamp . '/0', $render->getUrlResource('img', '0'));
+		$this->assertSame('http://www.cdn.com/img/1/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+		$this->assertSame('http://www.cdn.com/img/1/' . $releaseStamp . '/0', $render->getUrlResource('layout', '0'));
 		$this->assertSame('http://www.cdn.com/0/1/' . $releaseStamp . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
 	}
 

@@ -16,7 +16,7 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 		$responses['/vendor-css'] = 'CM_Response_Resource_Css_Vendor';
 		$responses['/library-js'] = 'CM_Response_Resource_Javascript_Library';
 		$responses['/vendor-js'] = 'CM_Response_Resource_Javascript_Vendor';
-		$responses['/img'] = 'CM_Response_Resource_Img';
+		$responses['/layout'] = 'CM_Response_Resource_Layout';
 		$responses['/ajax'] = 'CM_Response_View_Ajax';
 		$responses['/form'] = 'CM_Response_View_Form';
 		$responses['/homepage'] = 'CM_Response_Page';
