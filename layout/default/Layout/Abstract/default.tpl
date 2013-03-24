@@ -14,9 +14,9 @@
 		<link rel="apple-touch-icon" sizes="144x144" href="{imgUrl path='touch-icon-144.png'}" />
 		<link rel="shortcut icon" href="{imgUrl path='favicon.ico'}">
 		<title>{$title|escape}</title>
-		{resource file='library.css'}
-		{resource file='internal.css'}
-		{resource file='init.js'}
+		{resourceCss file='all.css' type="vendor"}
+		{resourceCss file='all.css' type="library"}
+		{resourceJs file='init.js' type="vendor"}
 		{block name='head'}{/block}
 	</head>
 	<body id="{$viewObj->getAutoId()}" class="{$viewObj->getClassHierarchy()|implode:' '}">
@@ -27,10 +27,10 @@
 			{/block}
 		</div>
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
-		{resource file='library.js'}
-		{resource file='internal.js'}
+		{resourceJs file='library.js' type="vendor"}
+		{resourceJs file='all.js' type="library"}
 		{if $render->getLanguage()}
-			{resource file="translations/{CM_Model_Language::getVersionJavascript()}.js"}
+			{resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
 		{/if}
 		{$render->getJs()->renderScripts()}
 		{$render->getJs()->getTracking()->getHtml()}
