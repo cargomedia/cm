@@ -7,7 +7,7 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 			case '/library.js':
 				$content = '';
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
-					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/library';
+					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/library/';
 					foreach (CM_Util::rglob('*.js', $libraryPath) as $path) {
 						$content .= new CM_File($path) . ';' . PHP_EOL;
 					}
@@ -17,7 +17,7 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 			case '/init.js':
 				$content = '';
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
-					$initPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/js/init';
+					$initPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/init/';
 					foreach (CM_Util::rglob('*.js', $initPath) as $path) {
 						$content .= new CM_File($path) . ';' . PHP_EOL;
 					}

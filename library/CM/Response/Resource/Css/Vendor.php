@@ -6,13 +6,15 @@ class CM_Response_Resource_Css_Vendor extends CM_Response_Resource_Css_Abstract 
 		switch ($this->getRequest()->getPath()) {
 			case '/all.css':
 				$content = '';
-				foreach (CM_Util::rglob('*.css', DIR_PUBLIC . 'static/css/library/') as $path) {
-					$content .= new CM_File($path);
-				}
-
-				foreach (CM_Util::rglob('*.less', DIR_PUBLIC . 'static/css/library/') as $path) {
-					$css = new CM_Css(new CM_File($path));
-					$content .= $css->compile($this->getRender());
+				foreach ($this->getSite()->getNamespaces() as $namespace) {
+					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/';
+					foreach (CM_Util::rglob('*.css', $libraryPath) as $path) {
+						$content .= new CM_File($path) . ';' . PHP_EOL;
+					}
+					foreach (CM_Util::rglob('*.less', $libraryPath) as $path) {
+						$css = new CM_Css(new CM_File($path));
+						$content .= $css->compile($this->getRender());
+					}
 				}
 				$this->_setContent($content);
 				break;
