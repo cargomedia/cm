@@ -6,7 +6,7 @@ class CM_Response_Resource_Css_Vendor extends CM_Response_Resource_Css_Abstract 
 		switch ($this->getRequest()->getPath()) {
 			case '/all.css':
 				$content = '';
-				foreach ($this->getSite()->getNamespaces() as $namespace) {
+				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
 					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/';
 					foreach (CM_Util::rglob('*.css', $libraryPath) as $path) {
 						$content .= new CM_File($path);
