@@ -6,8 +6,6 @@ function smarty_function_resourceUrl(array $params, Smarty_Internal_Template $te
 	$path = (string) $params['path'];
 	$type = (string) $params['type'];
 	switch ($type) {
-		case 'vendor':
-		case 'library':
 		case 'layout':
 			return $render->getUrlResource($type, $path);
 		case 'static':
