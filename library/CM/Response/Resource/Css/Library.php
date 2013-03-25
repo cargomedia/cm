@@ -16,8 +16,9 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 					}
 				}
 
-				$path = DIR_PUBLIC . 'static/css/library/icon.less';
-				$css->add(new CM_Css(new CM_File($path)));
+				if (CM_File::exists($path = DIR_PUBLIC . 'static/css/library/icon.less')) {
+					$css->add(new CM_Css(new CM_File($path)));
+				}
 
 				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
 					foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
@@ -58,7 +59,8 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 				$this->_setContent($content);
 				break;
 			default:
-				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');;
+				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
+				;
 		}
 	}
 
