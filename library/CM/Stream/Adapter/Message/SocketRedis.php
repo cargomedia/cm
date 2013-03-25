@@ -48,10 +48,10 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$streamsPersistenceArray = array();
 		/** @var $stream CM_Model_Stream_Subscribe */
 		foreach (new CM_Paging_StreamSubscribe_AdapterType($this->getType()) as $stream) {
-			// For cases when streamChannel has been deleted during this iteration
 			try {
 				$streamChannelKey = $stream->getStreamChannel()->getKey();
 			} catch (CM_Exception_Nonexistent $e) {
+				// For cases when streamChannel has been deleted during this iteration
 				continue;
 			}
 			if (!isset($channelsStatus[$streamChannelKey]) || !isset($channelsStatus[$streamChannelKey]['subscribers'][$stream->getKey()])) {
