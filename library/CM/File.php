@@ -87,7 +87,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function getExists() {
-		return is_file($this->getPath());
+		return self::exists($this->getPath());
 	}
 
 	/**
@@ -155,7 +155,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 */
 	public function delete() {
-		if (!file_exists($this->getPath())) {
+		if (!self::exists($this->getPath())) {
 			return;
 		}
 		if (is_dir($this->getPath())) {

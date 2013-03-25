@@ -24,7 +24,7 @@ class CM_Runner {
 	 * @throws CM_Exception
 	 */
 	public function run() {
-		if (file_exists($this->_pidPath)) {
+		if (CM_File::exists($this->_pidPath)) {
 			$pidFile = new CM_File($this->_pidPath);
 			$pidOld = $pidFile->read();
 			if (ctype_digit($pidOld) && posix_getsid($pidOld) !== false) {

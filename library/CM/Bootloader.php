@@ -40,14 +40,11 @@ class CM_Bootloader {
 
 	public function autoloader() {
 		$composerAutoloader = DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-		if (is_file($composerAutoloader)) {
-			require_once $composerAutoloader;
-		}
 
 		spl_autoload_register(function ($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
 			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className, true)) . 'library/' . $relativePath;
-			if (is_file($path)) {
+			if (CM_File::exists($path)) {
 				require_once $path;
 				return;
 			}
@@ -266,7 +263,7 @@ class CM_Bootloader {
 	private function _getNamespacePathsComposer() {
 		$namespacePaths = array();
 		$composerFilePath = DIR_ROOT . 'composer.json';
-		if (!file_exists($composerFilePath)) {
+		if (!CM_File::exists($composerFilePath)) {
 			return $namespacePaths;
 		}
 		$composerJson = file_get_contents($composerFilePath);

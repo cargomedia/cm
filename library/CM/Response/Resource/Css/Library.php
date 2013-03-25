@@ -10,7 +10,7 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
 					foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
 						$path = $this->getRender()->getThemeDir(true, $theme, $namespace) . 'variables.less';
-						if (is_file($path)) {
+						if (CM_File::exists($path)) {
 							$css->add(new CM_Css(new CM_File($path)));
 						}
 					}

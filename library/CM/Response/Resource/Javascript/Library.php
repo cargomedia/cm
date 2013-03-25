@@ -39,7 +39,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 	private function _getAppClassName() {
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
 			$appClassFilename = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'library/' . $namespace . '/App.js';
-			if (file_exists($appClassFilename)) {
+			if (CM_File::exists($appClassFilename)) {
 				return $namespace . '_App';
 			}
 		}
@@ -56,7 +56,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 
 		// TODO: Move namespace libraries out of here
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
-			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
+			if (CM_File::exists($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
 				$paths[] = $path;
 			}
 		}
