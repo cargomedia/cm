@@ -582,14 +582,14 @@ var CM_App = CM_Class_Abstract.extend({
 		_channelDispatchers: {},
 
 		/**
-		 * @param {String} channelName
+		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(channelName, channelType, namespace, callback, context) {
-			var channel = channelName + ':' + channelType;
+		bind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
 			}
@@ -600,14 +600,14 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} channelName
+		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channelName, channelType, namespace, callback, context) {
-			var channel = channelName + ':' + channelType;
+		unbind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!this._channelDispatchers[channel]) {
 				return;
 			}
@@ -724,30 +724,30 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
-		 * @param {String} streamChannelKey
-		 * @param {Number} streamChannelType
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, streamChannelKey, streamChannelType, callback, context) {
-			if (!streamChannelKey || !streamChannelType) {
+		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			if (!channelKey || !channelType) {
 				return;
 			}
-			cm.stream.bind(streamChannelKey, streamChannelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
-		 * @param {String} streamChannelKey
-		 * @param {Number} streamChannelType
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, streamChannelKey, streamChannelType, callback, context) {
-			if (!streamChannelKey || !streamChannelType) {
+		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			if (!channelKey || !channelType) {
 				return;
 			}
-			cm.stream.unbind(streamChannelKey, streamChannelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 
