@@ -16,7 +16,7 @@
 		<title>{$title|escape}</title>
 		{resourceCss file='all.css' type="vendor"}
 		{resourceCss file='all.css' type="library"}
-		{resourceJs file='init.js' type="vendor"}
+		{resourceJs file='before-body.js' type="vendor"}
 		{block name='head'}{/block}
 	</head>
 	<body id="{$viewObj->getAutoId()}" class="{$viewObj->getClassHierarchy()|implode:' '}">
@@ -27,7 +27,7 @@
 			{/block}
 		</div>
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
-		{resourceJs file='library.js' type="vendor"}
+		{resourceJs file='after-body.js' type="vendor"}
 		{resourceJs file='all.js' type="library"}
 		{if $render->getLanguage()}
 			{resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
