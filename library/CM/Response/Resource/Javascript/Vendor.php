@@ -4,21 +4,21 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 
 	protected function _process() {
 		switch ($this->getRequest()->getPath()) {
-			case '/library.js':
+			case '/before-body.js':
 				$content = '';
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
-					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/library/';
-					foreach (CM_Util::rglob('*.js', $libraryPath) as $path) {
+					$initPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/before-body/';
+					foreach (CM_Util::rglob('*.js', $initPath) as $path) {
 						$content .= new CM_File($path) . ';' . PHP_EOL;
 					}
 				}
 				$this->_setContent($content);
 				break;
-			case '/init.js':
+			case '/after-body.js':
 				$content = '';
 				foreach ($this->getSite()->getNamespaces() as $namespace) {
-					$initPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/init/';
-					foreach (CM_Util::rglob('*.js', $initPath) as $path) {
+					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/after-body/';
+					foreach (CM_Util::rglob('*.js', $libraryPath) as $path) {
 						$content .= new CM_File($path) . ';' . PHP_EOL;
 					}
 				}
@@ -29,8 +29,7 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 		}
 	}
 
-	public
-	static function match(CM_Request_Abstract $request) {
+	public static function match(CM_Request_Abstract $request) {
 		return $request->getPathPart(0) === 'vendor-js';
 	}
 }
