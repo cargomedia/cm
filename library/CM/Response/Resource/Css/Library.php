@@ -60,7 +60,6 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 				break;
 			default:
 				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
-				;
 		}
 	}
 
