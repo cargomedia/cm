@@ -29,7 +29,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 			$this->_setContent('cm.language.setAll(' . CM_Params::encode($translations, true) . ');');
 			return;
 		}
-		throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
+		throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, null, CM_Exception::WARN);
 	}
 
 	/**
