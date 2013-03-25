@@ -5,6 +5,8 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 	protected function _process() {
 		if ($this->getRequest()->getPath() === '/library.js') {
 			$paths = self::getIncludedPaths($this->getSite());
+
+			// TODO: Remove internal.js from here (autogenerate it)
 			$paths[] = DIR_ROOT . 'resources/config/js/internal.js';
 			$content = '';
 			foreach ($paths as $path) {
@@ -25,7 +27,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 			$this->_setContent('cm.language.setAll(' . CM_Params::encode($translations, true) . ');');
 			return;
 		}
-		throw new CM_Exception_Invalid();
+		throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
 	}
 
 	/**
@@ -36,7 +38,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 		$pathsUnsorted = CM_Util::rglobLibraries('*.js', $site);
 		$paths = array_keys(CM_Util::getClasses($pathsUnsorted));
 
-		// TODO: Move namespace libraries and remove internal.js (autogenerate it) from here
+		// TODO: Move namespace libraries out of here
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
 			if (is_file($path = DIR_PUBLIC . 'static/js/' . $namespace . '.js')) {
 				$paths[] = $path;

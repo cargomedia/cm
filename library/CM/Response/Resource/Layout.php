@@ -3,20 +3,22 @@
 class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
 
 	protected function _process() {
-		$file = null;
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
 			if ($path = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath(), $namespace, true, false)) {
-				$file = new CM_File($path);
-				break;
+				$this->_setContent(new CM_File($path));
+				return;
 			}
 		}
+		throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
+	}
 
-		if (!$file) {
-			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
-		}
+	/**
+	 * @param CM_File $file
+	 */
+	protected function _setContent(CM_File $file) {
 		$this->enableCache();
 		$this->setHeader('Content-Type', $file->getMimeType());
-		$this->_setContent($file->read());
+		parent::_setContent($file->read());
 	}
 
 	public static function match(CM_Request_Abstract $request) {

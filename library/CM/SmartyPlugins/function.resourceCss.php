@@ -5,9 +5,11 @@ function smarty_function_resourceCss(array $params, Smarty_Internal_Template $te
 	$render = $template->smarty->getTemplateVars('render');
 	$type = (string) $params['type'];
 	$file = (string) $params['file'];
+
 	if (!in_array($type, array('vendor', 'library'))) {
-		throw new CM_Exception_Invalid();
+		throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
 	}
+
 	$url = $render->getUrlResource($type . '-css', $file);
 	return '<link rel="stylesheet" type="text/css" href="' . $url . '" />';
 }

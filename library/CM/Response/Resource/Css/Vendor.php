@@ -19,7 +19,7 @@ class CM_Response_Resource_Css_Vendor extends CM_Response_Resource_Css_Abstract 
 				$this->_setContent($content);
 				break;
 			default:
-				throw new CM_Exception_Invalid();
+				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
 		}
 	}
 

@@ -25,8 +25,7 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 				$this->_setContent($content);
 				break;
 			default:
-				throw new CM_Exception_Invalid();
-				break;
+				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
 		}
 	}
 
