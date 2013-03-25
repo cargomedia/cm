@@ -288,6 +288,13 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
 	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
+		if (!channelKey && !channelType) {
+			channelKey = cm.options.stream.channel.key;
+			channelType = cm.options.stream.channel.type;
+		}
+		if (!channelKey || !channelType) {
+			return;
+		}
 		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
 		};
@@ -493,10 +500,6 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Number} [channelType]
 	 */
 	_bindActions: function(actions, channelKey, channelType) {
-		if (!channelKey && !channelType) {
-			channelKey = cm.options.stream.channel.key;
-			channelType = cm.options.stream.channel.type;
-		}
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
