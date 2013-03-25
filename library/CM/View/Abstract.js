@@ -283,17 +283,17 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
-	 * @param {String} [streamChannelKey]
-	 * @param {Number} [streamChannelType]
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, streamChannelKey, streamChannelType, callback) {
+	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
 		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
 		};
-		cm.action.bind(actionVerb, modelType, streamChannelKey, streamChannelType, callbackResponse, this);
+		cm.action.bind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, streamChannelKey, streamChannelType, callbackResponse, this);
+			cm.action.unbind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		});
 	},
 
@@ -489,13 +489,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
-	 * @param {String} [streamChannelKey]
-	 * @param {Number} [streamChannelType]
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 */
-	_bindActions: function(actions, streamChannelKey, streamChannelType) {
-		if (!streamChannelKey && !streamChannelType) {
-			streamChannelKey = cm.options.stream.channel.key;
-			streamChannelType = cm.options.stream.channel.type;
+	_bindActions: function(actions, channelKey, channelType) {
+		if (!channelKey && !channelType) {
+			channelKey = cm.options.stream.channel.key;
+			channelType = cm.options.stream.channel.type;
 		}
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
@@ -503,7 +503,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, streamChannelKey, streamChannelType, callback);
+				this.bindAction(actionVerb, modelType, channelKey, channelType, callback);
 			}, this);
 		}, this);
 	},
