@@ -87,7 +87,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function getExists() {
-		return self::exists($this->getPath());
+		return static::exists($this->getPath());
 	}
 
 	/**
