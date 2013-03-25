@@ -39,8 +39,6 @@ class CM_Bootloader {
 	}
 
 	public function autoloader() {
-		$composerAutoloader = DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
 		spl_autoload_register(function ($className) {
 			$relativePath = str_replace('_', '/', $className) . '.php';
 			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className, true)) . 'library/' . $relativePath;
