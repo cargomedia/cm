@@ -16,6 +16,9 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 					}
 				}
 
+				$path = DIR_PUBLIC . 'static/css/library/icon.less';
+				$css->add(new CM_Css(new CM_File($path)));
+
 				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
 					foreach (array_reverse($this->getSite()->getThemes()) as $theme) {
 						foreach (CM_Util::rglob('*.less', $this->getRender()->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
