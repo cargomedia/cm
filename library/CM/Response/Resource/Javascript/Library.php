@@ -4,14 +4,16 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 
 	protected function _process() {
 		if ($this->getRequest()->getPath() === '/library.js') {
-			$paths = self::getIncludedPaths($this->getSite());
-
-			// TODO: Remove internal.js from here (autogenerate it)
-			$paths[] = DIR_ROOT . 'resources/config/js/internal.js';
 			$content = '';
-			foreach ($paths as $path) {
-				$content .= new CM_File($path);
+			$query = $this->getRequest()->getQuery();
+			if (empty($query['debug'])) {
+				$paths = self::getIncludedPaths($this->getSite());
+				foreach ($paths as $path) {
+					$content .= new CM_File($path);
+				}
 			}
+			$content .= 'var app = cm = new ' . $this->_getAppClassName() . '();' . PHP_EOL;
+			$content .= new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
 			$this->_setContent($content);
 			return;
 		}
@@ -28,6 +30,20 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 			return;
 		}
 		throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided');
+	}
+
+	/**
+	 * @throws CM_Exception_Invalid
+	 * @return string
+	 */
+	private function _getAppClassName() {
+		foreach ($this->getSite()->getNamespaces() as $namespace) {
+			$appClassFilename = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'library/' . $namespace . '/App.js';
+			if (file_exists($appClassFilename)) {
+				return $namespace . '_App';
+			}
+		}
+		throw new CM_Exception_Invalid('No App class found');
 	}
 
 	/**

@@ -28,7 +28,7 @@
 		</div>
 		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
 		{resourceJs file='after-body.js' type="vendor"}
-		{resourceJs file='all.js' type="library"}
+		{resourceJs file='library.js' type="library"}
 		{if $render->getLanguage()}
 			{resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
 		{/if}

@@ -5,22 +5,32 @@ function smarty_function_resourceJs(array $params, Smarty_Internal_Template $tem
 	$render = $template->smarty->getTemplateVars('render');
 	$type = (string) $params['type'];
 	$file = (string) $params['file'];
+	return smarty_helper_resourceJs($type, $file, $render);
+}
 
+/**
+ * @param string    $type
+ * @param string    $file
+ * @param CM_Render $render
+ * @return string
+ * @throws CM_Exception_Invalid
+ */
+function smarty_helper_resourceJs($type, $file, $render) {
 	if (!in_array($type, array('vendor', 'library'))) {
 		throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
 	}
-	if ($render->isDebug() && $type === 'library' && $file === 'all.js') {
-		return smarty_helper_resource_internal($render);
+	if ($render->isDebug() && $type === 'library' && $file === 'library.js') {
+		return smarty_helper_resourceJs_libraryDebug($render);
 	}
 	$url = $render->getUrlResource($type . '-js', $file);
-	return '<script type="text/javascript" src="' . $url . '"></script>';
+	return '<script type="text/javascript" src="' . $url . '"></script>' . PHP_EOL;
 }
 
 /**
  * @param CM_Render $render
  * @return string
  */
-function smarty_helper_resource_internal(CM_Render $render) {
+function smarty_helper_resourceJs_libraryDebug(CM_Render $render) {
 	$paths = CM_Response_Resource_Javascript_Library::getIncludedPaths($render->getSite());
 	$content = '';
 	foreach ($paths as $path) {
@@ -28,6 +38,6 @@ function smarty_helper_resource_internal(CM_Render $render) {
 		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
 		$content .= '<script type="text/javascript" src="' . $path . '"></script>' . PHP_EOL;
 	}
-	$content .= '<script type="text/javascript">' . new CM_File(DIR_ROOT . 'resources/config/js/internal.js') . '</script>' . PHP_EOL;
+	$content .= smarty_helper_resourceJs('library', 'library.js?debug=true', $render);
 	return $content;
 }
