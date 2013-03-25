@@ -12,9 +12,11 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 		$responses['/emailtracking'] = 'CM_Response_EmailTracking';
 		$responses['/rpc'] = 'CM_Response_RPC';
 		$responses['/upload'] = 'CM_Response_Upload';
-		$responses['/css'] = 'CM_Response_Resource_CSS';
-		$responses['/img'] = 'CM_Response_Resource_Img';
-		$responses['/js'] = 'CM_Response_Resource_JS';
+		$responses['/library-css'] = 'CM_Response_Resource_Css_Library';
+		$responses['/vendor-css'] = 'CM_Response_Resource_Css_Vendor';
+		$responses['/library-js'] = 'CM_Response_Resource_Javascript_Library';
+		$responses['/vendor-js'] = 'CM_Response_Resource_Javascript_Vendor';
+		$responses['/layout'] = 'CM_Response_Resource_Layout';
 		$responses['/ajax'] = 'CM_Response_View_Ajax';
 		$responses['/form'] = 'CM_Response_View_Form';
 		$responses['/homepage'] = 'CM_Response_Page';

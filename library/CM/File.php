@@ -87,7 +87,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function getExists() {
-		return is_file($this->getPath());
+		return static::exists($this->getPath());
 	}
 
 	/**
@@ -155,15 +155,11 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 */
 	public function delete() {
-		if (!file_exists($this->getPath())) {
+		if (!$this->getExists()) {
 			return;
 		}
-		if (is_dir($this->getPath())) {
-			CM_Util::rmDir($this->getPath());
-		} else {
-			if (!@unlink($this->getPath())) {
-				throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
-			}
+		if (!@unlink($this->getPath())) {
+			throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
 		}
 	}
 

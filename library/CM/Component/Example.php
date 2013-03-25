@@ -73,7 +73,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 		$style = '';
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
 			$path = CM_Util::getNamespacePath($namespace) . 'layout/default/variables.less';
-			if (file_exists($path)) {
+			if (CM_File::exists($path)) {
 				$file = new CM_File($path);
 				$style .= $file . PHP_EOL;
 			}
