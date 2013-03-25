@@ -105,7 +105,7 @@ EOD;
 		$lessc->registerFunction('image', function ($arg) use($render) {
 			/** @var CM_Render $render */
 			list($type, $delimiter, $values) = $arg;
-			return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('img', $values[0]))));
+			return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
 		});
 		$lessc->registerFunction('urlFont', function ($arg) use($render) {
 			/** @var CM_Render $render */
