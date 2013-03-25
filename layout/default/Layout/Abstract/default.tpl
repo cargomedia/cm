@@ -6,13 +6,13 @@
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
 		<meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
-		<meta name="msapplication-TileImage" content="{resourceUrl path='tileImage.png' type='layout'}">
+		<meta name="msapplication-TileImage" content="{resourceUrl path='img/tileImage.png' type='layout'}">
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<link rel="apple-touch-icon" href="{resourceUrl path='touch-icon-57.png' type='layout'}" />
-		<link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='touch-icon-72.png' type='layout'}" />
-		<link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='touch-icon-114.png' type='layout'}" />
-		<link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='touch-icon-144.png' type='layout'}" />
-		<link rel="shortcut icon" href="{resourceUrl path='favicon.ico' type='layout'}">
+		<link rel="apple-touch-icon" href="{resourceUrl path='img/touch-icon-57.png' type='layout'}" />
+		<link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/touch-icon-72.png' type='layout'}" />
+		<link rel="apple-touch-icon" sizes="114x114" href="{resourceUrl path='img/touch-icon-114.png' type='layout'}" />
+		<link rel="apple-touch-icon" sizes="144x144" href="{resourceUrl path='img/touch-icon-144.png' type='layout'}" />
+		<link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}">
 		<title>{$title|escape}</title>
 		{resourceCss file='all.css' type="vendor"}
 		{resourceCss file='all.css' type="library"}
