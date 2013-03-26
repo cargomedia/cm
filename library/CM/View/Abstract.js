@@ -297,11 +297,11 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
 		if (!channelKey && !channelType) {
+			if (!cm.options.stream.channel.key || !cm.options.stream.channel.type) {
+				return;
+			}
 			channelKey = cm.options.stream.channel.key;
 			channelType = cm.options.stream.channel.type;
-		}
-		if (!channelKey || !channelType) {
-			return;
 		}
 		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
