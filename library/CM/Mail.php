@@ -63,8 +63,8 @@ class CM_Mail extends CM_View_Abstract {
 			}
 		}
 
-		if ($recipient instanceof CM_Model_User) {
-			$site = $recipient->getSite();
+		if ($this->_recipient) {
+			$site = $this->_recipient->getSite();
 		} else {
 			$site = CM_Site_Abstract::factory();
 		}
