@@ -21,7 +21,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
 					$emoticons['htmls'][] =
-							'<img src="' . $render->getUrlResource('img', 'emoticon/' . $emoticon['file']) . '" class="emoticon emoticon-' .
+							'<img src="' . $render->getUrlResource('layout', 'img/emoticon/' . $emoticon['file']) . '" class="emoticon emoticon-' .
 									$emoticon['id'] . '" title="' . $emoticon['code'] . '" />';
 				}
 			}

@@ -46,7 +46,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		$emoticonList = array();
 
 		foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-			$emoticonPath = CM_Util::getNamespacePath($namespace) . 'layout/default/img/emoticon/';
+			$emoticonPath = CM_Util::getNamespacePath($namespace) . 'layout/default/resource/img/emoticon/';
 			$paths = glob($emoticonPath . '*');
 			foreach ($paths as $path) {
 				$file = new CM_File($path);
