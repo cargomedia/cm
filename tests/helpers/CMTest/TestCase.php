@@ -109,7 +109,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param string|null $urlCdn
 	 * @return CM_Site_Abstract
 	 */
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
 		if (isset($this->_siteType)) {
 			return CM_Site_Abstract::factory($this->_siteType);
 		}
@@ -118,6 +118,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		}
 		$url = is_null($url) ? null : (string) $url;
 		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
+		$name = is_null($name) ? null : (string) $name;
+		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 		/** @var CM_Site_Abstract $site */
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
@@ -125,6 +127,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		CM_Config::get()->CM_Site_Mock = new stdClass;
 		CM_Config::get()->CM_Site_Mock->url = $url;
 		CM_Config::get()->CM_Site_Mock->urlCdn = $urlCdn;
+		CM_Config::get()->CM_Site_Mock->name = $name;
+		CM_Config::get()->CM_Site_Mock->emailAddress = $emailAddress;
 		return $site;
 	}
 

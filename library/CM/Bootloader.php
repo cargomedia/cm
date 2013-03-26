@@ -38,17 +38,6 @@ class CM_Bootloader {
 		umask(0);
 	}
 
-	public function autoloader() {
-		spl_autoload_register(function ($className) {
-			$relativePath = str_replace('_', '/', $className) . '.php';
-			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className, true)) . 'library/' . $relativePath;
-			if (CM_File::exists($path)) {
-				require_once $path;
-				return;
-			}
-		});
-	}
-
 	public function exceptionHandler() {
 		set_exception_handler(function(Exception $exception) {
 			if (!headers_sent()) {
