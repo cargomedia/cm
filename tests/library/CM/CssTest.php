@@ -61,7 +61,7 @@ EOD;
 
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
 		$expected = <<<EOD
 background: url('$url') no-repeat 66px 7px;
 EOD;
@@ -70,7 +70,7 @@ EOD;
 
 	public function testBackgroundImage() {
 		$css = new CM_Css("background-image: image('icon/mailbox_read.png');");
-		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
 		$expected = <<<EOD
 background-image: url('$url');
 EOD;

@@ -46,11 +46,11 @@ class CM_FileTest extends CMTest_TestCase {
 	public function testDelete() {
 		$file = new CM_File($this->_testFilePath);
 
-		$this->assertTrue(file_exists($this->_testFilePath));
+		$this->assertTrue(CM_File::exists($this->_testFilePath));
 
 		$file->delete();
 
-		$this->assertFalse(file_exists($this->_testFilePath));
+		$this->assertFalse(CM_File::exists($this->_testFilePath));
 
 		// Should do nothing if already deleted
 		$file->delete();
@@ -77,10 +77,10 @@ class CM_FileTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		$path = DIR_TEST_DATA . 'foo';
-		$this->assertFalse(file_exists($path));
+		$this->assertFalse(CM_File::exists($path));
 
 		$file = CM_File::create($path);
-		$this->assertTrue(file_exists($path));
+		$this->assertTrue(CM_File::exists($path));
 		$this->assertInstanceOf('CM_File', $file);
 		$this->assertEquals($path, $file->getPath());
 		$this->assertEquals('', $file->read());
@@ -100,7 +100,7 @@ class CM_FileTest extends CMTest_TestCase {
 
 	public function testCreateTmp() {
 		$file = CM_File::createTmp();
-		$this->assertTrue(file_exists($file->getPath()));
+		$this->assertTrue(CM_File::exists($file->getPath()));
 		$this->assertNull($file->getExtension());
 		$this->assertEmpty($file->read());
 		$file->delete();

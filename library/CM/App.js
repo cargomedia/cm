@@ -34,8 +34,21 @@ var CM_App = CM_Class_Abstract.extend({
 			return view;
 		}
 		return _.find(this.views, function(view) {
-			return _.contains(view.getClasses(), className);
+			return view.hasClass(className);
 		}) || null;
+	},
+
+	/**
+	 * @param {String|Null} [className]
+	 * @return CM_Component_Abstract[]
+	 */
+	getViewList: function(className) {
+		if (!className) {
+			return this.views;
+		}
+		return _.filter(this.views, function(view) {
+			return view.hasClass(className);
+		});
 	},
 
 	/**
@@ -622,10 +635,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {Number}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._events) {
+			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._callbacks) {
 				return 0;
 			}
-			return _.size(this._channelDispatchers[channel]._events);
+			return _.size(this._channelDispatchers[channel]._callbacks);
 		},
 
 		/**

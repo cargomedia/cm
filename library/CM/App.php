@@ -218,7 +218,7 @@ class CM_App {
 			$path = CM_Util::getNamespacePath($namespace);
 		}
 		$updateScript = $path . 'resources/db/update/' . $version . '.php';
-		if (!file_exists($updateScript)) {
+		if (!CM_File::exists($updateScript)) {
 			throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
 		}
 		return $updateScript;
