@@ -6,7 +6,7 @@ define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
 
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->setEnvironment('test');
-$bootloader->load(array('autoloader', 'constants', 'exceptionHandler', 'errorHandler', 'defaults'));
+$bootloader->load(array('constants', 'exceptionHandler', 'errorHandler', 'defaults'));
 
 !is_dir(DIR_TMP) ? mkdir(DIR_TMP) : null;
 !is_dir(DIR_DATA) ? mkdir(DIR_DATA) : null;
