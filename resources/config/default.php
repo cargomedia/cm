@@ -12,6 +12,7 @@ $config->CM_Render->cdnResource = false;
 $config->CM_Render->cdnUserContent = false;
 
 $config->CM_Mail = new stdClass();
+$config->CM_Mail->send = true;
 
 $config->CM_Site_Abstract = new stdClass();
 $config->CM_Site_Abstract->class = 'CM_Site_CM';
