@@ -7,7 +7,6 @@ class CM_FileTest extends CMTest_TestCase {
 	public static function setUpBeforeClass() {
 	}
 
-
 	public static function tearDownAfterClass() {
 	}
 
@@ -47,11 +46,11 @@ class CM_FileTest extends CMTest_TestCase {
 	public function testDelete() {
 		$file = new CM_File($this->_testFilePath);
 
-		$this->assertTrue(file_exists($this->_testFilePath));
+		$this->assertTrue(CM_File::exists($this->_testFilePath));
 
 		$file->delete();
 
-		$this->assertFalse(file_exists($this->_testFilePath));
+		$this->assertFalse(CM_File::exists($this->_testFilePath));
 
 		// Should do nothing if already deleted
 		$file->delete();
@@ -78,16 +77,40 @@ class CM_FileTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		$path = DIR_TEST_DATA . 'foo';
-		$this->assertFalse(file_exists($path));
+		$this->assertFalse(CM_File::exists($path));
 
 		$file = CM_File::create($path);
-		$this->assertTrue(file_exists($path));
+		$this->assertTrue(CM_File::exists($path));
 		$this->assertInstanceOf('CM_File', $file);
 		$this->assertEquals($path, $file->getPath());
 		$this->assertEquals('', $file->read());
 		$file->delete();
 
 		$file = CM_File::create($path, 'bar');
+		$this->assertEquals('bar', $file->read());
+		$file->delete();
+
+		try {
+			CM_File::create(DIR_TEST_DATA);
+			$this->fail('Could create file with invalid path');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Cannot write to', $e->getMessage());
+		}
+	}
+
+	public function testCreateTmp() {
+		$file = CM_File::createTmp();
+		$this->assertTrue(CM_File::exists($file->getPath()));
+		$this->assertNull($file->getExtension());
+		$this->assertEmpty($file->read());
+		$file->delete();
+
+		$file = CM_File::createTmp('');
+		$this->assertSame('', $file->getExtension());
+		$file->delete();
+
+		$file = CM_File::createTmp('testExtension', 'bar');
+		$this->assertContains('testextension', $file->getExtension());
 		$this->assertEquals('bar', $file->read());
 		$file->delete();
 	}
@@ -101,7 +124,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testCopy() {
-		$path = DIR_TMP. 'filecopytest.txt';
+		$path = DIR_TMP . 'filecopytest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$this->assertFileNotExists($path);
 		$file->copy($path);
@@ -118,7 +141,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testMove() {
-		$newPath = DIR_TMP. 'filemovetest.txt';
+		$newPath = DIR_TMP . 'filemovetest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$oldPath = $file->getPath();
 

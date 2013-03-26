@@ -56,6 +56,14 @@ class CM_File_UserContent extends CM_File {
 		CM_Util::mkDir(DIR_USERFILES . $this->_getDir());
 	}
 
+	public function delete() {
+		if (is_dir($this->getPath())) {
+			CM_Util::rmDir($this->getPath());
+		} else {
+			parent::delete();
+		}
+	}
+
 	/**
 	 * @return string
 	 */
@@ -65,5 +73,9 @@ class CM_File_UserContent extends CM_File {
 			$dirs[] = $this->_sequence % self::BUCKETS_COUNT;
 		}
 		return implode(DIRECTORY_SEPARATOR, $dirs);
+	}
+
+	public static function exists($path) {
+		return file_exists($path);
 	}
 }

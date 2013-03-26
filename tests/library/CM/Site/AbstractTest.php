@@ -6,10 +6,24 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Site_Abstract = new stdClass();
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
+		CM_Config::get()->CM_Site_Abstract->name = 'Foo';
+		CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
 	}
 
-	public static function tearDownAfterClass() {	
+	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();
+	}
+
+	public function testGetEmailAddress() {
+		/** @var CM_Site_Abstract $site */
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract');
+		$this->assertEquals('foo@foo.com', $site->getEmailAddress());
+	}
+
+	public function testGetName() {
+		/** @var CM_Site_Abstract $site */
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract');
+		$this->assertEquals('Foo', $site->getName());
 	}
 
 	public function testGetUrl() {

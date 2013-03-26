@@ -109,7 +109,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param string|null $urlCdn
 	 * @return CM_Site_Abstract
 	 */
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
 		if (isset($this->_siteType)) {
 			return CM_Site_Abstract::factory($this->_siteType);
 		}
@@ -118,6 +118,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		}
 		$url = is_null($url) ? null : (string) $url;
 		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
+		$name = is_null($name) ? null : (string) $name;
+		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 		/** @var CM_Site_Abstract $site */
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
@@ -125,6 +127,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		CM_Config::get()->CM_Site_Mock = new stdClass;
 		CM_Config::get()->CM_Site_Mock->url = $url;
 		CM_Config::get()->CM_Site_Mock->urlCdn = $urlCdn;
+		CM_Config::get()->CM_Site_Mock->name = $name;
+		CM_Config::get()->CM_Site_Mock->emailAddress = $emailAddress;
 		return $site;
 	}
 
@@ -142,9 +146,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Form_Abstract           $form
-	 * @param CM_FormField_Abstract      $formField
-	 * @param array|null                 $params
+	 * @param CM_Form_Abstract      $form
+	 * @param CM_FormField_Abstract $formField
+	 * @param array|null            $params
 	 * @return CMTest_TH_Html
 	 */
 	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null) {
@@ -317,6 +321,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = true) {
+		if ($expected instanceof CM_Paging_Abstract) {
+			$expected = $expected->getItems();
+		}
+		if ($actual instanceof CM_Paging_Abstract) {
+			$actual = $actual->getItems();
+		}
+		if (is_array($expected) && is_array($actual)) {
+			self::assertSame(array_keys($expected), array_keys($actual), $message);
+			foreach ($expected as $expectedKey => $expectedValue) {
+				self::assertEquals($expectedValue, $actual[$expectedKey], $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+			}
+			return;
+		}
 		if ($expected instanceof CM_Comparable) {
 			self::assertTrue($expected->equals($actual), 'Comparables differ');
 		} else {
@@ -325,11 +342,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function assertNotEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
-		if ($expected instanceof CM_Comparable) {
-			self::assertFalse($expected->equals($actual), 'Comparables do not differ');
-		} else {
-			parent::assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		try {
+			self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		} catch (PHPUnit_Framework_AssertionFailedError $exception) {
+			return;
 		}
+		self::fail($message);
 	}
 
 	/**
@@ -419,8 +437,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param number          $expected
-	 * @param number          $actual
+	 * @param number $expected
+	 * @param number $actual
 	 * @param number|null
 	 */
 	public static function assertSameTime($expected, $actual, $delta = null) {
@@ -431,8 +449,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CMTest_TH_Html  $page
-	 * @param bool            $warnings
+	 * @param CMTest_TH_Html $page
+	 * @param bool           $warnings
 	 */
 	public static function assertTidy(CMTest_TH_Html $page, $warnings = true) {
 		if (!extension_loaded('tidy')) {

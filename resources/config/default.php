@@ -13,8 +13,6 @@ $config->CM_Render->cdnUserContent = false;
 
 $config->CM_Mail = new stdClass();
 $config->CM_Mail->send = true;
-$config->CM_Mail->siteName = 'CM';
-$config->CM_Mail->siteEmailAddress = 'noreply@example.com';
 
 $config->CM_Site_Abstract = new stdClass();
 $config->CM_Site_Abstract->class = 'CM_Site_CM';
@@ -71,6 +69,7 @@ $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Db_Db->serversRead = array();
 $config->CM_Db_Db->serversReadEnabled = true;
 $config->CM_Db_Db->delayedEnabled = true;
+$config->CM_Db_Db->reconnectTimeout = 300;
 
 $config->CM_Action_Abstract = new stdClass();
 
@@ -79,10 +78,6 @@ $config->CM_Model_Abstract = new stdClass();
 $config->CM_Model_ActionLimit_Abstract = new stdClass();
 
 $config->CM_Model_Entity_Abstract = new stdClass();
-
-$config->CM_Mail = new stdClass();
-$config->CM_Mail->siteName = 'Example';
-$config->CM_Mail->siteEmailAddress = 'example@example.dev';
 
 $config->CM_Paging_Log_Abstract = new stdClass();
 
@@ -96,10 +91,10 @@ $config->CM_Params->class = 'CM_Params';
 
 $config->CM_Response_Page = new stdClass();
 $config->CM_Response_Page->catch = array(
-	'CM_Exception_Nonexistent' => '/error/not-found',
+	'CM_Exception_Nonexistent'  => '/error/not-found',
 	'CM_Exception_InvalidParam' => '/error/not-found',
 	'CM_Exception_AuthRequired' => '/error/auth-required',
-	'CM_Exception_NotAllowed' => '/error/not-allowed',
+	'CM_Exception_NotAllowed'   => '/error/not-allowed',
 );
 
 $config->CM_Response_View_Abstract = new stdClass();
@@ -132,6 +127,8 @@ $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
 $config->CM_Site_CM = new stdClass();
 $config->CM_Site_CM->url = 'http://www.example.dev';
 $config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
+$config->CM_Site_CM->name = 'Example';
+$config->CM_Site_CM->emailAddress = 'example@example.dev';
 
 $config->CM_KissTracking = new stdClass();
 $config->CM_KissTracking->enabled = false;

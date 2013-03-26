@@ -72,7 +72,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	findChild: function(className) {
 		return _.find(this.getChildren(), function(child) {
-			return _.contains(child.getClasses(), className);
+			return child.hasClass(className);
 		}) || null;
 	},
 
@@ -95,7 +95,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		if (!parent) {
 			return null;
 		}
-		if (_.contains(parent.getClasses(), className)) {
+		if (parent.hasClass(className)) {
 			return parent;
 		}
 		return parent.findParent(className);
@@ -134,7 +134,15 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Boolean} skipDomRemoval OPTIONAL
+	 * @param {String} className
+	 * @returns Boolean
+	 */
+	hasClass: function(className) {
+		return _.contains(this.getClasses(), className);
+	},
+
+	/**
+	 * @param {Boolean} [skipDomRemoval]
 	 */
 	remove: function(skipDomRemoval) {
 		this.trigger("destruct");
@@ -283,12 +291,16 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
+	 * @param {String} [streamChannel]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, callback) {
-		cm.action.bind(actionVerb, modelType, callback, this);
+	bindAction: function(actionVerb, modelType, streamChannel, callback) {
+		var callbackResponse = function(response) {
+			callback.call(this, response.action, response.model, response.data);
+		};
+		cm.action.bind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, callback, this);
+			cm.action.unbind(actionVerb, modelType, callbackResponse, streamChannel, this);
 		});
 	},
 
@@ -376,30 +388,26 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} mp3Path
 	 * @param {Object} [params]
-	 * @return {jQuery}
+	 * @return {MediaElement}
 	 */
 	createAudioPlayer: function(mp3Path, params) {
 		params = _.extend({loop: false, autoplay: false}, params);
-		var $player = $('<div class="jplayer"></div>').appendTo($('body'));
-		var options = {
-			'swfPath': cm.getUrlStatic('/swf/Jplayer.swf'),
-			ready: function() {
-				$player.jPlayer('setMedia', {
-					'mp3': cm.getUrlStatic('/audio/' + mp3Path)
-				});
-				if (params.autoplay) {
-					$player.jPlayer('play');
-				}
+
+		var $element = $('<audio />');
+		$element.wrap('<div />');	// MediaElement needs a parent to show error msgs
+		$element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
+		$element.attr('autoplay', params.autoplay);
+		$element.attr('loop', params.loop);
+
+		return new MediaElement($element.get(0), {
+			startVolume: 1,
+			flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+			silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+			error: function() {
+				this.play = new Function();
+				this.pause = new Function();
 			}
-		};
-		if (params.loop) {
-			options.loop = true;
-		}
-		this.on('destruct', function() {
-			$player.jPlayer('destroy');
-			$player.remove();
 		});
-		return $player.jPlayer(options);
 	},
 
 	/**
@@ -431,7 +439,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		};
 
 		var self = this;
-		swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlStatic('/swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
+		swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlResource('layout', 'swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
 			if (event.success) {
 				callbackSuccess.call(self, event.ref);
 			} else {
@@ -491,15 +499,16 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
+	 * @param {String} [streamChannel]
 	 */
-	_bindActions: function(actions) {
+	_bindActions: function(actions, streamChannel) {
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, callback);
+				this.bindAction(actionVerb, modelType, streamChannel, callback);
 			}, this);
 		}, this);
 	},

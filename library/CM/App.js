@@ -34,8 +34,21 @@ var CM_App = CM_Class_Abstract.extend({
 			return view;
 		}
 		return _.find(this.views, function(view) {
-			return _.contains(view.getClasses(), className);
+			return view.hasClass(className);
 		}) || null;
+	},
+
+	/**
+	 * @param {String|Null} [className]
+	 * @return CM_Component_Abstract[]
+	 */
+	getViewList: function(className) {
+		if (!className) {
+			return this.views;
+		}
+		return _.filter(this.views, function(view) {
+			return view.hasClass(className);
+		});
 	},
 
 	/**
@@ -599,15 +612,15 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} channel
-		 * @param {String} [event]
+		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channel, event, callback, context) {
+		unbind: function(channel, namespace, callback, context) {
 			if (!this._channelDispatchers[channel]) {
 				return;
 			}
-			this._channelDispatchers[channel].off(event, callback, context);
+			this._channelDispatchers[channel].off(namespace, callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
@@ -618,10 +631,10 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {Integer}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._events) {
+			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._callbacks) {
 				return 0;
 			}
-			return _.size(this._channelDispatchers[channel]._events);
+			return _.size(this._channelDispatchers[channel]._callbacks);
 		},
 
 		/**
@@ -715,37 +728,35 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	action: {
-		verbs: {
-		},
-		_registered: false,
-		_dispatcher: _.clone(Backbone.Events),
+		verbs: {},
 
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
+		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, callback, context) {
-			if (!cm.options.stream.channel) {
+		bind: function(actionVerb, modelType, callback, streamChannel, context) {
+			streamChannel = streamChannel || cm.options.stream.channel;
+			if (!streamChannel) {
 				return;
 			}
-			if (!this._registered) {
-				cm.stream.bind(cm.options.stream.channel, 'CM_Action_Abstract', function(response) {
-					this._dispatcher.trigger(response.action.verb + ':' + response.model._type, response.action, response.model, response.data);
-				}, this);
-				this._registered = true;
-			}
-			this._dispatcher.on(actionVerb + ':' + modelType, callback, context);
+			cm.stream.bind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
-		 * @param {Function} callback
+		 * @param {Function} [callback]
+		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback, context) {
-			this._dispatcher.off(actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, modelType, callback, streamChannel, context) {
+			streamChannel = streamChannel || cm.options.stream.channel;
+			if (!streamChannel) {
+				return;
+			}
+			cm.stream.unbind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 
