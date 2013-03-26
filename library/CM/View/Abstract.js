@@ -134,6 +134,14 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String} className
+	 * @returns Boolean
+	 */
+	hasClass: function(className) {
+		return _.contains(this.getClasses(), className);
+	},
+
+	/**
 	 * @param {Boolean} [skipDomRemoval]
 	 */
 	remove: function(skipDomRemoval) {
@@ -491,7 +499,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
- 	 * @param {String} [streamChannel]
+	 * @param {String} [streamChannel]
 	 */
 	_bindActions: function(actions, streamChannel) {
 		_.each(actions, function(callback, key) {
