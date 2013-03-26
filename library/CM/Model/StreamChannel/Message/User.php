@@ -34,7 +34,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 		if (!$user->getOnline()) {
 			return;
 		}
-		$streamChannel = CM_Model_StreamChannel_Message_User::getKeyByUser($user);
+		$streamChannel = self::getKeyByUser($user);
 		parent::publish($streamChannel, $namespace, $data);
 	}
 
@@ -48,7 +48,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 		if (!$user->getOnline()) {
 			return;
 		}
-		$streamChannel = CM_Model_StreamChannel_Message_User::getKeyByUser($user);
+		$streamChannel = self::getKeyByUser($user);
 		parent::publishAction($streamChannel, $action, $model, $data);
 	}
 }
