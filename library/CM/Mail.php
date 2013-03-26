@@ -46,7 +46,7 @@ class CM_Mail extends CM_View_Abstract {
 	 * @param CM_Site_Abstract|null     $site
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($recipient = null, array $tplParams = null, $site = null) {
+	public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null) {
 		if ($this->hasTemplate()) {
 			$this->setRenderLayout(true);
 		}
@@ -67,12 +67,11 @@ class CM_Mail extends CM_View_Abstract {
 			}
 		}
 
-		if (null === $site) {
-			if ($this->_recipient) {
-				$site = $this->_recipient->getSite();
-			} else {
-				$site = CM_Site_Abstract::factory();
-			}
+		if (!$site && $this->_recipient) {
+			$site = $this->_recipient->getSite();
+		}
+		if (!$site) {
+			$site = CM_Site_Abstract::factory();
 		}
 		$this->_site = $site;
 
@@ -255,10 +254,9 @@ class CM_Mail extends CM_View_Abstract {
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
+		$language = null;
 		if ($this->_recipient) {
 			$language = $this->_recipient->getLanguage();
-		} else {
-			$language = null;
 		}
 		list($subject, $html, $text) = $this->_render($language);
 		if ($delayed) {

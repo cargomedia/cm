@@ -46,7 +46,7 @@ class CM_MailTest extends CMTest_TestCase {
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
 		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
 
-		$msg = new CM_Mail($user, null, true);
+		$msg = new CM_Mail($user, null);
 		$msg->setSubject('testSubject');
 		$msg->setHtml('<b>hallo</b>');
 		$msg->addReplyTo('foo@bar.com');
