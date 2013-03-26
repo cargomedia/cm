@@ -487,21 +487,4 @@ class CM_Util {
 		}
 		return $result;
 	}
-
-	/**
-	 * @param string $className
-	 * @return string[]
-	 */
-	public static function getClassTypes($className) {
-		$classes = CM_Util::getClassChildren($className);
-		$classes[] = $className;
-		$types = array();
-		foreach ($classes as $class) {
-			$reflection = new ReflectionClass($class);
-			if ($reflection->hasConstant('TYPE')) {
-				$types[] = $class::TYPE;
-			}
-		}
-		return $types;
-	}
 }
