@@ -39,6 +39,19 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	/**
+	 * @param {String|Null} [className]
+	 * @return CM_Component_Abstract[]
+	 */
+	findViewList: function(className) {
+		if (!className) {
+			return this.views;
+		}
+		return _.filter(this.views, function(view) {
+			return view.hasClass(className);
+		});
+	},
+
+	/**
 	 * @param {Number} min
 	 * @param {Number} max
 	 * @return {Number}
