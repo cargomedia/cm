@@ -72,7 +72,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	findChild: function(className) {
 		return _.find(this.getChildren(), function(child) {
-			return _.contains(child.getClasses(), className);
+			return child.hasClass(className);
 		}) || null;
 	},
 
@@ -95,7 +95,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		if (!parent) {
 			return null;
 		}
-		if (_.contains(parent.getClasses(), className)) {
+		if (parent.hasClass(className)) {
 			return parent;
 		}
 		return parent.findParent(className);
@@ -131,6 +131,14 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	getClass: function() {
 		return this._class;
+	},
+
+	/**
+	 * @param {String} className
+	 * @returns Boolean
+	 */
+	hasClass: function(className) {
+		return _.contains(this.getClasses(), className);
 	},
 
 	/**
@@ -491,7 +499,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
- 	 * @param {String} [streamChannel]
+	 * @param {String} [streamChannel]
 	 */
 	_bindActions: function(actions, streamChannel) {
 		_.each(actions, function(callback, key) {
