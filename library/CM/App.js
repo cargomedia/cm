@@ -606,6 +606,9 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!cm.options.stream.enabled) {
 				return;
 			}
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
+			}
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
 			}
@@ -623,6 +626,9 @@ var CM_App = CM_Class_Abstract.extend({
 			var channel = channelKey + ':' + channelType;
 			if (!this._channelDispatchers[channel]) {
 				return;
+			}
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
 			}
 			this._channelDispatchers[channel].off(namespace, callback, context);
 			if (this._getBindCount(channel) === 0) {
