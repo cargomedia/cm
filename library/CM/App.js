@@ -743,9 +743,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			if (!channelKey || !channelType) {
-				return;
-			}
 			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
@@ -757,9 +754,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			if (!channelKey || !channelType) {
-				return;
-			}
 			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
