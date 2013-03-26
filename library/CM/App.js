@@ -42,7 +42,7 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @param {String|Null} [className]
 	 * @return CM_Component_Abstract[]
 	 */
-	findViewList: function(className) {
+	getViewList: function(className) {
 		if (!className) {
 			return this.views;
 		}
