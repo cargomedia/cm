@@ -63,9 +63,13 @@ class CM_Mail extends CM_View_Abstract {
 			}
 		}
 
-		$config = self::_getConfig();
-		$this->setTplParam('siteName', $config->siteName);
-		$this->setSender($config->siteEmailAddress, $config->siteName);
+		if ($recipient instanceof CM_Model_User) {
+			$site = $recipient->getSite();
+		} else {
+			$site = CM_Site_Abstract::factory();
+		}
+		$this->setTplParam('siteName', $site->getName());
+		$this->setSender($site->getEmailAddress(), $site->getName());
 	}
 
 	/**
@@ -172,7 +176,6 @@ class CM_Mail extends CM_View_Abstract {
 		$address = (string) $address;
 		$name = is_null($name) ? $name : (string) $name;
 		$this->_sender = array('address' => $address, 'name' => $name);
-
 	}
 
 	/**
@@ -300,8 +303,9 @@ class CM_Mail extends CM_View_Abstract {
 
 	private function _queue($subject, $text, $html) {
 		CM_Db_Db::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
-			'sender' => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()), 'to' => serialize($this->getTo()),
-			'cc' => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
+											'sender'  => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()),
+											'to'      => serialize($this->getTo()),
+											'cc'      => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
 	}
 
 	private function _log($subject, $text) {
@@ -346,7 +350,7 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param CM_Site_Abstract|null $site
+	 * @param CM_Site_Abstract|null  $site
 	 * @param CM_Model_Language|null $language
 	 * @return string
 	 */

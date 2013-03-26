@@ -13,6 +13,11 @@ class CM_RenderTest extends CMTest_TestCase {
 		CMTest_TH::clearEnv();
 	}
 
+	public function testGetSiteName() {
+		$render = new CM_Render($this->_getSite());
+		$this->assertSame('Foo', $render->getSiteName());
+	}
+
 	public function testGetUrl() {
 		$render = new CM_Render($this->_getSite());
 		$this->assertSame('http://www.foo.com', $render->getUrl());
@@ -21,7 +26,6 @@ class CM_RenderTest extends CMTest_TestCase {
 		$this->assertSame('http://www.cdn.com/foo/bar', $render->getUrl('/foo/bar', true));
 		$this->assertSame('http://www.foo.com/0', $render->getUrl('/0'));
 		$this->assertSame('http://www.cdn.com/0', $render->getUrl('/0', true));
-
 	}
 
 	public function testGetUrlPage() {
@@ -29,9 +33,9 @@ class CM_RenderTest extends CMTest_TestCase {
 		$render = new CM_Render($this->_getSite(array('TEST')));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar', $render->getUrlPage('TEST_Page_Foo_Bar_FooBar'));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('TEST_Page_Foo_Bar_FooBar', array('userId' => 15,
-			'foo' => 'bar')));
+																																		'foo'    => 'bar')));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('TEST_Page_Foo_Bar_FooBar', array('userId' => 15,
-			'foo' => 'bar')));
+																																		'foo'    => 'bar')));
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDNAMESPACE_Page_Test', false);
 		try {
 			$render->getUrlPage('InvalidNamespace_Page_Test');
@@ -45,7 +49,7 @@ class CM_RenderTest extends CMTest_TestCase {
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
 		$this->assertSame('http://www.test.com/foo/bar/foo-bar', $render->getUrlPage('TEST_Page_Foo_Bar_FooBar', null, $site));
 		$this->assertSame('http://www.test.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage('TEST_Page_Foo_Bar_FooBar', array('userId' => 15,
-					'foo' => 'bar'), $site));
+																																		 'foo'    => 'bar'), $site));
 		$this->assertSame('http://www.foo.com/foo/bar/foo-bar?userId=15&foo=bar', $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
 		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDNAMESPACE_Page_Foo_Bar_FooBar', false);
 		try {
@@ -76,7 +80,6 @@ class CM_RenderTest extends CMTest_TestCase {
 		$this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 		$render = new CM_Render($this->_getSite(), null, $language, true);
 		$this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
-
 	}
 
 	public function testGetUrlResource() {
@@ -125,9 +128,9 @@ class CM_RenderTest extends CMTest_TestCase {
 
 		/** @var CM_Model_Language $language */
 		$language = CM_Model_Language::create(array(
-			'name' => 'Test language',
+			'name'         => 'Test language',
 			'abbreviation' => 'test',
-			'enabled' => true
+			'enabled'      => true
 		));
 		$render = new CM_Render($this->_getSite(), null, $language);
 		$language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
@@ -144,8 +147,7 @@ class CM_RenderTest extends CMTest_TestCase {
 		$this->assertNull($render->getViewer());
 	}
 
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null) {
-		return parent::_getSite($namespaces, 'http://www.foo.com', 'http://www.cdn.com');
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		return parent::_getSite($namespaces, 'http://www.foo.com', 'http://www.cdn.com', 'Foo', 'foo@foo.com');
 	}
-
 }
