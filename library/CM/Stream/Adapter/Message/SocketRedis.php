@@ -3,6 +3,7 @@
 class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
 
 	const TYPE = 1;
+	const SYNCHRONIZE_DELAY = 10;
 
 	public function getOptions() {
 		$servers = static::_getConfig()->servers;
@@ -31,7 +32,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	public function synchronize() {
-		$startStampLimit = time() - 10;
+		$startStampLimit = time() - self::SYNCHRONIZE_DELAY;
 		$channelsStatus = $this->_fetchStatus();
 		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
 		$channelsPersistenceArray = array();
