@@ -17,6 +17,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getEmailAddress() {
+		return self::_getConfig()->emailAddress;
+	}
+
+	/**
 	 * @return CM_EventHandler_EventHandler
 	 */
 	public function getEventHandler() {
@@ -69,6 +76,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 			}
 		}
 		return $menuEntries;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return self::_getConfig()->name;
 	}
 
 	/**
