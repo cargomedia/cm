@@ -17,6 +17,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 		/** @var CM_JobDistribution_JobWorker $jobWorkerMock */
 		$jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker'), array(), '', false);
 		$jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
+		ob_start();
 		try {
 			$jobWorkerMock->run();
 		} catch (CM_Exception_Invalid $ex) {
@@ -25,6 +26,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 		} catch (Exception $ex) {
 			$this->fail('Exception not caught.');
 		}
+		ob_end_clean();
 	}
 
 }
