@@ -1,0 +1,15 @@
+#windowHint {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 105;
+	text-align: center;
+	height: 0;
+}
+
+#windowHint .windowHint-content {
+	display: inline-block;
+	background-color: black;
+	color: white;
+	text-align: left;
+}

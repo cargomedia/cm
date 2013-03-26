@@ -1,0 +1,35 @@
+.offCanvas-wrap {
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+}
+
+.offCanvas-wrap > .offCanvas-mask {
+	display: none;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 80;
+	background-color: rgba(0, 0, 0, .5);
+	opacity: 0;
+}
+
+.offCanvas {
+	position: relative;
+	width: 100%;
+	z-index: 81;
+}
+
+html.offCanvas-active, html.offCanvas-active body {
+	height: 100%;
+}
+
+html.offCanvas-active .offCanvas-wrap {
+	height: 100%;
+}
+
+html.offCanvas-active .offCanvas {
+	height: 100%;
+	min-height: 100%;
+}
