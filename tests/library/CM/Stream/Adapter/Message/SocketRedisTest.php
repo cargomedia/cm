@@ -129,6 +129,23 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertSame(0, $subscribes->getCount());
 	}
 
+	public function testSynchronizeInvalidType() {
+		$jsTime =  (time() - 3) * 1000;
+		$status = array(
+			'channel-foo:invalid-type' => array('subscribers' => array(
+				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
+			))
+		);
+		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
+		try {
+			$adapter->synchronize();
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $e->getMessage());
+		}
+	}
+
 	/**
 	 * @param array $status
 	 */
