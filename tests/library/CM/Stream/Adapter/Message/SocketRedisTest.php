@@ -141,6 +141,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
 		try {
 			$adapter->synchronize();
+			$this->fail('Was able to instantiate StreamChannel with invalid type');
 		} catch (CM_Exception_Invalid $e) {
 			$this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $e->getMessage());
 		}
