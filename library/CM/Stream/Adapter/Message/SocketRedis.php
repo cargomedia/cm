@@ -59,8 +59,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		}
 
 		foreach ($channelsStatus as $channel => $channelModel) {
+			list($channelKey, $channelType) = explode(':', $channel, 2);
 			if (isset($channelsPersistenceArray[$channel])) {
 				$streamChannel = $channelsPersistenceArray[$channel];
+				if ($streamChannel->getType() != $channelType) {
+					throw new CM_Exception_Invalid('streamChannel\'s `type` doesn\'t match excpected value');
+				}
 			} else {
 				$oldSubscribers = array_filter($channelModel['subscribers'], function ($subscriber) use ($startStampLimit) {
 					return $subscriber['subscribeStamp'] / 1000 <= $startStampLimit;
@@ -68,7 +72,6 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				if (!count($oldSubscribers)) {
 					continue;
 				}
-				list($channelKey, $channelType) = explode(':', $channel, 2);
 				$streamChannel = CM_Model_StreamChannel_Message::createType($channelType, array('key' => $channelKey, 'adapterType' => $this->getType()));
 			}
 			foreach ($channelModel['subscribers'] as $subscriber) {
