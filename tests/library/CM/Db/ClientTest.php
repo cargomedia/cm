@@ -56,9 +56,9 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 		$timeForward = 100;
 		CMTest_TH::timeForward($timeForward);
 		$client->createStatement('SELECT 1')->execute();
-		$this->assertSameTime($firstTime + $timeForward, $client->getLastConnect());
+		$this->assertSameTime($firstTime + $timeForward, $client->getLastConnect(), 5);
 		CMTest_TH::timeForward($timeForward);
 		$client->createStatement('SELECT 1')->execute();
-		$this->assertSameTime($firstTime + (2 * $timeForward), $client->getLastConnect());
+		$this->assertSameTime($firstTime + (2 * $timeForward), $client->getLastConnect(), 5);
 	}
 }
