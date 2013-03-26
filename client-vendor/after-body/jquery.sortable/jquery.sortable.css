@@ -1,9 +1,0 @@
-.sortable > * {
-	height: 25px;
-}
-.sortable .handle:hover {
-	cursor: move;
-}
-.sortable .sortable-placeholder {
-	border: 1px dashed #CCC;
-}
