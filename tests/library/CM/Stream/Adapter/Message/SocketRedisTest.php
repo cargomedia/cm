@@ -90,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
-		$jsTime =  (time() - 3) * 1000;
+		$jsTime =  (time() - 4) * 1000;
 		for ($i = 0; $i < 2; $i++) {
 			$status = array(
 				'channel-foo:' . CM_Model_StreamChannel_Message::TYPE => array('subscribers' => array(
@@ -130,7 +130,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronizeInvalidType() {
-		$jsTime =  (time() - 3) * 1000;
+		$jsTime =  (time() - 4) * 1000;
 		$status = array(
 			'channel-foo:invalid-type' => array('subscribers' => array(
 				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
