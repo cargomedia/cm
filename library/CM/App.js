@@ -628,7 +628,7 @@ var CM_App = CM_Class_Abstract.extend({
 				return;
 			}
 			if (!channelKey || !channelType) {
-				return;
+				cm.error.triggerThrow('No channel provided');
 			}
 			this._channelDispatchers[channel].off(namespace, callback, context);
 			if (this._getBindCount(channel) === 0) {
