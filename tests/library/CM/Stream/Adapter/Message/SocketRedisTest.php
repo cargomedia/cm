@@ -34,7 +34,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
 		$this->assertNull($streamSubscribe->getUser());
 
-		CMTest_TH::timeForward(10);
+		CMTest_TH::timeForward(CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY);
 		$adapter->onRedisMessage(json_encode($message));
 		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
 		$this->assertSame(1, $streamChannels->getCount());
@@ -90,7 +90,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronize() {
-		$jsTime =  (time() - 4) * 1000;
+		$jsTime =  (time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
 		for ($i = 0; $i < 2; $i++) {
 			$status = array(
 				'channel-foo:' . CM_Model_StreamChannel_Message::TYPE => array('subscribers' => array(
@@ -130,7 +130,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testSynchronizeInvalidType() {
-		$jsTime =  (time() - 4) * 1000;
+		$jsTime =  (time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1) * 1000;
 		$status = array(
 			'channel-foo:invalid-type' => array('subscribers' => array(
 				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
@@ -171,7 +171,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
 				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
 				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
-				$this->assertSameTime(time() - 3, $subscribe->getStart());
+				$this->assertSameTime(time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY, $subscribe->getStart());
 				$this->assertNull($subscribe->getAllowedUntil());
 			}
 		}
