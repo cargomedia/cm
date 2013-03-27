@@ -90,7 +90,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetch();
+		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
+		if ($this->getType() !== $data['type']) {
+			throw new CM_Exception_Nonexistent('Invalid type `' . $data['type'] . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`');
+		}
+		return $data;
 	}
 
 	protected function _onDelete() {
