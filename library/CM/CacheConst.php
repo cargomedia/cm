@@ -16,9 +16,9 @@ class CM_CacheConst {
 
 	const PagingSource = 'PagingSource';
 
-	const Usertext_Badwords = 'Usertext_Badwords';
+	const Usertext_Filter_BadwordList = 'Usertext_Filter_BadwordList';
 
-	const Usertext_Emoticons = 'Usertext_Emoticons';
+	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
 
 	// _id:X
 	const Session = 'Session';

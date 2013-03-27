@@ -34,6 +34,13 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getFileNameWithoutExtension() {
+		return pathinfo($this->getPath(), PATHINFO_FILENAME);
+	}
+
+	/**
 	 * @return int File size in bytes
 	 * @throws CM_Exception
 	 */

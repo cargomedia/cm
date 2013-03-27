@@ -22,7 +22,6 @@ $config->CM_Model_Abstract->types = array();
 $config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model_DeviceCapabilities'; // #20
 $config->CM_Model_Abstract->types[CM_Model_Language::TYPE] = 'CM_Model_Language'; // #23
 $config->CM_Model_Abstract->types[CM_Model_Location::TYPE] = 'CM_Model_Location'; // #24
-$config->CM_Model_Abstract->types[CM_Model_SmileySet::TYPE] = 'CM_Model_SmileySet'; // #15
 $config->CM_Model_Abstract->types[CM_Model_Splitfeature::TYPE] = 'CM_Model_Splitfeature'; // #28
 $config->CM_Model_Abstract->types[CM_Model_Splittest::TYPE] = 'CM_Model_Splittest'; // #16
 $config->CM_Model_Abstract->types[CM_Model_Splittest_RequestClient::TYPE] = 'CM_Model_Splittest_RequestClient'; // #26
