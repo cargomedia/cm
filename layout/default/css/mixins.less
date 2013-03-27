@@ -24,7 +24,7 @@
 
 .error() {
 	border-color: @colorError;
-	background:	@colorError;
+	background: @colorError;
 	color: white;
 }
 
@@ -38,6 +38,15 @@
 .font_placeholder() {
 	font-style: italic;
 	color: @colorFgShy;
+}
+
+.word_wrap() {
+	word-break: break-all;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;
 }
 
 .input_focus() {
@@ -97,7 +106,7 @@
 		font-size: @iconSizeClickable;
 		line-height: @size - 2px;
 	}
-	&.hasIcon.hasLabel{
+	&.hasIcon.hasLabel {
 		.label {
 			vertical-align: top;
 			line-height: @size - 2px;
