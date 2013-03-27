@@ -91,9 +91,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	protected function _loadData() {
 		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
-		$type = (int) $data['type'];
-		if ($this->getType() !== $type) {
-			throw new CM_Exception_Nonexistent('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+		if (false !== $data) {
+			$type = (int) $data['type'];
+			if ($this->getType() !== $type) {
+				throw new CM_Exception_Invalid('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+			}
 		}
 		return $data;
 	}
@@ -113,8 +115,8 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param int      $id
 	 * @param int|null $type
+	 * @throws CM_Exception_Nonexistent
 	 * @return CM_Model_StreamChannel_Abstract
-	 * @throws CM_Exception_Invalid
 	 */
 	public static function factory($id, $type = null) {
 		if (null === $type) {
