@@ -69,6 +69,13 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId(), 'site' => $siteCM->getType()));
 	}
 
+	public function testCreateWithLanguage() {
+		$language = CMTest_TH::createLanguage();
+		/** @var CM_Model_User $user */
+		$user = CM_Model_User::create(array('language' => $language));
+		$this->assertEquals($language, $user->getLanguage());
+	}
+
 	public function testDelete() {
 		$user = CMTest_TH::createUser();
 		$user->delete();
@@ -87,5 +94,14 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$siteCM = new CM_Site_CM();
 		$user->setSite($siteCM);
 		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId(), 'site' => $siteCM->getType()));
+	}
+
+	public function testSetLanguage() {
+		/** @var CM_Model_User $user */
+		$user = CM_Model_User::create();
+		$this->assertNull($user->getLanguage());
+		$language = CMTest_TH::createLanguage();
+		$user->setLanguage($language);
+		$this->assertEquals($language, $user->getLanguage());
 	}
 }

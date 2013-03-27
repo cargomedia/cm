@@ -250,7 +250,14 @@ class CM_Model_User extends CM_Model_Abstract {
 			$site = $data['site'];
 			$siteType = $site->getType();
 		}
-		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType));
+		$languageId = null;
+		if (isset($data['language'])) {
+			/** @var CM_Model_Language $language */
+			$language = $data['language'];
+			$languageId = $language->getId();
+		}
+		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
+													  'languageId'  => $languageId));
 		return new static($userId);
 	}
 
