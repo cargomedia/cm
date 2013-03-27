@@ -36,8 +36,8 @@ class CM_Util {
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
-		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT);
 		$files = glob($path . $pattern);
+		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR);
 		foreach ($paths as $path) {
 			$files = array_merge($files, self::rglob($pattern, $path));
 		}
