@@ -185,6 +185,14 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param CM_Site_Abstract $site
+	 */
+	public function setSite(CM_Site_Abstract $site) {
+		CM_Db_Db::update(TBL_CM_USER, array('site' => $site->getType()), array('userId' => $this->getId()));
+		$this->_change();
+	}
+
+	/**
 	 * @return CM_Model_User
 	 */
 	public function updateLatestactivity() {
@@ -236,7 +244,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	protected static function _create(array $data) {
-		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time()));
+		$siteType = null;
+		if (isset($data['site'])) {
+			/** @var CM_Site_Abstract $site */
+			$site = $data['site'];
+			$siteType = $site->getType();
+		}
+		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType));
 		return new static($userId);
 	}
 
