@@ -67,7 +67,7 @@
 
 		/**
 		 * @param {String} content
-		 * @param {Integer} hideDelay
+		 * @param {Number} hideDelay
 		 */
 		popoverInfo: function(content, hideDelay) {
 			var timeout = this.data('popover-timeout');
