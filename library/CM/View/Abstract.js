@@ -301,7 +301,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
 		if (!channelKey && !channelType) {
-			if (!cm.options.stream.channel.key || !cm.options.stream.channel.type) {
+			if (!cm.options.stream.channel) {
 				return;
 			}
 			channelKey = cm.options.stream.channel.key;
