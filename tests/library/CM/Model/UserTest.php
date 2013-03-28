@@ -88,12 +88,13 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testSetSite() {
+		$siteDefault = CM_Site_Abstract::factory();
+		$site = $this->_getSite();
 		/** @var CM_Model_User $user */
 		$user = CM_Model_User::create();
-		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId(), 'site' => null));
-		$siteCM = new CM_Site_CM();
-		$user->setSite($siteCM);
-		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId(), 'site' => $siteCM->getType()));
+		$this->assertSame($siteDefault->getId(), $user->getSite()->getId());
+		$user->setSite($site);
+		$this->assertSame($site->getId(), $user->getSite()->getId());
 	}
 
 	public function testSetLanguage() {

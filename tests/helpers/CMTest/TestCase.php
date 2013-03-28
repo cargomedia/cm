@@ -96,6 +96,60 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @param array|null  $namespaces
+	 * @param string|null $url
+	 * @param string|null $urlCdn
+	 * @param string|null $name
+	 * @param string|null $emailAddress
+	 * @throws PHPUnit_Framework_Exception
+	 * @return CM_Site_Abstract
+	 */
+	protected function _createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		if (null === $namespaces) {
+			$namespaces = array();
+		}
+		$url = is_null($url) ? null : (string) $url;
+		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
+		$name = is_null($name) ? null : (string) $name;
+		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
+
+		$types = CM_Config::get()->CM_Site_Abstract->types;
+		if (count($types) >= 255) {
+			throw new PHPUnit_Framework_Exception('Maximum number of concurrent sites reached');
+		}
+		do {
+			$siteId = rand(1, 255);
+			$siteClassName = 'CM_Site_Mock' . $siteId . 'r' . rand();
+		} while (array_key_exists($siteId, $types) || class_exists($siteClassName, false));
+		$codeNamespaces = '';
+		foreach ($namespaces as $namespace) {
+			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
+		}
+		$code = <<<EOD
+class $siteClassName extends CM_Site_Abstract {
+
+	const TYPE = $siteId;
+
+	public function __construct() {
+		parent::__construct();
+		$codeNamespaces
+	}
+}
+EOD;
+		eval($code);
+
+		$site = new $siteClassName();
+		$types[$siteId] = $siteClassName;
+		CM_Config::get()->CM_Site_Abstract->types = $types;
+		CM_Config::get()->$siteClassName = new stdClass;
+		CM_Config::get()->$siteClassName->url = $url;
+		CM_Config::get()->$siteClassName->urlCdn = $urlCdn;
+		CM_Config::get()->$siteClassName->name = $name;
+		CM_Config::get()->$siteClassName->emailAddress = $emailAddress;
+		return $site;
+	}
+
+	/**
 	 * @param CM_Model_User|null $viewer
 	 * @return CM_Render
 	 */
@@ -107,28 +161,28 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param array|null  $namespaces
 	 * @param string|null $url
 	 * @param string|null $urlCdn
+	 * @param string|null $name
+	 * @param string|null $emailAddress
 	 * @return CM_Site_Abstract
 	 */
 	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
 		if (isset($this->_siteType)) {
-			return CM_Site_Abstract::factory($this->_siteType);
+			$site = CM_Site_Abstract::factory($this->_siteType);
+			$fullNamespaces = $namespaces;
+			if (null === $fullNamespaces) {
+				$fullNamespaces = array();
+			}
+			array_push($fullNamespaces, 'CM');
+			if (($site->getNamespaces() === $fullNamespaces) && ($site->getUrl() === $url) && ($site->getUrlCdn() === $urlCdn) &&
+					($site->getName() === $name) && ($site->getEmailAddress() === $emailAddress)
+			) {
+				return $site;
+			}
 		}
-		if (null === $namespaces) {
-			$namespaces = array('CM');
+		$site = $this->_createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+		if (!isset($this->_siteType)) {
+			$this->_siteType = $site->getType();
 		}
-		$url = is_null($url) ? null : (string) $url;
-		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
-		$name = is_null($name) ? null : (string) $name;
-		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
-		/** @var CM_Site_Abstract $site */
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
-		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
-		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
-		CM_Config::get()->CM_Site_Mock = new stdClass;
-		CM_Config::get()->CM_Site_Mock->url = $url;
-		CM_Config::get()->CM_Site_Mock->urlCdn = $urlCdn;
-		CM_Config::get()->CM_Site_Mock->name = $name;
-		CM_Config::get()->CM_Site_Mock->emailAddress = $emailAddress;
 		return $site;
 	}
 
