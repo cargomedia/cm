@@ -45,8 +45,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				} else {
 					$channelsPersistenceArray[$channel] = $channelModel;
 				}
-			} catch (Exception $e) {
-				CM_Bootloader::getInstance()->handleException($e);
+			} catch (CM_Exception $e) {
+				$this->_handleException($e);
 			}
 		}
 
@@ -63,8 +63,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					$streamsPersistenceArray[$channel . '/' . $stream->getKey()] = $stream;
 				}
 
-			} catch (Exception $e) {
-				CM_Bootloader::getInstance()->handleException($e);
+			} catch (CM_Exception $e) {
+				$this->_handleException($e);
 			}
 		}
 
@@ -105,12 +105,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 																		'streamChannel' => $streamChannel, 'key' => $clientKey));
 							}
 						}
-					} catch (Exception $e) {
-						CM_Bootloader::getInstance()->handleException($e);
+					} catch (CM_Exception $e) {
+						$this->_handleException($e);
 					}
 				}
-			} catch (Exception $e) {
-				CM_Bootloader::getInstance()->handleException($e);
+			} catch (CM_Exception $e) {
+				$this->_handleException($e);
 			}
 		}
 	}
@@ -208,5 +208,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			$statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
 		}
 		return $statusData;
+	}
+
+	/**
+	 * @param CM_Exception $exception
+	 */
+	protected function _handleException(CM_Exception $exception) {
+		CM_Bootloader::getInstance()->handleException($exception);
 	}
 }

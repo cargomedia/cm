@@ -136,15 +136,16 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 				'foo' => array('clientKey' => 'foo', 'subscribeStamp' => $jsTime, 'data' => array()),
 			))
 		);
-		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus'))->getMock();
+		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus', '_handleException'))->getMock();
 		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
+		$test = $this;
+		$adapter->expects($this->once())->method('_handleException')->will($this->returnCallback(function() use ($test) {
+			/** @var $exception CM_Exception */
+			$exception = func_get_arg(0);
+			$test->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $exception->getMessage());
+		}));
 		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
-		try {
-			$adapter->synchronize();
-			$this->fail('Was able to instantiate StreamChannel with invalid type');
-		} catch (CM_Exception_Invalid $e) {
-			$this->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $e->getMessage());
-		}
+		$adapter->synchronize();
 	}
 
 	/**
