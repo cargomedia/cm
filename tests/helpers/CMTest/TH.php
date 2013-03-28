@@ -13,20 +13,37 @@ class CMTest_TH {
 		if (self::$initialized) {
 			return;
 		}
-		$config = CM_Config::get()->CM_Db_Db;
-		$client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password);
+		$config = CM_Config::get();
+		$configDb = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
 
 		if (CM_Config::get()->CMTest_TH->dropDatabase) {
-			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($config->db))->execute();
+			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
 		}
 
-		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($config->db))->fetch();
+		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
 		if (!$databaseExists) {
-			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config->db))->execute();
+			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Db_Db::runDump($config->db, $dump);
+				CM_Db_Db::runDump($configDb->db, $dump);
 			}
 		}
+
+		$siteCMTest = new CMTest_Site_CM();
+		$siteId = $siteCMTest->getId();
+		$siteClassName = get_class($siteCMTest);
+		$types = CM_Config::get()->CM_Site_Abstract->types;
+		$types[$siteId] = $siteClassName;
+		CM_Config::get()->CM_Site_Abstract->types = $types;
+		CM_Config::get()->$siteClassName = new stdClass;
+		CM_Config::get()->$siteClassName->url = 'http://www.example.dev';
+		CM_Config::get()->$siteClassName->urlCdn = 'http://cdn.example.dev';
+		CM_Config::get()->$siteClassName->name = 'Example';
+		CM_Config::get()->$siteClassName->emailAddress = 'example@example.dev';
+
+		$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
+		$siteDefault = $siteCMTest;
+		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
 
 		self::$_configBackup = serialize(CM_Config::get());
 

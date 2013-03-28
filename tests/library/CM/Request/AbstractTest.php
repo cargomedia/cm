@@ -37,7 +37,8 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function testGetCookie() {
 		$uri = '/';
-		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
+		$headers = array('Host'   => 'example.ch', 'Connection' => 'keep-alive',
+						 'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertEquals('hello', $mock->getCookie('foo'));
 		$this->assertEquals('tender', $mock->getCookie('bar'));
@@ -153,9 +154,9 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$this->assertTrue($mock->hasClientId());
 	}
 
-
 	public function testGetClientIdSetCookie() {
-		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+		$siteDefaultType = CM_Site_Abstract::factory()->getType();
+		$request = new CM_Request_Post('/foo/' . $siteDefaultType);
 		$clientId = $request->getClientId();
 		/** @var CM_Response_Abstract $response */
 		$response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));

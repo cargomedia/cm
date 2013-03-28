@@ -39,7 +39,7 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		set_exception_handler(function(Exception $exception) {
+		set_exception_handler(function (Exception $exception) {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain');
 			}
@@ -51,11 +51,11 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-			$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-				E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-				E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-				E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-				E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+			$errorCodes = array(E_ERROR           => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+								E_CORE_ERROR      => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+								E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
+								E_USER_NOTICE     => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+								E_DEPRECATED      => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
 			$errstr = $errorCodes[$errno] . ': ' . $errstr;
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
@@ -232,6 +232,14 @@ class CM_Bootloader {
 	 */
 	private function _getNamespacePathsLibrary() {
 		$namespacePaths = array();
+		if (DIR_LIBRARY_TESTS) {
+			$directory = dir(DIR_ROOT . DIR_LIBRARY_TESTS);
+			while (false !== ($entry = $directory->read())) {
+				if (substr($entry, 0, 1) !== '.') {
+					$namespacePaths[$entry] = DIR_LIBRARY_TESTS . $entry . '/';
+				}
+			}
+		}
 		if (DIR_LIBRARY) {
 			$directory = dir(DIR_ROOT . DIR_LIBRARY);
 			while (false !== ($entry = $directory->read())) {
