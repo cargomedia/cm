@@ -104,6 +104,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @return CM_Site_Abstract
+	 */
+	protected function _getSite() {
+		if (null === $this->_siteType) {
+			return $this->_getSiteMock();
+		}
+		return CM_Site_Abstract::factory($this->_siteType);
+	}
+
+	/**
 	 * @param array|null  $namespaces
 	 * @param string|null $url
 	 * @param string|null $urlCdn
@@ -111,23 +121,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param string|null $emailAddress
 	 * @return CM_Site_Abstract
 	 */
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		if (isset($this->_siteType)) {
-			$site = CM_Site_Abstract::factory($this->_siteType);
-			$fullNamespaces = $namespaces;
-			if (null === $fullNamespaces) {
-				$fullNamespaces = array();
-			}
-			array_push($fullNamespaces, 'CM');
-			if (($site->getNamespaces() === $fullNamespaces) && ($site->getUrl() === $url) && ($site->getUrlCdn() === $urlCdn) &&
-					($site->getName() === $name) && ($site->getEmailAddress() === $emailAddress)
-			) {
-				return $site;
-			}
-		}
-		$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
-		if (!isset($this->_siteType)) {
-			$this->_siteType = $site->getType();
+	protected function _getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress);
+		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
+			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+			$siteClassName = get_class($site);
+			CM_CacheLocal::set($cacheKey, $siteClassName);
+		} else {
+			$site = new $siteClassName();
 		}
 		return $site;
 	}
