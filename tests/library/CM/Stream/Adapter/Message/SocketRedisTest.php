@@ -138,12 +138,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		);
 		$adapter = $this->getMockBuilder('CM_Stream_Adapter_Message_SocketRedis')->setMethods(array('_fetchStatus', '_handleException'))->getMock();
 		$adapter->expects($this->any())->method('_fetchStatus')->will($this->returnValue($status));
-		$test = $this;
-		$adapter->expects($this->once())->method('_handleException')->will($this->returnCallback(function() use ($test) {
-			/** @var $exception CM_Exception */
-			$exception = func_get_arg(0);
-			$test->assertSame('Type `0` not configured for class `CM_Model_StreamChannel_Message`.', $exception->getMessage());
-		}));
+		$adapter->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('Type `0` not configured for class `CM_Model_StreamChannel_Message`.'));
 		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
 		$adapter->synchronize();
 	}
