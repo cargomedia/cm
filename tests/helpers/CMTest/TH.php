@@ -169,8 +169,8 @@ class CMTest_TH {
 		}
 		do {
 			$siteId = rand(1, 255);
-			$siteClassName = 'CM_Site_Mock' . $siteId . 'r' . rand();
-		} while (array_key_exists($siteId, $types) || class_exists($siteClassName, false));
+			$siteClassName = 'CM_Site_Mock' . md5(rand() . uniqid());
+		} while (array_key_exists($siteId, $types) || class_exists($siteClassName));
 		$codeNamespaces = '';
 		foreach ($namespaces as $namespace) {
 			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
