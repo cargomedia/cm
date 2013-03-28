@@ -226,6 +226,15 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $tree;
 	}
 
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public static function existsKey($name) {
+        $name = (string) $name;
+        return (boolean) CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetch();
+    }
+
 	/**
 	 * @param string       $name
 	 * @param string|null  $nameNew

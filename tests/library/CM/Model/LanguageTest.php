@@ -163,6 +163,13 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		$this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
 	}
 
+    public function testExistsKey() {
+        $language = CM_Model_Language::findDefault();
+        $this->assertFalse(CM_Model_Language::existsKey('foo'));
+        $language->setTranslation('foo', 'true');
+        $this->assertTrue(CM_Model_Language::existsKey('foo'));
+    }
+
 	public function testFindDefault() {
 		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
