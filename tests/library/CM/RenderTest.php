@@ -85,21 +85,21 @@ class CM_RenderTest extends CMTest_TestCase {
 	public function testGetUrlResource() {
 		$site = $this->_getSite();
 		$render = new CM_Render($site);
-		$type = $site->getType();
+		$siteType = $site->getType();
 		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
 		$this->assertSame('http://www.foo.com', $render->getUrlResource());
 		$this->assertSame('http://www.foo.com', $render->getUrlResource('layout'));
 		$this->assertSame('http://www.foo.com', $render->getUrlResource(null, 'foo/bar.jpg'));
 		$this->assertSame(
-			'http://www.foo.com/layout/' . $type . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+			'http://www.foo.com/layout/' . $siteType . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
 		CM_Config::get()->CM_Render->cdnResource = true;
 		$this->assertSame('http://www.cdn.com', $render->getUrlResource());
 		$this->assertSame('http://www.cdn.com', $render->getUrlResource('layout'));
 		$this->assertSame('http://www.cdn.com', $render->getUrlResource(null, 'foo/bar.jpg'));
 		$this->assertSame(
-			'http://www.cdn.com/layout/' . $type . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-		$this->assertSame('http://www.cdn.com/layout/' . $type . '/' . $releaseStamp . '/0', $render->getUrlResource('layout', '0'));
-		$this->assertSame('http://www.cdn.com/0/' . $type . '/' . $releaseStamp . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+			'http://www.cdn.com/layout/' . $siteType . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+		$this->assertSame('http://www.cdn.com/layout/' . $siteType . '/' . $releaseStamp . '/0', $render->getUrlResource('layout', '0'));
+		$this->assertSame('http://www.cdn.com/0/' . $siteType . '/' . $releaseStamp . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
 	}
 
 	public function testGetUrlStatic() {
