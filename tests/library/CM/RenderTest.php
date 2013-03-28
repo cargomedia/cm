@@ -151,7 +151,7 @@ class CM_RenderTest extends CMTest_TestCase {
 		$this->assertNull($render->getViewer());
 	}
 
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		return parent::_getSite($namespaces, 'http://www.foo.com', 'http://www.cdn.com', 'Foo', 'foo@foo.com');
+	protected function _getSite(array $namespaces = null) {
+		return $this->_getSiteMock($namespaces, 'http://www.foo.com', 'http://www.cdn.com', 'Foo', 'foo@foo.com');
 	}
 }
