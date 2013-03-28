@@ -20,11 +20,8 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 		$this->assertAjaxResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
 	}
 
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		if (null === $url) {
-			$url = 'http://www.test.com/';
-		}
-		return parent::_getSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+	protected function _getSite() {
+		return $this->_getSiteMock(null, 'http://www.test.com/');
 	}
 }
 
