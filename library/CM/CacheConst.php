@@ -16,15 +16,15 @@ class CM_CacheConst {
 
 	const PagingSource = 'PagingSource';
 
-	const Usertext_Badwords = 'Usertext_Badwords';
+	const Usertext_Filter_BadwordRegexp = 'Usertext_Filter_BadwordRegexp';
 
-	const Usertext_Emoticons = 'Usertext_Emoticons';
+	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
 
 	// _id:X
 	const Session = 'Session';
 	// _id:X
 	const Request_Client = 'Request_Client';
-	
+
 	// _class:X_id:X
 	const Model = 'Model';
 
