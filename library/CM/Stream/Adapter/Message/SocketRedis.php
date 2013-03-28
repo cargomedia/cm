@@ -65,7 +65,9 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		}
 
 		foreach ($channelsStatus as $channel => $channelModel) {
-			list($channelKey, $channelType) = explode(':', $channel, 2);
+			$channelData = CM_Model_StreamChannel_Message::getChannelData($channel);
+			$channelKey = $channelData['key'];
+			$channelType = $channelData['type'];
 			if (isset($channelsPersistenceArray[$channel])) {
 				$streamChannel = $channelsPersistenceArray[$channel];
 				if ($streamChannel->getType() != $channelType) {
@@ -147,7 +149,9 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _subscribe($channel, $clientKey, $start, $allowedUntil, CM_Model_User $user = null) {
-		list($channelKey, $channelType) = explode(':', $channel, 2);
+		$channelData = CM_Model_StreamChannel_Message::getChannelData($channel);
+		$channelKey = $channelData['key'];
+		$channelType = $channelData['type'];
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
 		if ($streamChannel && $streamChannel->getType() != $channelType) {
 			throw new CM_Exception_Invalid('StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType .'`');
