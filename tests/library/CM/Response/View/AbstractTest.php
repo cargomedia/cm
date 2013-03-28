@@ -19,6 +19,13 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
 		$this->assertAjaxResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
 	}
+
+	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		if (null === $url) {
+			$url = 'http://www.test.com/';
+		}
+		return parent::_getSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+	}
 }
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
