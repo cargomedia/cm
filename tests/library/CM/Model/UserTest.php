@@ -64,9 +64,10 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testCreateWithSite() {
-		$siteCM = new CM_Site_CM();
-		$user = CM_Model_User::create(array('site' => $siteCM));
-		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId(), 'site' => $siteCM->getType()));
+		$site = $this->_getSite();
+		/** @var CM_Model_User $user */
+		$user = CM_Model_User::create(array('site' => $site));
+		$this->assertEquals($site, $user->getSite());
 	}
 
 	public function testCreateWithLanguage() {
@@ -88,20 +89,17 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testSetSite() {
-		$siteDefault = CM_Site_Abstract::factory();
 		$site = $this->_getSite();
-		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create();
-		$this->assertSame($siteDefault->getId(), $user->getSite()->getId());
+		$user = CMTest_TH::createUser();
+		$this->assertNotEquals($site, $user->getSite());
 		$user->setSite($site);
-		$this->assertSame($site->getId(), $user->getSite()->getId());
+		$this->assertEquals($site, $user->getSite());
 	}
 
 	public function testSetLanguage() {
-		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create();
-		$this->assertNull($user->getLanguage());
 		$language = CMTest_TH::createLanguage();
+		$user = CMTest_TH::createUser();
+		$this->assertNotEquals($language, $user->getLanguage());
 		$user->setLanguage($language);
 		$this->assertEquals($language, $user->getLanguage());
 	}
