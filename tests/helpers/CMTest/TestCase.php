@@ -96,60 +96,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param array|null  $namespaces
-	 * @param string|null $url
-	 * @param string|null $urlCdn
-	 * @param string|null $name
-	 * @param string|null $emailAddress
-	 * @throws PHPUnit_Framework_Exception
-	 * @return CM_Site_Abstract
-	 */
-	protected function _createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		if (null === $namespaces) {
-			$namespaces = array();
-		}
-		$url = is_null($url) ? null : (string) $url;
-		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
-		$name = is_null($name) ? null : (string) $name;
-		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
-
-		$types = CM_Config::get()->CM_Site_Abstract->types;
-		if (count($types) >= 255) {
-			throw new PHPUnit_Framework_Exception('Maximum number of concurrent sites reached');
-		}
-		do {
-			$siteId = rand(1, 255);
-			$siteClassName = 'CM_Site_Mock' . $siteId . 'r' . rand();
-		} while (array_key_exists($siteId, $types) || class_exists($siteClassName, false));
-		$codeNamespaces = '';
-		foreach ($namespaces as $namespace) {
-			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
-		}
-		$code = <<<EOD
-class $siteClassName extends CM_Site_Abstract {
-
-	const TYPE = $siteId;
-
-	public function __construct() {
-		parent::__construct();
-		$codeNamespaces
-	}
-}
-EOD;
-		eval($code);
-
-		$site = new $siteClassName();
-		$types[$siteId] = $siteClassName;
-		CM_Config::get()->CM_Site_Abstract->types = $types;
-		CM_Config::get()->$siteClassName = new stdClass;
-		CM_Config::get()->$siteClassName->url = $url;
-		CM_Config::get()->$siteClassName->urlCdn = $urlCdn;
-		CM_Config::get()->$siteClassName->name = $name;
-		CM_Config::get()->$siteClassName->emailAddress = $emailAddress;
-		return $site;
-	}
-
-	/**
 	 * @param CM_Model_User|null $viewer
 	 * @return CM_Render
 	 */
@@ -179,7 +125,7 @@ EOD;
 				return $site;
 			}
 		}
-		$site = $this->_createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+		$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
 		if (!isset($this->_siteType)) {
 			$this->_siteType = $site->getType();
 		}
