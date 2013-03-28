@@ -38,15 +38,11 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$channelsPersistenceArray = array();
 		/** @var $channelModel CM_Model_StreamChannel_Message */
 		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channelModel) {
-			try {
-				$channel = $channelModel->getKey() . ':' . $channelModel->getType();
-				if (!isset($channelsStatus[$channel])) {
-					$channelModel->delete();
-				} else {
-					$channelsPersistenceArray[$channel] = $channelModel;
-				}
-			} catch (CM_Exception $e) {
-				$this->_handleException($e);
+			$channel = $channelModel->getKey() . ':' . $channelModel->getType();
+			if (!isset($channelsStatus[$channel])) {
+				$channelModel->delete();
+			} else {
+				$channelsPersistenceArray[$channel] = $channelModel;
 			}
 		}
 
@@ -57,14 +53,14 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			try {
 				$channelModel = $stream->getStreamChannel();
 				$channel = $channelModel->getKey() . ':' . $channelModel->getType();
-				if (!isset($channelsStatus[$channel]) || !isset($channelsStatus[$channel]['subscribers'][$stream->getKey()])) {
-					$stream->delete();
-				} else {
-					$streamsPersistenceArray[$channel . '/' . $stream->getKey()] = $stream;
-				}
-
-			} catch (CM_Exception $e) {
-				$this->_handleException($e);
+			} catch (CM_Exception_Nonexistent $e) {
+				// For cases when streamChannel has been deleted during this iteration
+				continue;
+			}
+			if (!isset($channelsStatus[$channel]) || !isset($channelsStatus[$channel]['subscribers'][$stream->getKey()])) {
+				$stream->delete();
+			} else {
+				$streamsPersistenceArray[$channel . '/' . $stream->getKey()] = $stream;
 			}
 		}
 
@@ -76,7 +72,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				if (isset($channelsPersistenceArray[$channel])) {
 					$streamChannel = $channelsPersistenceArray[$channel];
 					if ($streamChannel->getType() != $channelType) {
-						throw new CM_Exception_Invalid('StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType .'`');
+						throw new CM_Exception_Invalid(
+							'StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType . '`');
 					}
 				} else {
 					$oldSubscribers = array_filter($channelModel['subscribers'], function ($subscriber) use ($startStampLimit) {
@@ -85,7 +82,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 					if (!count($oldSubscribers)) {
 						continue;
 					}
-					$streamChannel = CM_Model_StreamChannel_Message::createType($channelType, array('key' => $channelKey, 'adapterType' => $this->getType()));
+					$streamChannel = CM_Model_StreamChannel_Message::createType($channelType, array('key'         => $channelKey,
+																									'adapterType' => $this->getType()));
 				}
 				foreach ($channelModel['subscribers'] as $subscriber) {
 					try {
@@ -166,7 +164,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$channelType = $channelData['type'];
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
 		if ($streamChannel && $streamChannel->getType() != $channelType) {
-			throw new CM_Exception_Invalid('StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType .'`');
+			throw new CM_Exception_Invalid(
+				'StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType . '`');
 		}
 		if (!$streamChannel) {
 			/** @var $streamChannel CM_Model_StreamChannel_Message */
@@ -205,7 +204,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$servers = self::_getConfig()->servers;
 		$statusData = array();
 		foreach ($servers as $server) {
-			$statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents('http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
+			$statusData = array_merge_recursive($statusData, CM_Params::decode(CM_Util::getContents(
+				'http://' . $server['httpHost'] . ':' . $server['httpPort']), true));
 		}
 		return $statusData;
 	}
