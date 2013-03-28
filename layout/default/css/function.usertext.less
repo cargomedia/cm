@@ -15,7 +15,13 @@
 		margin: 5px 0;
 		display: block;
 		padding: 2px;
-		border: 1px solid #dddddd;
+		border: 1px solid @colorFgBorderEmphasize1;
+
+		&.emoticon {
+			.emoticon;
+			padding: 0;
+			border: 0;
+		}
 	}
 
 	h1, h2, h3, h4, h5, h6 {
