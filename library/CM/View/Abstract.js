@@ -143,9 +143,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Boolean} [skipDomRemoval]
+	 * @param {Boolean} [skipTriggerRemove]
 	 */
-	remove: function(skipDomRemoval) {
-		this.trigger("destruct");
+	remove: function(skipDomRemoval, skipTriggerRemove) {
+		this.trigger('destruct');
+		if (!skipTriggerRemove) {
+			this.trigger('remove');
+		}
 
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
@@ -174,7 +178,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		view._callbacks = this._callbacks;
 		this.getParent().registerChild(view);
 		this.$().replaceWith(view.$());
-		this.remove(true);
+		this.remove(true, true);
 	},
 
 	disable: function() {

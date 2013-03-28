@@ -29,7 +29,6 @@ class CMTest_TH_Html {
 			return '';
 		}
 		$text = $element->textContent;
-		$text = preg_replace('/' . CM_Usertext::getSplitChar() . '/u', '', $text);
 		return $text;
 	}
 

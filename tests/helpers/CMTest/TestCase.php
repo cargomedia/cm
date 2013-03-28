@@ -104,31 +104,32 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @return CM_Site_Abstract
+	 */
+	protected function _getSite() {
+		if (null === $this->_siteType) {
+			return $this->_getSiteMock();
+		}
+		return CM_Site_Abstract::factory($this->_siteType);
+	}
+
+	/**
 	 * @param array|null  $namespaces
 	 * @param string|null $url
 	 * @param string|null $urlCdn
+	 * @param string|null $name
+	 * @param string|null $emailAddress
 	 * @return CM_Site_Abstract
 	 */
-	protected function _getSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		if (isset($this->_siteType)) {
-			return CM_Site_Abstract::factory($this->_siteType);
+	protected function _getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress);
+		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
+			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
+			$siteClassName = get_class($site);
+			CM_CacheLocal::set($cacheKey, $siteClassName);
+		} else {
+			$site = new $siteClassName();
 		}
-		if (null === $namespaces) {
-			$namespaces = array('CM');
-		}
-		$url = is_null($url) ? null : (string) $url;
-		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
-		$name = is_null($name) ? null : (string) $name;
-		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
-		/** @var CM_Site_Abstract $site */
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_Mock', true, true, true, array('getId', 'getNamespaces'));
-		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
-		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue($namespaces));
-		CM_Config::get()->CM_Site_Mock = new stdClass;
-		CM_Config::get()->CM_Site_Mock->url = $url;
-		CM_Config::get()->CM_Site_Mock->urlCdn = $urlCdn;
-		CM_Config::get()->CM_Site_Mock->name = $name;
-		CM_Config::get()->CM_Site_Mock->emailAddress = $emailAddress;
 		return $site;
 	}
 

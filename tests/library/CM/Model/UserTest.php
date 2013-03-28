@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_UserTest extends CMTest_TestCase {
+
 	public static function setupBeforeClass() {
 	}
 
@@ -62,16 +63,44 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId()));
 	}
 
+	public function testCreateWithSite() {
+		$site = $this->_getSite();
+		/** @var CM_Model_User $user */
+		$user = CM_Model_User::create(array('site' => $site));
+		$this->assertEquals($site, $user->getSite());
+	}
+
+	public function testCreateWithLanguage() {
+		$language = CMTest_TH::createLanguage();
+		/** @var CM_Model_User $user */
+		$user = CM_Model_User::create(array('language' => $language));
+		$this->assertEquals($language, $user->getLanguage());
+	}
+
 	public function testDelete() {
 		$user = CMTest_TH::createUser();
 		$user->delete();
 		try {
 			new CM_Model_User($user->getId());
 			$this->fail('User not deleted.');
-		} catch(CM_Exception_Nonexistent $ex) {
+		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-
 	}
 
+	public function testSetSite() {
+		$site = $this->_getSite();
+		$user = CMTest_TH::createUser();
+		$this->assertNotEquals($site, $user->getSite());
+		$user->setSite($site);
+		$this->assertEquals($site, $user->getSite());
+	}
+
+	public function testSetLanguage() {
+		$language = CMTest_TH::createLanguage();
+		$user = CMTest_TH::createUser();
+		$this->assertNotEquals($language, $user->getLanguage());
+		$user->setLanguage($language);
+		$this->assertEquals($language, $user->getLanguage());
+	}
 }
