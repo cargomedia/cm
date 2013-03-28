@@ -12,11 +12,12 @@
 
 			$this.addClass('clipSlide').data('clipSlide', true);
 			var $content = $this.children();
+			$content.css({display: 'block'});
 			if ($this.height() >= $content.outerHeight(true)) {
 				return;
 			}
 			var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon-expand clickable"></div></a>').appendTo($this);
-			
+
 			$this.css({
 				position: 'relative'
 			});
@@ -25,7 +26,7 @@
 				bottom: '0',
 				width: '100%'
 			});
-			
+
 			$handle.on("click.clipSlide", function() {
 				$this.height($this.height());
 				$this.css('max-height', 'none');
