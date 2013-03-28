@@ -1,5 +1,6 @@
 // Current Version: https://github.com/christopheschwyzer/mediaelement/tree/issue-811
 // with fix for issue https://github.com/johndyer/mediaelement/pull/811
+// and fix from https://github.com/johndyer/mediaelement/pull/800
 
 /*!
  * MediaElement.js
@@ -32,6 +33,7 @@ mejs.plugins = {
 		{version: [9,0,124], types: ['video/mp4','video/m4v','video/mov','video/flv','video/rtmp','video/x-flv','audio/flv','audio/x-flv','audio/mp3','audio/m4a','audio/mpeg', 'video/youtube', 'video/x-youtube']}
 		//,{version: [12,0], types: ['video/webm']} // for future reference (hopefully!)
 	],
+
 	youtube: [
 		{version: null, types: ['video/youtube', 'video/x-youtube', 'audio/youtube', 'audio/x-youtube']}
 	],
@@ -3684,9 +3686,9 @@ if (typeof jQuery != 'undefined') {
 								fullscreenIsDisabled = false;
 							}
 						},
-						videoHoverDiv = $('<div class="mejs-fullscreen-hover" />').appendTo(t.container).mouseover(restoreControls),
-						controlsLeftHoverDiv = $('<div class="mejs-fullscreen-hover"  />').appendTo(t.container).mouseover(restoreControls),
-						controlsRightHoverDiv = $('<div class="mejs-fullscreen-hover"  />').appendTo(t.container).mouseover(restoreControls),
+						videoHoverDiv = $('<div class="mejs-fullscreen-hover" />').appendTo(t.container).mouseover(restoreControls).hide(),
+						controlsLeftHoverDiv = $('<div class="mejs-fullscreen-hover"  />').appendTo(t.container).mouseover(restoreControls).hide(),
+						controlsRightHoverDiv = $('<div class="mejs-fullscreen-hover"  />').appendTo(t.container).mouseover(restoreControls).hide(),
 						positionHoverDivs = function() {
 							var style = {position: 'absolute', top: 0, left: 0}; //, backgroundColor: '#f00'};
 							videoHoverDiv.css(style);
