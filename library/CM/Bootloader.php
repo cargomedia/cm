@@ -15,6 +15,9 @@ class CM_Bootloader {
 	/** @var array|null */
 	private $_namespacePaths;
 
+	/** @var int|null */
+	private $_exceptionOutputSeverityMin;
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -43,7 +46,7 @@ class CM_Bootloader {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain');
 			}
-			CM_Bootloader::handleException($exception);
+			CM_Bootloader::getInstance()->handleException($exception);
 			exit(1);
 		});
 	}
@@ -292,27 +295,22 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return CM_Bootloader
-	 * @throws Exception
+	 * @param int|null $severity
 	 */
-	public static function getInstance() {
-		if (!self::$_instance) {
-			throw new Exception('No bootloader instance');
+	public function setExceptionOutputSeverityMin($severity) {
+		if (null !== $severity) {
+			$severity = (int) $severity;
 		}
-		return self::$_instance;
+		$this->_exceptionOutputSeverityMin = $severity;
 	}
 
 	/**
 	 * @param Exception                      $exception
 	 * @param CM_OutputStream_Interface|null $output
-	 * @param int|null                       $outputSeverityMin
 	 */
-	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null, $outputSeverityMin = null) {
+	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
-		}
-		if (null !== $outputSeverityMin) {
-			$outputSeverityMin = (int) $outputSeverityMin;
 		}
 		$exceptionFormatter = function (Exception $exception) {
 			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
@@ -342,8 +340,8 @@ class CM_Bootloader {
 		}
 
 		$outputEnabled = true;
-		if ($outputSeverityMin !== null && $exception instanceof CM_Exception) {
-			$outputEnabled = ($exception->getSeverity() >= $outputSeverityMin);
+		if ($this->_exceptionOutputSeverityMin !== null && $exception instanceof CM_Exception) {
+			$outputEnabled = ($exception->getSeverity() >= $this->_exceptionOutputSeverityMin);
 		}
 		if ($outputEnabled) {
 			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
@@ -355,5 +353,16 @@ class CM_Bootloader {
 				$output->writeln('Internal server error');
 			}
 		}
+	}
+
+	/**
+	 * @return CM_Bootloader
+	 * @throws Exception
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			throw new Exception('No bootloader instance');
+		}
+		return self::$_instance;
 	}
 }
