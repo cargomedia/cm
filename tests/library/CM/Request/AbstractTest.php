@@ -37,7 +37,8 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function testGetCookie() {
 		$uri = '/';
-		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
+		$headers = array('Host'   => 'example.ch', 'Connection' => 'keep-alive',
+						 'Cookie' => ';213q;213;=foo=hello;bar=tender;  adkhfa ; asdkf===fsdaf');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
 		$this->assertEquals('hello', $mock->getCookie('foo'));
 		$this->assertEquals('tender', $mock->getCookie('bar'));
@@ -153,7 +154,6 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$this->assertTrue($mock->hasClientId());
 	}
 
-
 	public function testGetClientIdSetCookie() {
 		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
 		$clientId = $request->getClientId();
@@ -161,6 +161,23 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));
 		$response->expects($this->once())->method('setCookie')->with('clientId', (string) $clientId);
 		$response->process();
+	}
+
+	public function testIsBotCrawler() {
+		$useragents = array(
+			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => true,
+			'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)' => false,
+			'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' => true,
+		);
+		foreach ($useragents as $useragent => $expected) {
+			$request = new CM_Request_Get('/foo', array('user-agent' => $useragent));
+			$this->assertSame($expected, $request->isBotCrawler());
+		}
+	}
+
+	public function testIsBotCrawlerWithoutUseragent() {
+		$request = new CM_Request_Get('/foo');
+		$this->assertFalse($request->isBotCrawler());
 	}
 
 	/**

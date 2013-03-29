@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_SplittestVariation extends CM_Model_Abstract {
+
 	CONST TYPE = 17;
 
 	/**
