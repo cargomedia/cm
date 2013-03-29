@@ -452,6 +452,17 @@ var CM_App = CM_Class_Abstract.extend({
 			this._$hidden.append(html);
 		},
 
+		/**
+		 * @param {Element} element
+		 * @return Boolean
+		 */
+		isHidden: function(element) {
+			if (!this._$hidden) {
+				return false;
+			}
+			return $.contains(this._$hidden[0], element);
+		},
+
 		hint: function(content) {
 			$.windowHint(content);
 		},

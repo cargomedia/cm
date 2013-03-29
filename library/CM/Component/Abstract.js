@@ -35,18 +35,26 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 		if (!selector) {
 			return this.$el;
 		}
-		selector = selector.replace('#', '#'+this.getAutoId()+'-');
+		selector = selector.replace('#', '#' + this.getAutoId() + '-');
 		return $(selector, this.el);
 	},
 
 	popOut: function(options) {
 		this.repaint();
-		this.$().floatOut(options);
+		this.$el.floatOut(options);
 		this.repaint();
+
+		var self = this;
+		this.$el.one('floatbox-close', function() {
+			if (app.window.isHidden(self.el)) {
+				self.remove();
+			}
+			return false;
+		});
 	},
 
 	popIn: function() {
-		this.$().floatIn();
+		this.$el.floatIn();
 	},
 
 	/**
