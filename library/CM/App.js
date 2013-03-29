@@ -386,8 +386,9 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {String} question
 		 * @param {Function} callback
+		 * @param {Object} [context]
 		 */
-		confirm: function(question, callback) {
+		confirm: function(question, callback, context) {
 			var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
 			var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
 			var $html = $('<div><div class="box_cap clearfix nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
@@ -398,11 +399,12 @@ var CM_App = CM_Class_Abstract.extend({
 			$html.floatOut();
 			$ok.click(function() {
 				$html.floatIn();
-				callback();
+				callback.call(context);
 			});
 			$cancel.click(function() {
 				$html.floatIn();
 			});
+			$ok.focus();
 		}
 	},
 
