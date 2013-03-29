@@ -1,4 +1,5 @@
 <?php
+
 class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
 	const TYPE = 26;
