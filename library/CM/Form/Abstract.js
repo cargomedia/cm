@@ -162,14 +162,14 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 			return false;
 		}
 
-		var handler = this;
 		if (action.confirm_msg && !confirmed) {
 			cm.ui.confirm(cm.language.get(action.confirm_msg), function() {
-				handler.submit(actionName, true, data);
-			});
+				this.submit(actionName, true, data);
+			}, this);
 			return false;
 		}
 
+		var handler = this;
 		this.disable();
 		this.trigger('submit', [data]);
 		cm.ajax('form', {view:this.getComponent()._getArray(), form:this._getArray(), actionName:actionName, data:data}, {
