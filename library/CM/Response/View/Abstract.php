@@ -74,8 +74,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$component->prepare();
 
 		$html = $this->getRender()->render($component);
+		$js = $this->getRender()->getJs()->getJs();
 
-		return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $this->getRender()->getJs()->getJs());
+		$this->getRender()->getJs()->clear();
+		return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $js);
 	}
 
 	/**
@@ -114,6 +116,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$html = $responsePage->getContent();
 		$js = $responsePage->getRender()->getJs()->getJs();
+		$responsePage->getRender()->getJs()->clear();
+
 		$title = $responsePage->getTitle();
 		$layoutClass = get_class($page->getLayout());
 		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {

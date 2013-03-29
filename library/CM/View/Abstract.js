@@ -49,6 +49,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		_.each(this.getChildren(), function(child) {
 			child._ready();
 		});
+		this.trigger('ready');
 	},
 
 	/**
