@@ -104,10 +104,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 							}
 						}
 					} catch (CM_Exception $e) {
+						$e->setSeverity(CM_Exception::WARN);
 						$this->_handleException($e);
 					}
 				}
 			} catch (CM_Exception $e) {
+				$e->setSeverity(CM_Exception::WARN);
 				$this->_handleException($e);
 			}
 		}
