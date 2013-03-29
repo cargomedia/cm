@@ -39,7 +39,7 @@ class CM_Bootloader {
 	}
 
 	public function exceptionHandler() {
-		set_exception_handler(function(Exception $exception) {
+		set_exception_handler(function (Exception $exception) {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain');
 			}
@@ -51,11 +51,24 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-			$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-				E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-				E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-				E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-				E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+			$errorCodes = array(
+				E_ERROR             => 'E_ERROR',
+				E_WARNING           => 'E_WARNING',
+				E_PARSE             => 'E_PARSE',
+				E_NOTICE            => 'E_NOTICE',
+				E_CORE_ERROR        => 'E_CORE_ERROR',
+				E_CORE_WARNING      => 'E_CORE_WARNING',
+				E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+				E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
+				E_USER_ERROR        => 'E_USER_ERROR',
+				E_USER_WARNING      => 'E_USER_WARNING',
+				E_USER_NOTICE       => 'E_USER_NOTICE',
+				E_STRICT            => 'E_STRICT',
+				E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+				E_DEPRECATED        => 'E_DEPRECATED',
+				E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
+				E_ALL               => 'E_ALL',
+			);
 			$errstr = $errorCodes[$errno] . ': ' . $errstr;
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
@@ -292,10 +305,14 @@ class CM_Bootloader {
 	/**
 	 * @param Exception                      $exception
 	 * @param CM_OutputStream_Interface|null $output
+	 * @param int|null                       $outputSeverityMin
 	 */
-	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
+	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null, $outputSeverityMin = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
+		}
+		if (null !== $outputSeverityMin) {
+			$outputSeverityMin = (int) $outputSeverityMin;
 		}
 		$exceptionFormatter = function (Exception $exception) {
 			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
@@ -304,7 +321,6 @@ class CM_Bootloader {
 			return $text;
 		};
 
-		$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
 		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			header('HTTP/1.1 500 Internal Server Error');
 		}
@@ -325,12 +341,19 @@ class CM_Bootloader {
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 
-		if ($showError) {
-			$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
-			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
-			$output->writeln($exception->getTraceAsString());
-		} else {
-			$output->writeln('Internal server error');
+		$outputEnabled = true;
+		if ($outputSeverityMin !== null && $exception instanceof CM_Exception) {
+			$outputEnabled = ($exception->getSeverity() >= $outputSeverityMin);
+		}
+		if ($outputEnabled) {
+			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
+			if ($outputVerbose) {
+				$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
+				$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
+				$output->writeln($exception->getTraceAsString());
+			} else {
+				$output->writeln('Internal server error');
+			}
 		}
 	}
 }
