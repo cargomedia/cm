@@ -14,9 +14,6 @@ class CM_Cli_CommandManager {
 	/** @var CM_OutputStream_Interface */
 	private $_streamError;
 
-	/** @var bool|null */
-	private $_errorOutputSeverityMin = null;
-
 	public function __construct() {
 		$this->_setStreamInput(new CM_InputStream_Readline());
 		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
@@ -103,7 +100,7 @@ class CM_Cli_CommandManager {
 			}
 			return 1;
 		} catch (Exception $e) {
-			CM_Bootloader::handleException($e, $this->_streamError, $this->_errorOutputSeverityMin);
+			CM_Bootloader::getInstance()->handleException($e, $this->_streamError);
 			return 1;
 		}
 	}
@@ -118,7 +115,7 @@ class CM_Cli_CommandManager {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
 		if ($quietWarnings) {
-			$this->_errorOutputSeverityMin = CM_Exception::ERROR;
+			CM_Bootloader::getInstance()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());
