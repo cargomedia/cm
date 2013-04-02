@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Color extends CM_FormField_Abstract {
+class CM_FormField_Color extends CM_FormField_Text {
 
 	public function __construct($name = 'color') {
 		parent::__construct($name);
@@ -12,5 +12,4 @@ class CM_FormField_Color extends CM_FormField_Abstract {
 		}
 		return (string) $userInput;
 	}
-
 }
