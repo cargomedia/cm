@@ -257,7 +257,14 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
-			$dom.find('video').mediaelementplayer({
+			cm.dom.setupVideo($dom.find('video.mediaElement'));
+		},
+		/**
+		 * @param {Object} element
+		 */
+		setupVideo: function(element) {
+			console.log('juhuuu');
+			element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
