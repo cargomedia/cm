@@ -44,7 +44,6 @@ class CMTest_TH {
 		CM_Config::get()->$siteClassName->emailAddress = 'example@example.dev';
 
 		$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
-		$siteDefault = $siteCMTest;
 		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
 
 		self::$_configBackup = serialize(CM_Config::get());

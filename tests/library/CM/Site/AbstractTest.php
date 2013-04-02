@@ -38,8 +38,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFindByRequest() {
-		$siteDefault = CM_Site_Abstract::factory();
 		$request = new CM_Request_Get('/test');
-		$this->assertInstanceOf(get_class($siteDefault), CM_Site_Abstract::findByRequest($request));
+		$this->assertInstanceOf('CMTest_Site_CM', CM_Site_Abstract::findByRequest($request));
 	}
 }
