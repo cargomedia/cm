@@ -32,7 +32,7 @@ class CMTest_TH {
 		$siteCMTest = new CMTest_Site_CM();
 		self::configureSite($siteCMTest, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
 
-		if (!CM_Config::get()->CM_Site_Abstract->class) {
+		if (empty(CM_Config::get()->CM_Site_Abstract->class)) {
 			$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
 			CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
 		}
