@@ -7,6 +7,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerField(new CM_FormField_Distance('locationSlider'));
 		$this->registerField(new CM_FormField_Location('location', null, null, $this->getField('locationSlider')));
 		$this->registerField(new CM_FormField_FileImage('image', 2));
+		$this->registerField(new CM_FormField_Color('color'));
 		$this->registerField(new CM_FormField_Set('set', array(1 => 'Eins', 2 => 'Zwei'), true));
 		$this->registerField(new CM_FormField_Boolean('boolean'));
 		$this->registerField(new CM_FormField_Set_Select('setSelect1', array(1 => 'Eins', 2 => 'Zwei'), true));

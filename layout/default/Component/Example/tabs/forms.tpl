@@ -4,6 +4,7 @@
 	{formField name='location' label="{translate 'Location'}"}
 	{formField name='locationSlider' label="{translate 'Radius'}"}
 	{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
+	{formField name='color' label="{translate 'Color'}"}
 	{formField name='set' label="{translate 'Set'}"}
 	{formField name='boolean' text="{translate 'Bool'}"}
 	{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
