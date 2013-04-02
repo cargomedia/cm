@@ -14,12 +14,12 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	},
 
 	ready: function() {
+		var self = this;
 		this.on('change', function() {
-			$('.iconBox').css('background-color', this.getField('colorBackground').getValue());
-			$('.iconBox .icon').css('text-shadow', this._getShadowValue());
-			$('.iconBox .icon').css('color', this.getField('color').getValue());
-			$('.iconBox .icon').css('font-size', this.getField('sizeSlider').getValue() + "px");
-			this.$('.iconCss').html('background-color: ' + $(".iconBox").css('background-color') + ';<br />' + $(".iconBox .icon").first().attr('style').replace(/; /g, ";<br />"));
+			self._updateCss();
+		});
+		this.$('input[type="text"], input[type="color"]').changetext(function() {
+			self.trigger('change')
 		});
 		this.trigger('change');
 	},
@@ -34,12 +34,15 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 
 	_getShadowValue: function() {
 		return [
-			this.getField('shadowColor').getValue() || '#fff',
-			this.getField('shadowX').getValue() + 'px',
-			this.getField('shadowY').getValue() + 'px',
-			this.getField('shadowBlur').getValue() + 'px'
+			this.getField('shadowColor').getValue() || '#fff', this.getField('shadowX').getValue() + 'px', this.getField('shadowY').getValue() + 'px', this.getField('shadowBlur').getValue() + 'px'
 		].join(' ');
+	},
+
+	_updateCss: function() {
+		this.$('.iconBox').css('background-color', this.getField('colorBackground').getValue());
+		this.$('.iconBox .icon').css('text-shadow', this._getShadowValue());
+		this.$('.iconBox .icon').css('color', this.getField('color').getValue());
+		this.$('.iconBox .icon').css('font-size', this.getField('sizeSlider').getValue() + "px");
+		this.$('.iconCss').html('background-color: ' + this.$(".iconBox").css('background-color') + ';<br />' + this.$(".iconBox .icon").first().attr('style').replace(/; /g, ";<br />"));
 	}
-
-
 });
