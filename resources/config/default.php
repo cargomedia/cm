@@ -15,7 +15,7 @@ $config->CM_Mail = new stdClass();
 $config->CM_Mail->send = true;
 
 $config->CM_Site_Abstract = new stdClass();
-$config->CM_Site_Abstract->class = 'CM_Site_CM';
+$config->CM_Site_Abstract->class = null;
 
 $config->CM_Tracking_Abstract = new stdClass();
 $config->CM_Tracking_Abstract->class = 'CM_Tracking';
@@ -123,12 +123,6 @@ $config->CM_Stream_Video->servers = array(
 $config->CM_Stream_Adapter_Video_Wowza = new stdClass();
 $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
 $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
-
-$config->CM_Site_CM = new stdClass();
-$config->CM_Site_CM->url = 'http://www.example.dev';
-$config->CM_Site_CM->urlCdn = 'http://cdn.example.dev';
-$config->CM_Site_CM->name = 'Example';
-$config->CM_Site_CM->emailAddress = 'example@example.dev';
 
 $config->CM_KissTracking = new stdClass();
 $config->CM_KissTracking->enabled = false;

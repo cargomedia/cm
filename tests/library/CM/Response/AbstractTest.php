@@ -21,14 +21,16 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 		$responses['/form'] = 'CM_Response_View_Form';
 		$responses['/homepage'] = 'CM_Response_Page';
 
+		$siteType = $this->_getSite()->getType();
 		foreach ($responses as $path => $expectedResponse) {
-			$request = new CM_Request_Post($path . '/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+			$request = new CM_Request_Post($path . '/' . $siteType . '/timestamp', null, '');
 			$this->assertInstanceOf($expectedResponse, CM_Response_Abstract::factory($request));
 		}
 	}
 
 	public function testSetDeleteCookie() {
-		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post('/foo/' . $siteType);
 		$response = CM_Response_Abstract::factory($request);
 		$time = time();
 		$timeString = date('D\, d\-M\-Y h:i:s e', $time);

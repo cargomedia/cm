@@ -72,10 +72,18 @@ class CM_Usertext_Usertext {
 	 * @return string
 	 */
 	public function transform($text) {
-		foreach ($this->_getFilters() as $filter) {
-			$text = $filter->transform($text, $this->_render);
+		$cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+		if (0 !== count($this->_getFilters())){
+			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
 		}
-		return $text;
+		if (($result = CM_CacheLocal::get($cacheKey)) === false) {
+			$result = $text;
+			foreach ($this->_getFilters() as $filter) {
+				$result = $filter->transform($result, $this->_render);
+			}
+			CM_CacheLocal::set($cacheKey, $result);
+		}
+		return $result;
 	}
 
 	private function _clearFilters() {
