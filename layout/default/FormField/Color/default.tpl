@@ -1,3 +1,3 @@
 <div>
-<input type="color" name="{$name}" id="{$id}" value="{$value}" data-text="hidden" data-hex="true" />
+	<input type="color" name="{$name}" id="{$id}" value="{$value}" />
 </div>
