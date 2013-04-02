@@ -4,9 +4,9 @@ class CM_Form_ExampleIcon extends CM_Form_Abstract {
 	public function setup() {
 
 		$this->registerField(new CM_FormField_Integer('sizeSlider', 6, 120, 0));
-		$this->registerField(new CM_FormField_Color('colorBackground'));
-		$this->registerField(new CM_FormField_Color('color'));
-		$this->registerField(new CM_FormField_Color('shadowColor'));
+		$this->registerField(new CM_FormField_Text('colorBackground'));
+		$this->registerField(new CM_FormField_Text('color'));
+		$this->registerField(new CM_FormField_Text('shadowColor'));
 		$this->registerField(new CM_FormField_Integer('shadowX', 0, 20, 0));
 		$this->registerField(new CM_FormField_Integer('shadowY', 0, 20, 0));
 		$this->registerField(new CM_FormField_Integer('shadowBlur', 0, 20, 0));
