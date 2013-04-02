@@ -15,17 +15,17 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		this._fields = {};
 		_.each(this.options.fields, function(fieldInfo, name) {
 			// Lazy construct
-			var $field = this.$("#"+name);
+			var $field = this.$("#" + name);
 			if ($field.length) {
 				var fieldClass = window[fieldInfo.className];
-				this.registerField(name,  new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
+				this.registerField(name, new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
 			}
 		}, this);
 
 		var handler = this;
 
 		_.each(this.options.actions, function(action, name) {
-			var $btn = $('#'+this.getAutoId()+'-'+name+'-button');
+			var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
 			$btn.on('click', {action: name}, function(event) {
 				handler.submit(event.data.action);
 				return false;
@@ -78,7 +78,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		if (!selector) {
 			return this.$el;
 		}
-		selector = selector.replace('#', '#'+this.getAutoId()+'-');
+		selector = selector.replace('#', '#' + this.getAutoId() + '-');
 		return $(selector, this.el);
 	},
 
@@ -130,9 +130,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		var action = this.options.actions[actionName];
 
 		if (!confirmed) {
-			$('.form_field_error', this.$())
-				.next('br').remove()
-				.andSelf().remove();
+			$('.form_field_error', this.$()).next('br').remove().andSelf().remove();
 		}
 
 		data = data || this.getData(actionName);
@@ -172,10 +170,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		var handler = this;
 		this.disable();
 		this.trigger('submit', [data]);
-		cm.ajax('form', {view:this.getComponent()._getArray(), form:this._getArray(), actionName:actionName, data:data}, {
+		cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
 			success: function(response) {
 				if (response.errors) {
-					for (var i = response.errors.length-1, error; error = response.errors[i]; i--) {
+					for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
 						if (_.isArray(error)) {
 							handler.getField(error[1]).error(error[0]);
 						} else {

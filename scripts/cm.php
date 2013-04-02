@@ -1,5 +1,4 @@
-#!/usr/bin/env php
-<?php
+#!/usr/bin/env php<?php
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
