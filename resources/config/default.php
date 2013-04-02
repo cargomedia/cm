@@ -15,7 +15,7 @@ $config->CM_Mail = new stdClass();
 $config->CM_Mail->send = true;
 
 $config->CM_Site_Abstract = new stdClass();
-$config->CM_Site_Abstract->class = '';
+$config->CM_Site_Abstract->class = null;
 
 $config->CM_Tracking_Abstract = new stdClass();
 $config->CM_Tracking_Abstract->class = 'CM_Tracking';
