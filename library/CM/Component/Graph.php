@@ -33,7 +33,7 @@ class CM_Component_Graph extends CM_Component_Abstract {
 		if ($xmode == 'time') {
 			$flotOptions['xaxis']['mode'] = 'time';
 		}
-		if (700 / $numPoints < 10) {
+		if ($numPoints > 0 && (700 / $numPoints) < 10) {
 			$flotOptions['points']['show'] = false;
 		}
 
