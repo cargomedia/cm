@@ -1,6 +1,7 @@
 <?php
 
 class CMTest_TH_Html {
+
 	private $_doc;
 	private $_xpath;
 	private $_html;

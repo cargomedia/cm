@@ -1,7 +1,5 @@
 <?php
 
-include_once 'library/CMTest/Site/CM.php';
-
 class CMTest_TH {
 
 	private static $timeDelta = 0;
