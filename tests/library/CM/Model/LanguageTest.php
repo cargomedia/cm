@@ -163,11 +163,11 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		$this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
 	}
 
-    public function testExistsKey() {
-        $language = CM_Model_Language::findDefault();
-        $this->assertFalse(CM_Model_Language::existsKey('foo'));
+    public function testHasKey() {
+        $language = $this->_language;
+        $this->assertFalse(CM_Model_Language::hasKey('foo'));
         $language->setTranslation('foo', 'true');
-        $this->assertTrue(CM_Model_Language::existsKey('foo'));
+        $this->assertTrue(CM_Model_Language::hasKey('foo'));
     }
 
 	public function testFindDefault() {
@@ -225,6 +225,13 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 				'otherKey' => array('value' => 'value', 'variables' => array()),
 				'thirdKey' => array('value' => 'its value', 'variables' => array()),
 			), $this->_language->getTranslations()->getAssociativeArray());
+		}
+
+		try {
+			CM_Model_Language::updateKey('nonExistentKey', 'otherKey');
+			$this->fail('Should throw exception in nonexistent value');
+		} catch (CM_Exception_Nonexistent $e) {
+			$this->assertTrue(true);
 		}
 
 		$this->_language->setTranslation('variableKey', 'value', array('foo', 'bar'));
