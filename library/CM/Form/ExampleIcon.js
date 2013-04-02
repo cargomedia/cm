@@ -18,7 +18,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 		this.on('change', function() {
 			self._updateCss();
 		});
-		this.$('input[type="text"]').changetext(function() {
+		this.$('input[type="text"], input[type="color"]').changetext(function() {
 			self.trigger('change')
 		});
 		this.trigger('change');
