@@ -30,16 +30,7 @@ class CMTest_TH {
 		}
 
 		$siteCMTest = new CMTest_Site_CM();
-		$siteId = $siteCMTest->getId();
-		$siteClassName = get_class($siteCMTest);
-		$types = CM_Config::get()->CM_Site_Abstract->types;
-		$types[$siteId] = $siteClassName;
-		CM_Config::get()->CM_Site_Abstract->types = $types;
-		CM_Config::get()->$siteClassName = new stdClass;
-		CM_Config::get()->$siteClassName->url = 'http://www.example.dev';
-		CM_Config::get()->$siteClassName->urlCdn = 'http://cdn.example.dev';
-		CM_Config::get()->$siteClassName->name = 'Example';
-		CM_Config::get()->$siteClassName->emailAddress = 'example@example.dev';
+		self::configureSite($siteCMTest, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
 
 		$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
 		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
@@ -174,10 +165,6 @@ class CMTest_TH {
 		if (null === $namespaces) {
 			$namespaces = array();
 		}
-		$url = is_null($url) ? null : (string) $url;
-		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
-		$name = is_null($name) ? null : (string) $name;
-		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 
 		$types = CM_Config::get()->CM_Site_Abstract->types;
 		if (count($types) >= 255) {
@@ -187,6 +174,7 @@ class CMTest_TH {
 			$siteId = rand(1, 255);
 			$siteClassName = 'CM_Site_Mock' . md5(rand() . uniqid());
 		} while (array_key_exists($siteId, $types) || class_exists($siteClassName));
+
 		$codeNamespaces = '';
 		foreach ($namespaces as $namespace) {
 			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
@@ -205,6 +193,26 @@ EOD;
 		eval($code);
 
 		$site = new $siteClassName();
+		self::configureSite($site, $url, $urlCdn, $name, $emailAddress);
+		return $site;
+	}
+
+	/**
+	 * @param CM_Site_Abstract $site
+	 * @param string|null      $url
+	 * @param string|null      $urlCdn
+	 * @param string|null      $name
+	 * @param string|null      $emailAddress
+	 */
+	public static function configureSite(CM_Site_Abstract $site, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+		$siteClassName = get_class($site);
+		$siteId = $site->getType();
+		$url = is_null($url) ? null : (string) $url;
+		$urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
+		$name = is_null($name) ? null : (string) $name;
+		$emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
+
+		$types = CM_Config::get()->CM_Site_Abstract->types;
 		$types[$siteId] = $siteClassName;
 		CM_Config::get()->CM_Site_Abstract->types = $types;
 		CM_Config::get()->$siteClassName = new stdClass;
@@ -212,7 +220,6 @@ EOD;
 		CM_Config::get()->$siteClassName->urlCdn = $urlCdn;
 		CM_Config::get()->$siteClassName->name = $name;
 		CM_Config::get()->$siteClassName->emailAddress = $emailAddress;
-		return $site;
 	}
 
 	/**
