@@ -34,42 +34,36 @@ class CM_Usertext_Usertext {
 		}
 		$mode = (string) $mode;
 		$this->_clearFilters();
-		$cacheKey = 'Usertext_Transformation_' . $mode;
-
-		if ($maxLength !== null || ($this->_filterList = CM_CacheLocal::get($cacheKey)) === false) {
-			$this->addFilter(new CM_Usertext_Filter_Escape());
-			$this->addFilter(new CM_Usertext_Filter_Badwords());
-			switch ($mode) {
-				case 'oneline':
-					$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-					break;
-				case 'simple':
-					$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-					$this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
-					break;
-				case 'markdown':
-					if (null !== $maxLength) {
-						throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
-					}
-					$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-					$this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
-					$this->addFilter(new CM_Usertext_Filter_Markdown(true));
-					$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-					break;
-				case 'markdownPlain':
-					$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-					$this->addFilter(new CM_Usertext_Filter_Markdown(true));
-					$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
-					$this->addFilter(new CM_Usertext_Filter_Striptags());
-					$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
-					break;
-			}
-			$this->addFilter(new CM_Usertext_Filter_Emoticon());
-			if ('markdownPlain' != $mode) {
-				$this->addFilter(new CM_Usertext_Filter_CutWhitespace());
-			}
-
-			CM_CacheLocal::set($cacheKey, $this->_filterList);
+		$this->addFilter(new CM_Usertext_Filter_Escape());
+		$this->addFilter(new CM_Usertext_Filter_Badwords());
+		switch ($mode) {
+			case 'oneline':
+				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+				break;
+			case 'simple':
+				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+				$this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
+				break;
+			case 'markdown':
+				if (null !== $maxLength) {
+					throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
+				}
+				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
+				$this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
+				$this->addFilter(new CM_Usertext_Filter_Markdown(true));
+				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
+				break;
+			case 'markdownPlain':
+				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
+				$this->addFilter(new CM_Usertext_Filter_Markdown(true));
+				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
+				$this->addFilter(new CM_Usertext_Filter_Striptags());
+				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+				break;
+		}
+		$this->addFilter(new CM_Usertext_Filter_Emoticon());
+		if ('markdownPlain' != $mode) {
+			$this->addFilter(new CM_Usertext_Filter_CutWhitespace());
 		}
 	}
 
@@ -78,10 +72,18 @@ class CM_Usertext_Usertext {
 	 * @return string
 	 */
 	public function transform($text) {
-		foreach ($this->_getFilters() as $filter) {
-			$text = $filter->transform($text, $this->_render);
+		$cacheKey = CM_CacheConst::Usertext . '_text:' . CM_Cache_Abstract::key(md5($text));
+		if (0 !== count($this->_getFilters())){
+			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
 		}
-		return $text;
+		if (($result = CM_CacheLocal::get($cacheKey)) === false) {
+			foreach ($this->_getFilters() as $filter) {
+				$text = $filter->transform($text, $this->_render);
+			}
+			$result = $text;
+			CM_CacheLocal::set($cacheKey, $result);
+		}
+		return $result;
 	}
 
 	private function _clearFilters() {
