@@ -10,7 +10,7 @@
 		"wurfl/tera-wurfl": "2.1.5",
 		"michelf/php-markdown": "1.3-beta5"
 	},
-	"repositories": [
+	"repositories":[
 		{
 			"packagist": false
 		},
@@ -26,8 +26,8 @@
 	"autoload": {
 		"psr-0": {
 			"CM_": "library/",
-			"CMService_": "library/",
-			"CMTest_": "tests/helpers/"
+			"CMService_" : "library/",
+			"CMTest_" : "tests/helpers/"
 		}
 	}
 }
