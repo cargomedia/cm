@@ -49,6 +49,7 @@ class CM_Usertext_Usertext {
 					throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
 				}
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
+				$this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
 				$this->addFilter(new CM_Usertext_Filter_Markdown(true));
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
 				break;
