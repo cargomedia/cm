@@ -226,6 +226,15 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $tree;
 	}
 
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public static function hasKey($name) {
+        $name = (string) $name;
+        return (boolean) CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $name));
+    }
+
 	/**
 	 * @param string       $name
 	 * @param string|null  $nameNew
@@ -238,10 +247,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::_setKeyVariables($name, $variableNamesNew);
 		}
 		if ($nameNew !== null) {
-			if (!CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn()) {
+			if (!CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $name))) {
 				throw new CM_Exception_Nonexistent('LanguageKey `' . $name . '` does not exist');
 			}
-			if (CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchColumn()) {
+			if (CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $nameNew))) {
 				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
 			}
 			CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
