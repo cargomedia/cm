@@ -232,14 +232,6 @@ class CM_Bootloader {
 	 */
 	private function _getNamespacePathsLibrary() {
 		$namespacePaths = array();
-		if (DIR_LIBRARY_TESTS) {
-			$directory = dir(DIR_ROOT . DIR_LIBRARY_TESTS);
-			while (false !== ($entry = $directory->read())) {
-				if (substr($entry, 0, 1) !== '.') {
-					$namespacePaths[$entry] = DIR_LIBRARY_TESTS . $entry . '/';
-				}
-			}
-		}
 		if (DIR_LIBRARY) {
 			$directory = dir(DIR_ROOT . DIR_LIBRARY);
 			while (false !== ($entry = $directory->read())) {
