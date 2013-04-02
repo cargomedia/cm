@@ -263,7 +263,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} element
 		 */
 		setupVideo: function(element) {
-			console.log('juhuuu');
 			element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
