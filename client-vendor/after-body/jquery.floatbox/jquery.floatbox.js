@@ -96,13 +96,14 @@
 			});
 
 			this.$layer.data('floatbox', this);
+			$element.trigger('floatbox-open');
 		},
 		close: function() {
 			if (!this.options.closable) {
 				return;
 			}
+			var $element = this.$floatbox.children('.floatbox-body').children();
 			if (this.$parent.length) {
-				var $element = this.$floatbox.children('.floatbox-body').children();
 				this.$parent.append($element);
 			}
 			this.$layer.removeData('floatbox');
@@ -117,6 +118,7 @@
 				$('html').removeClass('floatbox-active floatbox-replaceBody');
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
+			$element.trigger('floatbox-close');
 		},
 		repaint: function() {
 			if (this.options.fullscreen) {

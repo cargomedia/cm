@@ -206,8 +206,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string  $path
-	 * @param array   $params Query parameters
+	 * @param string $path
+	 * @param array  $params Query parameters
 	 * @return string
 	 */
 	public static function link($path, array $params = null) {
@@ -269,8 +269,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string        $string
-	 * @param string|null   $separator
+	 * @param string      $string
+	 * @param string|null $separator
 	 * @return string
 	 */
 	public static function uncamelize($string, $separator = null) {
@@ -442,10 +442,10 @@ class CM_Util {
 	 * Each leaf node contains an array consisting of the $rowcount - $level last entries of the row it represents. Or a scalar in the
 	 * case of $level = $rowcount -1.
 	 *
-	 * @param array[]               $items
-	 * @param int|null              $level           The number of columns that are used as indexes.
-	 * @param bool|null             $distinctLeaves  Whether or not the leaves are unique given the specified indexes
-	 * @param string[]|string|null  $keyNames
+	 * @param array[]              $items
+	 * @param int|null             $level           The number of columns that are used as indexes.
+	 * @param bool|null            $distinctLeaves  Whether or not the leaves are unique given the specified indexes
+	 * @param string[]|string|null $keyNames
 	 * @throws CM_Exception_Invalid
 	 * @return array[]
 	 */

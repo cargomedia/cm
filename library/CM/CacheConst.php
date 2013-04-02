@@ -1,6 +1,7 @@
 <?php
 
 class CM_CacheConst {
+
 	// _tag:X
 	const Tag_Version = 'Tag_Version';
 
@@ -58,4 +59,6 @@ class CM_CacheConst {
 
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';
+
+	const TestCase_Site_Mock = 'TestCase_Site_Mock';
 }

@@ -164,6 +164,23 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$response->process();
 	}
 
+	public function testIsBotCrawler() {
+		$useragents = array(
+			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => true,
+			'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)' => false,
+			'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' => true,
+		);
+		foreach ($useragents as $useragent => $expected) {
+			$request = new CM_Request_Get('/foo', array('user-agent' => $useragent));
+			$this->assertSame($expected, $request->isBotCrawler());
+		}
+	}
+
+	public function testIsBotCrawlerWithoutUseragent() {
+		$request = new CM_Request_Get('/foo');
+		$this->assertFalse($request->isBotCrawler());
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders

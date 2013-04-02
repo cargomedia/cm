@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require_once dirname(__DIR__) . '/library/CM/Bootloader.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->setEnvironment('cli');
 $bootloader->load(array('constants', 'exceptionHandler', 'errorHandler', 'defaults'));

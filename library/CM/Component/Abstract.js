@@ -7,13 +7,10 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 
 	_ready: function() {
 		cm.dom.setup(this.$());
-	
-		this.ready();
-		_.each(this.getChildren(), function(child) {
-			child._ready();
-		});
+
+		CM_View_Abstract.prototype._ready.call(this);
 	},
-	
+
 	/**
 	 * Called on popOut()
 	 */
@@ -30,7 +27,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 			$(window).off('resize', callback);
 		});
 	},
-	
+
 	/**
 	 * @return jQuery
 	 */
@@ -38,34 +35,42 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 		if (!selector) {
 			return this.$el;
 		}
-		selector = selector.replace('#', '#'+this.getAutoId()+'-');
+		selector = selector.replace('#', '#' + this.getAutoId() + '-');
 		return $(selector, this.el);
 	},
-	
+
 	popOut: function(options) {
 		this.repaint();
-		this.$().floatOut(options);
+		this.$el.floatOut(options);
 		this.repaint();
+
+		var self = this;
+		this.$el.one('floatbox-close', function() {
+			if (app.window.isHidden(self.el)) {
+				self.remove();
+			}
+			return false;
+		});
 	},
-	
+
 	popIn: function() {
-		this.$().floatIn();
+		this.$el.floatIn();
 	},
-	
+
 	/**
 	 * @param {String} message
 	 */
 	error: function(message) {
 		cm.window.hint(message);
 	},
-	
+
 	/**
 	 * @param {String} message
 	 */
 	message: function(message) {
 		cm.window.hint(message);
 	},
-	
+
 	/**
 	 * @return jqXHR
 	 */

@@ -25,4 +25,30 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 		return hash('md5', self::SALT . ':' . $user->getId());
 	}
 
+	/**
+	 * @param CM_Model_User $user
+	 * @param string        $namespace
+	 * @param mixed|null    $data
+	 */
+	public static function publish(CM_Model_User $user, $namespace, $data = null) {
+		if (!$user->getOnline()) {
+			return;
+		}
+		$streamChannel = self::getKeyByUser($user);
+		parent::publish($streamChannel, $namespace, $data);
+	}
+
+	/**
+	 * @param CM_Model_User      $user
+	 * @param CM_Action_Abstract $action
+	 * @param CM_Model_Abstract  $model
+	 * @param mixed|null         $data
+	 */
+	public static function publishAction(CM_Model_User $user, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
+		if (!$user->getOnline()) {
+			return;
+		}
+		$streamChannel = self::getKeyByUser($user);
+		parent::publishAction($streamChannel, $action, $model, $data);
+	}
 }

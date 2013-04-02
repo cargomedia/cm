@@ -305,14 +305,14 @@ var CM_App = CM_Class_Abstract.extend({
 			return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		$timeago: function(timestamp) {
 			return $(this.timeago(timestamp)).timeago();
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		timeago: function(timestamp) {
@@ -386,8 +386,9 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {String} question
 		 * @param {Function} callback
+		 * @param {Object} [context]
 		 */
-		confirm: function(question, callback) {
+		confirm: function(question, callback, context) {
 			var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
 			var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
 			var $html = $('<div><div class="box_cap clearfix nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
@@ -398,11 +399,12 @@ var CM_App = CM_Class_Abstract.extend({
 			$html.floatOut();
 			$ok.click(function() {
 				$html.floatIn();
-				callback();
+				callback.call(context);
 			});
 			$cancel.click(function() {
 				$html.floatIn();
 			});
+			$ok.focus();
 		}
 	},
 
@@ -450,6 +452,17 @@ var CM_App = CM_Class_Abstract.extend({
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
 			}
 			this._$hidden.append(html);
+		},
+
+		/**
+		 * @param {Element} element
+		 * @return Boolean
+		 */
+		isHidden: function(element) {
+			if (!this._$hidden) {
+				return false;
+			}
+			return $.contains(this._$hidden[0], element);
 		},
 
 		hint: function(content) {
@@ -595,14 +608,19 @@ var CM_App = CM_Class_Abstract.extend({
 		_channelDispatchers: {},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(channel, namespace, callback, context) {
+		bind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
+			}
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
 			}
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
@@ -611,14 +629,19 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channel, namespace, callback, context) {
+		unbind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!this._channelDispatchers[channel]) {
 				return;
+			}
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
 			}
 			this._channelDispatchers[channel].off(namespace, callback, context);
 			if (this._getBindCount(channel) === 0) {
@@ -628,7 +651,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} channel
-		 * @return {Integer}
+		 * @return {Number}
 		 */
 		_getBindCount: function(channel) {
 			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._callbacks) {
@@ -733,30 +756,24 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
-		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, callback, streamChannel, context) {
-			streamChannel = streamChannel || cm.options.stream.channel;
-			if (!streamChannel) {
-				return;
-			}
-			cm.stream.bind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {Function} [callback]
-		 * @param {String} [streamChannel]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback, streamChannel, context) {
-			streamChannel = streamChannel || cm.options.stream.channel;
-			if (!streamChannel) {
-				return;
-			}
-			cm.stream.unbind(streamChannel, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 

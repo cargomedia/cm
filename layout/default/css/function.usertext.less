@@ -8,14 +8,15 @@
 .usertext {
 	.word_wrap;
 
-	.img {
+	// Use img:not(.emoticon) instead when dropping IE8 support
+	img[alt] {
 		.box-sizing(border-box);
 		max-width: 100%;
 		max-height: 1500px;
 		margin: 5px 0;
 		display: block;
 		padding: 2px;
-		border: 1px solid #dddddd;
+		border: 1px solid @colorFgBorderEmphasize1;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -76,5 +77,18 @@
 	}
 	li {
 		padding: @usertextFontSizeP*0.1 0;
+	}
+	blockquote {
+		margin-left: 0px;
+		margin-right: 0px;
+		color: lighten(@colorFg, 50);
+		background-color: @colorBgEmphasize1;
+		p {
+			padding-left: 8px;
+			border-left: 3px solid lighten(@colorFg, 50);
+			margin-bottom: 0;
+			padding-bottom: @usertextFontSizeP*0.15;
+			padding-top: @usertextFontSizeP*0.15;
+		}
 	}
 }

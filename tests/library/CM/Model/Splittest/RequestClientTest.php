@@ -44,4 +44,11 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
 		$test->delete();
 	}
+
+	public function testIgnoreBots() {
+		$request = new CM_Request_Get('/foo', array('user-agent' => 'Googlebot'));
+		/** @var CM_Model_Splittest_RequestClient $test */
+		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1')));
+		$this->assertFalse($test->isVariationFixture($request, 'v1'));
+	}
 }

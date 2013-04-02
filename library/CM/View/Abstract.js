@@ -49,6 +49,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		_.each(this.getChildren(), function(child) {
 			child._ready();
 		});
+		this.trigger('ready');
 	},
 
 	/**
@@ -143,9 +144,13 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Boolean} [skipDomRemoval]
+	 * @param {Boolean} [skipTriggerRemove]
 	 */
-	remove: function(skipDomRemoval) {
-		this.trigger("destruct");
+	remove: function(skipDomRemoval, skipTriggerRemove) {
+		this.trigger('destruct');
+		if (!skipTriggerRemove) {
+			this.trigger('remove');
+		}
 
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
@@ -174,7 +179,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		view._callbacks = this._callbacks;
 		this.getParent().registerChild(view);
 		this.$().replaceWith(view.$());
-		this.remove(true);
+		this.remove(true, true);
 	},
 
 	disable: function() {
@@ -291,38 +296,48 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
-	 * @param {String} [streamChannel]
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, streamChannel, callback) {
+	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
+		if (!channelKey && !channelType) {
+			if (!cm.options.stream.channel) {
+				return;
+			}
+			channelKey = cm.options.stream.channel.key;
+			channelType = cm.options.stream.channel.type;
+		}
 		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
 		};
-		cm.action.bind(actionVerb, modelType, callbackResponse, streamChannel, this);
+		cm.action.bind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, callbackResponse, streamChannel, this);
+			cm.action.unbind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		});
 	},
 
 	/**
-	 * @param {String} channel
+	 * @param {String} channelKey
+	 * @param {Number} channelType
 	 * @param {String} event
 	 * @param {Function} callback fn(array data)
 	 */
-	bindStream: function(channel, event, callback) {
-		cm.stream.bind(channel, event, callback, this);
+	bindStream: function(channelKey, channelType, event, callback) {
+		cm.stream.bind(channelKey, channelType, event, callback, this);
 		this.on('destruct', function() {
-			cm.stream.unbind(channel, event, callback, this);
+			cm.stream.unbind(channelKey, channelType, event, callback, this);
 		});
 	},
 
 	/**
-	 * @param {String} channel
+	 * @param {String} channelKey
+	 * @param {Number} channelType
 	 * @param {String} [event]
 	 * @param {Function} [callback]
 	 */
-	unbindStream: function(channel, event, callback) {
-		cm.stream.unbind(channel, event, callback, this);
+	unbindStream: function(channelKey, channelType, event, callback) {
+		cm.stream.unbind(channelKey, channelType, event, callback, this);
 	},
 
 	/**
@@ -499,16 +514,17 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
-	 * @param {String} [streamChannel]
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 */
-	_bindActions: function(actions, streamChannel) {
+	_bindActions: function(actions, channelKey, channelType) {
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, streamChannel, callback);
+				this.bindAction(actionVerb, modelType, channelKey, channelType, callback);
 			}, this);
 		}, this);
 	},
@@ -521,7 +537,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			return;
 		}
 		_.each(streams, function(callback, key) {
-			this.bindStream(cm.options.stream.channel, this.getClass() + ':' + key, callback);
+			this.bindStream(cm.options.stream.channel.key, cm.options.stream.channel.type, this.getClass() + ':' + key, callback);
 		}, this);
 	},
 
