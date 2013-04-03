@@ -66,26 +66,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 	/**
 	 * @param CM_Params $params
-	 * @return string
-	 */
-	public function replaceWithComponent(CM_Params $params) {
-		$componentInfo = $this->_getViewInfo();
-		$component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
-		$component->checkAccessible();
-		$component->prepare();
-
-		$html = $this->getRender()->render($component);
-
-		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
-		$this->getRender()->getJs()->onloadPrepareJs(
-			'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
-		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
-
-		return $component->getAutoId();
-	}
-
-	/**
-	 * @param CM_Params $params
 	 * @return array
 	 */
 	public function loadComponent(CM_Params $params) {

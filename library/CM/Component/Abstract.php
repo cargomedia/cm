@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
+
 	/**
 	 * @var CM_Model_User|null
 	 */
@@ -125,10 +126,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 		return $response->reloadComponent($params->getAll());
 	}
 
-	public static function ajax_replaceWithComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
-		return $response->replaceWithComponent($params);
-	}
-
 	/**
 	 * @param string             $className
 	 * @param CM_Params|array    $params
@@ -146,7 +143,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param string $property
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	protected function _setJsParam($property, $value) {
 		$this->_js->setParam($property, $value);

@@ -85,9 +85,14 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	 * @return jqXHR
 	 */
 	replaceWithComponent: function(className, params, options) {
-		params = params || {};
-		options = options || {};
-		params.className = className;
-		return this.ajax('replaceWithComponent', params, options);
+		var handler = this;
+		options = _.defaults(options || {}, {
+			'success': function() {
+				handler.$().replaceWith(this.$());
+				handler.remove(true);
+			},
+			'modal': false
+		});
+		return this.getParent().loadComponent(className, params, options);
 	}
 });
