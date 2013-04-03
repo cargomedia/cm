@@ -39,6 +39,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
 	public function testFindByRequest() {
 		$request = new CM_Request_Get('/test');
-		$this->assertInstanceOf('CMTest_Site_CM', CM_Site_Abstract::findByRequest($request));
+		$this->assertInstanceOf(get_class(CMTest_TH::getSiteMockMatchAll()), CM_Site_Abstract::findByRequest($request));
 	}
 }
