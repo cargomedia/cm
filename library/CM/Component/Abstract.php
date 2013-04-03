@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
+
 	/**
 	 * @var CM_Model_User|null
 	 */
@@ -142,7 +143,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param string $property
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	protected function _setJsParam($property, $value) {
 		$this->_js->setParam($property, $value);
