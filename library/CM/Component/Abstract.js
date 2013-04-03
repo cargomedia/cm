@@ -76,5 +76,18 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	 */
 	reload: function(params) {
 		return this.ajaxModal('reload', params);
+	},
+
+	/**
+	 * @param {String} className
+	 * @param {Object|Null} [params]
+	 * @param {Object|Null} [options]
+	 * @return jqXHR
+	 */
+	replaceWithComponent: function(className, params, options) {
+		params = params || {};
+		options = options || {};
+		params.className = className;
+		return this.ajax('replaceWithComponent', params, options);
 	}
 });

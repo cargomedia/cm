@@ -125,6 +125,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 		return $response->reloadComponent($params->getAll());
 	}
 
+	public static function ajax_replaceWithComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+		return $response->replaceWithComponent($params);
+	}
+
 	/**
 	 * @param string             $className
 	 * @param CM_Params|array    $params

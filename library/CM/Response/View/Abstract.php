@@ -33,8 +33,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		if (!isset($viewInfo['parentId'])) {
 			$viewInfo['parentId'] = null;
 		}
-		return array('id' => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
-			'parentId' => (string) $viewInfo['parentId']);
+		return array('id'       => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
+					 'parentId' => (string) $viewInfo['parentId']);
 	}
 
 	/**
@@ -60,6 +60,26 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
 		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
 		$componentInfo['id'] = $component->getAutoId();
+
+		return $component->getAutoId();
+	}
+
+	/**
+	 * @param CM_Params $params
+	 * @return string
+	 */
+	public function replaceWithComponent(CM_Params $params) {
+		$componentInfo = $this->_getViewInfo();
+		$component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
+		$component->checkAccessible();
+		$component->prepare();
+
+		$html = $this->getRender()->render($component);
+
+		$this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
+		$this->getRender()->getJs()->onloadPrepareJs(
+			'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
+		$this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
 
 		return $component->getAutoId();
 	}
@@ -124,8 +144,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			return $menuEntry->getHash();
 		}, $this->getSite()->getMenuEntriesActive($page)));
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'layoutClass' => $layoutClass,
-			'menuEntryHashList' => $menuEntryHashList);
+		return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
+					 'layoutClass'       => $layoutClass,
+					 'menuEntryHashList' => $menuEntryHashList);
 	}
 
 	public function popinComponent() {
