@@ -260,26 +260,26 @@ var CM_App = CM_Class_Abstract.extend({
 			cm.dom.setupVideo($dom.find('video.mediaElement'));
 		},
 		/**
-		 * @param {Object} element
+		 * @param {jQuery} $element
 		 */
-		setupVideo: function(element) {
-			element.mediaelementplayer({
+		setupVideo: function($element) {
+			$element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
 				videoHeight: '100%',
-				success: function (mediaElement, domObject) {
+				success: function ($mediaElement, $domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
 					if (null !== mediaElementMuted) {
-						mediaElement.setMuted(mediaElementMuted);
+						$mediaElement.setMuted(mediaElementMuted);
 					}
 					if (null !== mediaElementVolume) {
-						mediaElement.setVolume(mediaElementVolume);
+						$mediaElement.setVolume(mediaElementVolume);
 					}
-					mediaElement.addEventListener("volumechange", function () {
-						cm.storage.set('mediaElement-volume', mediaElement.volume);
-						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
+					$mediaElement.addEventListener("volumechange", function () {
+						cm.storage.set('mediaElement-volume', $mediaElement.volume);
+						cm.storage.set('mediaElement-muted', $mediaElement.muted.valueOf());
 					});
 				}
 			});
