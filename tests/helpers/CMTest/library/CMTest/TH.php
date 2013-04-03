@@ -29,14 +29,6 @@ class CMTest_TH {
 			}
 		}
 
-		$siteCMTest = new CMTest_Site_CM();
-		self::configureSite($siteCMTest, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
-
-		if (empty(CM_Config::get()->CM_Site_Abstract->class)) {
-			$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
-			CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
-		}
-
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
@@ -52,6 +44,7 @@ class CMTest_TH {
 		self::clearCache();
 		self::timeReset();
 		self::clearTmp();
+		self::clearMocks();
 		self::clearConfig();
 	}
 
@@ -72,6 +65,12 @@ class CMTest_TH {
 
 	public static function clearTmp() {
 		CM_Util::rmDirContents(DIR_TMP);
+	}
+
+	public static function clearMocks() {
+		$dirMocks = CM_Util::getNamespacePath('CMTest') . 'library/CMTest/Site/';
+		CM_Util::mkDir($dirMocks);
+		CM_Util::rmDirContents($dirMocks);
 	}
 
 	public static function clearConfig() {
@@ -155,18 +154,20 @@ class CMTest_TH {
 	}
 
 	/**
-	 * @param array|null  $namespaces
-	 * @param string|null $url
-	 * @param string|null $urlCdn
-	 * @param string|null $name
-	 * @param string|null $emailAddress
+	 * @param array|null   $namespaces
+	 * @param string|null  $url
+	 * @param string|null  $urlCdn
+	 * @param string|null  $name
+	 * @param string|null  $emailAddress
+	 * @param boolean|null $matchAll
 	 * @throws PHPUnit_Framework_Exception
 	 * @return CM_Site_Abstract
 	 */
-	public static function createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+	public static function createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null, $matchAll = null) {
 		if (null === $namespaces) {
 			$namespaces = array();
 		}
+		$matchAll = (bool) $matchAll;
 
 		$types = CM_Config::get()->CM_Site_Abstract->types;
 		if (count($types) >= 255) {
@@ -182,6 +183,19 @@ class CMTest_TH {
 		foreach ($namespaces as $namespace) {
 			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
 		}
+
+		if ($matchAll) {
+			$codeMatchAll = <<<'EOD'
+
+	public static function match(CM_Request_Abstract $request) {
+		return true;
+	}
+
+EOD;
+		} else {
+			$codeMatchAll = '';
+		}
+
 		$code = <<<EOD
 <?php
 
@@ -193,7 +207,7 @@ class $siteClassName extends CM_Site_Abstract {
 		parent::__construct();
 		$codeNamespaces
 	}
-}
+$codeMatchAll}
 
 EOD;
 		CM_File_Php::create(CM_Util::getNamespacePath('CMTest') . 'library/CMTest/Site/Mock' . $siteMockId . '.php', $code);
@@ -323,6 +337,38 @@ EOD;
 		$config = CM_Config::get()->CM_Db_Db;
 		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
 		return self::$_dbClient;
+	}
+
+	/**
+	 * @param array|null   $namespaces
+	 * @param string|null  $url
+	 * @param string|null  $urlCdn
+	 * @param string|null  $name
+	 * @param string|null  $emailAddress
+	 * @param boolean|null $matchAll
+	 * @return CM_Site_Abstract
+	 */
+	public static function getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null, $matchAll = null) {
+		if ($matchAll) {
+			$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key(true);
+		} else {
+			$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress, $matchAll);
+		}
+		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
+			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress, $matchAll);
+			$siteClassName = get_class($site);
+			CM_CacheLocal::set($cacheKey, $siteClassName);
+		} else {
+			$site = new $siteClassName();
+		}
+		return $site;
+	}
+
+	/**
+	 * @return CM_Site_Abstract
+	 */
+	public static function getSiteMockMatchAll() {
+		return self::getSiteMock(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev', true);
 	}
 
 	public static function randomizeAutoincrement() {
