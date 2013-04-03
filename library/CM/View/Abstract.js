@@ -178,7 +178,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	replaceWith: function(view) {
 		view._callbacks = this._callbacks;
 		this.getParent().registerChild(view);
-		this.$().replaceWith(view.$());
+		this.$el.replaceWith(view.$el);
 		this.remove(true, true);
 	},
 
