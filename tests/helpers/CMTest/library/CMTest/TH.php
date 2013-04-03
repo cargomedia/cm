@@ -174,14 +174,17 @@ class CMTest_TH {
 		}
 		do {
 			$siteId = rand(1, 255);
-			$siteClassName = 'CM_Site_Mock' . md5(rand() . uniqid());
-		} while (array_key_exists($siteId, $types) || class_exists($siteClassName));
+			$siteMockId = md5(rand() . uniqid());
+			$siteClassName = 'CMTest_Site_Mock' . $siteMockId;
+		} while (array_key_exists($siteId, $types) || class_exists($siteClassName, false));
 
 		$codeNamespaces = '';
 		foreach ($namespaces as $namespace) {
 			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
 		}
 		$code = <<<EOD
+<?php
+
 class $siteClassName extends CM_Site_Abstract {
 
 	const TYPE = $siteId;
@@ -191,8 +194,9 @@ class $siteClassName extends CM_Site_Abstract {
 		$codeNamespaces
 	}
 }
+
 EOD;
-		eval($code);
+		CM_File_Php::create(CM_Util::getNamespacePath('CMTest') . 'library/CMTest/Site/Mock' . $siteMockId . '.php', $code);
 
 		$site = new $siteClassName();
 		self::configureSite($site, $url, $urlCdn, $name, $emailAddress);
