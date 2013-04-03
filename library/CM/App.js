@@ -257,6 +257,32 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
+			cm.dom.setupVideo($dom.find('video.mediaElement'));
+		},
+		/**
+		 * @param {jQuery} $element
+		 */
+		setupVideo: function($element) {
+			$element.mediaelementplayer({
+				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+				videoWidth: '100%',
+				videoHeight: '100%',
+				success: function (mediaElement, domObject) {
+					var mediaElementMuted = cm.storage.get('mediaElement-muted');
+					var mediaElementVolume = cm.storage.get('mediaElement-volume');
+					if (null !== mediaElementMuted) {
+						mediaElement.setMuted(mediaElementMuted);
+					}
+					if (null !== mediaElementVolume) {
+						mediaElement.setVolume(mediaElementVolume);
+					}
+					mediaElement.addEventListener("volumechange", function () {
+						cm.storage.set('mediaElement-volume', mediaElement.volume);
+						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
+					});
+				}
+			});
 		}
 	},
 
