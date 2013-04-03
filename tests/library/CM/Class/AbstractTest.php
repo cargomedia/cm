@@ -13,11 +13,14 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 
 	public function testGetConfig() {
 		CM_Config::get()->CM_Class_AbstractMock->foo = 'foo';
+		CM_Config::get()->CM_Class_AbstractMock->foobar = 'foo';
 		CM_Config::get()->CM_Class_Implementation = new stdClass();
 		CM_Config::get()->CM_Class_Implementation->bar = 'bar';
+		CM_Config::get()->CM_Class_Implementation->foobar = 'bar';
 
 		$this->assertEquals('foo', CM_Class_Implementation::getConfig()->foo);
 		$this->assertEquals('bar', CM_Class_Implementation::getConfig()->bar);
+		$this->assertEquals('bar', CM_Class_Implementation::getConfig()->foobar);
 
 		try {
 			$config = CM_Class_AbstractMockWithoutConfig::getConfig();
