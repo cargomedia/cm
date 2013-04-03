@@ -42,12 +42,16 @@ abstract class CM_Class_Abstract {
 	 */
 	protected static function _getConfig() {
 		$config = CM_Config::get();
+		$result = array();
 		foreach (self::_getClassHierarchy() as $class) {
 			if (isset($config->$class)) {
-				return $config->$class;
+				$result = array_merge((array) $config->$class, $result);
 			}
 		}
-		throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+		if (empty($result)) {
+			throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+		}
+		return (object) $result;
 	}
 
 	/**

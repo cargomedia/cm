@@ -5,7 +5,6 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 	public static function setupBeforeClass() {
 		CM_Config::get()->CM_Class_AbstractMock = new stdClass();
 		CM_Config::get()->CM_Class_AbstractMock->types[CM_Class_Implementation::TYPE] = 'CM_Class_Implementation';
-		CM_Config::get()->CM_Class_AbstractMock->foo = 'bar';
 	}
 
 	public static function tearDownAfterClass() {
@@ -13,7 +12,12 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetConfig() {
-		$this->assertEquals('bar', CM_Class_AbstractMock::getConfig()->foo);
+		CM_Config::get()->CM_Class_AbstractMock->foo = 'foo';
+		CM_Config::get()->CM_Class_Implementation = new stdClass();
+		CM_Config::get()->CM_Class_Implementation->bar = 'bar';
+
+		$this->assertEquals('foo', CM_Class_Implementation::getConfig()->foo);
+		$this->assertEquals('bar', CM_Class_Implementation::getConfig()->bar);
 
 		try {
 			$config = CM_Class_AbstractMockWithoutConfig::getConfig();
