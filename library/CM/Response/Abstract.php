@@ -30,8 +30,7 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		$this->_request = $request;
 		$responseType = $request->popPathPart();
 		$language = $request->popPathLanguage();
-		$siteId = $request->popPathPart();
-		$this->_site = CM_Site_Abstract::factory($siteId);
+		$this->_site = $request->popPathSite();
 	}
 
 	abstract protected function _process();

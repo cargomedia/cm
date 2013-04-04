@@ -217,6 +217,17 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return CM_Site_Abstract
+	 */
+	public function popPathSite() {
+		$siteId = $this->popPathPart();
+		if ('null' === $siteId) {
+			$siteId = null;
+		}
+		return CM_Site_Abstract::factory($siteId);
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getQuery() {
