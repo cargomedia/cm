@@ -1,6 +1,7 @@
 <?php
 
 class CM_App {
+
 	/**
 	 * @var CM_App
 	 */
@@ -174,15 +175,15 @@ class CM_App {
 		/** @var $className CM_Class_Abstract */
 		foreach ($className::getClassChildren() as $className) {
 			$reflectionClass = new ReflectionClass($className);
-            if ($reflectionClass->hasConstant('TYPE')) {
-                $type = $className::TYPE;
-                if ($classNameDuplicate = array_search($type, $classTypes)) {
-                    throw new CM_Exception_Invalid(
-                        'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
-                            $className . '` type namespace).');
-                }
-                $classTypes[$className] = $type;
-            } elseif (!$reflectionClass->isAbstract()) {
+			if ($reflectionClass->hasConstant('TYPE')) {
+				$type = $className::TYPE;
+				if ($classNameDuplicate = array_search($type, $classTypes)) {
+					throw new CM_Exception_Invalid(
+						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
+								$className . '` type namespace).');
+				}
+				$classTypes[$className] = $type;
+			} elseif (!$reflectionClass->isAbstract()) {
 				throw new CM_Exception_Invalid('`' . $className . '` does not have `TYPE` constant defined');
 			}
 		}
