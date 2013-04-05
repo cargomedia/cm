@@ -40,5 +40,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 	public function testFindByRequest() {
 		$request = new CM_Request_Get('/test');
 		$this->assertInstanceOf(get_class(CMTest_TH::getSiteMockMatchAll()), CM_Site_Abstract::findByRequest($request));
+		$siteDefault = CM_Site_Abstract::factory();
+		// Remove site mocks from the cache and from the file system
+		CMTest_TH::clearCache();
+		CMTest_TH::clearTmp();
+		$this->assertInstanceOf(get_class($siteDefault), CM_Site_Abstract::findByRequest($request));
 	}
 }
