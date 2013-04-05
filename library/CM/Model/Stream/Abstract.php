@@ -50,6 +50,13 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	public function getUser() {
-		return CM_Model_User::factory($this->_get('userId'));
+		return CM_Model_User::factory($this->getUserId());
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getUserId() {
+		return $this->_get('userId');
 	}
 }

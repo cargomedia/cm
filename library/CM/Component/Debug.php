@@ -16,11 +16,6 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		$cacheArray['CM_Cache'] = 'CM_Cache';
 		$cacheArray['CM_CacheLocal'] = 'CM_CacheLocal';
 		$this->setTplParam('clearCacheButtons', $cacheArray);
-		$errors = $debug->getErrors();
-		foreach ($errors as &$error) {
-			$error['file'] = str_replace(DIR_ROOT, '', $error['file']);
-		}
-		$this->setTplParam('errors', $errors);
 	}
 
 	public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {

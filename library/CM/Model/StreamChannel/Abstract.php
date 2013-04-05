@@ -89,6 +89,21 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return new CM_Paging_User_StreamChannel($this);
 	}
 
+	/**
+	 * @param CM_Model_User                  $user
+	 * @param CM_Model_Stream_Subscribe|null $excludedStreamSubscribe
+	 * @return bool
+	 */
+	public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
+		/** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
+		foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
+			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() === $user->getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected function _loadData() {
 		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
