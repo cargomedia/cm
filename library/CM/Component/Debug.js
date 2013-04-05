@@ -25,6 +25,24 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 			});
 		});
 
+		if (cm.stream) {
+			var _subscribe = cm.stream._subscribe;
+			var _unsubscribe = cm.stream._unsubscribe;
+			cm.stream._subscribe = function() {
+				var params = ['SUBSCRIBE:'];
+				params.push.apply(params, arguments);
+				handler.log.apply(handler, params);
+				_subscribe.apply(this, arguments);
+			};
+			cm.stream._unsubscribe = function() {
+				var params = ['UNSUBSCRIBE:'];
+				params.push.apply(params, arguments);
+				handler.log.apply(handler, params);
+				_unsubscribe.apply(this, arguments);
+			};
+		}
+
+
 		if (cm.options.stream.channel) {
 			_.each(cm.model.types, function(modelType, modelName) {
 				_.each(cm.action.verbs, function(actionVerb, actionName) {
