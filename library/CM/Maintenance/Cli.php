@@ -28,6 +28,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	public function heavy() {
 		CM_Mail::processQueue(500);
 		CM_Action_Abstract::aggregate();
+		CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 	}
 
 	public static function getPackageName() {
