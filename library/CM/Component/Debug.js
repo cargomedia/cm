@@ -24,18 +24,20 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 				}
 			});
 		});
-	
-		_.each(cm.model.types, function(modelType, modelName) {
-			_.each(cm.action.verbs, function(actionVerb, actionName) {
-				handler.bindAction(actionVerb, modelType, function(action, model, data) {
-					var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
-					msg += " (" + JSON.stringify(data) + ")";
-					handler.alert(msg);
+
+		if (cm.options.stream.channel) {
+			_.each(cm.model.types, function(modelType, modelName) {
+				_.each(cm.action.verbs, function(actionVerb, actionName) {
+					handler.bindAction(actionVerb, modelType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
+						var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
+						msg += " (" + JSON.stringify(data) + ")";
+						handler.alert(msg);
+					});
 				});
 			});
-		});
+		}
 	},
-	
+
 	alert: function(msg) {
 		var $msg = $("<li>" + msg + "</li>");
 		this.$(".alerts").append($msg);

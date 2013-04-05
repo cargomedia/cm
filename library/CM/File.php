@@ -34,6 +34,13 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getFileNameWithoutExtension() {
+		return pathinfo($this->getPath(), PATHINFO_FILENAME);
+	}
+
+	/**
 	 * @return int File size in bytes
 	 * @throws CM_Exception
 	 */
@@ -60,10 +67,15 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return string File extension
+	 * @return string|null
 	 */
 	public function getExtension() {
-		return strtolower(pathinfo($this->getFileName(), PATHINFO_EXTENSION));
+		$fileName = $this->getFileName();
+		if (false === strpos($fileName, '.')) {
+			return null;
+		}
+
+		return strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 	}
 
 	/**
@@ -82,7 +94,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function getExists() {
-		return is_file($this->getPath());
+		return static::exists($this->getPath());
 	}
 
 	/**
@@ -150,15 +162,11 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception
 	 */
 	public function delete() {
-		if (!file_exists($this->getPath())) {
+		if (!$this->getExists()) {
 			return;
 		}
-		if (is_dir($this->getPath())) {
-			CM_Util::rmDir($this->getPath());
-		} else {
-			if (!unlink($this->getPath())) {
-				throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
-			}
+		if (!@unlink($this->getPath())) {
+			throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
 		}
 	}
 
@@ -203,11 +211,24 @@ class CM_File extends CM_Class_Abstract {
 	 */
 	public static function create($path, $content = null) {
 		$content = (string) $content;
-		if (false === file_put_contents($path, $content)) {
+		if (false === @file_put_contents($path, $content)) {
 			throw new CM_Exception('Cannot write to `' . $path . '`.');
 		}
 		$file = new static($path);
 		return $file;
+	}
+
+	/**
+	 * @param string|null $content
+	 * @param string|null $extension
+	 * @return CM_File
+	 */
+	public static function createTmp($extension = null, $content = null) {
+		if (null !== $extension) {
+			$extension = '.' . $extension;
+		}
+		$extension = (string) $extension;
+		return static::create(DIR_TMP . uniqid() . $extension, $content);
 	}
 
 	/**

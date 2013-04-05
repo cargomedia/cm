@@ -1,6 +1,7 @@
 <?php
 
 class CM_CacheConst {
+
 	// _tag:X
 	const Tag_Version = 'Tag_Version';
 
@@ -16,15 +17,18 @@ class CM_CacheConst {
 
 	const PagingSource = 'PagingSource';
 
-	const Usertext_Badwords = 'Usertext_Badwords';
+	// _text:X_filter:X
+	const Usertext = 'Usertext';
 
-	const Usertext_Emoticons = 'Usertext_Emoticons';
+	const Usertext_Filter_BadwordRegexp = 'Usertext_Filter_BadwordRegexp';
+
+	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
 
 	// _id:X
 	const Session = 'Session';
 	// _id:X
 	const Request_Client = 'Request_Client';
-	
+
 	// _class:X_id:X
 	const Model = 'Model';
 
@@ -58,4 +62,6 @@ class CM_CacheConst {
 
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';
+
+	const TestCase_Site_Mock = 'TestCase_Site_Mock';
 }

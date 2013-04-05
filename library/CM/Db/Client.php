@@ -20,20 +20,30 @@ class CM_Db_Client {
 	/** @var PDO */
 	private $_pdo;
 
+	/** @var int */
+	private $_lastConnect;
+
+	/** @var int|null */
+	private $_reconnectTimeout;
+
 	/**
 	 * @param string      $host
 	 * @param int         $port
 	 * @param string      $username
 	 * @param string      $password
 	 * @param string|null $db
+	 * @param int|null    $reconnectTimeout
 	 */
-	public function __construct($host, $port, $username, $password, $db = null) {
+	public function __construct($host, $port, $username, $password, $db = null, $reconnectTimeout = null) {
 		$this->_host = (string) $host;
 		$this->_port = (int) $port;
 		$this->_username = (string) $username;
 		$this->_password = (string) $password;
 		if (null !== $db) {
 			$this->_db = (string) $db;
+		}
+		if (null !== $reconnectTimeout) {
+			$this->_reconnectTimeout = (int) $reconnectTimeout;
 		}
 		$this->connect();
 	}
@@ -56,6 +66,7 @@ class CM_Db_Client {
 		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
 		}
+		$this->_lastConnect = time();
 	}
 
 	public function disconnect() {
@@ -84,6 +95,10 @@ class CM_Db_Client {
 	 * @return CM_Db_Statement
 	 */
 	public function createStatement($sqlTemplate) {
+		if ($this->_getShouldReconnect()) {
+			$this->disconnect();
+			$this->connect();
+		}
 		return new CM_Db_Statement($this->createPdoStatement($sqlTemplate), $this);
 	}
 
@@ -107,7 +122,7 @@ class CM_Db_Client {
 					$this->connect();
 					continue;
 				}
-				throw new CM_Db_Exception('Cannot prepare statement: ' . $e->getMessage());
+				throw new CM_Db_Exception('Cannot prepare statement (retried ' . $try . 'x): ' . $e->getMessage());
 			}
 		}
 		throw new CM_Db_Exception('Line should never be reached');
@@ -125,6 +140,13 @@ class CM_Db_Client {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getLastConnect() {
+		return $this->_lastConnect;
+	}
+
+	/**
 	 * @param PDOException $exception
 	 * @return bool
 	 */
@@ -132,14 +154,15 @@ class CM_Db_Client {
 		$sqlState = $exception->errorInfo[0];
 		$driverCode = $exception->errorInfo[1];
 		$driverMessage = $exception->errorInfo[2];
-
-		if (1317 === $driverCode && false !== stripos('Query execution was interrupted', $driverMessage)) {
+		if (
+			(1053 === $driverCode && false !== stripos($driverMessage, 'Server shutdown in progress')) ||
+			(1317 === $driverCode && false !== stripos($driverMessage, 'Query execution was interrupted')) ||
+			(2006 === $driverCode && false !== stripos($driverMessage, 'MySQL server has gone away')) ||
+			(2013 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server')) ||
+			(2055 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server'))
+		) {
 			return true;
 		}
-		if (2006 === $driverCode && false !== stripos('MySQL server has gone away', $driverMessage)) {
-			return true;
-		}
-
 		return false;
 	}
 
@@ -149,5 +172,15 @@ class CM_Db_Client {
 	 */
 	public function quoteIdentifier($name) {
 		return '`' . str_replace('`', '``', $name) . '`';
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function _getShouldReconnect() {
+		if (null === $this->_reconnectTimeout) {
+			return false;
+		}
+		return ($this->getLastConnect() + $this->_reconnectTimeout) < time();
 	}
 }

@@ -1,6 +1,7 @@
 <?php
 
 class CM_Exception extends Exception {
+
 	const WARN = 1;
 	const ERROR = 2;
 	const FATAL = 3;
@@ -23,8 +24,8 @@ class CM_Exception extends Exception {
 	public function __construct($message = null, $messagePublic = null, array $variables = null, $severity = null) {
 		$this->_messagePublic = $messagePublic;
 		$this->_variables = (array) $variables;
-		if (in_array($severity, array(self::WARN, self::ERROR, self::FATAL))) {
-			$this->_severity = $severity;
+		if (null !== $severity) {
+			$this->setSeverity($severity);
 		}
 		parent::__construct($message);
 	}
@@ -48,10 +49,28 @@ class CM_Exception extends Exception {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getSeverity() {
+		return $this->_severity;
+	}
+
+	/**
+	 * @param int $severity
+	 * @throws CM_Exception_Invalid
+	 */
+	public function setSeverity($severity) {
+		if (!in_array($severity, array(self::WARN, self::ERROR, self::FATAL), true)) {
+			throw new CM_Exception_Invalid('Invalid severity `' . $severity . '`');
+		}
+		$this->_severity = $severity;
+	}
+
+	/**
 	 * @return CM_Paging_Log_Error|CM_Paging_Log_Fatal|CM_Paging_Log_Warn
 	 */
 	public function getLog() {
-		switch($this->_severity) {
+		switch ($this->getSeverity()) {
 			case self::WARN:
 				return new CM_Paging_Log_Warn();
 				break;

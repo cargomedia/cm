@@ -25,6 +25,12 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	}
 	unset($params['icon']);
 
+	$data = array();
+	if (isset($params['data'])) {
+		$data = (array) $params['data'];
+	}
+	unset($params['data']);
+
 	$href = 'javascript:;';
 	if (isset($params['page'])) {
 		$href = smarty_function_linkUrl($params, $template);
@@ -37,15 +43,25 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 	$html = '';
 	if (!empty($label)) {
 		$html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+		$class .= ' hasLabel';
 	}
+
 	if (!empty($icon)) {
 		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
+		$class .= ' hasIcon';
 	}
+
 	$titleAttr = '';
 	if (!empty($title)) {
 		$titleAttr = ' title="' . $title . '"';
 	}
-	$html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . '>' . $html . '</a>';
+
+	$dataAttr = '';
+	foreach ($data as $name => $value) {
+		$dataAttr .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+	}
+
+	$html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
 
 	return $html;
 }

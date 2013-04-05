@@ -1,0 +1,94 @@
+.emoticon {
+	width: @emoticonSize;
+	height: @emoticonSize;
+	display: inline-block;
+	margin: -0.25em 0;
+}
+
+.usertext {
+	.word_wrap;
+
+	// Use img:not(.emoticon) instead when dropping IE8 support
+	img[alt] {
+		.box-sizing(border-box);
+		max-width: 100%;
+		max-height: 1500px;
+		margin: 5px 0;
+		display: block;
+		padding: 2px;
+		border: 1px solid @colorFgBorderEmphasize1;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: bold;
+		font-style: normal;
+		line-height: 1.6;
+	}
+	h1 {
+		font-size: @usertextFontSizeH1;
+		color: @usertextColorFgH1;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH1;
+		margin: 0 0 @usertextFontSizeH1*0.5 0;
+	}
+	h2 {
+		font-size: @usertextFontSizeH2;
+		color: @usertextColorFgH2;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH2;
+		margin: 0 0 @usertextFontSizeH2*0.5 0;
+	}
+	h3 {
+		font-size: @usertextFontSizeH3;
+		color: @usertextColorFgH3;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH3;
+		margin: 0 0 @usertextFontSizeH3*0.5 0;
+	}
+	h4 {
+		font-size: @usertextFontSizeH4;
+		color: @usertextColorFgH4;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH4;
+		margin: 0 0 @usertextFontSizeH4*0.5 0;
+	}
+	h5 {
+		font-size: @usertextFontSizeH5;
+		color: @usertextColorFgH6;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH5;
+		margin: 0 0 @usertextFontSizeH5*0.5 0;
+	}
+	h6 {
+		font-size: @usertextFontSizeH6;
+		color: @usertextColorFgH6;
+		text-shadow: 1px 1px 1px @usertextColorFgShadowH6;
+		margin: 0 0 @usertextFontSizeH6*0.5 0;
+	}
+	p {
+		font-size: @usertextFontSizeP;
+		line-height: 1.5;
+		margin-bottom: @usertextFontSizeP*0.7;
+	}
+	ul, ol {
+		font-size: @usertextFontSizeP;
+		margin: 0 0 @usertextFontSizeP*0.5 @usertextFontSizeP*1.5;
+	}
+	ul {
+		list-style: disc;
+	}
+	ol {
+		list-style: decimal;
+	}
+	li {
+		padding: @usertextFontSizeP*0.1 0;
+	}
+	blockquote {
+		margin-left: 0px;
+		margin-right: 0px;
+		color: lighten(@colorFg, 50);
+		background-color: @colorBgEmphasize1;
+		p {
+			padding-left: 8px;
+			border-left: 3px solid lighten(@colorFg, 50);
+			margin-bottom: 0;
+			padding-bottom: @usertextFontSizeP*0.15;
+			padding-top: @usertextFontSizeP*0.15;
+		}
+	}
+}

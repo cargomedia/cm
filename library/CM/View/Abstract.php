@@ -51,11 +51,11 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param CM_Model_User $user
 	 * @param string        $event
-	 * @param mixed         $data
+	 * @param mixed|null         $data
 	 */
-	public static function stream(CM_Model_User $user, $event, $data) {
+	public static function stream(CM_Model_User $user, $event, $data = null) {
 		$namespace = get_called_class() . ':' . $event;
-		CM_Stream_Message::publishUser($user, array('namespace' => $namespace, 'data' => $data));
+		CM_Model_StreamChannel_Message_User::publish($user, $namespace, $data);
 	}
 
 	/**
@@ -68,7 +68,7 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		$contextTypes = array(
 			self::CONTEXT_ALL        => array('View', 'Layout', 'Page', 'Component', 'Form', 'FormField'),
 			self::CONTEXT_JAVASCRIPT => array('View', 'Layout', 'Page', 'Component', 'Form', 'FormField'),
-			self::CONTEXT_CSS        => array('Layout', 'Page', 'Component', 'FormField'),
+			self::CONTEXT_CSS        => array('Layout', 'Page', 'Component', 'Form', 'FormField'),
 		);
 		if (!array_key_exists($context, $contextTypes)) {
 			throw new CM_Exception_Invalid('Context needs to be one of: `CONTEXT_ALL`, `CONTEXT_JAVASCRIPT`, `CONTEXT_CSS`');

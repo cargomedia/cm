@@ -2,9 +2,6 @@
 
 class CM_Response_UploadTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
 	public static function tearDownAfterClass() {
 		CMTest_TH::clearEnv();
 	}
@@ -13,7 +10,8 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$filename = 'test.jpg';
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post('/upload/' . $siteType . '?qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -30,7 +28,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?qqfile=' . $filename . '&field=CM_FormField_FileImage', array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?qqfile=' . $filename . '&field=CM_FormField_FileImage', array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -48,7 +48,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$_SERVER['CONTENT_LENGTH'] = strlen($content);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -63,7 +65,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$content = file_get_contents(DIR_TEST_DATA . $filename);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -76,7 +80,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$content = file_get_contents(DIR_TEST_DATA . $filename);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -90,7 +96,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=CM_FormField_FileImage&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -107,7 +115,9 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$_SERVER['CONTENT_LENGTH'] = strlen($content);
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=CM_FormField_File&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent());
@@ -122,13 +132,15 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$field = 'doesnotexist';
 
 		// No field test
-		$request = new CM_Request_Post('/upload/test?field=' . $field . '&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post(
+			'/upload/' . $siteType . '?field=' . $field . '&qqfile=' . $filename, array('Content-Length' => strlen($content)), $content);
 		$upload = new CM_Response_Upload($request);
 
 		try {
 			$upload->process();
 			$this->fail('Should throw invalid exception');
-		} catch(CM_Exception_Invalid $e) {
+		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
 		}
 	}

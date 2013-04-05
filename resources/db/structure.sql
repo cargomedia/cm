@@ -253,29 +253,20 @@ CREATE TABLE `cm_session` (
   KEY `expires` (`expires`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_smiley`;
 
+DROP TABLE IF EXISTS `cm_emoticon`;
 
-CREATE TABLE `cm_smiley` (
+CREATE TABLE `cm_emoticon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `setId` int(10) NOT NULL,
   `code` varchar(50) NOT NULL,
+  `codeAdditional` varchar(50),
   `file` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `section` (`setId`)
+  UNIQUE KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_smileySet`;
-
-
-CREATE TABLE `cm_smileySet` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `label` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_splitfeature`;
-
 
 CREATE TABLE `cm_splitfeature` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -349,8 +340,7 @@ CREATE TABLE `cm_streamChannel` (
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  UNIQUE KEY `key-adapterType` (`key`,`adapterType`),
+  UNIQUE KEY `adapterType-key` (`adapterType`, `key`),
   KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

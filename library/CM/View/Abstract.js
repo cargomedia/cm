@@ -49,6 +49,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		_.each(this.getChildren(), function(child) {
 			child._ready();
 		});
+		this.trigger('ready');
 	},
 
 	/**
@@ -72,7 +73,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	findChild: function(className) {
 		return _.find(this.getChildren(), function(child) {
-			return _.contains(child.getClasses(), className);
+			return child.hasClass(className);
 		}) || null;
 	},
 
@@ -95,7 +96,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		if (!parent) {
 			return null;
 		}
-		if (_.contains(parent.getClasses(), className)) {
+		if (parent.hasClass(className)) {
 			return parent;
 		}
 		return parent.findParent(className);
@@ -134,10 +135,22 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {Boolean} skipDomRemoval OPTIONAL
+	 * @param {String} className
+	 * @returns Boolean
 	 */
-	remove: function(skipDomRemoval) {
-		this.trigger("destruct");
+	hasClass: function(className) {
+		return _.contains(this.getClasses(), className);
+	},
+
+	/**
+	 * @param {Boolean} [skipDomRemoval]
+	 * @param {Boolean} [skipTriggerRemove]
+	 */
+	remove: function(skipDomRemoval, skipTriggerRemove) {
+		this.trigger('destruct');
+		if (!skipTriggerRemove) {
+			this.trigger('remove');
+		}
 
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
@@ -165,8 +178,8 @@ var CM_View_Abstract = Backbone.View.extend({
 	replaceWith: function(view) {
 		view._callbacks = this._callbacks;
 		this.getParent().registerChild(view);
-		this.$().replaceWith(view.$());
-		this.remove(true);
+		this.$el.replaceWith(view.$el);
+		this.remove(true, true);
 	},
 
 	disable: function() {
@@ -283,34 +296,48 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, callback) {
-		cm.action.bind(actionVerb, modelType, callback, this);
+	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
+		if (!channelKey && !channelType) {
+			if (!cm.options.stream.channel) {
+				return;
+			}
+			channelKey = cm.options.stream.channel.key;
+			channelType = cm.options.stream.channel.type;
+		}
+		var callbackResponse = function(response) {
+			callback.call(this, response.action, response.model, response.data);
+		};
+		cm.action.bind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, callback, this);
+			cm.action.unbind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
 		});
 	},
 
 	/**
-	 * @param {String} channel
+	 * @param {String} channelKey
+	 * @param {Number} channelType
 	 * @param {String} event
 	 * @param {Function} callback fn(array data)
 	 */
-	bindStream: function(channel, event, callback) {
-		cm.stream.bind(channel, event, callback, this);
+	bindStream: function(channelKey, channelType, event, callback) {
+		cm.stream.bind(channelKey, channelType, event, callback, this);
 		this.on('destruct', function() {
-			cm.stream.unbind(channel, event, callback, this);
+			cm.stream.unbind(channelKey, channelType, event, callback, this);
 		});
 	},
 
 	/**
-	 * @param {String} channel
+	 * @param {String} channelKey
+	 * @param {Number} channelType
 	 * @param {String} [event]
 	 * @param {Function} [callback]
 	 */
-	unbindStream: function(channel, event, callback) {
-		cm.stream.unbind(channel, event, callback, this);
+	unbindStream: function(channelKey, channelType, event, callback) {
+		cm.stream.unbind(channelKey, channelType, event, callback, this);
 	},
 
 	/**
@@ -376,30 +403,32 @@ var CM_View_Abstract = Backbone.View.extend({
 	/**
 	 * @param {String} mp3Path
 	 * @param {Object} [params]
-	 * @return {jQuery}
+	 * @return {MediaElement}
 	 */
 	createAudioPlayer: function(mp3Path, params) {
 		params = _.extend({loop: false, autoplay: false}, params);
-		var $player = $('<div class="jplayer"></div>').appendTo($('body'));
-		var options = {
-			'swfPath': cm.getUrlStatic('/swf/Jplayer.swf'),
-			ready: function() {
-				$player.jPlayer('setMedia', {
-					'mp3': cm.getUrlStatic('/audio/' + mp3Path)
-				});
-				if (params.autoplay) {
-					$player.jPlayer('play');
-				}
+
+		var $element = $('<audio />');
+		$element.wrap('<div />');	// MediaElement needs a parent to show error msgs
+		$element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
+		$element.attr('autoplay', params.autoplay);
+		$element.attr('loop', params.loop);
+
+		var error = false;
+		var mediaElement = new MediaElement($element.get(0), {
+			startVolume: 1,
+			flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+			silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+			error: function() {
+				error = true;
 			}
-		};
-		if (params.loop) {
-			options.loop = true;
-		}
-		this.on('destruct', function() {
-			$player.jPlayer('destroy');
-			$player.remove();
 		});
-		return $player.jPlayer(options);
+		if (error) {
+			mediaElement.play = new Function();
+			mediaElement.pause = new Function();
+		}
+
+		return mediaElement;
 	},
 
 	/**
@@ -431,7 +460,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		};
 
 		var self = this;
-		swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlStatic('/swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
+		swfobject.embedSWF(url, id, "100%", "100%", "11.0.0", cm.getUrlResource('layout', 'swf/expressInstall.swf'), flashvars, flashparams, attributes, function(event) {
 			if (event.success) {
 				callbackSuccess.call(self, event.ref);
 			} else {
@@ -491,15 +520,17 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {Object} actions
+	 * @param {String} [channelKey]
+	 * @param {Number} [channelType]
 	 */
-	_bindActions: function(actions) {
+	_bindActions: function(actions, channelKey, channelType) {
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var modelType = cm.model.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, callback);
+				this.bindAction(actionVerb, modelType, channelKey, channelType, callback);
 			}, this);
 		}, this);
 	},
@@ -512,7 +543,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			return;
 		}
 		_.each(streams, function(callback, key) {
-			this.bindStream(cm.options.stream.channel, this.getClass() + ':' + key, callback);
+			this.bindStream(cm.options.stream.channel.key, cm.options.stream.channel.type, this.getClass() + ':' + key, callback);
 		}, this);
 	},
 

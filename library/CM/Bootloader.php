@@ -15,6 +15,9 @@ class CM_Bootloader {
 	/** @var array|null */
 	private $_namespacePaths;
 
+	/** @var int|null */
+	private $_exceptionOutputSeverityMin;
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -38,28 +41,12 @@ class CM_Bootloader {
 		umask(0);
 	}
 
-	public function autoloader() {
-		$composerAutoloader = DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-		if (is_file($composerAutoloader)) {
-			require_once $composerAutoloader;
-		}
-
-		spl_autoload_register(function ($className) {
-			$relativePath = str_replace('_', '/', $className) . '.php';
-			$path = CM_Util::getNamespacePath(CM_Util::getNamespace($className, true)) . 'library/' . $relativePath;
-			if (is_file($path)) {
-				require_once $path;
-				return;
-			}
-		});
-	}
-
 	public function exceptionHandler() {
-		set_exception_handler(function(Exception $exception) {
+		set_exception_handler(function (Exception $exception) {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain');
 			}
-			CM_Bootloader::handleException($exception);
+			CM_Bootloader::getInstance()->handleException($exception);
 			exit(1);
 		});
 	}
@@ -67,11 +54,24 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-			$errorCodes = array(E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING', E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
-				E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING', E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-				E_COMPILE_WARNING => 'E_COMPILE_WARNING', E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
-				E_USER_NOTICE => 'E_USER_NOTICE', E_STRICT => 'E_STRICT', E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-				E_DEPRECATED => 'E_DEPRECATED', E_USER_DEPRECATED => 'E_USER_DEPRECATED', E_ALL => 'E_ALL');
+			$errorCodes = array(
+				E_ERROR             => 'E_ERROR',
+				E_WARNING           => 'E_WARNING',
+				E_PARSE             => 'E_PARSE',
+				E_NOTICE            => 'E_NOTICE',
+				E_CORE_ERROR        => 'E_CORE_ERROR',
+				E_CORE_WARNING      => 'E_CORE_WARNING',
+				E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+				E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
+				E_USER_ERROR        => 'E_USER_ERROR',
+				E_USER_WARNING      => 'E_USER_WARNING',
+				E_USER_NOTICE       => 'E_USER_NOTICE',
+				E_STRICT            => 'E_STRICT',
+				E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+				E_DEPRECATED        => 'E_DEPRECATED',
+				E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
+				E_ALL               => 'E_ALL',
+			);
 			$errstr = $errorCodes[$errno] . ': ' . $errstr;
 			if (!(error_reporting() & $errno)) {
 				// This error code is not included in error_reporting
@@ -100,8 +100,7 @@ class CM_Bootloader {
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 
-		define('TBL_CM_SMILEY', 'cm_smiley');
-		define('TBL_CM_SMILEYSET', 'cm_smileySet');
+		define('TBL_CM_EMOTICON', 'cm_emoticon');
 		define('TBL_CM_USER', 'cm_user');
 		define('TBL_CM_USER_ONLINE', 'cm_user_online');
 		define('TBL_CM_USER_PREFERENCE', 'cm_user_preference');
@@ -266,7 +265,7 @@ class CM_Bootloader {
 	private function _getNamespacePathsComposer() {
 		$namespacePaths = array();
 		$composerFilePath = DIR_ROOT . 'composer.json';
-		if (!file_exists($composerFilePath)) {
+		if (!CM_File::exists($composerFilePath)) {
 			return $namespacePaths;
 		}
 		$composerJson = file_get_contents($composerFilePath);
@@ -296,21 +295,20 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return CM_Bootloader
-	 * @throws Exception
+	 * @param int|null $severity
 	 */
-	public static function getInstance() {
-		if (!self::$_instance) {
-			throw new Exception('No bootloader instance');
+	public function setExceptionOutputSeverityMin($severity) {
+		if (null !== $severity) {
+			$severity = (int) $severity;
 		}
-		return self::$_instance;
+		$this->_exceptionOutputSeverityMin = $severity;
 	}
 
 	/**
 	 * @param Exception                      $exception
 	 * @param CM_OutputStream_Interface|null $output
 	 */
-	public static function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
+	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
 		}
@@ -321,7 +319,6 @@ class CM_Bootloader {
 			return $text;
 		};
 
-		$showError = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
 		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			header('HTTP/1.1 500 Internal Server Error');
 		}
@@ -342,12 +339,30 @@ class CM_Bootloader {
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 
-		if ($showError) {
-			$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
-			$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
-			$output->writeln($exception->getTraceAsString());
-		} else {
-			$output->writeln('Internal server error');
+		$outputEnabled = true;
+		if ($this->_exceptionOutputSeverityMin !== null && $exception instanceof CM_Exception) {
+			$outputEnabled = ($exception->getSeverity() >= $this->_exceptionOutputSeverityMin);
 		}
+		if ($outputEnabled) {
+			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
+			if ($outputVerbose) {
+				$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
+				$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
+				$output->writeln($exception->getTraceAsString());
+			} else {
+				$output->writeln('Internal server error');
+			}
+		}
+	}
+
+	/**
+	 * @return CM_Bootloader
+	 * @throws Exception
+	 */
+	public static function getInstance() {
+		if (!self::$_instance) {
+			throw new Exception('No bootloader instance');
+		}
+		return self::$_instance;
 	}
 }

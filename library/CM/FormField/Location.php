@@ -30,7 +30,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			$names[] = $location->getName($level);
 		}
 		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)),
-			'img' => $render->getUrlStatic('/img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
+			'img' => $render->getUrlResource('layout', 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
 	}
 
 	protected function _getSuggestions($term, array $options, CM_Render $render) {

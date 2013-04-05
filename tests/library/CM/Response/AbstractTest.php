@@ -12,21 +12,25 @@ class CM_Response_AbstractTest extends CMTest_TestCase {
 		$responses['/emailtracking'] = 'CM_Response_EmailTracking';
 		$responses['/rpc'] = 'CM_Response_RPC';
 		$responses['/upload'] = 'CM_Response_Upload';
-		$responses['/css'] = 'CM_Response_Resource_CSS';
-		$responses['/img'] = 'CM_Response_Resource_Img';
-		$responses['/js'] = 'CM_Response_Resource_JS';
+		$responses['/library-css'] = 'CM_Response_Resource_Css_Library';
+		$responses['/vendor-css'] = 'CM_Response_Resource_Css_Vendor';
+		$responses['/library-js'] = 'CM_Response_Resource_Javascript_Library';
+		$responses['/vendor-js'] = 'CM_Response_Resource_Javascript_Vendor';
+		$responses['/layout'] = 'CM_Response_Resource_Layout';
 		$responses['/ajax'] = 'CM_Response_View_Ajax';
 		$responses['/form'] = 'CM_Response_View_Form';
 		$responses['/homepage'] = 'CM_Response_Page';
 
+		$siteType = $this->_getSite()->getType();
 		foreach ($responses as $path => $expectedResponse) {
-			$request = new CM_Request_Post($path . '/' . CM_Site_CM::TYPE . '/timestamp', null, '');
+			$request = new CM_Request_Post($path . '/' . $siteType . '/timestamp', null, '');
 			$this->assertInstanceOf($expectedResponse, CM_Response_Abstract::factory($request));
 		}
 	}
 
 	public function testSetDeleteCookie() {
-		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+		$siteType = $this->_getSite()->getType();
+		$request = new CM_Request_Post('/foo/' . $siteType);
 		$response = CM_Response_Abstract::factory($request);
 		$time = time();
 		$timeString = date('D\, d\-M\-Y h:i:s e', $time);

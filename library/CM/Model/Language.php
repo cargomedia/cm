@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_Language extends CM_Model_Abstract {
+
 	const TYPE = 23;
 
 	/** @var CM_Model_Language|null $_backup */
@@ -35,9 +36,9 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string           $key
-	 * @param array|null       $variableNames
-	 * @param bool|null        $skipCacheLocal
+	 * @param string     $key
+	 * @param array|null $variableNames
+	 * @param bool|null  $skipCacheLocal
 	 * @return string
 	 */
 	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
@@ -80,8 +81,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public function setTranslation($key, $value, array $variables = null) {
 		$languageKeyId = static::_setKey($key, $variables);
 
-		CM_Db_Db::insert(TBL_CM_LANGUAGEVALUE, array('value' => $value, 'languageKeyId' => $languageKeyId,
-			'languageId' => $this->getId()), null, array('value' => $value));
+		CM_Db_Db::insert(TBL_CM_LANGUAGEVALUE, array('value'      => $value, 'languageKeyId' => $languageKeyId,
+													 'languageId' => $this->getId()), null, array('value' => $value));
 		$this->_change();
 	}
 
@@ -95,18 +96,18 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string                             $name
-	 * @param string                             $abbreviation
-	 * @param bool|null                          $enabled
-	 * @param CM_Model_Language|null             $backup
+	 * @param string                 $name
+	 * @param string                 $abbreviation
+	 * @param bool|null              $enabled
+	 * @param CM_Model_Language|null $backup
 	 */
 	public function setData($name, $abbreviation, $enabled = null, CM_Model_Language $backup = null) {
 		$name = (string) $name;
 		$abbreviation = (string) $abbreviation;
 		$enabled = (bool) $enabled;
 		$backupId = ($backup) ? $backup->getId() : null;
-		CM_Db_Db::update(TBL_CM_LANGUAGE, array('name' => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled,
-			'backupId' => $backupId), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_LANGUAGE, array('name'     => $name, 'abbreviation' => $abbreviation, 'enabled' => $enabled,
+												'backupId' => $backupId), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -170,7 +171,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string      $abbreviation
+	 * @param string $abbreviation
 	 * @return CM_Model_Language|null
 	 */
 	public static function findByAbbreviation($abbreviation) {
@@ -227,9 +228,18 @@ class CM_Model_Language extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param string       $name
-	 * @param string|null  $nameNew
-	 * @param array|null   $variableNamesNew
+	 * @param string $name
+	 * @return boolean
+	 */
+	public static function hasKey($name) {
+		$name = (string) $name;
+		return (boolean) CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $name));
+	}
+
+	/**
+	 * @param string      $name
+	 * @param string|null $nameNew
+	 * @param array|null  $variableNamesNew
 	 * @throws CM_Exception_Nonexistent
 	 * @throws CM_Exception_Duplicate
 	 */
@@ -238,16 +248,15 @@ class CM_Model_Language extends CM_Model_Abstract {
 			self::_setKeyVariables($name, $variableNamesNew);
 		}
 		if ($nameNew !== null) {
-			if (!CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn()) {
+			if (!CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $name))) {
 				throw new CM_Exception_Nonexistent('LanguageKey `' . $name . '` does not exist');
 			}
-			if (CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $nameNew))->fetchColumn()) {
+			if (CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $nameNew))) {
 				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
 			}
 			CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('name' => $nameNew), array('name' => $name));
 			self::flushCacheLocal();
 		}
-
 	}
 
 	/**
@@ -279,14 +288,14 @@ class CM_Model_Language extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		$params = CM_Params::factory($data);
 		$backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
-		$id = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name' => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
-			'enabled' => $params->getBoolean('enabled'), 'backupId' => $backupId));
+		$id = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name'    => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
+													  'enabled' => $params->getBoolean('enabled'), 'backupId' => $backupId));
 		return new static($id);
 	}
 
 	/**
-	 * @param string          $name
-	 * @param array|null      $variableNames
+	 * @param string     $name
+	 * @param array|null $variableNames
 	 * @return int
 	 */
 	private static function _setKey($name, array $variableNames = null) {

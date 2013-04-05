@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_Splittest extends CM_Model_Abstract {
+
 	CONST TYPE = 16;
 
 	/** @var bool */
@@ -102,8 +103,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 		$data = CM_Db_Db::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetch();
 		if ($data) {
-			$data['variations'] = CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, array('id',
-				'name'), array('splittestId' => $data['id']))->fetchAllTree();
+			$data['variations'] = CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION,
+				array('id', 'name'), array('splittestId' => $data['id']))->fetchAllTree();
 		}
 		return $data;
 	}
@@ -152,13 +153,14 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
-		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('conversionStamp' => time(),
-			'conversionWeight' => $weight), array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
+		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE,
+			array('conversionStamp' => time(), 'conversionWeight' => $weight),
+			array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
 	}
 
 	/**
-	 * @param int         $fixtureId
-	 * @param string      $variationName
+	 * @param int    $fixtureId
+	 * @param string $variationName
 	 * @return bool
 	 */
 	protected function _isVariationFixture($fixtureId, $variationName) {
@@ -169,7 +171,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int           $fixtureId
+	 * @param int $fixtureId
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
@@ -195,8 +197,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			if (!$variation) {
 				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
 			}
-			CM_Db_Db::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId,
-				'variationId' => $variation->getId(), 'createStamp' => time()));
+			CM_Db_Db::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE,
+				array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
 			$variationFixtures[$this->getId()] = $variation->getName();
 			$cacheWrite = true;
 		}
@@ -207,5 +209,4 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		return $variationFixtures[$this->getId()];
 	}
-
 }

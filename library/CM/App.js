@@ -34,8 +34,21 @@ var CM_App = CM_Class_Abstract.extend({
 			return view;
 		}
 		return _.find(this.views, function(view) {
-			return _.contains(view.getClasses(), className);
+			return view.hasClass(className);
 		}) || null;
+	},
+
+	/**
+	 * @param {String|Null} [className]
+	 * @return CM_Component_Abstract[]
+	 */
+	getViewList: function(className) {
+		if (!className) {
+			return this.views;
+		}
+		return _.filter(this.views, function(view) {
+			return view.hasClass(className);
+		});
 	},
 
 	/**
@@ -244,6 +257,32 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
+			cm.dom.setupVideo($dom.find('video.mediaElement'));
+		},
+		/**
+		 * @param {jQuery} $element
+		 */
+		setupVideo: function($element) {
+			$element.mediaelementplayer({
+				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
+				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
+				videoWidth: '100%',
+				videoHeight: '100%',
+				success: function (mediaElement, domObject) {
+					var mediaElementMuted = cm.storage.get('mediaElement-muted');
+					var mediaElementVolume = cm.storage.get('mediaElement-volume');
+					if (null !== mediaElementMuted) {
+						mediaElement.setMuted(mediaElementMuted);
+					}
+					if (null !== mediaElementVolume) {
+						mediaElement.setVolume(mediaElementVolume);
+					}
+					mediaElement.addEventListener("volumechange", function () {
+						cm.storage.set('mediaElement-volume', mediaElement.volume);
+						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
+					});
+				}
+			});
 		}
 	},
 
@@ -292,14 +331,14 @@ var CM_App = CM_Class_Abstract.extend({
 			return date.getUTCFullYear() + '-' + cm.string.padLeft(date.getUTCMonth() + 1, 2, '0') + '-' + cm.string.padLeft(date.getUTCDate(), 2, '0') + 'T' + cm.string.padLeft(date.getUTCHours(), 2, '0') + ':' + cm.string.padLeft(date.getUTCMinutes(), 2, '0') + ':' + cm.string.padLeft(date.getUTCSeconds(), 2, '0') + '.' + cm.string.padLeft(date.getUTCMilliseconds(), 3, '0') + 'Z';
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		$timeago: function(timestamp) {
 			return $(this.timeago(timestamp)).timeago();
 		},
 		/**
-		 * @param {Integer} [timestamp]
+		 * @param {Number} [timestamp]
 		 * @return {jQuery}
 		 */
 		timeago: function(timestamp) {
@@ -373,8 +412,9 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {String} question
 		 * @param {Function} callback
+		 * @param {Object} [context]
 		 */
-		confirm: function(question, callback) {
+		confirm: function(question, callback, context) {
 			var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
 			var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
 			var $html = $('<div><div class="box_cap clearfix nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
@@ -385,11 +425,12 @@ var CM_App = CM_Class_Abstract.extend({
 			$html.floatOut();
 			$ok.click(function() {
 				$html.floatIn();
-				callback();
+				callback.call(context);
 			});
 			$cancel.click(function() {
 				$html.floatIn();
 			});
+			$ok.focus();
 		}
 	},
 
@@ -437,6 +478,17 @@ var CM_App = CM_Class_Abstract.extend({
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
 			}
 			this._$hidden.append(html);
+		},
+
+		/**
+		 * @param {Element} element
+		 * @return Boolean
+		 */
+		isHidden: function(element) {
+			if (!this._$hidden) {
+				return false;
+			}
+			return $.contains(this._$hidden[0], element);
 		},
 
 		hint: function(content) {
@@ -582,14 +634,19 @@ var CM_App = CM_Class_Abstract.extend({
 		_channelDispatchers: {},
 
 		/**
-		 * @param {String} channel
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(channel, namespace, callback, context) {
+		bind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
+			}
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
 			}
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
@@ -598,16 +655,21 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} channel
-		 * @param {String} [event]
+		 * @param {String} channelKey
+		 * @param {Number} channelType
+		 * @param {String} [namespace]
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(channel, event, callback, context) {
+		unbind: function(channelKey, channelType, namespace, callback, context) {
+			var channel = channelKey + ':' + channelType;
 			if (!this._channelDispatchers[channel]) {
 				return;
 			}
-			this._channelDispatchers[channel].off(event, callback, context);
+			if (!channelKey || !channelType) {
+				cm.error.triggerThrow('No channel provided');
+			}
+			this._channelDispatchers[channel].off(namespace, callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
@@ -615,13 +677,13 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} channel
-		 * @return {Integer}
+		 * @return {Number}
 		 */
 		_getBindCount: function(channel) {
-			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._events) {
+			if (!this._channelDispatchers[channel] || !this._channelDispatchers[channel]._callbacks) {
 				return 0;
 			}
-			return _.size(this._channelDispatchers[channel]._events);
+			return _.size(this._channelDispatchers[channel]._callbacks);
 		},
 
 		/**
@@ -715,37 +777,29 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	action: {
-		verbs: {
-		},
-		_registered: false,
-		_dispatcher: _.clone(Backbone.Events),
+		verbs: {},
 
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
+		 * @param {String} channelKey
+		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, callback, context) {
-			if (!cm.options.stream.channel) {
-				return;
-			}
-			if (!this._registered) {
-				cm.stream.bind(cm.options.stream.channel, 'CM_Action_Abstract', function(response) {
-					this._dispatcher.trigger(response.action.verb + ':' + response.model._type, response.action, response.model, response.data);
-				}, this);
-				this._registered = true;
-			}
-			this._dispatcher.on(actionVerb + ':' + modelType, callback, context);
+		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
 		 * @param {Number} modelType
-		 * @param {Function} callback
+		 * @param {String} channelKey
+		 * @param {Number} channelType
+		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, callback, context) {
-			this._dispatcher.off(actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
 		}
 	},
 

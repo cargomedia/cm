@@ -1,6 +1,7 @@
 <?php
 
 class CM_App {
+
 	/**
 	 * @var CM_App
 	 */
@@ -176,9 +177,9 @@ class CM_App {
 			$reflectionClass = new ReflectionClass($className);
 			if ($reflectionClass->hasConstant('TYPE')) {
 				$type = $className::TYPE;
-				if (in_array($type, $classTypes)) {
+				if ($classNameDuplicate = array_search($type, $classTypes)) {
 					throw new CM_Exception_Invalid(
-						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classTypes[$type] . '`. Both equal `' . $type . '` (within `' .
+						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
 								$className . '` type namespace).');
 				}
 				$classTypes[$className] = $type;
@@ -218,7 +219,7 @@ class CM_App {
 			$path = CM_Util::getNamespacePath($namespace);
 		}
 		$updateScript = $path . 'resources/db/update/' . $version . '.php';
-		if (!file_exists($updateScript)) {
+		if (!CM_File::exists($updateScript)) {
 			throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
 		}
 		return $updateScript;

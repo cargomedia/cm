@@ -36,7 +36,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$this->_verb = (int) $verb;
 	}
 
-	abstract protected function _notify();
+	protected function _notify(){
+		$arguments = func_get_args();
+		$methodName = '_notify' . $this->getVerbName();
+
+		if (method_exists($this, $methodName)) {
+			call_user_func_array(array($this, $methodName), $arguments);
+		}
+	}
 
 	abstract protected function _prepare();
 

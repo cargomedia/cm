@@ -90,7 +90,14 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetch();
+		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
+		if (false !== $data) {
+			$type = (int) $data['type'];
+			if ($this->getType() !== $type) {
+				throw new CM_Exception_Invalid('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+			}
+		}
+		return $data;
 	}
 
 	protected function _onDelete() {
@@ -108,14 +115,17 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param int      $id
 	 * @param int|null $type
+	 * @throws CM_Exception_Nonexistent
 	 * @return CM_Model_StreamChannel_Abstract
-	 * @throws CM_Exception_Invalid
 	 */
 	public static function factory($id, $type = null) {
 		if (null === $type) {
 			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
 			if (false === ($type = CM_Cache::get($cacheKey))) {
 				$type = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchColumn();
+				if (false === $type) {
+					throw new CM_Exception_Nonexistent('No record found in `' . TBL_CM_STREAMCHANNEL . '` for id `' . $id . '`');
+				}
 				CM_Cache::set($cacheKey, $type);
 			}
 		}
@@ -136,27 +146,6 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			return null;
 		}
 		return self::factory($result['id'], $result['type']);
-	}
-
-	/**
-	 * @param string $key
-	 * @param int    $adapterType
-	 * @return CM_Model_StreamChannel_Abstract
-	 */
-	public static function getByKey($key, $adapterType) {
-		$streamChannel = static::findByKey($key, $adapterType);
-		if (!$streamChannel) {
-			$streamChannel = static::create(array('key' => $key, 'adapterType' => $adapterType));
-		}
-		return $streamChannel;
-	}
-
-	/**
-	 * @param int $type
-	 * @return CM_Paging_StreamChannel_Type
-	 */
-	public static function getAllByType($type) {
-		return new CM_Paging_StreamChannel_Type(array($type));
 	}
 
 	protected static function _create(array $data) {

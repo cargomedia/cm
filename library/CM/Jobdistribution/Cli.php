@@ -10,5 +10,4 @@ class CM_Jobdistribution_Cli extends CM_Cli_Runnable_Abstract {
 	public static function getPackageName() {
 		return 'job-distribution';
 	}
-
 }

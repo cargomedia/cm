@@ -7,6 +7,9 @@ class CM_Mail extends CM_View_Abstract {
 	/** @var CM_Model_User|null */
 	private $_recipient;
 
+	/** @var CM_Site_Abstract */
+	private $_site;
+
 	/** @var array */
 	private $_to = array();
 
@@ -40,9 +43,10 @@ class CM_Mail extends CM_View_Abstract {
 	/**
 	 * @param CM_Model_User|string|null $recipient
 	 * @param array|null                $tplParams
+	 * @param CM_Site_Abstract|null     $site
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($recipient = null, array $tplParams = null) {
+	public function __construct($recipient = null, array $tplParams = null, CM_Site_Abstract $site = null) {
 		if ($this->hasTemplate()) {
 			$this->setRenderLayout(true);
 		}
@@ -63,9 +67,16 @@ class CM_Mail extends CM_View_Abstract {
 			}
 		}
 
-		$config = self::_getConfig();
-		$this->setTplParam('siteName', $config->siteName);
-		$this->setSender($config->siteEmailAddress, $config->siteName);
+		if (!$site && $this->_recipient) {
+			$site = $this->_recipient->getSite();
+		}
+		if (!$site) {
+			$site = CM_Site_Abstract::factory();
+		}
+		$this->_site = $site;
+
+		$this->setTplParam('siteName', $this->_site->getName());
+		$this->setSender($this->_site->getEmailAddress(), $this->_site->getName());
 	}
 
 	/**
@@ -172,7 +183,6 @@ class CM_Mail extends CM_View_Abstract {
 		$address = (string) $address;
 		$name = is_null($name) ? $name : (string) $name;
 		$this->_sender = array('address' => $address, 'name' => $name);
-
 	}
 
 	/**
@@ -244,15 +254,11 @@ class CM_Mail extends CM_View_Abstract {
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
+		$language = null;
 		if ($this->_recipient) {
-			$site = $this->_recipient->getSite();
 			$language = $this->_recipient->getLanguage();
-		} else {
-			$site = null;
-			$language = null;
 		}
-		$render = new CM_Render($site, $this->_recipient, $language);
-		list($subject, $html, $text) = $render->render($this);
+		list($subject, $html, $text) = $this->_render($language);
 		if ($delayed) {
 			$this->_queue($subject, $text, $html);
 		} else {
@@ -301,8 +307,9 @@ class CM_Mail extends CM_View_Abstract {
 
 	private function _queue($subject, $text, $html) {
 		CM_Db_Db::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
-			'sender' => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()), 'to' => serialize($this->getTo()),
-			'cc' => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
+											'sender'  => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()),
+											'to'      => serialize($this->getTo()),
+											'cc'      => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
 	}
 
 	private function _log($subject, $text) {
@@ -312,7 +319,7 @@ class CM_Mail extends CM_View_Abstract {
 		$log->add($this, $msg);
 	}
 
-	private function _send($subject, $text, $html = null) {
+	protected function _send($subject, $text, $html = null) {
 		if (!self::_getConfig()->send) {
 			$this->_log($subject, $text);
 		} else {
@@ -344,5 +351,14 @@ class CM_Mail extends CM_View_Abstract {
 				throw new CM_Exception_Invalid('Cannot send email, phpmailer reports: ' . $e->getMessage());
 			}
 		}
+	}
+
+	/**
+	 * @param CM_Model_Language|null $language
+	 * @return string
+	 */
+	protected function _render($language) {
+		$render = new CM_Render($this->_site, $this->_recipient, $language);
+		return $render->render($this);
 	}
 }

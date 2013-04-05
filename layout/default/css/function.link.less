@@ -1,7 +1,13 @@
-.link:hover {
+.link {
 	text-decoration: none;
 
-	> .label {
-		text-decoration: underline;
+	&:hover {
+		> .label {
+			text-decoration: underline;
+		}
+	}
+
+	&.hasIcon.hasLabel > .label{
+		margin-left: 4px;
 	}
 }

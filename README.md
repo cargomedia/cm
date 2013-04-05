@@ -48,7 +48,7 @@ Caching can be enabled optionally with `enableCache()`.
 Items within a paging can be post-processed before being returned. For example one can instantiate an object for the id returned from the database.
 
 Naming convention:
-```
+```php
 CM_Paging_<Type of item>_<Lookup description>
 CM_Paging_Photo_User                           # All photos of a given user
 CM_Paging_User_Country                         # All users from a given country
@@ -56,35 +56,72 @@ CM_Paging_User_Country                         # All users from a given country
 
 
 ## Creating a new project
-```
+
+### Cloning the CM skeleton application
+
+In your workspace, run:
+```bash
 composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
+```
+This will create a new directory `<project-name>` containing a project based on CM.
+
+### Setting up a virtual host
+
+The only entry point of your application should be `public/index.php`.
+A typical Apache virtual host configuration for this purpose were:
+
+```conf
+<VirtualHost *>
+  ServerName ‹hostname›
+  RedirectPermanent / http://www.‹hostname›/
+</VirtualHost>
+
+<VirtualHost *>
+  ServerName www.‹hostname›
+  DocumentRoot ‹project-dir›
+
+  <Directory ‹project-dir›/>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ public/$1
+  </Directory>
+
+  <Directory ‹project-dir›/public/>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php
+    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:%{HTTP:X-Requested-With}]
+  </Directory>
+</VirtualHost>
 ```
 
 ### Project configuration
 
-```
+In your project directory, run:
+```bash
 ./scripts/cm.php config generate
 ```
 
 ### Namespace creation, site setup
-CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run.
-```
+
+CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
+```bash
 ./scripts/cm.php generator create-namespace <namespace>
 ```
 Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
-```
+```php
 require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
 ```
 
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
 
-```
+```bash
 generator create-view <class-name>
 ```
 Creates new view based on the <class-name> provided. It will create php class, javascript class, empty html template and less file. It will also look for most appropriate abstract class to extend.
 
-```
+```bash
 generator create-class <class-name>
 ```
 Creates new <class-name> class.
