@@ -13,7 +13,6 @@ class CMTest_TH {
 		if (self::$initialized) {
 			return;
 		}
-		$config = CM_Config::get();
 		$configDb = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
 
@@ -44,7 +43,6 @@ class CMTest_TH {
 		self::clearCache();
 		self::timeReset();
 		self::clearTmp();
-		self::clearMocks();
 		self::clearConfig();
 	}
 
@@ -65,12 +63,6 @@ class CMTest_TH {
 
 	public static function clearTmp() {
 		CM_Util::rmDirContents(DIR_TMP);
-	}
-
-	public static function clearMocks() {
-		$dirMocks = CM_Util::getNamespacePath('CMTest') . 'library/CMTest/Site/';
-		CM_Util::mkDir($dirMocks);
-		CM_Util::rmDirContents($dirMocks);
 	}
 
 	public static function clearConfig() {
@@ -176,8 +168,8 @@ class CMTest_TH {
 		do {
 			$siteId = rand(1, 255);
 			$siteMockId = md5(rand() . uniqid());
-			$siteClassName = 'CMTest_Site_Mock' . $siteMockId;
-		} while (array_key_exists($siteId, $types) || class_exists($siteClassName, false));
+			$siteClassName = 'CMTestTemp_Site_Mock' . $siteMockId;
+		} while (array_key_exists($siteId, $types) || class_exists($siteClassName));
 
 		$codeNamespaces = '';
 		foreach ($namespaces as $namespace) {
@@ -210,7 +202,11 @@ class $siteClassName extends CM_Site_Abstract {
 $codeMatchAll}
 
 EOD;
-		CM_File_Php::create(CM_Util::getNamespacePath('CMTest') . 'library/CMTest/Site/Mock' . $siteMockId . '.php', $code);
+		$pathDirectory = CM_Util::getNamespacePath('CMTestTemp') . 'library/CMTestTemp/Site/';
+		CM_Util::mkDir($pathDirectory);
+		$pathFile = $pathDirectory . 'Mock' . $siteMockId . '.php';
+		CM_File_Php::create($pathFile, $code);
+		require $pathFile;
 
 		$site = new $siteClassName();
 		self::configureSite($site, $url, $urlCdn, $name, $emailAddress);

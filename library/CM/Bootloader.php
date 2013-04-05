@@ -172,7 +172,10 @@ class CM_Bootloader {
 	 * @return string[]
 	 */
 	public function getNamespaces() {
-		return array('CM');
+		if (!$this->isEnvironment('test')) {
+			return array('CM');
+		}
+		return array('CM', 'CMTestTemp');
 	}
 
 	/**
@@ -233,7 +236,16 @@ class CM_Bootloader {
 			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
 			apc_store($cacheKey, $this->_namespacePaths);
 		}
-		return $this->_namespacePaths;
+		if (!$this->isEnvironment('test')) {
+			return $this->_namespacePaths;
+		}
+		$namespacePathsTemp = array();
+		if (defined('DIR_TMP') && strpos(DIR_TMP, DIR_ROOT) === 0) {
+			$pathTemp = substr(DIR_TMP, strlen(DIR_ROOT));
+			$pathCMTestTemp = $pathTemp . 'CMTestTemp/';
+			$namespacePathsTemp['CMTestTemp'] = $pathCMTestTemp;
+		}
+		return array_merge($this->_namespacePaths, $namespacePathsTemp);
 	}
 
 	/**
