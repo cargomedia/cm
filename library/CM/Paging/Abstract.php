@@ -208,8 +208,10 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return static
 	 */
 	public function exclude($items) {
-		$items = (array) $items;
-		if (count($items) == 0) {
+		if (!is_array($items)) {
+			$items = array($items);
+		}
+		if (count($items) === 0) {
 			return $this;
 		}
 
