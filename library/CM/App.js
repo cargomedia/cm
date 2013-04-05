@@ -257,7 +257,6 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
-			cm.dom.setupVideo($dom.find('video.mediaElement'));
 		},
 		/**
 		 * @param {jQuery} $element
