@@ -97,7 +97,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
 		/** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
 		foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
-			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUser()->equals($user)) {
+			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() === $user->getId()) {
 				return true;
 			}
 		}
