@@ -1,9 +1,9 @@
 <?php
 
 class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message {
-	const SALT = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
 
 	const TYPE = 29;
+	const SALT = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
 
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
 	}
