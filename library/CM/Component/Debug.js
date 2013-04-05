@@ -50,18 +50,6 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		var messages = Array.prototype.slice.call(arguments);
 		if (console && console.log) {
 			console.log.apply(console, messages);
-		} else {
-			var $msg = $("<li></li>");
-			_.each(messages, function (message) {
-				if (!_.isString(message)) {
-					message = JSON.stringify(message);
-				}
-				$msg.append(message + ' ');
-			});
-			this.$(".alerts").append($msg);
-			$msg.delay(8000).slideUp(200, function() {
-				$(this).remove();
-			});
 		}
 	}
 });
