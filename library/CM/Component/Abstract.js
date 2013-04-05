@@ -76,5 +76,26 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 	 */
 	reload: function(params) {
 		return this.ajaxModal('reload', params);
+	},
+
+	/**
+	 * @param {String} className
+	 * @param {Object|Null} [params]
+	 * @param {Object|Null} [options]
+	 * @return jqXHR
+	 */
+	replaceWithComponent: function(className, params, options) {
+		if (!this.getParent()) {
+			cm.error.triggerThrow('Cannot replace root component')
+		}
+		var handler = this;
+		options = _.defaults(options || {}, {
+			'success': function() {
+				handler.$el.replaceWith(this.$el);
+				handler.remove(true);
+			},
+			'modal': false
+		});
+		return this.getParent().loadComponent(className, params, options);
 	}
 });

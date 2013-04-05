@@ -33,8 +33,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		if (!isset($viewInfo['parentId'])) {
 			$viewInfo['parentId'] = null;
 		}
-		return array('id' => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
-			'parentId' => (string) $viewInfo['parentId']);
+		return array('id'       => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
+					 'parentId' => (string) $viewInfo['parentId']);
 	}
 
 	/**
@@ -124,8 +124,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			return $menuEntry->getHash();
 		}, $this->getSite()->getMenuEntriesActive($page)));
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'layoutClass' => $layoutClass,
-			'menuEntryHashList' => $menuEntryHashList);
+		return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
+					 'layoutClass'       => $layoutClass,
+					 'menuEntryHashList' => $menuEntryHashList);
 	}
 
 	public function popinComponent() {

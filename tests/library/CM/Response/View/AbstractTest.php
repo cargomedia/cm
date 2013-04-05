@@ -21,7 +21,7 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 	}
 
 	protected function _getSite() {
-		return $this->_getSiteMock(null, 'http://www.test.com/');
+		return CMTest_TH::getSiteMock(null, 'http://www.test.com/');
 	}
 }
 
