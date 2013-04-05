@@ -42,7 +42,6 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 			};
 		}
 
-
 		if (cm.options.stream.channel) {
 			_.each(cm.model.types, function(modelType, modelName) {
 				_.each(cm.action.verbs, function(actionVerb, actionName) {
