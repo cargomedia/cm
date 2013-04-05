@@ -1,29 +1,67 @@
-.panel {
+& {
 	position: fixed;
 	z-index: 9999;
 	bottom: 0;
+	left: 10px;
+	padding: 0 10px;
+}
+
+.debugIndication {
+	position: fixed;
+	display: block;
+	bottom: 0;
 	left: 0;
+	padding: 0 5px;
+	line-height: 22px;
+	background-color: @colorNotice;
+	color: @colorFgTheme;
+	border-top: 1px solid @colorNotice;
+	border-left: 1px solid @colorNotice;
 }
 
-.buttons {
-	.background-color(rgb(231, 253, 192));
-	height: 15px;
-	border: 1px solid black;
-	border-bottom: none;
-	border-left: none;
-}
-
-.containers {
-	position: absolute;
-	left: 0;
-	bottom: 15px;
-	.background-color(rgb(231, 253, 192));
-	border: 1px solid black;
-}
-
-.containers>* {
+.debugBar {
 	display: none;
-	height: auto;
-	max-height: 500px;
-	overflow-y: auto;
+	position: relative;
+
+	> .panel {
+		display: block;
+		float: left;
+		height: 22px;
+		line-height: 22px;
+		padding: 0 8px;
+		background-color: lighten(@colorNotice, 40);
+		border-top: 1px solid @colorNotice;
+		border-right: 1px solid @colorNotice;
+		color: @colorFg;
+
+		&:hover {
+			background-color: @colorNotice;
+			color: @colorFgTheme;
+
+			.count {
+				color: @colorFg;
+			}
+		}
+
+		.count {
+			color: @colorFgShy;
+		}
+	}
+
+	.window {
+		display: none;
+		box-sizing: border-box;
+		position: absolute;
+		left: 0;
+		bottom: 100%;
+		margin-bottom: -1px;
+		max-height: 500px;
+		max-width: 100%;
+		padding: 5px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		background-color: lighten(@colorNotice, 45);
+		border: 1px solid @colorNotice;
+		word-break: break-all;
+	}
 }

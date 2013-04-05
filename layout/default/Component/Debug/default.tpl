@@ -1,28 +1,27 @@
-<div class="panel">
-	<div class="buttons">
-		<a href="javascript:;" class="actions">{{translate 'Actions'}|strtoupper}</a> ·
-		{foreach from=$stats key=stat item=value}
-			<a href="javascript:;" class="{$stat}">{$stat}</a>
-			({$value|@count})
+<a class="debugIndication toggleDebugBar" href="javacript:;" title="{translate 'Debug (Click here or use [d] key)'}">D</a>
+
+<div class="debugBar clearfix">
+	<a href="javascript:;" class="panel" data-id="actions">{{translate 'Actions'}|strtoupper}</a>
+	{foreach $stats as $key => $value}
+		<a href="javascript:;" class="panel" data-id="{$key}">{$key}<span class="count"> ({$value|@count})</span></a>
+	{/foreach}
+
+	<div class="window actions">
+		{foreach $clearCacheButtons as $key => $text}
+			<input id="{id tag=$key}" checked="checked" type="checkbox" name="{$key}" />
+			<label for="{id tag=$key}">{$text}</label>
+			<br />
 		{/foreach}
+		{button_link class="clearCache" label="{translate 'Clear Cache'}"}
 	</div>
-	<div class="containers">
-		{foreach from=$stats key=key item=stat}
-			<div class="{$key}">
-				<ul>
-					{foreach from=$stat item=entry}
-						<li>{$entry}</li>
-					{/foreach}
-				</ul>
-			</div>
-		{/foreach}
-		<div class="actions">
-			{foreach from=$clearCacheButtons key=var item=text}
-				<input id="{id tag=$var}" checked="checked" type="checkbox" name="{$var}" />
-				<label for="{id tag=$var}">{$text}</label>
-				<br />
-			{/foreach}
-			<input class="clearCache" type="submit" value="{translate 'Clear Cache'}">
+
+	{foreach $stats as $key => $value}
+		<div class="window {$key}">
+			<ul>
+				{foreach $value as $entry}
+					<li>{$entry}</li>
+				{/foreach}
+			</ul>
 		</div>
-	</div>
+	{/foreach}
 </div>
