@@ -29,26 +29,39 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 			_.each(cm.model.types, function(modelType, modelName) {
 				_.each(cm.action.verbs, function(actionVerb, actionName) {
 					handler.bindAction(actionVerb, modelType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
-						if (console && console.log) {
-							console.log('ACTION: ', action._class + '::' + actionName);
-							console.log(' ', 'Actor:', action.actor);
-							console.log(' ', modelName + ':', model);
-						} else {
-							var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
-							msg += " (" + JSON.stringify(data) + ")";
-							handler.alert(msg);
-						}
+						var messages = [];
+						messages.push("ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>");
+						messages.push("(");
+						messages.push(data);
+						messages.push(")");
+						handler.log.apply(handler, messages);
 					});
 				});
 			});
 		}
 	},
 
-	alert: function(msg) {
-		var $msg = $("<li>" + msg + "</li>");
-		this.$(".alerts").append($msg);
-		$msg.delay(8000).slideUp(200, function() {
-			$(this).remove();
-		});
+	/**
+	 * @param message1
+	 * @param [message2]
+	 * @param [message3]
+	 */
+	log: function(message1, message2, message3) {
+		var messages = Array.prototype.slice.call(arguments);
+		if (console && console.log) {
+			console.log.apply(console, messages);
+		} else {
+			var $msg = $("<li></li>");
+			_.each(messages, function (message) {
+				if (!_.isString(message)) {
+					message = JSON.stringify(message);
+				}
+				$msg.append(message + ' ');
+			});
+			this.$(".alerts").append($msg);
+			$msg.delay(8000).slideUp(200, function() {
+				$(this).remove();
+			});
+		}
 	}
 });
