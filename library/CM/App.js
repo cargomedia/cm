@@ -268,7 +268,7 @@ var CM_App = CM_Class_Abstract.extend({
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
 				videoHeight: '100%',
-				success: function (mediaElement, domObject) {
+				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
 					if (null !== mediaElementMuted) {
@@ -277,7 +277,7 @@ var CM_App = CM_Class_Abstract.extend({
 					if (null !== mediaElementVolume) {
 						mediaElement.setVolume(mediaElementVolume);
 					}
-					mediaElement.addEventListener("volumechange", function () {
+					mediaElement.addEventListener("volumechange", function() {
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
@@ -840,61 +840,61 @@ var CM_App = CM_Class_Abstract.extend({
 
 	router: {
 		_router: null,
-		start: function() {
-			var $placeholder;
-			var request;
-			var urlBase = cm.getUrl();
-			var pushState = Modernizr.history;
-
-			/**
-			 * @param {String} path
-			 */
-			var navigate = function(path) {
-				console.log('navigate: ' + path);
-				if (!$placeholder) {
-					$placeholder = $('<div class="router-placeholder" />');
-					var page = cm.findView('CM_Page_Abstract');
-					page.$().replaceWith($placeholder);
-					page.remove(true);
-					cm.router.onTeardown();
-				} else {
-					$placeholder.removeClass('error').html('');
-				}
-				var timeoutLoading = window.setTimeout(function() {
-					$placeholder.html('<div class="spinner" />')
-				}, 750);
-				if (request) {
-					request.abort();
-				}
-				request = cm.findView().loadPage(path, {
-					success: function(response) {
-						var fragment = response.url.substr(urlBase.length);
-						var currentLayout = cm.findView('CM_Layout_Abstract');
-						var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-						if (reload) {
-							var reloadUrl = response.url;
-							if (!pushState) {
-								reloadUrl += '#' + fragment;
-							}
-							console.log('reload: ' + reloadUrl);
-							window.location.replace(reloadUrl);
-							return;
+		_$placeholder: null,
+		_request: null,
+		/**
+		 * @param {String} path
+		 */
+		navigate: function(path) {
+			var handler = this;
+			console.log('navigate: ' + path);
+			if (!this._$placeholder) {
+				this._$placeholder = $('<div class="router-placeholder" />');
+				var page = cm.findView('CM_Page_Abstract');
+				page.$().replaceWith(this._$placeholder);
+				page.remove(true);
+				cm.router.onTeardown();
+			} else {
+				this._$placeholder.removeClass('error').html('');
+			}
+			var timeoutLoading = window.setTimeout(function() {
+				handler._$placeholder.html('<div class="spinner" />')
+			}, 750);
+			if (this._request) {
+				this._request.abort();
+			}
+			this._request = cm.findView().loadPage(path, {
+				success: function(response) {
+					var fragment = response.url.substr(cm.getUrl().length);
+					var currentLayout = cm.findView('CM_Layout_Abstract');
+					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
+					if (reload) {
+						var reloadUrl = response.url;
+						if (!pushState) {
+							reloadUrl += '#' + fragment;
 						}
-						$placeholder.replaceWith(this.$());
-						$placeholder = null;
-						window.history.replaceState(null, null, fragment);
-						cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-					},
-					error: function(msg, type, isPublic) {
-						$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-						cm.router.onError();
-						return false;
-					},
-					complete: function() {
-						window.clearTimeout(timeoutLoading);
+						console.log('reload: ' + reloadUrl);
+						window.location.replace(reloadUrl);
+						return;
 					}
-				});
-			};
+					handler._$placeholder.replaceWith(this.$());
+					handler._$placeholder = null;
+					window.history.replaceState(null, null, fragment);
+					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
+				},
+				error: function(msg, type, isPublic) {
+					handler._$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
+					cm.router.onError();
+					return false;
+				},
+				complete: function() {
+					window.clearTimeout(timeoutLoading);
+				}
+			});
+		},
+
+		start: function() {
+			var urlBase = cm.getUrl();
 
 			var skipInitialFire = false;
 			$(window).bind('popstate', function(event) {
@@ -905,12 +905,12 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 				var url = window.history.location || document.location;
 				console.log('popstate: ' + url.pathname + url.search);
-				navigate(url.pathname + url.search);
+				cm.router.navigate(url.pathname + url.search);
 			});
 
 			var hash = window.location.hash.substr(1);
 			var path = window.location.pathname + window.location.search;
-			if (pushState) {
+			if (Modernizr.history) {
 				if (hash) {
 					// Hash-URL copied into a PushState-browser
 					if (hash != path) {
