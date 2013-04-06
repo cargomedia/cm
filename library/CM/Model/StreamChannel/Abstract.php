@@ -128,6 +128,14 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param string $encryptionKey
+	 * @return string Data
+	 */
+	protected function _decryptKey($encryptionKey) {
+		return mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB);
+	}
+
+	/**
 	 * @param int      $id
 	 * @param int|null $type
 	 * @throws CM_Exception_Nonexistent
@@ -161,6 +169,15 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			return null;
 		}
 		return self::factory($result['id'], $result['type']);
+	}
+
+	/**
+	 * @param string $encryptionKey
+	 * @param string $data
+	 * @return string Channel-key
+	 */
+	protected static function _encryptKey($data, $encryptionKey) {
+		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
 	}
 
 	protected static function _create(array $data) {
