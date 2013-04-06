@@ -61,7 +61,6 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		}
 	},
 
-
 	toggleDebugBar: function() {
 		var debugBar = this.$('.debugBar');
 
@@ -74,6 +73,9 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		}
 	},
 
+	/**
+	 * @param {String} name
+	 */
 	toggleWindow: function(name) {
 		this.$('.window:not(.' + name + ')').hide();
 		this.$('.window.' + name).toggle();
