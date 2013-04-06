@@ -23,5 +23,5 @@
 			</ul>
 		</div>
 	{/foreach}
-	<a class="debugIndication toggleDebugBar" href="javacript:;" title="{translate 'Debug (Click here or use [d] key)'}">D</a>
+	<a class="debugIndication toggleDebugBar" href="javacript:;" title="{translate 'Debug (Click here or use [d] key)'}"><span class="icon-debug"></span></a>
 </div>
