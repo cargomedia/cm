@@ -76,14 +76,14 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		CM_Model_Stream_Subscribe::create(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
 		CM_Model_Stream_Subscribe::create(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
 
-		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'foo'));
+		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'foo'));
 		$adapter->onRedisMessage(json_encode($message));
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
 		$this->assertNotNull($streamChannel);
 		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('foo', $streamChannel);
 		$this->assertNull($streamSubscribe);
 
-		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo', 'clientKey' => 'bar'));
+		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'bar'));
 		$adapter->onRedisMessage(json_encode($message));
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
 		$this->assertNull($streamChannel);
