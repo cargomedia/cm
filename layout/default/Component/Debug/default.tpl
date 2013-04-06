@@ -1,22 +1,21 @@
-<a class="debugIndication toggleDebugBar" href="javacript:;" title="{translate 'Debug (Click here or use [d] key)'}">D</a>
-
 <div class="debugBar clearfix">
-	<a href="javascript:;" class="panel" data-id="actions">{{translate 'Actions'}|strtoupper}</a>
-	{foreach $stats as $key => $value}
-		<a href="javascript:;" class="panel" data-id="{$key}">{$key}<span class="count"> ({$value|@count})</span></a>
+	<a href="javascript:;" class="panel" data-name="actions">{{translate 'Actions'}|strtoupper}</a>
+	{foreach $stats as $name => $value}
+		<a href="javascript:;" class="panel" data-name="{$name}">{$name}<span class="count"> ({$value|@count})</span></a>
 	{/foreach}
 
 	<div class="window actions">
-		{foreach $clearCacheButtons as $key => $text}
-			<input id="{id tag=$key}" checked="checked" type="checkbox" name="{$key}" />
-			<label for="{id tag=$key}">{$text}</label>
-			<br />
+		{foreach $clearCacheButtons as $name => $text}
+			<p>
+				<input id="{$name}" checked="checked" type="checkbox" name="{$name}" />
+				<label for="{$name}">{$text}</label>
+			</p>
 		{/foreach}
 		{button_link class="clearCache" label="{translate 'Clear Cache'}"}
 	</div>
 
-	{foreach $stats as $key => $value}
-		<div class="window {$key}">
+	{foreach $stats as $name => $value}
+		<div class="window {$name}">
 			<ul>
 				{foreach $value as $entry}
 					<li>{$entry}</li>
@@ -24,4 +23,5 @@
 			</ul>
 		</div>
 	{/foreach}
+	<a class="debugIndication toggleDebugBar" href="javacript:;" title="{translate 'Debug (Click here or use [d] name)'}">D</a>
 </div>

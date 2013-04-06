@@ -2,26 +2,13 @@
 	position: fixed;
 	z-index: 9999;
 	bottom: 0;
-	left: 10px;
-	padding: 0 10px;
-}
-
-.debugIndication {
-	position: fixed;
-	display: block;
-	bottom: 0;
 	left: 0;
-	padding: 0 5px;
-	line-height: 22px;
-	background-color: @colorNotice;
-	color: @colorFgTheme;
-	border-top: 1px solid @colorNotice;
-	border-left: 1px solid @colorNotice;
 }
 
 .debugBar {
-	display: none;
 	position: relative;
+	.transform(translate3d(-100%, 0, 0));
+	border-left: 5px solid @colorNotice;
 
 	> .panel {
 		display: block;
@@ -58,10 +45,22 @@
 		max-height: 500px;
 		max-width: 100%;
 		padding: 5px;
-		overflow-y: auto;
-		overflow-x: hidden;
+		overflow: auto;
 		background-color: lighten(@colorNotice, 45);
 		border: 1px solid @colorNotice;
-		word-break: break-all;
+	}
+
+	.debugIndication {
+		position: absolute;
+		display: block;
+		top: 0;
+		right: 0;
+		.transform(translate3d(100%, 0, 0));
+		padding: 0 5px;
+		line-height: 22px;
+		background-color: @colorNotice;
+		color: @colorFgTheme;
+		border-top: 1px solid @colorNotice;
+		border-left: 1px solid @colorNotice;
 	}
 }

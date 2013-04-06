@@ -5,21 +5,26 @@
 var CM_Component_Debug = CM_Component_Abstract.extend({
 	_class: 'CM_Component_Debug',
 
+	/** @type Boolean */
+	active: false,
+
 	events: {
 		'click .toggleDebugBar': 'toggleDebugBar',
 		'click .clearCache': 'clearCache',
-		'click .panel': 'toggleWindow'
+		'click .panel': function(e) {
+			this.toggleWindow($(e.currentTarget).data('name'));
+		}
 	},
 
 	ready: function() {
 		var self = this;
 
 		$(window).bind('keydown.debugBar', function(event) {
-			var tagName = event.srcElement.tagName.toLowerCase();
-			if (tagName === 'input' || tagName === 'textarea') {
-				return;
-			}
 			if (event.which === 68) { // d Key
+				var tagName = event.srcElement.tagName.toLowerCase();
+				if (tagName === 'input' || tagName === 'textarea') {
+					return;
+				}
 				self.toggleDebugBar();
 			}
 		});
@@ -56,20 +61,28 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		}
 	},
 
+
 	toggleDebugBar: function() {
-		this.$('.debugBar').slideToggle();
+		var debugBar = this.$('.debugBar');
+
+		if (this.active) {
+			debugBar.stop().transition({x: '-100%'}, '400ms', 'snap');
+			this.active = false;
+		} else {
+			debugBar.stop().transition({x: 0}, '400ms', 'snap');
+			this.active = true;
+		}
 	},
 
-	toggleWindow: function(e) {
-		var name = $(e.currentTarget).data('id');
+	toggleWindow: function(name) {
 		this.$('.window:not(.' + name + ')').hide();
-		this.$('.window.' + name).slideToggle();
+		this.$('.window.' + name).toggle();
 	},
 
 	clearCache: function() {
 		this.ajax('clearCache', {
-			'CM_Cache': this.$('#CM_Cache').is(':checked'),
-			'CM_CacheLocal': this.$('#CM_CacheLocal').is(':checked')
+			'CM_Cache': this.$('.CM_Cache').is(':checked'),
+			'CM_CacheLocal': this.$('.CM_CacheLocal').is(':checked')
 		}, {
 			success: function() {
 				location.reload();
