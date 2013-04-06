@@ -126,7 +126,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$data = $message['data'];
 		switch ($type) {
 			case 'subscribe':
-				$channelKey = $data['channel'];
+				$channel = $data['channel'];
 				$clientKey = $data['clientKey'];
 				$start = time();
 				$allowedUntil = null;
@@ -137,12 +137,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 						$user = $session->getUser(false);
 					}
 				}
-				$this->_subscribe($channelKey, $clientKey, $start, $allowedUntil, $user);
+				$this->_subscribe($channel, $clientKey, $start, $allowedUntil, $user);
 				break;
 			case 'unsubscribe':
-				$channelKey = $data['channel'];
+				$channel = $data['channel'];
 				$clientKey = $data['clientKey'];
-				$this->_unsubscribe($channelKey, $clientKey);
+				$this->_unsubscribe($channel, $clientKey);
 
 				break;
 			case 'message':
@@ -183,13 +183,21 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	}
 
 	/**
-	 * @param string $channelKey
+	 * @param string $channel
 	 * @param string $clientKey
+	 * @throws CM_Exception_Invalid
 	 */
-	protected function _unsubscribe($channelKey, $clientKey) {
+	protected function _unsubscribe($channel, $clientKey) {
+		$channelData = CM_Model_StreamChannel_Message::getChannelData($channel);
+		$channelKey = $channelData['key'];
+		$channelType = $channelData['type'];
 		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
 		if (!$streamChannel) {
 			return;
+		}
+		if ($streamChannel->getType() != $channelType) {
+			throw new CM_Exception_Invalid(
+				'StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType . '`');
 		}
 		$streamChannelSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamChannelSubscribe) {
