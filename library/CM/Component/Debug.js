@@ -39,13 +39,13 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 			cm.stream._subscribe = function() {
 				var params = ['SUBSCRIBE:'];
 				params.push.apply(params, arguments);
-				handler.log.apply(handler, params);
+				self.log.apply(self, params);
 				_subscribe.apply(this, arguments);
 			};
 			cm.stream._unsubscribe = function() {
 				var params = ['UNSUBSCRIBE:'];
 				params.push.apply(params, arguments);
-				handler.log.apply(handler, params);
+				self.log.apply(self, params);
 				_unsubscribe.apply(this, arguments);
 			};
 		}
