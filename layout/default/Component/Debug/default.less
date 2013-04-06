@@ -21,7 +21,7 @@
 		border-right: 1px solid @colorNotice;
 		color: @colorFg;
 
-		&:hover {
+		&:hover, &.active {
 			background-color: @colorNotice;
 			color: @colorFgTheme;
 
@@ -47,11 +47,20 @@
 		bottom: 100%;
 		margin-bottom: -1px;
 		max-height: 500px;
-		max-width: 100%;
+		width: 100%;
 		padding: 5px;
 		overflow: auto;
 		background-color: lighten(@colorNotice, 45);
 		border: 1px solid @colorNotice;
+		white-space: nowrap;
+
+		li {
+			padding: 2px;
+
+			&:nth-child(odd) {
+				background-color: lighten(@colorNotice, 42);
+			}
+		}
 	}
 
 	.debugIndication {

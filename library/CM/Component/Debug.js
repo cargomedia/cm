@@ -77,6 +77,8 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	 * @param {String} name
 	 */
 	toggleWindow: function(name) {
+		this.$('.panel').removeClass('active');
+		this.$('.panel[data-name="' + name + '"]').addClass('active');
 		this.$('.window:not(.' + name + ')').hide();
 		this.$('.window.' + name).toggle();
 	},
