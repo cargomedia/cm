@@ -33,6 +33,23 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 			$(window).unbind('keydown.debugBar');
 		});
 
+		if (cm.stream) {
+			var _subscribe = cm.stream._subscribe;
+			var _unsubscribe = cm.stream._unsubscribe;
+			cm.stream._subscribe = function() {
+				var params = ['SUBSCRIBE:'];
+				params.push.apply(params, arguments);
+				self.log.apply(self, params);
+				_subscribe.apply(this, arguments);
+			};
+			cm.stream._unsubscribe = function() {
+				var params = ['UNSUBSCRIBE:'];
+				params.push.apply(params, arguments);
+				self.log.apply(self, params);
+				_unsubscribe.apply(this, arguments);
+			};
+		}
+
 		if (cm.options.stream.channel) {
 			_.each(cm.model.types, function(modelType, modelName) {
 				_.each(cm.action.verbs, function(actionVerb, actionName) {
