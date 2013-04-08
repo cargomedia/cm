@@ -1,40 +1,76 @@
-.panel {
+.debugBar {
 	position: fixed;
 	z-index: 9999;
 	bottom: 0;
 	left: 0;
-}
+	.transform(translate3d(-100%, 0, 0));
+	background-color: lighten(@colorNotice, 40);
+	border-left: 5px solid @colorNotice;
+	white-space: nowrap;
 
-.buttons {
-	.background-color(rgb(231, 253, 192));
-	height: 15px;
-	border: 1px solid black;
-	border-bottom: none;
-	border-left: none;
-}
+	> .panel {
+		display: inline-block;
+		height: 22px;
+		margin-right: -4px;
+		line-height: 22px;
+		padding: 0 8px;
+		border-top: 1px solid @colorNotice;
+		border-right: 1px solid @colorNotice;
+		color: @colorFg;
 
-.containers {
-	position: absolute;
-	left: 0;
-	bottom: 15px;
-	.background-color(rgb(231, 253, 192));
-	border: 1px solid black;
-}
+		&:hover, &.active {
+			background-color: @colorNotice;
+			color: @colorFgTheme;
 
-.containers>* {
-	display: none;
-	height: auto;
-	max-height: 500px;
-	overflow-y: auto;
-}
+			.count {
+				color: @colorFg;
+			}
+		}
 
-.alerts {
-	.background-color(rgba(231, 253, 192, 0.5));
-	text-shadow: white 1px 1px 0px;
-}
+		.count {
+			color: @colorFgShy;
+		}
 
-.errors {
-	font-family: monospace;
-	.background-color(#FFA500);
-	margin: 20px;
+		&.actions {
+			text-transform: uppercase;
+		}
+	}
+
+	.window {
+		display: none;
+		box-sizing: border-box;
+		position: absolute;
+		left: 0;
+		bottom: 100%;
+		margin-bottom: -1px;
+		max-height: 500px;
+		width: 100%;
+		padding: 5px;
+		overflow: auto;
+		background-color: lighten(@colorNotice, 45);
+		border: 1px solid @colorNotice;
+		white-space: nowrap;
+
+		li {
+			padding: 2px;
+
+			&:nth-child(odd) {
+				background-color: lighten(@colorNotice, 42);
+			}
+		}
+	}
+
+	.debugIndication {
+		position: absolute;
+		display: block;
+		top: 0;
+		right: 0;
+		.transform(translate3d(100%, 0, 0));
+		padding: 0 5px;
+		line-height: 22px;
+		background-color: @colorNotice;
+		color: @colorFgTheme;
+		border-top: 1px solid @colorNotice;
+		border-left: 1px solid @colorNotice;
+	}
 }

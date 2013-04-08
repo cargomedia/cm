@@ -89,6 +89,21 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return new CM_Paging_User_StreamChannel($this);
 	}
 
+	/**
+	 * @param CM_Model_User                  $user
+	 * @param CM_Model_Stream_Subscribe|null $excludedStreamSubscribe
+	 * @return bool
+	 */
+	public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
+		/** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
+		foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
+			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() === $user->getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected function _loadData() {
 		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
@@ -110,6 +125,14 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			$streamPublish->delete();
 		}
 		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+	}
+
+	/**
+	 * @param string $encryptionKey
+	 * @return string Data
+	 */
+	protected function _decryptKey($encryptionKey) {
+		return mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB);
 	}
 
 	/**
@@ -146,6 +169,15 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			return null;
 		}
 		return self::factory($result['id'], $result['type']);
+	}
+
+	/**
+	 * @param string $encryptionKey
+	 * @param string $data
+	 * @return string Channel-key
+	 */
+	protected static function _encryptKey($data, $encryptionKey) {
+		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
 	}
 
 	protected static function _create(array $data) {

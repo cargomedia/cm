@@ -3,7 +3,6 @@
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Config::get()->CM_Site_Abstract = new stdClass();
 		CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
 		CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
 		CM_Config::get()->CM_Site_Abstract->name = 'Foo';
@@ -40,6 +39,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
 	public function testFindByRequest() {
 		$request = new CM_Request_Get('/test');
-		$this->assertInstanceOf('CM_Site_CM', CM_Site_Abstract::findByRequest($request));
+		$this->assertInstanceOf('CMTest_Site_CM', CM_Site_Abstract::findByRequest($request));
 	}
 }

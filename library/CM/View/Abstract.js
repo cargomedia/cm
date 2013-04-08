@@ -178,7 +178,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	replaceWith: function(view) {
 		view._callbacks = this._callbacks;
 		this.getParent().registerChild(view);
-		this.$().replaceWith(view.$());
+		this.$el.replaceWith(view.$el);
 		this.remove(true, true);
 	},
 
@@ -414,15 +414,21 @@ var CM_View_Abstract = Backbone.View.extend({
 		$element.attr('autoplay', params.autoplay);
 		$element.attr('loop', params.loop);
 
-		return new MediaElement($element.get(0), {
+		var error = false;
+		var mediaElement = new MediaElement($element.get(0), {
 			startVolume: 1,
 			flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 			silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 			error: function() {
-				this.play = new Function();
-				this.pause = new Function();
+				error = true;
 			}
 		});
+		if (error) {
+			mediaElement.play = new Function();
+			mediaElement.pause = new Function();
+		}
+
+		return mediaElement;
 	},
 
 	/**

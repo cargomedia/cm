@@ -97,5 +97,4 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 		}
 		return $this->_gearmanClient;
 	}
-
 }
