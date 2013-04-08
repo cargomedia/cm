@@ -46,7 +46,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
 
 		var self = this;
 		this.$el.one('floatbox-close', function() {
-			if (app.window.isHidden(self.el)) {
+			if (cm.window.isHidden(self.el)) {
 				self.remove();
 			}
 			return false;
