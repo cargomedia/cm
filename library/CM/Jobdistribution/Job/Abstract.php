@@ -86,9 +86,13 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @return GearmanClient
+	 * @throws CM_Exception
 	 */
 	protected function _getGearmanClient() {
 		if (!$this->_gearmanClient) {
+			if (!extension_loaded('gearman')) {
+				throw new CM_Exception('Missing `gearman` extension');
+			}
 			$config = static::_getConfig();
 			$this->_gearmanClient = new GearmanClient();
 			foreach ($config->servers as $server) {
