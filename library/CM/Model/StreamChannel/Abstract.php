@@ -124,6 +124,10 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
+		CM_Cache::delete($cacheKey);
+
 		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
 	}
 
@@ -164,7 +168,16 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	public static function findByKeyAndAdapter($key, $adapterType) {
 		$key = (string) $key;
 		$adapterType = (int) $adapterType;
-		$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+		if (false === ($result = CM_Cache::get($cacheKey))) {
+			$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+			if (false === $result) {
+				$result = null;
+			}
+			CM_Cache::set($cacheKey, $result);
+		}
+
 		if (!$result) {
 			return null;
 		}

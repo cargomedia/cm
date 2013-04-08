@@ -63,5 +63,8 @@ class CM_CacheConst {
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';
 
+	// _key:X_adapterType:X
+	const StreamChannel_Id = 'StreamChannel_Id';
+
 	const TestCase_Site_Mock = 'TestCase_Site_Mock';
 }
