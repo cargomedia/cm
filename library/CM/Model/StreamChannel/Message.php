@@ -21,7 +21,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
 	public static function findByKey($key) {
-		$adapterType = CM_Stream_Message::getInstance()->getAdapterClass();
+		$adapterType = CM_Stream_Message::getInstance()->getAdapter()->getType();
 		return self::findByKeyAndAdapter($key, $adapterType);
 	}
 
