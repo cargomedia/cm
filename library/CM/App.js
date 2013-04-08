@@ -870,7 +870,7 @@ var CM_App = CM_Class_Abstract.extend({
 					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
 					if (reload) {
 						var reloadUrl = response.url;
-						if (!pushState) {
+						if (!Modernizr.history) {
 							reloadUrl += '#' + fragment;
 						}
 						console.log('reload: ' + reloadUrl);
@@ -879,7 +879,14 @@ var CM_App = CM_Class_Abstract.extend({
 					}
 					handler._$placeholder.replaceWith(this.$());
 					handler._$placeholder = null;
-					window.history.replaceState(null, null, fragment);
+					if (window.history.state) {
+						var path = window.history.state.path;
+					} else {
+						path = window.history.location.pathname + window.history.location.search;
+					}
+					if ((path != fragment)) {
+						window.history.replaceState({'path': fragment}, null, fragment);
+					}
 					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
 				},
 				error: function(msg, type, isPublic) {
@@ -903,9 +910,18 @@ var CM_App = CM_Class_Abstract.extend({
 					console.log("skip initial fire");
 					return;
 				}
-				var url = window.history.location || document.location;
-				console.log('popstate: ' + url.pathname + url.search);
-				cm.router.navigate(url.pathname + url.search);
+				var url;
+				if (event.originalEvent.state) {
+					url = event.originalEvent.state.path;
+				} else {
+					if (window.history.location.hash) {
+						url = window.location.hash.substr(1);
+					} else {
+						window.history.location.pathname + window.history.location.search;
+					}
+				}
+				console.log('popstate: ' + url);
+				cm.router.navigate(url);
 			});
 
 			var hash = window.location.hash.substr(1);
@@ -914,12 +930,15 @@ var CM_App = CM_Class_Abstract.extend({
 				if (hash) {
 					// Hash-URL copied into a PushState-browser
 					if (hash != path) {
-						// Replace state from Hash -> this will trigger "popstate"
-						window.history.replaceState(null, null, hash);
+						// Replace state from Hash -> this will trigger "popstate" (only chrome, and it is wrong)
+						window.history.replaceState({'path': hash}, null, hash);
+						cm.router.navigate(hash);
 					}
 				}
 			} else {
 				if (hash) {
+					console.log("hash: " + hash);
+					console.log("path: " + path);
 					// Hash-URL copied into a Hash-browser
 					if (hash == path) {
 						// Prevent initial "popstate"
@@ -927,7 +946,7 @@ var CM_App = CM_Class_Abstract.extend({
 					}
 				} else {
 					// Replace state from path if no hash provided
-					window.history.replaceState(null, null, path);
+					window.history.replaceState({'path': path}, null, path);
 				}
 			}
 
@@ -959,8 +978,8 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
-			window.history.pushState(null, null, fragment);
-			$(window).trigger('popstate');
+			window.history.pushState({'path': fragment}, 'test', fragment);
+			cm.router.navigate(fragment);
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
 		},
 
