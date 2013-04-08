@@ -17,6 +17,15 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return CM_Model_StreamChannel_Abstract|null
+	 */
+	public static function findByKey($key) {
+		$adapterType = CM_Stream_Message::getInstance()->getAdapterClass();
+		return self::findByKeyAndAdapter($key, $adapterType);
+	}
+
+	/**
 	 * @param string $channel
 	 * @throws CM_Exception_Invalid
 	 * @return array ['key' => string, 'type' => int]

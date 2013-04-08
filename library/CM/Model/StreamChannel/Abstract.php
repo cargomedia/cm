@@ -161,7 +161,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @param int    $adapterType
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
-	public static function findByKey($key, $adapterType) {
+	public static function findByKeyAndAdapter($key, $adapterType) {
 		$key = (string) $key;
 		$adapterType = (int) $adapterType;
 		$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
