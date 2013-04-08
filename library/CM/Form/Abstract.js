@@ -132,7 +132,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		if (!confirmed) {
 			$('.form_field_error', this.$())
 				.next('br').remove()
-				.andSelf().remove();
+				.addBack().remove();
 		}
 
 		data = data || this.getData(actionName);
