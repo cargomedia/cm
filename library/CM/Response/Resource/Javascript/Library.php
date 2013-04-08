@@ -12,7 +12,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 					$content .= new CM_File($path);
 				}
 			}
-			$content .= 'var app = new ' . $this->_getAppClassName() . '(), cm = app;' . PHP_EOL;
+			$content .= 'var cm = new ' . $this->_getAppClassName() . '();' . PHP_EOL;
 			$content .= new CM_File(DIR_ROOT . 'resources/config/js/internal.js');
 			$this->_setContent($content);
 			return;
