@@ -229,10 +229,25 @@ var CM_App = CM_Class_Abstract.extend({
 		viewTree: function(view, indentation) {
 			view = view || cm.findView();
 			indentation = indentation || 0;
-			console.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
+			cm.debug.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
 			_.each(view.getChildren(), function(child) {
 				cm.debug.viewTree(child, indentation + 1);
 			});
+		},
+
+		/**
+		 * @param message
+		 * @param [message2]
+		 * @param [message3]
+		 */
+		log: function(message, message2, message3) {
+			if (!cm.options.debug) {
+				return;
+			}
+			var messages = _.toArray(arguments);
+			if (console && console.log) {
+				console.log.apply(console, messages);
+			}
 		}
 	},
 
@@ -267,7 +282,7 @@ var CM_App = CM_Class_Abstract.extend({
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
 				videoHeight: '100%',
-				success: function (mediaElement, domObject) {
+				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
 					if (null !== mediaElementMuted) {
@@ -276,7 +291,7 @@ var CM_App = CM_Class_Abstract.extend({
 					if (null !== mediaElementVolume) {
 						mediaElement.setVolume(mediaElementVolume);
 					}
-					mediaElement.addEventListener("volumechange", function () {
+					mediaElement.addEventListener("volumechange", function() {
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
@@ -704,8 +719,10 @@ var CM_App = CM_Class_Abstract.extend({
 			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
 				if (handler._channelDispatchers[channel]) {
 					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
+					cm.debug.log('Stream channel (' + channel + '): message: ', message);
 				}
 			});
+			cm.debug.log('Stream channel (' + channel + '): subscribe');
 		},
 
 		/**
@@ -716,6 +733,7 @@ var CM_App = CM_Class_Abstract.extend({
 				delete this._channelDispatchers[channel];
 			}
 			this._adapter.unsubscribe(channel);
+			cm.debug.log('Stream channel (' + channel + '): unsubscribe');
 		}
 	},
 
