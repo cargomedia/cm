@@ -839,15 +839,15 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
-		_router: null,
 		_$placeholder: null,
 		_request: null,
+
 		/**
-		 * @param {String} path
+		 * @param {String} fragment
 		 */
-		navigate: function(path) {
+		_navigate: function(fragment) {
 			var handler = this;
-			console.log('navigate: ' + path);
+			console.log('navigate: ' + fragment);
 			if (!this._$placeholder) {
 				this._$placeholder = $('<div class="router-placeholder" />');
 				var page = cm.findView('CM_Page_Abstract');
@@ -863,30 +863,18 @@ var CM_App = CM_Class_Abstract.extend({
 			if (this._request) {
 				this._request.abort();
 			}
-			this._request = cm.findView().loadPage(path, {
+			this._request = cm.findView().loadPage(fragment, {
 				success: function(response) {
 					var fragment = response.url.substr(cm.getUrl().length);
 					var currentLayout = cm.findView('CM_Layout_Abstract');
 					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
 					if (reload) {
-						var reloadUrl = response.url;
-						if (!Modernizr.history) {
-							reloadUrl += '#' + fragment;
-						}
-						console.log('reload: ' + reloadUrl);
-						window.location.replace(reloadUrl);
+						window.location.replace(response.url);
 						return;
 					}
 					handler._$placeholder.replaceWith(this.$());
 					handler._$placeholder = null;
-					if (window.history.state) {
-						var path = window.history.state.path;
-					} else {
-						path = window.history.location.pathname + window.history.location.search;
-					}
-					if ((path != fragment)) {
-						window.history.replaceState({'path': fragment}, null, fragment);
-					}
+					window.history.replaceState(null, null, fragment);
 					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
 				},
 				error: function(msg, type, isPublic) {
@@ -902,51 +890,28 @@ var CM_App = CM_Class_Abstract.extend({
 
 		start: function() {
 			var urlBase = cm.getUrl();
-
 			var skipInitialFire = false;
-			$(window).bind('popstate', function(event) {
+
+			$(window).on('popstate', function(event) {
 				if (skipInitialFire) {
 					skipInitialFire = false;
 					console.log("skip initial fire");
 					return;
 				}
-				var url;
-				if (event.originalEvent.state) {
-					url = event.originalEvent.state.path;
-				} else {
-					if (window.history.location.hash) {
-						url = window.location.hash.substr(1);
-					} else {
-						url = window.history.location.pathname + window.history.location.search;
-					}
-				}
-				console.log('popstate: ' + url);
-				cm.router.navigate(url);
+				var location = window.history.location || document.location;
+				var fragment = location.pathname + location.search;
+				cm.router._navigate(location.pathname + location.search);
 			});
 
 			var hash = window.location.hash.substr(1);
 			var path = window.location.pathname + window.location.search;
-			if (Modernizr.history) {
+			if (!Modernizr.history) {
 				if (hash) {
-					// Hash-URL copied into a PushState-browser
-					// Replace state from Hash -> this will trigger "popstate" (only chrome, and it is wrong)
-					window.history.replaceState({'path': hash}, null, hash);
-					if (hash != path) {
-						cm.router.navigate(hash);
-					}
-				}
-			} else {
-				if (hash) {
-					console.log("hash: " + hash);
-					console.log("path: " + path);
-					// Hash-URL copied into a Hash-browser
 					if (hash == path) {
-						// Prevent initial "popstate"
 						skipInitialFire = true;
 					}
 				} else {
-					// Replace state from path if no hash provided
-					window.history.replaceState({'path': path}, null, path);
+					window.history.replaceState(null, null, path);
 				}
 			}
 
@@ -978,8 +943,9 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
-			window.history.pushState({'path': fragment}, 'test', fragment);
-			cm.router.navigate(fragment);
+			console.log("pushState: " + fragment);
+			window.history.pushState(null, null, fragment);
+			cm.router._navigate(fragment);
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
 		},
 
