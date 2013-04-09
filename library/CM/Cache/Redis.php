@@ -23,14 +23,6 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		}
 	}
 
-	/**
-	 * @param string|string[] $channels
-	 * @param Closure $callback fn($channel, $message)
-	 */
-	public static function subscribe($channels, Closure $callback) {
-		static::_callInstance('subscribe', array($channels, $callback), false);
-	}
-
 	protected function _getName() {
 		return 'Redis';
 	}
@@ -110,7 +102,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string|string[] $channels
 	 * @param Closure $callback
 	 */
-	protected function _subscribe($channels, Closure $callback) {
+	public function subscribe($channels, Closure $callback) {
 		$channels = (array) $channels;
 		$this->_subscribeCallback = $callback;
 		$this->_redis->subscribe($channels, array($this, '_subscribeCallback'));

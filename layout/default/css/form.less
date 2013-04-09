@@ -43,10 +43,6 @@ button:disabled, input:disabled {
 	.input_disabled;
 }
 
-button:focus, input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
-	.input_focus;
-}
-
 button, input[type=submit], input[type=button] {
 	.input_button(@heightButton);
 	.input_button_color;
@@ -111,6 +107,10 @@ button, input[type=submit], input[type=button] {
 			font-size: @fontSizeButtonLarge;
 		}
 	}
+}
+
+button:focus, input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
+	.input_focus;
 }
 
 input[type=radio], input[type=checkbox] {
