@@ -917,7 +917,7 @@ var CM_App = CM_Class_Abstract.extend({
 					if (window.history.location.hash) {
 						url = window.location.hash.substr(1);
 					} else {
-						window.history.location.pathname + window.history.location.search;
+						url = window.history.location.pathname + window.history.location.search;
 					}
 				}
 				console.log('popstate: ' + url);
