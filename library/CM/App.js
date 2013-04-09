@@ -929,9 +929,9 @@ var CM_App = CM_Class_Abstract.extend({
 			if (Modernizr.history) {
 				if (hash) {
 					// Hash-URL copied into a PushState-browser
+					// Replace state from Hash -> this will trigger "popstate" (only chrome, and it is wrong)
+					window.history.replaceState({'path': hash}, null, hash);
 					if (hash != path) {
-						// Replace state from Hash -> this will trigger "popstate" (only chrome, and it is wrong)
-						window.history.replaceState({'path': hash}, null, hash);
 						cm.router.navigate(hash);
 					}
 				}
