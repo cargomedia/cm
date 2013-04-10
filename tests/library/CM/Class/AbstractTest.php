@@ -38,7 +38,7 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 		try {
 			$className = CM_Class_AbstractMock::getClassName(2);
 			$this->fail('Classname defined.');
-		} catch (CM_Exception_Invalid $ex) {
+		} catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
 			$this->assertTrue(true);
 		}
 	}
