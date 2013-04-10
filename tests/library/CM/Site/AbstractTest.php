@@ -41,4 +41,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 		$request = new CM_Request_Get('/test');
 		$this->assertInstanceOf('CMTest_Site_CM', CM_Site_Abstract::findByRequest($request));
 	}
+
+	public function testFactory() {
+		try {
+			CM_Site_Abstract::factory(9999);
+			$this->fail('Factory returned non-configured site');
+		} catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+			$this->assertContains('Site with type `9999` not configured', $ex->getMessage());
+		}
+	}
 }
