@@ -19,10 +19,6 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
 		$this->assertAjaxResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
 	}
-
-	protected function _getSite() {
-		return CMTest_TH::getSiteMock(null, 'http://www.test.com/');
-	}
 }
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {

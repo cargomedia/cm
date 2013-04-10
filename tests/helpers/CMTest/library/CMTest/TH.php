@@ -360,13 +360,6 @@ EOD;
 		return $site;
 	}
 
-	/**
-	 * @return CM_Site_Abstract
-	 */
-	public static function getSiteMockMatchAll() {
-		return self::getSiteMock(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev', true);
-	}
-
 	public static function randomizeAutoincrement() {
 		$tables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
 		foreach ($tables as $table) {

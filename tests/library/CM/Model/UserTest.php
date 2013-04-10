@@ -89,9 +89,14 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testSetSite() {
-		$site = $this->_getSite();
+		$siteDefault = CM_Site_Abstract::factory();
 		$user = CMTest_TH::createUser();
-		$this->assertNotEquals($site, $user->getSite());
+		$this->assertEquals($siteDefault, $user->getSite());
+
+		$type = $siteDefault->getType() + 1;
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getType'))->getMock();
+		$site->expects($this->any())->method('getType')->will($this->returnValue($type));
+		CM_Config::get()->CM_Site_Abstract->types[$type] = get_class($site);
 		$user->setSite($site);
 		$this->assertEquals($site, $user->getSite());
 	}
