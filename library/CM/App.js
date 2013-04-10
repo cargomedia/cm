@@ -229,7 +229,7 @@ var CM_App = CM_Class_Abstract.extend({
 		viewTree: function(view, indentation) {
 			view = view || cm.findView();
 			indentation = indentation || 0;
-			cm.debug.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
+			console.log(new Array(indentation + 1).join("  ") + view.getClass() + " (", view.el, ")");
 			_.each(view.getChildren(), function(child) {
 				cm.debug.viewTree(child, indentation + 1);
 			});
@@ -245,6 +245,7 @@ var CM_App = CM_Class_Abstract.extend({
 				return;
 			}
 			var messages = _.toArray(arguments);
+			messages.unshift('[CM]');
 			if (console && console.log) {
 				console.log.apply(console, messages);
 			}
