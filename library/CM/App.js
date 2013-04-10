@@ -260,8 +260,9 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 		/**
 		 * @param {jQuery} $element
+ 		 * @param {Function} success fn(MediaElement, Element)
 		 */
-		setupVideo: function($element) {
+		setupVideo: function($element, success) {
 			$element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
@@ -280,6 +281,7 @@ var CM_App = CM_Class_Abstract.extend({
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
+					success(mediaElement, domObject);
 				}
 			});
 		}
