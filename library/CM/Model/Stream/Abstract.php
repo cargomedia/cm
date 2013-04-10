@@ -57,6 +57,10 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	 * @return int|null
 	 */
 	public function getUserId() {
-		return $this->_get('userId');
+		$userId = $this->_get('userId');
+		if (null === $userId) {
+			return null;
+		}
+		return (int) $userId;
 	}
 }

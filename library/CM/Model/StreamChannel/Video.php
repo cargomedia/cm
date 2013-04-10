@@ -120,6 +120,15 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 								WHERE `id` = ?", array($this->getId()))->fetch();
 	}
 
+	/**
+	 * @param string $key
+	 * @return CM_Model_StreamChannel_Video|null
+	 */
+	public static function findByKey($key) {
+		$adapterType = CM_Stream_Video::getInstance()->getAdapter()->getType();
+		return self::findByKeyAndAdapter($key, $adapterType);
+	}
+
 	protected static function _create(array $data) {
 		$key = (string) $data['key'];
 		$width = (int) $data['width'];
