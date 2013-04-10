@@ -31,7 +31,7 @@ abstract class CM_Class_Abstract {
 		}
 		$type = (int) $type;
 		if (empty($config->types[$type])) {
-			throw new CM_Exception_Invalid('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
+			throw new CM_Exception_Invalid('Type `' . $type . '` not configured for class `' . get_called_class() . '`.', null, null, CM_Exception::WARN);
 		}
 		return $config->types[$type];
 	}
