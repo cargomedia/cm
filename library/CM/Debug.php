@@ -1,9 +1,9 @@
 <?php
 
 class CM_Debug {
+
 	private static $_instance = null;
 	private $_stats = array();
-	private $_errors = array();
 
 	/**
 	 * Singleton Getter
@@ -34,32 +34,16 @@ class CM_Debug {
 	}
 
 	/**
-	 * @param string $file
-	 * @param int $line
-	 * @param string $msg
-	 */
-	public function addError($file, $line, $msg) {
-		$this->_errors[] = array('file' => $file, 'line' => $line, 'msg' => $msg);
-	}
-
-	/**
 	 * @return array stats array
 	 */
 
 	public function getStats() {
 		return $this->_stats;
 	}
-
-	/**
-	 * @return array
-	 */
-	public function getErrors() {
-		return $this->_errors;
-	}
-
 }
 
 class CM_DebugDummy {
+
 	public function __call($name, $arguments) {
 		return false;
 	}
