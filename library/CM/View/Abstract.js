@@ -61,10 +61,16 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {String|Null} [className]
 	 * @return CM_View_Abstract[]
 	 */
-	getChildren: function() {
-		return this._children;
+	getChildren: function(className) {
+		if (!className) {
+			return this._children;
+		}
+		return _.filter(this._children, function(child) {
+			return child.hasClass(className);
+		});
 	},
 
 	/**
