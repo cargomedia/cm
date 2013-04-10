@@ -73,12 +73,14 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$streamSubscribeWithoutUser = CM_Model_Stream_Subscribe::create(array('user' => null, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_2'));
 		$this->assertNull($streamSubscribeWithoutUser->getUser());
+		$this->assertNull($streamSubscribeWithoutUser->getUserId());
 
 		$user = CMTest_TH::createUser();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 			'streamChannel' => $streamChannel, 'key' => '123123_3'));
 		$this->assertEquals($user, $streamSubscribe->getUser());
+		$this->assertSame($user->getId(), $streamSubscribe->getUserId());
 	}
 
 	public function testDelete() {

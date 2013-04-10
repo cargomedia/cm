@@ -97,7 +97,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
 		/** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
 		foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
-			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() === $user->getId()) {
+			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() == $user->getId()) {
 				return true;
 			}
 		}
@@ -105,7 +105,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type'), array('id' => $this->getId()))->fetch();
+		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
 			$type = (int) $data['type'];
 			if ($this->getType() !== $type) {
@@ -124,6 +124,10 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
+		CM_Cache::delete($cacheKey);
+
 		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
 	}
 
@@ -138,13 +142,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param int      $id
 	 * @param int|null $type
-	 * @throws CM_Exception_Nonexistent
-	 * @return CM_Model_StreamChannel_Abstract
+	 * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
+	 * @return static
 	 */
 	public static function factory($id, $type = null) {
 		if (null === $type) {
 			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
-			if (false === ($type = CM_Cache::get($cacheKey))) {
+			if (false === ($type = CM_CacheLocal::get($cacheKey))) {
 				$type = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchColumn();
 				if (false === $type) {
 					throw new CM_Exception_Nonexistent('No record found in `' . TBL_CM_STREAMCHANNEL . '` for id `' . $id . '`');
@@ -153,7 +157,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			}
 		}
 		$class = self::_getClassName($type);
-		return new $class($id);
+		$instance = new $class($id);
+		if (!$instance instanceof static) {
+			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class(). '`.');
+		}
+		return $instance;
 	}
 
 	/**
@@ -161,10 +169,19 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @param int    $adapterType
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
-	public static function findByKey($key, $adapterType) {
+	public static function findByKeyAndAdapter($key, $adapterType) {
 		$key = (string) $key;
 		$adapterType = (int) $adapterType;
-		$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+		if (false === ($result = CM_Cache::get($cacheKey))) {
+			$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+			if (false === $result) {
+				$result = null;
+			}
+			CM_Cache::set($cacheKey, $result);
+		}
+
 		if (!$result) {
 			return null;
 		}
@@ -184,6 +201,8 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];
 		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+		CM_Cache::delete($cacheKey);
 		return new static($id);
 	}
 }

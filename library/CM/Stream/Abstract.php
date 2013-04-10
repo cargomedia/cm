@@ -30,7 +30,7 @@ abstract class CM_Stream_Abstract extends CM_Class_Abstract {
 	/**
 	 * @return CM_Stream_Adapter_Abstract
 	 */
-	protected function _getAdapter() {
+	public function getAdapter() {
 		if (!$this->_adapter) {
 			$className = $this->getAdapterClass();
 			$this->_adapter = new $className();

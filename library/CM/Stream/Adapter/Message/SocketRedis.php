@@ -165,7 +165,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$channelData = CM_Model_StreamChannel_Message::getChannelData($channel);
 		$channelKey = $channelData['key'];
 		$channelType = $channelData['type'];
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter($channelKey, $this->getType());
 		if ($streamChannel && $streamChannel->getType() != $channelType) {
 			throw new CM_Exception_Invalid(
 				'StreamChannel type `' . $streamChannel->getType() . '` doesn\'t match expected value `' . $channelType . '`');
@@ -191,7 +191,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$channelData = CM_Model_StreamChannel_Message::getChannelData($channel);
 		$channelKey = $channelData['key'];
 		$channelType = $channelData['type'];
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $this->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter($channelKey, $this->getType());
 		if (!$streamChannel) {
 			return;
 		}
