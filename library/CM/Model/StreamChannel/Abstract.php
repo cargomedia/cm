@@ -159,7 +159,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$class = self::_getClassName($type);
 		$instance = new $class($id);
 		if (!$instance instanceof static) {
-			throw new CM_Exception_Invalid('Factory should return `' . get_called_class() . '`. Instance of `' . $class . '` given.');
+			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class(). '`.');
 		}
 		return $instance;
 	}
