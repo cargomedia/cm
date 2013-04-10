@@ -33,10 +33,9 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetAdapterType() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel  */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foobar', 'adapterType' => 1));
 		$this->assertEquals(1, $streamChannel->getAdapterType());
 	}
-
 	public function testFactory() {
 		$streamChannel1 = CM_Model_StreamChannel_Video::create(array('key' => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1, 'width' => 100, 'height' => 100, 'thumbnailCount' => 0));
 		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
@@ -47,7 +46,16 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals($streamChannel1, $streamChannel2);
 	}
 
-	public function testFindKeyAndAdapter() {
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Factory should return
+	 */
+	public function testFactoryInvalidInstance() {
+		$messageStreamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'message-stream-channel', 'adapterType' => 1));
+		CM_Model_StreamChannel_Video::factory($messageStreamChannel->getId());
+	}
+
+	public function testFindByKeyAndAdapter() {
 		$adapterType = 1;
 		/** @var CM_Model_StreamChannel_Video $streamChannelOriginal */
 		$streamChannelOriginal = CMTest_TH::createStreamChannel(null, $adapterType);

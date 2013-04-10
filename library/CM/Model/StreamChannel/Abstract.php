@@ -142,8 +142,8 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	/**
 	 * @param int      $id
 	 * @param int|null $type
-	 * @throws CM_Exception_Nonexistent
-	 * @return CM_Model_StreamChannel_Abstract
+	 * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
+	 * @return static
 	 */
 	public static function factory($id, $type = null) {
 		if (null === $type) {
@@ -157,7 +157,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			}
 		}
 		$class = self::_getClassName($type);
-		return new $class($id);
+		$instance = new $class($id);
+		if (!$instance instanceof static) {
+			throw new CM_Exception_Invalid('Factory should return `' . get_called_class() . '`. Instance of `' . $class . '` given.');
+		}
+		return $instance;
 	}
 
 	/**
