@@ -267,7 +267,7 @@ var CM_App = CM_Class_Abstract.extend({
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
 				videoHeight: '100%',
-				success: function (mediaElement, domObject) {
+				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
 					if (null !== mediaElementMuted) {
@@ -276,7 +276,7 @@ var CM_App = CM_Class_Abstract.extend({
 					if (null !== mediaElementVolume) {
 						mediaElement.setVolume(mediaElementVolume);
 					}
-					mediaElement.addEventListener("volumechange", function () {
+					mediaElement.addEventListener("volumechange", function() {
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
@@ -838,79 +838,80 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
-		_router: null,
-		start: function() {
-			var $placeholder;
-			var request;
-			var urlBase = cm.getUrl();
-			var pushState = Modernizr.history;
-			var Router = Backbone.Router.extend({
-				routes: {
-					'*path': 'page'
+		_$placeholder: null,
+		_request: null,
+
+		/**
+		 * @param {String} fragment
+		 */
+		_navigate: function(fragment) {
+			var handler = this;
+			if (!this._$placeholder) {
+				this._$placeholder = $('<div class="router-placeholder" />');
+				var page = cm.findView('CM_Page_Abstract');
+				page.$().replaceWith(this._$placeholder);
+				page.remove(true);
+				cm.router.onTeardown();
+			} else {
+				this._$placeholder.removeClass('error').html('');
+			}
+			var timeoutLoading = window.setTimeout(function() {
+				handler._$placeholder.html('<div class="spinner" />')
+			}, 750);
+			if (this._request) {
+				this._request.abort();
+			}
+			this._request = cm.findView().loadPage(fragment, {
+				success: function(response) {
+					var fragment = response.url.substr(cm.getUrl().length);
+					var currentLayout = cm.findView('CM_Layout_Abstract');
+					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
+					if (reload) {
+						window.location.replace(response.url);
+						return;
+					}
+					handler._$placeholder.replaceWith(this.$());
+					handler._$placeholder = null;
+					window.history.replaceState(null, null, fragment);
+					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
 				},
-				page: function(url) {
-					url = '/' + url;
-					if (!$placeholder) {
-						$placeholder = $('<div class="router-placeholder" />');
-						var page = cm.findView('CM_Page_Abstract');
-						page.$().replaceWith($placeholder);
-						page.remove(true);
-						cm.router.onTeardown();
-					} else {
-						$placeholder.removeClass('error').html('');
-					}
-					var timeoutLoading = window.setTimeout(function() {
-						$placeholder.html('<div class="spinner" />')
-					}, 750);
-					if (request) {
-						request.abort();
-					}
-					request = cm.findView().loadPage(url, {
-						success: function(response) {
-							var fragment = response.url.substr(urlBase.length);
-							var currentLayout = cm.findView('CM_Layout_Abstract');
-							var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-							if (reload) {
-								var reloadUrl = response.url;
-								if (!pushState) {
-									reloadUrl += '#' + fragment.substr(1);
-								}
-								window.location.replace(reloadUrl);
-								return;
-							}
-							$placeholder.replaceWith(this.$());
-							$placeholder = null;
-							cm.router._router.navigate(fragment, {trigger: false, replace: true});
-							cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-						},
-						error: function(msg, type, isPublic) {
-							$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-							cm.router.onError();
-							return false;
-						},
-						complete: function() {
-							window.clearTimeout(timeoutLoading);
-						}
-					});
+				error: function(msg, type, isPublic) {
+					handler._$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
+					cm.router.onError();
+					return false;
+				},
+				complete: function() {
+					window.clearTimeout(timeoutLoading);
 				}
 			});
-			this._router = new Router();
+		},
+
+		start: function() {
+			var urlBase = cm.getUrl();
+			var skipInitialFire = false;
+
+			$(window).on('popstate', function(event) {
+				if (skipInitialFire) {
+					skipInitialFire = false;
+					return;
+				}
+				var location = window.history.location || document.location;
+				var fragment = location.pathname + location.search;
+				cm.router._navigate(location.pathname + location.search);
+			});
+
 			var hash = window.location.hash.substr(1);
-			var path = window.location.pathname.substr(1) + window.location.search;
-			var fragment = path;
-			var trigger = false;
-			if (hash) {
-				fragment = hash;
-				if (hash != path) {
-					trigger = true;
+			var path = window.location.pathname + window.location.search;
+			if (!Modernizr.history) {
+				if (hash) {
+					if (hash == path) {
+						skipInitialFire = true;
+					}
+				} else {
+					window.history.replaceState(null, null, path);
 				}
 			}
-			Backbone.history.start({pushState: pushState, silent: true});
-			Backbone.history.fragment = path;
-			if (!pushState && !hash && path) {
-				Backbone.history.fragment = '';	// Force navigation to add hash to URL field
-			}
-			this._router.navigate(fragment, {trigger: trigger, replace: true});
+
 			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
 				if (0 === this.href.indexOf(urlBase)) {
 					var fragment = this.href.substr(urlBase.length);
@@ -934,11 +935,12 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				fragment = url.substr(urlBase.length);
 			}
-			if (!this._router || forceReload || 0 !== url.indexOf(urlBase)) {
+			if (forceReload || 0 !== url.indexOf(urlBase)) {
 				window.location.assign(url);
 				return;
 			}
-			this._router.navigate(fragment, {trigger: true});
+			window.history.pushState(null, null, fragment);
+			cm.router._navigate(fragment);
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
 		},
 
