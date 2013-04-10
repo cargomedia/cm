@@ -846,7 +846,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		_navigate: function(fragment) {
 			var handler = this;
-			console.log('navigate: ' + fragment);
 			if (!this._$placeholder) {
 				this._$placeholder = $('<div class="router-placeholder" />');
 				var page = cm.findView('CM_Page_Abstract');
@@ -894,7 +893,6 @@ var CM_App = CM_Class_Abstract.extend({
 			$(window).on('popstate', function(event) {
 				if (skipInitialFire) {
 					skipInitialFire = false;
-					console.log("skip initial fire");
 					return;
 				}
 				var location = window.history.location || document.location;
@@ -929,7 +927,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Boolean} [forceReload]
 		 */
 		route: function(url, forceReload) {
-			console.log('route: ' + url);
 			forceReload = forceReload || false;
 			var urlBase = cm.getUrl();
 			var fragment = url;
@@ -942,7 +939,6 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
-			console.log("pushState: " + fragment);
 			window.history.pushState(null, null, fragment);
 			cm.router._navigate(fragment);
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
