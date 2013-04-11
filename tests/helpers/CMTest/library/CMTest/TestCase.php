@@ -140,15 +140,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @return CM_Render
 	 */
 	protected function _getRender(CM_Model_User $viewer = null) {
-		return new CM_Render($this->_getSite(), $viewer);
-	}
-
-	/**
-	 * @return CM_Site_Abstract
-	 * @deprecated
-	 */
-	protected function _getSite() {
-		return CM_Site_Abstract::factory($this->_siteType);
+		return new CM_Render(null, $viewer);
 	}
 
 	/**

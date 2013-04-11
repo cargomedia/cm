@@ -7,13 +7,12 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 	}
 
 	public function testProcess() {
-		$site = $this->_getSite();
-		$siteType = $site->getType();
+		$siteType = CM_Site_Abstract::factory()->getType();
 		$emoticonId = CM_Db_Db::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
 		$text = 'foo :) bar :smiley:';
 		$expected =
-				'foo <img src="/layout/' . $siteType . '/0/img/emoticon/1.png" class="emoticon emoticon-' . $emoticonId .
-						'" title=":smiley:" /> bar <img src="/layout/' . $siteType . '/0/img/emoticon/1.png" class="emoticon emoticon-' .
+				'foo <img src="http://www.default.dev/layout/' . $siteType . '/0/img/emoticon/1.png" class="emoticon emoticon-' . $emoticonId .
+						'" title=":smiley:" /> bar <img src="http://www.default.dev/layout/' . $siteType . '/0/img/emoticon/1.png" class="emoticon emoticon-' .
 						$emoticonId .
 						'" title=":smiley:" />';
 		$filter = new CM_Usertext_Filter_Emoticon();

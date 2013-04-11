@@ -64,7 +64,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testCreateWithSite() {
-		$site = $this->_getSite();
+		$site = CM_Site_Abstract::factory();
 		/** @var CM_Model_User $user */
 		$user = CM_Model_User::create(array('site' => $site));
 		$this->assertEquals($site, $user->getSite());
