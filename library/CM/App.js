@@ -260,7 +260,7 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 		/**
 		 * @param {jQuery} $element
- 		 * @param {Function} [success] fn(MediaElement, Element)
+		 * @param {Function} [success] fn(MediaElement, Element)
 		 */
 		setupVideo: function($element, success) {
 			$element.mediaelementplayer({
@@ -281,7 +281,7 @@ var CM_App = CM_Class_Abstract.extend({
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
-					if(success) {
+					if (success) {
 						success(mediaElement, domObject);
 					}
 				}
