@@ -136,14 +136,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Model_User|null $viewer
-	 * @return CM_Render
-	 */
-	protected function _getRender(CM_Model_User $viewer = null) {
-		return new CM_Render(null, $viewer);
-	}
-
-	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User|null    $viewer
 	 * @return CMTest_TH_Html
@@ -151,7 +143,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
 		$component->checkAccessible();
 		$component->prepare();
-		$componentHtml = $this->_getRender($viewer)->render($component);
+		$render = new CM_Render(null, $viewer);
+		$componentHtml = $render->render($component);
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
 		return new CMTest_TH_Html($html);
 	}
@@ -167,7 +160,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$params = array();
 		}
 		$formField->prepare($params);
-		$html = $this->_getRender()->render($formField, array('form' => $form));
+		$render = new CM_Render();
+		$html = $render->render($formField, array('form' => $form));
 		return new CMTest_TH_Html($html);
 	}
 
@@ -177,13 +171,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @return CMTest_TH_Html
 	 */
 	protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null) {
-		$host = parse_url($this->_getRender()->getUrl(), PHP_URL_HOST);
+		$render = new CM_Render();
+		$host = parse_url($render->getUrl(), PHP_URL_HOST);
 		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
 		$response = new CM_Response_Page($request);
 		$page->prepareResponse($response);
 		$page->checkAccessible();
 		$page->prepare();
-		$html = $this->_getRender($viewer)->render($page);
+		$render = new CM_Render(null, $viewer);
+		$html = $render->render($page);
 		return new CMTest_TH_Html($html);
 	}
 

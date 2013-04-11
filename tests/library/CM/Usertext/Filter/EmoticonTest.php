@@ -16,7 +16,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 						$emoticonId .
 						'" title=":smiley:" />';
 		$filter = new CM_Usertext_Filter_Emoticon();
-		$actual = $filter->transform($text, $this->_getRender());
+		$actual = $filter->transform($text, new CM_Render());
 
 		$this->assertSame($expected, $actual);
 	}
