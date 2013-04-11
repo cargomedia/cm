@@ -170,7 +170,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @return int Site id
 	 */
 	public function getId() {
-		return $this->getType();
+		return static::TYPE;
 	}
 
 	/**
@@ -180,7 +180,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 */
 	public static function findByRequest(CM_Request_Abstract $request) {
 		/** @var CM_Site_Abstract $className */
-		foreach (array_reverse(static::getClassChildren()) as $className) {
+		foreach (array_reverse(self::getClassChildren()) as $className) {
 			if ($className::match($request)) {
 				return new $className();
 			}
