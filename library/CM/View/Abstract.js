@@ -407,6 +407,18 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
+	 * @param {jQuery} $element
+	 * @param {String} event
+	 * @param {Function} callback
+	 */
+	bindJquery: function($element, event, callback) {
+		$element.on(event, callback);
+		this.on('destruct', function() {
+			$element.off(event, callback);
+		});
+	},
+
+	/**
 	 * @param {String} mp3Path
 	 * @param {Object} [params]
 	 * @return {MediaElement}
