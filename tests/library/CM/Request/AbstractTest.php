@@ -156,7 +156,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function testGetClientIdSetCookie() {
 		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/foo/' . $siteType);
+		$request = new CM_Request_Post('/foo/null/');
 		$clientId = $request->getClientId();
 		/** @var CM_Response_Abstract $response */
 		$response = $this->getMock('CM_Response_Abstract', array('_process', 'setCookie'), array($request));
