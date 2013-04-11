@@ -26,5 +26,5 @@ class CM_FormField_FileImage extends CM_FormField_File {
 		$html .= '<div class="actions"><a href="javascript:;" class="icon-delete deleteFile"></a></div>';
 		return $html;
 	}
-	
+
 }
