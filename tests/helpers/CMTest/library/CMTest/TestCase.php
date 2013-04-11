@@ -2,9 +2,6 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
-	/** @var int|null */
-	protected $_siteType = null;
-
 	public function runBare() {
 		$siteDefault = $this->getMockSite(1);
 		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
