@@ -185,6 +185,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 				return new $className();
 			}
 		}
-		throw new CM_Exception_Invalid('Cannot identify site from current request');
+		return self::factory();
 	}
 }
