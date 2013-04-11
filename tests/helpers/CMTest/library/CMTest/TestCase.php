@@ -2,8 +2,20 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
-	/** @var int */
+	/** @var int|null */
 	protected $_siteType = null;
+
+	public function runBare() {
+		$siteDefault = $this->getMockSite(1);
+		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
+		CMTest_TH::configureSite($siteDefault, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
+
+		parent::runBare();
+	}
+
+	public static function tearDownAfterClass() {
+		CMTest_TH::clearEnv();
+	}
 
 	/**
 	 * @return CM_Form_Abstract
@@ -13,6 +25,34 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
 		$formMock->frontend_data['auto_id'] = 'formId';
 		return $formMock;
+	}
+
+	/**
+	 * @param int|null   $type
+	 * @param array|null $methods
+	 * @throws CM_Exception_Invalid
+	 * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
+	 */
+	public function getMockSite($type = null, array $methods = null) {
+		if (null === $type) {
+			$types = CM_Config::get()->CM_Site_Abstract->types;
+			for ($i = 1; $i <= 255; $i++) {
+				if (!isset($types[$i])) {
+					$type = $i;
+					break;
+				}
+			}
+			if (null === $type) {
+				throw new CM_Exception_Invalid('Cannot find unused site type');
+			}
+		}
+		$type = (int) $type;
+		$methods = (array) $methods;
+		$methods[] = 'getType';
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMockClassName('CM_Site_Mock' . $type)->setMethods($methods)->getMock();
+		$site->expects($this->any())->method('getType')->will($this->returnValue($type));
+		CM_Config::get()->CM_Site_Abstract->types[$type] = get_class($site);
+		return $site;
 	}
 
 	/**
@@ -32,7 +72,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$params = array();
 		}
 		if (null === $siteId) {
-			$siteId = $this->_getSite()->getId();
+			$siteId = 'null';
 		}
 		$session = new CM_Session();
 		if ($viewer) {
@@ -66,7 +106,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$componentParams = array();
 		}
 		if (null === $siteId) {
-			$siteId = $this->_getSite()->getId();
+			$siteId = 'null';
 		}
 		$session = new CM_Session();
 		if ($viewer) {
@@ -96,44 +136,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param CM_Model_User|null $viewer
-	 * @return CM_Render
-	 */
-	protected function _getRender(CM_Model_User $viewer = null) {
-		return new CM_Render($this->_getSite(), $viewer);
-	}
-
-	/**
-	 * @return CM_Site_Abstract
-	 */
-	protected function _getSite() {
-		if (null === $this->_siteType) {
-			return $this->_getSiteMock();
-		}
-		return CM_Site_Abstract::factory($this->_siteType);
-	}
-
-	/**
-	 * @param array|null  $namespaces
-	 * @param string|null $url
-	 * @param string|null $urlCdn
-	 * @param string|null $name
-	 * @param string|null $emailAddress
-	 * @return CM_Site_Abstract
-	 */
-	protected function _getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress);
-		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
-			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
-			$siteClassName = get_class($site);
-			CM_CacheLocal::set($cacheKey, $siteClassName);
-		} else {
-			$site = new $siteClassName();
-		}
-		return $site;
-	}
-
-	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User|null    $viewer
 	 * @return CMTest_TH_Html
@@ -141,7 +143,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
 		$component->checkAccessible();
 		$component->prepare();
-		$componentHtml = $this->_getRender($viewer)->render($component);
+		$render = new CM_Render(null, $viewer);
+		$componentHtml = $render->render($component);
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
 		return new CMTest_TH_Html($html);
 	}
@@ -157,7 +160,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$params = array();
 		}
 		$formField->prepare($params);
-		$html = $this->_getRender()->render($formField, array('form' => $form));
+		$render = new CM_Render();
+		$html = $render->render($formField, array('form' => $form));
 		return new CMTest_TH_Html($html);
 	}
 
@@ -167,13 +171,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @return CMTest_TH_Html
 	 */
 	protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null) {
-		$host = parse_url($this->_getRender()->getUrl(), PHP_URL_HOST);
+		$render = new CM_Render();
+		$host = parse_url($render->getUrl(), PHP_URL_HOST);
 		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
 		$response = new CM_Response_Page($request);
 		$page->prepareResponse($response);
 		$page->checkAccessible();
 		$page->prepare();
-		$html = $this->_getRender($viewer)->render($page);
+		$render = new CM_Render(null, $viewer);
+		$html = $render->render($page);
 		return new CMTest_TH_Html($html);
 	}
 

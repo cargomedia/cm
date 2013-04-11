@@ -9,7 +9,7 @@ class CM_MailTest extends CMTest_TestCase {
 	public function testWithTemplate() {
 		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
-		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
+		$user->expects($this->any())->method('getSite')->will($this->returnValue(CM_Site_Abstract::factory()));
 
 		$templateVariabels = array('foo' => 'bar');
 		$msg = new CM_Mail_Welcome($user, $templateVariabels);
@@ -35,7 +35,7 @@ class CM_MailTest extends CMTest_TestCase {
 			$this->assertTrue(true);
 		}
 		$msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
-		list($subject, $html, $text) = $msg->send(null, $this->_getSite());
+		list($subject, $html, $text) = $msg->send(null);
 		$this->assertEquals('blabla', $subject);
 		$this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
 		$this->assertEquals('Hello (http://www.foo.bar)', $text);
@@ -44,7 +44,7 @@ class CM_MailTest extends CMTest_TestCase {
 	public function testQueue() {
 		$user = $this->getMock('CM_Model_User', array('getEmail', 'getSite'), array(CMTest_TH::createUser()->getId()));
 		$user->expects($this->any())->method('getEmail')->will($this->returnValue('foo@example.com'));
-		$user->expects($this->any())->method('getSite')->will($this->returnValue($this->_getSite()));
+		$user->expects($this->any())->method('getSite')->will($this->returnValue(CM_Site_Abstract::factory()));
 
 		$msg = new CM_Mail($user, null);
 		$msg->setSubject('testSubject');

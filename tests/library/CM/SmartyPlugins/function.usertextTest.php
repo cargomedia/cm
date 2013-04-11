@@ -11,7 +11,7 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 
 	public function setUp() {
 		$smarty = new Smarty();
-		$render = new CM_Render($this->_getSite());
+		$render = new CM_Render();
 		$this->_template = $smarty->createTemplate('string:');
 		$this->_template->assignGlobal('render', $render);
 	}

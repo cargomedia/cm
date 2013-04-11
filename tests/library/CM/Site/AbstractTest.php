@@ -38,8 +38,22 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFindByRequest() {
-		$request = new CM_Request_Get('/test');
-		$this->assertInstanceOf('CMTest_Site_CM', CM_Site_Abstract::findByRequest($request));
+		$siteClassMatchFoo = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockFoo');
+		$siteClassMatchFoo::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
+			return '/foo' === $request->getPath();
+		}));
+
+		$siteClassMatchBar = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockBar');
+		$siteClassMatchBar::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
+			return '/bar' === $request->getPath();
+		}));
+
+		$site = $this->getMockClass('CM_Site_Abstract', array('getClassChildren'));
+		$site::staticExpects($this->any())->method('getClassChildren')->will($this->returnValue(array($siteClassMatchFoo, $siteClassMatchBar)));
+
+		$this->assertInstanceOf($siteClassMatchFoo, $site::findByRequest(new CM_Request_Get('/foo')));
+		$this->assertInstanceOf($siteClassMatchBar, $site::findByRequest(new CM_Request_Get('/bar')));
+		$this->assertInstanceOf(get_class(CM_Site_Abstract::factory()), $site::findByRequest(new CM_Request_Get('/somethingelse')));
 	}
 
 	public function testFactory() {

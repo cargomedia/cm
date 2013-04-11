@@ -17,7 +17,7 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		CMTest_TH::clearCache();
 
 		$filter = new CM_Usertext_Filter_Badwords();
-		$render = $this->_getRender();
+		$render = new CM_Render();
 
 		$actual = $filter->transform("hello foo there", $render);
 		$this->assertSame("hello ${replace} there", $actual);

@@ -174,7 +174,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @return int Site id
 	 */
 	public function getId() {
-		return static::TYPE;
+		return $this->getType();
 	}
 
 	/**
@@ -184,11 +184,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 */
 	public static function findByRequest(CM_Request_Abstract $request) {
 		/** @var CM_Site_Abstract $className */
-		foreach (array_reverse(self::getClassChildren()) as $className) {
+		foreach (array_reverse(static::getClassChildren()) as $className) {
 			if ($className::match($request)) {
 				return new $className();
 			}
 		}
-		throw new CM_Exception_Invalid('Cannot identify site from current request');
+		return self::factory();
 	}
 }
