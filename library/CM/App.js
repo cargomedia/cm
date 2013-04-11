@@ -233,6 +233,22 @@ var CM_App = CM_Class_Abstract.extend({
 			_.each(view.getChildren(), function(child) {
 				cm.debug.viewTree(child, indentation + 1);
 			});
+		},
+
+		/**
+		 * @param message
+		 * @param [message2]
+		 * @param [message3]
+		 */
+		log: function(message, message2, message3) {
+			if (!cm.options.debug) {
+				return;
+			}
+			var messages = _.toArray(arguments);
+			messages.unshift('[CM]');
+			if (console && console.log) {
+				console.log.apply(console, messages);
+			}
 		}
 	},
 
@@ -704,8 +720,10 @@ var CM_App = CM_Class_Abstract.extend({
 			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
 				if (handler._channelDispatchers[channel]) {
 					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
+					cm.debug.log('Stream channel (' + channel + '): message: ', message);
 				}
 			});
+			cm.debug.log('Stream channel (' + channel + '): subscribe');
 		},
 
 		/**
@@ -716,6 +734,7 @@ var CM_App = CM_Class_Abstract.extend({
 				delete this._channelDispatchers[channel];
 			}
 			this._adapter.unsubscribe(channel);
+			cm.debug.log('Stream channel (' + channel + '): unsubscribe');
 		}
 	},
 
