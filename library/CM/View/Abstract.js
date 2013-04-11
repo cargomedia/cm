@@ -204,7 +204,8 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	ajax: function(functionName, params, options) {
 		options = _.defaults(options || {}, {
-			'modal': false
+			'modal': false,
+			'view': this
 		});
 		params = params || {};
 		var handler = this;
@@ -220,7 +221,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.disable();
 		}
 
-		var xhr = cm.ajax('ajax', {view: this._getArray(), method: functionName, params: params}, {
+		var xhr = cm.ajax('ajax', {view: options.view._getArray(), method: functionName, params: params}, {
 			success: function(response) {
 				if (response.exec) {
 					new Function(response.exec).call(handler);
