@@ -270,7 +270,8 @@ var CM_View_Abstract = Backbone.View.extend({
 			'success': function() {
 				this.popOut();
 			},
-			'modal': true
+			'modal': true,
+			'method': 'loadComponent'
 		});
 		params = params || {};
 		params.className = className;
@@ -278,7 +279,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		options.success = function(response) {
 			this._injectView(response, success);
 		};
-		return this.ajax('loadComponent', params, options);
+		return this.ajax(options.method, params, options);
 	},
 
 	/**
