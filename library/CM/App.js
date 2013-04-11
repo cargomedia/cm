@@ -281,7 +281,7 @@ var CM_App = CM_Class_Abstract.extend({
 						cm.storage.set('mediaElement-volume', mediaElement.volume);
 						cm.storage.set('mediaElement-muted', mediaElement.muted.valueOf());
 					});
-					if("undefined" !== typeof(success)  && null !== success) {
+					if(success) {
 						success(mediaElement, domObject);
 					}
 				}
