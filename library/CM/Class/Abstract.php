@@ -2,6 +2,12 @@
 
 abstract class CM_Class_Abstract {
 
+	/** @var string[] */
+	private static $_dynamicClassChildren = array();
+
+	/** @var string[] */
+	private static $_dynamicClassChildrenAbstract = array();
+
 	/**
 	 * @return int
 	 */
@@ -14,6 +20,31 @@ abstract class CM_Class_Abstract {
 	 */
 	public function getClassHierarchy() {
 		return self::_getClassHierarchy();
+	}
+
+	public static function registerDynamicClass() {
+		$className = get_called_class();
+		$reflectionClass = new ReflectionClass($className);
+		if ($reflectionClass->isAbstract()) {
+			$dynamicClassChildren = & self::$_dynamicClassChildrenAbstract;
+		} else {
+			$dynamicClassChildren = & self::$_dynamicClassChildren;
+		}
+		$classHierarchy = self::_getClassHierarchy();
+		array_shift($classHierarchy);
+		foreach ($classHierarchy as $classNameParent) {
+			if (!isset($dynamicClassChildren[$classNameParent])) {
+				$dynamicClassChildren[$classNameParent] = array();
+			}
+			if (!in_array($className, $dynamicClassChildren[$classNameParent], true)) {
+				array_push($dynamicClassChildren[$classNameParent], $className);
+			}
+		}
+	}
+
+	public static function unregisterDynamicClasses() {
+		self::$_dynamicClassChildren = array();
+		self::$_dynamicClassChildrenAbstract = array();
 	}
 
 	/**
@@ -78,6 +109,23 @@ abstract class CM_Class_Abstract {
 	 */
 	public static function getClassChildren($includeAbstracts = null) {
 		$className = get_called_class();
-		return CM_Util::getClassChildren($className, $includeAbstracts);
+		$dynamicClassChildren = self::_getDynamicClassChildren($includeAbstracts);
+		return array_merge(CM_Util::getClassChildren($className, $includeAbstracts), $dynamicClassChildren);
+	}
+
+	/**
+	 * @param bool $includeAbstracts
+	 * @return string[]
+	 */
+	private static function _getDynamicClassChildren($includeAbstracts = null) {
+		$className = get_called_class();
+		$dynamicClassChildren = array();
+		if (isset(self::$_dynamicClassChildren[$className])) {
+			$dynamicClassChildren = self::$_dynamicClassChildren[$className];
+		}
+		if ($includeAbstracts && isset(self::$_dynamicClassChildrenAbstract[$className])) {
+			$dynamicClassChildren = array_merge($dynamicClassChildren, self::$_dynamicClassChildrenAbstract[$className]);
+		}
+		return $dynamicClassChildren;
 	}
 }

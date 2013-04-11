@@ -44,6 +44,7 @@ class CMTest_TH {
 		self::timeReset();
 		self::clearTmp();
 		self::clearConfig();
+		CM_Class_Abstract::unregisterDynamicClasses();
 	}
 
 	public static function clearCache() {
@@ -189,7 +190,6 @@ EOD;
 		}
 
 		$code = <<<EOD
-<?php
 
 class $siteClassName extends CM_Site_Abstract {
 
@@ -202,11 +202,8 @@ class $siteClassName extends CM_Site_Abstract {
 $codeMatchAll}
 
 EOD;
-		$pathDirectory = CM_Util::getNamespacePath('CMTestTemp') . 'library/CMTestTemp/Site/';
-		CM_Util::mkDir($pathDirectory);
-		$pathFile = $pathDirectory . 'Mock' . $siteMockId . '.php';
-		CM_File_Php::create($pathFile, $code);
-		require $pathFile;
+		eval($code);
+		$siteClassName::registerDynamicClass();
 
 		$site = new $siteClassName();
 		self::configureSite($site, $url, $urlCdn, $name, $emailAddress);
