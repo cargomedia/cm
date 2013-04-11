@@ -153,10 +153,9 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Boolean} [skipTriggerRemove]
 	 */
 	remove: function(skipDomRemoval, skipTriggerRemove) {
-		this.trigger('destruct');
-		if (!skipTriggerRemove) {
-			this.trigger('remove');
-		}
+		_.each(_.clone(this.getChildren()), function(child) {
+			child.remove();
+		});
 
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
@@ -167,11 +166,12 @@ var CM_View_Abstract = Backbone.View.extend({
 			}
 		}
 
-		_.each(_.clone(this.getChildren()), function(child) {
-			child.remove();
-		});
-
 		delete cm.views[this.getAutoId()];
+
+		this.trigger('destruct');
+		if (!skipTriggerRemove) {
+			this.trigger('remove');
+		}
 
 		if (!skipDomRemoval) {
 			this.$el.remove();
