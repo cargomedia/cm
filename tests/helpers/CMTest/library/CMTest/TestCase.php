@@ -145,6 +145,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @return CM_Site_Abstract
+	 * @deprecated
 	 */
 	protected function _getSite() {
 		return CM_Site_Abstract::factory($this->_siteType);
