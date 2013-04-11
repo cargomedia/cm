@@ -49,7 +49,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		$type = (int) $type;
 		$methods = (array) $methods;
 		$methods[] = 'getType';
-		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods($methods)->getMock();
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMockClassName('CM_Site_Mock' . $type)->setMethods($methods)->getMock();
 		$site->expects($this->any())->method('getType')->will($this->returnValue($type));
 		CM_Config::get()->CM_Site_Abstract->types[$type] = get_class($site);
 		return $site;
