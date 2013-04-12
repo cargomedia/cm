@@ -3,9 +3,10 @@
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 	public function runBare() {
-		$siteDefault = $this->getMockSite(null, null, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
-		CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
-
+		if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
+			$siteDefault = $this->getMockSite(null, null, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
+			CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
+		}
 		parent::runBare();
 	}
 
