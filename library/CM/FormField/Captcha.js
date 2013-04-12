@@ -13,7 +13,6 @@ var CM_FormField_Captcha = CM_FormField_Abstract.extend({
 		this.getForm().bind("error", function(){
 			field.refresh();
 		});
-
 	},
 
 	refresh: function(){
