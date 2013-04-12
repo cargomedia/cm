@@ -1,9 +1,9 @@
-<div class="captcha_container">
-	<div class="captcha_image">
+<div class="captcha">
+	<div class="captcha-image">
 		<img src="{$render->getUrl("/captcha/{$render->getSite()->getId()}?id={$imageId}")}" />
-		<a class="icon-reload refresh" title="{translate 'Refresh'}" href="javascript:;"></a>
+		{link icon="reload" class="refreshCaptcha refresh-link" title="{translate 'Refresh'}"}
 	</div>
-	<div class="captcha_input">
+	<div class="captcha-input">
 		<label for="{$name}">{translate 'Enter Code'}</label>
 		<input type="text" name="{$name}[value]" id="{$id}" class="textinput" maxlength="6" />
 	</div>
