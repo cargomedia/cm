@@ -2,10 +2,6 @@
 
 class CM_FormField_SetTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstructor() {
 		$field = new CM_FormField_Set('foo');
 		$this->assertInstanceOf('CM_FormField_Set', $field);
@@ -62,5 +58,4 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 			}
 		}
 	}
-
 }

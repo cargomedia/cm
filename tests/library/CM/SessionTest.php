@@ -2,13 +2,6 @@
 
 class CM_SessionTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstructor() {
 		$session = new CM_Session();
 		$this->assertTrue(true);
@@ -69,7 +62,8 @@ class CM_SessionTest extends CMTest_TestCase {
 		$this->assertEquals($expiration + 10, $session->getExpiration(), null, 1);
 
 		//test that session is only persisted when data changed
-		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
+		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo'    => 'foo',
+																		 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
 		CMTest_TH::clearCache();
 		unset($session);
 		$session = new CM_Session($sessionId);
@@ -139,7 +133,6 @@ class CM_SessionTest extends CMTest_TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-
 	}
 
 	public function testLogin() {

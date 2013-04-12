@@ -6,10 +6,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testIsVariationFixture() {
 		$request = new CM_Request_Post('/foo/null');
 		/** @var CM_Model_Splittest_RequestClient $test */

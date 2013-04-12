@@ -2,10 +2,6 @@
 
 class CM_Usertext_Filter_NewlineToLinebreakTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testProcess() {
 		$text = "foo\n\rbar\n\n\n\n\n\n\n\n\nfoo\n\nbar\n\r\r\r";
 		$expected = "foo<br />\nbar<br />\n<br />\n<br />\nfoo<br />\n<br />\nbar";

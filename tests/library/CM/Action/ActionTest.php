@@ -6,10 +6,6 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function tearDown() {
 		CM_Db_Db::truncate(TBL_CM_ACTION);
 	}
@@ -204,6 +200,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
+
 	const TYPE = 1;
 
 	protected function _notify() {
@@ -218,6 +215,7 @@ class CM_Action_Mock extends CM_Action_Abstract {
 }
 
 class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
+
 	const TYPE = 1;
 
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {

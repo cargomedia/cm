@@ -8,6 +8,7 @@ class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
 		CM_Db_Db::truncate(TBL_CM_USER_PREFERENCEDEFAULT);
 	}
 

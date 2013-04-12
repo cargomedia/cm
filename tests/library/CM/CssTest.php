@@ -12,10 +12,6 @@ class CM_CssTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function setUp() {
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_MockCss', true, true, true, array('getId'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));

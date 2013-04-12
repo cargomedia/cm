@@ -1,12 +1,14 @@
 <?php
 
 class CM_Paging_Mock extends CM_Paging_Abstract {
+
 	protected function _processItem($itemRaw) {
 		return (int) $itemRaw;
 	}
 }
 
 class CM_Paging_Mock_Gaps extends CM_Paging_Mock {
+
 	protected function _processItem($itemRaw) {
 		if ($itemRaw % 3 == 0) {
 			throw new CM_Exception_Nonexistent();
@@ -16,6 +18,7 @@ class CM_Paging_Mock_Gaps extends CM_Paging_Mock {
 }
 
 class CM_Comparable_Mock implements CM_Comparable {
+
 	private $_value;
 
 	public function __construct($value) {
@@ -32,6 +35,7 @@ class CM_Comparable_Mock implements CM_Comparable {
 }
 
 class CM_PagingSource_Mock extends CM_PagingSource_Abstract {
+
 	private $_items;
 
 	public function __construct($min, $max) {
@@ -52,18 +56,21 @@ class CM_PagingSource_Mock extends CM_PagingSource_Abstract {
 }
 
 class CM_PagingSource_MockStale extends CM_PagingSource_Mock {
+
 	public function getStalenessChance() {
 		return 0.5;
 	}
 }
 
 class CM_Paging_Mock_Comparable extends CM_Paging_Mock {
+
 	protected function _processItem($itemRaw) {
 		return new CM_Comparable_Mock($itemRaw);
 	}
 }
 
 class CM_Paging_AbstractTest extends CMTest_TestCase {
+
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
@@ -90,7 +97,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
+		parent::tearDownAfterClass();
 		CM_Db_Db::exec('DROP TABLE TBL_TEST');
 		CM_Db_Db::exec('DROP TABLE TBL_TEST2');
 	}
@@ -389,7 +396,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			array('id' => 2, 'type' => 1, 'amount' => 2), array('id' => 3, 'type' => 1, 'amount' => 3),
 			array('id' => 4, 'type' => 1, 'amount' => 4))));
 		$this->assertSame(array(1 => array('type' => 1, 'amount' => 1), 2 => array('type' => 1, 'amount' => 2),
-			3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
+								3 => array('type' => 1, 'amount' => 3), 4 => array('type' => 1, 'amount' => 4)), $paging->getItemsRawTree());
 	}
 
 	public function testFlattenItems() {

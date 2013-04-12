@@ -5,10 +5,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	public static function setupBeforeClass() {
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testGetCreated() {
 		$time = time();
 		$user = CMTest_TH::createUser();

@@ -9,10 +9,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testGetEmailAddress() {
 		/** @var CM_Site_Abstract $site */
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract');

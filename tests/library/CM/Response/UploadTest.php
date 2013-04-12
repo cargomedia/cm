@@ -2,10 +2,6 @@
 
 class CM_Response_UploadTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testUpload() {
 		$filename = 'test.jpg';
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
