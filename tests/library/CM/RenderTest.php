@@ -152,6 +152,6 @@ class CM_RenderTest extends CMTest_TestCase {
 	}
 
 	protected function _getSite(array $namespaces = null) {
-		return $this->_getSiteMock($namespaces, 'http://www.foo.com', 'http://www.cdn.com', 'Foo', 'foo@foo.com');
+		return CMTest_TH::getSiteMock($namespaces, 'http://www.foo.com', 'http://www.cdn.com', 'Foo', 'foo@foo.com');
 	}
 }

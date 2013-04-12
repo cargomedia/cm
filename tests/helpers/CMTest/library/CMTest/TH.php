@@ -13,7 +13,6 @@ class CMTest_TH {
 		if (self::$initialized) {
 			return;
 		}
-		$config = CM_Config::get();
 		$configDb = CM_Config::get()->CM_Db_Db;
 		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
 
@@ -27,14 +26,6 @@ class CMTest_TH {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Db_Db::runDump($configDb->db, $dump);
 			}
-		}
-
-		$siteCMTest = new CMTest_Site_CM();
-		self::configureSite($siteCMTest, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
-
-		if (empty(CM_Config::get()->CM_Site_Abstract->class)) {
-			$siteDefault = self::createSite(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev');
-			CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
 		}
 
 		self::$_configBackup = serialize(CM_Config::get());
@@ -53,6 +44,7 @@ class CMTest_TH {
 		self::timeReset();
 		self::clearTmp();
 		self::clearConfig();
+		CM_Class_Abstract::unregisterDynamicClasses();
 	}
 
 	public static function clearCache() {
@@ -155,18 +147,20 @@ class CMTest_TH {
 	}
 
 	/**
-	 * @param array|null  $namespaces
-	 * @param string|null $url
-	 * @param string|null $urlCdn
-	 * @param string|null $name
-	 * @param string|null $emailAddress
+	 * @param array|null   $namespaces
+	 * @param string|null  $url
+	 * @param string|null  $urlCdn
+	 * @param string|null  $name
+	 * @param string|null  $emailAddress
+	 * @param boolean|null $matchAll
 	 * @throws PHPUnit_Framework_Exception
 	 * @return CM_Site_Abstract
 	 */
-	public static function createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+	public static function createSite(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null, $matchAll = null) {
 		if (null === $namespaces) {
 			$namespaces = array();
 		}
+		$matchAll = (bool) $matchAll;
 
 		$types = CM_Config::get()->CM_Site_Abstract->types;
 		if (count($types) >= 255) {
@@ -174,14 +168,29 @@ class CMTest_TH {
 		}
 		do {
 			$siteId = rand(1, 255);
-			$siteClassName = 'CM_Site_Mock' . md5(rand() . uniqid());
+			$siteMockId = md5(rand() . uniqid());
+			$siteClassName = 'CMTestTemp_Site_Mock' . $siteMockId;
 		} while (array_key_exists($siteId, $types) || class_exists($siteClassName));
 
 		$codeNamespaces = '';
 		foreach ($namespaces as $namespace) {
 			$codeNamespaces .= '$this->_setNamespace(' . var_export($namespace, true) . ');';
 		}
+
+		if ($matchAll) {
+			$codeMatchAll = <<<'EOD'
+
+	public static function match(CM_Request_Abstract $request) {
+		return true;
+	}
+
+EOD;
+		} else {
+			$codeMatchAll = '';
+		}
+
 		$code = <<<EOD
+
 class $siteClassName extends CM_Site_Abstract {
 
 	const TYPE = $siteId;
@@ -190,9 +199,11 @@ class $siteClassName extends CM_Site_Abstract {
 		parent::__construct();
 		$codeNamespaces
 	}
-}
+$codeMatchAll}
+
 EOD;
 		eval($code);
+		$siteClassName::registerDynamicClass();
 
 		$site = new $siteClassName();
 		self::configureSite($site, $url, $urlCdn, $name, $emailAddress);
@@ -319,6 +330,38 @@ EOD;
 		$config = CM_Config::get()->CM_Db_Db;
 		self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
 		return self::$_dbClient;
+	}
+
+	/**
+	 * @param array|null   $namespaces
+	 * @param string|null  $url
+	 * @param string|null  $urlCdn
+	 * @param string|null  $name
+	 * @param string|null  $emailAddress
+	 * @param boolean|null $matchAll
+	 * @return CM_Site_Abstract
+	 */
+	public static function getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null, $matchAll = null) {
+		if ($matchAll) {
+			$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key(true);
+		} else {
+			$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress, $matchAll);
+		}
+		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
+			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress, $matchAll);
+			$siteClassName = get_class($site);
+			CM_CacheLocal::set($cacheKey, $siteClassName);
+		} else {
+			$site = new $siteClassName();
+		}
+		return $site;
+	}
+
+	/**
+	 * @return CM_Site_Abstract
+	 */
+	public static function getSiteMockMatchAll() {
+		return self::getSiteMock(null, 'http://www.example.dev', 'http://cdn.example.dev', 'Example', 'example@example.dev', true);
 	}
 
 	public static function randomizeAutoincrement() {

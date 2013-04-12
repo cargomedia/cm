@@ -5,6 +5,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/** @var int */
 	protected $_siteType = null;
 
+	protected function setUp() {
+		CMTest_TH::getSiteMockMatchAll();
+		if (empty(CM_Config::get()->CM_Site_Abstract->class)) {
+			$siteDefault = CMTest_TH::createSite(null, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
+			CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
+		}
+	}
+
+	public static function tearDownAfterClass() {
+		CMTest_TH::clearEnv();
+	}
+
 	/**
 	 * @return CM_Form_Abstract
 	 */
@@ -108,29 +120,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 */
 	protected function _getSite() {
 		if (null === $this->_siteType) {
-			return $this->_getSiteMock();
+			return CMTest_TH::getSiteMock();
 		}
 		return CM_Site_Abstract::factory($this->_siteType);
-	}
-
-	/**
-	 * @param array|null  $namespaces
-	 * @param string|null $url
-	 * @param string|null $urlCdn
-	 * @param string|null $name
-	 * @param string|null $emailAddress
-	 * @return CM_Site_Abstract
-	 */
-	protected function _getSiteMock(array $namespaces = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-		$cacheKey = CM_CacheConst::TestCase_Site_Mock . CM_Cache::key($namespaces, $url, $urlCdn, $name, $emailAddress);
-		if (false === ($siteClassName = CM_CacheLocal::get($cacheKey))) {
-			$site = CMTest_TH::createSite($namespaces, $url, $urlCdn, $name, $emailAddress);
-			$siteClassName = get_class($site);
-			CM_CacheLocal::set($cacheKey, $siteClassName);
-		} else {
-			$site = new $siteClassName();
-		}
-		return $site;
 	}
 
 	/**
