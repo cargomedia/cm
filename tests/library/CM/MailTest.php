@@ -35,7 +35,7 @@ class CM_MailTest extends CMTest_TestCase {
 			$this->assertTrue(true);
 		}
 		$msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
-		list($subject, $html, $text) = $msg->send(null);
+		list($subject, $html, $text) = $msg->send();
 		$this->assertEquals('blabla', $subject);
 		$this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
 		$this->assertEquals('Hello (http://www.foo.bar)', $text);
