@@ -5,3 +5,4 @@
 /resources/config/local.php
 /tmp
 /tests/tmp
+/tests/helpers/CMTest/library/CMTest/Site
