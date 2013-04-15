@@ -157,12 +157,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param CM_Component_Abstract $component
 	 * @param CM_Model_User|null    $viewer
+	 * @param CM_Site_Abstract|null $site
 	 * @return CMTest_TH_Html
 	 */
-	protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null) {
+	protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
 		$component->checkAccessible();
 		$component->prepare();
-		$render = new CM_Render(null, $viewer);
+		$render = new CM_Render($site, $viewer);
 		$componentHtml = $render->render($component);
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
 		return new CMTest_TH_Html($html);
@@ -172,32 +173,37 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
 	 * @param array|null            $params
+	 * @param CM_Model_User|null    $viewer
+	 * @param CM_Site_Abstract|null $site
 	 * @return CMTest_TH_Html
 	 */
-	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null) {
+	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
 		if (null === $params) {
 			$params = array();
 		}
 		$formField->prepare($params);
-		$render = new CM_Render();
+		$render = new CM_Render($site, $viewer);
 		$html = $render->render($formField, array('form' => $form));
 		return new CMTest_TH_Html($html);
 	}
 
 	/**
-	 * @param CM_Page_Abstract   $page
-	 * @param CM_Model_User|null $viewer
+	 * @param CM_Page_Abstract      $page
+	 * @param CM_Model_User|null    $viewer
+	 * @param CM_Site_Abstract|null $site
 	 * @return CMTest_TH_Html
 	 */
-	protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null) {
-		$render = new CM_Render();
-		$host = parse_url($render->getUrl(), PHP_URL_HOST);
+	protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+		if (null === $site) {
+			$site = CM_Site_Abstract::factory();
+		}
+		$host = parse_url($site->getUrl(), PHP_URL_HOST);
 		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
 		$response = new CM_Response_Page($request);
 		$page->prepareResponse($response);
 		$page->checkAccessible();
 		$page->prepare();
-		$render = new CM_Render(null, $viewer);
+		$render = new CM_Render($site, $viewer);
 		$html = $render->render($page);
 		return new CMTest_TH_Html($html);
 	}
