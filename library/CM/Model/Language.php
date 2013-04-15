@@ -300,9 +300,20 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	private static function _setKey($name, array $variableNames = null) {
 		$name = (string) $name;
-		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name))->fetchColumn();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name), 'id ASC')->fetchColumn();
 		if (!$languageKeyId) {
 			$languageKeyId = CM_Db_Db::insert(TBL_CM_LANGUAGEKEY, array('name' => $name));
+
+			// check if the language Key is double inserted because of high load
+			$languageKeyIdList = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name), 'id ASC')->fetchAll();
+			if (1 < count($languageKeyIdList)) {
+				$languageKeyId = array_shift($languageKeyIdList);
+				foreach($languageKeyIdList as $languageKeyIdRemove){
+					$language = new CM_Model_Language($languageKeyIdRemove);
+					$language->delete();
+				}
+			}
+
 			/** @var CM_Model_Language $language */
 			foreach (new CM_Paging_Language_All() as $language) {
 				$language->_change();
