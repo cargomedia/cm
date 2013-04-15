@@ -31,7 +31,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 				field.error(null);
 				_.each(data.files, function(file) {
 					if (allowedExtensionsRegexp && !allowedExtensionsRegexp.test(file.name)) {
-						field.error(cm.language.get('{$file} has invalid extension. Only {$extensions} are allowed.', {file: file.name, extensions: allowedExtensions.join(', ')}));
+						field.error(cm.language.get('{$file} has a invalid extension. Only {$extensions} are allowed.', {file: file.name, extensions: allowedExtensions.join(', ')}));
 						file.error = true;
 					}
 				});
