@@ -6,13 +6,8 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testIsVariationFixture() {
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/foo/' . $siteType);
+		$request = new CM_Request_Post('/foo/null');
 		/** @var CM_Model_Splittest_RequestClient $test */
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
@@ -25,9 +20,8 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 	}
 
 	public function testSetConversion() {
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/foo/' . $siteType);
-		$request2 = new CM_Request_Post('/foo/' . $siteType);
+		$request = new CM_Request_Post('/foo/null');
+		$request2 = new CM_Request_Post('/foo/null');
 
 		/** @var CM_Model_Splittest_RequestClient $test */
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'bar', 'variations' => array('v1')));

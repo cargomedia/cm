@@ -2,13 +2,6 @@
 
 class CM_Paging_StreamChannelArchiveVideo_TypeTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testPaging() {
 		CMTest_TH::createStreamChannelVideoArchive();
 		$archive = CMTest_TH::createStreamChannelVideoArchive();

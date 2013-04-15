@@ -7,14 +7,6 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 	private $_type = 3;
 	private $_role = 1;
 
-	public static function setUpBeforeClass() {
-
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function setup() {
 		CMTest_TH::clearEnv();
 		CM_Db_Db::replace(TBL_CM_ACTIONLIMIT, array('actionType', 'actionVerb', 'type', 'role', 'limit', 'period'), array(array($this->_actionType,
@@ -76,6 +68,7 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 }
 
 class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
+
 	const TYPE = 3;
 
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {
