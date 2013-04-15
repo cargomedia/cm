@@ -58,7 +58,6 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 				}
 			},
 			fail: function(e, data) {
-				console.log(e, data);
 				data.$preview.remove();
 				if (!data.skipFailMessage) {
 					field.error('Upload error');
