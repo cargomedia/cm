@@ -305,10 +305,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$languageKeyId = CM_Db_Db::insert(TBL_CM_LANGUAGEKEY, array('name' => $name));
 
 			// check if the language Key is double inserted because of high load
-			$languageKeyIdList = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name), 'id ASC')->fetchAll();
+			$languageKeyIdList = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
 			if (1 < count($languageKeyIdList)) {
 				$languageKeyId = array_shift($languageKeyIdList);
-				CM_Db_Db::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyIdList));
+				CM_Db_Db::exec("DELETE FROM TBL_CM_LANGUAGEKEY WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
 			}
 
 			/** @var CM_Model_Language $language */
