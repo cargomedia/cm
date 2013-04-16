@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_LocationTest extends CMTest_TestCase {
+
 	private static $_fields;
 
 	public static function setUpBeforeClass() {
@@ -11,9 +12,9 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$zuerich = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Zürich'));
 
 		$basel = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
-			'lat' => 47.569535, 'lon' => 7.574063));
+															 'lat'     => 47.569535, 'lon' => 7.574063));
 		$winterthur = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $zuerich, 'countryId' => $switzerland, 'name' => 'Winterthur',
-			'lat' => 47.502315, 'lon' => 8.724947));
+																  'lat'     => 47.502315, 'lon' => 8.724947));
 
 		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
 		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
@@ -32,10 +33,6 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		self::$_fields[CM_Model_Location::LEVEL_STATE] = array('id' => (int) $location['2.id'], 'name' => $location['2.name']);
 		self::$_fields[CM_Model_Location::LEVEL_CITY] = array('id' => (int) $location['3.id'], 'name' => $location['3.name']);
 		self::$_fields[CM_Model_Location::LEVEL_ZIP] = array('id' => (int) $location['4.id'], 'name' => $location['4.name']);
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
 	}
 
 	public function testConstructor() {
@@ -69,7 +66,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	public function testGetId() {
 		foreach (self::$_fields as $level => $fields) {
 			$location = new CM_Model_Location($level, $fields['id']);
-			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY,
+						 CM_Model_Location::LEVEL_ZIP) as $level2) {
 				if ($level >= $level2) {
 					$this->assertSame(self::$_fields[$level2]['id'], $location->getId($level2));
 				} else {
@@ -82,7 +80,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	public function testGetName() {
 		foreach (self::$_fields as $level => $fields) {
 			$location = new CM_Model_Location($level, $fields['id']);
-			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY,
+						 CM_Model_Location::LEVEL_ZIP) as $level2) {
 				if ($level >= $level2) {
 					$this->assertSame(self::$_fields[$level2]['name'], $location->getName($level2));
 				} else {
@@ -95,7 +94,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	public function testGet() {
 		foreach (self::$_fields as $level => $fields) {
 			$location = new CM_Model_Location($level, $fields['id']);
-			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_ZIP) as $level2) {
+			foreach (array(CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_STATE, CM_Model_Location::LEVEL_CITY,
+						 CM_Model_Location::LEVEL_ZIP) as $level2) {
 				$location2 = $location->get($level2);
 				if ($level2 > $level) {
 					$this->assertNull($location2);

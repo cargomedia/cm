@@ -1,22 +1,39 @@
-.captcha_container {
-	width: 200px;
-}
-.captcha_container .captcha_input {
-	margin-top: 3px;
-}
-.captcha_container input[type=text] {
-	width: 125px !important;
-}
-.captcha_container .captcha_image {
-	position: relative;
-}
-.captcha_container .captcha_image img {
-	width: 200px;
-	height: 40px;
-}
-.captcha_container .captcha_image .reload {
-	position: absolute;
-	top: 0;
-	left: 0;
-	margin: 3px;
+.captcha {
+	.captcha-image, .captcha-input {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	.captcha-image {
+		position: relative;
+		margin-right: 10px;
+
+		img {
+			width: 200px;
+			height: 40px;
+		}
+
+		.refresh-link {
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 5px;
+			line-height: 1;
+			color: @colorFg;
+			font-size: @iconSizeClickable;
+
+			&:hover {
+				color: darken(@colorFg, 10);
+			}
+		}
+	}
+
+	.captcha-input {
+		margin-top: 3px;
+
+		input {
+			width: 125px;
+		}
+	}
 }

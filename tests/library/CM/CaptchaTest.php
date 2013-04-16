@@ -2,13 +2,6 @@
 
 class CM_CaptchaTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testCreate() {
 		$captcha = CM_Captcha::create();
 		$this->assertInstanceOf('CM_Captcha', $captcha);

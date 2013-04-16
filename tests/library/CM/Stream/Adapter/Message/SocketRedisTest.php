@@ -23,7 +23,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$adapter->onRedisMessage(json_encode($message));
 		$timeStarted = time();
 
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter('foo', $adapter->getType());
 		$this->assertNotNull($streamChannel);
 		$streamChannels = new CM_Paging_StreamChannel_AdapterType($adapter->getType());
 		$this->assertSame(1, $streamChannels->getCount());
@@ -54,7 +54,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 						 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'bar', 'data' => array('sessionId' => $session->getId())));
 		$adapter->onRedisMessage(json_encode($message));
 
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter('foo', $adapter->getType());
 		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
 		$this->assertEquals($user, $streamSubscribe->getUser());
 	}
@@ -65,7 +65,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 						 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'bar', 'data' => array('sessionId' => 'foo')));
 		$adapter->onRedisMessage(json_encode($message));
 
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter('foo', $adapter->getType());
 		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('bar', $streamChannel);
 		$this->assertNull($streamSubscribe->getUser());
 	}
@@ -78,14 +78,14 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 
 		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'foo'));
 		$adapter->onRedisMessage(json_encode($message));
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter('foo', $adapter->getType());
 		$this->assertNotNull($streamChannel);
 		$streamSubscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel('foo', $streamChannel);
 		$this->assertNull($streamSubscribe);
 
 		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'bar'));
 		$adapter->onRedisMessage(json_encode($message));
-		$streamChannel = CM_Model_StreamChannel_Message::findByKey('foo', $adapter->getType());
+		$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter('foo', $adapter->getType());
 		$this->assertNull($streamChannel);
 	}
 
@@ -124,7 +124,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		/** @var $adapter CM_Stream_Adapter_Message_SocketRedis */
 		$adapter->synchronize();
 
-		$this->assertNull(CM_Model_StreamChannel_Message::findByKey('channel-foo', $adapter->getType()));
+		$this->assertNull(CM_Model_StreamChannel_Message::findByKeyAndAdapter('channel-foo', $adapter->getType()));
 		$subscribes = new CM_Paging_StreamSubscribe_AdapterType($adapter->getType());
 		$this->assertSame(0, $subscribes->getCount());
 	}
@@ -162,7 +162,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		}
 		foreach ($status as $channel => $channelData) {
 			list ($channelKey, $channelType) = explode(':', $channel);
-			$streamChannel = CM_Model_StreamChannel_Message::findByKey($channelKey, $adapter->getType());
+			$streamChannel = CM_Model_StreamChannel_Message::findByKeyAndAdapter($channelKey, $adapter->getType());
 			$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 			foreach ($channelData['subscribers'] as $clientKey => $subscriberData) {
 				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);

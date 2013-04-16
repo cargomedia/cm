@@ -2,19 +2,14 @@
 
 class CM_Response_UploadTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testUpload() {
 		$filename = 'test.jpg';
 		$content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-		$siteType = $this->_getSite()->getType();
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$request = new CM_Request_Post('/upload/' . $siteType);
+		$request = new CM_Request_Post('/upload/null');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -34,8 +29,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=CM_FormField_FileImage');
+		$request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -52,8 +46,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=CM_FormField_FileImage');
+		$request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -68,8 +61,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=CM_FormField_File');
+		$request = new CM_Request_Post('/upload/null?field=CM_FormField_File');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -84,8 +76,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=CM_FormField_FileImage');
+		$request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -100,8 +91,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=CM_FormField_File');
+		$request = new CM_Request_Post('/upload/null?field=CM_FormField_File');
 		$upload = new CM_Response_Upload($request);
 		$upload->process();
 		$data = json_decode($upload->getContent(), true);
@@ -116,8 +106,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
 		$fileTmp = CM_File::createTmp(null, $content);
 		$_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
-		$siteType = $this->_getSite()->getType();
-		$request = new CM_Request_Post('/upload/' . $siteType . '?field=nonexistent');
+		$request = new CM_Request_Post('/upload/null?field=nonexistent');
 		$upload = new CM_Response_Upload($request);
 
 		try {
