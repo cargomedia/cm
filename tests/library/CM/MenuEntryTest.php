@@ -2,13 +2,6 @@
 
 class CM_MenuEntryTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testGetters() {
 		$pageName = 'CM_Page_Mock';
 		$label = 'helloworld';
@@ -98,11 +91,12 @@ class CM_MenuEntryTest extends CMTest_TestCase {
 		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock2'), array('label' => 'Example', 'page' => 'CM_Page_Mock'));
 		return new CM_Menu($entriesData);
 	}
-
 }
 
 class CM_Page_Mock extends CM_Page_Abstract {
+
 }
 
 class CM_Page_Mock2 extends CM_Page_Abstract {
+
 }

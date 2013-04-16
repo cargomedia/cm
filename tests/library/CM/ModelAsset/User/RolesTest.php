@@ -6,9 +6,6 @@ class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 	const ROLE_B = 11;
 	const ROLE_C = 12;
 
-	public static function setUpBeforeClass() {
-	}
-
 	protected function tearDown() {
 		CMTest_TH::clearEnv();
 	}

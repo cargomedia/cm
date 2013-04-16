@@ -2,10 +2,6 @@
 
 class CM_FormField_TextTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testRender() {
 		$form = $this->getMockForm();
 		$field = new CM_FormField_Text('foo');
@@ -15,7 +11,6 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 			'<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
 					$form->getTagAutoId($field->getName() . '-input') .
 					'" type="text" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
-
 	}
 
 	public function testRenderValue() {

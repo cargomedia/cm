@@ -18,8 +18,8 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		$mockAdapter->expects($this->any())->method('getType')->will($this->returnValue(1));
 
 		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
-		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('_getAdapter'));
-		$wowza->expects($this->any())->method('_getAdapter')->will($this->returnValue($mockAdapter));
+		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('getAdapter'));
+		$wowza->expects($this->any())->method('getAdapter')->will($this->returnValue($mockAdapter));
 		/** @var $wowza CM_Stream_Video */
 
 		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()

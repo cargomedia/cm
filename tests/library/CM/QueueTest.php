@@ -2,11 +2,8 @@
 
 class CM_QueueTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
 	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
+		parent::tearDownAfterClass();
 		CM_Cache_Redis::flush();
 	}
 
@@ -14,7 +11,7 @@ class CM_QueueTest extends CMTest_TestCase {
 		try {
 			$queue = new CM_Queue('');
 			$this->fail('No error with empty key');
-		} catch(CM_Exception_Invalid $e) {
+		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
 		}
 
@@ -39,6 +36,5 @@ class CM_QueueTest extends CMTest_TestCase {
 		$this->assertSame(array(3 => 'three'), $queue2->pop());
 		$this->assertSame(false, $queue2->pop());
 		$this->assertSame(false, $queue1->pop());
-
 	}
 }

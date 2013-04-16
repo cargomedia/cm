@@ -4,12 +4,6 @@ class CM_FileTest extends CMTest_TestCase {
 
 	protected static $_backupContent;
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-	}
-
 	protected $_testFilePath = '';
 
 	public function setUp() {

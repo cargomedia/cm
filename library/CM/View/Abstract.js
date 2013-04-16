@@ -153,10 +153,9 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Boolean} [skipTriggerRemove]
 	 */
 	remove: function(skipDomRemoval, skipTriggerRemove) {
-		this.trigger('destruct');
-		if (!skipTriggerRemove) {
-			this.trigger('remove');
-		}
+		_.each(_.clone(this.getChildren()), function(child) {
+			child.remove();
+		});
 
 		if (this.getParent()) {
 			var siblings = this.getParent().getChildren();
@@ -167,11 +166,12 @@ var CM_View_Abstract = Backbone.View.extend({
 			}
 		}
 
-		_.each(_.clone(this.getChildren()), function(child) {
-			child.remove();
-		});
-
 		delete cm.views[this.getAutoId()];
+
+		this.trigger('destruct');
+		if (!skipTriggerRemove) {
+			this.trigger('remove');
+		}
 
 		if (!skipDomRemoval) {
 			this.$el.remove();
@@ -204,7 +204,8 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	ajax: function(functionName, params, options) {
 		options = _.defaults(options || {}, {
-			'modal': false
+			'modal': false,
+			'view': this
 		});
 		params = params || {};
 		var handler = this;
@@ -220,7 +221,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.disable();
 		}
 
-		var xhr = cm.ajax('ajax', {view: this._getArray(), method: functionName, params: params}, {
+		var xhr = cm.ajax('ajax', {view: options.view._getArray(), method: functionName, params: params}, {
 			success: function(response) {
 				if (response.exec) {
 					new Function(response.exec).call(handler);
@@ -270,7 +271,8 @@ var CM_View_Abstract = Backbone.View.extend({
 			'success': function() {
 				this.popOut();
 			},
-			'modal': true
+			'modal': true,
+			'method': 'loadComponent'
 		});
 		params = params || {};
 		params.className = className;
@@ -278,7 +280,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		options.success = function(response) {
 			this._injectView(response, success);
 		};
-		return this.ajax('loadComponent', params, options);
+		return this.ajax(options.method, params, options);
 	},
 
 	/**

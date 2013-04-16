@@ -38,11 +38,30 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFindByRequest() {
-		$request = new CM_Request_Get('/test');
-		$this->assertInstanceOf(get_class(CMTest_TH::getSiteMockMatchAll()), CM_Site_Abstract::findByRequest($request));
-		// Remove site mocks from the cache and from the file system
-		CMTest_TH::clearCache();
-		CMTest_TH::clearTmp();
-		$this->assertInstanceOf(get_class(CM_Site_Abstract::factory()), CM_Site_Abstract::findByRequest($request));
+		$siteClassMatchFoo = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockFoo');
+		$siteClassMatchFoo::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
+			return '/foo' === $request->getPath();
+		}));
+
+		$siteClassMatchBar = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockBar');
+		$siteClassMatchBar::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
+			return '/bar' === $request->getPath();
+		}));
+
+		$site = $this->getMockClass('CM_Site_Abstract', array('getClassChildren'));
+		$site::staticExpects($this->any())->method('getClassChildren')->will($this->returnValue(array($siteClassMatchFoo, $siteClassMatchBar)));
+
+		$this->assertInstanceOf($siteClassMatchFoo, $site::findByRequest(new CM_Request_Get('/foo')));
+		$this->assertInstanceOf($siteClassMatchBar, $site::findByRequest(new CM_Request_Get('/bar')));
+		$this->assertInstanceOf(get_class(CM_Site_Abstract::factory()), $site::findByRequest(new CM_Request_Get('/somethingelse')));
+	}
+
+	public function testFactory() {
+		try {
+			CM_Site_Abstract::factory(9999);
+			$this->fail('Factory returned non-configured site');
+		} catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+			$this->assertContains('Site with type `9999` not configured', $ex->getMessage());
+		}
 	}
 }

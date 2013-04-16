@@ -9,21 +9,21 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 		if (!$this->getEnabled()) {
 			throw new CM_Exception('Stream is not enabled');
 		}
-		$this->_getAdapter()->startSynchronization();
+		$this->getAdapter()->startSynchronization();
 	}
 
 	public function synchronize() {
 		if (!$this->getEnabled()) {
 			throw new CM_Exception('Stream is not enabled');
 		}
-		$this->_getAdapter()->synchronize();
+		$this->getAdapter()->synchronize();
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getOptions() {
-		return $this->_getAdapter()->getOptions();
+		return $this->getAdapter()->getOptions();
 	}
 
 	/**
@@ -34,7 +34,7 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 		if (!$this->getEnabled()) {
 			return;
 		}
-		$this->_getAdapter()->publish($channel, CM_Params::encode($data));
+		$this->getAdapter()->publish($channel, CM_Params::encode($data));
 	}
 
 	/**
@@ -50,7 +50,7 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 	/**
 	 * @return CM_Stream_Adapter_Message_Abstract
 	 */
-	protected function _getAdapter() {
-		return parent::_getAdapter();
+	public function getAdapter() {
+		return parent::getAdapter();
 	}
 }

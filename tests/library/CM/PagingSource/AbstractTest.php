@@ -1,11 +1,6 @@
 <?php
 
 class CM_PagingSourceTest extends CMTest_TestCase {
-	public static function setUpBeforeClass() {
-	}
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
 
 	public function setUp() {
 		defined('TBL_TEST') || define('TBL_TEST', 'test');
@@ -18,6 +13,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
 		}
 	}
+
 	public function tearDown() {
 		CM_Db_Db::exec('DROP TABLE TBL_TEST');
 	}

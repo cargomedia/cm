@@ -13,6 +13,7 @@ class CM_Db_StatementTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 

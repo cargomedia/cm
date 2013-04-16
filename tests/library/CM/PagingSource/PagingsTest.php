@@ -18,12 +18,13 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
-		for ($i = 1; $i <=5; $i++) {
+		for ($i = 1; $i <= 5; $i++) {
 			CM_Db_Db::insert(TBL_TEST_B, array('num' => $i % 5));
 		}
 	}
 
 	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
 		CM_Db_Db::exec('DROP TABLE TBL_TEST_A');
 		CM_Db_Db::exec('DROP TABLE TBL_TEST_B');
 	}
@@ -52,7 +53,6 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 		//duplicate elimination
 		$pagingSource = new CM_PagingSource_Pagings(array($pagingA, $pagingB), true);
 		$this->assertEquals(10, $pagingSource->getCount());
-
 	}
 
 	public function testGetItems() {
@@ -76,7 +76,6 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 		$this->assertEquals(array('id' => 1, 'num' => 1), reset($items));
 		$this->assertEquals(array('id' => 3, 'num' => 3), end($items));
 		$this->assertEquals(3, count($items));
-
 	}
 }
 
