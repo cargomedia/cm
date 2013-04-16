@@ -1,15 +1,7 @@
 <?php
 
 class CM_Paging_Ip_BlockedTest extends CMTest_TestCase {
-	
-	public static function setUpBeforeClass() {	
-	}
-	
-	public static function tearDownAfterClass() {
-		
-		CM_CacheLocal::flush();
-	}
-	
+
 	public function testAdd() {
 		$ip = '127.0.0.1';
 		$ip2 = '127.0.0.2';

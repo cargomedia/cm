@@ -6,10 +6,6 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testCreate() {
 		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 		$this->assertInstanceOf('CM_Model_Splitfeature', $splitfeature);
@@ -158,6 +154,5 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 			}
 		}
 	}
-
 }
 

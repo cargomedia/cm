@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
+class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 
 	public static function setupBeforeClass() {
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `entityMock` (
@@ -13,6 +13,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 	}
 
 	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
 		CM_Db_Db::exec("DROP TABLE `entityMock`");
 	}
 
@@ -56,8 +57,8 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase{
 		$entity = $this->getMockBuilder('CM_Model_Entity_Abstract')->setMethods(array('getUser'))->disableOriginalConstructor()->getMockForAbstractClass();
 		$entity->expects($this->any())->method('getUser')->will(
 			$this->onConsecutiveCalls($this->returnValue($user),
-			$this->onConsecutiveCalls($this->returnValue($user)),
-			$this->throwException(new CM_Exception_Nonexistent()))
+				$this->onConsecutiveCalls($this->returnValue($user)),
+				$this->throwException(new CM_Exception_Nonexistent()))
 		);
 		/** @var $entity CM_Model_Entity_Abstract */
 		$this->assertTrue($entity->isOwner($user));
@@ -94,7 +95,6 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 		return (string) $this->_get('foo');
 	}
 
-
 	protected function _loadData() {
 		return CM_Db_Db::select('entityMock', array('userId', 'foo'), array('id' => $this->getId()))->fetch();
 	}
@@ -112,5 +112,4 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 	protected static function _create(array $data) {
 		return new self(CM_Db_Db::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
 	}
-
 }

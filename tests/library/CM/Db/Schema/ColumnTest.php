@@ -28,10 +28,6 @@ class CM_Db_Schema_ColumnTest extends CMTest_TestCase {
 		self::$_columnEnumWithDefault = new CM_Db_Schema_Column(CMTest_TH::getDbClient(), 'cm_db_schema_columntest', 'enumWithDefault');
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testSize() {
 		$this->assertSame(12, self::$_columnId->getSize());
 		$this->assertSame(10, self::$_columnIntNoSize->getSize()); // Default int size

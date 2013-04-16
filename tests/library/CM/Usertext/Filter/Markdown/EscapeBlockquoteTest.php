@@ -16,7 +16,7 @@ EOD;
     > blockquote
 EOD;
 		$filter = new CM_Usertext_Filter_Markdown_UnescapeBlockquote();
-		$actual = $filter->transform($text, $this->_getRender());
+		$actual = $filter->transform($text, new CM_Render());
 
 		$this->assertSame($expected, $actual);
 	}
