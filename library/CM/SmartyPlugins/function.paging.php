@@ -24,7 +24,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	}
 
 	$html = '';
-	$html .= '<div class="paging"><div class="paging-inner">';
+	$html .= '<div class="paging">';
 
 	$boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
 	$sizeMax = $size - min($boundDistMin, floor($size / 2)) - 1;
@@ -50,7 +50,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 		}
 	}
 
-	$html .= '</div></div>';
+	$html .= '</div>';
 
 	return $html;
 }
