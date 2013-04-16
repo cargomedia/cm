@@ -20,7 +20,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
 		$input.fileupload({
 			dataType: 'json',
-			url: "/upload/" + cm.options.siteId + "/?field=" + field.getClass(),
+			url: cm.getUrl('/upload/' + cm.options.siteId + '/', {'field': field.getClass()}),
 			dropZone: $dropZone,
 			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
 			singleFileUploads: false,
@@ -52,13 +52,14 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 					}
 					data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
 				} else if (data.result.error) {
-					console.log(data.result.error);
 					data.$preview.remove();
 					field.error(data.result.error.msg);
 				}
 			},
 			fail: function(e, data) {
-				data.$preview.remove();
+				if (data.$preview) {
+					data.$preview.remove();
+				}
 				if (!data.skipFailMessage) {
 					field.error('Upload error');
 				}
