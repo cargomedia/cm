@@ -308,10 +308,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$languageKeyIdList = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $name), 'id ASC')->fetchAll();
 			if (1 < count($languageKeyIdList)) {
 				$languageKeyId = array_shift($languageKeyIdList);
-				foreach($languageKeyIdList as $languageKeyIdRemove){
-					$language = new CM_Model_Language($languageKeyIdRemove);
-					$language->delete();
-				}
+				CM_Db_Db::delete(TBL_CM_LANGUAGEKEY, array('id' => $languageKeyIdList));
 			}
 
 			/** @var CM_Model_Language $language */
