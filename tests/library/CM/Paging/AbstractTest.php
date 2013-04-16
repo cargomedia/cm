@@ -330,6 +330,11 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(array(0, 4, 6, 7, 8, 9, 10), $paging->getItems());
 
 		$paging = new CM_Paging_Mock_Comparable(new CM_PagingSource_Mock(1, 5));
+		$paging->exclude(new CM_Comparable_Mock(2));
+		$expected = array(new CM_Comparable_Mock(1), new CM_Comparable_Mock(3), new CM_Comparable_Mock(4), new CM_Comparable_Mock(5));
+		$this->assertEquals($expected, $paging->getItems());
+
+		$paging = new CM_Paging_Mock_Comparable(new CM_PagingSource_Mock(1, 5));
 		$paging->exclude(array(new CM_Comparable_Mock(3), new CM_Comparable_Mock(2)));
 		$expected = array(new CM_Comparable_Mock(1), new CM_Comparable_Mock(4), new CM_Comparable_Mock(5));
 		$this->assertEquals($expected, $paging->getItems());
