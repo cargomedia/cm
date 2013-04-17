@@ -61,13 +61,6 @@ class CM_Css {
 	background-image: -ms-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
 }
-.background-color(@color) when (iscolor(@color)) and (alpha(@color) < 1) {
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
-	background-color: @color;
-}
-.background-color(@color) when not (iscolor(@color)), (iscolor(@color)) and (alpha(@color) = 1)  {
-	background-color: @color;
-}
 .box-shadow(@args...) {
 	box-shadow: @args;
 	-webkit-box-shadow: @args;
