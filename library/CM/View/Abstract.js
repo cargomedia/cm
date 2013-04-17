@@ -182,7 +182,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {CM_View_Abstract} view
 	 */
 	replaceWith: function(view) {
-		view._callbacks = this._callbacks;
+		view._events = this._events;
 		this.getParent().registerChild(view);
 		this.$el.replaceWith(view.$el);
 		this.remove(true, true);
