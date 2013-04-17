@@ -17,17 +17,18 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		var $dropZone = this.$('.dropZone');
 		var allowedExtensions = field.getOption("allowedExtensions");
 		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
+		var inProgressCount = 0;
 
 		$input.fileupload({
 			dataType: 'json',
 			url: cm.getUrl('/upload/' + cm.options.siteId + '/', {'field': field.getClass()}),
 			dropZone: $dropZone,
 			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-			singleFileUploads: false,
 			formData: function(form) {
 				return $input;
 			},
 			send: function(e, data) {
+				inProgressCount++;
 				field.error(null);
 				_.each(data.files, function(file) {
 					if (allowedExtensionsRegexp && !allowedExtensionsRegexp.test(file.name)) {
@@ -47,7 +48,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			},
 			done: function(e, data) {
 				if (data.result.success) {
-					while (field.getOption("cardinality") && field.getOption("cardinality") < field.$('.previews .preview').length) {
+					while (field.getOption("cardinality") && field.getOption("cardinality") < field.getCountUploaded()) {
 						field.$('.previews .preview').first().remove();
 					}
 					data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
@@ -63,6 +64,12 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 				if (!data.skipFailMessage) {
 					field.error('Upload error');
 				}
+			},
+			always: function (e, data) {
+				inProgressCount--;
+				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
+					field.trigger("uploadComplete");
+				}
 			}
 		});
 
@@ -75,5 +82,12 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		this.bindJquery($(document), 'drop dragover', function(e) {
 			e.preventDefault();
 		});
+	},
+
+	/**
+	 * @returns {Number}
+	 */
+	getCountUploaded: function() {
+		return this.$('.previews .preview').length;
 	}
 });
