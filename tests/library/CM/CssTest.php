@@ -166,29 +166,6 @@ EOD;
 		$this->assertSame('', $css->compile($this->_render, true));
 	}
 
-	public function testBackgroundColor() {
-		$css = <<<'EOD'
-.foo {
-	.background-color(rgba(1,1,1,0.5));
-}
-.bar {
-	.background-color(rgba(1,1,1,1));
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
-  background-color: rgba(1,1,1,0.5);
-}
-.bar {
-  background-color: #010101;
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render, true));
-	}
-
 	public function testBoxShadow() {
 		$css = <<<'EOD'
 .foo {
