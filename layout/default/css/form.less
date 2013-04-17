@@ -1,8 +1,14 @@
 .textinput {
 	.appearance(none);
-	.input_text;
-	.input_text_height;
-	.border(@colorFgBorderEmphasize2);
+	.box-sizing(border-box);
+	width: 100%;
+	height: @heightInputText;
+	overflow: hidden;
+	padding-left: 6px;
+	padding-right: 6px;
+	border-radius: 0;
+	background: @colorBg;
+	border: 1px solid @colorFgBorderEmphasize2;
 	.transition(.1s);
 
 	&:hover {
@@ -11,7 +17,10 @@
 }
 
 textarea.textinput {
-	.input_textarea;
+	height: @heightInputTextarea;
+	padding-top: 7px;
+	overflow: auto;
+	resize: vertical;
 }
 
 select {
@@ -34,13 +43,18 @@ select {
 	}
 	label.placeholder {
 		color: @color;
+		margin-top: 7px;
+
+		.CM_FormField_Textarea & {
+			margin-top: 1px;
+		}
 	}
 }
 
 .placeholder(lighten(@colorFgShy, 10));
 
 button:disabled, input:disabled {
-	.input_disabled;
+	opacity: .5;
 }
 
 button, input[type=submit], input[type=button] {
