@@ -171,6 +171,14 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param int $permission
+	 */
+	public function setPermissions($permission){
+		$permission = (int) $permission;
+		@chmod($this->getPath(), $permission);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function __toString() {
