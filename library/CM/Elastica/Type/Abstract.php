@@ -45,6 +45,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 
 		// Create new index and switch alias
 		$version = time();
+		/** @var $indexNew CM_Elastica_Type_Abstract */
 		$indexNew = new static($this->_client->getHost(), $this->_client->getPort(), $version);
 		$indexNew->create(true);
 		$indexNew->getIndex()->addAlias($this->_indexName . '.tmp');
@@ -56,7 +57,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		//$settings->setMergePolicy('merge_factor', 50);
 		$settings->setRefreshInterval('-1');
 
-		$indexNew->update();
+		$indexNew->update(null, true);
 
 		//$settings->setMergePolicy('merge_factor', $mergeFactor);
 		$settings->setRefreshInterval($refreshInterval);
@@ -76,11 +77,12 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	/**
 	 * Update the complete index
 	 *
-	 * @param mixed[] $ids               Only update given IDs
-	 * @param int     $limit             Limit query
-	 * @param int     $maxDocsPerRequest Number of docs per bulk-request
+	 * @param mixed[]      $ids               Only update given IDs
+	 * @param bool|null    $useSlave          Read data from one of the slave databases, if any
+	 * @param int          $limit             Limit query
+	 * @param int          $maxDocsPerRequest Number of docs per bulk-request
 	 */
-	public function update($ids = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
+	public function update($ids = null, $useSlave = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
 		if (is_array($ids) && empty($ids)) {
 			return;
 		}
@@ -92,7 +94,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		}
 
 		$query = $this->_getQuery($ids, $limit);
-		$result = CM_Db_Db::exec($query);
+		$result = CM_Db_Db::exec($query, null, $useSlave);
 
 		$docs = array();
 		$i = 0;
