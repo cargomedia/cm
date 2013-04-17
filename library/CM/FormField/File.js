@@ -5,50 +5,75 @@
 var CM_FormField_File = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_File',
 
-	fileUploader: null,
-	
+	events: {
+		'click .previews .deleteFile': function(e) {
+			$(e.currentTarget).closest('.preview').remove();
+		}
+	},
+
 	ready: function() {
 		var field = this;
-		
-		this.fileUploader = new qq.FileUploader({
-			element: field.$(".file-uploader").get(0),
-			action: "/upload/" + cm.options.siteId + "/?field=" + field.getClass(),
-			multiple: !field.getOption("cardinality") || field.getOption("cardinality") > 1,
-			allowedExtensions: field.getOption("allowedExtensions"),
-			template: field.$(".file-uploader").html(),
-			fileTemplate: $.trim(field.$(".previewsTemplate").html()),
-			listElement: field.$(".previews").get(0),
-			onComplete: function(id, fileName, response) {
-				var $item = field.$(".previews").children().filter(function(i) {
-					return this.qqFileId == id;
-				});
-				if (response.success) {
-					this.showMessage(null);
-					while (field.getOption("cardinality") && field.getOption("cardinality") < field.getCountUploaded()) {
-						$item.siblings().first().remove();
+		var $input = this.$('input[type="file"]');
+		var $dropZone = this.$('.dropZone');
+		var allowedExtensions = field.getOption("allowedExtensions");
+		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
+
+		$input.fileupload({
+			dataType: 'json',
+			url: cm.getUrl('/upload/' + cm.options.siteId + '/', {'field': field.getClass()}),
+			dropZone: $dropZone,
+			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+			singleFileUploads: false,
+			formData: function(form) {
+				return $input;
+			},
+			send: function(e, data) {
+				field.error(null);
+				_.each(data.files, function(file) {
+					if (allowedExtensionsRegexp && !allowedExtensionsRegexp.test(file.name)) {
+						field.error(cm.language.get('{$file} has an invalid extension. Only {$extensions} are allowed.', {file: file.name, extensions: allowedExtensions.join(', ')}));
+						file.error = true;
 					}
-					$item.html(response.success.preview + "<input type=\"hidden\" name=\"" +field.getName()+ "[]\" value=\"" +response.success.id+ "\"/>");
-				} else {
-					$item.remove();	
+				});
+				data.files = _.reject(data.files, function(file) {
+					return file.error;
+				});
+				if (_.isEmpty(data.files)) {
+					data.skipFailMessage = true;
+					return false;
 				}
-				if (field.fileUploader.getInProgress() == 0 && field.getCountUploaded() > 0) {
-					field.trigger("uploadComplete");
+				data.$preview = $('<li class="preview"><div class="template"><span class="spinner"></span></div></li>');
+				field.$('.previews').append(data.$preview);
+			},
+			done: function(e, data) {
+				if (data.result.success) {
+					while (field.getOption("cardinality") && field.getOption("cardinality") < field.$('.previews .preview').length) {
+						field.$('.previews .preview').first().remove();
+					}
+					data.$preview.html(data.result.success.preview + '<input type="hidden" name="' + field.getName() + '[]" value="' + data.result.success.id + '"/>');
+				} else if (data.result.error) {
+					data.$preview.remove();
+					field.error(data.result.error.msg);
 				}
 			},
-			showMessage: function(message) {
-				if (message && message.msg) {
-					message = message.msg;
+			fail: function(e, data) {
+				if (data.$preview) {
+					data.$preview.remove();
 				}
-				field.error(message);
+				if (!data.skipFailMessage) {
+					field.error('Upload error');
+				}
 			}
 		});
-		
-		this.$(".previews").on("click", ".deleteFile", function() {
-			$(this).closest("li").remove();
+
+		this.bindJquery($(document), 'dragenter', function() {
+			$dropZone.show();
 		});
-	},
-	
-	getCountUploaded: function() {
-		return this.$(".previews .qq-upload-success").length;
+		this.bindJquery($(document), 'drop', function() {
+			$dropZone.hide();
+		});
+		this.bindJquery($(document), 'drop dragover', function(e) {
+			e.preventDefault();
+		});
 	}
 });
