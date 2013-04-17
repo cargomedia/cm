@@ -21,7 +21,7 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 
 		$(window).bind('keydown.debugBar', function(event) {
 			if (event.which === 68) { // d Key
-				var tagName = event.srcElement.tagName.toLowerCase();
+				var tagName = event.target.tagName.toLowerCase();
 				if (tagName === 'input' || tagName === 'textarea') {
 					return;
 				}
