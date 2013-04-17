@@ -43,11 +43,6 @@ class CM_Css {
 	 */
 	public function compile(CM_Render $render, $skipCompression = null) {
 		$mixins = <<< 'EOD'
-.opacity(@opacity) when (isnumber(@opacity)) {
-	opacity: @opacity;
-	@ieOpacity = @opacity*100;
-	filter:e("alpha(opacity=@{ieOpacity})");
-}
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
 	background-image: linear-gradient(left,@color1 @pos1,@color2 @pos2);
