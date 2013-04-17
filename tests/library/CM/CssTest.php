@@ -111,28 +111,6 @@ EOD;
 		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
-	public function testOpacity() {
-		$css = <<<'EOD'
-.foo {
-	filter:hello(world);
-	.opacity(.3);
-}
-.bar {
-	.opacity(foo);
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: hello(world);
-  opacity: .3;
-  filter: alpha(opacity=30);
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertEquals($expected, $css->compile($this->_render, true));
-	}
-
 	public function testLinearGradient() {
 		//horizontal
 		$css = <<<'EOD'
