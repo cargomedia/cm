@@ -26,7 +26,7 @@ class CM_App {
 		if ($namespace) {
 			$namespace = '.' . $namespace;
 		}
-		return (int) CM_Option::getInstance()->get('cm.version' . $namespace);
+		return (int) CM_Option::getInstance()->get('app.version' . $namespace);
 	}
 
 	/**
@@ -39,14 +39,14 @@ class CM_App {
 		if ($namespace) {
 			$namespace = '.' . $namespace;
 		}
-		CM_Option::getInstance()->set('cm.version' . $namespace, $version);
+		CM_Option::getInstance()->set('app.version' . $namespace, $version);
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getReleaseStamp() {
-		return (int) CM_Option::getInstance()->get('cm.releaseStamp');
+		return (int) CM_Option::getInstance()->get('app.releaseStamp');
 	}
 
 	/**
@@ -57,7 +57,7 @@ class CM_App {
 			$releaseStamp = time();
 		}
 		$releaseStamp = (int) $releaseStamp;
-		CM_Option::getInstance()->set('cm.releaseStamp', $releaseStamp);
+		CM_Option::getInstance()->set('app.releaseStamp', $releaseStamp);
 	}
 
 	/**

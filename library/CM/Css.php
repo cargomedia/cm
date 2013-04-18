@@ -43,11 +43,6 @@ class CM_Css {
 	 */
 	public function compile(CM_Render $render, $skipCompression = null) {
 		$mixins = <<< 'EOD'
-.opacity(@opacity) when (isnumber(@opacity)) {
-	opacity: @opacity;
-	@ieOpacity = @opacity*100;
-	filter:e("alpha(opacity=@{ieOpacity})");
-}
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
 	background-image: linear-gradient(left,@color1 @pos1,@color2 @pos2);
@@ -65,13 +60,6 @@ class CM_Css {
 	background-image: -o-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -ms-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
-}
-.background-color(@color) when (iscolor(@color)) and (alpha(@color) < 1) {
-	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=rgbahex(@color),endColorstr=rgbahex(@color));
-	background-color: @color;
-}
-.background-color(@color) when not (iscolor(@color)), (iscolor(@color)) and (alpha(@color) = 1)  {
-	background-color: @color;
 }
 .box-shadow(@args...) {
 	box-shadow: @args;

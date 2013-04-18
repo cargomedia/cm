@@ -6,10 +6,7 @@ class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 	const ROLE_B = 11;
 	const ROLE_C = 12;
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
+	protected function tearDown() {
 		CMTest_TH::clearEnv();
 	}
 
@@ -39,7 +36,6 @@ class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 	}
 
 	public function testClean() {
-		CMTest_TH::clearEnv();
 		$user1 = CMTest_TH::createUser();
 		$user2 = CMTest_TH::createUser();
 		$user1->getRoles()->add(self::ROLE_A, 2000);

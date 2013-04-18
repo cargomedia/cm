@@ -19,7 +19,7 @@
 .message() {
 	color: @colorFg;
 	.border(lighten(@colorNotice, 42));
-	.background-color(lighten(@colorNotice, 48));
+	background-color: lighten(@colorNotice, 48);
 }
 
 .error() {
@@ -52,34 +52,6 @@
 .input_focus() {
 	outline: none;
 	border: 1px solid lighten(@colorNotice, 15);
-}
-
-.input_disabled() {
-	.opacity(.5);
-}
-
-.input_text() {
-	border-radius: 0;
-	padding-left: 6px;
-	padding-right: 6px;
-	background: white;
-	width: 100%;
-	overflow: hidden;
-	line-height: 14px;
-}
-
-.input_text_height() {
-	.box-sizing(border-box);
-	height: @heightInputText;
-	padding-top: (@heightInputText - 16px) / 2;
-	padding-bottom: (@heightInputText - 16px) / 2;
-}
-
-.input_textarea() {
-	.box-sizing(border-box);
-	height: @heightInputTextarea;
-	overflow: auto;
-	resize: vertical;
 }
 
 .input_button(@size) {

@@ -159,10 +159,14 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param int|null $type
 	 * @return CM_Site_Abstract
-	 * @throws CM_Exception
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
 	public static function factory($type = null) {
-		$class = self::_getClassName($type);
+		try {
+			$class = self::_getClassName($type);
+		} catch (CM_Class_Exception_TypeNotConfiguredException $ex) {
+			throw new CM_Class_Exception_TypeNotConfiguredException('Site with type `' . $type . '` not configured', null, null, CM_Exception::WARN);
+		}
 		return new $class();
 	}
 
@@ -170,7 +174,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 * @return int Site id
 	 */
 	public function getId() {
-		return static::TYPE;
+		return $this->getType();
 	}
 
 	/**
@@ -180,11 +184,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 	 */
 	public static function findByRequest(CM_Request_Abstract $request) {
 		/** @var CM_Site_Abstract $className */
-		foreach (array_reverse(self::getClassChildren()) as $className) {
+		foreach (array_reverse(static::getClassChildren()) as $className) {
 			if ($className::match($request)) {
 				return new $className();
 			}
 		}
-		throw new CM_Exception_Invalid('Cannot identify site from current request');
+		return self::factory();
 	}
 }

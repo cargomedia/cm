@@ -7,9 +7,6 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Cache_Mock->enabled = true;
 	}
 
-	public static function tearDownAfterClass() {
-	}
-
 	protected function tearDown() {
 		CM_Cache_Mock::flush();
 	}
@@ -51,6 +48,7 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 }
 
 class CM_Cache_Mock extends CM_Cache_Abstract {
+
 	protected static $_instance;
 	private $_store = array();
 

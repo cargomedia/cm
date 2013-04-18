@@ -6,11 +6,11 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	private static $_instance;
 
 	public function checkStreams() {
-		$this->_getAdapter()->checkStreams();
+		$this->getAdapter()->checkStreams();
 	}
 
 	public function synchronize() {
-		$this->_getAdapter()->synchronize();
+		$this->getAdapter()->synchronize();
 	}
 
 	/**
@@ -18,7 +18,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function stopStream(CM_Model_Stream_Abstract $stream) {
-		$this->_getAdapter()->stopStream($stream);
+		$this->getAdapter()->stopStream($stream);
 	}
 
 	/**
@@ -49,8 +49,8 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	/**
 	 * @return CM_Stream_Adapter_Video_Abstract
 	 */
-	protected function _getAdapter() {
-		return parent::_getAdapter();
+	public function getAdapter() {
+		return parent::getAdapter();
 	}
 
 	/**
@@ -65,9 +65,9 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$request = CM_Request_Abstract::getInstance();
-		$serverId = self::getInstance()->_getAdapter()->getServerId($request);
+		$serverId = self::getInstance()->getAdapter()->getServerId($request);
 
-		$channelId = self::getInstance()->_getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
+		$channelId = self::getInstance()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
 		return $channelId;
 	}
 
@@ -77,7 +77,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return bool
 	 */
 	public static function rpc_unpublish($streamName, $thumbnailCount) {
-		$adapter = self::getInstance()->_getAdapter();
+		$adapter = self::getInstance()->getAdapter();
 		$adapter->getServerId(CM_Request_Abstract::getInstance());
 		$adapter->unpublish($streamName, $thumbnailCount);
 		return true;
@@ -91,7 +91,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_subscribe($streamName, $clientKey, $start, $data) {
-		$adapter = self::getInstance()->_getAdapter();
+		$adapter = self::getInstance()->getAdapter();
 		$adapter->getServerId(CM_Request_Abstract::getInstance());
 		$adapter->subscribe($streamName, $clientKey, $start, $data);
 		return true;
@@ -103,7 +103,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @return boolean
 	 */
 	public static function rpc_unsubscribe($streamName, $clientKey) {
-		$adapter = self::getInstance()->_getAdapter();
+		$adapter = self::getInstance()->getAdapter();
 		$adapter->getServerId(CM_Request_Abstract::getInstance());
 		$adapter->unsubscribe($streamName, $clientKey);
 		return true;

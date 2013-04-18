@@ -6,10 +6,6 @@ class CM_Paging_Splitfeature_AllTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testPaging() {
 		CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 		CM_Model_Splitfeature::create(array('name' => 'bar', 'percentage' => 10));

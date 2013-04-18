@@ -3,6 +3,7 @@
 	{formField name='int' label="{translate 'Integer'}"}
 	{formField name='location' label="{translate 'Location'}"}
 	{formField name='locationSlider' label="{translate 'Radius'}"}
+	{formField name='file' label="{translate 'Upload Files'}"}
 	{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
 	{formField name='color' label="{translate 'Color'}"}
 	{formField name='set' label="{translate 'Set'}"}

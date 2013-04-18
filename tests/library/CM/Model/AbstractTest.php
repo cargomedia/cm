@@ -18,6 +18,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
+		parent::tearDownAfterClass();
 		CM_Db_Db::exec("DROP TABLE `modelMock`");
 		CM_Db_Db::exec("DROP TABLE `modelThasIsAnAssetMock`");
 	}

@@ -6,10 +6,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testCreate() {
 		$test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 		$this->assertInstanceOf('CM_Model_Splittest', $test);
@@ -120,7 +116,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
 		CMTest_TH::clearConfig();
 	}
-
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
@@ -128,8 +123,8 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 	const TYPE = 1;
 
 	/**
-	 * @param int         $fixtureId
-	 * @param string      $variationName
+	 * @param int    $fixtureId
+	 * @param string $variationName
 	 * @return bool
 	 */
 	public function isVariationFixture($fixtureId, $variationName) {
@@ -137,7 +132,7 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 	}
 
 	/**
-	 * @param  int            $fixtureId
+	 * @param  int $fixtureId
 	 * @return string
 	 */
 	public function getVariationFixture($fixtureId) {

@@ -19,7 +19,7 @@ abstract class CM_Class_Abstract {
 	/**
 	 * @param int $type
 	 * @return string
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
 	protected static function _getClassName($type = null) {
 		$config = self::_getConfig();
@@ -31,7 +31,7 @@ abstract class CM_Class_Abstract {
 		}
 		$type = (int) $type;
 		if (empty($config->types[$type])) {
-			throw new CM_Exception_Invalid('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
+			throw new CM_Class_Exception_TypeNotConfiguredException('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
 		}
 		return $config->types[$type];
 	}

@@ -6,7 +6,7 @@ class smarty_function_resourceUrlTest extends CMTest_TestCase {
 
 	public function testRender() {
 		$smarty = new Smarty();
-		$render = new CM_Render($this->_getSite());
+		$render = new CM_Render();
 		$template = $smarty->createTemplate('string:');
 		$template->assignGlobal('render', $render);
 		$this->assertSame($render->getUrlResource('layout', 'foo'), smarty_function_resourceUrl(array('path' => 'foo', 'type' => 'layout'), $template));

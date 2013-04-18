@@ -19,7 +19,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 		$streamChannels = $this->_getStreamChannels();
 		foreach ($status as $streamName => $publish) {
 			/** @var CM_Model_StreamChannel_Abstract $streamChannel */
-			$streamChannel = CM_Model_StreamChannel_Abstract::findByKey($streamName, $this->getType());
+			$streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
 			if (!$streamChannel || !$streamChannel->getStreamPublishs()->findKey($publish['clientId'])) {
 				$this->_stopClient($publish['clientId'], $publish['serverHost']);
 			}

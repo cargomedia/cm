@@ -12,10 +12,6 @@ class CM_CssTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function setUp() {
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_MockCss', true, true, true, array('getId'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
@@ -115,28 +111,6 @@ EOD;
 		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
-	public function testOpacity() {
-		$css = <<<'EOD'
-.foo {
-	filter:hello(world);
-	.opacity(.3);
-}
-.bar {
-	.opacity(foo);
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: hello(world);
-  opacity: .3;
-  filter: alpha(opacity=30);
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertEquals($expected, $css->compile($this->_render, true));
-	}
-
 	public function testLinearGradient() {
 		//horizontal
 		$css = <<<'EOD'
@@ -190,29 +164,6 @@ EOD;
 EOD;
 		$css = new CM_Css($css);
 		$this->assertSame('', $css->compile($this->_render, true));
-	}
-
-	public function testBackgroundColor() {
-		$css = <<<'EOD'
-.foo {
-	.background-color(rgba(1,1,1,0.5));
-}
-.bar {
-	.background-color(rgba(1,1,1,1));
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
-  background-color: rgba(1,1,1,0.5);
-}
-.bar {
-  background-color: #010101;
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testBoxShadow() {

@@ -2,13 +2,6 @@
 
 class CM_File_ImageTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstruct() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
 		$image = new CM_File_Image($path);
