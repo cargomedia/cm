@@ -1,5 +1,5 @@
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-boxshadow-history-svg-touch-shiv-cssclasses-teststyles-testprop-testallprops-prefixes-domprefixes
+ * Build: http://modernizr.com/download/#-history-svg-touch-shiv-cssclasses-teststyles-testprop-testallprops-prefixes-domprefixes
  */
 ;
 
@@ -211,9 +211,6 @@ window.Modernizr = (function( window, document, undefined ) {
 	};
 	tests['history'] = function() {
 		return !!(window.history && history.pushState);
-	};
-	tests['boxshadow'] = function() {
-		return testPropsAll('boxShadow');
 	};
 	tests['svg'] = function() {
 		return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
