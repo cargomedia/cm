@@ -284,6 +284,8 @@ var CM_App = CM_Class_Abstract.extend({
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 				videoWidth: '100%',
 				videoHeight: '100%',
+				defaultVideoWidth: '100%',
+				defaultVideoHeight: '100%',
 				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
