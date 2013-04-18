@@ -133,7 +133,7 @@
 
 	$.fn.floatOut = function(options) {
 		return this.each(function() {
-			if (!$(this).parents('.floatbox-layer').andSelf().data('floatbox')) {
+			if (!$(this).parents('.floatbox-layer').addBack().data('floatbox')) {
 				var floatbox = new $.floatbox(options);
 				floatbox.show($(this));
 			}
@@ -141,7 +141,7 @@
 	};
 	$.fn.floatIn = function() {
 		return this.each(function() {
-			var floatbox = $(this).parents('.floatbox-layer').andSelf().data('floatbox');
+			var floatbox = $(this).parents('.floatbox-layer').addBack().data('floatbox');
 			if (floatbox) {
 				floatbox.close();
 			}
