@@ -58,5 +58,5 @@ function smarty_function_date_timeago($params, Smarty_Internal_Template $templat
 	$print = trim($prefix . ' ' . $print . ' ' . $suffix);
 	$date = new DateTime('@' . $stamp);
 	$iso8601 = $date->format('c');
-	return '<abbr title="' . $iso8601 . '" class="' . $class . '">' . $print . '</abbr>';
+	return '<time datetime="' . $iso8601 . '" class="' . $class . '">' . $print . '</time>';
 }
