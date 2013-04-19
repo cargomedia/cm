@@ -6,31 +6,29 @@ var CM_FormField_TreeSelect = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_TreeSelect',
 
 	events: {
-		'click .unselect': 'unselect',
-		'click .selector': 'toggle',
-		'click .node': function (event) {
-			this.select($(event.currentTarget));
-		}
+		'click .selectNode': function(event) {
+			this.selectNode($(event.currentTarget));
+		},
+		'click .toggleSubtree': function(event) {
+			this.toggleSubtree($(event.currentTarget));
+		},
+		'click .toggleWindow': 'toggleWindow',
+		'click .unselectNode': 'unselectNode'
 	},
-	
+
 	$input: null,
 	$selector: null,
 	$options: null,
 	defaultSelectorLabel: null,
-	
+
 	ready: function() {
 		var handler = this;
 		this.$input = this.$('input');
 		this.$selector = this.$('.selector');
 		this.$options = this.$('.options');
 		this.defaultSelectorLabel = this.$selector.text();
-	
-		this.$('.toggle').click(function () {
-			$(this).closest('li').toggleClass('active');
-			$(this).toggleClass('active');
-		});
-	
-		this.on('change', function () {
+
+		this.on('change', function() {
 			handler.$('.selected').removeClass('selected');
 			var $item = handler.getSelectedItem();
 			if ($item.length) {
@@ -40,41 +38,49 @@ var CM_FormField_TreeSelect = CM_FormField_Abstract.extend({
 				handler.$selector.find('.label').text(handler.defaultSelectorLabel);
 			}
 		});
-	
-		this.$input.watch("disabled", function (propName, oldVal, newVal) {
+
+		this.$input.watch("disabled", function(propName, oldVal, newVal) {
 			handler.$selector.toggleClass("disabled", newVal);
 		});
-	
-		this.select(this.getSelectedItem());
+
+		this.selectNode(this.getSelectedItem());
 	},
-	
-	toggle: function() {
+
+	toggleWindow: function() {
 		this.$options.toggleModal();
 		if (this.$options.is(':visible')) {
-			this.getSelectedItem().parent().parents('.CM_FormField_TreeSelect li').addClass('active').find('> .toggle').addClass('active');
+			this.getSelectedItem().parent().parents('.CM_FormField_TreeSelect li').addClass('active').find('> .toggleSubtree').addClass('active');
 		}
 	},
-	
+
 	close: function() {
 		this.$options.toggleModalClose();
 	},
-	
+
 	/**
 	 * @param {jQuery} $selectedItem
 	 */
-	select: function($selectedItem) {
+	selectNode: function($selectedItem) {
 		this.$input.val($selectedItem ? $selectedItem.data('id') : null);
 		this.trigger('change');
 		this.close();
 	},
-	
-	unselect: function() {
+
+	/**
+	 * @param {jQuery} $toggleSubtree
+	 */
+	toggleSubtree: function($toggleSubtree) {
+		$toggleSubtree.closest('li').toggleClass('active');
+		$toggleSubtree.toggleClass('active');
+	},
+
+	unselectNode: function() {
 		this.$input.val(null);
 		this.trigger('change');
 		this.close();
 	},
-	
+
 	getSelectedItem: function() {
-		return this.$('.node[data-id="' + this.getValue()+ '"]');
+		return this.$('.node[data-id="' + this.getValue() + '"]');
 	}
 });

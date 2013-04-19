@@ -11,7 +11,7 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	events: {
 		'click .toggleDebugBar': 'toggleDebugBar',
 		'click .clearCache': 'clearCache',
-		'click .panel': function(e) {
+		'click .toggleWindow': function(e) {
 			this.toggleWindow($(e.currentTarget).data('name'));
 		}
 	},

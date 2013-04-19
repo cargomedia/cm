@@ -6,7 +6,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_File',
 
 	events: {
-		'click .previews .deleteFile': function(e) {
+		'click .deleteFile': function(e) {
 			$(e.currentTarget).closest('.preview').remove();
 		}
 	},
@@ -65,7 +65,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 					field.error('Upload error');
 				}
 			},
-			always: function (e, data) {
+			always: function(e, data) {
 				inProgressCount--;
 				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
 					field.trigger("uploadComplete");
