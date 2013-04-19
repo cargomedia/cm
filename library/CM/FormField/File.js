@@ -7,10 +7,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
 	events: {
 		'click .deleteFile': function(e) {
-			var preview = $(e.currentTarget).closest('.preview');
-			if (preview.length) {
-				preview.remove();
-			}
+			$(e.currentTarget).closest('.preview').remove();
 		}
 	},
 
