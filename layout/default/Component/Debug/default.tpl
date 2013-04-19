@@ -7,7 +7,7 @@
 	<div class="window actions">
 		{foreach $clearCacheButtons as $name => $text}
 			<p>
-				<input id="{$name}" checked="checked" type="checkbox" name="{$name}" />
+				<input class="{$name}" checked="checked" type="checkbox" name="{$name}" />
 				<label for="{$name}">{$text}</label>
 			</p>
 		{/foreach}
