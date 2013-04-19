@@ -29,7 +29,7 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	 */
 	selectIcon: function($icon) {
 		$icon.addClass('active').siblings().removeClass('active');
-		this.$('.iconMarkup').text('<span class="' + $icon.find('.label').text() + '"></span>');
+		this.$('.iconMarkup').text('<span class="icon icon-' + $icon.find('.label').text() + '"></span>');
 	},
 
 	_getShadowValue: function() {

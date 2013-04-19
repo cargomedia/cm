@@ -1,7 +1,7 @@
 <div class="debugBar clearfix">
-	<a href="javascript:;" class="panel actions" data-name="actions">{{translate 'Actions'}}</a>
+	<a href="javascript:;" class="panel actions toggleWindow" data-name="actions">{{translate 'Actions'}}</a>
 	{foreach $stats as $name => $value}
-		<a href="javascript:;" class="panel" data-name="{$name}">{$name}<span class="count"> ({$value|@count})</span></a>
+		<a href="javascript:;" class="panel toggleWindow" data-name="{$name}">{$name}<span class="count"> ({$value|@count})</span></a>
 	{/foreach}
 
 	<div class="window actions">
