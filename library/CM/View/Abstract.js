@@ -112,6 +112,9 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @return String
 	 */
 	getAutoId: function() {
+		if (!this.el.id) {
+			this.el.id = cm.getUuid();
+		}
 		return this.el.id;
 	},
 
