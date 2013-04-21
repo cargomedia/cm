@@ -47,7 +47,9 @@ class CM_Jobdistribution_JobManager extends CM_Class_Abstract {
 	 */
 	public function _handleKill($signal) {
 		foreach ($this->_children as $child) {
-			posix_kill($child, $signal);
+			// To kill worker processes, need to use SIGKILL instead of $signal
+			// Probably because GEARMAN_WORKER_NON_BLOCKING is not enabled in CM_Jobdistribution_JobWorker
+			posix_kill($child, SIGKILL);
 		}
 		exit;
 	}
