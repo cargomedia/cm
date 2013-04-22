@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
 	protected $_themes = array();
 	protected $_namespaces = array();
@@ -128,6 +128,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 		}
 	}
 
+	public function toArray() {
+		return array('type' => $this->getType());
+	}
+
 	/**
 	 * @param string $theme
 	 * @return CM_Site_Abstract
@@ -190,5 +194,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract {
 			}
 		}
 		return self::factory();
+	}
+
+	public static function fromArray(array $array) {
+		$type = (int) $array['type'];
+		return self::factory($type);
 	}
 }
