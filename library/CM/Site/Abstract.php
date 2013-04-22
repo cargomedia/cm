@@ -132,11 +132,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 		return array('type' => $this->getType());
 	}
 
-	public static function fromArray(array $array) {
-		$site = (int) $array['type'];
-		return self::factory($site);
-	}
-
 	/**
 	 * @param string $theme
 	 * @return CM_Site_Abstract
@@ -199,5 +194,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 			}
 		}
 		return self::factory();
+	}
+
+	public static function fromArray(array $array) {
+		$type = (int) $array['type'];
+		return self::factory($type);
 	}
 }
