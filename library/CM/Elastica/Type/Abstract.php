@@ -77,10 +77,10 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	/**
 	 * Update the complete index
 	 *
-	 * @param mixed[]      $ids               Only update given IDs
-	 * @param bool|null    $useSlave          Read data from one of the slave databases, if any
-	 * @param int          $limit             Limit query
-	 * @param int          $maxDocsPerRequest Number of docs per bulk-request
+	 * @param mixed[]   $ids               Only update given IDs
+	 * @param bool|null $useSlave          Read data from one of the slave databases, if any
+	 * @param int       $limit             Limit query
+	 * @param int       $maxDocsPerRequest Number of docs per bulk-request
 	 */
 	public function update($ids = null, $useSlave = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
 		if (is_array($ids) && empty($ids)) {
@@ -177,6 +177,6 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	 * @param string $id
 	 */
 	protected static function _updateItem($id) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, self::_getIdSerialized($id));
+		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
 	}
 }
