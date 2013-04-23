@@ -22,6 +22,7 @@ class CM_CacheConst {
 
 	const Usertext_Filter_BadwordRegexp = 'Usertext_Filter_BadwordRegexp';
 
+	// _fixedHeight:X
 	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
 
 	// _id:X
