@@ -14,9 +14,10 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$text = (string) $params['text'];
 	$mode = (string) $params['mode'];
 	$maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
+	$isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
 
 	$usertext = new CM_Usertext_Usertext($render);
-	$usertext->setMode($mode, $maxLength);
+	$usertext->setMode($mode, $maxLength, $isMail);
 
 	$text = $usertext->transform($text);
 
