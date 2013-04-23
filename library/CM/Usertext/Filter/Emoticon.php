@@ -2,14 +2,16 @@
 
 class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 
-	/** @var int $_fixedHeight */
-	private $_fixedHeight;
+	/** @var int|null $_fixedHeight */
+	private $_fixedHeight = null;
 
 	/**
 	 * @param int|null $fixedHeight
 	 */
 	function __construct($fixedHeight = null) {
-		$this->_fixedHeight = (int) $fixedHeight;
+		if (null !== $fixedHeight) {
+			$this->_fixedHeight = (int) $fixedHeight;
+		}
 	}
 
 	public function transform($text, CM_Render $render) {
@@ -24,10 +26,13 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 * @return array
 	 */
 	private function _getEmoticonData(CM_Render $render) {
-		$cacheKey = CM_CacheConst::Usertext_Filter_EmoticonList . '_fixedHeight:' . $this->_fixedHeight;
+		$cacheKey = CM_CacheConst::Usertext_Filter_EmoticonList . '_fixedHeight:' . (string) $this->_fixedHeight;
 		if (($emoticons = CM_CacheLocal::get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'htmls' => array());
-			$fixedHeight = $this->_fixedHeight ? ' height="' . $this->_fixedHeight . '"' : null;
+			$fixedHeight = '';
+			if (null !== $this->_fixedHeight) {
+				$fixedHeight = ' height="' . $this->_fixedHeight . '"';
+			}
 			foreach (new CM_Paging_Emoticon_All() as $emoticon) {
 				foreach ($emoticon['codes'] as $code) {
 					$emoticons['codes'][] = $code;
