@@ -13,7 +13,7 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 		$value = $value ? array($value) : null;
 		parent::setValue($value);
 	}
-	
+
 	/**
 	 * @param string $userInput
 	 * @return string|null

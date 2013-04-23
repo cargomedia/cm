@@ -10,70 +10,87 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var prePopulate = this.$(".prePopulate");
 		prePopulate = prePopulate.length ? JSON.parse(prePopulate.val()) : null;
 		var $input = this.$('input[type="text"]');
-		$input.tokenInput(
-			function (query, handle_results) {
-				field.ajax('getSuggestions', {'term':query, 'options':field.getOptions()}, {
+
+		$input.select2({
+			tags: null,
+			allowClear: true,
+			maximumSelectionSize: field.getOption("cardinality") + 1,
+			formatResult: this.getItem,
+			formatSelection: this.getItemSelected,
+			escapeMarkup: function(item) {
+				return item;
+			},
+			query: function(options) {
+				var _options = options;
+				field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
 					success: function(results) {
-						handle_results(query, results);
+						_options.callback({
+							results: results
+						});
 					}
 				});
-			},{
-			resultsFormatter: function(item){
-				var output = "<p>" + item.name + "</p>";
-				if (item.description) {
-					output += "<small>" + item.description + "</small>";
+			},
+			createSearchChoice: function(term, data) {
+				if(field.getOption("enableChoiceCreate")){
+					if ($(data).filter(function() {
+						return this.name.localeCompare(term) === 0;
+					}).length === 0) {
+						return {id: term, name: term, new: 1};
+					}
 				}
-				if (item.img) {
-					output = "<img src=\"" + item.img + "\" />" + output;
-				}
-				return "<li>" + output + "</li>";
-			},
-			tokenFormatter: function(item) {
-				var output = "<p>" + item.name + "</p>";
-				if (item.img) {
-					output = "<img src=\"" + item.img + "\" />" + output;
-				}					
-				return "<li>" + output + "</li>";
-			},
-			onAdd: function(item) {
-				field.onAdd(item);
-				field.onChange($input.tokenInput("get"));
-				field.trigger('add', item);
-			},
-			onDelete: function(item) {
-				field.onDelete(item);
-				field.onChange($input.tokenInput("get"));
-				field.trigger('delete', item);
-			},
-			animateDropdown: false,
-			preventDuplicates: true,
-			hintText: null,
-			deleteText: '',
-			searchDelay: 0,
-			tokenLimit: field.getOption("cardinality"),
-			prePopulate: prePopulate,
-			classes: {
-				tokenDelete: 'token-input-delete-token icon-close',
-				focused: 'focus'
 			}
+		}).select2('data', prePopulate);
+
+		$input.on("change", function(e) {
+			if (!_.isUndefined(e.added)) {
+				field.onAdd(e.added);
+				field.trigger('add', e.added);
+			}
+			if (!_.isUndefined(e.removed)) {
+				field.onAdd(e.removed);
+				field.trigger('delete', e.removed);
+			}
+			field.onChange($input.select2("data"));
 		});
-		this.getForm().$().bind("reset", function() {
-			$input.tokenInput("clear");
-		});
+
 		if (this.getOption("cardinality") == 1) {
-			this.$(".token-input-list").click(function() {
-				$input.tokenInput("clear");
+			$input.on("open", function(e) {
+				$input.select2('data', null);
 			});
 		}
-		this.onChange($input.tokenInput("get"));
+
+		this.getForm().$().bind("reset", function() {
+			$input.select2('data', null);
+		});
+
+		this.onChange($input.select2("data"));
 	},
-	
+
+	getItem: function(item) {
+		var output = _.escape(item.name);
+		if (item.description) {
+			output += "<small>" + _.escape(item.description) + "</small>";
+		}
+		if (item.img) {
+			output = "<img src=\"" + item.img + "\" /> " + output;
+		}
+		return output;
+	},
+
+	getItemSelected: function(item) {
+		var output = _.escape(item.name);
+		if (item.img) {
+			output = "<img src=\"" + item.img + "\" /> " + output;
+		}
+		return output;
+	},
+
 	onAdd: function(item) {
 	},
-	
+
 	onDelete: function(item) {
 	},
-	
+
 	onChange: function(items) {
 	}
 });
