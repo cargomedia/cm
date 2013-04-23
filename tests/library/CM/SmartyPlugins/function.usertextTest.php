@@ -16,6 +16,10 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 		$this->_template->assignGlobal('render', $render);
 	}
 
+	public function tearDown() {
+		CMTest_TH::clearEnv();
+	}
+
 	public function testModeOneline() {
 		$this->_assertSame('<span class="usertext oneline">foo</span>', array('text' => 'foo', 'mode' => 'oneline'));
 	}
@@ -60,6 +64,15 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertSame('Invalid mode `foo`', $ex->getMessage());
 		}
+	}
+
+	public function testIsMail() {
+		$emoticonId = CM_Db_Db::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
+
+		$this->_assertSame(
+			'<span class="usertext oneline">foo <img src="http://www.default.dev/layout//0/img/emoticon/1.png" class="emoticon emoticon-' .
+					$emoticonId . '" title=":smiley:" height="16" /></span>',
+			array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));
 	}
 
 	private function _assertSame($expected, array $params) {
