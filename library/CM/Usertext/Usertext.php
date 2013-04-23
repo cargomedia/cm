@@ -23,11 +23,12 @@ class CM_Usertext_Usertext {
 	}
 
 	/**
-	 * @param string   $mode
-	 * @param int|null $maxLength
+	 * @param string    $mode
+	 * @param int|null  $maxLength
+	 * @param bool|null $isMail
 	 * @throws CM_Exception_Invalid
 	 */
-	public function setMode($mode, $maxLength = null) {
+	public function setMode($mode, $maxLength = null, $isMail = null) {
 		$acceptedModes = array('oneline', 'simple', 'markdown', 'markdownPlain');
 		if (!in_array($mode, $acceptedModes)) {
 			throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
@@ -61,7 +62,13 @@ class CM_Usertext_Usertext {
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 				break;
 		}
-		$this->addFilter(new CM_Usertext_Filter_Emoticon());
+
+		$fixedHeight = null;
+		if ($isMail) {
+			$fixedHeight = 16;
+		}
+		$this->addFilter(new CM_Usertext_Filter_Emoticon($fixedHeight));
+
 		if ('markdownPlain' != $mode) {
 			$this->addFilter(new CM_Usertext_Filter_CutWhitespace());
 		}
@@ -73,7 +80,7 @@ class CM_Usertext_Usertext {
 	 */
 	public function transform($text) {
 		$cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
-		if (0 !== count($this->_getFilters())){
+		if (0 !== count($this->_getFilters())) {
 			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
 		}
 		if (($result = CM_CacheLocal::get($cacheKey)) === false) {
