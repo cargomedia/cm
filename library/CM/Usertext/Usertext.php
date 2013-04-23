@@ -63,11 +63,11 @@ class CM_Usertext_Usertext {
 				break;
 		}
 
-		$fixedHeight = null;
+		$emoticonFixedHeight = null;
 		if ($isMail) {
-			$fixedHeight = 16;
+			$emoticonFixedHeight = 16;
 		}
-		$this->addFilter(new CM_Usertext_Filter_Emoticon($fixedHeight));
+		$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 
 		if ('markdownPlain' != $mode) {
 			$this->addFilter(new CM_Usertext_Filter_CutWhitespace());
