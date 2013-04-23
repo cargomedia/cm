@@ -11,7 +11,7 @@ class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
 			'1' => array('type' => 'integer'),
 			'2' => array('type' => 'integer'),
 			'3' => array('type' => 'integer'),
-			'4' => array('type' => 'integer'),			
+			'4' => array('type' => 'integer'),
 		)),
 		'name' => array('type' => 'string', 'analyzer' => 'lw'),
 		'coordinates' => array('type' => 'geo_point'),
@@ -34,7 +34,7 @@ class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
 	);
 
 	protected function _getQuery($ids = null, $limit = null) {
-		$query = 'SELECT * FROM `cm_tmp_location`';
+		$query = 'SELECT * FROM TBL_CM_TMP_LOCATION';
 		if (($limit = (int) $limit) > 0) {
 			$query .= ' LIMIT ' . $limit;
 		}
@@ -50,14 +50,14 @@ class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
 				'1' => $data['1Id'],
 				'2' => $data['2Id'],
 				'3' => $data['3Id'],
-				'4' => $data['4Id'],		
+				'4' => $data['4Id'],
 			),
 		));
 
 		if (isset($data['lat']) && isset($data['lon'])) {
-			$doc->addGeoPoint('coordinates', $data['lat'], $data['lon']);	
+			$doc->addGeoPoint('coordinates', $data['lat'], $data['lon']);
 		}
-		
+
 		return $doc;
 	}
 
