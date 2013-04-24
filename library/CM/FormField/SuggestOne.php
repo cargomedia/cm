@@ -15,7 +15,8 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 	}
 
 	/**
-	 * @param string $userInput
+	 * @param string               $userInput
+	 * @param CM_Response_Abstract $response
 	 * @return string|null
 	 */
 	public function validate($userInput, CM_Response_Abstract $response) {
