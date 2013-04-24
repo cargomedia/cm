@@ -115,11 +115,11 @@ class CM_Model_Location extends CM_Model_Abstract {
 			return null;
 		}
 
-		$pi80 = M_PI / 180;
-		$currentCoordinates['lat'] *= $pi80;
-		$currentCoordinates['lon'] *= $pi80;
-		$againstCoordinates['lat'] *= $pi80;
-		$againstCoordinates['lon'] *= $pi80;
+		$pi180 = M_PI / 180;
+		$currentCoordinates['lat'] *= $pi180;
+		$currentCoordinates['lon'] *= $pi180;
+		$againstCoordinates['lat'] *= $pi180;
+		$againstCoordinates['lon'] *= $pi180;
 
 		$earthRadius = 6371009;
 		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
