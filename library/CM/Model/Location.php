@@ -103,6 +103,31 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return null;
 	}
 
+	/**
+	 * @param CM_Model_Location $location
+	 * @return int|null
+	 */
+	public function getDistance(CM_Model_Location $location) {
+		$currentCoordinates = $this->getCoordinates();
+		$againstCoordinates = $location->getCoordinates();
+
+		if (!$currentCoordinates || !$againstCoordinates) {
+			return null;
+		}
+
+		$pi180 = M_PI / 180;
+		$currentCoordinates['lat'] *= $pi180;
+		$currentCoordinates['lon'] *= $pi180;
+		$againstCoordinates['lat'] *= $pi180;
+		$againstCoordinates['lon'] *= $pi180;
+
+		$earthRadius = 6371009;
+		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
+				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
+
+		return (int) round($earthRadius * $arcCosine);
+	}
+
 	protected function _loadData() {
 		switch ($this->getLevel()) {
 			case self::LEVEL_ZIP:
