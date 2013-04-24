@@ -123,6 +123,15 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testGetDistance() {
+		$winterthur = (int) CM_Db_Db::select(TBL_CM_LOCATIONCITY,'id', array('name' => 'Winterthur'))->fetchColumn();
+		$basel = (int) CM_Db_Db::select(TBL_CM_LOCATIONCITY,'id', array('name' => 'Basel'))->fetchColumn();
+		$location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $basel);
+		$locationAgainst = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $winterthur);
+
+		$this->assertSame(86744, $location->getDistance($locationAgainst));
+	}
+
 	public function testFindByIp() {
 		$cityId1 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCITY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
