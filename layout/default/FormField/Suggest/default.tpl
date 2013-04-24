@@ -1,4 +1,4 @@
-<input type="text" class="{$class}" name="{$name}" />
+<input type="text" class="inputSuggest {$class}" name="{$name}" />
 {if $value}
 	{foreach $value as $valueItem}
 		{$prePopulate[] = $field->getSuggestion($valueItem, $render)}
