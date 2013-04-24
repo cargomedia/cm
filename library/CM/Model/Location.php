@@ -122,13 +122,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$againstCoordinates['lon'] *= $pi80;
 
 		$earthRadius = 6372797;
-		$deltalat = $currentCoordinates['lat'] - $againstCoordinates['lat'];
-		$deltalong = $currentCoordinates['lon'] - $againstCoordinates['lon'];
-		$a = sin($deltalat / 2) * sin($deltalat / 2) +
-				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * sin($deltalong / 2) * sin($deltalong / 2);
-		$arcTangent = 2 * atan2(sqrt($a), sqrt(1 - $a));
+		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
+				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
 
-		return (int) round($earthRadius * $arcTangent);
+		return (int) round($earthRadius * $arcCosine);
 	}
 
 	protected function _loadData() {
