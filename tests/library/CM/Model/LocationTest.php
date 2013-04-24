@@ -129,7 +129,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $basel);
 		$locationAgainst = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $winterthur);
 
-		$this->assertSame(86744, $location->getDistance($locationAgainst));
+		$this->assertSame(86720, $location->getDistance($locationAgainst));
 	}
 
 	public function testFindByIp() {

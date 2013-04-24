@@ -121,7 +121,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$againstCoordinates['lat'] *= $pi80;
 		$againstCoordinates['lon'] *= $pi80;
 
-		$earthRadius = 6372797;
+		$earthRadius = 6371009;
 		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
 				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
 
