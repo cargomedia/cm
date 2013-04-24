@@ -31,7 +31,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				});
 			},
 			createSearchChoice: function(term, data) {
-				if(field.getOption("enableChoiceCreate")){
+				if (field.getOption("enableChoiceCreate")) {
 					if ($(data).filter(function() {
 						return this.name.localeCompare(term) === 0;
 					}).length === 0) {
