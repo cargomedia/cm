@@ -40,15 +40,15 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				}
 			},
 			formatSelectionTooBig: null
-		}).select2('data', this.getValue());
+		}).select2('data', this._getPrePopulateValue());
 
 		this.input.on("change", function(e) {
 			if (!_.isUndefined(e.added)) {
 				var items = field.input.select2("data");
-				if (cardinality &&  items.length > cardinality) {
+				if (cardinality && items.length > cardinality) {
 					items.pop();
 					field.input.select2('data', items);
-					field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality':cardinality}), 2000);
+					field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
 					return false;
 				}
 				field.onAdd(e.added);
@@ -63,7 +63,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 
 		if (1 == cardinality) {
 			this.input.on("open", function(e) {
-				console.log("open");
 				field.input.select2('data', null);
 			});
 		}
@@ -75,23 +74,39 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		this.onChange(this.input.select2("data"));
 	},
 
-	getValue: function() {
-		var prePopulate = this.input.attr('data-prePopulate');
-		if (prePopulate) {
-			prePopulate = prePopulate.length ? JSON.parse(prePopulate) : null;
-		}
-		return prePopulate;
-	},
-
+	/**
+	 * @param {Object} item
+	 */
 	onAdd: function(item) {
 	},
 
+	/**
+	 * @param {Object} item
+	 */
 	onDelete: function(item) {
 	},
 
+	/**
+	 * @param {Object[]} items
+	 */
 	onChange: function(items) {
 	},
 
+	/**
+	 * @return {Object[]|null}
+	 */
+	_getPrePopulateValue: function() {
+		var prePopulate = this.input.attr('data-prePopulate');
+		if (prePopulate && prePopulate.length) {
+			return JSON.parse(prePopulate);
+		}
+		return null;
+	},
+
+	/**
+	 * @param {Object} item
+	 * @return String
+	 */
 	_formatItem: function(item) {
 		var output = _.escape(item.name);
 		if (item.description) {
@@ -103,6 +118,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		return output;
 	},
 
+	/**
+	 * @param {Object} item
+	 * @return String
+	 */
 	_formatItemSelected: function(item) {
 		var output = _.escape(item.name);
 		if (item.img) {
