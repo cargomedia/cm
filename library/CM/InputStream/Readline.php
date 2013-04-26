@@ -3,6 +3,9 @@
 class CM_InputStream_Readline extends CM_InputStream_Abstract {
 
 	public function __construct() {
+		if (!extension_loaded('readline')) {
+			throw new CM_Exception('`readline` extension is not loaded.');
+		}
 		$this->_outputStream = new CM_OutputStream_Stream_StandardError();
 	}
 
