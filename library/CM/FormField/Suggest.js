@@ -5,14 +5,15 @@
 var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_Suggest',
 
-	input: null,
+	$input: null,
 
 	ready: function() {
 		var field = this;
 		var cardinality = this.getOption("cardinality");
-		this.input = this.$('input[type="text"]');
+		this.$input = this.$('input[type="text"]');
+		this.$input.removeClass('textInput');
 
-		this.input.select2({
+		this.$input.select2({
 			tags: null,
 			allowClear: true,
 			maximumSelectionSize: cardinality,
@@ -42,12 +43,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			formatSelectionTooBig: null
 		}).select2('data', this._getPrePopulateValue());
 
-		this.input.on("change", function(e) {
+		this.$input.on("change", function(e) {
 			if (!_.isUndefined(e.added)) {
-				var items = field.input.select2("data");
+				var items = field.$input.select2("data");
 				if (cardinality && items.length > cardinality) {
 					items.pop();
-					field.input.select2('data', items);
+					field.$input.select2('data', items);
 					field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
 					return false;
 				}
@@ -58,20 +59,20 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				field.onDelete(e.removed);
 				field.trigger('delete', e.removed);
 			}
-			field.onChange(field.input.select2("data"));
+			field.onChange(field.$input.select2("data"));
 		});
 
 		if (1 == cardinality) {
-			this.input.on("open", function(e) {
-				field.input.select2('data', null);
+			this.$input.on("open", function(e) {
+				field.$input.select2('data', null);
 			});
 		}
 
 		this.getForm().$().bind("reset", function() {
-			field.input.select2('data', null);
+			field.$input.select2('data', null);
 		});
 
-		this.onChange(this.input.select2("data"));
+		this.onChange(this.$input.select2("data"));
 	},
 
 	/**
@@ -96,7 +97,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	 * @return {Object[]|null}
 	 */
 	_getPrePopulateValue: function() {
-		var prePopulate = this.input.attr('data-prePopulate');
+		var prePopulate = this.$input.attr('data-prePopulate');
 		if (prePopulate && prePopulate.length) {
 			return JSON.parse(prePopulate);
 		}
