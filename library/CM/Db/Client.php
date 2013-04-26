@@ -153,7 +153,11 @@ class CM_Db_Client {
 	public function isConnectionLossError(PDOException $exception) {
 		$sqlState = $exception->errorInfo[0];
 		$driverCode = $exception->errorInfo[1];
-		$driverMessage = $exception->errorInfo[2];
+		$driverMessage = '';
+		if (isset($exception->errorInfo[2])) {
+			$driverMessage = $exception->errorInfo[2];
+		}
+
 		if (
 			(1053 === $driverCode && false !== stripos($driverMessage, 'Server shutdown in progress')) ||
 			(1317 === $driverCode && false !== stripos($driverMessage, 'Query execution was interrupted')) ||
