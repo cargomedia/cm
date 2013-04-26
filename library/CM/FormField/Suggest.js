@@ -115,13 +115,19 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	 * @return String
 	 */
 	_formatItem: function(item) {
-		var output = _.escape(item.name);
+		var cssClass = 'suggestItem';
+		if (item.class) {
+			cssClass += ' ' + item.class;
+		}
+		var output = '<div class="' + cssClass + '">';
+		if (item.img) {
+			output += '<img src="' + item.img + '" /> ';
+		}
+		output += _.escape(item.name);
 		if (item.description) {
 			output += '<small>' + _.escape(item.description) + '</small>';
 		}
-		if (item.img) {
-			output = '<img src="' + item.img + '" /> ' + output;
-		}
+		output += '</div>';
 		return output;
 	},
 
