@@ -93,6 +93,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	onChange: function(items) {
 	},
 
+	blur: function() {
+		this.setTimeout(function() {
+			this.$('input.select2-input').blur();
+		}, 10);
+	},
+
 	/**
 	 * @return {Object[]|null}
 	 */
