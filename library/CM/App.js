@@ -247,7 +247,11 @@ var CM_App = CM_Class_Abstract.extend({
 			var messages = _.toArray(arguments);
 			messages.unshift('[CM]');
 			if (console && console.log) {
-				console.log.apply(console, messages);
+				var log = console.log;
+				if (typeof log == "object" && Function.prototype.bind) {
+					log = Function.prototype.bind.call(console.log, console);
+				}
+				log.apply(console, messages);
 			}
 		}
 	},
