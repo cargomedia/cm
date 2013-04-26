@@ -125,7 +125,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		}
 		output += '<span class="suggestItem-name">' + _.escape(item.name) + '</span>';
 		if (item.description) {
-			output += '<small>' + _.escape(item.description) + '</small>';
+			output += '<small class="suggestItem-description">' + _.escape(item.description) + '</small>';
 		}
 		output += '</div>';
 		return output;
