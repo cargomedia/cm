@@ -167,6 +167,22 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 		CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1', 'adapterType' => 2));
 	}
+
+	public function testEncryptAndDecryptKey() {
+		$data = 'foo ';
+		$encryptionKey = 'qwertyuiopasdfghjk';
+		$encryptMethod = new ReflectionMethod('CM_Model_StreamChannel_Abstract', '_encryptKey');
+		$encryptMethod->setAccessible(true);
+		$encryptedData = $encryptMethod->invoke(null, $data, $encryptionKey);
+		$this->assertNotSame(false, base64_decode($encryptedData, true), 'Encrypted data is not valid base64 string');
+
+		$streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Abstract')->setMethods(array('getKey'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$streamChannel->expects($this->any())->method('getKey')->will($this->returnValue($encryptedData));
+		$decryptMethod = new ReflectionMethod('CM_Model_StreamChannel_Abstract', '_decryptKey');
+		$decryptMethod->setAccessible(true);
+		$decryptedData = $decryptMethod->invoke($streamChannel, $encryptionKey);
+		$this->assertSame($data, $decryptedData);
+	}
 }
 
 class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {

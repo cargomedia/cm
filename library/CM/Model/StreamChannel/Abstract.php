@@ -136,7 +136,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	 * @return string Data
 	 */
 	protected function _decryptKey($encryptionKey) {
-		return mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB);
+		return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB), "\0");
 	}
 
 	/**
