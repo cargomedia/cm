@@ -11,7 +11,7 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
 			}
 		}
 		if (!$file) {
-			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`');
+			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`', null, null, CM_Exception::WARN);
 		}
 		$this->enableCache();
 		$this->setHeader('Content-Type', $file->getMimeType());
