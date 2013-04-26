@@ -11,7 +11,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var field = this;
 		var cardinality = this.getOption("cardinality");
 		this.$input = this.$('input[type="text"]');
-		this.$input.removeClass('textInput');
+		this.$input.removeClass('textinput');
 
 		this.$input.select2({
 			tags: null,
