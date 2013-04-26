@@ -2,14 +2,23 @@
 	display: block;
 }
 
-.select2-container .select2-choices {
-	.textinput;
-	min-height: @heightInputText;
-}
+.select2-container {
 
-.select2-container-multi.select2-container-active .select2-choices {
-	.input_focus;
-	.box-shadow(none);
+	&.select2-container-active {
+		.input_focus;
+
+		.select2-choices {
+			border: none;
+			.box-shadow(none);
+			background: none;
+		}
+	}
+
+	.select2-choices {
+		border: none;
+		.box-shadow(none);
+		background: none;
+	}
 }
 
 .select2-drop {
@@ -36,11 +45,13 @@
 .select2-container .select2-choice abbr {
 	background: image('select2/select2.png') right top no-repeat;
 }
+
 .select2-container .select2-choice div b {
 	background: image('select2/select2.png') no-repeat 0 1px;
 }
+
 .select2-search input {
-	background: #fff image('select2/select2.png') no-repeat 100% -22px;
+	background: transparent image('select2/select2.png') no-repeat 100% -22px;
 	background: image('select2/select2.png') no-repeat 100% -22px, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, white), color-stop(0.99, #eeeeee));
 	background: image('select2/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, white 85%, #eeeeee 99%);
 	background: image('select2/select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, white 85%, #eeeeee 99%);
@@ -48,8 +59,9 @@
 	background: image('select2/select2.png') no-repeat 100% -22px, -ms-linear-gradient(top, #ffffff 85%, #eeeeee 99%);
 	background: image('select2/select2.png') no-repeat 100% -22px, linear-gradient(top, #ffffff 85%, #eeeeee 99%);
 }
+
 .select2-search input.select2-active {
-	background: @colorBg image('spinner.svg') no-repeat 100%;
+	background: transparent image('spinner.svg') no-repeat 100%;
 	background: image('spinner.svg') no-repeat 100%, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, white), color-stop(0.99, #eeeeee));
 	background: image('spinner.svg') no-repeat 100%, -webkit-linear-gradient(center bottom, white 85%, #eeeeee 99%);
 	background: image('spinner.svg') no-repeat 100%, -moz-linear-gradient(center bottom, white 85%, #eeeeee 99%);
@@ -58,30 +70,33 @@
 	background: image('spinner.svg') no-repeat 100%, linear-gradient(top, #ffffff 85%, #eeeeee 99%);
 
 	html.no-svg & {
-		background: @colorBg image('spinner.gif') no-repeat 100%;
+		background: transparent image('spinner.gif') no-repeat 100%;
 	}
 }
+
 .select2-more-results.select2-active {
-	background: #f4f4f4 image('spinner.svg') no-repeat 100%;
+	background: transparent image('spinner.svg') no-repeat 100%;
 
 	html.no-svg & {
-		background: #f4f4f4 image('spinner.gif') no-repeat 100%
+		background: transparent image('spinner.gif') no-repeat 100%
 	}
 }
+
 .select2-search-choice-close {
 	background: image('select2/select2.png') right top no-repeat;
 }
+
 .select2-container-multi .select2-choices .select2-search-field input.select2-active {
-	background: @colorBg image('spinner.svg') no-repeat 100% !important;
+	background: transparent image('spinner.svg') no-repeat 100% !important;
 
 	html.no-svg & {
-		background: @colorBg image('spinner.gif') no-repeat 100% !important;
+		background: transparent image('spinner.gif') no-repeat 100% !important;
 
 	}
 }
 
 /* Retina-ize icons */
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-resolution: 144dpi)  {
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-resolution: 144dpi) {
 	.select2-search input, .select2-search-choice-close, .select2-container .select2-choice abbr, .select2-container .select2-choice div b {
 		background-image: image('select2/select2x2.png') !important;
 	}
