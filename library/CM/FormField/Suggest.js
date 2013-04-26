@@ -120,7 +120,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		}
 		var output = '<div class="' + cssClass + '">';
 		if (item.img) {
-			output += '<img src="' + item.img + '" /> ';
+			output += '<div class="suggestItem-image"><img src="' + item.img + '" /></div>';
 		}
 		output += '<span class="suggestItem-name">' + _.escape(item.name) + '</span>';
 		if (item.description) {
@@ -137,7 +137,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	_formatItemSelected: function(item) {
 		var output = _.escape(item.name);
 		if (item.img) {
-			output = '<img src="' + item.img + '" /> ' + output;
+			output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
 		}
 		return output;
 	}

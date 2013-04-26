@@ -101,3 +101,50 @@
 		background-image: image('select2/select2x2.png') !important;
 	}
 }
+
+.suggestItem {
+	position: relative;
+	min-height: 16px;
+	padding-left: 18px;
+
+	.suggestItem-image {
+		height: 16px;
+		width: 16px;
+		position: absolute;
+		left: -2px;
+		top: 0;
+		vertical-align: top;
+		text-align: right;
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+		}
+	}
+
+	.suggestItem-name {
+		display: block;
+		font-weight: bold;
+	}
+
+	.suggestItem-description {
+		display: block;
+	}
+}
+
+.select2-choices {
+
+	.suggestItem-image {
+		width: 12px;
+		height: 12px;
+		line-height: 12px;
+		display: inline-block;
+		margin-right: 3px;
+		vertical-align: middle;
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+		}
+	}
+}
