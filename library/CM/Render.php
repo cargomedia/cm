@@ -383,7 +383,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterDate() {
 		if (!$this->_formatterDate) {
-			$this->_formatterDate = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+			$this->_formatterDate = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 		}
 		return $this->_formatterDate;
 	}
@@ -393,7 +393,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterDateTime() {
 		if (!$this->_formatterDateTime) {
-			$this->_formatterDateTime = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+			$this->_formatterDateTime = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
 		}
 		return $this->_formatterDateTime;
 	}
@@ -403,7 +403,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterCurrency() {
 		if (!$this->_formatterCurrency) {
-			$this->_formatterCurrency = new NumberFormatter($this->_getLocale(), NumberFormatter::CURRENCY);
+			$this->_formatterCurrency = new NumberFormatter($this->getLocale(), NumberFormatter::CURRENCY);
 		}
 		return $this->_formatterCurrency;
 	}
@@ -418,7 +418,7 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @return string
 	 */
-	private function _getLocale() {
+	public function getLocale() {
 		$locale = 'en';
 		if ($this->getLanguage()) {
 			$locale = $this->getLanguage()->getAbbreviation();
