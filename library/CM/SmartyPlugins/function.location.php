@@ -9,7 +9,7 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	/** @var CM_Model_Location $location */
 	$location = $params['location'];
 	$showLink = !empty($params['link']);
-	$distance = isset($params['distanceFrom']) ? $location->getDistance($params['distanceFrom']) : null;
+	$distanceFrom = isset($params['distanceFrom']) ? $location->getDistance($params['distanceFrom']) : null;
 
 	$parts = array();
 	/** @var CM_Render $render */
@@ -51,10 +51,9 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 				'" />';
 	}
 
-	if (null !== $distance && $distance < 100 * 1000) {
-		$html .= ' <small class="distance" title="' . $render->getTranslation('Distance from your location: ') .
-				smarty_function_distance(array('distance' => $distance), $template) . '">' .
-				smarty_function_distance(array('distance' => $distance), $template) . '</small>';
+	if (null !== $distanceFrom && $distanceFrom < 100 * 1000) {
+		$distance = smarty_function_distance(array('distance' => $distanceFrom), $template);
+		$html .= ' <small class="distance" title="' . $render->getTranslation('Distance from your location: ') . $distance . '">' . $distance . '</small>';
 	}
 
 	return $html;
