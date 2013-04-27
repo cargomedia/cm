@@ -33,6 +33,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
+		$this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
