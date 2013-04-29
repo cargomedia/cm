@@ -16,6 +16,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
+			openOnEnter: false,
 			maximumSelectionSize: cardinality,
 			formatResult: this._formatItem,
 			formatSelection: this._formatItemSelected,
