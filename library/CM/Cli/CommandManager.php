@@ -53,6 +53,7 @@ class CM_Cli_CommandManager {
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
 		$helpHeader .= ' --quiet' . PHP_EOL;
+		$helpHeader .= ' --quiet-warnings' . PHP_EOL;
 		$helpHeader .= ' --non-interactive' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
@@ -69,7 +70,7 @@ class CM_Cli_CommandManager {
 	}
 
 	/**
-	 * @param CM_Cli_Arguments    $arguments
+	 * @param CM_Cli_Arguments $arguments
 	 * @return int
 	 */
 	public function run(CM_Cli_Arguments $arguments) {
@@ -99,19 +100,22 @@ class CM_Cli_CommandManager {
 			}
 			return 1;
 		} catch (Exception $e) {
-			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
-			$this->_streamError->writeln($e->getTraceAsString());
+			CM_Bootloader::getInstance()->handleException($e, $this->_streamError);
 			return 1;
 		}
 	}
 
 	/**
 	 * @param boolean|null $quiet
+	 * @param boolean|null $quietWarnings
 	 * @param boolean|null $nonInteractive
 	 */
-	public function configure($quiet = null, $nonInteractive = null) {
+	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null) {
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
+		}
+		if ($quietWarnings) {
+			CM_Bootloader::getInstance()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());
@@ -153,5 +157,4 @@ class CM_Cli_CommandManager {
 	private function _setStreamError(CM_OutputStream_Interface $output) {
 		$this->_streamError = $output;
 	}
-
 }

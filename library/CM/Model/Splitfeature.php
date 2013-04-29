@@ -44,7 +44,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 		$percentage = $this->_checkPercentage($percentage);
 
-		CM_Mysql::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -60,12 +60,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
 		if (($fixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$fixtures = CM_Mysql::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
+			$fixtures = CM_Db_Db::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
 		if (!array_key_exists($this->getId(), $fixtures)) {
-			$fixtureId = CM_Mysql::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
+			$fixtureId = CM_Db_Db::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
 			$fixtures[$this->getId()] = $fixtureId;
 			$cacheWrite = true;
 		}
@@ -84,7 +84,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return 0;
 		}
-		return CM_Mysql::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		return CM_Db_Db::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
 	}
 
 	/**
@@ -100,20 +100,20 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if($this->_withoutPersistence) {
 			return array();
 		}
-		$data = CM_Mysql::select(TBL_CM_SPLITFEATURE, '*', array('name' => $this->getName()))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_SPLITFEATURE, '*', array('name' => $this->getName()))->fetch();
 		return $data;
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_SPLITFEATURE, array('id' => $this->getId()));
-		CM_Mysql::delete(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITFEATURE, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
 	}
 
 	protected static function _create(array $data) {
 		$name = (string) $data['name'];
 		$percentage = self::_checkPercentage($data['percentage']);
 
-		CM_Mysql::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
+		CM_Db_Db::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
 
 		return new static($name);
 	}

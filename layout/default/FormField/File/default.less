@@ -1,0 +1,79 @@
+.previews {
+	overflow: hidden; /* Clearfix */
+
+	.preview {
+		position: relative;
+		float: left;
+		display: block;
+		margin: 2px;
+
+		img {
+			max-height: 50px;
+			max-width: 100px
+		}
+
+		.actions {
+			display: none;
+			position: absolute;
+			left: 3px;
+			top: 3px;
+			background-color: @colorBg;
+			padding: 1px 3px;
+			border-radius: 2px;
+			color: @colorFg;
+		}
+		&:hover .actions {
+			display: block;
+		}
+
+		.template {
+			width: 48px;
+			height: 48px;
+			background-color: @colorBgEmphasize1;
+			border: 1px solid @colorFgBorderEmphasize1;
+
+			.spinner {
+				margin-top: 16px;
+			}
+		}
+	}
+}
+
+.uploadButton {
+	.input_button(@heightButton);
+	.input_button_color;
+	display: inline-block;
+	height: @heightButton - 2px;
+	line-height: @heightButton - 2px;
+	position: relative;
+	overflow: hidden;
+	direction: ltr;
+
+	input {
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-family: Arial;
+		font-size: 118px;
+		margin: 0;
+		padding: 0;
+		cursor: pointer;
+		opacity: 0;
+	}
+}
+
+.dropZone {
+	.border(@colorNotice);
+	height: 100px;
+	border-style: dashed;
+	background-color: lighten(@colorNotice, 48);
+	text-align: center;
+	margin-bottom: 5px;
+
+	span {
+		color: @colorFgHeading;
+		font-size: 14px;
+		display: block;
+		margin-top: 40px;
+	}
+}

@@ -6,12 +6,8 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function tearDown() {
-		CM_Mysql::truncate(TBL_CM_ACTION);
+		CM_Db_Db::truncate(TBL_CM_ACTION);
 	}
 
 	public function testConstruct() {
@@ -54,7 +50,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$action = new CM_Action_Mock(1, $actor);
 		$action->prepare();
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Db_Db::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 		CMTest_TH::clearCache();
 		try {
 			$action->prepare();
@@ -113,7 +109,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$values[] = array(null, 1, 1, 2, null, $time - 22, 1);
 		$values[] = array(null, 1, 1, 2, null, $time - 23, 1);
 		$values[] = array(null, 1, 1, 2, null, $time - 24, 4);
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
+		CM_Db_Db::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
 		CM_Action_Abstract::aggregate(array(array('interval' => 5, 'limit' => 86400), array('interval' => 10, 'limit' => 86400 + 20),
 			array('interval' => 30, 'limit' => 86400 + 30)));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'interval' => 1, 'count' => 1));
@@ -135,7 +131,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 5, 'count' => 4));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 2, 'interval' => 10, 'count' => 7));
 
-		$this->assertEquals(18, CM_Mysql::count(TBL_CM_ACTION));
+		$this->assertEquals(18, CM_Db_Db::count(TBL_CM_ACTION));
 	}
 
 	public function testAggregateInvalidIntervals() {
@@ -165,9 +161,9 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$values[] = array(1, null, 2, 1, null, 4, 100);
 		$values[] = array(1, null, 1, 2, null, 4, 100);
 		$values[] = array(1, null, 1, 1, null, 5, 100);
-		CM_Mysql::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
+		CM_Db_Db::insert(TBL_CM_ACTION, array('actorId', 'ip', 'verb', 'type', 'actionLimitType', 'createStamp', 'count'), $values);
 		CM_Action_Abstract::collapse(1, 4);
-		$this->assertEquals(6, CM_Mysql::count(TBL_CM_ACTION));
+		$this->assertEquals(6, CM_Db_Db::count(TBL_CM_ACTION));
 		$this->assertRow(TBL_CM_ACTION, array('verb' => 1, 'type' => 1, 'createStamp' => 2, 'count' => 5));
 	}
 
@@ -175,7 +171,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$actor = CMTest_TH::createUser();
 		$action = new CM_Action_Mock(1, $actor);
 
-		CM_Mysql::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
+		CM_Db_Db::insert(TBL_CM_ACTIONLIMIT, array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 
 		$action->forceAllow(false);
 		try {
@@ -204,6 +200,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
+
 	const TYPE = 1;
 
 	protected function _notify() {
@@ -218,6 +215,7 @@ class CM_Action_Mock extends CM_Action_Abstract {
 }
 
 class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
+
 	const TYPE = 1;
 
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {

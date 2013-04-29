@@ -1,0 +1,88 @@
+html.floatbox-active {
+	overflow: hidden;
+}
+
+#floatbox-viewport {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 100;
+}
+
+.floatbox-layer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	min-height: 100%;
+	width: 100%;
+	z-index: 1;
+}
+
+.floatbox-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	min-height: 100%;
+	width: 100%;
+	background-color: #000000;
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
+.floatbox-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+	overflow: auto;
+	text-align: center;
+}
+
+.floatbox {
+	position: relative;
+	opacity: 0;
+	max-width: 100%;
+	text-align: left;
+	display: inline-block;
+}
+
+.floatbox.fullscreen {
+	width: 100%;
+	display: block; /* IE8: Some height-affecting styles are inherited from "display: inline-block" to children */
+}
+
+.floatbox.fullscreen .floatbox-body {
+	padding: 0;
+	min-height: 100%;
+}
+
+.floatbox-body {
+	padding: 10px;
+}
+
+.floatbox-controls {
+	position: absolute;
+	top: 0;
+}
+
+html.floatbox-replaceBody {
+	overflow: visible;
+}
+
+html.floatbox-replaceBody #floatbox-viewport {
+	position: absolute;
+	height: auto;
+	min-height: 100%;
+}
+
+html.floatbox-replaceBody .floatbox-layer:not(.active) {
+	display: none;
+}
+
+html.floatbox-replaceBody .floatbox-container {
+	position: relative;
+}

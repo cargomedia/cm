@@ -21,7 +21,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function setThumbnailCount($thumbnailCount) {
 		$thumbnailCount = (int) $thumbnailCount;
-		CM_Mysql::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+		CM_Db_Db::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -69,7 +69,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPublicHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Wowza::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['publicHost'];
 	}
 
@@ -78,7 +78,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getPrivateHost() {
 		$serverId = (int) $this->_get('serverId');
-		$serverArray = CM_Wowza::getServer($serverId);
+		$serverArray = CM_Stream_Video::getInstance()->getServer($serverId);
 		return (string) $serverArray['privateIp'];
 	}
 
@@ -111,12 +111,22 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	protected function _onDelete() {
-		CM_Mysql::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
 		parent::_onDelete();
 	}
 
 	protected function _loadData() {
-		return CM_Mysql::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`) WHERE `id` = ?", $this->getId())->fetchAssoc();
+		return CM_Db_Db::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`)
+								WHERE `id` = ?", array($this->getId()))->fetch();
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Model_StreamChannel_Video|null
+	 */
+	public static function findByKey($key) {
+		$adapterType = CM_Stream_Video::getInstance()->getAdapter()->getType();
+		return self::findByKeyAndAdapter($key, $adapterType);
 	}
 
 	protected static function _create(array $data) {
@@ -125,12 +135,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		$height = (int) $data['height'];
 		$serverId = $data['serverId'];
 		$thumbnailCount = (int) $data['thumbnailCount'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
+		$adapterType = (int) $data['adapterType'];
+		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		try {
-			CM_Mysql::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
+			CM_Db_Db::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
-			CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
+			CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
 			throw $ex;
 		}
 		return new static($id);

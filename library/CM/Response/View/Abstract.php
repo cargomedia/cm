@@ -33,8 +33,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		if (!isset($viewInfo['parentId'])) {
 			$viewInfo['parentId'] = null;
 		}
-		return array('id' => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
-			'parentId' => (string) $viewInfo['parentId']);
+		return array('id'       => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
+					 'parentId' => (string) $viewInfo['parentId']);
 	}
 
 	/**
@@ -74,8 +74,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$component->prepare();
 
 		$html = $this->getRender()->render($component);
+		$js = $this->getRender()->getJs()->getJs();
 
-		return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $this->getRender()->getJs()->getJs());
+		$this->getRender()->getJs()->clear();
+		return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $js);
 	}
 
 	/**
@@ -114,14 +116,17 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$html = $responsePage->getContent();
 		$js = $responsePage->getRender()->getJs()->getJs();
+		$responsePage->getRender()->getJs()->clear();
+
 		$title = $responsePage->getTitle();
 		$layoutClass = get_class($page->getLayout());
 		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
 			return $menuEntry->getHash();
 		}, $this->getSite()->getMenuEntriesActive($page)));
 
-		return array('autoId' => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url, 'layoutClass' => $layoutClass,
-			'menuEntryHashList' => $menuEntryHashList);
+		return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
+					 'layoutClass'       => $layoutClass,
+					 'menuEntryHashList' => $menuEntryHashList);
 	}
 
 	public function popinComponent() {

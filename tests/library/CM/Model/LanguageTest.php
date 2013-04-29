@@ -6,7 +6,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	protected $_language;
 
 	public function setUp() {
-		$languageId = CM_Mysql::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
+		$languageId = CM_Db_Db::insert(TBL_CM_LANGUAGE, array('name' => 'English', 'abbreviation' => 'EN', 'enabled' => 1));
 		$this->_language = new CM_Model_Language($languageId);
 	}
 
@@ -16,34 +16,39 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testSetGetTranslation() {
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
-		$this->assertSame(array('keyFirst' => array('value' => null, 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('keyFirst' => array('value'     => null,
+													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
-		$this->_language->getTranslation('keyFirst');	// Fill APC
+		$this->_language->getTranslation('keyFirst'); // Fill APC
 		$this->_language->setTranslation('keyFirst', 'abc');
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
-		$this->assertSame(array('keyFirst' => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
-
+		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
+													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', array('variable')));
-		$this->assertSame(array('keyFirst' => array('value' => 'abc', 'variables' => array('variable'))), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
+													'variables' => array('variable'))), $this->_language->getTranslations()->getAssociativeArray());
 
-		$this->_language->getTranslation('keyFirst');	// Fill APC
+		$this->_language->getTranslation('keyFirst'); // Fill APC
 		$this->_language->setTranslation('keyFirst', 'xyz', array('another'));
-		$this->assertSame(array('keyFirst' => array('value' => 'xyz', 'variables' => array('another'))), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('keyFirst' => array('value'     => 'xyz',
+													'variables' => array('another'))), $this->_language->getTranslations()->getAssociativeArray());
 
 		$this->_language->getTranslation('keyFirst');
-		$this->assertSame(array('keyFirst' => array('value' => 'xyz', 'variables' => array('another'))), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('keyFirst' => array('value'     => 'xyz',
+													'variables' => array('another'))), $this->_language->getTranslations()->getAssociativeArray());
 	}
 
 	public function testSetGetTranslationWithoutLocalCache() {
 		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', null, true));
-		$this->assertSame(array('keyFirst' => array('value' => null, 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('keyFirst' => array('value'     => null,
+													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
-		$this->_language->getTranslation('keyFirst');	// Fill APC
+		$this->_language->getTranslation('keyFirst'); // Fill APC
 		$this->_language->setTranslation('keyFirst', 'abc');
 		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', null, true));
-		$this->assertSame(array('keyFirst' => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
-
+		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
+													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 	}
 
 	public function testCreate() {
@@ -78,10 +83,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testDelete() {
 		/** @var CM_Model_Language $backedUpLanguage */
 		$backedUpLanguage = CM_Model_Language::create(array(
-			'name' => 'Backed up language',
+			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
-			'enabled' => true,
-			'backup' => $this->_language,
+			'enabled'      => true,
+			'backup'       => $this->_language,
 		));
 		$this->_language->delete();
 		try {
@@ -103,9 +108,9 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testSetDataDuplicateAbbreviation() {
 		CM_Model_Language::create(array(
-			'name' => 'Another',
+			'name'         => 'Another',
 			'abbreviation' => 'pl',
-			'enabled' => true
+			'enabled'      => true
 		));
 		try {
 			$this->_language->setData('Polish', 'pl', false);
@@ -123,13 +128,14 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testDeleteKey() {
 		$key = 'languageKey';
 		$this->_language->setTranslation($key, 'abc');
-		$languageKeyId = CM_Mysql::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchOne();
+		$languageKeyId = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'id', array('name' => $key))->fetchColumn();
 		$this->assertSame(array($key => array('value' => 'abc', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
 		CM_Model_Language::deleteKey($key);
 		$this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
-		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
-		$this->assertSame(0, CM_Mysql::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId, 'languageId' => $this->_language->getId())));
+		$this->assertSame(0, CM_Db_Db::count(TBL_CM_LANGUAGEKEY, array('name' => $key)));
+		$this->assertSame(0, CM_Db_Db::count(TBL_CM_LANGUAGEVALUE, array('languageKeyId' => $languageKeyId,
+																		 'languageId'    => $this->_language->getId())));
 	}
 
 	public function testUnsetTranslation() {
@@ -142,10 +148,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testGetTranslationWithBackup() {
 		/** @var CM_Model_Language $backedUpLanguage */
 		$backedUpLanguage = CM_Model_Language::create(array(
-			'name' => 'Backed up language',
+			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
-			'enabled' => true,
-			'backup' => $this->_language
+			'enabled'      => true,
+			'backup'       => $this->_language
 		));
 		$this->_language->setTranslation('phrase', 'abc');
 		$this->assertSame('abc', $backedUpLanguage->getTranslation('phrase'));
@@ -154,13 +160,20 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testIsBackingUp() {
 		/** @var CM_Model_Language $backedUpLanguage */
 		$backedUpLanguage = CM_Model_Language::create(array(
-			'name' => 'Backed up language',
+			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
-			'enabled' => true,
-			'backup' => $this->_language
+			'enabled'      => true,
+			'backup'       => $this->_language
 		));
 		$this->assertTrue($this->_language->isBackingUp($backedUpLanguage));
 		$this->assertFalse($backedUpLanguage->isBackingUp($this->_language));
+	}
+
+	public function testHasKey() {
+		$language = $this->_language;
+		$this->assertFalse(CM_Model_Language::hasKey('foo'));
+		$language->setTranslation('foo', 'true');
+		$this->assertTrue(CM_Model_Language::hasKey('foo'));
 	}
 
 	public function testFindDefault() {
@@ -207,7 +220,8 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testUpdateKey() {
 		$this->_language->setTranslation('someKey', 'value');
 		CM_Model_Language::updateKey('someKey', 'otherKey');
-		$this->assertSame(array('otherKey' => array('value' => 'value', 'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
+		$this->assertSame(array('otherKey' => array('value'     => 'value',
+													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
 		$this->_language->setTranslation('thirdKey', 'its value');
 		try {
@@ -220,13 +234,19 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 			), $this->_language->getTranslations()->getAssociativeArray());
 		}
 
+		try {
+			CM_Model_Language::updateKey('nonExistentKey', 'otherKey');
+			$this->fail('Should throw exception in nonexistent value');
+		} catch (CM_Exception_Nonexistent $e) {
+			$this->assertTrue(true);
+		}
+
 		$this->_language->setTranslation('variableKey', 'value', array('foo', 'bar'));
 		CM_Model_Language::updateKey('variableKey', null, array('foo', 'bar', 'more'));
 		$this->assertSame(array(
-			'otherKey' => array('value' => 'value', 'variables' => array()),
-			'thirdKey' => array('value' => 'its value', 'variables' => array()),
+			'otherKey'    => array('value' => 'value', 'variables' => array()),
+			'thirdKey'    => array('value' => 'its value', 'variables' => array()),
 			'variableKey' => array('value' => 'value', 'variables' => array('bar', 'foo', 'more')),
 		), $this->_language->getTranslations()->getAssociativeArray());
-
 	}
 }

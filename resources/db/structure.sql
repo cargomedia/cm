@@ -253,29 +253,20 @@ CREATE TABLE `cm_session` (
   KEY `expires` (`expires`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_smiley`;
 
+DROP TABLE IF EXISTS `cm_emoticon`;
 
-CREATE TABLE `cm_smiley` (
+CREATE TABLE `cm_emoticon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `setId` int(10) NOT NULL,
   `code` varchar(50) NOT NULL,
+  `codeAdditional` varchar(50),
   `file` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `section` (`setId`)
+  UNIQUE KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_smileySet`;
-
-
-CREATE TABLE `cm_smileySet` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `label` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_splitfeature`;
-
 
 CREATE TABLE `cm_splitfeature` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -331,7 +322,7 @@ CREATE TABLE `cm_splittestVariation_fixture` (
   `fixtureId` int(10) unsigned NOT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `conversionWeight` decimal(10,2) DEFAULT 1 NOT NULL,
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
   `conversionStamp` int(11) DEFAULT NULL,
   PRIMARY KEY (`splittestId`,`fixtureId`),
   KEY `splittestId` (`splittestId`),
@@ -347,8 +338,10 @@ CREATE TABLE `cm_streamChannel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(64) NOT NULL,
   `type` int(10) unsigned NOT NULL,
+  `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`)
+  UNIQUE KEY `adapterType-key` (`adapterType`, `key`),
+  KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
@@ -389,13 +382,12 @@ CREATE TABLE `cm_stream_publish` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
+  UNIQUE KEY `channelId-key` (`channelId`,`key`),
+  KEY `userId` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_subscribe`;
@@ -405,13 +397,12 @@ CREATE TABLE `cm_stream_subscribe` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned DEFAULT NULL,
   `start` int(10) unsigned NOT NULL,
-  `allowedUntil` int(10) unsigned NOT NULL,
+  `allowedUntil` int(10) unsigned DEFAULT NULL,
   `key` varchar(36) NOT NULL,
   `channelId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `key` (`key`),
-  KEY `userId` (`userId`),
-  KEY `channelId` (`channelId`)
+  UNIQUE KEY `channelId-key` (`channelId`,`key`),
+  KEY `userId` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;

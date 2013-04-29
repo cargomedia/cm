@@ -1,12 +1,6 @@
 <?php
 
 class CM_OptionTest extends CMTest_TestCase {
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
 
 	public function testGetSet() {
 		$option = CM_Option::getInstance();

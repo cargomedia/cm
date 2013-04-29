@@ -3,12 +3,14 @@
 abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
 	/**
-	 * @param string $name
-	 * @param int	$cardinality OPTIONAL
+	 * @param string    $name
+	 * @param int|null  $cardinality
+	 * @param bool|null $enableChoiceCreate
 	 */
-	public function __construct($name, $cardinality = null) {
+	public function __construct($name, $cardinality = null, $enableChoiceCreate = null) {
 		parent::__construct($name);
 		$this->_options['cardinality'] = isset($cardinality) ? ((int) $cardinality) : null;
+		$this->_options['enableChoiceCreate'] = isset($enableChoiceCreate) ? ((bool) $enableChoiceCreate) : false;
 	}
 
 	/**
@@ -16,7 +18,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 	 * @param array     $options
 	 * @param CM_Render $render
 	 * @throws CM_Exception_NotImplemented
-	 * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img]))
+	 * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string]))
 	 */
 	protected function _getSuggestions($term, array $options, CM_Render $render) {
 		throw new CM_Exception_NotImplemented();
@@ -25,12 +27,13 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 	/**
 	 * @param mixed     $item
 	 * @param CM_Render $render
-	 * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img])
+	 * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
 	 */
 	abstract public function getSuggestion($item, CM_Render $render);
 
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
+		$this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {

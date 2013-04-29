@@ -48,6 +48,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getAdapterType() {
+		return (int) $this->_get('adapterType');
+	}
+
+	/**
 	 * @return CM_Paging_User_StreamChannelPublisher
 	 */
 	public function getPublishers() {
@@ -82,8 +89,30 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return new CM_Paging_User_StreamChannel($this);
 	}
 
+	/**
+	 * @param CM_Model_User                  $user
+	 * @param CM_Model_Stream_Subscribe|null $excludedStreamSubscribe
+	 * @return bool
+	 */
+	public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
+		/** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
+		foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
+			if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() == $user->getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected function _loadData() {
-		return CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'key', array('id' => $this->getId()))->fetchAssoc();
+		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
+		if (false !== $data) {
+			$type = (int) $data['type'];
+			if ($this->getType() !== $type) {
+				throw new CM_Exception_Invalid('Invalid type `' . $type . '` for `' . get_class($this) . '` (type: `' . $this->getType() . '`)');
+			}
+		}
+		return $data;
 	}
 
 	protected function _onDelete() {
@@ -95,29 +124,64 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
 		}
-		CM_Mysql::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
+		CM_Cache::delete($cacheKey);
+
+		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+	}
+
+	/**
+	 * @param string $encryptionKey
+	 * @return string Data
+	 */
+	protected function _decryptKey($encryptionKey) {
+		return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, base64_decode($this->getKey()), MCRYPT_MODE_ECB), "\0");
 	}
 
 	/**
 	 * @param int      $id
 	 * @param int|null $type
-	 * @return CM_Model_StreamChannel_Abstract
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception_Invalid|CM_Exception_Nonexistent
+	 * @return static
 	 */
 	public static function factory($id, $type = null) {
-		if (is_null($type)) {
-			$type = CM_Mysql::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchOne();
+		if (null === $type) {
+			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
+			if (false === ($type = CM_CacheLocal::get($cacheKey))) {
+				$type = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchColumn();
+				if (false === $type) {
+					throw new CM_Exception_Nonexistent('No record found in `' . TBL_CM_STREAMCHANNEL . '` for id `' . $id . '`');
+				}
+				CM_Cache::set($cacheKey, $type);
+			}
 		}
 		$class = self::_getClassName($type);
-		return new $class($id);
+		$instance = new $class($id);
+		if (!$instance instanceof static) {
+			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class(). '`.');
+		}
+		return $instance;
 	}
 
 	/**
 	 * @param string $key
+	 * @param int    $adapterType
 	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
-	public static function findKey($key) {
-		$result = CM_Mysql::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => (string) $key))->fetchAssoc();
+	public static function findByKeyAndAdapter($key, $adapterType) {
+		$key = (string) $key;
+		$adapterType = (int) $adapterType;
+
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+		if (false === ($result = CM_Cache::get($cacheKey))) {
+			$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+			if (false === $result) {
+				$result = null;
+			}
+			CM_Cache::set($cacheKey, $result);
+		}
+
 		if (!$result) {
 			return null;
 		}
@@ -125,16 +189,20 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int $type
-	 * @return CM_Paging_StreamChannel_Type
+	 * @param string $encryptionKey
+	 * @param string $data
+	 * @return string Channel-key
 	 */
-	public static function getAllByType($type) {
-		return new CM_Paging_StreamChannel_Type(array($type));
+	protected static function _encryptKey($data, $encryptionKey) {
+		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
 	}
 
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
-		$id = CM_Mysql::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE));
+		$adapterType = (int) $data['adapterType'];
+		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
+		CM_Cache::delete($cacheKey);
 		return new static($id);
 	}
 }

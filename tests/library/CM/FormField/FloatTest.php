@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_FloatTest extends CMTest_TestCaseRender {
+class CM_FormField_FloatTest extends CMTest_TestCase {
 
 	public function testValidate() {
 		$field = new CM_FormField_Float('foo');

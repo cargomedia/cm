@@ -6,10 +6,6 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testCreate() {
 		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 		$this->assertInstanceOf('CM_Model_Splitfeature', $splitfeature);
@@ -24,7 +20,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 			CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
 			$this->fail('Could create duplicate splitfeature');
 		} catch (CM_Exception $e) {
-			$this->assertContains("`Duplicate entry 'foo' for key 'name'`", $e->getMessage());
+			$this->assertContains("Duplicate entry 'foo' for key 'name'", $e->getMessage());
 		}
 
 		$splitfeature->delete();
@@ -158,6 +154,5 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 			}
 		}
 	}
-
 }
 

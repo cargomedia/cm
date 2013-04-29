@@ -1,10 +1,6 @@
 <?php
 
-class CM_FormField_SetTest extends CMTest_TestCaseRender {
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
+class CM_FormField_SetTest extends CMTest_TestCase {
 
 	public function testConstructor() {
 		$field = new CM_FormField_Set('foo');
@@ -62,5 +58,4 @@ class CM_FormField_SetTest extends CMTest_TestCaseRender {
 			}
 		}
 	}
-
 }

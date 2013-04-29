@@ -11,7 +11,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 		$response = CMTest_TH::createResponsePage('/en/mock5', null, $user);
 		$response->process();
-		$this->assertContains('Location: ' . CM_Config::get()->CM_Site_CM->url . '/mock5', $response->getHeaders());
+		$this->assertContains('Location: ' . $response->getSite()->getUrl() . '/mock5', $response->getHeaders());
 	}
 
 	public function testProcessLanguageNoRedirect() {
@@ -41,7 +41,6 @@ class CM_Page_Mock5 extends CM_Page_Abstract {
 		$classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
 		return new $classname($this);
 	}
-
 }
 
 class CM_Layout_Mock extends CM_Layout_Abstract {

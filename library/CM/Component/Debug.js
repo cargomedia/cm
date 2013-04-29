@@ -5,42 +5,75 @@
 var CM_Component_Debug = CM_Component_Abstract.extend({
 	_class: 'CM_Component_Debug',
 
+	/** @type Boolean */
+	active: false,
+
+	events: {
+		'click .toggleDebugBar': 'toggleDebugBar',
+		'click .clearCache': 'clearCache',
+		'click .toggleWindow': function(e) {
+			this.toggleWindow($(e.currentTarget).data('name'));
+		}
+	},
+
 	ready: function() {
-		var handler = this;
-		this.$('.buttons > a').each(function() {
-			$(this).click(function() {
-				var name = $(this).attr('class');
-				handler.$('.containers div:not(.' + name + ')').hide();
-				handler.$('.containers div.' + name).toggle();
-			});
-		});
-		this.$('.clearCache').click(function() {
-			handler.ajax('clearCache', {
-				'CM_Cache': handler.$('#CM_Cache').is(':checked'),
-				'CM_CacheLocal': handler.$('#CM_CacheLocal').is(':checked')
-			}, {
-				success: function() {
-					location.reload();
+		var self = this;
+
+		$(window).bind('keydown.debugBar', function(event) {
+			if (event.which === 68) { // d Key
+				var tagName = event.target.tagName.toLowerCase();
+				if (tagName === 'input' || tagName === 'textarea') {
+					return;
 				}
-			});
+				self.toggleDebugBar();
+			}
 		});
-	
-		_.each(cm.model.types, function(modelType, modelName) {
-			_.each(cm.action.verbs, function(actionVerb, actionName) {
-				handler.bindAction(actionVerb, modelType, function(action, model, data) {
-					var msg = "ACTION: <[ACTOR:" + (action.actor ? action.actor.id : null) + "] , " + actionName + " , " + "[" + modelName + ":" + JSON.stringify(model._id) + "]>";
-					msg += " (" + JSON.stringify(data) + ")";
-					handler.alert(msg);
+
+		this.on('destruct', function() {
+			$(window).unbind('keydown.debugBar');
+		});
+
+		if (cm.options.stream.channel) {
+			_.each(cm.model.types, function(modelType, modelName) {
+				_.each(cm.action.verbs, function(actionVerb, actionName) {
+					self.bindAction(actionVerb, modelType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
+						cm.debug.log('ACTION: <[ACTOR:' + (action.actor ? action.actor.id : null) + '] , ' + actionName + ' , ' + '[' + modelName + ':' + JSON.stringify(model._id) + ']>', '(', data, ')');
+					});
 				});
 			});
-		});
+		}
 	},
-	
-	alert: function(msg) {
-		var $msg = $("<li>" + msg + "</li>");
-		this.$(".alerts").append($msg);
-		$msg.delay(8000).slideUp(200, function() {
-			$(this).remove();
+
+	toggleDebugBar: function() {
+		var debugBar = this.$('.debugBar');
+
+		if (this.active) {
+			debugBar.stop().transition({x: '-100%'}, '400ms', 'snap');
+			this.active = false;
+		} else {
+			debugBar.stop().transition({x: 0}, '400ms', 'snap');
+			this.active = true;
+		}
+	},
+
+	/**
+	 * @param {String} name
+	 */
+	toggleWindow: function(name) {
+		this.$('.panel:not([data-name="' + name + '"])').removeClass('active');
+		this.$('.panel[data-name="' + name + '"]').toggleClass('active');
+		this.$('.window:not(.' + name + ')').hide();
+		this.$('.window.' + name).toggle();
+	},
+
+	clearCache: function() {
+		this.ajax('clearCache', {
+			'CM_Cache': this.$('.CM_Cache').is(':checked'),
+			'CM_CacheLocal': this.$('.CM_CacheLocal').is(':checked')
+		}, {
+			success: function() {
+				location.reload();
+			}
 		});
 	}
 });

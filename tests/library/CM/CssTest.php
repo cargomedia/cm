@@ -7,15 +7,13 @@ class CM_CssTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Render->cdnResource = false;
-		CM_Config::get()->CM_Render->cdnUsetContent = false;
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
+		CM_Config::get()->CM_Render->cdnUserContent = false;
+		CM_Config::get()->CM_Site_MockCss = new stdClass;
+		CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
 	}
 
 	public function setUp() {
-		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), '', true, true, true, array('getId'));
+		$site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_MockCss', true, true, true, array('getId'));
 		$site->expects($this->any())->method('getId')->will($this->returnValue(1));
 		$this->_render = new CM_Render($site);
 	}
@@ -59,7 +57,7 @@ EOD;
 
 	public function testImage() {
 		$css = new CM_Css("background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
 		$expected = <<<EOD
 background: url('$url') no-repeat 66px 7px;
 EOD;
@@ -68,7 +66,7 @@ EOD;
 
 	public function testBackgroundImage() {
 		$css = new CM_Css("background-image: image('icon/mailbox_read.png');");
-		$url = $this->_render->getUrlResource('img', 'icon/mailbox_read.png');
+		$url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
 		$expected = <<<EOD
 background-image: url('$url');
 EOD;
@@ -110,28 +108,6 @@ EOD;
 }
 
 EOD;
-		$this->assertEquals($expected, $css->compile($this->_render, true));
-	}
-
-	public function testOpacity() {
-		$css = <<<'EOD'
-.foo {
-	filter:hello(world);
-	.opacity(.3);
-}
-.bar {
-	.opacity(foo);
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: hello(world);
-  opacity: .3;
-  filter: alpha(opacity=30);
-}
-
-EOD;
-		$css = new CM_Css($css);
 		$this->assertEquals($expected, $css->compile($this->_render, true));
 	}
 
@@ -188,29 +164,6 @@ EOD;
 EOD;
 		$css = new CM_Css($css);
 		$this->assertSame('', $css->compile($this->_render, true));
-	}
-
-	public function testBackgroundColor() {
-		$css = <<<'EOD'
-.foo {
-	.background-color(rgba(1,1,1,0.5));
-}
-.bar {
-	.background-color(rgba(1,1,1,1));
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7f010101,endColorstr=#7f010101);
-  background-color: rgba(1,1,1,0.5);
-}
-.bar {
-  background-color: #010101;
-}
-
-EOD;
-		$css = new CM_Css($css);
-		$this->assertSame($expected, $css->compile($this->_render, true));
 	}
 
 	public function testBoxShadow() {

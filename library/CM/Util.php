@@ -36,12 +36,26 @@ class CM_Util {
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
-		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR | GLOB_NOSORT);
 		$files = glob($path . $pattern);
+		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR);
 		foreach ($paths as $path) {
 			$files = array_merge($files, self::rglob($pattern, $path));
 		}
 		return $files;
+	}
+
+	/**
+	 * @param string           $pattern
+	 * @param CM_Site_Abstract $site
+	 * @return string[]
+	 */
+	public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
+		$paths = array();
+		foreach ($site->getNamespaces() as $namespace) {
+			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
+			$paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
+		}
+		return $paths;
 	}
 
 	/**
@@ -124,17 +138,42 @@ class CM_Util {
 	}
 
 	/**
+	 * @param string $xml
+	 * @throws CM_Exception_Invalid
+	 * @return SimpleXMLElement
+	 */
+	public static function parseXml($xml) {
+		$xml = (string) $xml;
+
+		$xml = @simplexml_load_string($xml);
+		if (false === $xml) {
+			throw new CM_Exception_Invalid('Could not parse xml');
+		}
+
+		return $xml;
+	}
+
+	/**
 	 * @param string $path
+	 * @return string
 	 * @throws CM_Exception
 	 */
 	public static function mkDir($path) {
 		$path = (string) $path;
-		if (is_dir($path)) {
-			return;
+		if (!is_dir($path)) {
+			if (false === mkdir($path, 0777, true)) {
+				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+			}
 		}
-		if (false === mkdir($path, 0777, true)) {
-			throw new CM_Exception('Cannot mkdir `' . $path . '`.');
-		}
+		return $path;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function mkDirTmp() {
+		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		return self::mkDir($path);
 	}
 
 	/**
@@ -167,8 +206,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string  $path
-	 * @param array   $params Query parameters
+	 * @param string $path
+	 * @param array  $params Query parameters
 	 * @return string
 	 */
 	public static function link($path, array $params = null) {
@@ -195,47 +234,30 @@ class CM_Util {
 
 	/**
 	 * @param string[] $paths
-	 * @return array[]
-	 * @throws CM_Exception
+	 * @throws CM_Exception_Invalid
+	 * @return array
 	 */
 	public static function getClasses(array $paths) {
 		$classes = array();
-		$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
-
-		// Detect class names and parents
 		foreach ($paths as $path) {
-			$file = new CM_File($path);
-
-			if (!preg_match($regexp, $file->read(), $match)) {
-				throw new CM_Exception('Cannot detect php-class inheritance of `' . $path . '`');
+			$file = CM_File::factory($path);
+			if (!$file instanceof CM_File_ClassInterface) {
+				throw new CM_Exception_Invalid('Can only accept Class files. `' . $path . '` is not one.');
 			}
-
-			$classHierarchy = array_values(class_parents($match['name']));
-			array_unshift($classHierarchy, $match['name']);
-
-			$classes[] = array('classNames' => $classHierarchy, 'path' => $path);
+			$meta = $file->getClassDeclaration();
+			$classes[$meta['class']] = array('parent' => $meta['parent'], 'path' => $path);
 		}
 
-		// Order classes by inheritance
-		for ($i1 = 0; $i1 < count($classes); $i1++) {
-			$class1 = $classes[$i1];
-			for ($i2 = $i1 + 1; $i2 < count($classes); $i2++) {
-				$class2 = $classes[$i2];
-				if (isset($class1['classNames'][1]) && $class1['classNames'][1] == $class2['classNames'][0]) {
-					$tmp = $classes[$i1];
-					$classes[$i1] = $classes[$i2];
-					$classes[$i2] = $tmp;
-					$i1--;
-					break;
+		$paths = array();
+		while (count($classes)) {
+			foreach ($classes as $class => $data) {
+				if (!isset($classes[$data['parent']])) {
+					$paths[$data['path']] = $class;
+					unset($classes[$class]);
 				}
 			}
 		}
-
-		$classesAssociative = array();
-		foreach ($classes as $classInfo) {
-			$classesAssociative[$classInfo['path']] = $classInfo['classNames'][0];
-		}
-		return $classesAssociative;
+		return $paths;
 	}
 
 	/**
@@ -247,8 +269,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @param string        $string
-	 * @param string|null   $separator
+	 * @param string      $string
+	 * @param string|null $separator
 	 * @return string
 	 */
 	public static function uncamelize($string, $separator = null) {
@@ -325,9 +347,8 @@ class CM_Util {
 	}
 
 	/**
-	 * @static
-	 * @param $command
-	 * @param $stdin
+	 * @param string $command
+	 * @param string $stdin
 	 * @return string
 	 * @throws CM_Exception
 	 */
@@ -367,14 +388,13 @@ class CM_Util {
 		}
 		$now = microtime(true) * 1000;
 		$previousValue = null;
-		if ($times[$namespace]) {
+		if (array_key_exists($namespace, $times)) {
 			$difference = $now - $times[$namespace];
 		} else {
 			$difference = null;
 		}
 		$times[$namespace] = $now;
 		return sprintf('%.2f ms', $difference);
-
 	}
 
 	/**
@@ -412,6 +432,59 @@ class CM_Util {
 			CM_CacheLocal::set($key, $classNames);
 		}
 		return $classNames;
+	}
 
+	/**
+	 * A tree with $level tiers. The children of the rootnode have the distinct value of the first column as key and contain all the rows
+	 * with this key as first value. The children of such a node have the distinct values of the second column as key and contain all the
+	 * rows which have the the key of their grandparent as first value and the key of their parent as second value. And so on.
+	 * The amount of leaf nodes corresponds to the amount of rows in the resultset.
+	 * Each leaf node contains an array consisting of the $rowcount - $level last entries of the row it represents. Or a scalar in the
+	 * case of $level = $rowcount -1.
+	 *
+	 * @param array[]              $items
+	 * @param int|null             $level           The number of columns that are used as indexes.
+	 * @param bool|null            $distinctLeaves  Whether or not the leaves are unique given the specified indexes
+	 * @param string[]|string|null $keyNames
+	 * @throws CM_Exception_Invalid
+	 * @return array[]
+	 */
+	public static function getArrayTree(array $items, $level = null, $distinctLeaves = null, $keyNames = null) {
+		if (null === $level) {
+			$level = 1;
+		}
+		if (null === $distinctLeaves) {
+			$distinctLeaves = true;
+		}
+		$keyNames = (array) $keyNames;
+		$result = array();
+		foreach ($items as $item) {
+			if (!is_array($item) || count($item) < ($level + 1)) {
+				throw new CM_Exception_Invalid('Item is not an array or has less than `' . ($level + 1) . '` elements.');
+			}
+			$resultEntry = & $result;
+			for ($i = 0; $i < $level; $i++) {
+				if (isset($keyNames[$i])) {
+					$keyName = $keyNames[$i];
+					if (!array_key_exists($keyName, $item)) {
+						throw new CM_Exception_Invalid('Item has no key `' . $keyName . '`.');
+					}
+					$value = $item[$keyName];
+					unset($item[$keyName]);
+				} else {
+					$value = array_shift($item);
+				}
+				$resultEntry = & $resultEntry[$value];
+			}
+			if (count($item) <= 1) {
+				$item = reset($item);
+			}
+			if ($distinctLeaves) {
+				$resultEntry = $item;
+			} else {
+				$resultEntry[] = $item;
+			}
+		}
+		return $result;
 	}
 }

@@ -6,25 +6,33 @@
 @colorBrand: 			#2d78e2;
 
 // Basic Color
-@colorBg:				#ffffff;
 @colorFg: 				#333333;
 @colorFgShy: 			lighten(@colorFg, 25);
-@colorBgShy: 			darken(@colorBg, 10);
-@colorBgStrong:			@colorBrand;
-@colorFgStrong:			#ffffff;
+
+@colorBgTheme:			@colorBrand;
+@colorFgTheme:			#ffffff;
+
 @colorFgHeading:		@colorBrand;
 @colorFgIcon:			@colorFgShy;
 @colorFgIconHover:		@colorBrand;
+
+// Backgrounds
+@colorBgBody:				#ffffff;
+@colorBg:					#ffffff;
+@colorBgEmphasize1: 		darken(@colorBg, 3);
+@colorBgEmphasize2:			darken(@colorBg, 6);
+@colorBgEmphasize3: 		darken(@colorBg, 10);
+
+//Border
+@colorFgBorder: 			#f1f1f1;
+@colorFgBorderEmphasize1:	darken(@colorFgBorder, 3);
+@colorFgBorderEmphasize2:	darken(@colorFgBorder, 6);
+@colorFgBorderEmphasize3:	darken(@colorFgBorder, 10);
 
 //Links
 @colorFgLink:			#0a7bc3;
 @colorFgLinkLight:		#6d6e71;
 @colorBgSelect:			mix(@colorBrand, @colorBg, 10);
-
-//Border
-@colorFgBorder:			#E8E8E8;
-@colorFgBorderEmphasize:darken(@colorFgBorder, 15);
-@colorFgBorderShy:		lighten(@colorFgBorder, 5);
 
 //Buttons
 @colorBgButton:			@colorBg;
@@ -36,8 +44,8 @@
 @colorFgButtonAltFont:	white;
 
 // Tooltip
-@colorFgTooltip: @colorBg;
-@colorBgTooltip: lighten(@colorFg, 20);
+@colorFgTooltip: 		@colorBg;
+@colorBgTooltip: 		lighten(@colorFg, 20);
 
 //Font
 @fontFamily:			"Lucida Grande", Verdana, Arial, sans-serif;
@@ -50,7 +58,8 @@
 //Buttons
 @heightButton:			30px;
 @fontSizeButton:		11px;
-@iconSizeClickable: 	14px;
+@iconSize:				1.25em;
+@iconSizeClickable: 	1.25em;
 
 @heightButtonLarge:		56px;
 @fontSizeButtonLarge:	25px;
@@ -58,3 +67,27 @@
 //Textinput
 @heightInputText:		30px;
 @heightInputTextarea:	65px;
+
+//Usertext
+@usertextFontSizeH1: @fontSize*1.6;
+@usertextFontSizeH2: @fontSize*1.5;
+@usertextFontSizeH3: @fontSize*1.4;
+@usertextFontSizeH4: @fontSize*1.3;
+@usertextFontSizeH5: @fontSize*1.2;
+@usertextFontSizeH6: @fontSize*1.1;
+@usertextFontSizeP: @fontSize;
+
+@usertextColorFgH1: #000000;
+@usertextColorFgShadowH1: #ffffff;
+@usertextColorFgH2: #000000;
+@usertextColorFgShadowH2: #ffffff;
+@usertextColorFgH3: #333333;
+@usertextColorFgShadowH3: #ffffff;
+@usertextColorFgH4: #333333;
+@usertextColorFgShadowH4: #ffffff;
+@usertextColorFgH5: #333333;
+@usertextColorFgShadowH5: #ffffff;
+@usertextColorFgH6: #777777;
+@usertextColorFgShadowH6: #ffffff;
+
+@emoticonSize: 1.5em;

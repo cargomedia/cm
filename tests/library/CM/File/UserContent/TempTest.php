@@ -2,13 +2,6 @@
 
 class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstructorInvalid() {
 		try {
 			new CM_File_UserContent_Temp(uniqid());
@@ -33,7 +26,7 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
 
 	public function testCreateNoExtension() {
 		$file = CM_File_UserContent_Temp::create('foo');
-		$this->assertSame('', $file->getExtension());
+		$this->assertNull($file->getExtension());
 	}
 
 	public function testCreateContent() {
@@ -72,5 +65,4 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
 		CM_File_UserContent_Temp::deleteOlder(100);
 		$this->assertFalse($file->getExists());
 	}
-
 }

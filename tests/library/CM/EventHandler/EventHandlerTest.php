@@ -5,13 +5,6 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
 	public static $_foo;
 	public static $_counter;
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function test() {
 		$eventHandler = new CM_EventHandler_EventHandler();
 		self::$_foo = '';
@@ -37,9 +30,7 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
 		} catch (Exception $ex) {
 			$this->fail('Cant trigger nonexistent events');
 		}
-
 	}
-
 }
 
 class CM_JobMock_1 extends CM_Jobdistribution_Job_Abstract {
@@ -47,7 +38,6 @@ class CM_JobMock_1 extends CM_Jobdistribution_Job_Abstract {
 	protected function _run(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_foo .= $params->getString('text');
 	}
-
 }
 
 class CM_JobMock_2 extends CM_Jobdistribution_Job_Abstract {
@@ -55,7 +45,6 @@ class CM_JobMock_2 extends CM_Jobdistribution_Job_Abstract {
 	protected function _run(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter++;
 	}
-
 }
 
 class CM_JobMock_3 extends CM_Jobdistribution_Job_Abstract {
@@ -63,7 +52,6 @@ class CM_JobMock_3 extends CM_Jobdistribution_Job_Abstract {
 	protected function _run(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('i');
 	}
-
 }
 
 class CM_JobMock_4 extends CM_Jobdistribution_Job_Abstract {
@@ -71,5 +59,4 @@ class CM_JobMock_4 extends CM_Jobdistribution_Job_Abstract {
 	protected function _run(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('a');
 	}
-
 }

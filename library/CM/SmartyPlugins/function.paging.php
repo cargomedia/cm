@@ -24,7 +24,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	}
 
 	$html = '';
-	$html .= '<div class="paging"><div class="paging-inner">';
+	$html .= '<div class="paging">';
 
 	$boundDistMin = min($paging->getPage() - 1, $paging->getPageCount() - $paging->getPage());
 	$sizeMax = $size - min($boundDistMin, floor($size / 2)) - 1;
@@ -35,7 +35,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 		if ($pageMin > 1) {
 			$html .= _smarty_function_paging_link($path, $query, $component, 1, '1', $ajax, 'pagingFirst');
 		}
-		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev icon');
+		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() - 1, '', $ajax, 'pagingPrev icon-arrow-left');
 	}
 
 	for ($p = $pageMin; $p <= $pageMax; $p++) {
@@ -44,13 +44,13 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon');
+		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon-arrow-right');
 		if ($pageMax < $paging->getPageCount()) {
 			$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
 		}
 	}
 
-	$html .= '</div></div>';
+	$html .= '</div>';
 
 	return $html;
 }

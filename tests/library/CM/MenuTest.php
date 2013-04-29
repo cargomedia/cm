@@ -2,13 +2,6 @@
 
 class CM_MenuTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testFindNull() {
 		$menu = $this->_getMenu();
 		$page = new CM_Page_Mock3();
@@ -53,17 +46,20 @@ class CM_MenuTest extends CMTest_TestCase {
 	 * @return CM_Menu
 	 */
 	private function _getMenu() {
-		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock4'), array('label' => 'Example', 'page' => 'CM_Page_Mock3', 'submenu' => array(array('label' => 'Example', 'page' => 'CM_Page_Mock3'))));
+		$entriesData = array(array('label' => 'Home', 'page' => 'CM_Page_Mock4'),
+			array('label' => 'Example', 'page' => 'CM_Page_Mock3', 'submenu' => array(array('label' => 'Example', 'page' => 'CM_Page_Mock3'))));
 		return new CM_Menu($entriesData);
 	}
-
 }
 
 class CM_Page_Mock3 extends CM_Page_Abstract {
+
 }
 
 class CM_Page_Mock4 extends CM_Page_Abstract {
+
 }
 
 class CM_Page_Mock6 extends CM_Page_Abstract {
+
 }

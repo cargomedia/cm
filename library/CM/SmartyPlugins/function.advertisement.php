@@ -8,5 +8,6 @@ function smarty_function_advertisement(array $params, Smarty_Internal_Template $
 	if (!isset($params['zone'])) {
 		trigger_error('Param `zone` missing.');
 	}
-	return '<div class="advertisement">' . CM_Adprovider::getInstance()->getHtml($params['zone']) . '</div>';
+	$variables = isset($params['variables']) ? $params['variables'] : null;
+	return '<div class="advertisement">' . CM_Adprovider::getInstance()->getHtml($params['zone'], $variables) . '</div>';
 }

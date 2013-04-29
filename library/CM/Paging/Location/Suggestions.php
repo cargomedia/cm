@@ -21,8 +21,8 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
 			}
 			$source = new CM_PagingSource_Search_Location($query);
 		} else {
-			$where = CM_Mysql::placeholder("level >= ? AND level <= ? AND `name` LIKE '?'", $minLevel, $maxLevel, '%' . $term . '%');
-			$source = new CM_PagingSource_Sql_Deferred('level,id', TBL_CM_TMP_LOCATION, $where, 'level');
+			$source = new CM_PagingSource_Sql_Deferred('level,id', TBL_CM_TMP_LOCATION,
+				"level >= ? AND level <= ? AND `name` LIKE ?", 'level', array($minLevel, $maxLevel, '%' . $term . '%'));
 		}
 		$source->enableCacheLocal();
 

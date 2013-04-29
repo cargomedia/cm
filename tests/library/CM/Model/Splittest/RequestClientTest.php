@@ -6,12 +6,8 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testIsVariationFixture() {
-		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+		$request = new CM_Request_Post('/foo/null');
 		/** @var CM_Model_Splittest_RequestClient $test */
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
@@ -23,9 +19,9 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		$test->delete();
 	}
 
-	public  function testSetConversion() {
-		$request = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
-		$request2 = new CM_Request_Post('/foo/' . CM_Site_CM::TYPE);
+	public function testSetConversion() {
+		$request = new CM_Request_Post('/foo/null');
+		$request2 = new CM_Request_Post('/foo/null');
 
 		/** @var CM_Model_Splittest_RequestClient $test */
 		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'bar', 'variations' => array('v1')));
@@ -41,5 +37,12 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		$this->assertSame(1.75, $variation->getConversionRate());
 
 		$test->delete();
+	}
+
+	public function testIgnoreBots() {
+		$request = new CM_Request_Get('/foo', array('user-agent' => 'Googlebot'));
+		/** @var CM_Model_Splittest_RequestClient $test */
+		$test = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => array('v1')));
+		$this->assertFalse($test->isVariationFixture($request, 'v1'));
 	}
 }

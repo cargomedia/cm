@@ -2,11 +2,8 @@
 
 class CM_SetTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
 	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
+		parent::tearDownAfterClass();
 		CM_Cache_Redis::flush();
 	}
 

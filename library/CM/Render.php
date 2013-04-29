@@ -38,10 +38,10 @@ class CM_Render extends CM_Class_Abstract {
 	protected $_stack = array();
 
 	/**
-	 * @param CM_Site_Abstract|null          $site
-	 * @param CM_Model_User|null             $viewer
-	 * @param CM_Model_Language|null         $language
-	 * @param boolean|null                   $languageRewrite
+	 * @param CM_Site_Abstract|null  $site
+	 * @param CM_Model_User|null     $viewer
+	 * @param CM_Model_Language|null $language
+	 * @param boolean|null           $languageRewrite
 	 */
 	public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null) {
 		if (!$site) {
@@ -168,8 +168,8 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param bool   $absolute      OPTIONAL True if full path required
-	 * @param string $theme     OPTIONAL
-	 * @param string $namespace OPTIONAL
+	 * @param string $theme         OPTIONAL
+	 * @param string $namespace     OPTIONAL
 	 * @return string Theme base path
 	 */
 	public function getThemeDir($absolute = false, $theme = null, $namespace = null) {
@@ -196,7 +196,7 @@ class CM_Render extends CM_Class_Abstract {
 		foreach ($this->getSite()->getThemes() as $theme) {
 			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
-			if (file_exists($file)) {
+			if (CM_File::exists($file)) {
 				if ($absolute) {
 					return $file;
 				} else {
@@ -213,8 +213,8 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string        $path
-	 * @param string|null   $namespace
+	 * @param string      $path
+	 * @param string|null $namespace
 	 * @return CM_File
 	 * @throws CM_Exception_Invalid
 	 */
@@ -223,9 +223,16 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string|null                  $path
-	 * @param boolean|null                 $cdn
-	 * @param CM_Site_Abstract|null        $site
+	 * @return string
+	 */
+	public function getSiteName() {
+		return $this->getSite()->getName();
+	}
+
+	/**
+	 * @param string|null           $path
+	 * @param boolean|null          $cdn
+	 * @param CM_Site_Abstract|null $site
 	 * @return string
 	 */
 	public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null) {
@@ -244,10 +251,10 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Page_Abstract|string      $pageClassName
-	 * @param array|null                   $params
-	 * @param CM_Site_Abstract|null        $site
-	 * @param CM_Model_Language|null       $language
+	 * @param CM_Page_Abstract|string $pageClassName
+	 * @param array|null              $params
+	 * @param CM_Site_Abstract|null   $site
+	 * @param CM_Model_Language|null  $language
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
@@ -353,8 +360,8 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
-	 * @param array|null  $params
+	 * @param string     $key
+	 * @param array|null $params
 	 * @return string
 	 */
 	public function getTranslation($key, array $params = null) {
@@ -376,7 +383,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterDate() {
 		if (!$this->_formatterDate) {
-			$this->_formatterDate = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
+			$this->_formatterDate = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 		}
 		return $this->_formatterDate;
 	}
@@ -386,7 +393,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterDateTime() {
 		if (!$this->_formatterDateTime) {
-			$this->_formatterDateTime = new IntlDateFormatter($this->_getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
+			$this->_formatterDateTime = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
 		}
 		return $this->_formatterDateTime;
 	}
@@ -396,7 +403,7 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	public function getFormatterCurrency() {
 		if (!$this->_formatterCurrency) {
-			$this->_formatterCurrency = new NumberFormatter($this->_getLocale(), NumberFormatter::CURRENCY);
+			$this->_formatterCurrency = new NumberFormatter($this->getLocale(), NumberFormatter::CURRENCY);
 		}
 		return $this->_formatterCurrency;
 	}
@@ -411,7 +418,7 @@ class CM_Render extends CM_Class_Abstract {
 	/**
 	 * @return string
 	 */
-	private function _getLocale() {
+	public function getLocale() {
 		$locale = 'en';
 		if ($this->getLanguage()) {
 			$locale = $this->getLanguage()->getAbbreviation();
@@ -436,7 +443,7 @@ class CM_Render extends CM_Class_Abstract {
 
 		$pluginDirs = array(SMARTY_PLUGINS_DIR);
 		foreach ($this->getSite()->getNamespaces() as $namespace) {
-			$pluginDirs[] = CM_Util::getNamespacePath($namespace). 'library/' . $namespace . '/SmartyPlugins';
+			$pluginDirs[] = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
 		}
 		self::$_smarty->setPluginsDir($pluginDirs);
 		self::$_smarty->loadFilter('pre', 'translate');
@@ -445,8 +452,8 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $phrase
-	 * @param array        $variables
+	 * @param string $phrase
+	 * @param array  $variables
 	 * @return string
 	 */
 	private function _parseVariables($phrase, array $variables) {

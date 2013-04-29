@@ -16,9 +16,10 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 		CM_Captcha::deleteOlder(3600);
 		CM_ModelAsset_User_Roles::deleteOld();
 		CM_Session::deleteExpired();
-		CM_Wowza::getInstance()->synchronize();
-		CM_Wowza::getInstance()->checkStreams();
+		CM_Stream_Video::getInstance()->synchronize();
+		CM_Stream_Video::getInstance()->checkStreams();
 		CM_KissTracking::getInstance()->exportEvents();
+		CM_Stream_Message::getInstance()->synchronize();
 	}
 
 	/**
@@ -27,6 +28,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	public function heavy() {
 		CM_Mail::processQueue(500);
 		CM_Action_Abstract::aggregate();
+		CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 	}
 
 	public static function getPackageName() {

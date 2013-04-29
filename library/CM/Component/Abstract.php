@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
+
 	/**
 	 * @var CM_Model_User|null
 	 */
@@ -126,16 +127,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_User $user
-	 * @param string        $event
-	 * @param mixed         $data
-	 */
-	public static function stream(CM_Model_User $user, $event, $data) {
-		$namespace = get_called_class() . ':' . $event;
-		CM_Stream_Stream::publishUser($user, array('namespace' => $namespace, 'data' => $data));
-	}
-
-	/**
 	 * @param string             $className
 	 * @param CM_Params|array    $params
 	 * @param CM_Model_User|null $viewer
@@ -152,7 +143,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param string $property
-	 * @param mixed $value
+	 * @param mixed  $value
 	 */
 	protected function _setJsParam($property, $value) {
 		$this->_js->setParam($property, $value);

@@ -2,13 +2,6 @@
 
 class CM_SessionTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstructor() {
 		$session = new CM_Session();
 		$this->assertTrue(true);
@@ -69,7 +62,8 @@ class CM_SessionTest extends CMTest_TestCase {
 		$this->assertEquals($expiration + 10, $session->getExpiration(), null, 1);
 
 		//test that session is only persisted when data changed
-		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
+		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo'    => 'foo',
+																		 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
 		CMTest_TH::clearCache();
 		unset($session);
 		$session = new CM_Session($sessionId);
@@ -87,7 +81,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session = new CM_Session($sessionId);
 		unset($session);
 
-		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'bar'))), array('sessionId' => $sessionId));
+		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'bar'))), array('sessionId' => $sessionId));
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
 
@@ -139,7 +133,6 @@ class CM_SessionTest extends CMTest_TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-
 	}
 
 	public function testLogin() {
@@ -195,7 +188,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session->start();
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
-		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
+		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
 		unset($session);
 		CMTest_TH::clearCache();
 
@@ -208,7 +201,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session->start();
 
 		$this->assertEquals('bar', $session->get('foo'));
-		CM_Mysql::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
+		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
 		unset($session);
 		CMTest_TH::clearCache();
 
@@ -234,5 +227,15 @@ class CM_SessionTest extends CMTest_TestCase {
 		unset($session);
 		$session = new CM_Session($sessionId);
 		$this->assertEquals(time() + CM_Session::LIFETIME_DEFAULT, $session->getExpiration(), null, 1);
+	}
+
+	public function testFindById() {
+		$session = new CM_Session();
+		$session->set('foo', 'bar');
+		$session->write();
+		$this->assertEquals($session, CM_Session::findById($session->getId()));
+
+		$this->assertNull(CM_Session::findById('foo'));
+		$this->assertNull(CM_Session::findById(''));
 	}
 }

@@ -33,7 +33,8 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	 */
 	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
 		$html = '';
-		$html .= '<a href="javascript:;" class="icon delete"></a>';
+		$html .= CM_Util::htmlspecialchars($file->getFileName());
+		$html .= '<a href="javascript:;" class="icon-delete deleteFile"></a>';
 		return $html;
 	}
 

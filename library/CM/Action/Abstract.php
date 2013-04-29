@@ -36,7 +36,14 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$this->_verb = (int) $verb;
 	}
 
-	abstract protected function _notify();
+	protected function _notify(){
+		$arguments = func_get_args();
+		$methodName = '_notify' . $this->getVerbName();
+
+		if (method_exists($this, $methodName)) {
+			call_user_func_array(array($this, $methodName), $arguments);
+		}
+	}
 
 	abstract protected function _prepare();
 
@@ -207,7 +214,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static final function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Mysql::exec("DELETE FROM TBL_CM_ACTION WHERE `createStamp` < ?", time() - $age);
+		CM_Db_Db::delete(TBL_CM_ACTION, '`createStamp` < ' . (time() - $age));
 	}
 
 	public final function toArray() {
@@ -250,8 +257,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		$time = time();
 		foreach (array_reverse($intervals) as $interval) {
-			$timeMin = CM_Mysql::exec('SELECT MIN(`createStamp`) FROM ' . TBL_CM_ACTION .
-					' WHERE `actionLimitType` IS NULL AND `interval` < ?', $interval['interval'])->fetchOne();
+			$timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM TBL_CM_ACTION WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
 			if (false === $timeMin) {
 				return;
 			}
@@ -273,17 +279,17 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$upperBound = (int) $upperBound;
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
-		$result = CM_Mysql::exec(
+		$result = CM_Db_Db::exec(
 			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `verb`, `type`");
 		$insert = array();
-		while ($row = $result->fetchAssoc()) {
+		while ($row = $result->fetch()) {
 			if ($row['count'] >= 1) {
 				$insert[] = array((int) $row['verb'], (int) $row['type'], $timeStamp, (int) $row['sum'], ($upperBound - $lowerBound));
 			}
 		}
 		if (!empty($insert)) {
-			CM_Mysql::delete(TBL_CM_ACTION, $where);
-			CM_Mysql::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
+			CM_Db_Db::delete(TBL_CM_ACTION, $where);
+			CM_Db_Db::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
 

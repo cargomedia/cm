@@ -3,45 +3,43 @@
 class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Config::get()->CM_Wowza->servers = array(1 => array('publicHost' => 'wowza1.fuckbook.cat.cargomedia', 'privateIp' => '10.0.3.108'));
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
+		CM_Config::get()->CM_Stream_Video->servers = array(1 => array('publicHost' => 'video.example.com', 'privateIp' => '10.0.3.108'));
 	}
 
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foo', 'width' => 100, 'height' => 200, 'serverId' => 1,
-			'thumbnailCount' => 2));
+		$channel = CM_Model_StreamChannel_Video::create(array('key'            => 'foo', 'width' => 100, 'height' => 200, 'serverId' => 1,
+															  'thumbnailCount' => 2, 'adapterType' => 1));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
 		$this->assertSame('10.0.3.108', $channel->getPrivateHost());
-		$this->assertSame('wowza1.fuckbook.cat.cargomedia', $channel->getPublicHost());
+		$this->assertSame('video.example.com', $channel->getPublicHost());
 		$this->assertSame('foo', $channel->getKey());
+		$this->assertSame(1, $channel->getAdapterType());
 		$this->assertSame(2, $channel->getThumbnailCount());
 	}
 
 	public function testCreateWithoutServerId() {
 		try {
-			CM_Model_StreamChannel_Video::create(array('key' => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null, 'thumbnailCount' => 2));
-			$this->fail('Can create streamChannel without wowzaIp');
+			CM_Model_StreamChannel_Video::create(array('key'            => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null,
+													   'thumbnailCount' => 2, 'adapterType' => 1));
+			$this->fail('Can create streamChannel without serverId');
 		} catch (CM_Exception $ex) {
-			$this->assertContains("`Column 'serverId' cannot be null`", $ex->getMessage());
+			$this->assertContains("Column 'serverId' cannot be null", $ex->getMessage());
 		}
 	}
 
 	public function testNonexistentServerId() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::create(array('key' => 'foobar', 'width' => 100, 'height' => 200, 'serverId' => 800,
-			'thumbnailCount' => 2));
+		$channel = CM_Model_StreamChannel_Video::create(array('key'            => 'foobar', 'width' => 100, 'height' => 200, 'serverId' => 800,
+															  'thumbnailCount' => 2, 'adapterType' => 1));
 
 		try {
 			$channel->getPublicHost();
 			$this->fail('Found server with Id 800');
 		} catch (CM_Exception $ex) {
-			$this->assertSame("No wowza server with id `800` found", $ex->getMessage());
+			$this->assertSame("No video server with id `800` found", $ex->getMessage());
 		}
 	}
 
@@ -64,7 +62,6 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 		$this->assertFalse($streamChannel->hasStreamPublish());
 		CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertTrue($streamChannel->hasStreamPublish());
-
 	}
 
 	public function testThumbnailCount() {

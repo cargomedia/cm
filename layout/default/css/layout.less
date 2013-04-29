@@ -1,52 +1,67 @@
-/*  Basic elements  */
-body {
-	.background-color(@colorBg);
+html {
+	font-family: @fontFamily;
+	font-size: @fontSize;
+	line-height: 1.5;
+	color: @colorFg;
 }
 
-a:link, a:visited  {
-	.link;
+body {
+	background-color: @colorBgBody;
+}
+
+a, a:visited {
+	color: @colorFgLink;
+	text-decoration: none;
 }
 
 a:hover {
-	.link_hover;
+	text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5 {
+	line-height: 1.7;
+}
+
+h1, h2, h3 {
+	font-family: @fontFamilyHeading;
+	font-weight: normal;
+	color: @colorFgHeading;
 }
 
 h1 {
-	.font( 18px, @fontFamilyHeading, @colorFgHeading );
-	letter-spacing: 1px;
 	margin: 7px 0;
-	.nowrap;
+	font-size: 18px;
+	letter-spacing: 1px;
 }
 
 h2 {
-	.font( 15px, @fontFamilyHeading, @colorFgHeading );
-	.nowrap;
+	margin: 0;
+	font-size: 15px;
 }
 
 h3 {
-	.font( 13px, @fontFamilyHeading, @colorFgHeading );
-	.nowrap;
+	margin: 0;
+	font-size: 13px;
 }
 
 h4 {
-	.font(@fontSize, @fontFamily, @colorFg );
 	margin: 8px 0 2px 0;
-	.nowrap;
 }
 
 h5 {
+	margin: 0;
 	font-weight: normal;
+	font-style: italic;
+}
+
+q {
 	font-style: italic;
 }
 
 hr {
 	height: 1px;
-	.border(@colorFgBorderShy);
+	.border(@colorFgBorderEmphasize1);
 	border-width: 1px 0 0 0;
-}
-
-body, p, input, table, textarea, select {
-	.font(@fontSize, @fontFamily, @colorFg );
 }
 
 strong {

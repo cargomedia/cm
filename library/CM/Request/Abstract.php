@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Request_Abstract {
+
 	/**
 	 * @var string
 	 */
@@ -37,7 +38,7 @@ abstract class CM_Request_Abstract {
 	private $_capabilities;
 
 	/**
-	 * @var CM_Session
+	 * @var CM_Session|null
 	 */
 	private $_session;
 
@@ -57,9 +58,9 @@ abstract class CM_Request_Abstract {
 	private static $_instance;
 
 	/**
-	 * @param string                   $uri
-	 * @param array|null               $headers OPTIONAL
-	 * @param CM_Model_User|null       $viewer
+	 * @param string             $uri
+	 * @param array|null         $headers OPTIONAL
+	 * @param CM_Model_User|null $viewer
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
@@ -71,10 +72,8 @@ abstract class CM_Request_Abstract {
 		$this->setUri($uri);
 
 		if ($sessionId = $this->getCookie('sessionId')) {
-			try {
-				$this->_session = new CM_Session($sessionId);
+			if ($this->_session = CM_Session::findById($sessionId)) {
 				$this->_session->start();
-			} catch (CM_Exception_Nonexistent $ex) {
 			}
 		}
 
@@ -132,7 +131,7 @@ abstract class CM_Request_Abstract {
 	public function getClientId() {
 		if (!$this->hasClientId()) {
 			if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = (int) CM_Mysql::insert(TBL_CM_REQUESTCLIENT, array());
+				$this->_clientId = (int) CM_Db_Db::insert(TBL_CM_REQUESTCLIENT, array());
 			}
 		}
 
@@ -215,6 +214,17 @@ abstract class CM_Request_Abstract {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return CM_Site_Abstract
+	 */
+	public function popPathSite() {
+		$siteId = $this->popPathPart();
+		if ('null' === $siteId) {
+			$siteId = null;
+		}
+		return CM_Site_Abstract::factory($siteId);
 	}
 
 	/**
@@ -401,6 +411,31 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isBotCrawler() {
+		if (!$this->hasHeader('user-agent')) {
+			return false;
+		}
+		$useragent = $this->getHeader('user-agent');
+		$useragentMatches = array(
+			'Googlebot',
+			'bingbot',
+			'msnbot',
+			'Sogou web spider',
+			'ia_archiver',
+			'Baiduspider',
+			'YandexBot',
+		);
+		foreach ($useragentMatches as $useragentMatch) {
+			if (false !== stripos($useragent, $useragentMatch)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @return CM_Model_Language|null
 	 */
 	private function _getLanguageViewer() {
@@ -419,7 +454,7 @@ abstract class CM_Request_Abstract {
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
 
 		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
-			$isValid = (bool) CM_Mysql::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+			$isValid = (bool) CM_Db_Db::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
 			if ($isValid) {
 				CM_CacheLocal::set($cacheKey, true);
 			}
@@ -465,10 +500,10 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param string               $method
-	 * @param string               $uri
-	 * @param array|null           $headers
-	 * @param string|null          $body
+	 * @param string      $method
+	 * @param string      $uri
+	 * @param array|null  $headers
+	 * @param string|null $body
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Get|CM_Request_Post
 	 */

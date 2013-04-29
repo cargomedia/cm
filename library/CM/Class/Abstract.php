@@ -19,19 +19,19 @@ abstract class CM_Class_Abstract {
 	/**
 	 * @param int $type
 	 * @return string
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
 	protected static function _getClassName($type = null) {
-		$type = (int) $type;
 		$config = self::_getConfig();
-		if (!$type || empty($config->types)) {
+		if (null === $type || empty($config->types)) {
 			if (empty($config->class)) {
 				return get_called_class();
 			}
 			return $config->class;
 		}
+		$type = (int) $type;
 		if (empty($config->types[$type])) {
-			throw new CM_Exception_Invalid('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
+			throw new CM_Class_Exception_TypeNotConfiguredException('Type `' . $type . '` not configured for class `' . get_called_class() . '`.');
 		}
 		return $config->types[$type];
 	}
@@ -42,12 +42,16 @@ abstract class CM_Class_Abstract {
 	 */
 	protected static function _getConfig() {
 		$config = CM_Config::get();
+		$result = array();
 		foreach (self::_getClassHierarchy() as $class) {
 			if (isset($config->$class)) {
-				return $config->$class;
+				$result = array_merge((array) $config->$class, $result);
 			}
 		}
-		throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+		if (empty($result)) {
+			throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+		}
+		return (object) $result;
 	}
 
 	/**

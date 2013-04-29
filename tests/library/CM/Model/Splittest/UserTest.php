@@ -6,10 +6,6 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 	}
 
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testIsVariationFixture() {
 		$user = CMTest_TH::createUser();
 

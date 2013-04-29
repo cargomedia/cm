@@ -2,13 +2,6 @@
 
 class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-	}
-
-	public static function tearDownAfterClass() {
-		CMTest_TH::clearEnv();
-	}
-
 	public function testConstructor() {
 		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$this->assertGreaterThan(0, $videoStreamPublish->getId());
@@ -20,22 +13,39 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testDuplicateKeys() {
+		$data = array('user'          => CMTest_TH::createUser(), 'start' => time(), 'allowedUntil' => time() + 100,
+					  'streamChannel' => CMTest_TH::createStreamChannel(), 'key' => '13215231_1');
+		CM_Model_Stream_Publish::create($data);
+		try {
+			CM_Model_Stream_Publish::create($data);
+			$this->fail('Should not be able to create duplicate key instance');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Duplicate entry', $e->getMessage());
+		}
+		$data['streamChannel'] = CMTest_TH::createStreamChannel();
+		CM_Model_Stream_Publish::create($data);
+	}
+
 	public function testSetAllowedUntil() {
 		$videoStreamPublish = CMTest_TH::createStreamPublish();
 		$videoStreamPublish->setAllowedUntil(234234);
-		$this->assertEquals(234234, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(234234, $videoStreamPublish->getAllowedUntil());
 		$videoStreamPublish->setAllowedUntil(2342367);
-		$this->assertEquals(2342367, $videoStreamPublish->getAllowedUntil());
+		$this->assertSame(2342367, $videoStreamPublish->getAllowedUntil());
+		$videoStreamPublish->setAllowedUntil(null);
+		$this->assertNull($videoStreamPublish->getAllowedUntil());
 	}
 
 	public function testCreate() {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
 		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
-		$videoStream = CM_Model_Stream_Publish::create(array('user' => $user, 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
-			'streamChannel' => $streamChannel));
-		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
-			'channelId' => $streamChannel->getId()));
+		$videoStream = CM_Model_Stream_Publish::create(array('user'          => $user, 'start' => 123123, 'allowedUntil' => 324234,
+															 'key'           => '123123_2',
+															 'streamChannel' => $streamChannel));
+		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId'    => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
+													  'channelId' => $streamChannel->getId()));
 		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 	}
 
@@ -55,12 +65,13 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public function testFindKey() {
 		$videoStreamPublishOrig = CMTest_TH::createStreamPublish();
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey($videoStreamPublishOrig->getKey());
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel($videoStreamPublishOrig->getKey(), $videoStreamPublishOrig->getStreamChannel());
 		$this->assertEquals($videoStreamPublish, $videoStreamPublishOrig);
 	}
 
 	public function testFindKeyNonexistent() {
-		$videoStreamPublish = CM_Model_Stream_Publish::findKey('doesnotexist');
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$videoStreamPublish = CM_Model_Stream_Publish::findByKeyAndChannel('doesnotexist', $streamChannel);
 		$this->assertNull($videoStreamPublish);
 	}
 
@@ -68,8 +79,9 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
 		/** @var CM_Model_Stream_Publish $streamPublish */
-		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'key' => 'foo'));
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+															   'allowedUntil'  => time() + 100,
+															   'key'           => 'foo'));
 		$this->assertSame('foo', $streamPublish->getKey());
 	}
 
@@ -77,8 +89,9 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
 		/** @var CM_Model_Stream_Publish $streamPublish */
-		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(), 'allowedUntil' => time() + 100,
-			'key' => str_repeat('a', 100)));
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+															   'allowedUntil'  => time() + 100,
+															   'key'           => str_repeat('a', 100)));
 		$this->assertSame(str_repeat('a', 36), $streamPublish->getKey());
 	}
 
@@ -86,6 +99,5 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
-
 	}
 }

@@ -1,33 +1,35 @@
 .paging {
 	margin-top: 5px;
-	.clearfix;
+	text-align: right;
 
-	.paging-inner {
-		a {
-			.border(@colorFgBorderShy);
-			color: @colorFgLinkLight;
-			float: left;
-			padding: 0 7px;
-			text-align: center;
-			border-width: 0;
+	a {
+		display: inline-block;
+		padding: 0 7px;
+		border: 1px solid @colorFgBorderEmphasize1;
+		border-width: 0;
+		text-align: center;
+		color: @colorFgLinkLight;
+		text-decoration: none;
 
-			&.pagingFirst, &.pagingPrev {
-				border-right-width: 1px;
-			}
-			&.pagingNumber {
-				border-left-width: 1px;
-				&:first-child {
-					border-left-width: 0;
-				}
-				font-weight: bold;
-			}
-			&.pagingNext, &.pagingLast {
-				border-left-width: 1px;
-			}
+		&.pagingFirst, &.pagingPrev {
+			border-right-width: 1px;
+		}
 
-			&.active {
-				color: darken(@colorFgHeading, 15);
+		&.pagingNext, &.pagingLast {
+			border-left-width: 1px;
+		}
+
+		&.pagingNumber {
+			border-left-width: 1px;
+			font-weight: bold;
+
+			&:first-child {
+				border-left-width: 0;
 			}
+		}
+
+		&.active {
+			color: darken(@colorFgHeading, 15);
 		}
 	}
 }

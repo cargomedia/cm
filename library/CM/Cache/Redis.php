@@ -23,14 +23,6 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		}
 	}
 
-	/**
-	 * @param string|string[] $channels
-	 * @param Closure         $callback fn($channel, $message)
-	 */
-	public static function subscribe($channels, Closure $callback) {
-		static::_callInstance('subscribe', array($channels, $callback), false);
-	}
-
 	protected function _getName() {
 		return 'Redis';
 	}
@@ -108,23 +100,26 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 
 	/**
 	 * @param string|string[] $channels
-	 * @param Closure         $callback
+	 * @param Closure $callback
 	 */
-	protected function _subscribe($channels, Closure $callback) {
+	public function subscribe($channels, Closure $callback) {
 		$channels = (array) $channels;
 		$this->_subscribeCallback = $callback;
-		$this->_redis->setOption(Redis::OPT_READ_TIMEOUT, 86400 * 100);
 		$this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
 	}
 
 	/**
-	 * @param Redis  $redis
+	 * @param Redis $redis
 	 * @param string $channel
 	 * @param string $message
 	 */
 	public function _subscribeCallback($redis, $channel, $message) {
-		$callback = $this->_subscribeCallback;
-		$callback($channel, $message);
+		try {
+			$callback = $this->_subscribeCallback;
+			$callback($channel, $message);
+		} catch (Exception $e) {
+			CM_Bootloader::getInstance()->handleException($e);
+		}
 	}
 
 	protected function _flush() {
