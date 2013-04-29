@@ -43,6 +43,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			formatSelectionTooBig: null
 		}).select2('data', this._getPrePopulateValue());
 
+		this.$('.select2-container').removeClass('textinput');
+		this.$('.select2-choices').addClass('textinput');
+
 		this.$input.on("change", function(e) {
 			if (!_.isUndefined(e.added)) {
 				var items = field.$input.select2("data");
