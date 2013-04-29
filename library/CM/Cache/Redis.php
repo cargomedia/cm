@@ -105,6 +105,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	public function subscribe($channels, Closure $callback) {
 		$channels = (array) $channels;
 		$this->_subscribeCallback = $callback;
+		$this->_redis->setOption(Redis::OPT_READ_TIMEOUT, 86400 * 100);
 		$this->_redis->subscribe($channels, array($this, '_subscribeCallback'));
 	}
 
