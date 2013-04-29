@@ -137,23 +137,10 @@ input[type=radio], input[type=checkbox] {
 	width: 660px;
 	max-width: 100%;
 	min-height: 24px;
-	padding: 12px;
-	border: 1px solid darken(@colorFgBorderEmphasize2, 3);
-	border-bottom-width: 0;
-	background-color: darken(@colorBg, 3);
-	border-top-color: lighten(@colorFgBorderEmphasize2, 3);
+	padding: 8px;
 
 	@media (max-width: 600px) {
 		padding: 6px 12px;
-	}
-
-	&:first-child{
-		border-top: 1px solid @colorFgBorderEmphasize2;
-	}
-
-	&.submit {
-		border-top-width: 0;
-		border-bottom-width: 1px;
 	}
 
 	> label {
