@@ -1,6 +1,6 @@
 <?php
 
-class CM_SVM {
+class CM_SVM_Model {
 
 	/**
 	 * @var SVMModel
