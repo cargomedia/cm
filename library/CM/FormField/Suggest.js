@@ -13,7 +13,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		this.$input = this.$('input[type="text"]');
 
 		this.$input.select2({
-			tags: null,
+			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
 			maximumSelectionSize: cardinality,
 			formatResult: this._formatItem,
