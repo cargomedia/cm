@@ -54,13 +54,16 @@
 	border: 1px solid lighten(@colorNotice, 15);
 }
 
-.indication_pointer(@color, @size: 5px) {
+.triangle(@colorDirectionBottom: transparent, @colorDirectionLeft: transparent, @colorDirectionTop: transparent, @colorDirectionRight: transparent, @size: 5px) {
 	position: absolute;
 	width: 0;
 	height: 0;
 	content: "";
 	border: @size solid transparent;
-	border-left-color: @color;
+	border-top-color: @colorDirectionBottom;
+	border-right-color: @colorDirectionLeft;
+	border-bottom-color: @colorDirectionTop;
+	border-left-color: @colorDirectionRight;
 	top: 50%;
 	margin-top: -@size;
 	left: -10px;
