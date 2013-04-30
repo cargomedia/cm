@@ -12,6 +12,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var cardinality = this.getOption("cardinality");
 		this.$input = this.$('input[type="text"]');
 
+		this.$input.removeClass('textinput');
 		this.$input.select2({
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
@@ -43,8 +44,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			},
 			formatSelectionTooBig: null
 		}).select2('data', this._getPrePopulateValue());
-
-		this.$('.select2-container').removeClass('textinput');
 		this.$('.select2-choices').addClass('textinput');
 
 		this.$input.on("change", function(e) {
