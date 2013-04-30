@@ -436,6 +436,20 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isSupported() {
+		if (!$this->hasHeader('user-agent')) {
+			return true;
+		}
+		$userAgent = $this->getHeader('user-agent');
+		if (preg_match('#MSIE [5678]\.#', $userAgent)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @return CM_Model_Language|null
 	 */
 	private function _getLanguageViewer() {
