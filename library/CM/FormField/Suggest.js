@@ -11,11 +11,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var field = this;
 		var cardinality = this.getOption("cardinality");
 		this.$input = this.$('input[type="text"]');
-		this.$input.removeClass('textinput');
 
 		this.$input.select2({
 			tags: null,
+			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
+			openOnEnter: false,
 			maximumSelectionSize: cardinality,
 			formatResult: this._formatItem,
 			formatSelection: this._formatItemSelected,
@@ -42,6 +43,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			},
 			formatSelectionTooBig: null
 		}).select2('data', this._getPrePopulateValue());
+
+		this.$('.select2-container').removeClass('textinput');
+		this.$('.select2-choices').addClass('textinput');
 
 		this.$input.on("change", function(e) {
 			if (!_.isUndefined(e.added)) {
@@ -121,7 +125,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		}
 		var output = '<div class="' + cssClass + '">';
 		if (item.img) {
-			output += '<img src="' + item.img + '" /> ';
+			output += '<div class="suggestItem-image"><img src="' + item.img + '" /></div>';
 		}
 		output += '<span class="suggestItem-name">' + _.escape(item.name) + '</span>';
 		if (item.description) {
@@ -138,7 +142,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	_formatItemSelected: function(item) {
 		var output = _.escape(item.name);
 		if (item.img) {
-			output = '<img src="' + item.img + '" /> ' + output;
+			output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
 		}
 		return output;
 	}
