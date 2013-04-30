@@ -147,9 +147,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 
 		CM_Model_Location::dumpToTable();
 
-//		$referenceLocation = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $reference);
-//		$test = $referenceLocation->findByCoordinates();
-//		$this->assertSame(array('id' => $expected, 'level' => CM_Model_Location::LEVEL_CITY), $referenceLocation->findByCoordinates());
+		$referenceLocation = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $reference);
+		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), $referenceLocation->findByCoordinates());
 	}
 
 	public function testFindByIp() {
