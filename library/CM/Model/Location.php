@@ -214,21 +214,23 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$searchRadius = 100000;
 		$metersPerDegree = 111100;
 
-		$result = CM_Db_Db::execRead("SELECT `id`, `level`
+		$result = CM_Db_Db::execRead("
+			SELECT `id`, `level`
 			FROM TBL_CM_TMP_LOCATION_COORDINATES
-				WHERE
-					MBRContains(
-						GeomFromText(
-							'LineString(
-								" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
-								" . ($lon + $searchRadius / $metersPerDegree) . ",
-								" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
-								" . ($lon - $searchRadius / $metersPerDegree) . "
-							)'
-						), coordinates
-					)
-				ORDER BY
-					((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC LIMIT 1"
+			WHERE
+				MBRContains(
+					GeomFromText(
+						'LineString(
+							" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon + $searchRadius / $metersPerDegree) . ",
+							" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon - $searchRadius / $metersPerDegree) . "
+						)'
+					), coordinates
+				)
+			ORDER BY
+				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
+			LIMIT 1"
 		)->fetch();
 
 		if (!$result) {
