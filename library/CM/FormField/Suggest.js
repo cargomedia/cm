@@ -11,6 +11,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var field = this;
 		var cardinality = this.getOption("cardinality");
 		this.$input = this.$('input[type="text"]');
+		var prePopulate = this.$input.data('pre-populate');
 
 		this.$input.removeClass('textinput');
 		this.$input.select2({
@@ -43,7 +44,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				}
 			},
 			formatSelectionTooBig: null
-		}).select2('data', this._getPrePopulateValue());
+		}).select2('data', prePopulate);
 		this.$('.select2-choices').addClass('textinput');
 
 		this.$input.on("change", function(e) {
@@ -100,17 +101,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		this.setTimeout(function() {
 			this.$('input.select2-input').blur();
 		}, 10);
-	},
-
-	/**
-	 * @return {Object[]|null}
-	 */
-	_getPrePopulateValue: function() {
-		var prePopulate = this.$input.attr('data-prePopulate');
-		if (prePopulate && prePopulate.length) {
-			return JSON.parse(prePopulate);
-		}
-		return null;
 	},
 
 	/**
