@@ -10,8 +10,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 		CM_ModelAsset_User_Roles::deleteOld();
 		CM_Paging_Useragent_Abstract::deleteOlder(100 * 86400);
 		CM_File_UserContent_Temp::deleteOlder(86400);
-		CM_SVM::deleteOldTrainings(3000);
-		CM_SVM::trainChanged();
+		CM_SVM_Model::deleteOldTrainings(3000);
+		CM_SVM_Model::trainChanged();
 		CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
 		CM_Captcha::deleteOlder(3600);
 		CM_ModelAsset_User_Roles::deleteOld();

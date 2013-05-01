@@ -5,75 +5,134 @@
 var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_Suggest',
 
+	$input: null,
+
 	ready: function() {
 		var field = this;
-		var prePopulate = this.$(".prePopulate");
-		prePopulate = prePopulate.length ? JSON.parse(prePopulate.val()) : null;
-		var $input = this.$('input[type="text"]');
-		$input.tokenInput(
-			function (query, handle_results) {
-				field.ajax('getSuggestions', {'term':query, 'options':field.getOptions()}, {
+		var cardinality = this.getOption("cardinality");
+		this.$input = this.$('input[type="text"]');
+		var prePopulate = this.$input.data('pre-populate');
+
+		this.$input.removeClass('textinput');
+		this.$input.select2({
+			tags: null,
+			dropdownCssClass: this.$el.attr('class'),
+			allowClear: true,
+			openOnEnter: false,
+			maximumSelectionSize: cardinality,
+			formatResult: this._formatItem,
+			formatSelection: this._formatItemSelected,
+			escapeMarkup: function(item) {
+				return item;
+			},
+			query: function(options) {
+				field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
 					success: function(results) {
-						handle_results(query, results);
+						options.callback({
+							results: results
+						});
 					}
 				});
-			},{
-			resultsFormatter: function(item){
-				var output = "<p>" + item.name + "</p>";
-				if (item.description) {
-					output += "<small>" + item.description + "</small>";
+			},
+			createSearchChoice: function(term, data) {
+				if (field.getOption("enableChoiceCreate")) {
+					if ($(data).filter(function() {
+						return this.name.localeCompare(term) === 0;
+					}).length === 0) {
+						return {'id': term, 'name': term, 'new': 1};
+					}
 				}
-				if (item.img) {
-					output = "<img src=\"" + item.img + "\" />" + output;
+			},
+			formatSelectionTooBig: null
+		}).select2('data', prePopulate);
+		this.$('.select2-choices').addClass('textinput');
+
+		this.$input.on("change", function(e) {
+			if (!_.isUndefined(e.added)) {
+				var items = field.$input.select2("data");
+				if (cardinality && items.length > cardinality) {
+					items.pop();
+					field.$input.select2('data', items);
+					field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
+					return false;
 				}
-				return "<li>" + output + "</li>";
-			},
-			tokenFormatter: function(item) {
-				var output = "<p>" + item.name + "</p>";
-				if (item.img) {
-					output = "<img src=\"" + item.img + "\" />" + output;
-				}					
-				return "<li>" + output + "</li>";
-			},
-			onAdd: function(item) {
-				field.onAdd(item);
-				field.onChange($input.tokenInput("get"));
-				field.trigger('add', item);
-			},
-			onDelete: function(item) {
-				field.onDelete(item);
-				field.onChange($input.tokenInput("get"));
-				field.trigger('delete', item);
-			},
-			animateDropdown: false,
-			preventDuplicates: true,
-			hintText: null,
-			deleteText: '',
-			searchDelay: 0,
-			tokenLimit: field.getOption("cardinality"),
-			prePopulate: prePopulate,
-			classes: {
-				tokenDelete: 'token-input-delete-token icon-close',
-				focused: 'focus'
+				field.onAdd(e.added);
+				field.trigger('add', e.added);
 			}
+			if (!_.isUndefined(e.removed)) {
+				field.onDelete(e.removed);
+				field.trigger('delete', e.removed);
+			}
+			field.onChange(field.$input.select2("data"));
 		});
-		this.getForm().$().bind("reset", function() {
-			$input.tokenInput("clear");
-		});
-		if (this.getOption("cardinality") == 1) {
-			this.$(".token-input-list").click(function() {
-				$input.tokenInput("clear");
+
+		if (1 == cardinality) {
+			this.$input.on("open", function(e) {
+				field.$input.select2('data', null);
 			});
 		}
-		this.onChange($input.tokenInput("get"));
+
+		this.getForm().$().bind("reset", function() {
+			field.$input.select2('data', null);
+		});
+
+		this.onChange(this.$input.select2("data"));
 	},
-	
+
+	/**
+	 * @param {Object} item
+	 */
 	onAdd: function(item) {
 	},
-	
+
+	/**
+	 * @param {Object} item
+	 */
 	onDelete: function(item) {
 	},
-	
+
+	/**
+	 * @param {Object[]} items
+	 */
 	onChange: function(items) {
+	},
+
+	blur: function() {
+		this.setTimeout(function() {
+			this.$('input.select2-input').blur();
+		}, 10);
+	},
+
+	/**
+	 * @param {Object} item
+	 * @return String
+	 */
+	_formatItem: function(item) {
+		var cssClass = 'suggestItem';
+		if (item['class']) {
+			cssClass += ' ' + _.escape(item['class']);
+		}
+		var output = '<div class="' + cssClass + '">';
+		if (item['img']) {
+			output += '<div class="suggestItem-image"><img src="' + item['img'] + '" /></div>';
+		}
+		output += '<span class="suggestItem-name">' + _.escape(item['name']) + '</span>';
+		if (item['description']) {
+			output += '<small class="suggestItem-description">' + _.escape(item['description']) + '</small>';
+		}
+		output += '</div>';
+		return output;
+	},
+
+	/**
+	 * @param {Object} item
+	 * @return String
+	 */
+	_formatItemSelected: function(item) {
+		var output = _.escape(item['name']);
+		if (item['img']) {
+			output = '<div class="suggestItem-image"><img src="' + item['img'] + '" /></div>' + output;
+		}
+		return output;
 	}
 });

@@ -1,8 +1,8 @@
 <?php
 
-class CM_SVMTest extends CMTest_TestCase {
+class CM_SVM_ModelTest extends CMTest_TestCase {
 	/**
-	 * @var CM_SVM
+	 * @var CM_SVM_Model
 	 */
 	private $_svm;
 
@@ -10,7 +10,7 @@ class CM_SVMTest extends CMTest_TestCase {
 		if (!extension_loaded('svm')) {
 			$this->markTestSkipped('Extension `svm` not loaded.');
 		}
-		$this->_svm = new CM_SVM(1);
+		$this->_svm = new CM_SVM_Model(1);
 	}
 
 	public function tearDown() {
@@ -85,34 +85,34 @@ class CM_SVMTest extends CMTest_TestCase {
 	}
 
 	public function testTrainChanged() {
-		$svm = new CM_SVM(1);
+		$svm = new CM_SVM_Model(1);
 		$svm->addTraining(-1, array(1 => 1.0, 2 => 0.0));
 		$svm->addTraining(1, array(1 => 0.0, 2 => 1.0));
 		$this->assertNotSame(1, $svm->predict(array(1 => 0.0, 2 => 1.0)));
 
-		CM_SVM::trainChanged();
-		$svm = new CM_SVM(1);
+		CM_SVM_Model::trainChanged();
+		$svm = new CM_SVM_Model(1);
 		$this->assertSame(1, $svm->predict(array(1 => 0.0, 2 => 1.0)));
 
 		$svm->flush();
 	}
-	
+
 	public function testDeleteOldTrainings() {
-		$svm = new CM_SVM(1);
+		$svm = new CM_SVM_Model(1);
 		$svm->addTraining(-1, array(1 => 1.0, 2 => 0.0));
 		$svm->addTraining(-1, array(1 => 1.0, 2 => 0.0));
 		$svm->addTraining(1, array(1 => 0.0, 2 => 1.0));
 		$svm->addTraining(1, array(1 => 0.0, 2 => 1.0));
 		$svm->train();
 		$this->assertSame(1, $svm->predict(array(1 => 0.0, 2 => 1.0)));
-		
+
 		$svm->addTraining(1, array(1 => 1.0, 2 => 0.0));
 		$svm->addTraining(-1, array(1 => 0.0, 2 => 1.0));
 		$svm->train();
 		$this->assertNotSame(-1, $svm->predict(array(1 => 0.0, 2 => 1.0)));
 
-		CM_SVM::deleteOldTrainings(2);
-		$svm = new CM_SVM(1);
+		CM_SVM_Model::deleteOldTrainings(2);
+		$svm = new CM_SVM_Model(1);
 		$svm->train();
 		$this->assertSame(-1, $svm->predict(array(1 => 0.0, 2 => 1.0)));
 
