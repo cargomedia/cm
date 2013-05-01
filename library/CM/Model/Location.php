@@ -266,27 +266,36 @@ class CM_Model_Location extends CM_Model_Abstract {
 
 	public static function dumpToTable() {
 		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
-		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `coordinates`)
+		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
-					`1`.`name`, `1`.`abbreviation`, POINT(0,0)
+					`1`.`name`, `1`.`abbreviation`
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
-					`2`.`name`, NULL, POINT(0,0)
+					`2`.`name`, NULL
 			FROM `' . TBL_CM_LOCATIONSTATE . '` AS `2`
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 3, `3`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, NULL,
-					`3`.`name`, NULL, POINT(IFNULL(`3`.`lat`, 0), IFNULL(`3`.`lon`, 0))
+					`3`.`name`, NULL
 			FROM `' . TBL_CM_LOCATIONCITY . '` AS `3`
 			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`,
-					`4`.`name`, NULL, POINT(IFNULL(`4`.`lat`, 0), IFNULL(`4`.`lon`, 0))
+					`4`.`name`, NULL
 			FROM `' . TBL_CM_LOCATIONZIP . '` AS `4`
 			LEFT JOIN `' . TBL_CM_LOCATIONCITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)');
+
+		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION_COORDINATES . '` (`level`,`id`,`coordinates`)
+			SELECT 3, `id`, POINT(lat, lon)
+			FROM `' . TBL_CM_LOCATIONCITY . '`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
+			UNION
+			SELECT 4, `id`, POINT(lat, lon)
+			FROM `' . TBL_CM_LOCATIONZIP . '`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
 	}
 }
