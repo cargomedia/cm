@@ -11,7 +11,4 @@ if (!CM_Db_Db::existsTable('`cm_tmp_location_coordinates`')) {
 
 	CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
 		SELECT `level`, `id`, POINT(lat, lon) FROM `cm_tmp_location` WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
-
-	CM_Db_Db::exec('ALTER TABLE `cm_tmp_location` DROP COLUMN `lat`');
-	CM_Db_Db::exec('ALTER TABLE `cm_tmp_location` DROP COLUMN `lon`');
 }
