@@ -460,7 +460,7 @@ CREATE TABLE IF NOT EXISTS `cm_tmp_location_coordinates` (
   `level` tinyint(4) NOT NULL,
   `id` int(10) unsigned NOT NULL,
   `coordinates` point NOT NULL,
-  UNIQUE KEY `levelId` (`level`,`id`),
+  PRIMARY KEY (`level`,`id`),
   SPATIAL KEY `coordinates_spatial` (`coordinates`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
