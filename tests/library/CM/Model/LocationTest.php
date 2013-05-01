@@ -132,6 +132,24 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$this->assertSame(86720, $location->getDistance($locationAgainst));
 	}
 
+	public function testFindByCoordinates() {
+		CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array(
+			'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
+			'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
+			'name'      => 'test',
+			'lat'       => 20, 'lon' => 20));
+
+		$expected = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array(
+			'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
+			'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
+			'name'      => 'test',
+			'lat'       => 20.1, 'lon' => 20.2));
+
+		CM_Model_Location::dumpToTable();
+		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), CM_Model_Location::findByCoordinates(20, 20.3));
+		$this->assertNull(CM_Model_Location::findByCoordinates(100, 100));
+	}
+
 	public function testFindByIp() {
 		$cityId1 = CM_Db_Db::getRandId(TBL_CM_LOCATIONCITY, 'id');
 		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
