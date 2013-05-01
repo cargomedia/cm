@@ -211,28 +211,31 @@ class CM_Model_Location extends CM_Model_Abstract {
 	public static function findByCoordinates($lat, $lon) {
 		$lat = (float) $lat;
 		$lon = (float) $lon;
-		$distance = 100;
+		$searchRadius = 100000;
+		$metersPerDegree = 111100;
 
-		return CM_Db_Db::exec("SELECT `id`, `level`
+		$result = CM_Db_Db::execRead("SELECT `id`, `level`
 			FROM TBL_CM_TMP_LOCATION_COORDINATES
 				WHERE
 					MBRContains(
 						GeomFromText(
 							'LineString(
-								" . ($lat + $distance / (111.1 / cos($lat))) . "
-								" . ($lon + $distance / 111.1) . ",
-								" . ($lat - $distance / (111.1 / cos($lat))) . "
-								" . ($lon - $distance / 111.1) . "
+								" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
+								" . ($lon + $searchRadius / $metersPerDegree) . ",
+								" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
+								" . ($lon - $searchRadius / $metersPerDegree) . "
 							)'
 						), coordinates
 					)
 				ORDER BY
-					((
-						POW(" . $lat . " - X(coordinates), 2)) + (
-						POW(" . $lon . " - Y(coordinates), 2))
-					)
-				ASC LIMIT 1"
+					((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC LIMIT 1"
 		)->fetch();
+
+		if (!$result) {
+			return null;
+		}
+
+		return $result;
 	}
 
 	/**
