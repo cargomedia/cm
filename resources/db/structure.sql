@@ -451,19 +451,16 @@ CREATE TABLE IF NOT EXISTS `cm_tmp_location` (
   `abbreviation` char(2) DEFAULT NULL,
   `lat` float DEFAULT NULL,
   `lon` float DEFAULT NULL,
-  `coordinates` point NOT NULL,
-  UNIQUE KEY `levelId` (`level`,`id`),
-  SPATIAL KEY `coordinates_spatial` (`coordinates`)
+  UNIQUE KEY `levelId` (`level`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_tmp_location_coordinates`;
-
 
 CREATE TABLE IF NOT EXISTS `cm_tmp_location_coordinates` (
   `level` tinyint(4) NOT NULL,
   `id` int(10) unsigned NOT NULL,
   `coordinates` point NOT NULL,
-  PRIMARY KEY (`level`,`id`),
+  UNIQUE KEY `levelId` (`level`,`id`),
   SPATIAL KEY `coordinates_spatial` (`coordinates`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
