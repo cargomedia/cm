@@ -122,6 +122,7 @@ class CM_Bootloader {
 		define('TBL_CM_LOCATIONCOUNTRYIP', 'cm_locationCountryIp');
 
 		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
+		define('TBL_CM_TMP_LOCATION_COORDINATES', 'cm_tmp_location_coordinates');
 		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
 
 		define('TBL_CM_CAPTCHA', 'cm_captcha');

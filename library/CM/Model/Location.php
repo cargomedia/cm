@@ -204,6 +204,43 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param float $lat
+	 * @param float $lon
+	 * @return string[]|null
+	 */
+	public static function findByCoordinates($lat, $lon) {
+		$lat = (float) $lat;
+		$lon = (float) $lon;
+		$searchRadius = 100000;
+		$metersPerDegree = 111100;
+
+		$result = CM_Db_Db::execRead("
+			SELECT `id`, `level`
+			FROM TBL_CM_TMP_LOCATION_COORDINATES
+			WHERE
+				MBRContains(
+					GeomFromText(
+						'LineString(
+							" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon + $searchRadius / $metersPerDegree) . ",
+							" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon - $searchRadius / $metersPerDegree) . "
+						)'
+					), coordinates
+				)
+			ORDER BY
+				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
+			LIMIT 1"
+		)->fetch();
+
+		if (!$result) {
+			return null;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * @param string $db_table
 	 * @param string $db_column
 	 * @param int    $ip
@@ -254,5 +291,15 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `' . TBL_CM_LOCATIONCITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)');
+
+		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION_COORDINATES);
+		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION_COORDINATES . '` (`level`,`id`,`coordinates`)
+			SELECT 3, `id`, POINT(lat, lon)
+			FROM `' . TBL_CM_LOCATIONCITY . '`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
+			UNION
+			SELECT 4, `id`, POINT(lat, lon)
+			FROM `' . TBL_CM_LOCATIONZIP . '`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
 	}
 }
