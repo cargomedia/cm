@@ -468,7 +468,7 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.trigger(event.type, event.data);
 		});
 		flashvars = _.extend({'debug': cm.options.debug, 'eventCallback': eventCallbackName}, flashvars);
-		flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true'}, flashparams);
+		flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true', 'wmode': 'transparent'}, flashparams);
 		callbackSuccess = callbackSuccess || new Function();
 		callbackFailure = callbackFailure || new Function();
 		var id = $element.attr('id');
