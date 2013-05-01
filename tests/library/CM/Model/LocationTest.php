@@ -133,7 +133,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 	}
 
 	public function testFindByCoordinates() {
-		$reference = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array(
+		CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array(
 			'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
 			'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
 			'name'      => 'test',
@@ -146,9 +146,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 			'lat'       => 20.1, 'lon' => 20.2));
 
 		CM_Model_Location::dumpToTable();
-
-		$referenceLocation = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $reference);
-		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), $referenceLocation->findByCoordinates());
+		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), CM_Model_Location::findByCoordinates(20, 20.3));
+		$this->assertFalse(CM_Model_Location::findByCoordinates(100, 100));
 	}
 
 	public function testFindByIp() {

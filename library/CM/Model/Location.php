@@ -128,40 +128,6 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return (int) round($earthRadius * $arcCosine);
 	}
 
-	/**
-	 * @return string[]|null
-	 */
-	public function findByCoordinates() {
-		if (!$coordinates = $this->getCoordinates()) {
-			return null;
-		}
-
-		$distance = 100;
-
-		return CM_Db_Db::exec("SELECT `id`, `level`
-			FROM TBL_CM_TMP_LOCATION
-				WHERE
-					MBRContains(
-						GeomFromText(
-							'LineString(
-								" . ($coordinates['lat'] + $distance / (111.1 / cos($coordinates['lat']))) . "
-								" . ($coordinates['lon'] + $distance / 111.1) . ",
-								" . ($coordinates['lat'] - $distance / (111.1 / cos($coordinates['lat']))) . "
-								" . ($coordinates['lon'] - $distance / 111.1) . "
-							)'
-						), coordinates
-					)
-				AND
-					`id` != " . $this->getId() . "
-				ORDER BY
-					((
-						POW(" . $coordinates['lat'] . " - X(coordinates), 2)) + (
-						POW(" . $coordinates['lon'] . " - Y(coordinates), 2))
-					)
-				ASC LIMIT 1"
-		)->fetch();
-	}
-
 	protected function _loadData() {
 		switch ($this->getLevel()) {
 			case self::LEVEL_ZIP:
@@ -235,6 +201,38 @@ class CM_Model_Location extends CM_Model_Abstract {
 			return null;
 		}
 		return new self($level, $id);
+	}
+
+	/**
+	 * @param float $lat
+	 * @param float $lon
+	 * @return string[]|null
+	 */
+	public static function findByCoordinates($lat, $lon) {
+		$lat = (float) $lat;
+		$lon = (float) $lon;
+		$distance = 100;
+
+		return CM_Db_Db::exec("SELECT `id`, `level`
+			FROM TBL_CM_TMP_LOCATION_COORDINATES
+				WHERE
+					MBRContains(
+						GeomFromText(
+							'LineString(
+								" . ($lat + $distance / (111.1 / cos($lat))) . "
+								" . ($lon + $distance / 111.1) . ",
+								" . ($lat - $distance / (111.1 / cos($lat))) . "
+								" . ($lon - $distance / 111.1) . "
+							)'
+						), coordinates
+					)
+				ORDER BY
+					((
+						POW(" . $lat . " - X(coordinates), 2)) + (
+						POW(" . $lon . " - Y(coordinates), 2))
+					)
+				ASC LIMIT 1"
+		)->fetch();
 	}
 
 	/**
