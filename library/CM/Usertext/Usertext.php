@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Usertext {
+class CM_Usertext_Usertext extends CM_Class_Abstract {
 
 	/** @var CM_Render */
 	private $_render;
@@ -103,5 +103,15 @@ class CM_Usertext_Usertext {
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
+	}
+
+	/**
+	 * @param CM_Render $render
+	 * @param bool      $decode OPTIONAL
+	 * @return CM_Usertext_Usertext
+	 */
+	public static function factory(CM_Render $render, $decode = true) {
+		$className = self::_getClassName();
+		return new $className($render, $decode);
 	}
 }

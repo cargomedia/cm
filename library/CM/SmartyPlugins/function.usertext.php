@@ -17,7 +17,7 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
 	$skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
 
-	$usertext = new CM_Usertext_Usertext($render);
+	$usertext =CM_Usertext_Usertext::factory($render);
 	$usertext->setMode($mode, $maxLength, $isMail, $skipAnchors);
 
 	$text = $usertext->transform($text);
