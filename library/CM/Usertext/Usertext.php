@@ -107,11 +107,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 
 	/**
 	 * @param CM_Render $render
-	 * @param bool      $decode OPTIONAL
 	 * @return CM_Usertext_Usertext
 	 */
-	public static function factory(CM_Render $render, $decode = true) {
+	public static function factory(CM_Render $render) {
 		$className = self::_getClassName();
-		return new $className($render, $decode);
+		return new $className($render);
 	}
 }
