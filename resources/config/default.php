@@ -89,6 +89,9 @@ $config->CM_Model_User->class = 'CM_Model_User';
 $config->CM_Params = new stdClass();
 $config->CM_Params->class = 'CM_Params';
 
+$config->CM_Usertext_Usertext = new stdClass();
+$config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
+
 $config->CM_Response_Page = new stdClass();
 $config->CM_Response_Page->catch = array(
 	'CM_Exception_Nonexistent'  => '/error/not-found',
