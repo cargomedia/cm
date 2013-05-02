@@ -29,8 +29,13 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 	}
 
 	public function testModeMarkdown() {
-		$this->_assertSame("<span class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></span>", array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n",
-																															  'mode' => 'markdown'));
+		$this->_assertSame("<span class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p><a href=\"http://www.google.com\">google.com</a></p></span>",
+			array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n", 'mode' => 'markdown'));
+	}
+
+	public function testModeMarkdownSkipAnchors() {
+		$this->_assertSame("<span class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></span>",
+			array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n", 'mode' => 'markdown', 'skipAnchors' => true));
 	}
 
 	public function testModeMarkdownPlain() {
