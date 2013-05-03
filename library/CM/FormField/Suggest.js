@@ -11,7 +11,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		var field = this;
 		var cardinality = this.getOption("cardinality");
 		this.$input = this.$('input[type="text"]');
+		var prePopulate = this.$input.data('pre-populate');
 
+		this.$input.removeClass('textinput');
 		this.$input.select2({
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
@@ -37,14 +39,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 					if ($(data).filter(function() {
 						return this.name.localeCompare(term) === 0;
 					}).length === 0) {
-						return {id: term, name: term, new: 1};
+						return {'id': term, 'name': term, 'new': 1};
 					}
 				}
 			},
 			formatSelectionTooBig: null
-		}).select2('data', this._getPrePopulateValue());
-
-		this.$('.select2-container').removeClass('textinput');
+		}).select2('data', prePopulate);
 		this.$('.select2-choices').addClass('textinput');
 
 		this.$input.on("change", function(e) {
@@ -104,32 +104,21 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	},
 
 	/**
-	 * @return {Object[]|null}
-	 */
-	_getPrePopulateValue: function() {
-		var prePopulate = this.$input.attr('data-prePopulate');
-		if (prePopulate && prePopulate.length) {
-			return JSON.parse(prePopulate);
-		}
-		return null;
-	},
-
-	/**
 	 * @param {Object} item
 	 * @return String
 	 */
 	_formatItem: function(item) {
 		var cssClass = 'suggestItem';
-		if (item.class) {
-			cssClass += ' ' + _.escape(item.class);
+		if (item['class']) {
+			cssClass += ' ' + _.escape(item['class']);
 		}
 		var output = '<div class="' + cssClass + '">';
-		if (item.img) {
-			output += '<div class="suggestItem-image"><img src="' + item.img + '" /></div>';
+		if (item['img']) {
+			output += '<div class="suggestItem-image"><img src="' + item['img'] + '" /></div>';
 		}
-		output += '<span class="suggestItem-name">' + _.escape(item.name) + '</span>';
-		if (item.description) {
-			output += '<small class="suggestItem-description">' + _.escape(item.description) + '</small>';
+		output += '<span class="suggestItem-name">' + _.escape(item['name']) + '</span>';
+		if (item['description']) {
+			output += '<small class="suggestItem-description">' + _.escape(item['description']) + '</small>';
 		}
 		output += '</div>';
 		return output;
@@ -140,9 +129,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	 * @return String
 	 */
 	_formatItemSelected: function(item) {
-		var output = _.escape(item.name);
-		if (item.img) {
-			output = '<div class="suggestItem-image"><img src="' + item.img + '" /></div>' + output;
+		var output = _.escape(item['name']);
+		if (item['img']) {
+			output = '<div class="suggestItem-image"><img src="' + item['img'] + '" /></div>' + output;
 		}
 		return output;
 	}

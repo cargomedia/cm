@@ -281,8 +281,14 @@ var CM_App = CM_Class_Abstract.extend({
 		/**
 		 * @param {jQuery} $element
 		 * @param {Function} [success] fn(MediaElement, Element)
+		 * @param {Boolean} [preferPlugins]
 		 */
-		setupVideo: function($element, success) {
+		setupVideo: function($element, success, preferPlugins) {
+			var mode = 'auto';
+			if (preferPlugins) {
+				mode = 'auto_plugin';
+			}
+
 			$element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
@@ -290,6 +296,7 @@ var CM_App = CM_Class_Abstract.extend({
 				videoHeight: '100%',
 				defaultVideoWidth: '100%',
 				defaultVideoHeight: '100%',
+				mode: mode,
 				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');

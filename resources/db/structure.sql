@@ -440,7 +440,7 @@ CREATE TABLE `cm_svmtraining` (
 DROP TABLE IF EXISTS `cm_tmp_location`;
 
 
-CREATE TABLE `cm_tmp_location` (
+CREATE TABLE IF NOT EXISTS `cm_tmp_location` (
   `level` tinyint(4) NOT NULL,
   `id` int(10) unsigned NOT NULL,
   `1Id` int(10) unsigned DEFAULT NULL,
@@ -452,6 +452,16 @@ CREATE TABLE `cm_tmp_location` (
   `lat` float DEFAULT NULL,
   `lon` float DEFAULT NULL,
   UNIQUE KEY `levelId` (`level`,`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_tmp_location_coordinates`;
+
+CREATE TABLE IF NOT EXISTS `cm_tmp_location_coordinates` (
+  `level` tinyint(4) NOT NULL,
+  `id` int(10) unsigned NOT NULL,
+  `coordinates` point NOT NULL,
+  PRIMARY KEY (`level`,`id`),
+  SPATIAL KEY `coordinates_spatial` (`coordinates`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_tmp_userfile`;

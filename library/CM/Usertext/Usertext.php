@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Usertext {
+class CM_Usertext_Usertext extends CM_Class_Abstract {
 
 	/** @var CM_Render */
 	private $_render;
@@ -26,9 +26,10 @@ class CM_Usertext_Usertext {
 	 * @param string    $mode
 	 * @param int|null  $maxLength
 	 * @param bool|null $isMail
+	 * @param bool|null $skipAnchors
 	 * @throws CM_Exception_Invalid
 	 */
-	public function setMode($mode, $maxLength = null, $isMail = null) {
+	public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null) {
 		$acceptedModes = array('oneline', 'simple', 'markdown', 'markdownPlain');
 		if (!in_array($mode, $acceptedModes)) {
 			throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
@@ -51,12 +52,12 @@ class CM_Usertext_Usertext {
 				}
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
 				$this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
-				$this->addFilter(new CM_Usertext_Filter_Markdown(true));
+				$this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
 				break;
 			case 'markdownPlain':
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
-				$this->addFilter(new CM_Usertext_Filter_Markdown(true));
+				$this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
 				$this->addFilter(new CM_Usertext_Filter_Striptags());
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
@@ -102,5 +103,14 @@ class CM_Usertext_Usertext {
 	 */
 	private function _getFilters() {
 		return $this->_filterList;
+	}
+
+	/**
+	 * @param CM_Render $render
+	 * @return CM_Usertext_Usertext
+	 */
+	public static function factory(CM_Render $render) {
+		$className = self::_getClassName();
+		return new $className($render);
 	}
 }
