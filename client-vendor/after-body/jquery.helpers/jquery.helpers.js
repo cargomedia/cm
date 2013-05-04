@@ -39,7 +39,7 @@
 				var value_new = $(this).val();
 				if (value_new != value_old) {
 					$(this).data('value_last', value_new);
-					return handler.call(this);
+					return handler.call(this, value_new);
 				}
 			};
 			this.bind("propertychange keyup input cut paste", callback);
