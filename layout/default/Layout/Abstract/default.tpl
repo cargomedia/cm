@@ -5,6 +5,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true" />
 		{if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
 		{if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 		<meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
 		<meta name="msapplication-TileImage" content="{resourceUrl path='img/tileImage.png' type='layout'}">
 		<meta name="apple-mobile-web-app-capable" content="yes" />
