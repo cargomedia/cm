@@ -66,7 +66,20 @@
 	border-left-color: @colorDirectionRight;
 	top: 50%;
 	margin-top: -@size;
-	left: -10px;
+	left: -8px;
+}
+
+.clickable(@fontSize: 1.25em) {
+	cursor: pointer;
+	font-size: @fontSize;
+
+	html.touch & {
+		font-size: @fontSize * 1.12;
+	}
+}
+
+.clickable {
+	.clickable(1.25em);
 }
 
 .input_button(@size) {
@@ -90,7 +103,6 @@
 	}
 
 	.icon {
-		font-size: @iconSizeClickable;
 		line-height: @size - 2px;
 	}
 	&.hasIcon.hasLabel {
