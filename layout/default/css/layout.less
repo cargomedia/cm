@@ -17,10 +17,13 @@ a, a:visited {
 a:hover, a:active {
 	text-decoration: underline;
 
-	html.touch &, html.touch & {
+	html.touch & {
 		text-decoration: none;
-		background-color: fadeout(@colorFg, 70);
 	}
+}
+
+html.touch a:active {
+	background-color: fadeout(@colorFg, 70);
 }
 
 h1, h2, h3, h4, h5 {
