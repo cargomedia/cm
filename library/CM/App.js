@@ -960,10 +960,12 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} url
-		 * @param {Boolean} [forceReload]
+		 * @param {Boolean|Null} [forceReload]
+		 * @param {Boolean|Null} [replaceState]
 		 */
-		route: function(url, forceReload) {
+		route: function(url, forceReload, replaceState) {
 			forceReload = forceReload || false;
+			replaceState = replaceState || false;
 			var urlBase = cm.getUrl();
 			var fragment = url;
 			if ('/' == url.charAt(0)) {
@@ -971,14 +973,34 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				fragment = url.substr(urlBase.length);
 			}
+			cm.findView('CM_Layout_Abstract').trigger('route-before', url);
 			if (forceReload || 0 !== url.indexOf(urlBase)) {
 				window.location.assign(url);
 				return;
 			}
-			window.history.pushState(null, null, fragment);
+			if (replaceState) {
+				this.replaceState(fragment);
+			} else {
+				this.pushState(fragment);
+			}
 			cm.router._navigate(fragment);
 			cm.findView('CM_Layout_Abstract').trigger('route', url);
 		},
+
+		/**
+		 * @param {String|Null} [url] Absolute or relative URL
+		 */
+		pushState: function(url) {
+			window.history.pushState(null, null, url);
+		},
+
+		/**
+		 * @param {String|Null} [url] Absolute or relative URL
+		 */
+		replaceState: function(url) {
+			window.history.replaceState(null, null, url);
+		},
+
 
 		/**
 		 * @param {CM_Page_Abstract} page
