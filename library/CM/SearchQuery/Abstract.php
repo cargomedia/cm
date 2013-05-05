@@ -1,6 +1,7 @@
 <?php
 
 class CM_SearchQuery_Abstract {
+
 	private $_queries = array();
 	private $_filters = array();
 	private $_sorts = array();
@@ -34,6 +35,26 @@ class CM_SearchQuery_Abstract {
 	 */
 	public function queryField($field, $value) {
 		$this->_queries[] = array('field' => array($field => $value));
+	}
+
+	/**
+	 * @param string[]    $fields
+	 * @param string      $value
+	 * @param string|null $operator 'or' / 'and'
+	 * @param float|null  $fuzziness 0 - 1
+	 */
+	public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
+		$query = array('multi_match' => array(
+			'query'  => $value,
+			'fields' => $fields,
+		));
+		if (null !== $operator) {
+			$query['operator'] = (string) $operator;
+		}
+		if (null !== $fuzziness) {
+			$query['fuzziness'] = (float) $fuzziness;
+		}
+		$this->query($query);
 	}
 
 	protected function _filter(array $filter) {
