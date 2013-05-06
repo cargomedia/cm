@@ -69,6 +69,110 @@
 	left: -8px;
 }
 
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = top) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		bottom: 100%;
+		left: 50%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-bottom-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-bottom-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = bottom) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		left: 50%;
+		top: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-top-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-top-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = left) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		right: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-top: -@size;
+		border-right-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-right-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = right) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		left: 100%;
+	}
+
+	&:after {
+		border-width: @size;
+		border-color: transparent;
+		margin-top: -@size;
+		border-left-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-left-color: @colorBorder;
+	}
+}
+
 .clickable(@fontSize: 1.25em) {
 	cursor: pointer;
 	font-size: @fontSize;
