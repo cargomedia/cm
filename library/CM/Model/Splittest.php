@@ -99,7 +99,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 	protected function _loadData() {
 		if ($this->_withoutPersistence) {
-			return array();
+			return array('createStamp' => time());
 		}
 		$data = CM_Db_Db::select(TBL_CM_SPLITTEST, '*', array('name' => $this->getName()))->fetch();
 		if ($data) {
