@@ -58,7 +58,7 @@
 			var $controls = $('<div class="floatbox-controls"/>');
 			var $body = $('<div class="floatbox-body"/>');
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close clickable" href="javascript:;"/>');
+				$controls.append('<a class="icon-close" href="javascript:;"/>');
 			}
 			this.$floatbox = $('<div class="floatbox"/>');
 
