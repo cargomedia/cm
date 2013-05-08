@@ -37,6 +37,9 @@ class CM_Render extends CM_Class_Abstract {
 	/* @var array */
 	protected $_stack = array();
 
+	/** @var CM_Menu[] */
+	private $_menuList = array();
+
 	/**
 	 * @param CM_Site_Abstract|null  $site
 	 * @param CM_Model_User|null     $viewer
@@ -424,6 +427,20 @@ class CM_Render extends CM_Class_Abstract {
 			$locale = $this->getLanguage()->getAbbreviation();
 		}
 		return $locale;
+	}
+
+	/**
+	 * @param CM_Menu $menu
+	 */
+	public function addMenu(CM_Menu $menu) {
+		$this->_menuList[] = $menu;
+	}
+
+	/**
+	 * @return CM_MenuEntry[]
+	 */
+	public function getMenuList() {
+		return $this->_menuList;
 	}
 
 	/**
