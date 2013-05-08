@@ -72,14 +72,20 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return float|null P-value
 	 */
 	public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
-		$conversionsA = $this->getConversionWeight();
-		$fixturesA = $this->getFixtureCount();
-		$conversionsB = $variationWorse->getConversionWeight();
-		$fixturesB = $variationWorse->getFixtureCount();
+		$conversionsA = $this->getConversionCount();
+		$nonConversionsA = $this->getFixtureCount() - $this->getConversionCount();
+		$conversionsB = $variationWorse->getConversionCount();
+		$nonConversionsB = $variationWorse->getFixtureCount() - $variationWorse->getConversionCount();
+
+		$totalA = $conversionsA + $nonConversionsA;
+		$totalB = $conversionsB + $nonConversionsB;
+		$totalConversions = $conversionsA + $conversionsB;
+		$totalNonConversions = $nonConversionsA + $nonConversionsB;
+		$total = $totalA + $totalB;
 
 		// See http://math.hws.edu/javamath/ryan/ChiSquare.html
-		$nominator = (($conversionsA + $conversionsB + $fixturesA + $fixturesB) * pow($fixturesA * $conversionsB - $fixturesB * $conversionsA, 2));
-		$denominator = (($fixturesA + $fixturesB) * ($conversionsA + $conversionsB) * ($fixturesB + $conversionsB) * ($fixturesA + $conversionsA));
+		$nominator = $total * pow($nonConversionsA * $conversionsB - $nonConversionsB * $conversionsA, 2);
+		$denominator = $totalA * $totalB * $totalConversions * $totalNonConversions;
 		if (0 == $denominator) {
 			return null;
 		}

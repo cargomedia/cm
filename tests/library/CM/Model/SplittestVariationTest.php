@@ -1,6 +1,7 @@
 <?php
 
 class CM_Model_SplittestVariationTest extends CMTest_TestCase {
+
 	/** @var CM_Model_Splittest */
 	private $_test;
 
@@ -135,16 +136,18 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 	}
 
 	public function testGetSignificance() {
-		$variation1 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()->setMethods(array('getFixtureCount', 'getConversionWeight'))->getMock();
+		$variation1 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
+				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
 		$variation1->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation1->expects($this->any())->method('getConversionWeight')->will($this->returnValue(200));
+		$variation1->expects($this->any())->method('getConversionCount')->will($this->returnValue(200));
 
-		$variation2 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()->setMethods(array('getFixtureCount', 'getConversionWeight'))->getMock();
+		$variation2 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
+				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
 		$variation2->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation2->expects($this->any())->method('getConversionWeight')->will($this->returnValue(250));
+		$variation2->expects($this->any())->method('getConversionCount')->will($this->returnValue(250));
 
 		// See e.g. http://in-silico.net/tools/statistics/chi2test
-		$this->assertSame(0.033168957692078, $variation2->getSignificance($variation1));
-		$this->assertSame(0.033168957692078, $variation1->getSignificance($variation2));
+		$this->assertSame(0.0074196492610257, $variation2->getSignificance($variation1));
+		$this->assertSame(0.0074196492610257, $variation1->getSignificance($variation2));
 	}
 }
