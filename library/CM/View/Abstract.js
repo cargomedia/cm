@@ -176,16 +176,19 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.trigger('remove');
 		}
 
-		if (!skipDomRemoval) {
+		if (skipDomRemoval) {
+			this.undelegateEvents();
+		} else {
 			this.$el.remove();
 		}
+
+		this.stopListening();
 	},
 
 	/**
 	 * @param {CM_View_Abstract} view
 	 */
 	replaceWith: function(view) {
-		view._events = this._events;
 		this.getParent().registerChild(view);
 		this.$el.replaceWith(view.$el);
 		this.remove(true, true);
@@ -338,7 +341,7 @@ var CM_View_Abstract = Backbone.View.extend({
 		cm.stream.bind(channelKey, channelType, event, callback, this);
 		this.on('destruct', function() {
 			cm.stream.unbind(channelKey, channelType, event, callback, this);
-		});
+		}, this);
 	},
 
 	/**
