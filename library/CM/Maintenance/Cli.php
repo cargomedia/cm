@@ -74,12 +74,12 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param callback[] $callbacks
+	 * @param Closure[] $callbacks
 	 */
 	protected function _executeCallbacks($callbacks) {
 		foreach ($callbacks as $callback) {
 			try {
-				call_user_func($callback);
+				$callback();
 			} catch (CM_Exception $e) {
 				CM_Bootloader::getInstance()->handleException($e);
 			}
