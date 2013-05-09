@@ -188,34 +188,27 @@
 
 .input_button(@size) {
 	width: auto;
-	min-width: @size;
-	max-width: 100%;
 	height: @size;
+	min-width: @size;
+
+	html.touch & {
+		height: @size + 4;
+		min-width: @size + 4;
+	}
+
+	max-width: 100%;
+	overflow: hidden;
 	margin: 1px;
-	padding: 1px @size / 3;
+	padding: 0 8px;
 	font-weight: bold;
 	font-size: @fontSizeButton;
 	cursor: pointer;
-	overflow: visible;
 	vertical-align: top;
 	white-space: nowrap;
 
-	.label {
-		display: inline-block;
-		max-width: 100%;
-		.nowrap;
-	}
-
 	.icon {
 		font-size: 1.15em;
-		line-height: @size - 2px;
-	}
-
-	&.hasIcon.hasLabel {
-		.label {
-			vertical-align: top;
-			line-height: @size - 2px;
-		}
+		line-height: 1;
 	}
 }
 
