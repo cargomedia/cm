@@ -22,8 +22,10 @@ class smarty_function_moneyTest extends CMTest_TestCase {
 	}
 
 	public function testCurrency() {
-		$this->_assertSame("CHF23.35", array('amount' => 23.33333, 'currency' => 'CHF'));
-		$this->_assertSame("£23.33", array('amount' => 23.33333, 'currency' => 'GBP'));
+		$this->_assertSame("$23.00", array('amount' => 23, 'currency' => 'USD'));
+		$this->_assertSame("€23.00", array('amount' => 23, 'currency' => 'EUR'));
+		$this->_assertSame("CHF23.00", array('amount' => 23, 'currency' => 'CHF'));
+		$this->_assertSame("£23.00", array('amount' => 23, 'currency' => 'GBP'));
 	}
 
 	public function testNiceDiscount() {
