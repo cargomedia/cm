@@ -73,10 +73,10 @@ button, input[type=submit], input[type=button] {
 		padding: 0;
 
 		&.hasLabel {
-			padding: 0 8px 0 5px;
+			padding: 0 8px;
 
 			.icon {
-				margin-right: 3px;
+				margin-right: 5px;
 			}
 		}
 	}
@@ -137,39 +137,19 @@ input[type=radio], input[type=checkbox] {
 	width: 660px;
 	max-width: 100%;
 	min-height: 24px;
-	padding: 12px;
-	border: 1px solid darken(@colorFgBorderEmphasize2, 3);
-	border-bottom-width: 0;
-	background-color: darken(@colorBg, 3);
-	border-top-color: lighten(@colorFgBorderEmphasize2, 3);
-
-	@media (max-width: 600px) {
-		padding: 6px 12px;
-	}
-
-	&:first-child{
-		border-top: 1px solid @colorFgBorderEmphasize2;
-	}
-
-	&.submit {
-		border-top-width: 0;
-		border-bottom-width: 1px;
-	}
+	padding: 8px;
 
 	> label {
 		.box-sizing(border-box);
 		color: @colorFgLinkLight;
-		width: 100px;
-		float: left;
-		padding: 4px 4px 0 0;
 		font-weight: bold;
-		text-align: right;
+		padding-left: 2px;
 
-		@media (max-width: 600px) {
-			width: auto;
-			float: none;
-			text-align: left;
-			padding-left: 2px;
+		@media (min-width: 600px) {
+			width: 100px;
+			padding: 4px 4px 0 0;
+			float: left;
+			text-align: right;
 		}
 
 		&:after {
@@ -183,11 +163,10 @@ input[type=radio], input[type=checkbox] {
 	}
 
 	> .input {
-		margin-left: 110px;
+		margin-top: 2px;
 
-		@media (max-width: 600px) {
-			margin-left: 0;
-			margin-top: 2px;
+		@media (min-width: 600px) {
+			margin-left: 110px;
 		}
 	}
 

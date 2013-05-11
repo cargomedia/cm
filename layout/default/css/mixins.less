@@ -54,58 +54,178 @@
 	border: 1px solid lighten(@colorNotice, 15);
 }
 
+.triangle(@colorDirectionBottom: transparent, @colorDirectionLeft: transparent, @colorDirectionTop: transparent, @colorDirectionRight: transparent, @size: 5px) {
+	position: absolute;
+	width: 0;
+	height: 0;
+	content: "";
+	border: @size solid transparent;
+	border-top-color: @colorDirectionBottom;
+	border-right-color: @colorDirectionLeft;
+	border-bottom-color: @colorDirectionTop;
+	border-left-color: @colorDirectionRight;
+	top: 50%;
+	margin-top: -@size;
+	left: -8px;
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = top) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		bottom: 100%;
+		left: 50%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-bottom-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-bottom-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = bottom) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		left: 50%;
+		top: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-top-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-top-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = left) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		right: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-top: -@size;
+		border-right-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-right-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = right) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		left: 100%;
+	}
+
+	&:after {
+		border-width: @size;
+		border-color: transparent;
+		margin-top: -@size;
+		border-left-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-left-color: @colorBorder;
+	}
+}
+
+.clickable(@fontSize: 1.25em) {
+	cursor: pointer;
+	font-size: @fontSize;
+
+	html.touch & {
+		font-size: @fontSize * 1.12;
+	}
+}
+
+.clickable {
+	.clickable(1.25em);
+}
+
 .input_button(@size) {
 	width: auto;
+	height: @size;
 	min-width: @size;
 	max-width: 100%;
-	height: @size;
+	overflow: hidden;
 	margin: 1px;
-	padding: 1px @size / 3;
+	padding: 0 8px;
 	font-weight: bold;
 	font-size: @fontSizeButton;
 	cursor: pointer;
-	overflow: visible;
 	vertical-align: top;
 	white-space: nowrap;
 
-	.label {
-		display: inline-block;
-		max-width: 100%;
-		.nowrap;
-	}
-
 	.icon {
-		font-size: @iconSizeClickable;
-		line-height: @size - 2px;
-	}
-	&.hasIcon.hasLabel {
-		.label {
-			vertical-align: top;
-			line-height: @size - 2px;
-		}
+		font-size: 1.15em;
+		line-height: 1;
 	}
 }
 
 .input_button_color() {
-	color: @colorFgButtonFont;
+	border: 1px solid @colorFgBorderEmphasize3;
 	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
-	border: 1px solid lighten(@colorFgButton, 60);
+	color: @colorFgButtonFont;
 }
 
 .input_button_hover() {
-	border: 1px solid lighten(@colorFgButton, 50);
+	border: 1px solid darken(@colorFgBorderEmphasize3, 10);
 	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 12));
 	color: @colorFgButton;
 }
 
 .input_button_active() {
+	border: 1px solid darken(@colorFgBorderEmphasize3, 10);
 	background: darken(@colorBg, 12);
-	border: 1px solid darken(@colorFgBorderEmphasize2, 30);
 }
 
 .input_button_alt() {
-	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
+	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 	color: @colorFgButtonAltFont;
 	font-size: @fontSizeButton + 1px;
@@ -116,13 +236,13 @@
 }
 
 .input_button_alt_hover() {
-	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
 	border: 1px solid @colorFgButtonAlt;
+	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
 }
 
 .input_button_alt_active() {
-	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
 	border: 1px solid darken(@colorFgButtonAlt, 10);
+	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
 }
 
 .appearance(@value) {
