@@ -1,3 +1,5 @@
+// Pull request applied: https://github.com/ivaynberg/select2/pull/1212/files
+
 /*
 Copyright 2012 Igor Vaynberg
 

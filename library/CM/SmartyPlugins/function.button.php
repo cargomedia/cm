@@ -9,6 +9,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		trigger_error('Param `action` missing.');
 	}
 	$action = $form->getAction($params['action']);
+	$title = isset($params['title']) ? (string) $params['title'] : null;
 
 	$class = '';
 	if (isset($params['class'])) {
@@ -31,6 +32,9 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($icon) {
 		$class .= ' hasIcon';
 	}
+	if ($title) {
+		$class .= ' showTooltip';
+	}
 
 	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
@@ -38,8 +42,8 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 
 	$html = '';
 	$html .= '<button class="' . $class . '" id="' . $id . '" type="' . $type . '" value="' . $label . '"';
-	if (isset($params['title'])) {
-		$html .= ' title="' . $params['title'] . '"';
+	if ($title) {
+		$html .= ' title="' . $title . '"';
 	}
 	$html .= '>';
 	if ($icon) {

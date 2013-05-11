@@ -120,9 +120,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$title = $responsePage->getTitle();
 		$layoutClass = get_class($page->getLayout());
-		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
-			return $menuEntry->getHash();
-		}, $this->getSite()->getMenuEntriesActive($page)));
+		$menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
+		$menuEntryHashList = $this->_getMenuEntryHashList($menuList, $page);
 
 		return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
 					 'layoutClass'       => $layoutClass,
@@ -162,5 +161,23 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$forceReload = (boolean) $forceReload;
 		$js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
 		$this->getRender()->getJs()->onloadPrepareJs($js);
+	}
+
+	/**
+	 * @param CM_Menu[]        $menuList
+	 * @param CM_Page_Abstract $page
+	 * @return string[]
+	 */
+	private function _getMenuEntryHashList(array $menuList, CM_Page_Abstract $page) {
+		$menuEntryHashList = array();
+		foreach ($menuList as $menu) {
+			foreach ($menu->findEntries($page) as $menuEntry) {
+				$menuEntryHashList[] = $menuEntry->getHash();
+				foreach ($menuEntry->getParents() as $parentEntry) {
+					$menuEntryHashList[] = $parentEntry->getHash();
+				}
+			}
+		}
+		return $menuEntryHashList;
 	}
 }

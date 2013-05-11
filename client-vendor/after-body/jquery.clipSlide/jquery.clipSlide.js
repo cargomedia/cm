@@ -16,7 +16,7 @@
 			if ($this.height() >= $content.outerHeight(true)) {
 				return;
 			}
-			var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon-expand clickable"></div></a>').appendTo($this);
+			var $handle = $('<a href="javascript:;" class="clipSlide-handle"><div class="icon-expand"></div></a>').appendTo($this);
 
 			$this.css({
 				position: 'relative'
