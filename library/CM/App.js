@@ -273,7 +273,7 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.timeago').timeago();
 			$dom.find('textarea.autosize, .autosize textarea').autosize();
 			$dom.find('.clipSlide').clipSlide();
-			$dom.find('button[title]').tooltip();
+			$dom.find('button[title], .showTooltip[title]').tooltip();
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
