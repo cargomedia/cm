@@ -61,7 +61,7 @@ CM_Paging_User_Country                         # All users from a given country
 
 In your workspace, run:
 ```bash
-composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
+composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch/source" <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
