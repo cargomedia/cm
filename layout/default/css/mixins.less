@@ -40,13 +40,16 @@
 	color: @colorFgShy;
 }
 
+.hyphens(@arg) {
+	-webkit-hyphens: @arg;
+	-moz-hyphens: @arg;
+	hyphens: @arg;
+}
+
 .word_wrap() {
 	word-break: break-all;
 	word-break: break-word;
 	overflow-wrap: break-word;
-	-webkit-hyphens: auto;
-	-moz-hyphens: auto;
-	hyphens: auto;
 }
 
 .input_focus() {
