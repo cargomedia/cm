@@ -452,7 +452,11 @@ var CM_App = CM_Class_Abstract.extend({
 			var $html = $('<div class="box"><div class="box_cap nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
 			$html.find('.box_cap h2').text(cm.language.get('Confirmation'));
 			$html.find('.box_body').text(question);
-			$html.find('.box_bottom').append($ok, $cancel);
+			var buttons = [$ok, $cancel];
+			if (Modernizr.touch) {
+				buttons = buttons.reverse();
+			}
+			$html.find('.box_bottom').append(buttons);
 
 			$html.floatOut();
 			$ok.click(function() {
