@@ -442,7 +442,6 @@ var CM_View_Abstract = Backbone.View.extend({
 		$element.wrap('<div />');	// MediaElement needs a parent to show error msgs
 		$element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
 		$element.attr('autoplay', params.autoplay);
-		$element.attr('loop', params.loop);
 
 		var error = false;
 		var mediaElement = new MediaElement($element.get(0), {
@@ -451,6 +450,13 @@ var CM_View_Abstract = Backbone.View.extend({
 			silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 			error: function() {
 				error = true;
+			},
+			success: function(mediaElement, domObject) {
+				if (params.loop) {
+					mediaElement.addEventListener('ended', function() {
+						mediaElement.load();
+					});
+				}
 			}
 		});
 		if (error) {
