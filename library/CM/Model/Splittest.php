@@ -145,7 +145,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			return;
 		}
 		switch ($fixture->getFixtureType()) {
-			case CM_Splittest_Fixture::TYPE_CLIENT:
+			case CM_Splittest_Fixture::TYPE_REQUEST_CLIENT:
 				$columnId = 'clientId';
 				break;
 			case CM_Splittest_Fixture::TYPE_USER:
@@ -190,7 +190,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
 		switch ($fixture->getFixtureType()) {
-			case CM_Splittest_Fixture::TYPE_CLIENT:
+			case CM_Splittest_Fixture::TYPE_REQUEST_CLIENT:
 				$columnId = 'clientId';
 				break;
 			case CM_Splittest_Fixture::TYPE_USER:

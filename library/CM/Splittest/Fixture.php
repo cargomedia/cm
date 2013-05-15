@@ -2,7 +2,7 @@
 
 class CM_Splittest_Fixture extends CM_Class_Abstract {
 
-	const TYPE_CLIENT = 1;
+	const TYPE_REQUEST_CLIENT = 1;
 	const TYPE_USER = 2;
 
 	/** @var int */
@@ -18,7 +18,7 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 	public function __construct($fixture) {
 		if ($fixture instanceof CM_Request_Abstract) {
 			$this->_id = $fixture->getClientId();
-			$this->_type = self::TYPE_CLIENT;
+			$this->_type = self::TYPE_REQUEST_CLIENT;
 		} elseif ($fixture instanceof CM_Model_User) {
 			$this->_id = (int) $fixture->getId();
 			$this->_type = self::TYPE_USER;
@@ -39,5 +39,13 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 	 */
 	public function getId() {
 		return $this->_id;
+	}
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @param CM_Model_User       $user
+	 */
+	public static function setUserForRequestClient(CM_Request_Abstract $request, CM_Model_User $user) {
+		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('userId' => $user->getId()), array('clientId' => $request->getClientId()));
 	}
 }
