@@ -494,23 +494,116 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	window: {
+		_id: null,
 		_hasFocus: true,
 		_$hidden: null,
 
+		getId: function() {
+			if (!this._id) {
+				this._id = cm.getUuid();
+			}
+			return this._id;
+		},
+
+		focus: {
+			/**
+			 * @return {Array}
+			 */
+			_get: function() {
+				var windows = cm.storage.get('focusWindows');
+				if (windows === null) {
+					windows = [];
+				}
+				return windows;
+			},
+			/**
+			 * @param {Array} focusWindows
+			 */
+			_set: function(focusWindows) {
+				cm.storage.set('focusWindows', focusWindows)
+			},
+			/**
+			 * @param {String} uuid
+			 * @returns {Boolean}
+			 */
+			has: function(uuid) {
+				var windows = this._get();
+				return windows.indexOf(uuid) !== -1;
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			prepend: function(uuid) {
+				if (this.has(uuid)) {
+					return;
+				}
+				var windows = this._get();
+				windows.unshift(uuid);
+				this._set(windows);
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			add: function(uuid) {
+				this.remove(uuid);
+				var windows = this._get();
+				windows.push(uuid);
+				this._set(windows);
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			remove: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				if (index !== -1) {
+					windows.splice(index, 1);
+					this._set(windows);
+				}
+			},
+			/**
+			 * @param {String} uuid
+			 * @returns {Boolean}
+			 */
+			isLast: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				return index === windows.length - 1;
+			}
+		},
+
 		ready: function() {
 			var handler = this;
+			handler.focus.prepend(handler.getId());
+			$(window).on('beforeunload', function() {
+				handler.focus.remove(handler.getId());
+			});
 			$(window).focus(function() {
+				handler.focus.add(handler.getId());
 				handler._hasFocus = true;
 			}).blur(function() {
-					handler._hasFocus = false;
-				});
+				handler._hasFocus = false;
+			});
 			this.title.ready();
 		},
 
+		/**
+		 * @return {Boolean}
+		 */
+		isLastFocus: function() {
+			return this.focus.isLast(this.getId());
+		},
+
+		/**
+		 * @return {Boolean}
+		 */
 		hasFocus: function() {
 			return this._hasFocus;
 		},
 
+		/**
+		 * @param {String|jQuery} html
+		 */
 		appendHidden: function(html) {
 			if (!this._$hidden) {
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
@@ -529,6 +622,9 @@ var CM_App = CM_Class_Abstract.extend({
 			return $.contains(this._$hidden[0], element);
 		},
 
+		/**
+		 * @param {String} content
+		 */
 		hint: function(content) {
 			$.windowHint(content);
 		},
