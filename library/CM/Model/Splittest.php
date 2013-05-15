@@ -136,13 +136,23 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int        $fixtureId
-	 * @param float|null $weight
+	 * @param CM_Splittest_Fixture $fixture
+	 * @param float|null           $weight
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _setConversion($fixtureId, $weight = null) {
+	protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
 		if ($this->_withoutPersistence) {
 			return;
+		}
+		switch ($fixture->getFixtureType()) {
+			case CM_Splittest_Fixture::TYPE_CLIENT:
+				$columnId = 'clientId';
+				break;
+			case CM_Splittest_Fixture::TYPE_USER:
+				$columnId = 'userId';
+				break;
+			default:
+				throw new CM_Exception_Invalid('Invalid fixture type `' . $fixture->getFixtureType() . '`');
 		}
 		if (null === $weight) {
 			$weight = 1;
@@ -151,43 +161,51 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 			throw new CM_Exception_Invalid('Weight must be positive or null, `' . $weight . '` given');
 		}
 
-		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
 		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE,
 			array('conversionStamp' => time(), 'conversionWeight' => $weight),
-			array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
+			array('splittestId' => $this->getId(), $columnId => $fixture->getId()));
 	}
 
 	/**
-	 * @param int    $fixtureId
-	 * @param string $variationName
+	 * @param CM_Splittest_Fixture $fixture
+	 * @param string               $variationName
 	 * @return bool
 	 */
-	protected function _isVariationFixture($fixtureId, $variationName) {
+	protected function _isVariationFixture(CM_Splittest_Fixture $fixture, $variationName) {
 		if ($this->_withoutPersistence) {
 			return true;
 		}
-		return ($variationName == $this->_getVariationFixture($fixtureId));
+		return ($variationName == $this->_getVariationFixture($fixture));
 	}
 
 	/**
-	 * @param int $fixtureId
+	 * @param CM_Splittest_Fixture $fixture
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	protected function _getVariationFixture($fixtureId) {
+	protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
 		if ($this->_withoutPersistence) {
 			return '';
 		}
-		$fixtureId = (int) $fixtureId;
-		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
+		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
+		switch ($fixture->getFixtureType()) {
+			case CM_Splittest_Fixture::TYPE_CLIENT:
+				$columnId = 'clientId';
+				break;
+			case CM_Splittest_Fixture::TYPE_USER:
+				$columnId = 'userId';
+				break;
+			default:
+				throw new CM_Exception_Invalid('Invalid fixture type `' . $fixture->getFixtureType() . '`');
+		}
 		$cacheWrite = false;
 		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
 			$variationFixtures = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 				FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
 				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-				WHERE `fixture`.`fixtureId` = ?', array($fixtureId))->fetchAllTree();
+				WHERE `fixture`.`' . $columnId . '` = ?', array($fixture->getId()))->fetchAllTree();
 
 			$cacheWrite = true;
 		}
@@ -198,7 +216,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
 			}
 			CM_Db_Db::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE,
-				array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
+				array('splittestId' => $this->getId(), $columnId => $fixture->getId(), 'variationId' => $variation->getId(),
+					  'createStamp' => time()));
 			$variationFixtures[$this->getId()] = $variation->getName();
 			$cacheWrite = true;
 		}
