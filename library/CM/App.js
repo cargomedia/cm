@@ -20,6 +20,13 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	/**
+	 * @return {String}
+	 */
+	getId: function() {
+		return window.location.host;
+	},
+
+	/**
 	 * @param {String|Null} [className]
 	 * @return {CM_Component_Abstract|Null}
 	 */
@@ -678,7 +685,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(key, value);
+			$.jStorage.set(this.getId() + ':' + key, value);
 		},
 
 		/**
@@ -686,14 +693,14 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return $.jStorage.get(key);
+			return $.jStorage.get(this.getId() + ':' + key);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(key);
+			$.jStorage.deleteKey(this.getId() + ':' + key);
 		}
 	},
 
