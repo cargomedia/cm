@@ -567,7 +567,7 @@ var CM_App = CM_Class_Abstract.extend({
 			isLast: function(uuid) {
 				var windows = this._get();
 				var index = windows.indexOf(uuid);
-				return index === windows.length - 1;
+				return index !== -1 && index === windows.length - 1;
 			}
 		},
 
