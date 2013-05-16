@@ -40,9 +40,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
 		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
-		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
 		/** @var CM_Model_Splittest_User $splittestUser */
-		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request1 = new CM_Request_Post('/foo/null');
 		$variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
@@ -65,9 +65,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
 		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
-		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
 		/** @var CM_Model_Splittest_User $splittestUser */
-		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request1 = new CM_Request_Post('/foo/null');
 		$variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
@@ -90,9 +90,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
 		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
-		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
 		/** @var CM_Model_Splittest_User $splittestUser */
-		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request = new CM_Request_Post('/foo/null');
 		$variationRequest = $splittestRequestClient->getVariationFixture($request);
@@ -103,5 +103,31 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 
 		$splittestRequestClient->delete();
 		CMTest_TH::clearCache();
+	}
+}
+
+class CM_Model_Splittest_RequestClient_Mock extends CM_Model_Splittest_RequestClient {
+
+	const TYPE = 1;
+
+	/**
+	 * @param CM_Request_Abstract $request
+	 * @return string
+	 */
+	public function getVariationFixture(CM_Request_Abstract $request) {
+		return $this->_getVariationFixture(new CM_Splittest_Fixture($request));
+	}
+}
+
+class CM_Model_Splittest_User_Mock extends CM_Model_Splittest_User {
+
+	const TYPE = 1;
+
+	/**
+	 * @param CM_Model_User $user
+	 * @return string
+	 */
+	public function getVariationFixture(CM_Model_User $user) {
+		return $this->_getVariationFixture(new CM_Splittest_Fixture($user));
 	}
 }

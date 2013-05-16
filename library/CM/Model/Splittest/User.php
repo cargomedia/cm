@@ -15,14 +15,6 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
 
 	/**
 	 * @param CM_Model_User $user
-	 * @return string
-	 */
-	public function getVariationFixture(CM_Model_User $user) {
-		return $this->_getVariationFixture(new CM_Splittest_Fixture($user));
-	}
-
-	/**
-	 * @param CM_Model_User $user
 	 * @param float|null    $weight
 	 */
 	public function setConversion(CM_Model_User $user, $weight = null) {

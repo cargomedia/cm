@@ -18,17 +18,6 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
 	/**
 	 * @param CM_Request_Abstract $request
-	 * @return string
-	 */
-	public function getVariationFixture(CM_Request_Abstract $request) {
-		if ($request->isBotCrawler()) {
-			return '';
-		}
-		return $this->_getVariationFixture(new CM_Splittest_Fixture($request));
-	}
-
-	/**
-	 * @param CM_Request_Abstract $request
 	 * @param float|null          $weight
 	 */
 	public function setConversion(CM_Request_Abstract $request, $weight = null) {
