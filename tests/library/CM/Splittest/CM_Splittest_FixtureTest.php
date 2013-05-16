@@ -1,0 +1,107 @@
+<?php
+
+class CM_Splittest_FixtureTest extends CMTest_TestCase {
+
+	public function testCreate() {
+		new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+		new CM_Splittest_Fixture(CMTest_TH::createUser());
+		try {
+			new CM_Splittest_Fixture(CMTest_TH::createSession());
+			$this->fail('Should not be able to create a fixture from a session');
+		} catch (CM_Exception_Invalid $e) {
+			$this->assertContains('Invalid fixture type', $e->getMessage());
+		}
+	}
+
+	public function testGetFixtureTye() {
+		$fixtureRequestClient = new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+		$fixtureUser = new CM_Splittest_Fixture(CMTest_TH::createUser());
+		$this->assertSame(CM_Splittest_Fixture::TYPE_REQUEST_CLIENT, $fixtureRequestClient->getFixtureType());
+		$this->assertSame(CM_Splittest_Fixture::TYPE_USER, $fixtureUser->getFixtureType());
+	}
+
+	public function testGetColumnId() {
+		$fixtureRequestClient = new CM_Splittest_Fixture(new CM_Request_Post('/foo/null'));
+		$fixtureUser = new CM_Splittest_Fixture(CMTest_TH::createUser());
+		$this->assertSame('requestClientId', $fixtureRequestClient->getColumnId());
+		$this->assertSame('userId', $fixtureUser->getColumnId());
+	}
+
+	public function testGetId() {
+		$request = new CM_Request_Post('/foo/null');
+		$user = CMTest_TH::createUser();
+		$fixtureRequestClient = new CM_Splittest_Fixture($request);
+		$fixtureUser = new CM_Splittest_Fixture($user);
+		$this->assertSame($request->getClientId(), $fixtureRequestClient->getId());
+		$this->assertSame($user->getId(), $fixtureUser->getId());
+	}
+
+	public function testSetUserForRequestClient_userGetsFirstRequestClientVariation() {
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+
+		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		/** @var CM_Model_Splittest_User $splittestUser */
+		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+
+		$request1 = new CM_Request_Post('/foo/null');
+		$variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
+		$userA = CMTest_TH::createUser();
+		CM_Splittest_Fixture::setUserForRequestClient($request1, $userA);
+		$this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
+
+		for ($i = 0; $i < 10; $i++) {
+			$requestNew = new CM_Request_Post('/foo/null');
+			$splittestRequestClient->getVariationFixture($requestNew);
+			CM_Splittest_Fixture::setUserForRequestClient($requestNew, $userA);
+			$this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
+		}
+
+		$splittestRequestClient->delete();
+		CMTest_TH::clearCache();
+	}
+
+	public function testSetUserForRequestClient_usersFromSameClientGetSameVariation() {
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+
+		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		/** @var CM_Model_Splittest_User $splittestUser */
+		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+
+		$request1 = new CM_Request_Post('/foo/null');
+		$variationRequest1 = $splittestRequestClient->getVariationFixture($request1);
+		$userA = CMTest_TH::createUser();
+		CM_Splittest_Fixture::setUserForRequestClient($request1, $userA);
+		$this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
+
+		for ($i = 0; $i < 10; $i++) {
+			$userNew = CMTest_TH::createUser();
+			CM_Splittest_Fixture::setUserForRequestClient($request1, $userNew);
+			$this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userNew));
+		}
+		$this->assertSame($variationRequest1, $splittestUser->getVariationFixture($userA));
+
+		$splittestRequestClient->delete();
+		CMTest_TH::clearCache();
+	}
+
+	public function testSetUserForRequestClient_onLogin() {
+		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+
+		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		$splittestRequestClient = CM_Model_Splittest_RequestClient::create(array('name' => 'foo', 'variations' => range(1, 100)));
+		/** @var CM_Model_Splittest_User $splittestUser */
+		$splittestUser = CM_Model_Splittest_User::findId($splittestRequestClient->getId());
+
+		$request = new CM_Request_Post('/foo/null');
+		$variationRequest = $splittestRequestClient->getVariationFixture($request);
+		$user = CMTest_TH::createUser();
+		$session = new CM_Session(null, $request);
+		$session->setUser($user);
+		$this->assertSame($variationRequest, $splittestUser->getVariationFixture($user));
+
+		$splittestRequestClient->delete();
+		CMTest_TH::clearCache();
+	}
+}
