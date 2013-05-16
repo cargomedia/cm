@@ -14,16 +14,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function fileToDb() {
-		$configDb = CM_Config::get()->CM_Db_Db;
-		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
-
-		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
-		if (!$databaseExists) {
-			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
-		}
-		foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-			CM_Db_Db::runDump($configDb->db, $dump);
-		}
+		CM_App::getInstance()->setupDatabase(true);
 	}
 
 	public function runUpdates() {
