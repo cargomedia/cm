@@ -71,7 +71,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @param CM_Params $params
 	 */
 	protected function _renderStart(CM_Params $params) {
-
 	}
 
 	/**
@@ -178,9 +177,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param array							 $data
-	 * @param string							$action_name
-	 * @param CM_Response_View_Form  $response
+	 * @param array                             $data
+	 * @param string                            $action_name
+	 * @param CM_Response_View_Form             $response
+	 * @return mixed
 	 */
 	public function process(array $data, $action_name, CM_Response_View_Form $response) {
 		$action = $this->getAction($action_name);
@@ -209,10 +209,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		}
 
 		if ($response->hasErrors()) {
-			return;
+			return null;
 		}
 
-		$action->process($form_data, $response, $this);
+		return $action->process($form_data, $response, $this);
 	}
-
 }
