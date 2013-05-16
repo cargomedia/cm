@@ -94,7 +94,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if (false === $name) {
 			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
 		}
-		return new self($name);
+		return new static($name);
 	}
 
 	protected function _loadData() {
