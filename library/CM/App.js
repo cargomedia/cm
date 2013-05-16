@@ -20,6 +20,13 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	/**
+	 * @return {Number}
+	 */
+	getSiteId: function() {
+		return cm.options.siteId;
+	},
+
+	/**
 	 * @param {String|Null} [className]
 	 * @return {CM_Component_Abstract|Null}
 	 */
@@ -494,23 +501,108 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	window: {
+		/** @var {String|Null} */
+		_id: null,
+
+		/** @var {Boolean} */
 		_hasFocus: true,
+
+		/** @var {jQuery|Null} */
 		_$hidden: null,
+
+		/**
+		 * @returns {String}
+		 */
+		getId: function() {
+			if (!this._id) {
+				this._id = cm.getUuid();
+			}
+			return this._id;
+		},
+
+		focus: {
+			/**
+			 * @return {Array}
+			 */
+			_get: function() {
+				var windows = cm.storage.get('focusWindows');
+				if (windows === null) {
+					windows = [];
+				}
+				return windows;
+			},
+			/**
+			 * @param {Array} focusWindows
+			 */
+			_set: function(focusWindows) {
+				cm.storage.set('focusWindows', focusWindows)
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			add: function(uuid) {
+				if (this.isLast(uuid)) {
+					return;
+				}
+				this.remove(uuid);
+				var windows = this._get();
+				windows.push(uuid);
+				this._set(windows);
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			remove: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				if (index !== -1) {
+					windows.splice(index, 1);
+					this._set(windows);
+				}
+			},
+			/**
+			 * @param {String} uuid
+			 * @returns {Boolean}
+			 */
+			isLast: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				return index !== -1 && index === windows.length - 1;
+			}
+		},
 
 		ready: function() {
 			var handler = this;
+			handler.focus.add(handler.getId());
+			$(window).on('beforeunload', function() {
+				handler.focus.remove(handler.getId());
+			});
 			$(window).focus(function() {
+				handler.focus.add(handler.getId());
 				handler._hasFocus = true;
 			}).blur(function() {
-					handler._hasFocus = false;
-				});
+				handler._hasFocus = false;
+			});
 			this.title.ready();
 		},
 
+		/**
+		 * @return {Boolean}
+		 */
+		isLastFocus: function() {
+			return this.focus.isLast(this.getId());
+		},
+
+		/**
+		 * @return {Boolean}
+		 */
 		hasFocus: function() {
 			return this._hasFocus;
 		},
 
+		/**
+		 * @param {String|jQuery} html
+		 */
 		appendHidden: function(html) {
 			if (!this._$hidden) {
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
@@ -529,6 +621,9 @@ var CM_App = CM_Class_Abstract.extend({
 			return $.contains(this._$hidden[0], element);
 		},
 
+		/**
+		 * @param {String} content
+		 */
 		hint: function(content) {
 			$.windowHint(content);
 		},
@@ -582,7 +677,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(key, value);
+			$.jStorage.set(cm.getSiteId() + ':' + key, value);
 		},
 
 		/**
@@ -590,14 +685,14 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return $.jStorage.get(key);
+			return $.jStorage.get(cm.getSiteId() + ':' + key);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(key);
+			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
 		}
 	},
 
