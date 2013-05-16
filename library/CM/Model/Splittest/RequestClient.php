@@ -26,4 +26,12 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 		}
 		$this->_setConversion(new CM_Splittest_Fixture($request), $weight);
 	}
+
+	/**
+	 * @param CM_Model_User $user
+	 * @param float|null    $weight
+	 */
+	public function setConversionUser(CM_Model_User $user, $weight = null) {
+		$this->_setConversion(new CM_Splittest_Fixture($user), $weight);
+	}
 }
