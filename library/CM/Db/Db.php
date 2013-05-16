@@ -205,6 +205,18 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string            $table
+	 * @param array             $values Associative array field=>value
+	 * @param string|array|null $where  Associative array field=>value OR string
+	 * @return int
+	 */
+	public static function updateIgnore($table, array $values, $where = null) {
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_Update($client, $table, $values, $where, 'UPDATE IGNORE');
+		return $query->execute()->getAffectedRows();
+	}
+
+	/**
 	 * @param string     $table
 	 * @param string     $column
 	 * @param int        $position
