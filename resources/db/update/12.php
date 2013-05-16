@@ -12,10 +12,6 @@ if (CM_Db_Db::existsColumn('cm_splittestVariation_fixture', 'fixtureId')) {
 		ALTER TABLE `cm_splittestVariation_fixture`
 			CHANGE `fixtureId` `userId` INT(10) UNSIGNED NULL,
 			ADD COLUMN `requestClientId` INT(10) UNSIGNED NULL AFTER `splittestId`');
-	CM_Db_Db::exec('
-		UPDATE `cm_splittestVariation_fixture`
-			SET `requestClientId` = `userId`, `userId` = NULL
-			WHERE `splittestId` = 41');
 }
 
 if (!CM_Db_Db::existsIndex('cm_splittestVariation_fixture', 'userSplittest')) {
