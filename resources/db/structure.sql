@@ -45,6 +45,18 @@ CREATE TABLE `cm_captcha` (
   KEY `create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_emoticon`;
+
+
+CREATE TABLE `cm_emoticon` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL,
+  `codeAdditional` varchar(50) DEFAULT NULL,
+  `file` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_ipBlocked`;
 
 
@@ -253,20 +265,8 @@ CREATE TABLE `cm_session` (
   KEY `expires` (`expires`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
-DROP TABLE IF EXISTS `cm_emoticon`;
-
-CREATE TABLE `cm_emoticon` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `codeAdditional` varchar(50),
-  `file` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
 DROP TABLE IF EXISTS `cm_splitfeature`;
+
 
 CREATE TABLE `cm_splitfeature` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -319,16 +319,17 @@ DROP TABLE IF EXISTS `cm_splittestVariation_fixture`;
 
 CREATE TABLE `cm_splittestVariation_fixture` (
   `splittestId` int(10) unsigned NOT NULL,
-  `fixtureId` int(10) unsigned NOT NULL,
+  `requestClientId` int(10) unsigned DEFAULT NULL,
+  `userId` int(10) unsigned DEFAULT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
   `conversionStamp` int(11) DEFAULT NULL,
-  PRIMARY KEY (`splittestId`,`fixtureId`),
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
+  UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
+  UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
   KEY `splittestId` (`splittestId`),
   KEY `conversionStamp` (`conversionStamp`),
-  KEY `createStamp` (`createStamp`),
-  KEY `fixtureId` (`fixtureId`)
+  KEY `createStamp` (`createStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_streamChannel`;
@@ -340,7 +341,7 @@ CREATE TABLE `cm_streamChannel` (
   `type` int(10) unsigned NOT NULL,
   `adapterType` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `adapterType-key` (`adapterType`, `key`),
+  UNIQUE KEY `adapterType-key` (`adapterType`,`key`),
   KEY `type` (`type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -440,7 +441,7 @@ CREATE TABLE `cm_svmtraining` (
 DROP TABLE IF EXISTS `cm_tmp_location`;
 
 
-CREATE TABLE IF NOT EXISTS `cm_tmp_location` (
+CREATE TABLE `cm_tmp_location` (
   `level` tinyint(4) NOT NULL,
   `id` int(10) unsigned NOT NULL,
   `1Id` int(10) unsigned DEFAULT NULL,
@@ -456,7 +457,8 @@ CREATE TABLE IF NOT EXISTS `cm_tmp_location` (
 
 DROP TABLE IF EXISTS `cm_tmp_location_coordinates`;
 
-CREATE TABLE IF NOT EXISTS `cm_tmp_location_coordinates` (
+
+CREATE TABLE `cm_tmp_location_coordinates` (
   `level` tinyint(4) NOT NULL,
   `id` int(10) unsigned NOT NULL,
   `coordinates` point NOT NULL,

@@ -13,7 +13,7 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 		if ($request->isBotCrawler()) {
 			return false;
 		}
-		return $this->_isVariationFixture($request->getClientId(), $variationName);
+		return $this->_isVariationFixture(new CM_Splittest_Fixture($request), $variationName);
 	}
 
 	/**
@@ -24,6 +24,6 @@ class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 		if ($request->isBotCrawler()) {
 			return;
 		}
-		$this->_setConversion($request->getClientId(), $weight);
+		$this->_setConversion(new CM_Splittest_Fixture($request), $weight);
 	}
 }
