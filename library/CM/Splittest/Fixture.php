@@ -34,6 +34,11 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 		return $this->_type;
 	}
 
+	public function getColumnId() {
+		$columnIdList = array(CM_Splittest_Fixture::TYPE_REQUEST_CLIENT => 'requestClientId', CM_Splittest_Fixture::TYPE_USER => 'userId');
+		return $columnIdList[$this->getFixtureType()];
+	}
+
 	/**
 	 * @return int
 	 */
@@ -46,6 +51,8 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 	 * @param CM_Model_User       $user
 	 */
 	public static function setUserForRequestClient(CM_Request_Abstract $request, CM_Model_User $user) {
-		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('userId' => $user->getId()), array('clientId' => $request->getClientId()));
+		$requestClientId = $request->getClientId();
+		$userId = $user->getId();
+		CM_Db_Db::updateIgnore(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('userId' => $userId), array('requestClientId' => $requestClientId));
 	}
 }
