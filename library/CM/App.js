@@ -20,10 +20,10 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	/**
-	 * @return {String}
+	 * @return {Number}
 	 */
-	getId: function() {
-		return window.location.host;
+	getSiteId: function() {
+		return cm.options.siteId;
 	},
 
 	/**
@@ -501,10 +501,18 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	window: {
+		/** @var {String|Null} */
 		_id: null,
+
+		/** @var {Boolean} */
 		_hasFocus: true,
+
+		/** @var {jQuery|Null} */
 		_$hidden: null,
 
+		/**
+		 * @returns {String}
+		 */
 		getId: function() {
 			if (!this._id) {
 				this._id = cm.getUuid();
@@ -531,27 +539,11 @@ var CM_App = CM_Class_Abstract.extend({
 			},
 			/**
 			 * @param {String} uuid
-			 * @returns {Boolean}
-			 */
-			has: function(uuid) {
-				var windows = this._get();
-				return windows.indexOf(uuid) !== -1;
-			},
-			/**
-			 * @param {String} uuid
-			 */
-			prepend: function(uuid) {
-				if (this.has(uuid)) {
-					return;
-				}
-				var windows = this._get();
-				windows.unshift(uuid);
-				this._set(windows);
-			},
-			/**
-			 * @param {String} uuid
 			 */
 			add: function(uuid) {
+				if (this.isLast(uuid)) {
+					return;
+				}
 				this.remove(uuid);
 				var windows = this._get();
 				windows.push(uuid);
@@ -581,7 +573,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 		ready: function() {
 			var handler = this;
-			handler.focus.prepend(handler.getId());
+			handler.focus.add(handler.getId());
 			$(window).on('beforeunload', function() {
 				handler.focus.remove(handler.getId());
 			});
@@ -685,7 +677,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(cm.getId() + ':' + key, value);
+			$.jStorage.set(cm.getSiteId() + ':' + key, value);
 		},
 
 		/**
@@ -693,14 +685,14 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return $.jStorage.get(cm.getId() + ':' + key);
+			return $.jStorage.get(cm.getSiteId() + ':' + key);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(cm.getId() + ':' + key);
+			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
 		}
 	},
 
