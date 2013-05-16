@@ -29,10 +29,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @see CM_ModelAsset_User_Roles::getDefault()
+	 * @param int[] $nonDefaultRoles
 	 * @return int[]
 	 */
-	public function getDefaultRoles() {
+	public function getDefaultRoles(array $nonDefaultRoles) {
 		return array();
 	}
 
