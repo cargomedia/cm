@@ -101,7 +101,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 					->fetchAllTree();
 			$this->_cacheSet('roles', $values);
 		}
-		foreach ($this->_model->getDefaultRoles(array_keys($values)) as $role) {
+		foreach ($this->_model->getDefaultRoles() as $role) {
 			$values[$role] = array(null, null);
 		}
 		return $values;
