@@ -319,14 +319,14 @@ DROP TABLE IF EXISTS `cm_splittestVariation_fixture`;
 
 CREATE TABLE `cm_splittestVariation_fixture` (
   `splittestId` int(10) unsigned NOT NULL,
-  `clientId` int(10) unsigned DEFAULT NULL,
+  `requestClientId` int(10) unsigned DEFAULT NULL,
   `userId` int(10) unsigned DEFAULT NULL,
   `variationId` int(10) unsigned NOT NULL,
   `createStamp` int(10) unsigned NOT NULL,
-  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
   `conversionStamp` int(11) DEFAULT NULL,
-  UNIQUE KEY `user` (`userId`,`splittestId`),
-  UNIQUE KEY `client` (`clientId`,`splittestId`),
+  `conversionWeight` decimal(10,2) NOT NULL DEFAULT '1.00',
+  UNIQUE KEY `userSplittest` (`userId`,`splittestId`),
+  UNIQUE KEY `requestClientSplittest` (`requestClientId`,`splittestId`),
   KEY `splittestId` (`splittestId`),
   KEY `conversionStamp` (`conversionStamp`),
   KEY `createStamp` (`createStamp`)
