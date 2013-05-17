@@ -49,6 +49,9 @@ $config->CM_Cache_Redis = new stdClass;
 $config->CM_Cache_Redis->enabled = true;
 $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
+$config->CM_Cache_File = new stdClass();
+$config->CM_Cache_File->enabled = true;
+
 $config->CM_Stream_Message = new stdClass();
 $config->CM_Stream_Message->enabled = true;
 $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';

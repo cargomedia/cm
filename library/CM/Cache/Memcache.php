@@ -36,5 +36,4 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 	protected function _flush() {
 		return $this->_memcache->flush();
 	}
-
 }

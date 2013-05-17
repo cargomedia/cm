@@ -31,7 +31,7 @@ function smarty_helper_resourceJs($type, $file, $render) {
  * @return string
  */
 function smarty_helper_resourceJs_libraryDebug(CM_Render $render) {
-	$paths = CM_Response_Resource_Javascript_Library::getIncludedPaths($render->getSite());
+	$paths = CM_App_Resource_Javascript_Library::getIncludedPaths($render->getSite());
 	$content = '';
 	foreach ($paths as $path) {
 		$path = str_replace(DIR_ROOT, '/', $path);
