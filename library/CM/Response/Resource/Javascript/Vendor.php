@@ -5,24 +5,10 @@ class CM_Response_Resource_Javascript_Vendor extends CM_Response_Resource_Javasc
 	protected function _process() {
 		switch ($this->getRequest()->getPath()) {
 			case '/before-body.js':
-				$content = '';
-				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
-					$initPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/before-body/';
-					foreach (CM_Util::rglob('*.js', $initPath) as $path) {
-						$content .= new CM_File($path) . ';' . PHP_EOL;
-					}
-				}
-				$this->_setContent($content);
+				$this->_setResource(new CM_App_Resource_Javascript_VendorBeforeBody($this->getSite()));
 				break;
 			case '/after-body.js':
-				$content = '';
-				foreach (array_reverse($this->getSite()->getNamespaces()) as $namespace) {
-					$libraryPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'client-vendor/after-body/';
-					foreach (CM_Util::rglob('*.js', $libraryPath) as $path) {
-						$content .= new CM_File($path) . ';' . PHP_EOL;
-					}
-				}
-				$this->_setContent($content);
+				$this->_setResource(new CM_App_Resource_Javascript_VendorAfterBody($this->getSite()));
 				break;
 			default:
 				throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, null, CM_Exception::WARN);
