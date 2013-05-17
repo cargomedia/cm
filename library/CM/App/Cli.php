@@ -3,10 +3,7 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function setup() {
-		CM_Util::mkDir(DIR_TMP);
-		CM_Util::rmDirContents(DIR_TMP);
-		CM_Cache_File::setup();
-		CM_Render::setup();
+		CM_App::getInstance()->setupFilesystem();
 	}
 
 	public function fillCache() {
@@ -30,10 +27,6 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_getOutput()->writeln('Cached ' . count($resources) . ' resources.');
 	}
 
-	public static function getPackageName() {
-		return 'app';
-	}
-
 	public function generateConfig() {
 		// Create class types and action verbs config PHP
 		$fileHeader = '<?php' . PHP_EOL;
@@ -55,5 +48,9 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$actionVerbsConfig = 'cm.action.verbs = ' . CM_Params::encode($actionVerbs, true) . ';';
 		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionVerbsConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
+	}
+
+	public static function getPackageName() {
+		return 'app';
 	}
 }
