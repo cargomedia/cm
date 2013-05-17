@@ -9,6 +9,13 @@ class CM_Cache_FileTest extends CMTest_TestCase {
 		$this->assertSame('bar', CM_Cache_File::get('foo'));
 	}
 
+	/**
+	 * @expectedException CM_Exception_NotImplemented
+	 */
+	public function testSetLifetime() {
+		CM_Cache_File::set('foo', 'bar', 500);
+	}
+
 	public function testDelete() {
 		CM_Cache_File::set('foo', 'bar');
 		$this->assertSame('bar', CM_Cache_File::get('foo'));

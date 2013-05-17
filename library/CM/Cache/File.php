@@ -18,15 +18,19 @@ class CM_Cache_File extends CM_Cache_Abstract {
 	}
 
 	protected function _set($key, $data, $lifeTime = null) {
-		file_put_contents($this->_getPath($key), $data);
+		if (null !== $lifeTime) {
+			throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
+		}
+		CM_File::create($this->_getPath($key), $data);
 	}
 
 	protected function _get($key) {
 		$path = $this->_getPath($key);
-		if (!file_exists($path)) {
+		if (!CM_File::exists($path)) {
 			return false;
 		}
-		return file_get_contents($path);
+		$file = new CM_File($path);
+		return $file->read();
 	}
 
 	protected function _delete($key) {
@@ -46,7 +50,7 @@ class CM_Cache_File extends CM_Cache_Abstract {
 	 * @return string
 	 */
 	private function _getPath($key) {
-		return $this->_storageDir . base64_encode($key);
+		return $this->_storageDir . md5($key);
 	}
 
 
