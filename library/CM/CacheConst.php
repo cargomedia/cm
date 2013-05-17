@@ -46,7 +46,7 @@ class CM_CacheConst {
 	const Css = 'Css';
 
 	//_md5:X
-	const Response_Resource_JS = 'Response_Resource_JS';
+	const App_Resource = 'App_Resource';
 
 	//_lock:X
 	const Lock = 'Lock';
