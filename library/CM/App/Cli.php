@@ -26,7 +26,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function setup() {
-		CM_Cache_File::getInstance()->setup();
+		CM_Cache_File::setup();
 	}
 
 	public function fillCache() {
