@@ -17,6 +17,13 @@ class CM_App {
 		return self::$_instance;
 	}
 
+	public function setupFilesystem() {
+		CM_Util::mkDir(DIR_TMP);
+		CM_Util::rmDirContents(DIR_TMP);
+		CM_Cache_File::setup();
+		CM_Render::setup();
+	}
+
 	/**
 	 * @param boolean|null $forceReload
 	 */

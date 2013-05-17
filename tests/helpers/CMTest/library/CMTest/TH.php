@@ -50,7 +50,7 @@ class CMTest_TH {
 	}
 
 	public static function clearTmp() {
-		CM_Util::rmDirContents(DIR_TMP);
+		CM_App::getInstance()->setupFilesystem();
 	}
 
 	public static function clearConfig() {
