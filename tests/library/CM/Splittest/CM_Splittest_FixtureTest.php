@@ -39,9 +39,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 	public function testSetUserForRequestClient_userGetsFirstRequestClientVariation() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
-		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		/** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
 		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
-		/** @var CM_Model_Splittest_User $splittestUser */
+		/** @var CM_Model_Splittest_User_Mock $splittestUser */
 		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request1 = new CM_Request_Post('/foo/null');
@@ -64,9 +64,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 	public function testSetUserForRequestClient_usersFromSameClientGetSameVariation() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
-		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		/** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
 		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
-		/** @var CM_Model_Splittest_User $splittestUser */
+		/** @var CM_Model_Splittest_User_Mock $splittestUser */
 		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request1 = new CM_Request_Post('/foo/null');
@@ -89,9 +89,9 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 	public function testSetUserForRequestClient_onLogin() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
 
-		/** @var CM_Model_Splittest_RequestClient $splittestRequestClient */
+		/** @var CM_Model_Splittest_RequestClient_Mock $splittestRequestClient */
 		$splittestRequestClient = CM_Model_Splittest_RequestClient_Mock::create(array('name' => 'foo', 'variations' => range(1, 100)));
-		/** @var CM_Model_Splittest_User $splittestUser */
+		/** @var CM_Model_Splittest_User_Mock $splittestUser */
 		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$request = new CM_Request_Post('/foo/null');
