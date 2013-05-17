@@ -67,19 +67,6 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
 		$this->_setContent($content);
 	}
 
-	/**
-	 * @return string
-	 */
-	private function _getCssSmiley() {
-		$css = '';
-		foreach (new CM_Paging_Smiley_All() as $smiley) {
-			$css .= '.smiley.smiley-' . $smiley['id'] . '{';
-			$css .= 'background-image: url(' . $this->getRender()->getUrlStatic('/img/smiles/' . $smiley['path']) . ')';
-			$css .= '}' . PHP_EOL;
-		}
-		return $css;
-	}
-
 	public static function match(CM_Request_Abstract $request) {
 		return $request->getPathPart(0) === 'library-css';
 	}
