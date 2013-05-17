@@ -30,6 +30,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$resources = array();
 		$siteClassNames = CM_Site_Abstract::getClassChildren();
 		foreach ($siteClassNames as $siteClassName) {
+			/** @var CM_Site_Abstract $site */
 			$site = new $siteClassName();
 			$resources[] = new CM_App_Resource_Javascript_Internal($site);
 			$resources[] = new CM_App_Resource_Javascript_Library($site);
