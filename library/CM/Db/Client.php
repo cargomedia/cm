@@ -163,7 +163,8 @@ class CM_Db_Client {
 			(1317 === $driverCode && false !== stripos($driverMessage, 'Query execution was interrupted')) ||
 			(2006 === $driverCode && false !== stripos($driverMessage, 'MySQL server has gone away')) ||
 			(2013 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server')) ||
-			(2055 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server'))
+			(2055 === $driverCode && false !== stripos($driverMessage, 'Lost connection to MySQL server')) ||
+			(1028 === $driverCode && false !== stripos($driverMessage, 'Sort aborted'))
 		) {
 			return true;
 		}
