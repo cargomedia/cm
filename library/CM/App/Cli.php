@@ -25,6 +25,10 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
 
+	public function setup() {
+		CM_Cache_File::getInstance()->setup();
+	}
+
 	public function fillCache() {
 		/** @var CM_App_Resource_Javascript_Abstract[] $resources */
 		$resources = array();
