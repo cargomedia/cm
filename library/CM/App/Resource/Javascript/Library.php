@@ -17,7 +17,7 @@ class CM_App_Resource_Javascript_Library extends CM_App_Resource_Javascript_Abst
 
 	/**
 	 * @param CM_Site_Abstract $site
-	 * @return array
+	 * @return string[]
 	 */
 	public static function getIncludedPaths(CM_Site_Abstract $site) {
 		$pathsUnsorted = CM_Util::rglobLibraries('*.js', $site);
