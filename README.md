@@ -99,7 +99,7 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php config generate
+./scripts/cm.php app generate-config
 ```
 
 ### Namespace creation, site setup
@@ -137,19 +137,28 @@ Usage:
 
 Options:
  --quiet
+ --quiet-warnings
  --non-interactive
 
 Commands:
- config generate
+ app generate-config
+ app fill-cache
+ console interactive
+ css icon-refresh
+ css emoticon-refresh
+ db dump <namespace>
+ db run-updates
+ db run-update <version> [--namespace=<value>]
  generator create-view <class-name>
  generator create-class <class-name>
  generator create-namespace <namespace>
  generator create-javascript-files
  job-distribution start-manager
- db dump <namespace>
- db run-updates
- db run-update <version> [--namespace=<value>]
+ maintenance common
+ maintenance heavy
  search-index create [--index-name=<value>]
  search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
  search-index optimize
+ stream start-message-synchronization
+ entertainment start-processing [--interval=<value>]
 ```
