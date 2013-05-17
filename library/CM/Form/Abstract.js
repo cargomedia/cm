@@ -201,7 +201,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				}
 
 				if (!response.errors) {
-					handler.trigger('success success.' + actionName);
+					handler.trigger('success success.' + actionName, response.data);
 				}
 			},
 			complete: function() {
