@@ -18,6 +18,26 @@ class CM_App {
 	}
 
 	/**
+	 * @param boolean|null $forceReload
+	 */
+	public function setupDatabase($forceReload = null) {
+		$configDb = CM_Config::get()->CM_Db_Db;
+		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
+
+		if ($forceReload) {
+			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
+		}
+
+		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
+		if (!$databaseExists) {
+			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
+				CM_Db_Db::runDump($configDb->db, $dump);
+			}
+		}
+	}
+
+	/**
 	 * @param string|null $namespace
 	 * @return int
 	 */
