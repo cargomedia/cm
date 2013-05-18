@@ -13,7 +13,7 @@ class CM_KissTrackingTest extends CMTest_TestCase {
 		CM_Config::get()->CM_KissTracking->awsBucketName = 'foo';
 		CM_Config::get()->CM_KissTracking->awsFilePrefix = 'bar';
 
-		$this->_filePath = DIR_TMP . 'kisstracking.csv';
+		$this->_filePath = DIR_TMP_TRACKING . 'kisstracking.csv';
 		$this->_kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
 		$this->_kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
 	}
