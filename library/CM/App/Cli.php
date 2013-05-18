@@ -50,6 +50,20 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
 
+	public function createModule($namespace) {
+		$modulePath = DIR_ROOT . DIR_LIBRARY . $namespace . '/';
+		$moduleLibraryPath = $modulePath . 'library/' . $namespace . '/';
+		$moduleLayoutPath = $modulePath . 'layout/default/';
+
+		CM_Util::mkDir($moduleLibraryPath);
+		$this->_getOutput()->writeln('Created `'  . $moduleLibraryPath . '`');
+		CM_Util::mkDir($moduleLayoutPath);
+		$this->_getOutput()->writeln('Created `'  . $moduleLayoutPath . '`');
+		// TODO: Add namespace to autoloader
+		CM_Bootloader::getInstance()->reloadNamespacePaths();
+		// TODO: Create bootloader if needed, see https://github.com/cargomedia/CM/issues/536
+	}
+
 	public static function getPackageName() {
 		return 'app';
 	}
