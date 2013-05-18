@@ -3,7 +3,11 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function setup() {
-		CM_App::getInstance()->setupFilesystem();
+		$application = CM_App::getInstance();
+		$application->setupFilesystem();
+		$this->_getOutput()->writeln('Filesystem have been set up');
+		$application->setupDatabase();
+		$this->_getOutput()->writeln('Database have been set up');
 	}
 
 	public function fillCache() {
