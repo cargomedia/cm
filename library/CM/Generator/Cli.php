@@ -22,18 +22,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_generateClassFilePhp($className);
 	}
 
-	/**
-	 * @param string $namespace
-	 */
-	public function createNamespace($namespace) {
-		$this->_createNamespaceDirectories($namespace);
-		CM_Bootloader::getInstance()->reloadNamespacePaths();
-		$this->_generateClassFilePhp($namespace . '_Site', 'CM_Site_Abstract');
-		$bootloaderFile = $this->_generateClassFilePhp($namespace . '_Bootloader', 'CM_Bootloader');
-		$namespaces = array_merge(CM_Bootloader::getInstance()->getNamespaces(), array($namespace));
-		$bootloaderFile->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
-	}
-
 	public function createJavascriptFiles() {
 		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
 		foreach ($viewClasses as $path => $className) {
@@ -42,19 +30,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 				$jsFile = CM_File_Javascript::createLibraryClass($className);
 				$this->_getOutput()->writeln('Created `' . $jsFile->getPath() . '`');
 			}
-		}
-	}
-
-	/**
-	 * @param string $namespace
-	 */
-	private function _createNamespaceDirectories($namespace) {
-		$paths = array();
-		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/library/' . $namespace;
-		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/layout/default';
-		foreach ($paths as $path) {
-			CM_Util::mkDir($path);
-			$this->_getOutput()->writeln('Created `'  . $path . '`');
 		}
 	}
 
