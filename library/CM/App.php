@@ -28,9 +28,13 @@ class CM_App {
 
 	/**
 	 * @param boolean|null $forceReload
+	 * @throws CM_Exception_Invalid
 	 */
 	public function setupDatabase($forceReload = null) {
 		$configDb = CM_Config::get()->CM_Db_Db;
+		if (!$configDb->db) {
+			throw new CM_Exception_Invalid('No database name configured');
+		}
 		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
 
 		if ($forceReload) {
