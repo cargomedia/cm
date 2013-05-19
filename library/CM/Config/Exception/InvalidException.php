@@ -1,4 +1,4 @@
 <?php
 
-class CM_Config_Exception_InvalidException extends CM_Exception {
+class CM_Config_Exception_Invalid extends CM_Exception {
 }
