@@ -8,12 +8,10 @@
 		"ruflin/Elastica": "v0.19.8.0",
 		"phpmailer/phpmailer": "5.2.1",
 		"wurfl/tera-wurfl": "2.1.5",
-		"michelf/php-markdown": "1.3-beta5"
+		"michelf/php-markdown": "1.3-beta5",
+		"tomaszdurka/codegenerator": "dev-master"
 	},
 	"repositories": [
-		{
-			"packagist": false
-		},
 		{
 			"type": "composer",
 			"url": "http://satis.cargomedia.ch/source"
