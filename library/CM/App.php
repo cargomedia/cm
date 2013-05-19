@@ -54,6 +54,26 @@ class CM_App {
 		CM_Util::mkDir(DIR_TMP_SMARTY);
 	}
 
+	public function fillCaches() {
+		/** @var CM_Asset_Javascript_Abstract[] $resources */
+		$resources = array();
+		$siteClassNames = CM_Site_Abstract::getClassChildren();
+		foreach ($siteClassNames as $siteClassName) {
+			/** @var CM_Site_Abstract $site */
+			$site = new $siteClassName();
+			$resources[] = new CM_Asset_Javascript_Internal($site);
+			$resources[] = new CM_Asset_Javascript_Library($site);
+			$resources[] = new CM_Asset_Javascript_VendorAfterBody($site);
+			$resources[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+		}
+		foreach (new CM_Paging_Language_All() as $language) {
+			$resources[] = new CM_Asset_Javascript_Translations($language);
+		}
+		foreach ($resources as $resource) {
+			$resource->get(true);
+		}
+	}
+
 	/**
 	 * @param string|null $namespace
 	 * @return int
@@ -117,6 +137,10 @@ class CM_App {
 				$this->setVersion($version, $namespace);
 			}
 			$versionBumps += ($version - $versionStart);
+		}
+		if ($versionBumps > 0) {
+			$db = CM_Config::get()->CM_Db_Db->db;
+			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
 		}
 		return $versionBumps;
 	}
