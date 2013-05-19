@@ -1,6 +1,6 @@
 <?php
 
-class CM_CodeGenerator_Php {
+class CM_CodeGenerator_Php extends CM_CodeGenerator_Abstract {
 
 	/**
 	 * @param string $className
@@ -43,38 +43,8 @@ class CM_CodeGenerator_Php {
 	/**
 	 * @param string $className
 	 * @return string
-	 * @throws CM_Exception_Invalid
 	 */
 	private function _getClassPath($className) {
-		$namespace = substr($className, 0, strpos($className, '_'));
-		$libraryNamespacePaths = CM_Bootloader::getInstance()->getNamespacePathsLibrary();
-		if (!array_key_exists($namespace, $libraryNamespacePaths)) {
-			throw new CM_Exception_Invalid('Cannot generate class for non-library namespace');
-		}
-		return DIR_ROOT . $libraryNamespacePaths[$namespace] . DIR_LIBRARY. str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-	}
-
-	/**
-	 * @param string $className
-	 * @return string
-	 * @throws CM_Exception_Invalid
-	 */
-	private function _getParentClassName($className) {
-		$parts = explode('_', $className);
-		$classNamespace = array_shift($parts);
-		$type = array_shift($parts);
-		$namespaces = array_reverse(CM_Bootloader::getInstance()->getNamespaces());
-		$position = array_search($classNamespace, $namespaces);
-		if (false === $position) {
-			throw new CM_Exception_Invalid('Namespace `' . $classNamespace . '` not found within `' . implode(', ', $namespaces) . '` namespaces.');
-		}
-		$namespaces = array_splice($namespaces, $position);
-		foreach ($namespaces as $namespace) {
-			$className = $namespace . '_' . $type . '_Abstract';
-			if (class_exists($className)) {
-				return $className;
-			}
-		}
-		return 'CM_Class_Abstract';
+		return $this->_getClassDirectory($className) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 	}
 }
