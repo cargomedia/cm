@@ -17,6 +17,16 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 		CM_App::getInstance()->setupDatabase(true);
 	}
 
+	public function runUpdates() {
+		$app = CM_App::getInstance();
+		$output = $this->_getOutput();
+		$output->writeln('Running database updates…');
+		$app->runUpdateScripts(function ($version) use ($output) {
+			$output->writeln('  Running update ' . $version . '…');
+		});
+		$app->setReleaseStamp();
+	}
+
 	/**
 	 * @param integer $version
 	 * @param string|null  $namespace
