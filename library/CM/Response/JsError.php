@@ -10,6 +10,13 @@ class CM_Response_JsError extends CM_Response_Abstract {
 		$fileUrl = (string) $query['fileUrl'];
 		$fileLine = (int) $query['fileLine'];
 
+		$text = 'Error #' . $index . ' : ' . $message . PHP_EOL;
+		$text .= 'URL: ' . $url . PHP_EOL;
+		$text .= 'File: ' . $fileUrl . ' (line ' . $fileLine . ')' . PHP_EOL;
+
+		$log = new CM_Paging_Log_JsError();
+		$log->add($text);
+
 		$this->setHeader('Content-Type', 'text/javascript');
 		$this->_setContent('');
 	}
