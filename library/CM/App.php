@@ -23,6 +23,7 @@ class CM_App {
 		CM_Util::mkDir(DIR_DATA_LOCKS);
 		CM_Util::mkDir(DIR_DATA_LOG);
 		CM_Util::mkDir(DIR_USERFILES);
+		$this->resetTmp();
 	}
 
 	/**
