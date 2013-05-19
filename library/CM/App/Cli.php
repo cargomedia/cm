@@ -3,28 +3,22 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function setup() {
-		$application = CM_App::getInstance();
 		$this->_getOutput()->writeln('Setting up filesystem…');
-		$application->setupFilesystem();
+		CM_App::getInstance()->setupFilesystem();
 		$this->_getOutput()->writeln('Setting up database…');
-		$application->setupDatabase();
+		CM_App::getInstance()->setupDatabase();
+	}
+
+	public function fillCaches() {
+		$this->_getOutput()->writeln('Warming up caches…');
+		CM_App::getInstance()->fillCaches();
 	}
 
 	public function deploy() {
-		$app = CM_App::getInstance();
-		$output = $this->_getOutput();
-		$output->writeln('Setting up filesystem…');
-		$app->setupFilesystem();
+		$this->setup();
 
-		$output->writeln('Running database updates…');
-		$app->runUpdateScripts(function ($version) use ($output) {
-			$output->writeln('  Running update ' . $version . '…');
-		});
-
-		$output->writeln('Warming up caches…');
-		$app->fillCaches();
-
-		$app->setReleaseStamp();
+		$dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput());
+		$dbCli->runUpdates();
 	}
 
 	public function generateConfig() {

@@ -47,6 +47,15 @@ class CM_App {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Db_Db::runDump($configDb->db, $dump);
 			}
+			$app = CM_App::getInstance();
+			foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+				$updateFiles = CM_Util::rglob('*.php', $path);
+				$version = array_reduce($updateFiles, function ($initial, $path) {
+					$filename = basename($path);
+					return max($initial, (int) $filename);
+				}, $app->getVersion());
+				$app->setVersion($version, $namespace);
+			}
 		}
 	}
 
