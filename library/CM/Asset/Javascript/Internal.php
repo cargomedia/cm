@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Resource_Javascript_Internal extends CM_App_Resource_Javascript_Abstract {
+class CM_Asset_Javascript_Internal extends CM_Asset_Javascript_Abstract {
 
 	/**
 	 * @param CM_Site_Abstract $site

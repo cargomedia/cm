@@ -101,7 +101,7 @@ class CM_SVM_Model {
 	 * @return string
 	 */
 	private function _getPath() {
-		$basePath = DIR_DATA . 'svm' . DIRECTORY_SEPARATOR;
+		$basePath = DIR_DATA_SVM;
 		if (!is_dir($basePath)) {
 			CM_Util::mkDir($basePath);
 		}

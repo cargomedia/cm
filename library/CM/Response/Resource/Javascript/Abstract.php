@@ -9,9 +9,9 @@ abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Reso
 	}
 
 	/**
-	 * @param CM_App_Resource_Javascript_Abstract $resource
+	 * @param CM_Asset_Javascript_Abstract $resource
 	 */
-	protected function _setResource(CM_App_Resource_Javascript_Abstract $resource) {
+	protected function _setResource(CM_Asset_Javascript_Abstract $resource) {
 		$minify = !$this->getRender()->isDebug();
 		$this->_setContent($resource->get($minify));
 	}
