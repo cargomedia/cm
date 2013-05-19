@@ -8,14 +8,14 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	/** @var CM_CodeGenerator_Javascript */
 	protected $_generatorJavascript;
 
-	/** @var CM_CodeGenerator_Smarty */
-	protected $_generatorSmarty;
+	/** @var CM_CodeGenerator_Layout */
+	protected $_generatorLayout;
 
 	public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null) {
 		parent::__construct($input, $output);
 		$this->_generatorPhp = new CM_CodeGenerator_Php();
 		$this->_generatorJavascript = new CM_CodeGenerator_Javascript();
-		$this->_generatorSmarty = new CM_CodeGenerator_Smarty();
+		$this->_generatorLayout = new CM_CodeGenerator_Layout();
 	}
 
 	/**
@@ -32,7 +32,10 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$jsClassFile = $this->_generatorJavascript->createClassFile($className);
 		$this->_logFileCreation($jsClassFile);
 
-		$smartyTemplateFile = $this->_generatorSmarty->createTemplateFile($className);
+		$smartyTemplateFile = $this->_generatorLayout->createTemplateFile($className);
+		$this->_logFileCreation($smartyTemplateFile);
+
+		$smartyTemplateFile = $this->_generatorLayout->createStylesheetFile($className);
 		$this->_logFileCreation($smartyTemplateFile);
 	}
 
