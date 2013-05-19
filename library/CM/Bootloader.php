@@ -228,26 +228,7 @@ class CM_Bootloader {
 	/**
 	 * @return array
 	 */
-	private function _getNamespacePaths() {
-		$cacheKey = $this->_getNamespacePathsCacheKey();
-		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($cacheKey))) {
-			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
-			apc_store($cacheKey, $this->_namespacePaths);
-		}
-		return $this->_namespacePaths;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function _getNamespacePathsCacheKey() {
-		return DIR_ROOT . '_CM_NamespacesPaths';
-	}
-
-	/**
-	 * @return array
-	 */
-	private function _getNamespacePathsLibrary() {
+	public function getNamespacePathsLibrary() {
 		$namespacePaths = array();
 		if (DIR_LIBRARY) {
 			$directory = dir(DIR_ROOT . DIR_LIBRARY);
@@ -258,6 +239,25 @@ class CM_Bootloader {
 			}
 		}
 		return $namespacePaths;
+	}
+
+	/**
+	 * @return array
+	 */
+	private function _getNamespacePaths() {
+		$cacheKey = $this->_getNamespacePathsCacheKey();
+		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($cacheKey))) {
+			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->getNamespacePathsLibrary());
+			apc_store($cacheKey, $this->_namespacePaths);
+		}
+		return $this->_namespacePaths;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getNamespacePathsCacheKey() {
+		return DIR_ROOT . '_CM_NamespacesPaths';
 	}
 
 	/**

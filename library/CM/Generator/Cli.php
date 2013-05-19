@@ -2,6 +2,14 @@
 
 class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 
+	/** @var CM_CodeGenerator_Php */
+	protected $_generatorPhp;
+
+	public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null) {
+		parent::__construct($input, $output);
+		$this->_generatorPhp = new CM_CodeGenerator_Php();
+	}
+
 	/**
 	 * @param string $className
 	 * @throws CM_Exception_Invalid
@@ -10,16 +18,21 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		if (class_exists($className)) {
 			throw new CM_Exception_Invalid('`' . $className . '` already exists');
 		}
-		$this->_generateClassFilePhp($className);
+		$this->_generatorPhp->createClassFile($className);
 		$this->_generateClassFileJavascript($className);
 		$this->_generateViewLayout($className);
 	}
 
 	/**
 	 * @param string $className
+	 * @throws CM_Exception_Invalid
 	 */
 	public function createClass($className) {
-		$this->_generateClassFilePhp($className);
+		if (class_exists($className) && !$this->_getInput()->confirm('Class `' . $className . '` already exists. Replace?')) {
+			return;
+		}
+		$file = $this->_generatorPhp->createClassFile($className);
+		$this->_logFileCreation($file);
 	}
 
 	/**
@@ -28,10 +41,12 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	public function createNamespace($namespace) {
 		$this->_createNamespaceDirectories($namespace);
 		CM_Bootloader::getInstance()->reloadNamespacePaths();
-		$this->_generateClassFilePhp($namespace . '_Site', 'CM_Site_Abstract');
-		$bootloaderFile = $this->_generateClassFilePhp($namespace . '_Bootloader', 'CM_Bootloader');
+		$this->_generatorPhp->createClassFile($namespace . '_Site');
+
+		$bootloaderClass = $this->_generatorPhp->createClass($namespace . '_Bootloader');
 		$namespaces = array_merge(CM_Bootloader::getInstance()->getNamespaces(), array($namespace));
-		$bootloaderFile->addMethod('public', 'getNamespaces', array(), "return array('" . implode("', '", $namespaces) . "');");
+		$bootloaderClass->addMethod(new CG_Method('getNamespaces', "return array('" . implode("', '", $namespaces) . "');"));
+		$this->_generatorPhp->createClassFileFromClass($bootloaderClass);
 	}
 
 	public function createJavascriptFiles() {
@@ -56,29 +71,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			CM_Util::mkDir($path);
 			$this->_getOutput()->writeln('Created `'  . $path . '`');
 		}
-	}
-
-	/**
-	 * @param string        $className
-	 * @param string|null   $parentClass
-	 * @return CM_File_Php
-	 */
-	private function _generateClassFilePhp($className, $parentClass = null) {
-		$parts = explode('_', $className);
-		$namespace = array_shift($parts);
-		$type = array_shift($parts);
-		if (!$parentClass) {
-			$parentClass = $this->_getParentClass($namespace, $type);
-		}
-		$file = CM_File_Php::createLibraryClass($className, $parentClass);
-		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
-		$reflectionClass = new ReflectionClass($parentClass);
-		foreach ($reflectionClass->getMethods() as $method) {
-			if ($method->isAbstract()) {
-				$file->copyMethod($method);
-			}
-		}
-		return $file;
 	}
 
 	/**
@@ -108,25 +100,10 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param string $viewNamespace
-	 * @param string $type
-	 * @return string
-	 * @throws CM_Exception_Invalid
+	 * @param CM_File $file
 	 */
-	private function _getParentClass($viewNamespace, $type) {
-		$namespaces = array_reverse(CM_Bootloader::getInstance()->getNamespaces());
-		$position = array_search($viewNamespace, $namespaces);
-		if (false === $position) {
-			throw new CM_Exception_Invalid('Namespace `' . $viewNamespace . '` not found within `' . implode(', ', $namespaces) . '` namespaces.');
-		}
-		$namespaces = array_splice($namespaces, $position);
-		foreach ($namespaces as $namespace) {
-			$className = $namespace . '_' . $type . '_Abstract';
-			if (class_exists($className)) {
-				return $className;
-			}
-		}
-		throw new CM_Exception_Invalid('No abstract class found for `' . $type . '` type within `' . implode(', ', $namespaces) . '` namespaces.');
+	private function _logFileCreation(CM_File $file) {
+		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
 	}
 
 	public static function getPackageName() {
