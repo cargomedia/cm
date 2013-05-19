@@ -9,13 +9,18 @@
 		/** @type Function|Null */
 		onerrorBackup: null,
 
+		/** @type String */
+		logUrl: null,
+
 		/** @type Number */
 		index: 0,
 
 		/**
+		 * @param {String} logUrl
 		 * @param {Boolean} [suppressFromBrowser]
 		 */
-		install: function(suppressFromBrowser) {
+		install: function(logUrl, suppressFromBrowser) {
+			this.logUrl = logUrl;
 			if (window.onerror) {
 				this.onerrorBackup = window.onerror;
 			}
@@ -36,7 +41,7 @@
 		 * @param {Number} fileLine
 		 */
 		log: function(message, fileUrl, fileLine) {
-			var src = '/logger.js';
+			var src = this.logUrl;
 			src += '?index=' + (this.index++);
 			src += "&url=" + encodeURIComponent(document.location.href);
 			src += "&message=" + encodeURIComponent(message.trim().substr(0, 10000));
@@ -56,6 +61,6 @@
 		}
 	};
 
-	jserror.install();
+	jserror.install('/logger.js');
 
 }).call(this);
