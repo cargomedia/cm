@@ -25,7 +25,10 @@
 				this.onerrorBackup = window.onerror;
 			}
 			window.onerror = function(message, fileUrl, fileLine) {
-				jserror.log(message, fileUrl, fileLine);
+				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
+				if (!originatesFromLogging) {
+					jserror.log(message, fileUrl, fileLine);
+				}
 				if (jserror.onerrorBackup) {
 					jserror.onerrorBackup(message, fileUrl, fileLine);
 				}
