@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Resource_Javascript_Abstract extends CM_App_Resource_Abstract {
+class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
 	protected $_content;
 

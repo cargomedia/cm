@@ -26,19 +26,19 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function fillCache() {
-		/** @var CM_App_Resource_Javascript_Abstract[] $resources */
+		/** @var CM_Asset_Javascript_Abstract[] $resources */
 		$resources = array();
 		$siteClassNames = CM_Site_Abstract::getClassChildren();
 		foreach ($siteClassNames as $siteClassName) {
 			/** @var CM_Site_Abstract $site */
 			$site = new $siteClassName();
-			$resources[] = new CM_App_Resource_Javascript_Internal($site);
-			$resources[] = new CM_App_Resource_Javascript_Library($site);
-			$resources[] = new CM_App_Resource_Javascript_VendorAfterBody($site);
-			$resources[] = new CM_App_Resource_Javascript_VendorBeforeBody($site);
+			$resources[] = new CM_Asset_Javascript_Internal($site);
+			$resources[] = new CM_Asset_Javascript_Library($site);
+			$resources[] = new CM_Asset_Javascript_VendorAfterBody($site);
+			$resources[] = new CM_Asset_Javascript_VendorBeforeBody($site);
 		}
 		foreach (new CM_Paging_Language_All() as $language) {
-			$resources[] = new CM_App_Resource_Javascript_Translations($language);
+			$resources[] = new CM_Asset_Javascript_Translations($language);
 		}
 		foreach ($resources as $resource) {
 			$resource->get(true);

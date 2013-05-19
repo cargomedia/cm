@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Resource_Javascript_Library extends CM_App_Resource_Javascript_Abstract {
+class CM_Asset_Javascript_Library extends CM_Asset_Javascript_Abstract {
 
 	/**
 	 * @param CM_Site_Abstract $site
@@ -10,7 +10,7 @@ class CM_App_Resource_Javascript_Library extends CM_App_Resource_Javascript_Abst
 		foreach (self::getIncludedPaths($site) as $path) {
 			$content .= new CM_File($path);
 		}
-		$internal = new CM_App_Resource_Javascript_Internal($site);
+		$internal = new CM_Asset_Javascript_Internal($site);
 		$content .= $internal->get();
 		$this->_content = $content;
 	}
