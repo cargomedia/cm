@@ -23,12 +23,12 @@ class CM_App {
 		CM_Util::mkDir(DIR_TMP_SMARTY);
 		CM_Util::mkDir(DIR_TMP_CACHE);
 		CM_Util::mkDir(DIR_TMP_SMARTY);
+		CM_Util::mkDir(DIR_TMP_TRACKING);
 
 		CM_Util::mkDir(DIR_DATA);
 		CM_Util::mkDir(DIR_DATA_SVM);
 		CM_Util::mkDir(DIR_DATA_LOCKS);
 		CM_Util::mkDir(DIR_DATA_LOG);
-		CM_Util::mkDir(DIR_DATA_TRACKING);
 
 		CM_Util::mkDir(DIR_USERFILES);
 	}
