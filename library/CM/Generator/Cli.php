@@ -32,11 +32,11 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$jsClassFile = $this->_generatorJavascript->createClassFile($className);
 		$this->_logFileCreation($jsClassFile);
 
-		$smartyTemplateFile = $this->_generatorLayout->createTemplateFile($className);
-		$this->_logFileCreation($smartyTemplateFile);
+		$templateFile = $this->_generatorLayout->createTemplateFile($className);
+		$this->_logFileCreation($templateFile);
 
-		$smartyTemplateFile = $this->_generatorLayout->createStylesheetFile($className);
-		$this->_logFileCreation($smartyTemplateFile);
+		$stylesheetFile = $this->_generatorLayout->createStylesheetFile($className);
+		$this->_logFileCreation($stylesheetFile);
 	}
 
 	/**
