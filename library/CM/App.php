@@ -20,8 +20,16 @@ class CM_App {
 	public function setupFilesystem() {
 		CM_Util::mkDir(DIR_TMP);
 		CM_Util::rmDirContents(DIR_TMP);
-		CM_Cache_File::setup();
-		CM_Render::setup();
+		CM_Util::mkDir(DIR_TMP_SMARTY);
+		CM_Util::mkDir(DIR_TMP_CACHE);
+		CM_Util::mkDir(DIR_TMP_SMARTY);
+
+		CM_Util::mkDir(DIR_DATA);
+		CM_Util::mkDir(DIR_DATA_SVM);
+		CM_Util::mkDir(DIR_DATA_LOCKS);
+		CM_Util::mkDir(DIR_DATA_LOG);
+
+		CM_Util::mkDir(DIR_USERFILES);
 	}
 
 	/**

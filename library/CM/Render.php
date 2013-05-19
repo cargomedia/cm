@@ -476,8 +476,4 @@ class CM_Render extends CM_Class_Abstract {
 	private function _parseVariables($phrase, array $variables) {
 		return preg_replace('~\{\$(\w+)\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1'] : ''", $phrase);
 	}
-
-	public static function setup() {
-		CM_Util::mkDir(DIR_TMP_SMARTY);
-	}
 }
