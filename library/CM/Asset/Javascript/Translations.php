@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Resource_Javascript_Translations extends CM_App_Resource_Javascript_Abstract {
+class CM_Asset_Javascript_Translations extends CM_Asset_Javascript_Abstract {
 
 	/**
 	 * @param CM_Model_Language $language
