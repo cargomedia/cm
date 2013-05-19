@@ -5,9 +5,13 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	/** @var CM_CodeGenerator_Php */
 	protected $_generatorPhp;
 
+	/** @var CM_CodeGenerator_Javascript */
+	protected $_generatorJavascript;
+
 	public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null) {
 		parent::__construct($input, $output);
 		$this->_generatorPhp = new CM_CodeGenerator_Php();
+		$this->_generatorJavascript = new CM_CodeGenerator_Javascript();
 	}
 
 	/**
@@ -18,8 +22,10 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		if (class_exists($className)) {
 			throw new CM_Exception_Invalid('`' . $className . '` already exists');
 		}
-		$this->_generatorPhp->createClassFile($className);
-		$this->_generateClassFileJavascript($className);
+		$phpClassFile = $this->_generatorPhp->createClassFile($className);
+		$this->_logFileCreation($phpClassFile);
+		$jsClassFile = $this->_generatorJavascript->createClassFile($className);
+		$this->_logFileCreation($jsClassFile);
 		$this->_generateViewLayout($className);
 	}
 
@@ -71,16 +77,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			CM_Util::mkDir($path);
 			$this->_getOutput()->writeln('Created `'  . $path . '`');
 		}
-	}
-
-	/**
-	 * @param string $className
-	 * @return CM_File_Javascript
-	 */
-	private function _generateClassFileJavascript($className) {
-		$file = CM_File_Javascript::createLibraryClass($className);
-		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
-		return $file;
 	}
 
 	/**
