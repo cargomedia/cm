@@ -25,7 +25,7 @@ class CM_CodeGenerator_Javascript extends CM_CodeGenerator_Abstract {
 	protected function _classExists($className) {
 		$namespace = CM_Util::getNamespace($className);
 		$classPath = CM_Util::getNamespacePath($namespace) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
-		return parent::_classExists($className) && CM_File::exists($classPath);
+		return CM_File::exists($classPath);
 	}
 
 	/**

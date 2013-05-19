@@ -8,10 +8,14 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	/** @var CM_CodeGenerator_Javascript */
 	protected $_generatorJavascript;
 
+	/** @var CM_CodeGenerator_Smarty */
+	protected $_generatorSmarty;
+
 	public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null) {
 		parent::__construct($input, $output);
 		$this->_generatorPhp = new CM_CodeGenerator_Php();
 		$this->_generatorJavascript = new CM_CodeGenerator_Javascript();
+		$this->_generatorSmarty = new CM_CodeGenerator_Smarty();
 	}
 
 	/**
@@ -24,9 +28,12 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		}
 		$phpClassFile = $this->_generatorPhp->createClassFile($className);
 		$this->_logFileCreation($phpClassFile);
+
 		$jsClassFile = $this->_generatorJavascript->createClassFile($className);
 		$this->_logFileCreation($jsClassFile);
-		$this->_generateViewLayout($className);
+
+		$smartyTemplateFile = $this->_generatorSmarty->createTemplateFile($className);
+		$this->_logFileCreation($smartyTemplateFile);
 	}
 
 	/**
@@ -77,22 +84,6 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 			CM_Util::mkDir($path);
 			$this->_getOutput()->writeln('Created `'  . $path . '`');
 		}
-	}
-
-	/**
-	 * @param string $className
-	 */
-	private function _generateViewLayout($className) {
-		$parts = explode('_', $className);
-		$namespace = array_shift($parts);
-		$viewType = array_shift($parts);
-		$pathRelative = implode('_', $parts);
-		$layoutPath = CM_Util::getNamespacePath($namespace) . 'layout/default/' . $viewType . '/' . $pathRelative . '/';
-		CM_Util::mkDir($layoutPath);
-		$file = CM_File::create($layoutPath . 'default.tpl');
-		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
-		$file = CM_File::create($layoutPath . 'default.less');
-		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
 	}
 
 	/**

@@ -45,6 +45,8 @@ abstract class CM_CodeGenerator_Abstract {
 	 * @return bool
 	 */
 	protected function _classExists($className) {
-		return class_exists($className);
+		$namespace = CM_Util::getNamespace($className);
+		$classPath = CM_Util::getNamespacePath($namespace) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		return CM_File::exists($classPath);
 	}
 }
