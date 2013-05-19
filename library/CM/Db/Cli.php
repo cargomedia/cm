@@ -17,19 +17,6 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 		CM_App::getInstance()->setupDatabase(true);
 	}
 
-	public function runUpdates() {
-		$app = CM_App::getInstance();
-		$output = $this->_getOutput();
-		$versionBumps = $app->runUpdateScripts(function ($version) use ($output) {
-			$output->writeln('Running update ' . $version . '...');
-		});
-		if ($versionBumps > 0) {
-			$db = CM_Config::get()->CM_Db_Db->db;
-			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
-		}
-		$app->setReleaseStamp();
-	}
-
 	/**
 	 * @param integer $version
 	 * @param string|null  $namespace
