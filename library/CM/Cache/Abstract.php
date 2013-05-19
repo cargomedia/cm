@@ -16,7 +16,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_Abstract
+	 * @return static
 	 */
 	public static final function getInstance() {
 		if (!isset(static::$_instance)) {

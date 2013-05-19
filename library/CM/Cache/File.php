@@ -6,11 +6,10 @@ class CM_Cache_File extends CM_Cache_Abstract {
 	protected static $_instance;
 
 	/** @var string */
-	private $_storageDir;
+	protected $_storageDir;
 
 	public function __construct() {
 		$this->_storageDir = DIR_TMP . 'cache/';
-		CM_Util::mkDir($this->_storageDir);
 	}
 
 	protected function _getName() {
@@ -53,5 +52,7 @@ class CM_Cache_File extends CM_Cache_Abstract {
 		return $this->_storageDir . md5($key);
 	}
 
-
+	public static function setup() {
+		CM_Util::mkDir(self::getInstance()->_storageDir);
+	}
 }
