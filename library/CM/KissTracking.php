@@ -91,7 +91,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 * @return string
 	 */
 	protected function _getFileName() {
-		return DIR_DATA . 'kiss-tracking.csv';
+		return DIR_TMP . 'kiss-tracking.csv';
 	}
 
 	/**
