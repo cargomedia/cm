@@ -61,6 +61,6 @@
 		}
 	};
 
-	jserror.install('/logger.js');
+	jserror.install('/jserror/null');
 
 }).call(this);
