@@ -10,7 +10,6 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 	public function __construct(CM_Render $render, CM_Site_Abstract $site) {
 		parent::__construct($render);
 
-		$files = array();
 		foreach (array_reverse($site->getNamespaces()) as $namespace) {
 			foreach (array_reverse($site->getThemes()) as $theme) {
 				$path = $render->getThemeDir(true, $theme, $namespace) . 'variables.less';
@@ -33,11 +32,9 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 			}
 		}
 
-
-
-		$viewClasses = CM_View_Abstract::getClasses($site->getNamespaces(), CM_View_Abstract::CONTEXT_CSS);
-		foreach ($viewClasses as $className) {
-			$asset = new CM_Asset_Css_View($this->_render, $className);
+		$viewClasses = CM_View_Abstract::getClassChildren(true);
+		foreach ($viewClasses as $viewClassName) {
+			$asset = new CM_Asset_Css_View($this->_render, $viewClassName);
 			$this->add($asset->_getContent());
 		}
 	}
