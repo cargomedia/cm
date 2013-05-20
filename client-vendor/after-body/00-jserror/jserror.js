@@ -26,7 +26,8 @@
 			}
 			window.onerror = function(message, fileUrl, fileLine) {
 				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
-				if (!originatesFromLogging) {
+				var detailsUnavailable = (0 === fileLine);
+				if (!originatesFromLogging && !detailsUnavailable) {
 					jserror.log(message, fileUrl, fileLine);
 				}
 				if (jserror.onerrorBackup) {
