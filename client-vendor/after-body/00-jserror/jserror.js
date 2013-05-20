@@ -13,7 +13,7 @@
 		logUrl: null,
 
 		/** @type Number */
-		index: 0,
+		counter: 0,
 
 		/**
 		 * @param {String} logUrl
@@ -45,7 +45,7 @@
 		 */
 		log: function(message, fileUrl, fileLine) {
 			var src = this.logUrl;
-			src += '?index=' + (this.index++);
+			src += '?counter=' + (this.counter++);
 			src += "&url=" + encodeURIComponent(document.location.href);
 			src += "&message=" + encodeURIComponent(message.trim().substr(0, 10000));
 			src += "&fileUrl=" + encodeURIComponent(fileUrl);
