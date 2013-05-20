@@ -17,9 +17,9 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 		$viewType = array_shift($classNameParts);
 		$viewName = array_shift($classNameParts);
 
-		$viewPath = $viewType;
+		$viewPath = $viewType . '/';
 		if ($viewName) {
-			$viewPath .= $viewName;
+			$viewPath .= $viewName . '/';
 		}
 
 		$relativePaths = array();
