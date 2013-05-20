@@ -35,8 +35,12 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function createJavascriptFiles() {
-		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
+		$viewClasses = CM_View_Abstract::getClassChildren();
 		foreach ($viewClasses as $path => $className) {
+			$skipGeneration = is_a($className, 'CM_Mail', true);
+			if ($skipGeneration) {
+				continue;
+			}
 			$jsPath = preg_replace('/\.php$/', '.js', $path);
 			if (!CM_File::exists($jsPath)) {
 				$jsFile = CM_File_Javascript::createLibraryClass($className);
