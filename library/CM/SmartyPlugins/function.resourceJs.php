@@ -23,7 +23,7 @@ function smarty_helper_resourceJs($type, $file, $render) {
 		return smarty_helper_resourceJs_libraryDebug($render);
 	}
 	$url = $render->getUrlResource($type . '-js', $file);
-	return '<script type="text/javascript" src="' . $url . '"></script>' . PHP_EOL;
+	return '<script type="text/javascript" src="' . $url . '" crossorigin="anonymous"></script>' . PHP_EOL;
 }
 
 /**
