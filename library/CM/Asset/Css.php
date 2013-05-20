@@ -1,6 +1,6 @@
 <?php
 
-class CM_Css {
+class CM_Asset_Css {
 
 	/**
 	 * @var string|null
@@ -11,7 +11,7 @@ class CM_Css {
 	 */
 	private $_prefix = null;
 	/**
-	 * @var CM_Css[]
+	 * @var CM_Asset_Css[]
 	 */
 	private $_children = array();
 
@@ -33,7 +33,7 @@ class CM_Css {
 	 * @param string|null $prefix
 	 */
 	public function add($css, $prefix = null) {
-		$this->_children[] = new CM_Css($css, $prefix);
+		$this->_children[] = new CM_Asset_Css($css, $prefix);
 	}
 
 	/**
