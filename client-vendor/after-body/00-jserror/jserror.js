@@ -17,9 +17,9 @@
 
 		/**
 		 * @param {String} logUrl
-		 * @param {Boolean} [suppressFromBrowser]
+		 * @param {Boolean} [suppressErrors]
 		 */
-		install: function(logUrl, suppressFromBrowser) {
+		install: function(logUrl, suppressErrors) {
 			this.logUrl = logUrl;
 			if (window.onerror) {
 				this.onerrorBackup = window.onerror;
@@ -32,7 +32,7 @@
 				if (jserror.onerrorBackup) {
 					jserror.onerrorBackup(message, fileUrl, fileLine);
 				}
-				if (suppressFromBrowser) {
+				if (suppressErrors) {
 					return true;
 				}
 			}
