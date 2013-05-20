@@ -34,8 +34,24 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 
 		$viewClasses = CM_View_Abstract::getClassChildren(true);
 		foreach ($viewClasses as $viewClassName) {
-			$asset = new CM_Asset_Css_View($this->_render, $viewClassName);
-			$this->add($asset->_getContent());
+			if ($this->_isAllowedViewClass($viewClassName)) {
+				$asset = new CM_Asset_Css_View($this->_render, $viewClassName);
+				$this->add($asset->_getContent());
+			}
 		}
+	}
+
+	/**
+	 * @param string $viewClassName
+	 * @return bool
+	 */
+	private function _isAllowedViewClass($viewClassName) {
+		$skipClasses = array('CM_Mail');
+		foreach ($skipClasses as $skipClass) {
+			if (is_a($viewClassName, $skipClass, true)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
