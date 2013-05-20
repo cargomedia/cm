@@ -12,7 +12,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 	private $_prefix;
 
 	/** @var CM_Asset_Css[] */
-	protected $_children = array();
+	private $_children = array();
 
 	/**
 	 * @param CM_Render   $render
@@ -44,6 +44,23 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 		} else {
 			return $this->_compile($content);
 		}
+	}
+
+	protected function _getContent() {
+		$content = '';
+		if ($this->_prefix) {
+			$content .= $this->_prefix . ' {' . PHP_EOL;
+		}
+		if ($this->_content) {
+			$content .= $this->_content . PHP_EOL;
+		}
+		foreach ($this->_children as $css) {
+			$content .= $css->_getContent();
+		}
+		if ($this->_prefix) {
+			$content .= '}' . PHP_EOL;
+		}
+		return $content;
 	}
 
 	/**
@@ -81,23 +98,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 			CM_Cache_File::set($cacheKey, $contentTransformed);
 		}
 		return $contentTransformed;
-	}
-
-	protected function _getContent() {
-		$content = '';
-		if ($this->_prefix) {
-			$content .= $this->_prefix . ' {' . PHP_EOL;
-		}
-		if ($this->_content) {
-			$content .= $this->_content . PHP_EOL;
-		}
-		foreach ($this->_children as $css) {
-			$content .= $css->_getContent();
-		}
-		if ($this->_prefix) {
-			$content .= '}' . PHP_EOL;
-		}
-		return $content;
 	}
 
 	/**
