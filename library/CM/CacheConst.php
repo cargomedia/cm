@@ -46,6 +46,9 @@ class CM_CacheConst {
 	const Css = 'Css';
 
 	//_md5:X
+	//_md5:X_compress:X
+	//_md5:X_compress:X_siteId:X
+	//_md5:X_compress:X_siteId:X_languageId:X
 	const App_Resource = 'App_Resource';
 
 	//_lock:X

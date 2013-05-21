@@ -7,9 +7,9 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 			$query = $this->getRequest()->getQuery();
 			$skipLibraries = !empty($query['debug']);
 			if ($skipLibraries) {
-				$this->_setResource(new CM_Asset_Javascript_Internal($this->getSite()));
+				$this->_setAsset(new CM_Asset_Javascript_Internal($this->getSite()));
 			} else {
-				$this->_setResource(new CM_Asset_Javascript_Library($this->getSite()));
+				$this->_setAsset(new CM_Asset_Javascript_Library($this->getSite()));
 			}
 			return;
 		}
@@ -18,7 +18,7 @@ class CM_Response_Resource_Javascript_Library extends CM_Response_Resource_Javas
 			if (!$language) {
 				throw new CM_Exception_Invalid('Render has no language');
 			}
-			$this->_setResource(new CM_Asset_Javascript_Translations($language));
+			$this->_setAsset(new CM_Asset_Javascript_Translations($language));
 			return;
 		}
 		throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, null, CM_Exception::WARN);
