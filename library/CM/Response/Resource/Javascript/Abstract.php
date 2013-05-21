@@ -5,6 +5,7 @@ abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Reso
 	protected function _setContent($content) {
 		$this->enableCache();
 		$this->setHeader('Content-Type', 'application/x-javascript');
+		$this->setHeader('Access-Control-Allow-Origin', $this->getSite()->getUrl());
 		parent::_setContent($content);
 	}
 
