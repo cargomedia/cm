@@ -18,8 +18,9 @@
 		/**
 		 * @param {String} logUrl
 		 * @param {Boolean} [suppressErrors]
+		 * @param {Boolean} [suppressWithoutDetails]
 		 */
-		install: function(logUrl, suppressErrors) {
+		install: function(logUrl, suppressErrors, suppressWithoutDetails) {
 			this.logUrl = logUrl;
 			if (window.onerror) {
 				this.onerrorBackup = window.onerror;
@@ -27,7 +28,8 @@
 			window.onerror = function(message, fileUrl, fileLine) {
 				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
 				var detailsUnavailable = (0 === fileLine);
-				if (!originatesFromLogging && !detailsUnavailable) {
+				var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable);
+				if (!suppressLogging) {
 					jserror.log(message, fileUrl, fileLine);
 				}
 				if (jserror.onerrorBackup) {
@@ -65,6 +67,6 @@
 		}
 	};
 
-	jserror.install('/jserror/null');
+	jserror.install('/jserror/null', false, false);
 
 }).call(this);
