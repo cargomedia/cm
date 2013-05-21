@@ -161,7 +161,7 @@ class CM_Util {
 	public static function mkDir($path) {
 		$path = (string) $path;
 		if (!is_dir($path)) {
-			if (false === mkdir($path, 0777, true)) {
+			if (false === @mkdir($path, 0777, true)) {
 				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
 			}
 		}
@@ -178,19 +178,19 @@ class CM_Util {
 
 	/**
 	 * @param string $path
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public static function rmDir($path) {
 		$path = (string) $path;
 		self::rmDirContents($path);
-		if (!rmdir($path)) {
-			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
+		if (!@rmdir($path)) {
+			throw new CM_Exception('Could not delete directory `' . $path . '`');
 		}
 	}
 
 	/**
 	 * @param string $path
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public static function rmDirContents($path) {
 		$path = (string) $path;
@@ -198,8 +198,8 @@ class CM_Util {
 			if (is_dir($file)) {
 				self::rmDir($file . '/');
 			} else {
-				if (!unlink($file)) {
-					throw new CM_Exception_Invalid('Could not delete file `' . $file . '`');
+				if (!@unlink($file)) {
+					throw new CM_Exception('Could not delete file `' . $file . '`');
 				}
 			}
 		}
