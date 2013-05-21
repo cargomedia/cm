@@ -37,8 +37,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	public function createJavascriptFiles() {
 		$viewClasses = CM_View_Abstract::getClassChildren();
 		foreach ($viewClasses as $path => $className) {
-			$validView = !is_a($className, 'CM_Mail', true);
-			if ($validView) {
+			if ($this->_isValidJavascriptView($className)) {
 				$jsPath = preg_replace('/\.php$/', '.js', $path);
 				if (!CM_File::exists($jsPath)) {
 					$jsFile = CM_File_Javascript::createLibraryClass($className);
@@ -46,6 +45,20 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param string $className
+	 * @return bool
+	 */
+	private function _isValidJavascriptView($className) {
+		$disallowedClasses = array('CM_Mail');
+		foreach ($disallowedClasses as $disallowedClass) {
+			if ($className === $disallowedClass || is_subclass_of($className, $disallowedClass)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
