@@ -9,18 +9,12 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 	 */
 	public function __construct(CM_Render $render, $className) {
 		parent::__construct($render);
-		$classNameParts = explode('_', $className, 3);
-		if (count($classNameParts) < 2) {
-			throw new CM_Exception('Cannot detect all className parts from component\'s classNname `' . $className . '`');
+		preg_match('/^([^_]+)_(.*)$/', $className, $matches);
+		if (!$matches) {
+			throw new CM_Exception('Cannot detect all className parts from view\'s classNname `' . $className . '`');
 		}
-		$namespace = array_shift($classNameParts);
-		$viewType = array_shift($classNameParts);
-		$viewName = array_shift($classNameParts);
-
-		$viewPath = $viewType . '/';
-		if ($viewName) {
-			$viewPath .= $viewName . '/';
-		}
+		list($className, $namespace, $viewName) = $matches;
+		$viewPath = str_replace('_', '/', $viewName) . '/';
 
 		$relativePaths = array();
 		foreach ($render->getSite()->getThemes() as $theme) {
@@ -31,7 +25,7 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 		}
 		foreach (array_unique($relativePaths) as $path) {
 			$prefix = '.' . $className;
-			if ('Component' == $viewType) {
+			if (is_subclass_of($className, 'CM_Component_Abstract')) {
 				if ($path !== 'default.less' && strpos($path, '/') === false) {
 					$prefix .= '.' . preg_replace('#.less$#', '', $path);
 				}

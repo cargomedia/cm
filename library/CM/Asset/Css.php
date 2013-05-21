@@ -39,11 +39,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 
 	public function get($compress = null) {
 		$content = $this->_getContent();
-		if ($compress) {
-			return $this->_compile($content, true);
-		} else {
-			return $this->_compile($content);
-		}
+		return $this->_compile($content, $compress);
 	}
 
 	protected function _getContent() {
@@ -80,7 +76,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 		}
 		if (false === ($contentTransformed = CM_Cache_File::get($cacheKey))) {
 			$lessCompiler = new lessc();
-			$render = $this->_render;
 			$lessCompiler->registerFunction('image', function ($arg) use ($render) {
 				/** @var CM_Render $render */
 				list($type, $delimiter, $values) = $arg;
