@@ -190,7 +190,7 @@ class CM_Util {
 
 	/**
 	 * @param string $path
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public static function rmDirContents($path) {
 		$path = (string) $path;
@@ -199,7 +199,7 @@ class CM_Util {
 				self::rmDir($file . '/');
 			} else {
 				if (!@unlink($file)) {
-					throw new CM_Exception_Invalid('Could not delete file `' . $file . '`');
+					throw new CM_Exception('Could not delete file `' . $file . '`');
 				}
 			}
 		}
