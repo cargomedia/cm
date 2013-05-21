@@ -52,9 +52,9 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 * @return bool
 	 */
 	private function _isValidJavascriptView($className) {
-		$disallowedClasses = array('CM_Mail');
-		foreach ($disallowedClasses as $disallowedClass) {
-			if ($className === $disallowedClass || is_subclass_of($className, $disallowedClass)) {
+		$invalidClassNameList = array('CM_Mail');
+		foreach ($invalidClassNameList as $invalidClassName) {
+			if ($className === $invalidClassName || is_subclass_of($className, $invalidClassName)) {
 				return false;
 			}
 		}
