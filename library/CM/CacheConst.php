@@ -47,7 +47,7 @@ class CM_CacheConst {
 
 	//_md5:X
 	//_md5:X_compress:X
-	//_md5:X_compress:X_languageId:X
+	//_md5:X_compress:X_siteId:X_languageId:X
 	const App_Resource = 'App_Resource';
 
 	//_lock:X
