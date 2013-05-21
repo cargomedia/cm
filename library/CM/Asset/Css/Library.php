@@ -33,7 +33,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 
 		$viewClasses = CM_View_Abstract::getClassChildren(true);
 		foreach ($viewClasses as $viewClassName) {
-			if ($this->_isAllowedViewClass($viewClassName)) {
+			if ($this->_isValidViewClass($viewClassName)) {
 				$asset = new CM_Asset_Css_View($this->_render, $viewClassName);
 				$this->add($asset->_getContent());
 			}
@@ -41,13 +41,13 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 	}
 
 	/**
-	 * @param string $viewClassName
+	 * @param string $className
 	 * @return bool
 	 */
-	private function _isAllowedViewClass($viewClassName) {
-		$skipClasses = array('CM_Mail');
-		foreach ($skipClasses as $skipClass) {
-			if ($viewClassName === $skipClass || is_subclass_of($viewClassName, $skipClass)) {
+	private function _isValidViewClass($className) {
+		$invalidClassNameList = array('CM_Mail');
+		foreach ($invalidClassNameList as $invalidClassName) {
+			if ($className === $invalidClassName || is_subclass_of($className, $invalidClassName)) {
 				return false;
 			}
 		}
