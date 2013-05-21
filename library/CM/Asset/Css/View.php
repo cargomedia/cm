@@ -9,8 +9,7 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 	 */
 	public function __construct(CM_Render $render, $className) {
 		parent::__construct($render);
-		preg_match('/^([^_]+)_(.*)$/', $className, $matches);
-		if (!$matches) {
+		if (!preg_match('/^([^_]+)_(.*)$/', $className, $matches)) {
 			throw new CM_Exception('Cannot detect all className parts from view\'s classNname `' . $className . '`');
 		}
 		list($className, $namespace, $viewName) = $matches;

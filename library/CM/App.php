@@ -81,7 +81,6 @@ class CM_App {
 			foreach (new CM_Paging_Language_All() as $language) {
 				$render = new CM_Render($site, null, $language);
 				$resources[] = new CM_Asset_Css_Library($render);
-
 			}
 		}
 		foreach (new CM_Paging_Language_All() as $language) {
