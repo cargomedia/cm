@@ -4,14 +4,13 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 
 	/**
 	 * @param CM_Render        $render
-	 * @param CM_Site_Abstract $site
 	 * @throws CM_Exception
 	 */
-	public function __construct(CM_Render $render, CM_Site_Abstract $site) {
+	public function __construct(CM_Render $render) {
 		parent::__construct($render);
 
-		foreach (array_reverse($site->getNamespaces()) as $namespace) {
-			foreach (array_reverse($site->getThemes()) as $theme) {
+		foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
+			foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
 				$path = $render->getThemeDir(true, $theme, $namespace) . 'variables.less';
 				if (CM_File::exists($path)) {
 					$file = new CM_File($path);
@@ -23,8 +22,8 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 			$file = new CM_File($path);
 			$this->add($file->read());
 		}
-		foreach (array_reverse($site->getNamespaces()) as $namespace) {
-			foreach (array_reverse($site->getThemes()) as $theme) {
+		foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
+			foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
 				foreach (CM_Util::rglob('*.less', $render->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
 					$file = new CM_File($path);
 					$this->add($file->read());
