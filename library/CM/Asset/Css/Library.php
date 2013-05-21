@@ -47,7 +47,7 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 	private function _isAllowedViewClass($viewClassName) {
 		$skipClasses = array('CM_Mail');
 		foreach ($skipClasses as $skipClass) {
-			if (is_a($viewClassName, $skipClass, true)) {
+			if ($viewClassName === $skipClass || is_subclass_of($viewClassName, $skipClass)) {
 				return false;
 			}
 		}
