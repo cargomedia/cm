@@ -112,8 +112,18 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return mixed|null
 	 */
 	public function getItemRand() {
-		$offset = rand(0, $this->getCount() - 1);
-		return $this->getItem($offset);
+		if (0 === $this->_pageOffset && null === $this->_pageSize) {
+			$offset = rand(0, $this->getCount() - 1);
+			$this->_pageOffset = $offset;
+			$this->_pageSize = 1;
+			$item = $this->getItem(0);
+			$this->_pageOffset = 0;
+			$this->_pageSize = null;
+		} else {
+			$offset = rand(0, $this->_pageSize - 1);
+			$item = $this->getItem($offset);
+		}
+		return $item;
 	}
 
 	/**
