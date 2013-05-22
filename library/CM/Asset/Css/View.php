@@ -24,7 +24,7 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 		}
 		foreach (array_unique($relativePaths) as $path) {
 			$prefix = '.' . $className;
-			if (is_subclass_of($className, 'CM_Component_Abstract')) {
+			if (is_subclass_of($className, 'CM_Component_Abstract') && !is_subclass_of($className, 'CM_Page_Abstract')) {
 				if ($path !== 'default.less' && strpos($path, '/') === false) {
 					$prefix .= '.' . preg_replace('#.less$#', '', $path);
 				}
