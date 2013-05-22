@@ -8,6 +8,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	public function common() {
 		$this->_executeCallbacks(array(
 			function () {
+				CM_Model_User::offlineOld();
+			},
+			function () {
 				CM_ModelAsset_User_Roles::deleteOld();
 			},
 			function () {
