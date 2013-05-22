@@ -78,12 +78,12 @@ class CM_App {
 			$resources[] = new CM_Asset_Javascript_Library($site);
 			$resources[] = new CM_Asset_Javascript_VendorAfterBody($site);
 			$resources[] = new CM_Asset_Javascript_VendorBeforeBody($site);
-			foreach (new CM_Paging_Language_All() as $language) {
+			foreach (new CM_Paging_Language_Enabled() as $language) {
 				$render = new CM_Render($site, null, $language);
 				$resources[] = new CM_Asset_Css_Library($render);
 			}
 		}
-		foreach (new CM_Paging_Language_All() as $language) {
+		foreach (new CM_Paging_Language_Enabled() as $language) {
 			$resources[] = new CM_Asset_Javascript_Translations($language);
 		}
 		foreach ($resources as $resource) {
