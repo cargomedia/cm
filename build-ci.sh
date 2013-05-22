@@ -12,7 +12,6 @@ ssh ${USER}@${HOST} "
  cd ${DIR} &&
  cp resources/config/local.ci.php resources/config/local.php &&
  composer -n install &&
- scripts/cm.php app setup &&
  phpunit -d display_errors=1
 "
 ssh ${USER}@${HOST} "rm -rf ${DIR}"

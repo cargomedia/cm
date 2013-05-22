@@ -3,28 +3,22 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function setup() {
+		$this->_getOutput()->writeln('Setting up filesystem…');
 		CM_App::getInstance()->setupFilesystem();
+		$this->_getOutput()->writeln('Setting up database…');
+		CM_App::getInstance()->setupDatabase();
 	}
 
-	public function fillCache() {
-		/** @var CM_App_Resource_Javascript_Abstract[] $resources */
-		$resources = array();
-		$siteClassNames = CM_Site_Abstract::getClassChildren();
-		foreach ($siteClassNames as $siteClassName) {
-			/** @var CM_Site_Abstract $site */
-			$site = new $siteClassName();
-			$resources[] = new CM_App_Resource_Javascript_Internal($site);
-			$resources[] = new CM_App_Resource_Javascript_Library($site);
-			$resources[] = new CM_App_Resource_Javascript_VendorAfterBody($site);
-			$resources[] = new CM_App_Resource_Javascript_VendorBeforeBody($site);
-		}
-		foreach (new CM_Paging_Language_All() as $language) {
-			$resources[] = new CM_App_Resource_Javascript_Translations($language);
-		}
-		foreach ($resources as $resource) {
-			$resource->get(true);
-		}
-		$this->_getOutput()->writeln('Cached ' . count($resources) . ' resources.');
+	public function fillCaches() {
+		$this->_getOutput()->writeln('Warming up caches…');
+		CM_App::getInstance()->fillCaches();
+	}
+
+	public function deploy() {
+		$this->setup();
+
+		$dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput());
+		$dbCli->runUpdates();
 	}
 
 	public function generateConfig() {

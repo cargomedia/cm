@@ -99,6 +99,9 @@ class CM_Cli_CommandManager {
 				$this->_streamError->writeln($this->getHelp());
 			}
 			return 1;
+		} catch (CM_Cli_Exception_Internal $e) {
+			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+			return 1;
 		} catch (Exception $e) {
 			CM_Bootloader::getInstance()->handleException($e, $this->_streamError);
 			return 1;

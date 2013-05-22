@@ -108,4 +108,23 @@ class CM_UtilTest extends CMTest_TestCase {
 			$this->assertTrue(true);
 		}
 	}
+
+	/**
+	 * @expectedException CM_Exception
+	 * @expectedExceptionMessage Cannot mkdir
+	 */
+	public function testMkDirExistingFile() {
+		$path = CM_File::createTmp()->getPath();
+		CM_File::create($path);
+		CM_Util::mkDir($path);
+	}
+
+	/**
+	 * @expectedException CM_Exception
+	 * @expectedExceptionMessage Could not delete directory
+	 */
+	public function testRmDirNonexisting() {
+		$path = CM_File::createTmp()->getPath();
+		CM_Util::rmDir($path);
+	}
 }

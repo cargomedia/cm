@@ -1,8 +1,16 @@
 <?php
 
-class CM_App_Resource_Javascript_Abstract extends CM_App_Resource_Abstract {
+class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
 
 	protected $_content;
+
+	public function get($compress = null) {
+		$content = (string) $this->_content;
+		if ($compress) {
+			$content = $this->_minify($content);
+		}
+		return $content;
+	}
 
 	/**
 	 * @param string $content
@@ -16,17 +24,5 @@ class CM_App_Resource_Javascript_Abstract extends CM_App_Resource_Abstract {
 			CM_Cache_File::set($cacheKey, $contentMinified);
 		}
 		return $contentMinified;
-	}
-
-	/**
-	 * @param boolean|null $minify
-	 * @return string
-	 */
-	public function get($minify = null) {
-		$content = $this->_content;
-		if ($minify) {
-			$content = $this->_minify($content);
-		}
-		return $content;
 	}
 }

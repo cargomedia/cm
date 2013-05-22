@@ -1,6 +1,6 @@
 <?php
 
-class CM_App_Resource_Javascript_VendorBeforeBody extends CM_App_Resource_Javascript_Abstract {
+class CM_Asset_Javascript_VendorBeforeBody extends CM_Asset_Javascript_Abstract {
 
 	public function __construct(CM_Site_Abstract $site) {
 		$content = '';

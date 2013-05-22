@@ -23,7 +23,7 @@ function smarty_helper_resourceJs($type, $file, $render) {
 		return smarty_helper_resourceJs_libraryDebug($render);
 	}
 	$url = $render->getUrlResource($type . '-js', $file);
-	return '<script type="text/javascript" src="' . $url . '"></script>' . PHP_EOL;
+	return '<script type="text/javascript" src="' . $url . '" crossorigin="anonymous"></script>' . PHP_EOL;
 }
 
 /**
@@ -31,7 +31,7 @@ function smarty_helper_resourceJs($type, $file, $render) {
  * @return string
  */
 function smarty_helper_resourceJs_libraryDebug(CM_Render $render) {
-	$paths = CM_App_Resource_Javascript_Library::getIncludedPaths($render->getSite());
+	$paths = CM_Asset_Javascript_Library::getIncludedPaths($render->getSite());
 	$content = '';
 	foreach ($paths as $path) {
 		$path = str_replace(DIR_ROOT, '/', $path);
