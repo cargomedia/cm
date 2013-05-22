@@ -68,26 +68,27 @@ class CM_App {
 	}
 
 	public function fillCaches() {
-		/** @var CM_Asset_Javascript_Abstract[] $resources */
-		$resources = array();
-		$siteClassNames = CM_Site_Abstract::getClassChildren();
-		foreach ($siteClassNames as $siteClassName) {
+		/** @var CM_Asset_Javascript_Abstract[] $assetList */
+		$assetList = array();
+		$languageList = new CM_Paging_Language_Enabled();
+		$siteClassNameList = CM_Site_Abstract::getClassChildren();
+		foreach ($siteClassNameList as $siteClassName) {
 			/** @var CM_Site_Abstract $site */
 			$site = new $siteClassName();
-			$resources[] = new CM_Asset_Javascript_Internal($site);
-			$resources[] = new CM_Asset_Javascript_Library($site);
-			$resources[] = new CM_Asset_Javascript_VendorAfterBody($site);
-			$resources[] = new CM_Asset_Javascript_VendorBeforeBody($site);
-			foreach (new CM_Paging_Language_All() as $language) {
+			$assetList[] = new CM_Asset_Javascript_Internal($site);
+			$assetList[] = new CM_Asset_Javascript_Library($site);
+			$assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
+			$assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+			foreach ($languageList as $language) {
 				$render = new CM_Render($site, null, $language);
-				$resources[] = new CM_Asset_Css_Library($render);
+				$assetList[] = new CM_Asset_Css_Library($render);
 			}
 		}
-		foreach (new CM_Paging_Language_All() as $language) {
-			$resources[] = new CM_Asset_Javascript_Translations($language);
+		foreach ($languageList as $language) {
+			$assetList[] = new CM_Asset_Javascript_Translations($language);
 		}
-		foreach ($resources as $resource) {
-			$resource->get(true);
+		foreach ($assetList as $asset) {
+			$asset->get(true);
 		}
 	}
 
