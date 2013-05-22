@@ -3,18 +3,22 @@
 class CM_Response_JsError extends CM_Response_Abstract {
 
 	protected function _process() {
-		$query = $this->_request->getQuery();
+		$request = $this->getRequest();
+		$query = $request->getQuery();
 		$counter = (int) $query['counter'];
 		$url = (string) $query['url'];
 		$message = (string) $query['message'];
 		$fileUrl = (string) $query['fileUrl'];
 		$fileLine = (int) $query['fileLine'];
 
-		$text = $message . PHP_EOL;
-		$text .= '## ' . $fileUrl . '(' . $fileLine . ')' . PHP_EOL;
+		$suppressLogging = $request->isBotCrawler() || !$request->isSupported();
+		if (!$suppressLogging) {
+			$text = $message . PHP_EOL;
+			$text .= '## ' . $fileUrl . '(' . $fileLine . ')' . PHP_EOL;
 
-		$log = new CM_Paging_Log_JsError();
-		$log->add($text, array('url' => $url, 'errorCounter' => $counter));
+			$log = new CM_Paging_Log_JsError();
+			$log->add($text, array('url' => $url, 'errorCounter' => $counter));
+		}
 
 		$this->setHeader('Content-Type', 'text/javascript');
 		$this->_setContent('');
