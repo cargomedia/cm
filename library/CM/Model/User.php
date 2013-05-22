@@ -3,7 +3,7 @@
 class CM_Model_User extends CM_Model_Abstract {
 
 	const TYPE = 13;
-	const ACTIVITY_EXPIRATION = 1800;
+	const ONLINE_EXPIRATION = 1800;
 
 	/**
 	 * @return boolean
@@ -228,7 +228,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			FROM TBL_CM_USER_ONLINE `o`
 			LEFT JOIN TBL_CM_USER `u` USING(`userId`)
 			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
-			array(time() - self::ACTIVITY_EXPIRATION));
+			array(time() - self::ONLINE_EXPIRATION));
 		while ($userId = $res->fetchColumn()) {
 			try {
 				$user = CM_Model_User::factory($userId);
