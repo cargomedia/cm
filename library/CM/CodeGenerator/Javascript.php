@@ -33,7 +33,7 @@ class CM_CodeGenerator_Javascript extends CM_CodeGenerator_Abstract {
 	 * @return string
 	 */
 	private function _getClassPath($className) {
-		return $this->_getClassDirectory($className) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . 'js';
+		return $this->_getClassDirectory($className) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.js';
 	}
 
 	/**
