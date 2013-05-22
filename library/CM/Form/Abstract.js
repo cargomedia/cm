@@ -10,8 +10,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	ready: function() {
 	},
 
+	initialize: function() {
+		CM_View_Abstract.prototype.initialize.call(this);
 
-	_ready: function() {
 		this._fields = {};
 		_.each(this.options.fields, function(fieldInfo, name) {
 			// Lazy construct
@@ -21,7 +22,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				this.registerField(name,  new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
 			}
 		}, this);
+	},
 
+
+	_ready: function() {
 		var handler = this;
 
 		_.each(this.options.actions, function(action, name) {
