@@ -19,10 +19,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
 	/**
 	 * @param {String} value
-	 * @param {Boolean} [skipTriggerChange]
 	 */
-	setValue: function(value, skipTriggerChange) {
-		this._skipTriggerChange = skipTriggerChange;
+	setValue: function(value) {
+		this._skipTriggerChange = true;
 		this.$('input').val(value);
 		this._skipTriggerChange = false;
 	},
