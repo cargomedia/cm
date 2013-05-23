@@ -432,18 +432,15 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	public function testGetItemRand() {
 		$data = range(1, 30);
 		srand(3);
-		$expected1 = $data[rand(0, 29)];
-		$expected2 = $data[rand(0, 29)];
-		srand(3);
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
 
-		$this->assertSame($expected1, $paging->getItemRand());
+		$this->assertSame(17, $paging->getItemRand());
 		$this->assertSame(1, $paging->getPage());
 		$this->assertSame($data, $paging->getItems());
 		$this->assertNull($paging->getPageSize());
-		
+
 		$paging->setPage(3,10);
-		$this->assertSame($expected2, $paging->getItemRand());
+		$this->assertSame(7, $paging->getItemRand());
 		$this->assertSame(3, $paging->getPage());
 		$this->assertSame(10, $paging->getPageSize());
 		$this->assertSame(range(21, 30), $paging->getItems());
