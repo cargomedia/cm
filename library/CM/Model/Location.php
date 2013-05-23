@@ -321,6 +321,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WV'), array('name' => 'West Virginia', 'countryId' => $idUS));
 		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WI'), array('name' => 'Wisconsin', 'countryId' => $idUS));
 		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WY'), array('name' => 'Wyoming', 'countryId' => $idUS));
+
+		self::createAggregation();
 	}
 
 	public static function createAggregation() {
@@ -331,7 +333,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
-					`2`.`name`, NULL, NULL, NULL
+					`2`.`name`, `2`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONSTATE . '` AS `2`
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
