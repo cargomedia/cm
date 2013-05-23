@@ -433,29 +433,19 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$data = range(1, 30);
 		srand(3);
 		$expected1 = $data[rand(0, 29)];
-		$page2 = 1;
-		$pageSize2 = 10;
-		$expected2 = $data[(($page2 - 1) * $pageSize2) + rand(0, $pageSize2 - 1)];
-		$page3 = 3;
-		$pageSize3 = 10;
-		$expected3 = $data[(($page3 - 1) * $pageSize3) + rand(0, $pageSize3 - 1)];
-		$page4 = 2;
-		$pageSize4 = 15;
-		$expected4 = $data[(($page4 - 1) * $pageSize4) + rand(0, $pageSize4 - 1)];
+		$expected2 = $data[rand(0, 29)];
 		srand(3);
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
 
 		$this->assertSame($expected1, $paging->getItemRand());
 		$this->assertSame(1, $paging->getPage());
+		$this->assertSame($data, $paging->getItems());
 		$this->assertNull($paging->getPageSize());
-
-		$paging->setPage($page2, $pageSize2);
+		
+		$paging->setPage(3,10);
 		$this->assertSame($expected2, $paging->getItemRand());
-
-		$paging->setPage($page3, $pageSize3);
-		$this->assertSame($expected3, $paging->getItemRand());
-
-		$paging->setPage($page4, $pageSize4);
-		$this->assertSame($expected4, $paging->getItemRand());
+		$this->assertSame(3, $paging->getPage());
+		$this->assertSame(10, $paging->getPageSize());
+		$this->assertSame(range(21, 30), $paging->getItems());
 	}
 }
