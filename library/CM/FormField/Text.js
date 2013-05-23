@@ -5,6 +5,9 @@
 var CM_FormField_Text = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_Text',
 
+	/** @type Boolean */
+	_skipTriggerChange: false,
+
 	events: {
 		'blur input': function() {
 			this.trigger('blur');
@@ -16,9 +19,12 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 
 	/**
 	 * @param {String} value
+	 * @param {Boolean} [skipTriggerChange]
 	 */
-	setValue: function(value) {
+	setValue: function(value, skipTriggerChange) {
+		this._skipTriggerChange = skipTriggerChange;
 		this.$('input').val(value);
+		this._skipTriggerChange = false;
 	},
 
 	setFocus: function() {
@@ -33,10 +39,12 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 			var value = this.value;
 			if (value != valueLast) {
 				valueLast = value;
-				self.trigger('change');
+				if (!self._skipTriggerChange) {
+					self.trigger('change');
+				}
 			}
 		};
-		// IE9: `propertychange` and `keyup` needed additionally
+		// `propertychange` and `keyup` needed for IE9
 		$input.on('input propertychange keyup', callback);
 	}
 });
