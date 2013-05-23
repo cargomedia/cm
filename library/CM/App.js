@@ -117,7 +117,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	/**
 	 * @param {String} [path]
-	 * @param {Array} [params]
+	 * @param {Object} [params]
 	 * @return {String}
 	 */
 	getUrl: function(path, params) {
