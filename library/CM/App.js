@@ -36,7 +36,7 @@ var CM_App = CM_Class_Abstract.extend({
 				return !view.getParent();
 			});
 			if (!view) {
-				cm.error.trigger('Cannot find root component');
+				cm.error.triggerThrow('Cannot find root component');
 			}
 			return view;
 		}
