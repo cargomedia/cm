@@ -998,7 +998,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 				var location = window.history.location || document.location;
 				var fragment = location.pathname + location.search;
-				router.getLayout().loadPage(location.pathname + location.search);
+				cm.getLayout().loadPage(location.pathname + location.search);
 			});
 
 			var hash = window.location.hash.substr(1);
