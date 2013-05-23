@@ -323,7 +323,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WY'), array('name' => 'Wyoming', 'countryId' => $idUS));
 	}
 
-	public static function dumpToTable() {
+	public static function createAggregation() {
 		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
 		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
