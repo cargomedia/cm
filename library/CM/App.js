@@ -17,6 +17,7 @@ var CM_App = CM_Class_Abstract.extend({
 		this.window.ready();
 		this.date.ready();
 		this.template.ready();
+		this.router.ready();
 	},
 
 	/**
@@ -986,56 +987,8 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
-		_$placeholder: null,
-		_request: null,
-
-		/**
-		 * @param {String} fragment
-		 */
-		_navigate: function(fragment) {
-			var handler = this;
-			if (!this._$placeholder) {
-				this._$placeholder = $('<div class="router-placeholder" />');
-				var page = cm.findView('CM_Page_Abstract');
-				page.$().replaceWith(this._$placeholder);
-				page.remove(true);
-				cm.router.onTeardown();
-			} else {
-				this._$placeholder.removeClass('error').html('');
-			}
-			var timeoutLoading = window.setTimeout(function() {
-				handler._$placeholder.html('<div class="spinner" />')
-			}, 750);
-			if (this._request) {
-				this._request.abort();
-			}
-			this._request = cm.findView().loadPage(fragment, {
-				success: function(response) {
-					var fragment = response.url.substr(cm.getUrl().length);
-					var currentLayout = cm.findView('CM_Layout_Abstract');
-					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-					if (reload) {
-						window.location.replace(response.url);
-						return;
-					}
-					handler._$placeholder.replaceWith(this.$());
-					handler._$placeholder = null;
-					window.history.replaceState(null, null, fragment);
-					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-				},
-				error: function(msg, type, isPublic) {
-					handler._$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-					cm.router.onError();
-					return false;
-				},
-				complete: function() {
-					window.clearTimeout(timeoutLoading);
-				}
-			});
-		},
-
-		start: function() {
-			var urlBase = cm.getUrl();
+		ready: function() {
+			var router = this;
 			var skipInitialFire = false;
 
 			$(window).on('popstate', function(event) {
@@ -1045,7 +998,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 				var location = window.history.location || document.location;
 				var fragment = location.pathname + location.search;
-				cm.router._navigate(location.pathname + location.search);
+				router.getLayout().loadPage(location.pathname + location.search);
 			});
 
 			var hash = window.location.hash.substr(1);
@@ -1060,11 +1013,12 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 
+			var urlBase = cm.getUrl();
 			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
 				if (0 === this.href.indexOf(urlBase)) {
 					var fragment = this.href.substr(urlBase.length);
 					var forceReload = $(this).data('force-reload');
-					cm.router.route(fragment, forceReload);
+					router.route(fragment, forceReload);
 					event.preventDefault();
 				}
 			});
@@ -1085,7 +1039,6 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				fragment = url.substr(urlBase.length);
 			}
-			cm.findView('CM_Layout_Abstract').trigger('route-before', url);
 			if (forceReload || 0 !== url.indexOf(urlBase)) {
 				window.location.assign(url);
 				return;
@@ -1095,8 +1048,7 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				this.pushState(fragment);
 			}
-			cm.router._navigate(fragment);
-			cm.findView('CM_Layout_Abstract').trigger('route', url);
+			cm.getLayout().loadPage(fragment);
 		},
 
 		/**
@@ -1111,31 +1063,6 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		replaceState: function(url) {
 			window.history.replaceState(null, null, url);
-		},
-
-
-		/**
-		 * @param {CM_Page_Abstract} page
-		 * @param {String} title
-		 * @param {String} url
-		 * @param {String[]} menuEntryHashList
-		 */
-		onSetup: function(page, title, url, menuEntryHashList) {
-			document.title = title;
-			$('[data-menu-entry-hash]').removeClass('active');
-			var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
-				return '[data-menu-entry-hash=' + menuEntryHash + ']';
-			});
-			$(menuEntrySelectors.join(',')).addClass('active');
-		},
-
-		onTeardown: function() {
-			$(document).scrollTop(0);
-			$('.floatbox-layer').floatIn();
-		},
-
-		onError: function() {
-			$('[data-menu-entry-hash]').removeClass('active');
 		}
 	}
 });
