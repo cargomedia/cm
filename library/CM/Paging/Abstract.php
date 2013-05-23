@@ -110,14 +110,17 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/**
 	 * @return mixed|null
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getItemRand() {
-		$pageOld = $this->getPage();
-		$pageSizeOld = $this->getPageSize();
+		if (null !== $this->getPageSize()) {
+			throw new CM_Exception_Invalid('Can\'t get random item on a paged Paging.');
+		}
 		$this->setPage(rand(0, $this->getCount() - 1) + 1, 1);
 		$item = $this->getItem(0);
-		$this->setPage($pageOld, $pageSizeOld);
-		$this->_pageSize = $pageSizeOld;
+		$this->_pageOffset = 0;
+		$this->_pageSize = null;
+		$this->_clearItems();
 		return $item;
 	}
 

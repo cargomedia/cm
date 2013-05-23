@@ -434,14 +434,13 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
 
 		$this->assertContains($paging->getItemRand(), $data);
-		$this->assertSame(1, $paging->getPage());
 		$this->assertSame($data, $paging->getItems());
-		$this->assertNull($paging->getPageSize());
 
 		$paging->setPage(3,10);
-		$this->assertContains($paging->getItemRand(), $data);
-		$this->assertSame(3, $paging->getPage());
-		$this->assertSame(10, $paging->getPageSize());
-		$this->assertSame(range(21, 30), $paging->getItems());
+		try {
+			$paging->getItemRand();
+		} catch (CM_Exception_Invalid $ex) {
+			$this->assertContains('Can\'t get random item on a paged Paging.', $ex->getMessage());
+		}
 	}
 }
