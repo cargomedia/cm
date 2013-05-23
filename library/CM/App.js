@@ -59,6 +59,17 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	/**
+	 * @return {CM_Layout_Abstract}
+	 */
+	getLayout: function() {
+		var layout = this.findView('CM_Layout_Abstract');
+		if (!layout) {
+			cm.error.triggerThrow('Cannot find layout');
+		}
+		return layout;
+	},
+
+	/**
 	 * @param {Number} min
 	 * @param {Number} max
 	 * @return {Number}
