@@ -16,6 +16,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 
 		this._$input.removeClass('textinput');
 		this._$input.select2({
+			width: 'off',
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
