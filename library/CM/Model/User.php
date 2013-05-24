@@ -4,7 +4,7 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	const TYPE = 13;
 	const ONLINE_EXPIRATION = 1800;
-	const ACTIVITY_EXPIRATION = 240; // 4 mins
+	const ACTIVITY_EXPIRATION = 60;
 
 	/**
 	 * @return boolean
@@ -197,10 +197,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	public function updateLatestactivity() {
-		if ($this->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
+		if ($this->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION) {
 			CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+			return $this->_change();
 		}
-		return $this->_change();
 	}
 
 	protected function _loadAssets() {

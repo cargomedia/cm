@@ -183,7 +183,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session = new CM_Session($sessionId);
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
-		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 10);
+		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
 		$session = new CM_Session($sessionId);
 		$session->start();
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
@@ -192,7 +192,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		unset($session);
 		CMTest_TH::clearCache();
 
-		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
+		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
 		$activityStamp2 = time();
 		$session = new CM_Session($sessionId);
 		$session->start();
