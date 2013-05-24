@@ -11,14 +11,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$this->assertGreaterThanOrEqual($time, $user->getCreated());
 	}
 
-	public function testGetLatestactivity() {
-		$user = CMTest_TH::createUser();
-		$time = $user->getLatestactivity();
-		CMTest_TH::timeForward(1);
-		$user->updateLatestactivity();
-		$this->assertGreaterThan($time, $user->getLatestactivity());
-	}
-
 	public function testGetSetOnline() {
 		$user = CMTest_TH::createUser();
 		$this->assertFalse($user->getOnline());
