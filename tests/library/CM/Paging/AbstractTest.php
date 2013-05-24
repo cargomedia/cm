@@ -435,7 +435,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 
 		$this->assertContains($paging->getItemRand(), $data);
 		$this->assertSame($data, $paging->getItems());
-		$this->assertNull($this->testGetPageSize());
+		$this->assertNull($paging->getPageSize());
 		$this->assertSame(1, $paging->getPage());
 
 		$paging->setPage(3,10);
