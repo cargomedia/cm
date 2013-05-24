@@ -132,7 +132,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 		switch ($this->getLevel()) {
 			case self::LEVEL_ZIP:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 						`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
 					FROM TBL_CM_LOCATIONZIP AS `4`
@@ -143,7 +143,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 			case self::LEVEL_CITY:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`
 					FROM TBL_CM_LOCATIONCITY AS `3`
 					LEFT JOIN TBL_CM_LOCATIONSTATE AS `2` ON(`3`.`stateId`=`2`.`id`)
@@ -152,7 +152,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 			case self::LEVEL_STATE:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`
 					FROM TBL_CM_LOCATIONSTATE AS `2`
 					LEFT JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`2`.`countryId`=`1`.`id`)
 					WHERE `2`.`id` = ?';
