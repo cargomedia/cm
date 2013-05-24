@@ -11,14 +11,6 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$this->assertGreaterThanOrEqual($time, $user->getCreated());
 	}
 
-	public function testGetLatestactivity() {
-		$user = CMTest_TH::createUser();
-		$time = $user->getLatestactivity();
-		CMTest_TH::timeForward(1);
-		$user->updateLatestactivity();
-		$this->assertGreaterThan($time, $user->getLatestactivity());
-	}
-
 	public function testGetSetOnline() {
 		$user = CMTest_TH::createUser();
 		$this->assertFalse($user->getOnline());
@@ -103,5 +95,18 @@ class CM_Model_UserTest extends CMTest_TestCase {
 		$this->assertNotEquals($language, $user->getLanguage());
 		$user->setLanguage($language);
 		$this->assertEquals($language, $user->getLanguage());
+	}
+
+	public function testUpdateLatestActivity() {
+		$user = CMTest_TH::createUser();
+		$activityStamp1 = time();
+		$this->assertSameTime($activityStamp1, $user->getLatestactivity());
+		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2);
+		$user->updateLatestactivity();
+		$this->assertSameTime($activityStamp1, $user->getLatestactivity());
+		CMTest_TH::timeForward(CM_Model_User::ACTIVITY_EXPIRATION / 2 + 1);
+		$activityStamp2 = time();
+		$user->updateLatestactivity();
+		$this->assertSameTime($activityStamp2, $user->getLatestactivity());
 	}
 }
