@@ -17,18 +17,21 @@
 
 		/**
 		 * @param {String} logUrl
+		 * @param {Number} [counterMax]
 		 * @param {Boolean} [suppressErrors]
 		 * @param {Boolean} [suppressWithoutDetails]
 		 */
-		install: function(logUrl, suppressErrors, suppressWithoutDetails) {
+		install: function(logUrl, counterMax, suppressErrors, suppressWithoutDetails) {
 			this.logUrl = logUrl;
 			if (window.onerror) {
 				this.onerrorBackup = window.onerror;
 			}
 			window.onerror = function(message, fileUrl, fileLine) {
+				jserror.counter++;
 				var originatesFromLogging = (fileUrl.indexOf(jserror.logUrl) >= 0);
 				var detailsUnavailable = (0 === fileLine);
-				var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable);
+				var counterMaxReached = (counterMax && jserror.counter > counterMax);
+				var suppressLogging = originatesFromLogging || (suppressWithoutDetails && detailsUnavailable) || counterMaxReached;
 				if (!suppressLogging) {
 					jserror.log(message, fileUrl, fileLine);
 				}
@@ -48,7 +51,7 @@
 		 */
 		log: function(message, fileUrl, fileLine) {
 			var src = this.logUrl;
-			src += '?counter=' + (this.counter++);
+			src += '?counter=' + this.counter;
 			src += "&url=" + encodeURIComponent(document.location.href);
 			src += "&message=" + encodeURIComponent(message.trim().substr(0, 10000));
 			src += "&fileUrl=" + encodeURIComponent(fileUrl);
@@ -67,6 +70,6 @@
 		}
 	};
 
-	jserror.install('/jserror/null', false, false);
+	jserror.install('/jserror/null', 10, false, false);
 
 }).call(this);
