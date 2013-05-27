@@ -268,7 +268,11 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	public static function createUSStatesAbbreviation() {
-		$idUS = (int) CM_Db_Db::select(TBL_CM_LOCATIONCOUNTRY, 'id', array('abbreviation' => 'US'))->fetchColumn();
+		$idUS = CM_Db_Db::select(TBL_CM_LOCATIONCOUNTRY, 'id', array('abbreviation' => 'US'))->fetchColumn();
+		if (false === $idUS) {
+			throw new CM_Exception_Invalid('No country with abbreviation `US` found');
+		}
+		$idUS = (int) $idUS;
 
 		foreach (self::_getUSStatesAbbreviationList() as $stateName => $abbreviation) {
 			CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
