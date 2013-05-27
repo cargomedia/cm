@@ -9,7 +9,7 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	active: false,
 
 	/** @type Object */
-	clearCacheButtons: null,
+	cacheNames: null,
 
 	events: {
 		'click .toggleDebugBar': 'toggleDebugBar',
@@ -70,12 +70,11 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	},
 
 	clearCache: function() {
-		var clearCacheButtons = {};
-		_.each(this.clearCacheButtons, function(cacheName) {
-			clearCacheButtons[cacheName] = this.$('.' + cacheName).is(':checked');
+		var clearCacheArguments = {};
+		_.each(this.cacheNames, function(cacheName) {
+			clearCacheArguments[cacheName] = this.$('.' + cacheName).is(':checked');
 		});
-
-		this.ajax('clearCache', clearCacheButtons, {
+		this.ajax('clearCache', clearCacheArguments, {
 			success: function() {
 				location.reload();
 			}
