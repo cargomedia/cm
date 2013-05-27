@@ -461,10 +461,10 @@ var CM_App = CM_Class_Abstract.extend({
 			} else {
 				var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
 				var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
-				var $html = $('<div class="box"><div class="box_cap nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
-				$html.find('.box_cap h2').text(cm.language.get('Confirmation'));
-				$html.find('.box_body').text(question);
-				$html.find('.box_bottom').append($ok, $cancel);
+				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
+				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
+				$html.find('.box-body').text(question);
+				$html.find('.box-footer').append($ok, $cancel);
 
 				$html.floatOut();
 				$ok.click(function() {

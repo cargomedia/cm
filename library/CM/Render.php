@@ -29,11 +29,6 @@ class CM_Render extends CM_Class_Abstract {
 	/* @var CM_Model_User|null */
 	private $_viewer;
 
-	public static $block_cap = '';
-
-	/* @var array */
-	public static $block_stack = array();
-
 	/* @var array */
 	protected $_stack = array();
 
@@ -104,6 +99,9 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return mixed|null
 	 */
 	public function popStack($key) {
+		if (!isset($this->_stack[$key])) {
+			return null;
+		}
 		$last = array_pop($this->_stack[$key]);
 		return $last;
 	}
