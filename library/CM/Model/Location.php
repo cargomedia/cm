@@ -123,7 +123,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 
 		$earthRadius = 6371009;
 		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
-				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
+		cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
 
 		return (int) round($earthRadius * $arcCosine);
 	}
@@ -270,57 +270,9 @@ class CM_Model_Location extends CM_Model_Abstract {
 	public static function createUSStatesAbbreviation() {
 		$idUS = (int) CM_Db_Db::select(TBL_CM_LOCATIONCOUNTRY, 'id', array('abbreviation' => 'US'))->fetchColumn();
 
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'AL'), array('name' => 'Alabama', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'AK'), array('name' => 'Alaska', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'AZ'), array('name' => 'Arizona', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'AR'), array('name' => 'Arkansas', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'CA'), array('name' => 'California', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'CO'), array('name' => 'Colorado', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'CT'), array('name' => 'Connecticut', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'DE'), array('name' => 'Delaware', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'DC'), array('name' => 'District of Columbia', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'FL'), array('name' => 'Florida', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'GA'), array('name' => 'Georgia', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'HI'), array('name' => 'Hawaii', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'ID'), array('name' => 'Idaho', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'IL'), array('name' => 'Illinois', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'IN'), array('name' => 'Indiana', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'IA'), array('name' => 'Iowa', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'KS'), array('name' => 'Kansas', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'KY'), array('name' => 'Kentucky', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'LA'), array('name' => 'Louisiana', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'ME'), array('name' => 'Maine', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MD'), array('name' => 'Maryland', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MA'), array('name' => 'Massachusetts', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MI'), array('name' => 'Michigan', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MN'), array('name' => 'Minnesota', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MS'), array('name' => 'Mississippi', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MO'), array('name' => 'Missouri', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'MT'), array('name' => 'Montana', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NE'), array('name' => 'Nebraska', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NV'), array('name' => 'Nevada', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NH'), array('name' => 'New Hampshire', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NJ'), array('name' => 'New Jersey', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NM'), array('name' => 'New Mexico', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NY'), array('name' => 'New York', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'NC'), array('name' => 'North Carolina', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'ND'), array('name' => 'North Dakota', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'OH'), array('name' => 'Ohio', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'OK'), array('name' => 'Oklahoma', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'OR'), array('name' => 'Oregon', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'PA'), array('name' => 'Pennsylvania', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'RI'), array('name' => 'Rhode Island', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'SC'), array('name' => 'South Carolina', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'SD'), array('name' => 'South Dakota', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'TN'), array('name' => 'Tennessee', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'TX'), array('name' => 'Texas', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'UT'), array('name' => 'Utah', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'VT'), array('name' => 'Vermont', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'VA'), array('name' => 'Virginia', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WA'), array('name' => 'Washington', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WV'), array('name' => 'West Virginia', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WI'), array('name' => 'Wisconsin', 'countryId' => $idUS));
-		CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => 'WY'), array('name' => 'Wyoming', 'countryId' => $idUS));
+		foreach (self::_getUSStatesAbbreviationList() as $stateName => $abbreviation) {
+			CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
+		}
 
 		self::createAggregation();
 	}
@@ -359,5 +311,62 @@ class CM_Model_Location extends CM_Model_Abstract {
 			SELECT 4, `id`, POINT(lat, lon)
 			FROM `' . TBL_CM_LOCATIONZIP . '`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSStatesAbbreviationList() {
+		return array('Alabama'              => 'AL',
+					 'Alaska'               => 'AK',
+					 'Arizona'              => 'AZ',
+					 'Arkansas'             => 'AR',
+					 'California'           => 'CA',
+					 'Colorado'             => 'CO',
+					 'Connecticut'          => 'CT',
+					 'Delaware'             => 'DE',
+					 'District of Columbia' => 'DC',
+					 'Florida'              => 'FL',
+					 'Georgia'              => 'GA',
+					 'Hawaii'               => 'HI',
+					 'Idaho'                => 'ID',
+					 'Illinois'             => 'IL',
+					 'Indiana'              => 'IN',
+					 'Iowa'                 => 'IA',
+					 'Kansas'               => 'KS',
+					 'Kentucky'             => 'KY',
+					 'Louisiana'            => 'LA',
+					 'Maine'                => 'ME',
+					 'Maryland'             => 'MD',
+					 'Massachusetts'        => 'MA',
+					 'Michigan'             => 'MI',
+					 'Minnesota'            => 'MN',
+					 'Mississippi'          => 'MS',
+					 'Missouri'             => 'MO',
+					 'Montana'              => 'MT',
+					 'Nebraska'             => 'NE',
+					 'Nevada'               => 'NV',
+					 'New Hampshire'        => 'NH',
+					 'New Jersey'           => 'NJ',
+					 'New Mexico'           => 'NM',
+					 'New York'             => 'NY',
+					 'North Carolina'       => 'NC',
+					 'North Dakota'         => 'ND',
+					 'Ohio'                 => 'OH',
+					 'Oklahoma'             => 'OK',
+					 'Oregon'               => 'OR',
+					 'Pennsylvania'         => 'PA',
+					 'Rhode Island'         => 'RI',
+					 'South Carolina'       => 'SC',
+					 'South Dakota'         => 'SD',
+					 'Tennessee'            => 'TN',
+					 'Texas'                => 'TX',
+					 'Utah'                 => 'UT',
+					 'Vermont'              => 'VT',
+					 'Virginia'             => 'VA',
+					 'Washington'           => 'WA',
+					 'West Virginia'        => 'WV',
+					 'Wisconsin'            => 'WI',
+					 'Wyoming'              => 'WY');
 	}
 }
