@@ -8,6 +8,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	/** @type {jQuery} */
 	_$input: null,
 
+	/** @type {jqXHR} */
+	_request: null,
+
 	ready: function() {
 		var field = this;
 		var cardinality = this.getOption("cardinality");
@@ -28,7 +31,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				return item;
 			},
 			query: function(options) {
-				field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
+				if (this._request) {
+					this._request.abort();
+				}
+				this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
 					success: function(results) {
 						options.callback({
 							results: results
