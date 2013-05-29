@@ -274,6 +274,16 @@ class CM_Model_Location extends CM_Model_Abstract {
 		}
 		$idUS = (int) $idUS;
 
+		$stateMilitaryId = CM_Db_Db::select(TBL_CM_LOCATIONSTATE, 'id', array('name' => 'U.S. Armed Forces', 'abbreviation' => 'AE', 'countryId' => $idUS))->fetchColumn();
+		if (false === $stateMilitaryId) {
+			$stateMilitaryId = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $idUS, 'name' => 'U.S. Armed Forces', 'abbreviation' => 'AE'));
+		}
+		$stateMilitaryId = (int) $stateMilitaryId;
+
+		foreach (self::_getUSCitiesMilitrayBasisList() as $militaryBasis) {
+			CM_Db_Db::update(TBL_CM_LOCATIONCITY, array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
+		}
+
 		foreach (self::_getUSStatesAbbreviationList() as $stateName => $abbreviation) {
 			CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
 		}
@@ -372,5 +382,12 @@ class CM_Model_Location extends CM_Model_Abstract {
 					 'West Virginia'        => 'WV',
 					 'Wisconsin'            => 'WI',
 					 'Wyoming'              => 'WY');
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSCitiesMilitrayBasisList() {
+		return array('T3 R1 Nbpp', 'Apo', 'Fpo');
 	}
 }
