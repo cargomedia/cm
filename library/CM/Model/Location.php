@@ -122,8 +122,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$againstCoordinates['lon'] *= $pi180;
 
 		$earthRadius = 6371009;
-		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
-				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
+		$arcCosine = acos(
+			sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
+			+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
+		);
 
 		return (int) round($earthRadius * $arcCosine);
 	}
@@ -132,7 +134,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 		switch ($this->getLevel()) {
 			case self::LEVEL_ZIP:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 						`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
 					FROM TBL_CM_LOCATIONZIP AS `4`
@@ -143,7 +145,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 			case self::LEVEL_CITY:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`
 					FROM TBL_CM_LOCATIONCITY AS `3`
 					LEFT JOIN TBL_CM_LOCATIONSTATE AS `2` ON(`3`.`stateId`=`2`.`id`)
@@ -152,7 +154,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 				break;
 			case self::LEVEL_STATE:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`
 					FROM TBL_CM_LOCATIONSTATE AS `2`
 					LEFT JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`2`.`countryId`=`1`.`id`)
 					WHERE `2`.`id` = ?';
@@ -267,7 +269,33 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return new self($data['level'], $data['id']);
 	}
 
-	public static function dumpToTable() {
+	public static function createUSStatesAbbreviation() {
+		$idUS = CM_Db_Db::select(TBL_CM_LOCATIONCOUNTRY, 'id', array('abbreviation' => 'US'))->fetchColumn();
+		if (false === $idUS) {
+			throw new CM_Exception_Invalid('No country with abbreviation `US` found');
+		}
+		$idUS = (int) $idUS;
+
+		$stateMilitaryId = CM_Db_Db::select(TBL_CM_LOCATIONSTATE, 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
+																			  'countryId' => $idUS))->fetchColumn();
+		if (false === $stateMilitaryId) {
+			$stateMilitaryId = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
+																			'abbreviation' => 'AE'));
+		}
+		$stateMilitaryId = (int) $stateMilitaryId;
+
+		foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
+			CM_Db_Db::update(TBL_CM_LOCATIONCITY, array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
+		}
+
+		foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
+			CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
+		}
+
+		self::createAggregation();
+	}
+
+	public static function createAggregation() {
 		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
 		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
@@ -275,7 +303,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
-					`2`.`name`, NULL, NULL, NULL
+					`2`.`name`, `2`.`abbreviation`, NULL, NULL
 			FROM `' . TBL_CM_LOCATIONSTATE . '` AS `2`
 			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
@@ -301,5 +329,71 @@ class CM_Model_Location extends CM_Model_Abstract {
 			SELECT 4, `id`, POINT(lat, lon)
 			FROM `' . TBL_CM_LOCATIONZIP . '`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSStateAbbreviationList() {
+		return array(
+			'Alabama'              => 'AL',
+			'Alaska'               => 'AK',
+			'Arizona'              => 'AZ',
+			'Arkansas'             => 'AR',
+			'California'           => 'CA',
+			'Colorado'             => 'CO',
+			'Connecticut'          => 'CT',
+			'Delaware'             => 'DE',
+			'District of Columbia' => 'DC',
+			'Florida'              => 'FL',
+			'Georgia'              => 'GA',
+			'Hawaii'               => 'HI',
+			'Idaho'                => 'ID',
+			'Illinois'             => 'IL',
+			'Indiana'              => 'IN',
+			'Iowa'                 => 'IA',
+			'Kansas'               => 'KS',
+			'Kentucky'             => 'KY',
+			'Louisiana'            => 'LA',
+			'Maine'                => 'ME',
+			'Maryland'             => 'MD',
+			'Massachusetts'        => 'MA',
+			'Michigan'             => 'MI',
+			'Minnesota'            => 'MN',
+			'Mississippi'          => 'MS',
+			'Missouri'             => 'MO',
+			'Montana'              => 'MT',
+			'Nebraska'             => 'NE',
+			'Nevada'               => 'NV',
+			'New Hampshire'        => 'NH',
+			'New Jersey'           => 'NJ',
+			'New Mexico'           => 'NM',
+			'New York'             => 'NY',
+			'North Carolina'       => 'NC',
+			'North Dakota'         => 'ND',
+			'Ohio'                 => 'OH',
+			'Oklahoma'             => 'OK',
+			'Oregon'               => 'OR',
+			'Pennsylvania'         => 'PA',
+			'Rhode Island'         => 'RI',
+			'South Carolina'       => 'SC',
+			'South Dakota'         => 'SD',
+			'Tennessee'            => 'TN',
+			'Texas'                => 'TX',
+			'Utah'                 => 'UT',
+			'Vermont'              => 'VT',
+			'Virginia'             => 'VA',
+			'Washington'           => 'WA',
+			'West Virginia'        => 'WV',
+			'Wisconsin'            => 'WI',
+			'Wyoming'              => 'WY'
+		);
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSCityMilitrayBasisList() {
+		return array('T3 R1 Nbpp', 'Apo', 'Fpo');
 	}
 }
