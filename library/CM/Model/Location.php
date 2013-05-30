@@ -284,11 +284,11 @@ class CM_Model_Location extends CM_Model_Abstract {
 		}
 		$stateMilitaryId = (int) $stateMilitaryId;
 
-		foreach (self::_getUSCitiesMilitrayBasisList() as $militaryBasis) {
+		foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
 			CM_Db_Db::update(TBL_CM_LOCATIONCITY, array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
 		}
 
-		foreach (self::_getUSStatesAbbreviationList() as $stateName => $abbreviation) {
+		foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
 			CM_Db_Db::update(TBL_CM_LOCATIONSTATE, array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
 		}
 
@@ -334,64 +334,66 @@ class CM_Model_Location extends CM_Model_Abstract {
 	/**
 	 * @return string[]
 	 */
-	private static function _getUSStatesAbbreviationList() {
-		return array('Alabama'              => 'AL',
-					 'Alaska'               => 'AK',
-					 'Arizona'              => 'AZ',
-					 'Arkansas'             => 'AR',
-					 'California'           => 'CA',
-					 'Colorado'             => 'CO',
-					 'Connecticut'          => 'CT',
-					 'Delaware'             => 'DE',
-					 'District of Columbia' => 'DC',
-					 'Florida'              => 'FL',
-					 'Georgia'              => 'GA',
-					 'Hawaii'               => 'HI',
-					 'Idaho'                => 'ID',
-					 'Illinois'             => 'IL',
-					 'Indiana'              => 'IN',
-					 'Iowa'                 => 'IA',
-					 'Kansas'               => 'KS',
-					 'Kentucky'             => 'KY',
-					 'Louisiana'            => 'LA',
-					 'Maine'                => 'ME',
-					 'Maryland'             => 'MD',
-					 'Massachusetts'        => 'MA',
-					 'Michigan'             => 'MI',
-					 'Minnesota'            => 'MN',
-					 'Mississippi'          => 'MS',
-					 'Missouri'             => 'MO',
-					 'Montana'              => 'MT',
-					 'Nebraska'             => 'NE',
-					 'Nevada'               => 'NV',
-					 'New Hampshire'        => 'NH',
-					 'New Jersey'           => 'NJ',
-					 'New Mexico'           => 'NM',
-					 'New York'             => 'NY',
-					 'North Carolina'       => 'NC',
-					 'North Dakota'         => 'ND',
-					 'Ohio'                 => 'OH',
-					 'Oklahoma'             => 'OK',
-					 'Oregon'               => 'OR',
-					 'Pennsylvania'         => 'PA',
-					 'Rhode Island'         => 'RI',
-					 'South Carolina'       => 'SC',
-					 'South Dakota'         => 'SD',
-					 'Tennessee'            => 'TN',
-					 'Texas'                => 'TX',
-					 'Utah'                 => 'UT',
-					 'Vermont'              => 'VT',
-					 'Virginia'             => 'VA',
-					 'Washington'           => 'WA',
-					 'West Virginia'        => 'WV',
-					 'Wisconsin'            => 'WI',
-					 'Wyoming'              => 'WY');
+	private static function _getUSStateAbbreviationList() {
+		return array(
+			'Alabama'              => 'AL',
+			'Alaska'               => 'AK',
+			'Arizona'              => 'AZ',
+			'Arkansas'             => 'AR',
+			'California'           => 'CA',
+			'Colorado'             => 'CO',
+			'Connecticut'          => 'CT',
+			'Delaware'             => 'DE',
+			'District of Columbia' => 'DC',
+			'Florida'              => 'FL',
+			'Georgia'              => 'GA',
+			'Hawaii'               => 'HI',
+			'Idaho'                => 'ID',
+			'Illinois'             => 'IL',
+			'Indiana'              => 'IN',
+			'Iowa'                 => 'IA',
+			'Kansas'               => 'KS',
+			'Kentucky'             => 'KY',
+			'Louisiana'            => 'LA',
+			'Maine'                => 'ME',
+			'Maryland'             => 'MD',
+			'Massachusetts'        => 'MA',
+			'Michigan'             => 'MI',
+			'Minnesota'            => 'MN',
+			'Mississippi'          => 'MS',
+			'Missouri'             => 'MO',
+			'Montana'              => 'MT',
+			'Nebraska'             => 'NE',
+			'Nevada'               => 'NV',
+			'New Hampshire'        => 'NH',
+			'New Jersey'           => 'NJ',
+			'New Mexico'           => 'NM',
+			'New York'             => 'NY',
+			'North Carolina'       => 'NC',
+			'North Dakota'         => 'ND',
+			'Ohio'                 => 'OH',
+			'Oklahoma'             => 'OK',
+			'Oregon'               => 'OR',
+			'Pennsylvania'         => 'PA',
+			'Rhode Island'         => 'RI',
+			'South Carolina'       => 'SC',
+			'South Dakota'         => 'SD',
+			'Tennessee'            => 'TN',
+			'Texas'                => 'TX',
+			'Utah'                 => 'UT',
+			'Vermont'              => 'VT',
+			'Virginia'             => 'VA',
+			'Washington'           => 'WA',
+			'West Virginia'        => 'WV',
+			'Wisconsin'            => 'WI',
+			'Wyoming'              => 'WY'
+		);
 	}
 
 	/**
 	 * @return string[]
 	 */
-	private static function _getUSCitiesMilitrayBasisList() {
+	private static function _getUSCityMilitrayBasisList() {
 		return array('T3 R1 Nbpp', 'Apo', 'Fpo');
 	}
 }
