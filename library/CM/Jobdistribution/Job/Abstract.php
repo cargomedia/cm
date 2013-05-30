@@ -42,15 +42,16 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param GearmanJob $job
 	 * @return string|null
-	 * @throws CM_Exception_Nonexistent|Exception
+	 * @throws CM_Exception_Nonexistent
 	 */
 	final public function __run(GearmanJob $job) {
 		$workload = $job->workload();
 		try {
 			$params = CM_Params::factory(CM_Params::decode($workload, true));
 		} catch (CM_Exception_Nonexistent $ex) {
-			$ex->setSeverity(CM_Exception::WARN);
-			throw $ex;
+			throw new CM_Exception_Nonexistent(
+				'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
+						'`', null, null, CM_Exception::WARN);
 		}
 		return CM_Params::encode($this->_run($params), true);
 	}
