@@ -173,6 +173,7 @@ CREATE TABLE `cm_locationState` (
   `countryId` int(10) unsigned NOT NULL,
   `name` varchar(120) NOT NULL,
   `_maxmind` char(5) DEFAULT NULL,
+  `abbreviation` char(2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `maxmind` (`_maxmind`),
   KEY `name` (`name`),
