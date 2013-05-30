@@ -122,8 +122,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$againstCoordinates['lon'] *= $pi180;
 
 		$earthRadius = 6371009;
-		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
-		cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
+		$arcCosine = acos(
+			sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
+			+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
+		);
 
 		return (int) round($earthRadius * $arcCosine);
 	}
@@ -274,9 +276,11 @@ class CM_Model_Location extends CM_Model_Abstract {
 		}
 		$idUS = (int) $idUS;
 
-		$stateMilitaryId = CM_Db_Db::select(TBL_CM_LOCATIONSTATE, 'id', array('name' => 'U.S. Armed Forces', 'abbreviation' => 'AE', 'countryId' => $idUS))->fetchColumn();
+		$stateMilitaryId = CM_Db_Db::select(TBL_CM_LOCATIONSTATE, 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
+																			  'countryId' => $idUS))->fetchColumn();
 		if (false === $stateMilitaryId) {
-			$stateMilitaryId = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $idUS, 'name' => 'U.S. Armed Forces', 'abbreviation' => 'AE'));
+			$stateMilitaryId = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
+																			'abbreviation' => 'AE'));
 		}
 		$stateMilitaryId = (int) $stateMilitaryId;
 
