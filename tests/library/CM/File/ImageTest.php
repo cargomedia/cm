@@ -132,4 +132,15 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$this->assertSame($sizeExpected, $imageNew->getWidth());
 		$this->assertSame($sizeExpected, $imageNew->getHeight());
 	}
+
+	public function testResizeFileSize() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$pathNew = '/tmp/' . uniqid();
+		$image = new CM_File_Image($path);
+		$this->assertEquals(17661, $image->getSize(), '', 300);
+
+		$image->resize(100, 100, null, $pathNew);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertEquals(2627, $imageNew->getSize(), '', 300);
+	}
 }
