@@ -158,6 +158,19 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
+	 * @return bool
+	 * @throws CM_Exception_Invalid
+	 */
+	public function isAnimated() {
+		try {
+			$iteratorIndex = $this->_getImagick()->getIteratorIndex();
+		} catch (ImagickException $e) {
+			throw new CM_Exception('Cannot get iterator index: ' . $e->getMessage());
+		}
+		return ($iteratorIndex > 0);
+	}
+
+	/**
 	 * @param int $quality 1-100
 	 * @throws CM_Exception_Invalid
 	 */
