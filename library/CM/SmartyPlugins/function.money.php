@@ -10,11 +10,11 @@ function smarty_function_money($params, Smarty_Internal_Template $template) {
 
 	if ('discount' == $format) {
 		$amountsRounded = array();
-		$amountsRounded[] = round($amount / 10 + 0.5, 0) * 10;
-		$amountsRounded[] = round($amount / 2 - 1 + 0.5, 0) * 2 + 1;
-		$amountsRounded[] = round($amount + 0.5, 0);
+		$amountsRounded[] = round($amount / 10, 0, PHP_ROUND_HALF_DOWN) * 10;
+		$amountsRounded[] = round($amount / 2 - 1, 0, PHP_ROUND_HALF_DOWN) * 2 + 1;
+		$amountsRounded[] = round($amount, 0, PHP_ROUND_HALF_DOWN);
 		foreach ($amountsRounded as $amountRounded) {
-			if ($amountRounded > $amount && abs($amount - $amountRounded ) <= $amount / 10) {
+			if (abs($amountRounded - $amount) <= $amount / 10) {
 				$amount = $amountRounded - 0.05;
 				break;
 			}
