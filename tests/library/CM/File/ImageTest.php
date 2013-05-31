@@ -86,7 +86,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$imageNew = new CM_File_Image($pathNew);
 		$this->assertSame($image->getHeight(), $imageNew->getWidth());
 		$this->assertSame($image->getWidth(), $imageNew->getHeight());
-		$this->assertEquals(148987, $imageNew->getSize(), 5000);
+		$this->assertEquals(148987, $imageNew->getSize(), '', 5000);
 	}
 
 	public function testGetFormat() {
