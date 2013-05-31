@@ -290,24 +290,6 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {String} path
-	 * @param {Object} [options]
-	 * @return jqXHR
-	 */
-	loadPage: function(path, options) {
-		options = options || {};
-		var success = options.success;
-		options.success = function(response) {
-			if (response.redirectExternal) {
-				cm.router.route(response.redirectExternal);
-				return;
-			}
-			this._injectView(response, success);
-		};
-		return this.ajaxModal('loadPage', {path: path}, options);
-	},
-
-	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
 	 * @param {String} [channelKey]
