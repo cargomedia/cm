@@ -159,7 +159,7 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @return bool
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public function isAnimated() {
 		try {
