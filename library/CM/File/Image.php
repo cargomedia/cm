@@ -2,43 +2,44 @@
 
 class CM_File_Image extends CM_File {
 
-	const QUALITY_JPEG = 95;
+	const FORMAT_JPEG = 1;
+	const FORMAT_GIF = 2;
+	const FORMAT_PNG = 3;
 
-	/**
-	 * @var int
-	 */
-	private $_imageType;
+	/** @var Imagick */
+	private $_imagick;
 
-	/**
-	 * @var resource
-	 */
-	private $_resource;
+	/** @var int */
+	private $_compressionQuality = 90;
 
 	public function __construct($file) {
 		parent::__construct($file);
 
-		$this->_getResource(); // Make sure resource can be created
-	}
-
-	public function __destruct() {
-		imagedestroy($this->_resource);
+		$this->_getImagick(); // Make sure resource can be created
 	}
 
 	/**
-	 * @param int         $type    Image type. Use IMAGETYPE_* consts
-	 * @param string|null $pathNew Where the resulting image should be written
+	 * @param int         $format
+	 * @param string|null $pathNew
+	 * @throws CM_Exception
 	 */
-	public function convert($type, $pathNew = null) {
-		if ($this->_getImageType() == $type) {
+	public function convert($format, $pathNew = null) {
+		$format = (int) $format;
+		$pathNew = isset($pathNew) ? (string) $pathNew : null;
+		if ($format === $this->getFormat()) {
 			// Copy image if no conversion necessary
-			if (isset($pathNew)) {
+			if (null !== $pathNew) {
 				$this->copy($pathNew);
 				@chmod($pathNew, 0666);
 			}
 			return;
 		}
 
-		$this->_writeResource($this->_resource, $pathNew, $type);
+		$imagick = $this->_getImagickClone();
+		if (true !== $imagick->setImageFormat($this->_getImagickFormat($format))) {
+			throw new CM_Exception('Cannot set image format `' . $format . '`');
+		}
+		$this->_writeImagick($imagick, $pathNew);
 		@chmod($pathNew, 0666);
 	}
 
@@ -47,89 +48,162 @@ class CM_File_Image extends CM_File {
 	 * @param int         $heightMax
 	 * @param bool        $square     True if result image should be a square
 	 * @param string|null $pathNew
-	 * @param int|null    $typeNew
-	 * @throws CM_Exception_Invalid
+	 * @param int|null    $formatNew
+	 * @throws CM_Exception
 	 */
-	public function resize($widthMax, $heightMax, $square = false, $pathNew = null, $typeNew = null) {
+	public function resize($widthMax, $heightMax, $square = false, $pathNew = null, $formatNew = null) {
 		$width = $this->getWidth();
 		$height = $this->getHeight();
 
-		$resource = $this->_getResource();
 		if ($square) {
-			$resource = $this->_getResourceSquare();
+			$imagick = $this->_getImagickCloneSquare();
 			$width = $height = ($width < $height ? $width : $height);
+		} else {
+			$imagick = $this->_getImagickClone();
 		}
 
 		if (($width > $widthMax) || ($height > $heightMax)) {
 			if ($height / $heightMax > $width / $widthMax) {
-				$scale_coef = $heightMax / $height;
+				$scaleCoefficient = $heightMax / $height;
 			} else {
-				$scale_coef = $widthMax / $width;
+				$scaleCoefficient = $widthMax / $width;
 			}
-			$heightNew = $height * $scale_coef;
-			$widthNew = $width * $scale_coef;
+			$heightNew = $height * $scaleCoefficient;
+			$widthNew = $width * $scaleCoefficient;
 		} else {
 			// Don't blow image up
 			$heightNew = $height;
 			$widthNew = $width;
 		}
 
-		$resourceNew = imagecreatetruecolor($widthNew, $heightNew);
-		$result = imagecopyresampled($resourceNew, $resource, 0, 0, 0, 0, $widthNew, $heightNew, $width, $height);
-		if (!$result) {
-			throw new CM_Exception_Invalid('Cannot resample image');
+		try {
+			$imagick->thumbnailImage($widthNew, $heightNew);
+		} catch (ImagickException $e) {
+			throw new CM_Exception('Cannot resize image to `' . $widthNew . '`x`' . $heightNew . '`.');
 		}
-		$this->_writeResource($resourceNew, $pathNew, $typeNew, $typeNew);
+
+		if (null !== $formatNew) {
+			if (true !== $imagick->setImageFormat($this->_getImagickFormat($formatNew))) {
+				throw new CM_Exception('Cannot set image format `' . $formatNew . '`');
+			}
+		}
+
+		$this->_writeImagick($imagick, $pathNew);
 		@chmod($pathNew, 0666);
 	}
 
 	/**
-	 * @param int         $angle   Angle to rotate the image
+	 * @param int         $angle
 	 * @param string|null $pathNew
-	 * @param int|null    $typeNew
-	 * @throws CM_Exception_Invalid If something goes wrong during rotation or conversion
+	 * @param int|null    $formatNew
+	 * @throws CM_Exception
 	 */
-	public function rotate($angle, $pathNew = null, $typeNew = null) {
-		$resource = imagerotate($this->_resource, $angle + 180, 0);
-		if (!$resource) {
-			throw new CM_Exception_Invalid('Cannot rotate image');
+	public function rotate($angle, $pathNew = null, $formatNew = null) {
+		$angle = (int) $angle;
+		$imagick = $this->_getImagickClone();
+		if (true !== $imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
+			throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
 		}
-		$this->_writeResource($resource, $pathNew, $typeNew);
+
+		if (null !== $formatNew) {
+			if (true !== $imagick->setImageFormat($this->_getImagickFormat($formatNew))) {
+				throw new CM_Exception('Cannot set image format `' . $formatNew . '`');
+			}
+		}
+
+		$this->_writeImagick($imagick, $pathNew);
+		@chmod($pathNew, 0666);
 	}
 
 	/**
 	 * @return int
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public function getWidth() {
-		$width = imagesx($this->_resource);
-		if (false === $width) {
-			throw new CM_Exception_Invalid('Cannot detect image width');
+		try {
+			return $this->_getImagick()->getImageWidth();
+		} catch (ImagickException $e) {
+			throw new CM_Exception('Cannot detect image width: ' . $e->getMessage());
 		}
-		return (int) $width;
+	}
+
+	/**
+	 * @return int
+	 * @throws CM_Exception
+	 */
+	public function getHeight() {
+		try {
+			return $this->_getImagick()->getImageHeight();
+		} catch (ImagickException $e) {
+			throw new CM_Exception('Cannot detect image height: ' . $e->getMessage());
+		}
 	}
 
 	/**
 	 * @return int
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getHeight() {
-		$height = imagesy($this->_resource);
-		if (false === $height) {
-			throw new CM_Exception_Invalid('Cannot detect image height');
+	public function getFormat() {
+		$imagickFormat = $this->_getImagick()->getImageFormat();
+		switch ($imagickFormat) {
+			case 'JPEG':
+				return self::FORMAT_JPEG;
+			case 'GIF':
+				return self::FORMAT_GIF;
+			case'PNG':
+				return self::FORMAT_PNG;
+			default:
+				throw new CM_Exception_Invalid('Unsupported format `' . $imagickFormat . '`.');
 		}
-		return (int) $height;
 	}
 
 	/**
-	 * @return resource
+	 * @param int $quality 1-100
 	 * @throws CM_Exception_Invalid
 	 */
-	private function _getResourceSquare() {
+	public function setCompressionQuality($quality) {
+		$this->_compressionQuality = (int) $quality;
+		if ($quality < 1 || $quality > 100) {
+			throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
+		}
+	}
+
+	/**
+	 * @return Imagick
+	 * @throws CM_Exception
+	 */
+	private function _getImagick() {
+		if (!extension_loaded('imagick')) {
+			throw new CM_Exception('Missing `imagick` extension');
+		}
+		if (!isset($this->_imagick)) {
+			try {
+				$this->_imagick = new Imagick($this->getPath());
+			} catch (ImagickException $e) {
+				throw new CM_Exception('Cannot load Imagick instance for `' . $this->getPath() . '`: ' . $e->getMessage());
+			}
+		}
+		return $this->_imagick;
+	}
+
+	/**
+	 * @return Imagick
+	 */
+	private function _getImagickClone() {
+		$imagick = $this->_getImagick();
+		return clone $imagick;
+	}
+
+	/**
+	 * @return Imagick
+	 * @throws CM_Exception
+	 */
+	private function _getImagickCloneSquare() {
+		$imagick = $this->_getImagickClone();
 		$width = $this->getWidth();
 		$height = $this->getHeight();
 		if ($width == $height) {
-			return $this->_getResource();
+			return $imagick;
 		}
 
 		if ($width > $height) {
@@ -142,90 +216,55 @@ class CM_File_Image extends CM_File {
 			$size = $width;
 		}
 
-		$resource = imagecreatetruecolor($size, $size);
-		$result = imagecopyresampled($resource, $this->_getResource(), 0, 0, $offsetX, $offsetY, $width, $height, $width, $height);
-		if (!$result) {
-			throw new CM_Exception_Invalid('Cannot resample image');
+		if (true !== $imagick->cropImage($size, $size, $offsetX, $offsetY)) {
+			throw new CM_Exception('Cannot crop image');
 		}
-		return $resource;
+		return $imagick;
+	}
+
+	/**
+	 * @param Imagick     $imagick
+	 * @param string|null $path
+	 * @throws CM_Exception
+	 */
+	private function _writeImagick(Imagick $imagick, $path = null) {
+		if (null === $path) {
+			$path = $this->getPath();
+		}
+		$compressionQuality = $this->_getCompressionQuality();
+		if (true !== $imagick->setImageCompressionQuality($compressionQuality)) {
+			throw new CM_Exception('Cannot set compression quality to `' . $compressionQuality . '`.');
+		}
+		if (true !== $imagick->writeImage($path)) {
+			throw new CM_Exception('Cannot write to `' . $path . '`');
+		}
+		if ($path === $this->getPath()) {
+			$this->_imagick = $imagick;
+		}
 	}
 
 	/**
 	 * @return int
-	 * @throws CM_Exception_Invalid
 	 */
-	private function _getImageType() {
-		if (!isset($this->_imageType)) {
-			$imageType = @exif_imagetype($this->getPath());
-			if (false === $imageType) {
-				throw new CM_Exception_Invalid('Cannot detect image type of `' . $this->getPath() . '`.');
-			}
-			$this->_imageType = $imageType;
-		}
-		return $this->_imageType;
+	private function _getCompressionQuality() {
+		return $this->_compressionQuality;
 	}
 
 	/**
-	 * @return resource
+	 * @param int $format
+	 * @return string
 	 * @throws CM_Exception_Invalid
 	 */
-	private function _getResource() {
-		if (!isset($this->_resource)) {
-			switch ($this->_getImageType()) {
-				case IMAGETYPE_GIF:
-					$resource = @imagecreatefromgif($this->getPath());
-					break;
-				case IMAGETYPE_JPEG:
-					$resource = @imagecreatefromjpeg($this->getPath());
-					break;
-				case IMAGETYPE_PNG:
-					$resource = @imagecreatefrompng($this->getPath());
-					break;
-				default:
-					throw new CM_Exception_Invalid('Unsupported image type `' . $this->_getImageType() . '`.');
-					break;
-			}
-			if (!$resource) {
-				throw new CM_Exception_Invalid('Cannot create image resource from `' . $this->getPath() . '`.');
-			}
-			$this->_resource = $resource;
-		}
-		return $this->_resource;
-	}
-
-	/**
-	 * @param resource    $resource
-	 * @param string|null $path
-	 * @param int|null    $type
-	 * @throws CM_Exception_Invalid
-	 */
-	private function _writeResource($resource, $path = null, $type = null) {
-		if (null === $path) {
-			$path = $this->getPath();
-		}
-		if (null === $type) {
-			$type = $this->_getImageType();
-		}
-		switch ($type) {
-			case IMAGETYPE_JPEG:
-				$result = imagejpeg($resource, $path, self::QUALITY_JPEG);
-				break;
-			case IMAGETYPE_GIF:
-				$result = imagegif($resource, $path);
-				break;
-			case IMAGETYPE_PNG:
-				$result = imagepng($resource, $path);
-				break;
+	private function _getImagickFormat($format) {
+		switch ($format) {
+			case self::FORMAT_JPEG:
+				return 'JPEG';
+			case self::FORMAT_GIF:
+				return 'GIF';
+			case self::FORMAT_PNG:
+				return 'PNG';
 			default:
-				throw new CM_Exception_Invalid('Unsupported image type `' . $type . '`.');
-				break;
-		}
-		if (!$result) {
-			throw new CM_Exception_Invalid('Could not convert image');
-		}
-		if ($path == $this->getPath()) {
-			$this->_resource = $resource;
-			$this->_imageType = $type;
+				throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
 		}
 	}
 }
