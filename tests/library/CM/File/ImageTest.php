@@ -123,6 +123,12 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testGetWidthHeightAnimatedGif() {
+		$image = new CM_File_Image(DIR_TEST_DATA . 'img/animated.gif');
+		$this->assertSame(180, $image->getWidth());
+		$this->assertSame(135, $image->getHeight());
+	}
+
 	/**
 	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage Invalid compression quality
