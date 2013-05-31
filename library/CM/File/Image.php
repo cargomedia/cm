@@ -1,6 +1,7 @@
 <?php
 
 class CM_File_Image extends CM_File {
+
 	const QUALITY_JPEG = 95;
 
 	/**
@@ -24,7 +25,7 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
-	 * @param int		 $type	Image type. Use IMAGETYPE_* consts
+	 * @param int         $type    Image type. Use IMAGETYPE_* consts
 	 * @param string|null $pathNew Where the resulting image should be written
 	 */
 	public function convert($type, $pathNew = null) {
@@ -44,9 +45,10 @@ class CM_File_Image extends CM_File {
 	/**
 	 * @param int         $widthMax
 	 * @param int         $heightMax
-	 * @param bool        $square	 True if result image should be a square
+	 * @param bool        $square     True if result image should be a square
 	 * @param string|null $pathNew
 	 * @param int|null    $typeNew
+	 * @throws CM_Exception_Invalid
 	 */
 	public function resize($widthMax, $heightMax, $square = false, $pathNew = null, $typeNew = null) {
 		$width = $this->getWidth();
@@ -82,9 +84,9 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
-	 * @param int		 $angle   Angle to rotate the image
+	 * @param int         $angle   Angle to rotate the image
 	 * @param string|null $pathNew
-	 * @param int|null	$typeNew
+	 * @param int|null    $typeNew
 	 * @throws CM_Exception_Invalid If something goes wrong during rotation or conversion
 	 */
 	public function rotate($angle, $pathNew = null, $typeNew = null) {
@@ -97,6 +99,7 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @return int
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getWidth() {
 		$width = imagesx($this->_resource);
@@ -108,6 +111,7 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @return int
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getHeight() {
 		$height = imagesy($this->_resource);
@@ -190,9 +194,9 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
-	 * @param resource	$resource
+	 * @param resource    $resource
 	 * @param string|null $path
-	 * @param int|null	$type
+	 * @param int|null    $type
 	 * @throws CM_Exception_Invalid
 	 */
 	private function _writeResource($resource, $path = null, $type = null) {
