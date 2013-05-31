@@ -77,6 +77,18 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$this->assertSame($image->getWidth(), $imageNew->getHeight());
 	}
 
+	public function testRotateAnimatedGif() {
+		$path = DIR_TEST_DATA . 'img/animated.gif';
+		$pathNew = DIR_TMP . uniqid();
+		$image = new CM_File_Image($path);
+
+		$image->rotate(90, $pathNew, CM_File_Image::FORMAT_GIF);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame($image->getHeight(), $imageNew->getWidth());
+		$this->assertSame($image->getWidth(), $imageNew->getHeight());
+		$this->assertEquals(148987, $imageNew->getSize(), 5000);
+	}
+
 	public function testGetFormat() {
 		$pathList = array(
 			DIR_TEST_DATA . 'img/test.jpg'            => CM_File_Image::FORMAT_JPEG,
@@ -244,5 +256,31 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$image->resize(100, 100, null, $pathNew);
 		$imageNew = new CM_File_Image($pathNew);
 		$this->assertEquals(4620, $imageNew->getSize(), '', 300);
+	}
+
+	public function testResizeAnimatedGif() {
+		$path = DIR_TEST_DATA . 'img/animated.gif';
+		$pathNew = DIR_TMP . uniqid();
+		$image = new CM_File_Image($path);
+
+		$image->resize(50, 50, true, $pathNew, CM_File_Image::FORMAT_GIF);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame('image/gif', $imageNew->getMimeType());
+		$this->assertSame(50, $imageNew->getWidth());
+		$this->assertSame(50, $imageNew->getHeight());
+		$this->assertEquals(25697, $imageNew->getSize(), '', 2000);
+	}
+
+	public function testResizeAnimatedGifToJpeg() {
+		$path = DIR_TEST_DATA . 'img/animated.gif';
+		$pathNew = DIR_TMP . uniqid();
+		$image = new CM_File_Image($path);
+
+		$image->resize(50, 50, true, $pathNew, CM_File_Image::FORMAT_JPEG);
+		$imageNew = new CM_File_Image($pathNew);
+		$this->assertSame('image/jpeg', $imageNew->getMimeType());
+		$this->assertSame(50, $imageNew->getWidth());
+		$this->assertSame(50, $imageNew->getHeight());
+		$this->assertEquals(1682, $imageNew->getSize(), '', 100);
 	}
 }
