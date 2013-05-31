@@ -76,7 +76,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testRotate() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->rotate(90, $pathNew);
@@ -87,7 +87,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testConvert() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->convert(IMAGETYPE_GIF, $pathNew);
@@ -98,7 +98,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResize() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, false, $pathNew);
@@ -112,7 +112,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeSquare() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, true, $pathNew);
@@ -123,7 +123,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeSquareNoBlowup() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(5000, 5000, true, $pathNew);
@@ -135,7 +135,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeFileSize() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = '/tmp/' . uniqid();
+		$pathNew = DIR_TMP . uniqid();
 		$image = new CM_File_Image($path);
 		$this->assertEquals(17661, $image->getSize(), '', 300);
 
