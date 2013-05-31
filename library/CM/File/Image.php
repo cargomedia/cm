@@ -54,12 +54,19 @@ class CM_File_Image extends CM_File {
 	public function resize($widthMax, $heightMax, $square = false, $pathNew = null, $formatNew = null) {
 		$width = $this->getWidth();
 		$height = $this->getHeight();
+		$offsetX = null;
+		$offsetY = null;
 
 		if ($square) {
-			$imagick = $this->_getImagickCloneSquare();
-			$width = $height = ($width < $height ? $width : $height);
-		} else {
-			$imagick = $this->_getImagickClone();
+			if ($width > $height) {
+				$offsetX = floor(($width - $height) / 2);
+				$offsetY = 0;
+				$width = $height;
+			} elseif ($width < $height) {
+				$offsetX = 0;
+				$offsetY = floor(($height - $width) / 2);
+				$height = $width;
+			}
 		}
 
 		if (($width > $widthMax) || ($height > $heightMax)) {
@@ -68,18 +75,26 @@ class CM_File_Image extends CM_File {
 			} else {
 				$scaleCoefficient = $widthMax / $width;
 			}
-			$heightNew = $height * $scaleCoefficient;
-			$widthNew = $width * $scaleCoefficient;
+			$heightResize = $height * $scaleCoefficient;
+			$widthResize = $width * $scaleCoefficient;
 		} else {
 			// Don't blow image up
-			$heightNew = $height;
-			$widthNew = $width;
+			$heightResize = $height;
+			$widthResize = $width;
+		}
+
+		$imagick = $this->_getImagickClone();
+
+		if (null !== $offsetX && null !== $offsetY) {
+			if (true !== $imagick->cropImage($width, $height, $offsetX, $offsetY)) {
+				throw new CM_Exception('Cannot crop image');
+			}
 		}
 
 		try {
-			$imagick->thumbnailImage($widthNew, $heightNew);
+			$imagick->thumbnailImage($widthResize, $heightResize);
 		} catch (ImagickException $e) {
-			throw new CM_Exception('Cannot resize image to `' . $widthNew . '`x`' . $heightNew . '`.');
+			throw new CM_Exception('Cannot resize image to `' . $widthResize . '`x`' . $heightResize . '`.');
 		}
 
 		if (null !== $formatNew) {
@@ -181,7 +196,7 @@ class CM_File_Image extends CM_File {
 		}
 	}
 
-	/**
+	/*akec*
 	 * @return Imagick
 	 * @throws CM_Exception
 	 */
@@ -205,34 +220,6 @@ class CM_File_Image extends CM_File {
 	private function _getImagickClone() {
 		$imagick = $this->_getImagick();
 		return clone $imagick;
-	}
-
-	/**
-	 * @return Imagick
-	 * @throws CM_Exception
-	 */
-	private function _getImagickCloneSquare() {
-		$imagick = $this->_getImagickClone();
-		$width = $this->getWidth();
-		$height = $this->getHeight();
-		if ($width == $height) {
-			return $imagick;
-		}
-
-		if ($width > $height) {
-			$offsetX = ($width - $height) / 2;
-			$offsetY = 0;
-			$size = $height;
-		} else {
-			$offsetX = 0;
-			$offsetY = ($height - $width) / 2;
-			$size = $width;
-		}
-
-		if (true !== $imagick->cropImage($size, $size, $offsetX, $offsetY)) {
-			throw new CM_Exception('Cannot crop image');
-		}
-		return $imagick;
 	}
 
 	/**
@@ -279,5 +266,16 @@ class CM_File_Image extends CM_File {
 			default:
 				throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
 		}
+	}
+
+	/**
+	 * @param int $format
+	 * @return bool
+	 */
+	private function _getAnimationRequired($format) {
+		if (self::FORMAT_GIF === $format && $this->isAnimated()) {
+			return true;
+		}
+		return false;
 	}
 }
