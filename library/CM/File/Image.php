@@ -12,6 +12,9 @@ class CM_File_Image extends CM_File {
 	/** @var int */
 	private $_compressionQuality = 90;
 
+	/** @var bool */
+	private $_animated = false;
+
 	public function __construct($file) {
 		parent::__construct($file);
 
@@ -36,10 +39,7 @@ class CM_File_Image extends CM_File {
 		}
 
 		$imagick = $this->_getImagickClone();
-		if (true !== $imagick->setImageFormat($this->_getImagickFormat($format))) {
-			throw new CM_Exception('Cannot set image format `' . $format . '`');
-		}
-		$this->_writeImagick($imagick, $pathNew);
+		$this->_writeImagick($imagick, $pathNew, $format);
 		@chmod($pathNew, 0666);
 	}
 
@@ -85,25 +85,18 @@ class CM_File_Image extends CM_File {
 
 		$imagick = $this->_getImagickClone();
 
-		if (null !== $offsetX && null !== $offsetY) {
-			if (true !== $imagick->cropImage($width, $height, $offsetX, $offsetY)) {
-				throw new CM_Exception('Cannot crop image');
-			}
-		}
-
 		try {
-			$imagick->thumbnailImage($widthResize, $heightResize);
+			$this->_invokeOnEveryFrame($imagick, function (Imagick $imagick) use ($offsetX, $offsetY, $width, $height, $widthResize, $heightResize) {
+				if (null !== $offsetX && null !== $offsetY) {
+					$imagick->cropImage($width, $height, $offsetX, $offsetY);
+				}
+				$imagick->thumbnailImage($widthResize, $heightResize);
+			}, $formatNew);
 		} catch (ImagickException $e) {
-			throw new CM_Exception('Cannot resize image to `' . $widthResize . '`x`' . $heightResize . '`.');
+			throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
 		}
 
-		if (null !== $formatNew) {
-			if (true !== $imagick->setImageFormat($this->_getImagickFormat($formatNew))) {
-				throw new CM_Exception('Cannot set image format `' . $formatNew . '`');
-			}
-		}
-
-		$this->_writeImagick($imagick, $pathNew);
+		$this->_writeImagick($imagick, $pathNew, $formatNew);
 		@chmod($pathNew, 0666);
 	}
 
@@ -116,17 +109,14 @@ class CM_File_Image extends CM_File {
 	public function rotate($angle, $pathNew = null, $formatNew = null) {
 		$angle = (int) $angle;
 		$imagick = $this->_getImagickClone();
-		if (true !== $imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
-			throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
-		}
 
-		if (null !== $formatNew) {
-			if (true !== $imagick->setImageFormat($this->_getImagickFormat($formatNew))) {
-				throw new CM_Exception('Cannot set image format `' . $formatNew . '`');
+		$this->_invokeOnEveryFrame($imagick, function (Imagick $imagick) use ($angle) {
+			if (true !== $imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
+				throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
 			}
-		}
+		}, $formatNew);
 
-		$this->_writeImagick($imagick, $pathNew);
+		$this->_writeImagick($imagick, $pathNew, $formatNew);
 		@chmod($pathNew, 0666);
 	}
 
@@ -174,15 +164,9 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @return bool
-	 * @throws CM_Exception
 	 */
 	public function isAnimated() {
-		try {
-			$iteratorIndex = $this->_getImagick()->getIteratorIndex();
-		} catch (ImagickException $e) {
-			throw new CM_Exception('Cannot get iterator index: ' . $e->getMessage());
-		}
-		return ($iteratorIndex > 0);
+		return $this->_animated;
 	}
 
 	/**
@@ -196,7 +180,7 @@ class CM_File_Image extends CM_File {
 		}
 	}
 
-	/*akec*
+	/**
 	 * @return Imagick
 	 * @throws CM_Exception
 	 */
@@ -206,10 +190,15 @@ class CM_File_Image extends CM_File {
 		}
 		if (!isset($this->_imagick)) {
 			try {
-				$this->_imagick = new Imagick($this->getPath());
+				$imagick = new Imagick($this->getPath());
+				if ($imagick->getIteratorIndex() > 0) {
+					$this->_animated = true;
+					$imagick = $imagick->coalesceImages();
+				}
 			} catch (ImagickException $e) {
 				throw new CM_Exception('Cannot load Imagick instance for `' . $this->getPath() . '`: ' . $e->getMessage());
 			}
+			$this->_imagick = $imagick;
 		}
 		return $this->_imagick;
 	}
@@ -225,18 +214,36 @@ class CM_File_Image extends CM_File {
 	/**
 	 * @param Imagick     $imagick
 	 * @param string|null $path
+	 * @param int|null    $format
 	 * @throws CM_Exception
 	 */
-	private function _writeImagick(Imagick $imagick, $path = null) {
+	private function _writeImagick(Imagick $imagick, $path = null, $format = null) {
 		if (null === $path) {
 			$path = $this->getPath();
+		}
+		if (null !== $format) {
+			if (true !== $imagick->setImageFormat($this->_getImagickFormat($format))) {
+				throw new CM_Exception('Cannot set image format `' . $format . '`');
+			}
 		}
 		$compressionQuality = $this->_getCompressionQuality();
 		if (true !== $imagick->setImageCompressionQuality($compressionQuality)) {
 			throw new CM_Exception('Cannot set compression quality to `' . $compressionQuality . '`.');
 		}
-		if (true !== $imagick->writeImage($path)) {
-			throw new CM_Exception('Cannot write to `' . $path . '`');
+		if (!$this->_getAnimationRequired($format)) {
+			try {
+				/** @var Imagick $imagick */
+				$imagick = $imagick->deconstructImages();
+			} catch (ImagickException $e) {
+				throw new CM_Exception('Cannot deconstruct animated image');
+			}
+			if (true !== $imagick->writeImage($path)) {
+				throw new CM_Exception('Cannot write image to `' . $path . '`');
+			}
+		} else {
+			if (true !== $imagick->writeImages($path, true)) {
+				throw new CM_Exception('Cannot write images to `' . $path . '`');
+			}
 		}
 		if ($path === $this->getPath()) {
 			$this->_imagick = $imagick;
@@ -269,13 +276,32 @@ class CM_File_Image extends CM_File {
 	}
 
 	/**
-	 * @param int $format
+	 * @param int|null $format
 	 * @return bool
 	 */
-	private function _getAnimationRequired($format) {
+	private function _getAnimationRequired($format = null) {
+		if (null === $format) {
+			$format = $this->getFormat();
+		}
 		if (self::FORMAT_GIF === $format && $this->isAnimated()) {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @param Imagick  $imagick
+	 * @param callable $callback fn(Imagick)
+	 * @param int|null $format
+	 */
+	private function _invokeOnEveryFrame(Imagick $imagick, Closure $callback, $format = null) {
+		if (!$this->_getAnimationRequired($format)) {
+			$callback($imagick);
+		} else {
+			/** @var Imagick $frame */
+			foreach ($imagick as $frame) {
+				$callback($imagick);
+			}
+		}
 	}
 }
