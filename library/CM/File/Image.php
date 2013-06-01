@@ -231,12 +231,6 @@ class CM_File_Image extends CM_File {
 			throw new CM_Exception('Cannot set compression quality to `' . $compressionQuality . '`.');
 		}
 		if (!$this->_getAnimationRequired($format)) {
-			try {
-				/** @var Imagick $imagick */
-				$imagick = $imagick->deconstructImages();
-			} catch (ImagickException $e) {
-				throw new CM_Exception('Cannot deconstruct animated image');
-			}
 			if (true !== $imagick->writeImage($path)) {
 				throw new CM_Exception('Cannot write image to `' . $path . '`');
 			}
