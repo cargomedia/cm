@@ -122,6 +122,20 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$this->assertTrue($imageAnimatedGif->isAnimated());
 	}
 
+	public function testIsAnimatedConvertingToNonAnimated() {
+		$file = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
+		$path = DIR_TMP . uniqid();
+		$file->copy($path);
+		$image = new CM_File_Image($path);
+		$this->assertTrue($image->isAnimated());
+
+		$image->convert(CM_File_Image::FORMAT_GIF, $path);
+		$this->assertTrue($image->isAnimated());
+
+		$image->convert(CM_File_Image::FORMAT_JPEG, $path);
+		$this->assertFalse($image->isAnimated());
+	}
+
 	public function testGetWidthHeight() {
 		$pathList = array(
 			DIR_TEST_DATA . 'img/test.jpg',

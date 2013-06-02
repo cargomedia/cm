@@ -245,6 +245,7 @@ class CM_File_Image extends CM_File {
 		}
 		if ($path === $this->getPath()) {
 			$this->_imagick = $imagick;
+			$this->_animated = $this->_getAnimationRequired($format);
 		}
 	}
 
