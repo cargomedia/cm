@@ -300,4 +300,22 @@ class CM_File_Image extends CM_File {
 			}
 		}
 	}
+
+	/**
+	 * @param int $format
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public static function getExtensionByFormat($format) {
+		switch ($format) {
+			case self::FORMAT_JPEG:
+				return 'jpg';
+			case self::FORMAT_GIF:
+				return 'gif';
+			case self::FORMAT_PNG:
+				return 'png';
+			default:
+				throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
+		}
+	}
 }

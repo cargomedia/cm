@@ -325,4 +325,18 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$this->assertSame(50, $imageNew->getHeight());
 		$this->assertEquals(1682, $imageNew->getSize(), '', 100);
 	}
+
+	public function testGetExtensionByFormat() {
+		$this->assertSame('jpg', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_JPEG));
+		$this->assertSame('gif', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_GIF));
+		$this->assertSame('png', CM_File_Image::getExtensionByFormat(CM_File_Image::FORMAT_PNG));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Invalid format
+	 */
+	public function testGetExtensionByFormatInvalid() {
+		CM_File_Image::getExtensionByFormat(-999);
+	}
 }
