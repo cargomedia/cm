@@ -32,7 +32,7 @@ class CM_File_Image extends CM_File {
 
 		if ($format === $this->getFormat()) {
 			// Copy image if no conversion necessary
-			if (null !== $pathNew) {
+			if ($this->getPath() !== $pathNew) {
 				$this->copy($pathNew);
 				@chmod($pathNew, 0666);
 			}

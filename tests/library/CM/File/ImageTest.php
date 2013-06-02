@@ -209,6 +209,34 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testConvertSamePath() {
+		$file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+		$path = DIR_TMP . uniqid();
+		$file->copy($path);
+		$image = new CM_File_Image($path);
+		$imageWidth = $image->getWidth();
+		$imageHeight = $image->getHeight();
+		$imageHash = $image->getHash();
+		$image->convert(CM_File_Image::FORMAT_GIF, $path);
+
+		$imageNew = new CM_File_Image($path);
+		$this->assertSame($imageWidth, $imageNew->getWidth());
+		$this->assertSame($imageHeight, $imageNew->getHeight());
+		$this->assertNotSame($imageHash, $imageNew->getHash());
+	}
+
+	public function testConvertSamePathSameFormat() {
+		$file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+		$path = DIR_TMP . uniqid();
+		$file->copy($path);
+		$image = new CM_File_Image($path);
+		$imageHash = $image->getHash();
+		$image->convert(CM_File_Image::FORMAT_JPEG, $path);
+
+		$imageNew = new CM_File_Image($path);
+		$this->assertSame($imageHash, $imageNew->getHash());
+	}
+
 	public function testResize() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
 		$pathNew = DIR_TMP . uniqid();
