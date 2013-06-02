@@ -174,10 +174,11 @@ class CM_File_Image extends CM_File {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setCompressionQuality($quality) {
-		$this->_compressionQuality = (int) $quality;
+		$quality = (int) $quality;
 		if ($quality < 1 || $quality > 100) {
 			throw new CM_Exception_Invalid('Invalid compression quality `' . $quality . '`, should be between 1-100.');
 		}
+		$this->_compressionQuality = $quality;
 	}
 
 	/**
