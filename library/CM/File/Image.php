@@ -227,7 +227,7 @@ class CM_File_Image extends CM_File {
 	 * @throws CM_Exception
 	 */
 	private function _writeImagick(Imagick $imagick, $path, $format) {
-		if (true !== $imagick->setImageFormat($this->_getImagickFormat($format))) {
+		if (true !== $imagick->setFormat($this->_getImagickFormat($format))) {
 			throw new CM_Exception('Cannot set image format `' . $format . '`');
 		}
 		$compressionQuality = $this->_getCompressionQuality();
