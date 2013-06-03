@@ -187,10 +187,7 @@ class CM_App {
 	}
 
 	public function generateConfigActionVerbs() {
-		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
-		$content .= '	$config->CM_Action_Abstract = new StdClass();' . PHP_EOL;
-		$content .= '}' . PHP_EOL;
-		$content .= '$config->CM_Action_Abstract->verbs = array();';
+		$content = '$config->CM_Action_Abstract->verbs = array();';
 		foreach ($this->getActionVerbs() as $actionVerb) {
 			$content .= PHP_EOL;
 			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' .
@@ -318,9 +315,6 @@ class CM_App {
 
 		$lines = array();
 		$lines[] = '';
-		$lines[] = 'if (!isset($config->' . $className . ')) {';
-		$lines[] = "\t" . '$config->' . $className . ' = new StdClass();';
-		$lines[] = '}';
 		$lines[] = '$config->' . $className . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
