@@ -98,32 +98,32 @@ class CM_RenderTest extends CMTest_TestCase {
 	public function testGetUrlResource() {
 		$render = new CM_Render();
 		$siteType = CM_Site_Abstract::factory()->getType();
-		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
+		$deployVersion = CM_App::getInstance()->getDeployVersion();
 		$this->assertSame('http://www.default.dev', $render->getUrlResource());
 		$this->assertSame('http://www.default.dev', $render->getUrlResource('layout'));
 		$this->assertSame('http://www.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
 		$this->assertSame(
-			'http://www.default.dev/layout/' . $siteType . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+			'http://www.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
 		CM_Config::get()->CM_Render->cdnResource = true;
 		$this->assertSame('http://cdn.default.dev', $render->getUrlResource());
 		$this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
 		$this->assertSame('http://cdn.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
 		$this->assertSame(
-			'http://cdn.default.dev/layout/' . $siteType . '/' . $releaseStamp . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-		$this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $releaseStamp . '/0', $render->getUrlResource('layout', '0'));
-		$this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $releaseStamp . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+			'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+		$this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
+		$this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
 	}
 
 	public function testGetUrlStatic() {
 		$render = new CM_Render();
-		$releaseStamp = CM_App::getInstance()->getReleaseStamp();
+		$deployVersion = CM_App::getInstance()->getDeployVersion();
 		$this->assertSame('http://www.default.dev/static', $render->getUrlStatic());
-		$this->assertSame('http://www.default.dev/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('/foo.jpg'));
+		$this->assertSame('http://www.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
 
 		CM_Config::get()->CM_Render->cdnResource = true;
 		$this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
-		$this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $releaseStamp, $render->getUrlStatic('/foo.jpg'));
-		$this->assertSame('http://cdn.default.dev/static/0?' . $releaseStamp, $render->getUrlStatic('/0'));
+		$this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
+		$this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
 	}
 
 	public function testGetUrlUserContent() {

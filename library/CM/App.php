@@ -120,7 +120,7 @@ class CM_App {
 	/**
 	 * @return int
 	 */
-	public function getReleaseStamp() {
+	public function getDeployVersion() {
 		return (int) CM_Config::get()->deployVersion;
 	}
 

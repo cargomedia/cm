@@ -13,7 +13,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$this->getRender()->pushStack('pages', $layout->getPage());
 
 		$options = array();
-		$options['releaseStamp'] = CM_App::getInstance()->getReleaseStamp();
+		$options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
 		$options['siteId'] = $this->getRender()->getSite()->getId();
 		$options['url'] = $this->getRender()->getUrl();

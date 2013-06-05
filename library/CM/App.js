@@ -136,7 +136,7 @@ var CM_App = CM_Class_Abstract.extend({
 	getUrlStatic: function(path) {
 		var url = cm.options.urlStatic;
 		if (path) {
-			url += path + '?' + cm.options.releaseStamp;
+			url += path + '?' + cm.options.deployVersion;
 		}
 		return url;
 	},
@@ -153,7 +153,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (cm.options.language) {
 				urlPath += '/' + cm.options.language.abbreviation;
 			}
-			urlPath += '/' + cm.options.siteId + '/' + cm.options.releaseStamp + '/' + path;
+			urlPath += '/' + cm.options.siteId + '/' + cm.options.deployVersion + '/' + path;
 		}
 		return cm.options.urlResource + urlPath;
 	},

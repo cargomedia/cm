@@ -335,7 +335,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 		$languageKeyId = $languageKeyParams['id'];
 		$updateCount = $languageKeyParams['updateCount'] + 1;
-		if (CM_App::getInstance()->getReleaseStamp() > $languageKeyParams['accessStamp']) {
+		if (CM_App::getInstance()->getDeployVersion() > $languageKeyParams['accessStamp']) {
 			$updateCount = 1;
 		}
 		CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
