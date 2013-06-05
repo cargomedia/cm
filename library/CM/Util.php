@@ -36,9 +36,9 @@ class CM_Util {
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
-		$files = glob($path . $pattern);
-		sort($files);
-		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR);
+		$files = glob($path . $pattern, GLOB_NOSORT);
+		sort($files);	// glob's sort is not reliable (locale dependent?)
+		$paths = glob($path . '*', GLOB_NOSORT | GLOB_MARK | GLOB_ONLYDIR);
 		sort($paths);
 		foreach ($paths as $path) {
 			$files = array_merge($files, self::rglob($pattern, $path));
