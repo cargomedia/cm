@@ -36,7 +36,7 @@ function smarty_helper_resourceJs_libraryDebug(CM_Render $render) {
 	foreach ($paths as $path) {
 		$path = str_replace(DIR_ROOT, '/', $path);
 		$path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-		$path .= '?' . CM_App::getInstance()->getReleaseStamp();
+		$path .= '?' . CM_App::getInstance()->getDeployVersion();
 		$content .= '<script type="text/javascript" src="' . $path . '"></script>' . PHP_EOL;
 	}
 	$content .= smarty_helper_resourceJs('library', 'library.js?debug=true', $render);
