@@ -37,7 +37,9 @@ class CM_Util {
 	 */
 	public static function rglob($pattern = '*', $path = './') {
 		$files = glob($path . $pattern);
+		sort($files);
 		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR);
+		sort($paths);
 		foreach ($paths as $path) {
 			$files = array_merge($files, self::rglob($pattern, $path));
 		}
@@ -409,7 +411,6 @@ class CM_Util {
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
 				$namespacePaths = CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/');
-				sort($namespacePaths);
 				$paths = array_merge($paths, $namespacePaths);
 			}
 			$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
