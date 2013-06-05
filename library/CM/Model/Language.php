@@ -329,16 +329,17 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	private static function _setKeyVariables($name, array $variableNames) {
-		$languageKeyParams = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, array('id', 'accessStamp', 'updateCount'), array('name' => $name))->fetch();
+		$languageKeyParams = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, array('id', 'updateCountResetVersion', 'updateCount'), array('name' => $name))->fetch();
 		if (!$languageKeyParams) {
 			throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
 		}
 		$languageKeyId = $languageKeyParams['id'];
 		$updateCount = $languageKeyParams['updateCount'] + 1;
-		if (CM_App::getInstance()->getDeployVersion() > $languageKeyParams['accessStamp']) {
+		$deployVersion = CM_App::getInstance()->getDeployVersion();
+		if ($deployVersion > $languageKeyParams['updateCountResetVersion']) {
 			$updateCount = 1;
 		}
-		CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('accessStamp' => time(), 'updateCount' => $updateCount), array('name' => $name));
+		CM_Db_Db::update(TBL_CM_LANGUAGEKEY, array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
 		if ($updateCount > 10) {
 			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
 		}
