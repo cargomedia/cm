@@ -305,7 +305,7 @@ class CM_Render extends CM_Class_Abstract {
 			if ($this->getLanguage()) {
 				$urlPath .= '/' . $this->getLanguage()->getAbbreviation();
 			}
-			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -330,7 +330,7 @@ class CM_Render extends CM_Class_Abstract {
 	public function getUrlStatic($path = null) {
 		$urlPath = '/static';
 		if (null !== $path) {
-			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
+			$urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
