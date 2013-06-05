@@ -121,18 +121,7 @@ class CM_App {
 	 * @return int
 	 */
 	public function getReleaseStamp() {
-		return (int) CM_Option::getInstance()->get('app.releaseStamp');
-	}
-
-	/**
-	 * @param int|null $releaseStamp
-	 */
-	public function setReleaseStamp($releaseStamp = null) {
-		if (null === $releaseStamp) {
-			$releaseStamp = time();
-		}
-		$releaseStamp = (int) $releaseStamp;
-		CM_Option::getInstance()->set('app.releaseStamp', $releaseStamp);
+		return (int) CM_Config::get()->deployVersion;
 	}
 
 	/**
