@@ -170,7 +170,6 @@ class CM_Params extends CM_Class_Abstract {
 	 * @param string       $className
 	 * @param mixed|null   $default
 	 * @param Closure|null $getter
-	 * @throws CM_Exception_InvalidParam
 	 * @return object
 	 */
 	protected function _getObject($key, $className, $default = null, Closure $getter = null) {
@@ -180,11 +179,8 @@ class CM_Params extends CM_Class_Abstract {
 			};
 		}
 		$param = $this->_get($key, $default);
-		if (ctype_digit($param) || is_int($param)) {
-			return $getter($className, $param);
-		}
 		if (!($param instanceof $className)) {
-			throw new CM_Exception_InvalidParam('Not a ' . $className);
+			return $getter($className, $param);
 		}
 		return $param;
 	}
@@ -305,6 +301,15 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getStreamChannelVideo($key) {
 		return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_File
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getFile($key) {
+		return $this->_getObject($key, 'CM_File');
 	}
 
 	/**
