@@ -119,4 +119,16 @@ class CM_ParamsTest extends CMTest_TestCase {
 			$this->assertContains(get_class($language), $e->getMessage());
 		}
 	}
+
+	/**
+	 * @expectedException CM_Exception_InvalidParam
+	 * @expectedExceptionMessage Not a CM_File
+	 */
+	public function testGetFile() {
+		$file = CM_File::createTmp();
+		$params = new CM_Params(array('file' => $file, 'filename' => $file->getPath(), 'nonexistent' => 'foo/bar'));
+		$this->assertEquals($file, $params->getFile('file'));
+		$this->assertEquals($file, $params->getFile('filename'));
+		$params->getFile('nonexistent');
+	}
 }

@@ -308,6 +308,15 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return CM_File
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getFile($key) {
+		return $this->_getObject($key, 'CM_File');
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function shift() {
