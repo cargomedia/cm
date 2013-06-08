@@ -1,6 +1,6 @@
 <?php
 
-class CM_Geo_Point {
+class CM_Geo_Point implements CM_Comparable {
 
 	/** @var float */
 	private $_latitude;
@@ -54,5 +54,19 @@ class CM_Geo_Point {
 			throw new CM_Exception_Invalid('Longitude `' . $longitude . '` out of range');
 		}
 		$this->_longitude = $longitude;
+	}
+
+	/**
+	 * @param CM_Comparable $other
+	 * @return boolean
+	 */
+	public function equals(CM_Comparable $other = null) {
+		if (empty($other)) {
+			return false;
+		}
+		/** @var CM_Geo_Point $other */
+		return (get_class($this) === get_class($other)
+				&& $this->getLatitude() === $other->getLatitude()
+				&& $this->getLongitude() === $other->getLongitude());
 	}
 }
