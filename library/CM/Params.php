@@ -313,6 +313,15 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return CM_Geo_Point
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getGeoPoint($key) {
+		return $this->_getObject($key, 'CM_Geo_Point');
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function shift() {
