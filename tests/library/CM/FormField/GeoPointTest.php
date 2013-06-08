@@ -6,14 +6,17 @@ class CM_FormField_GeoPointTest extends CMTest_TestCase {
 		$field = new CM_FormField_GeoPoint('foo');
 		$response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
 
-		$this->assertSame(array('latitude' => -30.2, 'longitude' => -122.2),
-			$field->validate(array('latitude' => -30.2, 'longitude' => -122.2), $response));
+		$value = $field->validate(array('latitude' => -30.2, 'longitude' => -122.2), $response);
+		$this->assertSame(-30.2, $value->getLatitude());
+		$this->assertSame(-122.2, $value->getLongitude());
 
-		$this->assertSame(array('latitude' => 30.2, 'longitude' => 122.2),
-			$field->validate(array('latitude' => 30.2, 'longitude' => 122.2), $response));
+		$value = $field->validate(array('latitude' => 30.2, 'longitude' => 122.2), $response);
+		$this->assertSame(30.2, $value->getLatitude());
+		$this->assertSame(122.2, $value->getLongitude());
 
-		$this->assertSame(array('latitude' => 0.0, 'longitude' => 0.0),
-			$field->validate(array('latitude' => 0, 'longitude' => 0), $response));
+		$value = $field->validate(array('latitude' => 0, 'longitude' => 0), $response);
+		$this->assertSame(0.0, $value->getLatitude());
+		$this->assertSame(0.0, $value->getLongitude());
 
 		try {
 			$field->validate(array('latitude' => 300, 'longitude' => 20), $response);
