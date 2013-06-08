@@ -32,9 +32,11 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 	public function prepare(array $params) {
 		/** @var CM_Geo_Point $value */
 		$value = $this->getValue();
+		$latitude = $value ? $value->getLatitude() : null;
+		$longitude = $value ? $value->getLongitude() : null;
 
-		$this->setTplParam('latitude', $value->getLatitude());
-		$this->setTplParam('longitude', $value->getLongitude());
+		$this->setTplParam('latitude', $latitude);
+		$this->setTplParam('longitude', $longitude);
 	}
 
 	public function isEmpty($userInput) {
