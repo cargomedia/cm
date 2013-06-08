@@ -243,7 +243,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param array|null $data
-	 * @return CM_Model_Abstract
+	 * @return static
 	 */
 	final public static function create(array $data = null) {
 		if ($data === null) {
