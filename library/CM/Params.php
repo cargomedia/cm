@@ -436,7 +436,7 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param array $params
 	 * @param bool  $decode OPTIONAL
-	 * @return CM_Params
+	 * @return static
 	 */
 	public static function factory(array $params = array(), $decode = true) {
 		$className = self::_getClassName();
