@@ -1,6 +1,7 @@
 <?php
 
-abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, CM_Cacheable, CM_ArrayConvertible {
+abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, Countable, CM_Cacheable, CM_ArrayConvertible {
+
 	private $_count = null;
 	private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
 	private $_pageOffset = 0;
@@ -473,8 +474,11 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		return isset($this->_iteratorItems[$this->_iteratorPosition]);
 	}
 
+	public function count() {
+		return $this->getCount();
+	}
+
 	public static function fromArray(array $array) {
 		throw new CM_Exception_NotImplemented();
 	}
-
 }
