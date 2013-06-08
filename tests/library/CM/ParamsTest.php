@@ -137,10 +137,12 @@ class CM_ParamsTest extends CMTest_TestCase {
 	}
 
 	public function testGetFileGeoPoint() {
-		$file = CM_File::createTmp();
 		$point = new CM_Geo_Point(1, 2);
 		$params = new CM_Params(array('point' => $point));
-		$this->assertEquals($file, $params->getGeoPoint('point'));
+		$value = $params->getGeoPoint('point');
+		$this->assertInstanceOf('CM_Geo_Point', $value);
+		$this->assertSame(1.0, $value->getLatitude());
+		$this->assertSame(2.0, $value->getLongitude());
 	}
 
 	/**
