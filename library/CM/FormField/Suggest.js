@@ -72,6 +72,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				field.trigger('delete', e.removed);
 			}
 			field.onChange(field._$input.select2("data"));
+			field.trigger('change');
 		});
 
 		if (1 == cardinality) {
@@ -93,6 +94,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		});
 
 		this.onChange(this._$input.select2("data"));
+		this.trigger('change');
 	},
 
 	/**
