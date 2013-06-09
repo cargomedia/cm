@@ -178,6 +178,7 @@ class CM_Params extends CM_Class_Abstract {
 	 * @param string       $className
 	 * @param mixed|null   $default
 	 * @param Closure|null $getter
+	 * @throws CM_Exception_InvalidParam
 	 * @return object
 	 */
 	protected function _getObject($key, $className, $default = null, Closure $getter = null) {
@@ -188,7 +189,11 @@ class CM_Params extends CM_Class_Abstract {
 		}
 		$param = $this->_get($key, $default);
 		if (!($param instanceof $className)) {
-			return $getter($className, $param);
+			try {
+				return $getter($className, $param);
+			} catch (CM_Exception $exception) {
+				throw new CM_Exception_InvalidParam($exception->getMessage());
+			}
 		}
 		return $param;
 	}
@@ -459,5 +464,4 @@ class CM_Params extends CM_Class_Abstract {
 		$className = self::_getClassName();
 		return new $className($params, $decode);
 	}
-
 }
