@@ -151,6 +151,14 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return DateTime
+	 */
+	public function getDateTime($key) {
+		return $this->_getObject($key, 'DateTime');
+	}
+
+	/**
 	 * @param string   $key
 	 * @param int|null $default
 	 * @return int
