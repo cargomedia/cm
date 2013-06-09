@@ -7,5 +7,12 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 
 	setFocus: function() {
 		this.$('select').first().focus();
+	},
+
+	ready: function() {
+		var self = this;
+		this.$('select').on('change', function() {
+			self.trigger('change');
+		})
 	}
 });
