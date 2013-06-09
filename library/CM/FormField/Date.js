@@ -10,9 +10,8 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 	},
 
 	ready: function() {
-		var self = this;
-		this.$('select').on('change', function() {
-			self.trigger('change');
-		})
+		this.bindJquery(this.$('select'), 'change', function() {
+			this.trigger('change');
+		});
 	}
 });
