@@ -278,9 +278,11 @@ class CM_Bootloader {
 			$vendorDir = preg_replace('#/?$#', '/', $composerJson->config['vendor-dir']);
 		}
 		foreach ((array) $composerJson->require as $path => $version) {
-			$parts = explode('/', $path);
-			$namespace = $parts[1];
-			$namespacePaths[$namespace] = $vendorDir . $path . '/';
+			if (false !== strpos($path, '/')) {
+				$parts = explode('/', $path);
+				$namespace = $parts[1];
+				$namespacePaths[$namespace] = $vendorDir . $path . '/';
+			}
 		}
 		return $namespacePaths;
 	}
