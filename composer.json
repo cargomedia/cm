@@ -1,6 +1,7 @@
 {
 	"name": "cargomedia/CM",
 	"require": {
+		"ext-gd": "*",
 		"smarty/smarty": "3.1.*",
 		"leafo/lessphp": "0.3.*",
 		"easybook/geshi": "1.0.8.11",
