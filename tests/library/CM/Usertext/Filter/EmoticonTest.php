@@ -45,8 +45,9 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 			$emoticonId[$emoticonName] = CM_Db_Db::insert(TBL_CM_EMOTICON, $emoticonData);
 		}
 
-		$text = '(2003) (2008) (100%) (B) (O) 3) 8) %) B) O)';
-		$expected = '(2003) (2008) (100%) (B) (O) ' . $this->_getEmoticonImg(':imp:', 'imp.png', $emoticonId['imp']) .
+		$text = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO) 3) 8) %) B) O)';
+		$expected = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO)' .
+				' ' . $this->_getEmoticonImg(':imp:', 'imp.png', $emoticonId['imp']) .
 				' ' . $this->_getEmoticonImg(':sunglasses:', 'sunglasses.png', $emoticonId['sunglasses']) .
 				' ' . $this->_getEmoticonImg(':dizzy_face:', 'dizzy_face.png', $emoticonId['dizzy_face']) .
 				' ' . $this->_getEmoticonImg(':sunglasses:', 'sunglasses.png', $emoticonId['sunglasses']) .
