@@ -114,6 +114,8 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$page = $responsePage->getPage();
 
+		$this->_setStringRepresentation(get_class($page));
+
 		$html = $responsePage->getContent();
 		$js = $responsePage->getRender()->getJs()->getJs();
 		$responsePage->getRender()->getJs()->clear();
