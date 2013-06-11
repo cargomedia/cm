@@ -32,7 +32,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 		$this->assertSame($expected, $actual);
 	}
 
-	public function testSmartEscaping() {
+	public function testFalseSmileys() {
 		$site = $this->getMockSite(24, null, 'http://www.default.dev');
 
 		$emoticonId = array();

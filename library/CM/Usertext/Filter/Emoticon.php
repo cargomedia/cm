@@ -17,9 +17,9 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		$emoticons = $this->_getEmoticonData($render);
-		$text = $this->_smartEscape($text);
+		$text = $this->_escapeFalseSmileys($text);
 		$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
-		$text = $this->_smartUnescape($text);
+		$text = $this->_unescapeFalseSmileys($text);
 		return $text;
 	}
 
@@ -27,7 +27,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 * @param string $text
 	 * @return string
 	 */
-	protected function _smartEscape($text) {
+	protected function _escapeFalseSmileys($text) {
 		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
 		return preg_replace('#' . $pattern . '\)#', '$1' . html_entity_decode('&#xE000;', ENT_NOQUOTES, 'UTF-8'), $text);
 	}
@@ -36,7 +36,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 * @param string $text
 	 * @return string
 	 */
-	protected function _smartUnescape($text) {
+	protected function _unescapeFalseSmileys($text) {
 		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
 		return preg_replace('#' . $pattern . '\x{E000}#u', '$1)', $text);
 	}
