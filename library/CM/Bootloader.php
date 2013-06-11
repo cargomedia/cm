@@ -36,6 +36,7 @@ class CM_Bootloader {
 	}
 
 	public function defaults() {
+		CMService_Newrelic::getInstance()->setConfig();
 		date_default_timezone_set(CM_Config::get()->timeZone);
 		mb_internal_encoding('UTF-8');
 		umask(0);
@@ -344,9 +345,14 @@ class CM_Bootloader {
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 
+		$severity = CM_Exception::ERROR;
+		if ($exception instanceof CM_Exception) {
+			$severity = $exception->getSeverity();
+		}
+
 		$outputEnabled = true;
-		if ($this->_exceptionOutputSeverityMin !== null && $exception instanceof CM_Exception) {
-			$outputEnabled = ($exception->getSeverity() >= $this->_exceptionOutputSeverityMin);
+		if (null !== $this->_exceptionOutputSeverityMin) {
+			$outputEnabled = ($severity >= $this->_exceptionOutputSeverityMin);
 		}
 		if ($outputEnabled) {
 			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
@@ -357,6 +363,10 @@ class CM_Bootloader {
 			} else {
 				$output->writeln('Internal server error');
 			}
+		}
+
+		if ($severity >= CM_Exception::ERROR) {
+			CMService_Newrelic::getInstance()->setNoticeError($exception);
 		}
 	}
 
