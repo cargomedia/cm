@@ -48,7 +48,7 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 	private function _registerJobs() {
 		foreach (CM_Jobdistribution_Job_Abstract::getClassChildren() as $jobClassName) {
 			$job = new $jobClassName();
-			$this->_gearmanWorker->addFunction($jobClassName, array($job, '__run'));
+			$this->_gearmanWorker->addFunction($jobClassName, array($job, '__executeGearman'));
 		}
 	}
 }
