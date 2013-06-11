@@ -90,11 +90,8 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
+			CMService_Newrelic::getInstance()->startTransaction($packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
-
-			CMService_Newrelic::getInstance()->setBackgroundJob();
-			CMService_Newrelic::getInstance()->setNameTransaction($packageName . ' ' . $methodName);
-
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);

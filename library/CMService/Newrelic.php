@@ -16,9 +16,8 @@ class CMService_Newrelic extends CM_Class_Abstract {
 	}
 
 	public function setConfig() {
-		$name = (string) $this->_getConfig()->appName;
 		if ($this->_isEnabled()) {
-			newrelic_set_appname($name);
+			newrelic_set_appname($this->_getAppName());
 		}
 	}
 
@@ -34,10 +33,27 @@ class CMService_Newrelic extends CM_Class_Abstract {
 	/**
 	 * @param string $name
 	 */
+	public function startTransaction($name) {
+		if ($this->_isEnabled()) {
+			$this->endTransaction();
+			newrelic_start_transaction($this->_getAppName());
+			$this->setNameTransaction($name);
+		}
+	}
+
+	/**
+	 * @param string $name
+	 */
 	public function setNameTransaction($name) {
 		$name = (string) $name;
 		if ($this->_isEnabled()) {
 			newrelic_name_transaction($name);
+		}
+	}
+
+	public function endTransaction() {
+		if ($this->_isEnabled()) {
+			newrelic_end_transaction();
 		}
 	}
 
@@ -65,6 +81,13 @@ class CMService_Newrelic extends CM_Class_Abstract {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getAppName() {
+		return (string) $this->_getConfig()->appName;
 	}
 
 	/**
