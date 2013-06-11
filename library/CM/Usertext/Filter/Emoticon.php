@@ -17,8 +17,28 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	public function transform($text, CM_Render $render) {
 		$text = (string) $text;
 		$emoticons = $this->_getEmoticonData($render);
+		$text = $this->_smartEscape($text);
 		$text = str_replace($emoticons['codes'], $emoticons['htmls'], $text);
+		$text = $this->_smartUnescape($text);
 		return $text;
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	protected function _smartEscape($text) {
+		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
+		return preg_replace('#' . $pattern . '\)#', '$1' . html_entity_decode('&#xE000;', ENT_NOQUOTES, 'UTF-8'), $text);
+	}
+
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	protected function _smartUnescape($text) {
+		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
+		return preg_replace('#' . $pattern . '\x{E000}#u', '$1)', $text);
 	}
 
 	/**
@@ -38,7 +58,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 					$emoticons['codes'][] = $code;
 					$emoticons['htmls'][] =
 							'<img src="' . $render->getUrlResource('layout', 'img/emoticon/' . $emoticon['file']) . '" class="emoticon emoticon-' .
-									$emoticon['id'] . '" title="' . $emoticon['code'] . '"' . $fixedHeight . ' />';
+							$emoticon['id'] . '" title="' . $emoticon['code'] . '"' . $fixedHeight . ' />';
 				}
 			}
 			CM_CacheLocal::set($cacheKey, $emoticons);
