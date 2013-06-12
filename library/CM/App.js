@@ -296,6 +296,7 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
+			$dom.find('.tapTwice').tapTwice();
 		},
 		/**
 		 * @param {jQuery} $element

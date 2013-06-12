@@ -239,6 +239,25 @@
 	background: darken(@colorBg, 12);
 }
 
+.input_button_tapped() {
+	border: 1px solid darken(@colorLike, 6);
+	.gradient(vertical, lighten(@colorLike, 6), @colorLike);
+	color: @colorBg;
+}
+
+.input_button_tapped_hover() {
+	border: 1px solid darken(@colorLike, 12);
+	.gradient(vertical, lighten(@colorLike, 6), darken(@colorLike, 6));
+	color: @colorBg;
+}
+
+.input_button_tapped_active() {
+	border: 1px solid darken(@colorLike, 12);
+	.gradient(vertical, lighten(@colorLike, 6), @colorLike);
+	color: @colorBg;
+	background: darken(@colorLike, 6);
+}
+
 .input_button_alt() {
 	border: 1px solid darken(@colorFgButtonAlt, 10);
 	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));

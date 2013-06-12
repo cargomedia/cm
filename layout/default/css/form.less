@@ -107,6 +107,17 @@ button, input[type=submit], input[type=button] {
 		}
 	}
 
+	&.tapped {
+		.input_button_tapped;
+
+		&:hover {
+			.input_button_tapped_hover;
+		}
+		&:active {
+			.input_button_tapped_active;
+		}
+	}
+
 	&.alt {
 		.input_button_alt;
 
