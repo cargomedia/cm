@@ -10,7 +10,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'maintenance: CM_Model_User::offlineOld' => function () {
 				CM_Model_User::offlineOld();
 			},
-			'maintenance: CM_ModelAsset_User_Roles::deleteOld #1' => function () {
+			'maintenance: CM_ModelAsset_User_Roles::deleteOld' => function () {
 				CM_ModelAsset_User_Roles::deleteOld();
 			},
 			'maintenance: CM_Paging_Useragent_Abstract::deleteOlder' => function () {
@@ -30,9 +30,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			},
 			'maintenance: CM_Captcha::deleteOlder' => function () {
 				CM_Captcha::deleteOlder(3600);
-			},
-			'maintenance: CM_ModelAsset_User_Roles::deleteOld #2' => function () {
-				CM_ModelAsset_User_Roles::deleteOld();
 			},
 			'maintenance: CM_Session::deleteExpired' => function () {
 				CM_Session::deleteExpired();
