@@ -7,40 +7,40 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	public function common() {
 		$this->_executeCallbacks(array(
-			'CM_Model_User::offlineOld' => function () {
+			'maintenance: CM_Model_User::offlineOld' => function () {
 				CM_Model_User::offlineOld();
 			},
-			'CM_ModelAsset_User_Roles::deleteOld #1' => function () {
+			'maintenance: CM_ModelAsset_User_Roles::deleteOld #1' => function () {
 				CM_ModelAsset_User_Roles::deleteOld();
 			},
-			'CM_Paging_Useragent_Abstract::deleteOlder' => function () {
+			'maintenance: CM_Paging_Useragent_Abstract::deleteOlder' => function () {
 				CM_Paging_Useragent_Abstract::deleteOlder(100 * 86400);
 			},
-			'CM_File_UserContent_Temp::deleteOlder' => function () {
+			'maintenance: CM_File_UserContent_Temp::deleteOlder' => function () {
 				CM_File_UserContent_Temp::deleteOlder(86400);
 			},
-			'CM_SVM_Model::deleteOldTrainings' => function () {
+			'maintenance: CM_SVM_Model::deleteOldTrainings' => function () {
 				CM_SVM_Model::deleteOldTrainings(3000);
 			},
-			'CM_SVM_Model::trainChanged' => function () {
+			'maintenance: CM_SVM_Model::trainChanged' => function () {
 				CM_SVM_Model::trainChanged();
 			},
-			'CM_Paging_Ip_Blocked::deleteOlder' => function () {
+			'maintenance: CM_Paging_Ip_Blocked::deleteOlder' => function () {
 				CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
 			},
-			'CM_Captcha::deleteOlder' => function () {
+			'maintenance: CM_Captcha::deleteOlder' => function () {
 				CM_Captcha::deleteOlder(3600);
 			},
-			'CM_ModelAsset_User_Roles::deleteOld #2' => function () {
+			'maintenance: CM_ModelAsset_User_Roles::deleteOld #2' => function () {
 				CM_ModelAsset_User_Roles::deleteOld();
 			},
-			'CM_Session::deleteExpired' => function () {
+			'maintenance: CM_Session::deleteExpired' => function () {
 				CM_Session::deleteExpired();
 			},
-			'CM_KissTracking::exportEvents' => function () {
+			'maintenance: CM_KissTracking::exportEvents' => function () {
 				CM_KissTracking::getInstance()->exportEvents();
 			},
-			'CM_Stream_Message::synchronize' => function () {
+			'maintenance: CM_Stream_Message::synchronize' => function () {
 				CM_Stream_Message::getInstance()->synchronize();
 			}
 		));
@@ -51,13 +51,13 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	public function heavy() {
 		$this->_executeCallbacks(array(
-			function () {
+			'maintenance: CM_Mail::processQueue' => function () {
 				CM_Mail::processQueue(500);
 			},
-			function () {
+			'maintenance: CM_Action_Abstract::aggregate' => function () {
 				CM_Action_Abstract::aggregate();
 			},
-			function () {
+			'maintenance: CM_Paging_Log_Abstract::deleteOlder' => function () {
 				CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 			}
 		));
