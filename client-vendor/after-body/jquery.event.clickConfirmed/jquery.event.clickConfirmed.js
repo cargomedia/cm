@@ -2,17 +2,16 @@
  * Author: CM
  */
 (function($) {
-	var hasTouch = $('html').hasClass('touch');
-
-	$.event.special.tapConfirm = {
+	$.event.special.clickConfirmed = {
 		bindType: "click",
 		delegateType: "click",
 		handle: function(event) {
 			var $this = $(this);
-			if (!hasTouch || $this.hasClass('tapped')) {
+			if ($this.hasClass('confirmClick')) {
 				return event.handleObj.handler.call(this, event);
 			}
-			$this.addClass('tapped');
+			$this.addClass('confirmClick');
+			$this.attr('title', cm.language.get('Please Confirm')).tooltip().mouseenter();
 		}
 	};
 })(jQuery);
