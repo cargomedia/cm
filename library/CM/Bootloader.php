@@ -36,10 +36,10 @@ class CM_Bootloader {
 	}
 
 	public function defaults() {
-		CMService_Newrelic::getInstance()->setConfig();
 		date_default_timezone_set(CM_Config::get()->timeZone);
 		mb_internal_encoding('UTF-8');
 		umask(0);
+		CMService_Newrelic::getInstance()->setConfig();
 	}
 
 	public function exceptionHandler() {
