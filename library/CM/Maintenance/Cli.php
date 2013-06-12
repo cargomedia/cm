@@ -7,43 +7,43 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	public function common() {
 		$this->_executeCallbacks(array(
-			'maintenance: CM_Model_User::offlineOld' => function () {
+			$this->getPackageName().': CM_Model_User::offlineOld' => function () {
 				CM_Model_User::offlineOld();
 			},
-			'maintenance: CM_ModelAsset_User_Roles::deleteOld' => function () {
+			$this->getPackageName().': CM_ModelAsset_User_Roles::deleteOld' => function () {
 				CM_ModelAsset_User_Roles::deleteOld();
 			},
-			'maintenance: CM_Paging_Useragent_Abstract::deleteOlder' => function () {
+			$this->getPackageName().': CM_Paging_Useragent_Abstract::deleteOlder' => function () {
 				CM_Paging_Useragent_Abstract::deleteOlder(100 * 86400);
 			},
-			'maintenance: CM_File_UserContent_Temp::deleteOlder' => function () {
+			$this->getPackageName().': CM_File_UserContent_Temp::deleteOlder' => function () {
 				CM_File_UserContent_Temp::deleteOlder(86400);
 			},
-			'maintenance: CM_SVM_Model::deleteOldTrainings' => function () {
+			$this->getPackageName().': CM_SVM_Model::deleteOldTrainings' => function () {
 				CM_SVM_Model::deleteOldTrainings(3000);
 			},
-			'maintenance: CM_SVM_Model::trainChanged' => function () {
+			$this->getPackageName().': CM_SVM_Model::trainChanged' => function () {
 				CM_SVM_Model::trainChanged();
 			},
-			'maintenance: CM_Paging_Ip_Blocked::deleteOlder' => function () {
+			$this->getPackageName().': CM_Paging_Ip_Blocked::deleteOlder' => function () {
 				CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
 			},
-			'maintenance: CM_Captcha::deleteOlder' => function () {
+			$this->getPackageName().': CM_Captcha::deleteOlder' => function () {
 				CM_Captcha::deleteOlder(3600);
 			},
-			'maintenance: CM_Session::deleteExpired' => function () {
+			$this->getPackageName().': CM_Session::deleteExpired' => function () {
 				CM_Session::deleteExpired();
 			},
-			'maintenance: CM_Stream_Video::synchronize' => function () {
+			$this->getPackageName().': CM_Stream_Video::synchronize' => function () {
 				CM_Stream_Video::getInstance()->synchronize();
 			},
-			'CM_Stream_Video::checkStreams' => function () {
+			$this->getPackageName().': CM_Stream_Video::checkStreams' => function () {
 				CM_Stream_Video::getInstance()->checkStreams();
 			},
-			'maintenance: CM_KissTracking::exportEvents' => function () {
+			$this->getPackageName().': CM_KissTracking::exportEvents' => function () {
 				CM_KissTracking::getInstance()->exportEvents();
 			},
-			'maintenance: CM_Stream_Message::synchronize' => function () {
+			$this->getPackageName().': CM_Stream_Message::synchronize' => function () {
 				CM_Stream_Message::getInstance()->synchronize();
 			}
 		));
@@ -54,13 +54,13 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	public function heavy() {
 		$this->_executeCallbacks(array(
-			'maintenance: CM_Mail::processQueue' => function () {
+			$this->getPackageName().': CM_Mail::processQueue' => function () {
 				CM_Mail::processQueue(500);
 			},
-			'maintenance: CM_Action_Abstract::aggregate' => function () {
+			$this->getPackageName().': CM_Action_Abstract::aggregate' => function () {
 				CM_Action_Abstract::aggregate();
 			},
-			'maintenance: CM_Paging_Log_Abstract::deleteOlder' => function () {
+			$this->getPackageName().': CM_Paging_Log_Abstract::deleteOlder' => function () {
 				CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 			}
 		));
