@@ -39,7 +39,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			},
 			'maintenance: CM_Stream_Video::synchronize' => function () {
 				CM_Stream_Video::getInstance()->synchronize();
-		    },
+			},
 			'CM_Stream_Video::checkStreams' => function () {
 				CM_Stream_Video::getInstance()->checkStreams();
 			},
