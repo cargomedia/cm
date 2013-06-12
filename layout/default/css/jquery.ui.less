@@ -1,9 +1,9 @@
 .ui-slider {
-	.border(@colorFgBorderEmphasize3);
-	background-color: #ddd;
-	border-radius: 4px;
-	.box-shadow(inset 0 0 5px #bbb);
 	margin: 4px 5px;
+	border: 1px solid @colorFgBorderEmphasize3;
+	border-radius: 4px;
+	background-color: @colorBgEmphasize3;
+	.box-shadow(inset 0 0 5px #bbb);
 
 	&.ui-state-disabled {
 		opacity: .3;
@@ -12,12 +12,13 @@
 	.ui-slider-handle {
 		.input_button(20px);
 		.input_button_color;
-		.border(@colorFgBorderEmphasize3);
+		border: 1px solid @colorFgBorderEmphasize3;
 		line-height: 20px;
 		margin-top: -0.4em;
 		margin-left: -10px;
 		border-radius: 3px;
 		text-align: center;
+		text-decoration: none;
 	}
 
 	.ui-slider-handle:focus {
