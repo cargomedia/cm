@@ -240,22 +240,22 @@
 }
 
 .input_button_tapped() {
-	border: 1px solid darken(@colorLike, 6);
-	.gradient(vertical, lighten(@colorLike, 6), @colorLike);
+	border: 1px solid @colorOk;
+	.gradient(vertical, lighten(@colorOk, 12), lighten(@colorOk, 6));
 	color: @colorBg;
 }
 
 .input_button_tapped_hover() {
-	border: 1px solid darken(@colorLike, 12);
-	.gradient(vertical, lighten(@colorLike, 6), darken(@colorLike, 6));
+	border: 1px solid darken(@colorOk, 6);
+	.gradient(vertical, lighten(@colorOk, 12), @colorOk);
 	color: @colorBg;
 }
 
 .input_button_tapped_active() {
-	border: 1px solid darken(@colorLike, 12);
-	.gradient(vertical, lighten(@colorLike, 6), @colorLike);
+	border: 1px solid darken(@colorOk, 6);
+	.gradient(vertical, lighten(@colorOk, 12), lighten(@colorOk, 6));
 	color: @colorBg;
-	background: darken(@colorLike, 6);
+	background: @colorOk;
 }
 
 .input_button_alt() {
