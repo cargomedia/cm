@@ -5,16 +5,6 @@ class CMService_Newrelic extends CM_Class_Abstract {
 	/** @var CMService_Newrelic */
 	protected static $_instance;
 
-	/**
-	 * @throws CM_Exception_Invalid
-	 */
-	final public function __construct() {
-		if (self::$_instance) {
-			throw new CM_Exception_Invalid('Newrelic already instantiated');
-		}
-		self::$_instance = $this;
-	}
-
 	public function setConfig() {
 		if ($this->_isEnabled()) {
 			newrelic_set_appname($this->_getAppName());
