@@ -12,13 +12,9 @@
 	text-overflow: ellipsis;
 }
 
-.border(@color) {
-	border: 1px solid @color;
-}
-
 .message() {
 	color: @colorFg;
-	.border(lighten(@colorNotice, 42));
+	border: 1px solid lighten(@colorNotice, 42);
 	background-color: lighten(@colorNotice, 48);
 }
 
