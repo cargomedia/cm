@@ -116,5 +116,5 @@ $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'local
 $config->CMService_Amazon_Abstract->accessKey = '';
 $config->CMService_Amazon_Abstract->secretKey = '';
 
-$config->CMService_Newrelic->enabled = true;
+$config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
