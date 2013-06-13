@@ -11,7 +11,11 @@
 				return event.handleObj.handler.call(this, event);
 			}
 			$this.addClass('confirmClick');
-			$this.attr('title', cm.language.get('Please Confirm')).tooltip().mouseenter();
+			$this.attr('title', cm.language.get('Please Confirm')).tooltip('enable').mouseenter();
+			setTimeout(function() {
+				$this.removeClass('confirmClick');
+				$this.removeAttr('title').tooltip('disable').mouseleave();
+			}, 5000);
 		}
 	};
 })(jQuery);
