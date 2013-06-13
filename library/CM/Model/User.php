@@ -215,6 +215,18 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	/**
 	 * @param int $id
+	 * @return CM_Model_User|null
+	 */
+	public static function findById($id) {
+		try {
+			return new static((int) $id);
+		} catch (CM_Exception_Nonexistent $e){
+			return null;
+		}
+	}
+
+	/**
+	 * @param int $id
 	 * @return CM_Model_User
 	 */
 	public static function factory($id) {
