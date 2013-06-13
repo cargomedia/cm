@@ -136,18 +136,67 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 	}
 
 	public function testGetSignificance() {
-		$variation1 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
-		$variation1->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation1->expects($this->any())->method('getConversionCount')->will($this->returnValue(200));
+		foreach (array(
+					 array(0, 0, 0, 0, 0, 0, null),
+					 array(1, 0, 0, 0, 0, 0, null),
+					 array(1, 1, 1, 0, 0, 0, null),
+					 array(1, 1, 1, 1, 0, 0, null),
+					 array(1, 1, 1, 1, 1, 1, null),
 
-		$variation2 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
-		$variation2->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation2->expects($this->any())->method('getConversionCount')->will($this->returnValue(250));
+					 array(1000, 0, 0, 1000, 0, 0, null),
+					 array(1000, 1, 1, 1000, 0, 0, null),
+					 array(1000, 1, 1, 1000, 1, 1, null),
+					 array(1000, 1, 1, 1000, 2, 2, null),
+					 array(1000, 9, 9, 1000, 8, 8, null),
+					 array(1000, 9, 9, 1000, 9, 9, null),
+					 array(1000, 9, 9, 1000, 10, 10, 0.9832350325711),
+					 array(1000, 10, 10, 1000, 10, 10, 1.0),
+					 array(1000, 10, 10, 1000, 11, 11, 0.98480372092235),
 
-		// See e.g. http://in-silico.net/tools/statistics/chi2test
-		$this->assertSame(0.0074196492610257, $variation2->getSignificance($variation1));
-		$this->assertSame(0.0074196492610257, $variation1->getSignificance($variation2));
+					 array(1000, 250, 250, 1000, 250, 250, 1.0),
+					 array(1000, 240, 240, 1000, 260, 260, 0.71399839213865),
+					 array(1000, 230, 230, 1000, 270, 270, 0.26748146746717),
+					 array(1000, 220, 220, 1000, 280, 280, 0.056109517207276),
+					 array(1000, 210, 210, 1000, 290, 290, 0.0069618505811649),
+
+					 array(1000, 250, 25000, 1000, 250, 25000, 1.0),
+					 array(1000, 240, 24000, 1000, 260, 26000, 0.71399839213865),
+					 array(1000, 230, 23000, 1000, 270, 27000, 0.26748146746717),
+					 array(1000, 220, 22000, 1000, 280, 28000, 0.056109517207276),
+					 array(1000, 210, 21000, 1000, 290, 29000, 0.0069618505811649),
+
+					 array(1000, 500, 250, 1000, 250, 250, 1.0),
+					 array(1000, 480, 240, 1000, 260, 260, 0.57532403980404),
+					 array(1000, 460, 230, 1000, 270, 270, 0.15389428823649),
+					 array(1000, 440, 220, 1000, 280, 280, 0.028603332811777),
+					 array(1000, 420, 210, 1000, 290, 290, 0.0034874234668595),
+
+					 array(1000, 500, 25000, 1000, 250, 25000, 1.0),
+					 array(1000, 480, 24000, 1000, 260, 26000, 0.57532403980404),
+					 array(1000, 460, 23000, 1000, 270, 27000, 0.15389428823649),
+					 array(1000, 440, 22000, 1000, 280, 28000, 0.028603332811777),
+					 array(1000, 420, 21000, 1000, 290, 29000, 0.0034874234668595),
+				 ) as $list) {
+			list($fixturesA, $conversionsA, $weightA, $fixturesB, $conversionsB, $weightB, $significance) = $list;
+			$variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA);
+			$variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB);
+			$this->assertSame($significance, $variationA->getSignificance($variationB));
+			$this->assertSame($significance, $variationB->getSignificance($variationA));
+		}
+	}
+
+	/**
+	 * @param int   $fixture
+	 * @param int   $conversion
+	 * @param float $weight
+	 * @return CM_Model_SplittestVariation
+	 */
+	protected function _getVariationMock($fixture, $conversion, $weight) {
+		$variation = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
+				->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
+		$variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
+		$variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
+		$variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));
+		return $variation;
 	}
 }
