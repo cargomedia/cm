@@ -33,8 +33,10 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 		$test->isVariationFixture($user2, 'v1');
 		$this->assertSame(0, $variation->getConversionCount());
 		$test->setConversion($user);
+		$variation->_change();
 		$this->assertSame(1, $variation->getConversionCount());
 		$test->setConversion($user2, 2.5);
+		$variation->_change();
 		$this->assertSame(1.75, $variation->getConversionRate());
 
 		$test->delete();

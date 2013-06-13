@@ -79,6 +79,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$test->isVariationFixture($user, 'v1');
 		$this->assertSame(0, $variation->getConversionCount());
 		$test->setConversion($user);
+		$variation->_change();
 		$this->assertSame(1, $variation->getConversionCount());
 
 		$test->delete();
@@ -100,6 +101,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$this->assertSame(0.0, $variation->getConversionWeight());
 		$test->setConversion($user, 3.75);
 		$test->setConversion($user2, 3.29);
+		$variation->_change();
 		$this->assertSame(7.04, $variation->getConversionWeight());
 		$this->assertSame(2.3466666666667, $variation->getConversionRate());
 
@@ -126,10 +128,13 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$this->assertSame(0, $variation->getFixtureCount());
 
 		$test->isVariationFixture($user1, 'v1');
+		$variation->_change();
 		$this->assertSame(1, $variation->getFixtureCount());
 		$test->isVariationFixture($user1, 'v1');
+		$variation->_change();
 		$this->assertSame(1, $variation->getFixtureCount());
 		$test->isVariationFixture($user2, 'v1');
+		$variation->_change();
 		$this->assertSame(2, $variation->getFixtureCount());
 
 		$test->delete();
