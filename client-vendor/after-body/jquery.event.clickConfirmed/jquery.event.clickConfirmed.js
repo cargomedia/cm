@@ -20,12 +20,20 @@
 				handle.timeoutId = setTimeout(function() {
 					deactivateButton();
 				}, 5000);
+				setTimeout(function() {
+					$(document).one('click.toggleModal', function(e) {
+						if (!$this.length || e.target !== $this[0] && !$.contains($this[0], e.target)) {
+							deactivateButton();
+						}
+					});
+				}, 0);
 			};
 
 			var deactivateButton = function() {
 				$this.removeClass('confirmClick');
 				$this.removeAttr('title').tooltip('disable').mouseleave();
 				clearTimeout(handle.timeoutId);
+				$(document).off('click.toggleModal');
 			}
 
 			if ($this.hasClass('confirmClick')) {
