@@ -5,17 +5,34 @@
 	$.event.special.clickConfirmed = {
 		bindType: "click",
 		delegateType: "click",
+
+		settings: {
+			message: 'Please Confirm'
+		},
+
 		handle: function(event) {
+			var handle = this;
 			var $this = $(this);
-			if ($this.hasClass('confirmClick')) {
-				return event.handleObj.handler.call(this, event);
-			}
-			$this.addClass('confirmClick');
-			$this.attr('title', cm.language.get('Please Confirm')).tooltip('enable').mouseenter();
-			setTimeout(function() {
+
+			var activateButton = function() {
+				$this.addClass('confirmClick');
+				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip('enable').mouseenter();
+				handle.timeoutId = setTimeout(function() {
+					deactivateButton();
+				}, 5000);
+			};
+
+			var deactivateButton = function() {
 				$this.removeClass('confirmClick');
 				$this.removeAttr('title').tooltip('disable').mouseleave();
-			}, 5000);
+				clearTimeout(handle.timeoutId);
+			}
+
+			if ($this.hasClass('confirmClick')) {
+				deactivateButton();
+				return event.handleObj.handler.call(this, event);
+			}
+			activateButton();
 		}
 	};
 })(jQuery);
