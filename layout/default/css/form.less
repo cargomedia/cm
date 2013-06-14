@@ -69,7 +69,7 @@ button, input[type=submit], input[type=button] {
 		.input_button_active;
 	}
 
-	&.hasIcon{
+	&.hasIcon {
 		padding: 0;
 
 		&.hasLabel {
@@ -85,7 +85,7 @@ button, input[type=submit], input[type=button] {
 		padding: 0 1px 0 8px;
 	}
 
-	&.large{
+	&.large {
 		.input_button(@heightButtonLarge);
 
 		border-radius: 3px;
@@ -108,13 +108,17 @@ button, input[type=submit], input[type=button] {
 	}
 
 	&.confirmClick {
-		.input_button_confirmClick;
+		border: 1px solid @colorOk;
+		.gradient(vertical, lighten(@colorOk, 12), lighten(@colorOk, 6));
+		color: @colorBg;
 
 		&:hover {
-			.input_button_confirmClick_hover;
+			border-color: darken(@colorOk, 6);
+			.gradient(vertical, lighten(@colorOk, 12), @colorOk);
 		}
 		&:active {
-			.input_button_confirmClick_active;
+			border-color: darken(@colorOk, 6);
+			background: @colorOk;
 		}
 	}
 
