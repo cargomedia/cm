@@ -122,6 +122,21 @@ button, input[type=submit], input[type=button] {
 		}
 	}
 
+	&.confirmClick.warning {
+		border: 1px solid @colorError;
+		.gradient(vertical, lighten(@colorError, 6), @colorError);
+		color: @colorBg;
+
+		&:hover {
+			border-color: darken(@colorError, 12);
+			.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
+		}
+		&:active {
+			border-color: darken(@colorError, 12);
+			background: darken(@colorError, 6);
+		}
+	}
+
 	&.alt {
 		.input_button_alt;
 

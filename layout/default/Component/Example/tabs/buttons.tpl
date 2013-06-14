@@ -11,3 +11,5 @@
 {button_link class="alt" label="Button"}
 <hr />
 {button_link class="confirmAction" label="With Confirmation"}
+<hr />
+{button_link class="confirmAction warning" label="With Warning"}
