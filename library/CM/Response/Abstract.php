@@ -23,6 +23,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	/** @var null|string */
 	private $_content = null;
 
+	/** @var string|null */
+	private $_stringRepresentation;
+
 	/**
 	 * @param CM_Request_Abstract $request
 	 */
@@ -46,7 +49,6 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 			} elseif ($this->getRequest()->getCookie('sessionId')) {
 				$this->deleteCookie('sessionId');
 			}
-
 		}
 
 		if ($this->getRequest()->hasClientId()) {
@@ -55,6 +57,9 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 				$this->setCookie('clientId', (string) $requestClientId, time() + (20 * 365 * 24 * 60 * 60));
 			}
 		}
+
+		$name = $this->_getStringRepresentation();
+		CMService_Newrelic::getInstance()->setNameTransaction($name);
 	}
 
 	/**
@@ -142,10 +147,10 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $name
-	 * @param string       $value
-	 * @param int          $expire
-	 * @param string|null  $path
+	 * @param string      $name
+	 * @param string      $value
+	 * @param int         $expire
+	 * @param string|null $path
 	 */
 	public function setCookie($name, $value, $expire = null, $path = null) {
 		if (null === $path) {
@@ -198,6 +203,23 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 	 */
 	protected function _setContent($content) {
 		$this->_content = (string) $content;
+	}
+
+	/**
+	 * @param string $string
+	 */
+	protected function _setStringRepresentation($string) {
+		$this->_stringRepresentation = (string) $string;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _getStringRepresentation() {
+		if (null === $this->_stringRepresentation) {
+			return get_class($this);
+		}
+		return $this->_stringRepresentation;
 	}
 
 	/**
