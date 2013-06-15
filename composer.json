@@ -13,6 +13,9 @@
 	},
 	"repositories": [
 		{
+			"packagist": false
+		},
+		{
 			"type": "composer",
 			"url": "http://satis.cargomedia.ch/source"
 		},
