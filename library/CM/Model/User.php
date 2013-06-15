@@ -3,6 +3,8 @@
 class CM_Model_User extends CM_Model_Abstract {
 
 	const TYPE = 13;
+	const ONLINE_EXPIRATION = 1800;
+	const ACTIVITY_EXPIRATION = 60;
 
 	/**
 	 * @return boolean
@@ -191,12 +193,11 @@ class CM_Model_User extends CM_Model_Abstract {
 		$this->_change();
 	}
 
-	/**
-	 * @return CM_Model_User
-	 */
 	public function updateLatestactivity() {
-		CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
-		return $this->_change();
+		if ($this->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION) {
+			CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+			$this->_change();
+		}
 	}
 
 	protected function _loadAssets() {
@@ -214,6 +215,18 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	/**
 	 * @param int $id
+	 * @return CM_Model_User|null
+	 */
+	public static function findById($id) {
+		try {
+			return new static((int) $id);
+		} catch (CM_Exception_Nonexistent $e){
+			return null;
+		}
+	}
+
+	/**
+	 * @param int $id
 	 * @return CM_Model_User
 	 */
 	public static function factory($id) {
@@ -227,7 +240,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			FROM TBL_CM_USER_ONLINE `o`
 			LEFT JOIN TBL_CM_USER `u` USING(`userId`)
 			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
-			array(time() - CM_Session::ACTIVITY_EXPIRATION));
+			array(time() - self::ONLINE_EXPIRATION));
 		while ($userId = $res->fetchColumn()) {
 			try {
 				$user = CM_Model_User::factory($userId);

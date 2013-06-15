@@ -8,6 +8,9 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	/** @type {jQuery} */
 	_$input: null,
 
+	/** @type {jqXHR} */
+	_request: null,
+
 	ready: function() {
 		var field = this;
 		var cardinality = this.getOption("cardinality");
@@ -16,6 +19,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 
 		this._$input.removeClass('textinput');
 		this._$input.select2({
+			width: 'off',
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
@@ -27,7 +31,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				return item;
 			},
 			query: function(options) {
-				field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
+				if (this._request) {
+					this._request.abort();
+				}
+				this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
 					success: function(results) {
 						options.callback({
 							results: results
@@ -65,6 +72,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				field.trigger('delete', e.removed);
 			}
 			field.onChange(field._$input.select2("data"));
+			field.trigger('change');
 		});
 
 		if (1 == cardinality) {
@@ -86,6 +94,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		});
 
 		this.onChange(this._$input.select2("data"));
+		this.trigger('change');
 	},
 
 	/**

@@ -87,7 +87,7 @@ DROP TABLE IF EXISTS `cm_languageKey`;
 CREATE TABLE `cm_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `accessStamp` int(10) unsigned DEFAULT NULL,
+  `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -173,6 +173,7 @@ CREATE TABLE `cm_locationState` (
   `countryId` int(10) unsigned NOT NULL,
   `name` varchar(120) NOT NULL,
   `_maxmind` char(5) DEFAULT NULL,
+  `abbreviation` char(2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `maxmind` (`_maxmind`),
   KEY `name` (`name`),

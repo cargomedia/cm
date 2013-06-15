@@ -119,4 +119,38 @@ class CM_ParamsTest extends CMTest_TestCase {
 			$this->assertContains(get_class($language), $e->getMessage());
 		}
 	}
+
+	public function testGetFile() {
+		$file = CM_File::createTmp();
+		$params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
+		$this->assertEquals($file, $params->getFile('file'));
+		$this->assertEquals($file, $params->getFile('filename'));
+	}
+
+	/**
+	 * @expectedException CM_Exception_InvalidParam
+	 * @expectedExceptionMessage does not exist or is not a file
+	 */
+	public function testGetFileException() {
+		$params = new CM_Params(array('nonexistent' => 'foo/bar'));
+		$params->getFile('nonexistent');
+	}
+
+	public function testGetFileGeoPoint() {
+		$point = new CM_Geo_Point(1, 2);
+		$params = new CM_Params(array('point' => $point));
+		$value = $params->getGeoPoint('point');
+		$this->assertInstanceOf('CM_Geo_Point', $value);
+		$this->assertSame(1.0, $value->getLatitude());
+		$this->assertSame(2.0, $value->getLongitude());
+	}
+
+	/**
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Missing argument 2
+	 */
+	public function testGetGeoPointException() {
+		$params = new CM_Params(array('point' => 'foo'));
+		$params->getGeoPoint('point');
+	}
 }

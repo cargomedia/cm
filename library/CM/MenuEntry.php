@@ -77,30 +77,32 @@ class CM_MenuEntry {
 	 * @return string|null
 	 */
 	public final function getClass() {
-		if (!isset($this->_data['class'])) {
-			return '';
-		}
-		return (string) $this->_data['class'];
+		return $this->getField('class');
 	}
 
 	/**
 	 * @return string|null
 	 */
 	public final function getIcon() {
-		if (!isset($this->_data['icon'])) {
-			return null;
-		}
-		return (string) $this->_data['icon'];
+		return $this->getField('icon');
 	}
 
 	/**
 	 * @return string|null
 	 */
 	public final function getIndication() {
-		if (!isset($this->_data['indication'])) {
+		return $this->getField('indication');
+	}
+
+	/**
+	 * @param string $name
+	 * @return string|null
+	 */
+	public final function getField($name) {
+		if (!isset($this->_data[$name])) {
 			return null;
 		}
-		return (string) $this->_data['indication'];
+		return (string) $this->_data[$name];
 	}
 
 	/**

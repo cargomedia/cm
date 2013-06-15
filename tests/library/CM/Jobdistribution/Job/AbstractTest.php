@@ -9,7 +9,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
 		/** @var CM_Jobdistribution_Job_Abstract $job  */
-		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_getGearmanClient', '_run'));
+		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_getGearmanClient', '_execute'));
 		$gearmanClientMock = $this->getMock('GearmanClient', array('doNormal', 'returnCode'));
 		$that = $this;
 		$gearmanJobMock = $gearmanJobMock = $this->getMock('GearmanJob', array('sendFail', 'workload'));
@@ -18,10 +18,10 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 			$gearmanJobMock->expects($that->any())->method('sendFail')->will($that->returnCallback(function () use ($gearmanClientMock, $that) {
 				$gearmanClientMock->expects($that->any())->method('returnCode')->will($that->returnValue(GEARMAN_WORK_FAIL));
 			}));
-			return $job->__run($gearmanJobMock);
+			return $job->__executeGearman($gearmanJobMock);
 		}));
 		$job->expects($this->any())->method('_getGearmanClient')->will($this->returnValue($gearmanClientMock));
-		$job->expects($this->any())->method('_run')->will($this->returnCallback(function (CM_Params $params) {
+		$job->expects($this->any())->method('_execute')->will($this->returnCallback(function (CM_Params $params) {
 			return array_flip($params->getAllOriginal());
 		}));
 
@@ -29,7 +29,7 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(array('bar' => 'foo'), $result);
 
 		// Exception thrown in worker
-		$job->expects($this->any())->method('_run')->will($this->returnCallback(function (CM_Params $params) use ($gearmanJobMock) {
+		$job->expects($this->any())->method('_execute')->will($this->returnCallback(function (CM_Params $params) use ($gearmanJobMock) {
 			$gearmanJobMock->sendFail();
 		}));
 		try {
@@ -45,8 +45,8 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 	public function testRunGearmanDisabled() {
 		CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
-		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_run'));
-		$job->expects($this->exactly(2))->method('_run')->will($this->returnCallback(function (CM_Params $params) {
+		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
+		$job->expects($this->exactly(2))->method('_execute')->will($this->returnCallback(function (CM_Params $params) {
 			return array_flip($params->getAllOriginal());
 		}));
 
@@ -62,8 +62,8 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 	public function testRunGearmanDisabledThrows() {
 		CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
-		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_run'));
-		$job->expects($this->exactly(1))->method('_run')->will($this->returnCallback(function (CM_Params $params) {
+		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_execute'));
+		$job->expects($this->exactly(1))->method('_execute')->will($this->returnCallback(function (CM_Params $params) {
 			throw new Exception('Job failed');
 		}));
 

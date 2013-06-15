@@ -9,7 +9,15 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	 * @param CM_Params $params
 	 * @return mixed
 	 */
-	abstract protected function _run(CM_Params $params);
+	abstract protected function _execute(CM_Params $params);
+
+	/**
+	 * @param CM_Params $params
+	 * @return mixed
+	 */
+	private function _executeJob(CM_Params $params) {
+		return $this->_execute($params);
+	}
 
 	/**
 	 * @param array|null $params
@@ -20,7 +28,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 			$params = array();
 		}
 		if (!$this->_getGearmanEnabled()) {
-			return $this->_run(CM_Params::factory($params));
+			return $this->_executeJob(CM_Params::factory($params));
 		}
 		return $this->_dispatch($params);
 	}
@@ -33,7 +41,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 			$params = array();
 		}
 		if (!$this->_getGearmanEnabled()) {
-			$this->_run(CM_Params::factory($params));
+			$this->_executeJob(CM_Params::factory($params));
 			return;
 		}
 		$this->_dispatch($params, true);
@@ -42,11 +50,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param GearmanJob $job
 	 * @return string|null
+	 * @throws CM_Exception_Nonexistent
 	 */
-	final public function __run(GearmanJob $job) {
+	final public function __executeGearman(GearmanJob $job) {
 		$workload = $job->workload();
-		$params = CM_Params::factory(CM_Params::decode($workload, true));
-		return CM_Params::encode($this->_run($params), true);
+		try {
+			$params = CM_Params::factory(CM_Params::decode($workload, true));
+		} catch (CM_Exception_Nonexistent $ex) {
+			throw new CM_Exception_Nonexistent(
+				'Cannot decode workload for Job `' . get_class($this) . '`: Original exception message `' . $ex->getMessage() .
+						'`', null, null, CM_Exception::WARN);
+		}
+		return CM_Params::encode($this->_executeJob($params), true);
 	}
 
 	/**

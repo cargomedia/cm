@@ -2,7 +2,6 @@
 
 class CM_Session implements CM_Comparable {
 
-	const ACTIVITY_EXPIRATION = 240; // 4 mins
 	const LIFETIME_DEFAULT = 3600;
 
 	/** @var string */
@@ -217,9 +216,7 @@ class CM_Session implements CM_Comparable {
 				$this->deleteUser();
 				return;
 			}
-			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
-				$user->updateLatestactivity();
-			}
+			$user->updateLatestactivity();
 			if (!$user->getOnline()) {
 				$user->setOnline(true);
 			}
