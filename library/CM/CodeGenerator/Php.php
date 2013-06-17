@@ -22,13 +22,15 @@ class CM_CodeGenerator_Php extends CM_CodeGenerator_Abstract {
 		$class = new CG_Class($className, $parentClassName);
 		if ($this->_isAbstractClassName($className)) {
 			$class->setAbstract(true);
-		}
-		$reflection = new ReflectionClass($parentClassName);
-		foreach ($reflection->getMethods(ReflectionMethod::IS_ABSTRACT) as $reflectionMethod) {
-			$method = CG_Method::buildFromReflection($reflectionMethod);
-			$method->setDocBlock(null);
-			$method->setCode('// TODO: Implement method body');
-			$class->addMethod($method);
+		} else {
+			$reflection = new ReflectionClass($parentClassName);
+			foreach ($reflection->getMethods(ReflectionMethod::IS_ABSTRACT) as $reflectionMethod) {
+				$method = CG_Method::buildFromReflection($reflectionMethod);
+				$method->setAbstract(false);
+				$method->setDocBlock(null);
+				$method->setCode('// TODO: Implement method body');
+				$class->addMethod($method);
+			}
 		}
 		return $class;
 	}
