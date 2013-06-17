@@ -37,16 +37,16 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getConversionCount() {
-		$data = $this->_getAggregationData();
-		return $data['conversionCount'];
+		$aggregationData = $this->_getAggregationData();
+		return $aggregationData['conversionCount'];
 	}
 
 	/**
 	 * @return float
 	 */
 	public function getConversionWeight() {
-		$data = $this->_getAggregationData();
-		return $data['conversionWeight'];
+		$aggregationData = $this->_getAggregationData();
+		return $aggregationData['conversionWeight'];
 	}
 
 	/**
@@ -64,8 +64,8 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getFixtureCount() {
-		$data = $this->_getAggregationData();
-		return $data['fixtureCount'];
+		$aggregationData = $this->_getAggregationData();
+		return $aggregationData['fixtureCount'];
 	}
 
 	/**
