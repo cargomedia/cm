@@ -2,6 +2,8 @@
 
 class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 
+	const PATTERN_FALSE_SMILEY = '(\p{N}\s*+%|(\(|\p{N}|\p{L}\p{M}*+)[38BO])';
+
 	/** @var int|null $_fixedHeight */
 	private $_fixedHeight = null;
 
@@ -28,8 +30,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 * @return string
 	 */
 	protected function _escapeFalseSmileys($text) {
-		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
-		return preg_replace('#' . $pattern . '\)#', '$1' . html_entity_decode('&#xE000;', ENT_NOQUOTES, 'UTF-8'), $text);
+		return preg_replace('#' . self::PATTERN_FALSE_SMILEY . '\)#u', '$1' . html_entity_decode('&#xE000;', ENT_NOQUOTES, 'UTF-8'), $text);
 	}
 
 	/**
@@ -37,8 +38,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 * @return string
 	 */
 	protected function _unescapeFalseSmileys($text) {
-		$pattern = '([0-9]\s*+%|[(a-zA-Z0-9][38BO])';
-		return preg_replace('#' . $pattern . '\x{E000}#u', '$1)', $text);
+		return preg_replace('#' . self::PATTERN_FALSE_SMILEY . '\x{E000}#u', '$1)', $text);
 	}
 
 	/**
