@@ -37,7 +37,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getConversionCount() {
-		$data = $this->_getData();
+		$data = $this->_getAggregationData();
 		return $data['conversionCount'];
 	}
 
@@ -45,7 +45,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return float
 	 */
 	public function getConversionWeight() {
-		$data = $this->_getData();
+		$data = $this->_getAggregationData();
 		return $data['conversionWeight'];
 	}
 
@@ -64,7 +64,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getFixtureCount() {
-		$data = $this->_getData();
+		$data = $this->_getAggregationData();
 		return $data['fixtureCount'];
 	}
 
@@ -106,29 +106,32 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	/**
 	 * @return array
 	 */
-	protected function _getData() {
-		$cacheKey = CM_CacheConst::Model . '_class:' . get_class($this) . '_id:' . serialize($this->_getId());
-		if (($data = CM_Cache_Runtime::get($cacheKey)) === false) {
-			$data = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
+	protected function _getAggregationData() {
+		$cacheKey = $this->_getCacheKeyRuntime();
+		if (($aggregationData = CM_Cache_Runtime::get($cacheKey)) === false) {
+			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
 				array($this->_getSplittestId(), $this->getId()))->fetch();
 			$fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
 				WHERE `splittestId`=? AND `variationId`=?',
 				array($this->_getSplittestId(), $this->getId()))->fetchColumn();
-			$data = array('conversionCount' => (int) $data['conversionCount'], 'conversionWeight' => (float) $data['conversionWeight'],
-						  'fixtureCount'    => $fixtureCount);
-			CM_Cache_Runtime::set($cacheKey, $data);
+			$aggregationData = array('conversionCount'  => (int) $conversionData['conversionCount'],
+									 'conversionWeight' => (float) $conversionData['conversionWeight'],
+									 'fixtureCount'     => $fixtureCount);
+			CM_Cache_Runtime::set($cacheKey, $aggregationData);
 		}
-		return $data;
+		return $aggregationData;
 	}
 
 	protected function _loadData() {
 		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
 	}
 
-	protected function _onChange() {
-		$cacheKey = CM_CacheConst::Model . '_class:' . get_class($this) . '_id:' . serialize($this->_getId());
-		CM_Cache_Runtime::delete($cacheKey);
+	/**
+	 * @return string
+	 */
+	private function _getCacheKeyRuntime() {
+		return CM_CacheConst::Splittest_Variation . '_id:' . serialize($this->_getId());
 	}
 
 	/**

@@ -4,6 +4,7 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+		CM_Config::get()->CM_Cache_Runtime->enabled = false;
 	}
 
 	public function testIsVariationFixture() {
@@ -32,10 +33,8 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 		$test->isVariationFixture($request2, 'v1');
 		$this->assertSame(0, $variation->getConversionCount());
 		$test->setConversion($request);
-		$variation->_change();
 		$this->assertSame(1, $variation->getConversionCount());
 		$test->setConversion($request2, 2.5);
-		$variation->_change();
 		$this->assertSame(1.75, $variation->getConversionRate());
 
 		$test->delete();
