@@ -47,9 +47,9 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 	}
 
 	public function testFalseSmileys() {
-		$text = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO) IÖO) ১ %) ' .
+		$text = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO) İÖO) ১ %) ' .
 				'3) 8) %) B) O) foo!8)bar';
-		$expected = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO) IÖO) ১ %) ' .
+		$expected = '(2003) (php3) (2008) (win8) (100%) (50 %) (B) (B2B) (O) (CEO) İÖO) ১ %) ' .
 				$this->_getEmoticonImg(':imp:') . ' ' .
 				$this->_getEmoticonImg(':sunglasses:') . ' ' .
 				$this->_getEmoticonImg(':dizzy_face:') . ' ' .
