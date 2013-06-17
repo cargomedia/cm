@@ -52,7 +52,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	}
 
 	/**
-	 * @param CM_Request_Abstract      $request
+	 * @param CM_Request_Abstract $request
 	 * @throws CM_Exception_Invalid
 	 * @return string|null
 	 */
@@ -107,6 +107,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			} catch (CM_Exception $ex) {
 				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
+			$this->_setStringRepresentation(get_class($page));
 			if ($this->getViewer() && $request->getLanguageUrl()) {
 				$this->redirect($page);
 			}

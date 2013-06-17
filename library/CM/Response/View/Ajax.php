@@ -17,10 +17,14 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 				throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
 			}
 			$view = $this->_getViewInfo();
-			$function = array($view['className'], 'ajax_' . $query['method']);
+			$className = $view['className'];
+			$functionName = 'ajax_' . $query['method'];
 			$params = CM_Params::factory($query['params']);
+			$this->_setStringRepresentation($className . '::' . $functionName);
+
 			$componentHandler = new CM_ComponentFrontendHandler();
-			$success['data'] = CM_Params::encode(call_user_func($function, $params, $componentHandler, $this));
+			$success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
+
 
 			$exec = $componentHandler->compile_js('this');
 
