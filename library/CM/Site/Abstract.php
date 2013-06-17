@@ -97,9 +97,28 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	}
 
 	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
+		if (false === $siteHost) {
+			throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
+		}
+		return $siteHost;
+	}
+
+	/**
 	 * @param CM_Response_Page $response
 	 */
 	public function preprocessPageResponse(CM_Response_Page $response) {
+		$site = $response->getSite();
+		$request = $response->getRequest();
+		if ($site->getHost() !== $request->getHeader('host')) {
+			$path = CM_Util::link($request->getPath(), $request->getQuery());
+			$response->redirectUrl($response->getRender()->getUrl($path, null, $site));
+			return;
+		}
 	}
 
 	/**
