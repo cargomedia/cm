@@ -8,7 +8,9 @@ class CM_CodeGenerator_Php extends CM_CodeGenerator_Abstract {
 	 */
 	public function createClassFile($className) {
 		$class = $this->createClass($className);
-		return $this->createClassFileFromClass($class);
+		$file = $this->createClassFileFromClass($class);
+		require_once($file->getPath());
+		return $file;
 	}
 
 	/**
@@ -18,6 +20,9 @@ class CM_CodeGenerator_Php extends CM_CodeGenerator_Abstract {
 	public function createClass($className) {
 		$parentClassName = $this->_getParentClassName($className);
 		$class = new CG_Class($className, $parentClassName);
+		if ($this->_isAbstractClassName($className)) {
+			$class->setAbstract(true);
+		}
 		$reflection = new ReflectionClass($parentClassName);
 		foreach ($reflection->getMethods(ReflectionMethod::IS_ABSTRACT) as $reflectionMethod) {
 			$method = CG_Method::buildFromReflection($reflectionMethod);
@@ -46,5 +51,14 @@ class CM_CodeGenerator_Php extends CM_CodeGenerator_Abstract {
 	 */
 	private function _getClassPath($className) {
 		return $this->_getClassDirectory($className) . 'library/' . str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+	}
+
+	/**
+	 * @param string $className
+	 * @return bool
+	 */
+	private function _isAbstractClassName($className) {
+		$parts = explode('_', $className);
+		return 'Abstract' === end($parts);
 	}
 }
