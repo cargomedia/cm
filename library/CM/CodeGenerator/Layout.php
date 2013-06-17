@@ -7,7 +7,14 @@ class CM_CodeGenerator_Layout extends CM_CodeGenerator_Abstract {
 	 * @return CM_File
 	 */
 	public function createTemplateFile($className) {
-		return $this->_createLayoutFile($className, 'default.tpl');
+		$templateFile = $this->_createLayoutFile($className, 'default.tpl');
+
+		$reflectionClass = new ReflectionClass($className);
+		if ($reflectionClass->isSubclassOf('CM_Page_Abstract')) {
+			$content = $this->_getPageContent($reflectionClass);
+			$templateFile->write($content);
+		}
+		return $templateFile;
 	}
 
 	/**
@@ -21,8 +28,8 @@ class CM_CodeGenerator_Layout extends CM_CodeGenerator_Abstract {
 	/**
 	 * @param string $className
 	 * @param string $templateBasename
-	 * @return CM_File
 	 * @throws CM_Exception_Invalid
+	 * @return CM_File
 	 */
 	private function _createLayoutFile($className, $templateBasename) {
 		if (!$this->_classExists($className)) {
@@ -38,8 +45,34 @@ class CM_CodeGenerator_Layout extends CM_CodeGenerator_Abstract {
 	 * @return string
 	 */
 	private function _getTemplateDirectory($className) {
+		return $this->_getClassDirectory($className) . 'layout/default/' . $this->_getTemplateDirectoryRelative($className);
+	}
+
+	/**
+	 * @param string $className
+	 * @return string
+	 */
+	private function _getTemplateDirectoryRelative($className) {
 		$pathParts = explode('_', $className, 3);
 		array_shift($pathParts);
-		return $this->_getClassDirectory($className) . 'layout/default/' . implode('/', $pathParts) . '/';
+		return implode('/', $pathParts) . '/';
+	}
+
+	/**
+	 * @param ReflectionClass $reflection
+	 * @return null|string
+	 */
+	private function _getPageContent(ReflectionClass $reflection) {
+		if ($reflection->isSubclassOf('CM_Page_Abstract')) {
+			$parentClassName = $reflection->getParentClass()->getName();
+			$content = "{extends file=\$render->getLayoutPath('" . $this->_getTemplateDirectoryRelative($parentClassName) . "default.tpl'";
+			if ($reflection->isAbstract()) {
+				$namespace = CM_Util::getNamespace($parentClassName);
+				$content .= ", '" . $namespace . "'";
+			}
+			$content .= ")}\n";
+			return $content;
+		}
+		return null;
 	}
 }
