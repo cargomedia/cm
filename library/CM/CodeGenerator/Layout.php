@@ -4,12 +4,15 @@ class CM_CodeGenerator_Layout extends CM_CodeGenerator_Abstract {
 
 	/**
 	 * @param string $className
-	 * @return CM_File
+	 * @return CM_File|null
 	 */
 	public function createTemplateFile($className) {
-		$templateFile = $this->_createLayoutFile($className, 'default.tpl');
-
 		$reflectionClass = new ReflectionClass($className);
+		if ($reflectionClass->isSubclassOf('CM_Form_Abstract')) {
+			return null;
+		}
+
+		$templateFile = $this->_createLayoutFile($className, 'default.tpl');
 		if ($reflectionClass->isSubclassOf('CM_Page_Abstract')) {
 			$content = $this->_getPageContent($reflectionClass);
 			$templateFile->write($content);
@@ -19,9 +22,13 @@ class CM_CodeGenerator_Layout extends CM_CodeGenerator_Abstract {
 
 	/**
 	 * @param string $className
-	 * @return CM_File
+	 * @return CM_File|null
 	 */
 	public function createStylesheetFile($className) {
+		$reflectionClass = new ReflectionClass($className);
+		if ($reflectionClass->isSubclassOf('CM_Form_Abstract')) {
+			return null;
+		}
 		return $this->_createLayoutFile($className, 'default.less');
 	}
 

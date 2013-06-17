@@ -101,19 +101,20 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/layout/default';
 		foreach ($paths as $path) {
 			CM_Util::mkDir($path);
-			$this->_getOutput()->writeln('Created `'  . $path . '`');
+			$this->_getOutput()->writeln('Created `' . $path . '`');
 		}
 	}
 
 	/**
-	 * @param CM_File $file
+	 * @param CM_File|null $file
 	 */
-	private function _logFileCreation(CM_File $file) {
-		$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
+	private function _logFileCreation(CM_File $file = null) {
+		if ($file) {
+			$this->_getOutput()->writeln('Created `' . $file->getPath() . '`');
+		}
 	}
 
 	public static function getPackageName() {
 		return 'generator';
 	}
-
 }
