@@ -2,6 +2,20 @@
 
 class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
+	protected $_emoticonData = array(
+		':smiley:'     => array('codeAdditional' => ':),:-)', 'file' => '1.png'),
+		':imp:'        => array('codeAdditional' => '3),3-)', 'file' => 'imp.png'),
+		':sunglasses:' => array('codeAdditional' => 'B-),B),8-),8)', 'file' => 'sunglasses.png'),
+		':dizzy_face:' => array('codeAdditional' => '%-),%),O.o,o.O', 'file' => 'dizzy_face.png'),
+		':innocent:'   => array('codeAdditional' => 'O),o-)', 'file' => 'innocent.png'),
+	);
+
+	/** @var  array */
+	protected $_emoticonId;
+
+	/** @var CM_Site_Abstract */
+	protected $_mockSite;
+
 	public function setUp() {
 		$this->_mockSite = $this->getMockSite(24, null, 'http://www.default.dev');
 		foreach ($this->_emoticonData as $emoticonCode => $emoticonData) {
@@ -47,20 +61,6 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
 		$this->assertSame($expected, $actual);
 	}
-
-	protected $_emoticonData = array(
-		':smiley:'     => array('codeAdditional' => ':),:-)', 'file' => '1.png'),
-		':imp:'        => array('codeAdditional' => '3),3-)', 'file' => 'imp.png'),
-		':sunglasses:' => array('codeAdditional' => 'B-),B),8-),8)', 'file' => 'sunglasses.png'),
-		':dizzy_face:' => array('codeAdditional' => '%-),%),O.o,o.O', 'file' => 'dizzy_face.png'),
-		':innocent:'   => array('codeAdditional' => 'O),o-)', 'file' => 'innocent.png'),
-	);
-
-	/** @var  array */
-	protected $_emoticonId;
-
-	/** @var CM_Site_Abstract */
-	protected $_mockSite;
 
 	protected function _getEmoticonImg($emoticonCode, $height = null) {
 		$siteUrl = $this->_mockSite->getUrl();
