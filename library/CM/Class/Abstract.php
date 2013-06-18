@@ -66,25 +66,10 @@ abstract class CM_Class_Abstract {
 	 * @return string[]
 	 */
 	private static function _getClassHierarchy() {
-		static $classHierarchyCM_CacheLocal = false;
-
-		$className = get_called_class();
-		if ('CM_CacheLocal' === $className) {
-			$classHierarchy = $classHierarchyCM_CacheLocal;
-		} else {
-			$key = CM_CacheConst::ClassHierarchy . '_className:' . $className;
-			$classHierarchy = CM_CacheLocal::get($key);
-		}
-		if (false === $classHierarchy) {
-			$classHierarchy = array_values(class_parents($className));
-			array_unshift($classHierarchy, $className);
-			array_pop($classHierarchy);
-			if ('CM_CacheLocal' === $className) {
-				$classHierarchyCM_CacheLocal = $classHierarchy;
-			} else {
-				CM_CacheLocal::set($key, $classHierarchy);
-			}
-		}
+		$calledClass = get_called_class();
+		$classHierarchy = array_values(class_parents($calledClass));
+		array_unshift($classHierarchy, $calledClass);
+		array_pop($classHierarchy);
 		return $classHierarchy;
 	}
 
