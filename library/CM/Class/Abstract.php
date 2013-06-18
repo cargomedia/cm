@@ -63,8 +63,9 @@ abstract class CM_Class_Abstract {
 			$result = (object) $result;
 			if ('CM_CacheLocal' === $className) {
 				$configCacheCM_CacheLocal = $result;
+			} else {
+				CM_CacheLocal::set($cacheKey, $result);
 			}
-			CM_CacheLocal::set($cacheKey, $result);
 		}
 		return $result;
 	}
