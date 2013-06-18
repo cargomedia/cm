@@ -87,16 +87,17 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		if (!$weightA || !$weightB) {
 			return null;
 		}
+		$rateA = $weightA / $fixturesA;
+		$rateB = $weightB / $fixturesB;
 		$netRateA = $weightA / $conversionsA;
 		$netRateB = $weightB / $conversionsB;
 
 		$fixturesTotal = $fixturesA + $fixturesB;
-		$conversionsTotal = $conversionsA + $conversionsB;
 		$weightTotal = $weightA + $weightB;
-		$netRateTotal = $weightTotal / $conversionsTotal;
+		$rateTotal = $weightTotal / $fixturesTotal;
 
-		$conversionsExpectedA = $conversionsTotal * $netRateTotal / $netRateA * $fixturesA / $fixturesTotal;
-		$conversionsExpectedB = $conversionsTotal * $netRateTotal / $netRateB * $fixturesB / $fixturesTotal;
+		$conversionsExpectedA = $rateTotal * $fixturesA / $netRateA;
+		$conversionsExpectedB = $rateTotal * $fixturesB / $netRateB;
 		$sigmaExpectedA = sqrt($conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA));
 		$sigmaExpectedB = sqrt($conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB));
 
@@ -110,10 +111,14 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 			return null;
 		}
 
-		$pValueA = 1 - abs(1 - 2 * stats_cdf_normal($conversionsA, $conversionsExpectedA, $sigmaExpectedA, 1));
-		$pValueB = 1 - abs(1 - 2 * stats_cdf_normal($conversionsB, $conversionsExpectedB, $sigmaExpectedB, 1));
+		$rateDeviation = abs($rateA - $rateB);
+		$sigmaExpectedRateA = $sigmaExpectedA * $netRateA / $fixturesA;
+		$sigmaExpectedRateB = $sigmaExpectedB * $netRateB / $fixturesB;
+		$sigmaExpectedRateDeviation = sqrt($sigmaExpectedRateA * $sigmaExpectedRateA + $sigmaExpectedRateB * $sigmaExpectedRateB);
 
-		return 1 - (1 - $pValueA) * (1 - $pValueB);
+		$pValue = 2 * stats_cdf_normal(-$rateDeviation, 0, $sigmaExpectedRateDeviation, 1);
+
+		return $pValue;
 	}
 
 	/**
