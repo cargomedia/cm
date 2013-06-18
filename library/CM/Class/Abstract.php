@@ -69,7 +69,7 @@ abstract class CM_Class_Abstract {
 		static $classHierarchyCache = array();
 
 		$className = get_called_class();
-		if (array_key_exists($className, $classHierarchyCache)) {
+		if (isset($classHierarchyCache[$className])) {
 			return $classHierarchyCache[$className];
 		}
 		$classHierarchy = array_values(class_parents($className));
