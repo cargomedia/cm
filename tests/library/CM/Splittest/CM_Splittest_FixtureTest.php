@@ -119,47 +119,47 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 
 		$request1 = new CM_Request_Post('/foo/null');
 		$splittestRequestClient->getVariationFixture($request1);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true));
 
 		$userA = CMTest_TH::createUser();
 		$session = $request1->getSession();
 		$session->setUser($userA);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true));
 
 		$splittestUser->setConversion($userA);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$request2 = new CM_Request_Post('/foo/null');
 		$splittestRequestClient->getVariationFixture($request2);
-		$this->assertSame(2, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(2, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$request3 = new CM_Request_Post('/foo/null');
 		$splittestRequestClient->getVariationFixture($request3);
-		$this->assertSame(3, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(3, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$session = $request3->getSession();
 		$session->setUser($userA);
-		$this->assertSame(3, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(3, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$splittestUser->setConversion($userA);
-		$this->assertSame(3, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(3, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$userB = CMTest_TH::createUser();
 		$session = $request2->getSession();
 		$session->setUser($userB);
-		$this->assertSame(3, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(3, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$splittestUser->setConversion($userB);
-		$this->assertSame(3, $variation->getFixtureCount(false));
-		$this->assertSame(2, $variation->getConversionCount(false));
+		$this->assertSame(3, $variation->getFixtureCount(true));
+		$this->assertSame(2, $variation->getConversionCount(true));
 
 		$splittestRequestClient->delete();
 		CMTest_TH::clearCache();
@@ -174,27 +174,27 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 		$splittestUser = CM_Model_Splittest_User_Mock::findId($splittestRequestClient->getId());
 
 		$variation = $splittestUser->getVariationBest();
-		$this->assertSame(0, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false));
+		$this->assertSame(0, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true));
 
 		$request = new CM_Request_Post('/foo/null');
 		$splittestRequestClient->getVariationFixture($request);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true));
 
 		$user = CMTest_TH::createUser();
 		$splittestUser->setConversion($user);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false)); // Conversion ignored
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true)); // Conversion ignored
 
 		$session = $request->getSession();
 		$session->setUser($user);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(0, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(0, $variation->getConversionCount(true));
 
 		$splittestUser->setConversion($user);
-		$this->assertSame(1, $variation->getFixtureCount(false));
-		$this->assertSame(1, $variation->getConversionCount(false));
+		$this->assertSame(1, $variation->getFixtureCount(true));
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$splittestRequestClient->delete();
 		CMTest_TH::clearCache();

@@ -34,41 +34,41 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param bool $useCache
+	 * @param bool $refreshCache
 	 * @return int
 	 */
-	public function getConversionCount($useCache = true) {
-		$aggregationData = $this->_getAggregationData($useCache);
+	public function getConversionCount($refreshCache = null) {
+		$aggregationData = $this->_getAggregationData($refreshCache);
 		return $aggregationData['conversionCount'];
 	}
 
 	/**
-	 * @param bool $useCache
+	 * @param bool $refreshCache
 	 * @return float
 	 */
-	public function getConversionWeight($useCache = true) {
-		$aggregationData = $this->_getAggregationData($useCache);
+	public function getConversionWeight($refreshCache = null) {
+		$aggregationData = $this->_getAggregationData($refreshCache);
 		return $aggregationData['conversionWeight'];
 	}
 
 	/**
-	 * @param bool $useCache
+	 * @param bool $refreshCache
 	 * @return float
 	 */
-	public function getConversionRate($useCache = true) {
-		$fixtureCount = $this->getFixtureCount($useCache);
+	public function getConversionRate($refreshCache = null) {
+		$fixtureCount = $this->getFixtureCount($refreshCache);
 		if (0 == $fixtureCount) {
 			return 0;
 		}
-		return $this->getConversionWeight($useCache) / $fixtureCount;
+		return $this->getConversionWeight($refreshCache) / $fixtureCount;
 	}
 
 	/**
-	 * @param bool $useCache
+	 * @param bool $refreshCache
 	 * @return int
 	 */
-	public function getFixtureCount($useCache = true) {
-		$aggregationData = $this->_getAggregationData($useCache);
+	public function getFixtureCount($refreshCache = null) {
+		$aggregationData = $this->_getAggregationData($refreshCache);
 		return $aggregationData['fixtureCount'];
 	}
 
@@ -108,12 +108,12 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param bool $useCache
+	 * @param bool $refreshCache
 	 * @return array
 	 */
-	protected function _getAggregationData($useCache = true) {
+	protected function _getAggregationData($refreshCache = null) {
 		$cacheKey = $this->_getCacheKeyAggregation();
-		if (!$useCache || false === ($aggregationData = CM_CacheLocal::get($cacheKey))) {
+		if ($refreshCache || false === ($aggregationData = CM_CacheLocal::get($cacheKey))) {
 			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
 				array($this->_getSplittestId(), $this->getId()))->fetch();
