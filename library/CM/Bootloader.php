@@ -39,6 +39,7 @@ class CM_Bootloader {
 		date_default_timezone_set(CM_Config::get()->timeZone);
 		mb_internal_encoding('UTF-8');
 		umask(0);
+		CMService_Newrelic::getInstance()->setConfig();
 	}
 
 	public function exceptionHandler() {
@@ -92,10 +93,12 @@ class CM_Bootloader {
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
-		define ('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA_SVM', DIR_DATA . 'svm' . DIRECTORY_SEPARATOR);
 
 		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP_CACHE', DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
@@ -276,9 +279,11 @@ class CM_Bootloader {
 			$vendorDir = preg_replace('#/?$#', '/', $composerJson->config['vendor-dir']);
 		}
 		foreach ((array) $composerJson->require as $path => $version) {
-			$parts = explode('/', $path);
-			$namespace = $parts[1];
-			$namespacePaths[$namespace] = $vendorDir . $path . '/';
+			if (false !== strpos($path, '/')) {
+				$parts = explode('/', $path);
+				$namespace = $parts[1];
+				$namespacePaths[$namespace] = $vendorDir . $path . '/';
+			}
 		}
 		return $namespacePaths;
 	}
@@ -340,9 +345,14 @@ class CM_Bootloader {
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 
+		$severity = CM_Exception::ERROR;
+		if ($exception instanceof CM_Exception) {
+			$severity = $exception->getSeverity();
+		}
+
 		$outputEnabled = true;
-		if ($this->_exceptionOutputSeverityMin !== null && $exception instanceof CM_Exception) {
-			$outputEnabled = ($exception->getSeverity() >= $this->_exceptionOutputSeverityMin);
+		if (null !== $this->_exceptionOutputSeverityMin) {
+			$outputEnabled = ($severity >= $this->_exceptionOutputSeverityMin);
 		}
 		if ($outputEnabled) {
 			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
@@ -353,6 +363,10 @@ class CM_Bootloader {
 			} else {
 				$output->writeln('Internal server error');
 			}
+		}
+
+		if ($severity >= CM_Exception::ERROR) {
+			CMService_Newrelic::getInstance()->setNoticeError($exception);
 		}
 	}
 

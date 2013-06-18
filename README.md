@@ -61,7 +61,7 @@ CM_Paging_User_Country                         # All users from a given country
 
 In your workspace, run:
 ```bash
-composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
+composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch/source" --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
@@ -99,7 +99,7 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php config generate
+./scripts/cm.php app generate-config
 ```
 
 ### Namespace creation, site setup
@@ -108,10 +108,7 @@ CM framework provides a base which should be extended. Our own libraries should 
 ```bash
 ./scripts/cm.php generator create-namespace <namespace>
 ```
-Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
-```php
-require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
-```
+Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader`.
 
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
@@ -137,19 +134,28 @@ Usage:
 
 Options:
  --quiet
+ --quiet-warnings
  --non-interactive
 
 Commands:
- config generate
+ app generate-config
+ app fill-cache
+ console interactive
+ css icon-refresh
+ css emoticon-refresh
+ db dump <namespace>
+ db run-updates
+ db run-update <version> [--namespace=<value>]
  generator create-view <class-name>
  generator create-class <class-name>
  generator create-namespace <namespace>
  generator create-javascript-files
  job-distribution start-manager
- db dump <namespace>
- db run-updates
- db run-update <version> [--namespace=<value>]
+ maintenance common
+ maintenance heavy
  search-index create [--index-name=<value>]
  search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
  search-index optimize
+ stream start-message-synchronization
+ entertainment start-processing [--interval=<value>]
 ```

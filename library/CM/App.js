@@ -17,6 +17,14 @@ var CM_App = CM_Class_Abstract.extend({
 		this.window.ready();
 		this.date.ready();
 		this.template.ready();
+		this.router.ready();
+	},
+
+	/**
+	 * @return {Number}
+	 */
+	getSiteId: function() {
+		return cm.options.siteId;
 	},
 
 	/**
@@ -29,7 +37,7 @@ var CM_App = CM_Class_Abstract.extend({
 				return !view.getParent();
 			});
 			if (!view) {
-				cm.error.trigger('Cannot find root component');
+				cm.error.triggerThrow('Cannot find root component');
 			}
 			return view;
 		}
@@ -49,6 +57,17 @@ var CM_App = CM_Class_Abstract.extend({
 		return _.filter(this.views, function(view) {
 			return view.hasClass(className);
 		});
+	},
+
+	/**
+	 * @return {CM_Layout_Abstract}
+	 */
+	getLayout: function() {
+		var layout = this.findView('CM_Layout_Abstract');
+		if (!layout) {
+			cm.error.triggerThrow('Cannot find layout');
+		}
+		return layout;
 	},
 
 	/**
@@ -98,7 +117,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	/**
 	 * @param {String} [path]
-	 * @param {Array} [params]
+	 * @param {Object} [params]
 	 * @return {String}
 	 */
 	getUrl: function(path, params) {
@@ -117,7 +136,7 @@ var CM_App = CM_Class_Abstract.extend({
 	getUrlStatic: function(path) {
 		var url = cm.options.urlStatic;
 		if (path) {
-			url += path + '?' + cm.options.releaseStamp;
+			url += path + '?' + cm.options.deployVersion;
 		}
 		return url;
 	},
@@ -134,7 +153,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (cm.options.language) {
 				urlPath += '/' + cm.options.language.abbreviation;
 			}
-			urlPath += '/' + cm.options.siteId + '/' + cm.options.releaseStamp + '/' + path;
+			urlPath += '/' + cm.options.siteId + '/' + cm.options.deployVersion + '/' + path;
 		}
 		return cm.options.urlResource + urlPath;
 	},
@@ -273,7 +292,7 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.timeago').timeago();
 			$dom.find('textarea.autosize, .autosize textarea').autosize();
 			$dom.find('.clipSlide').clipSlide();
-			$dom.find('button[title]').tooltip();
+			$dom.find('.showTooltip[title]').tooltip();
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
@@ -447,22 +466,28 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		confirm: function(question, callback, context) {
-			var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
-			var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
-			var $html = $('<div><div class="box_cap clearfix nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
-			$html.find('.box_cap h2').text(cm.language.get('Confirmation'));
-			$html.find('.box_body').text(question);
-			$html.find('.box_bottom').append($ok, $cancel);
+			if (Modernizr.touch) {
+				if (window.confirm(question)) {
+					callback.call(context);
+				}
+			} else {
+				var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
+				var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
+				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
+				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
+				$html.find('.box-body').text(question);
+				$html.find('.box-footer').append($ok, $cancel);
 
-			$html.floatOut();
-			$ok.click(function() {
-				$html.floatIn();
-				callback.call(context);
-			});
-			$cancel.click(function() {
-				$html.floatIn();
-			});
-			$ok.focus();
+				$html.floatOut();
+				$ok.click(function() {
+					$html.floatIn();
+					callback.call(context);
+				});
+				$cancel.click(function() {
+					$html.floatIn();
+				});
+				$ok.focus();
+			}
 		}
 	},
 
@@ -488,23 +513,108 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	window: {
+		/** @var {String|Null} */
+		_id: null,
+
+		/** @var {Boolean} */
 		_hasFocus: true,
+
+		/** @var {jQuery|Null} */
 		_$hidden: null,
+
+		/**
+		 * @returns {String}
+		 */
+		getId: function() {
+			if (!this._id) {
+				this._id = cm.getUuid();
+			}
+			return this._id;
+		},
+
+		focus: {
+			/**
+			 * @return {Array}
+			 */
+			_get: function() {
+				var windows = cm.storage.get('focusWindows');
+				if (windows === null) {
+					windows = [];
+				}
+				return windows;
+			},
+			/**
+			 * @param {Array} focusWindows
+			 */
+			_set: function(focusWindows) {
+				cm.storage.set('focusWindows', focusWindows)
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			add: function(uuid) {
+				if (this.isLast(uuid)) {
+					return;
+				}
+				this.remove(uuid);
+				var windows = this._get();
+				windows.push(uuid);
+				this._set(windows);
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			remove: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				if (index !== -1) {
+					windows.splice(index, 1);
+					this._set(windows);
+				}
+			},
+			/**
+			 * @param {String} uuid
+			 * @returns {Boolean}
+			 */
+			isLast: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				return index !== -1 && index === windows.length - 1;
+			}
+		},
 
 		ready: function() {
 			var handler = this;
+			handler.focus.add(handler.getId());
+			$(window).on('beforeunload', function() {
+				handler.focus.remove(handler.getId());
+			});
 			$(window).focus(function() {
+				handler.focus.add(handler.getId());
 				handler._hasFocus = true;
 			}).blur(function() {
-					handler._hasFocus = false;
-				});
+				handler._hasFocus = false;
+			});
 			this.title.ready();
 		},
 
+		/**
+		 * @return {Boolean}
+		 */
+		isLastFocus: function() {
+			return this.focus.isLast(this.getId());
+		},
+
+		/**
+		 * @return {Boolean}
+		 */
 		hasFocus: function() {
 			return this._hasFocus;
 		},
 
+		/**
+		 * @param {String|jQuery} html
+		 */
 		appendHidden: function(html) {
 			if (!this._$hidden) {
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
@@ -523,6 +633,9 @@ var CM_App = CM_Class_Abstract.extend({
 			return $.contains(this._$hidden[0], element);
 		},
 
+		/**
+		 * @param {String} content
+		 */
 		hint: function(content) {
 			$.windowHint(content);
 		},
@@ -576,7 +689,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(key, value);
+			$.jStorage.set(cm.getSiteId() + ':' + key, value);
 		},
 
 		/**
@@ -584,14 +697,14 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return $.jStorage.get(key);
+			return $.jStorage.get(cm.getSiteId() + ':' + key);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(key);
+			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
 		}
 	},
 
@@ -874,56 +987,8 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
-		_$placeholder: null,
-		_request: null,
-
-		/**
-		 * @param {String} fragment
-		 */
-		_navigate: function(fragment) {
-			var handler = this;
-			if (!this._$placeholder) {
-				this._$placeholder = $('<div class="router-placeholder" />');
-				var page = cm.findView('CM_Page_Abstract');
-				page.$().replaceWith(this._$placeholder);
-				page.remove(true);
-				cm.router.onTeardown();
-			} else {
-				this._$placeholder.removeClass('error').html('');
-			}
-			var timeoutLoading = window.setTimeout(function() {
-				handler._$placeholder.html('<div class="spinner" />')
-			}, 750);
-			if (this._request) {
-				this._request.abort();
-			}
-			this._request = cm.findView().loadPage(fragment, {
-				success: function(response) {
-					var fragment = response.url.substr(cm.getUrl().length);
-					var currentLayout = cm.findView('CM_Layout_Abstract');
-					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-					if (reload) {
-						window.location.replace(response.url);
-						return;
-					}
-					handler._$placeholder.replaceWith(this.$());
-					handler._$placeholder = null;
-					window.history.replaceState(null, null, fragment);
-					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-				},
-				error: function(msg, type, isPublic) {
-					handler._$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-					cm.router.onError();
-					return false;
-				},
-				complete: function() {
-					window.clearTimeout(timeoutLoading);
-				}
-			});
-		},
-
-		start: function() {
-			var urlBase = cm.getUrl();
+		ready: function() {
+			var router = this;
 			var skipInitialFire = false;
 
 			$(window).on('popstate', function(event) {
@@ -933,7 +998,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 				var location = window.history.location || document.location;
 				var fragment = location.pathname + location.search;
-				cm.router._navigate(location.pathname + location.search);
+				cm.getLayout().loadPage(location.pathname + location.search);
 			});
 
 			var hash = window.location.hash.substr(1);
@@ -948,11 +1013,12 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 
+			var urlBase = cm.getUrl();
 			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
 				if (0 === this.href.indexOf(urlBase)) {
 					var fragment = this.href.substr(urlBase.length);
 					var forceReload = $(this).data('force-reload');
-					cm.router.route(fragment, forceReload);
+					router.route(fragment, forceReload);
 					event.preventDefault();
 				}
 			});
@@ -960,10 +1026,12 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} url
-		 * @param {Boolean} [forceReload]
+		 * @param {Boolean|Null} [forceReload]
+		 * @param {Boolean|Null} [replaceState]
 		 */
-		route: function(url, forceReload) {
+		route: function(url, forceReload, replaceState) {
 			forceReload = forceReload || false;
+			replaceState = replaceState || false;
 			var urlBase = cm.getUrl();
 			var fragment = url;
 			if ('/' == url.charAt(0)) {
@@ -975,33 +1043,26 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
-			window.history.pushState(null, null, fragment);
-			cm.router._navigate(fragment);
-			cm.findView('CM_Layout_Abstract').trigger('route', url);
+			if (replaceState) {
+				this.replaceState(fragment);
+			} else {
+				this.pushState(fragment);
+			}
+			cm.getLayout().loadPage(fragment);
 		},
 
 		/**
-		 * @param {CM_Page_Abstract} page
-		 * @param {String} title
-		 * @param {String} url
-		 * @param {String[]} menuEntryHashList
+		 * @param {String|Null} [url] Absolute or relative URL
 		 */
-		onSetup: function(page, title, url, menuEntryHashList) {
-			document.title = title;
-			$('[data-menu-entry-hash]').removeClass('active');
-			var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
-				return '[data-menu-entry-hash=' + menuEntryHash + ']';
-			});
-			$(menuEntrySelectors.join(',')).addClass('active');
+		pushState: function(url) {
+			window.history.pushState(null, null, url);
 		},
 
-		onTeardown: function() {
-			$(document).scrollTop(0);
-			$('.floatbox-layer').floatIn();
-		},
-
-		onError: function() {
-			$('[data-menu-entry-hash]').removeClass('active');
+		/**
+		 * @param {String|Null} [url] Absolute or relative URL
+		 */
+		replaceState: function(url) {
+			window.history.replaceState(null, null, url);
 		}
 	}
 });

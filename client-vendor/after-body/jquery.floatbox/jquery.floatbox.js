@@ -2,10 +2,15 @@
  * Author: CM
  */
 (function($) {
+	var isOperaMobi = /Opera Mobi/.test(navigator.userAgent);
+	var isOperaMini = /Opera Mini/.test(navigator.userAgent);
+	var isAndroid2or3 = /Android [23]\.\d/.test(navigator.userAgent);
+
 	var defaults = {
 		delay: 200,
 		closable: true,
-		fullscreen: false
+		fullscreen: false,
+		replaceBody: isOperaMobi || isOperaMini || isAndroid2or3
 	};
 
 	$.floatbox = function(options) {
@@ -37,7 +42,7 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
-				if ($('html').hasClass('no-fixed')) {
+				if (this.options.replaceBody) {
 					$('html').addClass('floatbox-replaceBody');
 					var backupScrollTop = $(document).scrollTop();
 					var $backupBody = $('body > *:visible').detach();
@@ -58,7 +63,7 @@
 			var $controls = $('<div class="floatbox-controls"/>');
 			var $body = $('<div class="floatbox-body"/>');
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close clickable" href="javascript:;"/>');
+				$controls.append('<a class="icon-close" href="javascript:;"/>');
 			}
 			this.$floatbox = $('<div class="floatbox"/>');
 

@@ -49,6 +49,10 @@
 	overflow: hidden;
 	direction: ltr;
 
+	&:hover {
+		.input_button_hover;
+	}
+
 	input {
 		position: absolute;
 		right: 0;
@@ -63,7 +67,7 @@
 }
 
 .dropZone {
-	.border(@colorNotice);
+	border: 1px solid @colorNotice;
 	height: 100px;
 	border-style: dashed;
 	background-color: lighten(@colorNotice, 48);

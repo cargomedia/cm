@@ -17,6 +17,82 @@ class CM_App {
 		return self::$_instance;
 	}
 
+	public function setupFilesystem() {
+		CM_Util::mkDir(DIR_DATA);
+		CM_Util::mkDir(DIR_DATA_SVM);
+		CM_Util::mkDir(DIR_DATA_LOCKS);
+		CM_Util::mkDir(DIR_DATA_LOG);
+		CM_Util::mkDir(DIR_USERFILES);
+		$this->resetTmp();
+	}
+
+	/**
+	 * @param boolean|null $forceReload
+	 * @throws CM_Exception_Invalid
+	 */
+	public function setupDatabase($forceReload = null) {
+		$configDb = CM_Config::get()->CM_Db_Db;
+		if (!$configDb->db) {
+			throw new CM_Exception_Invalid('No database name configured');
+		}
+		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
+
+		if ($forceReload) {
+			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
+		}
+
+		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
+		if (!$databaseExists) {
+			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
+				CM_Db_Db::runDump($configDb->db, $dump);
+			}
+			$app = CM_App::getInstance();
+			foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
+				$updateFiles = CM_Util::rglob('*.php', $path);
+				$version = array_reduce($updateFiles, function ($initial, $path) {
+					$filename = basename($path);
+					return max($initial, (int) $filename);
+				}, $app->getVersion());
+				$app->setVersion($version, $namespace);
+			}
+		}
+	}
+
+	public function resetTmp() {
+		CM_Util::mkDir(DIR_TMP);
+		CM_Util::rmDirContents(DIR_TMP);
+		CM_Util::mkDir(DIR_TMP_SMARTY);
+		CM_Util::mkDir(DIR_TMP_CACHE);
+		CM_Util::mkDir(DIR_TMP_SMARTY);
+	}
+
+	public function fillCaches() {
+		/** @var CM_Asset_Javascript_Abstract[] $assetList */
+		$assetList = array();
+		$languageList = new CM_Paging_Language_Enabled();
+		$siteClassNameList = CM_Site_Abstract::getClassChildren();
+		foreach ($siteClassNameList as $siteClassName) {
+			/** @var CM_Site_Abstract $site */
+			$site = new $siteClassName();
+			$assetList[] = new CM_Asset_Javascript_Internal($site);
+			$assetList[] = new CM_Asset_Javascript_Library($site);
+			$assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
+			$assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
+			foreach ($languageList as $language) {
+				$render = new CM_Render($site, null, $language);
+				$assetList[] = new CM_Asset_Css_Vendor($render);
+				$assetList[] = new CM_Asset_Css_Library($render);
+			}
+		}
+		foreach ($languageList as $language) {
+			$assetList[] = new CM_Asset_Javascript_Translations($language);
+		}
+		foreach ($assetList as $asset) {
+			$asset->get(true);
+		}
+	}
+
 	/**
 	 * @param string|null $namespace
 	 * @return int
@@ -45,19 +121,8 @@ class CM_App {
 	/**
 	 * @return int
 	 */
-	public function getReleaseStamp() {
-		return (int) CM_Option::getInstance()->get('app.releaseStamp');
-	}
-
-	/**
-	 * @param int|null $releaseStamp
-	 */
-	public function setReleaseStamp($releaseStamp = null) {
-		if (null === $releaseStamp) {
-			$releaseStamp = time();
-		}
-		$releaseStamp = (int) $releaseStamp;
-		CM_Option::getInstance()->set('app.releaseStamp', $releaseStamp);
+	public function getDeployVersion() {
+		return (int) CM_Config::get()->deployVersion;
 	}
 
 	/**
@@ -80,6 +145,10 @@ class CM_App {
 				$this->setVersion($version, $namespace);
 			}
 			$versionBumps += ($version - $versionStart);
+		}
+		if ($versionBumps > 0) {
+			$db = CM_Config::get()->CM_Db_Db->db;
+			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
 		}
 		return $versionBumps;
 	}
@@ -108,10 +177,7 @@ class CM_App {
 	}
 
 	public function generateConfigActionVerbs() {
-		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
-		$content .= '	$config->CM_Action_Abstract = new StdClass();' . PHP_EOL;
-		$content .= '}' . PHP_EOL;
-		$content .= '$config->CM_Action_Abstract->verbs = array();';
+		$content = '$config->CM_Action_Abstract->verbs = array();';
 		foreach ($this->getActionVerbs() as $actionVerb) {
 			$content .= PHP_EOL;
 			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' .
@@ -239,9 +305,6 @@ class CM_App {
 
 		$lines = array();
 		$lines[] = '';
-		$lines[] = 'if (!isset($config->' . $className . ')) {';
-		$lines[] = "\t" . '$config->' . $className . ' = new StdClass();';
-		$lines[] = '}';
 		$lines[] = '$config->' . $className . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;

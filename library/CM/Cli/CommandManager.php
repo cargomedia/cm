@@ -80,6 +80,7 @@ class CM_Cli_CommandManager {
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
+
 			if (!$packageName) {
 				$this->_streamError->writeln($this->getHelp());
 				return 1;
@@ -89,6 +90,7 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
+			CMService_Newrelic::getInstance()->startTransaction($packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
@@ -98,6 +100,9 @@ class CM_Cli_CommandManager {
 			} else {
 				$this->_streamError->writeln($this->getHelp());
 			}
+			return 1;
+		} catch (CM_Cli_Exception_Internal $e) {
+			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
 		} catch (Exception $e) {
 			CM_Bootloader::getInstance()->handleException($e, $this->_streamError);

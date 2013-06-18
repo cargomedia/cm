@@ -40,10 +40,24 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return int[]
 	 */
 	public function get() {
 		return array_keys($this->_getAll());
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function getPersistent() {
+		return array_keys($this->_getPersistent());
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function getDefault() {
+		return $this->_model->getDefaultRoles();
 	}
 
 	/**
@@ -78,13 +92,6 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getDefault() {
-		return $this->_model->getDefaultRoles();
-	}
-
-	/**
 	 * @param int    $role
 	 * @param string $key
 	 * @return mixed|null
@@ -101,13 +108,24 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 		return $values[$role][$key];
 	}
 
-	private function _getAll() {
+	/**
+	 * @return array[]
+	 */
+	private function _getPersistent() {
 		if (($values = $this->_cacheGet('roles')) === false) {
 			$values = CM_Db_Db::select(TBL_CM_ROLE, array('role', 'startStamp', 'expirationStamp'),
 					'`userId`=' . $this->_model->getId() . ' AND (`expirationStamp` > ' . time() . ' OR `expirationStamp` IS NULL)')
 					->fetchAllTree();
 			$this->_cacheSet('roles', $values);
 		}
+		return $values;
+	}
+
+	/**
+	 * @return array[]
+	 */
+	private function _getAll() {
+		$values = $this->_getPersistent();
 		foreach ($this->getDefault() as $role) {
 			$values[$role] = array(null, null);
 		}

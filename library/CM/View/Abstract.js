@@ -290,24 +290,6 @@ var CM_View_Abstract = Backbone.View.extend({
 	},
 
 	/**
-	 * @param {String} path
-	 * @param {Object} [options]
-	 * @return jqXHR
-	 */
-	loadPage: function(path, options) {
-		options = options || {};
-		var success = options.success;
-		options.success = function(response) {
-			if (response.redirectExternal) {
-				cm.router.route(response.redirectExternal);
-				return;
-			}
-			this._injectView(response, success);
-		};
-		return this.ajaxModal('loadPage', {path: path}, options);
-	},
-
-	/**
 	 * @param {int} actionVerb
 	 * @param {int} modelType
 	 * @param {String} [channelKey]
@@ -420,9 +402,13 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Function} callback
 	 */
 	bindJquery: function($element, event, callback) {
-		$element.on(event, callback);
+		var self = this;
+		var callbackWithContext = function() {
+			callback.apply(self, arguments)
+		};
+		$element.on(event, callbackWithContext);
 		this.on('destruct', function() {
-			$element.off(event, callback);
+			$element.off(event, callbackWithContext);
 		});
 	},
 
@@ -438,7 +424,6 @@ var CM_View_Abstract = Backbone.View.extend({
 		$element.wrap('<div />');	// MediaElement needs a parent to show error msgs
 		$element.attr('src', cm.getUrlResource('layout', 'audio/' + mp3Path));
 		$element.attr('autoplay', params.autoplay);
-		$element.attr('loop', params.loop);
 
 		var error = false;
 		var mediaElement = new MediaElement($element.get(0), {
@@ -447,6 +432,13 @@ var CM_View_Abstract = Backbone.View.extend({
 			silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
 			error: function() {
 				error = true;
+			},
+			success: function(mediaElement, domObject) {
+				if (params.loop) {
+					mediaElement.addEventListener('ended', function() {
+						mediaElement.load();
+					});
+				}
 			}
 		});
 		if (error) {
@@ -471,6 +463,9 @@ var CM_View_Abstract = Backbone.View.extend({
 			this.trigger(event.type, event.data);
 		});
 		flashvars = _.extend({'debug': cm.options.debug, 'eventCallback': eventCallbackName}, flashvars);
+		_.each(flashvars, function(value, key) {
+			flashvars[key] = window.encodeURIComponent(value);
+		});
 		flashparams = _.extend({'allowscriptaccess': 'sameDomain', 'allowfullscreen': 'true', 'wmode': 'transparent'}, flashparams);
 		callbackSuccess = callbackSuccess || new Function();
 		callbackFailure = callbackFailure || new Function();

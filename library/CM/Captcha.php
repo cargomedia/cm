@@ -71,6 +71,9 @@ class CM_Captcha {
 	 * @throws CM_Exception
 	 */
 	public function render($width, $height) {
+		if (!extension_loaded('gd')) {
+			throw new CM_Exception('Missing `gd` extension');
+		}
 		if (!$resource = imagecreate($width, $height)) {
 			throw new CM_Exception('Could not create captcha image');
 		}

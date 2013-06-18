@@ -5,10 +5,10 @@
 	{/foreach}
 
 	<div class="window actions">
-		{foreach $clearCacheButtons as $name => $text}
+		{foreach $cacheNames as $name}
 			<p>
 				<input class="{$name}" checked="checked" type="checkbox" name="{$name}" />
-				<label for="{$name}">{$text}</label>
+				<label for="{$name}">{$name}</label>
 			</p>
 		{/foreach}
 		{button_link class="clearCache" label="{translate 'Clear Cache'}"}

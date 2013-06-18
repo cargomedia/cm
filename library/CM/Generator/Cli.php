@@ -35,14 +35,30 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function createJavascriptFiles() {
-		$viewClasses = CM_View_Abstract::getClasses(CM_Bootloader::getInstance()->getNamespaces(), CM_View_Abstract::CONTEXT_JAVASCRIPT);
+		$viewClasses = CM_View_Abstract::getClassChildren();
 		foreach ($viewClasses as $path => $className) {
-			$jsPath = preg_replace('/\.php$/', '.js', $path);
-			if (!CM_File::exists($jsPath)) {
-				$jsFile = CM_File_Javascript::createLibraryClass($className);
-				$this->_getOutput()->writeln('Created `' . $jsFile->getPath() . '`');
+			if ($this->_isValidJavascriptView($className)) {
+				$jsPath = preg_replace('/\.php$/', '.js', $path);
+				if (!CM_File::exists($jsPath)) {
+					$jsFile = CM_File_Javascript::createLibraryClass($className);
+					$this->_getOutput()->writeln('Created `' . $jsFile->getPath() . '`');
+				}
 			}
 		}
+	}
+
+	/**
+	 * @param string $className
+	 * @return bool
+	 */
+	private function _isValidJavascriptView($className) {
+		$invalidClassNameList = array('CM_Mail');
+		foreach ($invalidClassNameList as $invalidClassName) {
+			if ($className === $invalidClassName || is_subclass_of($className, $invalidClassName)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

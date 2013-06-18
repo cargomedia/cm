@@ -5,16 +5,21 @@
 var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	_class: 'CM_FormField_Suggest',
 
-	$input: null,
+	/** @type {jQuery} */
+	_$input: null,
+
+	/** @type {jqXHR} */
+	_request: null,
 
 	ready: function() {
 		var field = this;
 		var cardinality = this.getOption("cardinality");
-		this.$input = this.$('input[type="text"]');
-		var prePopulate = this.$input.data('pre-populate');
+		this._$input = this.$('input[type="text"]');
+		var prePopulate = this._$input.data('pre-populate');
 
-		this.$input.removeClass('textinput');
-		this.$input.select2({
+		this._$input.removeClass('textinput');
+		this._$input.select2({
+			width: 'off',
 			tags: null,
 			dropdownCssClass: this.$el.attr('class'),
 			allowClear: true,
@@ -26,7 +31,10 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				return item;
 			},
 			query: function(options) {
-				field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
+				if (this._request) {
+					this._request.abort();
+				}
+				this._request = field.ajax('getSuggestions', {'term': options.term, 'options': field.getOptions()}, {
 					success: function(results) {
 						options.callback({
 							results: results
@@ -47,12 +55,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		}).select2('data', prePopulate);
 		this.$('.select2-choices').addClass('textinput');
 
-		this.$input.on("change", function(e) {
+		this._$input.on("change", function(e) {
 			if (!_.isUndefined(e.added)) {
-				var items = field.$input.select2("data");
+				var items = field._$input.select2("data");
 				if (cardinality && items.length > cardinality) {
 					items.pop();
-					field.$input.select2('data', items);
+					field._$input.select2('data', items);
 					field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
 					return false;
 				}
@@ -63,20 +71,30 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 				field.onDelete(e.removed);
 				field.trigger('delete', e.removed);
 			}
-			field.onChange(field.$input.select2("data"));
+			field.onChange(field._$input.select2("data"));
+			field.trigger('change');
 		});
 
 		if (1 == cardinality) {
-			this.$input.on("open", function(e) {
-				field.$input.select2('data', null);
+			this._$input.on('open', function(e) {
+				field._$input.select2('data', null);
 			});
 		}
 
-		this.getForm().$().bind("reset", function() {
-			field.$input.select2('data', null);
+		this._$input.on('open', function() {
+			field.trigger('open');
 		});
 
-		this.onChange(this.$input.select2("data"));
+		this._$input.on('close', function() {
+			field.trigger('close');
+		});
+
+		this.getForm().$el.bind("reset", function() {
+			field._$input.select2('data', null);
+		});
+
+		this.onChange(this._$input.select2("data"));
+		this.trigger('change');
 	},
 
 	/**

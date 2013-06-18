@@ -12,10 +12,9 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		$stats = $debug->getStats();
 		ksort($stats);
 		$this->setTplParam('stats', $stats);
-		$cacheArray = array();
-		$cacheArray['CM_Cache'] = 'CM_Cache';
-		$cacheArray['CM_CacheLocal'] = 'CM_CacheLocal';
-		$this->setTplParam('clearCacheButtons', $cacheArray);
+		$cacheNames = array('CM_Cache', 'CM_CacheLocal', 'CM_Cache_File');
+		$this->_setJsParam('cacheNames', $cacheNames);
+		$this->setTplParam('cacheNames', $cacheNames);
 	}
 
 	public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
@@ -30,6 +29,10 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		if ($params->getBoolean('CM_CacheLocal', false)) {
 			CM_CacheLocal::flush();
 			$cachesCleared[] = 'CM_CacheLocal';
+		}
+		if ($params->getBoolean('CM_Cache_File', false)) {
+			CM_Cache_File::flush();
+			$cachesCleared[] = 'CM_Cache_File';
 		}
 		$handler->message('Cleared: ' . implode(', ', $cachesCleared));
 	}

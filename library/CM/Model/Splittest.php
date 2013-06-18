@@ -94,7 +94,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if (false === $name) {
 			throw new CM_Exception_Nonexistent('Cannot find splittest with id `' . $id . '`');
 		}
-		return new self($name);
+		return new static($name);
 	}
 
 	protected function _loadData() {
@@ -136,11 +136,11 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @param int        $fixtureId
-	 * @param float|null $weight
+	 * @param CM_Splittest_Fixture $fixture
+	 * @param float|null           $weight
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _setConversion($fixtureId, $weight = null) {
+	protected function _setConversion(CM_Splittest_Fixture $fixture, $weight = null) {
 		if ($this->_withoutPersistence) {
 			return;
 		}
@@ -150,63 +150,65 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		if ($weight <= 0) {
 			throw new CM_Exception_Invalid('Weight must be positive or null, `' . $weight . '` given');
 		}
-
-		$fixtureId = (int) $fixtureId;
 		$weight = (float) $weight;
+		$fixtureId = $fixture->getId();
+		$columnId = $fixture->getColumnId();
+
 		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION_FIXTURE,
 			array('conversionStamp' => time(), 'conversionWeight' => $weight),
-			array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId));
+			array('splittestId' => $this->getId(), $columnId => $fixtureId));
 	}
 
 	/**
-	 * @param int    $fixtureId
-	 * @param string $variationName
+	 * @param CM_Splittest_Fixture $fixture
+	 * @param string               $variationName
 	 * @return bool
 	 */
-	protected function _isVariationFixture($fixtureId, $variationName) {
+	protected function _isVariationFixture(CM_Splittest_Fixture $fixture, $variationName) {
 		if ($this->_withoutPersistence) {
 			return true;
 		}
-		return ($variationName == $this->_getVariationFixture($fixtureId));
+		return ($variationName == $this->_getVariationFixture($fixture));
 	}
 
 	/**
-	 * @param int $fixtureId
+	 * @param CM_Splittest_Fixture $fixture
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	protected function _getVariationFixture($fixtureId) {
+	protected function _getVariationFixture(CM_Splittest_Fixture $fixture) {
 		if ($this->_withoutPersistence) {
 			return '';
 		}
-		$fixtureId = (int) $fixtureId;
-		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_fixtureId:' . $fixtureId;
-		$cacheWrite = false;
-		if (($variationFixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$variationFixtures = CM_Db_Db::exec('
-				SELECT `variation`.`splittestId`, `variation`.`name`
-				FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
-				JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
-				WHERE `fixture`.`fixtureId` = ?', array($fixtureId))->fetchAllTree();
+		$columnId = $fixture->getColumnId();
+		$fixtureId = $fixture->getId();
 
+		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
+		$cacheWrite = false;
+		if (($variationFixtureList = CM_CacheLocal::get($cacheKey)) === false) {
+			$variationFixtureList = CM_Db_Db::exec('
+				SELECT `variation`.`splittestId`, `variation`.`name`
+					FROM TBL_CM_SPLITTESTVARIATION_FIXTURE `fixture`
+					JOIN TBL_CM_SPLITTESTVARIATION `variation` ON(`variation`.`id` = `fixture`.`variationId`)
+					WHERE `fixture`.`' . $columnId . '` = ?', array($fixtureId))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
-		if (!array_key_exists($this->getId(), $variationFixtures)) {
+		if (!array_key_exists($this->getId(), $variationFixtureList)) {
 			$variation = $this->getVariationsEnabled()->getItemRand();
 			if (!$variation) {
 				throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
 			}
 			CM_Db_Db::replace(TBL_CM_SPLITTESTVARIATION_FIXTURE,
-				array('splittestId' => $this->getId(), 'fixtureId' => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
-			$variationFixtures[$this->getId()] = $variation->getName();
+				array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
+			$variationFixtureList[$this->getId()] = $variation->getName();
 			$cacheWrite = true;
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $variationFixtures);
+			CM_CacheLocal::set($cacheKey, $variationFixtureList);
 		}
 
-		return $variationFixtures[$this->getId()];
+		return $variationFixtureList[$this->getId()];
 	}
 }

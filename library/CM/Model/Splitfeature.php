@@ -65,7 +65,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 
 		if (!array_key_exists($this->getId(), $fixtures)) {
-			$fixtureId = CM_Db_Db::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
+			$fixtureId = CM_Db_Db::replace(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
 			$fixtures[$this->getId()] = $fixtureId;
 			$cacheWrite = true;
 		}

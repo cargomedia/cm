@@ -38,7 +38,7 @@ class CM_CacheConst {
 	// _splitfeatureId:X_userId:X
 	const SplitFeature_Fixtures = 'SplitFeature_Fixtures';
 
-	// _userId:X
+	// _id:X_type:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 
 	//_md5:X
@@ -46,7 +46,10 @@ class CM_CacheConst {
 	const Css = 'Css';
 
 	//_md5:X
-	const Response_Resource_JS = 'Response_Resource_JS';
+	//_md5:X_compress:X
+	//_md5:X_compress:X_siteId:X
+	//_md5:X_compress:X_siteId:X_languageId:X
+	const App_Resource = 'App_Resource';
 
 	//_lock:X
 	const Lock = 'Lock';

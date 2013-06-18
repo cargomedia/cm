@@ -9,29 +9,29 @@
 
 <div class="tabs-content">
 	<div>
-	{load file='Component/Example/tabs/example.tpl' namespace='CM'}
+		{componentTemplate file='tabs/example.tpl' foo=$foo now=$now}
 	</div>
 
 	<div>
-	{code language="html5"}{load file='Component/Example/tabs/menus.tpl' namespace='CM' parse=false}{/code}
-		{load file='Component/Example/tabs/menus.tpl' namespace='CM'}
+		{code language="html5"}{load file='Component/Example/tabs/menus.tpl' namespace='CM' parse=false}{/code}
+		{componentTemplate file='tabs/menus.tpl'}
 	</div>
 
 	<div>
 		{code language="html5"}{load file='Component/Example/tabs/buttons.tpl' namespace='CM' parse=false}{/code}
-		{load file='Component/Example/tabs/buttons.tpl' namespace='CM'}
+		{componentTemplate file='tabs/buttons.tpl'}
 	</div>
 
 	<div>
 		{code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
-		{load file='Component/Example/tabs/forms.tpl' namespace='CM'}
+		{componentTemplate file='tabs/forms.tpl'}
 	</div>
 
 	<div>
-	{load file='Component/Example/tabs/variables.tpl' namespace='CM'}
+		{componentTemplate file='tabs/variables.tpl' colorStyles=$colorStyles}
 	</div>
 
 	<div>
-		{load file='Component/Example/tabs/icons.tpl' namespace='CM'}
+		{componentTemplate file='tabs/icons.tpl' icons=$icons}
 	</div>
 </div>

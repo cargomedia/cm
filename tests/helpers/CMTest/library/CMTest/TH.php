@@ -13,24 +13,13 @@ class CMTest_TH {
 		if (self::$initialized) {
 			return;
 		}
-		$configDb = CM_Config::get()->CM_Db_Db;
-		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
-
-		if (CM_Config::get()->CMTest_TH->dropDatabase) {
-			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
-		}
-
-		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
-		if (!$databaseExists) {
-			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
-			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Db_Db::runDump($configDb->db, $dump);
-			}
-		}
+		$forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
+		CM_App::getInstance()->setupDatabase($forceReload);
 
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
+		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
@@ -62,7 +51,7 @@ class CMTest_TH {
 	}
 
 	public static function clearTmp() {
-		CM_Util::rmDirContents(DIR_TMP);
+		CM_App::getInstance()->resetTmp();
 	}
 
 	public static function clearConfig() {

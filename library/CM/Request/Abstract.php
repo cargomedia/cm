@@ -305,7 +305,7 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getSession() {
 		if (!$this->hasSession()) {
-			$this->_session = new CM_Session();
+			$this->_session = new CM_Session(null, $this);
 			$this->_session->start();
 		}
 		return $this->_session;

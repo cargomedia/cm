@@ -15,6 +15,10 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 	}
 
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
+		$unsubscriber = $streamSubscribe->getUser();
+		if ($unsubscriber && !$this->isSubscriber($unsubscriber, $streamSubscribe)) {
+			$unsubscriber->setOnline(false);
+		}
 	}
 
 	/**

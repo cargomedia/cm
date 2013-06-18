@@ -17,18 +17,18 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		}
 		$viewInfo = $query[$key];
 		if (!is_array($viewInfo)) {
-			throw new CM_Exception_Invalid('View `' . $key . '` is not an array');
+			throw new CM_Exception_Invalid('View `' . $key . '` is not an array', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['id'])) {
-			throw new CM_Exception_Invalid('View id `' . $key . '` not set.');
+			throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) ||
 				!('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
 		) {
-			throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] . '`.');
+			throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] . '`.', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['params'])) {
-			throw new CM_Exception_Invalid('View params `' . $key . '` not set.');
+			throw new CM_Exception_Invalid('View params `' . $key . '` not set.', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['parentId'])) {
 			$viewInfo['parentId'] = null;
@@ -114,15 +114,16 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
 		$page = $responsePage->getPage();
 
+		$this->_setStringRepresentation(get_class($page));
+
 		$html = $responsePage->getContent();
 		$js = $responsePage->getRender()->getJs()->getJs();
 		$responsePage->getRender()->getJs()->clear();
 
 		$title = $responsePage->getTitle();
 		$layoutClass = get_class($page->getLayout());
-		$menuEntryHashList = array_unique(array_map(function (CM_MenuEntry $menuEntry) {
-			return $menuEntry->getHash();
-		}, $this->getSite()->getMenuEntriesActive($page)));
+		$menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
+		$menuEntryHashList = $this->_getMenuEntryHashList($menuList, $page);
 
 		return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
 					 'layoutClass'       => $layoutClass,
@@ -162,5 +163,23 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$forceReload = (boolean) $forceReload;
 		$js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
 		$this->getRender()->getJs()->onloadPrepareJs($js);
+	}
+
+	/**
+	 * @param CM_Menu[]        $menuList
+	 * @param CM_Page_Abstract $page
+	 * @return string[]
+	 */
+	private function _getMenuEntryHashList(array $menuList, CM_Page_Abstract $page) {
+		$menuEntryHashList = array();
+		foreach ($menuList as $menu) {
+			foreach ($menu->findEntries($page) as $menuEntry) {
+				$menuEntryHashList[] = $menuEntry->getHash();
+				foreach ($menuEntry->getParents() as $parentEntry) {
+					$menuEntryHashList[] = $parentEntry->getHash();
+				}
+			}
+		}
+		return $menuEntryHashList;
 	}
 }

@@ -2,7 +2,6 @@
 
 class CM_Session implements CM_Comparable {
 
-	const ACTIVITY_EXPIRATION = 240; // 4 mins
 	const LIFETIME_DEFAULT = 3600;
 
 	/** @var string */
@@ -14,6 +13,9 @@ class CM_Session implements CM_Comparable {
 	/** @var int */
 	private $_expires;
 
+	/** @var CM_Request_Abstract|null */
+	private $_request;
+
 	/** @var boolean */
 	private $_write = false;
 
@@ -21,10 +23,11 @@ class CM_Session implements CM_Comparable {
 	private $_isPersistent = false;
 
 	/**
-	 * @param string|null $id
+	 * @param string|null              $id
+	 * @param CM_Request_Abstract|null $request
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public function __construct($id = null) {
+	public function __construct($id = null, CM_Request_Abstract $request = null) {
 		if (null !== $id) {
 			$this->_id = (string) $id;
 			$data = self::_findDataById($this->getId());
@@ -43,6 +46,7 @@ class CM_Session implements CM_Comparable {
 		}
 		$this->_data = $data;
 		$this->_expires = $expires;
+		$this->_request = $request;
 	}
 
 	public function __destruct() {
@@ -126,6 +130,13 @@ class CM_Session implements CM_Comparable {
 	}
 
 	/**
+	 * @return CM_Request_Abstract|null
+	 */
+	public function getRequest() {
+		return $this->_request;
+	}
+
+	/**
 	 * @param bool|null $needed
 	 * @throws CM_Exception_AuthRequired
 	 * @return CM_Model_User|null
@@ -150,6 +161,9 @@ class CM_Session implements CM_Comparable {
 		$user->setOnline(true);
 		$this->set('userId', $user->getId());
 		$this->regenerateId();
+		if ($request = $this->getRequest()) {
+			CM_Splittest_Fixture::setUserForRequestClient($request, $user);
+		}
 	}
 
 	/**
@@ -202,9 +216,7 @@ class CM_Session implements CM_Comparable {
 				$this->deleteUser();
 				return;
 			}
-			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
-				$user->updateLatestactivity();
-			}
+			$user->updateLatestactivity();
 			if (!$user->getOnline()) {
 				$user->setOnline(true);
 			}

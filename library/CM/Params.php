@@ -151,6 +151,14 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return DateTime
+	 */
+	public function getDateTime($key) {
+		return $this->_getObject($key, 'DateTime');
+	}
+
+	/**
 	 * @param string   $key
 	 * @param int|null $default
 	 * @return int
@@ -180,11 +188,12 @@ class CM_Params extends CM_Class_Abstract {
 			};
 		}
 		$param = $this->_get($key, $default);
-		if (ctype_digit($param) || is_int($param)) {
-			return $getter($className, $param);
-		}
 		if (!($param instanceof $className)) {
-			throw new CM_Exception_InvalidParam('Not a ' . $className);
+			try {
+				return $getter($className, $param);
+			} catch (CM_Exception $exception) {
+				throw new CM_Exception_InvalidParam($exception->getMessage());
+			}
 		}
 		return $param;
 	}
@@ -305,6 +314,24 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getStreamChannelVideo($key) {
 		return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_File
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getFile($key) {
+		return $this->_getObject($key, 'CM_File');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Geo_Point
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getGeoPoint($key) {
+		return $this->_getObject($key, 'CM_Geo_Point');
 	}
 
 	/**
@@ -431,11 +458,10 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param array $params
 	 * @param bool  $decode OPTIONAL
-	 * @return CM_Params
+	 * @return static
 	 */
 	public static function factory(array $params = array(), $decode = true) {
 		$className = self::_getClassName();
 		return new $className($params, $decode);
 	}
-
 }

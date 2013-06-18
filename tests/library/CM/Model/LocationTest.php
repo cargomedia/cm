@@ -145,7 +145,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 			'name'      => 'test',
 			'lat'       => 20.1, 'lon' => 20.2));
 
-		CM_Model_Location::dumpToTable();
+		CM_Model_Location::createAggregation();
 		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), CM_Model_Location::findByCoordinates(20, 20.3));
 		$this->assertNull(CM_Model_Location::findByCoordinates(100, 100));
 	}

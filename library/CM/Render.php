@@ -29,13 +29,11 @@ class CM_Render extends CM_Class_Abstract {
 	/* @var CM_Model_User|null */
 	private $_viewer;
 
-	public static $block_cap = '';
-
-	/* @var array */
-	public static $block_stack = array();
-
 	/* @var array */
 	protected $_stack = array();
+
+	/** @var CM_Menu[] */
+	private $_menuList = array();
 
 	/**
 	 * @param CM_Site_Abstract|null  $site
@@ -101,6 +99,9 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return mixed|null
 	 */
 	public function popStack($key) {
+		if (!isset($this->_stack[$key])) {
+			return null;
+		}
 		$last = array_pop($this->_stack[$key]);
 		return $last;
 	}
@@ -304,7 +305,7 @@ class CM_Render extends CM_Class_Abstract {
 			if ($this->getLanguage()) {
 				$urlPath .= '/' . $this->getLanguage()->getAbbreviation();
 			}
-			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -329,7 +330,7 @@ class CM_Render extends CM_Class_Abstract {
 	public function getUrlStatic($path = null) {
 		$urlPath = '/static';
 		if (null !== $path) {
-			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
+			$urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -424,6 +425,20 @@ class CM_Render extends CM_Class_Abstract {
 			$locale = $this->getLanguage()->getAbbreviation();
 		}
 		return $locale;
+	}
+
+	/**
+	 * @param CM_Menu $menu
+	 */
+	public function addMenu(CM_Menu $menu) {
+		$this->_menuList[] = $menu;
+	}
+
+	/**
+	 * @return CM_MenuEntry[]
+	 */
+	public function getMenuList() {
+		return $this->_menuList;
 	}
 
 	/**

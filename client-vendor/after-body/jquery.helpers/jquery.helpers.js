@@ -33,19 +33,6 @@
 			this.scrollTop(target.offset().top);
 		},
 
-		changetext: function(handler) {
-			var callback = function() {
-				var value_old = $(this).data('value_last');
-				var value_new = $(this).val();
-				if (value_new != value_old) {
-					$(this).data('value_last', value_new);
-					return handler.call(this);
-				}
-			};
-			this.bind("propertychange keyup input cut paste", callback);
-			$(this).watch('value', callback);
-		},
-
 		nextOrFirst: function(selector) {
 			if (this.next(selector).length) {
 				return this.next(selector);
