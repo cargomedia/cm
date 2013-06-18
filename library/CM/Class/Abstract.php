@@ -66,10 +66,16 @@ abstract class CM_Class_Abstract {
 	 * @return string[]
 	 */
 	private static function _getClassHierarchy() {
-		$calledClass = get_called_class();
-		$classHierarchy = array_values(class_parents($calledClass));
-		array_unshift($classHierarchy, $calledClass);
+		static $classHierarchyCache = array();
+
+		$className = get_called_class();
+		if (array_key_exists($className, $classHierarchyCache)) {
+			return $classHierarchyCache[$className];
+		}
+		$classHierarchy = array_values(class_parents($className));
+		array_unshift($classHierarchy, $className);
 		array_pop($classHierarchy);
+		$classHierarchyCache[$className] = $classHierarchy;
 		return $classHierarchy;
 	}
 
