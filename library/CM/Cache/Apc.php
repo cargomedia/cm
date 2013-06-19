@@ -35,4 +35,12 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 		return apc_clear_cache('user');
 	}
 
+
+	protected static function _getConfig() {
+		static $config = false;
+		if (false === $config) {
+			$config = self::_getConfigRaw();
+		}
+		return $config;
+	}
 }

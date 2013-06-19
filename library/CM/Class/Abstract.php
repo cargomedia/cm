@@ -41,33 +41,33 @@ abstract class CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static function _getConfig() {
-		static $configCacheCM_CacheLocal = false;
-
 		$config = CM_Config::get();
-		$className = get_called_class();
-		if ('CM_CacheLocal' === $className && false !== $configCacheCM_CacheLocal) {
-			return $configCacheCM_CacheLocal;
-		}
 		$cacheEnabled = $config->CM_Class_Abstract->configCacheEnabled;
+		$className = get_called_class();
 		$cacheKey = CM_CacheConst::Config . '_className:' . $className;
-		if (!$cacheEnabled || 'CM_CacheLocal' === $className || false === ($result = CM_CacheLocal::get($cacheKey))) {
-			$result = array();
-			foreach (self::_getClassHierarchy() as $class) {
-				if (isset($config->$class)) {
-					$result = array_merge((array) $config->$class, $result);
-				}
-			}
-			if (empty($result)) {
-				throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
-			}
-			$result = (object) $result;
-			if ('CM_CacheLocal' === $className) {
-				$configCacheCM_CacheLocal = $result;
-			} else {
-				CM_CacheLocal::set($cacheKey, $result);
-			}
+		if (!$cacheEnabled || false === ($result = CM_CacheLocal::get($cacheKey))) {
+			$result = self::_getConfigRaw();
+			CM_CacheLocal::set($cacheKey, $result);
 		}
 		return $result;
+	}
+
+	/**
+	 * @return stdClass
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static function _getConfigRaw() {
+		$config = CM_Config::get();
+		$result = array();
+		foreach (self::_getClassHierarchy() as $class) {
+			if (isset($config->$class)) {
+				$result = array_merge((array) $config->$class, $result);
+			}
+		}
+		if (empty($result)) {
+			throw new CM_Exception_Invalid('Class `' . get_called_class() . '` has no configuration.');
+		}
+		return (object) $result;
 	}
 
 	/**
