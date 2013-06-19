@@ -128,6 +128,18 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		return CM_Model_Splittest::findId($this->_getSplittestId());
 	}
 
+	/**
+	 * @param CM_Model_SplittestVariation $variationWorse
+	 * @return bool
+	 */
+	public function isDeviationSignificant(CM_Model_SplittestVariation $variationWorse) {
+		$significance = $this->getSignificance($variationWorse);
+		if (null === $significance) {
+			return false;
+		}
+		return $significance < 0.01;
+	}
+
 	protected function _loadData() {
 		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
 	}
