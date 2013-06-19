@@ -289,6 +289,28 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return \Composer\Package\PackageInterface[]
+	 */
+	private function _getPackages() {
+		$oldCwd = getcwd();
+		chdir(DIR_ROOT);
+
+		$io = new Composer\IO\NullIO();
+		$composer = Composer\Factory::create($io, DIR_ROOT . 'composer.json');
+		$repo = $composer->getRepositoryManager()->getLocalRepository();
+
+		$packages = $repo->getPackages();
+		$packages[] = $composer->getPackage();
+		$packages = array_filter($packages, function($package) {
+			/** @var \Composer\Package\PackageInterface $package */
+			return array_key_exists('cm-modules', $package->getExtra());
+		});
+
+		chdir($oldCwd);
+		return $packages;
+	}
+
+	/**
 	 * @param string $namespace
 	 * @return string
 	 */
