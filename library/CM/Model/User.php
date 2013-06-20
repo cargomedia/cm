@@ -275,10 +275,6 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		$this->getTransgressions()->deleteAll();
-		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
-			$streamSubscribe->delete();
-		}
 		/** @var CM_Model_Stream_Publish $streamPublish */
 		foreach ($this->getStreamPublishs() as $streamPublish) {
 			$streamPublish->delete();
