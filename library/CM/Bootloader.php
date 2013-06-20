@@ -435,10 +435,10 @@ class CM_Bootloader {
 
 		$packages = array();
 		foreach ($composerPackages as $package) {
-			if ($package instanceof \Composer\Package\RootPackage) {
-				$path = DIR_ROOT;
-			} else {
+			$path = '';
+			if (!$package instanceof \Composer\Package\RootPackage) {
 				$path = $installationManager->getInstallPath($package);
+				$path = preg_replace('/^' . preg_quote(DIR_ROOT, '/') . '/', '', $path);
 			}
 
 			$extra = $package->getExtra();
