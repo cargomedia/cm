@@ -1,6 +1,7 @@
 {
 	"name": "cargomedia/CM",
 	"require": {
+		"composer/composer": "1.0.0-alpha7",
 		"smarty/smarty": "3.1.*",
 		"leafo/lessphp": "0.3.*",
 		"easybook/geshi": "1.0.8.11",
@@ -11,9 +12,6 @@
 		"michelf/php-markdown": "1.3-beta5"
 	},
 	"repositories": [
-		{
-			"packagist": false
-		},
 		{
 			"type": "composer",
 			"url": "http://satis.cargomedia.ch/source"
