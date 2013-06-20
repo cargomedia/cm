@@ -188,14 +188,19 @@ class CM_Bootloader {
 			$packages = $this->_getPackages();
 			$getNamespaces = function ($packageName) use (&$getNamespaces, $packages) {
 				$package = $packages[$packageName];
-				$namespaces = array();
-				foreach ($package['modules'] as $name => $path) {
-					$namespaces[$name] = $package['path'] . $path;
-				}
+				$dependencies = array();
+				$modules = array();
 				foreach ($package['dependencies'] as $dependencyPackageName) {
-					$namespaces = array_merge($getNamespaces($dependencyPackageName), $namespaces);
+					$dependencies = array_merge($getNamespaces($dependencyPackageName), $dependencies);
 				}
-				return $namespaces;
+				foreach ($package['modules'] as $name => $path) {
+					$modules[$name] = array(
+						'path' => $package['path'] . $path,
+						'dependencies' => array_keys($dependencies),
+					);
+				}
+				$modules = array_merge($dependencies, $modules);
+				return $modules;
 			};
 			$modules = $getNamespaces($this->_getName());
 			apc_store($cacheKey, $modules);
@@ -250,8 +255,10 @@ class CM_Bootloader {
 	/**
 	 * @return array
 	 */
-	private function _getNamespacePaths() {
-		return $this->getModules();
+	public function _getNamespacePaths() {
+		return array_map(function($module) {
+			return $module['path'];
+		}, $this->getModules());
 	}
 
 	/**
