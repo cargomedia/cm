@@ -247,69 +247,11 @@ class CM_Bootloader {
 		}
 	}
 
-	public function reloadNamespacePaths() {
-		$this->_namespacePaths = null;
-		apc_delete($this->_getNamespacePathsCacheKey());
-	}
-
 	/**
 	 * @return array
 	 */
 	private function _getNamespacePaths() {
-		$cacheKey = $this->_getNamespacePathsCacheKey();
-		if (null === $this->_namespacePaths && false === ($this->_namespacePaths = apc_fetch($cacheKey))) {
-			$this->_namespacePaths = array_merge($this->_getNamespacePathsComposer(), $this->_getNamespacePathsLibrary());
-			apc_store($cacheKey, $this->_namespacePaths);
-		}
-		return $this->_namespacePaths;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function _getNamespacePathsCacheKey() {
-		return DIR_ROOT . '_CM_NamespacesPaths';
-	}
-
-	/**
-	 * @return array
-	 */
-	private function _getNamespacePathsLibrary() {
-		$namespacePaths = array();
-		if (DIR_LIBRARY) {
-			$directory = dir(DIR_ROOT . DIR_LIBRARY);
-			while (false !== ($entry = $directory->read())) {
-				if (substr($entry, 0, 1) !== '.') {
-					$namespacePaths[$entry] = DIR_LIBRARY . $entry . '/';
-				}
-			}
-		}
-		return $namespacePaths;
-	}
-
-	/**
-	 * @return array
-	 */
-	private function _getNamespacePathsComposer() {
-		$namespacePaths = array();
-		$composerFilePath = DIR_ROOT . 'composer.json';
-		if (!CM_File::exists($composerFilePath)) {
-			return $namespacePaths;
-		}
-		$composerJson = file_get_contents($composerFilePath);
-		$composerJson = json_decode($composerJson);
-		$vendorDir = 'vendor/';
-		if (isset($composerJson->config) && isset($composerJson->config['vendor-dir'])) {
-			$vendorDir = preg_replace('#/?$#', '/', $composerJson->config['vendor-dir']);
-		}
-		foreach ((array) $composerJson->require as $path => $version) {
-			if (false !== strpos($path, '/')) {
-				$parts = explode('/', $path);
-				$namespace = $parts[1];
-				$namespacePaths[$namespace] = $vendorDir . $path . '/';
-			}
-		}
-		return $namespacePaths;
+		return $this->getModules();
 	}
 
 	/**
