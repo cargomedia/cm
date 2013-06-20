@@ -195,11 +195,7 @@ class CM_Bootloader {
 			}
 			return $namespaces;
 		};
-		return $getNamespaces($this->getName());
-	}
-
-	public function getName() {
-		return $this->_getComposer()->getPackage()->getName();
+		return $getNamespaces($this->_getName());
 	}
 
 	/**
@@ -452,12 +448,19 @@ class CM_Bootloader {
 			}
 
 			$packages[$package->getName()] = array(
-				'path'    => $path,
-				'modules' => $modules,
+				'path'         => $path,
+				'modules'      => $modules,
 				'dependencies' => $dependencies,
 			);
 		}
 		return $packages;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getName() {
+		return $this->_getComposer()->getPackage()->getName();
 	}
 
 	/**
