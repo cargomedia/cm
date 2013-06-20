@@ -438,7 +438,7 @@ class CM_Bootloader {
 			$path = '';
 			if (!$package instanceof \Composer\Package\RootPackage) {
 				$path = $installationManager->getInstallPath($package);
-				$path = preg_replace('/^' . preg_quote(DIR_ROOT, '/') . '/', '', $path);
+				$path = preg_replace('/^' . preg_quote(DIR_ROOT, '/') . '/', '', $path) . '/';
 			}
 
 			$extra = $package->getExtra();
