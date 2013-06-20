@@ -180,7 +180,7 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return string[]
+	 * @return array[]
 	 */
 	public function getModules() {
 		$cacheKey = DIR_ROOT . '_CM_Modules';
