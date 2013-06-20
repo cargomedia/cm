@@ -186,12 +186,12 @@ class CM_Bootloader {
 		$cacheKey = DIR_ROOT . '_CM_Modules';
 		if (false === ($modules = apc_fetch($cacheKey))) {
 			$packages = $this->_getPackages();
-			$getNamespaces = function ($packageName) use (&$getNamespaces, $packages) {
+			$getModules = function ($packageName) use (&$getModules, $packages) {
 				$package = $packages[$packageName];
 				$dependencies = array();
 				$modules = array();
 				foreach ($package['dependencies'] as $dependencyPackageName) {
-					$dependencies = array_merge($getNamespaces($dependencyPackageName), $dependencies);
+					$dependencies = array_merge($getModules($dependencyPackageName), $dependencies);
 				}
 				foreach ($package['modules'] as $name => $path) {
 					$modules[$name] = array(
@@ -202,7 +202,7 @@ class CM_Bootloader {
 				$modules = array_merge($dependencies, $modules);
 				return $modules;
 			};
-			$modules = $getNamespaces($this->_getName());
+			$modules = $getModules($this->_getName());
 			apc_store($cacheKey, $modules);
 		}
 		return $modules;
