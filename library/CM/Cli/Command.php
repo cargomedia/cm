@@ -21,16 +21,22 @@ class CM_Cli_Command {
 	 * @param CM_Cli_Arguments          $arguments
 	 * @param CM_InputStream_Interface  $input
 	 * @param CM_OutputStream_Interface $output
+	 * @param int                       $forks
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @throws CM_Exception
 	 */
-	public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output) {
+	public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output, $forks) {
+		$forks = (int) $forks;
 		$pidFile = null;
 		if ($this->_getSynchronized()) {
 			if ($this->_isRunning()) {
 				throw new CM_Exception('Process `' . $this->_getMethodName() . '` still running.');
 			}
 			$pidFile = $this->_createPidFile();
+		}
+		$keepalive = false;
+		if ($this->_getKeepalive()) {
+			$keepalive = true;
 		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
 		if ($arguments->getNumeric()->getAll()) {
@@ -39,7 +45,17 @@ class CM_Cli_Command {
 		if ($named = $arguments->getNamed()->getAll()) {
 			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
 		}
-		call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
+		$runnable = $this->_class->newInstance($input, $output);
+		$methodName = $this->_method->getName();
+		if ($keepalive || $forks) {
+			$function = function() use ($runnable, $methodName, $input, $output, $parameters) {
+				call_user_func_array(array($runnable, $methodName), $parameters);
+			};
+			$executor = new CM_Cli_ForkedExecutor($function, $forks, $keepalive);
+			$executor->run();
+		} else {
+			call_user_func_array(array($runnable, $methodName), $parameters);
+		}
 		if ($pidFile) {
 			$pidFile->delete();
 		}
@@ -126,6 +142,14 @@ class CM_Cli_Command {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	private function _getKeepalive() {
+		$methodDocComment = $this->_method->getDocComment();
+		return (boolean) preg_match('/\*\s+@keepalive\s+/', $methodDocComment);
+	}
+
+	/**
 	 * @param string $paramName
 	 * @return string|null
 	 */
@@ -182,5 +206,4 @@ class CM_Cli_Command {
 		$pid = posix_getpid();
 		return CM_File::create($this->_getPidFilePath(), $pid);
 	}
-
 }
