@@ -176,7 +176,7 @@ class CM_Bootloader {
 	 * @return string[]
 	 */
 	public function getNamespaces() {
-		return array('CM');
+		return array_keys($this->getModules());
 	}
 
 	/**
