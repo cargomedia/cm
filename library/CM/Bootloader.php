@@ -407,10 +407,10 @@ class CM_Bootloader {
 	 */
 	private function _getPackages() {
 		$installationManager = $this->_getComposer()->getInstallationManager();
-		$packages = $this->_getComposerPackages();
+		$composerPackages = $this->_getComposerPackages();
 
-		$cmPackages = array();
-		foreach ($packages as $package) {
+		$packages = array();
+		foreach ($composerPackages as $package) {
 			if ($package instanceof \Composer\Package\RootPackage) {
 				$path = DIR_ROOT;
 			} else {
@@ -421,20 +421,20 @@ class CM_Bootloader {
 			$modules = $extra['cm-modules'];
 
 			$dependencies = array();
-			foreach ($packages as $possibleDependency) {
+			foreach ($composerPackages as $possibleDependency) {
 				$dependencyName = $possibleDependency->getName();
 				if (array_key_exists($dependencyName, $package->getRequires())) {
 					$dependencies[] = $dependencyName;
 				}
 			}
 
-			$cmPackages[$package->getName()] = array(
+			$packages[$package->getName()] = array(
 				'path'    => $path,
 				'modules' => $modules,
 				'dependencies' => $dependencies,
 			);
 		}
-		return $cmPackages;
+		return $packages;
 	}
 
 	/**
