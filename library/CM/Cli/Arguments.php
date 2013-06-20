@@ -168,9 +168,12 @@ class CM_Cli_Arguments {
 		foreach ($method->getParameters() as $param) {
 			if ($param->isOptional()) {
 				$paramName = $param->getName();
+
 				$value = 'value';
 				if (preg_match('/\*\s+@param\s+([^\$]*)\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $method->getDocComment(), $matches)) {
-					$value = trim($matches[2]);
+					if ($commentValue = trim($matches[2])) {
+						$value = $commentValue;
+					}
 					if (preg_match('/bool(ean)?/', $matches[1])) {
 						$value = false;
 					}
