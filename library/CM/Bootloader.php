@@ -183,19 +183,24 @@ class CM_Bootloader {
 	 * @return string[]
 	 */
 	public function getModules() {
-		$packages = $this->_getPackages();
-		$getNamespaces = function ($packageName) use (&$getNamespaces, $packages) {
-			$package = $packages[$packageName];
-			$namespaces = array();
-			foreach ($package['modules'] as $name => $path) {
-				$namespaces[$name] = $package['path'] . $path;
-			}
-			foreach ($package['dependencies'] as $dependencyPackageName) {
-				$namespaces = array_merge($getNamespaces($dependencyPackageName), $namespaces);
-			}
-			return $namespaces;
-		};
-		return $getNamespaces($this->_getName());
+		$cacheKey = DIR_ROOT . '_CM_Modules';
+		if (false === ($modules = apc_fetch($cacheKey))) {
+			$packages = $this->_getPackages();
+			$getNamespaces = function ($packageName) use (&$getNamespaces, $packages) {
+				$package = $packages[$packageName];
+				$namespaces = array();
+				foreach ($package['modules'] as $name => $path) {
+					$namespaces[$name] = $package['path'] . $path;
+				}
+				foreach ($package['dependencies'] as $dependencyPackageName) {
+					$namespaces = array_merge($getNamespaces($dependencyPackageName), $namespaces);
+				}
+				return $namespaces;
+			};
+			$modules = $getNamespaces($this->_getName());
+			apc_store($cacheKey, $modules);
+		}
+		return $modules;
 	}
 
 	/**
