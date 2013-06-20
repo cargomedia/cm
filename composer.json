@@ -27,5 +27,10 @@
 			"CMService_": "library/",
 			"CMTest_": "tests/helpers/CMTest/library/"
 		}
+	},
+	"extra": {
+		"cm-modules": {
+			"CM": "."
+		}
 	}
 }
