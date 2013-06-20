@@ -371,25 +371,70 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return \Composer\Package\PackageInterface[]
+	 * @return \Composer\Composer
 	 */
-	private function _getPackages() {
-		$oldCwd = getcwd();
-		chdir(DIR_ROOT);
+	private function _getComposer() {
+		static $composer;
+		if (!$composer) {
+			$oldCwd = getcwd();
+			chdir(DIR_ROOT);
+			$io = new Composer\IO\NullIO();
+			$composer = Composer\Factory::create($io, DIR_ROOT . 'composer.json');
+			chdir($oldCwd);
+		}
+		return $composer;
+	}
 
-		$io = new Composer\IO\NullIO();
-		$composer = Composer\Factory::create($io, DIR_ROOT . 'composer.json');
+	/**
+	 * @return \Composer\Package\CompletePackage[]
+	 */
+	private function _getComposerPackages() {
+
+		$composer = $this->_getComposer();
 		$repo = $composer->getRepositoryManager()->getLocalRepository();
 
 		$packages = $repo->getPackages();
 		$packages[] = $composer->getPackage();
-		$packages = array_filter($packages, function($package) {
-			/** @var \Composer\Package\PackageInterface $package */
+		$packages = array_filter($packages, function ($package) {
+			/** @var \Composer\Package\CompletePackage $package */
 			return array_key_exists('cm-modules', $package->getExtra());
 		});
-
-		chdir($oldCwd);
 		return $packages;
+	}
+
+	/**
+	 * @return array[]
+	 */
+	private function _getPackages() {
+		$installationManager = $this->_getComposer()->getInstallationManager();
+		$packages = $this->_getComposerPackages();
+
+		$cmPackages = array();
+		foreach ($packages as $package) {
+			if ($package instanceof \Composer\Package\RootPackage) {
+				$path = DIR_ROOT;
+			} else {
+				$path = $installationManager->getInstallPath($package);
+			}
+
+			$extra = $package->getExtra();
+			$modules = $extra['cm-modules'];
+
+			$dependencies = array();
+			foreach ($packages as $possibleDependency) {
+				$dependencyName = $possibleDependency->getName();
+				if (array_key_exists($dependencyName, $package->getRequires())) {
+					$dependencies[] = $dependencyName;
+				}
+			}
+
+			$cmPackages[$package->getName()] = array(
+				'path'    => $path,
+				'modules' => $modules,
+				'dependencies' => $dependencies,
+			);
+		}
+		return $cmPackages;
 	}
 
 	/**
