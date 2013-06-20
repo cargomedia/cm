@@ -33,12 +33,6 @@ class CM_Cli_Command {
 			$pidFile = $this->_createPidFile();
 		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
-		if ($arguments->getNumeric()->getAll()) {
-			throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
-		}
-		if ($named = $arguments->getNamed()->getAll()) {
-			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
-		}
 		call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
 		if ($pidFile) {
 			$pidFile->delete();
