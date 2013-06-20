@@ -209,6 +209,23 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @param $moduleName
+	 * @return string[]
+	 */
+	public function getModuleNamespaces($moduleName) {
+		$modules = $this->getModules();
+		$getNamespaces = function ($moduleName) use (&$getNamespaces, $modules) {
+			$namespaces = array($moduleName);
+			$module = $modules[$moduleName];
+			foreach ($module['dependencies'] as $dependencyName) {
+				$namespaces = array_merge($namespaces, $getNamespaces($dependencyName));
+			}
+			return $namespaces;
+		};
+		return $getNamespaces($moduleName);
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getEnvironment() {
