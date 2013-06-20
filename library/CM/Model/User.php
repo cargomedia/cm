@@ -275,10 +275,6 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		$this->getTransgressions()->deleteAll();
-		/** @var CM_Model_Stream_Publish $streamPublish */
-		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
-		}
 		CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $this->getId()));
 	}
