@@ -94,7 +94,7 @@ class CM_Cli_Arguments {
 	}
 
 	/**
-	 * @param ReflectionParameter   $param
+	 * @param ReflectionParameter $param
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return mixed
 	 */
@@ -137,4 +137,44 @@ class CM_Cli_Arguments {
 		}
 	}
 
+	/**
+	 * @param ReflectionMethod $method
+	 * @return string[]
+	 */
+	public static function getNumericForMethod(ReflectionMethod $method) {
+		$params = array();
+		foreach ($method->getParameters() as $param) {
+			if (!$param->isOptional()) {
+				$params[] = '<' . CM_Util::uncamelize($param->getName()) . '>';
+			}
+		}
+		return $params;
+	}
+
+	/**
+	 * @param ReflectionMethod $method
+	 * @return string[]
+	 */
+	public static function getNamedForMethod(ReflectionMethod $method) {
+		$params = array();
+		$method->getDocComment();
+		foreach ($method->getParameters() as $param) {
+			if ($param->isOptional()) {
+				$paramName = $param->getName();
+				$value = 'value';
+				if (preg_match('/\*\s+@param\s+([^\$]*)\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $method->getDocComment(), $matches)) {
+					$value = trim($matches[2]);
+					if (preg_match('/bool(ean)?/', $matches[1])) {
+						$value = false;
+					}
+				}
+				$paramString = '--' . CM_Util::uncamelize($paramName);
+				if ($value !== false) {
+					$paramString .= '=<' . $value . '>';
+				}
+				$params[] = $paramString;
+			}
+		}
+		return $params;
+	}
 }
