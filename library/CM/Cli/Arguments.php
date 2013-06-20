@@ -168,6 +168,7 @@ class CM_Cli_Arguments {
 		foreach ($method->getParameters() as $param) {
 			if ($param->isOptional()) {
 				$paramName = $param->getName();
+				$paramString = '--' . CM_Util::uncamelize($paramName);
 
 				$value = 'value';
 				if (preg_match('/\*\s+@param\s+([^\$]*)\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $method->getDocComment(), $matches)) {
@@ -178,7 +179,6 @@ class CM_Cli_Arguments {
 						$value = false;
 					}
 				}
-				$paramString = '--' . CM_Util::uncamelize($paramName);
 				if ($value !== false) {
 					$paramString .= '=<' . $value . '>';
 				}
