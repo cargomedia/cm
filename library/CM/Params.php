@@ -264,6 +264,14 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @return CM_Model_ActionLimit_Abstract
+	 */
+	public function getActionLimit($key) {
+		return $this->_getObject($key, 'CM_Model_ActionLimit_Abstract');
+	}
+
+	/**
 	 * @param CM_Model_Language|string      $key
 	 * @param CM_Model_Language|string|null $default
 	 * @return CM_Model_Language
