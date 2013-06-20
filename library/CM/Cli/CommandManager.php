@@ -52,9 +52,10 @@ class CM_Cli_CommandManager {
 		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
-		$helpHeader .= ' --quiet' . PHP_EOL;
-		$helpHeader .= ' --quiet-warnings' . PHP_EOL;
-		$helpHeader .= ' --non-interactive' . PHP_EOL;
+		$reflection = new ReflectionClass($this);
+		foreach ($reflection->getMethod('Configure')->getParameters() as $parameter) {
+			$helpHeader .= ' --' . CM_Util::uncamelize($parameter->getName()) . PHP_EOL;
+		}
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
