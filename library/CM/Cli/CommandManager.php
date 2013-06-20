@@ -52,9 +52,9 @@ class CM_Cli_CommandManager {
 		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
-		$reflection = new ReflectionClass($this);
-		foreach ($reflection->getMethod('configure')->getParameters() as $parameter) {
-			$helpHeader .= ' --' . CM_Util::uncamelize($parameter->getName()) . PHP_EOL;
+		$reflectionMethod = new ReflectionMethod($this, 'configure');
+		foreach (CM_Cli_Arguments::getNamedForMethod($reflectionMethod) as $paramString) {
+			$helpHeader .= ' ' . $paramString . PHP_EOL;
 		}
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
