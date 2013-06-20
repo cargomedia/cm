@@ -55,7 +55,7 @@ class CM_formAction_FormTestExampleAction extends CM_FormAction_Abstract {
 		$this->required_fields = array('must_check');
 		parent::setup($form);
 	}
-	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+	protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		CM_FormTest::$formActionProcessCount++;
 	}
 }
