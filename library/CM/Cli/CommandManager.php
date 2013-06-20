@@ -53,7 +53,7 @@ class CM_Cli_CommandManager {
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
 		$reflection = new ReflectionClass($this);
-		foreach ($reflection->getMethod('Configure')->getParameters() as $parameter) {
+		foreach ($reflection->getMethod('configure')->getParameters() as $parameter) {
 			$helpHeader .= ' --' . CM_Util::uncamelize($parameter->getName()) . PHP_EOL;
 		}
 		$helpHeader .= PHP_EOL;
