@@ -43,16 +43,6 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		return new static($id);
 	}
 
-	/**
-	 * @return CM_Model_User|null
-	 */
-	public function getUser() {
-		if (is_null($this->getUserId())) {
-			return null;
-		}
-		return parent::getUser();
-	}
-
 	protected static function _create(array $data) {
 		$userId = null;
 		if (isset($data['user'])) {
