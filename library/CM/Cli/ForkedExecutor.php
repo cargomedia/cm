@@ -45,7 +45,7 @@ class CM_Cli_ForkedExecutor {
 				pcntl_signal_dispatch();
 				$this->_spawnChild();
 			}
-		} while ($this->_keepalive);
+		} while ($this->_keepalive || count($this->_childProcesses));
 	}
 
 	/**
