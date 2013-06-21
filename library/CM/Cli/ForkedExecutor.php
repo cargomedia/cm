@@ -53,7 +53,6 @@ class CM_Cli_ForkedExecutor {
 	public function _handleSignal($signal) {
 		$pid = posix_getpid();
 		foreach ($this->_childProcesses as $child) {
-			echo "$pid Killing " . $child . PHP_EOL;
 			posix_kill($child, SIGTERM);
 		}
 		exit;
