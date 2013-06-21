@@ -11,6 +11,9 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 
 	public function unsetUser() {
 		CM_Db_Db::update(TBL_CM_STREAM_PUBLISH, array('userId' => null), array('id' => $this->getId()));
+		if($user = $this->getUser()) {
+			$user->getStreamSubscribes()->_change();
+		}
 		$this->_change();
 	}
 
