@@ -42,6 +42,7 @@ class CM_Cli_ForkedExecutor {
 			unset($this->_childProcesses[$pid]);
 			if ($this->_keepalive) {
 				usleep(self::RESPAWN_TIMEOUT * 1000000);
+				pcntl_signal_dispatch();
 				$this->_spawnChild();
 			}
 		} while ($this->_keepalive);
