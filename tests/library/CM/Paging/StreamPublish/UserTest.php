@@ -9,5 +9,9 @@ class CM_Paging_StreamPublish_UserTest extends CMTest_TestCase {
 
 		$streams = new CM_Paging_StreamPublish_User($user);
 		$this->assertEquals(1, $streams->getCount());
+
+		$user->delete();
+		$streams = new CM_Paging_StreamPublish_User($user);
+		$this->assertEquals(0, $streams->getCount());
 	}
 }
