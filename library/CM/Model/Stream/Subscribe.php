@@ -11,7 +11,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 
 	public function unsetUser() {
 		CM_Db_Db::update(TBL_CM_STREAM_SUBSCRIBE, array('userId' => null), array('id' => $this->getId()));
-		if($user = $this->getUser()) {
+		if ($user = $this->getUser()) {
 			$user->getStreamSubscribes()->_change();
 		}
 		$this->_change();
