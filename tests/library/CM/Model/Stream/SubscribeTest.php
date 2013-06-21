@@ -132,4 +132,16 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser(), $streamChannel);
 		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
 	}
+
+	public function testUnsetUser() {
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
+		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+																   'allowedUntil'  => time() + 100, 'key' => str_repeat('a', 100)));
+		$this->assertEquals($user, $streamSubscribe->getUser());
+
+		$streamSubscribe->unsetUser();
+		$this->assertNull($streamSubscribe->getUser());
+	}
 }

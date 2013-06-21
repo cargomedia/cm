@@ -100,4 +100,17 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
 	}
+
+	public function testUnsetUser() {
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
+		/** @var CM_Model_Stream_Publish $streamPublish */
+		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+															   'allowedUntil'  => time() + 100,
+															   'key'           => str_repeat('a', 100)));
+		$this->assertEquals($user, $streamPublish->getUser());
+
+		$streamPublish->unsetUser();
+		$this->assertNull($streamPublish->getUser());
+	}
 }
