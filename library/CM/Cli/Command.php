@@ -48,7 +48,7 @@ class CM_Cli_Command {
 		$runnable = $this->_class->newInstance($input, $output);
 		$methodName = $this->_method->getName();
 		if ($keepalive || $forks) {
-			$function = function() use ($runnable, $methodName, $input, $output, $parameters) {
+			$function = function() use ($runnable, $methodName, $parameters) {
 				call_user_func_array(array($runnable, $methodName), $parameters);
 			};
 			$executor = new CM_Cli_ForkedExecutor($function, $forks, $keepalive);
