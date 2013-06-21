@@ -54,7 +54,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			try {
 				$channelModel = $stream->getStreamChannel();
 				$channel = $channelModel->getKey() . ':' . $channelModel->getType();
-			} catch (CM_Exception_Nonexistent $e) {
+			} catch (CM_Exception_Invalid $e) {
 				// For cases when streamChannel has been deleted during this iteration
 				continue;
 			}
