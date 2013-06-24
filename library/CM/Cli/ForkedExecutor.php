@@ -20,11 +20,15 @@ class CM_Cli_ForkedExecutor {
 	 * @param callable $function
 	 * @param int      $forks
 	 * @param boolean  $keepalive
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct(Closure $function, $forks, $keepalive) {
-		$forks = (int) $forks;
 		$this->_keepalive = (boolean) $keepalive;
-		$this->_forks = max($forks, (int) $keepalive);
+		$forks = (int) $forks;
+		if (!$forks) {
+			throw new CM_Exception_Invalid('Invalid amount of forks `' . $forks . '`');
+		}
+		$this->_forks = $forks;
 		$this->_function = $function;
 		pcntl_signal(SIGTERM, array($this, '_handleSignal'), false);
 		pcntl_signal(SIGINT, array($this, '_handleSignal'), false);

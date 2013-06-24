@@ -51,6 +51,7 @@ class CM_Cli_Command {
 			call_user_func_array(array($runnable, $methodName), $parameters);
 		};
 		if ($keepalive || $forks) {
+			$forks = max($forks, (int) $keepalive);
 			$executor = new CM_Cli_ForkedExecutor($function, $forks, $keepalive);
 			$executor->run();
 		} else {
