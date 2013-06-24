@@ -189,13 +189,10 @@ class CM_Params extends CM_Class_Abstract {
 		}
 		$param = $this->_get($key, $default);
 		if (!($param instanceof $className)) {
-			try {
-				return $getter($className, $param);
-			} catch (CM_Exception_Nonexistent $exception) {
-				throw $exception;
-			} catch (CM_Exception $exception) {
-				throw new CM_Exception_InvalidParam($exception->getMessage());
+			if (is_object($param)) {
+				throw new CM_Exception_InvalidParam(get_class($param) . ' is not a ' . $className);
 			}
+			return $getter($className, $param);
 		}
 		return $param;
 	}
