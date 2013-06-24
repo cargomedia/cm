@@ -29,6 +29,9 @@ class CM_Cli_Command {
 		$forks = (int) $forks;
 		$pidFile = null;
 		if ($this->_getSynchronized()) {
+			if ($forks) {
+				throw new CM_Exception('Can\'t fork synchronized process `' . $this->_getMethodName() . '`.');
+			}
 			if ($this->_isRunning()) {
 				throw new CM_Exception('Process `' . $this->_getMethodName() . '` still running.');
 			}
