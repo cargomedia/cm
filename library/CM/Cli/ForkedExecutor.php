@@ -47,6 +47,8 @@ class CM_Cli_ForkedExecutor {
 			if (!pcntl_wifexited($status) && $this->_keepalive) {
 				usleep(self::RESPAWN_TIMEOUT * 1000000);
 				pcntl_signal_dispatch();
+				CM_Bootloader::getInstance()->handleException(new CM_Exception(
+					'Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN));
 				$this->_spawnChild();
 			}
 		} while (count($this->_childProcesses));
