@@ -128,7 +128,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 	}
 
 	/**
-	 * @expectedException CM_Exception_InvalidParam
+	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage does not exist or is not a file
 	 */
 	public function testGetFileException() {
