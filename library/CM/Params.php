@@ -108,8 +108,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
-	 * @param int[]|null  $default
+	 * @param string     $key
+	 * @param int[]|null $default
 	 * @return int[]
 	 */
 	public function getIntArray($key, array $default = null) {
@@ -191,6 +191,8 @@ class CM_Params extends CM_Class_Abstract {
 		if (!($param instanceof $className)) {
 			try {
 				return $getter($className, $param);
+			} catch (CM_Exception_Nonexistent $exception) {
+				throw $exception;
 			} catch (CM_Exception $exception) {
 				throw new CM_Exception_InvalidParam($exception->getMessage());
 			}
@@ -238,8 +240,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string                   $key
-	 * @param CM_Model_User|null       $default
+	 * @param string             $key
+	 * @param CM_Model_User|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Model_User
 	 */
