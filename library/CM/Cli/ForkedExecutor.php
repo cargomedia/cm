@@ -47,12 +47,12 @@ class CM_Cli_ForkedExecutor {
 				throw new CM_Exception('Waiting on child processes failed');
 			}
 			unset($this->_childProcesses[$pid]);
-			if ($this->_keepalive) {
+			if (!pcntl_wifexited($status) && $this->_keepalive) {
 				usleep(self::RESPAWN_TIMEOUT * 1000000);
 				pcntl_signal_dispatch();
 				$this->_spawnChild();
 			}
-		} while ($this->_keepalive || count($this->_childProcesses));
+		} while (count($this->_childProcesses));
 	}
 
 	/**
