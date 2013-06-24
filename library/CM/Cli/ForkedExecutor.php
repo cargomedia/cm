@@ -28,6 +28,9 @@ class CM_Cli_ForkedExecutor {
 		if (!$forks) {
 			throw new CM_Exception_Invalid('Invalid amount of forks `' . $forks . '`');
 		}
+		if (!is_callable($function)) {
+			throw new CM_Exception_Invalid('Function is not callable');
+		}
 		$this->_forks = $forks;
 		$this->_function = $function;
 		pcntl_signal(SIGTERM, array($this, '_handleSignal'), false);
