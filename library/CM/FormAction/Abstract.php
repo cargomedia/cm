@@ -98,7 +98,7 @@ abstract class CM_FormAction_Abstract {
 	 * @param CM_Response_View_Form $response
 	 * @param CM_Form_Abstract $form
 	 */
-	public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+	final public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		$this->_checkData(CM_Params::factory($data), $response, $form);
 	}
 
@@ -108,7 +108,7 @@ abstract class CM_FormAction_Abstract {
 	 * @param CM_Form_Abstract      $form
 	 * @return mixed
 	 */
-	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+	final public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		return $this->_process(CM_Params::factory($data), $response, $form);
 	}
 
