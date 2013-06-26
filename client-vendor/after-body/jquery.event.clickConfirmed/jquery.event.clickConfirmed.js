@@ -11,17 +11,16 @@
 		},
 
 		handle: function(event) {
-			var handle = this;
 			var $this = $(this);
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
 				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip('enable').mouseenter();
-				handle.timeoutId = setTimeout(function() {
+				$this.data('timeoutId', setTimeout(function() {
 					deactivateButton();
-				}, 5000);
+				}, 5000));
 				setTimeout(function() {
-					$(document).one('click.toggleModal', function(e) {
+					$(document).one('click.clickConfirmed', function(e) {
 						if (!$this.length || e.target !== $this[0] && !$.contains($this[0], e.target)) {
 							deactivateButton();
 						}
@@ -32,8 +31,8 @@
 			var deactivateButton = function() {
 				$this.removeClass('confirmClick');
 				$this.removeAttr('title').tooltip('disable').mouseleave();
-				clearTimeout(handle.timeoutId);
-				$(document).off('click.toggleModal');
+				clearTimeout($this.data('timeoutId'));
+				$(document).off('click.clickConfirmed');
 			}
 
 			if ($this.hasClass('confirmClick')) {
