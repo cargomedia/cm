@@ -16,7 +16,7 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 	 */
 	protected function _set($key, $data, $lifeTime = null) {
 		if (!$lifeTime) {
-			$lifeTime = self::_getConfig()->lifetime;
+			$lifeTime = static::_getConfig()->lifetime;
 		}
 		$key = self::_getKeyArmored($key);
 		return apc_store($key, $data, $lifeTime);
@@ -34,13 +34,5 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 
 	protected function _flush() {
 		return apc_clear_cache('user');
-	}
-
-	protected static function _getConfig() {
-		static $config = false;
-		if (false === $config) {
-			$config = self::_getConfigRaw();
-		}
-		return $config;
 	}
 }
