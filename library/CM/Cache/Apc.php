@@ -1,6 +1,7 @@
 <?php
 
 abstract class CM_Cache_Apc extends CM_Cache_Abstract {
+
 	protected static $_instance;
 
 	protected function _getName() {
@@ -34,7 +35,6 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 	protected function _flush() {
 		return apc_clear_cache('user');
 	}
-
 
 	protected static function _getConfig() {
 		static $config = false;
