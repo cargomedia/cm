@@ -9,6 +9,11 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		$this->_change();
 	}
 
+	public function unsetUser() {
+		CM_Db_Db::update(TBL_CM_STREAM_SUBSCRIBE, array('userId' => null), array('id' => $this->getId()));
+		$this->_change();
+	}
+
 	protected function _getContainingCacheables() {
 		$cacheables = parent::_getContainingCacheables();
 		$cacheables[] = $this->getStreamChannel()->getStreamSubscribes();
@@ -36,16 +41,6 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 			return null;
 		}
 		return new static($id);
-	}
-
-	/**
-	 * @return CM_Model_User|null
-	 */
-	public function getUser() {
-		if (is_null($this->getUserId())) {
-			return null;
-		}
-		return parent::getUser();
 	}
 
 	protected static function _create(array $data) {

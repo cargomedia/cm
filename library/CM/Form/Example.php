@@ -1,6 +1,7 @@
 <?php
 
 class CM_Form_Example extends CM_Form_Abstract {
+
 	public function setup() {
 		$this->registerField(new CM_FormField_Text('text'));
 		$this->registerField(new CM_FormField_Integer('int', -10, 20, 2));
@@ -17,7 +18,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerAction(new CM_FormAction_Example_Go());
 	}
 
-	public function renderStart(array $params = null) {
+	public function _renderStart(CM_Params $params) {
 		$ip = CM_Request_Abstract::getInstance()->getIp();
 		if ($locationGuess = CM_Model_Location::findByIp($ip)) {
 			$this->getField('location')->setValue($locationGuess);
