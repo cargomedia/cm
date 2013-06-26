@@ -133,7 +133,11 @@ class CM_UtilTest extends CMTest_TestCase {
 
 		CM_File::create($path . '.test');
 		CM_File::create($path . 'test');
+		$this->assertFileExists($path . '.test');
+		$this->assertFileExists($path . 'test');
 
 		CM_Util::rmDirContents($path);
+		$this->assertFileNotExists($path . '.test');
+		$this->assertFileNotExists($path . 'test');
 	}
 }
