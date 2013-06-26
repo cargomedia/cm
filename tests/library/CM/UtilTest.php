@@ -129,10 +129,10 @@ class CM_UtilTest extends CMTest_TestCase {
 	}
 
 	public function testRmDirContents() {
-		$path = CM_Util::mkDir(DIR_TMP . uniqid());
+		$path = CM_Util::mkDir(DIR_TMP . uniqid() . '/');
 
-		CM_File::create($path . '/.test');
-		CM_File::create($path . '/test');
+		CM_File::create($path . '.test');
+		CM_File::create($path . 'test');
 
 		CM_Util::rmDirContents($path);
 	}
