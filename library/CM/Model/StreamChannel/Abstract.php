@@ -153,7 +153,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 				if (false === $type) {
 					throw new CM_Exception_Nonexistent('No record found in `' . TBL_CM_STREAMCHANNEL . '` for id `' . $id . '`');
 				}
-				CM_Cache::set($cacheKey, $type);
+				CM_CacheLocal::set($cacheKey, $type);
 			}
 		}
 		$class = self::_getClassName($type);
