@@ -16,7 +16,11 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 	 * @return mixed
 	 */
 	private function _executeJob(CM_Params $params) {
-		return $this->_execute($params);
+		CMService_Newrelic::getInstance()->endTransaction();
+		CMService_Newrelic::getInstance()->startTransaction($this->_getClassName());
+		$return = $this->_execute($params);
+		CMService_Newrelic::getInstance()->endTransaction();
+		return $return;
 	}
 
 	/**
