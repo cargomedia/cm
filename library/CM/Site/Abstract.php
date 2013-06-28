@@ -112,13 +112,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	 * @param CM_Response_Page $response
 	 */
 	public function preprocessPageResponse(CM_Response_Page $response) {
-		$site = $response->getSite();
-		$request = $response->getRequest();
-		if ($site->getHost() !== $request->getHeader('host')) {
-			$path = CM_Util::link($request->getPath(), $request->getQuery());
-			$response->redirectUrl($response->getRender()->getUrl($path, null, $site));
-			return;
-		}
 	}
 
 	/**
