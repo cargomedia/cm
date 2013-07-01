@@ -213,7 +213,8 @@ class CMTest_TH {
 	 */
 	public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (!$headers) {
-			$headers = array();
+			$site = CM_Site_Abstract::factory();
+			$headers = array('host' => $site->getHost());
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
