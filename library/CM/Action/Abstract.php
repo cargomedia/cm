@@ -15,30 +15,26 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	const SUBSCRIBE = 16;
 	const UNSUBSCRIBE = 17;
 
-	/**
-	 * @var CM_Model_User|int
-	 */
+	/** @var CM_Model_User|int */
 	protected $_actor = null;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	protected $_verb;
 
-	/**
-	 * @var int|null
-	 */
+	/** @var int|null */
 	protected $_ip = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $_ignoreLogging = array();
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_forceAllow = false;
+
+	/** @var array */
+	private $_trackingProperties = array();
+
+	/** @var bool */
+	private $_trackingEnabled = true;
 
 	/**
 	 * @param int               $verb
@@ -55,6 +51,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
+		}
+
+		if ($this->getActor() && $this->_trackingEnabled) {
+			$this->_track();
 		}
 	}
 
@@ -146,6 +146,21 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public final function getVerb() {
 		return $this->_verb;
+	}
+
+	/**
+	 * @param array $properties
+	 */
+	protected function _setTrackingProperties(array $properties) {
+		$this->_trackingProperties = $properties;
+	}
+
+	protected function _disableTracking() {
+		$this->_trackingEnabled = false;
+	}
+
+	protected function _track() {
+		CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
 	}
 
 	/**
