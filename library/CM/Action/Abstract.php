@@ -2,6 +2,8 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
+	const VIEW = 11;
+
 	/**
 	 * @var CM_Model_User|int
 	 */
@@ -36,7 +38,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$this->_verb = (int) $verb;
 	}
 
-	protected function _notify(){
+	protected function _notify() {
 		$arguments = func_get_args();
 		$methodName = '_notify' . $this->getVerbName();
 
@@ -136,8 +138,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract     $actionLimit
-	 * @param int                               $role
+	 * @param CM_Model_ActionLimit_Abstract $actionLimit
+	 * @param int                           $role
 	 * @return bool
 	 */
 	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
