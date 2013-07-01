@@ -2,7 +2,18 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
+	const CREATE = 1;
+	const UPDATE = 3;
+	const DELETE = 7;
+	const ONLINE = 9;
+	const OFFLINE = 10;
 	const VIEW = 11;
+	const VISIBLE = 12;
+	const INVISIBLE = 13;
+	const PUBLISH = 14;
+	const UNPUBLISH = 15;
+	const SUBSCRIBE = 16;
+	const UNSUBSCRIBE = 17;
 
 	/**
 	 * @var CM_Model_User|int
