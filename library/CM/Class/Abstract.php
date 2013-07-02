@@ -41,9 +41,14 @@ abstract class CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static function _getConfig() {
+		static $cacheEnabled = null;
+		if (null === $cacheEnabled) {
+			$config = CM_Config::get();
+			$cacheEnabled = $config->CM_Class_Abstract->configCacheEnabled;
+		}
 		$className = get_called_class();
 		$cacheKey = CM_CacheConst::Config . '_className:' . $className;
-		if (false === ($result = CM_CacheLocal::get($cacheKey)) || !CM_Config::get()->CM_Class_Abstract->configCacheEnabled) {
+		if (false === ($result = CM_CacheLocal::get($cacheKey)) || !$cacheEnabled) {
 			$result = self::_getConfigRaw();
 			CM_CacheLocal::set($cacheKey, $result);
 		}
