@@ -16,7 +16,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 	}
 
 	public function checkAccessible() {
-		if (!IS_DEBUG) {
+		if (!IS_DEBUG && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			throw new CM_Exception_NotAllowed();
 		}
 	}
