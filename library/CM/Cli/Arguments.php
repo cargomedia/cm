@@ -55,10 +55,19 @@ class CM_Cli_Arguments {
 		foreach ($method->getParameters() as $param) {
 			$params[] = $this->_getParamValue($param);
 		}
+		return $params;
+	}
+
+	/**
+	 * @throws CM_Cli_Exception_InvalidArguments
+	 */
+	public function checkUnused() {
+		if ($this->getNumeric()->getAll()) {
+			throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
+		}
 		if ($named = $this->getNamed()->getAll()) {
 			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
 		}
-		return $params;
 	}
 
 	/**

@@ -33,6 +33,7 @@ class CM_Cli_Command {
 			$pidFile = $this->_createPidFile();
 		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
+		$arguments->checkUnused();
 		call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
 		if ($pidFile) {
 			$pidFile->delete();
