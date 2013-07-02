@@ -36,6 +36,7 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
 	}
 
 	if (null !== $distanceFrom && $distanceFrom < 100 * 1000) {
+		$template->smarty->loadPlugin('smarty_function_distance');
 		$distance = smarty_function_distance(array('distance' => $distanceFrom), $template);
 		$html .= ' <small class="distance" title="' . $render->getTranslation('Distance from your location:') . ' ' . $distance . '">' . $distance .
 				'</small>';
