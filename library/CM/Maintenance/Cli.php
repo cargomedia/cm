@@ -77,7 +77,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	protected function _executeCallbacks($callbacks) {
 		foreach ($callbacks as $name => $callback) {
-			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $this->getPackageName() . $name);
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $this->getPackageName() . ' ' . $name);
 			try {
 				$callback();
 			} catch (CM_Exception $e) {
