@@ -33,18 +33,6 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			'img' => $render->getUrlResource('layout', 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
 	}
 
-	protected function _getSuggestions($term, array $options, CM_Render $render) {
-		$ip = CM_Request_Abstract::getInstance()->getIp();
-		$requestLocation = CM_Model_Location::findByIp($ip);
-		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $requestLocation);
-		$locations->setPage(1, 15);
-		$out = array();
-		foreach ($locations as $location) {
-			$out[] = $this->getSuggestion($location, $render);
-		}
-		return $out;
-	}
-
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$value = parent::validate($userInput, $response);
 		if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
@@ -56,5 +44,17 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			throw new CM_Exception_FormFieldValidation('Invalid location level.');
 		}
 		return new CM_Model_Location($level, $id);
+	}
+
+	protected function _getSuggestions($term, array $options, CM_Render $render) {
+		$ip = CM_Request_Abstract::getInstance()->getIp();
+		$requestLocation = CM_Model_Location::findByIp($ip);
+		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $requestLocation);
+		$locations->setPage(1, 15);
+		$out = array();
+		foreach ($locations as $location) {
+			$out[] = $this->getSuggestion($location, $render);
+		}
+		return $out;
 	}
 }
