@@ -72,6 +72,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 * @return CM_Model_Location|null
 	 */
 	private function _getRequestLocation() {
+		if (!CM_Request_Abstract::hasInstance()) {
+			return null;
+		}
+
 		$ip = CM_Request_Abstract::getInstance()->getIp();
 		return CM_Model_Location::findByIp($ip);
 	}
