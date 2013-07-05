@@ -46,6 +46,18 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		return new CM_Model_Location($level, $id);
 	}
 
+	public function setValueByRequest() {
+		$requestLocation = $this->_getRequestLocation();
+		if (null === $requestLocation) {
+			return;
+		}
+
+		$level = $requestLocation->getLevel();
+		if ($level >= $this->_options['levelMin'] && $level <= $this->_options['levelMax']) {
+			$this->setValue($requestLocation);
+		}
+	}
+
 	protected function _getSuggestions($term, array $options, CM_Render $render) {
 		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $this->_getRequestLocation());
 		$locations->setPage(1, 15);
