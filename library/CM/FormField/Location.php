@@ -47,14 +47,20 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	}
 
 	protected function _getSuggestions($term, array $options, CM_Render $render) {
-		$ip = CM_Request_Abstract::getInstance()->getIp();
-		$requestLocation = CM_Model_Location::findByIp($ip);
-		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $requestLocation);
+		$locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], $this->_getRequestLocation());
 		$locations->setPage(1, 15);
 		$out = array();
 		foreach ($locations as $location) {
 			$out[] = $this->getSuggestion($location, $render);
 		}
 		return $out;
+	}
+
+	/**
+	 * @return CM_Model_Location|null
+	 */
+	private function _getRequestLocation() {
+		$ip = CM_Request_Abstract::getInstance()->getIp();
+		return CM_Model_Location::findByIp($ip);
 	}
 }
