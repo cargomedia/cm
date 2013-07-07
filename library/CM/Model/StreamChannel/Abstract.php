@@ -116,15 +116,6 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
-			$streamSubscribe->delete();
-		}
-		/** @var CM_Model_Stream_Publish $streamPublish */
-		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
-		}
-
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
 		CM_Cache::delete($cacheKey);
 
