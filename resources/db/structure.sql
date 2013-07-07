@@ -390,7 +390,7 @@ CREATE TABLE `cm_stream_publish` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `channelId-key` (`channelId`,`key`),
   KEY `userId` (`userId`),
-  CONSTRAINT `cm_stream_publish-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `cm_stream_publish-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_subscribe`;
@@ -406,7 +406,7 @@ CREATE TABLE `cm_stream_subscribe` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `channelId-key` (`channelId`,`key`),
   KEY `userId` (`userId`),
-  CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;
