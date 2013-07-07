@@ -60,7 +60,10 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
 			$statusChannelKey = $channel->getKey() . ':' . $channel->getType();
 			if (!isset($socketRedisStatus[$statusChannelKey])) {
-				$channel->delete();
+				try {
+					$channel->delete();
+				} catch (CM_Db_Exception $e) {
+				}
 			} else {
 				$channelsPersistenceArray[$statusChannelKey] = $channel;
 			}
