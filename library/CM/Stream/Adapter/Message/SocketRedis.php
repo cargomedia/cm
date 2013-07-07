@@ -36,18 +36,6 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$startStampLimit = time() - self::SYNCHRONIZE_DELAY;
 		$socketRedisStatus = $this->_fetchStatus();
 
-		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
-		$channelsPersistenceArray = array();
-		/** @var $channel CM_Model_StreamChannel_Message */
-		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
-			$statusChannelKey = $channel->getKey() . ':' . $channel->getType();
-			if (!isset($socketRedisStatus[$statusChannelKey])) {
-				$channel->delete();
-			} else {
-				$channelsPersistenceArray[$statusChannelKey] = $channel;
-			}
-		}
-
 		/** @var $channelsPersistenceItems CM_Model_Stream_Subscribe[] */
 		$subscribesPersistenceArray = array();
 		/** @var $subscribe CM_Model_Stream_Subscribe */
@@ -63,6 +51,18 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 				$subscribe->delete();
 			} else {
 				$subscribesPersistenceArray[$statusChannelKey . '/' . $subscribe->getKey()] = $subscribe;
+			}
+		}
+
+		/** @var $channelsPersistenceArray CM_Model_StreamChannel_Abstract[] */
+		$channelsPersistenceArray = array();
+		/** @var $channel CM_Model_StreamChannel_Message */
+		foreach (new CM_Paging_StreamChannel_AdapterType($this->getType()) as $channel) {
+			$statusChannelKey = $channel->getKey() . ':' . $channel->getType();
+			if (!isset($socketRedisStatus[$statusChannelKey])) {
+				$channel->delete();
+			} else {
+				$channelsPersistenceArray[$statusChannelKey] = $channel;
 			}
 		}
 
