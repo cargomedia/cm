@@ -12,6 +12,10 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		}
 	}
 
+	public static function tearDownAfterClass() {
+		CMTest_TH::clearEnv();
+	}
+
 	public function testConstructor() {
 		try {
 			new CM_Model_StreamChannel_Mock(123123);
@@ -66,9 +70,23 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$this->assertNull(CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamChannelKey, $adapterType));
 	}
 
+	/**
+	 * @expectedException CM_Exception_Nonexistent
+	 */
 	public function testDelete() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar', 'adapterType' => 1));
+		$streamChannel->delete();
+		new CM_Model_StreamChannel_Mock($streamChannel->getId());
+	}
+
+	/**
+	 * @expectedException CM_Db_Exception
+	 * @expectedExceptionMessage CONSTRAINT
+	 */
+	public function testDeleteWIthSubscribes() {
+		/** @var CM_Model_StreamChannel_Mock $streamChannel */
+		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar-with-subscribers', 'adapterType' => 1));
 		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 											  'allowedUntil'  => 324234,
 											  'key'           => '123123_1',));
@@ -84,16 +102,6 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals(2, $streamChannel->getStreamPublishs()->getCount());
 		$this->assertEquals(2, $streamChannel->getStreamSubscribes()->getCount());
 		$streamChannel->delete();
-		try {
-			new CM_Model_StreamChannel_Mock($streamChannel->getId());
-			$this->fail('streamChannel not deleted.');
-		} catch (CM_Exception_Nonexistent $ex) {
-			$this->assertTrue(true);
-		}
-		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
-		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
-		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_STREAM_SUBSCRIBE, array('channelId' => $streamChannel->getId())), 'StreamSubscriptions not deleted');
-		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_STREAM_PUBLISH, array('channelId' => $streamChannel->getId())), 'StreamPublishs not deleted');
 	}
 
 	public function testGetSubscribers() {
@@ -111,8 +119,6 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 												'key'           => '111_3'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
-		$streamSubscribe->delete();
-		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 	}
 
 	public function testGetPublishers() {
