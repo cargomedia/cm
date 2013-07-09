@@ -41,6 +41,9 @@ class CM_CacheConst {
 	// _id:X_type:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 
+	// _id:X
+	const Splittest_Variation = 'Splittest_Variation';
+
 	//_md5:X
 	//_md5:X_languageId:X
 	const Css = 'Css';
@@ -63,6 +66,9 @@ class CM_CacheConst {
 
 	// _className:X_abstracts:X
 	const ClassChildren = 'ClassChildren';
+
+	// _className:X
+	const Config = 'Config';
 
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';

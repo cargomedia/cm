@@ -215,6 +215,18 @@ class CM_Model_User extends CM_Model_Abstract {
 
 	/**
 	 * @param int $id
+	 * @return CM_Model_User|null
+	 */
+	public static function findById($id) {
+		try {
+			return new static((int) $id);
+		} catch (CM_Exception_Nonexistent $e) {
+			return null;
+		}
+	}
+
+	/**
+	 * @param int $id
 	 * @return CM_Model_User
 	 */
 	public static function factory($id) {
@@ -265,11 +277,11 @@ class CM_Model_User extends CM_Model_Abstract {
 		$this->getTransgressions()->deleteAll();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
-			$streamSubscribe->delete();
+			$streamSubscribe->unsetUser();
 		}
 		/** @var CM_Model_Stream_Publish $streamPublish */
 		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
+			$streamPublish->unsetUser();
 		}
 		CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
 		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $this->getId()));

@@ -42,6 +42,8 @@ $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
 $config->CM_Cache_File->enabled = true;
 
+$config->CM_Class_Abstract->configCacheEnabled = true;
+
 $config->CM_Stream_Message->enabled = true;
 $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 
@@ -115,3 +117,6 @@ $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'local
 
 $config->CMService_Amazon_Abstract->accessKey = '';
 $config->CMService_Amazon_Abstract->secretKey = '';
+
+$config->CMService_Newrelic->enabled = false;
+$config->CMService_Newrelic->appName = 'CM Application';

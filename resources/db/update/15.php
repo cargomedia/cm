@@ -1,4 +1,5 @@
 <?php
 
-$language = CM_Model_Language::findByAbbreviation('en');
-$language->setTranslation('Please Confirm', 'Please Confirm');
+if (CM_Db_Db::existsColumn('cm_stream_publish', 'userId')) {
+	CM_Db_Db::exec('ALTER TABLE  `cm_stream_publish` MODIFY  `userId` int(10) unsigned DEFAULT NULL');
+}

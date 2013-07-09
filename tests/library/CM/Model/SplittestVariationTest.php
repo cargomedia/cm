@@ -77,9 +77,9 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$variation = $test->getVariations()->getItem(0);
 
 		$test->isVariationFixture($user, 'v1');
-		$this->assertSame(0, $variation->getConversionCount());
+		$this->assertSame(0, $variation->getConversionCount(true));
 		$test->setConversion($user);
-		$this->assertSame(1, $variation->getConversionCount());
+		$this->assertSame(1, $variation->getConversionCount(true));
 
 		$test->delete();
 	}
@@ -97,11 +97,11 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$test->isVariationFixture($user, 'v1');
 		$test->isVariationFixture($user2, 'v1');
 		$test->isVariationFixture($user3, 'v1');
-		$this->assertSame(0.0, $variation->getConversionWeight());
+		$this->assertSame(0.0, $variation->getConversionWeight(true));
 		$test->setConversion($user, 3.75);
 		$test->setConversion($user2, 3.29);
-		$this->assertSame(7.04, $variation->getConversionWeight());
-		$this->assertSame(2.3466666666667, $variation->getConversionRate());
+		$this->assertSame(7.04, $variation->getConversionWeight(true));
+		$this->assertSame(2.3466666666667, $variation->getConversionRate(true));
 
 		try {
 			$test->setConversion($user, -2);
@@ -123,31 +123,83 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
-		$this->assertSame(0, $variation->getFixtureCount());
+		$this->assertSame(0, $variation->getFixtureCount(true));
 
 		$test->isVariationFixture($user1, 'v1');
-		$this->assertSame(1, $variation->getFixtureCount());
+		$this->assertSame(1, $variation->getFixtureCount(true));
 		$test->isVariationFixture($user1, 'v1');
-		$this->assertSame(1, $variation->getFixtureCount());
+		$this->assertSame(1, $variation->getFixtureCount(true));
 		$test->isVariationFixture($user2, 'v1');
-		$this->assertSame(2, $variation->getFixtureCount());
+		$this->assertSame(2, $variation->getFixtureCount(true));
 
 		$test->delete();
 	}
 
 	public function testGetSignificance() {
-		$variation1 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
-		$variation1->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation1->expects($this->any())->method('getConversionCount')->will($this->returnValue(200));
+		foreach (array(
+					 array(0, 0, 0, 0, 0, 0, false, null),
+					 array(1, 0, 0, 0, 0, 0, false, null),
+					 array(1, 1, 1, 0, 0, 0, false, null),
+					 array(1, 1, 1, 1, 0, 0, false, null),
+					 array(1, 1, 1, 1, 1, 1, false, null),
 
-		$variation2 = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-				->setMethods(array('getFixtureCount', 'getConversionCount'))->getMock();
-		$variation2->expects($this->any())->method('getFixtureCount')->will($this->returnValue(1000));
-		$variation2->expects($this->any())->method('getConversionCount')->will($this->returnValue(250));
+					 array(1000, 0, 0, 1000, 0, 0, false, null),
+					 array(1000, 1, 1, 1000, 0, 0, false, null),
+					 array(1000, 1, 1, 1000, 1, 1, false, null),
+					 array(1000, 1, 1, 1000, 2, 2, false, null),
+					 array(1000, 9, 9, 1000, 8, 8, false, null),
+					 array(1000, 9, 9, 1000, 9, 9, false, null),
+					 array(1000, 9, 9, 1000, 10, 10, false, 0.817692941581),
+					 array(1000, 10, 10, 1000, 10, 10, false, 1.0),
+					 array(1000, 10, 10, 1000, 11, 11, false, 0.82635978436207),
 
-		// See e.g. http://in-silico.net/tools/statistics/chi2test
-		$this->assertSame(0.0074196492610257, $variation2->getSignificance($variation1));
-		$this->assertSame(0.0074196492610257, $variation1->getSignificance($variation2));
+					 array(1000, 200, 200, 1000, 250, 250, true, 0.0074196492610257),
+
+					 array(1000, 250, 250, 1000, 250, 250, false, 1.0),
+					 array(1000, 249, 249, 1000, 251, 251, false, 0.91774110086988),
+					 array(1000, 245, 245, 1000, 255, 255, false, 0.60557661633535),
+					 array(1000, 240, 240, 1000, 260, 260, false, 0.30169958247835),
+					 array(1000, 230, 230, 1000, 270, 270, false, 0.038867103812417),
+					 array(1000, 220, 220, 1000, 280, 280, true, 0.0019457736937391),
+					 array(1000, 210, 210, 1000, 290, 290, true, 0.000036090232367484),
+
+					 array(1000, 500, 250, 1000, 250, 250, false, 1.0),
+					 array(1000, 498, 249, 1000, 251, 251, false, 0.89934318856137),
+					 array(1000, 490, 245, 1000, 255, 255, false, 0.52708925686554),
+					 array(1000, 480, 240, 1000, 260, 260, false, 0.20590321073207),
+					 array(1000, 460, 230, 1000, 270, 270, false, 0.011412036386002),
+					 array(1000, 440, 220, 1000, 280, 280, true, 0.00014780231033445),
+					 array(1000, 420, 210, 1000, 290, 290, true, 0.0000004200393976022),
+
+				 ) as $list) {
+			list($fixturesA, $conversionsA, $weightA, $fixturesB, $conversionsB, $weightB, $significant, $significance) = $list;
+			$variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA);
+			$variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB);
+			$this->assertSame($significance, $variationA->getSignificance($variationB));
+			$this->assertSame($significance, $variationB->getSignificance($variationA));
+			$this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
+			$this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+			$variationA = $this->_getVariationMock($fixturesA, $conversionsA, $weightA * 1000);
+			$variationB = $this->_getVariationMock($fixturesB, $conversionsB, $weightB * 1000);
+			$this->assertSame($significance, $variationA->getSignificance($variationB));
+			$this->assertSame($significance, $variationB->getSignificance($variationA));
+			$this->assertSame($significant, $variationA->isDeviationSignificant($variationB));
+			$this->assertSame($significant, $variationB->isDeviationSignificant($variationA));
+		}
+	}
+
+	/**
+	 * @param int   $fixture
+	 * @param int   $conversion
+	 * @param float $weight
+	 * @return CM_Model_SplittestVariation
+	 */
+	protected function _getVariationMock($fixture, $conversion, $weight) {
+		$variation = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
+				->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
+		$variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
+		$variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
+		$variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));
+		return $variation;
 	}
 }

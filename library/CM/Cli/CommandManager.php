@@ -52,9 +52,10 @@ class CM_Cli_CommandManager {
 		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
-		$helpHeader .= ' --quiet' . PHP_EOL;
-		$helpHeader .= ' --quiet-warnings' . PHP_EOL;
-		$helpHeader .= ' --non-interactive' . PHP_EOL;
+		$reflectionMethod = new ReflectionMethod($this, 'configure');
+		foreach (CM_Cli_Arguments::getNamedForMethod($reflectionMethod) as $paramString) {
+			$helpHeader .= ' ' . $paramString . PHP_EOL;
+		}
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
@@ -80,6 +81,7 @@ class CM_Cli_CommandManager {
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
+
 			if (!$packageName) {
 				$this->_streamError->writeln($this->getHelp());
 				return 1;
@@ -89,6 +91,7 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {

@@ -47,6 +47,7 @@ class CM_Cli_Arguments {
 
 	/**
 	 * @param ReflectionMethod $method
+	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return array
 	 */
 	public function extractMethodParameters(ReflectionMethod $method) {
@@ -55,6 +56,18 @@ class CM_Cli_Arguments {
 			$params[] = $this->_getParamValue($param);
 		}
 		return $params;
+	}
+
+	/**
+	 * @throws CM_Cli_Exception_InvalidArguments
+	 */
+	public function checkUnused() {
+		if ($this->getNumeric()->getAll()) {
+			throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
+		}
+		if ($named = $this->getNamed()->getAll()) {
+			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
+		}
 	}
 
 	/**
@@ -94,7 +107,7 @@ class CM_Cli_Arguments {
 	}
 
 	/**
-	 * @param ReflectionParameter   $param
+	 * @param ReflectionParameter $param
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @return mixed
 	 */
@@ -137,4 +150,47 @@ class CM_Cli_Arguments {
 		}
 	}
 
+	/**
+	 * @param ReflectionMethod $method
+	 * @return string[]
+	 */
+	public static function getNumericForMethod(ReflectionMethod $method) {
+		$params = array();
+		foreach ($method->getParameters() as $param) {
+			if (!$param->isOptional()) {
+				$params[] = '<' . CM_Util::uncamelize($param->getName()) . '>';
+			}
+		}
+		return $params;
+	}
+
+	/**
+	 * @param ReflectionMethod $method
+	 * @return string[]
+	 */
+	public static function getNamedForMethod(ReflectionMethod $method) {
+		$params = array();
+		$method->getDocComment();
+		foreach ($method->getParameters() as $param) {
+			if ($param->isOptional()) {
+				$paramName = $param->getName();
+				$paramString = '--' . CM_Util::uncamelize($paramName);
+
+				$value = 'value';
+				if (preg_match('/\*\s+@param\s+([^\$]*)\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $method->getDocComment(), $matches)) {
+					if ($commentValue = trim($matches[2])) {
+						$value = $commentValue;
+					}
+					if (preg_match('/bool(ean)?/', $matches[1])) {
+						$value = false;
+					}
+				}
+				if ($value !== false) {
+					$paramString .= '=<' . $value . '>';
+				}
+				$params[] = $paramString;
+			}
+		}
+		return $params;
+	}
 }

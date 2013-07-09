@@ -52,7 +52,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	}
 
 	/**
-	 * @param CM_Request_Abstract      $request
+	 * @param CM_Request_Abstract $request
 	 * @throws CM_Exception_Invalid
 	 * @return string|null
 	 */
@@ -78,6 +78,10 @@ class CM_Response_Page extends CM_Response_Abstract {
 
 	protected function _process() {
 		$this->_site->preprocessPageResponse($this);
+		if ($this->_site->getHost() !== $this->_request->getHeader('host')) {
+			$path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
+			$this->redirectUrl($this->getRender()->getUrl($path, null, $this->_site));
+		}
 		if (!$this->getRedirectUrl()) {
 			$this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
 			$html = $this->_processPageLoop($this->getRequest());
@@ -107,6 +111,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 			} catch (CM_Exception $ex) {
 				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
 			}
+			$this->_setStringRepresentation(get_class($page));
 			if ($this->getViewer() && $request->getLanguageUrl()) {
 				$this->redirect($page);
 			}

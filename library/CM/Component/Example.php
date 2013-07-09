@@ -7,15 +7,16 @@ class CM_Component_Example extends CM_Component_Abstract {
 		$colorStyles = $this->_getColorStyles();
 		$icons = $this->_getIcons();
 
-		$this->_js->uname = `uname`;
 		$this->setTplParam('now', time());
 		$this->setTplParam('foo', $foo);
 		$this->setTplParam('colorStyles', $colorStyles);
 		$this->setTplParam('icons', $icons);
+
+		$this->_setJsParam('uname', 'uname');
 	}
 
 	public function checkAccessible() {
-		if (!IS_DEBUG && !$this->_getViewer(true)->getRoles()->contains(SK_Role::ADMIN, SK_Role::DEVELOPER)) {
+		if (!IS_DEBUG && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			throw new CM_Exception_NotAllowed();
 		}
 	}

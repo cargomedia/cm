@@ -30,11 +30,11 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
 		$test->isVariationFixture($request, 'v1');
 		$test->isVariationFixture($request2, 'v1');
-		$this->assertSame(0, $variation->getConversionCount());
+		$this->assertSame(0, $variation->getConversionCount(true));
 		$test->setConversion($request);
-		$this->assertSame(1, $variation->getConversionCount());
+		$this->assertSame(1, $variation->getConversionCount(true));
 		$test->setConversion($request2, 2.5);
-		$this->assertSame(1.75, $variation->getConversionRate());
+		$this->assertSame(1.75, $variation->getConversionRate(true));
 
 		$test->delete();
 	}
