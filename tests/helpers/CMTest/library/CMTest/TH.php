@@ -42,9 +42,11 @@ class CMTest_TH {
 
 	public static function clearDb() {
 		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+		CM_Db_Db::exec('SET foreign_key_checks = 0;');
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
+		CM_Db_Db::exec('SET foreign_key_checks = 1;');
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
