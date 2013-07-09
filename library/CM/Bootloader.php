@@ -318,12 +318,6 @@ class CM_Bootloader {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
 		}
-		$exceptionFormatter = function (Exception $exception) {
-			$text = get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage() . PHP_EOL;
-			$text .= '## ' . $exception->getFile() . '(' . $exception->getLine() . '):' . PHP_EOL;
-			$text .= $exception->getTraceAsString() . PHP_EOL;
-			return $text;
-		};
 
 		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			header('HTTP/1.1 500 Internal Server Error');
@@ -335,13 +329,13 @@ class CM_Bootloader {
 			} else {
 				$log = new CM_Paging_Log_Error();
 			}
-			$log->add($exceptionFormatter($exception));
+			$log->add($this->_formatException($exception));
 		} catch (Exception $loggerException) {
 			$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
 			$logEntry .= '### Cannot log error: ' . PHP_EOL;
-			$logEntry .= $exceptionFormatter($loggerException);
+			$logEntry .= $this->_formatException($loggerException);
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
-			$logEntry .= $exceptionFormatter($exception) . PHP_EOL;
+			$logEntry .= $this->_formatException($exception) . PHP_EOL;
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 
@@ -357,9 +351,7 @@ class CM_Bootloader {
 		if ($outputEnabled) {
 			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
 			if ($outputVerbose) {
-				$output->writeln(get_class($exception) . ' (' . $exception->getCode() . '): ' . $exception->getMessage());
-				$output->writeln('Thrown in: ' . $exception->getFile() . ':' . $exception->getLine());
-				$output->writeln($exception->getTraceAsString());
+				$output->writeln($this->_formatException($exception));
 			} else {
 				$output->writeln('Internal server error');
 			}
@@ -379,5 +371,51 @@ class CM_Bootloader {
 			throw new Exception('No bootloader instance');
 		}
 		return self::$_instance;
+	}
+
+	private function _formatException(Exception $exception) {
+		$dumpArgument = function($argument) {
+			if (is_object($argument)) {
+				$value = get_class($argument);
+				if ($argument instanceof CM_Model_Abstract) {
+					$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
+				}
+				return $value;
+			}
+			if (is_array($argument)) {
+				return 'array';
+			}
+			return var_export($argument, true);
+		};
+
+		$text = get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
+				PHP_EOL . PHP_EOL;
+		$trace = array_reverse($exception->getTrace());
+		array_unshift($trace, array(
+			'function' => '{main}',
+			'line'     => 0,
+			'file'     => $trace[0]['file'],
+		));
+
+		$intend = strlen(count($trace)) + 4;
+		foreach ($trace as $number => $entry) {
+			$text .= str_pad($number, $intend, ' ', STR_PAD_LEFT) . '. ';
+			if (array_key_exists('function', $entry)) {
+				if (array_key_exists('class', $entry)) {
+					$text .= $entry['class'] . '->';
+				}
+				$text .= $entry['function'];
+				if (array_key_exists('args', $entry)) {
+					$arguments = array();
+					foreach ($entry['args'] as $argument) {
+						$arguments[] = $dumpArgument($argument);
+					}
+					$text .= '(' . implode(', ', $arguments) . ')';
+				}
+			}
+			$text .= ' ' . $entry['file'] . ':' . $entry['line'];
+			$text .= PHP_EOL;
+		}
+		return $text;
 	}
 }
