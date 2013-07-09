@@ -51,6 +51,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 */
 	public function setValueByRequest(CM_Request_Abstract $request) {
 		$ip = $request->getIp();
+		if (null === $ip) {
+			return;
+		}
+
 		$requestLocation = CM_Model_Location::findByIp($ip);
 		if (null === $requestLocation) {
 			return;
