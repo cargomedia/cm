@@ -46,7 +46,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Stream_Message::synchronize' => function () {
 				CM_Stream_Message::getInstance()->synchronize();
 			}
-		));
+		), 'common');
 	}
 
 	/**
@@ -63,7 +63,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Paging_Log_Abstract::deleteOlder' => function () {
 				CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 			}
-		));
+		), 'heavy');
 	}
 
 	public static function getPackageName() {
@@ -72,10 +72,11 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param Closure[] $callbacks
+	 * @param string    $functionName
 	 */
-	protected function _executeCallbacks($callbacks) {
+	protected function _executeCallbacks($callbacks, $functionName) {
 		foreach ($callbacks as $name => $callback) {
-			CMService_Newrelic::getInstance()->startTransaction($this->getPackageName() . ': ' . $name);
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $this->getPackageName() . ' ' . $functionName . ': ' . $name);
 			try {
 				$callback();
 			} catch (CM_Exception $e) {
