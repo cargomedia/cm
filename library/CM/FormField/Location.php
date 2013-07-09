@@ -67,7 +67,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			}
 		}
 
-		if ($requestLocation->getLevel() <= $this->_options['levelMin']) {
+		if ($requestLocation->getLevel() < $this->_options['levelMin']) {
 			$requestLocation = $requestLocation->get($this->_options['levelMin']);
 			if (null === $requestLocation) {
 				return;
