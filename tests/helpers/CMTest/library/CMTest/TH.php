@@ -221,6 +221,32 @@ class CMTest_TH {
 	}
 
 	/**
+	 * @param int|null $level
+	 * @return CM_Model_Location
+	 */
+	public static function createLocation($level = null) {
+		$country = (int) CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+		$state = (int) CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $country, 'name' => 'stateFoo'));
+		$city = (int) CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+															'lon'     => 15));
+		$zip = (int) CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+
+		switch ($level) {
+			case CM_Model_Location::LEVEL_ZIP:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
+
+			case CM_Model_Location::LEVEL_CITY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $city);
+
+			case CM_Model_Location::LEVEL_STATE:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_STATE, $state);
+
+			default:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $country);
+		}
+	}
+
+	/**
 	 * @return CM_Db_Client
 	 */
 	public static function getDbClient() {
