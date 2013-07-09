@@ -380,16 +380,19 @@ class CM_Bootloader {
 	private function _formatException(Exception $exception) {
 		$dumpArgument = function($argument) {
 			if (is_object($argument)) {
+				if ($argument instanceof stdClass) {
+					return 'object';
+				}
 				$value = get_class($argument);
 				if ($argument instanceof CM_Model_Abstract) {
 					$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
 				}
 				return $value;
 			}
-			if (is_array($argument)) {
-				return 'array';
+			if (is_string($argument) || is_bool($argument) || is_numeric($argument)) {
+				return var_export($argument, true);
 			}
-			return var_export($argument, true);
+			return gettype($argument);
 		};
 
 		$text = get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
