@@ -2,6 +2,9 @@
 
 abstract class CM_Class_Abstract {
 
+	private static $_classConfigCacheEnabled = null;
+	private static $_classHierarchyCache = array();
+
 	/**
 	 * @return int
 	 */
@@ -41,11 +44,11 @@ abstract class CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static function _getConfig() {
-		$config = CM_Config::get();
-		$cacheEnabled = $config->CM_Class_Abstract->configCacheEnabled;
-		$className = get_called_class();
-		$cacheKey = CM_CacheConst::Config . '_className:' . $className;
-		if (!$cacheEnabled || false === ($result = CM_CacheLocal::get($cacheKey))) {
+		if (null === self::$_classConfigCacheEnabled) {
+			self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
+		}
+		$cacheKey = CM_CacheConst::Config . '_className:' . get_called_class();
+		if (!self::$_classConfigCacheEnabled || false === ($result = CM_CacheLocal::get($cacheKey))) {
 			$result = self::_getConfigRaw();
 			CM_CacheLocal::set($cacheKey, $result);
 		}
@@ -82,16 +85,14 @@ abstract class CM_Class_Abstract {
 	 * @return string[]
 	 */
 	private static function _getClassHierarchy() {
-		static $classHierarchyCache = array();
-
 		$className = get_called_class();
-		if (isset($classHierarchyCache[$className])) {
-			return $classHierarchyCache[$className];
+		if (isset(self::$_classHierarchyCache[$className])) {
+			return self::$_classHierarchyCache[$className];
 		}
 		$classHierarchy = array_values(class_parents($className));
 		array_unshift($classHierarchy, $className);
 		array_pop($classHierarchy);
-		$classHierarchyCache[$className] = $classHierarchy;
+		self::$_classHierarchyCache[$className] = $classHierarchy;
 		return $classHierarchy;
 	}
 
