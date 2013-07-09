@@ -31,5 +31,10 @@ class CM_FormField_LocationTest extends CMTest_TestCase {
 		/** @var CM_Model_Location $location */
 		$location = $value[0];
 		$this->assertSame($location->getId(), $countryId);
+
+		CM_Config::get()->testIp = null;
+		$field = new CM_FormField_Location('foo');
+		$field->setValueByRequest($request);
+		$this->assertSame($field->getValue(), null);
 	}
 }
