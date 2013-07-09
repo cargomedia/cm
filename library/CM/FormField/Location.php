@@ -46,6 +46,9 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		return new CM_Model_Location($level, $id);
 	}
 
+	/**
+	 * @param CM_Request_Abstract $request
+	 */
 	public function setValueByRequest(CM_Request_Abstract $request) {
 		$ip = $request->getIp();
 		$requestLocation = CM_Model_Location::findByIp($ip);
