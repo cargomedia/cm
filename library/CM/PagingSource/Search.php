@@ -1,28 +1,43 @@
 <?php
 
 class CM_PagingSource_Search extends CM_PagingSource_Abstract {
+
 	/** @var CM_SearchQuery_Abstract */
 	private $_query;
 
 	/** @var array|null */
 	private $_fields;
 
-	/** @var CM_Elastica_Type_Abstract */
-	private $_type;
+	/** @var CM_Elastica_Type_Abstract[] */
+	private $_types;
 
 	/**
-	 * @param CM_Elastica_Type_Abstract $type
-	 * @param CM_SearchQuery_Abstract   $query
-	 * @param array|null                $fields
+	 * @param CM_Elastica_Type_Abstract|CM_Elastica_Type_Abstract[] $types
+	 * @param CM_SearchQuery_Abstract                               $query
+	 * @param array|null                                            $fields
+	 * @throws CM_Exception_Invalid
 	 */
-	function __construct(CM_Elastica_Type_Abstract $type, CM_SearchQuery_Abstract $query, array $fields = null) {
-		$this->_type = $type;
+	function __construct($types, CM_SearchQuery_Abstract $query, array $fields = null) {
+		if (!is_array($types)) {
+			$types = array($types);
+		}
+		array_walk($types, function ($type) {
+			if (!$type instanceof CM_Elastica_Type_Abstract) {
+				throw new CM_Exception_Invalid("Type is not an instance of CM_Elastica_Type_Abstract");
+			}
+		});
+		$this->_types = $types;
 		$this->_query = $query;
 		$this->_fields = $fields;
 	}
 
 	protected function _cacheKeyBase() {
-		return array($this->_type->getIndex()->getName(), $this->_type->getType()->getName(), $this->_query->getQuery());
+		$keyParts = array();
+		foreach ($this->_types as $type) {
+			$keyParts[] = $type->getIndex()->getName() . '_' . $type->getType()->getName();
+		}
+		sort($keyParts);
+		return array(implode(',', $keyParts), $this->_query->getQuery());
 	}
 
 	private function _getResult($offset = null, $count = null) {
@@ -38,7 +53,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 			if ($count !== null) {
 				$data['size'] = $count;
 			}
-			$searchResult = CM_Search::getInstance()->query($this->_type, $data);
+			$searchResult = CM_Search::getInstance()->query($this->_types, $data);
 			$result = array('items' => array(), 'total' => 0);
 			if (isset($searchResult['hits'])) {
 				foreach ($searchResult['hits']['hits'] as $hit) {
