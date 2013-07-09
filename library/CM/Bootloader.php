@@ -373,6 +373,10 @@ class CM_Bootloader {
 		return self::$_instance;
 	}
 
+	/**
+	 * @param Exception $exception
+	 * @return string
+	 */
 	private function _formatException(Exception $exception) {
 		$dumpArgument = function($argument) {
 			if (is_object($argument)) {
@@ -413,7 +417,11 @@ class CM_Bootloader {
 					$text .= '(' . implode(', ', $arguments) . ')';
 				}
 			}
-			$text .= ' ' . $entry['file'] . ':' . $entry['line'];
+			if (array_key_exists('file', $entry)) {
+				$text .= ' ' . $entry['file'] . ':' . $entry['line'];
+			} else {
+				$text .= ' [internal function]';
+			}
 			$text .= PHP_EOL;
 		}
 		return $text;
