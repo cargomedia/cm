@@ -61,7 +61,8 @@ class CM_Db_Client {
 		}
 		$dsn = 'mysql:' . implode(';', $dsnOptions);
 		try {
-			$this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
+			$this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"',
+																				  PDO::ATTR_PERSISTENT         => true));
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 			throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
