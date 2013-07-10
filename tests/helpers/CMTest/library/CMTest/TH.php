@@ -225,15 +225,17 @@ class CMTest_TH {
 	 * @return CM_Model_Location
 	 */
 	public static function createLocation($level = null) {
-		$country = (int) CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
-		$state = (int) CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $country, 'name' => 'stateFoo'));
-		$city = (int) CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+		$country = CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+		$state =  CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $country, 'name' => 'stateFoo'));
+		$city = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
 															'lon'     => 15));
-		$zip = (int) CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+		$zip = CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+
+		CM_Model_Location::createAggregation();
 
 		switch ($level) {
-			case CM_Model_Location::LEVEL_ZIP:
-				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
+			case CM_Model_Location::LEVEL_COUNTRY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $zip);
 
 			case CM_Model_Location::LEVEL_CITY:
 				return new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $city);
@@ -242,7 +244,7 @@ class CMTest_TH {
 				return new CM_Model_Location(CM_Model_Location::LEVEL_STATE, $state);
 
 			default:
-				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $country);
+				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $country);
 		}
 	}
 
