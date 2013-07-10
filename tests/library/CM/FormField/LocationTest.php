@@ -2,39 +2,41 @@
 
 class CM_FormField_LocationTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-		$switzerland = CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'CH', 'name' => 'Switzerland'));
-		$baselStadt = CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
-		$basel = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
-															 'lat'     => 47.569535, 'lon' => 7.574063));
-		CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
-	}
-
 	public function testSetValueByRequest() {
-		CM_Config::get()->testIp = '0.0.0.1';
 		$request = new CM_Request_Get('/fuu/');
-		$cityId = (int) CM_Db_Db::getRandId(TBL_CM_LOCATIONCITY, 'id');
-		CM_Db_Db::insert(TBL_CM_LOCATIONCITYIP, array('ipStart' => 1, 'ipEnd' => 1, 'cityId' => $cityId));
-		$countryId = (int) CM_Db_Db::getRandId(TBL_CM_LOCATIONCOUNTRY, 'id');
-		CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRYIP, array('ipStart' => 1, 'ipEnd' => 1, 'countryId' => $countryId));
+		$location = CMTest_TH::createLocation();
+		$locationCity = $location->get(CM_Model_Location::LEVEL_CITY);
 
-		$field = new CM_FormField_Location('foo', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
+		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo'));
+		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue(null));
+		/** @var CM_FormField_Location $field */
+		$field->setValueByRequest($request);
+		$this->assertSame(null, $field->getValue());
+
+		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo', CM_Model_Location::LEVEL_CITY,
+			CM_Model_Location::LEVEL_CITY));
+		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($location->get(CM_Model_Location::LEVEL_COUNTRY)));
+		$field->setValueByRequest($request);
+		$this->assertSame(null, $field->getValue());
+
+		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo', CM_Model_Location::LEVEL_CITY,
+			CM_Model_Location::LEVEL_CITY));
+		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($location));
 		$field->setValueByRequest($request);
 		$value = $field->getValue();
-		/** @var CM_Model_Location $location */
-		$location = $value[0];
-		$this->assertSame($location->getId(), $cityId);
+		/** @var CM_Model_Location $locationValue */
+		$locationValue = $value[0];
+		$this->assertSame($locationCity->getId(), $locationValue->getId());
+		$this->assertSame($locationCity->getLevel(), $locationValue->getLevel());
 
-		$field = new CM_FormField_Location('foo', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_COUNTRY);
+		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo', CM_Model_Location::LEVEL_CITY,
+			CM_Model_Location::LEVEL_CITY));
+		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($locationCity));
 		$field->setValueByRequest($request);
 		$value = $field->getValue();
-		/** @var CM_Model_Location $location */
-		$location = $value[0];
-		$this->assertSame($location->getId(), $countryId);
-
-		CM_Config::get()->testIp = null;
-		$field = new CM_FormField_Location('foo');
-		$field->setValueByRequest($request);
-		$this->assertSame($field->getValue(), null);
+		/** @var CM_Model_Location $locationValue */
+		$locationValue = $value[0];
+		$this->assertSame($locationCity->getId(), $locationValue->getId());
+		$this->assertSame($locationCity->getLevel(), $locationValue->getLevel());
 	}
 }
