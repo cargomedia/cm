@@ -51,19 +51,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 */
 	public function setValueByRequest(CM_Request_Abstract $request) {
 		$requestLocation = $this->_getRequestLocationByRequest($request);
-		if (null === $requestLocation) {
+		if (null === $requestLocation || $requestLocation->getLevel() < $this->_options['levelMin']) {
 			return;
 		}
 
 		if ($requestLocation->getLevel() > $this->_options['levelMax']) {
 			$requestLocation = $requestLocation->get($this->_options['levelMax']);
-			if (null === $requestLocation) {
-				return;
-			}
-		}
-
-		if ($requestLocation->getLevel() < $this->_options['levelMin']) {
-			$requestLocation = $requestLocation->get($this->_options['levelMin']);
 			if (null === $requestLocation) {
 				return;
 			}
