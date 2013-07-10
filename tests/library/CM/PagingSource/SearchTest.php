@@ -16,13 +16,12 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
-		CMTest_TH::clearEnv();
+		CMTest_TH::clearDb();
 	}
 
 	public function setUp() {
 		$type1 = new CM_Elastica_Type_Mock1();
 		$type2 = new CM_Elastica_Type_Mock2();
-
 		$type1->createVersioned();
 		$type2->createVersioned();
 		$type1->getIndex()->refresh();
@@ -128,7 +127,7 @@ class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
 		$id = self::_getIdSerialized(array('id' => (int) $data['id']));
 		$doc = new Elastica_Document($id,
 			array(
-				'id'   => $data['id'],
+				'id'    => $data['id'],
 				'price' => $data['price'],
 			)
 		);
