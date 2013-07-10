@@ -235,7 +235,7 @@ class CMTest_TH {
 
 		switch ($level) {
 			case CM_Model_Location::LEVEL_COUNTRY:
-				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $zip);
+				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $country);
 
 			case CM_Model_Location::LEVEL_CITY:
 				return new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $city);
@@ -244,7 +244,7 @@ class CMTest_TH {
 				return new CM_Model_Location(CM_Model_Location::LEVEL_STATE, $state);
 
 			default:
-				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $country);
+				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
 		}
 	}
 
