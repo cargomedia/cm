@@ -64,7 +64,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 			$result = array('items' => array(), 'total' => 0);
 			if (isset($searchResult['hits'])) {
 				foreach ($searchResult['hits']['hits'] as $hit) {
-					if ($this->_fields) {
+					if ($this->_fields && array_key_exists('fields', $hit)) {
 						if ($this->_multipleTypes) {
 							$idArray = array('_id' => $hit['_id'], '_type' => $hit['_type']);
 						} else {
