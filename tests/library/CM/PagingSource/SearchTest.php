@@ -57,7 +57,6 @@ class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
 	const INDEX_NAME = 'index_1';
 
 	protected $_mapping = array(
-		'id'   => array('type' => 'integer'),
 		'name' => array('type' => 'string'),
 	);
 
@@ -82,10 +81,8 @@ class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
 	}
 
 	protected function _getDocument(array $data) {
-		$id = self::_getIdSerialized(array('id' => (int) $data['id']));
-		$doc = new Elastica_Document($id,
+		$doc = new Elastica_Document($data['id'],
 			array(
-				'id'   => $data['id'],
 				'name' => $data['name'],
 			)
 		);
@@ -99,7 +96,6 @@ class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
 	const INDEX_NAME = 'index_2';
 
 	protected $_mapping = array(
-		'id'    => array('type' => 'integer'),
 		'price' => array('type' => 'integer'),
 	);
 
@@ -124,10 +120,8 @@ class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
 	}
 
 	protected function _getDocument(array $data) {
-		$id = self::_getIdSerialized(array('id' => (int) $data['id']));
-		$doc = new Elastica_Document($id,
+		$doc = new Elastica_Document($data['id'],
 			array(
-				'id'    => $data['id'],
 				'price' => $data['price'],
 			)
 		);
