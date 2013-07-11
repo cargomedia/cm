@@ -318,4 +318,33 @@ class CM_File_Image extends CM_File {
 				throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
 		}
 	}
+
+	public static function create($path, $content = null) {
+		$file = CM_File::create($path, $content);
+
+		if (!self::isValid($file)) {
+			$file->delete();
+			throw new CM_Exception('Could not create `' . $path . '`');
+		}
+
+		return new self($path);
+	}
+
+	/**
+	 * @param CM_File $file
+	 * @return bool
+	 */
+	public static function isValid(CM_File $file) {
+		if (!extension_loaded('imagick')) {
+			throw new CM_Exception('Missing `imagick` extension');
+		}
+
+		try {
+			$imagick = new Imagick($file->getPath());
+		} catch (ImagickException $e) {
+			return false;
+		}
+
+		return $imagick->valid();
+	}
 }

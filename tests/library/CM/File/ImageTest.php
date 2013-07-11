@@ -339,4 +339,29 @@ class CM_File_ImageTest extends CMTest_TestCase {
 	public function testGetExtensionByFormatInvalid() {
 		CM_File_Image::getExtensionByFormat(-999);
 	}
+
+	public function testCreate() {
+		$rawImageData = file_get_contents(DIR_TEST_DATA . 'img/test.jpg', 'r');
+		$image = CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
+		$this->assertEquals('image/jpeg', $image->getMimeType());
+		$image->delete();
+
+		try {
+			$rawImageData = 'false image data';
+			CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
+			$this->fail('Could create image from false data');
+		} catch (CM_Exception $e) {
+			$this->assertContains('Could not create', $e->getMessage());
+		}
+	}
+
+	public function testIsValid() {
+		$path = DIR_TEST_DATA . 'img/test.jpg';
+		$file = new CM_File($path);
+		$this->assertTrue(CM_File_Image::isValid($file));
+
+		$file = CM_File::create(DIR_TMP . 'noImage.jpg');
+		$this->assertFalse(CM_File_Image::isValid($file));
+		$file->delete();
+	}
 }
