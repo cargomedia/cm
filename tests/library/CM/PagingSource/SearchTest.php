@@ -33,8 +33,9 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$source = new CM_PagingSource_Search($type1, new CM_SearchQuery_Mock());
 		$this->assertSame(0, $source->getCount());
 
-		$type1->createEntry('foo');
+		$id = $type1->createEntry('foo');
 		$this->assertSame(1, $source->getCount());
+		$this->assertSame(array((string) $id), $source->getItems());
 	}
 
 	public function testMultiGet() {
@@ -43,13 +44,16 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$source = new CM_PagingSource_Search(array($type1, $type2), new CM_SearchQuery_Mock());
 		$this->assertSame(0, $source->getCount());
 
-		$type1->createEntry('foo');
+		$id1 = $type1->createEntry('foo');
 		$this->assertSame(1, $source->getCount());
 
-		$type2->createEntry(1);
+		$id2 = $type2->createEntry(1);
 		$this->assertSame(2, $source->getCount());
+		$this->assertSame(array(
+			array('_id' => (string) $id1, '_type' => 'index_1'),
+			array('_id' => (string) $id2, '_type' => 'index_2')
+		), $source->getItems());
 	}
-
 }
 
 class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
@@ -69,11 +73,13 @@ class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
 
 	/**
 	 * @param string $name
+	 * @return int
 	 */
 	public function createEntry($name) {
 		$id = CM_Db_Db::insert('indexTest_1', array('name' => (string) $name));
 		$this->update($id);
 		$this->getIndex()->refresh();
+		return (int) $id;
 	}
 
 	protected function _getQuery($ids = null, $limit = null) {
@@ -108,11 +114,13 @@ class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
 
 	/**
 	 * @param int $price
+	 * @return int
 	 */
 	public function createEntry($price) {
 		$id = CM_Db_Db::insert('indexTest_2', array('price' => (int) $price));
 		$this->update($id);
 		$this->getIndex()->refresh();
+		return (int) $id;
 	}
 
 	protected function _getQuery($ids = null, $limit = null) {

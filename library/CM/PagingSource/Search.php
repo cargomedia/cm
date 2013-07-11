@@ -11,6 +11,9 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	/** @var CM_Elastica_Type_Abstract[] */
 	private $_types;
 
+	/** @var boolean */
+	private $_multipleTypes;
+
 	/**
 	 * @param CM_Elastica_Type_Abstract|CM_Elastica_Type_Abstract[] $types
 	 * @param CM_SearchQuery_Abstract                               $query
@@ -26,6 +29,10 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 				throw new CM_Exception_Invalid("Type is not an instance of CM_Elastica_Type_Abstract");
 			}
 		});
+		if (empty($types)) {
+			throw new CM_Exception_Invalid("At least one type needed");
+		}
+		$this->_multipleTypes = (1 < count($types));
 		$this->_types = $types;
 		$this->_query = $query;
 		$this->_fields = $fields;
@@ -58,9 +65,19 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 			if (isset($searchResult['hits'])) {
 				foreach ($searchResult['hits']['hits'] as $hit) {
 					if ($this->_fields) {
-						$result['items'][] = array_merge($hit['fields'], array('_id' => $hit['_id']));
+						if ($this->_multipleTypes) {
+							$idArray = array('_id' => $hit['_id'], '_type' => $hit['_type']);
+						} else {
+							$idArray = array('_id' => $hit['_id']);
+						}
+						$result['items'][] = array_merge($hit['fields'], $idArray);
 					} else {
-						$result['items'][] = $hit['_id'];
+						if ($this->_multipleTypes) {
+							$item = array('_id' => $hit['_id'], '_type' => $hit['_type']);
+						} else {
+							$item = $hit['_id'];
+						}
+						$result['items'][] = $item;
 					}
 				}
 				$result['total'] = $searchResult['hits']['total'];
