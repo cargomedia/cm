@@ -11,13 +11,13 @@ class CM_FormField_LocationTest extends CMTest_TestCase {
 		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue(null));
 		/** @var CM_FormField_Location $field */
 		$field->setValueByRequest($request);
-		$this->assertSame(null, $field->getValue());
+		$this->assertNull($field->getValue());
 
 		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo', CM_Model_Location::LEVEL_CITY,
 			CM_Model_Location::LEVEL_CITY));
 		$field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($location->get(CM_Model_Location::LEVEL_COUNTRY)));
 		$field->setValueByRequest($request);
-		$this->assertSame(null, $field->getValue());
+		$this->assertNull($field->getValue());
 
 		$field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array('foo', CM_Model_Location::LEVEL_CITY,
 			CM_Model_Location::LEVEL_CITY));
