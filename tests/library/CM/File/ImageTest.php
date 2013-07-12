@@ -360,6 +360,10 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		$file = new CM_File($path);
 		$this->assertTrue(CM_File_Image::isValid($file));
 
+		$path = DIR_TEST_DATA . 'img/test.tiff';
+		$file = new CM_File($path);
+		$this->assertFalse(CM_File_Image::isValid($file));
+
 		$file = CM_File::create(DIR_TMP . 'noImage.jpg');
 		$this->assertFalse(CM_File_Image::isValid($file));
 		$file->delete();

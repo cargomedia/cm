@@ -336,7 +336,8 @@ class CM_File_Image extends CM_File {
 	 */
 	public static function isValid(CM_File $file) {
 		try {
-			new self($file);
+			$imageFile = new self($file);
+			$imageFile->getFormat();
 		} catch (CM_Exception $e) {
 			return false;
 		}
