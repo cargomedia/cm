@@ -335,16 +335,12 @@ class CM_File_Image extends CM_File {
 	 * @return bool
 	 */
 	public static function isValid(CM_File $file) {
-		if (!extension_loaded('imagick')) {
-			throw new CM_Exception('Missing `imagick` extension');
-		}
-
 		try {
-			$imagick = new Imagick($file->getPath());
-		} catch (ImagickException $e) {
+			new self($file);
+		} catch (CM_Exception $e) {
 			return false;
 		}
 
-		return $imagick->valid();
+		return true;
 	}
 }
