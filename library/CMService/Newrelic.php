@@ -60,6 +60,18 @@ class CMService_Newrelic extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $name
+	 * @param int    $value
+	 */
+	public function setCustomMetric($name, $value) {
+		$name = (string) $name;
+		$value = (int) $value;
+		if ($this->_isEnabled()) {
+			newrelic_custom_metric($name, $value);
+		}
+	}
+
+	/**
 	 * @throws CM_Exception_Invalid
 	 * @return bool
 	 */
