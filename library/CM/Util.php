@@ -131,16 +131,17 @@ class CM_Util {
 		$curlError = null;
 		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
+			$curlError =  'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
 
 		$info = curl_getinfo($curlConnection);
 		if ((int) $info['http_code'] !== 200) {
-			$curlError .= 'HTTP Code = `' . $info['http_code'] . '`';
+			$curlError .= 'HTTP Code: `' . $info['http_code'] . '`';
 		}
 
 		curl_close($curlConnection);
 		if ($curlError) {
+			$curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
 			throw new CM_Exception_Invalid($curlError);
 		}
 		return $contents;
