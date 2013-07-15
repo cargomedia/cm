@@ -157,9 +157,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	 */
 	remove: function(skipDomRemoval, skipTriggerRemove) {
 		_.each(_.clone(this.getChildren()), function(child) {
-			if (!skipDomRemoval) {
-				child.remove();
-			}
+			child.remove(skipDomRemoval, skipTriggerRemove);
 		});
 
 		if (this.getParent()) {
