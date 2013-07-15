@@ -131,7 +131,7 @@ class CM_Util {
 		$curlError = null;
 		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
+			$curlError =  '`' . curl_error($curlConnection) . '`';
 		}
 
 		$info = curl_getinfo($curlConnection);
@@ -141,6 +141,7 @@ class CM_Util {
 
 		curl_close($curlConnection);
 		if ($curlError) {
+			$curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
 			throw new CM_Exception_Invalid($curlError);
 		}
 		return $contents;
