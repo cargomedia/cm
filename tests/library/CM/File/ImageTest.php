@@ -345,7 +345,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		CM_File_Image::getExtensionByFormat(-999);
 	}
 
-	public function testCreateSuccess() {
+	public function testCreate() {
 		$rawImageData = file_get_contents(DIR_TEST_DATA . 'img/test.jpg', 'r');
 		$image = CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
 		$this->assertEquals('image/jpeg', $image->getMimeType());
