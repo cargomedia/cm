@@ -114,6 +114,7 @@ class CM_Util {
 
 		$curlConnection = curl_init();
 		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
@@ -135,7 +136,7 @@ class CM_Util {
 
 		$info = curl_getinfo($curlConnection);
 		if ((int) $info['http_code'] !== 200) {
-			$curlError = 'HTTP Code = `' . $info['http_code'] . '`';
+			$curlError .= 'HTTP Code = `' . $info['http_code'] . '`';
 		}
 
 		curl_close($curlConnection);
