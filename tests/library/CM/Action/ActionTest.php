@@ -211,7 +211,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 	 * @expectedException CM_Exception_NotAllowed
 	 * @expectedExceptionMessage Action not allowed
 	 */
-	public function testNotAllowed() {
+	public function testPrepareNotAllowed() {
 		$actor = CMTest_TH::createUser();
 		$action = new CM_Action_Mock(1, $actor);
 		$action->prepare(true);
