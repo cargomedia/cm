@@ -36,7 +36,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$this->_verb = (int) $verb;
 	}
 
-	protected function _notify(){
+	protected function _notify() {
 		$arguments = func_get_args();
 		$methodName = '_notify' . $this->getVerbName();
 
@@ -45,9 +45,39 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		}
 	}
 
+	/**
+	 * @return bool
+	 */
+	protected final function _isAllowed() {
+		$arguments = func_get_args();
+		$methodName = '_isAllowed' . $this->getVerbName();
+
+		if (method_exists($this, $methodName)) {
+			return call_user_func_array(array($this, $methodName), $arguments);
+		}
+		return true;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public final function isAllowed() {
+		$arguments = func_get_args();
+		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
+			return false;
+		}
+		$role = null;
+		$actionLimit = $this->getActionLimit($role);
+		return !$actionLimit;
+	}
+
 	abstract protected function _prepare();
 
 	public final function prepare() {
+		$arguments = func_get_args();
+		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
+			throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
+		}
 		$role = null;
 		$actionLimit = $this->getActionLimit($role);
 		if ($actionLimit) {
@@ -136,8 +166,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract     $actionLimit
-	 * @param int                               $role
+	 * @param CM_Model_ActionLimit_Abstract $actionLimit
+	 * @param int                           $role
 	 * @return bool
 	 */
 	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
