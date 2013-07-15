@@ -114,6 +114,7 @@ class CM_Util {
 
 		$curlConnection = curl_init();
 		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
@@ -127,11 +128,17 @@ class CM_Util {
 		}
 		curl_setopt($curlConnection, CURLOPT_URL, $url);
 
-		$contents = curl_exec($curlConnection);
 		$curlError = null;
+		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
 			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
 		}
+
+		$info = curl_getinfo($curlConnection);
+		if ((int) $info['http_code'] !== 200) {
+			$curlError .= 'HTTP Code = `' . $info['http_code'] . '`';
+		}
+
 		curl_close($curlConnection);
 		if ($curlError) {
 			throw new CM_Exception_Invalid($curlError);
