@@ -50,14 +50,14 @@ class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 		$user2->_change();
 
 		$this->assertFalse($user1->getRoles()->contains(self::ROLE_B));
-		$this->assertRow(TBL_CM_ROLE, array('userId' => $user2->getId(), 'role' => self::ROLE_B));
+		$this->assertRow('cm_role', array('userId' => $user2->getId(), 'role' => self::ROLE_B));
 		$this->assertFalse($user2->getRoles()->contains(self::ROLE_B));
 		$this->assertTrue($user2->getRoles()->contains(self::ROLE_A));
 		CM_ModelAsset_User_Roles::deleteOld();
 		$user1->_change();
 		$user2->_change();
 
-		$this->assertNotRow(TBL_CM_ROLE, array('userId' => $user2->getId(), 'role' => self::ROLE_B));
+		$this->assertNotRow('cm_role', array('userId' => $user2->getId(), 'role' => self::ROLE_B));
 		$this->assertTrue($user2->getRoles()->contains(self::ROLE_A));
 		$this->assertTrue($user1->getRoles()->contains(self::ROLE_A));
 		$this->assertTrue($user1->getRoles()->contains(self::ROLE_C));
@@ -66,7 +66,7 @@ class CM_ModelAsset_User_RolesTest extends CMTest_TestCase {
 	public function test_Get() {
 		$user = CMTest_TH::createUser();
 		$user->getRoles()->add(self::ROLE_A, 2000);
-		$stamps = CM_Db_Db::select(TBL_CM_ROLE, array('startStamp', 'expirationStamp'), array('userId' => $user->getId()))->fetch();
+		$stamps = CM_Db_Db::select('cm_role', array('startStamp', 'expirationStamp'), array('userId' => $user->getId()))->fetch();
 		$this->assertEquals($stamps['startStamp'], $user->getRoles()->getStartStamp(self::ROLE_A));
 		$this->assertEquals($stamps['expirationStamp'], $user->getRoles()->getExpirationStamp(self::ROLE_A));
 	}

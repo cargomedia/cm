@@ -41,7 +41,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 		$this->assertInstanceOf('CM_Model_User', $user);
 
 		$this->assertNotEquals($user2, $entityMock->getUser());
-		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $user->getId()));
+		CM_Db_Db::delete('cm_user', array('userId' => $user->getId()));
 		CMTest_TH::clearCache();
 		try {
 			$entityMock->getUser();

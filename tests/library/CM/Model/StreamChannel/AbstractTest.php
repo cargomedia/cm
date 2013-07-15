@@ -92,8 +92,8 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		}
 		$this->assertEquals(0, $streamChannel->getStreamPublishs()->getCount());
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
-		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_STREAM_SUBSCRIBE, array('channelId' => $streamChannel->getId())), 'StreamSubscriptions not deleted');
-		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_STREAM_PUBLISH, array('channelId' => $streamChannel->getId())), 'StreamPublishs not deleted');
+		$this->assertEquals(0, CM_Db_Db::count('cm_stream_subscribe', array('channelId' => $streamChannel->getId())), 'StreamSubscriptions not deleted');
+		$this->assertEquals(0, CM_Db_Db::count('cm_stream_publish', array('channelId' => $streamChannel->getId())), 'StreamPublishs not deleted');
 	}
 
 	public function testGetSubscribers() {

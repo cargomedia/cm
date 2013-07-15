@@ -244,7 +244,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	public static final function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Db_Db::delete(TBL_CM_ACTION, '`createStamp` < ' . (time() - $age));
+		CM_Db_Db::delete('cm_action', '`createStamp` < ' . (time() - $age));
 	}
 
 	public final function toArray() {
@@ -287,7 +287,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		$time = time();
 		foreach (array_reverse($intervals) as $interval) {
-			$timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM TBL_CM_ACTION WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
+			$timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM `cm_action` WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
 			if (false === $timeMin) {
 				return;
 			}
@@ -310,7 +310,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
 		$result = CM_Db_Db::exec(
-			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `verb`, `type`");
+			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM `cm_action` WHERE " . $where . " GROUP BY `verb`, `type`");
 		$insert = array();
 		while ($row = $result->fetch()) {
 			if ($row['count'] >= 1) {
@@ -318,8 +318,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			}
 		}
 		if (!empty($insert)) {
-			CM_Db_Db::delete(TBL_CM_ACTION, $where);
-			CM_Db_Db::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
+			CM_Db_Db::delete('cm_action', $where);
+			CM_Db_Db::insert('cm_action', array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
 

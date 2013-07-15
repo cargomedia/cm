@@ -60,7 +60,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 			$insertList[] = array(':' . $emoticon['name'] . ':', $emoticon['fileName']);
 		}
 
-		CM_Db_Db::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
+		CM_Db_Db::insertIgnore('cm_emoticon', array('code', 'file'), $insertList);
 		$this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 
 		$this->_checkEmoticonValidity();
