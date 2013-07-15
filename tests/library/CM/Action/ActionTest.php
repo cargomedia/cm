@@ -8,6 +8,8 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CM_Db_Db::truncate(TBL_CM_ACTION);
+		CM_Db_Db::truncate(TBL_CM_ACTIONLIMIT);
+		CMTest_TH::clearCache();
 	}
 
 	public function testConstruct() {
@@ -197,6 +199,23 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$action = new CM_Action_Mock(1, $actor);
 		$this->assertSame('Mock Test', $action->getLabel());
 	}
+
+	public function testIsAllowed() {
+		$actor = CMTest_TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+		$this->assertTrue($action->isAllowed(false));
+		$this->assertFalse($action->isAllowed(true));
+	}
+
+	/**
+	 * @expectedException CM_Exception_NotAllowed
+	 * @expectedExceptionMessage Action not allowed
+	 */
+	public function testPrepareNotAllowed() {
+		$actor = CMTest_TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+		$action->prepare(true);
+	}
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
@@ -204,6 +223,14 @@ class CM_Action_Mock extends CM_Action_Abstract {
 	const TYPE = 1;
 
 	protected function _notify() {
+	}
+
+	/**
+	 * @param bool $private
+	 * @return bool
+	 */
+	protected function _isAllowedTest($private = false) {
+		return !$private;
 	}
 
 	protected function _prepare() {
