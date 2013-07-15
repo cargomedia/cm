@@ -76,7 +76,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	public final function prepare() {
 		$arguments = func_get_args();
 		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
-			throw new CM_Exception_NotAllowed();
+			throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
 		}
 		$role = null;
 		$actionLimit = $this->getActionLimit($role);
