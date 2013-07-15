@@ -45,6 +45,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		}
 	}
 
+	/**
+	 * @return bool
+	 */
 	protected final function _isAllowed() {
 		$arguments = func_get_args();
 		$methodName = '_isAllowed' . $this->getVerbName();
@@ -55,6 +58,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		return true;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public final function isAllowed() {
 		$arguments = func_get_args();
 		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
