@@ -18,7 +18,7 @@ class CM_File_Image extends CM_File {
 	public function __construct($file) {
 		parent::__construct($file);
 
-		$this->_validImagick();
+		$this->_validateImagick();
 	}
 
 	/**
@@ -301,7 +301,7 @@ class CM_File_Image extends CM_File {
 		}
 	}
 
-	private function _validImagick() {
+	private function _validateImagick() {
 		$this->getFormat();
 	}
 
