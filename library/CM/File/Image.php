@@ -18,7 +18,7 @@ class CM_File_Image extends CM_File {
 	public function __construct($file) {
 		parent::__construct($file);
 
-		$this->_getImagick(); // Make sure resource can be created
+		$this->_validImagick();
 	}
 
 	/**
@@ -301,6 +301,10 @@ class CM_File_Image extends CM_File {
 		}
 	}
 
+	private function _validImagick() {
+		$this->getFormat();
+	}
+
 	/**
 	 * @param int $format
 	 * @return string
@@ -317,31 +321,5 @@ class CM_File_Image extends CM_File {
 			default:
 				throw new CM_Exception_Invalid('Invalid format `' . $format . '`.');
 		}
-	}
-
-	public static function create($path, $content = null) {
-		$file = CM_File::create($path, $content);
-
-		if (!self::isValid($file)) {
-			$file->delete();
-			throw new CM_Exception('Could not create `' . $path . '`');
-		}
-
-		return new self($path);
-	}
-
-	/**
-	 * @param CM_File $file
-	 * @return bool
-	 */
-	public static function isValid(CM_File $file) {
-		try {
-			$imageFile = new self($file);
-			$imageFile->getFormat();
-		} catch (CM_Exception $e) {
-			return false;
-		}
-
-		return true;
 	}
 }
