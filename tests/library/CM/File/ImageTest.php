@@ -354,10 +354,10 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	/**
 	 * @expectedException CM_Exception
+	 * @expectedExceptionMessage Cannot load Imagick instance
 	 */
 	public function testCreateFailure() {
 		$rawImageData = 'false image data';
 		CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
-		$this->fail('Could create image from false data');
 	}
 }
