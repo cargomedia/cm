@@ -197,6 +197,16 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$action = new CM_Action_Mock(1, $actor);
 		$this->assertSame('Mock Test', $action->getLabel());
 	}
+
+	/**
+	 * @expectedException CM_Exception_NotAllowed
+	 * @expectedExceptionMessage Action not allowed
+	 */
+	public function testIsAllowed() {
+		$actor = CMTest_TH::createUser();
+		$action = new CM_Action_Mock(1, $actor);
+		$action->prepare(true);
+	}
 }
 
 class CM_Action_Mock extends CM_Action_Abstract {
@@ -204,6 +214,14 @@ class CM_Action_Mock extends CM_Action_Abstract {
 	const TYPE = 1;
 
 	protected function _notify() {
+	}
+
+	/**
+	 * @param bool $private
+	 * @return bool
+	 */
+	protected function _isAllowedTest($private = false) {
+		return !$private;
 	}
 
 	protected function _prepare() {
