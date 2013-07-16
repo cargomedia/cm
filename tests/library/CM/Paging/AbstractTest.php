@@ -74,32 +74,30 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
-		defined('TBL_TEST') || define('TBL_TEST', 'test');
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST (
+		CM_Db_Db::exec('CREATE TABLE `test` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert('test', array('num' => $i));
 		}
-		self::$_source = new CM_PagingSource_Sql('`num`', TBL_TEST);
-		define('TBL_TEST2', 'test2');
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST2 (
+		self::$_source = new CM_PagingSource_Sql('`num`', 'test');
+		CM_Db_Db::exec('CREATE TABLE `test2` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 50; $i++) {
-			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
-			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert('test2', array('num' => $i));
+			CM_Db_Db::insert('test2', array('num' => $i));
 		}
 	}
 
 	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
-		CM_Db_Db::exec('DROP TABLE TBL_TEST');
-		CM_Db_Db::exec('DROP TABLE TBL_TEST2');
+		CM_Db_Db::exec('DROP TABLE `test`');
+		CM_Db_Db::exec('DROP TABLE `test2`');
 	}
 
 	public function testGetCount() {
@@ -108,13 +106,13 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetCountGroup() {
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, null, null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', null, null, null, '`num`'));
 		$this->assertEquals(50, $paging->getCount());
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, 'id=1', null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', 'id=1', null, null, '`num`'));
 		$this->assertEquals(1, $paging->getCount());
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, 'id=99999', null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', 'id=99999', null, null, '`num`'));
 		$this->assertEquals(0, $paging->getCount());
 	}
 
