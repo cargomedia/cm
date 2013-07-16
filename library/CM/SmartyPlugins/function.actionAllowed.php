@@ -12,9 +12,6 @@ function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $
 	if (!isset($params['verb'])) {
 		trigger_error('Param `verb` missing.');
 	}
-	if (!empty($params['forceAllow'])) {
-		return true;
-	}
 
 	/** @var CM_Model_User $viewer */
 	$viewer = $template->smarty->getTemplateVars('viewer');
