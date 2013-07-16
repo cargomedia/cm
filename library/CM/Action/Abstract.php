@@ -66,8 +66,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
 			return false;
 		}
-		$role = null;
-		$actionLimit = $this->getActionLimit($role);
+		$actionLimit = $this->getActionLimit();
 		return !$actionLimit;
 	}
 
