@@ -119,7 +119,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 		return $field;
 	}
 
-	public static function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$userInput = $params->get('userInput');
 		$field = new static('field');
 		$field->validate($userInput, $response);

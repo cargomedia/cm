@@ -17,7 +17,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		$this->setTplParam('cacheNames', $cacheNames);
 	}
 
-	public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		if (!IS_DEBUG) {
 			throw new CM_Exception_NotAllowed();
 		}

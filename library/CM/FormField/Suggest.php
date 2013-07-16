@@ -45,7 +45,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 		return $values;
 	}
 
-	public static function ajax_getSuggestions(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_getSuggestions(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$field = new static(null);
 		$suggestions = $field->_getSuggestions($params->getString('term'), $params->getArray('options'), $response->getRender());
 		return $suggestions;
