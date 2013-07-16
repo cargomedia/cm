@@ -21,10 +21,16 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			$functionName = 'ajax_' . $query['method'];
 			$params = CM_Params::factory($query['params']);
 			$this->_setStringRepresentation($className . '::' . $functionName);
-
 			$componentHandler = new CM_ComponentFrontendHandler();
-			$success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
 
+			$reflection = new ReflectionClass($className);
+			if ($reflection->getMethod($functionName)->isStatic()){
+				$success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
+			} else {
+				$component = CM_Component_Abstract::factory($className, null, $this->getViewer());
+				$component->checkAccessible();
+				$success['data'] = $component->$functionName($params, $componentHandler, $this);
+			}
 
 			$exec = $componentHandler->compile_js('this');
 
