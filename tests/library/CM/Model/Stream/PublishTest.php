@@ -44,7 +44,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 		$videoStream = CM_Model_Stream_Publish::create(array('user'          => $user, 'start' => 123123, 'allowedUntil' => 324234,
 															 'key'           => '123123_2',
 															 'streamChannel' => $streamChannel));
-		$this->assertRow(TBL_CM_STREAM_PUBLISH, array('userId'    => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
+		$this->assertRow('cm_stream_publish', array('userId'    => $user->getId(), 'start' => 123123, 'allowedUntil' => 324234, 'key' => '123123_2',
 													  'channelId' => $streamChannel->getId()));
 		$this->assertEquals(1, $streamChannel->getStreamPublishs()->getCount());
 	}

@@ -3,7 +3,7 @@
 class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 
 	public function __construct() {
-		$source = new CM_PagingSource_Sql('`ip`', TBL_CM_IPBLOCKED);
+		$source = new CM_PagingSource_Sql('`ip`', 'cm_ipBlocked');
 		$source->enableCacheLocal(60);
 		parent::__construct($source);
 	}
@@ -13,7 +13,7 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 */
 	public function add($ip) {
 		$ip = (int) $ip;
-		CM_Db_Db::replace(TBL_CM_IPBLOCKED, array('ip' => $ip, 'createStamp' => time()));
+		CM_Db_Db::replace('cm_ipBlocked', array('ip' => $ip, 'createStamp' => time()));
 	}
 
 	/**
@@ -21,7 +21,7 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 */
 	public function remove($ip) {
 		$ip = (int) $ip;
-		CM_Db_Db::delete(TBL_CM_IPBLOCKED, array('ip' => $ip));
+		CM_Db_Db::delete('cm_ipBlocked', array('ip' => $ip));
 	}
 
 	/**
@@ -29,6 +29,6 @@ class CM_Paging_Ip_Blocked extends CM_Paging_Ip_Abstract {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Db_Db::delete(TBL_CM_IPBLOCKED, '`createStamp` < ' . (time() - $age));
+		CM_Db_Db::delete('cm_ipBlocked', '`createStamp` < ' . (time() - $age));
 	}
 }

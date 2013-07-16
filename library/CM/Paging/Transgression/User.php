@@ -33,17 +33,17 @@ class CM_Paging_Transgression_User extends CM_Paging_Transgression_Abstract {
 			$time = time() - $period;
 			$where .= ' AND `createStamp` > ' . $time;
 		}
-		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
+		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', 'cm_action', $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
 
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
-		CM_Db_Db::insertDelayed(TBL_CM_ACTION,
+		CM_Db_Db::insertDelayed('cm_action',
 				array('actorId' => $this->_user->getId(), 'verb' => $action->getVerb(), 'type' => $action->getType(), 'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
 
 	public function deleteAll() {
-		CM_Db_Db::delete(TBL_CM_ACTION, '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
+		CM_Db_Db::delete('cm_action', '`actorId` = ' . $this->_user->getId() . ' AND `actionLimitType` IS NOT NULL');
 	}
 }

@@ -12,7 +12,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 * @throws CM_Exception_Nonexistent
 	 */
 	public function __construct($uniqid) {
-		$data = CM_Db_Db::select(TBL_CM_TMP_USERFILE, '*', array('uniqid' => $uniqid))->fetch();
+		$data = CM_Db_Db::select('cm_tmp_userfile', '*', array('uniqid' => $uniqid))->fetch();
 		if (!$data) {
 			throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
 		}
@@ -31,7 +31,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 			$filename = substr($filename, -100, 100);
 		}
 		$uniqid = md5(rand() . uniqid());
-		CM_Db_Db::insert(TBL_CM_TMP_USERFILE, array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
+		CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
 		$file = new self($uniqid);
 		$file->mkDir();
@@ -56,7 +56,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	}
 
 	public function delete() {
-		CM_Db_Db::delete(TBL_CM_TMP_USERFILE, array('uniqid' => $this->getUniqid()));
+		CM_Db_Db::delete('cm_tmp_userfile', array('uniqid' => $this->getUniqid()));
 		parent::delete();
 	}
 
@@ -65,7 +65,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		$result = CM_Db_Db::select(TBL_CM_TMP_USERFILE, 'uniqid', '`createStamp` < ' . (time() - $age));
+		$result = CM_Db_Db::select('cm_tmp_userfile', 'uniqid', '`createStamp` < ' . (time() - $age));
 		foreach ($result->fetchAllColumn() as $uniqid) {
 			$tmpFile = new CM_File_UserContent_Temp($uniqid);
 			$tmpFile->delete();

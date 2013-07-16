@@ -19,12 +19,12 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 			$group = '`msg`';
 			$order = '`count` DESC';
 		}
-		$source = new CM_PagingSource_Sql_Deferred($select, TBL_CM_LOG, $where, $order, null, $group);
+		$source = new CM_PagingSource_Sql_Deferred($select, 'cm_log', $where, $order, null, $group);
 		parent::__construct($source);
 	}
 
 	public function flush() {
-		CM_Db_Db::delete(TBL_CM_LOG, array('type' => $this->getType()));
+		CM_Db_Db::delete('cm_log', array('type' => $this->getType()));
 	}
 
 	/**
@@ -32,7 +32,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Db_Db::delete(TBL_CM_LOG, '`timeStamp` < ' . (time() - $age));
+		CM_Db_Db::delete('cm_log', '`timeStamp` < ' . (time() - $age));
 	}
 
 	/**
@@ -80,7 +80,7 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 		if ($metaInfo) {
 			$values['metaInfo'] = serialize($metaInfo);
 		}
-		CM_Db_Db::insertDelayed(TBL_CM_LOG, $values);
+		CM_Db_Db::insertDelayed('cm_log', $values);
 	}
 
 	protected function _processItem($item) {
