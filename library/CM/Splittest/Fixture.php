@@ -53,6 +53,6 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 	public static function setUserForRequestClient(CM_Request_Abstract $request, CM_Model_User $user) {
 		$requestClientId = $request->getClientId();
 		$userId = $user->getId();
-		CM_Db_Db::updateIgnore(TBL_CM_SPLITTESTVARIATION_FIXTURE, array('userId' => $userId), array('requestClientId' => $requestClientId));
+		CM_Db_Db::updateIgnore('cm_splittestVariation_fixture', array('userId' => $userId), array('requestClientId' => $requestClientId));
 	}
 }

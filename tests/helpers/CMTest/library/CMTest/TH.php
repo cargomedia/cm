@@ -225,11 +225,11 @@ class CMTest_TH {
 	 * @return CM_Model_Location
 	 */
 	public static function createLocation($level = null) {
-		$country = CM_Db_Db::insert(TBL_CM_LOCATIONCOUNTRY, array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
-		$state =  CM_Db_Db::insert(TBL_CM_LOCATIONSTATE, array('countryId' => $country, 'name' => 'stateFoo'));
-		$city = CM_Db_Db::insert(TBL_CM_LOCATIONCITY, array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+		$country = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+		$state =  CM_Db_Db::insert('cm_locationState', array('countryId' => $country, 'name' => 'stateFoo'));
+		$city = CM_Db_Db::insert('cm_locationCity', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
 															'lon'     => 15));
-		$zip = CM_Db_Db::insert(TBL_CM_LOCATIONZIP, array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+		$zip = CM_Db_Db::insert('cm_locationZip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
 
 		CM_Model_Location::createAggregation();
 
