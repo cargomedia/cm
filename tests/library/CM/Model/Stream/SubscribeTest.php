@@ -49,7 +49,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => 123123, 'allowedUntil' => 324234,
 															   'streamChannel' => $streamChannel, 'key' => '123123_2'));
-		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id'           => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
+		$this->assertRow('cm_stream_subscribe', array('id'           => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
 														'allowedUntil' => 324234, 'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
 	}
@@ -59,7 +59,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user'          => null, 'start' => 123123, 'allowedUntil' => 324234,
 															   'streamChannel' => $streamChannel, 'key' => '123123_2'));
-		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id'           => $videoStream->getId(), 'userId' => null, 'start' => 123123,
+		$this->assertRow('cm_stream_subscribe', array('id'           => $videoStream->getId(), 'userId' => null, 'start' => 123123,
 														'allowedUntil' => 324234,
 														'channelId'    => $streamChannel->getId(), 'key' => '123123_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());

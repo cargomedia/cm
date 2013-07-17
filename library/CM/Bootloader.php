@@ -102,64 +102,6 @@ class CM_Bootloader {
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
-
-		define('TBL_CM_EMOTICON', 'cm_emoticon');
-		define('TBL_CM_USER', 'cm_user');
-		define('TBL_CM_USER_ONLINE', 'cm_user_online');
-		define('TBL_CM_USER_PREFERENCE', 'cm_user_preference');
-		define('TBL_CM_USER_PREFERENCEDEFAULT', 'cm_user_preferenceDefault');
-		define('TBL_CM_USERAGENT', 'cm_useragent');
-		define('TBL_CM_LOG', 'cm_log');
-		define('TBL_CM_IPBLOCKED', 'cm_ipBlocked');
-
-		define('TBL_CM_LANGUAGE', 'cm_language');
-		define('TBL_CM_LANGUAGEKEY', 'cm_languageKey');
-		define('TBL_CM_LANGUAGEKEY_VARIABLE', 'cm_languageKey_variable');
-		define('TBL_CM_LANGUAGEVALUE', 'cm_languageValue');
-
-		define('TBL_CM_LOCATIONCOUNTRY', 'cm_locationCountry');
-		define('TBL_CM_LOCATIONSTATE', 'cm_locationState');
-		define('TBL_CM_LOCATIONCITY', 'cm_locationCity');
-		define('TBL_CM_LOCATIONZIP', 'cm_locationZip');
-		define('TBL_CM_LOCATIONCITYIP', 'cm_locationCityIp');
-		define('TBL_CM_LOCATIONCOUNTRYIP', 'cm_locationCountryIp');
-
-		define('TBL_CM_TMP_LOCATION', 'cm_tmp_location');
-		define('TBL_CM_TMP_LOCATION_COORDINATES', 'cm_tmp_location_coordinates');
-		define('TBL_CM_TMP_USERFILE', 'cm_tmp_userfile');
-
-		define('TBL_CM_CAPTCHA', 'cm_captcha');
-
-		define('TBL_CM_STRING', 'cm_string');
-
-		define('TBL_CM_ACTION', 'cm_action');
-		define('TBL_CM_ACTIONLIMIT', 'cm_actionLimit');
-
-		define('TBL_CM_SESSION', 'cm_session');
-		define('TBL_CM_REQUESTCLIENT', 'cm_requestClient');
-
-		define('TBL_CM_MAIL', 'cm_mail');
-
-		define('TBL_CM_ROLE', 'cm_role');
-
-		define('TBL_CM_SVM', 'cm_svm');
-		define('TBL_CM_SVMTRAINING', 'cm_svmtraining');
-
-		define('TBL_CM_SPLITFEATURE', 'cm_splitfeature');
-		define('TBL_CM_SPLITFEATURE_FIXTURE', 'cm_splitfeature_fixture');
-
-		define('TBL_CM_SPLITTEST', 'cm_splittest');
-		define('TBL_CM_SPLITTESTVARIATION', 'cm_splittestVariation');
-		define('TBL_CM_SPLITTESTVARIATION_FIXTURE', 'cm_splittestVariation_fixture');
-
-		define('TBL_CM_OPTION', 'cm_option');
-
-		define('TBL_CM_STREAM_PUBLISH', 'cm_stream_publish');
-		define('TBL_CM_STREAM_SUBSCRIBE', 'cm_stream_subscribe');
-		define('TBL_CM_STREAMCHANNEL', 'cm_streamChannel');
-		define('TBL_CM_STREAMCHANNEL_VIDEO', 'cm_streamChannel_video');
-
-		define('TBL_CM_STREAMCHANNELARCHIVE_VIDEO', 'cm_streamChannelArchive_video');
 	}
 
 	/**
