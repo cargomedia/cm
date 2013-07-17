@@ -122,7 +122,13 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			/** @var CM_Model_StreamChannel_Video $streamChannel */
 			$streamChannel->setThumbnailCount($thumbnailCount);
 		}
-		$streamChannel->delete();
+		$streamPublish = $streamChannel->getStreamPublish();
+		if ($streamPublish) {
+			$streamPublish->delete();
+		}
+		if ($streamChannel->getStreamPublishs()->getCount() === 0 && $streamChannel->getStreamSubscribes()->getCount() === 0) {
+			$streamChannel->delete();
+		}
 	}
 
 	/**
@@ -174,6 +180,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamSubscribe) {
 			$streamSubscribe->delete();
+		}
+		if ($streamChannel->getStreamPublishs()->getCount() === 0 && $streamChannel->getStreamSubscribes()->getCount() === 0) {
+			$streamChannel->delete();
 		}
 	}
 

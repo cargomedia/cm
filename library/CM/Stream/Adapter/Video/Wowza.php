@@ -38,8 +38,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
-			$streamPublishs = $streamChannel->getStreamPublishs();
-			if (!$streamPublishs->getCount()) {
+			if (!$streamChannel->getStreamPublishs()->getCount() && !$streamChannel->getStreamSubscribes()->getCount()) {
 				$streamChannel->delete();
 				continue;
 			}
@@ -51,15 +50,14 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 			}
 			if (!isset($status[$streamChannel->getKey()])) {
 				$this->unpublish($streamChannel->getKey());
-			} else {
-				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-					if ($streamSubscribe->getStart() > $startStampLimit) {
-						continue;
-					}
-					if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
-						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
-					}
+			}
+			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+				if ($streamSubscribe->getStart() > $startStampLimit) {
+					continue;
+				}
+				if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
+					$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 				}
 			}
 		}
