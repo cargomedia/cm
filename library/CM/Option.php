@@ -23,7 +23,7 @@ class CM_Option {
 	public function get($key) {
 		$cacheKey = CM_CacheConst::Option;
 		if (($options = CM_Cache::get($cacheKey)) === false) {
-			$options = CM_Db_Db::select(TBL_CM_OPTION, array('key', 'value'))->fetchAllTree();
+			$options = CM_Db_Db::select('cm_option', array('key', 'value'))->fetchAllTree();
 			CM_Cache::set($cacheKey, $options);
 		}
 		if (!isset($options[$key])) {
@@ -41,7 +41,7 @@ class CM_Option {
 	 * @param mixed  $value
 	 */
 	public function set($key, $value) {
-		CM_Db_Db::replace(TBL_CM_OPTION, array('key' => $key, 'value' => serialize($value)));
+		CM_Db_Db::replace('cm_option', array('key' => $key, 'value' => serialize($value)));
 		$this->_clearCache();
 	}
 
@@ -49,7 +49,7 @@ class CM_Option {
 	 * @param string $key
 	 */
 	public function delete($key) {
-		CM_Db_Db::delete(TBL_CM_OPTION, array('key' => $key));
+		CM_Db_Db::delete('cm_option', array('key' => $key));
 		$this->_clearCache();
 	}
 

@@ -119,6 +119,8 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 												'key'           => '111_3'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
+		$streamSubscribe->delete();
+		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 	}
 
 	public function testGetPublishers() {

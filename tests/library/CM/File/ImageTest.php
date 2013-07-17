@@ -26,8 +26,13 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testConstructUnsupportedFormat() {
 		$path = DIR_TEST_DATA . 'img/test.tiff';
-		$image = new CM_File_Image($path);
-		$this->assertEquals('image/tiff', $image->getMimeType());
+
+		try {
+			new CM_File_Image($path);
+			$this->fail('Could instantiate a image with an unsupported format');
+		} catch (CM_Exception $e) {
+			$this->assertSame('Unsupported format `TIFF`.', $e->getMessage());
+		}
 	}
 
 	/**
@@ -338,5 +343,21 @@ class CM_File_ImageTest extends CMTest_TestCase {
 	 */
 	public function testGetExtensionByFormatInvalid() {
 		CM_File_Image::getExtensionByFormat(-999);
+	}
+
+	public function testCreate() {
+		$rawImageData = file_get_contents(DIR_TEST_DATA . 'img/test.jpg', 'r');
+		$image = CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
+		$this->assertEquals('image/jpeg', $image->getMimeType());
+		$image->delete();
+	}
+
+	/**
+	 * @expectedException CM_Exception
+	 * @expectedExceptionMessage Cannot load Imagick instance
+	 */
+	public function testCreateFailure() {
+		$rawImageData = 'false image data';
+		CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
 	}
 }

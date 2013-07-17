@@ -5,12 +5,12 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	const TYPE = 21;
 
 	public function setAllowedUntil($timeStamp) {
-		CM_Db_Db::update(TBL_CM_STREAM_PUBLISH, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_stream_publish', array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
 		$this->_change();
 	}
 
 	public function unsetUser() {
-		CM_Db_Db::update(TBL_CM_STREAM_PUBLISH, array('userId' => null), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_stream_publish', array('userId' => null), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -22,12 +22,12 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAM_PUBLISH, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_stream_publish', '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
 		$this->getStreamChannel()->onUnpublish($this);
-		CM_Db_Db::delete(TBL_CM_STREAM_PUBLISH, array('id' => $this->getId()));
+		CM_Db_Db::delete('cm_stream_publish', array('id' => $this->getId()));
 	}
 
 	/**
@@ -36,7 +36,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	 * @return CM_Model_Stream_Publish|null
 	 */
 	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
-		$id = CM_Db_Db::select(TBL_CM_STREAM_PUBLISH, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
+		$id = CM_Db_Db::select('cm_stream_publish', 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
 		if (!$id) {
 			return null;
 		}
@@ -54,7 +54,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 			$allowedUntil = (int) $data['allowedUntil'];
 		}
 		$key = (string) $data['key'];
-		$id = CM_Db_Db::insert(TBL_CM_STREAM_PUBLISH, array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$id = CM_Db_Db::insert('cm_stream_publish', array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'key' => $key, 'channelId' => $streamChannel->getId()));
 		$streamPublish = new self($id);
 		$streamChannel->onPublish($streamPublish);
