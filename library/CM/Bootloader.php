@@ -339,35 +339,40 @@ class CM_Bootloader {
 
 		$text = get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
 				PHP_EOL . PHP_EOL;
-		$trace = array_reverse($exception->getTrace());
-		array_unshift($trace, array(
-			'function' => '{main}',
-			'line'     => 0,
-			'file'     => $trace[0]['file'],
-		));
 
-		$intend = strlen(count($trace)) + 4;
-		foreach ($trace as $number => $entry) {
-			$text .= str_pad($number, $intend, ' ', STR_PAD_LEFT) . '. ';
-			if (array_key_exists('function', $entry)) {
-				if (array_key_exists('class', $entry)) {
-					$text .= $entry['class'] . '->';
-				}
-				$text .= $entry['function'];
-				if (array_key_exists('args', $entry)) {
-					$arguments = array();
-					foreach ($entry['args'] as $argument) {
-						$arguments[] = $dumpArgument($argument);
+		try {
+			$trace = array_reverse($exception->getTrace());
+			array_unshift($trace, array(
+				'function' => '{main}',
+				'line'     => 0,
+				'file'     => $trace[0]['file'],
+			));
+
+			$indent = strlen(count($trace)) + 4;
+			foreach ($trace as $number => $entry) {
+				$text .= str_pad($number, $indent, ' ', STR_PAD_LEFT) . '. ';
+				if (array_key_exists('function', $entry)) {
+					if (array_key_exists('class', $entry)) {
+						$text .= $entry['class'] . '->';
 					}
-					$text .= '(' . implode(', ', $arguments) . ')';
+					$text .= $entry['function'];
+					if (array_key_exists('args', $entry)) {
+						$arguments = array();
+						foreach ($entry['args'] as $argument) {
+							$arguments[] = $dumpArgument($argument);
+						}
+						$text .= '(' . implode(', ', $arguments) . ')';
+					}
 				}
+				if (array_key_exists('file', $entry)) {
+					$text .= ' ' . $entry['file'] . ':' . $entry['line'];
+				} else {
+					$text .= ' [internal function]';
+				}
+				$text .= PHP_EOL;
 			}
-			if (array_key_exists('file', $entry)) {
-				$text .= ' ' . $entry['file'] . ':' . $entry['line'];
-			} else {
-				$text .= ' [internal function]';
-			}
-			$text .= PHP_EOL;
+		} catch (Exception $e) {
+			$text .= $exception->getTraceAsString();
 		}
 		return $text;
 	}
