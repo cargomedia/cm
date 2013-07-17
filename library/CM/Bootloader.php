@@ -331,7 +331,13 @@ class CM_Bootloader {
 				}
 				return $value;
 			}
-			if (is_string($argument) || is_bool($argument) || is_numeric($argument)) {
+			if (is_string($argument)) {
+				if (strlen($argument) > 20) {
+					$argument = substr($argument, 0, 20) . '...';
+				}
+				return '\'' . $argument . '\'';
+			}
+			if (is_bool($argument) || is_numeric($argument)) {
 				return var_export($argument, true);
 			}
 			return gettype($argument);
