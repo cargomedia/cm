@@ -9,10 +9,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
 	events: {
 		'reset': function() {
-			this.resetErrors();
 			_.each(this._fields, function(field) {
 				field.reset();
 			});
+			this.resetErrors();
 		}
 	},
 
