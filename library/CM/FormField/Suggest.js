@@ -76,12 +76,12 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 		});
 
 		if (1 == cardinality) {
-			this._$input.on('open', function(e) {
+			this._$input.on('select2-open', function(e) {
 				field._$input.select2('data', null);
 			});
 		}
 
-		this._$input.on('open', function() {
+		this._$input.on('select2-open', function() {
 			field.trigger('open');
 		});
 
