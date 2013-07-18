@@ -11,6 +11,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
+		CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
 	}
 
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
@@ -103,12 +104,6 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function getThumbnails() {
 		return new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($this);
-	}
-
-	protected function _onBeforeDelete() {
-		if ($this->hasStreamPublish()) {
-			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
-		}
 	}
 
 	protected function _onDelete() {
