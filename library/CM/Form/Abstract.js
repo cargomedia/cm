@@ -7,6 +7,15 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
 	_fields: {},
 
+	events: {
+		'reset': function() {
+			_.each(this._fields, function(field) {
+				field.reset();
+			});
+			this.resetErrors();
+		}
+	},
+
 	ready: function() {
 	},
 
@@ -214,8 +223,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	},
 
 	reset: function() {
-		this.$().get(0).reset();
-		this.resetErrors();
+		this.el.reset();
 	},
 
 	disable: function() {
