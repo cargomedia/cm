@@ -85,7 +85,7 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 			field.trigger('open');
 		});
 
-		this._$input.on('close', function() {
+		this._$input.on('select2-close', function() {
 			field.trigger('close');
 		});
 
