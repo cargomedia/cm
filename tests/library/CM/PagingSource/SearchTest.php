@@ -48,7 +48,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 
 		$id2 = $type3->createEntry(3);
 		$this->assertSame(1, $source->getCount());
-		$this->assertSame(array(array('price' => 3, '_id' => (string) $id2)), $source->getItems());
+		$this->assertSame(array(array('price' => 3, 'id' => (string) $id2)), $source->getItems());
 	}
 
 	public function testMultiGet() {
@@ -63,8 +63,8 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$id2 = $type2->createEntry(1);
 		$this->assertSame(2, $source->getCount());
 		$this->assertSame(array(
-			array('_id' => (string) $id1, '_type' => 'index_1'),
-			array('_id' => (string) $id2, '_type' => 'index_2')
+			array('id' => (string) $id1, 'type' => 'index_1'),
+			array('id' => (string) $id2, 'type' => 'index_2')
 		), $source->getItems());
 
 		$type3 = new CM_Elastica_Type_Mock3();
@@ -72,11 +72,10 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$id3 = $type3->createEntry(5);
 
 		$this->assertSame(array(
-			array('_id' => (string) $id1, '_type' => 'index_1'),
-			array('_id' => (string) $id2, '_type' => 'index_2'),
-			array('price' => 5, '_id' => (string) $id3, '_type' => 'index_3')
+			array('id' => (string) $id1, 'type' => 'index_1'),
+			array('id' => (string) $id2, 'type' => 'index_2'),
+			array('price' => 5, 'id' => (string) $id3, 'type' => 'index_3')
 		), $source->getItems());
-		var_dump($source->getItems());
 	}
 }
 

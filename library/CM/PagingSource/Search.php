@@ -66,14 +66,14 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 				foreach ($searchResult['hits']['hits'] as $hit) {
 					if ($this->_fields && array_key_exists('fields', $hit)) {
 						if ($this->_multipleTypes) {
-							$idArray = array('_id' => $hit['_id'], '_type' => $hit['_type']);
+							$idArray = array('id' => $hit['_id'], 'type' => $hit['_type']);
 						} else {
-							$idArray = array('_id' => $hit['_id']);
+							$idArray = array('id' => $hit['_id']);
 						}
 						$result['items'][] = array_merge($hit['fields'], $idArray);
 					} else {
 						if ($this->_multipleTypes) {
-							$item = array('_id' => $hit['_id'], '_type' => $hit['_type']);
+							$item = array('id' => $hit['_id'], 'type' => $hit['_type']);
 						} else {
 							$item = $hit['_id'];
 						}
