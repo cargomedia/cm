@@ -127,7 +127,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			throw new CM_Exception_Invalid('No stream publish found for `' . $streamName . '`');
 		}
 		$streamPublish->delete();
-		if ($streamChannel->getStreamPublishs()->getCount() === 0 && $streamChannel->getStreamSubscribes()->getCount() === 0) {
+		if ($streamChannel->getStreamPublishs()->isEmpty() && $streamChannel->getStreamSubscribes()->isEmpty()) {
 			$streamChannel->delete();
 		}
 	}
@@ -182,7 +182,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		if ($streamSubscribe) {
 			$streamSubscribe->delete();
 		}
-		if ($streamChannel->getStreamPublishs()->getCount() === 0 && $streamChannel->getStreamSubscribes()->getCount() === 0) {
+		if ($streamChannel->getStreamPublishs()->isEmpty() && $streamChannel->getStreamSubscribes()->isEmpty()) {
 			$streamChannel->delete();
 		}
 	}
