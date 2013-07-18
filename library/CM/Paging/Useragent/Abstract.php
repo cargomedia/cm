@@ -14,6 +14,6 @@ abstract class CM_Paging_Useragent_Abstract extends CM_Paging_Abstract {
 	 */
 	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Db_Db::delete(TBL_CM_USERAGENT, '`createStamp` < ' . (time() - $age));
+		CM_Db_Db::delete('cm_useragent', '`createStamp` < ' . (time() - $age));
 	}
 }

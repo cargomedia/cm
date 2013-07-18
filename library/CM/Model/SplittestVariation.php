@@ -28,7 +28,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		if (!$state && $state != $this->getEnabled() && $variationsEnabled->getCount() <= 1) {
 			throw new CM_Exception('No variations for Splittest', 'At least one variation needs to be enabled');
 		}
-		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_splittestVariation', array('enabled' => $state), array('id' => $this->getId()));
 		$this->_change();
 		$variationsEnabled->_change();
 	}
@@ -152,10 +152,10 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	protected function _getAggregationData($refreshCache = null) {
 		$cacheKey = $this->_getCacheKeyAggregation();
 		if ($refreshCache || false === ($aggregationData = CM_CacheLocal::get($cacheKey))) {
-			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
+			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
 				array($this->_getSplittestId(), $this->getId()))->fetch();
-			$fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
+			$fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=?',
 				array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 			$aggregationData = array(
@@ -169,7 +169,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_splittestVariation', '*', array('id' => $this->getId()))->fetch();
 	}
 
 	/**
