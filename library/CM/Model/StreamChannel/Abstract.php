@@ -104,6 +104,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return false;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function hasStreams() {
+		return !$this->getStreamPublishs()->isEmpty() || !$this->getStreamSubscribes()->isEmpty();
+	}
+
 	protected function _loadData() {
 		$data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
