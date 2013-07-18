@@ -8,7 +8,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	_fields: {},
 
 	events: {
-		'reset': function() {
+		'reset form': function() {
 			_.each(this._fields, function(field) {
 				field.reset();
 			});
