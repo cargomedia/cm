@@ -134,8 +134,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			if ($mean > .5) {
 				throw new CM_Exception_NotImplemented('Normalized mean item index cannot be greater than .5.');
 			}
-			$x = 1 + 1 / (($N - 1) * $mean);
-			$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+			if ($N <= 1) {
+				$n = 0;
+			} else {
+				$x = 1 + 1 / (($N - 1) * $mean);
+				$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+			}
 		}
 		$this->setPage($n + 1, 1);
 		$item = $this->getItem(0);

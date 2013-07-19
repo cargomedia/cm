@@ -435,6 +435,12 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($data, $paging->getItems());
 		$this->assertNull($paging->getPageSize());
 		$this->assertSame(1, $paging->getPage());
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand());
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand());
 	}
 
 	/**
@@ -473,6 +479,12 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			$this->assertEquals($meanExpected, $count / $n, '', $maxDeviation);
 		}
 		$this->assertFalse($outOfBounds);
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand(.1));
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand(.1));
 	}
 
 	/**
