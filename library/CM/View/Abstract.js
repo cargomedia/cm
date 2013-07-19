@@ -291,12 +291,12 @@ var CM_View_Abstract = Backbone.View.extend({
 
 	/**
 	 * @param {int} actionVerb
-	 * @param {int} modelType
+	 * @param {int} actionType
 	 * @param {String} [channelKey]
 	 * @param {Number} [channelType]
 	 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 	 */
-	bindAction: function(actionVerb, modelType, channelKey, channelType, callback) {
+	bindAction: function(actionVerb, actionType, channelKey, channelType, callback) {
 		if (!channelKey && !channelType) {
 			if (!cm.options.stream.channel) {
 				return;
@@ -307,9 +307,9 @@ var CM_View_Abstract = Backbone.View.extend({
 		var callbackResponse = function(response) {
 			callback.call(this, response.action, response.model, response.data);
 		};
-		cm.action.bind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
+		cm.action.bind(actionVerb, actionType, channelKey, channelType, callbackResponse, this);
 		this.on('destruct', function() {
-			cm.action.unbind(actionVerb, modelType, channelKey, channelType, callbackResponse, this);
+			cm.action.unbind(actionVerb, actionType, channelKey, channelType, callbackResponse, this);
 		});
 	},
 
@@ -547,11 +547,11 @@ var CM_View_Abstract = Backbone.View.extend({
 	_bindActions: function(actions, channelKey, channelType) {
 		_.each(actions, function(callback, key) {
 			var match = key.match(/^(\S+)\s+(.+)$/);
-			var modelType = cm.model.types[match[1]];
+			var actionType = cm.action.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
 			_.each(actionNames, function(actionName) {
 				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, modelType, channelKey, channelType, callback);
+				this.bindAction(actionVerb, actionType, channelKey, channelType, callback);
 			}, this);
 		}, this);
 	},
