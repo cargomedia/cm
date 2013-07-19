@@ -931,6 +931,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	action: {
 		verbs: {},
+		types: {},
 
 		/**
 		 * @param {Number} actionVerb
