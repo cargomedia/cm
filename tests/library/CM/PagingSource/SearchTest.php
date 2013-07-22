@@ -48,7 +48,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 
 		$id2 = $type3->createEntry(3);
 		$this->assertSame(1, $source->getCount());
-		$this->assertSame(array(array('price' => 3, 'id' => (string) $id2)), $source->getItems());
+		$this->assertSame(array(array('id' => (string) $id2, 'price' => 3)), $source->getItems());
 	}
 
 	public function testMultiGet() {
@@ -74,7 +74,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$this->assertSame(array(
 			array('id' => (string) $id1, 'type' => 'index_1'),
 			array('id' => (string) $id2, 'type' => 'index_2'),
-			array('price' => 5, 'id' => (string) $id3, 'type' => 'index_3')
+			array('id' => (string) $id3, 'type' => 'index_3', 'price' => 5)
 		), $source->getItems());
 	}
 }

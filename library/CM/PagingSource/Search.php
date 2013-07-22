@@ -70,7 +70,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 						} else {
 							$idArray = array('id' => $hit['_id']);
 						}
-						$result['items'][] = array_merge($hit['fields'], $idArray);
+						$result['items'][] = array_merge($idArray, $hit['fields']);
 					} else {
 						if ($this->_multipleTypes) {
 							$item = array('id' => $hit['_id'], 'type' => $hit['_type']);
