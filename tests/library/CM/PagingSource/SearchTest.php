@@ -12,9 +12,9 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		CM_Db_Db::exec("DROP TABLE `indexTest_1");
-		CM_Db_Db::exec("DROP TABLE `indexTest_2");
-		CM_Db_Db::exec("DROP TABLE `indexTest_3");
+		CM_Db_Db::exec("DROP TABLE `indexTest_1`");
+		CM_Db_Db::exec("DROP TABLE `indexTest_2`");
+		CM_Db_Db::exec("DROP TABLE `indexTest_3`");
 	}
 
 	public function tearDown() {
