@@ -48,7 +48,7 @@ class CM_Model_UserTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		$user = CM_Model_User::create();
-		$this->assertRow(TBL_CM_USER, array('userId' => $user->getId()));
+		$this->assertRow('cm_user', array('userId' => $user->getId()));
 	}
 
 	public function testCreateWithSite() {

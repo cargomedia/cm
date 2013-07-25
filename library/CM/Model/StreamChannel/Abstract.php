@@ -105,7 +105,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		$data = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
+		$data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
 			$type = (int) $data['type'];
 			if ($this->getType() !== $type) {
@@ -128,7 +128,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
 		CM_Cache::delete($cacheKey);
 
-		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $this->getId()));
+		CM_Db_Db::delete('cm_streamChannel', array('id' => $this->getId()));
 	}
 
 	/**
@@ -149,11 +149,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		if (null === $type) {
 			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
 			if (false === ($type = CM_CacheLocal::get($cacheKey))) {
-				$type = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, 'type', array('id' => $id))->fetchColumn();
+				$type = CM_Db_Db::select('cm_streamChannel', 'type', array('id' => $id))->fetchColumn();
 				if (false === $type) {
-					throw new CM_Exception_Nonexistent('No record found in `' . TBL_CM_STREAMCHANNEL . '` for id `' . $id . '`');
+					throw new CM_Exception_Invalid('No record found in `cm_streamChannel` for id `' . $id . '`');
 				}
-				CM_Cache::set($cacheKey, $type);
+				CM_CacheLocal::set($cacheKey, $type);
 			}
 		}
 		$class = self::_getClassName($type);
@@ -175,7 +175,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
 		if (false === ($result = CM_Cache::get($cacheKey))) {
-			$result = CM_Db_Db::select(TBL_CM_STREAMCHANNEL, array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
+			$result = CM_Db_Db::select('cm_streamChannel', array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
 			if (false === $result) {
 				$result = null;
 			}
@@ -200,7 +200,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	protected static function _create(array $data) {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];
-		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
 		CM_Cache::delete($cacheKey);
 		return new static($id);

@@ -37,13 +37,13 @@ class CM_Paging_Transgression_Ip extends CM_Paging_Transgression_Abstract {
 			$time = time() - $period;
 			$where .= ' AND `createStamp` > ' . $time;
 		}
-		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', TBL_CM_ACTION, $where, '`createStamp` DESC');
+		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', 'cm_action', $where, '`createStamp` DESC');
 		parent::__construct($source);
 	}
 
 	public function add(CM_Action_Abstract $action, $limitType) {
 		$limitType = (int) $limitType;
-		CM_Db_Db::insertDelayed(TBL_CM_ACTION, array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(),
+		CM_Db_Db::insertDelayed('cm_action', array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(),
 				'actionLimitType' => $limitType, 'createStamp' => time()));
 	}
 }

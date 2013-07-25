@@ -42,12 +42,7 @@ class CM_Cli_Command {
 			$keepalive = true;
 		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
-		if ($arguments->getNumeric()->getAll()) {
-			throw new CM_Cli_Exception_InvalidArguments('Too many arguments provided');
-		}
-		if ($named = $arguments->getNamed()->getAll()) {
-			throw new CM_Cli_Exception_InvalidArguments('Illegal option used: `--' . key($named) . '`');
-		}
+		$arguments->checkUnused();
 		$runnable = $this->_class->newInstance($input, $output);
 		$methodName = $this->_method->getName();
 		$function = function() use ($runnable, $methodName, $parameters) {
@@ -70,19 +65,12 @@ class CM_Cli_Command {
 	 */
 	public function getHelp() {
 		$helpText = $this->getName();
-		foreach ($this->_getRequiredParameters() as $paramName) {
-			$helpText .= ' <' . CM_Util::uncamelize($paramName) . '>';
+		foreach (CM_Cli_Arguments::getNumericForMethod($this->_method) as $paramString) {
+			$helpText .= ' ' . $paramString;
 		}
-		$optionalParameters = $this->_getOptionalParameters();
-		if ($optionalParameters) {
-			foreach ($optionalParameters as $paramName => $defaultValue) {
-				$paramName = CM_Util::uncamelize($paramName);
-				$valueDoc = $this->_getParamDoc($paramName);
-				if (empty($valueDoc)) {
-					$valueDoc = 'value';
-				}
-				$helpText .= ' [--' . $paramName . '=<' . $valueDoc . '>]';
-			}
+
+		foreach (CM_Cli_Arguments::getNamedForMethod($this->_method) as $paramString) {
+			$helpText .= ' [' . $paramString . ']';
 		}
 		return $helpText;
 	}
@@ -117,52 +105,6 @@ class CM_Cli_Command {
 	 */
 	public function getName() {
 		return $this->getPackageName() . ' ' . $this->_getMethodName();
-	}
-
-	/**
-	 * @return string[]
-	 */
-	protected function _getRequiredParameters() {
-		$params = array();
-		foreach ($this->_method->getParameters() as $param) {
-			if (!$param->isOptional()) {
-				$params[] = $param->getName();
-			}
-		}
-		return $params;
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function _getOptionalParameters() {
-		$params = array();
-		foreach ($this->_method->getParameters() as $param) {
-			if ($param->isOptional()) {
-				$params[$param->getName()] = $param->getDefaultValue();
-			}
-		}
-		return $params;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	private function _getKeepalive() {
-		$methodDocComment = $this->_method->getDocComment();
-		return (boolean) preg_match('/\*\s+@keepalive\s+/', $methodDocComment);
-	}
-
-	/**
-	 * @param string $paramName
-	 * @return string|null
-	 */
-	private function _getParamDoc($paramName) {
-		$methodDocComment = $this->_method->getDocComment();
-		if (!preg_match('/\*\s+@param\s+[^\$]*\s*\$' . preg_quote($paramName) . '\s*([^@\*]*)/', $methodDocComment, $matches)) {
-			return null;
-		}
-		return trim($matches[1]);
 	}
 
 	/**

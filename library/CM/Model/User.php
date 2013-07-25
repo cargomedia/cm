@@ -72,9 +72,9 @@ class CM_Model_User extends CM_Model_Abstract {
 	public function setOnline($state = true, $visible = true) {
 		$visible = (bool) $visible;
 		if ($state) {
-			CM_Db_Db::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => $visible));
+			CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
 		} else {
-			CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
+			CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
 		}
 		$this->_change();
 	}
@@ -156,7 +156,7 @@ class CM_Model_User extends CM_Model_Abstract {
 		if (!$this->getOnline()) {
 			throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
 		}
-		CM_Db_Db::replace(TBL_CM_USER_ONLINE, array('userId' => $this->getId(), 'visible' => (int) $state));
+		CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => (int) $state));
 		return $this->_change();
 	}
 
@@ -181,7 +181,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param CM_Model_Language $language
 	 */
 	public function setLanguage(CM_Model_Language $language) {
-		CM_Db_Db::update(TBL_CM_USER, array('languageId' => $language->getId()), array('userId' => $this->getId()));
+		CM_Db_Db::update('cm_user', array('languageId' => $language->getId()), array('userId' => $this->getId()));
 		$this->_change();
 	}
 
@@ -189,13 +189,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param CM_Site_Abstract $site
 	 */
 	public function setSite(CM_Site_Abstract $site) {
-		CM_Db_Db::update(TBL_CM_USER, array('site' => $site->getType()), array('userId' => $this->getId()));
+		CM_Db_Db::update('cm_user', array('site' => $site->getType()), array('userId' => $this->getId()));
 		$this->_change();
 	}
 
 	public function updateLatestactivity() {
 		if ($this->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION) {
-			CM_Db_Db::update(TBL_CM_USER, array('activityStamp' => time()), array('userId' => $this->getId()));
+			CM_Db_Db::update('cm_user', array('activityStamp' => time()), array('userId' => $this->getId()));
 			$this->_change();
 		}
 	}
@@ -207,8 +207,8 @@ class CM_Model_User extends CM_Model_Abstract {
 	protected function _loadData() {
 		return CM_Db_Db::exec('
 			SELECT `main`.*, `online`.`userId` AS `online`, `online`.`visible`
-			FROM TBL_CM_USER AS `main`
-			LEFT JOIN TBL_CM_USER_ONLINE AS `online` USING (`userId`)
+			FROM `cm_user` AS `main`
+			LEFT JOIN `cm_user_online` AS `online` USING (`userId`)
 			WHERE `main`.`userId`=?',
 			array($this->getId()))->fetch();
 	}
@@ -220,7 +220,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	public static function findById($id) {
 		try {
 			return new static((int) $id);
-		} catch (CM_Exception_Nonexistent $e){
+		} catch (CM_Exception_Nonexistent $e) {
 			return null;
 		}
 	}
@@ -237,8 +237,8 @@ class CM_Model_User extends CM_Model_Abstract {
 	public static function offlineOld() {
 		$res = CM_Db_Db::exec('
 			SELECT `o`.`userId`
-			FROM TBL_CM_USER_ONLINE `o`
-			LEFT JOIN TBL_CM_USER `u` USING(`userId`)
+			FROM `cm_user_online` `o`
+			LEFT JOIN `cm_user` `u` USING(`userId`)
 			WHERE `u`.`activityStamp` < ? OR `u`.`userId` IS NULL',
 			array(time() - self::ONLINE_EXPIRATION));
 		while ($userId = $res->fetchColumn()) {
@@ -246,7 +246,7 @@ class CM_Model_User extends CM_Model_Abstract {
 				$user = CM_Model_User::factory($userId);
 				$user->setOnline(false);
 			} catch (CM_Exception_Nonexistent $e) {
-				CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $userId));
+				CM_Db_Db::delete('cm_user_online', array('userId' => $userId));
 			}
 		}
 	}
@@ -268,7 +268,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			$language = $data['language'];
 			$languageId = $language->getId();
 		}
-		$userId = CM_Db_Db::insert(TBL_CM_USER, array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
+		$userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
 													  'languageId'  => $languageId));
 		return new static($userId);
 	}
@@ -277,14 +277,14 @@ class CM_Model_User extends CM_Model_Abstract {
 		$this->getTransgressions()->deleteAll();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
-			$streamSubscribe->delete();
+			$streamSubscribe->unsetUser();
 		}
 		/** @var CM_Model_Stream_Publish $streamPublish */
 		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
+			$streamPublish->unsetUser();
 		}
-		CM_Db_Db::delete(TBL_CM_USER_ONLINE, array('userId' => $this->getId()));
-		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $this->getId()));
+		CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
+		CM_Db_Db::delete('cm_user', array('userId' => $this->getId()));
 	}
 
 	public function toArray() {

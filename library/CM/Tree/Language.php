@@ -12,7 +12,7 @@ class CM_Tree_Language extends CM_Tree_Abstract {
 	}
 
 	protected function _load() {
-		$result = CM_Db_Db::select(TBL_CM_LANGUAGEKEY, 'name', 'name LIKE ".%"', 'name ASC');
+		$result = CM_Db_Db::select('cm_languageKey', 'name', 'name LIKE ".%"', 'name ASC');
 		while ($section = $result->fetch()) {
 			$this->_addLanguageNode($section['name']);
 		}

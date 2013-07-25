@@ -5,7 +5,12 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	const TYPE = 22;
 
 	public function setAllowedUntil($timeStamp) {
-		CM_Db_Db::update(TBL_CM_STREAM_SUBSCRIBE, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_stream_subscribe', array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
+		$this->_change();
+	}
+
+	public function unsetUser() {
+		CM_Db_Db::update('cm_stream_subscribe', array('userId' => null), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -17,12 +22,12 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_stream_subscribe', '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
 		$this->getStreamChannel()->onUnsubscribe($this);
-		CM_Db_Db::delete(TBL_CM_STREAM_SUBSCRIBE, array('id' => $this->getId()));
+		CM_Db_Db::delete('cm_stream_subscribe', array('id' => $this->getId()));
 	}
 
 	/**
@@ -31,21 +36,11 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	 * @return CM_Model_Stream_Subscribe|null
 	 */
 	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
-		$id = CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
+		$id = CM_Db_Db::select('cm_stream_subscribe', 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
 		if (!$id) {
 			return null;
 		}
 		return new static($id);
-	}
-
-	/**
-	 * @return CM_Model_User|null
-	 */
-	public function getUser() {
-		if (is_null($this->getUserId())) {
-			return null;
-		}
-		return parent::getUser();
 	}
 
 	protected static function _create(array $data) {
@@ -63,7 +58,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$key = (string) $data['key'];
-		$id = CM_Db_Db::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		$id = CM_Db_Db::insert('cm_stream_subscribe', array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
 			'channelId' => $streamChannel->getId(), 'key' => $key));
 		$streamSubscribe = new self($id);
 		$streamChannel->onSubscribe($streamSubscribe);

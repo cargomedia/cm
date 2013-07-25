@@ -48,4 +48,8 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 		$this->setTplParam('minYear', $this->_yearMin);
 		$this->setTplParam('maxYear', $this->_yearMax);
 	}
+
+	public function isEmpty($userInput) {
+		return empty($userInput['day']) && empty($userInput['month']) && empty($userInput['year']);
+	}
 }

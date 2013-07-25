@@ -79,7 +79,7 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-		$this->assertNotRow(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $streamChannel->getId()));
+		$this->assertNotRow('cm_streamChannel_video', array('id' => $streamChannel->getId()));
 	}
 
 	public function testOnBeforeDelete() {

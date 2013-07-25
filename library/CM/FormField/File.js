@@ -89,5 +89,9 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 	 */
 	getCountUploaded: function() {
 		return this.$('.previews .preview').length;
+	},
+
+	reset: function() {
+		this.$('.previews').empty();
 	}
 });

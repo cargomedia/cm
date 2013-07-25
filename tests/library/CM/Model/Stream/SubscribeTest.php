@@ -49,7 +49,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => 123123, 'allowedUntil' => 324234,
 															   'streamChannel' => $streamChannel, 'key' => '123123_2'));
-		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id'           => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
+		$this->assertRow('cm_stream_subscribe', array('id'           => $videoStream->getId(), 'userId' => $user->getId(), 'start' => 123123,
 														'allowedUntil' => 324234, 'channelId' => $streamChannel->getId(), 'key' => '123123_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
 	}
@@ -59,7 +59,7 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$this->assertEquals(0, $streamChannel->getStreamSubscribes()->getCount());
 		$videoStream = CM_Model_Stream_Subscribe::create(array('user'          => null, 'start' => 123123, 'allowedUntil' => 324234,
 															   'streamChannel' => $streamChannel, 'key' => '123123_2'));
-		$this->assertRow(TBL_CM_STREAM_SUBSCRIBE, array('id'           => $videoStream->getId(), 'userId' => null, 'start' => 123123,
+		$this->assertRow('cm_stream_subscribe', array('id'           => $videoStream->getId(), 'userId' => null, 'start' => 123123,
 														'allowedUntil' => 324234,
 														'channelId'    => $streamChannel->getId(), 'key' => '123123_2'));
 		$this->assertEquals(1, $streamChannel->getStreamSubscribes()->getCount());
@@ -131,5 +131,17 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		$streamChannel = CMTest_TH::createStreamChannel();
 		$streamPublish = CMTest_TH::createStreamSubscribe(CMTest_TH::createUser(), $streamChannel);
 		$this->assertEquals($streamChannel, $streamPublish->getStreamChannel());
+	}
+
+	public function testUnsetUser() {
+		$user = CMTest_TH::createUser();
+		$streamChannel = CMTest_TH::createStreamChannel();
+		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+																   'allowedUntil'  => time() + 100, 'key' => str_repeat('a', 100)));
+		$this->assertEquals($user, $streamSubscribe->getUser());
+
+		$streamSubscribe->unsetUser();
+		$this->assertNull($streamSubscribe->getUser());
 	}
 }

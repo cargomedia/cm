@@ -37,7 +37,7 @@ class CM_Util {
 	 */
 	public static function rglob($pattern = '*', $path = './') {
 		$files = glob($path . $pattern, GLOB_NOSORT);
-		sort($files);	// glob's sort is not reliable (locale dependent?)
+		sort($files); // glob's sort is not reliable (locale dependent?)
 		$paths = glob($path . '*', GLOB_NOSORT | GLOB_MARK | GLOB_ONLYDIR);
 		sort($paths);
 		foreach ($paths as $path) {
@@ -114,6 +114,7 @@ class CM_Util {
 
 		$curlConnection = curl_init();
 		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
@@ -127,13 +128,20 @@ class CM_Util {
 		}
 		curl_setopt($curlConnection, CURLOPT_URL, $url);
 
-		$contents = curl_exec($curlConnection);
 		$curlError = null;
+		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
+			$curlError =  'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
+
+		$info = curl_getinfo($curlConnection);
+		if ((int) $info['http_code'] !== 200) {
+			$curlError .= 'HTTP Code: `' . $info['http_code'] . '`';
+		}
+
 		curl_close($curlConnection);
 		if ($curlError) {
+			$curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
 			throw new CM_Exception_Invalid($curlError);
 		}
 		return $contents;
@@ -195,13 +203,19 @@ class CM_Util {
 	 * @throws CM_Exception
 	 */
 	public static function rmDirContents($path) {
-		$path = (string) $path;
-		foreach (glob($path . '*') as $file) {
-			if (is_dir($file)) {
-				self::rmDir($file . '/');
+		$path = (string) $path . '/';
+		if(!is_dir($path)) {
+			return;
+		}
+		$systemFileList = scandir($path);
+		$userFileList = array_diff($systemFileList, array('.', '..'));
+		foreach ($userFileList as $filename) {
+			$fullpath = $path . $filename;
+			if (is_dir($fullpath)) {
+				self::rmDir($fullpath . '/');
 			} else {
-				if (!@unlink($file)) {
-					throw new CM_Exception('Could not delete file `' . $file . '`');
+				if (!@unlink($fullpath)) {
+					throw new CM_Exception('Could not delete file `' . $fullpath . '`');
 				}
 			}
 		}
@@ -421,7 +435,7 @@ class CM_Util {
 					if (class_exists($matches['name'], true)) {
 						$reflectionClass = new ReflectionClass($matches['name']);
 						if (($reflectionClass->isSubclassOf($className) ||
-								interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
+										interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
 								(!$reflectionClass->isAbstract() || $includeAbstracts)
 						) {
 							$pathsFiltered[] = $path;

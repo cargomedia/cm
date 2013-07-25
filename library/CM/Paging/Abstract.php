@@ -101,7 +101,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param int       $offset Negative: from end
+	 * @param int $offset Negative: from end
 	 * @return mixed|null Item at given index
 	 */
 	public function getItem($offset) {
@@ -110,14 +110,38 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @return mixed|null
+	 * @param float $mean Mean item index normalized between 0 and .5 (default)
 	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception_NotImplemented
+	 * @return mixed|null
 	 */
-	public function getItemRand() {
+	public function getItemRand($mean = null) {
 		if (null !== $this->getPageSize()) {
 			throw new CM_Exception_Invalid('Can\'t get random item on a paged Paging.');
 		}
-		$this->setPage(rand(1, $this->getCount()), 1);
+		if (null === $mean) {
+			$mean = .5;
+		}
+		$mean = (float) $mean;
+		$p = rand(0, getrandmax() - 1) / getrandmax();
+		$N = $this->getCount();
+		if (.5 === $mean) {
+			$n = (int) floor($N * $p);
+		} else {
+			if ($mean < 0) {
+				throw new CM_Exception_Invalid('Normalized mean item index must be positive.');
+			}
+			if ($mean > .5) {
+				throw new CM_Exception_NotImplemented('Normalized mean item index cannot be greater than .5.');
+			}
+			if ($N <= 1) {
+				$n = 0;
+			} else {
+				$x = 1 + 1 / (($N - 1) * $mean);
+				$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+			}
+		}
+		$this->setPage($n + 1, 1);
 		$item = $this->getItem(0);
 		$this->_pageOffset = 0;
 		$this->_pageSize = null;

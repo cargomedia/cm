@@ -62,7 +62,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$this->assertEquals($expiration + 10, $session->getExpiration(), null, 1);
 
 		//test that session is only persisted when data changed
-		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo'    => 'foo',
+		CM_Db_Db::update('cm_session', array('data' => serialize(array('foo'    => 'foo',
 																		 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
 		CMTest_TH::clearCache();
 		unset($session);
@@ -81,7 +81,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session = new CM_Session($sessionId);
 		unset($session);
 
-		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('foo' => 'bar'))), array('sessionId' => $sessionId));
+		CM_Db_Db::update('cm_session', array('data' => serialize(array('foo' => 'bar'))), array('sessionId' => $sessionId));
 		$session = new CM_Session($sessionId);
 		$this->assertEquals('foo', $session->get('foo'));
 
@@ -188,7 +188,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session->start();
 		$this->assertEquals($activityStamp1, $session->getUser(true)->getLatestactivity(), null, 1);
 
-		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
+		CM_Db_Db::update('cm_session', array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'bar'))));
 		unset($session);
 		CMTest_TH::clearCache();
 
@@ -201,7 +201,7 @@ class CM_SessionTest extends CMTest_TestCase {
 		$session->start();
 
 		$this->assertEquals('bar', $session->get('foo'));
-		CM_Db_Db::update(TBL_CM_SESSION, array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
+		CM_Db_Db::update('cm_session', array('data' => serialize(array('userId' => $user->getId(), 'foo' => 'foo'))));
 		unset($session);
 		CMTest_TH::clearCache();
 

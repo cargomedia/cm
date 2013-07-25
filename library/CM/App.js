@@ -16,6 +16,7 @@ var CM_App = CM_Class_Abstract.extend({
 		this.dom.ready();
 		this.window.ready();
 		this.date.ready();
+		this.ui.ready();
 		this.template.ready();
 		this.router.ready();
 	},
@@ -460,6 +461,10 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	ui: {
+		ready: function() {
+			$.event.special.clickConfirmed.settings.message = cm.language.get('Please Confirm');
+		},
+
 		/**
 		 * @param {String} question
 		 * @param {Function} callback
@@ -593,8 +598,8 @@ var CM_App = CM_Class_Abstract.extend({
 				handler.focus.add(handler.getId());
 				handler._hasFocus = true;
 			}).blur(function() {
-				handler._hasFocus = false;
-			});
+					handler._hasFocus = false;
+				});
 			this.title.ready();
 		},
 
@@ -926,28 +931,29 @@ var CM_App = CM_Class_Abstract.extend({
 
 	action: {
 		verbs: {},
+		types: {},
 
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		bind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		}
 	},
 

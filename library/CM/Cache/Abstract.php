@@ -170,9 +170,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	abstract protected function _getName();
 
 	/**
-	 * @param string      $key
-	 * @param mixed       $data
-	 * @param int|null    $lifeTime
+	 * @param string   $key
+	 * @param mixed    $data
+	 * @param int|null $lifeTime
 	 * @return boolean
 	 */
 	abstract protected function _set($key, $data, $lifeTime = null);

@@ -74,32 +74,30 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	private static $_source, $_sourceStale;
 
 	public static function setUpBeforeClass() {
-		defined('TBL_TEST') || define('TBL_TEST', 'test');
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST (
+		CM_Db_Db::exec('CREATE TABLE `test` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 100; $i++) {
-			CM_Db_Db::insert(TBL_TEST, array('num' => $i));
+			CM_Db_Db::insert('test', array('num' => $i));
 		}
-		self::$_source = new CM_PagingSource_Sql('`num`', TBL_TEST);
-		define('TBL_TEST2', 'test2');
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST2 (
+		self::$_source = new CM_PagingSource_Sql('`num`', 'test');
+		CM_Db_Db::exec('CREATE TABLE `test2` (
 					`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 					`num` INT(10) NOT NULL,
 					PRIMARY KEY (`id`)
 				)');
 		for ($i = 0; $i < 50; $i++) {
-			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
-			CM_Db_Db::insert(TBL_TEST2, array('num' => $i));
+			CM_Db_Db::insert('test2', array('num' => $i));
+			CM_Db_Db::insert('test2', array('num' => $i));
 		}
 	}
 
 	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
-		CM_Db_Db::exec('DROP TABLE TBL_TEST');
-		CM_Db_Db::exec('DROP TABLE TBL_TEST2');
+		CM_Db_Db::exec('DROP TABLE `test`');
+		CM_Db_Db::exec('DROP TABLE `test2`');
 	}
 
 	public function testGetCount() {
@@ -108,13 +106,13 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetCountGroup() {
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, null, null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', null, null, null, '`num`'));
 		$this->assertEquals(50, $paging->getCount());
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, 'id=1', null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', 'id=1', null, null, '`num`'));
 		$this->assertEquals(1, $paging->getCount());
 
-		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', TBL_TEST2, 'id=99999', null, null, '`num`'));
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Sql('`num`', 'test2', 'id=99999', null, null, '`num`'));
 		$this->assertEquals(0, $paging->getCount());
 	}
 
@@ -438,11 +436,76 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($paging->getPageSize());
 		$this->assertSame(1, $paging->getPage());
 
-		$paging->setPage(3,10);
-		try {
-			$paging->getItemRand();
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Can\'t get random item on a paged Paging.', $ex->getMessage());
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand());
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand());
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Can't get random item on a paged Paging.
+	 */
+	public function testGetItemRandInvalidPaged() {
+		$data = range(1, 30);
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
+
+		$paging->setPage(3, 10);
+		$paging->getItemRand();
+	}
+
+	public function testGetItemRandMean() {
+		$N = 10;
+		$data = range(0, $N - 1);
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
+
+		$outOfBounds = false;
+		foreach (array(null, .5, .4, .3, .2, .1) as $mean) {
+			$count = 0;
+			$n = 100;
+			for ($i = 0; $i < $n; $i++) {
+				$item = $paging->getItemRand($mean);
+				if (!in_array($item, $data, true)) {
+					$outOfBounds = true;
+				}
+				$count += $item;
+			}
+			if (null === $mean) {
+				$mean = .5;
+			}
+			$meanExpected = ($N - 1) * $mean;
+			$maxDeviation = $meanExpected / 2;
+			$this->assertEquals($meanExpected, $count / $n, '', $maxDeviation);
 		}
+		$this->assertFalse($outOfBounds);
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand(.1));
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand(.1));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Normalized mean item index must be positive.
+	 */
+	public function testGetItemRandInvalidMeanNegative() {
+		$data = range(1, 30);
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
+
+		$paging->getItemRand(-.1);
+	}
+
+	/**
+	 * @expectedException CM_Exception_NotImplemented
+	 * @expectedExceptionMessage Normalized mean item index cannot be greater than .5.
+	 */
+	public function testGetItemRandInvalidMeanTooBig() {
+		$data = range(1, 30);
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
+
+		$paging->getItemRand(.6);
 	}
 }
