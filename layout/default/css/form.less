@@ -51,13 +51,15 @@ select {
 	}
 }
 
-.placeholder(lighten(@colorFgShy, 10));
+	.placeholder(lighten(@colorFgShy, 10))
+
+;
 
 button:disabled, input:disabled {
 	opacity: .5;
 }
 
-button, input[type=submit], input[type=button] {
+button.button, input[type=submit].button, input[type=button].button {
 	.input_button(@heightButton);
 	.input_button_color;
 	.transition(.1s);
