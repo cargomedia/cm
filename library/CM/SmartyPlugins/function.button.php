@@ -35,6 +35,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($title) {
 		$class .= ' showTooltip';
 	}
+	$class .= ' button';
 
 	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
