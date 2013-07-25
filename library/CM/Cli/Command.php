@@ -21,40 +21,20 @@ class CM_Cli_Command {
 	 * @param CM_Cli_Arguments          $arguments
 	 * @param CM_InputStream_Interface  $input
 	 * @param CM_OutputStream_Interface $output
-	 * @param int                       $forks
 	 * @throws CM_Cli_Exception_InvalidArguments
 	 * @throws CM_Exception
 	 */
-	public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output, $forks) {
-		$forks = (int) $forks;
+	public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output) {
 		$pidFile = null;
 		if ($this->_getSynchronized()) {
-			if ($forks) {
-				throw new CM_Exception('Can\'t fork synchronized process `' . $this->_getMethodName() . '`.');
-			}
 			if ($this->_isRunning()) {
 				throw new CM_Exception('Process `' . $this->_getMethodName() . '` still running.');
 			}
 			$pidFile = $this->_createPidFile();
 		}
-		$keepalive = false;
-		if ($this->_getKeepalive()) {
-			$keepalive = true;
-		}
 		$parameters = $arguments->extractMethodParameters($this->_method);
 		$arguments->checkUnused();
-		$runnable = $this->_class->newInstance($input, $output);
-		$methodName = $this->_method->getName();
-		$function = function() use ($runnable, $methodName, $parameters) {
-			call_user_func_array(array($runnable, $methodName), $parameters);
-		};
-		if ($keepalive || $forks) {
-			$forks = max($forks, (int) $keepalive);
-			$executor = new CM_Cli_ForkedExecutor($function, $forks, $keepalive);
-			$executor->run();
-		} else {
-			$function();
-		}
+		call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
 		if ($pidFile) {
 			$pidFile->delete();
 		}

@@ -8,6 +8,9 @@ class CM_Cli_CommandManager {
 	/** @var int */
 	private $_forks = null;
 
+	/** @var boolean */
+	private $_keepalive;
+
 	/** @var CM_InputStream_Interface */
 	private $_streamInput;
 
@@ -94,8 +97,23 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
-			$command->run($arguments, $this->_streamInput, $this->_streamOutput, $this->_forks);
+
+			$streamInput = $this->_streamInput;
+			$streamOutput = $this->_streamOutput;
+			$function = function() use ($command, $packageName, $methodName, $parameters, $arguments, $streamInput, $streamOutput) {
+				CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
+				$command->run($arguments, $streamInput, $streamOutput);
+			};
+			if ($this->_keepalive || $this->_forks) {
+				echo "forked\n";
+				$forks = max($this->_forks, (int) $this->_keepalive);
+				$executor = new CM_Cli_ForkedExecutor($function, $forks, $this->_keepalive);
+				$executor->run();
+			} else {
+				echo "normal\n";
+				$function();
+			}
+
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
@@ -118,9 +136,10 @@ class CM_Cli_CommandManager {
 	 * @param boolean|null $quiet
 	 * @param boolean|null $quietWarnings
 	 * @param boolean|null $nonInteractive
+	 * @param boolean|null         $keepalive
 	 * @param int|null     $forks
 	 */
-	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
+	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $keepalive = null, $forks = null) {
 		$forks = (int) $forks;
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
@@ -134,6 +153,7 @@ class CM_Cli_CommandManager {
 		if ($forks > 1) {
 			$this->_forks = $forks;
 		}
+		$this->_keepalive = (boolean) $keepalive;
 	}
 
 	/**
