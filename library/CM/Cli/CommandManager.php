@@ -101,9 +101,9 @@ class CM_Cli_CommandManager {
 				$fork = new CM_Fork($forks, $keepalive);
 				$fork->fork();
 			}
+
 			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
-
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
