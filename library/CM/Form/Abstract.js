@@ -135,8 +135,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	},
 
 	submit: function(actionName, confirmed, data, callbacks) {
+		actionName = actionName || _.first(_.keys(this.options.actions));
 		confirmed = confirmed || false;
 		callbacks = callbacks || {};
+
 		var action = this.options.actions[actionName];
 		if (!action) {
 			cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
