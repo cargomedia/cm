@@ -2,7 +2,7 @@
 
 class CM_Fork {
 
-	const RESPAWN_TIMEOUT = 0.2;
+	const RESPAWN_TIMEOUT = 10;
 
 	/** @var boolean */
 	private $_isParent = true;
@@ -50,12 +50,11 @@ class CM_Fork {
 			}
 			unset($this->_childProcesses[$pid]);
 			if ($this->_keepalive) {
-				usleep(self::RESPAWN_TIMEOUT * 1000000);
-				pcntl_signal_dispatch();
 				CM_Bootloader::getInstance()->handleException(new CM_Exception(
 					'Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN));
 				$this->_spawnChild();
 				if (!$this->_isParent) {
+					usleep(self::RESPAWN_TIMEOUT * 1000000);
 					return;
 				}
 			}
