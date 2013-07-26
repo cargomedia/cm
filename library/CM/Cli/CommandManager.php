@@ -8,9 +8,6 @@ class CM_Cli_CommandManager {
 	/** @var int */
 	private $_forks = null;
 
-	/** @var boolean */
-	private $_keepalive;
-
 	/** @var CM_InputStream_Interface */
 	private $_streamInput;
 
@@ -98,9 +95,10 @@ class CM_Cli_CommandManager {
 			}
 			$command = $this->_getCommand($packageName, $methodName);
 
-			if ($this->_keepalive || $this->_forks) {
-				$forks = max($this->_forks, (int) $this->_keepalive);
-				$fork = new CM_Fork($forks, $this->_keepalive);
+			$keepalive = $command->getKeepalive();
+			if ($keepalive || $this->_forks) {
+				$forks = max($this->_forks, (int) $keepalive);
+				$fork = new CM_Fork($forks, $keepalive);
 				$fork->fork();
 			}
 			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
@@ -128,10 +126,9 @@ class CM_Cli_CommandManager {
 	 * @param boolean|null $quiet
 	 * @param boolean|null $quietWarnings
 	 * @param boolean|null $nonInteractive
-	 * @param boolean|null         $keepalive
 	 * @param int|null     $forks
 	 */
-	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $keepalive = null, $forks = null) {
+	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
 		$forks = (int) $forks;
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
@@ -145,7 +142,6 @@ class CM_Cli_CommandManager {
 		if ($forks > 1) {
 			$this->_forks = $forks;
 		}
-		$this->_keepalive = (boolean) $keepalive;
 	}
 
 	/**

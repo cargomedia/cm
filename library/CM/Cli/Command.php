@@ -56,6 +56,14 @@ class CM_Cli_Command {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function getKeepalive() {
+		$methodDocComment = $this->_method->getDocComment();
+		return (boolean) preg_match('/\*\s+@keepalive\s+/', $methodDocComment);
+	}
+
+	/**
 	 * @param string $packageName
 	 * @param string $methodName
 	 * @return bool
