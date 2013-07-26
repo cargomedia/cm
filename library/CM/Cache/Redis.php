@@ -5,6 +5,7 @@
  */
 
 class CM_Cache_Redis extends CM_Cache_Abstract {
+
 	protected static $_instance;
 
 	/** @var Redis */
@@ -91,6 +92,43 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @param int    $score
+	 * @param string $value
+	 * @return mixed
+	 */
+	protected function _zAdd($key, $score, $value) {
+		return $this->_redis->zAdd($key, $score, $value);
+	}
+
+	protected function _zRem($key, $value) {
+		return $this->_redis->zRem($key, $value);
+
+	}
+
+	/**
+	 * @param              $key
+	 * @param string       $start
+	 * @param string       $end
+	 * @param int|null     $count
+	 * @param int|null     $offset
+	 * @param boolean|null $returnScore
+	 * @return array
+	 */
+	protected function _zRangeByScore($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
+		$options = array();
+		if ($count || $offset) {
+			$count = (null !== $count) ? (int) $count : -1;
+			$offset = (null !== $offset) ? (int) $count : 0;
+			$options['limit'] = array($offset, $count);
+		}
+		if ($returnScore) {
+			$options['whithscores'] = true;
+		}
+		return $this->_redis->zRangeByScore($key, $start, $end, $options);
+	}
+
+	/**
 	 * @param string $channel
 	 * @param string $msg
 	 */
@@ -100,7 +138,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 
 	/**
 	 * @param string|string[] $channels
-	 * @param Closure $callback
+	 * @param Closure         $callback
 	 */
 	public function subscribe($channels, Closure $callback) {
 		$channels = (array) $channels;
@@ -110,7 +148,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
-	 * @param Redis $redis
+	 * @param Redis  $redis
 	 * @param string $channel
 	 * @param string $message
 	 */
