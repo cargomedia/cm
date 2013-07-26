@@ -20,15 +20,14 @@ class CM_Fork {
 	private $_keepalive;
 
 	/**
-	 * @param int      $forks
-	 * @param boolean  $keepalive
+	 * @param int|null     $forks
+	 * @param boolean|null $keepalive
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($forks = null, $keepalive = null) {
 		$forks = (null !== $forks) ? (int) $forks : 1;
 		$this->_keepalive = (boolean) $keepalive;
-		$forks = (int) $forks;
-		if (!$forks) {
+		if ($forks < 1) {
 			throw new CM_Exception_Invalid('Invalid amount of forks `' . $forks . '`');
 		}
 		$this->_forks = $forks;
