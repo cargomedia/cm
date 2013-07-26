@@ -49,7 +49,7 @@ class CM_Fork {
 				throw new CM_Exception('Waiting on child processes failed');
 			}
 			unset($this->_childProcesses[$pid]);
-			if (!pcntl_wifexited($status) && $this->_keepalive) {
+			if ($this->_keepalive) {
 				usleep(self::RESPAWN_TIMEOUT * 1000000);
 				pcntl_signal_dispatch();
 				CM_Bootloader::getInstance()->handleException(new CM_Exception(
