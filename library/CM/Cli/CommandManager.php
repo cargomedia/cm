@@ -98,21 +98,13 @@ class CM_Cli_CommandManager {
 			}
 			$command = $this->_getCommand($packageName, $methodName);
 
-			$streamInput = $this->_streamInput;
-			$streamOutput = $this->_streamOutput;
-			$function = function() use ($command, $packageName, $methodName, $parameters, $arguments, $streamInput, $streamOutput) {
-				CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
-				$command->run($arguments, $streamInput, $streamOutput);
-			};
 			if ($this->_keepalive || $this->_forks) {
-				echo "forked\n";
 				$forks = max($this->_forks, (int) $this->_keepalive);
-				$executor = new CM_Cli_ForkedExecutor($function, $forks, $this->_keepalive);
-				$executor->run();
-			} else {
-				echo "normal\n";
-				$function();
+				$fork = new CM_Fork($forks, $this->_keepalive);
+				$fork->fork();
 			}
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
+			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {

@@ -1,8 +1,11 @@
 <?php
 
-class CM_Cli_ForkedExecutor {
+class CM_Fork {
 
 	const RESPAWN_TIMEOUT = 0.2;
+
+	/** @var boolean */
+	private $_isParent = true;
 
 	/** @var array */
 	private $_childProcesses = array();
@@ -17,26 +20,28 @@ class CM_Cli_ForkedExecutor {
 	private $_keepalive;
 
 	/**
-	 * @param callable $function
 	 * @param int      $forks
 	 * @param boolean  $keepalive
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct(Closure $function, $forks, $keepalive) {
+	public function __construct($forks = null, $keepalive = null) {
+		$forks = (null !== $forks) ? (int) $forks : 1;
 		$this->_keepalive = (boolean) $keepalive;
 		$forks = (int) $forks;
 		if (!$forks) {
 			throw new CM_Exception_Invalid('Invalid amount of forks `' . $forks . '`');
 		}
 		$this->_forks = $forks;
-		$this->_function = $function;
 		pcntl_signal(SIGTERM, array($this, '_handleSignal'), false);
 		pcntl_signal(SIGINT, array($this, '_handleSignal'), false);
 	}
 
-	public function run() {
+	public function fork() {
 		while (count($this->_childProcesses) < $this->_forks) {
 			$this->_spawnChild();
+			if (!$this->_isParent) {
+				return;
+			}
 		}
 		do {
 			$pid = pcntl_wait($status);
@@ -50,8 +55,12 @@ class CM_Cli_ForkedExecutor {
 				CM_Bootloader::getInstance()->handleException(new CM_Exception(
 					'Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN));
 				$this->_spawnChild();
+				if (!$this->_isParent) {
+					return;
+				}
 			}
 		} while (count($this->_childProcesses));
+		exit;
 	}
 
 	/**
@@ -70,8 +79,8 @@ class CM_Cli_ForkedExecutor {
 			case 0: //child
 				pcntl_signal(SIGTERM, SIG_DFL);
 				pcntl_signal(SIGINT, SIG_DFL);
-				call_user_func($this->_function);
-				exit;
+				$this->_isParent = false;
+				break;
 			case -1: //failure
 				throw new CM_Exception('Could not spawn child process');
 			default: //parent
