@@ -98,7 +98,7 @@ class CM_Cli_CommandManager {
 			$keepalive = $command->getKeepalive();
 			if ($keepalive || $this->_forks) {
 				$forks = max($this->_forks, (int) $keepalive);
-				$fork = new CM_Fork($forks, $keepalive);
+				$fork = new CM_Process_Fork($forks, $keepalive);
 				$fork->fork();
 			}
 

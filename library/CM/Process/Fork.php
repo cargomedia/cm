@@ -1,20 +1,17 @@
 <?php
 
-class CM_Fork {
+class CM_Process_Fork {
 
 	const RESPAWN_TIMEOUT = 10;
 
 	/** @var boolean */
 	private $_isParent = true;
 
-	/** @var array */
-	private $_childProcesses = array();
+	/** @var int[] */
+	private $_childPids = array();
 
 	/** @var int */
 	private $_forks;
-
-	/** @var callable */
-	private $_function;
 
 	/** @var boolean */
 	private $_keepalive;
@@ -36,7 +33,7 @@ class CM_Fork {
 	}
 
 	public function fork() {
-		while (count($this->_childProcesses) < $this->_forks) {
+		while (count($this->_childPids) < $this->_forks) {
 			$this->_spawnChild();
 			if (!$this->_isParent) {
 				return;
@@ -47,7 +44,7 @@ class CM_Fork {
 			if (-1 === $pid) {
 				throw new CM_Exception('Waiting on child processes failed');
 			}
-			unset($this->_childProcesses[$pid]);
+			unset($this->_childPids[$pid]);
 			if ($this->_keepalive) {
 				CM_Bootloader::getInstance()->handleException(new CM_Exception(
 					'Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN));
@@ -57,7 +54,7 @@ class CM_Fork {
 					return;
 				}
 			}
-		} while (count($this->_childProcesses));
+		} while (count($this->_childPids));
 		exit;
 	}
 
@@ -65,7 +62,7 @@ class CM_Fork {
 	 * @param int $signal
 	 */
 	public function _handleSignal($signal) {
-		foreach ($this->_childProcesses as $child) {
+		foreach ($this->_childPids as $child) {
 			posix_kill($child, $signal);
 		}
 		exit;
@@ -75,14 +72,14 @@ class CM_Fork {
 		$pid = pcntl_fork();
 		switch ($pid) {
 			case 0: //child
-				pcntl_signal(SIGTERM, SIG_DFL);
-				pcntl_signal(SIGINT, SIG_DFL);
+				pcntl_signal(SIGTERM, SIG_DFL); //restores default signal handler
+				pcntl_signal(SIGINT, SIG_DFL); //restores default signal handler
 				$this->_isParent = false;
 				break;
 			case -1: //failure
 				throw new CM_Exception('Could not spawn child process');
 			default: //parent
-				$this->_childProcesses[$pid] = $pid;
+				$this->_childPids[$pid] = $pid;
 		}
 	}
 }
