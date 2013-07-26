@@ -1,6 +1,7 @@
 <?php
 
 class CM_Queue {
+
 	/**
 	 * @var string
 	 */
@@ -13,6 +14,7 @@ class CM_Queue {
 
 	/**
 	 * @param string $key
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($key) {
 		$this->_key = (string) $key;
@@ -30,19 +32,31 @@ class CM_Queue {
 	}
 
 	/**
-	 * @param mixed $value
+	 * @param mixed       $value
+	 * @param int|null $timestamp
 	 */
-	public function push($value) {
+	public function push($value, $timestamp = null) {
+		$timestamp = (null !== $timestamp) ? (int) $timestamp : null;
 		$value = serialize($value);
-		$this->_adapter->push($this->getKey(), $value);
+		if ($timestamp) {
+			$this->_adapter->pushDelayed($this->getKey(), $value, $timestamp);
+		} else {
+			$this->_adapter->push($this->getKey(), $value);
+		}
 	}
 
 	/**
+	 * @param int|null $timestampMax
 	 * @return mixed
 	 */
-	public function pop() {
-		$value = $this->_adapter->pop($this->getKey());
-		$value = unserialize($value);
-		return $value;
+	public function pop($timestampMax = null) {
+		$timestampMax = (null !== $timestampMax) ? (int) $timestampMax : null;
+		if ($timestampMax) {
+			$value = $this->_adapter->popDelayed($this->_key, $timestampMax);
+		} else {
+			$value = $this->_adapter->pop($this->getKey());
+		}
+		return unserialize($value);
 	}
+
 }

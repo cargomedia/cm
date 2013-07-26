@@ -2,8 +2,7 @@
 
 class CM_QueueTest extends CMTest_TestCase {
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
+	public function tearDown() {
 		CM_Cache_Redis::flush();
 	}
 
@@ -36,5 +35,29 @@ class CM_QueueTest extends CMTest_TestCase {
 		$this->assertSame(array(3 => 'three'), $queue2->pop());
 		$this->assertSame(false, $queue2->pop());
 		$this->assertSame(false, $queue1->pop());
+	}
+
+	public function testPushPopDelayed() {
+		$queue = new CM_Queue('foo');
+		$timestamp = time();
+		$queue->push('bla', $timestamp);
+
+		$this->assertSame('bla', $queue->pop($timestamp));
+		$this->assertFalse($queue->pop($timestamp));
+
+		$timeStamp1 = time();
+		$timeStamp2 = time() + 10;
+		$timeStamp3 = time() + 20;
+		$queue->push(1, $timeStamp1);
+		$queue->push('two', $timeStamp2);
+		$queue->push(array(3 => 'three'), $timeStamp3);
+		$this->assertSame(1, $queue->pop($timeStamp1));
+		$this->assertFalse($queue->pop($timeStamp1));
+
+		$this->assertSame('two', $queue->pop($timeStamp2));
+		$this->assertFalse($queue->pop($timeStamp2));
+
+		$this->assertSame(array(3 => 'three'), $queue->pop($timeStamp3));
+		$this->assertFalse($queue->pop($timeStamp3));
 	}
 }
