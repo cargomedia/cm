@@ -38,10 +38,8 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 
 	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
-	$type = $form->getActionDefaultName() ? 'submit' : 'button';
-
 	$html = '';
-	$html .= '<button class="' . $class . '" id="' . $id . '" type="' . $type . '" value="' . $label . '"';
+	$html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '"';
 	if ($title) {
 		$html .= ' title="' . $title . '"';
 	}
