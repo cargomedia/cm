@@ -122,11 +122,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			/** @var CM_Model_StreamChannel_Video $streamChannel */
 			$streamChannel->setThumbnailCount($thumbnailCount);
 		}
-		$streamPublish = $streamChannel->getStreamPublish();
-		if (!$streamPublish) {
-			throw new CM_Exception_Invalid('No stream publish found for `' . $streamName . '`');
-		}
-		$streamPublish->delete();
+		$streamChannel->getStreamPublish()->delete();
 		if (!$streamChannel->hasStreams()) {
 			$streamChannel->delete();
 		}
