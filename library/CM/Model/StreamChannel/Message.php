@@ -55,7 +55,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	 * @param mixed|null         $data
 	 */
 	public static function publishAction($streamChannel, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
-		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerb() . ':' . $model->getType();
+		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerb() . ':' . $action->getType();
 		self::publish($streamChannel, $namespace, array('action' => $action, 'model' => $model, 'data' => $data));
 	}
 

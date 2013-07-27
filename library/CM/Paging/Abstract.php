@@ -134,8 +134,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 			if ($mean > .5) {
 				throw new CM_Exception_NotImplemented('Normalized mean item index cannot be greater than .5.');
 			}
-			$x = 1 + 1 / (($N - 1) * $mean);
-			$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+			if ($N <= 1) {
+				$n = 0;
+			} else {
+				$x = 1 + 1 / (($N - 1) * $mean);
+				$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+			}
 		}
 		$this->setPage($n + 1, 1);
 		$item = $this->getItem(0);
@@ -150,7 +154,8 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 */
 	public function getCount() {
 		if ($this->_count === null && $this->_source) {
-			$this->_setCount($this->_source->getCount($this->_getItemOffset(), ceil($this->_pageSize * $this->_getPageFillRate())));
+			$count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
+			$this->_setCount($this->_source->getCount($this->_getItemOffset(), $count));
 		}
 		return (int) $this->_count;
 	}
@@ -164,7 +169,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		$field = (string) $field;
 		$sum = 0;
 		if ($this->_source) {
-			$itemsRaw = $this->_source->getItems();
+			$itemsRaw = $this->_source->getItems(null, null);
 			foreach ($itemsRaw as $itemRaw) {
 				if (!array_key_exists($field, $itemRaw)) {
 					throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
@@ -212,7 +217,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		if (!$this->_pageSize) {
 			return 0;
 		}
-		return ceil($this->getCount() / $this->_pageSize);
+		return (int) ceil($this->getCount() / $this->_pageSize);
 	}
 
 	/**
@@ -344,7 +349,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 		if ($this->_itemsRaw === null) {
 			$this->_itemsRaw = array();
 			if ($this->_source) {
-				$count = ($this->_pageSize === null) ? null : ceil($this->_pageSize * $this->_getPageFillRate());
+				$count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
 				$itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
 				foreach ($itemsRaw as &$itemRaw) {
 					if ($this->_flattenItems) {
@@ -466,7 +471,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 				if ($this->_pageSize == 0 || $this->getCount() == 0) {
 					$this->_pageOffset = 0;
 				} else {
-					$this->_pageOffset = ceil($this->getCount() / $this->_pageSize) - 1;
+					$this->_pageOffset = (int) ceil($this->getCount() / $this->_pageSize) - 1;
 				}
 			}
 		}

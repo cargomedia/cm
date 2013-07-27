@@ -37,10 +37,10 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		});
 
 		if (cm.options.stream.channel) {
-			_.each(cm.model.types, function(modelType, modelName) {
-				_.each(cm.action.verbs, function(actionVerb, actionName) {
-					self.bindAction(actionVerb, modelType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
-						cm.debug.log('ACTION: <[ACTOR:' + (action.actor ? action.actor.id : null) + '] , ' + actionName + ' , ' + '[' + modelName + ':' + JSON.stringify(model._id) + ']>', '(', data, ')');
+			_.each(cm.action.types, function(actionType, actionTypeName) {
+				_.each(cm.action.verbs, function(actionVerb, actionVerbName) {
+					self.bindAction(actionVerb, actionType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
+						cm.debug.log(actionTypeName + ': <[ACTOR:' + (action.actor ? action.actor.id : null) + '] , ' + actionVerbName + ' , ' + '[' + model._class + ':' + JSON.stringify(model._id) + ']>', '(', data, ')');
 					});
 				});
 			});
