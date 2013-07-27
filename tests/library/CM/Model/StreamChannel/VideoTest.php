@@ -82,31 +82,21 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 		$this->assertNotRow('cm_streamChannel_video', array('id' => $streamChannel->getId()));
 	}
 
-	public function testOnBeforeDelete() {
+	public function testOnUnpublish() {
 		$streamChannel = CMTest_TH::createStreamChannel();
-		CMTest_TH::createStreamPublish(null, $streamChannel);
+		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
 			$this->fail('Archive exists before StreamChannel deleted.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-		$streamChannel->delete();
+		$streamChannel->onUnpublish($streamPublish);
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
 			$this->assertTrue(true);
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->fail('Archive was not created.');
-		}
-
-		//without streamPublish
-		$streamChannel = CMTest_TH::createStreamChannel();
-		$streamChannel->delete();
-		try {
-			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
-			$this->fail('Archive created despite missing streamPublish.');
-		} catch (CM_Exception_Nonexistent $ex) {
-			$this->assertTrue(true);
 		}
 	}
 
