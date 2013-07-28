@@ -43,6 +43,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	if ($label) {
 		$class .= ' hasLabel';
 	}
+	$class .= ' button';
 
 	$iconMarkup = '';
 	if ($icon) {
