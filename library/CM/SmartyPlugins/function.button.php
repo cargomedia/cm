@@ -10,10 +10,11 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	}
 	$action = $form->getAction($params['action']);
 	$title = isset($params['title']) ? (string) $params['title'] : null;
+	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
 
-	$class = '';
+	$class = 'button ' . 'button-' . $theme . ' ';
 	if (isset($params['class'])) {
-		$class = trim($params['class']);
+		$class .= trim($params['class']);
 	}
 
 	$icon = null;
@@ -35,14 +36,13 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($title) {
 		$class .= ' showTooltip';
 	}
-	$class .= ' button';
 
 	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
-	$type = $form->getActionDefaultName() ? 'submit' : 'button';
+	$theme = $form->getActionDefaultName() ? 'submit' : 'button';
 
 	$html = '';
-	$html .= '<button class="' . $class . '" id="' . $id . '" type="' . $type . '" value="' . $label . '"';
+	$html .= '<button class="' . $class . '" id="' . $id . '" type="' . $theme . '" value="' . $label . '"';
 	if ($title) {
 		$html .= ' title="' . $title . '"';
 	}
