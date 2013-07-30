@@ -111,6 +111,7 @@ select {
 	border: 1px solid @colorFgBorderEmphasize3;
 	.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 6));
 	color: lighten(@colorFg, 25);
+	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
 
 	&:hover {
 		border: 1px solid darken(@colorFgBorderEmphasize3, 10);
@@ -124,7 +125,7 @@ select {
 }
 
 .button-highlight {
-	border: 1px solid spin(@colorBgButtonHighlight, -5);
+	border: 1px solid spin(@colorBgButtonHighlight, -3);
 	background-color: @colorBgButtonHighlight;
 	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -3));
 	color: @colorFgTheme;
@@ -135,17 +136,19 @@ select {
 	}
 
 	&:active {
-		background: spin(@colorBgButtonHighlight, -10);
+		border-color: spin(@colorBgButtonHighlight, -15);
+		background: spin(@colorBgButtonHighlight, -12);
 	}
 }
 
 .button-success {
-	border: 1px solid lighten(@colorOk, 4);
-	.gradient(vertical, lighten(@colorOk, 12), lighten(@colorOk, 6));
+	border: 1px solid lighten(@colorOk, 3);
+	.gradient(vertical, lighten(@colorOk, 9), lighten(@colorOk, 3));
 	color: @colorFgTheme;
+	text-shadow: 1px 1px spin(@colorOk, -8);
 
 	&:hover {
-		.gradient(vertical, lighten(@colorOk, 12), @colorOk);
+		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
 	}
 
 	&:active {
@@ -158,6 +161,7 @@ select {
 	border: 1px solid @colorError;
 	.gradient(vertical, lighten(@colorError, 10), @colorError);
 	color: @colorBg;
+	text-shadow: 1px 1px @colorError;
 
 	&:hover {
 		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
@@ -181,6 +185,7 @@ select {
 
 		.icon {
 			margin-right: 10px;
+			font-size: 1em;
 		}
 	}
 }
