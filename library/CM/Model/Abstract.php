@@ -154,10 +154,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param string $field
-	 * @param mixed  $value
+	 * @param string|array $field
+	 * @param mixed|null   $value
 	 */
-	final public function _set($field, $value) {
+	final public function _set($field, $value = null) {
+		if (is_array($field)) {
+			foreach ($field as $key => $value) {
+				$this->_set($key, $value);
+			}
+			return;
+		}
+
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
 		if ($this->_autoCommitCache) {
@@ -259,7 +266,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param int		$type
+	 * @param int        $type
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_Invalid
@@ -306,5 +313,4 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public static function fromArray(array $data) {
 		return self::factoryGeneric($data['_type'], $data['_id']);
 	}
-
 }
