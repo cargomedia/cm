@@ -53,20 +53,29 @@ select {
 
 .placeholder(lighten(@colorFgShy, 10));
 
-button:disabled, input:disabled {
-	opacity: .5;
-}
-
-button, input[type=submit], input[type=button] {
-	.input_button(@heightButton);
-	.input_button_color;
+.button {
+	.box-sizing(border-box);
+	width: auto;
+	height: @sizeButton;
+	min-width: @sizeButton;
+	max-width: 100%;
+	overflow: hidden;
+	margin: 1px;
+	font-weight: bold;
+	cursor: pointer;
+	vertical-align: top;
+	white-space: nowrap;
+	border-radius: 0;
 	.transition(.1s);
+	padding: 0 8px;
 
-	&:hover {
-		.input_button_hover;
-	}
 	&:active {
-		.input_button_active;
+		.box-shadow(inset 0 3 5px rgba(0, 0, 0, 0.125));
+	}
+
+	.icon {
+		font-size: 1.15em;
+		line-height: 1;
 	}
 
 	&.hasIcon {
@@ -85,72 +94,104 @@ button, input[type=submit], input[type=button] {
 		padding: 0 1px 0 8px;
 	}
 
-	&.large {
-		.input_button(@heightButtonLarge);
-
-		border-radius: 3px;
-		font-size: @fontSizeButtonLarge;
-		text-shadow: 1px 1px 1px @colorBg;
-		font-weight: bold;
-		text-transform: uppercase;
-		letter-spacing: -1px;
-
-		.icon {
-			font-size: @fontSizeButtonLarge;
-		}
-		&.hasIcon.hasLabel {
-			padding: 0 20px 0 10px;
-
-			.icon {
-				margin-right: 8px;
-			}
-		}
-	}
-
-	&.confirmClick {
-		border: 1px solid @colorOk;
-		.gradient(vertical, lighten(@colorOk, 12), lighten(@colorOk, 6));
-		color: @colorBg;
-
-		&:hover {
-			border-color: darken(@colorOk, 6);
-			.gradient(vertical, lighten(@colorOk, 12), @colorOk);
-		}
-		&:active {
-			border-color: darken(@colorOk, 6);
-			background: @colorOk;
-		}
+	&.confirmClick.success {
+		.button-success;
 	}
 
 	&.confirmClick.warning {
-		border: 1px solid @colorError;
-		.gradient(vertical, lighten(@colorError, 6), @colorError);
-		color: @colorBg;
+		.button-danger;
+	}
+}
 
-		&:hover {
-			border-color: darken(@colorError, 12);
-			.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
-		}
-		&:active {
-			border-color: darken(@colorError, 12);
-			background: darken(@colorError, 6);
-		}
+.button-default-active {
+	.gradient(vertical, darken(@colorBgButtonDefault, 12), darken(@colorBgButtonDefault, 12));
+}
+
+.button-default {
+	border: 1px solid @colorFgBorderEmphasize3;
+	.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 6));
+	color: lighten(@colorFg, 25);
+	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
+
+	&:hover {
+		border: 1px solid darken(@colorFgBorderEmphasize3, 10);
+		.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 12));
+		color: @colorFg;
 	}
 
-	&.alt {
-		.input_button_alt;
+	&:active {
+		.button-default-active;
+	}
+}
 
-		&:hover {
-			.input_button_alt_hover;
-		}
-		&:active {
-			.input_button_alt_active;
-		}
+.button-highlight {
+	border: 1px solid spin(@colorBgButtonHighlight, -3);
+	background-color: @colorBgButtonHighlight;
+	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -3));
+	color: @colorFgTheme;
+	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
 
-		&.large {
-			font-size: @fontSizeButtonLarge;
+	&:hover {
+		.gradient(vertical, spin(@colorBgButtonHighlight, -2), spin(@colorBgButtonHighlight, -8));
+	}
+
+	&:active {
+		border-color: spin(@colorBgButtonHighlight, -15);
+		background: spin(@colorBgButtonHighlight, -12);
+	}
+}
+
+.button-success {
+	border: 1px solid lighten(@colorOk, 3);
+	.gradient(vertical, lighten(@colorOk, 9), lighten(@colorOk, 3));
+	color: @colorFgTheme;
+	text-shadow: 1px 1px spin(@colorOk, -8);
+
+	&:hover {
+		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
+	}
+
+	&:active {
+		border-color: darken(@colorOk, 6);
+		background: @colorOk;
+	}
+}
+
+.button-danger {
+	border: 1px solid @colorError;
+	.gradient(vertical, lighten(@colorError, 10), @colorError);
+	color: @colorBg;
+	text-shadow: 1px 1px @colorError;
+
+	&:hover {
+		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
+	}
+
+	&:active {
+		border-color: darken(@colorError, 12);
+		background: darken(@colorError, 6);
+	}
+}
+
+.button-large {
+	height: 1.5*@sizeButton;
+	min-width: 1.5*@sizeButton;
+	font-size: 2em;
+	border-radius: 3px;
+	padding: 0 15px;
+
+	&.hasIcon.hasLabel {
+		padding: 0 20px 0 10px;
+
+		.icon {
+			margin-right: 10px;
+			font-size: 1em;
 		}
 	}
+}
+
+button:disabled, input:disabled {
+	opacity: .5;
 }
 
 button:focus, input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
