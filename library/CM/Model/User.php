@@ -72,11 +72,12 @@ class CM_Model_User extends CM_Model_Abstract {
 	public function setOnline($state = true, $visible = true) {
 		$visible = (bool) $visible;
 		if ($state) {
-			CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+			$this->_set(array('online' => $this->getId(), 'visible' => $visible));
+			CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
 		} else {
+			$this->_set(array('online' => null, 'visible' => null));
 			CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
 		}
-		$this->_change();
 	}
 
 	/**
@@ -269,7 +270,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			$languageId = $language->getId();
 		}
 		$userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
-													  'languageId'  => $languageId));
+													'languageId'  => $languageId));
 		return new static($userId);
 	}
 
