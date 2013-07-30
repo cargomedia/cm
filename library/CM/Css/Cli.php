@@ -27,7 +27,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		$dirBuild = $dirWork . 'build/';
-		CM_Util::exec('fontcustom', array('compile', '--nohash', '--name=icon-webfont', '--output=' . $dirBuild, $dirWork));
+		CM_Util::exec('fontcustom', array('compile', '--file-hash=false', '--font-name=icon-webfont', '--output=' . $dirBuild, $dirWork));
 
 		$cssFile = new CM_File($dirBuild . '/fontcustom.css');
 		$less = preg_replace('/url\("(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
