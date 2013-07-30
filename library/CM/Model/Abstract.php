@@ -170,6 +170,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if ($this->_autoCommitCache) {
 			$cacheClass = $this->_cacheClass;
 			$cacheClass::set($this->_getCacheKey(), $this->_data);
+			$this->_onChange();
 		}
 	}
 
