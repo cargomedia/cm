@@ -72,11 +72,12 @@ class CM_Model_User extends CM_Model_Abstract {
 	public function setOnline($state = true, $visible = true) {
 		$visible = (bool) $visible;
 		if ($state) {
-			CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+			CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+			$this->_set(array('online' => $this->getId(), 'visible' => $visible));
 		} else {
 			CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
+			$this->_set(array('online' => null, 'visible' => null));
 		}
-		$this->_change();
 	}
 
 	/**
@@ -153,11 +154,13 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @return CM_Model_User
 	 */
 	public function setVisible($state = true) {
+		$state = (int) $state;
 		if (!$this->getOnline()) {
 			throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
 		}
-		CM_Db_Db::replace('cm_user_online', array('userId' => $this->getId(), 'visible' => (int) $state));
-		return $this->_change();
+		CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
+		$this->_set(array('online' => $this->getId(), 'visible' => $state));
+		return $this;
 	}
 
 	/**
@@ -194,9 +197,10 @@ class CM_Model_User extends CM_Model_Abstract {
 	}
 
 	public function updateLatestactivity() {
-		if ($this->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION) {
-			CM_Db_Db::update('cm_user', array('activityStamp' => time()), array('userId' => $this->getId()));
-			$this->_change();
+		$currentTime = time();
+		if ($this->getLatestactivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
+			CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+			$this->_set('activityStamp', $currentTime);
 		}
 	}
 
@@ -269,7 +273,7 @@ class CM_Model_User extends CM_Model_Abstract {
 			$languageId = $language->getId();
 		}
 		$userId = CM_Db_Db::insert('cm_user', array('createStamp' => time(), 'activityStamp' => time(), 'site' => $siteType,
-													  'languageId'  => $languageId));
+													'languageId'  => $languageId));
 		return new static($userId);
 	}
 
