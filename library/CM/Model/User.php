@@ -72,11 +72,11 @@ class CM_Model_User extends CM_Model_Abstract {
 	public function setOnline($state = true, $visible = true) {
 		$visible = (bool) $visible;
 		if ($state) {
-			$this->_set(array('online' => $this->getId(), 'visible' => $visible));
 			CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $visible));
+			$this->_set(array('online' => $this->getId(), 'visible' => $visible));
 		} else {
-			$this->_set(array('online' => null, 'visible' => null));
 			CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
+			$this->_set(array('online' => null, 'visible' => null));
 		}
 	}
 
@@ -158,8 +158,8 @@ class CM_Model_User extends CM_Model_Abstract {
 		if (!$this->getOnline()) {
 			throw new CM_Exception_Invalid('Must not modify visibility of a user that is offline');
 		}
-		$this->_set(array('online' => $this->getId(), 'visible' => $state));
 		CM_Db_Db::replaceDelayed('cm_user_online', array('userId' => $this->getId(), 'visible' => $state));
+		$this->_set(array('online' => $this->getId(), 'visible' => $state));
 		return $this;
 	}
 
@@ -199,8 +199,8 @@ class CM_Model_User extends CM_Model_Abstract {
 	public function updateLatestactivity() {
 		$currentTime = time();
 		if ($this->getLatestactivity() < $currentTime - self::ACTIVITY_EXPIRATION) {
-			$this->_set('activityStamp', $currentTime);
 			CM_Db_Db::update('cm_user', array('activityStamp' => $currentTime), array('userId' => $this->getId()));
+			$this->_set('activityStamp', $currentTime);
 		}
 	}
 
