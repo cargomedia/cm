@@ -73,6 +73,14 @@ select {
 		.box-shadow(inset 0 3 5px rgba(0, 0, 0, 0.125));
 	}
 
+	&:focus {
+		.input_focus;
+	}
+
+	&:disabled {
+		opacity: .5;
+	}
+
 	.icon {
 		font-size: 1.15em;
 		line-height: 1;
@@ -94,7 +102,7 @@ select {
 		padding: 0 1px 0 8px;
 	}
 
-	&.confirmClick.success {
+	&.confirmClick {
 		.button-success;
 	}
 
@@ -133,6 +141,7 @@ select {
 
 	&:hover {
 		.gradient(vertical, spin(@colorBgButtonHighlight, -2), spin(@colorBgButtonHighlight, -8));
+		color: @colorFgTheme;
 	}
 
 	&:active {
@@ -149,6 +158,7 @@ select {
 
 	&:hover {
 		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
+		color: @colorFgTheme;
 	}
 
 	&:active {
@@ -165,6 +175,7 @@ select {
 
 	&:hover {
 		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
+		color: @colorFgTheme;
 	}
 
 	&:active {
@@ -190,11 +201,11 @@ select {
 	}
 }
 
-button:disabled, input:disabled {
+input:disabled {
 	opacity: .5;
 }
 
-button:focus, input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
+input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
 	.input_focus;
 }
 
