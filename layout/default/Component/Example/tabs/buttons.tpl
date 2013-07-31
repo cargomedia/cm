@@ -15,5 +15,5 @@
 {button_link theme='danger' label="Danger"}
 <hr />
 <h3>Confirmation</h3>
-{button_link class="confirmAction success" label="With Confirmation"}
+{button_link class="confirmAction" label="With Confirmation"}
 {button_link class="confirmAction warning" label="With Warning"}
