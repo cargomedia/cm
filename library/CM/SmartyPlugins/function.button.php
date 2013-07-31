@@ -10,10 +10,11 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	}
 	$action = $form->getAction($params['action']);
 	$title = isset($params['title']) ? (string) $params['title'] : null;
+	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
 
-	$class = '';
+	$class = 'button ' . 'button-' . $theme . ' ';
 	if (isset($params['class'])) {
-		$class = trim($params['class']);
+		$class .= trim($params['class']);
 	}
 
 	$icon = null;

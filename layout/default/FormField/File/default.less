@@ -40,18 +40,12 @@
 }
 
 .uploadButton {
-	.input_button(@heightButton);
-	.input_button_color;
+	.button;
+	.button-default;
 	display: inline-block;
-	height: @heightButton - 2px;
-	line-height: @heightButton - 2px;
+	height: @sizeButton;
+	line-height: @sizeButton;
 	position: relative;
-	overflow: hidden;
-	direction: ltr;
-
-	&:hover {
-		.input_button_hover;
-	}
 
 	input {
 		position: absolute;
