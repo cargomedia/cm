@@ -320,43 +320,47 @@ class CM_Bootloader {
 	 * @return string
 	 */
 	private function _formatException(Exception $exception) {
-		$text = get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
-				PHP_EOL . PHP_EOL;
-
+		$exceptionHeader = function(Exception $exception) {
+			return get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() . PHP_EOL . PHP_EOL;
+		};
 		try {
+			$exceptionMessage = '';
 			$trace = array_reverse($exception->getTrace());
 			array_unshift($trace, array(
 				'function' => '{main}',
 				'line'     => 0,
-				'file'     => $trace[0]['file'],
+				'file'     => $_SERVER['SCRIPT_FILENAME'],
 			));
 
 			$indent = strlen(count($trace)) + 4;
 			foreach ($trace as $number => $entry) {
-				$text .= str_pad($number, $indent, ' ', STR_PAD_LEFT) . '. ';
+				$exceptionMessage .= str_pad($number, $indent, ' ', STR_PAD_LEFT) . '. ';
 				if (array_key_exists('function', $entry)) {
 					if (array_key_exists('class', $entry)) {
-						$text .= $entry['class'] . '->';
+						$exceptionMessage .= $entry['class'] . '->';
 					}
-					$text .= $entry['function'];
+					$exceptionMessage .= $entry['function'];
 					if (array_key_exists('args', $entry)) {
 						$arguments = array();
 						foreach ($entry['args'] as $argument) {
 							$arguments[] = CM_Util::varDump($argument);
 						}
-						$text .= '(' . implode(', ', $arguments) . ')';
+						$exceptionMessage .= '(' . implode(', ', $arguments) . ')';
 					}
 				}
 				if (array_key_exists('file', $entry)) {
-					$text .= ' ' . $entry['file'] . ':' . $entry['line'];
+					$exceptionMessage .= ' ' . $entry['file'] . ':' . $entry['line'];
 				} else {
-					$text .= ' [internal function]';
+					$exceptionMessage .= ' [internal function]';
 				}
-				$text .= PHP_EOL;
+				$exceptionMessage .= PHP_EOL;
 			}
+			$output = $exceptionHeader($exception) . $exceptionMessage;
 		} catch (Exception $e) {
-			$text .= $exception->getTraceAsString();
+			$output = $exceptionHeader($e) . $e->getTraceAsString();
+			$output .= PHP_EOL . PHP_EOL;
+			$output .= $exceptionHeader($exception) . $exception->getTraceAsString();
 		}
-		return $text;
+		return $output;
 	}
 }
