@@ -21,7 +21,6 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	}
 	unset($params['iconPosition']);
 
-
 	$title = null;
 	if (isset($params['title'])) {
 		$title = (string) $params['title'];
@@ -34,10 +33,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	}
 	unset($params['id']);
 
-	$class = '';
+	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+	$class = 'button ' . 'button-' . $theme . ' ';
 	if (isset($params['class'])) {
-		$class = $params['class'];
+		$class .= $params['class'];
 	}
+	unset($params['theme']);
 	unset($params['class']);
 
 	if ($label) {

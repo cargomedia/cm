@@ -476,8 +476,8 @@ var CM_App = CM_Class_Abstract.extend({
 					callback.call(context);
 				}
 			} else {
-				var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
-				var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
+				var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
+				var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
 				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
 				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
 				$html.find('.box-body').text(question);
@@ -931,28 +931,29 @@ var CM_App = CM_Class_Abstract.extend({
 
 	action: {
 		verbs: {},
+		types: {},
 
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		bind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		}
 	},
 

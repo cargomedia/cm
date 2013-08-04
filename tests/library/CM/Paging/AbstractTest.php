@@ -435,6 +435,12 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($data, $paging->getItems());
 		$this->assertNull($paging->getPageSize());
 		$this->assertSame(1, $paging->getPage());
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand());
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand());
 	}
 
 	/**
@@ -473,6 +479,12 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 			$this->assertEquals($meanExpected, $count / $n, '', $maxDeviation);
 		}
 		$this->assertFalse($outOfBounds);
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array()));
+		$this->assertNull($paging->getItemRand(.1));
+
+		$paging = new CM_Paging_Mock(new CM_PagingSource_Array(array(1)));
+		$this->assertSame(1, $paging->getItemRand(.1));
 	}
 
 	/**
@@ -495,5 +507,28 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$paging = new CM_Paging_Mock(new CM_PagingSource_Array($data));
 
 		$paging->getItemRand(.6);
+	}
+
+	public function testGetCountGetItemsProxyToSourceWithPagination() {
+		$pagingSource = $this->getMockBuilder('CM_PagingSource_Abstract')->setMethods(array('getCount', 'getItems'))->getMockForAbstractClass();
+		$pagingSource->expects($this->once())->method('getCount')->with($this->identicalTo(10), $this->identicalTo(5))->will($this->returnValue(100));
+		$pagingSource->expects($this->once())->method('getItems')->with($this->identicalTo(10), $this->identicalTo(5))->will($this->returnValue(range(1, 5)));
+
+		/** @var CM_Paging_Abstract $paging */
+		$paging = $this->getMockBuilder('CM_Paging_Abstract')->setConstructorArgs(array($pagingSource))->getMockForAbstractClass();
+		$paging->setPage(3, 5);
+		$paging->getCount();
+		$paging->getItems();
+	}
+
+	public function testGetCountGetItemsProxyToSourceWithoutPagination() {
+		$pagingSource = $this->getMockBuilder('CM_PagingSource_Abstract')->setMethods(array('getCount', 'getItems'))->getMockForAbstractClass();
+		$pagingSource->expects($this->once())->method('getCount')->with($this->identicalTo(null), $this->identicalTo(null))->will($this->returnValue(100));
+		$pagingSource->expects($this->once())->method('getItems')->with($this->identicalTo(null), $this->identicalTo(null))->will($this->returnValue(range(1, 100)));
+
+		/** @var CM_Paging_Abstract $paging */
+		$paging = $this->getMockBuilder('CM_Paging_Abstract')->setConstructorArgs(array($pagingSource))->getMockForAbstractClass();
+		$paging->getCount();
+		$paging->getItems();
 	}
 }

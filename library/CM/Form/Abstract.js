@@ -7,6 +7,15 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
 	_fields: {},
 
+	events: {
+		'reset': function() {
+			_.each(this._fields, function(field) {
+				field.reset();
+			});
+			this.resetErrors();
+		}
+	},
+
 	ready: function() {
 	},
 
@@ -36,12 +45,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 			});
 		}, this);
 
-		if (this.options.default_action) {
-			this.$().submit(function(event) {
-				handler.submit(handler.default_action);
-				return false;
-			});
-		}
+		this.$el.on('submit', function() {
+			handler.$el.find('input[type="submit"], button[type="submit"]').first().click();
+			return false;
+		});
 
 		CM_View_Abstract.prototype._ready.call(this);
 	},
@@ -128,10 +135,14 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	},
 
 	submit: function(actionName, confirmed, data, callbacks) {
+		actionName = actionName || _.first(_.keys(this.options.actions));
 		confirmed = confirmed || false;
 		callbacks = callbacks || {};
-		actionName = actionName || this.options.default_action;
+
 		var action = this.options.actions[actionName];
+		if (!action) {
+			cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+		}
 
 		if (!confirmed) {
 			$('.form_field_error', this.$()).next('br').remove().addBack().remove();
@@ -214,8 +225,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 	},
 
 	reset: function() {
-		this.$().get(0).reset();
-		this.resetErrors();
+		this.el.reset();
 	},
 
 	disable: function() {

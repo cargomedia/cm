@@ -23,9 +23,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_assets = array();
 
 	/**
-	 * @var boolean $_autoCommitCache
+	 * @var boolean $_autoCommit
 	 */
-	private $_autoCommitCache = true;
+	private $_autoCommit = true;
 
 	/**
 	 * @param int $id
@@ -71,7 +71,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public function getId() {
 		return $this->_getId('id');
 	}
-
 
 	/**
 	 * @return array
@@ -126,12 +125,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				if (!is_array($this->_data)) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
 				}
-				$this->_autoCommitCache = false;
+				$this->_autoCommit = false;
 				/** @var CM_ModelAsset_Abstract $asset */
 				foreach ($this->_assets as $asset) {
 					$asset->_loadAsset();
 				}
-				$this->_autoCommitCache = true;
+				$this->_autoCommit = true;
 				$cacheClass::set($cacheKey, $this->_data);
 			}
 		}
@@ -154,15 +153,23 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param string $field
-	 * @param mixed  $value
+	 * @param string|array $field
+	 * @param mixed|null   $value
 	 */
-	final public function _set($field, $value) {
+	final public function _set($field, $value = null) {
+		if (is_array($field)) {
+			foreach ($field as $key => $value) {
+				$this->_set($key, $value);
+			}
+			return;
+		}
+
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
-		if ($this->_autoCommitCache) {
+		if ($this->_autoCommit) {
 			$cacheClass = $this->_cacheClass;
 			$cacheClass::set($this->_getCacheKey(), $this->_data);
+			$this->_onChange();
 		}
 	}
 
@@ -259,7 +266,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param int		$type
+	 * @param int        $type
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_Invalid
@@ -306,5 +313,4 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public static function fromArray(array $data) {
 		return self::factoryGeneric($data['_type'], $data['_id']);
 	}
-
 }

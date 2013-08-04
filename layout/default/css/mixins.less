@@ -197,66 +197,6 @@
 	.clickable(1.25em);
 }
 
-.input_button(@size) {
-	width: auto;
-	height: @size;
-	min-width: @size;
-	max-width: 100%;
-	overflow: hidden;
-	margin: 1px;
-	padding: 0 8px;
-	font-weight: bold;
-	font-size: @fontSizeButton;
-	cursor: pointer;
-	vertical-align: top;
-	white-space: nowrap;
-	border-radius: 0;
-
-	.icon {
-		font-size: 1.15em;
-		line-height: 1;
-	}
-}
-
-.input_button_color() {
-	border: 1px solid @colorFgBorderEmphasize3;
-	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
-	color: @colorFgButtonFont;
-}
-
-.input_button_hover() {
-	border: 1px solid darken(@colorFgBorderEmphasize3, 10);
-	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 12));
-	color: @colorFgButton;
-}
-
-.input_button_active() {
-	border: 1px solid darken(@colorFgBorderEmphasize3, 10);
-	background: darken(@colorBg, 12);
-}
-
-.input_button_alt() {
-	border: 1px solid darken(@colorFgButtonAlt, 10);
-	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
-	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
-	color: @colorFgButtonAltFont;
-	font-size: @fontSizeButton + 1px;
-
-	.icon {
-		color: @colorFgButtonAltFont;
-	}
-}
-
-.input_button_alt_hover() {
-	border: 1px solid @colorFgButtonAlt;
-	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
-}
-
-.input_button_alt_active() {
-	border: 1px solid darken(@colorFgButtonAlt, 10);
-	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
-}
-
 .appearance(@value) {
 	-webkit-appearance: @value;
 	-moz-appearance: @value;
@@ -267,4 +207,12 @@
 	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+}
+
+.transform-origin (@x:center, @y:center) {
+	-webkit-transform-origin: @x @y;
+	-moz-transform-origin: @x @y;
+	-ms-transform-origin: @x @y;
+	-o-transform-origin: @x @y;
+	transform-origin: @x @y;
 }

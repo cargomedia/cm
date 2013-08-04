@@ -23,14 +23,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 */
 	private $actions = array();
 
-	/**
-	 * If you have more than one actions in a form during $this->setup() set this value to the name
-	 * of the action which must processed by default when the user presses "Enter" button.
-	 *
-	 * @var string
-	 */
-	protected $default_action = null;
-
 	public function __construct() {
 		if (!preg_match('/^\w+_Form_(.+)$/', get_class($this), $matches)) {
 			throw new CM_Exception("Cannot detect namespace from forms class-name");
@@ -119,30 +111,15 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	/**
 	 * Get the reference to a form action object.
 	 *
-	 * @param string $name OPTIONAL
+	 * @param string $name
 	 * @return CM_FormAction_Abstract
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getAction($name = null) {
-		if (null === $name) {
-			$name = $this->getActionDefaultName();
-		}
+	public function getAction($name) {
 		if (!isset($this->actions[$name])) {
 			throw new CM_Exception_Invalid('Unrecognized action `' . $name . '`.');
 		}
 		return $this->actions[$name];
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getActionDefaultName() {
-		$actions = $this->getActions();
-		if (count($actions) == 1) {
-			$actionNames = array_keys($actions);
-			return reset($actionNames);
-		}
-		return $this->default_action;
 	}
 
 	/**
@@ -177,9 +154,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param array                             $data
-	 * @param string                            $action_name
-	 * @param CM_Response_View_Form             $response
+	 * @param array                 $data
+	 * @param string                $action_name
+	 * @param CM_Response_View_Form $response
 	 * @return mixed
 	 */
 	public function process(array $data, $action_name, CM_Response_View_Form $response) {
