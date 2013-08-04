@@ -320,29 +320,6 @@ class CM_Bootloader {
 	 * @return string
 	 */
 	private function _formatException(Exception $exception) {
-		$dumpArgument = function($argument) {
-			if (is_object($argument)) {
-				if ($argument instanceof stdClass) {
-					return 'object';
-				}
-				$value = get_class($argument);
-				if ($argument instanceof CM_Model_Abstract) {
-					$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
-				}
-				return $value;
-			}
-			if (is_string($argument)) {
-				if (strlen($argument) > 20) {
-					$argument = substr($argument, 0, 20) . '...';
-				}
-				return '\'' . $argument . '\'';
-			}
-			if (is_bool($argument) || is_numeric($argument)) {
-				return var_export($argument, true);
-			}
-			return gettype($argument);
-		};
-
 		$text = get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
 				PHP_EOL . PHP_EOL;
 
@@ -365,7 +342,7 @@ class CM_Bootloader {
 					if (array_key_exists('args', $entry)) {
 						$arguments = array();
 						foreach ($entry['args'] as $argument) {
-							$arguments[] = $dumpArgument($argument);
+							$arguments[] = CM_Util::varDump($argument);
 						}
 						$text .= '(' . implode(', ', $arguments) . ')';
 					}
