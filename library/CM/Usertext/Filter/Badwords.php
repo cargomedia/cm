@@ -7,9 +7,8 @@ class CM_Usertext_Filter_Badwords implements CM_Usertext_Filter_Interface {
 		$cacheKey = CM_CacheConst::Usertext_Filter_BadwordRegexp;
 		if (($badwordsRegexp = CM_CacheLocal::get($cacheKey)) === false) {
 			$badwordsRegexpList = array();
-			foreach (new CM_Paging_ContentList_Badwords() as $badword) {
-				$badword = preg_quote($badword, '#');
-				$badword = str_replace('\*', '[^\s]*', $badword);
+			foreach ($badwordList = new CM_Paging_ContentList_Badwords() as $badword) {
+				$badword = $badwordList->transformToRegexp($badword);
 				$badwordsRegexpList[] = $badword;
 			}
 			$badwordsRegexp = null;
