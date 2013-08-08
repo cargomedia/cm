@@ -13,6 +13,11 @@ class CM_Usertext_Filter_Badwords implements CM_Usertext_Filter_Interface {
 		if (!$badwordsRegex) {
 			return $text;
 		}
-		return preg_replace($badwordsRegex, '…', $text);
+
+		while ($text != preg_replace($badwordsRegex, '…', $text)) {
+			$text = preg_replace($badwordsRegex, '…', $text);
+		}
+
+		return $text;
 	}
 }
