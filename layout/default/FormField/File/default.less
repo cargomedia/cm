@@ -1,29 +1,24 @@
+& {
+	text-align: center;
+	padding-bottom: 12px;
+}
+
 .previews {
 	overflow: hidden; /* Clearfix */
+	text-align: left;
 
 	.preview {
-		position: relative;
-		float: left;
 		display: block;
+		float: left;
 		margin: 2px;
+		line-height: @sizeButton;
 
-		img {
-			max-height: 50px;
-			max-width: 100px
-		}
+		.deleteButton {
+			margin-left: 5px;
 
-		.actions {
-			display: none;
-			position: absolute;
-			left: 3px;
-			top: 3px;
-			background-color: @colorBg;
-			padding: 1px 3px;
-			border-radius: 2px;
-			color: @colorFg;
-		}
-		&:hover .actions {
-			display: block;
+			&:hover {
+				color: @colorError;
+			}
 		}
 
 		.template {
@@ -36,6 +31,34 @@
 				margin-top: 16px;
 			}
 		}
+	}
+}
+
+&.dragover {
+	border: 3px dashed @colorFgBorderEmphasize1;
+}
+
+.dropZone {
+	color: @colorFgShy;
+
+	html.touch & {
+		display: none;
+	}
+
+	.dropZone-icon {
+		font-size: 5em;
+		line-height: 1.2;
+		color: lighten(@colorFgIcon, 30);
+		text-shadow: 1px 1px @colorBg;
+	}
+
+	.dropZone-message {
+		font-size: 1.5em;
+	}
+
+	.dropZone-divide {
+		margin-bottom: 12px;
+		font-size: @fontSizeSmall;
 	}
 }
 
@@ -57,21 +80,5 @@
 		padding: 0;
 		cursor: pointer;
 		opacity: 0;
-	}
-}
-
-.dropZone {
-	border: 1px solid @colorNotice;
-	height: 100px;
-	border-style: dashed;
-	background-color: lighten(@colorNotice, 48);
-	text-align: center;
-	margin-bottom: 5px;
-
-	span {
-		color: @colorFgHeading;
-		font-size: 14px;
-		display: block;
-		margin-top: 40px;
 	}
 }

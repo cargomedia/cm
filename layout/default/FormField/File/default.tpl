@@ -6,8 +6,12 @@
 		</li>
 	{/foreach}
 </ul>
-<div style="display:none;" class="dropZone"><span>{translate 'Drop files here to upload.'}</span></div>
+<div class="dropZone">
+	<p class="dropZone-icon {block name="icon"}icon-upload{/block}"></p>
+	<p class="dropZone-message">{block name="message"}{translate 'Drag files here'}{/block}</p>
+	<p class="dropZone-divide">- {translate 'or'} -</p>
+</div>
 <div class="uploadButton">
 	<input type="file" name="{$name}-file" multiple />
-	{if isset($text)}{$text}{else}{translate 'Upload File'}{/if}
+	{if isset($text)}{$text}{else}{block name="button-text"}{translate 'Click To Upload Files'}{/block}{/if}
 </div>
