@@ -1,3 +1,5 @@
+// with fix for issue https://github.com/johndyer/mediaelement/pull/811
+
 /*!
  * MediaElement.js
  * HTML5 <video> and <audio> shim and player
@@ -1217,7 +1219,7 @@ mejs.HtmlMediaElementShim = {
 
 		// check for placement inside a <p> tag (sometimes WYSIWYG editors do this)
 		node = htmlMediaElement.parentNode;
-		while (node !== null && node.tagName.toLowerCase() != 'body') {
+		while (node !== null && node.tagName.toLowerCase() != 'body' && node.parentNode && node.parentNode.parentNode) {
 			if (node.parentNode.tagName.toLowerCase() == 'p') {
 				node.parentNode.parentNode.insertBefore(node, node.parentNode);
 				break;
