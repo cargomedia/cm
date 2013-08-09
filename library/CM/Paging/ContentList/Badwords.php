@@ -27,7 +27,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	public function toRegexList() {
 		$regexList = array();
