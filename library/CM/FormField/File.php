@@ -26,18 +26,6 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	public function validateFile(CM_File $file) {
 	}
 
-	/**
-	 * @param CM_File_UserContent_Temp $file
-	 * @param CM_Render                $render
-	 * @return string HTML
-	 */
-	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
-		$html = '';
-		$html .= CM_Util::htmlspecialchars($file->getFileName());
-		$html .= '<a href="javascript:;" class="icon-delete deleteFile"></a>';
-		return $html;
-	}
-
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$userInput = array_filter($userInput, function ($value) {
 			return !empty($value);
@@ -56,6 +44,10 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	public function prepare(array $params) {
-		$this->setTplParam('text', isset($params['text']) ? (string) $params['text'] : null);
+		$text = isset($params['text']) ? (string) $params['text'] : null;
+		$skipDropZone = !empty($params['skipDropZone']);
+
+		$this->setTplParam('text', $text);
+		$this->setTplParam('skipDropZone', $skipDropZone);
 	}
 }
