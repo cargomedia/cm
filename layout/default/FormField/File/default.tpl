@@ -6,10 +6,10 @@
 		</li>
 	{/foreach}
 </ul>
-<div class="dropZone">
-	<p class="dropZone-icon {block name="icon"}icon-upload{/block}"></p>
-	<p class="dropZone-message">{block name="message"}{translate 'Drag files here'}{/block}</p>
-	<p class="dropZone-divide">- {translate 'or'} -</p>
+<div class="dropInfo">
+	<p class="dropInfo-icon {block name="icon"}icon-upload{/block}"></p>
+	<p class="dropInfo-message">{block name="message"}{translate 'Drag files here'}{/block}</p>
+	<p class="dropInfo-divide">- {translate 'or'} -</p>
 </div>
 <div class="uploadButton">
 	<input type="file" name="{$name}-file" multiple />
