@@ -23,4 +23,13 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
 		return $html;
 	}
+
+	/**
+	 * @param string $tplName
+	 * @param array  $params
+	 * @return string
+	 */
+	public function fetchTemplate($tplName, array $params) {
+		return $this->_renderTemplate($tplName, $params, true);
+	}
 }
