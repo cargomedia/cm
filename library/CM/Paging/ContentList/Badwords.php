@@ -8,6 +8,9 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		parent::__construct(self::TYPE);
 	}
 
+	/**
+	 * @return null|string
+	 */
 	public function toRegex() {
 		$regexList = array();
 		foreach ($this as $badword) {
@@ -23,6 +26,9 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		return $regex;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function toRegexList() {
 		$regexList = array();
 		foreach ($this as $badword) {
