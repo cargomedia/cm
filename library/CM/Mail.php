@@ -339,7 +339,7 @@ class CM_Mail extends CM_View_Abstract {
 				$mail->AddBCC($bcc['address'], $bcc['name']);
 			}
 			if ($mailDeliveryAgent = $this->_getConfig()->mailDeliveryAgent) {
-				$mail->AddCustomHeader('Mail-Delivery-Agent: ' . $mailDeliveryAgent);
+				$mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
 			}
 			$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 
