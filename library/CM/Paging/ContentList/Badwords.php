@@ -28,7 +28,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		foreach ($this as $badword) {
 			$badwordRegex = preg_quote($badword, '#');
 			$badwordRegex = str_replace('\*', '[^\s]*', $badwordRegex);
-			$regexList[$badword] = '#' . $badwordRegex . '#i';
+			$regexList[$badword] = '#\b' . $badwordRegex . '\b#i';
 		}
 
 		return $regexList;
