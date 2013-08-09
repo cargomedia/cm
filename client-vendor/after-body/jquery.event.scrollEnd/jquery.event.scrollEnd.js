@@ -2,29 +2,59 @@
  * Author: CM
  */
 (function($) {
-	$.event.special.scrollEnd = {
-		delegateType: "scroll",
-		bindType: "scroll",
-		handle: function(event) {
-			var self = this;
-			var data = $.data(self);
-	
-			if (data.scrollTimeout) {
-				clearTimeout(data.scrollTimeout);
+	var checkDelay = 100;
+	var preloadMultiple = 3;
+
+	var checkScrollHeight = function(element, event) {
+		var $this = $(element);
+		var scrollHeight = $this.is($(window)) ? $('body').prop('scrollHeight') : $this.prop('scrollHeight');
+		var outerHeight = $this.outerHeight();
+		var distanceFromBottom = scrollHeight - outerHeight - $this.scrollTop();
+		var distanceMin = outerHeight * preloadMultiple;
+		if (distanceFromBottom < distanceMin) {
+			$(this).trigger('scrollEnd', [event]);
+			return true;
+		}
+		return false;
+	};
+
+	var handler = function(event) {
+		event.type = 'scrollEnd';
+		var element = this;
+		var data = $.data(element);
+
+		if (data.scrollTimeout) {
+			clearTimeout(data.scrollTimeout);
+		}
+		var now = (new Date()).getTime();
+		if (!data.scrollStart) {
+			data.scrollStart = now;
+		}
+		var startTimeout = true;
+		if ((now - data.scrollStart) > checkDelay) {
+			data.scrollStart = now;
+			if (checkScrollHeight(element, event)) {
+				startTimeout = false;
 			}
-			
+		}
+
+		if (startTimeout) {
 			data.scrollTimeout = setTimeout(function() {
-				var $this = $(self);
-				var scrollHeight = $this.is($(window)) ? $('body').prop('scrollHeight') : $this.prop('scrollHeight');
-				var distanceFromBottom = scrollHeight - $this.outerHeight() - $this.scrollTop();
-				var distanceMin = Math.max(20, Math.min(500, scrollHeight / 10));
-				if (distanceFromBottom < distanceMin) {
-					event.type = event.handleObj.origType;
-					var ret = event.handleObj.handler.call(self, event);
-					event.type = event.handleObj.type;
-					return ret;	// Bug: Doesn't return to handle(), since we're in a timeout
-				}
-			}, 50);
+				data.scrollTimeout = null;
+				data.scrollStart = null;
+				checkScrollHeight(element, event);
+			}, checkDelay);
+		}
+	};
+
+	$.event.special.scrollEnd = {
+		add: function(handleObj) {
+			jQuery.event.add(this, 'scroll', handler);
+			jQuery.event.add(this, 'touchmove', handler);
+		},
+		remove: function(handleObj) {
+			jQuery.event.remove(this, 'scroll', handler);
+			jQuery.event.remove(this, 'touchmove', handler);
 		}
 	};
 })(jQuery);
