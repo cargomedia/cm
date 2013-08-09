@@ -2,4 +2,4 @@
 
 {block name='icon'}icon-photo{/block}
 {block name='message'}{translate 'Drag photos here'}{/block}
-{block name='button-text'}{translate 'Click To Upload Photos'}{/block}
+{block name='button-text'}{translate 'Upload Photos'}{/block}
