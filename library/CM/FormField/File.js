@@ -14,6 +14,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 	ready: function() {
 		var field = this;
 		var $input = this.$('input[type="file"]');
+		var dropZoneEnabled = this.$('.dropInfo').length > 0;
 		var allowedExtensions = field.getOption("allowedExtensions");
 		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
 		var inProgressCount = 0;
@@ -21,7 +22,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		$input.fileupload({
 			dataType: 'json',
 			url: cm.getUrl('/upload/' + cm.options.siteId + '/', {'field': field.getClass()}),
-			dropZone: field.$el,
+			dropZone: dropZoneEnabled ? this.$el : null,
 			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
 			formData: function(form) {
 				return $input;
@@ -72,15 +73,17 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			}
 		});
 
-		this.bindJquery($(document), 'dragenter', function() {
-			field.$el.addClass('dragover')
-		});
-		this.bindJquery($(document), 'drop', function() {
-			field.$el.removeClass('dragover')
-		});
-		this.bindJquery($(document), 'drop dragover', function(e) {
-			e.preventDefault();
-		});
+		if (dropZoneEnabled) {
+			this.bindJquery($(document), 'dragenter', function() {
+				field.$el.addClass('dragover')
+			});
+			this.bindJquery($(document), 'drop', function() {
+				field.$el.removeClass('dragover')
+			});
+			this.bindJquery($(document), 'drop dragover', function(e) {
+				e.preventDefault();
+			});
+		}
 	},
 
 	/**

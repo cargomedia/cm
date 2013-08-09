@@ -44,6 +44,10 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	public function prepare(array $params) {
-		$this->setTplParam('text', isset($params['text']) ? (string) $params['text'] : null);
+		$text = isset($params['text']) ? (string) $params['text'] : null;
+		$skipDropZone = !empty($params['skipDropZone']);
+
+		$this->setTplParam('text', $text);
+		$this->setTplParam('skipDropZone', $skipDropZone);
 	}
 }
