@@ -18,12 +18,12 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 			$badword = str_replace('\*', '[^\s]*', $badword);
 			$regexList[] = $badword;
 		}
-		$regex = null;
-		if ($regexList) {
-			$regex = '#\b(?:' . implode('|', $regexList) . ')\b#i';
+
+		if (empty($regexList)) {
+			return '#\z.#';
 		}
 
-		return $regex;
+		return '#\b(?:' . implode('|', $regexList) . ')\b#i';
 	}
 
 	/**
