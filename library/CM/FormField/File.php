@@ -26,18 +26,6 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	public function validateFile(CM_File $file) {
 	}
 
-	/**
-	 * @param CM_File_UserContent_Temp $file
-	 * @param CM_Render                $render
-	 * @return string HTML
-	 */
-	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
-		$html = '';
-		$html .= CM_Util::htmlspecialchars($file->getFileName());
-		$html .= '<button class="button button-default deleteButton deleteFile hasIcon" type="button"><span class="icon icon-delete"></span></button>';
-		return $html;
-	}
-
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$userInput = array_filter($userInput, function ($value) {
 			return !empty($value);
