@@ -23,9 +23,7 @@
 		var element = this;
 		var data = $.data(element);
 
-		if (data.scrollTimeout) {
-			clearTimeout(data.scrollTimeout);
-		}
+		clearTimeout(data.scrollTimeout);
 		var now = (new Date()).getTime();
 		if (!data.scrollStart) {
 			data.scrollStart = now;
@@ -40,7 +38,6 @@
 
 		if (startTimeout) {
 			data.scrollTimeout = setTimeout(function() {
-				data.scrollTimeout = null;
 				data.scrollStart = null;
 				checkScrollHeight(element, event);
 			}, checkDelay);
