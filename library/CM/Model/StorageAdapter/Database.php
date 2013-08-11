@@ -1,6 +1,6 @@
 <?php
 
-class CM_Model_PersistenceAdapter_Database extends CM_Model_PersistenceAdapter_AbstractAdapter {
+class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractAdapter {
 
 	/** @var string */
 	private $_tableName;

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_PersistenceAdapter_AbstractAdapter {
+abstract class CM_Model_StorageAdapter_AbstractAdapter {
 
 	/**
 	 * @param array $id
