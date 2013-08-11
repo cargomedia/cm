@@ -45,4 +45,24 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$adapter->save(array('id' => $id1, 'foo' => '9999'), array('foo' => 'world', 'bar' => 66));
 		$this->assertNotRow('mock_modelStorageAdapter', array('id' => $id1, 'foo' => 'world', 'bar' => '66'));
 	}
+
+	public function testCreate() {
+		$adapter = new CM_Model_StorageAdapter_Database('mock_modelStorageAdapter');
+
+		$id = $adapter->create(array('foo' => 'foo1', 'bar' => 23));
+		$this->assertInternalType('array', $id);
+		$this->assertCount(1, $id);
+		$this->assertArrayHasKey('id', $id);
+		$this->assertRow('mock_modelStorageAdapter', array('id' => $id['id'], 'foo' => 'foo1', 'bar' => '23'));
+	}
+
+	public function testDelete() {
+		$adapter = new CM_Model_StorageAdapter_Database('mock_modelStorageAdapter');
+
+		$id = $adapter->create(array('foo' => 'foo1', 'bar' => 23));
+		$this->assertRow('mock_modelStorageAdapter', array('id' => $id['id'], 'foo' => 'foo1', 'bar' => '23'));
+
+		$adapter->delete($id);
+		$this->assertNotRow('mock_modelStorageAdapter', array('id' => $id['id'], 'foo' => 'foo1', 'bar' => '23'));
+	}
 }

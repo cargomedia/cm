@@ -20,6 +20,14 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 		CM_Cache::set($this->_getCacheKey($id), $data);
 	}
 
+	public function create(array $data) {
+		throw new CM_Exception_NotImplemented('Should generate an ID?');
+	}
+
+	public function delete(array $id) {
+		CM_Cache::delete($this->_getCacheKey($id));
+	}
+
 	/**
 	 * @param array $id
 	 * @return string

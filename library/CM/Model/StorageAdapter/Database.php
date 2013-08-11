@@ -19,4 +19,13 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 	public function save(array $id, array $data) {
 		CM_Db_Db::update($this->_tableName, $data, $id);
 	}
+
+	public function create(array $data) {
+		$id = CM_Db_Db::insert($this->_tableName, $data);
+		return array('id' => $id);
+	}
+
+	public function delete(array $id) {
+		CM_Db_Db::delete($this->_tableName, $id);
+	}
 }
