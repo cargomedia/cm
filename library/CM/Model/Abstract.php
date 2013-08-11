@@ -158,19 +158,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param string|array $field
+	 * @param string|array $data
 	 * @param mixed|null   $value
 	 */
-	final public function _set($field, $value = null) {
-		if (is_array($field)) {
-			foreach ($field as $key => $value) {
-				$this->_set($key, $value);
-			}
-			return;
+	final public function _set($data, $value = null) {
+		if (null !== $value) {
+			$data = array($data => $value);
+		}
+		$this->_get(); // Make sure data is loaded
+
+		foreach ($data as $field => $value) {
+			$this->_data[$field] = $value;
 		}
 
-		$this->_get(); // Make sure data is loaded
-		$this->_data[$field] = $value;
 		if ($this->_autoCommit) {
 			if ($cache = $this->getCache()) {
 				$cache->save($this->getIdRaw(), $this->_data);

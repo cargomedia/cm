@@ -124,6 +124,15 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals('bar1', $modelMock->getFoo());
 	}
 
+	public function testSetMultiple() {
+		$modelMock = CM_ModelMock::create(array('foo' => 'foo1'));
+		$modelMock = new CM_ModelMock($modelMock->getId());
+		$this->assertSame('foo1', $modelMock->getFoo());
+		$modelMock->_set(array('foo' => 'foo2', 'bar' => 'bar2'));
+		$this->assertSame('foo2', $modelMock->getFoo());
+		$this->assertSame('bar2', $modelMock->_get('bar'));
+	}
+
 	public function testDelete() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
