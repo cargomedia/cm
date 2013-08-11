@@ -4,7 +4,7 @@ abstract class CM_Model_StorageAdapter_AbstractAdapter {
 
 	/**
 	 * @param array $id
-	 * @return array|null
+	 * @return array|false
 	 */
 	abstract public function load(array $id);
 
