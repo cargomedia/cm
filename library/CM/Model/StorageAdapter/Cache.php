@@ -21,7 +21,7 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 	}
 
 	public function create(array $data) {
-		throw new CM_Exception_NotImplemented('Should generate an ID?');
+		$this->save($this->_generateId(), $data);
 	}
 
 	public function delete(array $id) {
@@ -32,7 +32,14 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 	 * @param array $id
 	 * @return string
 	 */
-	private function _getCacheKey(array $id) {
+	protected function _getCacheKey(array $id) {
 		return CM_CacheConst::Model . '_class:' . $this->_modelClass . '_id:' . serialize($id);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function _generateId() {
+		throw new CM_Exception_NotImplemented();
 	}
 }
