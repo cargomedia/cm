@@ -2,24 +2,16 @@
 
 abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable {
 
-	/**
-	 * @var array $_id
-	 */
+	/** @var array $_id */
 	protected $_id;
 
-	/**
-	 * @var array $_data
-	 */
+	/** @var array $_data */
 	private $_data;
 
-	/**
-	 * @var CM_ModelAsset_Abstract[]
-	 */
+	/** @var CM_ModelAsset_Abstract[] */
 	private $_assets = array();
 
-	/**
-	 * @var boolean $_autoCommit
-	 */
+	/** @var boolean $_autoCommit */
 	private $_autoCommit = true;
 
 	/**
