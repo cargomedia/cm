@@ -28,8 +28,8 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$this->assertSame(array('id' => $id1, 'foo' => 'foo1', 'bar' => '1'), $adapter->load(array('id' => $id1)));
 		$this->assertSame(array('id' => $id1, 'foo' => 'foo1', 'bar' => '1'), $adapter->load(array('id' => $id1, 'foo' => 'foo1')));
 		$this->assertSame(array('id' => $id2, 'foo' => 'foo2', 'bar' => '2'), $adapter->load(array('id' => $id2)));
-		$this->assertNull($adapter->load(array('id' => '9999')));
-		$this->assertNull($adapter->load(array('id' => $id1, 'foo' => '9999')));
+		$this->assertFalse($adapter->load(array('id' => '9999')));
+		$this->assertFalse($adapter->load(array('id' => $id1, 'foo' => '9999')));
 	}
 
 	public function testSave() {

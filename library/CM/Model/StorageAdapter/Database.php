@@ -13,11 +13,7 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 	}
 
 	public function load(array $id) {
-		$data = CM_Db_Db::select($this->_tableName, '*', $id)->fetch();
-		if (false === $data) {
-			return null;
-		}
-		return $data;
+		return CM_Db_Db::select($this->_tableName, '*', $id)->fetch();
 	}
 
 	public function save(array $id, array $data) {
