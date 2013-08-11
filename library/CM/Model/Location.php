@@ -13,7 +13,6 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @param int $id
 	 */
 	public function __construct($level, $id) {
-		$this->_setCacheLocal();
 		$this->_construct(array('id' => (int) $id, 'level' => (int) $level));
 	}
 
@@ -267,6 +266,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 
 	public static function fromArray(array $data) {
 		return new self($data['level'], $data['id']);
+	}
+
+	public static function getCacheStatic() {
+		return new CM_Model_StorageAdapter_CacheLocal(get_called_class());
 	}
 
 	public static function createUSStatesAbbreviation() {

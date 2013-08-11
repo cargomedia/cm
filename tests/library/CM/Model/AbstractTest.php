@@ -51,6 +51,42 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals('bar2', $modelMock->getFoo());
 	}
 
+	public function testCacheHit() {
+		$data = array('foo' => 12, 'bar' => 13);
+		$id = array('id' => 55);
+
+		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
+		$cache->expects($this->once())->method('load')->with($id)->will($this->returnValue($data));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache',
+			'getIdRaw'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($data, $model->_get());
+	}
+
+	public function testCacheMiss() {
+		$data = array('foo' => 12, 'bar' => 13);
+		$id = array('id' => 55);
+
+		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load', 'save'))->getMockForAbstractClass();
+		$cache->expects($this->once())->method('load')->with($id)->will($this->returnValue(false));
+		$cache->expects($this->once())->method('save')->with($id, $data);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw',
+			'_loadData'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		$model->expects($this->any())->method('_loadData')->will($this->returnValue($data));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($data, $model->_get());
+	}
+
 	public function testGet() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -160,23 +196,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals('foo', $modelMock->getModelAssetMock()->getFoo());
 	}
 
-	public function testCachingStrategy() {
-		$modelMock = new CM_ModelMock(1);
-		try {
-			$modelMock->_change();
-			$this->assertTrue(true);
-		} catch (CM_Exception_NotAllowed $ex) {
-			$this->fail("Using CacheLocal instead of Cache.");
-		}
-		$modelMock = new CM_ModelMock_Local(1);
-		try {
-			$modelMock->_change();
-			$this->fail("Using Cache instead of CacheLocal.");
-		} catch (CM_Exception_NotAllowed $ex) {
-			$this->assertTrue(true);
-		}
-	}
-
 	public function testCreateType() {
 		$user = CM_Model_Abstract::createType(CM_Model_User::TYPE);
 		$this->assertInstanceOf('CM_Model_User', $user);
@@ -228,14 +247,6 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 	protected static function _create(array $data) {
 		return new self(CM_Db_Db::insert('modelMock', array('foo' => $data['foo'])));
-	}
-}
-
-class CM_ModelMock_Local extends CM_ModelMock {
-
-	public function __construct($id) {
-		$this->_setCacheLocal();
-		parent::__construct($id);
 	}
 }
 

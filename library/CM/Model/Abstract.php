@@ -8,11 +8,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected $_id;
 
 	/**
-	 * @var CM_Cache_Abstract $_cacheClass
-	 */
-	private $_cacheClass = 'CM_Cache';
-
-	/**
 	 * @var array $_data
 	 */
 	private $_data;
@@ -57,8 +52,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$containingCacheables = $this->_getContainingCacheables();
 		$this->_onBeforeDelete();
 		$this->_onDelete();
-		$cacheClass = $this->_cacheClass;
-		$cacheClass::delete($this->_getCacheKey());
+		if ($cache = $this->getCache()) {
+			$cache->delete($this->getIdRaw());
+		}
 		foreach ($containingCacheables as $cacheable) {
 			$cacheable->_change();
 		}
@@ -75,7 +71,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return array
 	 */
-	final public function getIdRaw() {
+	public function getIdRaw() {
 		return $this->_id;
 	}
 
@@ -101,11 +97,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 */
+	public function getCache() {
+		return static::getCacheStatic();
+	}
+
+	/**
 	 * @return CM_Model_Abstract
 	 */
 	final public function _change() {
-		$cacheClass = $this->_cacheClass;
-		$cacheClass::delete($this->_getCacheKey());
+		if ($cache = $this->getCache()) {
+			$cache->delete($this->getIdRaw());
+		}
 		$this->_data = null;
 		$this->_onChange();
 		return $this;
@@ -118,9 +122,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	final public function _get($field = null) {
 		if (!$this->_data) {
-			$cacheKey = $this->_getCacheKey();
-			$cacheClass = $this->_cacheClass;
-			if (($this->_data = $cacheClass::get($cacheKey)) === false) {
+			$cache = $this->getCache();
+			if (!$cache || false === ($this->_data = $cache->load($this->getIdRaw()))) {
 				$this->_data = $this->_loadData();
 				if (!is_array($this->_data)) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
@@ -131,7 +134,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					$asset->_loadAsset();
 				}
 				$this->_autoCommit = true;
-				$cacheClass::set($cacheKey, $this->_data);
+				if ($cache) {
+					$cache->save($this->getIdRaw(), $this->_data);
+				}
 			}
 		}
 		if ($field === null) {
@@ -167,8 +172,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_get(); // Make sure data is loaded
 		$this->_data[$field] = $value;
 		if ($this->_autoCommit) {
-			$cacheClass = $this->_cacheClass;
-			$cacheClass::set($this->_getCacheKey(), $this->_data);
+			if ($cache = $this->getCache()) {
+				$cache->save($this->getIdRaw(), $this->_data);
+			}
 			$this->_onChange();
 		}
 	}
@@ -230,17 +236,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return $this->_assets[$className];
 	}
 
-	final protected function _setCacheLocal() {
-		$this->_cacheClass = 'CM_CacheLocal';
-	}
-
-	/**
-	 * @return string
-	 */
-	final private function _getCacheKey() {
-		return CM_CacheConst::Model . '_class:' . get_class($this) . '_id:' . serialize($this->_getId());
-	}
-
 	/**
 	 * @return CM_Cacheable[]
 	 */
@@ -275,6 +270,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		/** @var CM_Model_Abstract $className */
 		$className = static::_getClassName($type);
 		return $className::create($data);
+	}
+
+	/**
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 */
+	public static function getCacheStatic() {
+		return new CM_Model_StorageAdapter_Cache(get_called_class());
 	}
 
 	/**
