@@ -5,17 +5,23 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 	public function testProcess() {
 		$replace = '…';
 		$badwords = new CM_Paging_ContentList_Badwords();
+		$filter = new CM_Usertext_Filter_Badwords();
+		$render = new CM_Render();
+
+		$actual = $filter->transform("hello foo there", $render);
+		$this->assertSame("hello foo there", $actual);
+
 		$badwords->add('foo');
+		$badwords->add('x … x');
 		$badwords->add('f(o-].)o');
 		$badwords->add('bar*');
 		$badwords->add('*foobar*');
 		$badwords->add('*zoo*far*');
 		CMTest_TH::clearCache();
 
-		$filter = new CM_Usertext_Filter_Badwords();
-		$render = new CM_Render();
-
 		$actual = $filter->transform("hello foo there", $render);
+		$this->assertSame("hello ${replace} there", $actual);
+		$actual = $filter->transform("hello x foo x there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 		$actual = $filter->transform("hello Foo there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
