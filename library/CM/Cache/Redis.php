@@ -24,6 +24,67 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		}
 	}
 
+	/**
+	 * Add a value to a list
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function lPush($key, $value) {
+		$this->_redis->lPush($key, $value);
+	}
+
+	/**
+	 * Remove and return a value from a list
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	public function rPop($key) {
+		return $this->_redis->rPop($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param float  $score
+	 * @param string $value
+	 * @return mixed
+	 */
+	public function zAdd($key, $score, $value) {
+		return $this->_redis->zAdd($key, $score, $value);
+	}
+
+	/**
+	 * @param string       $key
+	 * @param string       $start
+	 * @param string       $end
+	 * @param int|null     $count
+	 * @param int|null     $offset
+	 * @param boolean|null $returnScore
+	 * @return array
+	 */
+	public function zRangeByScore($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
+		$options = array();
+		if ($count || $offset) {
+			$count = (null !== $count) ? (int) $count : -1;
+			$offset = (null !== $offset) ? (int) $count : 0;
+			$options['limit'] = array($offset, $count);
+		}
+		if ($returnScore) {
+			$options['whithscores'] = true;
+		}
+		return $this->_redis->zRangeByScore($key, $start, $end, $options);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 * @return mixed
+	 */
+	public function zRem($key, $value) {
+		return $this->_redis->zRem($key, $value);
+	}
+
 	protected function _getName() {
 		return 'Redis';
 	}
@@ -69,63 +130,6 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	protected function _sFlush($key) {
 		$values = $this->_redis->multi()->sMembers($key)->delete($key)->exec();
 		return $values[0];
-	}
-
-	/**
-	 * Add a value to a list
-	 *
-	 * @param string $key
-	 * @param string $value
-	 */
-	protected function _lPush($key, $value) {
-		$this->_redis->lPush($key, $value);
-	}
-
-	/**
-	 * Remove and return a value from a list
-	 *
-	 * @param string $key
-	 * @return string
-	 */
-	protected function _rPop($key) {
-		return $this->_redis->rPop($key);
-	}
-
-	/**
-	 * @param string $key
-	 * @param int    $score
-	 * @param string $value
-	 * @return mixed
-	 */
-	protected function _zAdd($key, $score, $value) {
-		return $this->_redis->zAdd($key, $score, $value);
-	}
-
-	protected function _zRem($key, $value) {
-		return $this->_redis->zRem($key, $value);
-
-	}
-
-	/**
-	 * @param              $key
-	 * @param string       $start
-	 * @param string       $end
-	 * @param int|null     $count
-	 * @param int|null     $offset
-	 * @param boolean|null $returnScore
-	 * @return array
-	 */
-	protected function _zRangeByScore($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
-		$options = array();
-		if ($count || $offset) {
-			$count = (null !== $count) ? (int) $count : -1;
-			$offset = (null !== $offset) ? (int) $count : 0;
-			$options['limit'] = array($offset, $count);
-		}
-		if ($returnScore) {
-			$options['whithscores'] = true;
-		}
-		return $this->_redis->zRangeByScore($key, $start, $end, $options);
 	}
 
 	/**
