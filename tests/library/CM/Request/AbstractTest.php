@@ -78,7 +78,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 		CMTest_TH::createLanguage('en'); // default language
 		$urlLanguage = CMTest_TH::createLanguage('de');
-		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
+		CM_Model_Language::changeAll(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
 		CM_Response_Abstract::factory($request);
 		$this->assertEquals($request->getLanguage(), $urlLanguage);

@@ -21,11 +21,11 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 		$this->_language->getTranslation('keyFirst'); // Fill APC
 		$this->_language->setTranslation('keyFirst', 'abc');
-		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst'));
 		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
 													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
-		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', array('variable')));
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', array('variable')));
 		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
 													'variables' => array('variable'))), $this->_language->getTranslations()->getAssociativeArray());
 
