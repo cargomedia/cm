@@ -9,7 +9,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	}
 
 	/**
-	 * @return null|string
+	 * @return string
 	 */
 	public function toRegex() {
 		$regexList = array();
