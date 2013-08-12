@@ -77,14 +77,32 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('save')->with($id, $data);
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw',
-			'_loadData'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', '_loadData'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
 		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('_loadData')->will($this->returnValue($data));
 		/** @var CM_Model_Abstract $model */
 
 		$this->assertSame($data, $model->_get());
+	}
+
+	public function testCacheSet() {
+		$data = array('foo' => 12);
+		$id = array('id' => 55);
+
+		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load', 'save'))->getMockForAbstractClass();
+		$cache->expects($this->once())->method('load')->with($id)->will($this->returnValue($data));
+		$cache->expects($this->once())->method('save')->with($id, array('foo' => 12, 'bar' => 14));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		/** @var CM_Model_Abstract $model */
+
+		$model->_set(array('bar' => 14));
 	}
 
 	public function testGet() {
