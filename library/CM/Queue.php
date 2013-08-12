@@ -38,7 +38,7 @@ class CM_Queue {
 	public function push($value, $timestamp = null) {
 		$timestamp = (null !== $timestamp) ? (int) $timestamp : null;
 		$value = serialize($value);
-		if ($timestamp) {
+		if (null !== $timestamp) {
 			$this->_adapter->pushDelayed($this->getKey(), $value, $timestamp);
 		} else {
 			$this->_adapter->push($this->getKey(), $value);
@@ -51,7 +51,7 @@ class CM_Queue {
 	 */
 	public function pop($timestampMax = null) {
 		$timestampMax = (null !== $timestampMax) ? (int) $timestampMax : null;
-		if ($timestampMax) {
+		if (null !== $timestampMax) {
 			$value = $this->_adapter->popDelayed($this->_key, $timestampMax);
 		} else {
 			$value = $this->_adapter->pop($this->getKey());

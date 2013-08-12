@@ -19,6 +19,5 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 		$value = reset($value);
 		CM_Cache_Redis::zRem($key, $value);
 		return $value;
-
 	}
 }
