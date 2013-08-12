@@ -216,6 +216,22 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			$this->assertArrayHasKey('TYPE', $classReflection->getConstants(), 'No `TYPE` constant defined for `' . $class . '`');
 		}
 	}
+
+	public function testIsSchemaField() {
+		$schema = array(
+			'foo' => array(),
+			'bar' => array(),
+		);
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+
+		$method = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_isSchemaField');
+
+		$this->assertTrue($method->invoke($model, 'foo'));
+		$this->assertTrue($method->invoke($model, array('foo', 'xxxx')));
+		$this->assertFalse($method->invoke($model, 'xxxxx'));
+		$this->assertFalse($method->invoke($model, array('xxxx', 'yyyyy')));
+	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {

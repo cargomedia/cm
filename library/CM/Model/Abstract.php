@@ -14,6 +14,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/** @var boolean */
 	private $_autoCommit = true;
 
+	/** @var array|null */
+	protected $_schema;
+
 	/**
 	 * @param int $id
 	 */
@@ -113,19 +116,27 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
 	final public function _get($field = null) {
-		if (!$this->_data) {
-			$cache = $this->getCache();
-			if (!$cache || false === ($this->_data = $cache->load($this->getIdRaw()))) {
-				$this->_data = $this->_loadData();
-				if (!is_array($this->_data)) {
+		if (null === $this->_data) {
+			if ($cache = $this->getCache()) {
+				if (false !== ($data = $cache->load($this->getIdRaw()))) {
+					$this->_data = $data;
+				}
+			}
+			if (null === $this->_data) {
+				if (is_array($data = $this->_loadData())) {
+					$this->_data = $data;
+				}
+				if (null === $this->_data) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
 				}
+
 				$this->_autoCommit = false;
 				/** @var CM_ModelAsset_Abstract $asset */
 				foreach ($this->_assets as $asset) {
 					$asset->_loadAsset();
 				}
 				$this->_autoCommit = true;
+
 				if ($cache) {
 					$cache->save($this->getIdRaw(), $this->_data);
 				}
@@ -167,7 +178,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if ($cache = $this->getCache()) {
 				$cache->save($this->getIdRaw(), $this->_data);
 			}
-			$this->_onChange();
+			if ($this->_isSchemaField(array_keys($data))) {
+				$this->_onChange();
+			}
 		}
 	}
 
@@ -233,6 +246,28 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected function _getContainingCacheables() {
 		return array();
+	}
+
+	/**
+	 * @return array|null
+	 */
+	protected function _getSchema() {
+		return $this->_schema;
+	}
+
+	/**
+	 * @param string|string[] $field
+	 * @return bool
+	 */
+	protected function _isSchemaField($field) {
+		$schema = $this->_getSchema();
+		if (null === $schema) {
+			return true;
+		}
+		if (is_array($field)) {
+			return count(array_intersect($field, array_keys($schema))) > 0;
+		}
+		return array_key_exists($field, $schema);
 	}
 
 	/**
