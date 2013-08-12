@@ -162,10 +162,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 		CM_Db_Db::delete('cm_languageValue', array('languageId' => $this->getId()));
 		CM_Db_Db::update('cm_language', array('backupId' => null), array('backupId' => $this->getId()));
 		CM_Db_Db::update('cm_user', array('languageId' => null), array('languageId' => $this->getId()));
-		self::flushCacheLocal();
+		self::changeAll();
 	}
 
-	public static function flushCacheLocal() {
+	public static function changeAll() {
 		/** @var CM_Model_Language $language */
 		foreach (new CM_Paging_Language_All() as $language) {
 			$language->_change();
@@ -211,7 +211,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 		}
 		CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $languageKeyId));
 		CM_Db_Db::delete('cm_languageKey', array('id' => $languageKeyId));
-		self::flushCacheLocal();
+		self::changeAll();
 	}
 
 	/**
@@ -254,7 +254,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 				throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
 			}
 			CM_Db_Db::update('cm_languageKey', array('name' => $nameNew), array('name' => $name));
-			self::flushCacheLocal();
+			self::changeAll();
 		}
 	}
 
@@ -310,7 +310,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 				CM_Db_Db::exec("DELETE FROM `cm_languageKey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
 			}
 
-			self::flushCacheLocal();
+			self::changeAll();
 		}
 		if ($variableNames !== null) {
 			self::_setKeyVariables($name, $variableNames);
@@ -344,6 +344,6 @@ class CM_Model_Language extends CM_Model_Abstract {
 		foreach ($variableNames as $variableName) {
 			CM_Db_Db::insert('cm_languageKey_variable', array('languageKeyId' => $languageKeyId, 'name' => $variableName));
 		}
-		self::flushCacheLocal();
+		self::changeAll();
 	}
 }
