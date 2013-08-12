@@ -277,6 +277,18 @@ class CMTest_TH {
 	}
 
 	/**
+	 * @param string $className
+	 * @param string $methodName
+	 * @return ReflectionMethod
+	 */
+	public static function getProtectedMethod($className, $methodName) {
+		$class = new ReflectionClass($className);
+		$method = $class->getMethod($methodName);
+		$method->setAccessible(true);
+		return $method;
+	}
+
+	/**
 	 * @param int    $length
 	 * @param string $charset
 	 * @return string
