@@ -41,6 +41,7 @@ class CM_Process_Fork {
 		}
 		do {
 			$pid = pcntl_wait($status);
+			pcntl_signal_dispatch();
 			if (-1 === $pid) {
 				throw new CM_Exception('Waiting on child processes failed');
 			}
