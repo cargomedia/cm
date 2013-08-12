@@ -71,7 +71,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 			$options['limit'] = array($offset, $count);
 		}
 		if ($returnScore) {
-			$options['whithscores'] = true;
+			$options['withscores'] = true;
 		}
 		return $this->_redis->zRangeByScore($key, $start, $end, $options);
 	}
