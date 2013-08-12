@@ -12,15 +12,15 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 * @return string
 	 */
 	public function toRegex() {
+		if (0 === $this->getCount()) {
+			return '#\z.#';
+		}
+
 		$regexList = array();
 		foreach ($this as $badword) {
 			$badword = preg_quote($badword, '#');
-			$badword = str_replace('\*', '[^\s]*', $badword);
+			$badword = str_replace('\*', '\S*', $badword);
 			$regexList[] = $badword;
-		}
-
-		if (empty($regexList)) {
-			return '#\z.#';
 		}
 
 		return '#\b(?:' . implode('|', $regexList) . ')\b#i';
@@ -33,7 +33,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		$regexList = array();
 		foreach ($this as $badword) {
 			$badwordRegex = preg_quote($badword, '#');
-			$badwordRegex = str_replace('\*', '[^\s]*', $badwordRegex);
+			$badwordRegex = str_replace('\*', '\S*', $badwordRegex);
 			$regexList[$badword] = '#\b' . $badwordRegex . '\b#i';
 		}
 

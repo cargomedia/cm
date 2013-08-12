@@ -26,7 +26,7 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 	}
 
 	public function testToRegex() {
-		$this->assertSame('#\b(?:[^\s]*superbad[^\s]*|bad\.com)\b#i', $this->_paging->toRegex());
+		$this->assertSame('#\b(?:\S*superbad\S*|bad\.com)\b#i', $this->_paging->toRegex());
 
 		$this->_paging->remove('bad.com');
 		$this->_paging->remove('*superbad*');
@@ -35,6 +35,6 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 	}
 
 	public function testToRegexList() {
-		$this->assertSame(array('*superbad*' => '#\b[^\s]*superbad[^\s]*\b#i', 'bad.com' => '#\bbad\.com\b#i'), $this->_paging->toRegexList());
+		$this->assertSame(array('*superbad*' => '#\b\S*superbad\S*\b#i', 'bad.com' => '#\bbad\.com\b#i'), $this->_paging->toRegexList());
 	}
 }
