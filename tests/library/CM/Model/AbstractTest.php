@@ -162,19 +162,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testCachingStrategy() {
 		$modelMock = new CM_ModelMock(1);
-		try {
-			$modelMock->_change();
-			$this->assertTrue(true);
-		} catch (CM_Exception_NotAllowed $ex) {
-			$this->fail("Using CacheLocal instead of Cache.");
-		}
+		$cacheKey = CM_CacheConst::Model . '_class:' . get_class($modelMock) . '_id:' . serialize(array('id' => $modelMock->getId()));
+		$this->assertTrue(is_array(CM_Cache::get($cacheKey)));
+		$this->assertFalse(is_array(CM_CacheLocal::get($cacheKey)));
+
 		$modelMock = new CM_ModelMock_Local(1);
-		try {
-			$modelMock->_change();
-			$this->fail("Using Cache instead of CacheLocal.");
-		} catch (CM_Exception_NotAllowed $ex) {
-			$this->assertTrue(true);
-		}
+		$cacheKey = CM_CacheConst::Model . '_class:' . get_class($modelMock) . '_id:' . serialize(array('id' => $modelMock->getId()));
+		$this->assertFalse(is_array(CM_Cache::get($cacheKey)));
+		$this->assertTrue(is_array(CM_CacheLocal::get($cacheKey)));
 	}
 
 	public function testCreateType() {
