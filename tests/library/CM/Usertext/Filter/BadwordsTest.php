@@ -14,9 +14,9 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		$badwords->add('foo');
 		$badwords->add('x … x');
 		$badwords->add('f(o-].)o');
-		$badwords->add('bar*');
-		$badwords->add('*foobar*');
-		$badwords->add('*zoo*far*');
+		$badwords->add('bar');
+		$badwords->add('foobar');
+		$badwords->add('zoo*far');
 		CMTest_TH::clearCache();
 
 		$actual = $filter->transform("hello foo there", $render);
@@ -26,7 +26,7 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		$actual = $filter->transform("hello Foo there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 		$actual = $filter->transform("hello foot there", $render);
-		$this->assertSame("hello foot there", $actual);
+		$this->assertSame("hello ${replace} there", $actual);
 
 		$actual = $filter->transform("hello f(o-].)o there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
@@ -57,6 +57,6 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		$actual = $filter->transform("hello zoo!!far there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 		$actual = $filter->transform("hello zoo far there", $render);
-		$this->assertSame("hello zoo far there", $actual);
+		$this->assertSame("hello ${replace} there", $actual);
 	}
 }
