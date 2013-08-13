@@ -86,6 +86,16 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @param string $start
+	 * @param string $end
+	 * @return mixed
+	 */
+	public function zRemByScore($key, $start, $end) {
+		return $this->_redis->zRemRangeByScore($key, $start, $end);
+	}
+
+	/**
 	 * @param string       $key
 	 * @param string       $start
 	 * @param string       $end
