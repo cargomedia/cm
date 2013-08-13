@@ -694,7 +694,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			localStorage.setItem(cm.getSiteId() + ':' + key, value);
+			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
 		},
 
 		/**
@@ -702,7 +702,12 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return localStorage.getItem(cm.getSiteId() + ':' + key);
+			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
+			try {
+				return JSON.parse(value);
+			} catch (e) {
+				return value;
+			}
 		},
 
 		/**
