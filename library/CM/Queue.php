@@ -32,7 +32,7 @@ class CM_Queue {
 	}
 
 	/**
-	 * @param mixed       $value
+	 * @param mixed    $value
 	 * @param int|null $timestamp
 	 */
 	public function push($value, $timestamp = null) {
@@ -47,16 +47,24 @@ class CM_Queue {
 
 	/**
 	 * @param int|null $timestampMax
+	 * @param int|null $count
 	 * @return mixed
 	 */
-	public function pop($timestampMax = null) {
+	public function pop($timestampMax = null, $count = null) {
+		$count = (null !== $count) ? (int) $count : null;
 		$timestampMax = (null !== $timestampMax) ? (int) $timestampMax : null;
 		if (null !== $timestampMax) {
-			$value = $this->_adapter->popDelayed($this->_key, $timestampMax);
+			$result = $this->_adapter->popDelayed($this->_key, $timestampMax, $count);
+			$value = array_map(function($value) {
+				return unserialize($value);
+			}, $result);
+			if (null === $count) {
+				$value = reset($value);
+			}
 		} else {
-			$value = $this->_adapter->pop($this->getKey());
+			$result = $this->_adapter->pop($this->getKey());
+			$value = unserialize($result);
 		}
-		return unserialize($value);
+		return $value;
 	}
-
 }
