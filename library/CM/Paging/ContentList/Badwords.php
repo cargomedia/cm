@@ -23,7 +23,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 			$regexList[] = '\S*' . $badword . '\S*';
 		}
 
-		return '#\b(?:' . implode('|', $regexList) . ')\b#i';
+		return '#(?:' . implode('|', $regexList) . ')#i';
 	}
 
 	/**
@@ -34,7 +34,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		foreach ($this as $badword) {
 			$badwordRegex = preg_quote($badword, '#');
 			$badwordRegex = str_replace('\*', '[^A-Za-z]*', $badwordRegex);
-			$regexList[$badword] = '#\b\S*' . $badwordRegex . '\S*\b#i';
+			$regexList[$badword] = '#\S*' . $badwordRegex . '\S*#i';
 		}
 
 		return $regexList;
