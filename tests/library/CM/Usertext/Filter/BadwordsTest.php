@@ -42,7 +42,7 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
 		$actual = $filter->transform("hello bar.de there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
 		$actual = $filter->transform("hello bar. there", $render);
-		$this->assertSame("hello ${replace}. there", $actual);
+		$this->assertSame("hello ${replace} there", $actual);
 
 		$actual = $filter->transform("hello foobar there", $render);
 		$this->assertSame("hello ${replace} there", $actual);
