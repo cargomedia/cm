@@ -26,21 +26,15 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->assertFalse($this->_paging->contains('evil.com', '/\Q$item\E$/i'));
 	}
 
-	public function testToRegex() {
-		$this->assertSame('#(?:\S*bad\.com\S*|\S*foo[^A-Za-z]*bar\S*|\S*superbad\S*)#i', $this->_paging->toRegex());
-
-		$this->_paging->remove('bad.com');
-		$this->_paging->remove('superbad');
-		$this->_paging->remove('foo*bar');
-
-		$this->assertSame('#\z.#', $this->_paging->toRegex());
+	public function testIsMatch(){
+		$this->assertTrue($this->_paging->isMatch('foo-bar'));
 	}
 
-	public function testToRegexList() {
-		$this->assertSame(array(
-			'bad.com'  => '#\S*bad\.com\S*#i',
-			'foo*bar'  => '#\S*foo[^A-Za-z]*bar\S*#i',
-			'superbad' => '#\S*superbad\S*#i',
-		), $this->_paging->toRegexList());
+	public function testGetMatch(){
+		$this->assertSame('foobar', $this->_paging->getMatch('hallo foo-bar world.'));
+	}
+
+	public function testReplaceMatch(){
+		$this->assertSame('hallo … world.', $this->_paging->replaceMatch('hallo foo-bar world.'));
 	}
 }
