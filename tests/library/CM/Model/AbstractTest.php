@@ -105,6 +105,22 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->_set(array('bar' => 14));
 	}
 
+	public function testCacheDelete() {
+		$id = array('id' => 55);
+
+		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('delete'))->getMockForAbstractClass();
+		$cache->expects($this->once())->method('delete')->with($id);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		/** @var CM_Model_Abstract $model */
+
+		$model->delete();
+	}
+
 	public function testGet() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
