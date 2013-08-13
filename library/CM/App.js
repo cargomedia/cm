@@ -694,7 +694,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(cm.getSiteId() + ':' + key, value);
+			localStorage.setItem(cm.getSiteId() + ':' + key, value);
 		},
 
 		/**
@@ -702,14 +702,14 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @return {*}
 		 */
 		get: function(key) {
-			return $.jStorage.get(cm.getSiteId() + ':' + key);
+			return localStorage.getItem(cm.getSiteId() + ':' + key);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
+			localStorage.removeItem(cm.getSiteId() + ':' + key);
 		}
 	},
 
