@@ -60,4 +60,15 @@ class CM_QueueTest extends CMTest_TestCase {
 		$this->assertSame(array(3 => 'three'), $queue->pop($timeStamp3));
 		$this->assertFalse($queue->pop($timeStamp3));
 	}
+
+	public function testPopDelayedCount() {
+		$queue = new CM_Queue('foo');
+		$timestamp = time();
+		$queue->push('bla', $timestamp);
+		$queue->push('foo', $timestamp + 1);
+		$queue->push('bar', $timestamp + 2);
+
+		$result = $queue->pop($timestamp + 1, 2);
+		$this->assertSame(array('bla', 'foo'), $result);
+	}
 }

@@ -85,6 +85,32 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		return $this->_redis->zRem($key, $value);
 	}
 
+	/**
+	 * @param string       $key
+	 * @param string       $start
+	 * @param string       $end
+	 * @param int|null     $count
+	 * @param int|null     $offset
+	 * @param boolean|null $returnScore
+	 * @return array
+	 */
+	public function zRangeByScoreRem($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
+		do {
+			$this->_redis->watch($key);
+			$result = $this->zRangeByScore($key, $start, $end, $count, $offset, $returnScore);
+			$this->_redis->multi();
+			if ($returnScore) {
+				$valueList = array_keys($result);
+			} else {
+				$valueList = $result;
+			}
+			foreach ($valueList as $value) {
+				$this->_redis->zRem($key, $value);
+			}
+		} while(false === ($this->_redis->exec()));
+		return $result;
+	}
+
 	protected function _getName() {
 		return 'Redis';
 	}
