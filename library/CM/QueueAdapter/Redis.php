@@ -25,6 +25,10 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 		return $value;
 	}
 
+	/**
+	 * @param string $key
+	 * @return string
+	 */
 	private function _getInternalKey($key) {
 		return 'Queue.' . (string) $key;
 	}
