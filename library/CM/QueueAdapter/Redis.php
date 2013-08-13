@@ -20,9 +20,8 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 	}
 
 	public function popDelayed($key, $timestampMax, $count = null) {
-		$count = (null !== $count) ? (int) $count : 1;
 		$redis = $this->_getRedisInstance();
-		$value = $redis->zRangeByScoreRem($this->_getInternalKey($key), 0, $timestampMax, $count);
+		$value = $redis->zPopRangeByScore($this->_getInternalKey($key), 0, $timestampMax);
 		return $value;
 	}
 

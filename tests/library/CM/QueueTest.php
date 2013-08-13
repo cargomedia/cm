@@ -42,8 +42,8 @@ class CM_QueueTest extends CMTest_TestCase {
 		$timestamp = time();
 		$queue->push('bla', $timestamp);
 
-		$this->assertSame('bla', $queue->pop($timestamp));
-		$this->assertFalse($queue->pop($timestamp));
+		$this->assertSame(array('bla'), $queue->pop($timestamp));
+		$this->assertSame(array(), $queue->pop($timestamp));
 
 		$timeStamp1 = time();
 		$timeStamp2 = time() + 10;
@@ -51,24 +51,11 @@ class CM_QueueTest extends CMTest_TestCase {
 		$queue->push(1, $timeStamp1);
 		$queue->push('two', $timeStamp2);
 		$queue->push(array(3 => 'three'), $timeStamp3);
-		$this->assertSame(1, $queue->pop($timeStamp1));
-		$this->assertFalse($queue->pop($timeStamp1));
+		$this->assertSame(array(1), $queue->pop($timeStamp1));
+		$this->assertSame(array(), $queue->pop($timeStamp1));
 
-		$this->assertSame('two', $queue->pop($timeStamp2));
-		$this->assertFalse($queue->pop($timeStamp2));
-
-		$this->assertSame(array(3 => 'three'), $queue->pop($timeStamp3));
-		$this->assertFalse($queue->pop($timeStamp3));
+		$this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
+		$this->assertSame(array(), $queue->pop($timeStamp3));
 	}
 
-	public function testPopDelayedCount() {
-		$queue = new CM_Queue('foo');
-		$timestamp = time();
-		$queue->push('bla', $timestamp);
-		$queue->push('foo', $timestamp + 1);
-		$queue->push('bar', $timestamp + 2);
-
-		$result = $queue->pop($timestamp + 1, 2);
-		$this->assertSame(array('bla', 'foo'), $result);
-	}
 }

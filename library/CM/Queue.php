@@ -47,20 +47,15 @@ class CM_Queue {
 
 	/**
 	 * @param int|null $timestampMax
-	 * @param int|null $count
 	 * @return mixed
 	 */
-	public function pop($timestampMax = null, $count = null) {
-		$count = (null !== $count) ? (int) $count : null;
+	public function pop($timestampMax = null) {
 		$timestampMax = (null !== $timestampMax) ? (int) $timestampMax : null;
 		if (null !== $timestampMax) {
-			$result = $this->_adapter->popDelayed($this->_key, $timestampMax, $count);
+			$result = $this->_adapter->popDelayed($this->_key, $timestampMax);
 			$value = array_map(function($value) {
 				return unserialize($value);
 			}, $result);
-			if (null === $count) {
-				$value = reset($value);
-			}
 		} else {
 			$result = $this->_adapter->pop($this->getKey());
 			$value = unserialize($result);

@@ -99,26 +99,15 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string       $key
 	 * @param string       $start
 	 * @param string       $end
-	 * @param int|null     $count
-	 * @param int|null     $offset
 	 * @param boolean|null $returnScore
 	 * @return array
 	 */
-	public function zRangeByScoreRem($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
-		do {
-			$this->_redis->watch($key);
-			$result = $this->zRangeByScore($key, $start, $end, $count, $offset, $returnScore);
-			$this->_redis->multi();
-			if ($returnScore) {
-				$valueList = array_keys($result);
-			} else {
-				$valueList = $result;
-			}
-			foreach ($valueList as $value) {
-				$this->_redis->zRem($key, $value);
-			}
-		} while(false === ($this->_redis->exec()));
-		return $result;
+	public function zPopRangeByScore($key, $start, $end, $returnScore = null) {
+		$this->_redis->multi();
+		$this->zRangeByScore($key, $start, $end, null, null, $returnScore);
+		$this->zRemByScore($key, $start, $end);
+		$result = $this->_redis->exec();
+		return $result[0];
 	}
 
 	protected function _getName() {
