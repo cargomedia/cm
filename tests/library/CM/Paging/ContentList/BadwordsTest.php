@@ -54,5 +54,6 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->assertSame('hallo … world.', $this->_paging->replaceMatch('hallo foo-bar world.', '…'));
 		$this->assertSame('hallo $1 \1 world.', $this->_paging->replaceMatch('hallo foo-bar world.', '$1 \1'));
 		$this->assertSame('Hello … world.', $this->_paging->replaceMatch('Hello bar world.', '…'));
+		$this->assertSame('Hello … world.', $this->_paging->replaceMatch('Hello sub.bad.com world.', '…'));
 	}
 }
