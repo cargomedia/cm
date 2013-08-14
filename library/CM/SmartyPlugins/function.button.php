@@ -17,6 +17,11 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		$class .= trim($params['class']);
 	}
 
+	if (isset($params['event'])) {
+		$params['data'] = array('event' => $params['event']);
+		unset($params['event']);
+	}
+
 	$icon = null;
 	if (isset($params['icon'])) {
 		$icon = $params['icon'];
