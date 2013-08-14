@@ -10,6 +10,7 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->_paging->add('bad.com');
 		$this->_paging->add('superbad');
 		$this->_paging->add('foo*bar');
+		$this->_paging->add('|bar|');
 	}
 
 	public function testIsMatch(){
@@ -19,6 +20,10 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->assertTrue($this->_paging->isMatch('bad.com-foo.de'));
 		$this->assertFalse($this->_paging->isMatch('evil.com'));
 		$this->assertTrue($this->_paging->isMatch('foo-bar'));
+		$this->assertTrue($this->_paging->isMatch('test bar test'));
+		$this->assertFalse($this->_paging->isMatch('testbar'));
+		$this->assertFalse($this->_paging->isMatch('testbartest'));
+		$this->assertFalse($this->_paging->isMatch('test bartest'));
 
 		$this->_paging->add('evil.com');
 		$this->assertTrue($this->_paging->isMatch('evil.com'));
