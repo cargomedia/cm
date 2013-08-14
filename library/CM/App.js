@@ -699,15 +699,14 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} key
-		 * @return {*}
+		 * @return {*|Null}
 		 */
 		get: function(key) {
 			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-			try {
-				return JSON.parse(value);
-			} catch (e) {
-				return value;
+			if (value === undefined) {
+				return null;
 			}
+			return JSON.parse(value);
 		},
 
 		/**
