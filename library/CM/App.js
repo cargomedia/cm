@@ -703,7 +703,7 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		get: function(key) {
 			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-			if (value === undefined) {
+			if (typeof value === 'undefined') {
 				return null;
 			}
 			return JSON.parse(value);
