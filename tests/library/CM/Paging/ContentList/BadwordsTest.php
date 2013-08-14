@@ -13,6 +13,10 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->_paging->add('|bar|');
 	}
 
+	protected function tearDown() {
+		$this->_paging->removeAll();
+	}
+
 	public function testIsMatch(){
 		$this->assertTrue($this->_paging->isMatch('bad.com'));
 		$this->assertTrue($this->_paging->isMatch('BAD.com'));
