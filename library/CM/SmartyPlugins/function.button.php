@@ -44,6 +44,11 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($title) {
 		$html .= ' title="' . $title . '"';
 	}
+	if (isset($params['data'])) {
+		foreach ($params['data'] as $name => $value) {
+			$html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+		}
+	}
 	$html .= '>';
 	if ($icon) {
 		$html .= '<span class="icon icon-' . $icon . '"></span>';
