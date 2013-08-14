@@ -39,7 +39,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
 		_.each(this.options.actions, function(action, name) {
 			var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
-			$btn.on('click', {action: name}, function(event) {
+			var event = $btn.data('event');
+			if (!event) {
+				event = 'click';
+			}
+			$btn.on(event, {action: name}, function(event) {
 				handler.submit(event.data.action);
 				return false;
 			});

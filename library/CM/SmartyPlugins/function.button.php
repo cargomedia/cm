@@ -17,6 +17,17 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		$class .= trim($params['class']);
 	}
 
+	$data = array();
+	if (isset($params['data'])) {
+		$data = $params['data'];
+		unset($params['data']);
+	}
+
+	if (isset($params['event'])) {
+		$data['event'] = (string) $params['event'];
+		unset($params['event']);
+	}
+
 	$icon = null;
 	if (isset($params['icon'])) {
 		$icon = $params['icon'];
@@ -43,6 +54,11 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	$html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '"';
 	if ($title) {
 		$html .= ' title="' . $title . '"';
+	}
+	if (!empty($data)) {
+		foreach ($data as $name => $value) {
+			$html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+		}
 	}
 	$html .= '>';
 	if ($icon) {
