@@ -31,10 +31,12 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 
 	public function testGetMatch(){
 		$this->assertSame('foobar', $this->_paging->getMatch('hallo foo-bar world.'));
+		$this->assertSame('bar', $this->_paging->getMatch('test bar test'));
 	}
 
 	public function testReplaceMatch(){
 		$this->assertSame('hallo … world.', $this->_paging->replaceMatch('hallo foo-bar world.', '…'));
 		$this->assertSame('hallo $1 \1 world.', $this->_paging->replaceMatch('hallo foo-bar world.', '$1 \1'));
+		$this->assertSame('Hello … world.', $this->_paging->replaceMatch('Hello bar world.', '…'));
 	}
 }

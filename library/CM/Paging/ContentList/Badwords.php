@@ -26,9 +26,10 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 */
 	public function getMatch($userInput) {
 		$userInput = (string) $userInput;
-		foreach ($this->_toRegexList() as $badword => $badwordRegex) {
-			if (preg_match($badwordRegex, $userInput)) {
-				return str_replace('*', '', $badword);
+		foreach ($this->getItems() as $badword) {
+			$regexp = $this->_transformItemToRegex($badword);
+			if (preg_match('#' . $regexp . '#i', $userInput)) {
+				return $this->_transformItemToHumanreadable($badword);
 			}
 		}
 
@@ -58,6 +59,26 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	}
 
 	/**
+	 * @param string $badword
+	 * @return string
+	 */
+	private function _transformItemToRegex($badword) {
+		$regexp = preg_quote($badword, '#');
+		$regexp = str_replace('\*', '[^A-Za-z]*', $regexp);
+		$regexp = str_replace('\|', '\b', $regexp);
+		$regexp = '\S*' . $regexp . '\S*';
+		return $regexp;
+	}
+
+	/**
+	 * @param string $badword
+	 * @return mixed
+	 */
+	private function _transformItemToHumanreadable($badword) {
+		return str_replace(array('*', '|'), '', $badword);
+	}
+
+	/**
 	 * @return string
 	 */
 	private function _toRegex() {
@@ -68,10 +89,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 			} else {
 				$regexList = array();
 				foreach ($this as $badword) {
-					$badword = preg_quote($badword, '#');
-					$badword = str_replace('\*', '[^A-Za-z]*', $badword);
-					$badword = str_replace('\|', '\b', $badword);
-					$regexList[] = '\S*' . $badword . '\S*';
+					$regexList[] = $this->_transformItemToRegex($badword);
 				}
 				$badwordsRegex = '#(?:' . implode('|', $regexList) . ')#i';
 			}
@@ -79,19 +97,5 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		}
 
 		return $badwordsRegex;
-	}
-
-	/**
-	 * @return string[]
-	 */
-	private function _toRegexList() {
-		$regexList = array();
-		foreach ($this as $badword) {
-			$badwordRegex = preg_quote($badword, '#');
-			$badwordRegex = str_replace('\*', '[^A-Za-z]*', $badwordRegex);
-			$regexList[$badword] = '#\S*' . $badwordRegex . '\S*#i';
-		}
-
-		return $regexList;
 	}
 }
