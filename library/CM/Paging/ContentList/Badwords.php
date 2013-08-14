@@ -25,6 +25,9 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 * @return string|false
 	 */
 	public function getMatch($userInput) {
+		if (!$this->isMatch($userInput)) {
+			return false;
+		}
 		$userInput = (string) $userInput;
 		foreach ($this->getItems() as $badword) {
 			$regexp = $this->_transformItemToRegex($badword);

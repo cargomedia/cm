@@ -30,8 +30,20 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 	}
 
 	public function testGetMatch(){
+		$this->assertSame('bad.com', $this->_paging->getMatch('bad.com'));
+		$this->assertSame('bad.com', $this->_paging->getMatch('BAD.com'));
+		$this->assertSame('bad.com', $this->_paging->getMatch('sub.bad.com'));
+		$this->assertSame('bad.com', $this->_paging->getMatch('bad.com-foo.de'));
+		$this->assertFalse($this->_paging->getMatch('evil.com'));
+		$this->assertSame('foobar', $this->_paging->getMatch('foo-bar'));
 		$this->assertSame('foobar', $this->_paging->getMatch('hallo foo-bar world.'));
 		$this->assertSame('bar', $this->_paging->getMatch('test bar test'));
+		$this->assertFalse($this->_paging->getMatch('testbar'));
+		$this->assertFalse($this->_paging->getMatch('testbartest'));
+		$this->assertFalse($this->_paging->getMatch('test bartest'));
+
+		$this->_paging->add('evil.com');
+		$this->assertSame('evil.com', $this->_paging->getMatch('evil.com'));
 	}
 
 	public function testReplaceMatch(){
