@@ -17,8 +17,14 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		$class .= trim($params['class']);
 	}
 
+	$data = array();
+	if (isset($params['data'])) {
+		$data = $params['data'];
+		unset($params['data']);
+	}
+
 	if (isset($params['event'])) {
-		$params['data'] = array('event' => $params['event']);
+		$data['event'] = (string) $params['event'];
 		unset($params['event']);
 	}
 
@@ -49,8 +55,8 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($title) {
 		$html .= ' title="' . $title . '"';
 	}
-	if (isset($params['data'])) {
-		foreach ($params['data'] as $name => $value) {
+	if (!empty($data)) {
+		foreach ($data as $name => $value) {
 			$html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
 		}
 	}
