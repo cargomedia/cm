@@ -694,22 +694,26 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(cm.getSiteId() + ':' + key, value);
+			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
 		},
 
 		/**
 		 * @param {String} key
-		 * @return {*}
+		 * @return {*|Null}
 		 */
 		get: function(key) {
-			return $.jStorage.get(cm.getSiteId() + ':' + key);
+			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
+			if (typeof value === 'undefined') {
+				return null;
+			}
+			return JSON.parse(value);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
+			localStorage.removeItem(cm.getSiteId() + ':' + key);
 		}
 	},
 
