@@ -37,11 +37,17 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 
 	/**
 	 * @param string $userInput
+	 * @param string $replacementString
 	 * @return string
 	 */
-	public function replaceMatch($userInput) {
+	public function replaceMatch($userInput, $replacementString) {
 		$userInput = (string) $userInput;
-		$userInput = preg_replace($this->_toRegex(), '…', $userInput);
+		$replacementString = (string) $replacementString;
+
+		do {
+			$userInputOld = $userInput;
+			$userInput = preg_replace($this->_toRegex(), $replacementString, $userInput);
+		} while ($userInputOld !== $userInput);
 
 		return $userInput;
 	}
@@ -50,7 +56,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 * @return string
 	 */
 	private function _toRegex() {
-		$cacheKey = CM_CacheConst::Usertext_Filter_BadwordRegexp;
+		$cacheKey = CM_CacheConst::ContentList_BadwordRegex;
 		if (false == ($badwordsRegex = CM_CacheLocal::get($cacheKey))) {
 			if (0 === $this->getCount()) {
 				return '#\z.#';
