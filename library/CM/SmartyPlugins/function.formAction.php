@@ -7,6 +7,10 @@ function smarty_function_formAction(array $params, Smarty_Internal_Template $tem
 	if (isset($params['prepend'])) {
 		$html .= (string) $params['prepend'];
 	}
+	if (isset($params['event'])) {
+		$params['data'] = array('event' => $params['event']);
+		unset($params['event']);
+	}
 	$html .= smarty_function_button($params, $template);
 	if (isset($params['append'])) {
 		$html .= (string) $params['append'];
