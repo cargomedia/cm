@@ -12,22 +12,16 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->_paging->add('foo*bar');
 	}
 
-	public function testAll() {
-		$this->assertTrue($this->_paging->contains('bad.com'));
-		$this->assertTrue($this->_paging->contains('BAD.com'));
-		$this->assertFalse($this->_paging->contains('sub.bad.com'));
-		$this->assertFalse($this->_paging->contains('bad.com-foo.de'));
-		$this->assertFalse($this->_paging->contains('evil.com'));
-
-		$this->assertTrue($this->_paging->contains('bad.com', '/\Q$item\E$/i'));
-		$this->assertTrue($this->_paging->contains('BAD.com', '/\Q$item\E$/i'));
-		$this->assertTrue($this->_paging->contains('sub.bad.com', '/\Q$item\E$/i'));
-		$this->assertFalse($this->_paging->contains('bad.com-foo.de', '/\Q$item\E$/i'));
-		$this->assertFalse($this->_paging->contains('evil.com', '/\Q$item\E$/i'));
-	}
-
 	public function testIsMatch(){
+		$this->assertTrue($this->_paging->isMatch('bad.com'));
+		$this->assertTrue($this->_paging->isMatch('BAD.com'));
+		$this->assertTrue($this->_paging->isMatch('sub.bad.com'));
+		$this->assertTrue($this->_paging->isMatch('bad.com-foo.de'));
+		$this->assertFalse($this->_paging->isMatch('evil.com'));
 		$this->assertTrue($this->_paging->isMatch('foo-bar'));
+
+		$this->_paging->add('evil.com');
+		$this->assertTrue($this->_paging->isMatch('evil.com'));
 	}
 
 	public function testGetMatch(){
@@ -36,5 +30,6 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 
 	public function testReplaceMatch(){
 		$this->assertSame('hallo … world.', $this->_paging->replaceMatch('hallo foo-bar world.', '…'));
+		$this->assertSame('hallo $1 \1 world.', $this->_paging->replaceMatch('hallo foo-bar world.', '$1 \1'));
 	}
 }

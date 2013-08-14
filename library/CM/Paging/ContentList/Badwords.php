@@ -42,7 +42,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 */
 	public function replaceMatch($userInput, $replacementString) {
 		$userInput = (string) $userInput;
-		$replacementString = (string) $replacementString;
+		$replacementString = str_replace('$', '\\$', str_replace('\\', '\\\\', (string) $replacementString));
 
 		do {
 			$userInputOld = $userInput;
@@ -52,25 +52,29 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 		return $userInput;
 	}
 
+	public function _change() {
+		parent::_change();
+		CM_Cache::delete(CM_CacheConst::ContentList_BadwordRegex);
+	}
+
 	/**
 	 * @return string
 	 */
 	private function _toRegex() {
 		$cacheKey = CM_CacheConst::ContentList_BadwordRegex;
-		if (false == ($badwordsRegex = CM_CacheLocal::get($cacheKey))) {
-			if (0 === $this->getCount()) {
-				return '#\z.#';
+		if (false == ($badwordsRegex = CM_Cache::get($cacheKey))) {
+			if ($this->isEmpty()) {
+				$badwordsRegex = '#\z.#';
+			} else {
+				$regexList = array();
+				foreach ($this as $badword) {
+					$badword = preg_quote($badword, '#');
+					$badword = str_replace('\*', '[^A-Za-z]*', $badword);
+					$regexList[] = '\S*' . $badword . '\S*';
+				}
+				$badwordsRegex = '#(?:' . implode('|', $regexList) . ')#i';
 			}
-
-			$regexList = array();
-			foreach ($this as $badword) {
-				$badword = preg_quote($badword, '#');
-				$badword = str_replace('\*', '[^A-Za-z]*', $badword);
-				$regexList[] = '\S*' . $badword . '\S*';
-			}
-
-			$badwordsRegex = '#(?:' . implode('|', $regexList) . ')#i';
-			CM_CacheLocal::set($cacheKey, $badwordsRegex);
+			CM_Cache::set($cacheKey, $badwordsRegex);
 		}
 
 		return $badwordsRegex;
