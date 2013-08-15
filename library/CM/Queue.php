@@ -8,7 +8,7 @@ class CM_Queue {
 	private $_key;
 
 	/**
-	 * @var CM_QueueAdapter_Abstract
+	 * @var CM_QueueAdapter_Redis
 	 */
 	private $_adapter;
 
@@ -53,9 +53,7 @@ class CM_Queue {
 		$timestampMax = (null !== $timestampMax) ? (int) $timestampMax : null;
 		if (null !== $timestampMax) {
 			$result = $this->_adapter->popDelayed($this->_key, $timestampMax);
-			$value = array_map(function($value) {
-				return unserialize($value);
-			}, $result);
+			$value = array_map('unserialize', $result);
 		} else {
 			$result = $this->_adapter->pop($this->getKey());
 			$value = unserialize($result);
