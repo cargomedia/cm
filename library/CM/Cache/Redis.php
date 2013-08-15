@@ -52,10 +52,9 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $key
 	 * @param float  $score
 	 * @param string $value
-	 * @return mixed
 	 */
 	public function zAdd($key, $score, $value) {
-		return $this->_redis->zAdd($key, $score, $value);
+		$this->_redis->zAdd($key, $score, $value);
 	}
 
 	/**
