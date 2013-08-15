@@ -29,13 +29,14 @@ abstract class CM_FormAction_Abstract {
 	 */
 	private $confirm_msg_lang_addr;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param string $action_name
-	 */
-	protected function __construct($action_name) {
-		$this->name = $action_name;
+	public function __construct() {
+		if (!preg_match('/^\w+_FormAction_(.+_)*(.+)$/', get_class($this), $matches)) {
+			throw new CM_Exception("Cannot detect namespace from forms class-name");
+		}
+		$namespace = lcfirst($matches[2]);
+		$namespace = preg_replace('/([A-Z])/', '_\1', $namespace);
+		$namespace = strtolower($namespace);
+		$this->name = $namespace;
 	}
 
 	/**
