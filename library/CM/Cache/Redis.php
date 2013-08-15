@@ -68,9 +68,9 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 */
 	public function zRangeByScore($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
 		$options = array();
-		if ($count || $offset) {
+		if (null !== $count || null !== $offset) {
 			$count = (null !== $count) ? (int) $count : -1;
-			$offset = (null !== $offset) ? (int) $count : 0;
+			$offset = (null !== $offset) ? (int) $offset : 0;
 			$options['limit'] = array($offset, $count);
 		}
 		if ($returnScore) {
