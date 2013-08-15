@@ -38,10 +38,14 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * Remove and return a value from a list
 	 *
 	 * @param string $key
-	 * @return string
+	 * @return string|null
 	 */
 	public function rPop($key) {
-		return $this->_redis->rPop($key);
+		$result = $this->_redis->rPop($key);
+		if (false === $result) {
+			$result = null;
+		}
+		return $result;
 	}
 
 	/**
