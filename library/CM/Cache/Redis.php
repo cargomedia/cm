@@ -91,10 +91,9 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $key
 	 * @param string $start
 	 * @param string $end
-	 * @return mixed
 	 */
-	public function zRemByScore($key, $start, $end) {
-		return $this->_redis->zRemRangeByScore($key, $start, $end);
+	public function zRemRangeByScore($key, $start, $end) {
+		$this->_redis->zRemRangeByScore($key, $start, $end);
 	}
 
 	/**
@@ -107,7 +106,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	public function zPopRangeByScore($key, $start, $end, $returnScore = null) {
 		$this->_redis->multi();
 		$this->zRangeByScore($key, $start, $end, null, null, $returnScore);
-		$this->zRemByScore($key, $start, $end);
+		$this->zRemRangeByScore($key, $start, $end);
 		$result = $this->_redis->exec();
 		return $result[0];
 	}
