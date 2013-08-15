@@ -82,10 +82,9 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	/**
 	 * @param string $key
 	 * @param string $value
-	 * @return mixed
 	 */
 	public function zRem($key, $value) {
-		return $this->_redis->zRem($key, $value);
+		$this->_redis->zRem($key, $value);
 	}
 
 	/**
