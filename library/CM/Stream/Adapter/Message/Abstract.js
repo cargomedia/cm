@@ -25,5 +25,14 @@ var CM_Stream_Adapter_Message_Abstract = CM_Class_Abstract.extend({
 	 */
 	unsubscribe: function(channel) {
 		throw 'Not implemented';
+	},
+
+	/**
+	 * @param {String} channel
+	 * @param {String} event
+	 * @param {Object} data
+	 */
+	publish: function(channel, event, data) {
+		throw 'Not implemented';
 	}
 });
