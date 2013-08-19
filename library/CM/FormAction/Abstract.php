@@ -5,20 +5,25 @@ abstract class CM_FormAction_Abstract {
 	/** @var string */
 	private $_name;
 
-	/** @var CM_FormField_Abstract[] */
-	private $_fieldList = array();
+	/** @var CM_Form_Abstract */
+	private $_form;
 
-	/** @var string[] */
-	protected $_fieldListRequired = array();
+	/** @var CM_FormField_Abstract[]|null */
+	private $_fieldList = null;
 
 	/** @var string */
 	private $confirm_msg_lang_addr;
 
-	public function __construct() {
-		if (!preg_match('/^\w+_FormAction_(.+_)*(.+)$/', get_class($this), $matches)) {
+	/**
+	 * @param CM_Form_Abstract $form
+	 * @throws CM_Exception
+	 */
+	public function __construct(CM_Form_Abstract $form) {
+		$this->_form = $form;
+		if (!preg_match('/^\w+_FormAction_[^_]+_(.+)$/', get_class($this), $matches)) {
 			throw new CM_Exception("Cannot detect action name from form action class name");
 		}
-		$this->_name = $matches[2];
+		$this->_name = $matches[1];
 	}
 
 	/**
@@ -46,16 +51,19 @@ abstract class CM_FormAction_Abstract {
 	 * @return array name => required
 	 */
 	public function getFieldList() {
+		if (null === $this->_fieldList) {
+			foreach ($this->_form->getFields() as $fieldName => $field) {
+				$this->_fieldList[$fieldName] = in_array($fieldName, $this->_getRequiredFields());
+			}
+		}
 		return $this->_fieldList;
 	}
 
 	/**
-	 * @param CM_Form_Abstract $form
+	 * @return CM_Form_Abstract
 	 */
-	public function setup(CM_Form_Abstract $form) {
-		foreach ($form->getFields() as $fieldName => $field) {
-			$this->_fieldList[$fieldName] = in_array($fieldName, $this->_fieldListRequired);
-		}
+	public function getForm() {
+		return $this->_form;
 	}
 
 	/**
@@ -63,7 +71,7 @@ abstract class CM_FormAction_Abstract {
 	 */
 	final public function js_presentation() {
 		$data = array();
-		$data['fields'] = $this->_fieldList;
+		$data['fields'] = $this->getFieldList();
 
 		if ($this->confirm_msg_lang_addr) {
 			$data['confirm_msg'] = $this->confirm_msg_lang_addr;
@@ -89,6 +97,13 @@ abstract class CM_FormAction_Abstract {
 	 */
 	final public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		return $this->_process(CM_Params::factory($data), $response, $form);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function _getRequiredFields() {
+		return array();
 	}
 
 	/**
