@@ -84,7 +84,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @param CM_FormAction_Abstract $action
 	 */
 	protected function registerAction(CM_FormAction_Abstract $action) {
-		$action->setup($this);
 		$action_name = $action->getName();
 		if (isset($this->actions[$action_name])) {
 			throw new CM_Exception_Invalid('Form action `' . $action_name . '` is already registered.');
