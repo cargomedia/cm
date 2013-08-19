@@ -40,13 +40,10 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 		$field = new CM_FormField_Set($name, $data, true);
 		$values = array(64, 128);
 		$field->setValue($values);
-		$cssWidth = '50%';
-		$field->setColumnSize($cssWidth);
 		$doc = $this->_renderFormField($form, $field);
 		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
-		$this->assertSame($cssWidth, preg_replace('/(^width: |;$)/', '', $doc->getAttr('li', 'style')));
 		foreach ($data as $value => $label) {
 			$this->assertTrue($doc->exists('li.' . $name . '_value_' . $value));
 			$spanQuery = 'label[class="' . $name . '_label_' . $value . '"]';
