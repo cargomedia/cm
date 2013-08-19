@@ -53,7 +53,7 @@ class CM_Form_FormTestExampleForm extends CM_Form_Abstract {
 class CM_FormAction_FormTestExampleAction extends CM_FormAction_Abstract {
 
 	public function setup(CM_Form_Abstract $form) {
-		$this->required_fields = array('must_check');
+		$this->_fieldListRequired = array('must_check');
 		parent::setup($form);
 	}
 

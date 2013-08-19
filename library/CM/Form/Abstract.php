@@ -163,7 +163,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		$action = $this->getAction($action_name);
 
 		$form_data = array();
-		foreach ($action->getFields() as $field_name => $required) {
+		foreach ($action->getFieldList() as $field_name => $required) {
 			$field = $this->getField($field_name);
 
 			if (array_key_exists($field_name, $data) && !$field->isEmpty($data[$field_name])) {

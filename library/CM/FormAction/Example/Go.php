@@ -3,7 +3,7 @@
 class CM_FormAction_Example_Go extends CM_FormAction_Abstract {
 
 	public function setup(CM_Form_Abstract $form) {
-		$this->required_fields = array('text', 'color');
+		$this->_fieldListRequired = array('text', 'color');
 		parent::setup($form);
 	}
 
