@@ -544,7 +544,7 @@ abstract class CM_Request_Abstract {
 	public static function factoryFromGlobals() {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$uri = $_SERVER['REQUEST_URI'];
-		$headers = apache_request_headers();
+		$headers = getallheaders();
 		$body = file_get_contents('php://input');
 		return self::factory($method, $uri, $headers, $body);
 	}
