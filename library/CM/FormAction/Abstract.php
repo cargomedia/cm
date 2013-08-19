@@ -23,37 +23,12 @@ abstract class CM_FormAction_Abstract {
 	protected $required_fields = array();
 
 	/**
-	 * Confirmation message language address.
-	 *
-	 * @var string
-	 */
-	private $confirm_msg_lang_addr;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param string $action_name
 	 */
 	protected function __construct($action_name) {
 		$this->name = $action_name;
-	}
-
-	/**
-	 * Set a confirmation message for the action.
-	 *
-	 * @param string $lang_addr
-	 */
-	protected function setConfirmation($lang_addr) {
-		$this->confirm_msg_lang_addr = $lang_addr;
-	}
-
-	/**
-	 * Get a confirmation message of the action.
-	 *
-	 * @return string
-	 */
-	public function getConfirmation() {
-		return $this->confirm_msg_lang_addr;
 	}
 
 	/**
@@ -82,10 +57,6 @@ abstract class CM_FormAction_Abstract {
 	final public function js_presentation() {
 		$data = array();
 		$data['fields'] = $this->_fields;
-
-		if ($this->confirm_msg_lang_addr) {
-			$data['confirm_msg'] = $this->confirm_msg_lang_addr;
-		}
 
 		return json_encode($data);
 
