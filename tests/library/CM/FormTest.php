@@ -30,7 +30,7 @@ class CM_FormTest extends CMTest_TestCase {
 	 * @return array
 	 */
 	private function _getData() {
-		return array("action" => "return_input_parameters", "classname" => "CM_Form_FormTestExampleForm",
+		return array("action" => "form_test_example_action", "classname" => "CM_Form_FormTestExampleForm",
 				"data" => array("color" => "#123123",
 						"must_check" => "checked"));
 	}
@@ -47,10 +47,7 @@ class CM_Form_FormTestExampleForm extends CM_Form_Abstract {
 	}
 }
 
-class CM_formAction_FormTestExampleAction extends CM_FormAction_Abstract {
-	public function __construct() {
-		parent::__construct('return_input_parameters');
-	}
+class CM_FormAction_FormTestExampleAction extends CM_FormAction_Abstract {
 	public function setup(CM_Form_Abstract $form) {
 		$this->required_fields = array('must_check');
 		parent::setup($form);
