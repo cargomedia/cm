@@ -17,14 +17,6 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		parent::__construct($name);
 	}
 
-	/**
-	 * @param string $cssSize
-	 * @deprecated
-	 */
-	public function setColumnSize($cssSize) {
-		$this->_columnSize = $cssSize;
-	}
-
 	public function validate($userInput, CM_Response_Abstract $response) {
 		foreach ($userInput as $key => $value) {
 			if (!in_array($value, $this->_getValues())) {
@@ -39,7 +31,6 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 		$this->setTplParam('optionList', $this->_getOptionList());
 		$this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
 		$this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
-		$this->setTplParam('colSize', !empty($params['colSize']) ? $params['colSize'] : $this->_columnSize);
 	}
 
 	/**
