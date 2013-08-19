@@ -31,7 +31,7 @@ class CM_FormTest extends CMTest_TestCase {
 	 */
 	private function _getData() {
 		return array(
-			"action"    => "form_test_example_action",
+			"action"    => "FormTestExampleAction",
 			"classname" => "CM_Form_FormTestExampleForm",
 			"data"      => array("color" => "#123123", "must_check" => "checked"));
 	}
