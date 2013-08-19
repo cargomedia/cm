@@ -16,7 +16,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerField(new CM_FormField_Set_Select('setSelect1', array(1 => 'Eins', 2 => 'Zwei'), true));
 		$this->registerField(new CM_FormField_Set_Select('setSelect2', array(1 => 'Eins', 2 => 'Zwei'), true));
 
-		$this->registerAction(new CM_FormAction_Example_Go());
+		$this->registerAction(new CM_FormAction_Example_Go($this));
 	}
 
 	public function _renderStart(CM_Params $params) {
