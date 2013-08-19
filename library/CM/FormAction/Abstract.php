@@ -18,10 +18,7 @@ abstract class CM_FormAction_Abstract {
 		if (!preg_match('/^\w+_FormAction_(.+_)*(.+)$/', get_class($this), $matches)) {
 			throw new CM_Exception("Cannot detect action name from form action class name");
 		}
-		$actionName = lcfirst($matches[2]);
-		$actionName = preg_replace('/([A-Z])/', '_\1', $actionName);
-		$actionName = strtolower($actionName);
-		$this->_name = $actionName;
+		$this->_name = $matches[2];
 	}
 
 	/**
