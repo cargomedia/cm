@@ -4,7 +4,6 @@
 class CM_FormField_Set extends CM_FormField_Abstract {
 	private $_values = array();
 	private $_labelsInValues = false;
-	private $_columnSize;
 
 	/**
 	 * @param string       $name
