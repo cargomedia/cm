@@ -9,7 +9,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	private $_fields = array();
 
 	/** @var array */
-	private $actions = array();
+	private $_actions = array();
 
 	public function __construct() {
 		if (!preg_match('/^\w+_Form_(.+)$/', get_class($this), $matches)) {
@@ -72,10 +72,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 */
 	protected function registerAction(CM_FormAction_Abstract $action) {
 		$action_name = $action->getName();
-		if (isset($this->actions[$action_name])) {
+		if (isset($this->_actions[$action_name])) {
 			throw new CM_Exception_Invalid('Form action `' . $action_name . '` is already registered.');
 		}
-		$this->actions[$action_name] = $action;
+		$this->_actions[$action_name] = $action;
 	}
 
 	/**
@@ -91,7 +91,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @return CM_FormAction_Abstract[]
 	 */
 	public function getActions() {
-		return $this->actions;
+		return $this->_actions;
 	}
 
 	/**
@@ -102,10 +102,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getAction($name) {
-		if (!isset($this->actions[$name])) {
+		if (!isset($this->_actions[$name])) {
 			throw new CM_Exception_Invalid('Unrecognized action `' . $name . '`.');
 		}
-		return $this->actions[$name];
+		return $this->_actions[$name];
 	}
 
 	/**
