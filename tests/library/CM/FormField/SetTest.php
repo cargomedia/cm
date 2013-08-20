@@ -40,7 +40,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 		$field = new CM_FormField_Set($name, $data, true);
 		$values = array(64, 128);
 		$field->setValue($values);
-		$doc = $this->_renderFormField($form, $field);
+		$doc = $this->_renderFormField($form, $field, 'foo');
 		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
