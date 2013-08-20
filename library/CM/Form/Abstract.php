@@ -66,18 +66,17 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Register and setup a form field.
-	 *
+	 * @param string                $fieldname
 	 * @param CM_FormField_Abstract $field
+	 * @throws CM_Exception_Invalid
 	 */
-	protected function registerField(CM_FormField_Abstract $field) {
-		$field_key = $field->getName();
-
-		if (isset($this->_fields[$field_key])) {
-			throw new CM_Exception_Invalid('Form field `' . $field_key . '` is already registered.');
+	protected function registerField($fieldname, CM_FormField_Abstract $field) {
+		$fieldname = (string) $fieldname;
+		if (isset($this->_fields[$fieldname])) {
+			throw new CM_Exception_Invalid('Form field `' . $fieldname . '` is already registered.');
 		}
 
-		$this->_fields[$field_key] = $field;
+		$this->_fields[$fieldname] = $field;
 	}
 
 	/**
