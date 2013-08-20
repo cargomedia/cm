@@ -19,10 +19,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$render->popStack('views');
 
 		/** @var CM_FormField_Abstract $field */
-		foreach ($form->getFields() as $field) {
+		foreach ($form->getFields() as $fieldname => $field) {
 			if ($field instanceof CM_FormField_Hidden) {
 				$field->prepare(array());
-				$content .= $render->render($field, array('form' => $form));
+				$content .= $render->render($field, array('form' => $form, 'fieldname' => $fieldname));
 			}
 		}
 
