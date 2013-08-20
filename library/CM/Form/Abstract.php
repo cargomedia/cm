@@ -2,25 +2,13 @@
 
 abstract class CM_Form_Abstract extends CM_View_Abstract {
 
-	/**
-	 * The name of a form.
-	 *
-	 * @var string
-	 */
-	private $name;
+	/** @var string */
+	private $_name;
 
-	/**
-	 * An array of fields objets.
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	private $_fields = array();
 
-	/**
-	 * Form actions.
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	private $actions = array();
 
 	public function __construct() {
@@ -30,7 +18,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		$namespace = lcfirst($matches[1]);
 		$namespace = preg_replace('/([A-Z])/', '_\1', $namespace);
 		$namespace = strtolower($namespace);
-		$this->name = $namespace;
+		$this->_name = $namespace;
 	}
 
 	/**
@@ -96,7 +84,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @return string
 	 */
 	public function getName() {
-		return $this->name;
+		return $this->_name;
 	}
 
 	/**
