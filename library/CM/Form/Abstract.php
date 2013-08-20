@@ -51,17 +51,17 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string                $fieldname
+	 * @param string                $fieldName
 	 * @param CM_FormField_Abstract $field
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function registerField($fieldname, CM_FormField_Abstract $field) {
-		$fieldname = (string) $fieldname;
-		if (isset($this->_fields[$fieldname])) {
-			throw new CM_Exception_Invalid('Form field `' . $fieldname . '` is already registered.');
+	protected function registerField($fieldName, CM_FormField_Abstract $field) {
+		$fieldName = (string) $fieldName;
+		if (isset($this->_fields[$fieldName])) {
+			throw new CM_Exception_Invalid('Form field `' . $fieldName . '` is already registered.');
 		}
 
-		$this->_fields[$fieldname] = $field;
+		$this->_fields[$fieldName] = $field;
 	}
 
 	/**
@@ -69,11 +69,11 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function registerAction(CM_FormAction_Abstract $action) {
-		$action_name = $action->getName();
-		if (isset($this->_actions[$action_name])) {
-			throw new CM_Exception_Invalid('Form action `' . $action_name . '` is already registered.');
+		$actionName = $action->getName();
+		if (isset($this->_actions[$actionName])) {
+			throw new CM_Exception_Invalid('Form action `' . $actionName . '` is already registered.');
 		}
-		$this->_actions[$action_name] = $action;
+		$this->_actions[$actionName] = $action;
 	}
 
 	/**
@@ -110,15 +110,15 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param string $field_name
+	 * @param string $fieldName
 	 * @return CM_FormField_Abstract
 	 * @throws CM_Exception_Invalid
 	 */
-	public function getField($field_name) {
-		if (!isset($this->_fields[$field_name])) {
-			throw new CM_Exception_Invalid('Unrecognized field `' . $field_name . '`.');
+	public function getField($fieldName) {
+		if (!isset($this->_fields[$fieldName])) {
+			throw new CM_Exception_Invalid('Unrecognized field `' . $fieldName . '`.');
 		}
-		return $this->_fields[$field_name];
+		return $this->_fields[$fieldName];
 	}
 
 	/**
@@ -131,40 +131,40 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param array                 $data
-	 * @param string                $action_name
+	 * @param string                $actionName
 	 * @param CM_Response_View_Form $response
 	 * @return mixed
 	 */
-	public function process(array $data, $action_name, CM_Response_View_Form $response) {
-		$action = $this->getAction($action_name);
+	public function process(array $data, $actionName, CM_Response_View_Form $response) {
+		$action = $this->getAction($actionName);
 
-		$form_data = array();
-		foreach ($action->getFieldList() as $field_name => $required) {
-			$field = $this->getField($field_name);
+		$formData = array();
+		foreach ($action->getFieldList() as $fieldName => $required) {
+			$field = $this->getField($fieldName);
 
-			if (array_key_exists($field_name, $data) && !$field->isEmpty($data[$field_name])) {
+			if (array_key_exists($fieldName, $data) && !$field->isEmpty($data[$fieldName])) {
 				try {
-					$form_data[$field_name] = $field->validate($data[$field_name], $response);
+					$formData[$fieldName] = $field->validate($data[$fieldName], $response);
 				} catch (CM_Exception_FormFieldValidation $e) {
-					$response->addError($e->getMessagePublic($response->getRender()), $field_name);
+					$response->addError($e->getMessagePublic($response->getRender()), $fieldName);
 				}
 			} else {
 				if ($required) {
-					$response->addError($response->getRender()->getTranslation('Required'), $field_name);
+					$response->addError($response->getRender()->getTranslation('Required'), $fieldName);
 				} else {
-					$form_data[$field_name] = null;
+					$formData[$fieldName] = null;
 				}
 			}
 		}
 
 		if (!$response->hasErrors()) {
-			$action->checkData($form_data, $response, $this);
+			$action->checkData($formData, $response, $this);
 		}
 
 		if ($response->hasErrors()) {
 			return null;
 		}
 
-		return $action->process($form_data, $response, $this);
+		return $action->process($formData, $response, $this);
 	}
 }
