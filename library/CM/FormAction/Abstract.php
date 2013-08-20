@@ -31,7 +31,7 @@ abstract class CM_FormAction_Abstract {
 	}
 
 	/**
-	 * @return array name => required
+	 * @return bool[] name => required
 	 */
 	public function getFieldList() {
 		if (null === $this->_fieldList) {
@@ -79,7 +79,7 @@ abstract class CM_FormAction_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	protected function _getRequiredFields() {
 		return array();
