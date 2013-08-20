@@ -2,10 +2,6 @@
 
 class CM_FormField_Email extends CM_FormField_Text {
 
-	public function __construct($name = 'email') {
-		parent::__construct($name);
-	}
-
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$userInput = parent::validate($userInput, $response);
 
