@@ -8,7 +8,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	/** @var array */
 	private $_fields = array();
 
-	/** @var array */
+	/** @var CM_FormAction_Abstract[] */
 	private $_actions = array();
 
 	public function __construct() {
@@ -35,9 +35,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		return $form;
 	}
 
-	/**
-	 * Register a form fields and actions.
-	 */
 	abstract public function setup();
 
 	/**
@@ -69,6 +66,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
 	/**
 	 * @param CM_FormAction_Abstract $action
+	 * @throws CM_Exception_Invalid
 	 */
 	protected function registerAction(CM_FormAction_Abstract $action) {
 		$action_name = $action->getName();
@@ -79,8 +77,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Get the name of a form.
-	 *
 	 * @return string
 	 */
 	public function getName() {
@@ -95,8 +91,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Get the reference to a form action object.
-	 *
 	 * @param string $name
 	 * @return CM_FormAction_Abstract
 	 * @throws CM_Exception_Invalid
@@ -116,8 +110,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Get the reference to a form field object.
-	 *
 	 * @param string $field_name
 	 * @return CM_FormField_Abstract
 	 * @throws CM_Exception_Invalid
@@ -130,8 +122,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	}
 
 	/**
-	 * Get auto id prefixed id value for a form html element.
-	 *
 	 * @param string $id_value
 	 * @return string
 	 */
