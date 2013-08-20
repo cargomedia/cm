@@ -30,6 +30,13 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
 		this.$('input').focus();
 	},
 
+	/**
+	 * @return {Boolean}
+	 */
+	hasFocus: function() {
+		return this.$('input').is(':focus');
+	},
+
 	enableTriggerChange: function() {
 		var self = this;
 		var $input = this.$('input');
