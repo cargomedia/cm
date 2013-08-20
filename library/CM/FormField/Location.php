@@ -5,9 +5,9 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	/**
 	 * @param int|null                   $minLevel
 	 * @param int|null                   $maxLevel
-	 * @param string|null $fieldnameDistance
+	 * @param string|null $fieldNameDistance
 	 */
-	public function __construct($minLevel = null, $maxLevel = null, $fieldnameDistance = null) {
+	public function __construct($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
 		parent::__construct();
 
 		if (is_null($minLevel)) {
@@ -18,8 +18,8 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		}
 		$this->_options['levelMin'] = (int) $minLevel;
 		$this->_options['levelMax'] = (int) $maxLevel;
-		if ($fieldnameDistance) {
-			$this->_options['distanceName'] = $fieldnameDistance;
+		if ($fieldNameDistance) {
+			$this->_options['distanceName'] = $fieldNameDistance;
 			$this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
 		}
 	}
