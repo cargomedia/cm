@@ -273,12 +273,14 @@ input[type=checkbox] {
 	}
 }
 
-.formField {
+
+.formField, .formAction {
 	.box-sizing(border-box);
-	width: 660px;
 	max-width: 100%;
 	padding: 6px;
+}
 
+.formField {
 	> label {
 		.box-sizing(border-box);
 		color: @colorFgLinkLight;
@@ -312,9 +314,13 @@ input[type=checkbox] {
 	&.noLabel > .input {
 		margin-left: 0;
 	}
+}
 
-	&.submit {
-		text-align: center;
+.formAction {
+	text-align: right;
+
+	.formAction-alternatives {
+		float: left;
 	}
 }
 

@@ -11,9 +11,6 @@ abstract class CM_FormAction_Abstract {
 	/** @var CM_FormField_Abstract[]|null */
 	private $_fieldList = null;
 
-	/** @var string */
-	private $confirm_msg_lang_addr;
-
 	/**
 	 * @param CM_Form_Abstract $form
 	 * @throws CM_Exception
@@ -24,20 +21,6 @@ abstract class CM_FormAction_Abstract {
 			throw new CM_Exception("Cannot detect action name from form action class name");
 		}
 		$this->_name = $matches[1];
-	}
-
-	/**
-	 * @param string $lang_addr
-	 */
-	protected function setConfirmation($lang_addr) {
-		$this->confirm_msg_lang_addr = $lang_addr;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getConfirmation() {
-		return $this->confirm_msg_lang_addr;
 	}
 
 	/**
@@ -72,10 +55,6 @@ abstract class CM_FormAction_Abstract {
 	final public function js_presentation() {
 		$data = array();
 		$data['fields'] = $this->getFieldList();
-
-		if ($this->confirm_msg_lang_addr) {
-			$data['confirm_msg'] = $this->confirm_msg_lang_addr;
-		}
 
 		return json_encode($data);
 	}
