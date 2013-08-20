@@ -2,18 +2,20 @@
 
 
 class CM_FormField_Set extends CM_FormField_Abstract {
+
+	/** @var array */
 	private $_values = array();
+
+	/** @var bool */
 	private $_labelsInValues = false;
 
 	/**
-	 * @param string       $name
-	 * @param array|null   $values
-	 * @param bool|null    $labelsInValues
+	 * @param array|null $values
+	 * @param bool|null  $labelsInValues
 	 */
-	public function __construct($name, array $values = null, $labelsInValues = null) {
+	public function __construct(array $values = null, $labelsInValues = null) {
 		$this->_values = (array) $values;
 		$this->_labelsInValues = (bool) $labelsInValues;
-		parent::__construct($name);
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
@@ -49,5 +51,4 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 	protected function _getValues() {
 		return array_keys($this->_getOptionList());
 	}
-
 }
