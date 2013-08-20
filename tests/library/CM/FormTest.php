@@ -40,8 +40,8 @@ class CM_FormTest extends CMTest_TestCase {
 class CM_Form_MockForm extends CM_Form_Abstract {
 
 	public function setup() {
-		$this->registerField(new CM_FormField_Boolean('must_check'));
-		$this->registerField(new CM_FormField_Color('color'));
+		$this->registerField('must_check', new CM_FormField_Boolean());
+		$this->registerField('color', new CM_FormField_Color());
 		$this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
 	}
 }
