@@ -171,7 +171,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
-	 * @param string 				$fieldName
+	 * @param string                $fieldName
 	 * @param array|null            $params
 	 * @param CM_Model_User|null    $viewer
 	 * @param CM_Site_Abstract|null $site

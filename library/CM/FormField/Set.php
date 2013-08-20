@@ -2,12 +2,16 @@
 
 
 class CM_FormField_Set extends CM_FormField_Abstract {
+
+	/** @var array */
 	private $_values = array();
+
+	/** @var bool */
 	private $_labelsInValues = false;
 
 	/**
-	 * @param array|null   $values
-	 * @param bool|null    $labelsInValues
+	 * @param array|null $values
+	 * @param bool|null  $labelsInValues
 	 */
 	public function __construct(array $values = null, $labelsInValues = null) {
 		$this->_values = (array) $values;
@@ -47,5 +51,4 @@ class CM_FormField_Set extends CM_FormField_Abstract {
 	protected function _getValues() {
 		return array_keys($this->_getOptionList());
 	}
-
 }

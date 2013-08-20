@@ -61,7 +61,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 	abstract public function validate($userInput, CM_Response_Abstract $response);
 
 	/**
-	 * @param array			 $params
+	 * @param array $params
 	 */
 	public function prepare(array $params) {
 	}
@@ -102,6 +102,5 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 		$field = new static('field');
 		$field->validate($userInput, $response);
 	}
-
 }
 

@@ -10,8 +10,8 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 		$this->assertSame(1, $doc->getCount('input'));
 		$this->assertSame(
 			'<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
-					$form->getTagAutoId($fieldName . '-input') .
-					'" type="text" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
+			$form->getTagAutoId($fieldName . '-input') .
+			'" type="text" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
 	}
 
 	public function testRenderValue() {
@@ -23,7 +23,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 		$this->assertSame('bar', $doc->getAttr('input', 'value'));
 		$this->assertSame(
 			'<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
-					$form->getTagAutoId($fieldName . '-input') .
-					'" type="text" value="bar" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
+			$form->getTagAutoId($fieldName . '-input') .
+			'" type="text" value="bar" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
 	}
 }

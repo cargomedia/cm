@@ -3,7 +3,7 @@
 abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 
 	/**
-	 * @param boolean|null   $enableChoiceCreate
+	 * @param boolean|null $enableChoiceCreate
 	 */
 	public function __construct($enableChoiceCreate = null) {
 		parent::__construct(1, $enableChoiceCreate);

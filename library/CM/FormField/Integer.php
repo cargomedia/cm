@@ -3,8 +3,8 @@
 class CM_FormField_Integer extends CM_FormField_Abstract {
 
 	/**
-	 * @param int $min OPTIONAL
-	 * @param int $max OPTIONAL
+	 * @param int $min  OPTIONAL
+	 * @param int $max  OPTIONAL
 	 * @param int $step OPTIONAL
 	 */
 	public function __construct($min = 0, $max = 100, $step = 1) {

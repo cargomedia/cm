@@ -9,8 +9,8 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	protected $_yearMax;
 
 	/**
-	 * @param int|null   $yearMin
-	 * @param int|null   $yearMax
+	 * @param int|null $yearMin
+	 * @param int|null $yearMax
 	 */
 	public function __construct($yearMin = null, $yearMax = null) {
 		if (null === $yearMin) {
