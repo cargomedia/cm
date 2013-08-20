@@ -20,7 +20,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	public function getMockForm() {
 		$formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
 		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
-		$formMock->frontend_data['auto_id'] = 'formId';
 		return $formMock;
 	}
 

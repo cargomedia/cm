@@ -1,13 +1,9 @@
 <?php
 
 class CM_FormAction_Example_Go extends CM_FormAction_Abstract {
-	public function __construct() {
-		parent::__construct('go');
-	}
 
-	public function setup(CM_Form_Abstract $form) {
-		$this->required_fields = array('text', 'color');
-		parent::setup($form);
+	protected function _getRequiredFields() {
+		return array('text', 'color');
 	}
 
 	protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {

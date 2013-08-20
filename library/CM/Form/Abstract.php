@@ -84,7 +84,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 	 * @param CM_FormAction_Abstract $action
 	 */
 	protected function registerAction(CM_FormAction_Abstract $action) {
-		$action->setup($this);
 		$action_name = $action->getName();
 		if (isset($this->actions[$action_name])) {
 			throw new CM_Exception_Invalid('Form action `' . $action_name . '` is already registered.');
@@ -163,7 +162,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 		$action = $this->getAction($action_name);
 
 		$form_data = array();
-		foreach ($action->getFields() as $field_name => $required) {
+		foreach ($action->getFieldList() as $field_name => $required) {
 			$field = $this->getField($field_name);
 
 			if (array_key_exists($field_name, $data) && !$field->isEmpty($data[$field_name])) {
