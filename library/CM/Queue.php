@@ -8,7 +8,7 @@ class CM_Queue {
 	private $_key;
 
 	/**
-	 * @var CM_QueueAdapter_Redis
+	 * @var CM_QueueAdapter_Abstract
 	 */
 	private $_adapter;
 

@@ -2,6 +2,7 @@
 
 class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 
+	/** @var CM_Cache_Redis|null */
 	private $_redis = null;
 
 	public function push($key, $value) {
