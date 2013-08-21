@@ -145,6 +145,28 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->delete();
 	}
 
+	public function testFactoryGeneric() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+
+		$modelMock1 = CM_ModelMock::create(array('foo' => 'bar'));
+		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw());
+		$this->assertEquals($modelMock1, $modelMock2);
+
+		CMTest_TH::clearConfig();
+	}
+
+	public function testFactoryGenericWithData() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+
+		$modelMock1 = CM_ModelMock::create(array('foo' => 'bar'));
+		/** @var CM_ModelMock $modelMock2 */
+		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw(), array('foo' => 'bla'));
+		$this->assertSame('bla', $modelMock2->getFoo());
+
+		CMTest_TH::clearConfig();
+	}
+
+
 	public function testPersistenceSet() {
 		$data = array('foo' => 12, 'muh' => 2);
 		$schema = array('foo' => array(), 'muh' => array());

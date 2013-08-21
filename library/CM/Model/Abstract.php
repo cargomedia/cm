@@ -94,9 +94,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return serialize(array($this->_id, $this->_data));
 	}
 
-	final public function unserialize($data) {
-		list($id, $this->_data) = unserialize($data);
-		$this->_construct($id);
+	final public function unserialize($serialized) {
+		list($id, $data) = unserialize($serialized);
+		$this->_construct($id, $data);
 	}
 
 	/**
@@ -373,15 +373,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param int   $type
 	 * @param array $id
+	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 */
-	final public static function factoryGeneric($type, array $id) {
+	final public static function factoryGeneric($type, array $id, array $data = null) {
 		$className = self::_getClassName($type);
 		/*
 		 * Cannot use __construct(), since signature is unknown.
 		 * unserialize() is ~10% slower.
 		 */
-		$serialized = serialize(array($id, null));
+		$serialized = serialize(array($id, $data));
 		return unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 	}
 
