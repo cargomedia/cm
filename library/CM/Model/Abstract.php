@@ -49,6 +49,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$containingCacheables = $this->_getContainingCacheables();
 		$this->_onBeforeDelete();
 		$this->_onDelete();
+		if ($persistence = $this->getPersistence()) {
+			$persistence->delete($this->getType(), $this->getIdRaw());
+		}
 		if ($cache = $this->getCache()) {
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
