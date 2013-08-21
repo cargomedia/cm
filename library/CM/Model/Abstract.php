@@ -48,7 +48,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_onBeforeDelete();
 		$this->_onDelete();
 		if ($cache = $this->getCache()) {
-			$cache->delete($this->getIdRaw());
+			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		foreach ($containingCacheables as $cacheable) {
 			$cacheable->_change();
@@ -103,7 +103,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	final public function _change() {
 		if ($cache = $this->getCache()) {
-			$cache->delete($this->getIdRaw());
+			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		$this->_data = null;
 		$this->_onChange();
@@ -118,7 +118,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	final public function _get($field = null) {
 		if (null === $this->_data) {
 			if ($cache = $this->getCache()) {
-				if (false !== ($data = $cache->load($this->getIdRaw()))) {
+				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
 					$this->_data = $data;
 				}
 			}
@@ -138,7 +138,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$this->_autoCommit = true;
 
 				if ($cache) {
-					$cache->save($this->getIdRaw(), $this->_data);
+					$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 				}
 			}
 		}
@@ -176,7 +176,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 		if ($this->_autoCommit) {
 			if ($cache = $this->getCache()) {
-				$cache->save($this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 			if ($this->_isSchemaField(array_keys($data))) {
 				$this->_onChange();
@@ -304,6 +304,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public static function getCacheStatic() {
 		return new CM_Model_StorageAdapter_Cache(get_called_class());
+	}
+
+	/**
+	 * @param int $type
+	 * @return string
+	 */
+	public static function getClassName($type) {
+		return self::_getClassName($type);
 	}
 
 	/**

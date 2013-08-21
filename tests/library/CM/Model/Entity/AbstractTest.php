@@ -84,6 +84,8 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
+	const TYPE = 1;
+
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
 

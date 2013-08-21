@@ -30,8 +30,8 @@ class CM_CacheConst {
 	// _id:X
 	const Request_Client = 'Request_Client';
 
-	// _class:X_id:X
-	const Model = 'Model';
+	// _type:X_id:X
+	const CM_Model_StorageAdapter_Cache = 'CM_Model_StorageAdapter_Cache';
 
 	const Option = 'Option';
 
