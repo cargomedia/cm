@@ -57,6 +57,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
 
 			if ($cache = $this->getCache()) {
+				$this->_loadAssets(true);
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 		} else {

@@ -75,7 +75,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
 	}
 
-	public function testCreate() {
+	public function testCreate2() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
 		$idRaw = array('id' => 1);
@@ -83,6 +83,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		$cacheable = $this->getMock('CM_Cacheable');
 		$cacheable->expects($this->once())->method('_change');
+
+		$assetClassHierarchy = array('CM_ModelAsset_Abstract', 'CM_ModelAsset_Concrete');
+		$asset = $this->getMockBuilder('CM_ModelAsset_Abstract')->setMethods(array('getClassHierarchy', '_loadAsset'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$asset->expects($this->once())->method('getClassHierarchy')->will($this->returnValue($assetClassHierarchy));
+		$asset->expects($this->exactly(count($assetClassHierarchy)))->method('_loadAsset');
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
 		$cache->expects($this->once())->method('save')->with($type, $idRaw, $data);
@@ -93,16 +99,20 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')
-				->setMethods(array('getType', 'getPersistence', 'getCache', '_getSchema', '_onChange', '_onCreate', '_getContainingCacheables'))
-				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+				->setMethods(array('getType', 'getPersistence', 'getCache', '_getSchema', '_getContainingCacheables', '_getAssets', '_onChange',
+					'_onCreate'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->once())->method('getPersistence')->will($this->returnValue($persistence));
 		$model->expects($this->once())->method('getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
 		$model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheable)));
+		$model->expects($this->once())->method('_getAssets')->will($this->returnValue(array($asset)));
 		$model->expects($this->once())->method('_onChange');
 		$model->expects($this->once())->method('_onCreate');
 		/** @var CM_Model_Abstract $model */
+
+		$model->__construct(null, $data);
 
 		$model->create();
 		$this->assertSame($idRaw, $model->getIdRaw());
