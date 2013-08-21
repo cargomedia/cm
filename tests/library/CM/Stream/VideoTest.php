@@ -25,17 +25,17 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
 		$userUnchanged = CMTest_TH::createUser();
 		$userUnchanged->setOnline();
-		$streamChannel = CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo1', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
+		$streamChannel = CM_Model_StreamChannel_Video_Mock::createStatic(array('key' => 'foo1', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
 			'height' => 100, 'thumbnailCount' => 0));
-		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
+		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
-		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
+		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 			'key' => 'foo1_4', 'start' => time(), 'allowedUntil' => time() + 100));
-		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
+		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 			'key' => 'foo1_3', 'start' => time(), 'allowedUntil' => time()));
-		$streamPublishUnchanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
+		$streamPublishUnchanged1 = CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
 			'key' => 'foo1_2', 'start' => time(), 'allowedUntil' => time()));
-		$streamPublishChanged1 = CM_Model_Stream_Publish::create(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::create(array('key' => 'foo2',
+		$streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::createStatic(array('key' => 'foo2',
 			'serverId' => 1, 'adapterType' => 1, 'width' => 100, 'height' => 100, 'thumbnailCount' => 0)), 'user' => CMTest_TH::createUser(),
 			'key' => 'foo2_1', 'start' => time(), 'allowedUntil' => time()));
 

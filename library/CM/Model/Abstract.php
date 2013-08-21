@@ -333,7 +333,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array|null $data
 	 * @return static
 	 */
-	final public static function create(array $data = null) {
+	final public static function createStatic(array $data = null) {
 		if ($data === null) {
 			$data = array();
 		}
@@ -355,7 +355,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	final public static function createType($type, array $data = null) {
 		/** @var CM_Model_Abstract $className */
 		$className = static::_getClassName($type);
-		return $className::create($data);
+		return $className::createStatic($data);
 	}
 
 	/**

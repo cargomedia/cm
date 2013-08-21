@@ -13,7 +13,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
 		CMTest_TH::timeForward(10);
 		/** @var CM_Model_StreamChannelArchive_Video $archive */
-		$archive = CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+		$archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 		$this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
 		$this->assertSame($streamChannel->getId(), $archive->getId());
 		$this->assertSame($user->getId(), $archive->getUserId());
@@ -28,7 +28,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 
 		$streamChannel = CMTest_TH::createStreamChannel();
 		try {
-			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+			CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 			$this->fail('StreamChannelArchive_Video created without StreamPublish.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);

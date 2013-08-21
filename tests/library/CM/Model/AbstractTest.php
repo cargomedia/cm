@@ -24,7 +24,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function setup() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 	}
 
 	public function tearDown() {
@@ -34,7 +34,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testConstructorWithIdWithoutData() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 	}
@@ -128,7 +128,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCache() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		CM_Db_Db::update('modelMock', array('foo' => 'bar2'), array('id' => $modelMock->getId()));
@@ -220,7 +220,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testFactoryGeneric() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
 
-		$modelMock1 = CM_ModelMock::create(array('foo' => 'bar'));
+		$modelMock1 = CM_ModelMock::createStatic(array('foo' => 'bar'));
 		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw());
 		$this->assertEquals($modelMock1, $modelMock2);
 
@@ -230,7 +230,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testFactoryGenericWithData() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
 
-		$modelMock1 = CM_ModelMock::create(array('foo' => 'bar'));
+		$modelMock1 = CM_ModelMock::createStatic(array('foo' => 'bar'));
 		/** @var CM_ModelMock $modelMock2 */
 		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw(), array('foo' => 'bla'));
 		$this->assertSame('bla', $modelMock2->getFoo());
@@ -299,7 +299,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGet() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		try {
 			$modelMock->_get('foo');
@@ -316,14 +316,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testHas() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertTrue($modelMock->_has('foo'));
 		$this->assertFalse($modelMock->_has('bar'));
 	}
 
 	public function testSet() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$modelMock->_set('foo', 'bar2');
@@ -336,7 +336,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetMultiple() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'foo1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'foo1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertSame('foo1', $modelMock->getFoo());
 		$modelMock->_set(array('foo' => 'foo2', 'bar' => 'bar2'));
@@ -345,7 +345,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testDelete() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$modelMock->delete();
 		try {
@@ -357,7 +357,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testOnChange() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals(0, $modelMock->onChangeCounter);
 		$modelMock->_change();
@@ -366,7 +366,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testOnCreate() {
 		/** @var CM_ModelMock $modelMock */
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$this->assertEquals(1, $modelMock->onCreateCounter);
 
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -374,7 +374,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSerializable() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 		$this->assertEquals('bar1', unserialize(serialize($modelMock))->getFoo());
@@ -384,8 +384,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testModelAsset() {
-		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
-		$modelThatIsAnAssetMock = CM_ModelThasIsAnAssetMock::create(array('modelMockId' => $modelMock->getId(), 'bar' => $modelMock->getFoo()));
+		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
+		$modelThatIsAnAssetMock = CM_ModelThasIsAnAssetMock::createStatic(array('modelMockId' => $modelMock->getId(), 'bar' => $modelMock->getFoo()));
 		$modelThatIsAnAssetMock->_change();
 		$modelMock->_change();
 		$modelMock = new CM_ModelMock($modelMock->getId());

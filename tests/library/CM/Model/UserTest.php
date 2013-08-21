@@ -47,21 +47,21 @@ class CM_Model_UserTest extends CMTest_TestCase {
 	}
 
 	public function testCreate() {
-		$user = CM_Model_User::create();
+		$user = CM_Model_User::createStatic();
 		$this->assertRow('cm_user', array('userId' => $user->getId()));
 	}
 
 	public function testCreateWithSite() {
 		$site = CM_Site_Abstract::factory();
 		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create(array('site' => $site));
+		$user = CM_Model_User::createStatic(array('site' => $site));
 		$this->assertEquals($site, $user->getSite());
 	}
 
 	public function testCreateWithLanguage() {
 		$language = CMTest_TH::createLanguage();
 		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create(array('language' => $language));
+		$user = CM_Model_User::createStatic(array('language' => $language));
 		$this->assertEquals($language, $user->getLanguage());
 	}
 

@@ -107,7 +107,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	protected function _onBeforeDelete() {
 		if ($this->hasStreamPublish()) {
-			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
+			CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $this));
 		}
 	}
 
