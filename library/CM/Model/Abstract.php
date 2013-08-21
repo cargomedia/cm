@@ -52,6 +52,26 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		throw new CM_Exception_NotImplemented();
 	}
 
+	public function create() {
+		if ($persistence = $this->getPersistence()) {
+			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
+
+			if ($cache = $this->getCache()) {
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+			}
+		} else {
+			// @todo refactor?
+			$model = self::createStatic($this->_getSchemaData());
+			$this->_id = $model->getIdRaw();
+			$this->_data = $model->_get();
+		}
+		$this->_onChange();
+		foreach ($this->_getContainingCacheables() as $cacheable) {
+			$cacheable->_change();
+		}
+		$this->_onCreate();
+	}
+
 	final public function delete() {
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
@@ -235,7 +255,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 			if ($this->_isSchemaField(array_keys($data))) {
 				if ($persistence = $this->getPersistence()) {
-					$persistence->save($this->getType(), $this->getIdRaw(), array_intersect_key($this->_data, $this->_getSchema()));
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 				}
 				$this->_onChange();
 			}
@@ -327,6 +347,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			return count(array_intersect($field, array_keys($schema))) > 0;
 		}
 		return array_key_exists($field, $schema);
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Invalid
+	 */
+	protected function _getSchemaData() {
+		if (null === $this->_data) {
+			throw new CM_Exception_Invalid('Model has no data');
+		}
+		return array_intersect_key($this->_data, $this->_getSchema());
 	}
 
 	/**

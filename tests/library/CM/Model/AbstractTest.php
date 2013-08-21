@@ -75,6 +75,39 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
 	}
 
+	public function testCreate() {
+		$data = array('foo' => 11, 'bar' => 'foo');
+		$type = 12;
+		$idRaw = array('id' => 1);
+		$schema = array('foo' => array(), 'bar' => array());
+
+		$cacheable = $this->getMock('CM_Cacheable');
+		$cacheable->expects($this->once())->method('_change');
+
+		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$cache->expects($this->once())->method('save')->with($type, $idRaw, $data);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($idRaw));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')
+				->setMethods(array('getType', 'getPersistence', 'getCache', '_getSchema', '_onChange', '_onCreate', '_getContainingCacheables'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->once())->method('getPersistence')->will($this->returnValue($persistence));
+		$model->expects($this->once())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheable)));
+		$model->expects($this->once())->method('_onChange');
+		$model->expects($this->once())->method('_onCreate');
+		/** @var CM_Model_Abstract $model */
+
+		$model->create();
+		$this->assertSame($idRaw, $model->getIdRaw());
+	}
+
 	/**
 	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage Model has no id
