@@ -213,6 +213,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 			if ($this->_isSchemaField(array_keys($data))) {
+				if ($persistence = $this->getPersistence()) {
+					$persistence->save($this->getType(), $this->getIdRaw(), array_intersect_key($this->_data, $this->_getSchema()));
+				}
 				$this->_onChange();
 			}
 		}

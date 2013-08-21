@@ -129,6 +129,28 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->delete();
 	}
 
+	public function testPersistenceSet() {
+		$data = array('foo' => 12, 'muh' => 2);
+		$schema = array('foo' => array(), 'muh' => array());
+		$id = array('id' => 55);
+		$type = 12;
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load', 'save'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('load')->with($type, $id)->will($this->returnValue($data));
+		$persistence->expects($this->once())->method('save')->with($type, $id, array('foo' => 15, 'muh' => 2));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getPersistence', 'getIdRaw', 'getType', '_getSchema'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		/** @var CM_Model_Abstract $model */
+
+		$model->_set(array('foo' => 15, 'bar' => 14));
+	}
+
 	public function testPersistenceGet() {
 		$data = array('foo' => 12, 'bar' => 13);
 		$id = array('id' => 55);
