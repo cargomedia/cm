@@ -268,8 +268,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return new self($data['level'], $data['id']);
 	}
 
-	public static function getCacheStatic() {
-		return new CM_Model_StorageAdapter_CacheLocal();
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
 	}
 
 	public static function createUSStatesAbbreviation() {

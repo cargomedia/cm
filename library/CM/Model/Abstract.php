@@ -94,8 +94,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 */
-	public function getCache() {
-		return static::getCacheStatic();
+	final public function getCache() {
+		$className = static::getCacheClass();
+		if (null === $className) {
+			return null;
+		}
+		if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
+			throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
+		}
+		return new $className();
 	}
 
 	/**
@@ -300,10 +307,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 * @return string|null
 	 */
-	public static function getCacheStatic() {
-		return new CM_Model_StorageAdapter_Cache();
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_Cache';
 	}
 
 	/**

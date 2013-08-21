@@ -55,7 +55,7 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 		return $capabilities;
 	}
 
-	public static function getCacheStatic() {
-		return new CM_Model_StorageAdapter_CacheLocal();
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
 	}
 }
