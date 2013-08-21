@@ -303,7 +303,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 */
 	public static function getCacheStatic() {
-		return new CM_Model_StorageAdapter_Cache(get_called_class());
+		return new CM_Model_StorageAdapter_Cache();
 	}
 
 	/**

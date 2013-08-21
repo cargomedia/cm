@@ -269,7 +269,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	public static function getCacheStatic() {
-		return new CM_Model_StorageAdapter_CacheLocal(get_called_class());
+		return new CM_Model_StorageAdapter_CacheLocal();
 	}
 
 	public static function createUSStatesAbbreviation() {
