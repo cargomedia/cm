@@ -38,7 +38,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return array
 	 */
-	abstract protected function _loadData();
+	protected function _loadData() {
+		throw new CM_Exception_NotImplemented();
+	}
 
 	final public function delete() {
 		foreach ($this->_assets as $asset) {
@@ -99,6 +101,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 */
+	public function getPersistence() {
+		return self::_getStorageAdapter(static::getPersistenceClass());
+	}
+
+	/**
 	 * @param string|null $className
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 * @throws CM_Exception_Invalid
@@ -138,11 +147,18 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				}
 			}
 			if (null === $this->_data) {
-				if (is_array($data = $this->_loadData())) {
-					$this->_data = $data;
+				if ($persistence = $this->getPersistence()) {
+					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
+						$this->_data = $data;
+					}
 				}
 				if (null === $this->_data) {
-					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
+					if (is_array($data = $this->_loadData())) {
+						$this->_data = $data;
+					}
+					if (null === $this->_data) {
+						throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
+					}
 				}
 
 				$this->_autoCommit = false;
@@ -319,6 +335,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public static function getCacheClass() {
 		return 'CM_Model_StorageAdapter_Cache';
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public static function getPersistenceClass() {
+		return null;
 	}
 
 	/**

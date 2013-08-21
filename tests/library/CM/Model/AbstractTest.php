@@ -129,6 +129,26 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->delete();
 	}
 
+	public function testPersistenceGet() {
+		$data = array('foo' => 12, 'bar' => 13);
+		$id = array('id' => 55);
+		$type = 12;
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('load')->with($type, $id)->will($this->returnValue($data));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', 'getType', 'getPersistence'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getCache')->will($this->returnValue(null));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($data, $model->_get());
+	}
+
 	public function testGet() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
