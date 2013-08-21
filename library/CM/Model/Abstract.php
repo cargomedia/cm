@@ -205,9 +205,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					}
 				}
 
-				$this->_loadAssets(true);
-
 				if ($cache) {
+					$this->_loadAssets(true);
 					$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 				}
 			}
