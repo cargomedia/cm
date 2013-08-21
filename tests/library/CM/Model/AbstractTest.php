@@ -75,7 +75,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
 	}
 
-	public function testCreate2() {
+	public function testCreate() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
 		$idRaw = array('id' => 1);
