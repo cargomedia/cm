@@ -33,13 +33,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		CMTest_TH::clearEnv();
 	}
 
-	public function testConstruct() {
+	public function testConstructor() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 	}
 
-	public function testContructWithData() {
+	public function testContructorWithData() {
 		$data = array('foo' => 12, 'bar' => 13);
 		$id = 55;
 		$type = 12;
