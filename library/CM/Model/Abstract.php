@@ -205,12 +205,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					}
 				}
 
-				$this->_autoCommit = false;
-				/** @var CM_ModelAsset_Abstract $asset */
-				foreach ($this->_assets as $asset) {
-					$asset->_loadAsset();
-				}
-				$this->_autoCommit = true;
+				$this->_loadAssets(true);
 
 				if ($cache) {
 					$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
@@ -318,6 +313,21 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			throw new CM_Exception('No such asset `' . $className . '`');
 		}
 		return $this->_assets[$className];
+	}
+
+	/**
+	 * @param bool|null $disableAutoCommit
+	 */
+	protected function _loadAssets($disableAutoCommit = null) {
+		$autoCommitBackup = $this->_autoCommit;
+		if ($disableAutoCommit) {
+			$this->_autoCommit = false;
+		}
+		/** @var CM_ModelAsset_Abstract $asset */
+		foreach ($this->_assets as $asset) {
+			$asset->_loadAsset();
+		}
+		$this->_autoCommit = $autoCommitBackup;
 	}
 
 	/**
