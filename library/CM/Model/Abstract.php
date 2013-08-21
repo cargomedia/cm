@@ -94,8 +94,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 */
-	final public function getCache() {
-		$className = static::getCacheClass();
+	public function getCache() {
+		return self::_getStorageAdapter(static::getCacheClass());
+	}
+
+	/**
+	 * @param string|null $className
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static function _getStorageAdapter($className = null) {
 		if (null === $className) {
 			return null;
 		}
