@@ -55,6 +55,46 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($data, $model->_get());
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Either data or id required
+	 */
+	public function testContructorWithoutIdWithoutData() {
+		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Model has no id
+	 */
+	public function testGetIdWithoutId() {
+		$data = array('foo' => 12);
+		$type = 12;
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model */
+
+		$model->getId();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Model has no id
+	 */
+	public function testGetIdRawWithoutId() {
+		$data = array('foo' => 12);
+		$type = 12;
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model */
+
+		$model->getIdRaw();
+	}
+
 	public function testCache() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -165,7 +205,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		CMTest_TH::clearConfig();
 	}
-
 
 	public function testPersistenceSet() {
 		$data = array('foo' => 12, 'muh' => 2);
@@ -375,6 +414,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
+
 	const TYPE = 1;
 
 	public $onChangeCounter = 0;
@@ -417,6 +457,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 }
 
 class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
+
 	const TYPE = 2;
 
 	public function getBar() {
@@ -491,6 +532,7 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 }
 
 class CM_ModelMock2 extends CM_Model_Abstract {
+
 	const TYPE = 3;
 
 	protected function _loadData() {

@@ -2,7 +2,7 @@
 
 abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable {
 
-	/** @var array */
+	/** @var array|null */
 	protected $_id;
 
 	/** @var array|null */
@@ -18,18 +18,25 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected $_schema;
 
 	/**
-	 * @param int        $id
+	 * @param int|null   $id
 	 * @param array|null $data
 	 */
-	public function __construct($id, array $data = null) {
-		$this->_construct(array('id' => (int) $id), $data);
+	public function __construct($id = null, array $data = null) {
+		if (null !== $id) {
+			$id = array('id' => (int) $id);
+		}
+		$this->_construct($id, $data);
 	}
 
 	/**
-	 * @param array      $id
+	 * @param array|null $id
 	 * @param array|null $data
+	 * @throws CM_Exception_Invalid
 	 */
-	final protected function _construct(array $id, array $data = null) {
+	final protected function _construct(array $id = null, array $data = null) {
+		if (null === $id && null === $data) {
+			throw new CM_Exception_Invalid('Either data or id required');
+		}
 		$this->_id = $id;
 		$this->_data = $data;
 		foreach ($this->_loadAssets() as $asset) {
@@ -73,8 +80,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @return array
+	 * @throws CM_Exception_Invalid
 	 */
 	public function getIdRaw() {
+		if (null === $this->_id) {
+			throw new CM_Exception_Invalid('Model has no id');
+		}
 		return $this->_id;
 	}
 
@@ -91,7 +102,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array($this->_id, $this->_data));
+		return serialize(array($this->getIdRaw(), $this->_data));
 	}
 
 	final public function unserialize($serialized) {
@@ -250,14 +261,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception_Invalid
 	 */
 	final protected function _getId($key = null) {
+		$idRaw = $this->getIdRaw();
 		if (null === $key) {
-			return $this->_id;
+			return $idRaw;
 		}
 		$key = (string) $key;
-		if (!array_key_exists($key, $this->_id)) {
+		if (!array_key_exists($key, $idRaw)) {
 			throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
 		}
-		return $this->_id[$key];
+		return $idRaw[$key];
 	}
 
 	/**
@@ -371,8 +383,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param int   $type
-	 * @param array $id
+	 * @param int        $type
+	 * @param array      $id
 	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 */
