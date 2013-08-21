@@ -90,6 +90,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function hasId() {
+		return (null !== $this->_id);
+	}
+
+	/**
 	 * @param CM_Comparable|null $model
 	 * @return boolean
 	 */

@@ -33,13 +33,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		CMTest_TH::clearEnv();
 	}
 
-	public function testConstructor() {
+	public function testConstructorWithIdWithoutData() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
 		$this->assertEquals('bar1', $modelMock->getFoo());
 	}
 
-	public function testContructorWithData() {
+	public function testConstructorWithIdWithData() {
 		$data = array('foo' => 12, 'bar' => 13);
 		$id = 55;
 		$type = 12;
@@ -55,11 +55,23 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($data, $model->_get());
 	}
 
+	public function testConstructorWithoutIdWithData() {
+		$data = array('foo' => 11, 'bar' => 'foo');
+		$type = 12;
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($data, $model->_get());
+	}
+
 	/**
 	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage Either data or id required
 	 */
-	public function testContructorWithoutIdWithoutData() {
+	public function testConstructorWithoutIdWithoutData() {
 		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
 	}
 
@@ -93,6 +105,26 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $model */
 
 		$model->getIdRaw();
+	}
+
+	public function testHasId() {
+		$data = array('foo' => 12, 'bar' => 13);
+		$id = 55;
+		$type = 12;
+
+		$model1 = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
+		$model1->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model1 */
+
+		$this->assertTrue($model1->hasId());
+
+		$model2 = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$model2->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model2 */
+
+		$this->assertFalse($model2->hasId());
 	}
 
 	public function testCache() {
