@@ -512,7 +512,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 		CM_Db_Db::delete('modelMock', array('id' => $this->getId()));
 	}
 
-	protected function _loadAssets() {
+	protected function _getAssets() {
 		return array(new CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock($this));
 	}
 
@@ -604,7 +604,7 @@ class CM_ModelMock2 extends CM_Model_Abstract {
 		return array();
 	}
 
-	protected function _loadAssets() {
+	protected function _getAssets() {
 		return array(new CM_ModelAsset_ModelMock_ModelAssetMock($this));
 	}
 

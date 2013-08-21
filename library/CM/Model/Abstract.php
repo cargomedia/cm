@@ -39,7 +39,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_id = $id;
 		$this->_data = $data;
-		foreach ($this->_loadAssets() as $asset) {
+		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
 		$this->_get(); // Make sure data can be loaded
@@ -277,7 +277,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_ModelAsset_Abstract[]
 	 */
-	protected function _loadAssets() {
+	protected function _getAssets() {
 		return array();
 	}
 

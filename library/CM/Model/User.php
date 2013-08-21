@@ -204,7 +204,7 @@ class CM_Model_User extends CM_Model_Abstract {
 		}
 	}
 
-	protected function _loadAssets() {
+	protected function _getAssets() {
 		return array(new CM_ModelAsset_User_Preferences($this), new CM_ModelAsset_User_Roles($this));
 	}
 
