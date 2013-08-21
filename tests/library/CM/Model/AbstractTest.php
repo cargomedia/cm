@@ -39,6 +39,22 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals('bar1', $modelMock->getFoo());
 	}
 
+	public function testContructWithData() {
+		$data = array('foo' => 12, 'bar' => 13);
+		$id = 55;
+		$type = 12;
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getType', 'getPersistence'))
+				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
+		$model->expects($this->never())->method('getCache');
+		$model->expects($this->never())->method('getPersistence');
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($id, $model->getId());
+		$this->assertSame($data, $model->_get());
+	}
+
 	public function testCache() {
 		$modelMock = CM_ModelMock::create(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());

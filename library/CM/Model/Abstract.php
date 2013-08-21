@@ -18,17 +18,20 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected $_schema;
 
 	/**
-	 * @param int $id
+	 * @param int        $id
+	 * @param array|null $data
 	 */
-	public function __construct($id) {
-		$this->_construct(array('id' => (int) $id));
+	public function __construct($id, array $data = null) {
+		$this->_construct(array('id' => (int) $id), $data);
 	}
 
 	/**
-	 * @param array $id
+	 * @param array      $id
+	 * @param array|null $data
 	 */
-	final protected function _construct(array $id) {
+	final protected function _construct(array $id, array $data = null) {
 		$this->_id = $id;
+		$this->_data = $data;
 		foreach ($this->_loadAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
