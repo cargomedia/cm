@@ -53,18 +53,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	public function create() {
-		if ($persistence = $this->getPersistence()) {
-			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
+		$persistence = $this->getPersistence();
+		if (!$persistence) {
+			throw new CM_Exception_Invalid('Cannot create model without persistence');
+		}
+		$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
 
-			if ($cache = $this->getCache()) {
-				$this->_loadAssets(true);
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
-			}
-		} else {
-			// @todo refactor?
-			$model = self::createStatic($this->_getSchemaData());
-			$this->_id = $model->getIdRaw();
-			$this->_data = $model->_get();
+		if ($cache = $this->getCache()) {
+			$this->_loadAssets(true);
+			$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 		}
 		$this->_onChange();
 		foreach ($this->_getContainingCacheables() as $cacheable) {

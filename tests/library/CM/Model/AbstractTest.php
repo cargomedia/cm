@@ -120,6 +120,21 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	/**
 	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot create model without persistence
+	 */
+	public function testCreateWithoutPersistence() {
+		$type = 12;
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', 'getPersistence'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->once())->method('getPersistence')->will($this->returnValue(null));
+		/** @var CM_Model_Abstract $model */
+
+		$model->create();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage Model has no id
 	 */
 	public function testGetIdWithoutId() {
