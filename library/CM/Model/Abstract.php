@@ -46,6 +46,33 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_get(); // Make sure data can be loaded
 	}
 
+	public function commit() {
+		$persistence = $this->getPersistence();
+		if (!$persistence) {
+			throw new CM_Exception_Invalid('Cannot create model without persistence');
+		}
+		if ($this->hasId())  {
+			$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+
+			if ($cache = $this->getCache()) {
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+			}
+			$this->_onChange();
+		} else {
+			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
+
+			if ($cache = $this->getCache()) {
+				$this->_loadAssets(true);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+			}
+			$this->_onChange();
+			foreach ($this->_getContainingCacheables() as $cacheable) {
+				$cacheable->_change();
+			}
+			$this->_onCreate();
+		}
+	}
+
 	final public function delete() {
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
@@ -257,21 +284,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	protected function _create() {
-		$persistence = $this->getPersistence();
-		if (!$persistence) {
-			throw new CM_Exception_Invalid('Cannot create model without persistence');
-		}
-		$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
-
-		if ($cache = $this->getCache()) {
-			$this->_loadAssets(true);
-			$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
-		}
-		$this->_onChange();
-		foreach ($this->_getContainingCacheables() as $cacheable) {
-			$cacheable->_change();
-		}
-		$this->_onCreate();
+		$this->commit();
 	}
 
 	/**

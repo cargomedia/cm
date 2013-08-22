@@ -88,6 +88,54 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(12, $model->_get('foo'));
 	}
 
+	public function testCommit() {
+		$schema = array('foo' => array());
+		$idRaw = array('id' => 909);
+		$type = 12;
+		$data = array('foo' => 12);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($idRaw));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', 'getPersistence'))
+				->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame(array(), $model->_get());
+		$this->assertFalse($model->hasId());
+		$model->_set($data);
+		$model->commit();
+
+		$this->assertSame($idRaw, $model->getIdRaw());
+	}
+
+	public function testCommitWithId() {
+		$schema = array('foo' => array());
+		$id = 123;
+		$idRaw = array('id' => $id);
+		$data = array('foo' => 12);
+		$type = 12;
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('save')->with($type, $idRaw, $data);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', 'getPersistence'))
+				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame($data, $model->_get());
+		$this->assertSame($id, $model->getId());
+		$model->commit();
+	}
+
 	public function testCreate() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
