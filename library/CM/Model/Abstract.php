@@ -392,6 +392,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string $key
 	 * @param mixed  $value
+	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
 	 */
 	protected function _validateField($key, $value) {
@@ -405,12 +406,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 		if (null !== $value) {
 			$type = isset($schemaField['type']) ? $schemaField['type'] : null;
-			switch ($type) {
-				case 'int':
-					if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
-						throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
-					}
-					break;
+			if (null !== $type) {
+				switch ($type) {
+					case 'int':
+						if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
+							throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
+						}
+						break;
+					default:
+						throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+				}
 			}
 		}
 	}

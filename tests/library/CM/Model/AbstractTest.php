@@ -638,7 +638,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			array(
 				'value'    => null,
 				'schema'   => array(),
-				'expected' => false,
+				'expected' => 'CM_Model_Exception_Validation',
 			),
 
 			// optional
@@ -662,12 +662,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			array(
 				'value'    => 12.01,
 				'schema'   => array('type' => 'int'),
-				'expected' => false,
+				'expected' => 'CM_Model_Exception_Validation',
 			),
 			array(
 				'value'    => '12abc',
 				'schema'   => array('type' => 'int'),
-				'expected' => false,
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
+			// type invalid
+			array(
+				'value'    => -12,
+				'schema'   => array('type' => 'invalid987628436'),
+				'expected' => 'CM_Exception_Invalid',
 			),
 		);
 		foreach ($testDataList as $testData) {
@@ -678,8 +685,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			try {
 				$modelMock->_set(array('foo' => $testData['value']));
 				$actual = true;
-			} catch (CM_Model_Exception_Validation $e) {
-				$actual = false;
+			} catch (Exception $e) {
+				$actual = get_class($e);
 			}
 			$this->assertSame($testData['expected'], $actual, 'Validation failure (' . CM_Util::var_line($testData) . ')');
 		}
