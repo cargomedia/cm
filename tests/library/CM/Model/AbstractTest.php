@@ -634,6 +634,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				'value'    => 12,
 				'schema'   => array(),
 				'expected' => true,
+				'returnValue' => 12,
 			),
 			array(
 				'value'    => null,
@@ -646,6 +647,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				'value'    => null,
 				'schema'   => array('optional' => true),
 				'expected' => true,
+				'returnValue' => null,
 			),
 
 			// type int
@@ -653,11 +655,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				'value'    => -12,
 				'schema'   => array('type' => 'int'),
 				'expected' => true,
+				'returnValue' => -12,
 			),
 			array(
 				'value'    => '-12',
 				'schema'   => array('type' => 'int'),
 				'expected' => true,
+				'returnValue' => -12,
 			),
 			array(
 				'value'    => 12.01,
@@ -682,13 +686,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue(array('foo' => $testData['schema'])));
 			/** @var CM_Model_Abstract $modelMock */
 
+			$methodValidate = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_validateField');
 			try {
-				$modelMock->_set(array('foo' => $testData['value']));
-				$actual = true;
-			} catch (Exception $e) {
-				$actual = get_class($e);
+				$value = $methodValidate->invoke($modelMock, 'foo', $testData['value']);
+				$this->assertSame($testData['expected'], true, 'Validation failure (' . CM_Util::var_line($testData) . ')');
+				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
+			} catch (CM_Exception $e) {
+				$this->assertSame($testData['expected'], get_class($e), 'Validation failure (' . CM_Util::var_line($testData) . ')');
 			}
-			$this->assertSame($testData['expected'], $actual, 'Validation failure (' . CM_Util::var_line($testData) . ')');
 		}
 	}
 }

@@ -392,6 +392,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string $key
 	 * @param mixed  $value
+	 * @return mixed
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
 	 */
@@ -412,12 +413,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 						if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
 							throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
 						}
+						$value = (int) $value;
 						break;
 					default:
 						throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
 				}
 			}
 		}
+
+		return $value;
 	}
 
 	/**
