@@ -527,6 +527,17 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->_set(array('foo' => 12, 'bar' => 23));
 	}
 
+	public function testSetValidateCast() {
+		$schema = array('foo' => array('type' => 'int'));
+
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->getMockForAbstractClass();
+		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_set(array('foo' => '12', 'bar' => 23));
+		$this->assertSame(12, $modelMock->_get('foo'));
+	}
+
 	public function testDelete() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -631,9 +642,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$testDataList = array(
 			// nothing
 			array(
-				'value'    => 12,
-				'schema'   => array(),
-				'expected' => true,
+				'value'       => 12,
+				'schema'      => array(),
+				'expected'    => true,
 				'returnValue' => 12,
 			),
 			array(
@@ -644,23 +655,23 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 			// optional
 			array(
-				'value'    => null,
-				'schema'   => array('optional' => true),
-				'expected' => true,
+				'value'       => null,
+				'schema'      => array('optional' => true),
+				'expected'    => true,
 				'returnValue' => null,
 			),
 
 			// type int
 			array(
-				'value'    => -12,
-				'schema'   => array('type' => 'int'),
-				'expected' => true,
+				'value'       => -12,
+				'schema'      => array('type' => 'int'),
+				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(
-				'value'    => '-12',
-				'schema'   => array('type' => 'int'),
-				'expected' => true,
+				'value'       => '-12',
+				'schema'      => array('type' => 'int'),
+				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(

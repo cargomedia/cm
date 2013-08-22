@@ -241,9 +241,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
-		foreach ($data as $key => $value) {
+		foreach ($data as $key => &$value) {
 			if ($this->_isSchemaField($key)) {
-				$this->_validateField($key, $value);
+				$value = $this->_validateField($key, $value);
 			}
 		}
 
