@@ -398,7 +398,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$schemaField = $schema[$key];
 		$optional = !empty($schemaField['optional']);
 		if (!$optional && null === $value) {
-			throw new CM_Model_Exception_Validation();
+			throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
 		}
 	}
 
