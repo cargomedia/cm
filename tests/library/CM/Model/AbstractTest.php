@@ -629,6 +629,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testValidateField() {
 		$testDataList = array(
+			// nothing
 			array(
 				'value'    => 12,
 				'schema'   => array(),
@@ -639,11 +640,15 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				'schema'   => array(),
 				'expected' => false,
 			),
+
+			// optional
 			array(
 				'value'    => null,
 				'schema'   => array('optional' => true),
 				'expected' => true,
 			),
+
+			// type int
 			array(
 				'value'    => -12,
 				'schema'   => array('type' => 'int'),
