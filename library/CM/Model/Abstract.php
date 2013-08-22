@@ -397,9 +397,21 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected function _validateField($key, $value) {
 		$schema = $this->_getSchema();
 		$schemaField = $schema[$key];
+
 		$optional = !empty($schemaField['optional']);
 		if (!$optional && null === $value) {
 			throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
+		}
+
+		if (null !== $value) {
+			$type = isset($schemaField['type']) ? $schemaField['type'] : null;
+			switch ($type) {
+				case 'int':
+					if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
+						throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
+					}
+					break;
+			}
 		}
 	}
 
