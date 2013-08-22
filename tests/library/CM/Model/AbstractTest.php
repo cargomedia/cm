@@ -519,11 +519,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetValidate() {
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateField'))->getMockForAbstractClass();
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateField', '_getSchema'))->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateField')->with('foo', 12);
+		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue(array('foo' => array())));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$modelMock->_set('foo', 12);
+		$modelMock->_set(array('foo' => 12, 'bar' => 23));
 	}
 
 	public function testDelete() {
