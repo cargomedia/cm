@@ -392,6 +392,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string $key
 	 * @param mixed  $value
+	 * @throws CM_Model_Exception_Validation
 	 */
 	protected function _validateField($key, $value) {
 		$schema = $this->_getSchema();
