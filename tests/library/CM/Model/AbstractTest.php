@@ -94,7 +94,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$type = 12;
 		$data = array('foo' => 12);
 
-		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create', 'save'))->getMockForAbstractClass();
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create',
+			'save'))->getMockForAbstractClass();
 		$persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($idRaw));
 		$persistence->expects($this->once())->method('save')->with($type, $idRaw, $data);
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
@@ -217,6 +218,35 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $model */
 
 		$methodCreate->invoke($model);
+	}
+
+	public function testCreateMultiple() {
+		$data = array('foo' => 11, 'bar' => 'foo');
+		$type = 12;
+		$idRaw1 = array('id' => 1);
+		$idRaw2 = array('id' => 2);
+		$schema = array('foo' => array(), 'bar' => array());
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+		$persistence->expects($this->exactly(2))->method('create')->with($type, $data)->will($this->onConsecutiveCalls($idRaw1, $idRaw2));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')
+				->setMethods(array('getType', 'getPersistence', 'getCache', '_getSchema', '_onChange', '_onCreate'))
+				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
+		$methodCreate = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_create');
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->exactly(2))->method('_onChange');
+		$model->expects($this->exactly(2))->method('_onCreate');
+		/** @var CM_Model_Abstract $model */
+
+		$methodCreate->invoke($model);
+		$this->assertSame($idRaw1, $model->getIdRaw());
+
+		$methodCreate->invoke($model);
+		$this->assertSame($idRaw2, $model->getIdRaw());
 	}
 
 	/**

@@ -51,7 +51,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (!$persistence) {
 			throw new CM_Exception_Invalid('Cannot create model without persistence');
 		}
-		if ($this->hasId())  {
+		if ($this->hasId()) {
 			$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 
 			if ($cache = $this->getCache()) {
@@ -285,6 +285,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	protected function _create() {
+		$this->_id = null;
 		$this->commit();
 	}
 
