@@ -85,6 +85,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(array(), $model->_get());
 		$this->assertFalse($model->hasId());
 		$model->_set('foo', 12);
+		$this->assertSame(12, $model->_get('foo'));
 	}
 
 	public function testCreate() {
