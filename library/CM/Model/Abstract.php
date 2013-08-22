@@ -241,10 +241,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
-		foreach ($data as $key => &$value) {
-			if ($this->_isSchemaField($key)) {
-				$value = $this->_validateField($key, $value);
-			}
+		foreach ($data as $key => $value) {
+			$data[$key] = $this->_validateField($key, $value);
 		}
 
 		foreach ($data as $field => $value) {
@@ -397,26 +395,29 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Model_Exception_Validation
 	 */
 	protected function _validateField($key, $value) {
-		$schema = $this->_getSchema();
-		$schemaField = $schema[$key];
+		if ($this->_isSchemaField($key)) {
+			$schema = $this->_getSchema();
+			$schemaField = $schema[$key];
 
-		$optional = !empty($schemaField['optional']);
-		if (!$optional && null === $value) {
-			throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
-		}
+			$optional = !empty($schemaField['optional']);
 
-		if (null !== $value) {
-			$type = isset($schemaField['type']) ? $schemaField['type'] : null;
-			if (null !== $type) {
-				switch ($type) {
-					case 'int':
-						if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
-							throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
-						}
-						$value = (int) $value;
-						break;
-					default:
-						throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+			if (!$optional && null === $value) {
+				throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
+			}
+
+			if (null !== $value) {
+				$type = isset($schemaField['type']) ? $schemaField['type'] : null;
+				if (null !== $type) {
+					switch ($type) {
+						case 'int':
+							if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
+							}
+							$value = (int) $value;
+							break;
+						default:
+							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
+					}
 				}
 			}
 		}

@@ -520,7 +520,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testSetValidate() {
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateField', '_getSchema'))->getMockForAbstractClass();
-		$modelMock->expects($this->once())->method('_validateField')->with('foo', 12);
+		$modelMock->expects($this->at(0))->method('_validateField')->with('foo', 12);
+		$modelMock->expects($this->at(1))->method('_validateField')->with('bar', 23);
 		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue(array('foo' => array())));
 		/** @var CM_Model_Abstract $modelMock */
 
