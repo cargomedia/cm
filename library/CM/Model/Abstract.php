@@ -35,7 +35,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	final protected function _construct(array $id = null, array $data = null) {
 		if (null === $id && null === $data) {
-			throw new CM_Exception_Invalid('Either data or id required');
+			$data = array();
+			$this->_autoCommit = false;
 		}
 		$this->_id = $id;
 		$this->_data = $data;

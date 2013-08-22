@@ -67,12 +67,24 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($data, $model->_get());
 	}
 
-	/**
-	 * @expectedException CM_Exception_Invalid
-	 * @expectedExceptionMessage Either data or id required
-	 */
 	public function testConstructorWithoutIdWithoutData() {
-		$this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+		$schema = array('foo' => array());
+		$type = 12;
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$persistence->expects($this->never())->method('save');
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', 'getPersistence'))
+				->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		/** @var CM_Model_Abstract $model */
+
+		$this->assertSame(array(), $model->_get());
+		$this->assertFalse($model->hasId());
+		$model->_set('foo', 12);
 	}
 
 	public function testCreate() {
