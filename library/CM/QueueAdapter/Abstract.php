@@ -17,14 +17,14 @@ abstract class CM_QueueAdapter_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return string
+	 * @return string|null
 	 */
 	abstract public function pop($key);
 
 	/**
 	 * @param string $key
 	 * @param int $timestampMax
-	 * @return string
+	 * @return String[]
 	 */
 	abstract public function popDelayed($key, $timestampMax);
 }
