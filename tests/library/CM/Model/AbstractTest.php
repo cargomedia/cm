@@ -518,6 +518,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame('bar2', $modelMock->_get('bar'));
 	}
 
+	public function testSetValidate() {
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateField'))->getMockForAbstractClass();
+		$modelMock->expects($this->once())->method('_validateField')->with('foo', 12);
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_set('foo', 12);
+	}
+
 	public function testDelete() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());

@@ -241,6 +241,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
+		foreach ($data as $key => $value) {
+			$this->_validateField($key, $value);
+		}
+
 		foreach ($data as $field => $value) {
 			$this->_data[$field] = $value;
 		}
@@ -381,6 +385,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			throw new CM_Exception_Invalid('Model has no data');
 		}
 		return array_intersect_key($this->_data, $this->_getSchema());
+	}
+
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	protected function _validateField($key, $value) {
 	}
 
 	/**
