@@ -53,7 +53,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		throw new CM_Exception_NotImplemented();
 	}
 
-	public function create() {
+	protected function _create() {
 		$persistence = $this->getPersistence();
 		if (!$persistence) {
 			throw new CM_Exception_Invalid('Cannot create model without persistence');
