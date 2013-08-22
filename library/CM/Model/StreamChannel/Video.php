@@ -130,7 +130,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return self::findByKeyAndAdapter($key, $adapterType);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$key = (string) $data['key'];
 		$width = (int) $data['width'];
 		$height = (int) $data['height'];

@@ -376,7 +376,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if ($data === null) {
 			$data = array();
 		}
-		$model = static::_create($data);
+		$model = static::_createStatic($data);
 		$model->_onChange();
 		foreach ($model->_getContainingCacheables() as $cacheable) {
 			$cacheable->_change();
@@ -424,7 +424,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_NotImplemented
 	 */
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		throw new CM_Exception_NotImplemented();
 	}
 

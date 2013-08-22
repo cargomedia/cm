@@ -553,7 +553,7 @@ class CM_ModelMock extends CM_Model_Abstract {
 		return array(new CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock($this));
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		return new self(CM_Db_Db::insert('modelMock', array('foo' => $data['foo'])));
 	}
 }
@@ -599,7 +599,7 @@ class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 		CM_Db_Db::delete('modelThasIsAnAssetMock', array('id' => $this->getId()));
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		return new self(CM_Db_Db::insert('modelThasIsAnAssetMock', array('modelMockId' => $data['modelMockId'], 'bar' => $data['bar'])));
 	}
 }

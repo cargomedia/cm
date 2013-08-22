@@ -43,7 +43,7 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		return new static($id);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$userId = null;
 		if (isset($data['user'])) {
 			/** @var CM_Model_User $user */

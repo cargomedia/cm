@@ -43,7 +43,7 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		return new static($id);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		/** @var CM_Model_User $user */
 		$user = $data['user'];
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */

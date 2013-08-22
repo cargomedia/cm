@@ -111,7 +111,7 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 	protected function _onLoad() {
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		return new self(CM_Db_Db::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
 	}
 }

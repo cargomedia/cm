@@ -259,7 +259,7 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param array $data
 	 * @return CM_Model_User
 	 */
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$siteType = null;
 		if (isset($data['site'])) {
 			/** @var CM_Site_Abstract $site */
