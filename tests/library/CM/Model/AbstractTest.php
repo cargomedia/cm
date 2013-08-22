@@ -626,6 +626,34 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertFalse($method->invoke($model, 'xxxxx'));
 		$this->assertFalse($method->invoke($model, array('xxxx', 'yyyyy')));
 	}
+
+	public function testValidateField() {
+		$testDataList = array(
+			array(
+				'value'    => 12,
+				'schema'   => array(),
+				'expected' => true,
+			),
+			array(
+				'value'    => null,
+				'schema'   => array(),
+				'expected' => false,
+			),
+		);
+		foreach ($testDataList as $testData) {
+			$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->getMockForAbstractClass();
+			$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue(array('foo' => $testData['schema'])));
+			/** @var CM_Model_Abstract $modelMock */
+
+			try {
+				$modelMock->_set(array('foo' => $testData['value']));
+				$actual = true;
+			} catch (CM_Model_Exception_Validation $e) {
+				$actual = false;
+			}
+			$this->assertSame($testData['expected'], $actual, 'Validation failure (' . CM_Util::var_line($testData) . ')');
+		}
+	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {
