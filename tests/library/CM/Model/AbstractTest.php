@@ -94,8 +94,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$type = 12;
 		$data = array('foo' => 12);
 
-		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create', 'save'))->getMockForAbstractClass();
 		$persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($idRaw));
+		$persistence->expects($this->once())->method('save')->with($type, $idRaw, $data);
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', 'getPersistence'))
@@ -111,6 +112,28 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->commit();
 
 		$this->assertSame($idRaw, $model->getIdRaw());
+		$model->_set($data);
+	}
+
+	public function testCommitMultipleSaves() {
+		$schema = array('foo' => array());
+		$idRaw = array('id' => 909);
+		$type = 12;
+		$data = array('foo' => 12);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$persistence->expects($this->exactly(2))->method('save')->with($type, $idRaw, $data);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', 'getPersistence'))
+				->setConstructorArgs(array($idRaw['id'], $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		/** @var CM_Model_Abstract $model */
+
+		$model->commit();
+		$model->commit();
 	}
 
 	public function testCommitWithId() {

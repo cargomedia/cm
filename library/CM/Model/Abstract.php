@@ -71,6 +71,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 			$this->_onCreate();
 		}
+		$this->_autoCommit = true;
 	}
 
 	final public function delete() {
