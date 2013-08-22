@@ -639,6 +639,11 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				'schema'   => array(),
 				'expected' => false,
 			),
+			array(
+				'value'    => null,
+				'schema'   => array('optional' => true),
+				'expected' => true,
+			),
 		);
 		foreach ($testDataList as $testData) {
 			$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->getMockForAbstractClass();
