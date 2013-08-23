@@ -10,17 +10,17 @@
 				return;
 			}
 
-			var $tabs = $buttonsContainer.find('> *');
-			var $buttons = $buttonsContainer.find('a');
-			var $contents = $contentContainer.find('> *');
-			$buttons.click(function(event) {
+			$buttonsContainer.on('click', 'a', function(event) {
 				var $activeTab = $(this).closest('.tabs > *');
+				var $contents = $contentContainer.find('> *');
 				var index = $activeTab.index();
 				$activeTab.addClass('active').siblings().removeClass('active');
 				var $activeTabContent = $contents.eq(index);
 				$activeTabContent.addClass('active').show();
 				$activeTabContent.siblings().removeClass('active').hide();
 			});
+
+			var $tabs = $buttonsContainer.find('> *');
 			var $activeTab = $tabs.filter('.active');
 			if (!$activeTab.length) {
 				$activeTab = $tabs.first();
