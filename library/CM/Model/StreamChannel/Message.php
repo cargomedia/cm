@@ -40,12 +40,12 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @param string     $streamChannel
-	 * @param string     $namespace
+	 * @param string     $event
 	 * @param mixed|null $data
 	 */
-	public static function publish($streamChannel, $namespace, $data = null) {
+	public static function publish($streamChannel, $event, $data = null) {
 		$streamChannel = $streamChannel . ':' . static::TYPE;
-		CM_Stream_Message::getInstance()->publish($streamChannel, array('namespace' => $namespace, 'data' => $data));
+		CM_Stream_Message::getInstance()->publish($streamChannel, $event, $data);
 	}
 
 	/**
