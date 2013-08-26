@@ -793,8 +793,9 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
+		 * @param {Boolean} [allowClientMessage]
 		 */
-		bind: function(channelKey, channelType, namespace, callback, context) {
+		bind: function(channelKey, channelType, namespace, callback, context, allowClientMessage) {
 			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
@@ -805,7 +806,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
 			}
-			this._channelDispatchers[channel].on(namespace, callback, context);
+			this._channelDispatchers[channel].on(this._getEventNames(namespace, allowClientMessage), callback, context);
 		},
 
 		/**
@@ -823,10 +824,33 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!channelKey || !channelType) {
 				cm.error.triggerThrow('No channel provided');
 			}
-			this._channelDispatchers[channel].off(namespace, callback, context);
+			this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
+		},
+
+		/**
+		 * @param {String} channelKey
+		 * @param {Number} channelType
+		 * @param {String} event
+		 * @param {Object} data
+		 */
+		publish: function(channelKey, channelType, event, data) {
+			var channel = channelKey + ':' + channelType;
+			this._getAdapter().publish(channel, event, data);
+		},
+
+		/**
+		 * @param {String} namespace
+		 * @param {Boolean} [allowClientMessage]
+		 */
+		_getEventNames: function(namespace, allowClientMessage) {
+			var eventName = namespace;
+			if (allowClientMessage) {
+				eventName += ' client-' + namespace;
+			}
+			return eventName;
 		},
 
 		/**
