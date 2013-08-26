@@ -3,12 +3,12 @@
 class CM_FormField_SetTest extends CMTest_TestCase {
 
 	public function testConstructor() {
-		$field = new CM_FormField_Set('foo');
+		$field = new CM_FormField_Set();
 		$this->assertInstanceOf('CM_FormField_Set', $field);
 	}
 
 	public function testSetGetValue() {
-		$field = new CM_FormField_Set('foo');
+		$field = new CM_FormField_Set();
 
 		$values = array(32 => 'apples');
 		$field->setValue($values);
@@ -21,7 +21,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 
 	public function testValidate() {
 		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
-		$field = new CM_FormField_Set('foo', $data, true);
+		$field = new CM_FormField_Set($data, true);
 
 		$userInputGood = array(32, 64, 128);
 		$response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
@@ -37,16 +37,13 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 		$name = 'foo';
 		$data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
 		$form = $this->getMockForm();
-		$field = new CM_FormField_Set($name, $data, true);
+		$field = new CM_FormField_Set($data, true);
 		$values = array(64, 128);
 		$field->setValue($values);
-		$cssWidth = '50%';
-		$field->setColumnSize($cssWidth);
-		$doc = $this->_renderFormField($form, $field);
+		$doc = $this->_renderFormField($form, $field, $name);
 		$this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
-		$this->assertSame($cssWidth, preg_replace('/(^width: |;$)/', '', $doc->getAttr('li', 'style')));
 		foreach ($data as $value => $label) {
 			$this->assertTrue($doc->exists('li.' . $name . '_value_' . $value));
 			$spanQuery = 'label[class="' . $name . '_label_' . $value . '"]';

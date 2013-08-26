@@ -27,6 +27,5 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
 
 		$this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
 		$this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
-		$this->setTplParam('colSize', !empty($params['colSize']) ? $params['colSize'] : '');
 	}
 }

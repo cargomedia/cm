@@ -33,13 +33,15 @@
 				$this.removeAttr('title').tooltip('disable').mouseleave();
 				clearTimeout($this.data('timeoutId'));
 				$(document).off('click.clickConfirmed');
-			}
+			};
 
 			if ($this.hasClass('confirmClick')) {
 				deactivateButton();
 				return event.handleObj.handler.call(this, event);
 			}
 			activateButton();
+
+			return false;
 		}
 	};
 })(jQuery);

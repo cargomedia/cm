@@ -20,7 +20,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	public function getMockForm() {
 		$formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
 		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
-		$formMock->frontend_data['auto_id'] = 'formId';
 		return $formMock;
 	}
 
@@ -172,18 +171,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
+	 * @param string                $fieldName
 	 * @param array|null            $params
 	 * @param CM_Model_User|null    $viewer
 	 * @param CM_Site_Abstract|null $site
 	 * @return CMTest_TH_Html
 	 */
-	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, $fieldName, array $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
 		if (null === $params) {
 			$params = array();
 		}
 		$formField->prepare($params);
 		$render = new CM_Render($site, $viewer);
-		$html = $render->render($formField, array('form' => $form));
+		$html = $render->render($formField, array('form' => $form, 'fieldName' => $fieldName));
 		return new CMTest_TH_Html($html);
 	}
 

@@ -35,12 +35,13 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		// Create model class types and action verbs config JS
 		$path = DIR_ROOT . 'resources/config/js/internal.js';
 		$modelTypesConfig = 'cm.model.types = ' . CM_Params::encode(CM_App::getInstance()->getClassTypes('CM_Model_Abstract'), true) . ';';
+		$actionTypesConfig = 'cm.action.types = ' . CM_Params::encode(CM_App::getInstance()->getClassTypes('CM_Action_Abstract'), true) . ';';
 		$actionVerbs = array();
 		foreach (CM_App::getInstance()->getActionVerbs() as $verb) {
 			$actionVerbs[$verb['name']] = $verb['value'];
 		}
 		$actionVerbsConfig = 'cm.action.verbs = ' . CM_Params::encode($actionVerbs, true) . ';';
-		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionVerbsConfig . PHP_EOL);
+		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionTypesConfig . PHP_EOL . $actionVerbsConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
 

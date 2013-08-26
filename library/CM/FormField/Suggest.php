@@ -3,12 +3,10 @@
 abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
 	/**
-	 * @param string    $name
 	 * @param int|null  $cardinality
 	 * @param bool|null $enableChoiceCreate
 	 */
-	public function __construct($name, $cardinality = null, $enableChoiceCreate = null) {
-		parent::__construct($name);
+	public function __construct($cardinality = null, $enableChoiceCreate = null) {
 		$this->_options['cardinality'] = isset($cardinality) ? ((int) $cardinality) : null;
 		$this->_options['enableChoiceCreate'] = isset($enableChoiceCreate) ? ((bool) $enableChoiceCreate) : false;
 	}

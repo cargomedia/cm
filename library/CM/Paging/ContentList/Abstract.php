@@ -33,6 +33,11 @@ abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 		$this->_change();
 	}
 
+	public function removeAll() {
+		CM_Db_Db::delete('cm_string', array('type' => $this->_type));
+		$this->_change();
+	}
+
 	/**
 	 * @param string $string
 	 * @param string $pattern OPTIONAL
