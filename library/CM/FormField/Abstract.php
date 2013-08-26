@@ -83,12 +83,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 		return $this->_tplParams;
 	}
 
-	/**
-	 * @param string $className
-	 * @return CM_FormField_Abstract
-	 * @throws CM_Exception
-	 */
-	public static function factory($className) {
+	public static function factory($className, $params = null, CM_Model_User $viewer = null) {
 		$className = (string) $className;
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
 			throw new CM_Exception_Invalid('Illegal field name `' . $className . '`.');
