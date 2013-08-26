@@ -28,13 +28,14 @@ class CM_Stream_Message extends CM_Stream_Abstract {
 
 	/**
 	 * @param string     $channel
+	 * @param string     $event
 	 * @param mixed|null $data
 	 */
-	public function publish($channel, $data = null) {
+	public function publish($channel, $event, $data = null) {
 		if (!$this->getEnabled()) {
 			return;
 		}
-		$this->getAdapter()->publish($channel, CM_Params::encode($data));
+		$this->getAdapter()->publish($channel, $event, CM_Params::encode($data));
 	}
 
 	/**

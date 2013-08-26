@@ -856,10 +856,10 @@ var CM_App = CM_Class_Abstract.extend({
 		_subscribe: function(channel) {
 			var handler = this;
 			this._channelDispatchers[channel] = _.clone(Backbone.Events);
-			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
+			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
 				if (handler._channelDispatchers[channel]) {
-					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
-					cm.debug.log('Stream channel (' + channel + '): message: ', message);
+					handler._channelDispatchers[channel].trigger(event, data);
+					cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
 				}
 			});
 			cm.debug.log('Stream channel (' + channel + '): subscribe');
