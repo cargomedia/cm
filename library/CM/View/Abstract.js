@@ -318,9 +318,10 @@ var CM_View_Abstract = Backbone.View.extend({
 	 * @param {Number} channelType
 	 * @param {String} event
 	 * @param {Function} callback fn(array data)
+	 * @param {Boolean} [allowClientMessage]
 	 */
-	bindStream: function(channelKey, channelType, event, callback) {
-		cm.stream.bind(channelKey, channelType, event, callback, this);
+	bindStream: function(channelKey, channelType, event, callback, allowClientMessage) {
+		cm.stream.bind(channelKey, channelType, event, callback, this, allowClientMessage);
 		this.on('destruct', function() {
 			cm.stream.unbind(channelKey, channelType, event, callback, this);
 		}, this);
