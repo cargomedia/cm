@@ -51,8 +51,9 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 					}
 					layout._$pagePlaceholder.replaceWith(this.$el);
 					layout._$pagePlaceholder = null;
-					window.history.replaceState(null, null, fragment);
+					cm.router.replaceState(null, null, fragment);
 					layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
+					cm.router.restoreScrollPosition();
 				});
 			},
 			error: function(msg, type, isPublic) {

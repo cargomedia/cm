@@ -1021,11 +1021,22 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
+
+		states: {},
+
+		currentIndex: 0,
+
 		ready: function() {
 			var router = this;
 			var skipInitialFire = false;
 
 			$(window).on('popstate', function(event) {
+				console.log("popstate");
+				cm.router.saveScrollPosition();
+				var state = event.originalEvent.state;
+				console.log(state);
+				var previousIndex = router.currentIndex;
+				router.currentIndex = state['index'];
 				if (skipInitialFire) {
 					skipInitialFire = false;
 					return;
@@ -1037,6 +1048,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 			var hash = window.location.hash.substr(1);
 			var path = window.location.pathname + window.location.search;
+			window.history.replaceState({index: 0});
 			if (!Modernizr.history) {
 				if (hash) {
 					if (hash == path) {
@@ -1077,11 +1089,14 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
+			console.log(window.history.state);
 			if (replaceState) {
 				this.replaceState(fragment);
 			} else {
+				this.saveScrollPosition();
 				this.pushState(fragment);
 			}
+			console.log(window.history.state);
 			cm.getLayout().loadPage(fragment);
 		},
 
@@ -1089,14 +1104,33 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String|Null} [url] Absolute or relative URL
 		 */
 		pushState: function(url) {
-			window.history.pushState(null, null, url);
+			console.log('index: ' + this.currentIndex + ' Pushing');
+			window.history.pushState({index: ++this.currentIndex}, null, url);
+
 		},
 
 		/**
 		 * @param {String|Null} [url] Absolute or relative URL
 		 */
 		replaceState: function(url) {
-			window.history.replaceState(null, null, url);
+			window.history.replaceState({index: this.currentIndex}, null, url);
+		},
+
+		restoreScrollPosition: function() {
+			var position;
+			var state;
+			if ((state = this.states[this.currentIndex]) && (position = state['position'])) {
+				console.log('index: ' + this.currentIndex + ' Restore position: ' + position );
+				$(window).scrollTop(position);
+			} else {
+				console.log('No position');
+			}
+		},
+
+		saveScrollPosition: function() {
+			var position = $(window).scrollTop();
+			console.log('index: ' + this.currentIndex + ' Save position: ' + position);
+			this.states[this.currentIndex] = {position: position};
 		}
 	}
 });
