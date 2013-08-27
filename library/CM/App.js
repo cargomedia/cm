@@ -1033,7 +1033,6 @@ var CM_App = CM_Class_Abstract.extend({
 			$(window).on('popstate', function(event) {
 				cm.router.saveScrollPosition();
 				var state = event.originalEvent.state;
-				var previousIndex = router.currentIndex;
 				router.currentIndex = state['index'];
 				if (skipInitialFire) {
 					skipInitialFire = false;
