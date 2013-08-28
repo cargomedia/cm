@@ -1029,6 +1029,7 @@ var CM_App = CM_Class_Abstract.extend({
 		ready: function() {
 			var router = this;
 			var skipInitialFire = false;
+			var state = window.history.state;
 
 			$(window).on('popstate', function(event) {
 				cm.router.saveScrollPosition();
@@ -1045,7 +1046,10 @@ var CM_App = CM_Class_Abstract.extend({
 
 			var hash = window.location.hash.substr(1);
 			var path = window.location.pathname + window.location.search;
-			window.history.replaceState({index: 0});
+			if (state && state['index']) {
+				router.currentIndex = state['index'];
+			}
+			window.history.replaceState({index: router.currentIndex});
 			if (!Modernizr.history) {
 				if (hash) {
 					if (hash == path) {
