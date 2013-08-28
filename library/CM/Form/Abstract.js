@@ -147,6 +147,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		}
 		var data = this.getData(actionName);
 
+		this.resetErrors();
+
 		var hasErrors = false;
 		_.each(_.keys(action.fields).reverse(), function(fieldName) {
 			var required = action.fields[fieldName];
