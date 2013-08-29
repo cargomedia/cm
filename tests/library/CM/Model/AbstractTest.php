@@ -629,6 +629,47 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($dataValidated, $modelMock->_get());
 	}
 
+	public function testSetPersistenceSave() {
+		$type = 1;
+		$idRaw = array('id' => 11);
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
+		$data = array('foo' => 12, 'bar' => 23);
+		$dataSchema = array('foo' => 12);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('save')->with($type, $idRaw, $dataSchema);
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getPersistence', 'getType', '_getSchema'))
+				->setConstructorArgs(array($idRaw['id'], $data))->getMockForAbstractClass();
+		$modelMock->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_set($data);
+	}
+
+	public function testSetPersistenceSaveNonschemaData() {
+		$type = 1;
+		$idRaw = array('id' => 11);
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
+		$data = array('bar' => 23);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
+		$persistence->expects($this->never())->method('save');
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getPersistence', 'getType', '_getSchema'))
+				->setConstructorArgs(array($idRaw['id'], $data))->getMockForAbstractClass();
+		$modelMock->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
+		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_set($data);
+	}
+
 	public function testSetOnChange() {
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getPersistence', '_onChange'))
 				->setConstructorArgs(array(1, array('foo' => 'bar')))->getMockForAbstractClass();

@@ -249,7 +249,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 			if ($persistence = $this->getPersistence()) {
-				$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+				if (!$schema = $this->_getSchema()) {
+					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
+				}
+				if ($schema->hasField(array_keys($data))) {
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+				}
 			}
 			$this->_onChange();
 		}
