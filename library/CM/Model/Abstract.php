@@ -233,9 +233,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param string|array $data
 	 * @param mixed|null   $value
+	 * @throws CM_Exception_Invalid
 	 */
 	final public function _set($data, $value = null) {
-		if (null !== $value) {
+		if (!is_array($data)) {
 			$data = array($data => $value);
 		}
 		$this->_get(); // Make sure data is loaded
