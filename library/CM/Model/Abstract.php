@@ -257,8 +257,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				if ($persistence = $this->getPersistence()) {
 					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 				}
-				$this->_onChange();
 			}
+			$this->_onChange();
 		}
 	}
 

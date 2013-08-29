@@ -539,6 +539,18 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(12, $modelMock->_get('foo'));
 	}
 
+	public function testSetOnChange() {
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getPersistence', '_isSchemaField', '_onChange'))
+				->setConstructorArgs(array(1, array('foo' => 'bar')))->getMockForAbstractClass();
+		$modelMock->expects($this->any())->method('getCache')->will($this->returnValue(null));
+		$modelMock->expects($this->any())->method('getPersistence')->will($this->returnValue(null));
+		$modelMock->expects($this->any())->method('_isSchemaField')->will($this->returnValue(true));
+		$modelMock->expects($this->once())->method('_onChange');
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_set(array('foo' => 12));
+	}
+
 	public function testDelete() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
