@@ -46,7 +46,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	public function commit() {
-		$persistence = $this->getPersistence();
+		$persistence = $this->_getPersistence();
 		if (!$persistence) {
 			throw new CM_Exception_Invalid('Cannot create model without persistence');
 		}
@@ -80,7 +80,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$containingCacheables = $this->_getContainingCacheables();
 		$this->_onBeforeDelete();
 		$this->_onDelete();
-		if ($persistence = $this->getPersistence()) {
+		if ($persistence = $this->_getPersistence()) {
 			$persistence->delete($this->getType(), $this->getIdRaw());
 		}
 		if ($cache = $this->getCache()) {
@@ -148,7 +148,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 */
-	public function getPersistence() {
+	protected function _getPersistence() {
 		return self::_getStorageAdapter(static::getPersistenceClass());
 	}
 
@@ -192,7 +192,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				}
 			}
 			if (null === $this->_data) {
-				if ($persistence = $this->getPersistence()) {
+				if ($persistence = $this->_getPersistence()) {
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
 						$this->_data = $this->_validateFields($data);
 					}
@@ -249,7 +249,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if ($cache = $this->getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
-			if ($persistence = $this->getPersistence()) {
+			if ($persistence = $this->_getPersistence()) {
 				if (!$schema = $this->_getSchema()) {
 					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
 				}
