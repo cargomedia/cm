@@ -19,8 +19,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		return array('sockjsUrl' => $sockjsUrl);
 	}
 
-	public function publish($channel, $data) {
-		$event = array('type' => 'message', 'data' => array('channel' => $channel, 'data' => $data));
+	public function publish($channel, $event, $data) {
+		$event = array('type' => 'publish', 'data' => array('channel' => $channel, 'event' => $event, 'data' => $data));
 		CM_Cache_Redis::publish('socket-redis-down', json_encode($event));
 	}
 

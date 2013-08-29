@@ -3,11 +3,9 @@
 class CM_FormField_File extends CM_FormField_Abstract {
 
 	/**
-	 * @param string $name
 	 * @param int $cardinality
 	 */
-	public function __construct($name = 'file', $cardinality = 1) {
-		parent::__construct($name);
+	public function __construct($cardinality = 1) {
 		$this->_options['cardinality'] = (int) $cardinality;
 		$this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
 	}

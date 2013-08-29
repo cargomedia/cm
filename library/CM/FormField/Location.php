@@ -3,23 +3,23 @@
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
 	/**
-	 * @param string                     $name
-	 * @param int|null                   $minLevel
-	 * @param int|null                   $maxLevel
-	 * @param CM_FormField_Distance|null $distance
+	 * @param int|null    $minLevel
+	 * @param int|null    $maxLevel
+	 * @param string|null $fieldNameDistance
 	 */
-	public function __construct($name, $minLevel = null, $maxLevel = null, CM_FormField_Distance $distance = null) {
+	public function __construct($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
+		parent::__construct();
+
 		if (is_null($minLevel)) {
 			$minLevel = CM_Model_Location::LEVEL_COUNTRY;
 		}
 		if (is_null($maxLevel)) {
 			$maxLevel = CM_Model_Location::LEVEL_ZIP;
 		}
-		parent::__construct($name);
 		$this->_options['levelMin'] = (int) $minLevel;
 		$this->_options['levelMax'] = (int) $maxLevel;
-		if ($distance) {
-			$this->_options['distanceName'] = $distance->getName();
+		if ($fieldNameDistance) {
+			$this->_options['distanceName'] = $fieldNameDistance;
 			$this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
 		}
 	}
@@ -29,8 +29,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
 			$names[] = $location->getName($level);
 		}
-		return array('id' => $location->getLevel() . '.' . $location->getId(), 'name' => implode(', ', array_filter($names)),
-			'img' => $render->getUrlResource('layout', 'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'));
+		return array(
+			'id'   => $location->getLevel() . '.' . $location->getId(),
+			'name' => implode(', ', array_filter($names)),
+			'img'  => $render->getUrlResource('layout',
+					'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+		);
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
@@ -69,7 +73,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 * @param CM_Request_Abstract $request
 	 * @return CM_Model_Location|null
 	 */
-	protected function _getRequestLocationByRequest(CM_Request_Abstract $request){
+	protected function _getRequestLocationByRequest(CM_Request_Abstract $request) {
 		$ip = $request->getIp();
 		if (null === $ip) {
 			return null;

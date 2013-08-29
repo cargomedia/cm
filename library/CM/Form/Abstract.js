@@ -39,7 +39,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
 		_.each(this.options.actions, function(action, name) {
 			var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
-			$btn.on('click', {action: name}, function(event) {
+			var event = $btn.data('event');
+			if (!event) {
+				event = 'click';
+			}
+			$btn.on(event, {action: name}, function(event) {
 				handler.submit(event.data.action);
 				return false;
 			});
@@ -134,21 +138,16 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		return data;
 	},
 
-	submit: function(actionName, confirmed, data, callbacks) {
+	submit: function(actionName) {
 		actionName = actionName || _.first(_.keys(this.options.actions));
-		confirmed = confirmed || false;
-		callbacks = callbacks || {};
 
 		var action = this.options.actions[actionName];
 		if (!action) {
 			cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
 		}
+		var data = this.getData(actionName);
 
-		if (!confirmed) {
-			$('.form_field_error', this.$()).next('br').remove().addBack().remove();
-		}
-
-		data = data || this.getData(actionName);
+		this.resetErrors();
 
 		var hasErrors = false;
 		_.each(_.keys(action.fields).reverse(), function(fieldName) {
@@ -175,13 +174,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 			return false;
 		}
 
-		if (action.confirm_msg && !confirmed) {
-			cm.ui.confirm(cm.language.get(action.confirm_msg), function() {
-				this.submit(actionName, true, data);
-			}, this);
-			return false;
-		}
-
 		var handler = this;
 		this.disable();
 		this.trigger('submit', [data]);
@@ -201,10 +193,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				if (response.exec) {
 					handler.evaluation = new Function(response.exec);
 					handler.evaluation();
-				}
-
-				if (callbacks.success) {
-					callbacks.success();
 				}
 
 				if (response.messages) {

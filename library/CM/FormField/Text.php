@@ -2,12 +2,11 @@
 
 class CM_FormField_Text extends CM_FormField_Abstract {
 
-	public function __construct($name, $lengthMin = null, $lengthMax = null) {
-		parent::__construct($name);
+	public function __construct($lengthMin = null, $lengthMax = null) {
 		$this->_options['lengthMin'] = isset($lengthMin) ? (int) $lengthMin : null;
 		$this->_options['lengthMax'] = isset($lengthMax) ? (int) $lengthMax : null;
 	}
-	
+
 	public function validate($userInput, CM_Response_Abstract $response) {
 		if (isset($this->_options['lengthMax']) && strlen($userInput) > $this->_options['lengthMax']) {
 			throw new CM_Exception_FormFieldValidation('Too long');

@@ -1,7 +1,7 @@
 {if $display === CM_FormField_Set_Select::DISPLAY_RADIOS}
 <ul id="{$id}" class="{$class}">
 	{foreach $optionList as $itemValue => $itemLabel}
-		<li class="list_label {$name}_value_{$itemValue}" {if $colSize}style="width:{$colSize};"{/if}>
+		<li class="set-item {$name}_value_{$itemValue}">
 			<input id="{$id}-{$itemValue}" name="{$name}" type="radio" value="{$itemValue|escape}" {if $itemValue==$value}checked="checked"{/if} />
 			<label for="{$id}-{$itemValue}" class="{$name}_label_{$itemValue}">
 				{block name='label'}
@@ -15,7 +15,6 @@
 		</li>
 	{/foreach}
 </ul>
-<br clear="all" />
 {/if}
 
 {if $display === CM_FormField_Set_Select::DISPLAY_SELECT}

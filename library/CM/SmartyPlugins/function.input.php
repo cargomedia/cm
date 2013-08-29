@@ -12,5 +12,5 @@ function smarty_function_input(array $params, Smarty_Internal_Template $template
 	$field = $form->getField($params['name']);
 
 	$field->prepare($params);
-	return $render->render($field, array('form' => $form));
+	return $render->render($field, array('form' => $form, 'fieldName' => $params['name']));
 }

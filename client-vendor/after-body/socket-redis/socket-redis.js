@@ -14,7 +14,7 @@ var SocketRedis = (function() {
 	var subscribes = {};
 
 	/**
-	 * @type {Integer|Null}
+	 * @type {Number|Null}
 	 */
 	var closeStamp = null;
 
@@ -39,7 +39,7 @@ var SocketRedis = (function() {
 			sockJS.onmessage = function(event) {
 				var data = JSON.parse(event.data);
 				if (subscribes[data.channel]) {
-					subscribes[data.channel].callback.call(handler, data.data);
+					subscribes[data.channel].callback.call(handler, data.event, data.data);
 				}
 			};
 			sockJS.onclose = function() {
@@ -61,7 +61,7 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
-	 * @param {Integer} start
+	 * @param {Number} [start]
 	 * @param {Object} [data]
 	 * @param {Function} [onmessage] fn(data)
 	 */
@@ -83,7 +83,7 @@ var SocketRedis = (function() {
 			delete subscribes[channel];
 		}
 		if (sockJS.readyState === SockJS.OPEN) {
-			sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
+			sockJS.send(JSON.stringify({event: 'unsubscribe', data: {channel: channel}}));
 		}
 	};
 
@@ -91,7 +91,16 @@ var SocketRedis = (function() {
 	 * @param {Object} data
 	 */
 	Client.prototype.send = function(data) {
-		sockJS.send(JSON.stringify({event: 'message', data: data}));
+		sockJS.send(JSON.stringify({event: 'message', data: {data: data}}));
+	};
+
+	/**
+	 * @param {String} channel
+	 * @param {String} event
+	 * @param {Object} data
+	 */
+	Client.prototype.publish = function(channel, event, data) {
+		sockJS.send(JSON.stringify({event: 'publish', data: {channel: channel, event: event, data: data}}));
 	};
 
 	Client.prototype.onopen = function() {
@@ -102,14 +111,14 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
-	 * @param {Integer} [startStamp]
+	 * @param {Number} [startStamp]
 	 */
 	var subscribe = function(channel, startStamp) {
 		var event = subscribes[channel].event;
 		if (!startStamp) {
 			startStamp = event.start || new Date().getTime();
 		}
-		sockJS.send(JSON.stringify({event: 'subscribe', channel: event.channel, data: event.data, start: startStamp}));
+		sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: event.data, start: startStamp}}));
 	};
 
 	/**
