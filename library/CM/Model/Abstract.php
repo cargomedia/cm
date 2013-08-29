@@ -375,21 +375,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param string|null $className
-	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
-	 * @throws CM_Exception_Invalid
-	 */
-	protected static function _getStorageAdapter($className = null) {
-		if (null === $className) {
-			return null;
-		}
-		if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
-			throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
-		}
-		return new $className();
-	}
-
-	/**
 	 * @param array|null $data
 	 * @return static
 	 */
@@ -447,6 +432,21 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected static function _createStatic(array $data) {
 		throw new CM_Exception_NotImplemented();
+	}
+
+	/**
+	 * @param string|null $className
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static function _getStorageAdapter($className = null) {
+		if (null === $className) {
+			return null;
+		}
+		if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
+			throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
+		}
+		return new $className();
 	}
 
 	/**
