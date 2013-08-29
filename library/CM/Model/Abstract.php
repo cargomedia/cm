@@ -39,7 +39,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$this->_autoCommit = false;
 		}
 		$this->_id = $id;
-		$this->_data = $data;
+		if (null !== $data) {
+			$this->_data = $this->_validateFields($data);
+		}
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
@@ -189,18 +191,18 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (null === $this->_data) {
 			if ($cache = $this->getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-					$this->_data = $data;
+					$this->_data = $this->_validateFields($data);
 				}
 			}
 			if (null === $this->_data) {
 				if ($persistence = $this->getPersistence()) {
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-						$this->_data = $data;
+						$this->_data = $this->_validateFields($data);
 					}
 				}
 				if (null === $this->_data) {
 					if (is_array($data = $this->_loadData())) {
-						$this->_data = $data;
+						$this->_data = $this->_validateFields($data);
 					}
 					if (null === $this->_data) {
 						throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
@@ -241,11 +243,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
-		foreach ($data as $key => $value) {
-			$data[$key] = $this->_validateField($key, $value);
-		}
-
-		foreach ($data as $field => $value) {
+		foreach ($this->_validateFields($data) as $field => $value) {
 			$this->_data[$field] = $value;
 		}
 
@@ -368,7 +366,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	protected function _isSchemaField($field) {
 		$schema = $this->_getSchema();
 		if (null === $schema) {
-			return true;
+			return false;
 		}
 		if (is_array($field)) {
 			return count(array_intersect($field, array_keys($schema))) > 0;
@@ -423,6 +421,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 
 		return $value;
+	}
+
+	/**
+	 * @param array $data
+	 * @return array
+	 */
+	protected function _validateFields(array $data) {
+		foreach ($data as $key => &$value) {
+			$value = $this->_validateField($key, $value);
+		}
+		return $data;
 	}
 
 	/**
