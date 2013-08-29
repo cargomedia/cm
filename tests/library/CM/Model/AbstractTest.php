@@ -68,7 +68,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testConstructorWithoutIdWithoutData() {
-		$schema = array('foo' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$type = 12;
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
@@ -102,7 +102,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCommit() {
-		$schema = array('foo' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$idRaw = array('id' => 909);
 		$type = 12;
 		$data = array('foo' => 12);
@@ -130,7 +130,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCommitMultipleSaves() {
-		$schema = array('foo' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$idRaw = array('id' => 909);
 		$type = 12;
 		$data = array('foo' => 12);
@@ -151,7 +151,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCommitWithId() {
-		$schema = array('foo' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$id = 123;
 		$idRaw = array('id' => $id);
 		$data = array('foo' => 12);
@@ -177,7 +177,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
 		$idRaw = array('id' => 1);
-		$schema = array('foo' => array(), 'bar' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
 		$cacheable = $this->getMock('CM_Cacheable');
 		$cacheable->expects($this->once())->method('_change');
@@ -238,7 +238,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$type = 12;
 		$idRaw1 = array('id' => 1);
 		$idRaw2 = array('id' => 2);
-		$schema = array('foo' => array(), 'bar' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
 		$persistence->expects($this->exactly(2))->method('create')->with($type, $data)->will($this->onConsecutiveCalls($idRaw1, $idRaw2));
@@ -427,7 +427,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testPersistenceSet() {
 		$data = array('foo' => 12, 'muh' => 2);
-		$schema = array('foo' => array(), 'muh' => array());
+		$schema = new CM_Model_Schema_Definition(array('foo' => array(), 'muh' => array()));
 		$id = array('id' => 55);
 		$type = 12;
 
@@ -630,11 +630,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetOnChange() {
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getPersistence', '_isSchemaField', '_onChange'))
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getPersistence', '_onChange'))
 				->setConstructorArgs(array(1, array('foo' => 'bar')))->getMockForAbstractClass();
 		$modelMock->expects($this->any())->method('getCache')->will($this->returnValue(null));
 		$modelMock->expects($this->any())->method('getPersistence')->will($this->returnValue(null));
-		$modelMock->expects($this->any())->method('_isSchemaField')->will($this->returnValue(true));
 		$modelMock->expects($this->once())->method('_onChange');
 		/** @var CM_Model_Abstract $modelMock */
 
@@ -722,101 +721,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		foreach (CM_Model_Abstract::getClassChildren() as $class) {
 			$classReflection = new ReflectionClass($class);
 			$this->assertArrayHasKey('TYPE', $classReflection->getConstants(), 'No `TYPE` constant defined for `' . $class . '`');
-		}
-	}
-
-	public function testIsSchemaField() {
-		$schema = array(
-			'foo' => array(),
-			'bar' => array(),
-		);
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
-
-		$method = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_isSchemaField');
-
-		$this->assertTrue($method->invoke($model, 'foo'));
-		$this->assertTrue($method->invoke($model, array('foo', 'xxxx')));
-		$this->assertFalse($method->invoke($model, 'xxxxx'));
-		$this->assertFalse($method->invoke($model, array('xxxx', 'yyyyy')));
-	}
-
-	public function testIsSchemaFieldWithoutSchema() {
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('_getSchema')->will($this->returnValue(null));
-
-		$method = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_isSchemaField');
-
-		$this->assertFalse($method->invoke($model, 'foo'));
-	}
-
-	public function testValidateField() {
-		$testDataList = array(
-			// nothing
-			array(
-				'value'       => 12,
-				'schema'      => array(),
-				'expected'    => true,
-				'returnValue' => 12,
-			),
-			array(
-				'value'    => null,
-				'schema'   => array(),
-				'expected' => 'CM_Model_Exception_Validation',
-			),
-
-			// optional
-			array(
-				'value'       => null,
-				'schema'      => array('optional' => true),
-				'expected'    => true,
-				'returnValue' => null,
-			),
-
-			// type int
-			array(
-				'value'       => -12,
-				'schema'      => array('type' => 'int'),
-				'expected'    => true,
-				'returnValue' => -12,
-			),
-			array(
-				'value'       => '-12',
-				'schema'      => array('type' => 'int'),
-				'expected'    => true,
-				'returnValue' => -12,
-			),
-			array(
-				'value'    => 12.01,
-				'schema'   => array('type' => 'int'),
-				'expected' => 'CM_Model_Exception_Validation',
-			),
-			array(
-				'value'    => '12abc',
-				'schema'   => array('type' => 'int'),
-				'expected' => 'CM_Model_Exception_Validation',
-			),
-
-			// type invalid
-			array(
-				'value'    => -12,
-				'schema'   => array('type' => 'invalid987628436'),
-				'expected' => 'CM_Exception_Invalid',
-			),
-		);
-		foreach ($testDataList as $testData) {
-			$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema'))->getMockForAbstractClass();
-			$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue(array('foo' => $testData['schema'])));
-			/** @var CM_Model_Abstract $modelMock */
-
-			$methodValidate = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_validateField');
-			try {
-				$value = $methodValidate->invoke($modelMock, 'foo', $testData['value']);
-				$this->assertSame($testData['expected'], true, 'Validation failure (' . CM_Util::var_line($testData) . ')');
-				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
-			} catch (CM_Exception $e) {
-				$this->assertSame($testData['expected'], get_class($e), 'Validation failure (' . CM_Util::var_line($testData) . ')');
-			}
 		}
 	}
 }

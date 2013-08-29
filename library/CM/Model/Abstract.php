@@ -14,9 +14,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/** @var boolean */
 	private $_autoCommit = true;
 
-	/** @var array|null */
-	protected $_schema;
-
 	/**
 	 * @param int|null   $id
 	 * @param array|null $data
@@ -251,10 +248,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if ($cache = $this->getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
-			if ($this->_isSchemaField(array_keys($data))) {
-				if ($persistence = $this->getPersistence()) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
-				}
+			if ($persistence = $this->getPersistence()) {
+				$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 			}
 			$this->_onChange();
 		}
@@ -353,25 +348,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return array|null
+	 * @return CM_Model_Schema_Definition|null
 	 */
 	protected function _getSchema() {
-		return $this->_schema;
-	}
-
-	/**
-	 * @param string|string[] $field
-	 * @return bool
-	 */
-	protected function _isSchemaField($field) {
-		$schema = $this->_getSchema();
-		if (null === $schema) {
-			return false;
-		}
-		if (is_array($field)) {
-			return count(array_intersect($field, array_keys($schema))) > 0;
-		}
-		return array_key_exists($field, $schema);
+		return null;
 	}
 
 	/**
@@ -382,45 +362,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (null === $this->_data) {
 			throw new CM_Exception_Invalid('Model has no data');
 		}
-		return array_intersect_key($this->_data, $this->_getSchema());
-	}
-
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 * @return mixed
-	 * @throws CM_Exception_Invalid
-	 * @throws CM_Model_Exception_Validation
-	 */
-	protected function _validateField($key, $value) {
-		if ($this->_isSchemaField($key)) {
-			$schema = $this->_getSchema();
-			$schemaField = $schema[$key];
-
-			$optional = !empty($schemaField['optional']);
-
-			if (!$optional && null === $value) {
-				throw new CM_Model_Exception_Validation('Field `' . $key . '` is mandatory');
-			}
-
-			if (null !== $value) {
-				$type = isset($schemaField['type']) ? $schemaField['type'] : null;
-				if (null !== $type) {
-					switch ($type) {
-						case 'int':
-							if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
-								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
-							}
-							$value = (int) $value;
-							break;
-						default:
-							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
-					}
-				}
-			}
+		if (!$schema = $this->_getSchema()) {
+			throw new CM_Exception_Invalid('Cannot get schema-data without a schema');
 		}
-
-		return $value;
+		return array_intersect_key($this->_data, array_flip($schema->getFieldNames()));
 	}
 
 	/**
@@ -428,8 +373,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return array
 	 */
 	protected function _validateFields(array $data) {
+		$schema = $this->_getSchema();
+		if (!$schema) {
+			return $data;
+		}
 		foreach ($data as $key => &$value) {
-			$value = $this->_validateField($key, $value);
+			$value = $schema->validateField($key, $value);
 		}
 		return $data;
 	}
