@@ -53,14 +53,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if ($this->hasId()) {
 			$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 
-			if ($cache = $this->getCache()) {
+			if ($cache = $this->_getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 			$this->_onChange();
 		} else {
 			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
 
-			if ($cache = $this->getCache()) {
+			if ($cache = $this->_getCache()) {
 				$this->_loadAssets(true);
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
@@ -83,7 +83,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if ($persistence = $this->_getPersistence()) {
 			$persistence->delete($this->getType(), $this->getIdRaw());
 		}
-		if ($cache = $this->getCache()) {
+		if ($cache = $this->_getCache()) {
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		foreach ($containingCacheables as $cacheable) {
@@ -141,7 +141,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
 	 */
-	public function getCache() {
+	protected function _getCache() {
 		return self::_getStorageAdapter(static::getCacheClass());
 	}
 
@@ -171,7 +171,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract
 	 */
 	final public function _change() {
-		if ($cache = $this->getCache()) {
+		if ($cache = $this->_getCache()) {
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		$this->_data = null;
@@ -186,7 +186,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	final public function _get($field = null) {
 		if (null === $this->_data) {
-			if ($cache = $this->getCache()) {
+			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
 					$this->_data = $this->_validateFields($data);
 				}
@@ -246,7 +246,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 
 		if ($this->_autoCommit) {
-			if ($cache = $this->getCache()) {
+			if ($cache = $this->_getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
 			}
 			if ($persistence = $this->_getPersistence()) {

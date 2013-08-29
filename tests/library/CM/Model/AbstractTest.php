@@ -44,9 +44,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$id = 55;
 		$type = 12;
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getType', '_getPersistence'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getType', '_getPersistence'))
 				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
-		$model->expects($this->never())->method('getCache');
+		$model->expects($this->never())->method('_getCache');
 		$model->expects($this->never())->method('_getPersistence');
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
@@ -197,13 +197,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')
-				->setMethods(array('getType', '_getPersistence', 'getCache', '_getSchema', '_getContainingCacheables', '_getAssets', '_onChange',
+				->setMethods(array('getType', '_getPersistence', '_getCache', '_getSchema', '_getContainingCacheables', '_getAssets', '_onChange',
 					'_onCreate'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$methodCreate = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_create');
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
-		$model->expects($this->once())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
 		$model->expects($this->once())->method('_getContainingCacheables')->will($this->returnValue(array($cacheable)));
 		$model->expects($this->once())->method('_getAssets')->will($this->returnValue(array($asset)));
@@ -245,7 +245,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')
-				->setMethods(array('getType', '_getPersistence', 'getCache', '_getSchema', '_onChange', '_onCreate'))
+				->setMethods(array('getType', '_getPersistence', '_getCache', '_getSchema', '_onChange', '_onCreate'))
 				->setConstructorArgs(array(null, $data))->getMockForAbstractClass();
 		$methodCreate = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_create');
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
@@ -335,9 +335,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->with($type, $id)->will($this->returnValue($data));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', 'getType'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
@@ -355,9 +355,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('save')->with($type, $id, $data);
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', '_loadData', 'getType'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getIdRaw', '_loadData', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->any())->method('_loadData')->will($this->returnValue($data));
@@ -376,9 +376,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('save')->with($type, $id, array('foo' => 12, 'bar' => 14));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', 'getType'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
@@ -394,9 +394,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('delete')->with($type, $id);
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', 'getType'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$model->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
@@ -456,9 +456,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$persistence->expects($this->once())->method('load')->with($type, $id)->will($this->returnValue($data));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
-		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', 'getIdRaw', 'getType', '_getPersistence'))
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', 'getIdRaw', 'getType', '_getPersistence'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$model->expects($this->any())->method('getCache')->will($this->returnValue(null));
+		$model->expects($this->any())->method('_getCache')->will($this->returnValue(null));
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue($id));
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
@@ -516,12 +516,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->will($this->returnValue(false));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', 'getCache', 'getIdRaw',
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', '_getCache', 'getIdRaw',
 			'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($data)->will($this->returnValue($dataValidated));
 		$modelMock->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
-		$modelMock->expects($this->once())->method('getCache')->will($this->returnValue($cache));
+		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
@@ -539,10 +539,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->will($this->returnValue($data));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', 'getCache', 'getIdRaw', 'getType'))
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($data)->will($this->returnValue($dataValidated));
-		$modelMock->expects($this->once())->method('getCache')->will($this->returnValue($cache));
+		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
@@ -564,12 +564,12 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->will($this->returnValue(false));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', 'getCache', '_loadData',
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', '_getCache', '_loadData',
 			'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($data)->will($this->returnValue($dataValidated));
 		$modelMock->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
-		$modelMock->expects($this->once())->method('getCache')->will($this->returnValue($cache));
+		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->once())->method('_loadData')->will($this->returnValue($data));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
@@ -625,10 +625,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->will($this->returnValue($data));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', 'getCache', 'getType', 'getIdRaw'))
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getType', 'getIdRaw'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->exactly(2))->method('_validateFields')->with($data)->will($this->returnValue($dataValidated));
-		$modelMock->expects($this->any())->method('getCache')->will($this->returnValue($cache));
+		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		/** @var CM_Model_Abstract $modelMock */
@@ -679,9 +679,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetOnChange() {
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getCache', '_getPersistence', '_onChange'))
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', '_getPersistence', '_onChange'))
 				->setConstructorArgs(array(1, array('foo' => 'bar')))->getMockForAbstractClass();
-		$modelMock->expects($this->any())->method('getCache')->will($this->returnValue(null));
+		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue(null));
 		$modelMock->expects($this->any())->method('_getPersistence')->will($this->returnValue(null));
 		$modelMock->expects($this->once())->method('_onChange');
 		/** @var CM_Model_Abstract $modelMock */
