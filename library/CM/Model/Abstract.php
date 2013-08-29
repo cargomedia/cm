@@ -139,35 +139,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
-	 */
-	protected function _getCache() {
-		return self::_getStorageAdapter(static::getCacheClass());
-	}
-
-	/**
-	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
-	 */
-	protected function _getPersistence() {
-		return self::_getStorageAdapter(static::getPersistenceClass());
-	}
-
-	/**
-	 * @param string|null $className
-	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
-	 * @throws CM_Exception_Invalid
-	 */
-	protected static function _getStorageAdapter($className = null) {
-		if (null === $className) {
-			return null;
-		}
-		if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
-			throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
-		}
-		return new $className();
-	}
-
-	/**
 	 * @return CM_Model_Abstract
 	 */
 	final public function _change() {
@@ -387,6 +358,35 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$value = $schema->validateField($key, $value);
 		}
 		return $data;
+	}
+
+	/**
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 */
+	protected function _getCache() {
+		return self::_getStorageAdapter(static::getCacheClass());
+	}
+
+	/**
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 */
+	protected function _getPersistence() {
+		return self::_getStorageAdapter(static::getPersistenceClass());
+	}
+
+	/**
+	 * @param string|null $className
+	 * @return CM_Model_StorageAdapter_AbstractAdapter|null
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static function _getStorageAdapter($className = null) {
+		if (null === $className) {
+			return null;
+		}
+		if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
+			throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
+		}
+		return new $className();
 	}
 
 	/**
