@@ -136,7 +136,7 @@ class CM_SessionTest extends CMTest_TestCase {
 	}
 
 	public function testLogin() {
-		$user = CM_Model_User::create();
+		$user = CM_Model_User::createStatic();
 		$session = new CM_Session();
 
 		$session->setUser($user);
@@ -146,7 +146,7 @@ class CM_SessionTest extends CMTest_TestCase {
 
 	public function testLogout() {
 		$session = new CM_Session();
-		$session->setUser(CM_Model_User::create());
+		$session->setUser(CM_Model_User::createStatic());
 		$user = $session->getUser(true);
 
 		$session->deleteUser();
@@ -166,14 +166,14 @@ class CM_SessionTest extends CMTest_TestCase {
 		}
 
 		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create();
+		$user = CM_Model_User::createStatic();
 		$session->setUser($user);
 		$this->assertEquals($user, $session->getUser(true));
 	}
 
 	public function testStart() {
 		/** @var CM_Model_User $user */
-		$user = CM_Model_User::create();
+		$user = CM_Model_User::createStatic();
 
 		$activityStamp1 = time();
 		$session = new CM_Session();

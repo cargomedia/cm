@@ -100,7 +100,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 							$start = (int) ($subscriber['subscribeStamp'] / 1000);
 							$allowedUntil = null;
 							if ($start <= $startStampLimit) {
-								CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+								CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 																		'streamChannel' => $streamChannel, 'key' => $clientKey));
 							}
 						}
@@ -178,7 +178,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		if ($streamChannelSubscribes->findKey($clientKey)) {
 			return;
 		}
-		CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 												'streamChannel' => $streamChannel, 'key' => $clientKey));
 	}
 

@@ -109,7 +109,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $data;
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$name = (string) $data['name'];
 		$variations = array_unique($data['variations']);
 		if (empty($variations)) {

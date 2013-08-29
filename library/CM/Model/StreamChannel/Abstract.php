@@ -197,7 +197,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $encryptionKey, $data, MCRYPT_MODE_ECB));
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];
 		$id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));

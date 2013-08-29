@@ -62,7 +62,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 
 		$id2 = $type2->createEntry(1);
 		$this->assertSame(2, $source->getCount());
-		$this->assertSame(array(
+		$this->assertContainsAll(array(
 			array('id' => (string) $id1, 'type' => 'index_1'),
 			array('id' => (string) $id2, 'type' => 'index_2')
 		), $source->getItems());
@@ -71,7 +71,8 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 		$source = new CM_PagingSource_Search(array($type1, $type2, $type3), new CM_SearchQuery_Mock(), array('price'));
 		$id3 = $type3->createEntry(5);
 
-		$this->assertSame(array(
+		$this->assertSame(3, $source->getCount());
+		$this->assertContainsAll(array(
 			array('id' => (string) $id1, 'type' => 'index_1'),
 			array('id' => (string) $id2, 'type' => 'index_2'),
 			array('id' => (string) $id3, 'type' => 'index_3', 'price' => 5)
