@@ -173,6 +173,43 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->commit();
 	}
 
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot create model without persistence
+	 */
+	public function testCommitWithoutPersistence() {
+		$id = 123;
+		$data = array('foo' => 12);
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getPersistence'))
+				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue(null));
+		/** @var CM_Model_Abstract $model */
+
+		$model->commit();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot create model without schema
+	 */
+	public function testCommitWithoutSchema() {
+		$id = 123;
+		$data = array('foo' => 12);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->getMockForAbstractClass();
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getPersistence', '_getSchema'))
+				->setConstructorArgs(array($id, $data))->getMockForAbstractClass();
+		$model->expects($this->any())->method('getPersistence')->will($this->returnValue($persistence));
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue(null));
+		/** @var CM_Model_Abstract $model */
+
+		$model->commit();
+	}
+
 	public function testCreate() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
