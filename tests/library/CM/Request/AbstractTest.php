@@ -100,7 +100,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetUri() {
-		$language = CM_Model_Language::create(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
+		$language = CM_Model_Language::createStatic(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
 		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
