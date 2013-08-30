@@ -12,7 +12,10 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 
 	public function create($type, array $data) {
 		$id = CM_Db_Db::insert($this->_getTableName($type), $data);
-		return array('id' => $id);
+		if (null === $id) {
+			throw new CM_Exception_Invalid('Insert statement did not return an ID');
+		}
+		return array('id' => (int) $id);
 	}
 
 	public function delete($type, array $id) {
