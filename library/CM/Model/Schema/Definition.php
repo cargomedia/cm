@@ -51,6 +51,7 @@ class CM_Model_Schema_Definition {
 				$type = isset($schemaField['type']) ? $schemaField['type'] : null;
 				if (null !== $type) {
 					switch ($type) {
+						case 'integer':
 						case 'int':
 							if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
@@ -71,6 +72,7 @@ class CM_Model_Schema_Definition {
 							}
 							break;
 						case 'boolean':
+						case 'bool':
 							if (!is_bool($value) && !(is_string($value) && ('0' === $value || '1' === $value))) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a boolean');
 							}

@@ -46,28 +46,34 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'returnValue' => null,
 			),
 
-			// type int
+			// type integer
 			array(
 				'value'       => -12,
-				'schema'      => array('type' => 'int'),
+				'schema'      => array('type' => 'integer'),
 				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(
 				'value'       => '-12',
-				'schema'      => array('type' => 'int'),
+				'schema'      => array('type' => 'integer'),
 				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(
 				'value'    => 12.01,
-				'schema'   => array('type' => 'int'),
+				'schema'   => array('type' => 'integer'),
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 			array(
 				'value'    => '12abc',
-				'schema'   => array('type' => 'int'),
+				'schema'   => array('type' => 'integer'),
 				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'       => 14,
+				'schema'      => array('type' => 'int'),
+				'expected'    => true,
+				'returnValue' => 14,
 			),
 
 			// type string
@@ -165,6 +171,12 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'value'    => '00',
 				'schema'   => array('type' => 'boolean'),
 				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'bool'),
+				'expected'    => true,
+				'returnValue' => true,
 			),
 
 			// type array
