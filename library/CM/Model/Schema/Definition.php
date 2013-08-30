@@ -19,6 +19,52 @@ class CM_Model_Schema_Definition {
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
 	 */
+	public function encodeField($key, $value) {
+		$this->validateField($key, $value);
+		if ($this->hasField($key)) {
+			$schemaField = $this->_schema[$key];
+
+			if (null !== $value) {
+				$type = isset($schemaField['type']) ? $schemaField['type'] : null;
+				if (null !== $type) {
+					switch ($type) {
+						case 'integer':
+						case 'int':
+							$value = (int) $value;
+							break;
+						case 'float':
+							$value = (float) $value;
+							break;
+						case 'string':
+							break;
+						case 'boolean':
+						case 'bool':
+							$value = (boolean) $value;
+							break;
+						case 'array':
+							break;
+						default:
+							/** @var CM_Model_Abstract $value */
+							if (count($value->getIdRaw()) > 1) {
+								$id = $value->getIdRaw();
+							} else {
+								$id = $value->getId();
+							}
+							$value = CM_Params::encode($id, true);
+					}
+				}
+			}
+		}
+		return $value;
+	}
+
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 * @throws CM_Exception_Invalid
+	 * @throws CM_Model_Exception_Validation
+	 */
 	public function decodeField($key, $value) {
 		$this->validateField($key, $value);
 		if ($this->hasField($key)) {
