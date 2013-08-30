@@ -56,7 +56,6 @@ class CM_Model_Schema_Definition {
 							if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an integer');
 							}
-							$value = (int) $value;
 							break;
 						case 'float':
 							if (!(is_float($value) || is_int($value))
@@ -64,7 +63,6 @@ class CM_Model_Schema_Definition {
 							) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a float');
 							}
-							$value = (float) $value;
 							break;
 						case 'string':
 							if (!is_string($value)) {
@@ -76,7 +74,6 @@ class CM_Model_Schema_Definition {
 							if (!is_bool($value) && !(is_string($value) && ('0' === $value || '1' === $value))) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a boolean');
 							}
-							$value = (boolean) $value;
 							break;
 						case 'array':
 							if (!is_array($value)) {
@@ -85,11 +82,15 @@ class CM_Model_Schema_Definition {
 							break;
 						default:
 							if (class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract')) {
-								$id = CM_Params::decode($value, true);
-								if (is_array($id)) {
-									$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
+								$value = CM_Params::decode($value, true);
+								if (is_array($value)) {
+									if (!array_key_exists('id', $value) || !is_int($value['id']) && !(is_string($value['id']) && $value['id'] === (string) (int) $value['id'])) {
+										throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model-id');
+									}
 								} else {
-									$value = new $type($id);
+									if (!is_int($value) && !(is_string($value) && $value === (string) (int) $value)) {
+										throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model-id');
+									}
 								}
 								break;
 							}
