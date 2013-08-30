@@ -57,6 +57,14 @@ class CM_Model_Schema_Definition {
 							}
 							$value = (int) $value;
 							break;
+						case 'float':
+							if (!(is_float($value) || is_int($value))
+									&& !(is_string($value) && ($value === (string) (float) $value || $value === (string) (int) $value))
+							) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a float');
+							}
+							$value = (float) $value;
+							break;
 						case 'string':
 							if (!is_string($value)) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a string');

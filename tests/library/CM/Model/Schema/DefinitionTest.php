@@ -95,6 +95,37 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 
+			// type float
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => -12.0,
+			),
+			array(
+				'value'       => '-123',
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => -123.0,
+			),
+			array(
+				'value'       => 12.01,
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'       => '12.01',
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'    => '12abc',
+				'schema'   => array('type' => 'float'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
 			// type invalid
 			array(
 				'value'    => -12,
