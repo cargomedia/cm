@@ -76,6 +76,11 @@ class CM_Model_Schema_Definition {
 							}
 							$value = (boolean) $value;
 							break;
+						case 'array':
+							if (!is_array($value)) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an array');
+							}
+							break;
 						default:
 							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
 					}

@@ -167,6 +167,19 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 
+			// type array
+			array(
+				'value'       => array('foo' => 'bar'),
+				'schema'      => array('type' => 'array'),
+				'expected'    => true,
+				'returnValue' => array('foo' => 'bar'),
+			),
+			array(
+				'value'       => '123',
+				'schema'      => array('type' => 'array'),
+				'expected'    => 'CM_Model_Exception_Validation',
+			),
+
 			// type invalid
 			array(
 				'value'    => -12,
