@@ -70,6 +70,31 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 
+			// type string
+			array(
+				'value'       => 'foo bar',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => 'foo bar',
+			),
+			array(
+				'value'       => 'foo 繁體字 bar',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => 'foo 繁體字 bar',
+			),
+			array(
+				'value'       => '',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => '',
+			),
+			array(
+				'value'    => 12,
+				'schema'   => array('type' => 'string'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
 			// type invalid
 			array(
 				'value'    => -12,

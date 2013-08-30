@@ -57,6 +57,11 @@ class CM_Model_Schema_Definition {
 							}
 							$value = (int) $value;
 							break;
+						case 'string':
+							if (!is_string($value)) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a string');
+							}
+							break;
 						default:
 							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
 					}
