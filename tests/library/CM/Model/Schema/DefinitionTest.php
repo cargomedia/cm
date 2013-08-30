@@ -46,28 +46,150 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'returnValue' => null,
 			),
 
-			// type int
+			// type integer
 			array(
 				'value'       => -12,
-				'schema'      => array('type' => 'int'),
+				'schema'      => array('type' => 'integer'),
 				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(
 				'value'       => '-12',
-				'schema'      => array('type' => 'int'),
+				'schema'      => array('type' => 'integer'),
 				'expected'    => true,
 				'returnValue' => -12,
 			),
 			array(
 				'value'    => 12.01,
-				'schema'   => array('type' => 'int'),
+				'schema'   => array('type' => 'integer'),
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 			array(
 				'value'    => '12abc',
-				'schema'   => array('type' => 'int'),
+				'schema'   => array('type' => 'integer'),
 				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'       => 14,
+				'schema'      => array('type' => 'int'),
+				'expected'    => true,
+				'returnValue' => 14,
+			),
+
+			// type string
+			array(
+				'value'       => 'foo bar',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => 'foo bar',
+			),
+			array(
+				'value'       => 'foo 繁體字 bar',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => 'foo 繁體字 bar',
+			),
+			array(
+				'value'       => '',
+				'schema'      => array('type' => 'string'),
+				'expected'    => true,
+				'returnValue' => '',
+			),
+			array(
+				'value'    => 12,
+				'schema'   => array('type' => 'string'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
+			// type float
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => -12.0,
+			),
+			array(
+				'value'       => '-123',
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => -123.0,
+			),
+			array(
+				'value'       => 12.01,
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'       => '12.01',
+				'schema'      => array('type' => 'float'),
+				'expected'    => true,
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'    => '12abc',
+				'schema'   => array('type' => 'float'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
+			// type boolean
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => true,
+			),
+			array(
+				'value'       => false,
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => false,
+			),
+			array(
+				'value'       => '1',
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => true,
+			),
+			array(
+				'value'       => '0',
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => false,
+			),
+			array(
+				'value'    => 1,
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => 'true',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => '00',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'bool'),
+				'expected'    => true,
+				'returnValue' => true,
+			),
+
+			// type array
+			array(
+				'value'       => array('foo' => 'bar'),
+				'schema'      => array('type' => 'array'),
+				'expected'    => true,
+				'returnValue' => array('foo' => 'bar'),
+			),
+			array(
+				'value'       => '123',
+				'schema'      => array('type' => 'array'),
+				'expected'    => 'CM_Model_Exception_Validation',
 			),
 
 			// type invalid
