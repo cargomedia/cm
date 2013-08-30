@@ -181,6 +181,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected'    => true,
 			),
 			array(
+				'value'       => '{"id": "foo"}',
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'expected'    => 'CM_Model_Exception_Validation',
+			),
+			array(
 				'value'       => '3',
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
 				'expected'    => true,
