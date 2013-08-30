@@ -556,19 +556,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$data = array('foo' => 12, 'bar' => 23);
 		$dataValidated = array('foo' => 'bar', 'bar' => 'foo');
 
-		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
-		$persistence->expects($this->once())->method('load')->will($this->returnValue(false));
-		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
-
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
 		$cache->expects($this->once())->method('load')->will($this->returnValue(false));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', '_getCache', '_loadData',
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', '_loadData',
 			'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($data)->will($this->returnValue($dataValidated));
-		$modelMock->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
 		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->once())->method('_loadData')->will($this->returnValue($data));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
@@ -576,6 +571,29 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $modelMock */
 
 		$this->assertSame($dataValidated, $modelMock->_get());
+	}
+
+	/**
+	 * @expectedException CM_Exception_Nonexistent
+	 * @expectedExceptionMessage has no data
+	 */
+	public function testGetNonexistent() {
+		$type = 1;
+		$idRaw = array('id' => 3);
+
+		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
+		$persistence->expects($this->once())->method('load')->will($this->returnValue(false));
+		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', '_getPersistence', 'getIdRaw', 'getType'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue(null));
+		$modelMock->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
+		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
+		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
+		/** @var CM_Model_Abstract $modelMock */
+
+		$modelMock->_get();
 	}
 
 	public function testHas() {
