@@ -13,6 +13,51 @@ class CM_Model_Schema_Definition {
 	}
 
 	/**
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 * @throws CM_Exception_Invalid
+	 * @throws CM_Model_Exception_Validation
+	 */
+	public function decodeField($key, $value) {
+		$this->validateField($key, $value);
+		if ($this->hasField($key)) {
+			$schemaField = $this->_schema[$key];
+
+			if (null !== $value) {
+				$type = isset($schemaField['type']) ? $schemaField['type'] : null;
+				if (null !== $type) {
+					switch ($type) {
+						case 'integer':
+						case 'int':
+							$value = (int) $value;
+							break;
+						case 'float':
+							$value = (float) $value;
+							break;
+						case 'string':
+							break;
+						case 'boolean':
+						case 'bool':
+							$value = (boolean) $value;
+							break;
+						case 'array':
+							break;
+						default:
+							$id = CM_Params::decode($value, true);
+							if (is_array($id)) {
+								$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
+							} else {
+								$value = new $type($id);
+							}
+					}
+				}
+			}
+		}
+		return $value;
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getFieldNames() {
