@@ -84,6 +84,15 @@ class CM_Model_Schema_Definition {
 							}
 							break;
 						default:
+							if (class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract')) {
+								$id = CM_Params::decode($value, true);
+								if (is_array($id)) {
+									$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
+								} else {
+									$value = new $type($id);
+								}
+								break;
+							}
 							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
 					}
 				}

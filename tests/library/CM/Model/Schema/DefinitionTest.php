@@ -210,4 +210,53 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			}
 		}
 	}
+
+	public function testValidateObjectField() {
+		$id = 1;
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
+
+		$schema = new CM_Model_Schema_Definition(array('model' => array('type' => 'CM_Model_Mock_Validation')));
+		$value = $schema->validateField('model', $id);
+
+		$this->assertEquals(new CM_Model_Mock_Validation($id), $value);
+	}
+
+	public function testValidateFieldIdRaw() {
+		$id = 1;
+		$idRaw = array('id' => $id, 'foo' => 'bar');
+		$idRawSerialized = CM_Params::encode($idRaw, true);
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
+
+		$schema = new CM_Model_Schema_Definition(array('model' => array('type' => 'CM_Model_Mock_Validation')));
+		$value = $schema->validateField('model', $idRawSerialized);
+
+		$this->assertEquals(new CM_Model_Mock_Validation($id, 'bar'), $value);
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Invalid type `CM_Class_Abstract`
+	 */
+	public function testValidateFieldInvalidClass() {
+		$schema = new CM_Model_Schema_Definition(array('model' => array('type' => 'CM_Class_Abstract')));
+		$schema->validateField('model', 1);
+	}
+
+}
+
+class CM_Model_Mock_Validation extends CM_Model_Abstract {
+
+	const TYPE = 1;
+
+	public function __construct($id, $foo = null) {
+		$id = array('id' => (int) $id);
+		if (null !== $foo) {
+			$id['foo'] = $foo;
+		}
+		$this->_construct($id);
+	}
+
+	protected function _loadData() {
+		return array('id' => $this->getId());
+	}
 }
