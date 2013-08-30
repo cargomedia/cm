@@ -79,6 +79,7 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$this->assertInternalType('array', $id);
 		$this->assertCount(1, $id);
 		$this->assertArrayHasKey('id', $id);
+		$this->assertInternalType('int', $id['id']);
 		$this->assertRow('mock_modelStorageAdapter', array('id' => $id['id'], 'foo' => 'foo1', 'bar' => '23'));
 	}
 
