@@ -90,8 +90,6 @@ class CM_Model_Schema_Definition {
 				}
 			}
 		}
-
-		return $value;
 	}
 
 	/**
