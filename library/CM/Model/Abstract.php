@@ -167,14 +167,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
 						$this->_data = $this->_validateFields($data);
 					}
-				}
-				if (null === $this->_data) {
+				} else {
 					if (is_array($data = $this->_loadData())) {
 						$this->_data = $this->_validateFields($data);
 					}
-					if (null === $this->_data) {
-						throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
-					}
+				}
+				if (null === $this->_data) {
+					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) .
+					'` has no data.');
 				}
 
 				if ($cache) {
