@@ -70,6 +70,12 @@ class CM_Model_Schema_Definition {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a string');
 							}
 							break;
+						case 'boolean':
+							if (!is_bool($value) && !(is_string($value) && ('0' === $value || '1' === $value))) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a boolean');
+							}
+							$value = (boolean) $value;
+							break;
 						default:
 							throw new CM_Exception_Invalid('Invalid type `' . $type . '`');
 					}

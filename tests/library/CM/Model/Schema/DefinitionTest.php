@@ -126,6 +126,47 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 
+			// type boolean
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => true,
+			),
+			array(
+				'value'       => false,
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => false,
+			),
+			array(
+				'value'       => '1',
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => true,
+			),
+			array(
+				'value'       => '0',
+				'schema'      => array('type' => 'boolean'),
+				'expected'    => true,
+				'returnValue' => false,
+			),
+			array(
+				'value'    => 1,
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => 'true',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => '00',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
 			// type invalid
 			array(
 				'value'    => -12,
