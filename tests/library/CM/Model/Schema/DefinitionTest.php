@@ -200,6 +200,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
 				'expected' => 'CM_Model_Exception_Validation',
 			),
+			array(
+				'value'    => '1',
+				'schema'   => array('type' => 'CM_Class_Abstract'),
+				'expected' => 'CM_Exception_Invalid',
+			),
 
 			// type invalid
 			array(
@@ -354,15 +359,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
 			}
 		}
-	}
-
-	/**
-	 * @expectedException CM_Exception_Invalid
-	 * @expectedExceptionMessage Invalid type `CM_Class_Abstract`
-	 */
-	public function testValidateFieldInvalidClass() {
-		$schema = new CM_Model_Schema_Definition(array('model' => array('type' => 'CM_Class_Abstract')));
-		$schema->validateField('model', 1);
 	}
 }
 
