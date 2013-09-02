@@ -37,7 +37,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_id = $id;
 		if (null !== $data) {
-			$this->_data = $this->_validateFields($data);
+			$this->_data = $this->_decodeFields($data);
 		}
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
@@ -159,17 +159,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (null === $this->_data) {
 			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-					$this->_data = $this->_validateFields($data);
+					$this->_data = $this->_decodeFields($data);
 				}
 			}
 			if (null === $this->_data) {
 				if ($persistence = $this->_getPersistence()) {
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-						$this->_data = $this->_validateFields($data);
+						$this->_data = $this->_decodeFields($data);
 					}
 				} else {
 					if (is_array($data = $this->_loadData())) {
-						$this->_data = $this->_validateFields($data);
+						$this->_data = $this->_decodeFields($data);
 					}
 				}
 				if (null === $this->_data) {
@@ -212,20 +212,21 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
-		foreach ($this->_validateFields($data) as $field => $value) {
+		foreach ($this->_decodeFields($data) as $field => $value) {
 			$this->_data[$field] = $value;
 		}
 
 		if ($this->_autoCommit) {
+			$data = $this->_encodeFields($this->_data);
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
 			if ($persistence = $this->_getPersistence()) {
 				if (!$schema = $this->_getSchema()) {
 					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
 				}
 				if ($schema->hasField(array_keys($data))) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
 				}
 			}
 			$this->_onChange();
@@ -332,30 +333,49 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @param array|null $data
 	 * @return array
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _getSchemaData() {
-		if (null === $this->_data) {
+	protected function _getSchemaData($data = null) {
+		$data = ($data !== null) ? $data: $this->_data;
+		if (null === $data) {
 			throw new CM_Exception_Invalid('Model has no data');
 		}
 		if (!$schema = $this->_getSchema()) {
 			throw new CM_Exception_Invalid('Cannot get schema-data without a schema');
 		}
-		return array_intersect_key($this->_data, array_flip($schema->getFieldNames()));
+		return array_intersect_key($data, array_flip($schema->getFieldNames()));
 	}
 
 	/**
 	 * @param array $data
 	 * @return array
+	 * @throws CM_Exception_Invalid
+	 * @throws CM_Model_Exception_Validation
 	 */
-	protected function _validateFields(array $data) {
-		$schema = $this->_getSchema();
-		if (!$schema) {
+	protected function _encodeFields(array $data) {
+		if (!$schema = $this->_getSchema()) {
 			return $data;
 		}
 		foreach ($data as $key => &$value) {
-			$value = $schema->validateField($key, $value);
+			$value = $schema->encodeField($key, $value);
+		}
+		return $data;
+	}
+
+	/**
+	 * @param array $data
+	 * @return array
+	 * @throws CM_Exception_Invalid
+	 * @throws CM_Model_Exception_Validation
+	 */
+	protected function _decodeFields(array $data) {
+		if (!$schema = $this->_getSchema()) {
+			return $data;
+		}
+		foreach ($data as $key => &$value) {
+			$value = $schema->decodeField($key, $value);
 		}
 		return $data;
 	}
