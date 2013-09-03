@@ -476,9 +476,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$models = array();
 		foreach ($dataSet as $modelData) {
 			$id = $modelData['id'];
-			if (!is_array($id)) {
-				$id = array('id' => $id);
-			}
 			$models[] = self::factoryGeneric($modelData['type'], $id, $modelData['data']);
 		}
 		return $models;
