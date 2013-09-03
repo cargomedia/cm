@@ -440,9 +440,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId())
 		));
 		foreach ($models as $model) {
-			$model->getModelAsset();
 			$this->assertSame($modelsCreated[$model->getId()]->_get(), $model->_get());
-			var_dump($model->_get());
 		}
 	}
 
