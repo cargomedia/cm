@@ -113,10 +113,10 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
 		/** @var CM_Model_StorageAdapter_Database $adapter */
 
-		$idsTypes = array(array('type' => 1, 'id' => array('id' => 1)),
-					 array('type' => 2, 'id' => array('id' => 3)),
-					 array('type' => 2, 'id' => array('id' => 8)),
-					 array('type' => 3, 'id' => array('id' => 10))
+		$idsTypes = array(array('type' => 1, 'id' => $id1),
+					 array('type' => 2, 'id' => $id3),
+					 array('type' => 2, 'id' => $id8),
+					 array('type' => 3, 'id' => $id10)
 		);
 		$values = $adapter->loadMultiple($idsTypes);
 		$this->assertContainsAll(array(array('id' => $id1, 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => 1)),
