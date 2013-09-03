@@ -96,4 +96,32 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$adapter->delete($type, $id);
 		$this->assertNotRow('mock_modelStorageAdapter', array('id' => $id['id'], 'foo' => 'foo1', 'bar' => '23'));
 	}
+
+	public function testLoadMultiple() {
+		$id1 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo1', 'bar' => 1));
+		$id2 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo2', 'bar' => 2));
+		$id3 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo3', 'bar' => 3));
+		$id4 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo4', 'bar' => 4));
+		$id5 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo5', 'bar' => 5));
+		$id6 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo6', 'bar' => 6));
+		$id7 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo7', 'bar' => 7));
+		$id8 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo8', 'bar' => 8));
+		$id9 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo9', 'bar' => 9));
+		$id10 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo10', 'bar' => 10));
+
+		$adapter = $this->getMockBuilder('CM_Model_StorageAdapter_Database')->setMethods(array('_getTableName'))->getMock();
+		$adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
+		/** @var CM_Model_StorageAdapter_Database $adapter */
+
+		$idsTypes = array(array('type' => 1, 'id' => array('id' => 1)),
+					 array('type' => 2, 'id' => array('id' => 3)),
+					 array('type' => 2, 'id' => array('id' => 8)),
+					 array('type' => 3, 'id' => array('id' => 10))
+		);
+		$values = $adapter->loadMultiple($idsTypes);
+		$this->assertContainsAll(array(array('type' => 1, 'data' => array('id' => $id1, 'foo' => 'foo1', 'bar' => 1)),
+										array('type' => 2, 'data' => array('id' => $id3, 'foo' => 'foo3', 'bar' => 3)),
+										array('type' => 2, 'data' => array('id' => $id8, 'foo' => 'foo8', 'bar' => 8)),
+										array('type' => 3, 'data' => array('id' => $id10, 'foo' => 'foo10', 'bar' => 10))), $values);
+	}
 }

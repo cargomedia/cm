@@ -6,6 +6,32 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 		return CM_Db_Db::select($this->_getTableName($type), '*', $id)->fetch();
 	}
 
+	public function loadMultiple(array $idTypeArray) {
+		$types = array();
+		foreach ($idTypeArray as $idType) {
+			$type = (int) $idType['type'];
+			$id = $idType['id'];
+			$types[$type][] = $id;
+		}
+		$resultSet = array();
+		foreach ($types as $type => $ids) {
+			$whereArray = array();
+			foreach ($ids as $id) { //id-array
+				$where = array();
+				foreach ($id as $key => $value) {
+					$where[] = $key . '=' . $value;
+				}
+				$whereArray[] = '(' . implode(' AND ', $where) . ')';
+			}
+			$where = implode(' OR ', $whereArray);
+			$result = CM_Db_Db::select($this->_getTableName($type), '*', $where)->fetchAll();
+			foreach ($result as $row) {
+				$resultSet[] = array('type' => $type, 'data' => $row);
+			}
+		}
+		return $resultSet;
+	}
+
 	public function save($type, array $id, array $data) {
 		CM_Db_Db::update($this->_getTableName($type), $data, $id);
 	}
