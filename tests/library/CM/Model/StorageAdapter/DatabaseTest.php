@@ -113,43 +113,17 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		$adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
 		/** @var CM_Model_StorageAdapter_Database $adapter */
 
-		$idsTypes = array(array('type' => 1, 'id' => $id1),
-					 array('type' => 2, 'id' => $id3),
-					 array('type' => 2, 'id' => $id8),
-					 array('type' => 3, 'id' => $id10)
-		);
-		$values = $adapter->loadMultiple($idsTypes);
-		$this->assertContainsAll(array(array('id' => $id1, 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => 1)),
-										array('id' => $id3, 'type' => 2, 'data' => array('foo' => 'foo3', 'bar' => 3)),
-										array('id' => $id8, 'type' => 2, 'data' => array('foo' => 'foo8', 'bar' => 8)),
-										array('id' => $id10, 'type' => 3, 'data' => array('foo' => 'foo10', 'bar' => 10))), $values);
-	}
-
-	public function testLoadMultipleIdArray() {
-		$id1 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo1', 'bar' => 1));
-		$id2 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo2', 'bar' => 2));
-		$id3 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo3', 'bar' => 3));
-		$id4 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo4', 'bar' => 4));
-		$id5 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo5', 'bar' => 5));
-		$id6 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo6', 'bar' => 6));
-		$id7 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo7', 'bar' => 7));
-		$id8 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo8', 'bar' => 8));
-		$id9 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo9', 'bar' => 9));
-		$id10 = CM_Db_Db::insert('mock_modelStorageAdapter', array('foo' => 'foo10', 'bar' => 10));
-
-		$adapter = $this->getMockBuilder('CM_Model_StorageAdapter_Database')->setMethods(array('_getTableName'))->getMock();
-		$adapter->expects($this->any())->method('_getTableName')->will($this->returnValue('mock_modelStorageAdapter'));
-		/** @var CM_Model_StorageAdapter_Database $adapter */
-
-		$idsTypes = array(array('type' => 1, 'id' => array('id' => 1)),
+		$idsTypes = array(
+			array('type' => 1, 'id' => $id1),
 			array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
 			array('type' => 2, 'id' => array('id' => 8, 'foo' => 'foo8')),
-			array('type' => 3, 'id' => array('id' => 10, 'foo' => 'foo10'))
+			array('type' => 3, 'id' => $id10)
 		);
 		$values = $adapter->loadMultiple($idsTypes);
-		$this->assertContainsAll(array(array('id' => $id1, 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => 1)),
+		$this->assertContainsAll(array(
+			array('id' => array('id' => $id1), 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => 1)),
 			array('id' => array('id' => $id3, 'foo' => 'foo3'), 'type' => 2, 'data' => array('bar' => 3)),
 			array('id' => array('id' => $id8, 'foo' => 'foo8'), 'type' => 2, 'data' => array('bar' => 8)),
-			array('id' => array('id' => $id10, 'foo' => 'foo10'), 'type' => 3, 'data' => array('bar' => 10))), $values);
+			array('id' => array('id' => $id10), 'type' => 3, 'data' => array('foo' => 'foo10', 'bar' => 10))), $values);
 	}
 }

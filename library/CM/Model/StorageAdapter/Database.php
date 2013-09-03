@@ -35,9 +35,6 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 					$id[$idColumn] = $row[$idColumn];
 					unset($row[$idColumn]);
 				}
-				if (1 === count($idColumnList)) {
-					$id = reset($id);
-				}
 				$resultSet[] = array('id' => $id, 'type' => $type, 'data' => $row);
 			}
 		}
