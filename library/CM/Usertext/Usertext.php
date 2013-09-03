@@ -36,8 +36,8 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		}
 		$mode = (string) $mode;
 		$this->_clearFilters();
-		$this->addFilter(new CM_Usertext_Filter_Escape());
 		$this->addFilter(new CM_Usertext_Filter_Badwords());
+		$this->addFilter(new CM_Usertext_Filter_Escape());
 		switch ($mode) {
 			case 'oneline':
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
