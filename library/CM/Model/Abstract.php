@@ -466,11 +466,22 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $idTypeArray
+	 * @param array $idTypeArray [['type' => int, id' => int|array],...]
+	 * @return CM_Model_Abstract[]
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
-
-
+		// TODO: add asset loading
+		$persistence = new CM_Model_StorageAdapter_Database();
+		$dataSet = $persistence->loadMultiple($idTypeArray);
+		$models = array();
+		foreach ($dataSet as $modelData) {
+			$id = $modelData['id'];
+			if (!is_array($id)) {
+				$id = array('id' => $id);
+			}
+			$models[] = self::factoryGeneric($modelData['type'], $id, $modelData['data']);
+		}
+		return $models;
 	}
 
 	public function toArray() {
