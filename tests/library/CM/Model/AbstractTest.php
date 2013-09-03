@@ -430,17 +430,18 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		$modelsCreated = array();
 		$model1 = CM_ModelMock::createStatic(array('foo' => 'bar1'));
-		$modelsCreated[$model1->getId()] = $model1;
 		$model2 = CM_ModelMock::createStatic(array('foo' => 'bar2'));
-		$modelsCreated[$model2->getId()] = $model2;
+		$modelsCreated[] = $model2;
+		$modelsCreated[] = $model1;
 
 		/** @var CM_ModelMock[] $models */
 		$models = CM_Model_Abstract::factoryGenericMultiple(array(
+			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId()),
 			array('type' => CM_ModelMock::TYPE, 'id' => $model1->getId()),
-			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId())
 		));
-		foreach ($models as $model) {
-			$this->assertSame($modelsCreated[$model->getId()]->_get(), $model->_get());
+		foreach ($models as $key => $model) {
+			$expected = $modelsCreated[$key];
+			$this->assertSame($expected->_get(), $model->_get());
 		}
 	}
 

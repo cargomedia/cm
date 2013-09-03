@@ -174,7 +174,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				}
 				if (null === $this->_data) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) .
-					'` has no data.');
+							'` has no data.');
 				}
 
 				if ($cache) {
@@ -470,15 +470,43 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract[]
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
-		// TODO: add asset loading
+		$data = array();
+		foreach ($idTypeArray as $idType) {
+			$idTypeSerialized = self::_serializeIdType($idType['type'], $idType['id']);
+			$data[$idTypeSerialized] = array_merge($idType, array('data' => null));
+		}
+
+		// TODO: try to load from cache first
 		$persistence = new CM_Model_StorageAdapter_Database();
 		$dataSet = $persistence->loadMultiple($idTypeArray);
-		$models = array();
 		foreach ($dataSet as $modelData) {
+			$type = $modelData['type'];
 			$id = $modelData['id'];
-			$models[] = self::factoryGeneric($modelData['type'], $id, $modelData['data']);
+			$idTypeSerialized = self::_serializeIdType($type, $id);
+			$data[$idTypeSerialized]['data'] = $modelData['data'];
+			$data[$idTypeSerialized]['id'] = $modelData['id'];
+		}
+		$models = array();
+		foreach ($data as $modelData) {
+			$models[] = self::factoryGeneric($modelData['type'], $modelData['id'], $modelData['data']);
+		// TODO: add asset loading ?
 		}
 		return $models;
+	}
+
+	/**
+	 * @param int       $type
+	 * @param int|array $id
+	 * @return string
+	 */
+	private static function _serializeIdType($type, $id) {
+		if (!is_array($id)) {
+			$id = array('id' => $id);
+		}
+		array_walk($id, function (&$idPart) {
+			$idPart = (string) $idPart;
+		});
+		return serialize(array('type' => $type, 'id' => $id));
 	}
 
 	public function toArray() {
