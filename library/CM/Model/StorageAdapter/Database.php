@@ -11,13 +11,16 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 		foreach ($idTypeArray as $idType) {
 			$type = (int) $idType['type'];
 			$id = $idType['id'];
+			if (!is_array($id)) {
+				$id = array('id' => $id);
+			}
 			$types[$type][] = $id;
 		}
 		$resultSet = array();
 		foreach ($types as $type => $ids) {
 			$idColumnList = array_keys($ids[0]);
 			$whereArray = array();
-			foreach ($ids as $id) { //id-array
+			foreach ($ids as $id) {
 				$where = array();
 				foreach ($id as $key => $value) {
 					$where[] = '`' . $key . '`=\'' . $value . '\'';
