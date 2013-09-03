@@ -465,6 +465,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 	}
 
+	/**
+	 * @param array $idTypeArray
+	 */
+	public static function factoryGenericMultiple(array $idTypeArray) {
+
+
+	}
+
 	public function toArray() {
 		$id = $this->_getId();
 		$array = array('_type' => $this->getType(), '_id' => $id);
