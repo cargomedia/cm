@@ -27,6 +27,11 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 		return apc_fetch($key);
 	}
 
+	protected function _getMulti(array $keys) {
+		// TODO: Implement _getMulti() method.
+		throw new CM_Exception_NotImplemented();
+	}
+
 	protected function _delete($key) {
 		$key = self::_getKeyArmored($key);
 		return apc_delete($key);

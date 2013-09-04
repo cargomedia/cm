@@ -23,6 +23,13 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}
 
+	public function _getMulti(array $keys) {
+		foreach ($keys as &$key) {
+			$key = self::_getKeyArmored($key);
+		}
+		return array_values($this->_memcache->get($keys));
+	}
+
 	protected function _get($key) {
 		$key = self::_getKeyArmored($key);
 		return $this->_memcache->get($key);
