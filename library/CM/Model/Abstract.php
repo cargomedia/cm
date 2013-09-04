@@ -471,28 +471,26 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
 		$data = array();
-		foreach ($idTypeArray as &$idType) {
+		$idTypeSerialized = array();
+		foreach ($idTypeArray as $idType) {
 			$id = &$idType['id'];
 			if (!is_array($id)) {
 				$id = array('id' => $id);
 			}
-			$idTypeSerialized = self::_serializeIdType($idType['type'], $idType['id']);
-			$data[$idTypeSerialized] = array_merge($idType, array('data' => null));
+			$serializedKey = self::serializeIdType($idType['type'], $idType['id']);
+			$data[$serializedKey] = null;
+			$idTypeSerialized[$serializedKey] = $idType;
 		}
 
 		// TODO: try to load from cache first
 		$persistence = new CM_Model_StorageAdapter_Database();
-		$dataSet = $persistence->loadMultiple($idTypeArray);
-		foreach ($dataSet as $modelData) {
-			$type = $modelData['type'];
-			$id = $modelData['id'];
-			$idTypeSerialized = self::_serializeIdType($type, $id);
-			$data[$idTypeSerialized]['data'] = $modelData['data'];
-			$data[$idTypeSerialized]['id'] = $modelData['id'];
+		$dataSet = $persistence->loadMultiple($idTypeSerialized);
+		foreach ($dataSet as $serializedKey => $modelData) {
+			$data[$serializedKey] = $modelData['data'];
 		}
 		$models = array();
-		foreach ($data as $modelData) {
-			$models[] = self::factoryGeneric($modelData['type'], $modelData['id'], $modelData['data']);
+		foreach ($data as $serializedKey => $modelData) {
+			$models[] = self::factoryGeneric($idTypeSerialized[$serializedKey]['type'], $idTypeSerialized[$serializedKey]['id'], $modelData);
 		// TODO: add asset loading ?
 		}
 		return $models;
@@ -503,7 +501,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param int|array $id
 	 * @return string
 	 */
-	private static function _serializeIdType($type, $id) {
+	public static function serializeIdType($type, $id) {
 		array_walk($id, function (&$idPart) {
 			$idPart = (string) $idPart;
 		});

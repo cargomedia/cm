@@ -32,7 +32,8 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 					$id[$idColumn] = $row[$idColumn];
 					unset($row[$idColumn]);
 				}
-				$resultSet[] = array('id' => $id, 'type' => $type, 'data' => $row);
+				$serializedKey = CM_Model_Abstract::serializeIdType($type, $id);
+				$resultSet[$serializedKey] = array('id' => $id, 'type' => $type, 'data' => $row);
 			}
 		}
 		return $resultSet;
