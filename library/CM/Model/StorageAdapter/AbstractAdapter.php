@@ -10,7 +10,7 @@ abstract class CM_Model_StorageAdapter_AbstractAdapter extends CM_Class_Abstract
 	abstract public function load($type, array $id);
 
 	/**
-	 * @param array $idTypeArray [['type' => int, id' => int|array],...]
+	 * @param array $idTypeArray [['type' => int, id' => array],...]
 	 * @return array['type', 'id', 'data']|false
 	 */
 	abstract public function loadMultiple(array $idTypeArray);

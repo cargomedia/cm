@@ -114,10 +114,10 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_Database $adapter */
 
 		$idsTypes = array(
-			array('type' => 1, 'id' => $id1),
+			array('type' => 1, 'id' => array('id' => $id1)),
 			array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
 			array('type' => 2, 'id' => array('id' => 8, 'foo' => 'foo8')),
-			array('type' => 3, 'id' => $id10)
+			array('type' => 3, 'id' => array('id' => $id10))
 		);
 		$values = $adapter->loadMultiple($idsTypes);
 		$this->assertContainsAll(array(

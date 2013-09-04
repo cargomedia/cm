@@ -472,6 +472,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	public static function factoryGenericMultiple(array $idTypeArray) {
 		$data = array();
 		foreach ($idTypeArray as $idType) {
+			$id = &$idType['id'];
+			if (!is_array($id)) {
+				$id = array('id' => $id);
+			}
 			$idTypeSerialized = self::_serializeIdType($idType['type'], $idType['id']);
 			$data[$idTypeSerialized] = array_merge($idType, array('data' => null));
 		}
@@ -500,9 +504,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return string
 	 */
 	private static function _serializeIdType($type, $id) {
-		if (!is_array($id)) {
-			$id = array('id' => $id);
-		}
 		array_walk($id, function (&$idPart) {
 			$idPart = (string) $idPart;
 		});
