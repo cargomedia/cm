@@ -471,7 +471,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
 		$data = array();
-		foreach ($idTypeArray as $idType) {
+		foreach ($idTypeArray as &$idType) {
 			$id = &$idType['id'];
 			if (!is_array($id)) {
 				$id = array('id' => $id);
