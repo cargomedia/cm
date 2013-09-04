@@ -27,7 +27,12 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 		foreach ($keys as &$key) {
 			$key = self::_getKeyArmored($key);
 		}
-		return array_values($this->_memcache->get($keys));
+		$values = $this->_memcache->get($keys);
+		$result = array();
+		foreach ($values as $key => $value) {
+			$result[$this->_extractKeyArmored($key)] = $value;
+		}
+		return $result;
 	}
 
 	protected function _get($key) {
