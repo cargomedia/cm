@@ -12,10 +12,9 @@
 
 			$buttonsContainer.on('click', 'a', function(event) {
 				var $activeTab = $(this).closest('.tabs > *');
-				var $contents = $contentContainer.find('> *');
 				var index = $activeTab.index();
 				$activeTab.addClass('active').siblings().removeClass('active');
-				var $activeTabContent = $contents.eq(index);
+				var $activeTabContent = $contentContainer.find('> *').eq(index);
 				$activeTabContent.addClass('active').show();
 				$activeTabContent.siblings().removeClass('active').hide();
 			});
