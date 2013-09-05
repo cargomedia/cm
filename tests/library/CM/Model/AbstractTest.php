@@ -502,11 +502,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		}
 	}
 
-	public function testGetDecodePersistence() {
+	public function testGetValidatePersistence() {
 		$type = 1;
 		$idRaw = array('id' => 3);
 		$data = array('foo' => 12, 'bar' => 23);
-		$dataDecoded = array('foo' => 'bar', 'bar' => 'foo');
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
 		$persistence->expects($this->once())->method('load')->will($this->returnValue($data));
@@ -516,61 +515,76 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$cache->expects($this->once())->method('load')->will($this->returnValue(false));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeFields', '_getPersistence', '_getCache', 'getIdRaw',
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getPersistence', '_getCache', 'getIdRaw',
 			'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->once())->method('_decodeFields')->with($data)->will($this->returnValue($dataDecoded));
+		$modelMock->expects($this->once())->method('_validateFields')->with($data);
 		$modelMock->expects($this->once())->method('_getPersistence')->will($this->returnValue($persistence));
 		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($dataDecoded, $modelMock->_get());
+		$this->assertSame($data, $modelMock->_get());
 	}
 
-	public function testGetDecodeCache() {
+	public function testGetValidateCache() {
 		$type = 1;
 		$idRaw = array('id' => 3);
 		$data = array('foo' => 12, 'bar' => 23);
-		$dataDecoded = array('foo' => 'bar', 'bar' => 'foo');
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
 		$cache->expects($this->once())->method('load')->will($this->returnValue($data));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeFields', '_getCache', 'getIdRaw', 'getType'))
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->once())->method('_decodeFields')->with($data)->will($this->returnValue($dataDecoded));
+		$modelMock->expects($this->once())->method('_validateFields')->with($data);
 		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($dataDecoded, $modelMock->_get());
+		$this->assertSame($data, $modelMock->_get());
 	}
 
-	public function testGetDecodeLoadData() {
+	public function testGetValidateLoadData() {
 		$type = 1;
 		$idRaw = array('id' => 3);
 		$data = array('foo' => 12, 'bar' => 23);
-		$dataDecoded = array('foo' => 'bar', 'bar' => 'foo');
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
 		$cache->expects($this->once())->method('load')->will($this->returnValue(false));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeFields', '_getCache', '_loadData',
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', '_loadData',
 			'getIdRaw', 'getType'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->once())->method('_decodeFields')->with($data)->will($this->returnValue($dataDecoded));
+		$modelMock->expects($this->once())->method('_validateFields')->with($data);
 		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->once())->method('_loadData')->will($this->returnValue($data));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($dataDecoded, $modelMock->_get());
+		$this->assertSame($data, $modelMock->_get());
+	}
+
+	public function testGetDecode() {
+		$type = 1;
+		$idRaw = array('id' => 3);
+		$data = array('foo' => 12, 'bar' => 23);
+
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeField', '_getCache', '_loadData',
+			'getIdRaw', 'getType'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$modelMock->expects($this->once())->method('_decodeField')->with('foo', 12)->will($this->returnValue('12'));
+		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue(null));
+		$modelMock->expects($this->once())->method('_loadData')->will($this->returnValue($data));
+		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
+		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
+
+		$this->assertSame('12', $modelMock->_get('foo'));
 	}
 
 	/**
@@ -648,7 +662,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeFields', '_encodeFields', '_getCache', 'getType', 'getIdRaw'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->exactly(2))->method('_decodeFields')->with($data)->will($this->returnValue($dataDecoded));
+		$modelMock->expects($this->exactly(1))->method('_decodeFields')->with($data)->will($this->returnValue($dataDecoded));
 		$modelMock->expects($this->once())->method('_encodeFields')->with($dataDecoded)->will($this->returnValue($dataEncoded));
 		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));

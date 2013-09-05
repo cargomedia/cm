@@ -159,17 +159,20 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (null === $this->_data) {
 			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-					$this->_data = $this->_decodeFields($data);
+					$this->_validateFields($data);
+					$this->_data = $data;
 				}
 			}
 			if (null === $this->_data) {
 				if ($persistence = $this->_getPersistence()) {
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-						$this->_data = $this->_decodeFields($data);
+						$this->_validateFields($data);
+						$this->_data = $data;
 					}
 				} else {
 					if (is_array($data = $this->_loadData())) {
-						$this->_data = $this->_decodeFields($data);
+						$this->_validateFields($data);
+						$this->_data = $data;
 					}
 				}
 				if (null === $this->_data) {
@@ -189,7 +192,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (!array_key_exists($field, $this->_data)) {
 			throw new CM_Exception('Model has no field `' . $field . '`');
 		}
-		return $this->_data[$field];
+		$valueDecoded = $this->_decodeField($field, $this->_data[$field]);
+		return $valueDecoded;
 	}
 
 	/**
@@ -350,6 +354,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param array $data
+	 */
+	protected function _validateFields(array $data) {
+		$schema = $this->_getSchema();
+		if (!$schema) {
+			return;
+		}
+		foreach ($data as $key => $value) {
+			$schema->validateField($key, $value);
+		}
+	}
+
+	/**
+	 * @param array $data
 	 * @return array
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
@@ -378,6 +395,18 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$value = $schema->decodeField($key, $value);
 		}
 		return $data;
+	}
+
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	protected function _decodeField($key, $value) {
+		if (!$schema = $this->_getSchema()) {
+			return $value;
+		}
+		return $schema->decodeField($key, $value);
 	}
 
 	/**
