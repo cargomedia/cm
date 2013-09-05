@@ -91,11 +91,10 @@ class CM_Model_Schema_Definition {
 							break;
 						default:
 							$id = CM_Params::decode($value, true);
-							if (is_array($id)) {
-								$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
-							} else {
-								$value = new $type($id);
+							if (!is_array($id)) {
+								$id = array('id' => $id);
 							}
+							$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
 					}
 				}
 			}
