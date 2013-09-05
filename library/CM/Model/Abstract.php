@@ -8,6 +8,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/** @var array|null */
 	private $_data;
 
+	/** @var array */
+	private $_dataDecoded = array();
+
 	/** @var CM_ModelAsset_Abstract[] */
 	private $_assets = array();
 
@@ -37,7 +40,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_id = $id;
 		if (null !== $data) {
-			$this->_data = $this->_decodeFields($data);
+			$this->_validateFields($data);
+			$this->_data = $data;
 		}
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
@@ -90,6 +94,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cacheable->_change();
 		}
 		$this->_data = null;
+		$this->_dataDecoded = array();
 	}
 
 	/**
@@ -146,6 +151,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		$this->_data = null;
+		$this->_dataDecoded = array();
 		$this->_onChange();
 		return $this;
 	}
@@ -177,7 +183,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				}
 				if (null === $this->_data) {
 					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) .
-					'` has no data.');
+							'` has no data.');
 				}
 
 				if ($cache) {
@@ -187,13 +193,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 		}
 		if ($field === null) {
-			return $this->_data;
+			return array_merge($this->_data, $this->_dataDecoded);
 		}
 		if (!array_key_exists($field, $this->_data)) {
 			throw new CM_Exception('Model has no field `' . $field . '`');
 		}
-		$valueDecoded = $this->_decodeField($field, $this->_data[$field]);
-		return $valueDecoded;
+		if (!isset($this->_dataDecoded[$field])) {
+			$this->_dataDecoded[$field] = $this->_decodeField($field, $this->_data[$field]);
+		}
+		return $this->_dataDecoded[$field];
 	}
 
 	/**
@@ -216,12 +224,15 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_get(); // Make sure data is loaded
 
-		foreach ($this->_decodeFields($data) as $field => $value) {
-			$this->_data[$field] = $value;
+		foreach ($this->_encodeFields($data) as $field => $valueEncoded) {
+			$this->_data[$field] = $valueEncoded;
+		}
+		foreach ($data as $field => $value) {
+			$this->_dataDecoded[$field] = $value;
 		}
 
 		if ($this->_autoCommit) {
-			$data = $this->_encodeFields($this->_data);
+			$data = $this->_data;
 			if ($cache = $this->_getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
@@ -342,7 +353,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _getSchemaData($data = null) {
-		$data = ($data !== null) ? $data: $this->_data;
+		$data = ($data !== null) ? $data : $this->_data;
 		if (null === $data) {
 			throw new CM_Exception_Invalid('Model has no data');
 		}
@@ -382,6 +393,18 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
+	 * @param string $key
+	 * @param mixed  $value
+	 * @return mixed
+	 */
+	public  function _encodeField($key, $value) {
+		if (!$schema = $this->_getSchema()) {
+			return $value;
+		}
+		return $schema->encodeField($key, $value);
+	}
+
+	/**
 	 * @param array $data
 	 * @return array
 	 * @throws CM_Exception_Invalid
@@ -399,7 +422,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return mixed
 	 */
 	protected function _decodeField($key, $value) {
