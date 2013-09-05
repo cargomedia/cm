@@ -114,16 +114,20 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_Database $adapter */
 
 		$idsTypes = array(
-			array('type' => 1, 'id' => array('id' => $id1)),
-			array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
-			array('type' => 2, 'id' => array('id' => 8, 'foo' => 'foo8')),
-			array('type' => 3, 'id' => array('id' => $id10))
+			1 => array('type' => 1, 'id' => array('id' => $id1)),
+			'2' => array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
+			'foo' => array('type' => 2, 'id' => array('id' => 8, 'foo' => 'foo8')),
+			'bar' => array('type' => 3, 'id' => array('id' => $id10))
 		);
+		$expected = array(
+			1     => array('id' => array('id' => $id1), 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => '1')),
+			'2'   => array('id' => array('id' => $id3, 'foo' => 'foo3'), 'type' => 2, 'data' => array('bar' => '3')),
+			'foo' => array('id' => array('id' => $id8, 'foo' => 'foo8'), 'type' => 2, 'data' => array('bar' => '8')),
+			'bar' => array('id' => array('id' => $id10), 'type' => 3, 'data' => array('foo' => 'foo10', 'bar' => '10'))
+		);
+
 		$values = $adapter->loadMultiple($idsTypes);
-		$this->assertContainsAll(array(
-			array('id' => array('id' => $id1), 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => 1)),
-			array('id' => array('id' => $id3, 'foo' => 'foo3'), 'type' => 2, 'data' => array('bar' => 3)),
-			array('id' => array('id' => $id8, 'foo' => 'foo8'), 'type' => 2, 'data' => array('bar' => 8)),
-			array('id' => array('id' => $id10), 'type' => 3, 'data' => array('foo' => 'foo10', 'bar' => 10))), $values);
+		$this->assertSame(4, count($values));
+		$this->assertSame($expected, $values);
 	}
 }
