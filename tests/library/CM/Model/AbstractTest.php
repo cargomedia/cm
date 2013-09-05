@@ -428,7 +428,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testFactoryGenericMultiple() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
 
-		$modelsCreated = array();
 		$model1 = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 
 		$model1->_set('foo', 'foo1');

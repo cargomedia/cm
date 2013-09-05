@@ -496,7 +496,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$persistence = new CM_Model_StorageAdapter_Database();
 			$resultSet = $persistence->loadMultiple($idTypeSerialized2);
 			foreach ($resultSet as $serializedKey => $modelData) {
-				$dataSet[$serializedKey] = $modelData['data'];
+				$dataSet[$serializedKey] = $modelData;
 			}
 		}
 		$models = array();
