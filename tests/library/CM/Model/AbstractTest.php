@@ -439,9 +439,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$models = CM_Model_Abstract::factoryGenericMultiple(array(
 			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId()),
 			array('type' => CM_ModelMock::TYPE, 'id' => $model1->getId()),
+			array('type' => CM_ModelMock::TYPE, 'id' => 9999),
 		));
+		$this->assertEquals($models[0], $model2);
 		$this->assertSame($models[0]->_get(), array('foo' => 'foo2'));
+		$this->assertEquals($models[1], $model1);
 		$this->assertSame($models[1]->_get(), array('foo' => 'foo1'));
+		$this->assertSame($models[2], null);
 	}
 
 	public function testPersistenceSet() {

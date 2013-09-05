@@ -501,8 +501,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$models = array();
 		foreach ($dataSet as $serializedKey => $modelData) {
-			$models[] = self::factoryGeneric($idTypeSerialized[$serializedKey]['type'], $idTypeSerialized[$serializedKey]['id'], $modelData);
-		// TODO: add asset loading ?
+			if (null === $modelData) {
+				$models[] = null;
+			} else {
+				$models[] = self::factoryGeneric($idTypeSerialized[$serializedKey]['type'], $idTypeSerialized[$serializedKey]['id'], $modelData);
+			}
+			// TODO: add asset loading ?
 		}
 		return $models;
 	}
