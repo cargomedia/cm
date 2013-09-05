@@ -430,19 +430,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		$modelsCreated = array();
 		$model1 = CM_ModelMock::createStatic(array('foo' => 'bar1'));
+
+		$model1->_set('foo', 'foo1');
 		$model2 = CM_ModelMock::createStatic(array('foo' => 'bar2'));
-		$modelsCreated[] = $model2;
-		$modelsCreated[] = $model1;
+		$model2->_change();
+		CM_Db_Db::update('cm_modelmock', array('foo' => 'foo2'), array('id' => $model2->getId()));
 
 		/** @var CM_ModelMock[] $models */
 		$models = CM_Model_Abstract::factoryGenericMultiple(array(
 			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId()),
 			array('type' => CM_ModelMock::TYPE, 'id' => $model1->getId()),
 		));
-		foreach ($models as $key => $model) {
-			$expected = $modelsCreated[$key];
-			$this->assertSame($expected->_get(), $model->_get());
-		}
+		$this->assertSame($models[0]->_get(), array('foo' => 'foo2'));
+		$this->assertSame($models[1]->_get(), array('foo' => 'foo1'));
 	}
 
 	public function testPersistenceSet() {

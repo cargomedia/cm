@@ -470,26 +470,37 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract[]
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
-		$data = array();
+		$dataSet = array();
 		$idTypeSerialized = array();
-		foreach ($idTypeArray as $idType) {
+		foreach ($idTypeArray as &$idType) {
 			$id = &$idType['id'];
 			if (!is_array($id)) {
 				$id = array('id' => $id);
 			}
 			$serializedKey = self::_serializeIdType($idType['type'], $idType['id']);
-			$data[$serializedKey] = null;
+			$dataSet[$serializedKey] = null;
 			$idTypeSerialized[$serializedKey] = $idType;
 		}
 
-		// TODO: try to load from cache first
-		$persistence = new CM_Model_StorageAdapter_Database();
-		$dataSet = $persistence->loadMultiple($idTypeSerialized);
-		foreach ($dataSet as $serializedKey => $modelData) {
-			$data[$serializedKey] = $modelData['data'];
+		$cache = new CM_Model_StorageAdapter_Cache();
+		$resultSet = $cache->loadMultiple($idTypeSerialized);
+		$idTypeSerialized2 = array();
+		foreach ($dataSet as $serializedKey => &$data) {
+			if (array_key_exists($serializedKey, $resultSet)) {
+				$data = $resultSet[$serializedKey];
+			} else {
+				$idTypeSerialized2[$serializedKey] = $idTypeSerialized[$serializedKey];
+			}
+		}
+		if (!empty($idTypeSerialized2)) {
+			$persistence = new CM_Model_StorageAdapter_Database();
+			$resultSet = $persistence->loadMultiple($idTypeSerialized2);
+			foreach ($resultSet as $serializedKey => $modelData) {
+				$dataSet[$serializedKey] = $modelData['data'];
+			}
 		}
 		$models = array();
-		foreach ($data as $serializedKey => $modelData) {
+		foreach ($dataSet as $serializedKey => $modelData) {
 			$models[] = self::factoryGeneric($idTypeSerialized[$serializedKey]['type'], $idTypeSerialized[$serializedKey]['id'], $modelData);
 		// TODO: add asset loading ?
 		}
