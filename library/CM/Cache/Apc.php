@@ -28,7 +28,6 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 	}
 
 	protected function _getMulti(array $keys) {
-		// TODO: Implement _getMulti() method.
 		throw new CM_Exception_NotImplemented();
 	}
 

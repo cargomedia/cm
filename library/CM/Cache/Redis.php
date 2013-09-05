@@ -123,6 +123,10 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		throw new CM_Exception_NotImplemented();
 	}
 
+	protected function _getMulti(array $keys) {
+		throw new CM_Exception_NotImplemented();
+	}
+
 	protected function _delete($key) {
 		throw new CM_Exception_NotImplemented();
 	}

@@ -15,6 +15,10 @@ class CM_Cache_Runtime extends CM_Cache_Abstract {
 		return false;
 	}
 
+	protected function _getMulti(array $keys) {
+		throw new CM_Exception_NotImplemented();
+	}
+
 	protected function _delete($key) {
 		return false;
 	}
