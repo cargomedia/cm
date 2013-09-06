@@ -26,7 +26,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		}
 		return array('mobile' => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
 			'tablet' => (boolean) $wurfl->capabilities['product_info']['is_tablet'],
-			'hasTouschreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
+			'hasTouchscreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
 	}
 
 	/**
