@@ -198,7 +198,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (!array_key_exists($field, $this->_data)) {
 			throw new CM_Exception('Model has no field `' . $field . '`');
 		}
-		if (!isset($this->_dataDecoded[$field])) {
+		if (!array_key_exists($field, $this->_dataDecoded)) {
 			$this->_dataDecoded[$field] = $this->_decodeField($field, $this->_data[$field]);
 		}
 		return $this->_dataDecoded[$field];
