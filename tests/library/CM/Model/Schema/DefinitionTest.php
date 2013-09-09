@@ -349,10 +349,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			),
 		);
 		foreach ($testDataList as $testData) {
-			$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setConstructorArgs(array(array('foo' => $testData['schema'])))
-					->setMethods(array('validateField'))->getMock();
-			$schema->expects($this->once())->method('validateField')->with('foo', $testData['value']);
-			/** @var CM_Model_Schema_Definition $schema  */
+			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->decodeField('foo', $testData['value']);
 			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
 				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
@@ -482,10 +479,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			),
 		);
 		foreach ($testDataList as $testData) {
-			$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setConstructorArgs(array(array('foo' => $testData['schema'])))
-					->setMethods(array('validateField'))->getMock();
-			$schema->expects($this->once())->method('validateField')->with('foo', $testData['value']);
-			/** @var CM_Model_Schema_Definition $schema  */
+			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->encodeField('foo', $testData['value']);
 			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
 				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
