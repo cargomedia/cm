@@ -773,6 +773,20 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->_set(array('foo' => 12));
 	}
 
+	public function testSetData() {
+		$data = array('bar' => '23', 'foo' => 'bar');
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType'))
+				->setConstructorArgs(array())->getMockForAbstractClass();
+		/** @var CM_Model_Abstract $model */
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame(array(), $getData->invoke($model));
+
+		$model->_set($data);
+
+		$this->assertSame($data, $getData->invoke($model));
+	}
+
 	public function testDelete() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());

@@ -18,7 +18,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_autoCommit = true;
 
 	/**
-	 * @param int|null   $id
+	 * @param int|null $id
 	 */
 	public function __construct($id = null) {
 		if (null !== $id) {
@@ -40,7 +40,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_id = $id;
 		if (null !== $data) {
 			$this->_validateFields($data);
-			$this->_data = $data;
+			$this->_setData($data);
 		}
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
@@ -57,7 +57,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
 			}
 			$this->_onChange();
 		} else {
@@ -65,7 +65,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 			if ($cache = $this->_getCache()) {
 				$this->_loadAssets(true);
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
 			}
 			$this->_onChange();
 			foreach ($this->_getContainingCacheables() as $cacheable) {
@@ -134,7 +134,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array($this->getIdRaw(), $this->_data));
+		return serialize(array($this->getIdRaw(), $this->_getData()));
 	}
 
 	final public function unserialize($serialized) {
@@ -192,16 +192,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_getData(); // Make sure data is loaded
 
-		foreach ($this->_encodeFields($data) as $field => $valueEncoded) {
-			$this->_data[$field] = $valueEncoded;
-		}
-		$this->_validateFields($this->_data);
+		$dataEncoded = $this->_encodeFields($data);
+		$this->_validateFields($dataEncoded);
+		$this->_setData($dataEncoded);
+		$dataEncoded = array_merge($this->_dataDecoded, $data);
 		foreach ($data as $field => $value) {
 			$this->_dataDecoded[$field] = $value;
 		}
 
 		if ($this->_autoCommit) {
-			$data = $this->_data;
+			$data = $this->_getData();
 			if ($cache = $this->_getCache()) {
 				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
@@ -226,19 +226,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
 					$this->_validateFields($data);
-					$this->_data = $data;
+					$this->_setData($data);
 				}
 			}
 			if (null === $this->_data) {
 				if ($persistence = $this->_getPersistence()) {
 					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
 						$this->_validateFields($data);
-						$this->_data = $data;
+						$this->_setData($data);
 					}
 				} else {
 					if (is_array($data = $this->_loadData())) {
 						$this->_validateFields($data);
-						$this->_data = $data;
+						$this->_setData($data);
 					}
 				}
 				if (null === $this->_data) {
@@ -253,6 +253,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 		}
 		return $this->_data;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	final protected function _setData(array $data) {
+		if (null === $this->_data) {
+			$this->_data = array();
+		}
+		$this->_data = array_merge($this->_data, $data);
 	}
 
 	/**
@@ -360,7 +370,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _getSchemaData($data = null) {
-		$data = ($data !== null) ? $data : $this->_data;
+		$data = ($data !== null) ? $data : $this->_getData();
 		if (null === $data) {
 			throw new CM_Exception_Invalid('Model has no data');
 		}
