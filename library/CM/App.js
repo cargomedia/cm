@@ -703,7 +703,8 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		get: function(key) {
 			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-			if (!value) {
+			if (value === null) {
+				// See: https://code.google.com/p/android/issues/detail?id=11973
 				return null;
 			}
 			return JSON.parse(value);
