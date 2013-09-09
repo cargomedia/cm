@@ -46,7 +46,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
-		$this->_get(); // Make sure data can be loaded
+		$this->_getData(); // Make sure data can be loaded
 	}
 
 	public function commit() {
@@ -161,7 +161,67 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
-	final public function _get($field = null) {
+	final public function _get($field) {
+		$string = (string) $field;
+		$data = $this->_getData();
+		if (!array_key_exists($field, $data)) {
+			throw new CM_Exception('Model has no field `' . $field . '`');
+		}
+		if (!array_key_exists($field, $this->_dataDecoded)) {
+			$this->_dataDecoded[$field] = $this->_decodeField($field, $data[$field]);
+		}
+		return $this->_dataDecoded[$field];
+	}
+
+	/**
+	 * @param string $field
+	 * @return boolean
+	 */
+	final public function _has($field) {
+		$data = $this->_getData(); // Make sure data is loaded
+		return array_key_exists($field, $data);
+	}
+
+	/**
+	 * @param string|array $data
+	 * @param mixed|null   $value
+	 * @throws CM_Exception_Invalid
+	 */
+	final public function _set($data, $value = null) {
+		if (!is_array($data)) {
+			$data = array($data => $value);
+		}
+		$this->_getData(); // Make sure data is loaded
+
+		foreach ($this->_encodeFields($data) as $field => $valueEncoded) {
+			$this->_data[$field] = $valueEncoded;
+		}
+		foreach ($data as $field => $value) {
+			$this->_dataDecoded[$field] = $value;
+		}
+
+		if ($this->_autoCommit) {
+			$data = $this->_data;
+			if ($cache = $this->_getCache()) {
+				$cache->save($this->getType(), $this->getIdRaw(), $data);
+			}
+			if ($persistence = $this->_getPersistence()) {
+				if (!$schema = $this->_getSchema()) {
+					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
+				}
+				if ($schema->hasField(array_keys($data))) {
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
+				}
+			}
+			$this->_onChange();
+		}
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Nonexistent
+	 */
+	final protected function _getData() {
 		if (null === $this->_data) {
 			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
@@ -192,60 +252,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				}
 			}
 		}
-		if ($field === null) {
-			return array_merge($this->_data, $this->_dataDecoded);
-		}
-		if (!array_key_exists($field, $this->_data)) {
-			throw new CM_Exception('Model has no field `' . $field . '`');
-		}
-		if (!array_key_exists($field, $this->_dataDecoded)) {
-			$this->_dataDecoded[$field] = $this->_decodeField($field, $this->_data[$field]);
-		}
-		return $this->_dataDecoded[$field];
-	}
-
-	/**
-	 * @param string $field
-	 * @return boolean
-	 */
-	final public function _has($field) {
-		$this->_get(); // Make sure data is loaded
-		return array_key_exists($field, $this->_data);
-	}
-
-	/**
-	 * @param string|array $data
-	 * @param mixed|null   $value
-	 * @throws CM_Exception_Invalid
-	 */
-	final public function _set($data, $value = null) {
-		if (!is_array($data)) {
-			$data = array($data => $value);
-		}
-		$this->_get(); // Make sure data is loaded
-
-		foreach ($this->_encodeFields($data) as $field => $valueEncoded) {
-			$this->_data[$field] = $valueEncoded;
-		}
-		foreach ($data as $field => $value) {
-			$this->_dataDecoded[$field] = $value;
-		}
-
-		if ($this->_autoCommit) {
-			$data = $this->_data;
-			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $data);
-			}
-			if ($persistence = $this->_getPersistence()) {
-				if (!$schema = $this->_getSchema()) {
-					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
-				}
-				if ($schema->hasField(array_keys($data))) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
-				}
-			}
-			$this->_onChange();
-		}
+		return $this->_data;
 	}
 
 	/**

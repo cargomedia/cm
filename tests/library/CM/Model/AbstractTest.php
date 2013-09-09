@@ -52,7 +52,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $model */
 
 		$this->assertSame($id, $model->getId());
-		$this->assertSame($data, $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 	}
 
 	public function testConstructorWithoutIdWithData() {
@@ -64,7 +65,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame($data, $model->_get());
+
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 	}
 
 	public function testConstructorWithoutIdWithoutData() {
@@ -82,7 +85,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame(array(), $model->_get());
+
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame(array(), $getData->invoke($model));
 		$this->assertFalse($model->hasId());
 		$model->_set('foo', 12);
 		$this->assertSame(12, $model->_get('foo'));
@@ -97,7 +102,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $modelMock */
 		$modelMock->__construct(null, $data);
 
-		$this->assertSame($data, $modelMock->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($modelMock));
 	}
 
 	public function testCommit() {
@@ -119,7 +125,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame(array(), $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame(array(), $getData->invoke($model));
 		$this->assertFalse($model->hasId());
 		$model->_set($data);
 		$model->commit();
@@ -167,7 +174,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame($data, $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 		$this->assertSame($id, $model->getId());
 		$model->commit();
 	}
@@ -341,7 +349,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame($data, $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 	}
 
 	public function testCacheMiss() {
@@ -362,7 +371,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('_loadData')->will($this->returnValue($data));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame($data, $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 	}
 
 	public function testCacheSet() {
@@ -463,7 +473,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
 
-		$this->assertSame($data, $model->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($model));
 	}
 
 	public function testPersistenceDelete() {
@@ -524,7 +535,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($data, $modelMock->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($modelMock));
 	}
 
 	public function testGetValidateCache() {
@@ -544,7 +556,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($data, $modelMock->_get());
+
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($modelMock));
 	}
 
 	public function testGetValidateLoadData() {
@@ -566,7 +580,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$this->assertSame($data, $modelMock->_get());
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$this->assertSame($data, $getData->invoke($modelMock));
 	}
 
 	public function testGetDecode() {
@@ -606,7 +621,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		/** @var CM_Model_Abstract $modelMock */
 
-		$modelMock->_get();
+		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
+		$getData->invoke($modelMock);
 	}
 
 	public function testHas() {
@@ -667,7 +683,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $modelMock */
 
 		$modelMock->_set($data);
-		$this->assertSame($data, $modelMock->_get());
+		$this->assertSame($data['foo'], $modelMock->_get('foo'));
+		$this->assertSame($data['bar'], $modelMock->_get('bar'));
+
 	}
 
 	public function testSetPersistenceSave() {
@@ -781,13 +799,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testLazyAsset() {
 		$modelMock = new CM_ModelMock2(1);
-		$this->assertFalse(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$this->assertFalse($modelMock->_has('CM_ModelAsset_ModelMock_ModelAssetMock:foo'));
 		$modelMock->getModelAssetMock()->getFoo();
-		$this->assertTrue(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$this->assertTrue($modelMock->_has('CM_ModelAsset_ModelMock_ModelAssetMock:foo'));
 		$modelMock->_set('CM_ModelAsset_ModelMock_ModelAssetMock:foo', 'bar');
 
 		$modelMock = new CM_ModelMock2(1);
-		$this->assertTrue(array_key_exists('CM_ModelAsset_ModelMock_ModelAssetMock:foo', $modelMock->_get()));
+		$this->assertTrue($modelMock->_has('CM_ModelAsset_ModelMock_ModelAssetMock:foo'));
 		$this->assertEquals('bar', $modelMock->getModelAssetMock()->getFoo());
 		$modelMock->_change();
 
@@ -935,10 +953,6 @@ class CM_ModelMock2 extends CM_Model_Abstract {
 
 	protected function _getAssets() {
 		return array(new CM_ModelAsset_ModelMock_ModelAssetMock($this));
-	}
-
-	public function getData() {
-		return $this->_get();
 	}
 
 	/**
