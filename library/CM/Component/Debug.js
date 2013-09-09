@@ -30,6 +30,9 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 				}
 				self.toggleDebugBar();
 			}
+			if (self.active && event.which === 67) { // c Key
+				self.clearCache();
+			}
 		});
 
 		this.on('destruct', function() {
