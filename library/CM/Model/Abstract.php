@@ -405,34 +405,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param mixed  $value
 	 * @return mixed
 	 */
-	public  function _encodeField($key, $value) {
-		if (!$schema = $this->_getSchema()) {
-			return $value;
-		}
-		return $schema->encodeField($key, $value);
-	}
-
-	/**
-	 * @param array $data
-	 * @return array
-	 * @throws CM_Exception_Invalid
-	 * @throws CM_Model_Exception_Validation
-	 */
-	protected function _decodeFields(array $data) {
-		if (!$schema = $this->_getSchema()) {
-			return $data;
-		}
-		foreach ($data as $key => &$value) {
-			$value = $schema->decodeField($key, $value);
-		}
-		return $data;
-	}
-
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 * @return mixed
-	 */
 	protected function _decodeField($key, $value) {
 		if (!$schema = $this->_getSchema()) {
 			return $value;
