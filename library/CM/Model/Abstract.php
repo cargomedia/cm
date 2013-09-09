@@ -19,13 +19,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param int|null   $id
-	 * @param array|null $data
 	 */
-	public function __construct($id = null, array $data = null) {
+	public function __construct($id = null) {
 		if (null !== $id) {
 			$id = array('id' => (int) $id);
 		}
-		$this->_construct($id, $data);
+		$this->_construct($id);
 	}
 
 	/**
