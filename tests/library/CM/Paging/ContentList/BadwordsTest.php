@@ -24,6 +24,7 @@ class CM_Paging_ContentList_BadwordsTest extends CMTest_TestCase {
 		$this->assertTrue($this->_paging->isMatch('bad.com-foo.de'));
 		$this->assertFalse($this->_paging->isMatch('evil.com'));
 		$this->assertTrue($this->_paging->isMatch('foo-bar'));
+		$this->assertTrue($this->_paging->isMatch('foo"bar'));
 		$this->assertTrue($this->_paging->isMatch('test zoo test'));
 		$this->assertFalse($this->_paging->isMatch('testzoo'));
 		$this->assertFalse($this->_paging->isMatch('testzootest'));
