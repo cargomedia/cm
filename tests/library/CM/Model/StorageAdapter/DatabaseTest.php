@@ -120,10 +120,10 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 			'bar' => array('type' => 3, 'id' => array('id' => $id10))
 		);
 		$expected = array(
-			1     => array('id' => array('id' => $id1), 'type' => 1, 'data' => array('foo' => 'foo1', 'bar' => '1')),
-			'2'   => array('id' => array('id' => $id3, 'foo' => 'foo3'), 'type' => 2, 'data' => array('bar' => '3')),
-			'foo' => array('id' => array('id' => $id8, 'foo' => 'foo8'), 'type' => 2, 'data' => array('bar' => '8')),
-			'bar' => array('id' => array('id' => $id10), 'type' => 3, 'data' => array('foo' => 'foo10', 'bar' => '10'))
+			1     => array('foo' => 'foo1', 'bar' => '1'),
+			'2'   => array('bar' => '3'),
+			'foo' => array('bar' => '8'),
+			'bar' => array('foo' => 'foo10', 'bar' => '10')
 		);
 
 		$values = $adapter->loadMultiple($idsTypes);
