@@ -44,11 +44,9 @@ class CM_Model_Schema_Definition {
 							break;
 						default:
 							/** @var CM_Model_Abstract $value */
-							$idRaw = $value->getIdRaw();
-							if (count($idRaw) > 1) {
-								$id = $idRaw;
-							} else {
-								$id = reset($idRaw);
+							$id = $value->getIdRaw();
+							if (count($id) == 1) {
+								$id = reset($id);
 							}
 							$value = CM_Params::encode($id, true);
 					}
