@@ -221,7 +221,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return array
 	 * @throws CM_Exception_Nonexistent
 	 */
-	final protected function _getData() {
+	protected function _getData() {
 		if (null === $this->_data) {
 			if ($cache = $this->_getCache()) {
 				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
@@ -258,7 +258,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param array $data
 	 */
-	final protected function _setData(array $data) {
+	protected function _setData(array $data) {
 		if (null === $this->_data) {
 			$this->_data = array();
 		}
