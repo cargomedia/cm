@@ -355,7 +355,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return CM_Model_Schema_Definition|null
+	 * @return CM_Model_Schema_Definition
 	 */
 	protected function _getSchema() {
 		return new CM_Model_Schema_Definition(array());
