@@ -195,7 +195,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$dataEncoded = $this->_encodeFields($data);
 		$this->_validateFields($dataEncoded);
 		$this->_setData($dataEncoded);
-		$dataEncoded = array_merge($this->_dataDecoded, $data);
 		foreach ($data as $field => $value) {
 			$this->_dataDecoded[$field] = $value;
 		}
