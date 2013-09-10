@@ -769,6 +769,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testSetData() {
 		$data = array('bar' => '23', 'foo' => 'bar');
+		$dataNew = array('baar' => '23', 'fooo' => 'bar');
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setConstructorArgs(array())->getMockForAbstractClass();
 		/** @var CM_Model_Abstract $model */
@@ -777,8 +778,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame(array(), $getData->invoke($model));
 
 		$setData->invoke($model, $data);
-
 		$this->assertSame($data, $getData->invoke($model));
+
+		$setData->invoke($model, $dataNew);
+		$this->assertSame($dataNew, $getData->invoke($model));
 	}
 
 	public function testDelete() {

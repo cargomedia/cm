@@ -190,11 +190,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (!is_array($data)) {
 			$data = array($data => $value);
 		}
-		$this->_getData(); // Make sure data is loaded
+		$modelData = $this->_getData(); // Make sure data is loaded
 
 		$dataEncoded = $this->_encodeFields($data);
 		$this->_validateFields($dataEncoded);
-		$this->_setData($dataEncoded);
+		$this->_setData(array_merge($modelData, $dataEncoded));
 		foreach ($data as $field => $value) {
 			$this->_dataDecoded[$field] = $value;
 		}
@@ -259,10 +259,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array $data
 	 */
 	protected function _setData(array $data) {
-		if (null === $this->_data) {
-			$this->_data = array();
-		}
-		$this->_data = array_merge($this->_data, $data);
+		$this->_data = $data;
 	}
 
 	/**
