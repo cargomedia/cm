@@ -367,9 +367,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception_Invalid
 	 */
 	protected function _getSchemaData($data = null) {
-		$data = ($data !== null) ? $data : $this->_getData();
 		if (null === $data) {
-			throw new CM_Exception_Invalid('Model has no data');
+			$data = $this->_getData();
 		}
 		$schema = $this->_getSchema();
 		if ($schema->isEmpty()) {
