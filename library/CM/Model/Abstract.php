@@ -206,8 +206,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
 			if ($persistence = $this->_getPersistence()) {
-				if (!$schema = $this->_getSchema()) {
-					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
+				$schema = $this->_getSchema();
+				if ($schema->isEmpty()) {
+					throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
 				}
 				if ($schema->hasField(array_keys($data))) {
 					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
@@ -361,7 +362,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Schema_Definition|null
 	 */
 	protected function _getSchema() {
-		return null;
+		return new CM_Model_Schema_Definition(array());
 	}
 
 	/**
@@ -374,8 +375,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (null === $data) {
 			throw new CM_Exception_Invalid('Model has no data');
 		}
-		if (!$schema = $this->_getSchema()) {
-			throw new CM_Exception_Invalid('Cannot get schema-data without a schema');
+		$schema = $this->_getSchema();
+		if ($schema->isEmpty()) {
+			throw new CM_Exception_Invalid('Cannot get schema-data with an empty schema');
 		}
 		return array_intersect_key($data, array_flip($schema->getFieldNames()));
 	}
@@ -385,7 +387,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected function _validateFields(array $data) {
 		$schema = $this->_getSchema();
-		if (!$schema) {
+		if (!$schema->hasField(array_keys($data))) {
 			return;
 		}
 		foreach ($data as $key => $value) {
@@ -400,7 +402,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Model_Exception_Validation
 	 */
 	protected function _encodeFields(array $data) {
-		if (!$schema = $this->_getSchema()) {
+		$schema = $this->_getSchema();
+		if (!$schema->hasField(array_keys($data))) {
 			return $data;
 		}
 		foreach ($data as $key => &$value) {
@@ -415,7 +418,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 */
 	protected function _decodeField($key, $value) {
-		if (!$schema = $this->_getSchema()) {
+		$schema = $this->_getSchema();
+		if (!$schema->hasField($key)) {
 			return $value;
 		}
 		return $schema->decodeField($key, $value);

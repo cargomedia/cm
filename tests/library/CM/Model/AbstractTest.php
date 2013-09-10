@@ -48,12 +48,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', '_getPersistence'))
-				->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+				->disableOriginalConstructor()->getMockForAbstractClass();
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
 
+		$model->__construct(null ,null);
 
 		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
 		$this->assertSame(array(), $getData->invoke($model));
@@ -126,11 +127,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType', '_getSchema', '_getPersistence'))
-				->setConstructorArgs(array(null, null))->getMockForAbstractClass();
+				->disableOriginalConstructor()->getMockForAbstractClass();
 		$model->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
 		$model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
 		/** @var CM_Model_Abstract $model */
+
+		$model->__construct(null, null);
 
 		$getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
 		$this->assertSame(array(), $getData->invoke($model));

@@ -2,6 +2,14 @@
 
 class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
+	public function testIsEmpty() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$this->assertTrue($schema->isEmpty());
+
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
+		$this->assertFalse($schema->isEmpty());
+	}
+
 	public function testHasKey() {
 		$schema = new  CM_Model_Schema_Definition(array(
 			'foo' => array(),

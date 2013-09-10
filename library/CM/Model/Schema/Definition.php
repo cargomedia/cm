@@ -120,6 +120,13 @@ class CM_Model_Schema_Definition {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function isEmpty() {
+		return empty($this->_schema);
+	}
+
+	/**
 	 * @param string $key
 	 * @param mixed  $value
 	 * @return mixed
