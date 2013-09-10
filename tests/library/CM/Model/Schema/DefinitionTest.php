@@ -30,7 +30,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		$this->assertTrue($_isFloat->invoke($schema, $value));
 
 		$value = '4E21';
-		$this->assertFalse($_isFloat->invoke($schema, $value));
+		$this->assertTrue($_isFloat->invoke($schema, $value));
 	}
 
 	public function testIsBoolean() {
