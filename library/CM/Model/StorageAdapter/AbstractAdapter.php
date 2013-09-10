@@ -11,7 +11,7 @@ abstract class CM_Model_StorageAdapter_AbstractAdapter extends CM_Class_Abstract
 
 	/**
 	 * @param array $idTypeArray [['type' => int, id' => array],...]
-	 * @return array['type', 'id', 'data']|false
+	 * @return array|false
 	 *
 	 * Return Array must preserve the keys of $idTypeArray
 	 */
