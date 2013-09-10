@@ -10,6 +10,25 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		$this->assertFalse($schema->isEmpty());
 	}
 
+	public function testIsFloat() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$_isFloat = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isFloat');
+		$value = '4.1';
+		$this->assertTrue($_isFloat->invoke($schema, $value));
+
+		$value = '4.0';
+		$this->assertTrue($_isFloat->invoke($schema, $value));
+
+		$value = '4';
+		$this->assertTrue($_isFloat->invoke($schema, $value));
+
+		$value = '4.0.2';
+		$this->assertFalse($_isFloat->invoke($schema, $value));
+
+		$value = '4E21';
+		$this->assertFalse($_isFloat->invoke($schema, $value));
+	}
+
 	public function testHasKey() {
 		$schema = new  CM_Model_Schema_Definition(array(
 			'foo' => array(),

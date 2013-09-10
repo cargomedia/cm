@@ -208,7 +208,7 @@ class CM_Model_Schema_Definition {
 	 */
 	protected function _isFloat($value) {
 		return (is_float($value) || is_int($value)) ||
-				(is_string($value) && ($value === (string) (float) $value || $value === (string) (int) $value));
+				(is_string($value) && ($value === (string) (float) $value || (($value % 1 === 0 && (float) $value . '.0' === $value))));
 	}
 
 	/**
