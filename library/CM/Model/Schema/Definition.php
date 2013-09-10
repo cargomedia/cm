@@ -20,6 +20,7 @@ class CM_Model_Schema_Definition {
 	 * @throws CM_Model_Exception_Validation
 	 */
 	public function encodeField($key, $value) {
+		$key = (string) $key;
 		if ($this->hasField($key)) {
 			$schemaField = $this->_schema[$key];
 
@@ -64,6 +65,7 @@ class CM_Model_Schema_Definition {
 	 * @throws CM_Model_Exception_Validation
 	 */
 	public function decodeField($key, $value) {
+		$key = (string) $key;
 		if ($this->hasField($key)) {
 			$schemaField = $this->_schema[$key];
 
@@ -132,6 +134,7 @@ class CM_Model_Schema_Definition {
 	 * @throws CM_Model_Exception_Validation
 	 */
 	public function validateField($key, $value) {
+		$key = (string) $key;
 		if ($this->hasField($key)) {
 			$schemaField = $this->_schema[$key];
 
