@@ -161,7 +161,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
 	final public function _get($field) {
-		$string = (string) $field;
 		$data = $this->_getData();
 		if (!array_key_exists($field, $data)) {
 			throw new CM_Exception('Model has no field `' . $field . '`');
