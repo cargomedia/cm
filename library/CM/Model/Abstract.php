@@ -240,8 +240,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					}
 				}
 				if (null === $this->_data) {
-					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) .
-							'` has no data.');
+					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
 				}
 
 				if ($cache) {
