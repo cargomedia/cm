@@ -167,7 +167,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			throw new CM_Exception('Model has no field `' . $field . '`');
 		}
 		if (!array_key_exists($field, $this->_dataDecoded)) {
-			$this->_dataDecoded[$field] = $this->_decodeField($field, $data[$field]);
+			$this->_dataDecoded[$field] = $this->_getSchema()->decodeField($field, $data[$field]);
 		}
 		return $this->_dataDecoded[$field];
 	}
@@ -396,15 +396,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$value = $schema->encodeField($key, $value);
 		}
 		return $data;
-	}
-
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 * @return mixed
-	 */
-	protected function _decodeField($key, $value) {
-		return $this->_getSchema()->decodeField($key, $value);
 	}
 
 	/**

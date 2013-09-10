@@ -602,17 +602,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$type = 1;
 		$idRaw = array('id' => 3);
 		$data = array('foo' => 12, 'bar' => 23);
+		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField'))->setConstructorArgs(array(array()))->getMock();
+		$schema->expects($this->once())->method('decodeField')->with('foo', 12)->will($this->returnValue(123));
 
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_decodeField', '_getCache', '_loadData',
-			'getIdRaw', 'getType'))
+			'getIdRaw', 'getType', '_getSchema'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->once())->method('_decodeField')->with('foo', 12)->will($this->returnValue('12'));
 		$modelMock->expects($this->once())->method('_getCache')->will($this->returnValue(null));
 		$modelMock->expects($this->once())->method('_loadData')->will($this->returnValue($data));
+		$modelMock->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 
-		$this->assertSame('12', $modelMock->_get('foo'));
+		$this->assertSame(123, $modelMock->_get('foo'));
 	}
 
 	/**
