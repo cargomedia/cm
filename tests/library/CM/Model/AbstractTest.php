@@ -673,9 +673,10 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$storedModel = CM_ModelMock::createStatic(array('foo' => 'bar1'));
 		$dataEncoded = array('foo' => $storedModel->getId());
 
-		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField'))
+		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField', 'encodeField'))
 				->setConstructorArgs(array(array('foo' => array('type' => 'CM_ModelMock'))))->getMockForAbstractClass();
 		$schema->expects($this->once())->method('decodeField')->with('foo', $storedModel->getId())->will($this->returnValue($storedModel));
+		$schema->expects($this->once())->method('encodeField')->with('foo', 1)->will($this->returnValue($storedModel->getId()));
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema', 'getType', '_getData', 'getIdRaw'))
 				->disableOriginalConstructor()->getMockForAbstractClass();
@@ -684,7 +685,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => 1)));
 
 		/** @var CM_Model_Abstract $model */
-		$model->_set('foo', $storedModel);
+		$model->_set('foo', 1);
 
 		$this->assertEquals($storedModel, $model->_get('foo'));
 	}
