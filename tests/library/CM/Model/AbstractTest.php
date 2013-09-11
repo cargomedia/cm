@@ -669,6 +669,27 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($modelMock->_get('foo'));
 	}
 
+	public function testSetDataUnsetDecoded() {
+		$dataPassed = $dataEncoded = array('foo' => '1');
+		$dataDecoded = array('foo' => 1);
+
+		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField', 'encodeField'))
+				->setConstructorArgs(array(array('foo' => array('type' => 'CM_ModelMock'))))->getMockForAbstractClass();
+		$schema->expects($this->once())->method('decodeField')->with('foo', $dataEncoded['foo'])->will($this->returnValue($dataDecoded['foo']));
+		$schema->expects($this->once())->method('encodeField')->with('foo', '1')->will($this->returnValue($dataEncoded['foo']));
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema', 'getType', '_getData', 'getIdRaw'))
+				->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('_getData')->will($this->returnValue($dataEncoded));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => 1)));
+
+		/** @var CM_Model_Abstract $model */
+		$model->_set('foo', $dataPassed['foo']);
+
+		$this->assertSame($dataDecoded['foo'], $model->_get('foo'));
+	}
+
 	public function testSetMultiple() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'foo1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -686,9 +707,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('encodeField'))->setConstructorArgs(
 			array(
 				array('foo' => array('type' => 'int'),
-				array('bar' => array('type' => 'int')
-			)
-		)))->getMockForAbstractClass();
+					array('bar' => array('type' => 'int')
+					)
+				)))->getMockForAbstractClass();
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
 		$cache->expects($this->once())->method('save')->with($type, $idRaw, $dataEncoded);
@@ -696,21 +717,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getType',
-			'getIdRaw', '_getData', '_setData', 'getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
+			'getIdRaw', '_getData', 'getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($dataEncoded);
-		$modelMock->expects($this->once())->method('_setData')->with($dataEncoded);
 		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('_getData')->will($this->returnValue($dataEncoded));
 		$modelMock->expects($this->any())->method('getSchema')->will($this->returnValue($schema));
 
-
 		/** @var CM_Model_Abstract $modelMock */
 
 		$modelMock->_set($data);
-		$this->assertSame($data['foo'], $modelMock->_get('foo'));
-		$this->assertSame($data['bar'], $modelMock->_get('bar'));
+		$this->assertSame((int) $data['foo'], $modelMock->_get('foo'));
+		$this->assertSame((int) $data['bar'], $modelMock->_get('bar'));
 	}
 
 	public function testSetPersistenceSave() {
