@@ -22,16 +22,7 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 		$resultSet = array();
 		foreach ($types as $type => $ids) {
 			$idColumnList = array_keys($ids[0]);
-			$whereArray = array();
-			foreach ($ids as $id) {
-				$where = array();
-				foreach ($id as $key => $value) {
-					$where[] = '`' . $key . '`=\'' . $value . '\'';
-				}
-				$whereArray[] = '(' . implode(' AND ', $where) . ')';
-			}
-			$where = implode(' OR ', $whereArray);
-			$result = CM_Db_Db::select($this->_getTableName($type), '*', $where)->fetchAll();
+			$result = CM_Db_Db::selectMultiple($this->_getTableName($type), '*', $ids)->fetchAll();
 			foreach ($result as $row) {
 				$id = array();
 				foreach ($idColumnList as $idColumn) {

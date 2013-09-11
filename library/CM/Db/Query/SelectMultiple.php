@@ -6,7 +6,7 @@ class CM_Db_Query_SelectMultiple extends CM_Db_Query_Abstract {
 	 * @param CM_Db_Client      $client
 	 * @param string            $table
 	 * @param string|array      $fields Column-name OR Column-names array
-	 * @param string|array[]    $where  Outer array-entries are combined using OR, inner arrays using AND
+	 * @param array[]           $where  Outer array-entries are combined using OR, inner arrays using AND
 	 * @param string|array|null $order
 	 */
 	public function __construct(CM_Db_Client $client, $table, $fields, array $where, $order = null) {
