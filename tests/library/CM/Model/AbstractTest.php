@@ -681,26 +681,31 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testSetEncodeValidate() {
 		$type = 1;
 		$idRaw = array('id' => 11);
-		$data = array('foo' => 12, 'bar' => 23);
-		$getData = array('foo' => 123, 'bar' => 234);
+		$data = array('foo' => '1', 'bar' => '2');
 		$dataEncoded = array('foo' => 1, 'bar' => 2);
+		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('encodeField'))->setConstructorArgs(
+			array(
+				array('foo' => array('type' => 'int'),
+				array('bar' => array('type' => 'int')
+			)
+		)))->getMockForAbstractClass();
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('save'))->getMockForAbstractClass();
-		$cache->expects($this->once())->method('save')->with($type, $idRaw, $getData);
+		$cache->expects($this->once())->method('save')->with($type, $idRaw, $dataEncoded);
 
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
-		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_encodeFields', '_getCache', 'getType',
-			'getIdRaw', '_getData', '_setData'))
-				->disableOriginalConstructor()->getMockForAbstractClass();
-		$modelMock->expects($this->at(1))->method('_encodeFields')->will($this->returnValue($dataEncoded));
-		$modelMock->expects($this->at(2))->method('_validateFields')->with($dataEncoded);
-		$modelMock->expects($this->at(3))->method('_setData')->with($dataEncoded);
-		$modelMock->expects($this->at(4))->method('_getData')->will($this->returnValue($getData));
+		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getType',
+			'getIdRaw', '_getData', '_setData', 'getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$modelMock->expects($this->once())->method('_validateFields')->with($dataEncoded);
+		$modelMock->expects($this->once())->method('_setData')->with($dataEncoded);
 		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
-		$modelMock->expects($this->any())->method('_getData')->will($this->returnValue($data));
+		$modelMock->expects($this->any())->method('_getData')->will($this->returnValue($dataEncoded));
+		$modelMock->expects($this->any())->method('getSchema')->will($this->returnValue($schema));
+
+
 		/** @var CM_Model_Abstract $modelMock */
 
 		$modelMock->_set($data);
