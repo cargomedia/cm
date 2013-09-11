@@ -25,7 +25,7 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @return {Number}
 	 */
 	getSiteId: function() {
-		return cm.options.siteId;
+		return cm.options.site.type;
 	},
 
 	/**
@@ -154,7 +154,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (cm.options.language) {
 				urlPath += '/' + cm.options.language.abbreviation;
 			}
-			urlPath += '/' + cm.options.siteId + '/' + cm.options.deployVersion + '/' + path;
+			urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
 		}
 		return cm.options.urlResource + urlPath;
 	},
@@ -177,7 +177,7 @@ var CM_App = CM_Class_Abstract.extend({
 		if (cm.options.language) {
 			path += '/' + cm.options.language.abbreviation;
 		}
-		path += '/' + this.options.siteId;
+		path += '/' + this.getSiteId();
 		return this.getUrl(path);
 	},
 
@@ -703,7 +703,8 @@ var CM_App = CM_Class_Abstract.extend({
 		 */
 		get: function(key) {
 			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
-			if (typeof value === 'undefined') {
+			if (value === null) {
+				// See: https://code.google.com/p/android/issues/detail?id=11973
 				return null;
 			}
 			return JSON.parse(value);
