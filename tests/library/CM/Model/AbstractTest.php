@@ -716,15 +716,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $cache */
 
 		$modelMock = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_validateFields', '_getCache', 'getType',
-			'getIdRaw', '_getData', '_setData', 'getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
+			'getIdRaw', '_getData', 'getSchema'))->disableOriginalConstructor()->getMockForAbstractClass();
 		$modelMock->expects($this->once())->method('_validateFields')->with($dataEncoded);
-		$modelMock->expects($this->once())->method('_setData')->with($dataEncoded);
 		$modelMock->expects($this->any())->method('_getCache')->will($this->returnValue($cache));
 		$modelMock->expects($this->any())->method('getType')->will($this->returnValue($type));
 		$modelMock->expects($this->any())->method('getIdRaw')->will($this->returnValue($idRaw));
 		$modelMock->expects($this->any())->method('_getData')->will($this->returnValue($dataEncoded));
 		$modelMock->expects($this->any())->method('getSchema')->will($this->returnValue($schema));
-
 
 		/** @var CM_Model_Abstract $modelMock */
 
