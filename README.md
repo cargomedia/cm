@@ -29,8 +29,8 @@ Every model is identified by an *id*, with which in can be instantiated:
 ```php
 $foo = new Foo(123);
 ```
-By default the constructor expects an integer value for the ID.
-Internally it is stored as a key-value store (array), which can be exposed if there's need for more complex model-identification.
+By default, the constructor expects an integer value for the ID.
+Internally, it is stored as a key-value store (array), which can be exposed if there's need for a more complex model identification.
 
 #### Schema
 To validate and enforce type casting of your models' fields, define an appropriate schema definition:
@@ -43,16 +43,16 @@ To validate and enforce type casting of your models' fields, define an appropria
 		));
 	}
 ```
-Fields with a model's class name as type will be converted forth and back between *object* and *json representation* of its ID when reading and writing from the data store.
+Fields with a model's class name as a type will be converted forth and back between an *object* and a *json representation of its ID* when reading and writing from the data store.
 
 #### Persisting data
-If present the *persistence* storage adapter will be used to load and save a model's data.
+If present, the *persistence* storage adapter will be used to load and save a model's data.
 ```php
 	public static function getPersistenceClass() {
 		return 'CM_Model_StorageAdapter_Database';
 	}
 ```
-In this example the database adapter's `load()` and `save()` methods will be called whenever you instantiate an existing model or update schema fields.
+In this example, the database adapter's `load()` and `save()` methods will be called whenever you instantiate an existing model or update schema fields.
 
 The `CM_Model_StorageAdapter_Database` will make use of following naming conventions to persist models in a database:
 - Table name: Lower-case class name of the model
@@ -90,7 +90,7 @@ It is recommended to implement a pair of getter and setter for each field in ord
  	}
 ```
 
-By default the data is cached between multiple reads in Memcache. Use `getCacheClass()` to change this behaviour:
+By default, the data is cached between multiple reads in Memcache. Use `getCacheClass()` to change this behaviour:
 ```php
 	public static function getCacheClass() {
 		return 'CM_Model_StorageAdapter_CacheLocal';
@@ -98,10 +98,10 @@ By default the data is cached between multiple reads in Memcache. Use `getCacheC
 ```
 
 Alternatively if you're not using a *persistence* storage adapter, you can implement a custom method `_loadData()` which should return an array of the model's key-value data.
-In this case your setters are responsible for persistence.
+In this case, your setters are responsible for persistence and should invalidate the cache by calling their `_change()` method.
 
 #### Creating and deleting
-Models with a *persistence* storage adapter can be created by using their setters plus `commit()`:
+Models with a *persistence* storage adapter can be created by using their setters followed by a `commit()`:
 ```php
 	$foo = new Foo();
 	$foo->setFieldA(23);
@@ -109,17 +109,17 @@ Models with a *persistence* storage adapter can be created by using their setter
 	$foo->commit();
 ```
 
-For deleting models just call:
+For deleting models, just call:
 ```php
 	$foo = new Foo(123);
 	$foo->delete();
 ```
 
-Alternatively if you're not using a *persistence* storage adapter, you can implement your own creation logic in `_createStatic(array $data)` and then create models with:
+Alternatively, if you're not using a *persistence* storage adapter, you can implement your own creation logic in `_createStatic(array $data)` and then create models with:
 ```php
 	$foo = Foo::createStatic(array('fieldA' => 1, 'fieldB' => 'hello world'));
 ```
-In this case make sure to delete the corresponding records within `_onDelete()` (see below).
+In this case, make sure to delete the corresponding records within `_onDelete()` (see below).
 
 #### Event handling
 The following methods will be called for different events in the lifetime of a model:
