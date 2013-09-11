@@ -25,7 +25,7 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @return {Number}
 	 */
 	getSiteId: function() {
-		return cm.options.siteId;
+		return cm.options.site.type;
 	},
 
 	/**
@@ -154,7 +154,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (cm.options.language) {
 				urlPath += '/' + cm.options.language.abbreviation;
 			}
-			urlPath += '/' + cm.options.siteId + '/' + cm.options.deployVersion + '/' + path;
+			urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
 		}
 		return cm.options.urlResource + urlPath;
 	},
@@ -177,7 +177,7 @@ var CM_App = CM_Class_Abstract.extend({
 		if (cm.options.language) {
 			path += '/' + cm.options.language.abbreviation;
 		}
-		path += '/' + this.options.siteId;
+		path += '/' + this.getSiteId();
 		return this.getUrl(path);
 	},
 
@@ -476,8 +476,8 @@ var CM_App = CM_Class_Abstract.extend({
 					callback.call(context);
 				}
 			} else {
-				var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
-				var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
+				var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
+				var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
 				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
 				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
 				$html.find('.box-body').text(question);
@@ -694,22 +694,27 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(cm.getSiteId() + ':' + key, value);
+			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
 		},
 
 		/**
 		 * @param {String} key
-		 * @return {*}
+		 * @return {*|Null}
 		 */
 		get: function(key) {
-			return $.jStorage.get(cm.getSiteId() + ':' + key);
+			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
+			if (value === null) {
+				// See: https://code.google.com/p/android/issues/detail?id=11973
+				return null;
+			}
+			return JSON.parse(value);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(cm.getSiteId() + ':' + key);
+			localStorage.removeItem(cm.getSiteId() + ':' + key);
 		}
 	},
 
@@ -789,8 +794,9 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
+		 * @param {Boolean} [allowClientMessage]
 		 */
-		bind: function(channelKey, channelType, namespace, callback, context) {
+		bind: function(channelKey, channelType, namespace, callback, context, allowClientMessage) {
 			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
@@ -801,7 +807,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
 			}
-			this._channelDispatchers[channel].on(namespace, callback, context);
+			this._channelDispatchers[channel].on(this._getEventNames(namespace, allowClientMessage), callback, context);
 		},
 
 		/**
@@ -819,10 +825,33 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!channelKey || !channelType) {
 				cm.error.triggerThrow('No channel provided');
 			}
-			this._channelDispatchers[channel].off(namespace, callback, context);
+			this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
+		},
+
+		/**
+		 * @param {String} channelKey
+		 * @param {Number} channelType
+		 * @param {String} event
+		 * @param {Object} data
+		 */
+		publish: function(channelKey, channelType, event, data) {
+			var channel = channelKey + ':' + channelType;
+			this._getAdapter().publish(channel, event, data);
+		},
+
+		/**
+		 * @param {String} namespace
+		 * @param {Boolean} [allowClientMessage]
+		 */
+		_getEventNames: function(namespace, allowClientMessage) {
+			var eventName = namespace;
+			if (allowClientMessage) {
+				eventName += ' client-' + namespace;
+			}
+			return eventName;
 		},
 
 		/**
@@ -852,10 +881,10 @@ var CM_App = CM_Class_Abstract.extend({
 		_subscribe: function(channel) {
 			var handler = this;
 			this._channelDispatchers[channel] = _.clone(Backbone.Events);
-			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
+			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
 				if (handler._channelDispatchers[channel]) {
-					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
-					cm.debug.log('Stream channel (' + channel + '): message: ', message);
+					handler._channelDispatchers[channel].trigger(event, data);
+					cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
 				}
 			});
 			cm.debug.log('Stream channel (' + channel + '): subscribe');

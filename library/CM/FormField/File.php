@@ -3,11 +3,9 @@
 class CM_FormField_File extends CM_FormField_Abstract {
 
 	/**
-	 * @param string $name
 	 * @param int $cardinality
 	 */
-	public function __construct($name = 'file', $cardinality = 1) {
-		parent::__construct($name);
+	public function __construct($cardinality = 1) {
 		$this->_options['cardinality'] = (int) $cardinality;
 		$this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
 	}
@@ -24,18 +22,6 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	 * @throws CM_Exception If invalid file
 	 */
 	public function validateFile(CM_File $file) {
-	}
-
-	/**
-	 * @param CM_File_UserContent_Temp $file
-	 * @param CM_Render                $render
-	 * @return string HTML
-	 */
-	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
-		$html = '';
-		$html .= CM_Util::htmlspecialchars($file->getFileName());
-		$html .= '<a href="javascript:;" class="icon-delete deleteFile"></a>';
-		return $html;
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
@@ -56,6 +42,10 @@ class CM_FormField_File extends CM_FormField_Abstract {
 	}
 
 	public function prepare(array $params) {
-		$this->setTplParam('text', isset($params['text']) ? (string) $params['text'] : null);
+		$text = isset($params['text']) ? (string) $params['text'] : null;
+		$skipDropZone = !empty($params['skipDropZone']);
+
+		$this->setTplParam('text', $text);
+		$this->setTplParam('skipDropZone', $skipDropZone);
 	}
 }

@@ -95,7 +95,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			if ($allowedUntil <= time()) {
 				throw new CM_Exception_NotAllowed();
 			}
-			CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
+			CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
 												  'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
 		} catch (CM_Exception $ex) {
 			$streamChannel->delete();
@@ -158,7 +158,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			throw new CM_Exception_NotAllowed();
 		}
 
-		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
+		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
 												'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
 	}
 

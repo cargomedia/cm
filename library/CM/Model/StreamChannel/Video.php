@@ -11,7 +11,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
-		CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
+		CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $this));
 	}
 
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
@@ -125,7 +125,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return self::findByKeyAndAdapter($key, $adapterType);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$key = (string) $data['key'];
 		$width = (int) $data['width'];
 		$height = (int) $data['height'];

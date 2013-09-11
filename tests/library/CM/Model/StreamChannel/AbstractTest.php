@@ -27,23 +27,23 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetKey() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foo', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foo', 'adapterType' => 1));
 		$this->assertEquals('foo', $streamChannel->getKey());
 	}
 
 	public function testGetAdapterType() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'foobar', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foobar', 'adapterType' => 1));
 		$this->assertEquals(1, $streamChannel->getAdapterType());
 	}
 
 	public function testFactory() {
-		$streamChannel1 = CM_Model_StreamChannel_Video::create(array('key'    => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
+		$streamChannel1 = CM_Model_StreamChannel_Video::createStatic(array('key'    => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
 																	 'height' => 100, 'thumbnailCount' => 0));
 		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
 		$this->assertEquals($streamChannel1, $streamChannel2);
 
-		$streamChannel1 = CM_Model_StreamChannel_Message::create(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
+		$streamChannel1 = CM_Model_StreamChannel_Message::createStatic(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
 		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
 		$this->assertEquals($streamChannel1, $streamChannel2);
 	}
@@ -53,7 +53,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 * @expectedExceptionMessage Unexpected instance of
 	 */
 	public function testFactoryInvalidInstance() {
-		$messageStreamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'message-stream-channel', 'adapterType' => 1));
+		$messageStreamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'message-stream-channel', 'adapterType' => 1));
 		CM_Model_StreamChannel_Video::factory($messageStreamChannel->getId());
 	}
 
@@ -75,7 +75,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testDelete() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
 		$streamChannel->delete();
 		new CM_Model_StreamChannel_Mock($streamChannel->getId());
 	}
@@ -86,17 +86,17 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testDeleteWIthSubscribes() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar-with-subscribers', 'adapterType' => 1));
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar-with-subscribers', 'adapterType' => 1));
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 											  'allowedUntil'  => 324234,
 											  'key'           => '123123_1',));
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 											  'allowedUntil'  => 324234,
 											  'key'           => '123123_2',));
-		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
+		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 												'allowedUntil'  => 324234,
 												'key'           => '133123_3'));
-		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
+		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 												'allowedUntil'  => 324234,
 												'key'           => '133123_4'));
 		$this->assertEquals(2, $streamChannel->getStreamPublishs()->getCount());
@@ -106,17 +106,17 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetSubscribers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getSubscribers()->getCount());
-		$streamSubscribe = CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
+		$streamSubscribe = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 																   'start'         => 123123, 'allowedUntil' => 324234,
 																   'key'           => '111_1'));
 		$this->assertEquals(1, $streamChannel->getSubscribers()->getCount());
 		$user = CMTest_TH::createUser();
-		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 												'key'           => '111_2'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
-		CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 												'key'           => '111_3'));
 		$this->assertEquals(2, $streamChannel->getSubscribers()->getCount());
 		$streamSubscribe->delete();
@@ -125,17 +125,17 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetPublishers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar1', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar1', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
-		$streamPublish = CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
+		$streamPublish = CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 															   'start'         => 123123, 'allowedUntil' => 324234,
 															   'key'           => '111_1'));
 		$this->assertEquals(1, $streamChannel->getPublishers()->getCount());
 		$user = CMTest_TH::createUser();
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 											  'key'           => '111_2'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 											  'key'           => '111_3'));
 		$this->assertEquals(2, $streamChannel->getPublishers()->getCount());
 		$streamPublish->delete();
@@ -144,19 +144,19 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetUsers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::create(array('key' => 'bar2', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar2', 'adapterType' => 1));
 		$this->assertEquals(0, $streamChannel->getUsers()->getCount());
 		$user = CMTest_TH::createUser();
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 											  'key'           => '112_1'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 											  'key'           => '112_2'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123, 'allowedUntil' => 324234,
 											  'key'           => '112_3'));
 		$this->assertEquals(1, $streamChannel->getUsers()->getCount());
-		CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
+		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 											  'allowedUntil'  => 324234, 'key' => '112_4'));
 		$this->assertEquals(2, $streamChannel->getUsers()->getCount());
 	}

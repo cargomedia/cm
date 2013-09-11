@@ -2,8 +2,8 @@
 
 class CM_FormField_FileImage extends CM_FormField_File {
 
-	public function __construct($name = 'file', $cardinality = 1) {
-		parent::__construct($name, $cardinality);
+	public function __construct($cardinality = 1) {
+		parent::__construct($cardinality);
 	}
 
 	protected function _getAllowedExtensions() {
@@ -18,12 +18,5 @@ class CM_FormField_FileImage extends CM_FormField_File {
 		} catch (CM_Exception $e) {
 			throw new CM_Exception_FormFieldValidation('Invalid image');
 		}
-	}
-
-	public function getPreview(CM_File_UserContent_Temp $file, CM_Render $render) {
-		$html = '';
-		$html .= '<img src="' . $render->getUrlUserContent($file) . '" />';
-		$html .= '<div class="actions"><a href="javascript:;" class="icon-delete deleteFile"></a></div>';
-		return $html;
 	}
 }
