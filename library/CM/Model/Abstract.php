@@ -191,8 +191,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$data = array($data => $value);
 		}
 		$modelData = $this->_getData(); // Make sure data is loaded
+		$schema = $this->_getSchema();
 
-		$dataEncoded = $this->_encodeFields($data);
+		$dataEncoded = array();
+		foreach ($data as $key => $value) {
+			$dataEncoded[$key] = $schema->encodeField($key, $value);
+		}
+
 		$this->_validateFields($dataEncoded);
 		$this->_setData(array_merge($modelData, $dataEncoded));
 		$this->_dataDecoded = array_merge($this->_dataDecoded, $data);
@@ -203,7 +208,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
 			if ($persistence = $this->_getPersistence()) {
-				$schema = $this->_getSchema();
 				if ($schema->isEmpty()) {
 					throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
 				}
@@ -382,20 +386,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($data as $key => $value) {
 			$schema->validateField($key, $value);
 		}
-	}
-
-	/**
-	 * @param array $data
-	 * @return array
-	 * @throws CM_Exception_Invalid
-	 * @throws CM_Model_Exception_Validation
-	 */
-	protected function _encodeFields(array $data) {
-		$schema = $this->_getSchema();
-		foreach ($data as $key => &$value) {
-			$value = $schema->encodeField($key, $value);
-		}
-		return $data;
 	}
 
 	/**
