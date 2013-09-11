@@ -23,21 +23,105 @@ A view (extending `CM_View_Abstract`) can be rendered, usually as HTML. The foll
 * `CM_Mail`: E-mail.
 
 ### Model
-A model (extending `CM_Model_Abstract`) represents a "real-world" object, stores state persistently and provides functionality.
+A model (extending `CM_Model_Abstract`) represents a "real-world" object, reads and writes data from a key-value store and provides functionality on top of that.
 
-Every model is identified by an *id*. The default constructor implements an integer-id.
-Internally the id is stored as a key-value structure (array), which can be exposed if there's need for more complex model-identification.
+Every model is identified by an *id*, with which in can be instantiated:
+```php
+$foo = new Foo(123);
+```
+By default the constructor expects an integer value for the ID.
+Internally it is stored as a key-value store (array), which can be exposed if there's need for more complex model-identification.
 
-All loaded data (implement `_loadData()`) is accessible as a key-value store with `_get()` and `_set()`.
-The key-value store is cached with Memcache by default.
+#### Schema
+To validate and enforce type casting of your models' fields, define an appropriate schema definition:
+```php
+	protected function _getSchema() {
+		return new CM_Model_Schema_Definition(array(
+			'fieldA' => array('type' => 'int'),
+			'fieldB' => array('type' => 'string', 'optional' => true),
+			'fieldC' => array('type' => 'CM_Model_Example'),
+		));
+	}
+```
+Fields with a model's class name as type will be converted forth and back between *object* and *json representation* of its ID when reading and writing from the data store.
 
-Model lifecycle uses the methods `create()` and `delete()`.
+#### Persisting data
+If present the *persistence* storage adapter will be used to load and save a model's data.
+```php
+	public static function getPersistenceClass() {
+		return 'CM_Model_StorageAdapter_Database';
+	}
+```
+In this example the database adapter's `load()` and `save()` methods will be called whenever you access schema fields.
 
-To create a fully-functional model implement the following:
-* `_create()`: Create the model, return an instance
-* `_loadData()`: Return key-value store as array, or FALSE on error
-* `_onDelete()`: Delete the model
-* Getters and Setters: Can use the internal `_get()` and `_set()` to access the key-value store. Setters should call `_change()` to invalidate caches.
+You can access a model's fields with `_get()` and `_set()`, which will consider the schema for type coercion.
+It is recommended to implement a pair of getter and setter for each field like this:
+```php
+ 	/**
+ 	 * @return string|null
+ 	 */
+ 	public function getFieldB() {
+ 		return $this->_get('fieldB');
+ 	}
+
+ 	/**
+ 	 * @param string|null $fieldB
+ 	 */
+ 	public function setFieldB($fieldB) {
+ 		$this->_set('fieldB', $fieldB);
+ 	}
+
+ 	/**
+ 	 * @return CM_Model_Example
+ 	 */
+ 	public function getFieldC() {
+ 		return $this->_get('fieldC');
+ 	}
+
+ 	/**
+ 	 * @param CM_Model_Example $fieldC
+ 	 */
+ 	public function setFieldC($fieldC) {
+ 		$this->_set('fieldC', $fieldC);
+ 	}
+```
+
+By default the data is cached between multiple reads in Memcache. Use `getCacheClass()` to change this behaviour:
+```php
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
+	}
+```
+
+Alternatively if you're not using a *persistence* storage adapter, you can implement a custom method `_loadData()` which should return an array of the model's key-value data.
+In this case your setters are responsible for persistence.
+
+#### Creating and deleting
+Models with a *persistence* storage adapter can be created by using their setters plus `commit()`:
+```php
+	$foo = new Foo();
+	$foo->setFieldA(23);
+	$foo->setFieldB('bar');
+	$foo->commit();
+```
+
+For deleting models just call:
+```php
+	$foo = new Foo(123);
+	$foo->delete();
+```
+
+Alternatively if you're not using a *persistence* storage adapter, you can implement your own creation logic in `_createStatic(array $data)` and then create models with:
+```php
+	$foo = Foo::createStatic(array('foo' => 1, 'bar' => 'hello world'));
+```
+In this case make sure to delete the corresponding records within `_onDelete()` (see below).
+
+#### Event handling
+The following methods will be called for different events in the lifetime of a model:
+* `_onCreate()`: After persistence, when a model was created.
+* `_onChange()`: After persistence, when a field's value was changed. Also after the model was created.
+* `_onDelete()`: Before persistence, when a model is deleted.
 
 ### Paging
 A paging is an ordered collection with pagination-capabilities.
