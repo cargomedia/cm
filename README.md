@@ -52,10 +52,14 @@ If present the *persistence* storage adapter will be used to load and save a mod
 		return 'CM_Model_StorageAdapter_Database';
 	}
 ```
-In this example the database adapter's `load()` and `save()` methods will be called whenever you access schema fields.
+In this example the database adapter's `load()` and `save()` methods will be called whenever you instantiate an existing model or update schema fields.
+
+The `CM_Model_StorageAdapter_Database` will make use of following naming conventions to persist models in a database:
+- Table name: Lower-case class name of the model
+- Column names: Name of the schema fields
 
 You can access a model's fields with `_get()` and `_set()`, which will consider the schema for type coercion.
-It is recommended to implement a pair of getter and setter for each field like this:
+It is recommended to implement a pair of getter and setter for each field in order to keep field names internal:
 ```php
  	/**
  	 * @return string|null
@@ -113,7 +117,7 @@ For deleting models just call:
 
 Alternatively if you're not using a *persistence* storage adapter, you can implement your own creation logic in `_createStatic(array $data)` and then create models with:
 ```php
-	$foo = Foo::createStatic(array('foo' => 1, 'bar' => 'hello world'));
+	$foo = Foo::createStatic(array('fieldA' => 1, 'fieldB' => 'hello world'));
 ```
 In this case make sure to delete the corresponding records within `_onDelete()` (see below).
 
