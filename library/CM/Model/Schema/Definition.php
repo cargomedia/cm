@@ -43,6 +43,10 @@ class CM_Model_Schema_Definition {
 							break;
 						case 'array':
 							break;
+						case 'DateTime':
+							/** @var DateTime $value */
+							$value = $value->getTimestamp();
+							break;
 						default:
 							/** @var CM_Model_Abstract $value */
 							$id = $value->getIdRaw();
@@ -87,6 +91,9 @@ class CM_Model_Schema_Definition {
 							$value = (boolean) $value;
 							break;
 						case 'array':
+							break;
+						case 'DateTime':
+							$value = DateTime::createFromFormat('U', $value);
 							break;
 						default:
 							$id = CM_Params::decode($value, true);
@@ -173,6 +180,11 @@ class CM_Model_Schema_Definition {
 						case 'array':
 							if (!$this->_isArray($value)) {
 								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not an array');
+							}
+							break;
+						case 'DateTime':
+							if (!$this->_isInt($value)) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid timestamp');
 							}
 							break;
 						default:
