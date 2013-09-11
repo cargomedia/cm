@@ -8,6 +8,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/** @var array|null */
 	private $_data;
 
+	/** @var array */
+	private $_dataDecoded = array();
+
 	/** @var CM_ModelAsset_Abstract[] */
 	private $_assets = array();
 
@@ -15,14 +18,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	private $_autoCommit = true;
 
 	/**
-	 * @param int|null   $id
-	 * @param array|null $data
+	 * @param int|null $id
 	 */
-	public function __construct($id = null, array $data = null) {
+	public function __construct($id = null) {
 		if (null !== $id) {
 			$id = array('id' => (int) $id);
 		}
-		$this->_construct($id, $data);
+		$this->_construct($id);
 	}
 
 	/**
@@ -37,12 +39,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 		$this->_id = $id;
 		if (null !== $data) {
-			$this->_data = $this->_validateFields($data);
+			$this->_validateFields($data);
+			$this->_setData($data);
 		}
 		foreach ($this->_getAssets() as $asset) {
 			$this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
 		}
-		$this->_get(); // Make sure data can be loaded
+		$this->_getData(); // Make sure data can be loaded
 	}
 
 	public function commit() {
@@ -54,7 +57,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
 			}
 			$this->_onChange();
 		} else {
@@ -62,7 +65,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 			if ($cache = $this->_getCache()) {
 				$this->_loadAssets(true);
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
 			}
 			$this->_onChange();
 			foreach ($this->_getContainingCacheables() as $cacheable) {
@@ -90,6 +93,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cacheable->_change();
 		}
 		$this->_data = null;
+		$this->_dataDecoded = array();
 	}
 
 	/**
@@ -130,7 +134,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array($this->getIdRaw(), $this->_data));
+		return serialize(array($this->getIdRaw(), $this->_getData()));
 	}
 
 	final public function unserialize($serialized) {
@@ -146,6 +150,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
 		$this->_data = null;
+		$this->_dataDecoded = array();
 		$this->_onChange();
 		return $this;
 	}
@@ -155,41 +160,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
-	final public function _get($field = null) {
-		if (null === $this->_data) {
-			if ($cache = $this->_getCache()) {
-				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
-					$this->_data = $this->_validateFields($data);
-				}
-			}
-			if (null === $this->_data) {
-				if ($persistence = $this->_getPersistence()) {
-					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
-						$this->_data = $this->_validateFields($data);
-					}
-				} else {
-					if (is_array($data = $this->_loadData())) {
-						$this->_data = $this->_validateFields($data);
-					}
-				}
-				if (null === $this->_data) {
-					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) .
-					'` has no data.');
-				}
-
-				if ($cache) {
-					$this->_loadAssets(true);
-					$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
-				}
-			}
-		}
-		if ($field === null) {
-			return $this->_data;
-		}
-		if (!array_key_exists($field, $this->_data)) {
+	final public function _get($field) {
+		$field = (string) $field;
+		$data = $this->_getData();
+		if (!array_key_exists($field, $data)) {
 			throw new CM_Exception('Model has no field `' . $field . '`');
 		}
-		return $this->_data[$field];
+		if (!array_key_exists($field, $this->_dataDecoded)) {
+			$this->_dataDecoded[$field] = $this->_getSchema()->decodeField($field, $data[$field]);
+		}
+		return $this->_dataDecoded[$field];
 	}
 
 	/**
@@ -197,8 +177,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return boolean
 	 */
 	final public function _has($field) {
-		$this->_get(); // Make sure data is loaded
-		return array_key_exists($field, $this->_data);
+		$data = $this->_getData(); // Make sure data is loaded
+		return array_key_exists($field, $data);
 	}
 
 	/**
@@ -210,26 +190,77 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		if (!is_array($data)) {
 			$data = array($data => $value);
 		}
-		$this->_get(); // Make sure data is loaded
+		$modelData = $this->_getData(); // Make sure data is loaded
+		$schema = $this->_getSchema();
 
-		foreach ($this->_validateFields($data) as $field => $value) {
-			$this->_data[$field] = $value;
+		$dataEncoded = array();
+		foreach ($data as $key => $value) {
+			$dataEncoded[$key] = $schema->encodeField($key, $value);
 		}
 
+		$this->_validateFields($dataEncoded);
+		$this->_setData(array_merge($modelData, $dataEncoded));
+		$this->_dataDecoded = array_merge($this->_dataDecoded, $data);
+
 		if ($this->_autoCommit) {
+			$data = $this->_getData();
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
 			if ($persistence = $this->_getPersistence()) {
-				if (!$schema = $this->_getSchema()) {
-					throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
+				if ($schema->isEmpty()) {
+					throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
 				}
 				if ($schema->hasField(array_keys($data))) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
 				}
 			}
 			$this->_onChange();
 		}
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Nonexistent
+	 */
+	protected function _getData() {
+		if (null === $this->_data) {
+			if ($cache = $this->_getCache()) {
+				if (false !== ($data = $cache->load($this->getType(), $this->getIdRaw()))) {
+					$this->_validateFields($data);
+					$this->_setData($data);
+				}
+			}
+			if (null === $this->_data) {
+				if ($persistence = $this->_getPersistence()) {
+					if (false !== ($data = $persistence->load($this->getType(), $this->getIdRaw()))) {
+						$this->_validateFields($data);
+						$this->_setData($data);
+					}
+				} else {
+					if (is_array($data = $this->_loadData())) {
+						$this->_validateFields($data);
+						$this->_setData($data);
+					}
+				}
+				if (null === $this->_data) {
+					throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
+				}
+
+				if ($cache) {
+					$this->_loadAssets(true);
+					$cache->save($this->getType(), $this->getIdRaw(), $this->_data);
+				}
+			}
+		}
+		return $this->_data;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	protected function _setData(array $data) {
+		$this->_data = $data;
 	}
 
 	/**
@@ -325,39 +356,36 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return CM_Model_Schema_Definition|null
+	 * @return CM_Model_Schema_Definition
 	 */
 	protected function _getSchema() {
-		return null;
+		return new CM_Model_Schema_Definition(array());
 	}
 
 	/**
+	 * @param array|null $data
 	 * @return array
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _getSchemaData() {
-		if (null === $this->_data) {
-			throw new CM_Exception_Invalid('Model has no data');
+	protected function _getSchemaData($data = null) {
+		if (null === $data) {
+			$data = $this->_getData();
 		}
-		if (!$schema = $this->_getSchema()) {
-			throw new CM_Exception_Invalid('Cannot get schema-data without a schema');
+		$schema = $this->_getSchema();
+		if ($schema->isEmpty()) {
+			throw new CM_Exception_Invalid('Cannot get schema-data with an empty schema');
 		}
-		return array_intersect_key($this->_data, array_flip($schema->getFieldNames()));
+		return array_intersect_key($data, array_flip($schema->getFieldNames()));
 	}
 
 	/**
 	 * @param array $data
-	 * @return array
 	 */
 	protected function _validateFields(array $data) {
 		$schema = $this->_getSchema();
-		if (!$schema) {
-			return $data;
+		foreach ($data as $key => $value) {
+			$schema->validateField($key, $value);
 		}
-		foreach ($data as $key => &$value) {
-			$value = $schema->validateField($key, $value);
-		}
-		return $data;
 	}
 
 	/**

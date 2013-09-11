@@ -2,6 +2,50 @@
 
 class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
+	public function testIsEmpty() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$this->assertTrue($schema->isEmpty());
+
+		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
+		$this->assertFalse($schema->isEmpty());
+	}
+
+	public function testIsFloat() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$_isFloat = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isFloat');
+
+		$this->assertTrue($_isFloat->invoke($schema, '4.1'));
+		$this->assertTrue($_isFloat->invoke($schema, '4.0'));
+		$this->assertTrue($_isFloat->invoke($schema, '4'));
+		$this->assertFalse($_isFloat->invoke($schema, '4.0.2'));
+		$this->assertTrue($_isFloat->invoke($schema, 4E21));
+		$this->assertTrue($_isFloat->invoke($schema, '4E21'));
+	}
+
+	public function testIsBoolean() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$_isBoolean = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isBoolean');
+
+		$this->assertTrue($_isBoolean->invoke($schema, true));
+		$this->assertTrue($_isBoolean->invoke($schema, false));
+		$this->assertTrue($_isBoolean->invoke($schema, '1'));
+		$this->assertFalse($_isBoolean->invoke($schema, 'true'));
+		$this->assertFalse($_isBoolean->invoke($schema, 'false'));
+		$this->assertFalse($_isBoolean->invoke($schema, 1));
+	}
+
+	public function testIsInt() {
+		$schema = new CM_Model_Schema_Definition(array());
+		$_isInt = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isInt');
+
+		$this->assertTrue($_isInt->invoke($schema, 1));
+		$this->assertTrue($_isInt->invoke($schema, '1'));
+		$this->assertFalse($_isInt->invoke($schema, 1.2));
+		$this->assertFalse($_isInt->invoke($schema, '1.0'));
+		$this->assertFalse($_isInt->invoke($schema, '4E2'));
+		$this->assertFalse($_isInt->invoke($schema, 4E2));
+	}
+
 	public function testHasKey() {
 		$schema = new  CM_Model_Schema_Definition(array(
 			'foo' => array(),
@@ -27,10 +71,9 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		$testDataList = array(
 			// nothing
 			array(
-				'value'       => 12,
-				'schema'      => array(),
-				'expected'    => true,
-				'returnValue' => 12,
+				'value'    => 12,
+				'schema'   => array(),
+				'expected' => true,
 			),
 			array(
 				'value'    => null,
@@ -40,24 +83,21 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 			// optional
 			array(
-				'value'       => null,
-				'schema'      => array('optional' => true),
-				'expected'    => true,
-				'returnValue' => null,
+				'value'    => null,
+				'schema'   => array('optional' => true),
+				'expected' => true,
 			),
 
 			// type integer
 			array(
-				'value'       => -12,
-				'schema'      => array('type' => 'integer'),
-				'expected'    => true,
-				'returnValue' => -12,
+				'value'    => -12,
+				'schema'   => array('type' => 'integer'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '-12',
-				'schema'      => array('type' => 'integer'),
-				'expected'    => true,
-				'returnValue' => -12,
+				'value'    => '-12',
+				'schema'   => array('type' => 'integer'),
+				'expected' => true,
 			),
 			array(
 				'value'    => 12.01,
@@ -70,30 +110,26 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 			array(
-				'value'       => 14,
-				'schema'      => array('type' => 'int'),
-				'expected'    => true,
-				'returnValue' => 14,
+				'value'    => 14,
+				'schema'   => array('type' => 'int'),
+				'expected' => true,
 			),
 
 			// type string
 			array(
-				'value'       => 'foo bar',
-				'schema'      => array('type' => 'string'),
-				'expected'    => true,
-				'returnValue' => 'foo bar',
+				'value'    => 'foo bar',
+				'schema'   => array('type' => 'string'),
+				'expected' => true,
 			),
 			array(
-				'value'       => 'foo 繁體字 bar',
-				'schema'      => array('type' => 'string'),
-				'expected'    => true,
-				'returnValue' => 'foo 繁體字 bar',
+				'value'    => 'foo 繁體字 bar',
+				'schema'   => array('type' => 'string'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '',
-				'schema'      => array('type' => 'string'),
-				'expected'    => true,
-				'returnValue' => '',
+				'value'    => '',
+				'schema'   => array('type' => 'string'),
+				'expected' => true,
 			),
 			array(
 				'value'    => 12,
@@ -103,28 +139,24 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 			// type float
 			array(
-				'value'       => -12,
-				'schema'      => array('type' => 'float'),
-				'expected'    => true,
-				'returnValue' => -12.0,
+				'value'    => -12,
+				'schema'   => array('type' => 'float'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '-123',
-				'schema'      => array('type' => 'float'),
-				'expected'    => true,
-				'returnValue' => -123.0,
+				'value'    => '-123',
+				'schema'   => array('type' => 'float'),
+				'expected' => true,
 			),
 			array(
-				'value'       => 12.01,
-				'schema'      => array('type' => 'float'),
-				'expected'    => true,
-				'returnValue' => 12.01,
+				'value'    => 12.01,
+				'schema'   => array('type' => 'float'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '12.01',
-				'schema'      => array('type' => 'float'),
-				'expected'    => true,
-				'returnValue' => 12.01,
+				'value'    => '12.01',
+				'schema'   => array('type' => 'float'),
+				'expected' => true,
 			),
 			array(
 				'value'    => '12abc',
@@ -134,28 +166,24 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 			// type boolean
 			array(
-				'value'       => true,
-				'schema'      => array('type' => 'boolean'),
-				'expected'    => true,
-				'returnValue' => true,
+				'value'    => true,
+				'schema'   => array('type' => 'boolean'),
+				'expected' => true,
 			),
 			array(
-				'value'       => false,
-				'schema'      => array('type' => 'boolean'),
-				'expected'    => true,
-				'returnValue' => false,
+				'value'    => false,
+				'schema'   => array('type' => 'boolean'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '1',
-				'schema'      => array('type' => 'boolean'),
-				'expected'    => true,
-				'returnValue' => true,
+				'value'    => '1',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '0',
-				'schema'      => array('type' => 'boolean'),
-				'expected'    => true,
-				'returnValue' => false,
+				'value'    => '0',
+				'schema'   => array('type' => 'boolean'),
+				'expected' => true,
 			),
 			array(
 				'value'    => 1,
@@ -173,23 +201,53 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 			array(
-				'value'       => true,
-				'schema'      => array('type' => 'bool'),
-				'expected'    => true,
-				'returnValue' => true,
+				'value'    => true,
+				'schema'   => array('type' => 'bool'),
+				'expected' => true,
 			),
 
 			// type array
 			array(
-				'value'       => array('foo' => 'bar'),
-				'schema'      => array('type' => 'array'),
-				'expected'    => true,
-				'returnValue' => array('foo' => 'bar'),
+				'value'    => array('foo' => 'bar'),
+				'schema'   => array('type' => 'array'),
+				'expected' => true,
 			),
 			array(
-				'value'       => '123',
-				'schema'      => array('type' => 'array'),
-				'expected'    => 'CM_Model_Exception_Validation',
+				'value'    => '123',
+				'schema'   => array('type' => 'array'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+
+			// type model
+			array(
+				'value'    => '{"id": 3}',
+				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+				'expected' => true,
+			),
+			array(
+				'value'    => '{"id": "foo"}',
+				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => '3',
+				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+				'expected' => true,
+			),
+			array(
+				'value'    => '{"id": 4, "foo": "bar"}',
+				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+				'expected' => true,
+			),
+			array(
+				'value'    => '{"bar": 4, "foo": "bar"}',
+				'schema'   => array('type' => 'CM_Model_Mock_Validation'),
+				'expected' => 'CM_Model_Exception_Validation',
+			),
+			array(
+				'value'    => '1',
+				'schema'   => array('type' => 'CM_Class_Abstract'),
+				'expected' => 'CM_Exception_Invalid',
 			),
 
 			// type invalid
@@ -202,12 +260,293 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		foreach ($testDataList as $testData) {
 			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			try {
-				$value = $schema->validateField('foo', $testData['value']);
+				$schema->validateField('foo', $testData['value']);
 				$this->assertSame($testData['expected'], true, 'Validation failure (' . CM_Util::var_line($testData) . ')');
-				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
 			} catch (CM_Exception $e) {
 				$this->assertSame($testData['expected'], get_class($e), 'Validation failure (' . CM_Util::var_line($testData) . ')');
 			}
 		}
+	}
+
+	public function testDecode() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
+		$testDataList = array(
+			// nothing
+			array(
+				'value'       => 12,
+				'schema'      => array(),
+				'returnValue' => 12,
+			),
+
+			// optional
+			array(
+				'value'       => null,
+				'schema'      => array('optional' => true),
+				'returnValue' => null,
+			),
+
+			// type integer
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'integer'),
+				'returnValue' => -12,
+			),
+			array(
+				'value'       => '-12',
+				'schema'      => array('type' => 'integer'),
+				'returnValue' => -12,
+			),
+			array(
+				'value'       => 14,
+				'schema'      => array('type' => 'int'),
+				'returnValue' => 14,
+			),
+
+			// type string
+			array(
+				'value'       => 'foo bar',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => 'foo bar',
+			),
+			array(
+				'value'       => 'foo 繁體字 bar',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => 'foo 繁體字 bar',
+			),
+			array(
+				'value'       => '',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => '',
+			),
+
+			// type float
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'float'),
+				'returnValue' => -12.0,
+			),
+			array(
+				'value'       => '-123',
+				'schema'      => array('type' => 'float'),
+				'returnValue' => -123.0,
+			),
+			array(
+				'value'       => 12.01,
+				'schema'      => array('type' => 'float'),
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'       => '12.01',
+				'schema'      => array('type' => 'float'),
+				'returnValue' => 12.01,
+			),
+
+			// type boolean
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => true,
+			),
+			array(
+				'value'       => false,
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => false,
+			),
+			array(
+				'value'       => '1',
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => true,
+			),
+			array(
+				'value'       => '0',
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => false,
+			),
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'bool'),
+				'returnValue' => true,
+			),
+
+			// type array
+			array(
+				'value'       => array('foo' => 'bar'),
+				'schema'      => array('type' => 'array'),
+				'returnValue' => array('foo' => 'bar'),
+			),
+
+			// type model
+			array(
+				'value'       => '{"id": 3}',
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'returnValue' => new CM_Model_Mock_Validation(3),
+			),
+			array(
+				'value'       => '2',
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'returnValue' => new CM_Model_Mock_Validation(2),
+			),
+			array(
+				'value'       => '{"id": 4, "foo": "bar"}',
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'returnValue' => new CM_Model_Mock_Validation(4, 'bar'),
+			),
+		);
+		foreach ($testDataList as $testData) {
+			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
+			$value = $schema->decodeField('foo', $testData['value']);
+			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
+				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
+			} else {
+				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
+			}
+		}
+	}
+
+	public function testEncode() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
+		$testDataList = array(
+			// nothing
+			array(
+				'value'       => 12,
+				'schema'      => array(),
+				'returnValue' => 12,
+			),
+
+			// optional
+			array(
+				'value'       => null,
+				'schema'      => array('optional' => true),
+				'returnValue' => null,
+			),
+
+			// type integer
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'integer'),
+				'returnValue' => -12,
+			),
+			array(
+				'value'       => '-12',
+				'schema'      => array('type' => 'integer'),
+				'returnValue' => -12,
+			),
+			array(
+				'value'       => 14,
+				'schema'      => array('type' => 'int'),
+				'returnValue' => 14,
+			),
+
+			// type string
+			array(
+				'value'       => 'foo bar',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => 'foo bar',
+			),
+			array(
+				'value'       => 'foo 繁體字 bar',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => 'foo 繁體字 bar',
+			),
+			array(
+				'value'       => '',
+				'schema'      => array('type' => 'string'),
+				'returnValue' => '',
+			),
+
+			// type float
+			array(
+				'value'       => -12,
+				'schema'      => array('type' => 'float'),
+				'returnValue' => -12.0,
+			),
+			array(
+				'value'       => '-123',
+				'schema'      => array('type' => 'float'),
+				'returnValue' => -123.0,
+			),
+			array(
+				'value'       => 12.01,
+				'schema'      => array('type' => 'float'),
+				'returnValue' => 12.01,
+			),
+			array(
+				'value'       => '12.01',
+				'schema'      => array('type' => 'float'),
+				'returnValue' => 12.01,
+			),
+
+			// type boolean
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => true,
+			),
+			array(
+				'value'       => false,
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => false,
+			),
+			array(
+				'value'       => '1',
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => true,
+			),
+			array(
+				'value'       => '0',
+				'schema'      => array('type' => 'boolean'),
+				'returnValue' => false,
+			),
+			array(
+				'value'       => true,
+				'schema'      => array('type' => 'bool'),
+				'returnValue' => true,
+			),
+
+			// type array
+			array(
+				'value'       => array('foo' => 'bar'),
+				'schema'      => array('type' => 'array'),
+				'returnValue' => array('foo' => 'bar'),
+			),
+
+			// type model
+			array(
+				'value'       => new CM_Model_Mock_Validation(2),
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'returnValue' => '2',
+			),
+			array(
+				'value'       => new CM_Model_Mock_Validation(4, 'bar'),
+				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
+				'returnValue' => '{"id":4,"foo":"bar"}',
+			),
+		);
+		foreach ($testDataList as $testData) {
+			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
+			$value = $schema->encodeField('foo', $testData['value']);
+			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
+				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
+			} else {
+				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
+			}
+		}
+	}
+}
+
+class CM_Model_Mock_Validation extends CM_Model_Abstract {
+
+	const TYPE = 1;
+
+	public function __construct($id, $foo = null) {
+		$id = array('id' => (int) $id);
+		if (null !== $foo) {
+			$id['foo'] = $foo;
+		}
+		$this->_construct($id);
+	}
+
+	protected function _loadData() {
+		return array('id' => $this->getId());
 	}
 }
