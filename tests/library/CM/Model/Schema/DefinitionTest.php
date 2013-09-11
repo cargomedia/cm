@@ -218,6 +218,13 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'expected' => 'CM_Model_Exception_Validation',
 			),
 
+			// type DateTime
+			array(
+				'value'    => 1378904141,
+				'schema'   => array('type' => 'DateTime'),
+				'expected' => true,
+			),
+
 			// type model
 			array(
 				'value'    => '{"id": 3}',
@@ -375,6 +382,13 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'returnValue' => array('foo' => 'bar'),
 			),
 
+			// type DateTime
+			array(
+				'value'       => 1378904141,
+				'schema'      => array('type' => 'DateTime'),
+				'returnValue' => DateTime::createFromFormat('U', 1378904141),
+			),
+
 			// type model
 			array(
 				'value'       => '{"id": 3}',
@@ -395,7 +409,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		foreach ($testDataList as $testData) {
 			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->decodeField('foo', $testData['value']);
-			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
+			if (is_object($testData['returnValue'])) {
 				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
 			} else {
 				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
@@ -510,6 +524,13 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'returnValue' => array('foo' => 'bar'),
 			),
 
+			// type DateTime
+			array(
+				'value'       => DateTime::createFromFormat('U', 1378904141),
+				'schema'      => array('type' => 'DateTime'),
+				'returnValue' => 1378904141,
+			),
+
 			// type model
 			array(
 				'value'       => new CM_Model_Mock_Validation(2),
@@ -525,7 +546,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		foreach ($testDataList as $testData) {
 			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->encodeField('foo', $testData['value']);
-			if ($testData['returnValue'] instanceof CM_Model_Abstract) {
+			if (is_object($testData['returnValue'])) {
 				$this->assertEquals($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
 			} else {
 				$this->assertSame($testData['returnValue'], $value, 'Unexpected return value (' . CM_Util::var_line($testData) . ')');
