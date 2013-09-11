@@ -98,7 +98,7 @@ By default, the data is cached between multiple reads in Memcache. Use `getCache
 ```
 
 Alternatively if you're not using a *persistence* storage adapter, you can implement a custom method `_loadData()` which should return an array of the model's key-value data.
-In this case, your setters are responsible for persistence and should invalidate the cache by calling their `_change()` method.
+In this case, your setters are responsible for persistence and should still call `_set()` for caching.
 
 #### Creating and deleting
 Models with a *persistence* storage adapter can be created by using their setters followed by a `commit()`:
