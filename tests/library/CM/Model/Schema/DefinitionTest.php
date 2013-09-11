@@ -14,69 +14,36 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 		$schema = new CM_Model_Schema_Definition(array());
 		$_isFloat = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isFloat');
 
-		$value = '4.1';
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = '4.0';
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = '4';
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = '4.0.2';
-		$this->assertFalse($_isFloat->invoke($schema, $value));
-
-		$value = 4E21;
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = '4E21';
-		$this->assertTrue($_isFloat->invoke($schema, $value));
+		$this->assertTrue($_isFloat->invoke($schema, '4.1'));
+		$this->assertTrue($_isFloat->invoke($schema, '4.0'));
+		$this->assertTrue($_isFloat->invoke($schema, '4'));
+		$this->assertFalse($_isFloat->invoke($schema, '4.0.2'));
+		$this->assertTrue($_isFloat->invoke($schema, 4E21));
+		$this->assertTrue($_isFloat->invoke($schema, '4E21'));
 	}
 
 	public function testIsBoolean() {
 		$schema = new CM_Model_Schema_Definition(array());
 		$_isBoolean = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isBoolean');
 
-		$value = true;
-		$this->assertTrue($_isBoolean->invoke($schema, $value));
-
-		$value = false;
-		$this->assertTrue($_isBoolean->invoke($schema, $value));
-
-		$value = '1';
-		$this->assertTrue($_isBoolean->invoke($schema, $value));
-
-		$value = 'true';
-		$this->assertFalse($_isBoolean->invoke($schema, $value));
-
-		$value = 'false';
-		$this->assertFalse($_isBoolean->invoke($schema, $value));
-
-		$value = 1;
-		$this->assertFalse($_isBoolean->invoke($schema, $value));
+		$this->assertTrue($_isBoolean->invoke($schema, true));
+		$this->assertTrue($_isBoolean->invoke($schema, false));
+		$this->assertTrue($_isBoolean->invoke($schema, '1'));
+		$this->assertFalse($_isBoolean->invoke($schema, 'true'));
+		$this->assertFalse($_isBoolean->invoke($schema, 'false'));
+		$this->assertFalse($_isBoolean->invoke($schema, 1));
 	}
 
 	public function testIsInt() {
 		$schema = new CM_Model_Schema_Definition(array());
-		$_isFloat = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isInt');
+		$_isInt = CMTest_TH::getProtectedMethod('CM_Model_Schema_Definition', '_isInt');
 
-		$value = 1;
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = '1';
-		$this->assertTrue($_isFloat->invoke($schema, $value));
-
-		$value = 1.2;
-		$this->assertFalse($_isFloat->invoke($schema, $value));
-
-		$value = '1.0';
-		$this->assertFalse($_isFloat->invoke($schema, $value));
-
-		$value = '4E2';
-		$this->assertFalse($_isFloat->invoke($schema, $value));
-
-		$value = 4E2;
-		$this->assertFalse($_isFloat->invoke($schema, $value));
+		$this->assertTrue($_isInt->invoke($schema, 1));
+		$this->assertTrue($_isInt->invoke($schema, '1'));
+		$this->assertFalse($_isInt->invoke($schema, 1.2));
+		$this->assertFalse($_isInt->invoke($schema, '1.0'));
+		$this->assertFalse($_isInt->invoke($schema, '4E2'));
+		$this->assertFalse($_isInt->invoke($schema, 4E2));
 	}
 
 	public function testHasKey() {
