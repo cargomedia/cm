@@ -123,9 +123,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
+		if ($this->hasStreams()) {
+			throw new CM_Exception_Invalid('Cannot delete streamChannel with existing streams');
+		}
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
 		CM_Cache::delete($cacheKey);
-
 		CM_Db_Db::delete('cm_streamChannel', array('id' => $this->getId()));
 	}
 
