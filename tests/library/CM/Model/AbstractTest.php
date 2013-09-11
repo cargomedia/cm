@@ -669,6 +669,26 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($modelMock->_get('foo'));
 	}
 
+
+	public function testSetDataUnsetDecoded() {
+		$storedModel = CM_ModelMock::createStatic(array('foo' => 'bar1'));
+		$dataEncoded = array('foo' => $storedModel->getId());
+
+		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField'))->setConstructorArgs(
+			array(array('foo' => array('type' => 'CM_ModelMock'))))->getMockForAbstractClass();
+		$schema->expects($this->once())->method('decodeField')->with('foo', $storedModel->getId())->will($this->returnValue($storedModel));
+
+		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getSchema', 'getType', '_getData', 'getIdRaw'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+		$model->expects($this->any())->method('_getData')->will($this->returnValue($dataEncoded));
+		$model->expects($this->any())->method('getIdRaw')->will($this->returnValue(array('id' => 1)));
+
+		/** @var CM_Model_Abstract $model */
+		$model->_set('foo',$storedModel);
+
+		$this->assertEquals($storedModel, $model->_get('foo'));
+	}
+
 	public function testSetMultiple() {
 		$modelMock = CM_ModelMock::createStatic(array('foo' => 'foo1'));
 		$modelMock = new CM_ModelMock($modelMock->getId());
@@ -709,8 +729,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $modelMock */
 
 		$modelMock->_set($data);
-		$this->assertSame($data['foo'], $modelMock->_get('foo'));
-		$this->assertSame($data['bar'], $modelMock->_get('bar'));
+		$this->assertSame((int) $data['foo'], $modelMock->_get('foo'));
+		$this->assertSame((int) $data['bar'], $modelMock->_get('bar'));
 	}
 
 	public function testSetPersistenceSave() {
