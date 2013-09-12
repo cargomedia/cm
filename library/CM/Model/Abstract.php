@@ -494,7 +494,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $idTypeArray [['type' => int, id' => int|array],...]
+	 * @param array $idTypeArray [['type' => int, 'id' => int|array],...]
 	 * @return CM_Model_Abstract[]
 	 */
 	public static function factoryGenericMultiple(array $idTypeArray) {
