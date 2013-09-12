@@ -14,4 +14,9 @@ class CM_Db_Query_SelectMultipleTest extends CMTest_TestCase {
 		$query = new CM_Db_Query_SelectMultiple(self::$_client, 't`est', array('f`oo', 'bar'), array(array('foo' => 'foo1', 'bar' => null), array('foo2' => 'foo2')), 'order1');
 		$this->assertSame('SELECT `f``oo`,`bar` FROM `t``est` WHERE (`foo` = ? AND `bar` IS NULL) OR (`foo2` = ?) ORDER BY order1', $query->getSqlTemplate());
 	}
+
+	public function testEmptyWhere() {
+		$query = new CM_Db_Query_SelectMultiple(self::$_client, 't`est', array('f`oo', 'bar'), array(), 'order1');
+		$this->assertSame('SELECT `f``oo`,`bar` FROM `t``est` ORDER BY order1', $query->getSqlTemplate());
+	}
 }

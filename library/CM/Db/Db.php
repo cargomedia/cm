@@ -184,14 +184,14 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string       $table
-	 * @param string|array $fields Column-name OR Column-names array
-	 * @param array[]      $where  Outer array-entries are combined using OR, inner arrays using AND
+	 * @param string|array $fields     Column-name OR Column-names array
+	 * @param array[]      $whereList  Outer array-entries are combined using OR, inner arrays using AND
 	 * @param string|null  $order
 	 * @return CM_Db_Result
 	 */
-	public static function selectMultiple($table, $fields, array $where, $order = null) {
+	public static function selectMultiple($table, $fields, array $whereList, $order = null) {
 		$client = self::_getClient(false);
-		$query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $where, $order);
+		$query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $whereList, $order);
 		return $query->execute();
 	}
 
