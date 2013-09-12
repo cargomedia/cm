@@ -481,7 +481,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		));
 		$_getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
 		$this->assertEquals($modelPersistence, $models[0]);
-		$this->assertSame($_getData->invoke($models[0]), array('foo' => 'bar2'));
+		$this->assertSame($_getData->invoke($models[0]), array('id' => (string) $modelPersistence->getId(), 'foo' => 'bar2'));
 		$this->assertEquals($modelLoadData, $models[1]);
 		$this->assertSame($_getData->invoke($models[1]), array('foo' => 'bar1'));
 		$this->assertEquals($modelCache, $models[2]);

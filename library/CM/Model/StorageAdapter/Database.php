@@ -27,7 +27,6 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 				$id = array();
 				foreach ($idColumnList as $idColumn) {
 					$id[$idColumn] = $row[$idColumn];
-					unset($row[$idColumn]);
 				}
 				$key = $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)];
 				$resultSet[$key] = $row;
