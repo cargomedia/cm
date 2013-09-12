@@ -8,7 +8,7 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 
 	public function loadMultiple(array $idTypeList) {
 		$types = array();
-		$arrayKeyListOriginal = array();
+		$dbEntryToArrayKey = array();
 
 		foreach ($idTypeList as $key => $idType) {
 			$type = (int) $idType['type'];
@@ -17,7 +17,7 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 			foreach ($id as &$idPart) {
 				$idPart = (string) $idPart;
 			}
-			$arrayKeyListOriginal['type:' . $type . 'id:' . serialize($id)] = $key;
+			$dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)] = $key;
 		}
 		$resultSet = array();
 		foreach ($types as $type => $ids) {
@@ -29,8 +29,8 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 					$id[$idColumn] = $row[$idColumn];
 					unset($row[$idColumn]);
 				}
-				$originalKey = $arrayKeyListOriginal['type:' . $type . 'id:' . serialize($id)];
-				$resultSet[$originalKey] = $row;
+				$key = $dbEntryToArrayKey['type:' . $type . 'id:' . serialize($id)];
+				$resultSet[$key] = $row;
 			}
 		}
 		return $resultSet;
