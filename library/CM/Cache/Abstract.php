@@ -60,20 +60,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string[] $keys
-	 * @return mixed|false
-	 */
-	public static final function getMulti($keys) {
-		if (!static::_enabled()) {
-			return false;
-		}
-		$cache = static::getInstance();
-		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-getMulti', $keys);
-		$value = $cache->_getMulti($keys);
-		return $value;
-	}
-
-	/**
 	 * @param string $key
 	 */
 	public static final function delete($key) {
@@ -208,12 +194,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @return mixed Result or false
 	 */
 	abstract protected function _get($key);
-
-	/**
-	 * @param string[] $keys
-	 * @return mixed Result or false
-	 */
-	abstract protected function _getMulti(array $keys);
 
 	/**
 	 * @param string $key

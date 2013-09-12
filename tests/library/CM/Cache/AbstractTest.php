@@ -102,8 +102,4 @@ class CM_Cache_Mock extends CM_Cache_Abstract {
 	protected function _getName() {
 		return 'Mock Cache';
 	}
-
-	protected function _getMulti(array $keys) {
-		throw new CM_Exception_NotImplemented();
-	}
 }

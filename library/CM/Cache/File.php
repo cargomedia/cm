@@ -32,10 +32,6 @@ class CM_Cache_File extends CM_Cache_Abstract {
 		return $file->read();
 	}
 
-	protected function _getMulti(array $keys) {
-		throw new CM_Exception_NotImplemented();
-	}
-
 	protected function _delete($key) {
 		$path = $this->_getPath($key);
 		if (CM_File::exists($path)) {
