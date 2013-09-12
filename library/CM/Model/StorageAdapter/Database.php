@@ -6,11 +6,11 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
 		return CM_Db_Db::select($this->_getTableName($type), '*', $id)->fetch();
 	}
 
-	public function loadMultiple(array $idTypeArray) {
+	public function loadMultiple(array $idTypeList) {
 		$types = array();
 		$arrayKeyListOriginal = array();
 
-		foreach ($idTypeArray as $key => $idType) {
+		foreach ($idTypeList as $key => $idType) {
 			$type = (int) $idType['type'];
 			$id = $idType['id'];
 			$types[$type][] = $id;
