@@ -15,6 +15,11 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 				KEY (`modelMockId`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 		");
+		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_modelmock3` (
+				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+				`foo` VARCHAR(32)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+		");
 	}
 
 	public static function tearDownAfterClass() {
@@ -451,26 +456,38 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testFactoryGenericMultiple() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
 
-		$model1 = CM_ModelMock::createStatic(array('foo' => 'bar1'));
-
-		$model1->_set('foo', 'foo1');
-		$model2 = CM_ModelMock::createStatic(array('foo' => 'bar2'));
-		$model2->_change();
-		CM_Db_Db::update('cm_modelmock', array('foo' => 'foo2'), array('id' => $model2->getId()));
+		/** @var CM_ModelMock $modelLoadData */
+		$modelLoadData = CM_ModelMock::createStatic(array('foo' => 'foo1'));
+		$modelLoadData->_change();
+		CM_Db_Db::update('cm_modelmock', array('foo' => 'bar1'), array('id' => $modelLoadData->getId()));
+		$modelPersistence = new CM_ModelMock3();
+		$modelPersistence->_set('foo', 'bar2');
+		$modelPersistence->commit();
+		$modelPersistence->_change();
+		CM_Db_Db::update('cm_modelmock3', array('foo' => 'bar2'), array('id' => $modelPersistence->getId()));
+		/** @var CM_ModelMock $modelCache */
+		$modelCache = CM_ModelMock::createStatic(array('foo' => 'foo3'));
+		CM_Db_Db::update('cm_modelmock3', array('foo' => 'bar3'), array('id' => $modelCache->getId()));
 
 		/** @var CM_ModelMock[] $models */
 		$models = CM_Model_Abstract::factoryGenericMultiple(array(
-			array('type' => CM_ModelMock::TYPE, 'id' => $model2->getId()),
-			array('type' => CM_ModelMock::TYPE, 'id' => $model1->getId()),
+			array('type' => $modelPersistence->getType(), 'id' => $modelPersistence->getId()),
+			array('type' => $modelLoadData->getType(), 'id' => $modelLoadData->getId()),
+			array('type' => $modelCache->getType(), 'id' => $modelCache->getId()),
+			array('type' => CM_ModelMock3::TYPE, 'id' => 9999),
 			array('type' => CM_ModelMock::TYPE, 'id' => 9999),
 		));
-		$this->assertEquals($models[0], $model2);
 		$_getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
-		$this->assertSame($_getData->invoke($models[0]), array('foo' => 'foo2'));
-		$this->assertEquals($models[1], $model1);
-		$this->assertSame($_getData->invoke($models[1]), array('foo' => 'foo1'));
-		$this->assertSame($models[2], null);
+		$this->assertEquals($modelPersistence, $models[0]);
+		$this->assertSame($_getData->invoke($models[0]), array('foo' => 'bar2'));
+		$this->assertEquals($modelLoadData, $models[1]);
+		$this->assertSame($_getData->invoke($models[1]), array('foo' => 'bar1'));
+		$this->assertEquals($modelCache, $models[2]);
+		$this->assertSame($_getData->invoke($models[2]), array('foo' => 'foo3'));
+		$this->assertNull($models[3]);
+		$this->assertNull($models[4]);
 	}
 
 	public function testPersistenceSet() {
@@ -1071,5 +1088,19 @@ class CM_ModelAsset_ModelMock_ModelAssetMock extends CM_ModelAsset_Abstract {
 			$this->_cacheSet('foo', $foo);
 		}
 		return $foo;
+	}
+}
+
+
+class CM_ModelMock3 extends CM_Model_Abstract {
+
+	const TYPE = 4;
+
+	public static function getPersistenceClass() {
+		return 'CM_Model_StorageAdapter_Database';
+	}
+
+	public function _getSchema() {
+		return new CM_Model_Schema_Definition(array('foo' => array('type' => 'string')));
 	}
 }
