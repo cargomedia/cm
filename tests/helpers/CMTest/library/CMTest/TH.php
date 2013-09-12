@@ -190,8 +190,11 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $user, 'start' => time(),
+			'key'           => rand(1, 10000) . '_' . rand(1, 100),
+		));
 	}
 
 	/**
@@ -204,7 +207,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+															 'key'           => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**

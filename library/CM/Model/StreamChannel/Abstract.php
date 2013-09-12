@@ -111,6 +111,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return !$this->getStreamPublishs()->isEmpty() || !$this->getStreamSubscribes()->isEmpty();
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function isValid() {
+		return true;
+	}
+
 	protected function _loadData() {
 		$data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
@@ -159,7 +166,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$class = self::_getClassName($type);
 		$instance = new $class($id);
 		if (!$instance instanceof static) {
-			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class(). '`.');
+			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class() . '`.');
 		}
 		return $instance;
 	}
