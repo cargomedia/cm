@@ -7,15 +7,13 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 	}
 
 	public function loadMultiple(array $idTypeList) {
-		$cacheKeyList = array();
 		$arrayKeyListOriginal = array();
 		foreach ($idTypeList as $key => $idType) {
 			$cacheKey = $this->_getCacheKey($idType['type'], $idType['id']);
-			$cacheKeyList[] = $cacheKey;
 			$arrayKeyListOriginal[$cacheKey] = $key;
 		}
 		$result = array();
-		$values = CM_Cache::getMulti($cacheKeyList);
+		$values = CM_Cache::getMulti(array_keys($arrayKeyListOriginal));
 		foreach ($values as $cacheKey => $value) {
 			$key = $arrayKeyListOriginal[$cacheKey];
 			$result[$key] = $value;
