@@ -490,7 +490,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		 * unserialize() is ~10% slower.
 		 */
 		$serialized = serialize(array($id, $data));
-		return unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
+		/** @var CM_Model_Abstract $model */
+		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
+		if (null !== $data) {
+			$model->_loadAssets(true);
+		}
+		return $model;
 	}
 
 	/**
