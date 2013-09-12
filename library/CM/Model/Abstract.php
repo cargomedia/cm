@@ -508,7 +508,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if (!is_array($idType['id'])) {
 				$idType['id'] = array('id' => $idType['id']);
 			}
-			$serializedKey = self::_serializeIdType($type, $idType['id']);
+
+			$serializedKey = serialize(array('type' => $type, 'id' => $idType['id']));
 			$dataList[$serializedKey] = null;
 			$idTypeMap[$serializedKey] = $idType;
 
