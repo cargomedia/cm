@@ -117,59 +117,6 @@ class CM_Bootloader {
 	/**
 	 * @return string[]
 	 */
-	public function getNamespaces() {
-		return array_keys($this->getModules());
-	}
-
-	/**
-	 * @return array[]
-	 */
-	public function getModules() {
-		$cacheKey = DIR_ROOT . '_CM_Modules';
-		if (false === ($modules = apc_fetch($cacheKey))) {
-			$packages = $this->_getPackages();
-			$getModules = function ($packageName) use (&$getModules, $packages) {
-				$package = $packages[$packageName];
-				$dependencies = array();
-				$modules = array();
-				foreach ($package['dependencies'] as $dependencyPackageName) {
-					$dependencies = array_merge($getModules($dependencyPackageName), $dependencies);
-				}
-				foreach ($package['modules'] as $name => $path) {
-					$modules[$name] = array(
-						'path' => $package['path'] . $path,
-						'dependencies' => array_keys($dependencies),
-					);
-				}
-				$modules = array_merge($dependencies, $modules);
-				return $modules;
-			};
-			$modules = $getModules($this->_getName());
-			apc_store($cacheKey, $modules);
-		}
-		return $modules;
-	}
-
-	/**
-	 * @param $moduleName
-	 * @return string[]
-	 */
-	public function getModuleNamespaces($moduleName) {
-		$modules = $this->getModules();
-		$getNamespaces = function ($moduleName) use (&$getNamespaces, $modules) {
-			$namespaces = array($moduleName);
-			$module = $modules[$moduleName];
-			foreach ($module['dependencies'] as $dependencyName) {
-				$namespaces = array_merge($namespaces, $getNamespaces($dependencyName));
-			}
-			return $namespaces;
-		};
-		return $getNamespaces($moduleName);
-	}
-
-	/**
-	 * @return string[]
-	 */
 	public function getEnvironment() {
 		return $this->_environments;
 	}
@@ -212,24 +159,16 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return array
-	 */
-	public function _getNamespacePaths() {
-		return array_map(function($module) {
-			return $module['path'];
-		}, $this->getModules());
-	}
-
-	/**
 	 * @param string $namespace
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
 	public function getNamespacePath($namespace) {
 		$namespacePaths = $this->_getNamespacePaths();
-		if (isset($namespacePaths[$namespace])) {
-			return $namespacePaths[$namespace];
+		if (!array_key_exists($namespace, $namespacePaths)) {
+			throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
 		}
-		return '';
+		return $namespacePaths[$namespace];
 	}
 
 	/**
@@ -303,71 +242,88 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return string[]
+	 */
+	public function getNamespaces() {
+		return array_keys($this->_getNamespacePaths());
+	}
+
+	/**
 	 * @return \Composer\Composer
 	 */
 	private function _getComposer() {
-		static $composer;
-		if (!$composer) {
+		static $composer = null;
+		if (null === $composer) {
+			if (!getenv('COMPOSER_HOME') && !getenv('HOME')) {
+				putenv('COMPOSER_HOME=' . sys_get_temp_dir() . 'composer/');
+			}
 			$oldCwd = getcwd();
 			chdir(DIR_ROOT);
-			$io = new Composer\IO\NullIO();
-			$composer = Composer\Factory::create($io, DIR_ROOT . 'composer.json');
+			$io = new \Composer\IO\NullIO();
+			$composer = \Composer\Factory::create($io, DIR_ROOT . 'composer.json');
 			chdir($oldCwd);
 		}
 		return $composer;
 	}
 
 	/**
-	 * @return \Composer\Package\CompletePackage[]
+	 * @return CM_Library_Package[]
+	 * @throws CM_Exception_Invalid
 	 */
-	private function _getComposerPackages() {
-
+	public function _getPackages() {
+		$packageName = 'cargomedia/cm';
 		$composer = $this->_getComposer();
 		$repo = $composer->getRepositoryManager()->getLocalRepository();
 
+		/** @var \Composer\Package\CompletePackage[] $packages */
 		$packages = $repo->getPackages();
-		$packages[] = $composer->getPackage();
-		$packages = array_filter($packages, function ($package) {
-			/** @var \Composer\Package\CompletePackage $package */
-			return array_key_exists('cm-modules', $package->getExtra());
-		});
-		return $packages;
+		$packages[] = $composer->getPackage();;
+		foreach ($packages as $package) {
+			if ($package->getName() === $packageName) {
+				$fsPackageMain = $package;
+			}
+		}
+		if (!isset($fsPackageMain)) {
+			throw new CM_Exception_Invalid('`' . $packageName . '` package not found within composer packages');
+		}
+
+		/** @var CM_Library_Package[] $fsPackages */
+		$fsPackages = array(new CM_Library_Package($fsPackageMain));
+		for (; $parentPackage = current($fsPackages); next($fsPackages)) {
+			foreach ($packages as $package) {
+				if (array_key_exists($parentPackage->getName(), $package->getRequires())) {
+					$fsPackages[] = new CM_Library_Package($package);
+				}
+			}
+		}
+		return array_reverse($fsPackages);
 	}
 
 	/**
-	 * @return array[]
+	 * @return array [namespace => pathRelative]
 	 */
-	private function _getPackages() {
-		$installationManager = $this->_getComposer()->getInstallationManager();
-		$composerPackages = $this->_getComposerPackages();
-
-		$packages = array();
-		foreach ($composerPackages as $package) {
-			$path = '';
-			if (!$package instanceof \Composer\Package\RootPackage) {
-				$path = $installationManager->getInstallPath($package);
-				$path = preg_replace('/^' . preg_quote(DIR_ROOT, '/') . '/', '', $path) . '/';
-			}
-
-			$extra = $package->getExtra();
-			$modules = $extra['cm-modules'];
-
-			$dependencies = array();
-			foreach ($composerPackages as $possibleDependency) {
-				$dependencyName = $possibleDependency->getName();
-				if (array_key_exists($dependencyName, $package->getRequires())) {
-					$dependencies[] = $dependencyName;
+	private function _getNamespacePaths() {
+		$cacheKey = DIR_ROOT . '_CM_Modules';
+		if (false === ($namespacePaths = apc_fetch($cacheKey))) {
+			$vendorDir = rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
+			$namespacePaths = array();
+			foreach ($this->_getPackages() as $package) {
+				foreach ($package->getModules() as $module) {
+					foreach ($module->getNamespaces() as $namespace => $namespacePathRelative) {
+						$pathRelative = '';
+						if (!$package->isRoot()) {
+							$pathRelative = $vendorDir . $package->getPrettyName() . '/';
+						}
+						$namespacePaths[$namespace] = $pathRelative . $namespacePathRelative;
+					}
 				}
 			}
-
-			$packages[$package->getName()] = array(
-				'path'         => $path,
-				'modules'      => $modules,
-				'dependencies' => $dependencies,
-			);
+			apc_store($cacheKey, $namespacePaths);
 		}
-		return $packages;
+		return $namespacePaths;
 	}
+
+
 
 	/**
 	 * @return string
