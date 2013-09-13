@@ -104,6 +104,20 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		return false;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function hasStreams() {
+		return !$this->getStreamPublishs()->isEmpty() || !$this->getStreamSubscribes()->isEmpty();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isValid() {
+		return true;
+	}
+
 	protected function _loadData() {
 		$data = CM_Db_Db::select('cm_streamChannel', array('key', 'type', 'adapterType'), array('id' => $this->getId()))->fetch();
 		if (false !== $data) {
@@ -116,18 +130,11 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	}
 
 	protected function _onDelete() {
-		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
-			$streamSubscribe->delete();
+		if ($this->hasStreams()) {
+			throw new CM_Exception_Invalid('Cannot delete streamChannel with existing streams');
 		}
-		/** @var CM_Model_Stream_Publish $streamPublish */
-		foreach ($this->getStreamPublishs() as $streamPublish) {
-			$streamPublish->delete();
-		}
-
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
 		CM_Cache::delete($cacheKey);
-
 		CM_Db_Db::delete('cm_streamChannel', array('id' => $this->getId()));
 	}
 
@@ -159,7 +166,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$class = self::_getClassName($type);
 		$instance = new $class($id);
 		if (!$instance instanceof static) {
-			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class(). '`.');
+			throw new CM_Exception_Invalid('Unexpected instance of `' . $class . '`. Expected `' . get_called_class() . '`.');
 		}
 		return $instance;
 	}
