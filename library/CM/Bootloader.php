@@ -248,6 +248,11 @@ class CM_Bootloader {
 		return array_keys($this->_getNamespacePaths());
 	}
 
+	public function reloadNamespacePaths() {
+		$cacheKey = DIR_ROOT . '_CM_Modules';
+		apc_delete($cacheKey);
+	}
+
 	/**
 	 * @return \Composer\Composer
 	 */
@@ -270,7 +275,7 @@ class CM_Bootloader {
 	 * @return CM_Library_Package[]
 	 * @throws CM_Exception_Invalid
 	 */
-	public function _getPackages() {
+	private function _getPackages() {
 		$packageName = 'cargomedia/cm';
 		$composer = $this->_getComposer();
 		$repo = $composer->getRepositoryManager()->getLocalRepository();
