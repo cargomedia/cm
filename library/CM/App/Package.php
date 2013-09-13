@@ -23,7 +23,7 @@ class CM_App_Package {
 		}
 		$modules = array();
 		foreach ($extra['cm-modules'] as $moduleName => $modulePath) {
-			$modules[] = new CM_App_Module($moduleName, $modulePath, $this);
+			$modules[] = new CM_App_Module($moduleName, $modulePath);
 		}
 		return array_reverse($modules);
 	}

@@ -19,17 +19,10 @@ class CM_App_Installation {
 	 * @return array [namespace => pathRelative]
 	 */
 	public function getNamespacePaths() {
-		$vendorDir = $this->_getComposerVendorDir();
 		$namespacePaths = array();
 		foreach ($this->getPackages() as $package) {
 			foreach ($package->getModules() as $module) {
-				foreach ($module->getNamespaces() as $namespace => $namespacePathRelative) {
-					$pathRelative = '';
-					if (!$package->isRoot()) {
-						$pathRelative = $vendorDir . $package->getPrettyName() . '/';
-					}
-					$namespacePaths[$namespace] = $pathRelative . $namespacePathRelative;
-				}
+				$namespacePaths[$module->getName()] = $this->_getPackagePath($package) . $module->getPath();
 			}
 		}
 		return $namespacePaths;
@@ -79,6 +72,19 @@ class CM_App_Installation {
 	 */
 	protected function _getComposerVendorDir() {
 		return rtrim($this->_composer->getConfig()->get('vendor-dir'), '/') . '/';
+	}
+
+	/**
+	 * @param CM_App_Package $package
+	 * @return string
+	 */
+	protected function _getPackagePath(CM_App_Package $package) {
+		$pathRelative = '';
+		if (!$package->isRoot()) {
+			$vendorDir = $this->_getComposerVendorDir();
+			$pathRelative = $vendorDir . $package->getPrettyName() . '/';
+		}
+		return $pathRelative;
 	}
 
 	/**
