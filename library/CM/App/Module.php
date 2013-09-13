@@ -1,6 +1,6 @@
 <?php
 
-class CM_Library_Module {
+class CM_App_Module {
 
 	/** @var string */
 	private $_name;
@@ -8,15 +8,15 @@ class CM_Library_Module {
 	/** @var string */
 	private $_path;
 
-	/** @var CM_Library_Package */
+	/** @var CM_App_Package */
 	private $_package;
 
 	/**
 	 * @param string                           $name
 	 * @param string                           $path
-	 * @param CM_Library_Package $package
+	 * @param CM_App_Package $package
 	 */
-	public function __construct($name, $path, CM_Library_Package $package) {
+	public function __construct($name, $path, CM_App_Package $package) {
 		$this->_name = (string) $name;
 		$this->_path = (string) $path;
 		$this->_package = $package;

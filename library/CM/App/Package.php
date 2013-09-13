@@ -1,6 +1,6 @@
 <?php
 
-class CM_Library_Package {
+class CM_App_Package {
 
 	/** @var \Composer\Package\CompletePackage */
 	private $_composerPackage;
@@ -13,19 +13,17 @@ class CM_Library_Package {
 	}
 
 	/**
-	 * @return CM_Library_Module[]
+	 * @return CM_App_Module[]
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getModules() {
 		$extra = $this->_composerPackage->getExtra();
 		if (!array_key_exists('cm-modules', $extra)) {
-			print_r($this->_composerPackage->getRequires());
-			die();
 			throw new CM_Exception_Invalid('No modules specified for package `' . $this->getName() . '`');
 		}
 		$modules = array();
 		foreach ($extra['cm-modules'] as $moduleName => $modulePath) {
-			$modules[] = new CM_Library_Module($moduleName, $modulePath, $this);
+			$modules[] = new CM_App_Module($moduleName, $modulePath, $this);
 		}
 		return array_reverse($modules);
 	}
