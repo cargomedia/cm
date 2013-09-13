@@ -38,7 +38,7 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
-			if (!$streamChannel->getStreamPublishs()->getCount() && !$streamChannel->getStreamSubscribes()->getCount()) {
+			if (!$streamChannel->hasStreams()) {
 				$streamChannel->delete();
 				continue;
 			}
