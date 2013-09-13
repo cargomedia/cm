@@ -6,19 +6,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_modelmock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
 		");
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `modelThasIsAnAssetMock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`modelMockId` INT UNSIGNED NOT NULL,
 				`bar` VARCHAR(32),
 				KEY (`modelMockId`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
 		");
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_modelmock3` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
 		");
 	}
 
@@ -488,6 +488,25 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertSame($_getData->invoke($models[2]), array('foo' => 'foo3'));
 		$this->assertNull($models[3]);
 		$this->assertNull($models[4]);
+	}
+
+	public function testFactoryGenericMultipleWithModelType() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+
+		/** @var CM_ModelMock $model1 */
+		$model1 = CM_ModelMock::createStatic(array('foo' => 'foo1'));
+		/** @var CM_ModelMock $model2 */
+		$model2 = CM_ModelMock::createStatic(array('foo' => 'foo2'));
+
+		/** @var CM_ModelMock[] $models */
+		$models = CM_Model_Abstract::factoryGenericMultiple(array(
+			$model1->getId(),
+			$model2->getIdRaw(),
+		), CM_ModelMock::TYPE);
+
+		$this->assertEquals($model1, $models[0]);
+		$this->assertEquals($model2, $models[1]);
 	}
 
 	public function testPersistenceSet() {
@@ -1090,7 +1109,6 @@ class CM_ModelAsset_ModelMock_ModelAssetMock extends CM_ModelAsset_Abstract {
 		return $foo;
 	}
 }
-
 
 class CM_ModelMock3 extends CM_Model_Abstract {
 

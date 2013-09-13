@@ -499,22 +499,31 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $idTypeList [['type' => int, 'id' => int|array],...]
+	 * @param array    $idTypeList [['type' => int, 'id' => int|array],...] | [int|array,...] Pass an array of ids if $modelType is used
+	 * @param int|null $modelType
 	 * @return CM_Model_Abstract[]
 	 */
-	public static function factoryGenericMultiple(array $idTypeList) {
+	public static function factoryGenericMultiple(array $idTypeList, $modelType = null) {
+		$modelType = (null !== $modelType) ? (int) $modelType : null;
 		$dataList = array();
 		$idTypeMap = array();
 		$storageTypeList = array();
 		$noPersistenceList = array();
 
 		foreach ($idTypeList as $idType) {
-			$type = $idType['type'];
-			if (!is_array($idType['id'])) {
-				$idType['id'] = array('id' => $idType['id']);
+			if (null === $modelType) {
+				$type = $idType['type'];
+				$id = $idType['id'];
+			} else {
+				$type = $modelType;
+				$id = $idType;
 			}
+			if (!is_array($id)) {
+				$id = array('id' => $id);
+			}
+			$idType = array('type' => $type, 'id' => $id);
 
-			$serializedKey = serialize(array('type' => $type, 'id' => $idType['id']));
+			$serializedKey = serialize($idType);
 			$dataList[$serializedKey] = null;
 			$idTypeMap[$serializedKey] = $idType;
 
