@@ -34,7 +34,9 @@
 	"bin": ["scripts/cm.php"],
 	"extra": {
 		"cm-modules": {
-			"CM": ""
+			"CM": {
+				"path": ""
+			}
 		}
 	}
 }

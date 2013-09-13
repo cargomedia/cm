@@ -18,14 +18,25 @@ class CM_App_Installation {
 	/**
 	 * @return array [namespace => pathRelative]
 	 */
-	public function getNamespacePaths() {
+	public function getModulePaths() {
 		$namespacePaths = array();
-		foreach ($this->getPackages() as $package) {
-			foreach ($package->getModules() as $module) {
-				$namespacePaths[$module->getName()] = $this->_getPackagePath($package) . $module->getPath();
-			}
+		foreach ($this->getModules() as $module) {
+			$namespacePaths[$module->getName()] = $module->getPath();
 		}
 		return $namespacePaths;
+	}
+
+	/**
+	 * @return CM_App_Module[]
+	 */
+	public function getModules() {
+		$modules = array();
+		foreach ($this->getPackages() as $package) {
+			foreach ($package->getModules() as $module) {
+				$modules[] = $module;
+			}
+		}
+		return $modules;
 	}
 
 	/**
@@ -33,27 +44,31 @@ class CM_App_Installation {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getPackages() {
-		$packageName = 'cargomedia/cm';
-		$packages = $this->_getComposerPackages();
-		foreach ($packages as $package) {
-			if ($package->getName() === $packageName) {
-				$fsPackageMain = $package;
+		$mainPackageName = 'cargomedia/cm';
+		$composerPackages = $this->_getComposerPackages();
+		foreach ($composerPackages as $package) {
+			if ($package->getName() === $mainPackageName) {
+				$composerPackagesFiltered = array($package);
 			}
 		}
-		if (!isset($fsPackageMain)) {
-			throw new CM_Exception_Invalid('`' . $packageName . '` package not found within composer packages');
+		if (!isset($composerPackagesFiltered)) {
+			throw new CM_Exception_Invalid('`' . $mainPackageName . '` package not found within composer packages');
 		}
 
-		/** @var CM_App_Package[] $fsPackages */
-		$fsPackages = array(new CM_App_Package($fsPackageMain));
-		for (; $parentPackage = current($fsPackages); next($fsPackages)) {
-			foreach ($packages as $package) {
+		for (; $parentPackage = current($composerPackagesFiltered); next($composerPackagesFiltered)) {
+			foreach ($composerPackages as $package) {
 				if (array_key_exists($parentPackage->getName(), $package->getRequires())) {
-					$fsPackages[] = new CM_App_Package($package);
+					$composerPackagesFiltered[] = $package;
 				}
 			}
 		}
-		return $fsPackages;
+
+		$packages = array();
+		/** @var \Composer\Package\CompletePackage[] $composerPackagesFiltered */
+		foreach ($composerPackagesFiltered as $package) {
+			$packages[] = $this->_getPackageFromComposerPackage($package);
+		}
+		return $packages;
 	}
 
 	/**
@@ -75,16 +90,23 @@ class CM_App_Installation {
 	}
 
 	/**
-	 * @param CM_App_Package $package
-	 * @return string
+	 * @param \Composer\Package\CompletePackage $package
+	 * @return CM_App_Package
+	 * @throws CM_Exception_Invalid
 	 */
-	protected function _getPackagePath(CM_App_Package $package) {
+	protected function _getPackageFromComposerPackage(\Composer\Package\CompletePackage $package) {
 		$pathRelative = '';
-		if (!$package->isRoot()) {
+		if (!$package instanceof \Composer\Package\RootPackage) {
 			$vendorDir = $this->_getComposerVendorDir();
 			$pathRelative = $vendorDir . $package->getPrettyName() . '/';
 		}
-		return $pathRelative;
+
+		$extra = $package->getExtra();
+		if (!array_key_exists('cm-modules', $extra)) {
+			throw new CM_Exception_Invalid('Missing `cm-modules` in `' . $package->getName() . '` package composer extra');
+
+		}
+		return new CM_App_Package($package->getName(), $pathRelative, $extra['cm-modules']);
 	}
 
 	/**

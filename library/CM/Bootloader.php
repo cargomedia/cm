@@ -260,7 +260,7 @@ class CM_Bootloader {
 		$cacheKey = DIR_ROOT . '_CM_Modules';
 		if (false === ($namespacePaths = apc_fetch($cacheKey))) {
 			$installation = new CM_App_Installation();
-			$namespacePaths = $installation->getNamespacePaths();
+			$namespacePaths = $installation->getModulePaths();
 			apc_store($cacheKey, $namespacePaths);
 		}
 		return $namespacePaths;
