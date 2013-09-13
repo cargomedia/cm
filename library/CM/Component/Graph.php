@@ -37,8 +37,8 @@ class CM_Component_Graph extends CM_Component_Abstract {
 			$flotOptions['points']['show'] = false;
 		}
 
-		$this->_js->series = $series;
-		$this->_js->flotOptions = $flotOptions;
+		$this->_setJsParam('series', $series);
+		$this->_setJsParam('flotOptions', $flotOptions);
 	}
 
 	public function checkAccessible() {

@@ -28,7 +28,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 		if (!$state && $state != $this->getEnabled() && $variationsEnabled->getCount() <= 1) {
 			throw new CM_Exception('No variations for Splittest', 'At least one variation needs to be enabled');
 		}
-		CM_Db_Db::update(TBL_CM_SPLITTESTVARIATION, array('enabled' => $state), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_splittestVariation', array('enabled' => $state), array('id' => $this->getId()));
 		$this->_change();
 		$variationsEnabled->_change();
 	}
@@ -77,27 +77,53 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 * @return float|null P-value
 	 */
 	public function getSignificance(CM_Model_SplittestVariation $variationWorse) {
-		$conversionsA = $this->getConversionCount();
-		$nonConversionsA = $this->getFixtureCount() - $this->getConversionCount();
-		$conversionsB = $variationWorse->getConversionCount();
-		$nonConversionsB = $variationWorse->getFixtureCount() - $variationWorse->getConversionCount();
-
-		$totalA = $conversionsA + $nonConversionsA;
-		$totalB = $conversionsB + $nonConversionsB;
-		$totalConversions = $conversionsA + $conversionsB;
-		$totalNonConversions = $nonConversionsA + $nonConversionsB;
-		$total = $totalA + $totalB;
-
-		// See http://math.hws.edu/javamath/ryan/ChiSquare.html
-		$nominator = $total * pow($nonConversionsA * $conversionsB - $nonConversionsB * $conversionsA, 2);
-		$denominator = $totalA * $totalB * $totalConversions * $totalNonConversions;
-		if (0 == $denominator) {
+		$fixturesA = $this->getFixtureCount();
+		$fixturesB = $variationWorse->getFixtureCount();
+		if (!$fixturesA || !$fixturesB) {
 			return null;
 		}
-		$chiSquare = $nominator / $denominator;
+		$conversionsA = $this->getConversionCount();
+		$conversionsB = $variationWorse->getConversionCount();
+		if (!$conversionsA || !$conversionsB) {
+			return null;
+		}
+		$weightA = $this->getConversionWeight();
+		$weightB = $variationWorse->getConversionWeight();
+		if (!$weightA || !$weightB) {
+			return null;
+		}
+		$rateA = $weightA / $fixturesA;
+		$rateB = $weightB / $fixturesB;
+		$netRateA = $weightA / $conversionsA;
+		$netRateB = $weightB / $conversionsB;
 
-		$p = 1 - stats_cdf_chisquare($chiSquare, 1, 1);
-		return $p;
+		$fixturesTotal = $fixturesA + $fixturesB;
+		$weightTotal = $weightA + $weightB;
+		$rateTotal = $weightTotal / $fixturesTotal;
+
+		$conversionsExpectedA = $rateTotal * $fixturesA / $netRateA;
+		$conversionsExpectedB = $rateTotal * $fixturesB / $netRateB;
+		$sigmaExpectedA = sqrt($conversionsExpectedA * (1 - $conversionsExpectedA / $fixturesA));
+		$sigmaExpectedB = sqrt($conversionsExpectedB * (1 - $conversionsExpectedB / $fixturesB));
+
+		if ($sigmaExpectedA < 3 || $sigmaExpectedB < 3) {
+			return null;
+		}
+		if ($conversionsExpectedA - 3 * $sigmaExpectedA < 0 || $conversionsExpectedB - 3 * $sigmaExpectedB < 0) {
+			return null;
+		}
+		if ($conversionsExpectedA + 3 * $sigmaExpectedA > $fixturesA || $conversionsExpectedB + 3 * $sigmaExpectedB > $fixturesB) {
+			return null;
+		}
+
+		$rateDeviation = abs($rateA - $rateB);
+		$sigmaExpectedRateA = $sigmaExpectedA * $netRateA / $fixturesA;
+		$sigmaExpectedRateB = $sigmaExpectedB * $netRateB / $fixturesB;
+		$sigmaExpectedRateDeviation = sqrt($sigmaExpectedRateA * $sigmaExpectedRateA + $sigmaExpectedRateB * $sigmaExpectedRateB);
+
+		$pValue = 2 * stats_cdf_normal(-$rateDeviation, 0, $sigmaExpectedRateDeviation, 1);
+
+		return $pValue;
 	}
 
 	/**
@@ -108,16 +134,28 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param CM_Model_SplittestVariation $variationWorse
+	 * @return bool
+	 */
+	public function isDeviationSignificant(CM_Model_SplittestVariation $variationWorse) {
+		$significance = $this->getSignificance($variationWorse);
+		if (null === $significance) {
+			return false;
+		}
+		return $significance < 0.01;
+	}
+
+	/**
 	 * @param bool $refreshCache
 	 * @return array
 	 */
 	protected function _getAggregationData($refreshCache = null) {
 		$cacheKey = $this->_getCacheKeyAggregation();
 		if ($refreshCache || false === ($aggregationData = CM_CacheLocal::get($cacheKey))) {
-			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
+			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
 				array($this->_getSplittestId(), $this->getId()))->fetch();
-			$fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM TBL_CM_SPLITTESTVARIATION_FIXTURE
+			$fixtureCount = (int) CM_Db_Db::execRead('SELECT COUNT(1) FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=?',
 				array($this->_getSplittestId(), $this->getId()))->fetchColumn();
 			$aggregationData = array(
@@ -131,7 +169,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_SPLITTESTVARIATION, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_splittestVariation', '*', array('id' => $this->getId()))->fetch();
 	}
 
 	/**

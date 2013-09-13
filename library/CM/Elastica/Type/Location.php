@@ -34,7 +34,7 @@ class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
 	);
 
 	protected function _getQuery($ids = null, $limit = null) {
-		$query = 'SELECT * FROM TBL_CM_TMP_LOCATION';
+		$query = 'SELECT * FROM `cm_tmp_location`';
 		if (($limit = (int) $limit) > 0) {
 			$query .= ' LIMIT ' . $limit;
 		}

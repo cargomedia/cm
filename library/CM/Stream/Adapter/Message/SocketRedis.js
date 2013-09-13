@@ -17,5 +17,9 @@ var CM_Stream_Adapter_Message_SocketRedis = CM_Stream_Adapter_Message_Abstract.e
 
 	unsubscribe: function(channel) {
 		this._socketRedis.unsubscribe(channel);
+	},
+
+	publish: function(channel, event, data) {
+		this._socketRedis.publish(channel, event, data);
 	}
 });

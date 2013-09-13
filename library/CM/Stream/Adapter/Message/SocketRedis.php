@@ -19,8 +19,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		return array('sockjsUrl' => $sockjsUrl);
 	}
 
-	public function publish($channel, $data) {
-		$event = array('type' => 'message', 'data' => array('channel' => $channel, 'data' => $data));
+	public function publish($channel, $event, $data) {
+		$event = array('type' => 'publish', 'data' => array('channel' => $channel, 'event' => $event, 'data' => $data));
 		CM_Cache_Redis::publish('socket-redis-down', json_encode($event));
 	}
 
@@ -54,7 +54,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			try {
 				$channelModel = $stream->getStreamChannel();
 				$channel = $channelModel->getKey() . ':' . $channelModel->getType();
-			} catch (CM_Exception_Nonexistent $e) {
+			} catch (CM_Exception_Invalid $e) {
 				// For cases when streamChannel has been deleted during this iteration
 				continue;
 			}
@@ -100,7 +100,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 							$start = (int) ($subscriber['subscribeStamp'] / 1000);
 							$allowedUntil = null;
 							if ($start <= $startStampLimit) {
-								CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+								CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 																		'streamChannel' => $streamChannel, 'key' => $clientKey));
 							}
 						}
@@ -178,7 +178,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		if ($streamChannelSubscribes->findKey($clientKey)) {
 			return;
 		}
-		CM_Model_Stream_Subscribe::create(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
+		CM_Model_Stream_Subscribe::createStatic(array('user'          => $user, 'start' => $start, 'allowedUntil' => $allowedUntil,
 												'streamChannel' => $streamChannel, 'key' => $clientKey));
 	}
 

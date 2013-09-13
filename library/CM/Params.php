@@ -108,8 +108,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
-	 * @param int[]|null  $default
+	 * @param string     $key
+	 * @param int[]|null $default
 	 * @return int[]
 	 */
 	public function getIntArray($key, array $default = null) {
@@ -189,11 +189,10 @@ class CM_Params extends CM_Class_Abstract {
 		}
 		$param = $this->_get($key, $default);
 		if (!($param instanceof $className)) {
-			try {
-				return $getter($className, $param);
-			} catch (CM_Exception $exception) {
-				throw new CM_Exception_InvalidParam($exception->getMessage());
+			if (is_object($param)) {
+				throw new CM_Exception_InvalidParam(get_class($param) . ' is not a ' . $className);
 			}
+			return $getter($className, $param);
 		}
 		return $param;
 	}
@@ -238,8 +237,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string                   $key
-	 * @param CM_Model_User|null       $default
+	 * @param string             $key
+	 * @param CM_Model_User|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Model_User
 	 */
@@ -261,6 +260,14 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getLocation($key) {
 		return $this->_getObject($key, 'CM_Model_Location');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Model_ActionLimit_Abstract
+	 */
+	public function getActionLimit($key) {
+		return $this->_getObject($key, 'CM_Model_ActionLimit_Abstract');
 	}
 
 	/**

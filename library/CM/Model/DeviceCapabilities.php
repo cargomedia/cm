@@ -9,7 +9,6 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 	 */
 	public function __construct($userAgent) {
 		$userAgent = (string) $userAgent;
-		$this->_setCacheLocal();
 		$this->_construct(array('id' => (string) $userAgent));
 	}
 
@@ -56,4 +55,7 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 		return $capabilities;
 	}
 
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
+	}
 }

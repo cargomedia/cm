@@ -10,7 +10,7 @@ $config->CM_Cache_Memcache->servers = array(
 	array('host' => '10.10.10.100', 'port' => 11211),
 );
 
-$config->CM_Db_Db->db = 'skadate_test';
+$config->CM_Db_Db->db = 'skadate';
 $config->CM_Db_Db->username = 'skadate';
 $config->CM_Db_Db->password = 'k290DSkjsfiE02sDjj';
 $config->CM_Db_Db->server = array('host' => '10.10.10.101', 'port' => 3306);

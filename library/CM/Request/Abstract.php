@@ -131,7 +131,7 @@ abstract class CM_Request_Abstract {
 	public function getClientId() {
 		if (!$this->hasClientId()) {
 			if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = (int) CM_Db_Db::insert(TBL_CM_REQUESTCLIENT, array());
+				$this->_clientId = (int) CM_Db_Db::insert('cm_requestClient', array());
 			}
 		}
 
@@ -468,7 +468,7 @@ abstract class CM_Request_Abstract {
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
 
 		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
-			$isValid = (bool) CM_Db_Db::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+			$isValid = (bool) CM_Db_Db::count('cm_requestClient', array('id' => $clientId));
 			if ($isValid) {
 				CM_CacheLocal::set($cacheKey, true);
 			}
@@ -519,7 +519,7 @@ abstract class CM_Request_Abstract {
 	 * @param array|null  $headers
 	 * @param string|null $body
 	 * @throws CM_Exception_Invalid
-	 * @return CM_Request_Get|CM_Request_Post
+	 * @return CM_Request_Abstract
 	 */
 	public static function factory($method, $uri, array $headers = null, $body = null) {
 		$method = strtolower($method);
@@ -536,5 +536,16 @@ abstract class CM_Request_Abstract {
 			return new CM_Request_Options($uri, $headers);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
+	}
+
+	/**
+	 * @return CM_Request_Abstract
+	 */
+	public static function factoryFromGlobals() {
+		$method = $_SERVER['REQUEST_METHOD'];
+		$uri = $_SERVER['REQUEST_URI'];
+		$headers = getallheaders();
+		$body = file_get_contents('php://input');
+		return self::factory($method, $uri, $headers, $body);
 	}
 }

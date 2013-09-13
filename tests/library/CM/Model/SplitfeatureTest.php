@@ -7,17 +7,17 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 	}
 
 	public function testCreate() {
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 		$this->assertInstanceOf('CM_Model_Splitfeature', $splitfeature);
 
 		$splitfeature->delete();
 	}
 
 	public function testCreateDuplicate() {
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 
 		try {
-			CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+			CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 			$this->fail('Could create duplicate splitfeature');
 		} catch (CM_Exception $e) {
 			$this->assertContains("Duplicate entry 'foo' for key 'name'", $e->getMessage());
@@ -28,7 +28,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testCreateNegativPercentage() {
 		try {
-			CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => -1));
+			CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => -1));
 			$this->fail('Could create splitfeature with negativ percentage');
 		} catch (CM_Exception_InvalidParam $e) {
 			$this->assertSame('Percentage must be between 0 and 100 -1 was given', $e->getMessage());
@@ -37,7 +37,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testCreatePercentageOutOfRange() {
 		try {
-			CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 110));
+			CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 110));
 			$this->fail('Could create splitfeature with more then 100%');
 		} catch (CM_Exception $e) {
 			$this->assertSame('Percentage must be between 0 and 100 110 was given', $e->getMessage());
@@ -45,7 +45,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 	}
 
 	public function testConstruct() {
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 		$splitfeature2 = new CM_Model_Splitfeature('foo');
 		$this->assertEquals($splitfeature, $splitfeature2);
 
@@ -53,7 +53,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 	}
 
 	public function testGetId() {
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 		$this->assertGreaterThanOrEqual(1, $splitfeature->getId());
 
 		$splitfeature->delete();
@@ -61,7 +61,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testGetName() {
 		/** @var CM_Model_Splitfeature $splitFeature */
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 		$this->assertSame('foo', $splitfeature->getName());
 
 		$splitfeature->delete();
@@ -69,7 +69,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testGetPercentage() {
 		/** @var CM_Model_Splitfeature $splitfeature */
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 		$this->assertSame(50, $splitfeature->getPercentage());
 
 		$splitfeature->delete();
@@ -77,7 +77,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testSetPercentage() {
 		/** @var CM_Model_Splitfeature $splitfeature */
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 
 		$splitfeature->setPercentage(80);
 		$this->assertSame(80, $splitfeature->getPercentage());
@@ -94,10 +94,10 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 
 	public function testGetEnabled() {
 		/** @var CM_Model_Splitfeature $splitfeature */
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
 
 		/** @var CM_Model_Splitfeature $splitfeature2 */
-		$splitfeature2 = CM_Model_Splitfeature::create(array('name' => 'bar', 'percentage' => 10));
+		$splitfeature2 = CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 10));
 
 		$i = 0;
 		$userArray = array();

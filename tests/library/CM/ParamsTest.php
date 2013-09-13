@@ -108,7 +108,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 	}
 
 	public function testGetObject() {
-		$language = CM_Model_Language::create(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
+		$language = CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
 		$params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
 		$this->assertEquals($language, $params->getLanguage('language'));
 		$this->assertEquals($language, $params->getLanguage('languageId'));
@@ -128,7 +128,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 	}
 
 	/**
-	 * @expectedException CM_Exception_InvalidParam
+	 * @expectedException CM_Exception_Invalid
 	 * @expectedExceptionMessage does not exist or is not a file
 	 */
 	public function testGetFileException() {

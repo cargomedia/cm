@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="300px" height="300px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
+<g id="Restricted">
+</g>
+<g id="Help">
+</g>
+<g>
+	<path d="M234,35v47h-22V35H88v47H67V35H5v260h290V35H234z M264,261H35V108h229V261z"/>
+	<rect x="47" y="124" width="61" height="44"/>
+	<rect x="120" y="124" width="60" height="44"/>
+	<rect x="192" y="124" width="61" height="44"/>
+	<rect x="47" y="183" width="61" height="44"/>
+	<rect x="120" y="183" width="60" height="44"/>
+	<polyline points="212,5 234,5 234,35 212,35 212,5 212,5 	"/>
+	<polyline points="67,5 88,5 88,35 67,35 67,5 67,5 	"/>
+</g>
+</svg>

@@ -30,32 +30,29 @@ class CM_FormTest extends CMTest_TestCase {
 	 * @return array
 	 */
 	private function _getData() {
-		return array("action" => "return_input_parameters", "classname" => "CM_Form_FormTestExampleForm",
-				"data" => array("color" => "#123123",
-						"must_check" => "checked"));
+		return array(
+			"action"    => "TestExampleAction",
+			"classname" => "CM_Form_MockForm",
+			"data"      => array("color" => "#123123", "must_check" => "checked"));
 	}
 }
 
-class CM_Form_FormTestExampleForm extends CM_Form_Abstract {
-	public function __construct() {
-		parent::__construct('form_FormTestExampleForm');
-	}
+class CM_Form_MockForm extends CM_Form_Abstract {
+
 	public function setup() {
-		$this->registerField(new CM_FormField_Boolean('must_check'));
-		$this->registerField(new CM_FormField_Color('color'));
-		$this->registerAction(new CM_formAction_FormTestExampleAction());
+		$this->registerField('must_check', new CM_FormField_Boolean());
+		$this->registerField('color', new CM_FormField_Color());
+		$this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
 	}
 }
 
-class CM_formAction_FormTestExampleAction extends CM_FormAction_Abstract {
-	public function __construct() {
-		parent::__construct('return_input_parameters');
+class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
+
+	protected function _getRequiredFields() {
+		return array('must_check');
 	}
-	public function setup(CM_Form_Abstract $form) {
-		$this->required_fields = array('must_check');
-		parent::setup($form);
-	}
-	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+
+	protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
 		CM_FormTest::$formActionProcessCount++;
 	}
 }

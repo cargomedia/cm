@@ -7,14 +7,14 @@ class CM_Paging_Splitfeature_AllTest extends CMTest_TestCase {
 	}
 
 	public function testPaging() {
-		CM_Model_Splitfeature::create(array('name' => 'foo', 'percentage' => 50));
-		CM_Model_Splitfeature::create(array('name' => 'bar', 'percentage' => 10));
+		CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 50));
+		CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 10));
 		$paging = new CM_Paging_Splitfeature_All();
 		$this->assertInstanceOf('CM_Model_Splitfeature', $paging->getItem(0));
 		$this->assertSame(2, count($paging->getItems()));
 
-		CM_Model_Splitfeature::create(array('name' => 'foobar', 'percentage' => 30));
-		$splitfeature = CM_Model_Splitfeature::create(array('name' => 'foofoobar', 'percentage' => 88));
+		CM_Model_Splitfeature::createStatic(array('name' => 'foobar', 'percentage' => 30));
+		$splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foofoobar', 'percentage' => 88));
 		$paging = new CM_Paging_Splitfeature_All();
 		$this->assertSame(4, count($paging->getItems()));
 
