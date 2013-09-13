@@ -183,6 +183,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return array('fields' => $fields);
 	}
 
+	protected function _sanitizeIdRaw(array $idRaw) {
+		return array('id' => (int) $idRaw['id'], 'level' => (int) $idRaw['level']);
+	}
+
 	/**
 	 * @param int $ip
 	 * @return CM_Model_Location|null

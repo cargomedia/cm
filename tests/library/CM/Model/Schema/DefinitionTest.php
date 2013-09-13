@@ -567,6 +567,14 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 		$this->_construct($id);
 	}
 
+	protected function _sanitizeIdRaw(array $idRaw) {
+		$_idRaw = array('id' => $idRaw['id']);
+		if (isset($idRaw['foo'])) {
+			$_idRaw['foo'] = (string) $idRaw['foo'];
+		}
+		return $_idRaw;
+	}
+
 	protected function _loadData() {
 		return array('id' => $this->getId());
 	}

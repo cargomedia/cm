@@ -109,6 +109,10 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
+	protected function _sanitizeIdRaw(array $idRaw) {
+		return array('name' => (string) $idRaw['name']);
+	}
+
 	protected static function _createStatic(array $data) {
 		$name = (string) $data['name'];
 		$percentage = self::_checkPercentage($data['percentage']);

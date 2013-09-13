@@ -211,4 +211,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		return $variationFixtureList[$this->getId()];
 	}
+
+	protected function _sanitizeIdRaw(array $idRaw) {
+		return array('name' => (string) $idRaw['name']);
+	}
 }

@@ -132,6 +132,10 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 			'actionVerb' => $this->getActionVerb(), 'type' => $this->getType()))->fetchAllTree());
 	}
 
+	protected function _sanitizeIdRaw(array $idRaw) {
+		return array('actionType' => (int) $idRaw['actionType'], 'actionVerb' => (int) $idRaw['actionVerb']);
+	}
+
 	/**
 	 * @param int $type
 	 * @param int $actionType
