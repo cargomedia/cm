@@ -29,7 +29,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 			this._$pagePlaceholder.removeClass('error').html('');
 		}
 		var timeoutLoading = this.setTimeout(function() {
-			this._$pagePlaceholder.html('<div class="spinner" />')
+			this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />')
 		}, 750);
 
 		if (this._pageRequest) {

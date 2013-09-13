@@ -65,6 +65,13 @@ class CM_SearchQuery_Abstract {
 		$this->_filters[] = array('not' => array('filter' => $filter));
 	}
 
+	/**
+	 * @param string $field
+	 */
+	public function filterExists($field) {
+		$this->_filter(array('exists' => array('field' => (string) $field)));
+	}
+
 	public function filterPrefix($field, $value) {
 		$this->_filter(array('prefix' => array($field => $value)));
 	}
@@ -154,8 +161,19 @@ class CM_SearchQuery_Abstract {
 		return $this->_sorts;
 	}
 
+	/**
+	 * @param array $sort
+	 */
 	protected function _sort(array $sort) {
-		$this->_sorts[] = $sort;
+		$sortNew = array();
+		foreach ($sort as $key => $value) {
+			$key = (string) $key;
+			if (null === $value) {
+				$value = 'desc';
+			}
+			$sortNew[$key] = $value;
+		}
+		$this->_sorts[] = $sortNew;
 	}
 
 	protected function _sortDefault() {

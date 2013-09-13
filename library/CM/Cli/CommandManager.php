@@ -5,6 +5,9 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
+	/** @var int */
+	private $_forks = null;
+
 	/** @var CM_InputStream_Interface */
 	private $_streamInput;
 
@@ -52,9 +55,10 @@ class CM_Cli_CommandManager {
 		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
-		$helpHeader .= ' --quiet' . PHP_EOL;
-		$helpHeader .= ' --quiet-warnings' . PHP_EOL;
-		$helpHeader .= ' --non-interactive' . PHP_EOL;
+		$reflectionMethod = new ReflectionMethod($this, 'configure');
+		foreach (CM_Cli_Arguments::getNamedForMethod($reflectionMethod) as $paramString) {
+			$helpHeader .= ' ' . $paramString . PHP_EOL;
+		}
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
@@ -90,7 +94,15 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
-			CMService_Newrelic::getInstance()->startTransaction($packageName . ' ' . $methodName);
+
+			$keepalive = $command->getKeepalive();
+			if ($keepalive || $this->_forks) {
+				$forks = max($this->_forks, (int) $keepalive);
+				$fork = new CM_Process_Fork($forks, $keepalive);
+				$fork->fork();
+			}
+
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
@@ -114,8 +126,10 @@ class CM_Cli_CommandManager {
 	 * @param boolean|null $quiet
 	 * @param boolean|null $quietWarnings
 	 * @param boolean|null $nonInteractive
+	 * @param int|null     $forks
 	 */
-	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null) {
+	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
+		$forks = (int) $forks;
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
@@ -124,6 +138,9 @@ class CM_Cli_CommandManager {
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());
+		}
+		if ($forks > 1) {
+			$this->_forks = $forks;
 		}
 	}
 

@@ -26,22 +26,22 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetUserId() {
-		$user = CM_Model_User::create();
-		CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'bar1'));
+		$user = CM_Model_User::createStatic();
+		CM_Model_Entity_Mock::createStatic(array('userId' => $user->getId(), 'foo' => 'bar1'));
 		$entityMock = new CM_Model_Entity_Mock(1);
 		$this->assertSame($user->getId(), $entityMock->getUserId());
 	}
 
 	public function testGetUser() {
-		$user = CM_Model_User::create();
-		$user2 = CM_Model_User::create();
-		CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'bar1'));
+		$user = CM_Model_User::createStatic();
+		$user2 = CM_Model_User::createStatic();
+		CM_Model_Entity_Mock::createStatic(array('userId' => $user->getId(), 'foo' => 'bar1'));
 		$entityMock = new CM_Model_Entity_Mock(1);
 		$this->assertEquals($user->getId(), $entityMock->getUser()->getId());
 		$this->assertInstanceOf('CM_Model_User', $user);
 
 		$this->assertNotEquals($user2, $entityMock->getUser());
-		CM_Db_Db::delete(TBL_CM_USER, array('userId' => $user->getId()));
+		CM_Db_Db::delete('cm_user', array('userId' => $user->getId()));
 		CMTest_TH::clearCache();
 		try {
 			$entityMock->getUser();
@@ -70,7 +70,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 
 	public function testToArray() {
 		$user = CMTest_TH::createUser();
-		$id = CM_Model_Entity_Mock::create(array('userId' => $user->getId(), 'foo' => 'boo'));
+		$id = CM_Model_Entity_Mock::createStatic(array('userId' => $user->getId(), 'foo' => 'boo'));
 		$mock = $this->getMockBuilder('CM_Model_Entity_Mock')->setConstructorArgs(array($id->getId()))->setMethods(array('getType'))->getMock();
 		$mock->expects($this->any())->method('getType')->will($this->returnValue(null));
 		/** @var $mock CM_Model_Entity_Abstract */
@@ -83,6 +83,8 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 }
 
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
+
+	const TYPE = 1;
 
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
@@ -109,7 +111,7 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 	protected function _onLoad() {
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		return new self(CM_Db_Db::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
 	}
 }

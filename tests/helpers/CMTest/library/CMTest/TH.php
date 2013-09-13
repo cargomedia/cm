@@ -93,7 +93,7 @@ class CMTest_TH {
 	 * @return CM_Model_User
 	 */
 	public static function createUser() {
-		return CM_Model_User::create();
+		return CM_Model_User::createStatic();
 	}
 
 	/**
@@ -106,7 +106,7 @@ class CMTest_TH {
 				$abbreviation = self::_randStr(5);
 			} while (CM_Model_Language::findByAbbreviation($abbreviation));
 		}
-		return CM_Model_Language::create(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+		return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
 	}
 
 	/**
@@ -173,7 +173,7 @@ class CMTest_TH {
 		if (!$streamChannel->hasStreamPublish()) {
 			self::createStreamPublish($user, $streamChannel);
 		}
-		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+		return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 	}
 
 	/**
@@ -188,7 +188,7 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+		return CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
@@ -201,7 +201,7 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
 													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
@@ -213,10 +213,39 @@ class CMTest_TH {
 	 */
 	public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (!$headers) {
-			$headers = array();
+			$site = CM_Site_Abstract::factory();
+			$headers = array('host' => $site->getHost());
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	/**
+	 * @param int|null $level
+	 * @return CM_Model_Location
+	 */
+	public static function createLocation($level = null) {
+		$country = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+		$state =  CM_Db_Db::insert('cm_locationState', array('countryId' => $country, 'name' => 'stateFoo'));
+		$city = CM_Db_Db::insert('cm_locationCity', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+															'lon'     => 15));
+		$zip = CM_Db_Db::insert('cm_locationZip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+
+		CM_Model_Location::createAggregation();
+
+		switch ($level) {
+			case CM_Model_Location::LEVEL_COUNTRY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $country);
+
+			case CM_Model_Location::LEVEL_CITY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $city);
+
+			case CM_Model_Location::LEVEL_STATE:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_STATE, $state);
+
+			default:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
+		}
 	}
 
 	/**
@@ -245,6 +274,18 @@ class CMTest_TH {
 	 */
 	public static function reinstantiateModel(CM_Model_Abstract &$model) {
 		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
+	}
+
+	/**
+	 * @param string $className
+	 * @param string $methodName
+	 * @return ReflectionMethod
+	 */
+	public static function getProtectedMethod($className, $methodName) {
+		$class = new ReflectionClass($className);
+		$method = $class->getMethod($methodName);
+		$method->setAccessible(true);
+		return $method;
 	}
 
 	/**

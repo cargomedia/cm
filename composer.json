@@ -30,5 +30,6 @@
 			"CMService_": "library/",
 			"CMTest_": "tests/helpers/CMTest/library/"
 		}
-	}
+	},
+	"bin": ["scripts/cm.php"]
 }

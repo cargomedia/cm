@@ -8,8 +8,8 @@ class CM_Paging_Emoticon_AllTest extends CMTest_TestCase {
 
 	public function testAll() {
 		$emoticonIdList = array();
-		$emoticonIdList[] = CM_Db_Db::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
-		$emoticonIdList[] = CM_Db_Db::insert(TBL_CM_EMOTICON, array('code' => ':<', 'file' => '2.png'));
+		$emoticonIdList[] = CM_Db_Db::insert('cm_emoticon', array('code' => ':smiley:', 'codeAdditional' => ':),:-)', 'file' => '1.png'));
+		$emoticonIdList[] = CM_Db_Db::insert('cm_emoticon', array('code' => ':<', 'file' => '2.png'));
 
 		$paging = new CM_Paging_Emoticon_All();
 		$emoticonList = $paging->getItems();

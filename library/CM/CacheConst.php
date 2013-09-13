@@ -20,7 +20,7 @@ class CM_CacheConst {
 	// _text:X_filter:X
 	const Usertext = 'Usertext';
 
-	const Usertext_Filter_BadwordRegexp = 'Usertext_Filter_BadwordRegexp';
+	const ContentList_BadwordRegex = 'ContentList_BadwordRegex';
 
 	// _fixedHeight:X
 	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
@@ -30,8 +30,8 @@ class CM_CacheConst {
 	// _id:X
 	const Request_Client = 'Request_Client';
 
-	// _class:X_id:X
-	const Model = 'Model';
+	// _type:X_id:X
+	const CM_Model_StorageAdapter_Cache = 'CM_Model_StorageAdapter_Cache';
 
 	const Option = 'Option';
 
@@ -40,6 +40,9 @@ class CM_CacheConst {
 
 	// _id:X_type:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
+
+	// _id:X
+	const Splittest_Variation = 'Splittest_Variation';
 
 	//_md5:X
 	//_md5:X_languageId:X
@@ -63,6 +66,9 @@ class CM_CacheConst {
 
 	// _className:X_abstracts:X
 	const ClassChildren = 'ClassChildren';
+
+	// _className:X
+	const Config = 'Config';
 
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';

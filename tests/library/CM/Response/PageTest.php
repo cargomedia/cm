@@ -32,6 +32,19 @@ class CM_Response_PageTest extends CMTest_TestCase {
 			$this->assertNotContains('Location:', $header);
 		}
 	}
+
+	public function testProcessHostRedirect() {
+		$site = CM_Site_Abstract::factory();
+		$redirectHeader = 'Location: http://' . $site->getHost() . '/mock5';
+
+		$response = CMTest_TH::createResponsePage('/mock5', array('host' => $site->getHost()));
+		$response->process();
+		$this->assertNotContains($redirectHeader, $response->getHeaders());
+
+		$response = CMTest_TH::createResponsePage('/mock5', array('host' => 'incorrect-host.org'));
+		$response->process();
+		$this->assertContains($redirectHeader, $response->getHeaders());
+	}
 }
 
 class CM_Page_Mock5 extends CM_Page_Abstract {

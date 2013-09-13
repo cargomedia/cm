@@ -60,6 +60,18 @@ class CMService_Newrelic extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $name
+	 * @param int    $milliseconds
+	 */
+	public function setCustomMetric($name, $milliseconds) {
+		$name = 'Custom/' . (string) $name;
+		$milliseconds = (int) $milliseconds;
+		if ($this->_isEnabled()) {
+			newrelic_custom_metric($name, $milliseconds);
+		}
+	}
+
+	/**
 	 * @throws CM_Exception_Invalid
 	 * @return bool
 	 */

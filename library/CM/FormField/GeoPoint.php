@@ -2,10 +2,6 @@
 
 class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 
-	public function __construct($name) {
-		parent::__construct($name);
-	}
-
 	/**
 	 * @param array                $userInput
 	 * @param CM_Response_Abstract $response

@@ -67,7 +67,6 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function exec($sqlTemplate, array $parameters = null, $readOnly = null) {
 		$readOnly = (bool) $readOnly;
-		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
 		$client = self::_getClient($readOnly);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
 	}
@@ -394,15 +393,5 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$idBounds = CM_Db_Db::exec($sql)->fetch();
 		return rand($idBounds['min'], $idBounds['max']);
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private static function _replaceTableConsts($query) {
-		return preg_replace_callback('/(TBL_.+?)\b/', function ($matches) {
-			return '`' . constant($matches[1]) . '`';
-		}, $query);
 	}
 }

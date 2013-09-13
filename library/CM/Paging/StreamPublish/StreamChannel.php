@@ -6,7 +6,7 @@ class CM_Paging_StreamPublish_StreamChannel extends CM_Paging_StreamPublish_Abst
 	 * @param CM_Model_StreamChannel_Abstract $streamChannel
 	 */
 	public function __construct(CM_Model_StreamChannel_Abstract $streamChannel) {
-		$source = new CM_PagingSource_Sql('id', TBL_CM_STREAM_PUBLISH, '`channelId` = ' . $streamChannel->getId());
+		$source = new CM_PagingSource_Sql('id', 'cm_stream_publish', '`channelId` = ' . $streamChannel->getId());
 		$source->enableCache();
 		parent::__construct($source);
 	}
