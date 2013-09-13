@@ -37,7 +37,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$data = array();
 			$this->_autoCommit = false;
 		}
-		$this->_id = $id;
+		if (null !== $id) {
+			$this->_id = $this->_sanitizeIdRaw($id);
+		}
 		if (null !== $data) {
 			$this->_validateFields($data);
 			$this->_setData($data);
@@ -400,6 +402,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	protected function _getPersistence() {
 		return self::_getStorageAdapter(static::getPersistenceClass());
+	}
+
+	/**
+	 * @param array $idRaw
+	 * @return array
+	 */
+	protected function _sanitizeIdRaw(array $idRaw) {
+		return array('id' => (int) $idRaw['id']);
 	}
 
 	/**

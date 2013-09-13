@@ -437,7 +437,11 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
 
 		$modelMock1 = CM_ModelMock::createStatic(array('foo' => 'bar'));
-		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw());
+		$idRaw = $modelMock1->getIdRaw();
+		foreach ($idRaw as &$idPart) {
+			$idPart = (string) $idPart;
+		}
+		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $idRaw);
 		$this->assertEquals($modelMock1, $modelMock2);
 
 		CMTest_TH::clearConfig();
