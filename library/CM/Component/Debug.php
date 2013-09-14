@@ -31,7 +31,8 @@ class CM_Component_Debug extends CM_Component_Abstract {
 			$cachesCleared[] = 'CM_CacheLocal';
 		}
 		if ($params->getBoolean('CM_Cache_File', false)) {
-			CM_Cache_File::flush();
+			$cache = new CM_Cache_StorageAdapter_File();
+			$cache->flush();
 			$cachesCleared[] = 'CM_Cache_File';
 		}
 		$handler->message('Cleared: ' . implode(', ', $cachesCleared));

@@ -3,32 +3,36 @@
 class CM_Cache_FileTest extends CMTest_TestCase {
 
 	public function testGetSet() {
-		$this->assertFalse(CM_Cache_File::get('foo'));
+		$cache = new CM_Cache_StorageAdapter_File();
+		$this->assertFalse($cache->get('foo'));
 
-		CM_Cache_File::set('foo', 'bar');
-		$this->assertSame('bar', CM_Cache_File::get('foo'));
+		$cache->set('foo', 'bar');
+		$this->assertSame('bar', $cache->get('foo'));
 	}
 
 	/**
 	 * @expectedException CM_Exception_NotImplemented
 	 */
 	public function testSetLifetime() {
-		CM_Cache_File::set('foo', 'bar', 500);
+		$cache = new CM_Cache_StorageAdapter_File();
+		$cache->set('foo', 'bar', 500);
 	}
 
 	public function testDelete() {
-		CM_Cache_File::set('foo', 'bar');
-		$this->assertSame('bar', CM_Cache_File::get('foo'));
+		$cache = new CM_Cache_StorageAdapter_File();
+		$cache->set('foo', 'bar');
+		$this->assertSame('bar', $cache->get('foo'));
 
-		CM_Cache_File::delete('foo');
-		$this->assertFalse(CM_Cache_File::get('foo'));
+		$cache->delete('foo');
+		$this->assertFalse($cache->get('foo'));
 	}
 
 	public function testFlush() {
-		CM_Cache_File::set('foo', 'bar');
-		$this->assertSame('bar', CM_Cache_File::get('foo'));
+		$cache = new CM_Cache_StorageAdapter_File();
+		$cache->set('foo', 'bar');
+		$this->assertSame('bar', $cache->get('foo'));
 
-		CM_Cache_File::flush();
-		$this->assertFalse(CM_Cache_File::get('foo'));
+		$cache->flush();
+		$this->assertFalse($cache->get('foo'));
 	}
 }

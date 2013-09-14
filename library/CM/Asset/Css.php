@@ -75,7 +75,8 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 		if ($render->getLanguage()) {
 			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
 		}
-		if (false === ($contentTransformed = CM_Cache_File::get($cacheKey))) {
+		$cache = new CM_Cache_StorageAdapter_File();
+		if (false === ($contentTransformed = $cache->get($cacheKey))) {
 			$lessCompiler = new lessc();
 			$lessCompiler->registerFunction('image', function ($arg) use ($render) {
 				/** @var CM_Render $render */
@@ -91,7 +92,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 				$lessCompiler->setFormatter('compressed');
 			}
 			$contentTransformed = $lessCompiler->compile($this->_getMixins() . $content);
-			CM_Cache_File::set($cacheKey, $contentTransformed);
+			$cache->set($cacheKey, $contentTransformed);
 		}
 		return $contentTransformed;
 	}
