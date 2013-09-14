@@ -3,11 +3,11 @@
 class CM_Cache_CacheTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		CM_Cache_Redis::flush();
+		CM_Redis_Client::flush();
 	}
 
 	public function testRPop() {
-		$redis = new CM_Cache_Redis();
+		$redis = new CM_Redis_Client();
 		$key = 'foo';
 		$redis->lPush($key, 'bar');
 		$this->assertSame('bar', $redis->rPop('foo'));
@@ -15,7 +15,7 @@ class CM_Cache_CacheTest extends CMTest_TestCase {
 	}
 
 	public function testZRangeByScore() {
-		$redis = new CM_Cache_Redis();
+		$redis = new CM_Redis_Client();
 		$key = 'foo';
 		$redis->zAdd($key, 1, 'foo');
 		$redis->zAdd($key, 1.5, 'bar');

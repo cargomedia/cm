@@ -177,6 +177,6 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 	 * @param string $id
 	 */
 	protected static function _updateItem($id) {
-		CM_Cache_Redis::sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
+		CM_Redis_Client::sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
 	}
 }

@@ -21,12 +21,12 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 
 	public function publish($channel, $event, $data) {
 		$event = array('type' => 'publish', 'data' => array('channel' => $channel, 'event' => $event, 'data' => $data));
-		CM_Cache_Redis::publish('socket-redis-down', json_encode($event));
+		CM_Redis_Client::publish('socket-redis-down', json_encode($event));
 	}
 
 	public function startSynchronization() {
 		$adapter = $this;
-		$redis = new CM_Cache_Redis();
+		$redis = new CM_Redis_Client();
 		$redis->subscribe('socket-redis-up', function ($channel, $message) use ($adapter) {
 			$adapter->onRedisMessage($message);
 		});

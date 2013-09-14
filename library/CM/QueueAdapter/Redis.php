@@ -2,7 +2,7 @@
 
 class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 
-	/** @var CM_Cache_Redis|null */
+	/** @var CM_Redis_Client|null */
 	private $_redis = null;
 
 	public function push($key, $value) {
@@ -35,11 +35,11 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_Redis
+	 * @return CM_Redis_Client
 	 */
 	private function _getRedisInstance() {
 		if (null === $this->_redis) {
-			$this->_redis = new CM_Cache_Redis();
+			$this->_redis = new CM_Redis_Client();
 		}
 		return $this->_redis;
 	}

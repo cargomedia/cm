@@ -7,7 +7,7 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
 	 * @param string  $value
 	 */
 	public function add($key, $value) {
-		CM_Cache_Redis::sAdd($key, $value);
+		CM_Redis_Client::sAdd($key, $value);
 	}
 
 	/**
@@ -15,7 +15,7 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
 	 * @param string  $value
 	 */
 	public function delete($key, $value) {
-		CM_Cache_Redis::sRem($key, $value);
+		CM_Redis_Client::sRem($key, $value);
 	}
 
 	/**
@@ -23,7 +23,7 @@ class CM_SetAdapter_Redis extends CM_SetAdapter_Abstract {
 	 * @return string[]
 	 */
 	public function flush($key) {
-		return CM_Cache_Redis::sFlush($key);
+		return CM_Redis_Client::sFlush($key);
 	}
 
 }
