@@ -1,4 +1,4 @@
 <?php
 
-class CM_Cache extends CM_Cache_Memcache {
+class CM_Cache extends CM_Cache_Abstract {
 }

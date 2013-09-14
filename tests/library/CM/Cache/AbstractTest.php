@@ -49,19 +49,19 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 
 class CM_Cache_Mock extends CM_Cache_Abstract {
 
-	protected static $_instance;
+	protected static $_storage;
 	private $_store = array();
 
 	/**
 	 * @return array
 	 */
 	public static function getRuntimeStore() {
-		return static::getInstance()->_runtimeStore;
+		return static::getStorage()->_runtimeStore;
 	}
 
 	public static function simulateForgetting($key) {
 		/** @var CM_Cache_Mock $cache */
-		$cache = static::getInstance();
+		$cache = static::getStorage();
 		$cache->_simulateForgetting($key);
 	}
 
