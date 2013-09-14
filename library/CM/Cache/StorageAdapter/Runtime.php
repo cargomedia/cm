@@ -2,6 +2,12 @@
 
 class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 
+	const RUNTIME_LIFETIME = 3;
+	const RUNTIME_CLEAR_INTERVAL = 300;
+
+	/** @var int */
+	private $_lastClearStamp;
+
 	/** @var CM_Cache_StorageAdapter_Runtime */
 	private static $_instance;
 
@@ -16,8 +22,14 @@ class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 		return 'Runtime';
 	}
 
-	protected function _set($key, $data, $lifeTime = null) {
-		$this->_storage[$key] = $data;
+	protected function _set($key, $value, $lifeTime = null) {
+
+		$expirationStamp = time() + self::RUNTIME_LIFETIME;
+		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
+		if ($this->_lastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
+			$this->_deleteExpired();
+		}
+		$this->_storage[$key] = $value;
 	}
 
 	protected function _get($key) {
@@ -33,6 +45,16 @@ class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 
 	protected function _flush() {
 		$this->_storage = array();
+	}
+
+	private function _deleteExpired() {
+		$currentTime = time();
+		foreach ($this->_storage as $key => $data) {
+			if ($currentTime > $data['expirationStamp']) {
+				$this->_delete($key);
+			}
+		}
+		$this->_lastClearStamp = $currentTime;
 	}
 
 	/**
