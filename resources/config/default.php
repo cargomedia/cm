@@ -27,19 +27,17 @@ $config->CM_Search->servers = array(
 	array('host' => 'localhost', 'port' => 9200),
 );
 
-$config->CM_Cache_Apc->enabled = true;
-$config->CM_Cache_Apc->lifetime = 86400;
+$config->CM_CacheLocal->storageAdapter = 'CM_Cache_StorageAdapter_Apc';
+$config->CM_CacheLocal->lifetime = 86400;
 
-$config->CM_Cache_Memcache->enabled = true;
-$config->CM_Cache_Memcache->lifetime = 3600;
+$config->CM_Cache->storageAdapter = 'CM_Cache_StorageAdapter_Memcache';
+$config->CM_Cache->lifetime = 3600;
+
 $config->CM_Memcache_Client->servers = array(
 	array('host' => 'localhost', 'port' => 11211),
 );
 
-$config->CM_Cache_Redis->enabled = true;
-$config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
-
-$config->CM_Cache_File->enabled = true;
+$config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
 
 $config->classConfigCacheEnabled = true;
 

@@ -1,12 +1,12 @@
 <?php
 
-$config->CM_Cache_Redis->server = array('host' => '10.10.10.100', 'port' => 6379);
+$config->CM_Redis_Client->server = array('host' => '10.10.10.100', 'port' => 6379);
 
 $config->CM_Search->servers = array(
 	array('host' => '10.10.10.105', 'port' => 9200),
 );
 
-$config->CM_Cache_Memcache->servers = array(
+$config->CM_Memcache_Client->servers = array(
 	array('host' => '10.10.10.100', 'port' => 11211),
 );
 
