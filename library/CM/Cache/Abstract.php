@@ -22,6 +22,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param int|null $lifeTime
 	 */
 	public static final function set($key, $value, $lifeTime = null) {
+		if (!$lifeTime) {
+			$lifeTime = self::_getConfig()->lifetime;
+		}
 		static::getStorage()->set($key, $value, $lifeTime);
 		static::_getRuntimeStorage()->set($key, $value, $lifeTime);
 	}
@@ -45,10 +48,12 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param string $key
 	 */
 	public static final function delete($key) {
+		static::_getRuntimeStorage()->delete($key);
 		static::getStorage()->delete($key);
 	}
 
 	public static final function flush() {
+		static::_getRuntimeStorage()->flush();
 		static::getStorage()->flush();
 	}
 
@@ -100,7 +105,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param string $tag
 	 * @return string
 	 */
-	private final function _getTagVersion($tag) {
+	private static final function _getTagVersion($tag) {
 		$cacheKey = CM_CacheConst::Tag_Version . '_tag:' . $tag;
 		if (($tagVersion = static::get($cacheKey)) === false) {
 			$tagVersion = md5(rand() . uniqid());

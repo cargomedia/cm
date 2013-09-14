@@ -19,9 +19,6 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function set($key, $data, $lifeTime = null) {
-		if (!$lifeTime) {
-			$lifeTime = self::_getConfig()->lifetime;
-		}
 		$key = $this->_getKeyArmored($key);
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}
