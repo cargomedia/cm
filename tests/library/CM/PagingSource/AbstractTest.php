@@ -14,7 +14,6 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
-		// TODO: SHould I need to flush here? Paging sources from testCacheLocal and testCache share the same cache
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
