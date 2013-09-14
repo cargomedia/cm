@@ -23,6 +23,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	public static final function set($key, $value, $lifeTime = null) {
 		static::getStorage()->set($key, $value, $lifeTime);
+		static::_getRuntimeStorage()->set($key, $value, $lifeTime);
 	}
 
 	/**
@@ -30,7 +31,14 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @return mixed|false
 	 */
 	public static final function get($key) {
-		return static::getStorage()->get($key);
+		$runtimeStorage = static::_getRuntimeStorage();
+		if (false !== ($value = $runtimeStorage->get($key))) {
+			return $value;
+		}
+		if (false !== ($value = static::getStorage()->get($key))) {
+			$runtimeStorage->set($key, $value);
+		}
+		return $value;
 	}
 
 	/**
@@ -99,5 +107,12 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			static::set($cacheKey, $tagVersion);
 		}
 		return $tagVersion;
+	}
+
+	/**
+	 * @return CM_Cache_StorageAdapter_Runtime
+	 */
+	private static final function _getRuntimeStorage() {
+		return CM_Cache_StorageAdapter_Runtime::getInstance();
 	}
 }

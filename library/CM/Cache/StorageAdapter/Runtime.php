@@ -23,7 +23,6 @@ class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 	}
 
 	protected function _set($key, $value, $lifeTime = null) {
-
 		$expirationStamp = time() + self::RUNTIME_LIFETIME;
 		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
 		if ($this->_lastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
