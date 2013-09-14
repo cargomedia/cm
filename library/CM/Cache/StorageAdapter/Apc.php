@@ -6,9 +6,9 @@ class CM_Cache_StorageAdapter_Apc extends CM_Cache_StorageAdapter_Abstract {
 		return 'APC';
 	}
 
-	protected function _set($key, $data, $lifeTime = null) {
+	protected function _set($key, $value, $lifeTime = null) {
 		$key = $this->_getKeyArmored($key);
-		return apc_store($key, $data, $lifeTime);
+		return apc_store($key, $value, $lifeTime);
 	}
 
 	protected function _get($key) {

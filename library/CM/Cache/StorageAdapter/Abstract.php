@@ -53,11 +53,11 @@ abstract class CM_Cache_StorageAdapter_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string   $key
-	 * @param mixed    $data
+	 * @param mixed    $value
 	 * @param int|null $lifeTime
 	 * @return boolean
 	 */
-	abstract protected function _set($key, $data, $lifeTime = null);
+	abstract protected function _set($key, $value, $lifeTime = null);
 
 	/**
 	 * @param string $key

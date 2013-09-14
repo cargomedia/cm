@@ -13,11 +13,11 @@ class CM_Cache_StorageAdapter_File extends CM_Cache_StorageAdapter_Abstract {
 		return 'File';
 	}
 
-	protected function _set($key, $data, $lifeTime = null) {
+	protected function _set($key, $value, $lifeTime = null) {
 		if (null !== $lifeTime) {
 			throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
 		}
-		CM_File::create($this->_getPath($key), $data);
+		CM_File::create($this->_getPath($key), $value);
 	}
 
 	protected function _get($key) {

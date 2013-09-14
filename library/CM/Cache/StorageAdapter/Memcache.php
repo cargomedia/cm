@@ -13,8 +13,8 @@ class CM_Cache_StorageAdapter_Memcache extends CM_Cache_StorageAdapter_Abstract 
 		return 'Memcache';
 	}
 
-	protected function _set($key, $data, $lifeTime = null) {
-		$this->_client->set($key, $data, $lifeTime);
+	protected function _set($key, $value, $lifeTime = null) {
+		$this->_client->set($key, $value, $lifeTime);
 	}
 
 	protected function _get($key) {
