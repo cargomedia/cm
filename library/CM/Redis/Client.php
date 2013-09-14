@@ -131,7 +131,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 * @param string $key
 	 * @param string $value
 	 */
-	protected function _sAdd($key, $value) {
+	public function sAdd($key, $value) {
 		$this->_redis->sAdd($key, $value);
 	}
 
@@ -141,7 +141,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 * @param string $key
 	 * @param string $value
 	 */
-	protected function _sRem($key, $value) {
+	public function sRem($key, $value) {
 		$this->_redis->sRem($key, $value);
 	}
 
@@ -151,7 +151,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 * @param string $key
 	 * @return string[]
 	 */
-	protected function _sFlush($key) {
+	public function sFlush($key) {
 		$values = $this->_redis->multi()->sMembers($key)->delete($key)->exec();
 		return $values[0];
 	}
@@ -189,7 +189,18 @@ class CM_Redis_Client extends CM_Class_Abstract {
 		}
 	}
 
-	protected function _flush() {
+	public function flush() {
 		$this->_redis->flushAll();
+	}
+
+	/**
+	 * @return CM_Redis_Client
+	 */
+	public static function getInstance() {
+		static $instance;
+		if (!$instance) {
+			$instance = new self();
+		}
+		return $instance;
 	}
 }

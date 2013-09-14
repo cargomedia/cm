@@ -14,6 +14,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
+		// TODO: SHould I need to flush here? Paging sources from testCacheLocal and testCache share the same cache
 		CM_Db_Db::exec('DROP TABLE `test`');
 	}
 
@@ -26,20 +27,23 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$this->assertEquals(100, $source->getCount());
 		$source->clearCache();
 		$this->assertEquals(99, $source->getCount());
+		CM_CacheLocal::flush();
 	}
 
 	public function testCache() {
 		$source = new CM_PagingSource_Sql('`num`', 'test');
 		$source->enableCache();
-		$sourceNocache = new CM_PagingSource_Sql('`id`, num`', 'test');
-		$this->assertEquals(100, $source->getCount());
-		$this->assertEquals(100, $sourceNocache->getCount());
+		$this->assertSame(100, $source->getCount());
+
+		$sourceNocache = new CM_PagingSource_Sql('`num`', 'test');
+		$this->assertSame(100, $sourceNocache->getCount());
 
 		CM_Db_Db::delete('test', array('num' => 0));
-		$this->assertEquals(100, $source->getCount());
-		$this->assertEquals(99, $sourceNocache->getCount());
+		$this->assertSame(100, $source->getCount());
+		$this->assertSame(99, $sourceNocache->getCount());
 		$source->clearCache();
-		$this->assertEquals(99, $source->getCount());
-		$this->assertEquals(99, $sourceNocache->getCount());
+		$this->assertSame(99, $source->getCount());
+		$this->assertSame(99, $sourceNocache->getCount());
+		CM_Cache::flush();
 	}
 }

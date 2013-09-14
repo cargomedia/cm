@@ -2,104 +2,23 @@
 
 class CM_Cache_AbstractTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-		CM_Config::get()->CM_Cache_Mock = new StdClass();
-		CM_Config::get()->CM_Cache_Mock->enabled = true;
-	}
-
-	protected function tearDown() {
-		CM_Cache_Mock::flush();
+	public function tearDown() {
+		CM_Cache_StorageAdapter_Runtime::getInstance()->flush();
 	}
 
 	public function testGetSet() {
-		$this->assertFalse(CM_Cache_Mock::get('foo'));
+		$storageAdapter = $this->getMockBuilder('CM_Cache_StorageAdapter_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
+		$storageAdapter->expects($this->exactly(2))->method('_get')->with('foo')->will($this->onConsecutiveCalls(false, 'cached-bar'));
+		$storageAdapter->expects($this->once())->method('_set')->with('foo', 'bar', 100);
 
-		CM_Cache_Mock::set('foo', 12);
-		$this->assertSame(12, CM_Cache_Mock::get('foo'));
-	}
-
-	public function testGetSetInvalidateRuntimeCache() {
-		CM_Cache_Mock::set('foo', 13);
-		$this->assertSame(13, CM_Cache_Mock::get('foo'));
-		CM_Cache_Mock::simulateForgetting('foo');
-		$this->assertSame(13, CM_Cache_Mock::get('foo'));
-		CMTest_TH::timeForward(CM_Cache_Abstract::RUNTIME_LIFETIME + 1);
-		$this->assertFalse(CM_Cache_Mock::get('foo'));
-	}
-
-	/**
-	 * @depends testGetSetInvalidateRuntimeCache
-	 */
-	public function testGetSetWithLifetime() {
-		$lifeTime = 5;
-		CM_Cache_Mock::set('foo', 14, $lifeTime);
-		$this->assertSame(14, CM_Cache_Mock::get('foo'));
-		CMTest_TH::timeForward($lifeTime + 1);
-		$this->assertFalse(CM_Cache_Mock::get('foo'));
-	}
-
-	public function testRuntimeDeleteExpired() {
-		CM_Cache_Mock::set('foo', 1);
-		$this->assertArrayHasKey('foo', CM_Cache_Mock::getRuntimeStore());
-		CMTest_TH::timeForward(305);
-		CM_Cache_Mock::set('bar', 1);
-		$this->assertArrayNotHasKey('foo', CM_Cache_Mock::getRuntimeStore());
-	}
-}
-
-class CM_Cache_Mock extends CM_Cache_Abstract {
-
-	protected static $_storage;
-	private $_store = array();
-
-	/**
-	 * @return array
-	 */
-	public static function getRuntimeStore() {
-		return static::getStorage()->_runtimeStore;
-	}
-
-	public static function simulateForgetting($key) {
-		/** @var CM_Cache_Mock $cache */
-		$cache = static::getStorage();
-		$cache->_simulateForgetting($key);
-	}
-
-	protected function _simulateForgetting($key) {
-		unset($this->_store[$key]);
-	}
-
-	protected function _set($key, $data, $lifeTime = null) {
-		$expirationStamp = null;
-		if (null !== $lifeTime) {
-			$expirationStamp = time() + (int) $lifeTime;
-		}
-		$this->_store[$key] = array('data' => $data, 'expirationStamp' => $expirationStamp);
-		return true;
-	}
-
-	protected function _get($key) {
-		if (!array_key_exists($key, $this->_store)) {
-			return false;
-		}
-		$entry = $this->_store[$key];
-		if (null !== $entry['expirationStamp'] && time() > $entry['expirationStamp']) {
-			return false;
-		}
-		return $entry['data'];
-	}
-
-	protected function _delete($key) {
-		unset($this->_store[$key]);
-		return true;
-	}
-
-	protected function _flush() {
-		$this->_store = array();
-		return true;
-	}
-
-	protected function _getName() {
-		return 'Mock Cache';
+		$cache = $this->getMockClass('CM_Cache_Abstract', array('getStorage'));
+		/** @var PHPUnit_Framework_MockObject_MockObject $cache */
+		$cache::staticExpects($this->any())->method('getStorage')->will($this->returnValue($storageAdapter));
+		/** @var CM_Cache_Abstract $cache */
+		$this->assertFalse($cache::get('foo'));
+		$cache::set('foo', 'bar', 100);
+		$this->assertSame('bar', $cache::get('foo'));
+		CM_Cache_StorageAdapter_Runtime::getInstance()->flush();
+		$this->assertSame('cached-bar', $cache::get('foo'));
 	}
 }

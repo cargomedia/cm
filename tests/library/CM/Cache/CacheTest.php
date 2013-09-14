@@ -3,11 +3,11 @@
 class CM_Cache_CacheTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		CM_Redis_Client::flush();
+		CM_Redis_Client::getInstance()->flush();
 	}
 
 	public function testRPop() {
-		$redis = new CM_Redis_Client();
+		$redis = CM_Redis_Client::getInstance();
 		$key = 'foo';
 		$redis->lPush($key, 'bar');
 		$this->assertSame('bar', $redis->rPop('foo'));

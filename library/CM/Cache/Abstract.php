@@ -8,7 +8,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	/**
 	 * @return CM_Cache_StorageAdapter_Abstract
 	 */
-	public static final function getStorage() {
+	public static function getStorage() {
 		if (!isset(static::$_storage)) {
 			$storageClassName = static::_getConfig()->storageAdapter;
 			static::$_storage = new $storageClassName();
@@ -23,7 +23,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	public static final function set($key, $value, $lifeTime = null) {
 		if (!$lifeTime) {
-			$lifeTime = self::_getConfig()->lifetime;
+			$lifeTime = static::_getConfig()->lifetime;
 		}
 		static::getStorage()->set($key, $value, $lifeTime);
 		static::_getRuntimeStorage()->set($key, $value, $lifeTime);
