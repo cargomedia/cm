@@ -5,13 +5,10 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	/** @var CM_Cache_Storage_Abstract */
 	protected $_storage;
 
-	/** @var CM_Cache_Storage_Runtime */
-	protected $_runtime;
 
 	public function __construct() {
 		$storageClassName = static::_getConfig()->storage;
 		$this->_storage = new $storageClassName();
-		$this->_runtime = CM_Cache_Storage_Runtime::getInstance();
 	}
 
 	/**
@@ -23,8 +20,8 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 		if (!$lifeTime) {
 			$lifeTime = static::_getConfig()->lifetime;
 		}
-		$this->_storage->set($key, $value, $lifeTime);
-		$this->_runtime->set($key, $value, $lifeTime);
+		$this->_getStorage()->set($key, $value, $lifeTime);
+		$this->_getRuntime()->set($key, $value, $lifeTime);
 	}
 
 	/**
@@ -32,11 +29,11 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @return mixed|false
 	 */
 	public final function get($key) {
-		if (false !== ($value = $this->_runtime->get($key))) {
+		if (false !== ($value = $this->_getRuntime()->get($key))) {
 			return $value;
 		}
-		if (false !== ($value = $this->_storage->get($key))) {
-			$this->_runtime->set($key, $value);
+		if (false !== ($value = $this->_getStorage()->get($key))) {
+			$this->_getRuntime()->set($key, $value);
 		}
 		return $value;
 	}
@@ -45,13 +42,13 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param string $key
 	 */
 	public final function delete($key) {
-		$this->_runtime->delete($key);
-		$this->_storage->delete($key);
+		$this->_getRuntime()->delete($key);
+		$this->_getStorage()->delete($key);
 	}
 
 	public final function flush() {
-		$this->_runtime->flush();
-		$this->_storage->flush();
+		$this->_getRuntime()->flush();
+		$this->_getStorage()->flush();
 	}
 
 	/**
@@ -96,6 +93,20 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 			}
 		}
 		return implode('_', $parts);
+	}
+
+	/**
+	 * @return CM_Cache_Storage_Abstract
+	 */
+	protected function _getStorage() {
+		return $this->_storage;
+	}
+
+	/**
+	 * @return CM_Cache_Storage_Runtime
+	 */
+	protected function _getRuntime() {
+		return CM_Cache_Storage_Runtime::getInstance();
 	}
 
 	/**
