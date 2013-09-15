@@ -9,6 +9,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 */
 	public final function set($key, $value, $lifeTime = null) {
 		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-set', $key);
+		$key = $this->_getKeyArmored($key);
 		$this->_set($key, $value, $lifeTime);
 	}
 
@@ -18,6 +19,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 */
 	public final function get($key) {
 		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-get', $key);
+		$key = $this->_getKeyArmored($key);
 		return $this->_get($key);
 	}
 
@@ -25,6 +27,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @param string $key
 	 */
 	public final function delete($key) {
+		$key = $this->_getKeyArmored($key);
 		$this->_delete($key);
 	}
 
@@ -75,4 +78,12 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return boolean
 	 */
 	abstract protected function _flush();
+
+	/**
+	 * @param string $key
+	 * @return string
+	 */
+	protected function _getKeyArmored($key) {
+		return DIR_ROOT . '_' . $key;
+	}
 }

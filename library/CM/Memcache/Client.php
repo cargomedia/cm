@@ -19,7 +19,6 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function set($key, $data, $lifeTime = null) {
-		$key = $this->_getKeyArmored($key);
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}
 
@@ -28,7 +27,6 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	 * @return mixed
 	 */
 	public function get($key) {
-		$key = $this->_getKeyArmored($key);
 		return $this->_memcache->get($key);
 	}
 
@@ -36,19 +34,10 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	 * @param string $key
 	 */
 	public function delete($key) {
-		$key = $this->_getKeyArmored($key);
 		$this->_memcache->delete($key, 0);
 	}
 
 	public function flush() {
 		$this->_memcache->flush();
-	}
-
-	/**
-	 * @param string $key
-	 * @return string
-	 */
-	private function _getKeyArmored($key) {
-		return DIR_ROOT . '_' . $key;
 	}
 }
