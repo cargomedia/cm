@@ -109,22 +109,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
 		return $result[0];
 	}
 
-	protected function _getName() {
-		return 'Redis';
-	}
-
-	protected function _set($key, $data, $lifeTime = null) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	protected function _get($key) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	protected function _delete($key) {
-		throw new CM_Exception_NotImplemented();
-	}
-
 	/**
 	 * Add a value to a set
 	 *
@@ -160,7 +144,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 * @param string $channel
 	 * @param string $msg
 	 */
-	protected function _publish($channel, $msg) {
+	public function publish($channel, $msg) {
 		$this->_redis->publish($channel, $msg);
 	}
 
