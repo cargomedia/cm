@@ -20,4 +20,20 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		CM_Cache_Storage_Runtime::getInstance()->flush();
 		$this->assertSame('cached-bar', $cache->get('foo'));
 	}
+
+	public function testRuntime() {
+		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
+		$storageAdapter->expects($this->any())->method('_get')->with('foo')->will($this->returnValue('bar'));
+
+		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($storageAdapter));
+		/** @var CM_Cache_Abstract $cache */
+
+		$runtimeCache = CM_Cache_Storage_Runtime::getInstance();
+		$this->assertFalse($runtimeCache->get('foo'));
+		$cache->get('foo');
+		$this->assertSame('bar', $runtimeCache->get('foo'));
+		$cache->set('foo', 'zoo', 100);
+		$this->assertSame('zoo', $runtimeCache->get('foo'));
+	}
 }
