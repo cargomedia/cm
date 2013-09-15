@@ -175,12 +175,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 		$adapterType = (int) $adapterType;
 
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
-		if (false === ($result = CM_Cache_Shared::getInstance()->get($cacheKey))) {
+		$cache = CM_Cache_Shared::getInstance();
+		if (false === ($result = $cache->get($cacheKey))) {
 			$result = CM_Db_Db::select('cm_streamChannel', array('id', 'type'), array('key' => $key, 'adapterType' => $adapterType))->fetch();
 			if (false === $result) {
 				$result = null;
 			}
-			CM_Cache_Shared::getInstance()->set($cacheKey, $result);
+			$cache->set($cacheKey, $result);
 		}
 
 		if (!$result) {
