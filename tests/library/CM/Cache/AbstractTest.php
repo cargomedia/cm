@@ -7,7 +7,7 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetSet() {
-		$storageAdapter = $this->getMockBuilder('CM_Cache_StorageAdapter_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
+		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
 		$storageAdapter->expects($this->exactly(2))->method('_get')->with('foo')->will($this->onConsecutiveCalls(false, 'cached-bar'));
 		$storageAdapter->expects($this->once())->method('_set')->with('foo', 'bar', 100);
 

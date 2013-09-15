@@ -10,7 +10,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	public static function getStorage() {
 		if (!isset(static::$_storage)) {
-			$storageClassName = static::_getConfig()->storageAdapter;
+			$storageClassName = static::_getConfig()->storage;
 			static::$_storage = new $storageClassName();
 		}
 		return static::$_storage;
