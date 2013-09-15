@@ -44,11 +44,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
 		$key = (string) $key;
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-		if ($skipCacheLocal || false === ($translations = CM_Cache_Local::getInstance()->get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if ($skipCacheLocal || false === ($translations = $cache->get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
 
 			if (!$skipCacheLocal) {
-				CM_Cache_Local::getInstance()->set($cacheKey, $translations);
+				$cache->set($cacheKey, $translations);
 			}
 		}
 
@@ -190,9 +191,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function findDefault() {
 		$cacheKey = CM_CacheConst::Language_Default;
-		if (false === ($languageId = CM_Cache_Local::getInstance()->get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($languageId = $cache->get($cacheKey))) {
 			$languageId = CM_Db_Db::select('cm_language', 'id', array('enabled' => true, 'backupId' => null))->fetchColumn();
-			CM_Cache_Local::getInstance()->set($cacheKey, $languageId);
+			$cache->set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
 			return null;
@@ -219,9 +221,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function getTree() {
 		$cacheKey = CM_CacheConst::Language_Tree;
-		if (false === ($tree = CM_Cache_Local::getInstance()->get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($tree = $cache->get($cacheKey))) {
 			$tree = new CM_Tree_Language();
-			CM_Cache_Local::getInstance()->set($cacheKey, $tree);
+			$cache->set($cacheKey, $tree);
 		}
 		return $tree;
 	}

@@ -148,12 +148,13 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	public static function factory($id, $type = null) {
 		if (null === $type) {
 			$cacheKey = CM_CacheConst::StreamChannel_Type . '_id:' . $id;
-			if (false === ($type = CM_Cache_Local::getInstance()->get($cacheKey))) {
+			$cache = CM_Cache_Local::getInstance();
+			if (false === ($type = $cache->get($cacheKey))) {
 				$type = CM_Db_Db::select('cm_streamChannel', 'type', array('id' => $id))->fetchColumn();
 				if (false === $type) {
 					throw new CM_Exception_Invalid('No record found in `cm_streamChannel` for id `' . $id . '`');
 				}
-				CM_Cache_Local::getInstance()->set($cacheKey, $type);
+				$cache->set($cacheKey, $type);
 			}
 		}
 		$class = self::_getClassName($type);
