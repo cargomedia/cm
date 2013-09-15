@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Cache_StorageAdapter_Abstract extends CM_Class_Abstract {
+abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string   $key

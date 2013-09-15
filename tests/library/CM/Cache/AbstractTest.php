@@ -3,7 +3,7 @@
 class CM_Cache_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		CM_Cache_StorageAdapter_Runtime::getInstance()->flush();
+		CM_Cache_Storage_Runtime::getInstance()->flush();
 	}
 
 	public function testGetSet() {
@@ -18,7 +18,7 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		$this->assertFalse($cache::get('foo'));
 		$cache::set('foo', 'bar', 100);
 		$this->assertSame('bar', $cache::get('foo'));
-		CM_Cache_StorageAdapter_Runtime::getInstance()->flush();
+		CM_Cache_Storage_Runtime::getInstance()->flush();
 		$this->assertSame('cached-bar', $cache::get('foo'));
 	}
 }

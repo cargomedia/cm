@@ -3,7 +3,7 @@
 class CM_Cache_FileTest extends CMTest_TestCase {
 
 	public function testGetSet() {
-		$cache = new CM_Cache_StorageAdapter_File();
+		$cache = new CM_Cache_Storage_File();
 		$this->assertFalse($cache->get('foo'));
 
 		$cache->set('foo', 'bar');
@@ -14,12 +14,12 @@ class CM_Cache_FileTest extends CMTest_TestCase {
 	 * @expectedException CM_Exception_NotImplemented
 	 */
 	public function testSetLifetime() {
-		$cache = new CM_Cache_StorageAdapter_File();
+		$cache = new CM_Cache_Storage_File();
 		$cache->set('foo', 'bar', 500);
 	}
 
 	public function testDelete() {
-		$cache = new CM_Cache_StorageAdapter_File();
+		$cache = new CM_Cache_Storage_File();
 		$cache->set('foo', 'bar');
 		$this->assertSame('bar', $cache->get('foo'));
 
@@ -28,7 +28,7 @@ class CM_Cache_FileTest extends CMTest_TestCase {
 	}
 
 	public function testFlush() {
-		$cache = new CM_Cache_StorageAdapter_File();
+		$cache = new CM_Cache_Storage_File();
 		$cache->set('foo', 'bar');
 		$this->assertSame('bar', $cache->get('foo'));
 

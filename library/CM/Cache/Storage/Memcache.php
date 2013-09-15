@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_StorageAdapter_Memcache extends CM_Cache_StorageAdapter_Abstract {
+class CM_Cache_Storage_Memcache extends CM_Cache_Storage_Abstract {
 
 	/** @var CM_Memcache_Client */
 	private $_client;

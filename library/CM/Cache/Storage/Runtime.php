@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
+class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 
 	const RUNTIME_LIFETIME = 3;
 	const RUNTIME_CLEAR_INTERVAL = 300;
@@ -8,7 +8,7 @@ class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 	/** @var int */
 	private $_lastClearStamp;
 
-	/** @var CM_Cache_StorageAdapter_Runtime */
+	/** @var CM_Cache_Storage_Runtime */
 	private static $_instance;
 
 	/** @var array */
@@ -57,7 +57,7 @@ class CM_Cache_StorageAdapter_Runtime extends CM_Cache_StorageAdapter_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_StorageAdapter_Runtime
+	 * @return CM_Cache_Storage_Runtime
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {

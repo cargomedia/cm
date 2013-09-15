@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_StorageAdapter_File extends CM_Cache_StorageAdapter_Abstract {
+class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
 	/** @var string */
 	protected $_storageDir;

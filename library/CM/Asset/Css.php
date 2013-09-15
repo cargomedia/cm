@@ -75,7 +75,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 		if ($render->getLanguage()) {
 			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
 		}
-		$cache = new CM_Cache_StorageAdapter_File();
+		$cache = new CM_Cache_Storage_File();
 		if (false === ($contentTransformed = $cache->get($cacheKey))) {
 			$lessCompiler = new lessc();
 			$lessCompiler->registerFunction('image', function ($arg) use ($render) {

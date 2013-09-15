@@ -2,11 +2,11 @@
 
 abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
-	/** @var CM_Cache_StorageAdapter_Abstract */
+	/** @var CM_Cache_Storage_Abstract */
 	protected static $_storage;
 
 	/**
-	 * @return CM_Cache_StorageAdapter_Abstract
+	 * @return CM_Cache_Storage_Abstract
 	 */
 	public static function getStorage() {
 		if (!isset(static::$_storage)) {
@@ -115,9 +115,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_StorageAdapter_Runtime
+	 * @return CM_Cache_Storage_Runtime
 	 */
 	private static final function _getRuntimeStorage() {
-		return CM_Cache_StorageAdapter_Runtime::getInstance();
+		return CM_Cache_Storage_Runtime::getInstance();
 	}
 }
