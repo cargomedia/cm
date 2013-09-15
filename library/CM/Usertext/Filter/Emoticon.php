@@ -47,7 +47,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 	 */
 	private function _getEmoticonData(CM_Render $render) {
 		$cacheKey = CM_CacheConst::Usertext_Filter_EmoticonList . '_fixedHeight:' . (string) $this->_fixedHeight;
-		if (($emoticons = CM_Cache_Local::get($cacheKey)) === false) {
+		if (($emoticons = CM_Cache_Local::getInstance()->get($cacheKey)) === false) {
 			$emoticons = array('codes' => array(), 'htmls' => array());
 			$fixedHeight = '';
 			if (null !== $this->_fixedHeight) {
@@ -61,7 +61,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
 							$emoticon['id'] . '" title="' . $emoticon['code'] . '"' . $fixedHeight . ' />';
 				}
 			}
-			CM_Cache_Local::set($cacheKey, $emoticons);
+			CM_Cache_Local::getInstance()->set($cacheKey, $emoticons);
 		}
 		return $emoticons;
 	}

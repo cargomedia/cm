@@ -59,7 +59,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
-		if (($fixtures = CM_Cache_Local::get($cacheKey)) === false) {
+		if (($fixtures = CM_Cache_Local::getInstance()->get($cacheKey)) === false) {
 			$fixtures = CM_Db_Db::select('cm_splitfeature_fixture', array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
@@ -71,7 +71,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 
 		if ($cacheWrite) {
-			CM_Cache_Local::set($cacheKey, $fixtures);
+			CM_Cache_Local::getInstance()->set($cacheKey, $fixtures);
 		}
 
 		return $this->_calculateEnabled($fixtures[$this->getId()]);

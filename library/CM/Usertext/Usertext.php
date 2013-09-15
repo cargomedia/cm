@@ -81,15 +81,16 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 	 */
 	public function transform($text) {
 		$cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+		$cache = CM_Cache_Local::getInstance();
 		if (0 !== count($this->_getFilters())) {
-			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
+			$cacheKey .= '_filter:' . call_user_func_array(array($cache, 'key'), $this->_getFilters());
 		}
-		if (($result = CM_Cache_Local::get($cacheKey)) === false) {
+		if (($result = $cache->get($cacheKey)) === false) {
 			$result = $text;
 			foreach ($this->_getFilters() as $filter) {
 				$result = $filter->transform($result, $this->_render);
 			}
-			CM_Cache_Local::set($cacheKey, $result);
+			$cache->set($cacheKey, $result);
 		}
 		return $result;
 	}

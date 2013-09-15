@@ -44,11 +44,11 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
 		$key = (string) $key;
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-		if ($skipCacheLocal || false === ($translations = CM_Cache_Local::get($cacheKey))) {
+		if ($skipCacheLocal || false === ($translations = CM_Cache_Local::getInstance()->get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
 
 			if (!$skipCacheLocal) {
-				CM_Cache_Local::set($cacheKey, $translations);
+				CM_Cache_Local::getInstance()->set($cacheKey, $translations);
 			}
 		}
 
@@ -147,7 +147,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	protected function _onChange() {
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-		CM_Cache_Local::delete($cacheKey);
+		CM_Cache_Local::getInstance()->delete($cacheKey);
 	}
 
 	protected function _getContainingCacheables() {
@@ -190,9 +190,9 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function findDefault() {
 		$cacheKey = CM_CacheConst::Language_Default;
-		if (false === ($languageId = CM_Cache_Local::get($cacheKey))) {
+		if (false === ($languageId = CM_Cache_Local::getInstance()->get($cacheKey))) {
 			$languageId = CM_Db_Db::select('cm_language', 'id', array('enabled' => true, 'backupId' => null))->fetchColumn();
-			CM_Cache_Local::set($cacheKey, $languageId);
+			CM_Cache_Local::getInstance()->set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
 			return null;
@@ -219,9 +219,9 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function getTree() {
 		$cacheKey = CM_CacheConst::Language_Tree;
-		if (false === ($tree = CM_Cache_Local::get($cacheKey))) {
+		if (false === ($tree = CM_Cache_Local::getInstance()->get($cacheKey))) {
 			$tree = new CM_Tree_Language();
-			CM_Cache_Local::set($cacheKey, $tree);
+			CM_Cache_Local::getInstance()->set($cacheKey, $tree);
 		}
 		return $tree;
 	}

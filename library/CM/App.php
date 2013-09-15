@@ -131,8 +131,8 @@ class CM_App {
 	 * @return int Number of version bumps
 	 */
 	public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
-		CM_Cache_Shared::flush();
-		CM_Cache_Local::flush();
+		CM_Cache_Shared::getInstance()->flush();
+		CM_Cache_Local::getInstance()->flush();
 		$versionBumps = 0;
 		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
 			$version = $versionStart = $this->getVersion($namespace);

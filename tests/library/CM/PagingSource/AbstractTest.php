@@ -26,7 +26,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$this->assertEquals(100, $source->getCount());
 		$source->clearCache();
 		$this->assertEquals(99, $source->getCount());
-		CM_Cache_Local::flush();
+		CM_Cache_Local::getInstance()->flush();
 	}
 
 	public function testCache() {
@@ -43,6 +43,6 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		$source->clearCache();
 		$this->assertSame(99, $source->getCount());
 		$this->assertSame(99, $sourceNocache->getCount());
-		CM_Cache_Shared::flush();
+		CM_Cache_Shared::getInstance()->flush();
 	}
 }

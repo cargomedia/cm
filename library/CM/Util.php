@@ -420,7 +420,7 @@ class CM_Util {
 	 */
 	public static function getClassChildren($className, $includeAbstracts = null) {
 		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
-		if (false === ($classNames = CM_Cache_Local::get($key))) {
+		if (false === ($classNames = CM_Cache_Local::getInstance()->get($key))) {
 			$pathsFiltered = array();
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
@@ -444,7 +444,7 @@ class CM_Util {
 				}
 			}
 			$classNames = self::getClasses($pathsFiltered);
-			CM_Cache_Local::set($key, $classNames);
+			CM_Cache_Local::getInstance()->set($key, $classNames);
 		}
 		return $classNames;
 	}

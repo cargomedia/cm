@@ -467,10 +467,10 @@ abstract class CM_Request_Abstract {
 		$clientId = (int) $clientId;
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
 
-		if (false === ($isValid = CM_Cache_Local::get($cacheKey))) {
+		if (false === ($isValid = CM_Cache_Local::getInstance()->get($cacheKey))) {
 			$isValid = (bool) CM_Db_Db::count('cm_requestClient', array('id' => $clientId));
 			if ($isValid) {
-				CM_Cache_Local::set($cacheKey, true);
+				CM_Cache_Local::getInstance()->set($cacheKey, true);
 			}
 		}
 
