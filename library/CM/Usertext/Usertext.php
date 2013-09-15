@@ -84,12 +84,12 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		if (0 !== count($this->_getFilters())) {
 			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
 		}
-		if (($result = CM_CacheLocal::get($cacheKey)) === false) {
+		if (($result = CM_Cache_Local::get($cacheKey)) === false) {
 			$result = $text;
 			foreach ($this->_getFilters() as $filter) {
 				$result = $filter->transform($result, $this->_render);
 			}
-			CM_CacheLocal::set($cacheKey, $result);
+			CM_Cache_Local::set($cacheKey, $result);
 		}
 		return $result;
 	}

@@ -74,7 +74,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 	 */
 	public static function getDefaults() {
 		$cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
-		if (($defaults = CM_CacheLocal::get($cacheKey)) === false) {
+		if (($defaults = CM_Cache_Local::get($cacheKey)) === false) {
 			$defaults = array();
 			$rows = CM_Db_Db::select('cm_user_preferenceDefault', array('section', 'key', 'preferenceId', 'defaultValue',
 				'configurable'))->fetchAll();
@@ -85,7 +85,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 				$defaults[$default['section']][$default['key']] = array('id' => (int) $default['preferenceId'],
 					'value' => (bool) $default['defaultValue'], 'configurable' => (boolean) $default['configurable']);
 			}
-			CM_CacheLocal::set($cacheKey, $defaults);
+			CM_Cache_Local::set($cacheKey, $defaults);
 		}
 		return $defaults;
 	}

@@ -182,7 +182,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		$this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
 		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
-		CM_CacheLocal::flush();
+		CM_Cache_Local::flush();
 		$this->assertNull(CM_Model_Language::findDefault());
 	}
 

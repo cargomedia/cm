@@ -36,8 +36,8 @@ class CMTest_TH {
 	}
 
 	public static function clearCache() {
-		CM_Cache::flush();
-		CM_CacheLocal::flush();
+		CM_Cache_Shared::flush();
+		CM_Cache_Local::flush();
 	}
 
 	public static function clearDb() {

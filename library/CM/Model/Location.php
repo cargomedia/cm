@@ -189,14 +189,14 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public static function findByIp($ip) {
 		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
-		if ((list($level, $id) = CM_CacheLocal::get($cacheKey)) === false) {
+		if ((list($level, $id) = CM_Cache_Local::get($cacheKey)) === false) {
 			$level = $id = null;
 			if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
 				$level = self::LEVEL_CITY;
 			} elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
 				$level = self::LEVEL_COUNTRY;
 			}
-			CM_CacheLocal::set($cacheKey, array($level, $id));
+			CM_Cache_Local::set($cacheKey, array($level, $id));
 		}
 		if (!$level && !$id) {
 			return null;

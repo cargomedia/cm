@@ -27,11 +27,11 @@ $config->CM_Search->servers = array(
 	array('host' => 'localhost', 'port' => 9200),
 );
 
-$config->CM_CacheLocal->storage = 'CM_Cache_Storage_Apc';
-$config->CM_CacheLocal->lifetime = 86400;
+$config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
+$config->CM_Cache_Local->lifetime = 86400;
 
-$config->CM_Cache->storage = 'CM_Cache_Storage_Memcache';
-$config->CM_Cache->lifetime = 3600;
+$config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
+$config->CM_Cache_Shared->lifetime = 3600;
 
 $config->CM_Memcache_Client->servers = array(
 	array('host' => 'localhost', 'port' => 11211),

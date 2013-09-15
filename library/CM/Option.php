@@ -22,9 +22,9 @@ class CM_Option {
 	 */
 	public function get($key) {
 		$cacheKey = CM_CacheConst::Option;
-		if (($options = CM_Cache::get($cacheKey)) === false) {
+		if (($options = CM_Cache_Shared::get($cacheKey)) === false) {
 			$options = CM_Db_Db::select('cm_option', array('key', 'value'))->fetchAllTree();
-			CM_Cache::set($cacheKey, $options);
+			CM_Cache_Shared::set($cacheKey, $options);
 		}
 		if (!isset($options[$key])) {
 			return null;
@@ -70,6 +70,6 @@ class CM_Option {
 
 	private function _clearCache() {
 		$cacheKey = CM_CacheConst::Option;
-		CM_Cache::delete($cacheKey);
+		CM_Cache_Shared::delete($cacheKey);
 	}
 }
