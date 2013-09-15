@@ -45,9 +45,10 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		$wowza->expects($this->at(1))->method('_stopClient')->with($streamPublish->getKey(), $streamChannel->getPrivateHost());
 		$wowza->expects($this->at(2))->method('_stopClient')->with($streamSubscribe->getKey(), $streamChannel->getPrivateHost());
 		$wowza->expects($this->exactly(2))->method('_stopClient');
-		$streamChannel->delete();
 
-		/** @var $wowza CM_Stream_Video */
+		/** @var $wowza CM_Stream_Adapter_Video_Wowza */
+		$wowza->unpublish($streamChannel->getKey());
+		$wowza->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 		$wowza->synchronize();
 	}
 
