@@ -7,9 +7,13 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetSet() {
-		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
-		$storageAdapter->expects($this->exactly(2))->method('_get')->with('foo')->will($this->onConsecutiveCalls(false, 'cached-bar'));
-		$storageAdapter->expects($this->once())->method('_set')->with('foo', 'bar', 100);
+		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')
+				->setMethods(array('_set', '_get', '_getKeyArmored'))->getMockForAbstractClass();
+		$storageAdapter->expects($this->any())->method('_getKeyArmored')->will($this->returnCallback(function ($key) {
+			return 'armor-' . $key;
+		}));
+		$storageAdapter->expects($this->exactly(2))->method('_get')->with('armor-foo')->will($this->onConsecutiveCalls(false, 'cached-bar'));
+		$storageAdapter->expects($this->once())->method('_set')->with('armor-foo', 'bar', 100);
 
 		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage'))->disableOriginalConstructor()->getMockForAbstractClass();
 		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($storageAdapter));
@@ -22,8 +26,8 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testRuntime() {
-		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')->setMethods(array('set', 'get'))->getMockForAbstractClass();
-		$storageAdapter->expects($this->any())->method('_get')->with('foo')->will($this->returnValue('bar'));
+		$storageAdapter = $this->getMockBuilder('CM_Cache_Storage_Abstract')->setMethods(array('_set', '_get'))->getMockForAbstractClass();
+		$storageAdapter->expects($this->any())->method('_get')->will($this->returnValue('bar'));
 
 		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage'))->disableOriginalConstructor()->getMockForAbstractClass();
 		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($storageAdapter));
