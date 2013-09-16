@@ -85,7 +85,11 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
 
 	protected function _processItem($item) {
 		if (!empty($item['metaInfo'])) {
-			$item['metaInfo'] = unserialize($item['metaInfo']);
+			$metaInfo = @unserialize($item['metaInfo']);
+			if (false === $metaInfo) {
+				$metaInfo = null;
+			}
+			$item['metaInfo'] = $metaInfo;
 		}
 		return $item;
 	}
