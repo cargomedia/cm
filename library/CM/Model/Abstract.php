@@ -509,7 +509,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$noPersistenceList = array();
 
 		foreach ($idTypeList as $idType) {
-			$type = $idType['type'];
+			$type = (int) $idType['type'];
 			if (!is_array($idType['id'])) {
 				$idType['id'] = array('id' => $idType['id']);
 			}
