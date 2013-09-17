@@ -34,7 +34,7 @@ class CM_Db_Query_SelectMultiple extends CM_Db_Query_Abstract {
 						$this->_addParameters($value);
 					}
 				}
-				$whereParts[] = '(' . implode(' AND ', $sqlParts) . ')';
+				$whereParts[] = implode(' AND ', $sqlParts);
 			}
 			$this->_addSql('WHERE ' . implode(' OR ', $whereParts));
 		}
