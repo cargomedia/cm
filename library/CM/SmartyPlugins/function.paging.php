@@ -44,7 +44,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 	}
 
 	if ($paging->getPage() < $paging->getPageCount()) {
-		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() + 1, '', $ajax, 'pagingNext icon-arrow-right');
+		$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPage() + 1, 'next', $ajax, 'pagingNext');
 		if ($pageMax < $paging->getPageCount()) {
 			$html .= _smarty_function_paging_link($path, $query, $component, $paging->getPageCount(), $paging->getPageCount(), $ajax, 'pagingLast');
 		}
