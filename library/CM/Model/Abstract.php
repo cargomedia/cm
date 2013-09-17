@@ -558,18 +558,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return array_values($dataList);
 	}
 
-	/**
-	 * @param int       $type
-	 * @param int|array $id
-	 * @return string
-	 */
-	protected static function _serializeIdType($type, $id) {
-		array_walk($id, function (&$idPart) {
-			$idPart = (string) $idPart;
-		});
-		return serialize(array('type' => $type, 'id' => $id));
-	}
-
 	public function toArray() {
 		$id = $this->_getId();
 		$array = array('_type' => $this->getType(), '_id' => $id);
