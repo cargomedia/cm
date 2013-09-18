@@ -493,7 +493,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 		if (null !== $data) {
-			$model->_loadAssets(true);
+			$model->_loadAssets(false);
 		}
 		return $model;
 	}
