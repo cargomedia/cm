@@ -56,7 +56,7 @@ class CM_Db_Query_SelectMultiple extends CM_Db_Query_Abstract {
 				$this->_addSql('WHERE ' . implode(' OR ', $whereParts));
 			} else {
 				if (!empty($whereParts)) {
-					$this->_addSql('WHERE ' . '(' . implode(' OR ', $whereParts) . ') AND' . '');
+					$this->_addSql('WHERE (' . implode(' OR ', $whereParts) . ') AND');
 				} else {
 					$this->_addSql('WHERE');
 				}
