@@ -548,6 +548,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					try {
 						$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id']);
 					} catch (CM_Exception_Nonexistent $ex) {
+						$model = null;
 					}
 				}
 			} else {
