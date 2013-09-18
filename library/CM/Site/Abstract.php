@@ -17,6 +17,17 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	}
 
 	/**
+	 * @return CM_Site_Abstract[]
+	 */
+	public static function getAll() {
+		$siteList = array();
+		foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
+			$siteList[] = new $siteClassName();
+		}
+		return $siteList;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getEmailAddress() {
