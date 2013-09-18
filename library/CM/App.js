@@ -843,12 +843,12 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} namespace
+		 * @param {String} [namespace]
 		 * @param {Boolean} [allowClientMessage]
 		 */
 		_getEventNames: function(namespace, allowClientMessage) {
 			var eventName = namespace;
-			if (allowClientMessage) {
+			if (namespace && allowClientMessage) {
 				eventName += ' client-' + namespace;
 			}
 			return eventName;
