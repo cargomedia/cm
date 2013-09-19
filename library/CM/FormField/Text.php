@@ -23,7 +23,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
 		if (!empty($this->_options['forbidBadwords'])) {
 			$badwordList = new CM_Paging_ContentList_Badwords();
 			if ($badword = $badwordList->getMatch($userInput)) {
-				throw new CM_Exception_FormFieldValidation('The word "{$badword}" is not allowed.', array('badword' => $badword));
+				throw new CM_Exception_FormFieldValidation('The word `{$badword}` is not allowed', array('badword' => $badword));
 			}
 		}
 		return $userInput;
