@@ -2,9 +2,6 @@
 
 class CM_ExceptionHandler {
 
-	/** @var int|null */
-	private $_exceptionOutputSeverityMin;
-
 	public function handleErrorRaw($code, $message, $file, $line) {
 		$errorCodes = array(
 			E_ERROR             => 'E_ERROR',
@@ -45,15 +42,8 @@ class CM_ExceptionHandler {
 	}
 
 	/**
-	 * @param int|null $severity
+	 * @param Exception $exception
 	 */
-	public function setExceptionOutputSeverityMin($severity) {
-		if (null !== $severity) {
-			$severity = (int) $severity;
-		}
-		$this->_exceptionOutputSeverityMin = $severity;
-	}
-
 	private function _logException(Exception $exception) {
 		try {
 			if ($exception instanceof CM_Exception) {
@@ -72,6 +62,10 @@ class CM_ExceptionHandler {
 		}
 	}
 
+	/**
+	 * @param Exception                $exception
+	 * @param CM_OutputStream_Abstract $output
+	 */
 	private function _printException(Exception $exception, CM_OutputStream_Abstract $output = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
@@ -80,25 +74,14 @@ class CM_ExceptionHandler {
 			header('HTTP/1.1 500 Internal Server Error');
 		}
 
-		$severity = CM_Exception::ERROR;
-		if ($exception instanceof CM_Exception) {
-			$severity = $exception->getSeverity();
+		$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
+		if ($outputVerbose) {
+			$output->writeln($this->_formatException($exception));
+		} else {
+			$output->writeln('Internal server error');
 		}
 
-		$outputEnabled = true;
-		if (null !== $this->_exceptionOutputSeverityMin) {
-			$outputEnabled = ($severity >= $this->_exceptionOutputSeverityMin);
-		}
-		if ($outputEnabled) {
-			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
-			if ($outputVerbose) {
-				$output->writeln($this->_formatException($exception));
-			} else {
-				$output->writeln('Internal server error');
-			}
-		}
-
-		if ($severity >= CM_Exception::ERROR) {
+		if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
 			CMService_Newrelic::getInstance()->setNoticeError($exception);
 		}
 	}
