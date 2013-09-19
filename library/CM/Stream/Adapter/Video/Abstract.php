@@ -19,22 +19,31 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	public function checkStreams() {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		foreach ($this->_getStreamChannels() as $streamChannel) {
+			$streamChannelIsValid = $streamChannel->isValid();
 			if ($streamChannel->hasStreamPublish()) {
 				/** @var CM_Model_Stream_Publish $streamPublish */
 				$streamPublish = $streamChannel->getStreamPublish();
-				if ($streamPublish->getAllowedUntil() < time()) {
-					$streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
+				if (!$streamChannelIsValid) {
+					$this->stopStream($streamPublish);
+				} else {
 					if ($streamPublish->getAllowedUntil() < time()) {
-						$this->stopStream($streamPublish);
+						$streamPublish->setAllowedUntil($streamChannel->canPublish($streamPublish->getUser(), $streamPublish->getAllowedUntil()));
+						if ($streamPublish->getAllowedUntil() < time()) {
+							$this->stopStream($streamPublish);
+						}
 					}
 				}
 			}
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-				if ($streamSubscribe->getAllowedUntil() < time()) {
-					$streamSubscribe->setAllowedUntil($streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil()));
+				if (!$streamChannelIsValid) {
+					$this->stopStream($streamSubscribe);
+				} else {
 					if ($streamSubscribe->getAllowedUntil() < time()) {
-						$this->stopStream($streamSubscribe);
+						$streamSubscribe->setAllowedUntil($streamChannel->canSubscribe($streamSubscribe->getUser(), $streamSubscribe->getAllowedUntil()));
+						if ($streamSubscribe->getAllowedUntil() < time()) {
+							$this->stopStream($streamSubscribe);
+						}
 					}
 				}
 			}
@@ -55,14 +64,14 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 	}
 
 	/**
-	 * @param string     $streamName
-	 * @param string     $clientKey
-	 * @param int        $start
-	 * @param int        $width
-	 * @param int        $height
-	 * @param int        $serverId
-	 * @param int        $thumbnailCount
-	 * @param string     $data
+	 * @param string $streamName
+	 * @param string $clientKey
+	 * @param int    $start
+	 * @param int    $width
+	 * @param int    $height
+	 * @param int    $serverId
+	 * @param int    $thumbnailCount
+	 * @param string $data
 	 * @throws CM_Exception
 	 * @throws CM_Exception_NotAllowed
 	 * @return int
@@ -91,22 +100,22 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			'thumbnailCount' => $thumbnailCount,
 		));
 		try {
-			$allowedUntil = $streamChannel->canPublish($user, time());
-			if ($allowedUntil <= time()) {
-				throw new CM_Exception_NotAllowed();
-			}
-			CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
-												  'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
+			CM_Model_Stream_Publish::createStatic(array(
+				'streamChannel' => $streamChannel,
+				'user'          => $user,
+				'start'         => $start,
+				'key'           => $clientKey,
+			));
 		} catch (CM_Exception $ex) {
 			$streamChannel->delete();
-			throw $ex;
+			throw new CM_Exception_NotAllowed('Cannot publish: ' . $ex->getMessage());
 		}
 		return $streamChannel->getId();
 	}
 
 	/**
-	 * @param string     $streamName
-	 * @param int|null   $thumbnailCount
+	 * @param string   $streamName
+	 * @param int|null $thumbnailCount
 	 * @return null
 	 */
 	public function unpublish($streamName, $thumbnailCount = null) {
@@ -122,7 +131,10 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			/** @var CM_Model_StreamChannel_Video $streamChannel */
 			$streamChannel->setThumbnailCount($thumbnailCount);
 		}
-		$streamChannel->delete();
+		$streamChannel->getStreamPublish()->delete();
+		if (!$streamChannel->hasStreams()) {
+			$streamChannel->delete();
+		}
 	}
 
 	/**
@@ -150,13 +162,16 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 			throw new CM_Exception_NotAllowed();
 		}
 
-		$allowedUntil = $streamChannel->canSubscribe($user, time());
-		if ($allowedUntil <= time()) {
-			throw new CM_Exception_NotAllowed();
+		try {
+			CM_Model_Stream_Subscribe::createStatic(array(
+				'streamChannel' => $streamChannel,
+				'user'          => $user,
+				'start'         => $start,
+				'key'           => $clientKey,
+			));
+		} catch (CM_Exception $ex) {
+			throw new CM_Exception_NotAllowed('Cannot subscribe: ' . $ex->getMessage());
 		}
-
-		CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => $start,
-												'allowedUntil'  => $allowedUntil, 'key' => $clientKey));
 	}
 
 	/**
@@ -174,6 +189,9 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 		$streamSubscribe = $streamChannel->getStreamSubscribes()->findKey($clientKey);
 		if ($streamSubscribe) {
 			$streamSubscribe->delete();
+		}
+		if (!$streamChannel->hasStreams()) {
+			$streamChannel->delete();
 		}
 	}
 

@@ -163,7 +163,7 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static final function _extractKeyArmored($keyArmored) {
-		if (!preg_match('!^' . DIR_ROOT . '_' . '(.+)$!', $keyArmored, $matches)) {
+		if (!preg_match('/^' . preg_quote(DIR_ROOT, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
 			throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
 		}
 		return $matches[1];

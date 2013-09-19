@@ -27,7 +27,7 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 	 * @param string[] $keys
 	 * @return mixed[]
 	 */
-	public function _getMulti(array $keys) {
+	protected  function _getMulti(array $keys) {
 		foreach ($keys as &$key) {
 			$key = self::_getKeyArmored($key);
 		}

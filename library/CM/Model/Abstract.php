@@ -503,7 +503,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 		if (null !== $data) {
-			$model->_loadAssets(true);
+			$model->_loadAssets(false);
 		}
 		return $model;
 	}
@@ -511,7 +511,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @param array    $idTypeList [['type' => int, 'id' => int|array],...] | [int|array,...] Pass an array of ids if $modelType is used
 	 * @param int|null $modelType
-	 * @return CM_Model_Abstract[]
+	 * @return CM_Model_Abstract[] Can contain null-entries when model doesn't exist
 	 */
 	public static function factoryGenericMultiple(array $idTypeList, $modelType = null) {
 		$modelType = (null !== $modelType) ? (int) $modelType : null;
@@ -522,7 +522,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 		foreach ($idTypeList as $idType) {
 			if (null === $modelType) {
-				$type = $idType['type'];
+				$type = (int) $idType['type'];
 				$id = $idType['id'];
 			} else {
 				$type = $modelType;
@@ -567,6 +567,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					try {
 						$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id']);
 					} catch (CM_Exception_Nonexistent $ex) {
+						$model = null;
 					}
 				}
 			} else {
@@ -575,18 +576,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$dataList[$serializedKey] = $model;
 		}
 		return array_values($dataList);
-	}
-
-	/**
-	 * @param int       $type
-	 * @param int|array $id
-	 * @return string
-	 */
-	protected static function _serializeIdType($type, $id) {
-		array_walk($id, function (&$idPart) {
-			$idPart = (string) $idPart;
-		});
-		return serialize(array('type' => $type, 'id' => $id));
 	}
 
 	public function toArray() {

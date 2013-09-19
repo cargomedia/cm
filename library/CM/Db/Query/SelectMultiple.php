@@ -23,10 +23,45 @@ class CM_Db_Query_SelectMultiple extends CM_Db_Query_Abstract {
 		$this->_addSql('FROM ' . $this->_getClient()->quoteIdentifier($table));
 
 		if (!empty($whereList)) {
+			$wherePartCommon = array();
+			if (count($whereList) >= 2) {
+				$wherePartCommon = reset($whereList);
+				foreach ($whereList as $wherePart) {
+					$wherePartCommon = array_uintersect_assoc($wherePartCommon, $wherePart,
+						function ($a, $b) {
+							return $a !== $b;
+						});
+				}
+			}
 			$whereParts = array();
 			foreach ($whereList as $wherePart) {
 				$sqlParts = array();
-				foreach ($wherePart as $field => $value) {
+				$wherePartFiltered = array_udiff_assoc($wherePart, $wherePartCommon,
+					function ($a, $b) {
+						return $a !== $b;
+					});
+				if (!empty($wherePartFiltered)) {
+					foreach ($wherePartFiltered as $field => $value) {
+						if (null === $value) {
+							$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' IS NULL';
+						} else {
+							$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' = ?';
+							$this->_addParameters($value);
+						}
+					}
+					$whereParts[] = implode(' AND ', $sqlParts);
+				}
+			}
+			if (empty($wherePartCommon)) {
+				$this->_addSql('WHERE ' . implode(' OR ', $whereParts));
+			} else {
+				if (!empty($whereParts)) {
+					$this->_addSql('WHERE (' . implode(' OR ', $whereParts) . ') AND');
+				} else {
+					$this->_addSql('WHERE');
+				}
+				$sqlParts = array();
+				foreach ($wherePartCommon as $field => $value) {
 					if (null === $value) {
 						$sqlParts[] = $this->_getClient()->quoteIdentifier($field) . ' IS NULL';
 					} else {
@@ -34,9 +69,8 @@ class CM_Db_Query_SelectMultiple extends CM_Db_Query_Abstract {
 						$this->_addParameters($value);
 					}
 				}
-				$whereParts[] = '(' . implode(' AND ', $sqlParts) . ')';
+				$this->_addSql(implode(' AND ', $sqlParts));
 			}
-			$this->_addSql('WHERE ' . implode(' OR ', $whereParts));
 		}
 		$this->_addOrderBy($order);
 	}
