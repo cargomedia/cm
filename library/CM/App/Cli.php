@@ -50,7 +50,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$sourceFile = new CM_File($configPath . 'local.json');
 		$generator = new CM_Config_Generator($sourceFile);
 		$sourceCode = $generator->generateOutput();
-		CM_File::create($configPath . 'localGenerated.php', $sourceCode);
+		CM_File::create($configPath . 'local.php', $sourceCode);
 	}
 
 	public static function getPackageName() {
