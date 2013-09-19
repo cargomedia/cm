@@ -119,3 +119,5 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
+
+$config->CM_Config_Mapping->class = 'CM_Config_Mapping';

@@ -45,6 +45,14 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
 
+	public function generateLocalConfig() {
+		$configPath = DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+		$sourceFile = new CM_File($configPath . 'local.json');
+		$generator = new CM_Config_Generator($sourceFile);
+		$sourceCode = $generator->generateOutput();
+		CM_File::create($configPath . 'localGenerated.php', $sourceCode);
+	}
+
 	public static function getPackageName() {
 		return 'app';
 	}
