@@ -7,7 +7,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
-		$this->_test = CM_Model_Splittest::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		$this->_test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 	}
 
 	public function tearDown() {
@@ -72,7 +72,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
-		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
+		$test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
@@ -90,7 +90,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$user3 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
-		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
+		$test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 
@@ -118,7 +118,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 		$user2 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
-		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
+		$test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
 
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);

@@ -15,7 +15,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$options = array();
 		$options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
-		$options['siteId'] = $this->getRender()->getSite()->getId();
+		$options['site'] = CM_Params::encode($this->getRender()->getSite());
 		$options['url'] = $this->getRender()->getUrl();
 		$options['urlStatic'] = $this->getRender()->getUrlStatic();
 		$options['urlUserContent'] = $this->getRender()->getUrlUserContent();

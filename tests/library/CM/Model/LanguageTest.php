@@ -21,11 +21,11 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 		$this->_language->getTranslation('keyFirst'); // Fill APC
 		$this->_language->setTranslation('keyFirst', 'abc');
-		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst'));
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst'));
 		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
 													'variables' => array())), $this->_language->getTranslations()->getAssociativeArray());
 
-		$this->assertSame('keyFirst', $this->_language->getTranslation('keyFirst', array('variable')));
+		$this->assertSame('abc', $this->_language->getTranslation('keyFirst', array('variable')));
 		$this->assertSame(array('keyFirst' => array('value'     => 'abc',
 													'variables' => array('variable'))), $this->_language->getTranslations()->getAssociativeArray());
 
@@ -53,7 +53,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		/** @var CM_Model_Language $language */
-		$language = CM_Model_Language::create(array('name' => 'Deutsch', 'abbreviation' => 'de', 'enabled' => true));
+		$language = CM_Model_Language::createStatic(array('name' => 'Deutsch', 'abbreviation' => 'de', 'enabled' => true));
 
 		$this->assertInstanceOf('CM_Model_Language', $language);
 		$this->assertSame('Deutsch', $language->getName());
@@ -64,7 +64,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testCreateWithoutName() {
 		try {
-			CM_Model_Language::create(array('abbreviation' => 'de',));
+			CM_Model_Language::createStatic(array('abbreviation' => 'de',));
 			$this->fail('Could create language without name');
 		} catch (CM_Exception_InvalidParam $e) {
 			$this->assertContains('`name`', $e->getMessage());
@@ -73,7 +73,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testCreateWithDuplicateAbbreviation() {
 		try {
-			CM_Model_Language::create(array('name' => 'Another one', 'abbreviation' => $this->_language->getAbbreviation(), 'enabled' => true));
+			CM_Model_Language::createStatic(array('name' => 'Another one', 'abbreviation' => $this->_language->getAbbreviation(), 'enabled' => true));
 			$this->fail('Could create language with duplicate abbreviation');
 		} catch (CM_Exception $e) {
 			$this->assertContains('Duplicate entry', $e->getMessage());
@@ -82,7 +82,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testDelete() {
 		/** @var CM_Model_Language $backedUpLanguage */
-		$backedUpLanguage = CM_Model_Language::create(array(
+		$backedUpLanguage = CM_Model_Language::createStatic(array(
 			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
 			'enabled'      => true,
@@ -107,7 +107,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	}
 
 	public function testSetDataDuplicateAbbreviation() {
-		CM_Model_Language::create(array(
+		CM_Model_Language::createStatic(array(
 			'name'         => 'Another',
 			'abbreviation' => 'pl',
 			'enabled'      => true
@@ -147,7 +147,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testGetTranslationWithBackup() {
 		/** @var CM_Model_Language $backedUpLanguage */
-		$backedUpLanguage = CM_Model_Language::create(array(
+		$backedUpLanguage = CM_Model_Language::createStatic(array(
 			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
 			'enabled'      => true,
@@ -159,7 +159,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 
 	public function testIsBackingUp() {
 		/** @var CM_Model_Language $backedUpLanguage */
-		$backedUpLanguage = CM_Model_Language::create(array(
+		$backedUpLanguage = CM_Model_Language::createStatic(array(
 			'name'         => 'Backed up language',
 			'abbreviation' => 'bul',
 			'enabled'      => true,

@@ -24,15 +24,17 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 		if (!isset($wurfl->capabilities['product_info'])) {
 			return null;
 		}
-		return array('mobile' => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
-			'tablet' => (boolean) $wurfl->capabilities['product_info']['is_tablet'],
-			'hasTouschreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen'));
+		return array(
+			'mobile'         => (boolean) $wurfl->capabilities['product_info']['is_wireless_device'],
+			'tablet'         => (boolean) $wurfl->capabilities['product_info']['is_tablet'],
+			'hasTouchscreen' => ($wurfl->capabilities['product_info']['pointing_method'] == 'touchscreen')
+		);
 	}
 
 	/**
 	 *  xml file repository http://sourceforge.net/projects/wurfl/files/WURFL/
 	 *
-	 * 	ON UPDATE: flush APC-cache!!!
+	 *    ON UPDATE: flush APC-cache!!!
 	 */
 	public static function setup() {
 		self::init();
@@ -54,6 +56,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 }
 
 class TeraWurflConfig {
+
 	/**
 	 * Database Hostname
 	 * To specify the MySQL 5 TCP port or use a named pipe / socket, put it at the end of your hostname,

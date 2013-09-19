@@ -161,8 +161,19 @@ class CM_SearchQuery_Abstract {
 		return $this->_sorts;
 	}
 
+	/**
+	 * @param array $sort
+	 */
 	protected function _sort(array $sort) {
-		$this->_sorts[] = $sort;
+		$sortNew = array();
+		foreach ($sort as $key => $value) {
+			$key = (string) $key;
+			if (null === $value) {
+				$value = 'desc';
+			}
+			$sortNew[$key] = $value;
+		}
+		$this->_sorts[] = $sortNew;
 	}
 
 	protected function _sortDefault() {

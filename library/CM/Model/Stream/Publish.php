@@ -26,7 +26,10 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _onDelete() {
-		$this->getStreamChannel()->onUnpublish($this);
+		$streamChannel = $this->getStreamChannel();
+		if ($streamChannel->isValid()) {
+			$streamChannel->onUnpublish($this);
+		}
 		CM_Db_Db::delete('cm_stream_publish', array('id' => $this->getId()));
 	}
 
@@ -43,19 +46,30 @@ class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 		return new static($id);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		/** @var CM_Model_User $user */
 		$user = $data['user'];
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$start = (int) $data['start'];
-		$allowedUntil = null;
-		if (null !== $data['allowedUntil']) {
-			$allowedUntil = (int) $data['allowedUntil'];
+
+		if (!$streamChannel->isValid()) {
+			throw new CM_Exception_Invalid('Stream channel not valid');
 		}
+
+		$allowedUntil = $streamChannel->canPublish($user, time());
+		if ($allowedUntil <= time()) {
+			throw new CM_Exception_NotAllowed('Not allowed to publish');
+		}
+
 		$key = (string) $data['key'];
-		$id = CM_Db_Db::insert('cm_stream_publish', array('userId' => $user->getId(), 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'key' => $key, 'channelId' => $streamChannel->getId()));
+		$id = CM_Db_Db::insert('cm_stream_publish', array(
+			'userId'       => $user->getId(),
+			'start'        => $start,
+			'allowedUntil' => $allowedUntil,
+			'key'          => $key,
+			'channelId'    => $streamChannel->getId(),
+		));
 		$streamPublish = new self($id);
 		$streamChannel->onPublish($streamPublish);
 		return $streamPublish;

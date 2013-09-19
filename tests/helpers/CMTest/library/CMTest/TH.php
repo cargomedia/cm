@@ -42,9 +42,11 @@ class CMTest_TH {
 
 	public static function clearDb() {
 		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+		CM_Db_Db::exec('SET foreign_key_checks = 0;');
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
+		CM_Db_Db::exec('SET foreign_key_checks = 1;');
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
@@ -93,7 +95,7 @@ class CMTest_TH {
 	 * @return CM_Model_User
 	 */
 	public static function createUser() {
-		return CM_Model_User::create();
+		return CM_Model_User::createStatic();
 	}
 
 	/**
@@ -106,7 +108,7 @@ class CMTest_TH {
 				$abbreviation = self::_randStr(5);
 			} while (CM_Model_Language::findByAbbreviation($abbreviation));
 		}
-		return CM_Model_Language::create(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+		return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
 	}
 
 	/**
@@ -173,7 +175,7 @@ class CMTest_TH {
 		if (!$streamChannel->hasStreamPublish()) {
 			self::createStreamPublish($user, $streamChannel);
 		}
-		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+		return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 	}
 
 	/**
@@ -188,8 +190,11 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $user, 'start' => time(),
+			'key'           => rand(1, 10000) . '_' . rand(1, 100),
+		));
 	}
 
 	/**
@@ -201,8 +206,8 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+															 'key'           => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -274,6 +279,18 @@ class CMTest_TH {
 	 */
 	public static function reinstantiateModel(CM_Model_Abstract &$model) {
 		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
+	}
+
+	/**
+	 * @param string $className
+	 * @param string $methodName
+	 * @return ReflectionMethod
+	 */
+	public static function getProtectedMethod($className, $methodName) {
+		$class = new ReflectionClass($className);
+		$method = $class->getMethod($methodName);
+		$method->setAccessible(true);
+		return $method;
 	}
 
 	/**

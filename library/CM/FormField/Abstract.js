@@ -14,7 +14,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 			this.error();
 			return;
 		}
-		this.ajax('validate', {'userInput': value}, {
+		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
 			success: function() {
 				if (value != this.getValue()) {
 					return false;

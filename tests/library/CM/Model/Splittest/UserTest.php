@@ -10,7 +10,7 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 		$user = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
-		$test = CM_Model_Splittest_User::create(array('name' => 'foo', 'variations' => array('v1', 'v2')));
+		$test = CM_Model_Splittest_User::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
 
 		for ($i = 0; $i < 2; $i++) {
 			$isVariationUser1 = $test->isVariationFixture($user, 'v1');
@@ -25,7 +25,7 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
 		$user2 = CMTest_TH::createUser();
 
 		/** @var CM_Model_Splittest_User $test */
-		$test = CM_Model_Splittest_User::create(array('name' => 'bar', 'variations' => array('v1')));
+		$test = CM_Model_Splittest_User::createStatic(array('name' => 'bar', 'variations' => array('v1')));
 		/** @var CM_Model_SplittestVariation $variation */
 		$variation = $test->getVariations()->getItem(0);
 

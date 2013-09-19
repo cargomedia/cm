@@ -23,6 +23,22 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 		return $this->_memcache->set($key, $data, 0, $lifeTime);
 	}
 
+	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	protected  function _getMulti(array $keys) {
+		foreach ($keys as &$key) {
+			$key = self::_getKeyArmored($key);
+		}
+		$values = $this->_memcache->get($keys);
+		$result = array();
+		foreach ($values as $key => $value) {
+			$result[$this->_extractKeyArmored($key)] = $value;
+		}
+		return $result;
+	}
+
 	protected function _get($key) {
 		$key = self::_getKeyArmored($key);
 		return $this->_memcache->get($key);
@@ -35,5 +51,20 @@ abstract class CM_Cache_Memcache extends CM_Cache_Abstract {
 
 	protected function _flush() {
 		return $this->_memcache->flush();
+	}
+
+	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	public static final function getMulti($keys) {
+		if (!static::_enabled()) {
+			return array();
+		}
+		/** @var self $cache */
+		$cache = self::getInstance();
+		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-getMulti', $keys);
+		$value = $cache->_getMulti($keys);
+		return $value;
 	}
 }

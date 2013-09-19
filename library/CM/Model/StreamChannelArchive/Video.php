@@ -100,7 +100,7 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		CM_Db_Db::delete('cm_streamChannelArchive_video', array('id' => $this->getId()));
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$streamPublish = $streamChannel->getStreamPublish();

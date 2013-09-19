@@ -25,7 +25,7 @@ class CM_PagingSourceTest extends CMTest_TestCase {
 		CM_Db_Db::delete('test', array('num' => 0));
 		$this->assertEquals(100, $source->getCount());
 		$source->clearCache();
-		$this->assertEquals(100, $source->getCount());
+		$this->assertEquals(99, $source->getCount());
 	}
 
 	public function testCache() {
