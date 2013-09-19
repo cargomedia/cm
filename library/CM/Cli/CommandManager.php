@@ -17,6 +17,9 @@ class CM_Cli_CommandManager {
 	/** @var CM_OutputStream_Interface */
 	private $_streamError;
 
+	/** @var int|null */
+	private $_hideWarnings;
+
 	public function __construct() {
 		$this->_setStreamInput(new CM_InputStream_Readline());
 		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
@@ -117,7 +120,11 @@ class CM_Cli_CommandManager {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
 		} catch (Exception $e) {
-			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e, $this->_streamError);
+			$output = $this->_streamError;
+			if ($e instanceof CM_Exception && $e->getSeverity() === CM_Exception::WARN && $this->_hideWarnings) {
+				$output = new CM_OutputStream_Null();
+			}
+			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e, $output);
 			return 1;
 		}
 	}
@@ -134,7 +141,7 @@ class CM_Cli_CommandManager {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
 		if ($quietWarnings) {
-			CM_Bootloader::getInstance()->getExceptionHandler()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
+			$this->_hideWarnings();
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());
@@ -178,5 +185,9 @@ class CM_Cli_CommandManager {
 	 */
 	private function _setStreamError(CM_OutputStream_Interface $output) {
 		$this->_streamError = $output;
+	}
+
+	private function _hideWarnings() {
+		$this->_hideWarnings = true;
 	}
 }
