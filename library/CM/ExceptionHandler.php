@@ -40,13 +40,21 @@ class CM_ExceptionHandler {
 	 * @param CM_OutputStream_Interface|null $output
 	 */
 	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
-		if (null === $output) {
-			$output = new CM_OutputStream_Stream_Output();
-		}
-		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
-			header('HTTP/1.1 500 Internal Server Error');
-		}
+		$this->_logException($exception);
+		$this->_printException($exception, $output);
+	}
 
+	/**
+	 * @param int|null $severity
+	 */
+	public function setExceptionOutputSeverityMin($severity) {
+		if (null !== $severity) {
+			$severity = (int) $severity;
+		}
+		$this->_exceptionOutputSeverityMin = $severity;
+	}
+
+	private function _logException(Exception $exception) {
 		try {
 			if ($exception instanceof CM_Exception) {
 				$log = $exception->getLog();
@@ -61,6 +69,15 @@ class CM_ExceptionHandler {
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
 			$logEntry .= $this->_formatException($exception) . PHP_EOL;
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+		}
+	}
+
+	private function _printException(Exception $exception, CM_OutputStream_Abstract $output = null) {
+		if (null === $output) {
+			$output = new CM_OutputStream_Stream_Output();
+		}
+		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
+			header('HTTP/1.1 500 Internal Server Error');
 		}
 
 		$severity = CM_Exception::ERROR;
@@ -84,16 +101,6 @@ class CM_ExceptionHandler {
 		if ($severity >= CM_Exception::ERROR) {
 			CMService_Newrelic::getInstance()->setNoticeError($exception);
 		}
-	}
-
-	/**
-	 * @param int|null $severity
-	 */
-	public function setExceptionOutputSeverityMin($severity) {
-		if (null !== $severity) {
-			$severity = (int) $severity;
-		}
-		$this->_exceptionOutputSeverityMin = $severity;
 	}
 
 	/**
