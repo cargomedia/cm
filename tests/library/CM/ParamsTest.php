@@ -153,4 +153,12 @@ class CM_ParamsTest extends CMTest_TestCase {
 		$params = new CM_Params(array('point' => 'foo'));
 		$params->getGeoPoint('point');
 	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot json_decode value `foo`
+	 */
+	public function testDecode() {
+		CM_Params::decode('foo', true);
+	}
 }
