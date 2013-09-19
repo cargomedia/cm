@@ -47,7 +47,7 @@ class CM_Process_Fork {
 			}
 			unset($this->_childPids[$pid]);
 			if ($this->_keepalive) {
-				CM_Bootloader::getInstance()->getErrorHandler()->handleException(new CM_Exception(
+				CM_Bootloader::getInstance()->getExceptionHandler()->handleException(new CM_Exception(
 					'Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN));
 				$this->_spawnChild();
 				if (!$this->_isParent) {

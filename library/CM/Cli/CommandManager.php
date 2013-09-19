@@ -117,7 +117,7 @@ class CM_Cli_CommandManager {
 			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
 		} catch (Exception $e) {
-			CM_Bootloader::getInstance()->getErrorHandler()->handleException($e, $this->_streamError);
+			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e, $this->_streamError);
 			return 1;
 		}
 	}
@@ -134,7 +134,7 @@ class CM_Cli_CommandManager {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
 		if ($quietWarnings) {
-			CM_Bootloader::getInstance()->getErrorHandler()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
+			CM_Bootloader::getInstance()->getExceptionHandler()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());

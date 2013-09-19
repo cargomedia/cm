@@ -18,8 +18,8 @@ class CM_Bootloader {
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
-	/** @var CM_ErrorHandler */
-	private $_errorHandler;
+	/** @var CM_ExceptionHandler */
+	private $_exceptionHandler;
 
 	/**
 	 * @param string      $pathRoot
@@ -33,7 +33,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
-		$this->_errorHandler = new CM_ErrorHandler();
+		$this->_exceptionHandler = new CM_ExceptionHandler();
 	}
 
 	public function defaults() {
@@ -141,19 +141,19 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return CM_ErrorHandler
+	 * @return CM_ExceptionHandler
 	 */
-	public function getErrorHandler() {
-		return $this->_errorHandler;
+	public function getExceptionHandler() {
+		return $this->_exceptionHandler;
 	}
 
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
-		set_error_handler(array($this->getErrorHandler(), 'handleErrorRaw'));
+		set_error_handler(array($this->getExceptionHandler(), 'handleErrorRaw'));
 	}
 
 	public function exceptionHandler() {
-		$errorHandler = $this->getErrorHandler();
+		$errorHandler = $this->getExceptionHandler();
 		set_exception_handler(function (Exception $exception) use ($errorHandler) {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain');

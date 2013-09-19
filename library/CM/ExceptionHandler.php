@@ -1,6 +1,6 @@
 <?php
 
-class CM_ErrorHandler {
+class CM_ExceptionHandler {
 
 	/** @var int|null */
 	private $_exceptionOutputSeverityMin;
@@ -40,11 +40,9 @@ class CM_ErrorHandler {
 	 * @param CM_OutputStream_Interface|null $output
 	 */
 	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
-
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
 		}
-
 		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
 			header('HTTP/1.1 500 Internal Server Error');
 		}
