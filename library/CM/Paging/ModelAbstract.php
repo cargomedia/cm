@@ -6,11 +6,10 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 	protected $_modelList;
 
 	/**
-	 * @return int
-	 * @throws CM_Exception_NotImplemented
+	 * @return int|null
 	 */
 	protected function _getModelType() {
-		throw new CM_Exception_NotImplemented();
+		return null;
 	}
 
 	protected function _onLoadItemsRaw(array $itemsRaw) {
@@ -24,7 +23,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 	protected function _processItem($itemRaw) {
 		$index = serialize($itemRaw);
 		if (null === ($model = $this->_modelList[$index])) {
-			throw new CM_Exception_Nonexistent('Model type:`' . $this->_getModelType() . '` id: `' . CM_Util::var_line($itemRaw) . '` has no data.');
+			throw new CM_Exception_Nonexistent('Model itemRaw: `' . CM_Util::var_line($itemRaw) . '` has no data');
 		}
 		return $model;
 	}
