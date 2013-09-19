@@ -15,11 +15,11 @@ class CM_Bootloader {
 	/** @var array|null */
 	private $_namespacePaths;
 
-	/** @var int|null */
-	private $_exceptionOutputSeverityMin;
-
 	/** @var CM_Bootloader */
 	protected static $_instance;
+
+	/** @var CM_ErrorHandler */
+	private $_errorHandler;
 
 	/**
 	 * @param string      $pathRoot
@@ -33,6 +33,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
+		$this->_errorHandler = new CM_ErrorHandler();
 	}
 
 	public function defaults() {
@@ -40,49 +41,6 @@ class CM_Bootloader {
 		mb_internal_encoding('UTF-8');
 		umask(0);
 		CMService_Newrelic::getInstance()->setConfig();
-	}
-
-	public function exceptionHandler() {
-		set_exception_handler(function (Exception $exception) {
-			if (!headers_sent()) {
-				header('Content-Type: text/plain');
-			}
-			CM_Bootloader::getInstance()->handleException($exception);
-			exit(1);
-		});
-	}
-
-	public function errorHandler() {
-		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
-		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-			$errorCodes = array(
-				E_ERROR             => 'E_ERROR',
-				E_WARNING           => 'E_WARNING',
-				E_PARSE             => 'E_PARSE',
-				E_NOTICE            => 'E_NOTICE',
-				E_CORE_ERROR        => 'E_CORE_ERROR',
-				E_CORE_WARNING      => 'E_CORE_WARNING',
-				E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
-				E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
-				E_USER_ERROR        => 'E_USER_ERROR',
-				E_USER_WARNING      => 'E_USER_WARNING',
-				E_USER_NOTICE       => 'E_USER_NOTICE',
-				E_STRICT            => 'E_STRICT',
-				E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-				E_DEPRECATED        => 'E_DEPRECATED',
-				E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
-				E_ALL               => 'E_ALL',
-			);
-			$errstr = $errorCodes[$errno] . ': ' . $errstr;
-			if (!(error_reporting() & $errno)) {
-				// This error code is not included in error_reporting
-				$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-				if ($atSign) {
-					return true;
-				}
-			}
-			throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-		});
 	}
 
 	public function constants() {
@@ -171,6 +129,41 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function getNamespacePath($namespace) {
+		$namespacePaths = $this->_getNamespacePaths();
+		if (isset($namespacePaths[$namespace])) {
+			return $namespacePaths[$namespace];
+		}
+		return '';
+	}
+
+	/**
+	 * @return CM_ErrorHandler
+	 */
+	public function getErrorHandler() {
+		return $this->_errorHandler;
+	}
+
+	public function errorHandler() {
+		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
+		set_error_handler(array($this->getErrorHandler(), 'handleErrorRaw'));
+	}
+
+	public function exceptionHandler() {
+		$errorHandler = $this->getErrorHandler();
+		set_exception_handler(function (Exception $exception) use ($errorHandler) {
+			if (!headers_sent()) {
+				header('Content-Type: text/plain');
+			}
+			$errorHandler->handleException($exception);
+			exit(1);
+		});
+	}
+
+	/**
 	 * @return array
 	 */
 	private function _getNamespacePaths() {
@@ -231,80 +224,6 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @param string $namespace
-	 * @return string
-	 */
-	public function getNamespacePath($namespace) {
-		$namespacePaths = $this->_getNamespacePaths();
-		if (isset($namespacePaths[$namespace])) {
-			return $namespacePaths[$namespace];
-		}
-		return '';
-	}
-
-	/**
-	 * @param int|null $severity
-	 */
-	public function setExceptionOutputSeverityMin($severity) {
-		if (null !== $severity) {
-			$severity = (int) $severity;
-		}
-		$this->_exceptionOutputSeverityMin = $severity;
-	}
-
-	/**
-	 * @param Exception                      $exception
-	 * @param CM_OutputStream_Interface|null $output
-	 */
-	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
-		if (null === $output) {
-			$output = new CM_OutputStream_Stream_Output();
-		}
-
-		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
-			header('HTTP/1.1 500 Internal Server Error');
-		}
-
-		try {
-			if ($exception instanceof CM_Exception) {
-				$log = $exception->getLog();
-			} else {
-				$log = new CM_Paging_Log_Error();
-			}
-			$log->add($this->_formatException($exception));
-		} catch (Exception $loggerException) {
-			$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
-			$logEntry .= '### Cannot log error: ' . PHP_EOL;
-			$logEntry .= $this->_formatException($loggerException);
-			$logEntry .= '### Original Exception: ' . PHP_EOL;
-			$logEntry .= $this->_formatException($exception) . PHP_EOL;
-			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
-		}
-
-		$severity = CM_Exception::ERROR;
-		if ($exception instanceof CM_Exception) {
-			$severity = $exception->getSeverity();
-		}
-
-		$outputEnabled = true;
-		if (null !== $this->_exceptionOutputSeverityMin) {
-			$outputEnabled = ($severity >= $this->_exceptionOutputSeverityMin);
-		}
-		if ($outputEnabled) {
-			$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
-			if ($outputVerbose) {
-				$output->writeln($this->_formatException($exception));
-			} else {
-				$output->writeln('Internal server error');
-			}
-		}
-
-		if ($severity >= CM_Exception::ERROR) {
-			CMService_Newrelic::getInstance()->setNoticeError($exception);
-		}
-	}
-
-	/**
 	 * @return CM_Bootloader
 	 * @throws Exception
 	 */
@@ -313,54 +232,5 @@ class CM_Bootloader {
 			throw new Exception('No bootloader instance');
 		}
 		return self::$_instance;
-	}
-
-	/**
-	 * @param Exception $exception
-	 * @return string
-	 */
-	private function _formatException(Exception $exception) {
-		$exceptionHeader = function(Exception $exception) {
-			return get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() . PHP_EOL . PHP_EOL;
-		};
-		try {
-			$exceptionMessage = '';
-			$trace = array_reverse($exception->getTrace());
-			array_unshift($trace, array(
-				'function' => '{main}',
-				'line'     => 0,
-				'file'     => $_SERVER['SCRIPT_FILENAME'],
-			));
-
-			$indent = strlen(count($trace)) + 4;
-			foreach ($trace as $number => $entry) {
-				$exceptionMessage .= str_pad($number, $indent, ' ', STR_PAD_LEFT) . '. ';
-				if (array_key_exists('function', $entry)) {
-					if (array_key_exists('class', $entry)) {
-						$exceptionMessage .= $entry['class'] . '->';
-					}
-					$exceptionMessage .= $entry['function'];
-					if (array_key_exists('args', $entry)) {
-						$arguments = array();
-						foreach ($entry['args'] as $argument) {
-							$arguments[] = CM_Util::varDump($argument);
-						}
-						$exceptionMessage .= '(' . implode(', ', $arguments) . ')';
-					}
-				}
-				if (array_key_exists('file', $entry)) {
-					$exceptionMessage .= ' ' . $entry['file'] . ':' . $entry['line'];
-				} else {
-					$exceptionMessage .= ' [internal function]';
-				}
-				$exceptionMessage .= PHP_EOL;
-			}
-			$output = $exceptionHeader($exception) . $exceptionMessage;
-		} catch (Exception $e) {
-			$output = $exceptionHeader($e) . $e->getTraceAsString();
-			$output .= PHP_EOL . PHP_EOL;
-			$output .= $exceptionHeader($exception) . $exception->getTraceAsString();
-		}
-		return $output;
 	}
 }
