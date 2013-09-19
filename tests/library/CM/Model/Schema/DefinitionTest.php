@@ -568,7 +568,7 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 	}
 
 	protected function _sanitizeIdRaw(array $idRaw) {
-		$_idRaw = array('id' => $idRaw['id']);
+		$_idRaw = array('id' => (int) $idRaw['id']);
 		if (isset($idRaw['foo'])) {
 			$_idRaw['foo'] = (string) $idRaw['foo'];
 		}
