@@ -442,9 +442,10 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public static function decode($value, $json = null) {
 		if ($json) {
-			$value = json_decode($value, true);
+			$valueString = (string) $value;
+			$value = json_decode($valueString, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . CM_Util::var_line($value) . '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString. '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {
