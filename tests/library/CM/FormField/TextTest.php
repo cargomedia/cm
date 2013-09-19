@@ -26,4 +26,38 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 			$form->getTagAutoId($fieldName . '-input') .
 			'" type="text" value="bar" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
 	}
+
+	public function testValidateMinLength() {
+		$field = new CM_FormField_Text(3);
+		$response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
+		$render = new CM_Render();
+		try {
+			$field->validate('foo', $response);
+		} catch (CM_Exception_FormFieldValidation $ex) {
+			$this->fail('Expected value to be long enough');
+		}
+		try {
+			$field->validate('fo', $response);
+			$this->fail('Expected value to be too short');
+		} catch (CM_Exception_FormFieldValidation $ex) {
+			$this->assertContains('Too short', $ex->getMessagePublic($render));
+		}
+	}
+
+	public function testValidateMaxLength() {
+		$field = new CM_FormField_Text(null, 3);
+		$response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
+		$render = new CM_Render();
+		try {
+			$field->validate('foo', $response);
+		} catch (CM_Exception_FormFieldValidation $ex) {
+			$this->fail('Expected value not to be too long');
+		}
+		try {
+			$field->validate('fooo', $response);
+			$this->fail('Expected value to be too long');
+		} catch (CM_Exception_FormFieldValidation $ex) {
+			$this->assertContains('Too long', $ex->getMessagePublic($render));
+		}
+	}
 }
