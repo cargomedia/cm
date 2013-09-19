@@ -101,6 +101,17 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$streamChannel->delete();
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot delete streamChannel with existing streams
+	 */
+	public function testDeleteWithPublishs() {
+		/** @var CM_Model_StreamChannel_Mock $streamChannel */
+		$streamChannel = CMTest_TH::createStreamChannel();
+		CMTest_TH::createStreamPublish(null, $streamChannel);
+		$streamChannel->delete();
+	}
+
 	public function testGetSubscribers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
