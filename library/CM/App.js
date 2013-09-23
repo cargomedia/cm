@@ -694,7 +694,11 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			try {
+				localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			} catch (e) {
+				// iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
+			}
 		},
 
 		/**
