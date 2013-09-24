@@ -8,8 +8,7 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 	 * @param string $userAgent
 	 */
 	public function __construct($userAgent) {
-		$userAgent = (string) $userAgent;
-		$this->_construct(array('id' => (string) $userAgent));
+		$this->_construct(array('id' => $userAgent));
 	}
 
 	/**
@@ -53,6 +52,10 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 			return $default;
 		}
 		return $capabilities;
+	}
+
+	protected function _setIdRaw(array $idRaw) {
+		$this->_id = array('id' => (string) $idRaw['id']);
 	}
 
 	public static function getCacheClass() {

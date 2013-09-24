@@ -12,7 +12,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public function __construct($name) {
 		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
-		$this->_construct(array('name' => (string) $name));
+		$this->_construct(array('name' => $name));
 	}
 
 	/**
@@ -212,7 +212,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $variationFixtureList[$this->getId()];
 	}
 
-	protected function _sanitizeIdRaw(array $idRaw) {
-		return array('name' => (string) $idRaw['name']);
+	protected function _setIdRaw(array $idRaw) {
+		$this->_id = array('name' => (string) $idRaw['name']);
 	}
 }

@@ -560,19 +560,19 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 	const TYPE = 1;
 
 	public function __construct($id, $foo = null) {
-		$id = array('id' => (int) $id);
+		$id = array('id' => $id);
 		if (null !== $foo) {
 			$id['foo'] = $foo;
 		}
 		$this->_construct($id);
 	}
 
-	protected function _sanitizeIdRaw(array $idRaw) {
+	protected function _setIdRaw(array $idRaw) {
 		$_idRaw = array('id' => (int) $idRaw['id']);
 		if (isset($idRaw['foo'])) {
 			$_idRaw['foo'] = (string) $idRaw['foo'];
 		}
-		return $_idRaw;
+		$this->_id = $_idRaw;
 	}
 
 	protected function _loadData() {

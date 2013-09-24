@@ -13,7 +13,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @param int $id
 	 */
 	public function __construct($level, $id) {
-		$this->_construct(array('id' => (int) $id, 'level' => (int) $level));
+		$this->_construct(array('id' => $id, 'level' => $level));
 	}
 
 	/**
@@ -183,8 +183,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return array('fields' => $fields);
 	}
 
-	protected function _sanitizeIdRaw(array $idRaw) {
-		return array('id' => (int) $idRaw['id'], 'level' => (int) $idRaw['level']);
+	protected function _setIdRaw(array $idRaw) {
+		$this->_id = array('id' => (int) $idRaw['id'], 'level' => (int) $idRaw['level']);
 	}
 
 	/**

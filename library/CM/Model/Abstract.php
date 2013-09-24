@@ -22,7 +22,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public function __construct($id = null) {
 		if (null !== $id) {
-			$id = array('id' => (int) $id);
+			$id = array('id' => $id);
 		}
 		$this->_construct($id);
 	}
@@ -38,7 +38,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$this->_autoCommit = false;
 		}
 		if (null !== $id) {
-			$this->_id = $this->_sanitizeIdRaw($id);
+			$this->_setIdRaw($id);
 		}
 		if (null !== $data) {
 			$this->_validateFields($data);
@@ -406,10 +406,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 	/**
 	 * @param array $idRaw
-	 * @return array
 	 */
-	protected function _sanitizeIdRaw(array $idRaw) {
-		return array('id' => (int) $idRaw['id']);
+	protected function _setIdRaw(array $idRaw) {
+		$this->_id = array('id' => (int) $idRaw['id']);
 	}
 
 	/**

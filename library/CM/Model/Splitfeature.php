@@ -11,7 +11,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function __construct($name) {
 		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
-		$this->_construct(array('name' => (string) $name));
+		$this->_construct(array('name' => $name));
 	}
 
 	/**
@@ -109,8 +109,8 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
-	protected function _sanitizeIdRaw(array $idRaw) {
-		return array('name' => (string) $idRaw['name']);
+	protected function _setIdRaw(array $idRaw) {
+		$this->_id = array('name' => (string) $idRaw['name']);
 	}
 
 	protected static function _createStatic(array $data) {
