@@ -17,11 +17,13 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
 	$skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
 
-	$usertext =CM_Usertext_Usertext::factory($render);
+	$usertext = CM_Usertext_Usertext::factory($render);
 	$usertext->setMode($mode, $maxLength, $isMail, $skipAnchors);
 
 	$text = $usertext->transform($text);
 
-	$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
+	if ($mode !== 'raw') {
+		$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
+	}
 	return $text;
 }
