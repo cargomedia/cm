@@ -512,6 +512,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array    $idTypeList [['type' => int, 'id' => int|array],...] | [int|array,...] Pass an array of ids if $modelType is used
 	 * @param int|null $modelType
 	 * @return CM_Model_Abstract[] Can contain null-entries when model doesn't exist
+	 * @throws CM_Exception_Invalid
 	 */
 	public static function factoryGenericMultiple(array $idTypeList, $modelType = null) {
 		$modelType = (null !== $modelType) ? (int) $modelType : null;
@@ -522,6 +523,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 
 		foreach ($idTypeList as $idType) {
 			if (null === $modelType) {
+				if (!is_array($idType)) {
+					throw new CM_Exception_Invalid('Invalid input' . CM_Util::var_line($idType));
+				}
 				$type = (int) $idType['type'];
 				$id = $idType['id'];
 			} else {
