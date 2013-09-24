@@ -1,6 +1,6 @@
 <?php
 
-class CM_ExceptionHandler {
+class CM_ExceptionHandling_Handler {
 
 	/**
 	 * @param int $code
@@ -53,19 +53,20 @@ class CM_ExceptionHandler {
 	 * @param Exception $exception
 	 */
 	private function _logException(Exception $exception) {
+		$formatter = new CM_ExceptionHandling_Formatter_Plain();
 		try {
 			if ($exception instanceof CM_Exception) {
 				$log = $exception->getLog();
 			} else {
 				$log = new CM_Paging_Log_Error();
 			}
-			$log->add($this->_formatException($exception));
+			$log->add($formatter->formatException($exception));
 		} catch (Exception $loggerException) {
 			$logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
 			$logEntry .= '### Cannot log error: ' . PHP_EOL;
-			$logEntry .= $this->_formatException($loggerException);
+			$logEntry .= $formatter->formatException($loggerException);
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
-			$logEntry .= $this->_formatException($exception) . PHP_EOL;
+			$logEntry .= $formatter->formatException($exception) . PHP_EOL;
 			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
 		}
 	}
@@ -82,65 +83,24 @@ class CM_ExceptionHandler {
 			header('HTTP/1.1 500 Internal Server Error');
 		}
 
-		$outputVerbose = IS_DEBUG || CM_Bootloader::getInstance()->isEnvironment('cli') || CM_Bootloader::getInstance()->isEnvironment('test');
-		if ($outputVerbose) {
-			$output->writeln($this->_formatException($exception));
-		} else {
+
+		$formatter = new CM_ExceptionHandling_Formatter_Plain();
+		$isHttpRequest = !CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test');
+		if ($isHttpRequest) {
+			if (!headers_sent()) {
+				header('Content-Type: text/html');
+			}
+			$formatter = new CM_ExceptionHandling_Formatter_Html();
+		}
+
+		if ($isHttpRequest && !IS_DEBUG) {
 			$output->writeln('Internal server error');
+		} else {
+			$output->writeln($formatter->formatException($exception));
 		}
 
 		if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
 			CMService_Newrelic::getInstance()->setNoticeError($exception);
 		}
-	}
-
-	/**
-	 * @param Exception $exception
-	 * @return string
-	 */
-	private function _formatException(Exception $exception) {
-		$exceptionHeader = function (Exception $exception) {
-			return get_class($exception) . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() .
-			PHP_EOL . PHP_EOL;
-		};
-		try {
-			$exceptionMessage = '';
-			$trace = array_reverse($exception->getTrace());
-			array_unshift($trace, array(
-				'function' => '{main}',
-				'line'     => 0,
-				'file'     => $_SERVER['SCRIPT_FILENAME'],
-			));
-
-			$indent = strlen(count($trace)) + 4;
-			foreach ($trace as $number => $entry) {
-				$exceptionMessage .= str_pad($number, $indent, ' ', STR_PAD_LEFT) . '. ';
-				if (array_key_exists('function', $entry)) {
-					if (array_key_exists('class', $entry)) {
-						$exceptionMessage .= $entry['class'] . '->';
-					}
-					$exceptionMessage .= $entry['function'];
-					if (array_key_exists('args', $entry)) {
-						$arguments = array();
-						foreach ($entry['args'] as $argument) {
-							$arguments[] = CM_Util::varDump($argument);
-						}
-						$exceptionMessage .= '(' . implode(', ', $arguments) . ')';
-					}
-				}
-				if (array_key_exists('file', $entry)) {
-					$exceptionMessage .= ' ' . $entry['file'] . ':' . $entry['line'];
-				} else {
-					$exceptionMessage .= ' [internal function]';
-				}
-				$exceptionMessage .= PHP_EOL;
-			}
-			$output = $exceptionHeader($exception) . $exceptionMessage;
-		} catch (Exception $e) {
-			$output = $exceptionHeader($e) . $e->getTraceAsString();
-			$output .= PHP_EOL . PHP_EOL;
-			$output .= $exceptionHeader($exception) . $exception->getTraceAsString();
-		}
-		return $output;
 	}
 }
