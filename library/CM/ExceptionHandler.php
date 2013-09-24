@@ -2,6 +2,14 @@
 
 class CM_ExceptionHandler {
 
+	/**
+	 * @param int $code
+	 * @param string $message
+	 * @param string $file
+	 * @param int $line
+	 * @return bool
+	 * @throws ErrorException
+	 */
 	public function handleErrorRaw($code, $message, $file, $line) {
 		$errorCodes = array(
 			E_ERROR             => 'E_ERROR',
