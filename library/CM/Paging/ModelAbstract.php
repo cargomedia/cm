@@ -9,6 +9,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 	 * @return int|null
 	 *
 	 * Overwrite this method if the paging source contains only ids and no type.
+	 * Must return null if type is contained in the source, else it will be treated as part of the id.
 	 */
 	protected function _getModelType() {
 		return null;
