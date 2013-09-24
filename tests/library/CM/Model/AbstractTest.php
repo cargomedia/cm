@@ -494,14 +494,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($models[4]);
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Invalid input
+	 */
 	public function testFactoryGenericMultipleInvalidInput() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
-		try {
 			CM_Model_Abstract::factoryGenericMultiple(array(array('id' => CM_ModelMock::TYPE, 'type' => 1), '1'), null);
-			$this->fail('Invalid input not caught');
-		} catch (CM_Exception_Invalid $ex) {
-			$this->assertContains('Invalid input', $ex->getMessage());
-		}
 	}
 
 	public function testFactoryGenericMultipleWithModelType() {
