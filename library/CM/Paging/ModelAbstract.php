@@ -23,7 +23,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 		}
 	}
 
-	protected function _processItem($itemRaw) {
+	final protected function _processItem($itemRaw) {
 		$index = serialize($itemRaw);
 		if (null === ($model = $this->_modelList[$index])) {
 			throw new CM_Exception_Nonexistent('Model itemRaw: `' . CM_Util::var_line($itemRaw) . '` has no data');
