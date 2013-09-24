@@ -12,13 +12,14 @@
 
 		handle: function(event) {
 			var $this = $(this);
+			var deactivateTimeout = null;
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
 				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip({trigger: 'manual'}).tooltip('show');
-				$this.data('timeoutId', setTimeout(function() {
+				deactivateTimeout = setTimeout(function() {
 					deactivateButton();
-				}, 5000));
+				}, 5000);
 				setTimeout(function() {
 					$(document).one('click.clickConfirmed', function(e) {
 						if (!$this.length || e.target !== $this[0] && !$.contains($this[0], e.target)) {
@@ -31,7 +32,7 @@
 			var deactivateButton = function() {
 				$this.removeClass('confirmClick');
 				$this.removeAttr('title').tooltip('hide');
-				clearTimeout($this.data('timeoutId'));
+				clearTimeout(deactivateTimeout);
 				$(document).off('click.clickConfirmed');
 			};
 
