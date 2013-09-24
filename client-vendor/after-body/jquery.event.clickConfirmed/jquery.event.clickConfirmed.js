@@ -15,7 +15,7 @@
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
-				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip('enable').mouseenter();
+				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip({trigger: 'manual'}).tooltip('show');
 				$this.data('timeoutId', setTimeout(function() {
 					deactivateButton();
 				}, 5000));
@@ -30,7 +30,7 @@
 
 			var deactivateButton = function() {
 				$this.removeClass('confirmClick');
-				$this.removeAttr('title').tooltip('disable').mouseleave();
+				$this.removeAttr('title').tooltip('hide');
 				clearTimeout($this.data('timeoutId'));
 				$(document).off('click.clickConfirmed');
 			};
