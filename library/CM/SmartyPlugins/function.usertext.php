@@ -3,6 +3,7 @@
 /**
  * Supported modes:
  * =====================================================
+ * escape = escape, remove badwords
  * oneline = escape, remove badwords, add emoticons
  * simple = escape, remove badwords, nl2br, add emoticons
  * markdown = escape, remove badwords, create html markdown, add emoticons
@@ -22,7 +23,7 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 
 	$text = $usertext->transform($text);
 
-	if ($mode !== 'raw') {
+	if ($mode !== 'escape') {
 		$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
 	}
 	return $text;

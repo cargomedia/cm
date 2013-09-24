@@ -30,7 +30,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null) {
-		$acceptedModes = array('raw', 'oneline', 'simple', 'markdown', 'markdownPlain');
+		$acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
 		if (!in_array($mode, $acceptedModes)) {
 			throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
 		}
@@ -43,7 +43,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 		$this->addFilter(new CM_Usertext_Filter_Badwords());
 		$this->addFilter(new CM_Usertext_Filter_Escape());
 		switch ($mode) {
-			case 'raw':
+			case 'escape':
 				break;
 			case 'oneline':
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
