@@ -3,7 +3,7 @@
 abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 
 	/** @var array */
-	protected $_modelList;
+	protected $_modelList = array();
 
 	/**
 	 * @return int|null
