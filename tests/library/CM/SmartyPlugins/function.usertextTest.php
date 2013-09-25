@@ -2,11 +2,9 @@
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext.php';
 
-class smarty_modifier_usertextTest extends CMTest_TestCase {
+class smarty_function_usertextTest extends CMTest_TestCase {
 
-	/**
-	 * @var Smarty_Internal_Template
-	 */
+	/** @var Smarty_Internal_Template */
 	private $_template;
 
 	public function setUp() {
@@ -18,6 +16,10 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CMTest_TH::clearEnv();
+	}
+
+	public function testModeEscape() {
+		$this->_assertSame('foo&lt;', array('text' => 'foo<', 'mode' => 'escape'));
 	}
 
 	public function testModeOneline() {
