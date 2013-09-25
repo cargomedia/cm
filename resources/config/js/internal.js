@@ -1,3 +1,3 @@
 cm.model.types = {"CM_Model_DeviceCapabilities":20,"CM_Model_Language":23,"CM_Model_Location":24,"CM_Model_Splitfeature":28,"CM_Model_Splittest":16,"CM_Model_SplittestVariation":17,"CM_Model_User":13,"CM_Model_Splittest_RequestClient":26,"CM_Model_Splittest_User":27,"CM_Model_Stream_Publish":21,"CM_Model_Stream_Subscribe":22,"CM_Model_StreamChannel_Message":18,"CM_Model_StreamChannel_Video":19,"CM_Model_StreamChannel_Message_User":29,"CM_Model_StreamChannelArchive_Video":25};
-cm.action.types = [];
-cm.action.verbs = [];
+cm.action.types = {"CM_Action_Email":6};
+cm.action.verbs = {"CREATE":1,"UPDATE":3,"DELETE":7,"ONLINE":9,"OFFLINE":10,"VIEW":11,"VISIBLE":12,"INVISIBLE":13,"PUBLISH":14,"UNPUBLISH":15,"SUBSCRIBE":16,"UNSUBSCRIBE":17};

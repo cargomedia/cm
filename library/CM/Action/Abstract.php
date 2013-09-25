@@ -2,18 +2,18 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
-	const CREATE = 1;
-	const UPDATE = 3;
-	const DELETE = 7;
-	const ONLINE = 9;
-	const OFFLINE = 10;
-	const VIEW = 11;
-	const VISIBLE = 12;
-	const INVISIBLE = 13;
-	const PUBLISH = 14;
-	const UNPUBLISH = 15;
-	const SUBSCRIBE = 16;
-	const UNSUBSCRIBE = 17;
+	const CREATE = 'Create';
+	const UPDATE = 'Update';
+	const DELETE = 'Delete';
+	const ONLINE = 'Online';
+	const OFFLINE = 'Offline';
+	const VIEW = 'View';
+	const VISIBLE = 'Visible';
+	const INVISIBLE = 'Invisible';
+	const PUBLISH = 'Pulish';
+	const UNPUBLISH = 'Unpublish';
+	const SUBSCRIBE = 'Subscribe';
+	const UNSUBSCRIBE = 'Unsubscribe';
 
 	/** @var CM_Model_User|int */
 	protected $_actor = null;
@@ -37,12 +37,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private $_trackingEnabled = true;
 
 	/**
-	 * @param int               $verb
+	 * @param int               $verbName
 	 * @param CM_Model_User|int $actor
 	 */
-	public final function __construct($verb, $actor) {
+	public final function __construct($verbName, $actor) {
 		$this->setActor($actor);
-		$this->_verb = (int) $verb;
+		$this->_verb = CM_Action_Abstract::getVerbByVerbName($verbName);
 	}
 
 	protected function _notify() {
@@ -269,15 +269,15 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int           $verb
+	 * @param string        $verbName
 	 * @param int           $type
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $verb, $type) {
+	public static function factory(CM_Model_User $actor, $verbName, $type) {
 		$class = self::_getClassName($type);
-		return new $class($verb, $actor);
+		return new $class($verbName, $actor);
 	}
 
 	/**
@@ -374,10 +374,26 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	static public function getVerbNameByVerb($verb) {
-		$actionVerbs = self::_getConfig()->verbs;
-		if (!array_key_exists($verb, $actionVerbs)) {
+		static $actionVerbNames;
+		if (!$actionVerbNames) {
+			$actionVerbNames = array_flip(self::_getConfig()->verbs);
+		}
+		if (!array_key_exists($verb, $actionVerbNames)) {
 			throw new CM_Exception_Invalid('The specified Action does not exist!');
 		}
-		return $actionVerbs[$verb];
+		return $actionVerbNames[$verb];
+	}
+
+	/**
+	 * @param string $name
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	static public function getVerbByVerbName($name) {
+		$actionVerbs = self::_getConfig()->verbs;
+		if (!array_key_exists($name, $actionVerbs)) {
+			throw new CM_Exception_Invalid('Action `' . $name . '` does not exist!');
+		}
+		return $actionVerbs[$name];
 	}
 }

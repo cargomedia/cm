@@ -3,6 +3,7 @@
 class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
+		CM_Config::get()->CM_Action_Abstract->verbs['foo'] = 1;
 		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
 	}
 
@@ -15,7 +16,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 	public function testConstruct() {
 		$actor = CMTest_TH::createUser();
 		/** @var CM_Action_Abstract $action */
-		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor), '', true, true, true, array('getType'));
+		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array('foo', $actor), '', true, true, true, array('getType'));
 		$action->expects($this->any())->method('getType')->will($this->returnValue(123));
 
 		$this->assertInstanceOf('CM_Action_Abstract', $action);
@@ -25,7 +26,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 		$actor = 123456; // IP address
 		/** @var CM_Action_Abstract $action */
-		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, $actor), '', true, true, true, array('getType'));
+		$action = $this->getMockForAbstractClass('CM_Action_Abstract', array('foo', $actor), '', true, true, true, array('getType'));
 		$action->expects($this->any())->method('getType')->will($this->returnValue(123));
 		$this->assertInstanceOf('CM_Action_Abstract', $action);
 		$this->assertSame(1, $action->getVerb());
@@ -33,14 +34,14 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$this->assertSame($actor, $action->getIp());
 
 		try {
-			$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, 'foo'));
-			$this->fail("Can instantiate action with actor `foo`");
+			$action = $this->getMockForAbstractClass('CM_Action_Abstract', array('foo', 'bar'));
+			$this->fail("Can instantiate action with actor `bar`");
 		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
 		}
 
 		try {
-			$action = $this->getMockForAbstractClass('CM_Action_Abstract', array(1, null));
+			$action = $this->getMockForAbstractClass('CM_Action_Abstract', array('foo', null));
 			$this->fail("Can instantiate action with actor `null`");
 		} catch (CM_Exception_Invalid $e) {
 			$this->assertTrue(true);
@@ -49,7 +50,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public function testPrepare() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 		$action->prepare();
 
 		CM_Db_Db::insert('cm_actionLimit', array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
@@ -171,7 +172,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public function testForceAllow() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 
 		CM_Db_Db::insert('cm_actionLimit', array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
 
@@ -190,19 +191,19 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public function testGetName() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 		$this->assertSame('Mock', $action->getName());
 	}
 
 	public function testGetLabel() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 		$this->assertSame('Mock Test', $action->getLabel());
 	}
 
 	public function testIsAllowed() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 		$this->assertTrue($action->isAllowed(false));
 		$this->assertFalse($action->isAllowed(true));
 	}
@@ -213,7 +214,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 	 */
 	public function testPrepareNotAllowed() {
 		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock(1, $actor);
+		$action = new CM_Action_Mock('foo', $actor);
 		$action->prepare(true);
 	}
 }
