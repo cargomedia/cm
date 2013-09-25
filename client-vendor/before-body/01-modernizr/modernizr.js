@@ -1,5 +1,5 @@
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-history-svg-touch-shiv-cssclasses-teststyles-testprop-testallprops-prefixes-domprefixes
+ * Build: http://modernizr.com/download/#-draganddrop-history-svg-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes
  */
 ;
 
@@ -85,6 +85,46 @@ window.Modernizr = (function( window, document, undefined ) {
 			return !!ret;
 
 		},
+
+
+
+		isEventSupported = (function() {
+
+			var TAGNAMES = {
+				'select': 'input', 'change': 'input',
+				'submit': 'form', 'reset': 'form',
+				'error': 'img', 'load': 'img', 'abort': 'img'
+			};
+
+			function isEventSupported( eventName, element ) {
+
+				element = element || document.createElement(TAGNAMES[eventName] || 'div');
+				eventName = 'on' + eventName;
+
+				var isSupported = eventName in element;
+
+				if ( !isSupported ) {
+					if ( !element.setAttribute ) {
+						element = document.createElement('div');
+					}
+					if ( element.setAttribute && element.removeAttribute ) {
+						element.setAttribute(eventName, '');
+						isSupported = is(element[eventName], 'function');
+
+						if ( !is(element[eventName], 'undefined') ) {
+							element[eventName] = undefined;
+						}
+						element.removeAttribute(eventName);
+					}
+				}
+
+				element = null;
+				return isSupported;
+			}
+			return isEventSupported;
+		})(),
+
+
 		_hasOwnProperty = ({}).hasOwnProperty, hasOwnProp;
 
 	if ( !is(_hasOwnProperty, 'undefined') && !is(_hasOwnProperty.call, 'undefined') ) {
@@ -196,23 +236,14 @@ window.Modernizr = (function( window, document, undefined ) {
 			props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
 			return testDOMProps(props, prefixed, elem);
 		}
-	}    tests['touch'] = function() {
-		var bool;
-
-		if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-			bool = true;
-		} else {
-			injectElementWithStyles(['@media (',prefixes.join('touch-enabled),('),mod,')','{#modernizr{top:9px;position:absolute}}'].join(''), function( node ) {
-				bool = node.offsetTop === 9;
-			});
-		}
-
-		return bool;
-	};
-	tests['history'] = function() {
+	}    tests['history'] = function() {
 		return !!(window.history && history.pushState);
 	};
-	tests['svg'] = function() {
+
+	tests['draganddrop'] = function() {
+		var div = document.createElement('div');
+		return ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div);
+	};    tests['svg'] = function() {
 		return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
 	};
 	for ( var feature in tests ) {
@@ -431,6 +462,7 @@ window.Modernizr = (function( window, document, undefined ) {
 	Modernizr._cssomPrefixes  = cssomPrefixes;
 
 
+	Modernizr.hasEvent      = isEventSupported;
 
 	Modernizr.testProp      = function(prop){
 		return testProps([prop]);
