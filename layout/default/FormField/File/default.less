@@ -41,25 +41,26 @@
 
 .dropInfo {
 	color: @colorFgShy;
+	display: none;
 
-	html.touch & {
-		display: none;
-	}
+	html.draganddrop & {
+		display: block;
 
-	.dropInfo-icon {
-		font-size: 5em;
-		line-height: 1.2;
-		color: lighten(@colorFgIcon, 30);
-		text-shadow: 1px 1px @colorBg;
-	}
+		.dropInfo-icon {
+			font-size: 5em;
+			line-height: 1.2;
+			color: lighten(@colorFgIcon, 30);
+			text-shadow: 1px 1px @colorBg;
+		}
 
-	.dropInfo-message {
-		font-size: 1.5em;
-	}
+		.dropInfo-message {
+			font-size: 1.5em;
+		}
 
-	.dropInfo-divide {
-		margin-bottom: 12px;
-		font-size: @fontSizeSmall;
+		.dropInfo-divide {
+			margin-bottom: 12px;
+			font-size: @fontSizeSmall;
+		}
 	}
 }
 
