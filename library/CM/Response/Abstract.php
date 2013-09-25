@@ -189,6 +189,15 @@ abstract class CM_Response_Abstract extends CM_Class_Abstract {
 		}
 	}
 
+	public function sendContent() {
+		echo $this->getContent();
+	}
+
+	public function send() {
+		$this->sendHeaders();
+		$this->sendContent();
+	}
+
 	/**
 	 * Enables caching by removing no-cache headers
 	 */

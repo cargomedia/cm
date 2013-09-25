@@ -27,7 +27,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		$dirBuild = $dirWork . 'build/';
-		CM_Util::exec('fontcustom', array('compile', '--nohash', '--name=icon-webfont', '--output=' . $dirBuild, $dirWork));
+		CM_Util::exec('fontcustom', array('compile', '--file-hash=false', '--font-name=icon-webfont', '--output=' . $dirBuild, $dirWork));
 
 		$cssFile = new CM_File($dirBuild . '/fontcustom.css');
 		$less = preg_replace('/url\("(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
@@ -60,7 +60,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 			$insertList[] = array(':' . $emoticon['name'] . ':', $emoticon['fileName']);
 		}
 
-		CM_Db_Db::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
+		CM_Db_Db::insertIgnore('cm_emoticon', array('code', 'file'), $insertList);
 		$this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 
 		$this->_checkEmoticonValidity();

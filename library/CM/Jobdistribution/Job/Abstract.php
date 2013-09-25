@@ -17,7 +17,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
  	 * @throws Exception
 	 */
 	private function _executeJob(CM_Params $params) {
-		CMService_Newrelic::getInstance()->startTransaction('job manager: ' . $this->_getClassName());
+		CMService_Newrelic::getInstance()->startTransaction('CM Job: ' . $this->_getClassName());
 		try {
 			$return = $this->_execute($params);
 			CMService_Newrelic::getInstance()->endTransaction();

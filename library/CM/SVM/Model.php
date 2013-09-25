@@ -40,9 +40,9 @@ class CM_SVM_Model {
 	public function addTraining($class, array $values) {
 		$class = (int) $class;
 		$values = $this->_parseValues($values);
-		CM_Db_Db::insert(TBL_CM_SVMTRAINING,
+		CM_Db_Db::insert('cm_svmtraining',
 			array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
-		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
+		CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 1));
 	}
 
 	/**
@@ -60,7 +60,7 @@ class CM_SVM_Model {
 	 */
 	public function train($autoWeight = true) {
 		$svm = new SVM();
-		$trainings = CM_Db_Db::select(TBL_CM_SVMTRAINING, array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
+		$trainings = CM_Db_Db::select('cm_svmtraining', array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
 		$classTrainings = array();
 		foreach ($trainings as $training) {
 			if (!isset($classTrainings[$training['class']])) {
@@ -86,12 +86,12 @@ class CM_SVM_Model {
 
 		$this->_model = $svm->train($problem);
 		$this->_model->save($this->_getPath());
-		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 0));
+		CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 0));
 	}
 
 	public function flush() {
-		CM_Db_Db::delete(TBL_CM_SVMTRAINING, array('svmId' => $this->getId()));
-		CM_Db_Db::replace(TBL_CM_SVM, array('id' => $this->getId(), 'trainingChanges' => 1));
+		CM_Db_Db::delete('cm_svmtraining', array('svmId' => $this->getId()));
+		CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 1));
 		$file = new CM_File($this->_getPath());
 		$file->delete();
 		$this->__construct($this->_id);
@@ -133,22 +133,22 @@ class CM_SVM_Model {
 	 */
 	public static function deleteOldTrainings($trainingsMax) {
 		$trainingsMax = (int) $trainingsMax;
-		$ids = CM_Db_Db::select(TBL_CM_SVM, 'id')->fetchAllColumn();
+		$ids = CM_Db_Db::select('cm_svm', 'id')->fetchAllColumn();
 		foreach ($ids as $id) {
-			$trainingsCount = CM_Db_Db::count(TBL_CM_SVMTRAINING, array('svmId' => $id));
+			$trainingsCount = CM_Db_Db::count('cm_svmtraining', array('svmId' => $id));
 			if ($trainingsCount > $trainingsMax) {
 				$limit = (int) ($trainingsCount - $trainingsMax);
 				$deletedCount = CM_Db_Db::exec(
-					'DELETE FROM TBL_CM_SVMTRAINING WHERE `svmId` = ? ORDER BY `createStamp` LIMIT ' . $limit, array($id))->getAffectedRows();
+					'DELETE FROM `cm_svmtraining` WHERE `svmId` = ? ORDER BY `createStamp` LIMIT ' . $limit, array($id))->getAffectedRows();
 				if ($deletedCount > 0) {
-					CM_Db_Db::replace(TBL_CM_SVM, array('id' => $id, 'trainingChanges' => 1));
+					CM_Db_Db::replace('cm_svm', array('id' => $id, 'trainingChanges' => 1));
 				}
 			}
 		}
 	}
 
 	public static function trainChanged() {
-		$ids = CM_Db_Db::select(TBL_CM_SVM, 'id', array('trainingChanges' => 1))->fetchAllColumn();
+		$ids = CM_Db_Db::select('cm_svm', 'id', array('trainingChanges' => 1))->fetchAllColumn();
 		foreach ($ids as $id) {
 			$svm = new self($id);
 			$svm->train();

@@ -27,6 +27,22 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 		return apc_fetch($key);
 	}
 
+	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	protected  function _getMulti(array $keys) {
+		foreach ($keys as &$key) {
+			$key = self::_getKeyArmored($key);
+		}
+		$values = apc_fetch($keys);
+		$result = array();
+		foreach ($values as $key => $value) {
+			$result[$this->_extractKeyArmored($key)] = $value;
+		}
+		return $result;
+	}
+
 	protected function _delete($key) {
 		$key = self::_getKeyArmored($key);
 		return apc_delete($key);
@@ -34,5 +50,20 @@ abstract class CM_Cache_Apc extends CM_Cache_Abstract {
 
 	protected function _flush() {
 		return apc_clear_cache('user');
+	}
+
+	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	public static final function getMulti($keys) {
+		if (!static::_enabled()) {
+			return array();
+		}
+		/** @var self $cache */
+		$cache = self::getInstance();
+		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-getMulti', $keys);
+		$value = $cache->_getMulti($keys);
+		return $value;
 	}
 }

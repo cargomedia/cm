@@ -12,6 +12,7 @@ $config->CM_Render->cdnResource = false;
 $config->CM_Render->cdnUserContent = false;
 
 $config->CM_Mail->send = true;
+$config->CM_Mail->mailDeliveryAgent = null;
 
 $config->CM_Site_Abstract->class = null;
 
@@ -42,7 +43,7 @@ $config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
 
 $config->CM_Cache_File->enabled = true;
 
-$config->CM_Class_Abstract->configCacheEnabled = true;
+$config->classConfigCacheEnabled = true;
 
 $config->CM_Stream_Message->enabled = true;
 $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
@@ -107,8 +108,6 @@ $config->CM_Adprovider->zones = array();
 
 $config->CM_AdproviderAdapter_Abstract->class = 'CM_AdproviderAdapter_Openx';
 $config->CM_AdproviderAdapter_Openx->host = 'www.example.dev';
-
-$config->CM_Jobdistribution_JobManager->workerCount = 5;
 
 $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhost', 'port' => 4730));
 

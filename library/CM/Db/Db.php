@@ -67,7 +67,6 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 */
 	public static function exec($sqlTemplate, array $parameters = null, $readOnly = null) {
 		$readOnly = (bool) $readOnly;
-		$sqlTemplate = self::_replaceTableConsts($sqlTemplate);
 		$client = self::_getClient($readOnly);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
 	}
@@ -180,6 +179,19 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function select($table, $fields, $where = null, $order = null) {
 		$client = self::_getClient(false);
 		$query = new CM_Db_Query_Select($client, $table, $fields, $where, $order);
+		return $query->execute();
+	}
+
+	/**
+	 * @param string       $table
+	 * @param string|array $fields     Column-name OR Column-names array
+	 * @param array[]      $whereList  Outer array-entries are combined using OR, inner arrays using AND
+	 * @param string|null  $order
+	 * @return CM_Db_Result
+	 */
+	public static function selectMultiple($table, $fields, array $whereList, $order = null) {
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $whereList, $order);
 		return $query->execute();
 	}
 
@@ -332,7 +344,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$idGuess = self::_getRandIdGuess($table, $column, $where);
 		$columnQuoted = $client->quoteIdentifier($column);
 		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
-		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted . ' DESC LIMIT 1')->fetchColumn();
+		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted .
+				' DESC LIMIT 1')->fetchColumn();
 
 		if (!$id) {
 			$id = CM_Db_Db::select($table, $column, $where)->fetchColumn();
@@ -394,15 +407,5 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$idBounds = CM_Db_Db::exec($sql)->fetch();
 		return rand($idBounds['min'], $idBounds['max']);
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private static function _replaceTableConsts($query) {
-		return preg_replace_callback('/(TBL_.+?)\b/', function ($matches) {
-			return '`' . constant($matches[1]) . '`';
-		}, $query);
 	}
 }

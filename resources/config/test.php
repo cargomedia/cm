@@ -12,7 +12,7 @@ $config->CM_Db_Db->db = $config->CM_Db_Db->db . '_test';
 $config->CM_Db_Db->serversReadEnabled = false;
 $config->CM_Db_Db->delayedEnabled = false;
 
-$config->CM_Class_Abstract->configCacheEnabled = false;
+$config->classConfigCacheEnabled = false;
 
 $config->CM_Model_DeviceCapabilities->adapter = null;
 

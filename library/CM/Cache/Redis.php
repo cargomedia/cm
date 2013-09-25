@@ -5,6 +5,7 @@
  */
 
 class CM_Cache_Redis extends CM_Cache_Abstract {
+
 	protected static $_instance;
 
 	/** @var Redis */
@@ -21,6 +22,93 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		} catch (RedisException $e) {
 			throw new CM_Exception('Cannot connect to redis server `' . $server['host'] . '` on port `' . $server['port'] . '`: ' . $e->getMessage());
 		}
+	}
+
+	/**
+	 * Add a value to a list
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function lPush($key, $value) {
+		$this->_redis->lPush($key, $value);
+	}
+
+	/**
+	 * Remove and return a value from a list
+	 *
+	 * @param string $key
+	 * @return string|null
+	 */
+	public function rPop($key) {
+		$result = $this->_redis->rPop($key);
+		if (false === $result) {
+			$result = null;
+		}
+		return $result;
+	}
+
+	/**
+	 * @param string $key
+	 * @param float  $score
+	 * @param string $value
+	 */
+	public function zAdd($key, $score, $value) {
+		$this->_redis->zAdd($key, $score, $value);
+	}
+
+	/**
+	 * @param string       $key
+	 * @param string       $start
+	 * @param string       $end
+	 * @param int|null     $count
+	 * @param int|null     $offset
+	 * @param boolean|null $returnScore
+	 * @return array
+	 */
+	public function zRangeByScore($key, $start, $end, $count = null, $offset = null, $returnScore = null) {
+		$options = array();
+		if (null !== $count || null !== $offset) {
+			$count = (null !== $count) ? (int) $count : -1;
+			$offset = (null !== $offset) ? (int) $offset : 0;
+			$options['limit'] = array($offset, $count);
+		}
+		if ($returnScore) {
+			$options['withscores'] = true;
+		}
+		return $this->_redis->zRangeByScore($key, $start, $end, $options);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function zRem($key, $value) {
+		$this->_redis->zRem($key, $value);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $start
+	 * @param string $end
+	 */
+	public function zRemRangeByScore($key, $start, $end) {
+		$this->_redis->zRemRangeByScore($key, $start, $end);
+	}
+
+	/**
+	 * @param string       $key
+	 * @param string       $start
+	 * @param string       $end
+	 * @param boolean|null $returnScore
+	 * @return array
+	 */
+	public function zPopRangeByScore($key, $start, $end, $returnScore = null) {
+		$this->_redis->multi();
+		$this->zRangeByScore($key, $start, $end, null, null, $returnScore);
+		$this->zRemRangeByScore($key, $start, $end);
+		$result = $this->_redis->exec();
+		return $result[0];
 	}
 
 	protected function _getName() {
@@ -71,26 +159,6 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
-	 * Add a value to a list
-	 *
-	 * @param string $key
-	 * @param string $value
-	 */
-	protected function _lPush($key, $value) {
-		$this->_redis->lPush($key, $value);
-	}
-
-	/**
-	 * Remove and return a value from a list
-	 *
-	 * @param string $key
-	 * @return string
-	 */
-	protected function _rPop($key) {
-		return $this->_redis->rPop($key);
-	}
-
-	/**
 	 * @param string $channel
 	 * @param string $msg
 	 */
@@ -100,7 +168,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 
 	/**
 	 * @param string|string[] $channels
-	 * @param Closure $callback
+	 * @param Closure         $callback
 	 */
 	public function subscribe($channels, Closure $callback) {
 		$channels = (array) $channels;
@@ -110,7 +178,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	}
 
 	/**
-	 * @param Redis $redis
+	 * @param Redis  $redis
 	 * @param string $channel
 	 * @param string $message
 	 */

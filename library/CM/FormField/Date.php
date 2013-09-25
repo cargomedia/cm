@@ -9,12 +9,10 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	protected $_yearMax;
 
 	/**
-	 * @param string     $field_name
-	 * @param int|null   $yearMin
-	 * @param int|null   $yearMax
+	 * @param int|null $yearMin
+	 * @param int|null $yearMax
 	 */
-	public function __construct($field_name, $yearMin = null, $yearMax = null) {
-		parent::__construct($field_name);
+	public function __construct($yearMin = null, $yearMax = null) {
 		if (null === $yearMin) {
 			$yearMin = date('Y') - 100;
 		}
@@ -47,5 +45,9 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 
 		$this->setTplParam('minYear', $this->_yearMin);
 		$this->setTplParam('maxYear', $this->_yearMax);
+	}
+
+	public function isEmpty($userInput) {
+		return empty($userInput['day']) && empty($userInput['month']) && empty($userInput['year']);
 	}
 }

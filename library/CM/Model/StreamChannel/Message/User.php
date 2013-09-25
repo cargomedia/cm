@@ -31,15 +31,15 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 
 	/**
 	 * @param CM_Model_User $user
-	 * @param string        $namespace
+	 * @param string        $event
 	 * @param mixed|null    $data
 	 */
-	public static function publish(CM_Model_User $user, $namespace, $data = null) {
+	public static function publish(CM_Model_User $user, $event, $data = null) {
 		if (!$user->getOnline()) {
 			return;
 		}
 		$streamChannel = self::getKeyByUser($user);
-		parent::publish($streamChannel, $namespace, $data);
+		parent::publish($streamChannel, $event, $data);
 	}
 
 	/**

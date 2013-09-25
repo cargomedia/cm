@@ -5,12 +5,12 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	const TYPE = 22;
 
 	public function setAllowedUntil($timeStamp) {
-		CM_Db_Db::update(TBL_CM_STREAM_SUBSCRIBE, array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_stream_subscribe', array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
 		$this->_change();
 	}
 
 	public function unsetUser() {
-		CM_Db_Db::update(TBL_CM_STREAM_SUBSCRIBE, array('userId' => null), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_stream_subscribe', array('userId' => null), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -22,12 +22,15 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_stream_subscribe', '*', array('id' => $this->getId()))->fetch();
 	}
 
 	protected function _onDelete() {
-		$this->getStreamChannel()->onUnsubscribe($this);
-		CM_Db_Db::delete(TBL_CM_STREAM_SUBSCRIBE, array('id' => $this->getId()));
+		$streamChannel = $this->getStreamChannel();
+		if ($streamChannel->isValid()) {
+			$streamChannel->onUnsubscribe($this);
+		}
+		CM_Db_Db::delete('cm_stream_subscribe', array('id' => $this->getId()));
 	}
 
 	/**
@@ -36,33 +39,44 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 	 * @return CM_Model_Stream_Subscribe|null
 	 */
 	public static function findByKeyAndChannel($key, CM_Model_StreamChannel_Abstract $channel) {
-		$id = CM_Db_Db::select(TBL_CM_STREAM_SUBSCRIBE, 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
+		$id = CM_Db_Db::select('cm_stream_subscribe', 'id', array('key' => (string) $key, 'channelId' => $channel->getId()))->fetchColumn();
 		if (!$id) {
 			return null;
 		}
 		return new static($id);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
+		$user = null;
 		$userId = null;
 		if (isset($data['user'])) {
 			/** @var CM_Model_User $user */
 			$user = $data['user'];
 			$userId = $user->getId();
 		}
+		$key = (string) $data['key'];
 		$start = (int) $data['start'];
-		$allowedUntil = null;
-		if (null !== $data['allowedUntil']) {
-			$allowedUntil = (int) $data['allowedUntil'];
-		}
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		$streamChannel = $data['streamChannel'];
-		$key = (string) $data['key'];
-		$id = CM_Db_Db::insert(TBL_CM_STREAM_SUBSCRIBE, array('userId' => $userId, 'start' => $start, 'allowedUntil' => $allowedUntil,
-			'channelId' => $streamChannel->getId(), 'key' => $key));
+
+		if (!$streamChannel->isValid()) {
+			throw new CM_Exception_Invalid('Stream channel not valid');
+		}
+
+		$allowedUntil = $streamChannel->canSubscribe($user, time());
+		if ($allowedUntil <= time()) {
+			throw new CM_Exception_NotAllowed('Not allowed to subscribe');
+		}
+
+		$id = CM_Db_Db::insert('cm_stream_subscribe', array(
+			'userId'       => $userId,
+			'start'        => $start,
+			'allowedUntil' => $allowedUntil,
+			'channelId'    => $streamChannel->getId(),
+			'key'          => $key,
+		));
 		$streamSubscribe = new self($id);
 		$streamChannel->onSubscribe($streamSubscribe);
 		return $streamSubscribe;
 	}
-
 }

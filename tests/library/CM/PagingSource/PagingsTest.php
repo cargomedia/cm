@@ -3,30 +3,28 @@
 class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		define('TBL_TEST_A', 'test_a');
-		define('TBL_TEST_B', 'test_b');
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST_A (
+		CM_Db_Db::exec('CREATE TABLE `test_a` (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <= 10; $i++) {
-			CM_Db_Db::insert(TBL_TEST_A, array('num' => $i % 5));
+			CM_Db_Db::insert('test_a', array('num' => $i % 5));
 		}
-		CM_Db_Db::exec('CREATE TABLE TBL_TEST_B (
+		CM_Db_Db::exec('CREATE TABLE `test_b` (
 						`id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
 						`num` INT(10) NOT NULL,
 						PRIMARY KEY (`id`)
 						)');
 		for ($i = 1; $i <= 5; $i++) {
-			CM_Db_Db::insert(TBL_TEST_B, array('num' => $i % 5));
+			CM_Db_Db::insert('test_b', array('num' => $i % 5));
 		}
 	}
 
 	public static function tearDownAfterClass() {
 		parent::tearDownAfterClass();
-		CM_Db_Db::exec('DROP TABLE TBL_TEST_A');
-		CM_Db_Db::exec('DROP TABLE TBL_TEST_B');
+		CM_Db_Db::exec('DROP TABLE `test_a`');
+		CM_Db_Db::exec('DROP TABLE `test_b`');
 	}
 
 	public function testCaching() {
@@ -82,7 +80,7 @@ class CM_PagingSource_PagingsTest extends CMTest_TestCase {
 class CM_Paging_A extends CM_Paging_Abstract {
 
 	public function __construct() {
-		$source = new CM_PagingSource_Sql('`id`, `num`', TBL_TEST_A);
+		$source = new CM_PagingSource_Sql('`id`, `num`', 'test_a');
 		parent::__construct($source);
 	}
 }
@@ -90,7 +88,7 @@ class CM_Paging_A extends CM_Paging_Abstract {
 class CM_Paging_B extends CM_Paging_Abstract {
 
 	public function __construct() {
-		$source = new CM_PagingSource_Sql('`id`, `num`', TBL_TEST_B);
+		$source = new CM_PagingSource_Sql('`id`, `num`', 'test_b');
 		parent::__construct($source);
 	}
 }
