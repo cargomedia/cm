@@ -48,7 +48,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getLevel() {
-		return $this->_getId('level');
+		return (int) $this->_getId('level');
 	}
 
 	/**
@@ -57,7 +57,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public function getId($level = null) {
 		if (null === $level) {
-			return $this->_getId('id');
+			return (int) $this->_getId('id');
 		}
 		$id = $this->_getField($level, 'id');
 		if (null === $id) {
@@ -181,10 +181,6 @@ class CM_Model_Location extends CM_Model_Abstract {
 			$fields[$level][$field] = $value;
 		}
 		return array('fields' => $fields);
-	}
-
-	protected function _setIdRaw(array $idRaw) {
-		$this->_id = array('id' => (int) $idRaw['id'], 'level' => (int) $idRaw['level']);
 	}
 
 	/**

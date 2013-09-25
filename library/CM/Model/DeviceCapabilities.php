@@ -54,10 +54,6 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 		return $capabilities;
 	}
 
-	protected function _setIdRaw(array $idRaw) {
-		$this->_id = array('id' => (string) $idRaw['id']);
-	}
-
 	public static function getCacheClass() {
 		return 'CM_Model_StorageAdapter_CacheLocal';
 	}

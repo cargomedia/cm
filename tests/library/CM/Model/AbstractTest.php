@@ -63,7 +63,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testConstructWithIdWithData() {
 		$data = array('foo' => 12, 'bar' => 13);
 		$id = 55;
-		$idRaw = array('id' => $id);
+		$idRaw = array('id' => (int) $id);
 		$type = 12;
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getCache', '_getPersistence'))
@@ -110,7 +110,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testCommit() {
 		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
-		$idRaw = array('id' => 909);
+		$idRaw = array('id' => '909');
 		$type = 12;
 		$data = array('foo' => 12);
 
@@ -141,7 +141,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testCommitMultipleSaves() {
 		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
-		$idRaw = array('id' => 909);
+		$idRaw = array('id' => '909');
 		$type = 12;
 		$data = array('foo' => 12);
 
@@ -166,7 +166,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testCommitWithId() {
 		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$id = 123;
-		$idRaw = array('id' => $id);
+		$idRaw = array('id' => (string) $id);
 		$data = array('foo' => 12);
 		$type = 12;
 
@@ -193,7 +193,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testCreate() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
-		$idRaw = array('id' => 1);
+		$idRaw = array('id' => '1');
 		$schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
 		$cacheable = $this->getMock('CM_Cacheable');
@@ -254,8 +254,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	public function testCreateMultiple() {
 		$data = array('foo' => 11, 'bar' => 'foo');
 		$type = 12;
-		$idRaw1 = array('id' => 1);
-		$idRaw2 = array('id' => 2);
+		$idRaw1 = array('id' => '1');
+		$idRaw2 = array('id' => '2');
 		$schema = new CM_Model_Schema_Definition(array('foo' => array(), 'bar' => array()));
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
@@ -602,7 +602,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testGetValidatePersistence() {
 		$type = 1;
-		$idRaw = array('id' => 3);
+		$idRaw = array('id' => '3');
 		$data = array('foo' => 12, 'bar' => 23);
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
@@ -629,7 +629,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testGetValidateCache() {
 		$type = 1;
-		$idRaw = array('id' => 3);
+		$idRaw = array('id' => '3');
 		$data = array('foo' => 12, 'bar' => 23);
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
@@ -650,7 +650,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testGetValidateLoadData() {
 		$type = 1;
-		$idRaw = array('id' => 3);
+		$idRaw = array('id' => '3');
 		$data = array('foo' => 12, 'bar' => 23);
 
 		$cache = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
@@ -673,7 +673,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testGetDecode() {
 		$type = 1;
-		$idRaw = array('id' => 3);
+		$idRaw = array('id' => '3');
 		$data = array('foo' => 12, 'bar' => 23);
 		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('decodeField'))->setConstructorArgs(array(array()))->getMock();
 		$schema->expects($this->once())->method('decodeField')->with('foo', 12)->will($this->returnValue(123));
@@ -696,7 +696,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testGetNonexistent() {
 		$type = 1;
-		$idRaw = array('id' => 3);
+		$idRaw = array('id' => '3');
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load'))->getMockForAbstractClass();
 		$persistence->expects($this->once())->method('load')->will($this->returnValue(false));
@@ -774,7 +774,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testSetEncodeValidate() {
 		$type = 1;
-		$idRaw = array('id' => 11);
+		$idRaw = array('id' => '11');
 		$data = array('foo' => '1', 'bar' => '2');
 		$dataEncoded = array('foo' => 1, 'bar' => 2);
 		$schema = $this->getMockBuilder('CM_Model_Schema_Definition')->setMethods(array('encodeField'))->setConstructorArgs(
@@ -807,7 +807,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testSetPersistenceSave() {
 		$type = 1;
-		$idRaw = array('id' => 11);
+		$idRaw = array('id' => '11');
 		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$data = array('foo' => 12, 'bar' => 23);
 		$dataSchema = array('foo' => 12);
@@ -831,7 +831,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	public function testSetPersistenceSaveNonschemaData() {
 		$type = 1;
-		$idRaw = array('id' => 11);
+		$idRaw = array('id' => '11');
 		$schema = new CM_Model_Schema_Definition(array('foo' => array()));
 		$data = array('bar' => 23);
 

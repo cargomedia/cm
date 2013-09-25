@@ -38,7 +38,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$this->_autoCommit = false;
 		}
 		if (null !== $id) {
-			$this->_setIdRaw($id);
+			$this->_id = self::_castIdRaw($id);
 		}
 		if (null !== $data) {
 			$this->_validateFields($data);
@@ -63,7 +63,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 			$this->_onChange();
 		} else {
-			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
+			$this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
 
 			if ($cache = $this->_getCache()) {
 				$this->_loadAssets(true);
@@ -102,7 +102,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 */
 	public function getId() {
-		return $this->_getId('id');
+		return (int) $this->_getId('id');
 	}
 
 	/**
@@ -405,13 +405,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $idRaw
-	 */
-	protected function _setIdRaw(array $idRaw) {
-		$this->_id = array('id' => (int) $idRaw['id']);
-	}
-
-	/**
 	 * @param array|null $data
 	 * @return static
 	 */
@@ -460,6 +453,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public static function getClassName($type) {
 		return self::_getClassName($type);
+	}
+
+	/**
+	 * @param array $idRaw
+	 * @return array
+	 */
+	final protected function _castIdRaw(array $idRaw) {
+		return array_map(function($el) {
+			return (string) $el;
+		}, $idRaw);
 	}
 
 	/**

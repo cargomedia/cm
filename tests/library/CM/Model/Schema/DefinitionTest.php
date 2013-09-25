@@ -535,12 +535,12 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			array(
 				'value'       => new CM_Model_Mock_Validation(2),
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
-				'returnValue' => '2',
+				'returnValue' => '"2"',
 			),
 			array(
 				'value'       => new CM_Model_Mock_Validation(4, 'bar'),
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
-				'returnValue' => '{"id":4,"foo":"bar"}',
+				'returnValue' => '{"id":"4","foo":"bar"}',
 			),
 		);
 		foreach ($testDataList as $testData) {
@@ -565,14 +565,6 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 			$id['foo'] = $foo;
 		}
 		$this->_construct($id);
-	}
-
-	protected function _setIdRaw(array $idRaw) {
-		$_idRaw = array('id' => (int) $idRaw['id']);
-		if (isset($idRaw['foo'])) {
-			$_idRaw['foo'] = (string) $idRaw['foo'];
-		}
-		$this->_id = $_idRaw;
 	}
 
 	protected function _loadData() {
