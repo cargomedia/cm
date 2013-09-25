@@ -8,7 +8,7 @@ class CM_Response_EmailTracking extends CM_Response_Abstract {
 			$user = $params->getUser('user');
 			$mailType = $params->getInt('mailType');
 
-			$action = new SK_Action_Email(SK_Action_Abstract::VIEW, $user);
+			$action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user);
 			$action->prepare();
 			$action->notify($user, $mailType);
 		} catch (CM_Exception_Nonexistent $e) {
