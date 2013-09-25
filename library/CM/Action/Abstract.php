@@ -356,6 +356,21 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		return $this->getName() . ' ' . $this->getVerbName();
 	}
 
+	protected function _track() {
+		CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+	}
+
+	/**
+	 * @param array $properties
+	 */
+	protected function _setTrackingProperties(array $properties) {
+		$this->_trackingProperties = $properties;
+	}
+
+	protected function _disableTracking() {
+		$this->_trackingEnabled = false;
+	}
+
 	/**
 	 * @param int         $type
 	 * @param string|null $className
