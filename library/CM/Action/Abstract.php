@@ -2,39 +2,30 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
-	const CREATE = 1;
-	const UPDATE = 3;
-	const DELETE = 7;
-	const ONLINE = 9;
-	const OFFLINE = 10;
-	const VIEW = 11;
-	const VISIBLE = 12;
-	const INVISIBLE = 13;
-	const PUBLISH = 14;
-	const UNPUBLISH = 15;
-	const SUBSCRIBE = 16;
-	const UNSUBSCRIBE = 17;
-
-	/** @var CM_Model_User|int */
+	/**
+	 * @var CM_Model_User|int
+	 */
 	protected $_actor = null;
 
-	/** @var int */
+	/**
+	 * @var int
+	 */
 	protected $_verb;
 
-	/** @var int|null */
+	/**
+	 * @var int|null
+	 */
 	protected $_ip = null;
 
-	/** @var array */
+	/**
+	 * @var array
+	 */
 	protected $_ignoreLogging = array();
 
-	/** @var bool */
+	/**
+	 * @var bool
+	 */
 	private $_forceAllow = false;
-
-	/** @var array */
-	private $_trackingProperties = array();
-
-	/** @var bool */
-	private $_trackingEnabled = true;
 
 	/**
 	 * @param int               $verb
@@ -51,10 +42,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
-		}
-
-		if ($this->getActor() && $this->_trackingEnabled) {
-			$this->_track();
 		}
 	}
 
