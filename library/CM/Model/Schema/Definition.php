@@ -51,9 +51,10 @@ class CM_Model_Schema_Definition {
 							/** @var CM_Model_Abstract $value */
 							$id = $value->getIdRaw();
 							if (count($id) == 1) {
-								$id = $value->getId();
+								$value = $value->getId();
+							} else {
+								$value = CM_Params::encode($id, true);
 							}
-							$value = CM_Params::encode($id, true);
 					}
 				}
 			}
