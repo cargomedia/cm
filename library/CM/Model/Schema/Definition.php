@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return mixed
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
@@ -51,7 +51,7 @@ class CM_Model_Schema_Definition {
 							/** @var CM_Model_Abstract $value */
 							$id = $value->getIdRaw();
 							if (count($id) == 1) {
-								$id = reset($id);
+								$id = $value->getId();
 							}
 							$value = CM_Params::encode($id, true);
 					}
@@ -63,7 +63,7 @@ class CM_Model_Schema_Definition {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return mixed
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
@@ -258,5 +258,4 @@ class CM_Model_Schema_Definition {
 	protected function _isString($value) {
 		return is_string($value);
 	}
-
 }

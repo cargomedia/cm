@@ -535,7 +535,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			array(
 				'value'       => new CM_Model_Mock_Validation(2),
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
-				'returnValue' => '"2"',
+				'returnValue' => '2',
 			),
 			array(
 				'value'       => new CM_Model_Mock_Validation(4, 'bar'),
