@@ -18,7 +18,17 @@
 		<div class="window {$name}">
 			<ul>
 				{foreach $value as $entry}
-					<li>{$entry}</li>
+					<li>
+						{if is_array($entry)}
+							<ul class="entryList">
+								{foreach $entry as $item}
+									<li>{$item}</li>
+								{/foreach}
+							</ul>
+						{else}
+							{$entry}
+						{/if}
+					</li>
 				{/foreach}
 			</ul>
 		</div>
