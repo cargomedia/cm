@@ -152,9 +152,30 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
+	 * @throws CM_Exception_InvalidParam
 	 * @return DateTime
 	 */
 	public function getDateTime($key) {
+		$value = $this->get($key);
+		if (is_array($value) && isset($value['date']) && isset($value['timezone_type']) && isset($value['timezone'])) {
+			$date = (string) $value['date'];
+			$timezone = (string) $value['timezone'];
+			$timezoneType = (int) $value['timezone_type'];
+			switch ($timezoneType) {
+				case 1:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 2:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 3:
+					$datetime = new DateTime($date, new DateTimeZone($timezone));
+					break;
+				default:
+					throw new CM_Exception_InvalidParam('Invalid timezone type `' . $timezoneType . '`');
+			}
+			return $datetime;
+		}
 		return $this->_getObject($key, 'DateTime');
 	}
 
