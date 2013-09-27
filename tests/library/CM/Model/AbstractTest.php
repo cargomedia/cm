@@ -847,7 +847,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		/** @var CM_Model_Abstract $modelMock */
 
 		$_construct = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_construct');
-		$_construct->invoke($modelMock, $idRaw, $data);
+		$_construct->invoke($modelMock, $idRaw, array('foo' => 'bar'));
 
 		$modelMock->_set($data);
 	}
