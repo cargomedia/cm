@@ -161,4 +161,21 @@ class CM_ParamsTest extends CMTest_TestCase {
 	public function testDecode() {
 		CM_Params::decode('foo', true);
 	}
+
+	public function testGetDateTime() {
+		$dateTimeList = array(
+			new DateTime('2012-12-12 13:00:00 +0300'),
+			new DateTime('2012-12-12 13:00:00 -0200'),
+			new DateTime('2012-12-12 13:00:00 -0212'),
+			new DateTime('2012-12-12 13:00:00 GMT'),
+			new DateTime('2012-12-12 13:00:00 GMT+2'),
+			new DateTime('2012-12-12 13:00:00 Europe/Zurich'),
+		);
+		foreach ($dateTimeList as $dateTime) {
+			$paramsArray = json_decode(json_encode(array('date' => $dateTime)), true);
+			$params = new CM_Params($paramsArray, true);
+
+			$this->assertEquals($params->getDateTime('date'), $dateTime);
+		}
+	}
 }
