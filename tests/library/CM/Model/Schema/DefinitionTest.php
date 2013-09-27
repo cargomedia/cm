@@ -564,6 +564,24 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			}
 		}
 	}
+
+	/**
+	 * @expectedException CM_Model_Exception_Validation
+	 * @expectedExceptionMessage Value `bar` is not an instance of `CM_Model_Mock_Validation2`
+	 */
+	public function testEncodeInvalidModel() {
+		$schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Model_Mock_Validation2')));
+		$schema->encodeField('foo', 'bar');
+	}
+
+	/**
+	 * @expectedException CM_Model_Exception_Validation
+	 * @expectedExceptionMessage Field `foo` is not a valid model
+	 */
+	public function testEncodeInvalidClass() {
+		$schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Class_Abstract')));
+		$schema->encodeField('foo', 'bar');
+	}
 }
 
 class CM_Model_Mock_Validation extends CM_Model_Abstract {

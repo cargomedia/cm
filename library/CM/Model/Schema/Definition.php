@@ -48,6 +48,13 @@ class CM_Model_Schema_Definition {
 							$value = $value->getTimestamp();
 							break;
 						default:
+							if (!(class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract'))) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+							}
+							if (!$value instanceof $type) {
+								throw new CM_Model_Exception_Validation(
+									'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $type . '`');
+							}
 							/** @var CM_Model_Abstract $value */
 							$id = $value->getIdRaw();
 							if (count($id) == 1) {
