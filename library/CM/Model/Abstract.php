@@ -205,9 +205,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 
 		if ($this->_autoCommit) {
-			$data = $this->_getData();
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $data);
+				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
 			}
 			if ($persistence = $this->_getPersistence()) {
 				if ($schema->isEmpty()) {
