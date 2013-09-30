@@ -14,6 +14,13 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 	/**
 	 * @return string
 	 */
+	public function getId() {
+		return $this->_getId('id');
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getUserAgent() {
 		return $this->getId();
 	}

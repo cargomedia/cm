@@ -588,7 +588,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$id = $this->_getId();
 		$array = array('_type' => $this->getType(), '_id' => $id);
 		if (array_key_exists('id', $id)) {
-			$array['id'] = $id['id'];
+			$array['id'] = (int) $id['id'];
 		}
 		return $array;
 	}
