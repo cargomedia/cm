@@ -512,7 +512,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 	/**
 	 * @expectedException CM_Exception_Invalid
-	 * @expectedExceptionMessage `idTypeList` should be an array if `modelType` is not defined
+	 * @expectedExceptionMessage `idType` should be an array if `modelType` is not defined
 	 */
 	public function testFactoryGenericMultipleInvalidInput() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
