@@ -494,9 +494,25 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($models[4]);
 	}
 
+	public function testFactoryGenericMultiple_idType() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+		$model = new CM_ModelMock3();
+		$id = 1;
+		/** @var CM_Model_StorageAdapter_Cache $cacheAdapter */
+		$_construct = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_construct');
+		$model = new CM_ModelMock3();
+		$_construct->invoke($model, array('id' => $id), array('foo' => 'bar'));
+		$cacheClass = $model->getCacheClass();
+		$cacheAdapter = new $cacheClass();
+		$cacheAdapter->save($model->getType(), array('id' => (string) $id), array('foo' => 'bar'));
+		$models = CM_Model_Abstract::factoryGenericMultiple(array($id), $model->getType());
+
+		$this->assertEquals($model, $models[0]);
+	}
+
 	/**
 	 * @expectedException CM_Exception_Invalid
-	 * @expectedExceptionMessage Invalid input
+	 * @expectedExceptionMessage `idTypeList` should be an array if `modelType` is not defined
 	 */
 	public function testFactoryGenericMultipleInvalidInput() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';

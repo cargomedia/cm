@@ -458,7 +458,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array $idRaw
 	 * @return array
 	 */
-	final protected function _castIdRaw(array $idRaw) {
+	final protected static function _castIdRaw(array $idRaw) {
 		return array_map(function($el) {
 			return (string) $el;
 		}, $idRaw);
@@ -536,6 +536,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			if (!is_array($id)) {
 				$id = array('id' => $id);
 			}
+			$id = self::_castIdRaw($id);
 			$idType = array('type' => $type, 'id' => $id);
 
 			$serializedKey = serialize($idType);
