@@ -419,7 +419,7 @@ class CM_Util {
 	 *
 	 * Measures time between two successive calls, sums up multiple measurements and tracks call count
 	 */
-	public static function benchMarkMultiple($namespace = null) {
+	public static function benchmarkMultiple($namespace = null) {
 		static $timeTotals;
 		if (!$timeTotals) {
 			$timeTotals = array();
@@ -433,7 +433,6 @@ class CM_Util {
 			$times = array();
 		}
 		$now = microtime(true) * 1000;
-		$previousValue = null;
 		$total = 0;
 		if (!array_key_exists($namespace, $callCount)) {
 			$callCount[$namespace] = 0;
@@ -450,7 +449,12 @@ class CM_Util {
 		} else {
 			$times[$namespace] = $now;
 		}
-		return sprintf('%.2f ms, called %d times', $total, $callCount[$namespace]);
+		$count = $callCount[$namespace];
+		$output = sprintf('called %d times', $count);
+		if ($count) {
+			$output .= sprintf(', Average: %.2f ms, Total: %.2f ms', $total/$count, $total);
+		}
+		return $output;
 	}
 
 	/**
