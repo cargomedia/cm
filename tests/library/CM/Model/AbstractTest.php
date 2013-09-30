@@ -546,7 +546,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 		$persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('load', 'save'))->getMockForAbstractClass();
 		$persistence->expects($this->once())->method('load')->with($type, $id)->will($this->returnValue($data));
-		$persistence->expects($this->once())->method('save')->with($type, $id, array('foo' => 15));
+		$persistence->expects($this->once())->method('save')->with($type, $id, array('foo' => 15, 'muh' => 2));
 		/** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
 
 		$model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getIdRaw', 'getType', '_getSchema'))

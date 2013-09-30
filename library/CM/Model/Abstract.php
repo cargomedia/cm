@@ -213,7 +213,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 					throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
 				}
 				if ($schema->hasField(array_keys($data))) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
 				}
 			}
 			$this->_onChange();
