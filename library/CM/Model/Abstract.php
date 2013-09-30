@@ -525,7 +525,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($idTypeList as $idType) {
 			if (null === $modelType) {
 				if (!is_array($idType)) {
-					throw new CM_Exception_Invalid('Invalid input: ' . CM_Util::var_line($idType));
+					throw new CM_Exception_Invalid('`idTypeList` should be an array if `modelType` is not defined: `' . CM_Util::var_line($idType) . '`');
 				}
 				$type = (int) $idType['type'];
 				$id = $idType['id'];
