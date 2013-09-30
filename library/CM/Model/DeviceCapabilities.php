@@ -64,4 +64,10 @@ class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 	public static function getCacheClass() {
 		return 'CM_Model_StorageAdapter_CacheLocal';
 	}
+
+	public function toArray() {
+		$array = parent::toArray();
+		$array['id'] = $this->getId();
+		return $array;
+	}
 }
