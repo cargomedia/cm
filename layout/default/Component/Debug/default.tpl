@@ -15,18 +15,18 @@
 	</div>
 
 	{foreach $stats as $name => $value}
-		<div class="window {$name}">
+		<div class="window {$name|escape}">
 			<ul>
 				{foreach $value as $entry}
 					<li>
 						{if is_array($entry)}
 							<ul class="entryList">
 								{foreach $entry as $item}
-									<li>{$item}</li>
+									<li>{$item|escape}</li>
 								{/foreach}
 							</ul>
 						{else}
-							{$entry}
+							{$entry|escape}
 						{/if}
 					</li>
 				{/foreach}
