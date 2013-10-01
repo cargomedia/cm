@@ -131,7 +131,7 @@ class CM_Model_Schema_Definition {
 		if (is_array($key)) {
 			return count(array_intersect($key, array_keys($this->_schema))) > 0;
 		}
-		return array_key_exists($key, $this->_schema);
+		return isset($this->_schema[$key]);
 	}
 
 	/**
