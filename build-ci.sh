@@ -11,8 +11,7 @@ scp -qr . ${USER}@${HOST}:${DIR}
 ssh ${USER}@${HOST} "
  cd ${DIR} &&
  composer -n install &&
- scripts/cm.php app generate-local-config local.ci
- cp resources/config/local.ci.php resources/config/local.php &&
+ scripts/cm.php app generate-local-config resources/config/local.ci.json &&
  phpunit -d display_errors=1
 "
 ssh ${USER}@${HOST} "rm -rf ${DIR}"
