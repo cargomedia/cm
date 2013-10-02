@@ -1,5 +1,5 @@
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-history-svg-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes
+ * Build: http://modernizr.com/download/#-history-svg-shiv-cssclasses
  */
 ;
 
@@ -24,15 +24,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
 		toString = {}.toString,
 
-		prefixes = ' -webkit- -moz- -o- -ms- '.split(' '),
 
-
-
-		omPrefixes = 'Webkit Moz O ms',
-
-		cssomPrefixes = omPrefixes.split(' '),
-
-		domPrefixes = omPrefixes.toLowerCase().split(' '),
 
 		ns = {'svg': 'http://www.w3.org/2000/svg'},
 
@@ -46,83 +38,6 @@ window.Modernizr = (function( window, document, undefined ) {
 
 		featureName,
 
-
-		injectElementWithStyles = function( rule, callback, nodes, testnames ) {
-
-			var style, ret, node, docOverflow,
-				div = document.createElement('div'),
-				body = document.body,
-				fakeBody = body || document.createElement('body');
-
-			if ( parseInt(nodes, 10) ) {
-				while ( nodes-- ) {
-					node = document.createElement('div');
-					node.id = testnames ? testnames[nodes] : mod + (nodes + 1);
-					div.appendChild(node);
-				}
-			}
-
-			style = ['&#173;','<style id="s', mod, '">', rule, '</style>'].join('');
-			div.id = mod;
-			(body ? div : fakeBody).innerHTML += style;
-			fakeBody.appendChild(div);
-			if ( !body ) {
-				fakeBody.style.background = '';
-				fakeBody.style.overflow = 'hidden';
-				docOverflow = docElement.style.overflow;
-				docElement.style.overflow = 'hidden';
-				docElement.appendChild(fakeBody);
-			}
-
-			ret = callback(div, rule);
-			if ( !body ) {
-				fakeBody.parentNode.removeChild(fakeBody);
-				docElement.style.overflow = docOverflow;
-			} else {
-				div.parentNode.removeChild(div);
-			}
-
-			return !!ret;
-
-		},
-
-
-
-		isEventSupported = (function() {
-
-			var TAGNAMES = {
-				'select': 'input', 'change': 'input',
-				'submit': 'form', 'reset': 'form',
-				'error': 'img', 'load': 'img', 'abort': 'img'
-			};
-
-			function isEventSupported( eventName, element ) {
-
-				element = element || document.createElement(TAGNAMES[eventName] || 'div');
-				eventName = 'on' + eventName;
-
-				var isSupported = eventName in element;
-
-				if ( !isSupported ) {
-					if ( !element.setAttribute ) {
-						element = document.createElement('div');
-					}
-					if ( element.setAttribute && element.removeAttribute ) {
-						element.setAttribute(eventName, '');
-						isSupported = is(element[eventName], 'function');
-
-						if ( !is(element[eventName], 'undefined') ) {
-							element[eventName] = undefined;
-						}
-						element.removeAttribute(eventName);
-					}
-				}
-
-				element = null;
-				return isSupported;
-			}
-			return isEventSupported;
-		})(),
 
 
 		_hasOwnProperty = ({}).hasOwnProperty, hasOwnProp;
@@ -197,15 +112,6 @@ window.Modernizr = (function( window, document, undefined ) {
 		return !!~('' + str).indexOf(substr);
 	}
 
-	function testProps( props, prefixed ) {
-		for ( var i in props ) {
-			var prop = props[i];
-			if ( !contains(prop, "-") && mStyle[prop] !== undefined ) {
-				return prefixed == 'pfx' ? prop : true;
-			}
-		}
-		return false;
-	}
 
 	function testDOMProps( props, obj, elem ) {
 		for ( var i in props ) {
@@ -223,20 +129,7 @@ window.Modernizr = (function( window, document, undefined ) {
 		}
 		return false;
 	}
-
-	function testPropsAll( prop, prefixed, elem ) {
-
-		var ucProp  = prop.charAt(0).toUpperCase() + prop.slice(1),
-			props   = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
-
-		if(is(prefixed, "string") || is(prefixed, "undefined")) {
-			return testProps(props, prefixed);
-
-		} else {
-			props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
-			return testDOMProps(props, prefixed, elem);
-		}
-	}    tests['history'] = function() {
+	tests['history'] = function() {
 		return !!(window.history && history.pushState);
 	};
 	tests['svg'] = function() {
@@ -453,21 +346,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
 	Modernizr._version      = version;
 
-	Modernizr._prefixes     = prefixes;
-	Modernizr._domPrefixes  = domPrefixes;
-	Modernizr._cssomPrefixes  = cssomPrefixes;
-
-
-	Modernizr.hasEvent      = isEventSupported;
-
-	Modernizr.testProp      = function(prop){
-		return testProps([prop]);
-	};
-
-	Modernizr.testAllProps  = testPropsAll;
-
-
-	Modernizr.testStyles    = injectElementWithStyles;    docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
+	docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2') +
 
 		(enableClasses ? ' js ' + classes.join(' ') : '');
 
