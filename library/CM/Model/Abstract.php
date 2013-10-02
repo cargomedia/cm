@@ -489,9 +489,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param int        $type
-	 * @param array      $id
-	 * @param array|null $data
+	 * @param int          $type
+	 * @param array        $id
+	 * @param array|null   $data
+	 * @param boolean|null $dataFromPersistence
 	 * @return CM_Model_Abstract
 	 */
 	final public static function factoryGeneric($type, array $id, array $data = null, $dataFromPersistence = null) {
@@ -503,13 +504,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$serialized = serialize(array($id, $data));
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
-		if (null !== $data) {
+		if ((null !== $data) && $dataFromPersistence && $cache = $model->_getCache()) {
 			$model->_loadAssets(true);
-			if ($dataFromPersistence) {
-				if ($cache = $model->_getCache()) {
-					$cache->save($model->getType(), $model->getIdRaw(), $model->_getData());
-				}
-			}
+			$cache->save($model->getType(), $model->getIdRaw(), $model->_getData());
 		}
 		return $model;
 	}
