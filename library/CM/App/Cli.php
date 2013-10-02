@@ -56,6 +56,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		CM_File::create($targetPath . 'local.php', $sourceCode);
 	}
 
+	public function setDeployVersion() {
+		$sourceCode = '<?php' . PHP_EOL . '$config->deployVersion = ' . time() . ';';
+		CM_File::create(DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'deploy.php', $sourceCode);
+	}
+
 	public static function getPackageName() {
 		return 'app';
 	}

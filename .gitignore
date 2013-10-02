@@ -3,5 +3,6 @@
 
 /data
 /resources/config/local.php
+/resources/config/deploy.php
 /tmp
 /tests/tmp
