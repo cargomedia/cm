@@ -52,8 +52,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$sourceFile = new CM_File($sourcePath);
 		$generator = new CM_Config_Generator($sourceFile);
 		$sourceCode = $generator->generateOutput();
-		$targetPath = DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
-		CM_File::create($targetPath . 'local.php', $sourceCode);
+		$targetPath = DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.php';
+		CM_File::create($targetPath, $sourceCode);
 	}
 
 	public function setDeployVersion() {
