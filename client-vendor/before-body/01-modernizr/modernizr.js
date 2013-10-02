@@ -1,5 +1,5 @@
 /* Modernizr 2.6.2 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-draganddrop-history-svg-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes
+ * Build: http://modernizr.com/download/#-history-svg-shiv-cssclasses-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes
  */
 ;
 
@@ -239,11 +239,7 @@ window.Modernizr = (function( window, document, undefined ) {
 	}    tests['history'] = function() {
 		return !!(window.history && history.pushState);
 	};
-
-	tests['draganddrop'] = function() {
-		var div = document.createElement('div');
-		return ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div);
-	};    tests['svg'] = function() {
+	tests['svg'] = function() {
 		return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
 	};
 	for ( var feature in tests ) {
