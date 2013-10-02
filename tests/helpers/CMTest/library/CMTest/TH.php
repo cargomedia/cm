@@ -21,7 +21,7 @@ class CMTest_TH {
 		// Reset environment
 		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
-//		self::randomizeAutoincrement();
+		self::randomizeAutoincrement();
 		self::timeInit();
 
 		self::$initialized = true;
