@@ -12,6 +12,7 @@ ssh ${USER}@${HOST} "
  cd ${DIR} &&
  composer -n install &&
  scripts/cm.php app generate-local-config resources/config/local.ci.json &&
+ scripts/cm.php app set-deploy-version &&
  phpunit -d display_errors=1
 "
 ssh ${USER}@${HOST} "rm -rf ${DIR}"
