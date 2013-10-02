@@ -57,7 +57,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 /**
  * @param CM_Render             $render
  * @param string|null           $urlPage
- * @param array|null            $urlParams
+ * @param array                 $urlParams
  * @param CM_Component_Abstract $component
  * @param int                   $page
  * @param string                $text
@@ -65,7 +65,7 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
  * @param string|null           $class
  * @return string
  */
-function _smarty_function_paging_link($render, $urlPage = null, $urlParams = null, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
+function _smarty_function_paging_link(CM_Render $render, $urlPage = null, array $urlParams, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
 	if ($ajax) {
 		$href = 'javascript:;';
 		$onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';
