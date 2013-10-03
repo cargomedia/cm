@@ -53,7 +53,7 @@ class CM_ExceptionHandling_Handler {
 	/**
 	 * @param Exception $exception
 	 */
-	private function _logException(Exception $exception) {
+	protected function _logException(Exception $exception) {
 		$formatter = new CM_ExceptionHandling_Formatter_Plain();
 		try {
 			if ($exception instanceof CM_Exception) {
@@ -77,7 +77,7 @@ class CM_ExceptionHandling_Handler {
 	 * @param CM_OutputStream_Abstract|null                $output
 	 * @param CM_ExceptionHandling_Formatter_Abstract|null $formatter
 	 */
-	private function _printException(Exception $exception, CM_OutputStream_Abstract $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
+	protected function _printException(Exception $exception, CM_OutputStream_Abstract $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
 		}
