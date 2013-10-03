@@ -1,0 +1,45 @@
+{
+	"Redis": {
+		"server": {
+			"host": "10.10.10.100",
+			"port": 6379
+		}
+	},
+	"Search": {
+		"servers": [{
+			"host": "10.10.10.105",
+			"port": 9200
+		}]
+	},
+	"Memcache": {
+		"servers": [{
+			"host": "10.10.10.100",
+			"port": 11211
+		}]
+	},
+	"Database": {
+		"db": "skadate",
+		"username": "skadate",
+		"password": "k290DSkjsfiE02sDjj",
+		"server": {
+			"host": "10.10.10.101",
+			"port": 3306
+		},
+		"serversRead": [{
+			"host": "127.0.0.1",
+			"port": 4040
+		}]
+	},
+	"JobWorker": {
+		"servers": [{
+			"host": "localhost",
+			"port": 4730
+		}]
+	},
+	"Job": {
+		"servers": [{
+			"host": "localhost",
+			"port": 4730
+		}]
+	}
+}
