@@ -60,7 +60,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	 * @param int|null $deployVersion
 	 */
 	public function setDeployVersion($deployVersion = null) {
-		$deployVersion = null !== $deployVersion ? (int) $deployVersion : time();
+		$deployVersion = (null !== $deployVersion) ? (int) $deployVersion : time();
 		$sourceCode = '<?php' . PHP_EOL . '$config->deployVersion = ' . $deployVersion . ';';
 		$targetPath = DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'deploy.php';
 		CM_File::create($targetPath, $sourceCode);
