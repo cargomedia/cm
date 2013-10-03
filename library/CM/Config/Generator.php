@@ -18,7 +18,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
 	public function generateOutput() {
 		$entryList = CM_Params::decode($this->_source->read(), true);
 		$output = '<?php' . PHP_EOL;
-		$mapping = $this->_getMapping();
+		$mapping = new CM_Config_Mapping();
 		foreach ($entryList as $key => $value) {
 			if (is_array($value)) {
 				$keyMapped = $mapping->getConfigKey($key);
@@ -30,12 +30,5 @@ class CM_Config_Generator extends CM_Class_Abstract {
 			}
 		}
 		return $output;
-	}
-
-	/**
-	 * @return CM_Config_Mapping
-	 */
-	protected function _getMapping() {
-		return CM_Config_Mapping::factory();
 	}
 }

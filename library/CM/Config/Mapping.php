@@ -8,11 +8,29 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getConfigKey($key) {
-		$mapping = $this->_getMapping();
+		$mapping = $this->getMapping();
 		if (!array_key_exists($key, $mapping)) {
 			throw new CM_Exception_Invalid('There is no mapping for `' . $key . '`');
 		}
 		return $mapping[$key];
+	}
+
+	/**
+	 * @return array
+	 * @throws CM_Exception_Invalid
+	 */
+	final public function getMapping() {
+		$mapping = $this->_getMapping();
+		foreach (self::getClassChildren() as $childClass) {
+			/** @var $child  */
+			$child = new $childClass();
+			$mappingChild = $child->_getMapping();
+			if ($duplicateKeys = array_intersect_key($mapping, $mappingChild)) {
+				throw new CM_Exception_Invalid("Duplicate keys `" . implode(', ', $duplicateKeys) . '` found in `' . $childClass . '`');
+			}
+			$mapping = array_merge($mapping, $mappingChild);
+		}
+		return $mapping;
 	}
 
 	/**
@@ -36,13 +54,4 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 			'Job' => 'CM_Jobdistribution_Job_Abstract'
 		);
 	}
-
-	/**
-	 * @return CM_Config_Mapping
-	 */
-	public static function factory() {
-		$className = self::_getClassName();
-		return new $className();
-	}
-
 }
