@@ -113,10 +113,10 @@ $config->CM_Jobdistribution_JobWorker->servers = array(array('host' => 'localhos
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 $config->CM_Jobdistribution_Job_Abstract->servers = array(array('host' => 'localhost', 'port' => 4730));
 
+$config->CM_Config_Mapping->class = 'CM_Config_Mapping';
+
 $config->CMService_Amazon_Abstract->accessKey = '';
 $config->CMService_Amazon_Abstract->secretKey = '';
 
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
-
-$config->CM_Config_Mapping->class = 'CM_Config_Mapping';
