@@ -50,9 +50,9 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
 
 	/**
 	 * @expectedException ErrorException
-	 * @expectedExceptionMessage Raw error message
+	 * @expectedExceptionMessage E_USER_ERROR: Raw error message
 	 */
 	public function testHandleErrorRaw() {
-		trigger_error('Raw error message');
+		trigger_error('Raw error message', E_USER_ERROR);
 	}
 }
