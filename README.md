@@ -187,7 +187,7 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php app generate-config
+./scripts/cm.php app generate-config-internal
 ```
 
 ### Namespace creation, site setup
