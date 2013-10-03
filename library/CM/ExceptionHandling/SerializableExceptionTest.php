@@ -71,6 +71,5 @@ class CM_ExceptionHandling_SerializableExceptionTest extends CMTest_TestCase {
 		$this->assertSame('CM_Exception', $serializableException->getClass());
 		$this->assertSame(__FILE__, $serializableException->getFile());
 		$this->assertInternalType('int', $serializableException->getLine());
-
 	}
 }
