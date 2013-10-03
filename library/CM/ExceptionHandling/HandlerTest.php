@@ -47,4 +47,12 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
 		$exceptionHandler = new CM_ExceptionHandling_Handler();
 		$method->invoke($exceptionHandler, $exception, $output, $formatter);
 	}
+
+	/**
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Raw error message
+	 */
+	public function testHandleErrorRaw() {
+		trigger_error('Raw error message');
+	}
 }
