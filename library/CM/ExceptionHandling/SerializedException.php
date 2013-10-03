@@ -1,6 +1,6 @@
 <?php
 
-class CM_ExceptionHandling_SerializedException {
+class CM_ExceptionHandling_SerializableException {
 
 	/** @var string */
 	public $class;

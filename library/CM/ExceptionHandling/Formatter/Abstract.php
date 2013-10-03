@@ -7,14 +7,14 @@ abstract class CM_ExceptionHandling_Formatter_Abstract {
 	 * @return string
 	 */
 	public function formatException(Exception $exception) {
-		return $this->format(new CM_ExceptionHandling_SerializedException($exception));
+		return $this->format(new CM_ExceptionHandling_SerializableException($exception));
 	}
 
 	/**
-	 * @param CM_ExceptionHandling_SerializedException $exception
+	 * @param CM_ExceptionHandling_SerializableException $exception
 	 * @return string
 	 */
-	public function format(CM_ExceptionHandling_SerializedException $exception) {
+	public function format(CM_ExceptionHandling_SerializableException $exception) {
 		$header = $this->getHeader($exception);
 		if (null !== $exception->trace) {
 			$trace = $this->getTrace($exception);
@@ -25,14 +25,14 @@ abstract class CM_ExceptionHandling_Formatter_Abstract {
 	}
 
 	/**
-	 * @param CM_ExceptionHandling_SerializedException $exception
+	 * @param CM_ExceptionHandling_SerializableException $exception
 	 * @return string
 	 */
-	abstract public function getHeader(CM_ExceptionHandling_SerializedException $exception);
+	abstract public function getHeader(CM_ExceptionHandling_SerializableException $exception);
 
 	/**
-	 * @param CM_ExceptionHandling_SerializedException $exception
+	 * @param CM_ExceptionHandling_SerializableException $exception
 	 * @return string
 	 */
-	abstract public function getTrace(CM_ExceptionHandling_SerializedException $exception);
+	abstract public function getTrace(CM_ExceptionHandling_SerializableException $exception);
 }

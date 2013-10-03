@@ -2,11 +2,11 @@
 
 class CM_ExceptionHandling_Formatter_Plain extends CM_ExceptionHandling_Formatter_Abstract {
 
-	public function getHeader(CM_ExceptionHandling_SerializedException $exception) {
+	public function getHeader(CM_ExceptionHandling_SerializableException $exception) {
 		return $exception->getClass() . ': ' . $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine() . PHP_EOL;
 	}
 
-	public function getTrace(CM_ExceptionHandling_SerializedException $exception) {
+	public function getTrace(CM_ExceptionHandling_SerializableException $exception) {
 		$traceString = '';
 		$indent = strlen(count($exception->trace)) + 4;
 		foreach ($exception->trace as $number => $entry) {
