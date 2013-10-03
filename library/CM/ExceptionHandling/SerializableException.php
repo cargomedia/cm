@@ -86,7 +86,7 @@ class CM_ExceptionHandling_SerializableException {
 				'file'     => $_SERVER['SCRIPT_FILENAME'],
 			);
 			foreach (array_reverse($exception->getTrace()) as $row) {
-				$trace[] = $this->_extractTraceRow($row);
+				$trace[] = self::_extractTraceRow($row);
 			}
 			$this->trace = $trace;
 		} catch (Exception $e) {
@@ -99,7 +99,7 @@ class CM_ExceptionHandling_SerializableException {
 	 * @param array $row
 	 * @return array
 	 */
-	private function _extractTraceRow($row) {
+	protected static function _extractTraceRow($row) {
 		$traceEntry = array();
 		$code = '';
 		if (array_key_exists('function', $row)) {
