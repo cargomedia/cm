@@ -226,7 +226,7 @@ Options:
  --non-interactive
 
 Commands:
- app generate-config
+ app generate-config-internal
  app fill-cache
  console interactive
  css icon-refresh
