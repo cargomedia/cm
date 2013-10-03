@@ -46,11 +46,10 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param CM_File|string $sourcePath
+	 * @param CM_File $sourcePath
 	 */
-	public function generateConfigLocal($sourcePath) {
-		$sourceFile = new CM_File($sourcePath);
-		$generator = new CM_Config_Generator($sourceFile);
+	public function generateConfigLocal(CM_File $sourcePath) {
+		$generator = new CM_Config_Generator($sourcePath);
 		$sourceCode = $generator->generateOutput();
 		$targetPath = DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.php';
 		CM_File::create($targetPath, $sourceCode);
