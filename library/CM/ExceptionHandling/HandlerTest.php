@@ -33,4 +33,18 @@ class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
 		$this->assertContains('### Cannot log error: ', $logContents);
 		$this->assertContains('### Original Exception: ', $logContents);
 	}
+
+	public function testPrintException() {
+		$exception = new CM_Exception('foo');
+
+		$formatter = $this->getMockBuilder('CM_ExceptionHandling_Formatter_Abstract')->setMethods(array('formatException'))->getMockForAbstractClass();
+		$formatter->expects($this->once())->method('formatException')->with($exception)->will($this->returnValue('bar'));
+
+		$output = $this->getMockBuilder('CM_OutputStream_Abstract')->setMethods(array('writeln'))->getMockForAbstractClass();
+		$output->expects($this->once())->method('writeln')->with('bar');
+
+		$method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler', '_printException');
+		$exceptionHandler = new CM_ExceptionHandling_Handler();
+		$method->invoke($exceptionHandler, $exception, $output, $formatter);
+	}
 }
