@@ -3,10 +3,10 @@
 class CM_ExceptionHandling_Handler {
 
 	/**
-	 * @param int $code
+	 * @param int    $code
 	 * @param string $message
 	 * @param string $file
-	 * @param int $line
+	 * @param int    $line
 	 * @return bool
 	 * @throws ErrorException
 	 */
@@ -41,12 +41,13 @@ class CM_ExceptionHandling_Handler {
 	}
 
 	/**
-	 * @param Exception                      $exception
-	 * @param CM_OutputStream_Interface|null $output
+	 * @param Exception                                    $exception
+	 * @param CM_OutputStream_Interface|null               $output
+	 * @param CM_ExceptionHandling_Formatter_Abstract|null $formatter
 	 */
-	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null) {
+	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
 		$this->_logException($exception);
-		$this->_printException($exception, $output);
+		$this->_printException($exception, $output, $formatter);
 	}
 
 	/**
@@ -72,25 +73,27 @@ class CM_ExceptionHandling_Handler {
 	}
 
 	/**
-	 * @param Exception                $exception
-	 * @param CM_OutputStream_Abstract $output
+	 * @param Exception                                    $exception
+	 * @param CM_OutputStream_Abstract|null                $output
+	 * @param CM_ExceptionHandling_Formatter_Abstract|null $formatter
 	 */
-	private function _printException(Exception $exception, CM_OutputStream_Abstract $output = null) {
+	private function _printException(Exception $exception, CM_OutputStream_Abstract $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
 		if (null === $output) {
 			$output = new CM_OutputStream_Stream_Output();
 		}
-		if (!CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test')) {
-			header('HTTP/1.1 500 Internal Server Error');
-		}
 
-
-		$formatter = new CM_ExceptionHandling_Formatter_Plain();
 		$isHttpRequest = !CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test');
 		if ($isHttpRequest) {
 			if (!headers_sent()) {
+				header('HTTP/1.1 500 Internal Server Error');
 				header('Content-Type: text/html');
 			}
-			$formatter = new CM_ExceptionHandling_Formatter_Html();
+			if (null === $formatter) {
+				$formatter = new CM_ExceptionHandling_Formatter_Html();
+			}
+		}
+		if (null === $formatter) {
+			$formatter = new CM_ExceptionHandling_Formatter_Plain();
 		}
 
 		if ($isHttpRequest && !IS_DEBUG) {
