@@ -57,11 +57,11 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param int|null $deployStamp
+	 * @param int|null $deployVersion
 	 */
-	public function setDeployVersion($deployStamp = null) {
-		$deployStamp = null !== $deployStamp ? (int) $deployStamp : time();
-		$sourceCode = '<?php' . PHP_EOL . '$config->deployVersion = ' . $deployStamp . ';';
+	public function setDeployVersion($deployVersion = null) {
+		$deployVersion = null !== $deployVersion ? (int) $deployVersion : time();
+		$sourceCode = '<?php' . PHP_EOL . '$config->deployVersion = ' . $deployVersion . ';';
 		CM_File::create(DIR_ROOT . 'resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'deploy.php', $sourceCode);
 	}
 
