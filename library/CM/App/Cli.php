@@ -16,6 +16,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function deploy() {
 		$this->setup();
+		$this->setDeployVersion();
 
 		$dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput());
 		$dbCli->runUpdates();
