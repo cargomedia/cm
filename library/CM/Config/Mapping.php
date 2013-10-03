@@ -22,7 +22,7 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 	final public function getMapping() {
 		$mapping = $this->_getMapping();
 		foreach (self::getClassChildren() as $childClass) {
-			/** @var $child  */
+			/** @var CM_Config_Mapping $child  */
 			$child = new $childClass();
 			$mappingChild = $child->_getMapping();
 			if ($duplicateKeys = array_intersect_key($mapping, $mappingChild)) {
