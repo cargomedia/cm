@@ -6,7 +6,6 @@ $config->dirTmp = null;
 $config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
-$config->deployVersion = 1;
 
 $config->CM_Render->cdnResource = false;
 $config->CM_Render->cdnUserContent = false;
