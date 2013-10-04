@@ -37,7 +37,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private $_trackingEnabled = true;
 
 	/**
-	 * @param int               $verbName
+	 * @param string            $verbName
 	 * @param CM_Model_User|int $actor
 	 */
 	public final function __construct($verbName, $actor) {
@@ -346,7 +346,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return string
 	 */
 	public function getName() {
-		return self::getNameByType($this->getType(), $this->_getClassName());
+		return self::getNameByClassName($this->_getClassName());
 	}
 
 	/**
@@ -372,14 +372,19 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int         $type
-	 * @param string|null $className
+	 * @param int $type
 	 * @return string
 	 */
-	static public function getNameByType($type, $className = null) {
-		if (!$className) {
-			$className = self::_getClassName($type);
-		}
+	static public function getNameByType($type) {
+		$className = self::_getClassName($type);
+		return self::getNameByClassName($className);
+	}
+
+	/**
+	 * @param string $className
+	 * @return string
+	 */
+	static public function getNameByClassName($className) {
 		return str_replace('_', ' ', str_replace(CM_Util::getNamespace($className) . '_Action_', '', $className));
 	}
 
