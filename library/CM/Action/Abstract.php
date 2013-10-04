@@ -264,7 +264,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	public static function fromArray(array $data) {
-		return self::factory($data['actor'], $data['verb'], $data['type']);
+		$verb = CM_Action_Abstract::getVerbNameByVerb($data['verb']);
+		return self::factory($data['actor'], $verb, $data['type']);
 	}
 
 	/**
