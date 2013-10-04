@@ -395,10 +395,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	static public function getVerbNameByVerb($verb) {
-		static $actionVerbNames;
-		if (!$actionVerbNames) {
-			$actionVerbNames = array_flip(self::_getConfig()->verbs);
-		}
+		$actionVerbNames = array_flip(self::_getConfig()->verbs);
 		if (!array_key_exists($verb, $actionVerbNames)) {
 			throw new CM_Exception_Invalid('The specified Action does not exist!');
 		}
