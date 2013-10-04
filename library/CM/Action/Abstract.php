@@ -406,7 +406,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param string $name
-	 * @return string
+	 * @return int
 	 * @throws CM_Exception_Invalid
 	 */
 	static public function getVerbByVerbName($name) {
