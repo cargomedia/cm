@@ -242,6 +242,17 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
+	 * @return array array($subject, $html, $text)
+	 */
+	public function render() {
+		$language = null;
+		if ($this->_recipient) {
+			$language = $this->_recipient->getLanguage();
+		}
+		return $this->_render($language);
+	}
+
+	/**
 	 * @param boolean|null $delayed
 	 * @return array|null  array($subject, $html, $text)
 	 * @throws CM_Exception_Invalid
@@ -254,11 +265,7 @@ class CM_Mail extends CM_View_Abstract {
 		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
 			return null;
 		}
-		$language = null;
-		if ($this->_recipient) {
-			$language = $this->_recipient->getLanguage();
-		}
-		list($subject, $html, $text) = $this->_render($language);
+		list($subject, $html, $text) = $this->render();
 		if ($delayed) {
 			$this->_queue($subject, $text, $html);
 		} else {
