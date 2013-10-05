@@ -68,7 +68,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			always: function(e, data) {
 				inProgressCount--;
 				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
-					field.trigger("uploadComplete");
+					field.trigger("uploadComplete", data.files);
 				}
 			}
 		});
