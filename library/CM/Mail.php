@@ -254,22 +254,27 @@ class CM_Mail extends CM_View_Abstract {
 
 	/**
 	 * @param boolean|null $delayed
-	 * @return array|null  array($subject, $html, $text)
+	 * @param boolean|null $renderRequired
 	 * @throws CM_Exception_Invalid
+	 * @return array|null  array($subject, $html, $text)
 	 */
-	public function send($delayed = null) {
+	public function send($delayed = null, $renderRequired = null) {
 		$delayed = (boolean) $delayed;
 		if (empty($this->_to)) {
 			throw new CM_Exception_Invalid('No recipient specified.');
 		}
-		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
+		$verificationMissing = $this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified();
+		if ($verificationMissing && !$renderRequired) {
 			return null;
 		}
+
 		list($subject, $html, $text) = $this->render();
-		if ($delayed) {
-			$this->_queue($subject, $text, $html);
-		} else {
-			$this->_send($subject, $text, $html);
+		if (!$verificationMissing) {
+			if ($delayed) {
+				$this->_queue($subject, $text, $html);
+			} else {
+				$this->_send($subject, $text, $html);
+			}
 		}
 		return array($subject, $html, $text);
 	}
