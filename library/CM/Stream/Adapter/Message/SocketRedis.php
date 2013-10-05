@@ -234,6 +234,6 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 	 * @param CM_Exception $exception
 	 */
 	protected function _handleException(CM_Exception $exception) {
-		CM_Bootloader::getInstance()->handleException($exception);
+		CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
 	}
 }
