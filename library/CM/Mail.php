@@ -243,7 +243,7 @@ class CM_Mail extends CM_View_Abstract {
 
 	/**
 	 * @param boolean|null $delayed
-	 * @return array|null  ($subject, $html, $text)
+	 * @return array|null  array($subject, $html, $text)
 	 * @throws CM_Exception_Invalid
 	 */
 	public function send($delayed = null) {
@@ -306,10 +306,17 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	private function _queue($subject, $text, $html) {
-		CM_Db_Db::insert('cm_mail', array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
-											'sender'  => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()),
-											'to'      => serialize($this->getTo()),
-											'cc'      => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
+		CM_Db_Db::insert('cm_mail', array(
+			'subject'     => $subject,
+			'text'        => $text,
+			'html'        => $html,
+			'createStamp' => time(),
+			'sender'      => serialize($this->getSender()),
+			'replyTo'     => serialize($this->getReplyTo()),
+			'to'          => serialize($this->getTo()),
+			'cc'          => serialize($this->getCc()),
+			'bcc'         => serialize($this->getBcc()),
+		));
 	}
 
 	private function _log($subject, $text) {
@@ -358,7 +365,7 @@ class CM_Mail extends CM_View_Abstract {
 
 	/**
 	 * @param CM_Model_Language|null $language
-	 * @return string
+	 * @return array array($subject, $html, $text)
 	 */
 	protected function _render($language) {
 		$render = new CM_Render($this->_site, $this->_recipient, $language);
