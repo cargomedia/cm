@@ -62,7 +62,8 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			if (!isset($socketRedisStatus[$statusChannelKey])) {
 				try {
 					$channel->delete();
-				} catch (CM_Db_Exception $e) {
+				} catch (CM_Exception_Invalid $e) {
+					// For cases when streamSubscribe has been added to this streamChannel in midtime
 				}
 			} else {
 				$channelsPersistenceArray[$statusChannelKey] = $channel;

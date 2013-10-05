@@ -471,28 +471,22 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		confirm: function(question, callback, context) {
-			if (Modernizr.touch) {
-				if (window.confirm(question)) {
-					callback.call(context);
-				}
-			} else {
-				var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
-				var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
-				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
-				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
-				$html.find('.box-body').text(question);
-				$html.find('.box-footer').append($ok, $cancel);
+			var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
+			var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
+			var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
+			$html.find('.box-header h2').text(cm.language.get('Confirmation'));
+			$html.find('.box-body').text(question);
+			$html.find('.box-footer').append($ok, $cancel);
 
-				$html.floatOut();
-				$ok.click(function() {
-					$html.floatIn();
-					callback.call(context);
-				});
-				$cancel.click(function() {
-					$html.floatIn();
-				});
-				$ok.focus();
-			}
+			$html.floatOut();
+			$ok.click(function() {
+				$html.floatIn();
+				callback.call(context);
+			});
+			$cancel.click(function() {
+				$html.floatIn();
+			});
+			$ok.focus();
 		}
 	},
 
@@ -694,7 +688,11 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			try {
+				localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			} catch (e) {
+				// iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
+			}
 		},
 
 		/**
