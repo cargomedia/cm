@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_AbstractTest extends CMTest_TestCase {
+class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CM_Cache_Storage_Runtime::getInstance()->flush();

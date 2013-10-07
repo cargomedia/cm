@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_FileTest extends CMTest_TestCase {
+class CM_Cache_Storage_FileTest extends CMTest_TestCase {
 
 	public function testGetSet() {
 		$cache = new CM_Cache_Storage_File();
