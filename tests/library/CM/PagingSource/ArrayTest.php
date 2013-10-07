@@ -2,6 +2,22 @@
 
 class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 
+	public function testClearCache() {
+		$pagingMock = $this->getMock('CM_PagingSource_Array', array('clearCache'), array(range(1, 10)));
+		$pagingMock->expects($this->once())->method('clearCache');
+		$pagingSource = new CM_PagingSource_Array($pagingMock);
+		$pagingSource->clearCache();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage does not support caching
+	 */
+	public function testClearCacheNotImplemented() {
+		$pagingSource = new CM_PagingSource_Array(range(1, 10));
+		$pagingSource->clearCache();
+	}
+
 	public function testFilter() {
 		$pagingSource = new CM_PagingSource_Array(range(1, 10), function ($item) {
 			return $item % 2 === 0;
