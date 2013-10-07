@@ -71,10 +71,7 @@ class CM_App {
 		/** @var CM_Asset_Javascript_Abstract[] $assetList */
 		$assetList = array();
 		$languageList = new CM_Paging_Language_Enabled();
-		$siteClassNameList = CM_Site_Abstract::getClassChildren();
-		foreach ($siteClassNameList as $siteClassName) {
-			/** @var CM_Site_Abstract $site */
-			$site = new $siteClassName();
+		foreach (CM_Site_Abstract::getAll() as $site) {
 			$assetList[] = new CM_Asset_Javascript_Internal($site);
 			$assetList[] = new CM_Asset_Javascript_Library($site);
 			$assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
@@ -215,12 +212,12 @@ class CM_App {
 				if (array_key_exists($constant, $actionVerbsValues) && $actionVerbsValues[$constant] !== $value) {
 					throw new CM_Exception_Invalid(
 						'Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' .
-								$actionVerbsValues[$constant] . '`.');
+						$actionVerbsValues[$constant] . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues) && in_array($value, $actionVerbsValues)) {
 					throw new CM_Exception_Invalid(
 						'Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className .
-								'::' . array_search($value, $actionVerbsValues) . '`.');
+						'::' . array_search($value, $actionVerbsValues) . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues)) {
 					$actionVerbsValues[$constant] = $value;
@@ -246,7 +243,7 @@ class CM_App {
 				if ($classNameDuplicate = array_search($type, $classTypes)) {
 					throw new CM_Exception_Invalid(
 						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
-								$className . '` type namespace).');
+						$className . '` type namespace).');
 				}
 				$classTypes[$className] = $type;
 			} elseif (!$reflectionClass->isAbstract()) {

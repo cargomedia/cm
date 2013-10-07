@@ -490,7 +490,73 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		 * unserialize() is ~10% slower.
 		 */
 		$serialized = serialize(array($id, $data));
-		return unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
+		/** @var CM_Model_Abstract $model */
+		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
+		if (null !== $data) {
+			$model->_loadAssets(false);
+		}
+		return $model;
+	}
+
+	/**
+	 * @param array $idTypeList [['type' => int, 'id' => int|array],...]
+	 * @return CM_Model_Abstract[] Can contain null-entries when model doesn't exist
+	 */
+	public static function factoryGenericMultiple(array $idTypeList) {
+		$dataList = array();
+		$idTypeMap = array();
+		$storageTypeList = array();
+		$noPersistenceList = array();
+
+		foreach ($idTypeList as $idType) {
+			$type = (int) $idType['type'];
+			if (!is_array($idType['id'])) {
+				$idType['id'] = array('id' => $idType['id']);
+			}
+
+			$serializedKey = serialize(array('type' => $type, 'id' => $idType['id']));
+			$dataList[$serializedKey] = null;
+			$idTypeMap[$serializedKey] = $idType;
+
+			$modelClass = CM_Model_Abstract::_getClassName($type);
+			if ($cacheStorageClass = $modelClass::getCacheClass()) {
+				$storageTypeList['cache'][$cacheStorageClass][$serializedKey] = $idType;
+			}
+			if ($persistenceStorageClass = $modelClass::getPersistenceClass()) {
+				$storageTypeList['persistence'][$persistenceStorageClass][$serializedKey] = $idType;
+			} else {
+				$noPersistenceList[$serializedKey] = $idType;
+			}
+		}
+
+		foreach ($storageTypeList as $adapterTypeList) {
+			$searchItemList = array_filter($dataList, function ($value) {
+				return null === $value;
+			});
+			foreach ($adapterTypeList as $adapterClass => $adapterItemList) {
+				/** @var CM_Model_StorageAdapter_AbstractAdapter $storageAdapter */
+				$storageAdapter = new $adapterClass();
+				$result = $storageAdapter->loadMultiple(array_intersect_key($adapterItemList, $searchItemList));
+				$dataList = array_merge($dataList, $result);
+			}
+		}
+
+		foreach ($dataList as $serializedKey => $modelData) {
+			$model = null;
+			if (null === $modelData) {
+				if (isset($noPersistenceList[$serializedKey])) {
+					try {
+						$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id']);
+					} catch (CM_Exception_Nonexistent $ex) {
+						$model = null;
+					}
+				}
+			} else {
+				$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id'], $modelData);
+			}
+			$dataList[$serializedKey] = $model;
+		}
+		return array_values($dataList);
 	}
 
 	public function toArray() {

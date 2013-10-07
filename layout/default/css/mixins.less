@@ -174,6 +174,7 @@
 
 .clipper(@height: 20px, @colorBg: @colorBg) {
 	&:after {
+		pointer-events: none;
 		position: absolute;
 		content: "";
 		width: 100%;
@@ -186,11 +187,7 @@
 
 .clickable(@fontSize: 1.25em) {
 	cursor: pointer;
-	font-size: @fontSize;
-
-	html.touch & {
-		font-size: @fontSize * 1.12;
-	}
+	font-size: @fontSize * 1.12;
 }
 
 .clickable {

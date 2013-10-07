@@ -80,7 +80,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			try {
 				$callback();
 			} catch (CM_Exception $e) {
-				CM_Bootloader::getInstance()->handleException($e);
+				CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
 			}
 			CMService_Newrelic::getInstance()->endTransaction();
 		}

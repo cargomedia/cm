@@ -12,6 +12,7 @@ class CM_Config {
 		$this->_loadConfig('internal.php');
 		$this->_loadConfig('default.php');
 		$this->_loadConfig('local.php');
+		$this->_loadConfig('deploy.php');
 		foreach (CM_Bootloader::getInstance()->getEnvironment() as $environment) {
 			$this->_loadConfig($environment . '.php');
 		}

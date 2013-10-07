@@ -50,6 +50,15 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	public final function getMulti($keys) {
+		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
+		return $this->_getMulti($keys);
+	}
+
+	/**
 	 * @return string
 	 */
 	abstract protected function _getName();
@@ -80,10 +89,34 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	abstract protected function _flush();
 
 	/**
+	 * @param string[] $keys
+	 * @return mixed[]
+	 */
+	protected function _getMulti(array $keys) {
+		$values = array();
+		foreach ($keys as $key) {
+			$values[$key] = $this->_get($key);
+		}
+		return $values;
+	}
+
+	/**
 	 * @param string $key
 	 * @return string
 	 */
 	protected function _getKeyArmored($key) {
 		return DIR_ROOT . '_' . $key;
+	}
+
+	/**
+	 * @param string $keyArmored
+	 * @return string mixed
+	 * @throws CM_Exception_Invalid
+	 */
+	protected static final function _extractKeyArmored($keyArmored) {
+		if (!preg_match('/^' . preg_quote(DIR_ROOT, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
+			throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
+		}
+		return $matches[1];
 	}
 }

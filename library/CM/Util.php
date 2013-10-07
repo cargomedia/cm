@@ -31,6 +31,33 @@ class CM_Util {
 	}
 
 	/**
+	 * @param mixed $argument
+	 * @return string
+	 */
+	public static function varDump($argument) {
+		if (is_object($argument)) {
+			if ($argument instanceof stdClass) {
+				return 'object';
+			}
+			$value = get_class($argument);
+			if ($argument instanceof CM_Model_Abstract) {
+				$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
+			}
+			return $value;
+		}
+		if (is_string($argument)) {
+			if (strlen($argument) > 20) {
+				$argument = substr($argument, 0, 20) . '...';
+			}
+			return '\'' . $argument . '\'';
+		}
+		if (is_bool($argument) || is_numeric($argument)) {
+			return var_export($argument, true);
+		}
+		return gettype($argument);
+	}
+
+	/**
 	 * @param string $pattern OPTIONAL
 	 * @param string $path    OPTIONAL
 	 * @return array

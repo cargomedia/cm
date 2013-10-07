@@ -23,9 +23,9 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $key
+	 * @param string|array $key
 	 * @return mixed
-	 */
+	 */	
 	public function get($key) {
 		return $this->_memcache->get($key);
 	}

@@ -3,7 +3,7 @@
 class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message {
 
 	const TYPE = 29;
-	const SALT = 'd98*2jflq74fçr8gföqwm&dsöwrds93"2d93tp+ihwd.20trl';
+	const SALT = 'd98*2jflq74fcr8gfoqwm&dsowrds93l';
 
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
 	}
@@ -26,10 +26,37 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 	 * @return string
 	 */
 	public static function getKeyByUser(CM_Model_User $user) {
-		return hash('md5', self::SALT . ':' . $user->getId());
+		return self::_encryptKey($user->getId(), self::SALT);
 	}
 
 	/**
+	 * @return CM_Model_User
+	 */
+	public function getUser() {
+		$userId = $this->_decryptKey(self::SALT);
+		return CM_Model_User::factory($userId);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasUser() {
+		try {
+			$this->getUser();
+			return true;
+		} catch (CM_Exception_Nonexistent $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isValid() {
+		return $this->hasUser();
+	}
+
+		/**
 	 * @param CM_Model_User $user
 	 * @param string        $event
 	 * @param mixed|null    $data

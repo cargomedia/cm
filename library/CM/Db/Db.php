@@ -183,6 +183,19 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string       $table
+	 * @param string|array $fields     Column-name OR Column-names array
+	 * @param array[]      $whereList  Outer array-entries are combined using OR, inner arrays using AND
+	 * @param string|null  $order
+	 * @return CM_Db_Result
+	 */
+	public static function selectMultiple($table, $fields, array $whereList, $order = null) {
+		$client = self::_getClient(false);
+		$query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $whereList, $order);
+		return $query->execute();
+	}
+
+	/**
 	 * @param string $table
 	 */
 	public static function truncate($table) {
@@ -331,7 +344,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$idGuess = self::_getRandIdGuess($table, $column, $where);
 		$columnQuoted = $client->quoteIdentifier($column);
 		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
-		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted . ' DESC LIMIT 1')->fetchColumn();
+		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted .
+				' DESC LIMIT 1')->fetchColumn();
 
 		if (!$id) {
 			$id = CM_Db_Db::select($table, $column, $where)->fetchColumn();

@@ -169,7 +169,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 			$callback = $this->_subscribeCallback;
 			$callback($channel, $message);
 		} catch (Exception $e) {
-			CM_Bootloader::getInstance()->handleException($e);
+			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
 		}
 	}
 
