@@ -1,6 +1,6 @@
 <?php
 
-class CM_ExceptionHandling_HandlerTest extends CMTest_TestCase {
+class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 
 	public function testLogException() {
 		$log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
