@@ -14,7 +14,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 	/** @var array */
 	private $_storage;
 
-	private function __construct() {
+	public function __construct() {
 		$this->_storage = array();
 	}
 
