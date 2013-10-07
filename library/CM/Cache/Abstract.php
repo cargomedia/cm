@@ -8,6 +8,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	public function __construct() {
 		$storageClassName = static::_getConfig()->storage;
+		if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
+			throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
+		}
 		$this->_storage = new $storageClassName();
 	}
 
