@@ -31,14 +31,6 @@ class CM_Cache_Storage_Memcache extends CM_Cache_Storage_Abstract {
 	}
 
 	protected function _getMulti(array $keys) {
-		foreach ($keys as &$key) {
-			$key = self::_getKeyArmored($key);
-		}
-		$values = $this->_client->get($keys);
-		$result = array();
-		foreach ($values as $key => $value) {
-			$result[$this->_extractKeyArmored($key)] = $value;
-		}
-		return $result;
+		return $this->_client->get($keys);
 	}
 }

@@ -45,11 +45,19 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string[] $key
+	 * @param string[] $keys
 	 * @return mixed[]
 	 */
-	public final function getMulti(array $key) {
-		return $this->_getStorage()->getMulti($key);
+	public final function getMulti(array $keys) {
+		$values = $this->_getRuntime()->getMulti($keys);
+		if (count($values) === count($keys)) {
+			return $values;
+		}
+		$values = $this->_getStorage()->getMulti($keys);
+		foreach ($values as $key => $value) {
+			$this->_getRuntime()->set($key, $value);
+		}
+		return $values;
 	}
 
 	/**
