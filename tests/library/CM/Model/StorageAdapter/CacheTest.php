@@ -6,7 +6,7 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
-		CM_Cache::flush();
+		CM_Cache_Shared::getInstance()->flush();
 	}
 
 	public function testGetCacheKey() {
@@ -31,9 +31,9 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
 			2 => 'CMTest_ModelMock_2',
 		);
 		$id1 = 1;
-		CM_Cache::set('CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:1;}', array('foo' => 'foo1', 'bar' => $id1));
+		CM_Cache_Shared::getInstance()->set('CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:1;}', array('foo' => 'foo1', 'bar' => $id1));
 		$id2 = 2;
-		CM_Cache::set('CM_Model_StorageAdapter_Cache_type:2_id:a:1:{s:2:"id";i:2;}', array('foo' => 'foo2', 'bar' => $id2));
+		CM_Cache_Shared::getInstance()->set('CM_Model_StorageAdapter_Cache_type:2_id:a:1:{s:2:"id";i:2;}', array('foo' => 'foo2', 'bar' => $id2));
 
 		$adapter = new CM_Model_StorageAdapter_Cache();
 
@@ -46,16 +46,16 @@ class CM_Model_StorageAdapter_CacheTest extends CMTest_TestCase {
 	public function testSave() {
 		$id1 = 1;
 		$cacheKey1 = 'CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:1;}';
-		CM_Cache::set($cacheKey1, array('foo' => 'foo1', 'bar' => $id1));
+		CM_Cache_Shared::getInstance()->set($cacheKey1, array('foo' => 'foo1', 'bar' => $id1));
 		$id2 = 2;
 		$cacheKey2 = 'CM_Model_StorageAdapter_Cache_type:1_id:a:1:{s:2:"id";i:2;}';
-		CM_Cache::set($cacheKey2, array('foo' => 'foo2', 'bar' => $id2));
+		CM_Cache_Shared::getInstance()->set($cacheKey2, array('foo' => 'foo2', 'bar' => $id2));
 		$type = 1;
 
 		$adapter = new CM_Model_StorageAdapter_Cache();
 		$adapter->save($type, array('id' => $id1), array('foo' => 'hello', 'bar' => 55));
-		$this->assertSame(array('foo' => 'hello', 'bar' => 55), CM_Cache::get($cacheKey1));
-		$this->assertSame(array('foo' => 'foo2', 'bar' => 2), CM_Cache::get($cacheKey2));
+		$this->assertSame(array('foo' => 'hello', 'bar' => 55), CM_Cache_Shared::getInstance()->get($cacheKey1));
+		$this->assertSame(array('foo' => 'foo2', 'bar' => 2), CM_Cache_Shared::getInstance()->get($cacheKey2));
 	}
 
 	/**

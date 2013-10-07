@@ -131,7 +131,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	protected function _onDelete() {
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $this->getKey() . '_adapterType:' . $this->getAdapterType();
-		CM_Cache::getInstance()->delete($cacheKey);
+		CM_Cache_Shared::getInstance()->delete($cacheKey);
 		try {
 			CM_Db_Db::delete('cm_streamChannel', array('id' => $this->getId()));
 		} catch (CM_Db_Exception $e) {

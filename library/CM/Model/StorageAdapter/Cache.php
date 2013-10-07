@@ -13,7 +13,7 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 			$cacheEntryToArrayKey[$cacheKey] = $key;
 		}
 		$result = array();
-		$values = CM_Cache::getMulti(array_keys($cacheEntryToArrayKey));
+		$values = CM_Cache_Shared::getInstance()->getMulti(array_keys($cacheEntryToArrayKey));
 		foreach ($values as $cacheKey => $value) {
 			$key = $cacheEntryToArrayKey[$cacheKey];
 			$result[$key] = $value;

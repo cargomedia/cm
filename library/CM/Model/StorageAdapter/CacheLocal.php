@@ -13,7 +13,7 @@ class CM_Model_StorageAdapter_CacheLocal extends CM_Model_StorageAdapter_Cache {
 			$cacheEntryToArrayKey[$cacheKey] = $key;
 		}
 		$result = array();
-		$values = CM_CacheLocal::getMulti(array_keys($cacheEntryToArrayKey));
+		$values = CM_Cache_Local::getInstance()->getMulti(array_keys($cacheEntryToArrayKey));
 		foreach ($values as $cacheKey => $value) {
 			$key = $cacheEntryToArrayKey[$cacheKey];
 			$result[$key] = $value;
