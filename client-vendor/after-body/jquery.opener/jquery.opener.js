@@ -6,7 +6,7 @@
 	var selector = '.openerDropdown';
 
 	var Opener = function($element) {
-		$element.on('click.opener', this.toggle);
+		$element.on('click.openerDropdown', this.toggle);
 	};
 
 	Opener.prototype = {
@@ -17,7 +17,7 @@
 			$opener.find('> .openerDropdown-window').toggleModal(function() {
 				$(this).toggle();
 				$opener.toggleClass('open');
-			})
+			});
 		}
 	};
 
