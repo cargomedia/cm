@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_CacheTest extends CMTest_TestCase {
+class CM_Redis_ClientTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CM_Redis_Client::getInstance()->flush();
