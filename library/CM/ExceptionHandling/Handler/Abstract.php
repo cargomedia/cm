@@ -1,6 +1,9 @@
 <?php
 
-class CM_ExceptionHandling_Handler {
+abstract class CM_ExceptionHandling_Handler_Abstract {
+
+	/** @var int|null */
+	private $_printSeverityMin;
 
 	/**
 	 * @param int    $code
@@ -41,14 +44,31 @@ class CM_ExceptionHandling_Handler {
 	}
 
 	/**
-	 * @param Exception                                    $exception
-	 * @param CM_OutputStream_Interface|null               $output
-	 * @param CM_ExceptionHandling_Formatter_Abstract|null $formatter
+	 * @param Exception $exception
 	 */
-	public function handleException(Exception $exception, CM_OutputStream_Interface $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
+	public function handleException(Exception $exception) {
 		$this->_logException($exception);
-		$this->_printException($exception, $output, $formatter);
+
+		if (!$exception instanceof CM_Exception || $exception->getSeverity() >= $this->_getPrintSeverityMin()) {
+			$this->_printException($exception);
+		}
+
+		if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
+			CMService_Newrelic::getInstance()->setNoticeError($exception);
+		}
 	}
+
+	/**
+	 * @param int $severity
+	 */
+	public function setPrintSeverityMin($severity) {
+		$this->_printSeverityMin = (int) $severity;
+	}
+
+	/**
+	 * @param Exception $exception
+	 */
+	abstract protected function _printException(Exception $exception);
 
 	/**
 	 * @param Exception $exception
@@ -73,37 +93,9 @@ class CM_ExceptionHandling_Handler {
 	}
 
 	/**
-	 * @param Exception                                    $exception
-	 * @param CM_OutputStream_Abstract|null                $output
-	 * @param CM_ExceptionHandling_Formatter_Abstract|null $formatter
+	 * @return int|null
 	 */
-	protected function _printException(Exception $exception, CM_OutputStream_Abstract $output = null, CM_ExceptionHandling_Formatter_Abstract $formatter = null) {
-		if (null === $output) {
-			$output = new CM_OutputStream_Stream_Output();
-		}
-
-		$isHttpRequest = !CM_Bootloader::getInstance()->isEnvironment('cli') && !CM_Bootloader::getInstance()->isEnvironment('test');
-		if ($isHttpRequest) {
-			if (!headers_sent()) {
-				header('HTTP/1.1 500 Internal Server Error');
-				header('Content-Type: text/html');
-			}
-			if (null === $formatter) {
-				$formatter = new CM_ExceptionHandling_Formatter_Html();
-			}
-		}
-		if (null === $formatter) {
-			$formatter = new CM_ExceptionHandling_Formatter_Plain();
-		}
-
-		if ($isHttpRequest && !IS_DEBUG) {
-			$output->writeln('Internal server error');
-		} else {
-			$output->writeln($formatter->formatException($exception));
-		}
-
-		if (!$exception instanceof CM_Exception || $exception->getSeverity() >= CM_Exception::ERROR) {
-			CMService_Newrelic::getInstance()->setNoticeError($exception);
-		}
+	private function _getPrintSeverityMin() {
+		return $this->_printSeverityMin;
 	}
 }

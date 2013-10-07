@@ -18,7 +18,7 @@ class CM_Bootloader {
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
-	/** @var CM_ExceptionHandling_Handler */
+	/** @var CM_ExceptionHandling_Handler_Abstract */
 	private $_exceptionHandler;
 
 	/**
@@ -33,7 +33,6 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
-		$this->_exceptionHandler = new CM_ExceptionHandling_Handler();
 	}
 
 	public function defaults() {
@@ -141,9 +140,17 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return CM_ExceptionHandling_Handler
+	 * @return CM_ExceptionHandling_Handler_Abstract
 	 */
 	public function getExceptionHandler() {
+		if (!$this->_exceptionHandler) {
+			$isHttpRequest = !$this->isEnvironment('cli') && !$this->isEnvironment('test');
+			if ($isHttpRequest) {
+				$this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
+			} else {
+				$this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+			}
+		}
 		return $this->_exceptionHandler;
 	}
 
