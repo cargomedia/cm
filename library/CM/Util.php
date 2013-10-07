@@ -158,7 +158,7 @@ class CM_Util {
 		$curlError = null;
 		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError =  'Curl error: `' . curl_error($curlConnection) . '` ';
+			$curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
 
 		$info = curl_getinfo($curlConnection);
@@ -231,7 +231,7 @@ class CM_Util {
 	 */
 	public static function rmDirContents($path) {
 		$path = (string) $path . '/';
-		if(!is_dir($path)) {
+		if (!is_dir($path)) {
 			return;
 		}
 		$systemFileList = scandir($path);
@@ -259,7 +259,9 @@ class CM_Util {
 		if (!empty($params)) {
 			$params = CM_Params::encode($params);
 			$query = http_build_query($params);
-			$link .= '?' . $query;
+			if (strlen($query) > 0) {
+				$link .= '?' . $query;
+			}
 		}
 
 		return $link;
