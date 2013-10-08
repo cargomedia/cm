@@ -17,19 +17,20 @@ class CM_Splittest_Fixture extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($fixture, $type = null) {
-		if (null !== $type) {
-			$this->_id = (int) $fixture;
-			$this->_type = $type;
-		} else {
-			if ($fixture instanceof CM_Request_Abstract) {
-				$this->_id = $fixture->getClientId();
-				$this->_type = self::TYPE_REQUEST_CLIENT;
-			} elseif ($fixture instanceof CM_Model_User) {
-				$this->_id = (int) $fixture->getId();
-				$this->_type = self::TYPE_USER;
-			} else {
+		if (is_int($fixture)) {
+			if (!in_array($type, array(self::TYPE_REQUEST_CLIENT, self::TYPE_USER), true)) {
 				throw new CM_Exception_Invalid('Invalid fixture type');
 			}
+			$this->_id = (int) $fixture;
+			$this->_type = (int) $type;
+		} elseif ($fixture instanceof CM_Request_Abstract) {
+			$this->_id = $fixture->getClientId();
+			$this->_type = self::TYPE_REQUEST_CLIENT;
+		} elseif ($fixture instanceof CM_Model_User) {
+			$this->_id = (int) $fixture->getId();
+			$this->_type = self::TYPE_USER;
+		} else {
+			throw new CM_Exception_Invalid('Invalid fixture type');
 		}
 	}
 
