@@ -23,11 +23,13 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		}
 		$cachesCleared = array();
 		if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
-			CM_Cache_Shared::getInstance()->flush();
+			$cache = new CM_Cache_Storage_Memcache();
+			$cache->flush();
 			$cachesCleared[] = 'CM_Cache_Storage_Memcache';
 		}
 		if ($params->getBoolean('CM_Cache_Storage_Apc', false)) {
-			CM_Cache_Local::getInstance()->flush();
+			$cache = new CM_Cache_Storage_Apc();
+			$cache->flush();
 			$cachesCleared[] = 'CM_Cache_Storage_Apc';
 		}
 		if ($params->getBoolean('CM_Cache_Storage_File', false)) {
