@@ -18,6 +18,14 @@ class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 		$pagingSource->clearCache();
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Paging data should be either an array or a paging source.
+	 */
+	public function testDataInvalid() {
+		new CM_PagingSource_Array('abc');
+	}
+
 	public function testFilter() {
 		$pagingSource = new CM_PagingSource_Array(range(1, 10), function ($item) {
 			return $item % 2 === 0;

@@ -16,13 +16,17 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
 	 * @param Closure|null                   $sortBy    Callback function returning the value to sort by for each item
 	 * @param int|null                       $sortOrder Either SORT_ASC or SORT_DESC
 	 * @param int|null                       $sortFlags Sort options, @see array_multisort()
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($data, Closure $filter = null, Closure $sortBy = null, $sortOrder = null, $sortFlags = null) {
 		if ($data instanceof CM_PagingSource_Abstract) {
 			$this->_source = $data;
 			$data = $this->_source->getItems();
 		}
-		$this->_data = (array) $data;
+		if (!is_array($data)) {
+			throw new CM_Exception_Invalid('Paging data should be either an array or a paging source.');
+		}
+		$this->_data = $data;
 		if (null !== $filter) {
 			$this->_data = array_filter($this->_data, $filter);
 		}
@@ -45,7 +49,7 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
 		if ($this->_source) {
 			$this->_source->clearCache();
 		} else {
-			parent::clearCache();
+			throw new CM_Exception_Invalid('`' . __CLASS__ . '` does not support caching.');
 		}
 	}
 
