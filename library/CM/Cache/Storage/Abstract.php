@@ -103,7 +103,10 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	protected function _getMulti(array $keys) {
 		$values = array();
 		foreach ($keys as $key) {
-			$values[$key] = $this->_get($key);
+			$value = $this->_get($key);
+			if (false !== $value) {
+				$values[$key] = $value;
+			}
 		}
 		return $values;
 	}
