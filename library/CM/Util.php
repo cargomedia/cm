@@ -31,6 +31,33 @@ class CM_Util {
 	}
 
 	/**
+	 * @param mixed $argument
+	 * @return string
+	 */
+	public static function varDump($argument) {
+		if (is_object($argument)) {
+			if ($argument instanceof stdClass) {
+				return 'object';
+			}
+			$value = get_class($argument);
+			if ($argument instanceof CM_Model_Abstract) {
+				$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
+			}
+			return $value;
+		}
+		if (is_string($argument)) {
+			if (strlen($argument) > 20) {
+				$argument = substr($argument, 0, 20) . '...';
+			}
+			return '\'' . $argument . '\'';
+		}
+		if (is_bool($argument) || is_numeric($argument)) {
+			return var_export($argument, true);
+		}
+		return gettype($argument);
+	}
+
+	/**
 	 * @param string $pattern OPTIONAL
 	 * @param string $path    OPTIONAL
 	 * @return array
@@ -131,7 +158,7 @@ class CM_Util {
 		$curlError = null;
 		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError =  'Curl error: `' . curl_error($curlConnection) . '` ';
+			$curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
 
 		$info = curl_getinfo($curlConnection);
@@ -204,7 +231,7 @@ class CM_Util {
 	 */
 	public static function rmDirContents($path) {
 		$path = (string) $path . '/';
-		if(!is_dir($path)) {
+		if (!is_dir($path)) {
 			return;
 		}
 		$systemFileList = scandir($path);
@@ -232,7 +259,9 @@ class CM_Util {
 		if (!empty($params)) {
 			$params = CM_Params::encode($params);
 			$query = http_build_query($params);
-			$link .= '?' . $query;
+			if (strlen($query) > 0) {
+				$link .= '?' . $query;
+			}
 		}
 
 		return $link;
