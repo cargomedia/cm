@@ -18,25 +18,23 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/** @var CM_Model_User|int */
 	protected $_actor = null;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	protected $_verb;
 
-	/**
-	 * @var int|null
-	 */
+	/** @var int|null */
 	protected $_ip = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $_ignoreLogging = array();
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_forceAllow = false;
+
+	/** @var array */
+	private $_trackingProperties = array();
+
+	/** @var bool */
+	private $_trackingEnabled = true;
 
 	/**
 	 * @param string            $verbName
@@ -53,6 +51,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
+		}
+
+		if ($this->getActor() && $this->_trackingEnabled) {
+			$this->_track();
 		}
 	}
 
