@@ -5,12 +5,12 @@
 
 	var selector = '.openerDropdown';
 
-	var Opener = function($element) {
+	var OpenerDropdown = function($element) {
 		$element.on('click.openerDropdown', this.toggle);
 	};
 
-	Opener.prototype = {
-		constructor: Opener,
+	OpenerDropdown.prototype = {
+		constructor: OpenerDropdown,
 
 		toggle: function(event) {
 			var $opener = $(this).closest('.openerDropdown');
@@ -26,7 +26,7 @@
 			var $this = $(this);
 			var data = $this.data('openerDropdown');
 			if (!data) {
-				$this.data('openerDropdown', (data = new Opener($this)))
+				$this.data('openerDropdown', (data = new OpenerDropdown($this)))
 			}
 			if (typeof option == 'string') {
 				data[option].call($this)
@@ -35,7 +35,7 @@
 	};
 
 	$(function() {
-		$('body').on('click.openerDropdown', selector + ' .openerDropdown-panel', Opener.prototype.toggle);
+		$('body').on('click.openerDropdown', selector + ' .openerDropdown-panel', OpenerDropdown.prototype.toggle);
 	});
 
 })(jQuery);
