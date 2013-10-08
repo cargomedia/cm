@@ -27,10 +27,10 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		$dirBuild = $dirWork . 'build/';
-		CM_Util::exec('fontcustom', array('compile', '--file-hash=false', '--font-name=icon-webfont', '--output=' . $dirBuild, $dirWork));
+		CM_Util::exec('fontcustom', array('compile', $dirWork, '--no-hash', '--font-name=icon-webfont', '--output=' . $dirBuild));
 
-		$cssFile = new CM_File($dirBuild . '/fontcustom.css');
-		$less = preg_replace('/url\("(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
+		$cssFile = new CM_File($dirBuild . '/icon-webfont.css');
+		$less = preg_replace('/url\("(?:.*?\/)(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
 		CM_File::create(DIR_PUBLIC . 'static/css/library/icon.less', $less);
 
 		foreach (glob($dirBuild . 'icon-webfont.*') as $fontPath) {
