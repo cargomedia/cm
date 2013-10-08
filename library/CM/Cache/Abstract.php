@@ -78,7 +78,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param string $key
 	 * @param mixed  $data
 	 * @param int    $lifeTime
-	 * @return boolean
 	 */
 	public final function setTagged($tag, $key, $data, $lifeTime = null) {
 		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
@@ -97,7 +96,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
 	/**
 	 * @param string $tag
-	 * @return boolean
 	 */
 	public final function deleteTag($tag) {
 		$this->delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
