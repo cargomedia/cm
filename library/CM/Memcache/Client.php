@@ -16,10 +16,9 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	 * @param string   $key
 	 * @param mixed    $data
 	 * @param int|null $lifeTime
-	 * @return bool
 	 */
 	public function set($key, $data, $lifeTime = null) {
-		return $this->_memcache->set($key, $data, 0, $lifeTime);
+		$this->_memcache->set($key, $data, 0, $lifeTime);
 	}
 
 	/**
