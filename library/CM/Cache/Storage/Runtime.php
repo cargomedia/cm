@@ -2,8 +2,8 @@
 
 class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 
-	const RUNTIME_LIFETIME = 3;
-	const RUNTIME_CLEAR_INTERVAL = 300;
+	const LIFETIME_MAX = 3;
+	const CLEAR_INTERVAL = 300;
 
 	/** @var int */
 	private $_lastClearStamp;
@@ -23,9 +23,14 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 	}
 
 	protected function _set($key, $value, $lifeTime = null) {
-		$expirationStamp = time() + min(self::RUNTIME_LIFETIME, $lifeTime);
+		if (null === $lifeTime) {
+			$lifeTime = self::LIFETIME_MAX;
+		} else {
+			$lifeTime = min(self::LIFETIME_MAX, $lifeTime);
+		}
+		$expirationStamp = time() + $lifeTime;
 		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
-		if ($this->_lastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
+		if ($this->_lastClearStamp + self::CLEAR_INTERVAL < time()) {
 			$this->_deleteExpired();
 		}
 	}
@@ -45,7 +50,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$this->_storage = array();
 	}
 
-	public function _deleteExpired() {
+	private function _deleteExpired() {
 		$currentTime = time();
 		foreach ($this->_storage as $key => $data) {
 			if ($currentTime > $data['expirationStamp']) {
