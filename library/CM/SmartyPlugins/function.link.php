@@ -53,7 +53,7 @@ function smarty_function_link(array $params, Smarty_Internal_Template $template)
 
 	$titleAttr = '';
 	if (!empty($title)) {
-		$titleAttr = ' title="' . $title . '"';
+		$titleAttr = ' title="' . CM_Util::htmlspecialchars($title) . '"';
 	}
 
 	$dataAttr = '';
