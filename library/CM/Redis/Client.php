@@ -4,9 +4,7 @@
  * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
  */
 
-class CM_Cache_Redis extends CM_Cache_Abstract {
-
-	protected static $_instance;
+class CM_Redis_Client extends CM_Class_Abstract {
 
 	/** @var Redis */
 	private $_redis = null;
@@ -111,29 +109,13 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		return $result[0];
 	}
 
-	protected function _getName() {
-		return 'Redis';
-	}
-
-	protected function _set($key, $data, $lifeTime = null) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	protected function _get($key) {
-		throw new CM_Exception_NotImplemented();
-	}
-
-	protected function _delete($key) {
-		throw new CM_Exception_NotImplemented();
-	}
-
 	/**
 	 * Add a value to a set
 	 *
 	 * @param string $key
 	 * @param string $value
 	 */
-	protected function _sAdd($key, $value) {
+	public function sAdd($key, $value) {
 		$this->_redis->sAdd($key, $value);
 	}
 
@@ -143,7 +125,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $key
 	 * @param string $value
 	 */
-	protected function _sRem($key, $value) {
+	public function sRem($key, $value) {
 		$this->_redis->sRem($key, $value);
 	}
 
@@ -153,7 +135,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $key
 	 * @return string[]
 	 */
-	protected function _sFlush($key) {
+	public function sFlush($key) {
 		$values = $this->_redis->multi()->sMembers($key)->delete($key)->exec();
 		return $values[0];
 	}
@@ -162,7 +144,7 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 	 * @param string $channel
 	 * @param string $msg
 	 */
-	protected function _publish($channel, $msg) {
+	public function publish($channel, $msg) {
 		$this->_redis->publish($channel, $msg);
 	}
 
@@ -191,7 +173,18 @@ class CM_Cache_Redis extends CM_Cache_Abstract {
 		}
 	}
 
-	protected function _flush() {
+	public function flush() {
 		$this->_redis->flushAll();
+	}
+
+	/**
+	 * @return CM_Redis_Client
+	 */
+	public static function getInstance() {
+		static $instance;
+		if (!$instance) {
+			$instance = new self();
+		}
+		return $instance;
 	}
 }

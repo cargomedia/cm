@@ -29,12 +29,12 @@ abstract class CM_PagingSource_Abstract {
 	 * Clear cache
 	 */
 	public function clearCache() {
-		$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+		$tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
 		if ($this->_cacheLocalLifetime) {
-			CM_CacheLocal::deleteTag($tag);
+			CM_Cache_Local::getInstance()->deleteTag($tag);
 		}
 		if ($this->_cacheLifetime) {
-			CM_Cache::deleteTag($tag);
+			CM_Cache_Shared::getInstance()->deleteTag($tag);
 		}
 	}
 
@@ -46,26 +46,27 @@ abstract class CM_PagingSource_Abstract {
 	}
 
 	protected function _cacheSet($key, $value) {
-		$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
-		$key = CM_Cache::key(CM_CacheConst::PagingSource, $key);
+		$tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+		$key = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $key);
 		if ($this->_cacheLocalLifetime) {
-			CM_CacheLocal::setTagged($tag, $key, $value, $this->_cacheLocalLifetime);
+			CM_Cache_Local::getInstance()->setTagged($tag, $key, $value, $this->_cacheLocalLifetime);
 		}
 		if ($this->_cacheLifetime) {
-			CM_Cache::setTagged($tag, $key, $value, $this->_cacheLifetime);
+			CM_Cache_Shared::getInstance()->setTagged($tag, $key, $value, $this->_cacheLifetime);
 		}
 	}
 
 	protected function _cacheGet($key) {
-		$tag = CM_Cache::key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
-		$key = CM_Cache::key(CM_CacheConst::PagingSource, $key);
+		$tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
+		$key = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $key);
+		$cache = CM_Cache_Local::getInstance();
 		if ($this->_cacheLocalLifetime) {
-			if (($result = CM_CacheLocal::getTagged($tag, $key)) !== false) {
+			if (($result = $cache->getTagged($tag, $key)) !== false) {
 				return $result;
 			}
 		}
 		if ($this->_cacheLifetime) {
-			if (($result = CM_Cache::getTagged($tag, $key)) !== false) {
+			if (($result = $cache->getTagged($tag, $key)) !== false) {
 				return $result;
 			}
 		}
