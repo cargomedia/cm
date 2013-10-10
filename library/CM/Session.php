@@ -249,7 +249,7 @@ class CM_Session implements CM_Comparable {
 
 	private function _change() {
 		if ($this->_isPersistent) {
-			CM_Cache::delete(self::_getCacheKey($this->getId()));
+			CM_Cache_Shared::getInstance()->delete(self::_getCacheKey($this->getId()));
 		}
 	}
 
@@ -274,12 +274,13 @@ class CM_Session implements CM_Comparable {
 	 */
 	private static function _findDataById($id) {
 		$cacheKey = self::_getCacheKey($id);
-		if (($data = CM_Cache::get($cacheKey)) === false) {
+		$cache = CM_Cache_Shared::getInstance();
+		if (($data = $cache->get($cacheKey)) === false) {
 			$data = CM_Db_Db::select('cm_session', array('data', 'expires'), array('sessionId' => $id))->fetch();
 			if (!$data) {
 				return null;
 			}
-			CM_Cache::set($cacheKey, $data, self::LIFETIME_DEFAULT);
+			$cache->set($cacheKey, $data, self::LIFETIME_DEFAULT);
 		}
 		return $data;
 	}

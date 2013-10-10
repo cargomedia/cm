@@ -58,7 +58,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 
 	public function _change() {
 		parent::_change();
-		CM_Cache::delete(CM_CacheConst::ContentList_BadwordRegex);
+		CM_Cache_Shared::getInstance()->delete(CM_CacheConst::ContentList_BadwordRegex);
 	}
 
 	/**
@@ -86,7 +86,8 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	 */
 	private function _toRegex() {
 		$cacheKey = CM_CacheConst::ContentList_BadwordRegex;
-		if (false == ($badwordsRegex = CM_Cache::get($cacheKey))) {
+		$cache = CM_Cache_Shared::getInstance();
+		if (false == ($badwordsRegex = $cache->get($cacheKey))) {
 			if ($this->isEmpty()) {
 				$badwordsRegex = '#\z.#';
 			} else {
@@ -96,7 +97,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 				}
 				$badwordsRegex = '#(?:' . implode('|', $regexList) . ')#i';
 			}
-			CM_Cache::set($cacheKey, $badwordsRegex);
+			$cache->set($cacheKey, $badwordsRegex);
 		}
 
 		return $badwordsRegex;

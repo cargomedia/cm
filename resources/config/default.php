@@ -6,7 +6,6 @@ $config->dirTmp = null;
 $config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
 $config->testIp = '162.23.39.73';
-$config->deployVersion = 1;
 
 $config->CM_Render->cdnResource = false;
 $config->CM_Render->cdnUserContent = false;
@@ -27,21 +26,17 @@ $config->CM_Search->servers = array(
 	array('host' => 'localhost', 'port' => 9200),
 );
 
-$config->CM_Cache_Runtime->enabled = true;
+$config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
+$config->CM_Cache_Local->lifetime = 86400;
 
-$config->CM_Cache_Apc->enabled = true;
-$config->CM_Cache_Apc->lifetime = 86400;
+$config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
+$config->CM_Cache_Shared->lifetime = 3600;
 
-$config->CM_Cache_Memcache->enabled = true;
-$config->CM_Cache_Memcache->lifetime = 3600;
-$config->CM_Cache_Memcache->servers = array(
+$config->CM_Memcache_Client->servers = array(
 	array('host' => 'localhost', 'port' => 11211),
 );
 
-$config->CM_Cache_Redis->enabled = true;
-$config->CM_Cache_Redis->server = array('host' => 'localhost', 'port' => 6379);
-
-$config->CM_Cache_File->enabled = true;
+$config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
 
 $config->classConfigCacheEnabled = true;
 

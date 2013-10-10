@@ -185,7 +185,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
 		$cacheWrite = false;
-		if (($variationFixtureList = CM_CacheLocal::get($cacheKey)) === false) {
+		$cache = CM_Cache_Local::getInstance();
+		if (($variationFixtureList = $cache->get($cacheKey)) === false) {
 			$variationFixtureList = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 					FROM `cm_splittestVariation_fixture` `fixture`
@@ -206,7 +207,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $variationFixtureList);
+			$cache->set($cacheKey, $variationFixtureList);
 		}
 
 		return $variationFixtureList[$this->getId()];
