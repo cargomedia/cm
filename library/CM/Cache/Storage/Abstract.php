@@ -54,7 +54,6 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return mixed[]
 	 */
 	public final function getMulti(array $keys) {
-		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
 		foreach ($keys as &$key) {
 			$key = self::_getKeyArmored($key);
 		}
@@ -62,6 +61,9 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 		$result = array();
 		foreach ($values as $armoredKey => $value) {
 			$result[$this->_extractKeyArmored($armoredKey)] = $value;
+		}
+		if (!empty($result)) {
+			CM_Debug::get()->incStats(strtolower($this->_getName()) . '-getMulti', array_keys($result));
 		}
 		return $result;
 	}
