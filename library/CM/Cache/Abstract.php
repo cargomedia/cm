@@ -2,27 +2,19 @@
 
 abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 
-	const RUNTIME_LIFETIME = 3;
-	const RUNTIME_CLEAR_INTERVAL = 300;
+	/** @var CM_Cache_Storage_Abstract */
+	protected $_storage;
 
-	/** @var array */
-	protected $_runtimeStore = array();
-
-	/** @var int */
-	private $_runtimeLastClearStamp;
+	/** @var CM_Cache_Storage_Abstract */
+	protected $_runtime;
 
 	public function __construct() {
-		$this->_runtimeDeleteExpired();
-	}
-
-	/**
-	 * @return static
-	 */
-	public static final function getInstance() {
-		if (!isset(static::$_instance)) {
-			static::$_instance = new static();
+		$storageClassName = static::_getConfig()->storage;
+		if (!is_subclass_of($storageClassName, 'CM_Cache_Storage_Abstract')) {
+			throw new CM_Exception('Invalid cache storage: `' . $storageClassName . '`');
 		}
-		return static::$_instance;
+		$this->_storage = new $storageClassName();
+		$this->_runtime = CM_Cache_Storage_Runtime::getInstance();
 	}
 
 	/**
@@ -30,87 +22,86 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 * @param mixed    $value
 	 * @param int|null $lifeTime
 	 */
-	public static final function set($key, $value, $lifeTime = null) {
-		if (!static::_enabled()) {
-			return;
+	public final function set($key, $value, $lifeTime = null) {
+		if (!$lifeTime) {
+			$lifeTime = static::_getConfig()->lifetime;
 		}
-		$cache = static::getInstance();
-		$cache->_setRuntime($key, $value);
-		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-set', $key);
-		$cache->_set($key, $value, $lifeTime);
+		$this->_getStorage()->set($key, $value, $lifeTime);
+		$this->_getRuntime()->set($key, $value, $lifeTime);
 	}
 
 	/**
 	 * @param string $key
 	 * @return mixed|false
 	 */
-	public static final function get($key) {
-		if (!static::_enabled()) {
-			return false;
-		}
-		$cache = static::getInstance();
-		if (false !== ($value = $cache->_getRuntime($key))) {
+	public final function get($key) {
+		if (false !== ($value = $this->_getRuntime()->get($key))) {
 			return $value;
 		}
-		CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-get', $key);
-		if (false !== ($value = $cache->_get($key))) {
-			$cache->_setRuntime($key, $value);
+		if (false !== ($value = $this->_getStorage()->get($key))) {
+			$this->_getRuntime()->set($key, $value);
 		}
 		return $value;
 	}
 
 	/**
-	 * @param string $key
+	 * @param string[] $keys
+	 * @return mixed[]
 	 */
-	public static final function delete($key) {
-		if (!static::_enabled()) {
-			return;
+	public final function getMulti(array $keys) {
+		$values = $this->_getStorage()->getMulti($keys);
+		foreach ($values as $key => $value) {
+			$this->_getRuntime()->set($key, $value);
 		}
-		$cache = static::getInstance();
-		$cache->_deleteRuntime($key);
-		$cache->_delete($key);
-	}
-
-	public static final function flush() {
-		if (!static::_enabled()) {
-			return;
-		}
-		$cache = static::getInstance();
-		$cache->_flushRuntime();
-		$cache->_flush();
+		return $values;
 	}
 
 	/**
-	 * @param string   $tag
-	 * @param string   $key
-	 * @param mixed    $value
-	 * @param int|null $lifetime
+	 * @param string $key
 	 */
-	public static final function setTagged($tag, $key, $value, $lifetime = null) {
-		static::_callInstance('setTagged', func_get_args());
+	public final function delete($key) {
+		$this->_getRuntime()->delete($key);
+		$this->_getStorage()->delete($key);
+	}
+
+	public final function flush() {
+		$this->_getRuntime()->flush();
+		$this->_getStorage()->flush();
 	}
 
 	/**
 	 * @param string $tag
 	 * @param string $key
-	 * @return mixed|false
+	 * @param mixed  $data
+	 * @param int    $lifeTime
 	 */
-	public static final function getTagged($tag, $key) {
-		return static::_callInstance('getTagged', func_get_args());
+	public final function setTagged($tag, $key, $data, $lifeTime = null) {
+		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
+		$this->set($key, $data, $lifeTime);
+	}
+
+	/**
+	 * @param string $tag
+	 * @param string $key
+	 * @return mixed Result or false
+	 */
+	public final function getTagged($tag, $key) {
+		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
+		return $this->get($key);
 	}
 
 	/**
 	 * @param string $tag
 	 */
-	public static final function deleteTag($tag) {
-		static::_callInstance('deleteTag', func_get_args());
+	public final function deleteTag($tag) {
+		$this->delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
 	}
 
 	/**
 	 * @param mixed $keyPart ...
 	 * @return string
 	 */
-	public static final function key($keyPart) {
+	public final function key($keyPart) {
 		$parts = func_get_args();
 		foreach ($parts as &$part) {
 			if (!is_scalar($part)) {
@@ -121,168 +112,17 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $name
-	 * @param array  $arguments
-	 * @return mixed
+	 * @return CM_Cache_Storage_Abstract
 	 */
-	public static final function __callStatic($name, $arguments) {
-		return static::_callInstance($name, $arguments, true);
+	protected function _getStorage() {
+		return $this->_storage;
 	}
 
 	/**
-	 * @param string    $functionName
-	 * @param array     $arguments
-	 * @param bool|null $log
-	 * @return mixed
+	 * @return CM_Cache_Storage_Abstract
 	 */
-	protected static final function _callInstance($functionName, $arguments, $log = null) {
-		if (!static::_enabled()) {
-			return false;
-		}
-		if (is_null($log)) {
-			$log = false;
-		}
-		$cache = static::getInstance();
-		if ($log) {
-			CM_Debug::get()->incStats(strtolower($cache->_getName()) . '-' . $functionName, implode(', ', $arguments));
-		}
-		return call_user_func_array(array($cache, '_' . $functionName), $arguments);
-	}
-
-	/**
-	 * @param string $key
-	 * @return string
-	 */
-	protected static final function _getKeyArmored($key) {
-		return DIR_ROOT . '_' . $key;
-	}
-
-	/**
-	 * @param string $keyArmored
-	 * @return string mixed
-	 * @throws CM_Exception_Invalid
-	 */
-	protected static final function _extractKeyArmored($keyArmored) {
-		if (!preg_match('/^' . preg_quote(DIR_ROOT, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
-			throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
-		}
-		return $matches[1];
-	}
-
-	/**
-	 * @return boolean
-	 */
-	protected static function _enabled() {
-		return static::_getConfig()->enabled;
-	}
-
-	/**
-	 * @return string
-	 */
-	abstract protected function _getName();
-
-	/**
-	 * @param string   $key
-	 * @param mixed    $data
-	 * @param int|null $lifeTime
-	 * @return boolean
-	 */
-	abstract protected function _set($key, $data, $lifeTime = null);
-
-	/**
-	 * @param string $key
-	 * @return mixed Result or false
-	 */
-	abstract protected function _get($key);
-
-	/**
-	 * @param string $key
-	 * @return boolean
-	 */
-	abstract protected function _delete($key);
-
-	/**
-	 * @return boolean
-	 */
-	abstract protected function _flush();
-
-	/**
-	 * @param string $tag
-	 * @param string $key
-	 * @param mixed  $data
-	 * @param int    $lifeTime
-	 * @return boolean
-	 */
-	protected final function _setTagged($tag, $key, $data, $lifeTime = null) {
-		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
-		return static::set($key, $data, $lifeTime);
-	}
-
-	/**
-	 * @param string $tag
-	 * @param string $key
-	 * @return mixed Result or false
-	 */
-	protected final function _getTagged($tag, $key) {
-		$key = $key . '_tag:' . $tag . '_tagVersion:' . $this->_getTagVersion($tag);
-		return static::get($key);
-	}
-
-	/**
-	 * @param string $tag
-	 * @return boolean
-	 */
-	protected final function _deleteTag($tag) {
-		return static::delete(CM_CacheConst::Tag_Version . '_tag:' . $tag);
-	}
-
-	/**
-	 * @param string $key
-	 * @return mixed|bool
-	 */
-	private function _getRuntime($key) {
-		if (!array_key_exists($key, $this->_runtimeStore)) {
-			return false;
-		}
-		$entry = $this->_runtimeStore[$key];
-		if (time() > $entry['expirationStamp']) {
-			$this->_deleteRuntime($key);
-			return false;
-		}
-		return $entry['value'];
-	}
-
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 */
-	private function _setRuntime($key, $value) {
-		$expirationStamp = time() + self::RUNTIME_LIFETIME;
-		$this->_runtimeStore[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
-		if ($this->_runtimeLastClearStamp + self::RUNTIME_CLEAR_INTERVAL < time()) {
-			$this->_runtimeDeleteExpired();
-		}
-	}
-
-	private function _runtimeDeleteExpired() {
-		$currentTime = time();
-		foreach ($this->_runtimeStore as $key => $data) {
-			if ($currentTime > $data['expirationStamp']) {
-				$this->_deleteRuntime($key);
-			}
-		}
-		$this->_runtimeLastClearStamp = $currentTime;
-	}
-
-	/**
-	 * @param string $key
-	 */
-	private function _deleteRuntime($key) {
-		unset($this->_runtimeStore[$key]);
-	}
-
-	private function _flushRuntime() {
-		$this->_runtimeStore = array();
+	protected function _getRuntime() {
+		return $this->_runtime;
 	}
 
 	/**
@@ -291,9 +131,9 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
 	 */
 	private final function _getTagVersion($tag) {
 		$cacheKey = CM_CacheConst::Tag_Version . '_tag:' . $tag;
-		if (($tagVersion = static::get($cacheKey)) === false) {
+		if (($tagVersion = $this->get($cacheKey)) === false) {
 			$tagVersion = md5(rand() . uniqid());
-			static::set($cacheKey, $tagVersion);
+			$this->set($cacheKey, $tagVersion);
 		}
 		return $tagVersion;
 	}

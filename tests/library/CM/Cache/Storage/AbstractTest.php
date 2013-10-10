@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_AbstractTest extends CMTest_TestCase {
+class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CM_Cache_Storage_Runtime::getInstance()->flush();
@@ -44,22 +44,5 @@ class CM_Cache_AbstractTest extends CMTest_TestCase {
 		$this->assertSame('bar', $cacheRuntime->get('foo'));
 		$cache->set('foo', 'zoo', 100);
 		$this->assertSame('zoo', $cacheRuntime->get('foo'));
-	}
-
-	public function testGetMulti() {
-		$cacheStorage = new CM_Cache_Storage_Memcache();
-		$cacheRuntime = new CM_Cache_Storage_Runtime();
-
-		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage', '_getRuntime'))->disableOriginalConstructor()->getMockForAbstractClass();
-		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($cacheStorage));
-		$cache->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
-		/** @var CM_Cache_Abstract $cache */
-
-		$this->assertSame(false, $cacheRuntime->get('foo'));
-		$this->assertSame(false, $cacheRuntime->get('missed'));
-		$cacheStorage->set('foo', 'bar');
-		$this->assertSame(array('foo' => 'bar'), $cache->getMulti(array('foo', 'missed')));
-		$this->assertSame('bar', $cacheRuntime->get('foo'));
-		$this->assertSame(false, $cacheRuntime->get('missed'));
 	}
 }
