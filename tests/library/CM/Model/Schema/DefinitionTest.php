@@ -277,7 +277,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 	public function testDecode() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::TYPE] = 'CM_Model_Mock_Validation2';
 		$testDataList = array(
 			// nothing
 			array(
@@ -406,11 +405,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
 				'returnValue' => new CM_Model_Mock_Validation(4, 'bar'),
 			),
-			array(
-				'value'       => '{"id": "4", "foo": "bar"}',
-				'schema'      => array('type' => 'CM_Model_Mock_Validation2'),
-				'returnValue' => new CM_Model_Mock_Validation2('4', 'bar'),
-		));
+		);
 		foreach ($testDataList as $testData) {
 			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->decodeField('foo', $testData['value']);
@@ -424,7 +419,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 	public function testEncode() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::TYPE] = 'CM_Model_Mock_Validation2';
 		$testDataList = array(
 			// nothing
 			array(
@@ -541,17 +535,12 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			array(
 				'value'       => new CM_Model_Mock_Validation(2),
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
-				'returnValue' => 2,
+				'returnValue' => '2',
 			),
 			array(
 				'value'       => new CM_Model_Mock_Validation(4, 'bar'),
 				'schema'      => array('type' => 'CM_Model_Mock_Validation'),
-				'returnValue' => '{"id":"4","foo":"bar"}',
-			),
-			array(
-				'value'       => new CM_Model_Mock_Validation2(2),
-				'schema'      => array('type' => 'CM_Model_Mock_Validation2'),
-				'returnValue' => '2',
+				'returnValue' => '{"id":4,"foo":"bar"}',
 			),
 		);
 		foreach ($testDataList as $testData) {
@@ -564,24 +553,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 			}
 		}
 	}
-
-	/**
-	 * @expectedException CM_Model_Exception_Validation
-	 * @expectedExceptionMessage Value `bar` is not an instance of `CM_Model_Mock_Validation2`
-	 */
-	public function testEncodeInvalidModel() {
-		$schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Model_Mock_Validation2')));
-		$schema->encodeField('foo', 'bar');
-	}
-
-	/**
-	 * @expectedException CM_Model_Exception_Validation
-	 * @expectedExceptionMessage Field `foo` is not a valid model
-	 */
-	public function testEncodeInvalidClass() {
-		$schema = new CM_Model_Schema_Definition(array('foo' => array('type' => 'CM_Class_Abstract')));
-		$schema->encodeField('foo', 'bar');
-	}
 }
 
 class CM_Model_Mock_Validation extends CM_Model_Abstract {
@@ -589,7 +560,7 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 	const TYPE = 1;
 
 	public function __construct($id, $foo = null) {
-		$id = array('id' => $id);
+		$id = array('id' => (int) $id);
 		if (null !== $foo) {
 			$id['foo'] = $foo;
 		}
@@ -598,14 +569,5 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 
 	protected function _loadData() {
 		return array('id' => $this->getId());
-	}
-}
-
-class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
-
-	const TYPE = 2;
-
-	public function getId() {
-		return (string) $this->_getId('id');
 	}
 }
