@@ -59,14 +59,13 @@ abstract class CM_PagingSource_Abstract {
 	protected function _cacheGet($key) {
 		$tag = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $this->_cacheKeyBase());
 		$key = CM_Cache_Shared::getInstance()->key(CM_CacheConst::PagingSource, $key);
-		$cache = CM_Cache_Local::getInstance();
 		if ($this->_cacheLocalLifetime) {
-			if (($result = $cache->getTagged($tag, $key)) !== false) {
+			if (($result = CM_Cache_Local::getInstance()->getTagged($tag, $key)) !== false) {
 				return $result;
 			}
 		}
 		if ($this->_cacheLifetime) {
-			if (($result = $cache->getTagged($tag, $key)) !== false) {
+			if (($result = CM_Cache_Shared::getInstance()->getTagged($tag, $key)) !== false) {
 				return $result;
 			}
 		}
