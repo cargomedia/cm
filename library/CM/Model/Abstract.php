@@ -22,7 +22,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 */
 	public function __construct($id = null) {
 		if (null !== $id) {
-			$id = array('id' => $id);
+			$id = array('id' => (int) $id);
 		}
 		$this->_construct($id);
 	}
@@ -37,9 +37,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$data = array();
 			$this->_autoCommit = false;
 		}
-		if (null !== $id) {
-			$this->_id = self::_castIdRaw($id);
-		}
+		$this->_id = $id;
 		if (null !== $data) {
 			$this->_validateFields($data);
 			$this->_setData($data);
@@ -63,7 +61,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 			$this->_onChange();
 		} else {
-			$this->_id = self::_castIdRaw($persistence->create($this->getType(), $this->_getSchemaData()));
+			$this->_id = $persistence->create($this->getType(), $this->_getSchemaData());
 
 			if ($cache = $this->_getCache()) {
 				$this->_loadAssets(true);
@@ -102,7 +100,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 */
 	public function getId() {
-		return (int) $this->_getId('id');
+		return $this->_getId('id');
 	}
 
 	/**
@@ -205,15 +203,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		}
 
 		if ($this->_autoCommit) {
+			$data = $this->_getData();
 			if ($cache = $this->_getCache()) {
-				$cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
+				$cache->save($this->getType(), $this->getIdRaw(), $data);
 			}
 			if ($persistence = $this->_getPersistence()) {
 				if ($schema->isEmpty()) {
 					throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
 				}
 				if ($schema->hasField(array_keys($data))) {
-					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+					$persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData($data));
 				}
 			}
 			$this->_onChange();
@@ -455,16 +454,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param array $idRaw
-	 * @return array
-	 */
-	final protected static function _castIdRaw(array $idRaw) {
-		return array_map(function ($el) {
-			return (string) $el;
-		}, $idRaw);
-	}
-
-	/**
 	 * @param array $data
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_NotImplemented
@@ -489,13 +478,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @param int          $type
-	 * @param array        $id
-	 * @param array|null   $data
-	 * @param boolean|null $dataFromPersistence
+	 * @param int        $type
+	 * @param array      $id
+	 * @param array|null $data
 	 * @return CM_Model_Abstract
 	 */
-	final public static function factoryGeneric($type, array $id, array $data = null, $dataFromPersistence = null) {
+	final public static function factoryGeneric($type, array $id, array $data = null) {
 		$className = self::_getClassName($type);
 		/*
 		 * Cannot use __construct(), since signature is unknown.
@@ -504,51 +492,32 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$serialized = serialize(array($id, $data));
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
-		if ((null !== $data) && $dataFromPersistence && $cache = $model->_getCache()) {
-			$model->_loadAssets(true);
-			$cache->save($model->getType(), $model->getIdRaw(), $model->_getData());
+		if (null !== $data) {
+			$model->_loadAssets(false);
 		}
 		return $model;
 	}
 
 	/**
-	 * @param array    $idTypeList [['type' => int, 'id' => int|array],...] | [int|array,...] Pass an array of ids if $modelType is used
-	 * @param int|null $modelType
+	 * @param array $idTypeList [['type' => int, 'id' => int|array],...]
 	 * @return CM_Model_Abstract[] Can contain null-entries when model doesn't exist
-	 * @throws CM_Exception_Invalid
 	 */
-	public static function factoryGenericMultiple(array $idTypeList, $modelType = null) {
-		$modelType = (null !== $modelType) ? (int) $modelType : null;
-		$modelList = array();
+	public static function factoryGenericMultiple(array $idTypeList) {
+		$dataList = array();
 		$idTypeMap = array();
-		$storageTypeList = array(
-			'cache'       => array(),
-			'persistence' => array()
-		);
+		$storageTypeList = array();
 		$noPersistenceList = array();
 
 		foreach ($idTypeList as $idType) {
-			if (null === $modelType) {
-				if (!is_array($idType)) {
-					throw new CM_Exception_Invalid('`idType` should be an array if `modelType` is not defined: `' . CM_Util::var_line($idType) . '`');
-				}
-				$type = (int) $idType['type'];
-				$id = $idType['id'];
-			} else {
-				$type = $modelType;
-				$id = $idType;
+			$type = (int) $idType['type'];
+			if (!is_array($idType['id'])) {
+				$idType['id'] = array('id' => $idType['id']);
 			}
-			if (!is_array($id)) {
-				$id = array('id' => $id);
-			}
-			$id = self::_castIdRaw($id);
-			$idType = array('type' => $type, 'id' => $id);
 
-			$serializedKey = serialize($idType);
-			$modelList[$serializedKey] = null;
+			$serializedKey = serialize(array('type' => $type, 'id' => $idType['id']));
+			$dataList[$serializedKey] = null;
 			$idTypeMap[$serializedKey] = $idType;
 
-			/** @var CM_Model_Abstract $modelClass */
 			$modelClass = CM_Model_Abstract::_getClassName($type);
 			if ($cacheStorageClass = $modelClass::getCacheClass()) {
 				$storageTypeList['cache'][$cacheStorageClass][$serializedKey] = $idType;
@@ -560,45 +529,41 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 		}
 
-		foreach ($storageTypeList as $storageType => $adapterTypeList) {
-			$searchItemList = array_filter($modelList, function ($value) {
+		foreach ($storageTypeList as $adapterTypeList) {
+			$searchItemList = array_filter($dataList, function ($value) {
 				return null === $value;
 			});
 			foreach ($adapterTypeList as $adapterClass => $adapterItemList) {
 				/** @var CM_Model_StorageAdapter_AbstractAdapter $storageAdapter */
 				$storageAdapter = new $adapterClass();
 				$result = $storageAdapter->loadMultiple(array_intersect_key($adapterItemList, $searchItemList));
-				foreach ($result as $serializedKey => $modelData) {
-					$model = null;
-					if (null !== $modelData) {
-						$dataFromPersistence = 'persistence' === $storageType;
-						$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id'], $modelData,
-							$dataFromPersistence);
-					}
-					$modelList[$serializedKey] = $model;
-				}
+				$dataList = array_merge($dataList, $result);
 			}
 		}
 
-		// no persistence
-		foreach ($noPersistenceList as $serializedKey => $idType) {
-			if (!isset($modelList[$serializedKey])) {
-				try {
-					$model = self::factoryGeneric($idType['type'], $idType['id']);
-				} catch (CM_Exception_Nonexistent $ex) {
-					$model = null;
+		foreach ($dataList as $serializedKey => $modelData) {
+			$model = null;
+			if (null === $modelData) {
+				if (isset($noPersistenceList[$serializedKey])) {
+					try {
+						$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id']);
+					} catch (CM_Exception_Nonexistent $ex) {
+						$model = null;
+					}
 				}
-				$modelList[$serializedKey] = $model;
+			} else {
+				$model = self::factoryGeneric($idTypeMap[$serializedKey]['type'], $idTypeMap[$serializedKey]['id'], $modelData);
 			}
+			$dataList[$serializedKey] = $model;
 		}
-		return array_values($modelList);
+		return array_values($dataList);
 	}
 
 	public function toArray() {
 		$id = $this->_getId();
 		$array = array('_type' => $this->getType(), '_id' => $id);
 		if (array_key_exists('id', $id)) {
-			$array['id'] = (int) $id['id'];
+			$array['id'] = $id['id'];
 		}
 		return $array;
 	}
