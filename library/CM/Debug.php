@@ -24,7 +24,7 @@ class CM_Debug {
 	/**
 	 * adds a new key value pair to the stats array
 	 * @param string $key
-	 * @param string|string[] $value
+	 * @param string $value
 	 */
 	public function incStats($key, $value) {
 		if (!array_key_exists($key, $this->_stats)) {
