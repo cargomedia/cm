@@ -1,6 +1,5 @@
 & {
 	text-align: center;
-	padding-bottom: 12px;
 }
 
 .previews {
@@ -40,9 +39,12 @@
 }
 
 .dropInfo {
+	display: none;
 	color: @colorFgShy;
 
-	display: block;
+	@media(min-width: 600px) {
+		display: block;
+	}
 
 	.dropInfo-icon {
 		font-size: 5em;
