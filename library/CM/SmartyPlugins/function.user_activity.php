@@ -7,9 +7,6 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
 	$forceDisplay = isset($params['force_display']);
 	/** @var CM_Model_User $user  */
 	$user = $params['user'];
-	if ($user->getVisible()) {
-		return '<span class="online">' . $render->getTranslation('Online') . '</span>';
-	}
 
 	$activityStamp = $user->getLatestactivity();
 	$activityDelta = time() - $activityStamp;
@@ -17,5 +14,20 @@ function smarty_function_user_activity(array $params, Smarty_Internal_Template $
 		return '';
 	}
 
-	return $render->getTranslation('Online') . ': ' . smarty_function_date_timeago(array('time' => $activityStamp), $template);
+	$class = 'user-activity ';
+
+	if ($user->getVisible()) {
+		$class .= 'online ';
+	}
+
+	$html = '<span class="' . $class . '">';
+	$html .= $render->getTranslation('Online');
+
+	if (!$user->getVisible()) {
+		$html .= ': ' . smarty_function_date_timeago(array('time' => $activityStamp), $template);
+	}
+
+	$html .= '</span>';
+
+	return $html;
 }
