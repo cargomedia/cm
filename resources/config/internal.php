@@ -6,7 +6,8 @@ $config->CM_Site_Abstract->types = array();
 // Highest type used: #0
 
 $config->CM_Action_Abstract->types = array();
-// Highest type used: #0
+$config->CM_Action_Abstract->types[CM_Action_Email::TYPE] = 'CM_Action_Email'; // #6
+// Highest type used: #6
 
 $config->CM_Model_Abstract->types = array();
 $config->CM_Model_Abstract->types[CM_Model_DeviceCapabilities::TYPE] = 'CM_Model_DeviceCapabilities'; // #20
@@ -56,3 +57,17 @@ $config->CM_Paging_ContentList_Abstract->types[CM_Paging_ContentList_Badwords::T
 
 
 $config->CM_Action_Abstract->verbs = array();
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::UPDATE] = 2;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::DELETE] = 3;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::ONLINE] = 4;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::OFFLINE] = 5;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::VIEW] = 6;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::VISIBLE] = 7;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::INVISIBLE] = 8;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::PUBLISH] = 9;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::UNPUBLISH] = 10;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::SUBSCRIBE] = 11;
+$config->CM_Action_Abstract->verbs[CM_Action_Abstract::UNSUBSCRIBE] = 12;
+$config->CM_Action_Abstract->verbsMaxValue = 12;
+

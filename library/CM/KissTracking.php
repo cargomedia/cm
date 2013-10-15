@@ -106,6 +106,13 @@ class CM_KissTracking extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return mixed[]
+	 */
+	protected function _getEvents() {
+		return $this->_getSet()->flush();
+	}
+
+	/**
 	 * @return CM_Set
 	 */
 	private function _getSet() {
@@ -113,13 +120,6 @@ class CM_KissTracking extends CM_Class_Abstract {
 			$this->_set = new CM_Set(self::SET_NAME);
 		}
 		return $this->_set;
-	}
-
-	/**
-	 * @return mixed[]
-	 */
-	private function _getEvents() {
-		return $this->_getSet()->flush();
 	}
 
 	/**

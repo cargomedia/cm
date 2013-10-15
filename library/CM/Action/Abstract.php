@@ -2,38 +2,47 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
-	/**
-	 * @var CM_Model_User|int
-	 */
+	const CREATE = 'Create';
+	const UPDATE = 'Update';
+	const DELETE = 'Delete';
+	const ONLINE = 'Online';
+	const OFFLINE = 'Offline';
+	const VIEW = 'View';
+	const VISIBLE = 'Visible';
+	const INVISIBLE = 'Invisible';
+	const PUBLISH = 'Pulish';
+	const UNPUBLISH = 'Unpublish';
+	const SUBSCRIBE = 'Subscribe';
+	const UNSUBSCRIBE = 'Unsubscribe';
+
+	/** @var CM_Model_User|int */
 	protected $_actor = null;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	protected $_verb;
 
-	/**
-	 * @var int|null
-	 */
+	/** @var int|null */
 	protected $_ip = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $_ignoreLogging = array();
 
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $_forceAllow = false;
 
+	/** @var array */
+	private $_trackingProperties = array();
+
+	/** @var bool */
+	private $_trackingEnabled = true;
+
 	/**
-	 * @param int               $verb
+	 * @param string            $verbName
 	 * @param CM_Model_User|int $actor
 	 */
-	public final function __construct($verb, $actor) {
+	public final function __construct($verbName, $actor) {
 		$this->setActor($actor);
-		$this->_verb = (int) $verb;
+		$this->_verb = CM_Action_Abstract::getVerbByVerbName($verbName);
 	}
 
 	protected function _notify() {
@@ -42,6 +51,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
+		}
+
+		if ($this->getActor() && $this->_trackingEnabled) {
+			$this->_track();
 		}
 	}
 
@@ -251,20 +264,21 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	public static function fromArray(array $data) {
-		return self::factory($data['actor'], $data['verb'], $data['type']);
+		$verb = CM_Action_Abstract::getVerbNameByVerb($data['verb']);
+		return self::factory($data['actor'], $verb, $data['type']);
 	}
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int           $verb
+	 * @param string        $verbName
 	 * @param int           $type
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $verb, $type) {
+	public static function factory(CM_Model_User $actor, $verbName, $type) {
 		$class = self::_getClassName($type);
-		return new $class($verb, $actor);
+		return new $class($verbName, $actor);
 	}
 
 	/**
@@ -333,7 +347,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return string
 	 */
 	public function getName() {
-		return self::getNameByType($this->getType(), $this->_getClassName());
+		return self::getNameByClassName($this->_getClassName());
 	}
 
 	/**
@@ -343,15 +357,35 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		return $this->getName() . ' ' . $this->getVerbName();
 	}
 
+	protected function _track() {
+		CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+	}
+
 	/**
-	 * @param int         $type
-	 * @param string|null $className
+	 * @param array $properties
+	 */
+	protected function _setTrackingProperties(array $properties) {
+		$this->_trackingProperties = $properties;
+	}
+
+	protected function _disableTracking() {
+		$this->_trackingEnabled = false;
+	}
+
+	/**
+	 * @param int $type
 	 * @return string
 	 */
-	static public function getNameByType($type, $className = null) {
-		if (!$className) {
-			$className = self::_getClassName($type);
-		}
+	static public function getNameByType($type) {
+		$className = self::_getClassName($type);
+		return self::getNameByClassName($className);
+	}
+
+	/**
+	 * @param string $className
+	 * @return string
+	 */
+	static public function getNameByClassName($className) {
 		return str_replace('_', ' ', str_replace(CM_Util::getNamespace($className) . '_Action_', '', $className));
 	}
 
@@ -361,10 +395,23 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	static public function getVerbNameByVerb($verb) {
-		$actionVerbs = self::_getConfig()->verbs;
-		if (!array_key_exists($verb, $actionVerbs)) {
+		$actionVerbNames = array_flip(self::_getConfig()->verbs);
+		if (!array_key_exists($verb, $actionVerbNames)) {
 			throw new CM_Exception_Invalid('The specified Action does not exist!');
 		}
-		return $actionVerbs[$verb];
+		return $actionVerbNames[$verb];
+	}
+
+	/**
+	 * @param string $name
+	 * @return int
+	 * @throws CM_Exception_Invalid
+	 */
+	static public function getVerbByVerbName($name) {
+		$actionVerbs = self::_getConfig()->verbs;
+		if (!array_key_exists($name, $actionVerbs)) {
+			throw new CM_Exception_Invalid('Action `' . $name . '` does not exist!');
+		}
+		return $actionVerbs[$name];
 	}
 }
