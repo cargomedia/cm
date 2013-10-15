@@ -174,12 +174,27 @@ class CM_App {
 	}
 
 	public function generateConfigActionVerbs() {
-		$content = '$config->CM_Action_Abstract->verbs = array();';
-		foreach ($this->getActionVerbs() as $actionVerb) {
-			$content .= PHP_EOL;
-			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' .
-					CM_Util::camelize($actionVerb['name']) . '\';';
+		$maxValue = 0;
+		if (isset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue)) {
+			$maxValue = CM_Config::get()->CM_Action_Abstract->verbsMaxValue;
 		}
+
+		$currentVerbs = array();
+		if (isset(CM_Config::get()->CM_Action_Abstract->verbs)) {
+			$currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
+		}
+
+		$content = '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
+		foreach ($this->getActionVerbs() as $actionVerb) {
+			if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
+				$maxValue++;
+				$currentVerbs[$actionVerb['value']] = $maxValue;
+			}
+			$key = $actionVerb['className'] . '::' . $actionVerb['name'];
+			$id = $currentVerbs[$actionVerb['value']];
+			$content .= '$config->CM_Action_Abstract->verbs[' . $key . '] = ' . var_export($id, true) . ';' . PHP_EOL;
+		}
+		$content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';' . PHP_EOL;
 		return $content;
 	}
 
@@ -204,7 +219,9 @@ class CM_App {
 	public function getActionVerbs() {
 		$actionVerbs = array();
 		$actionVerbsValues = array();
-		foreach (CM_Action_Abstract::getClassChildren(true) as $className) {
+		$classNames = CM_Action_Abstract::getClassChildren(true);
+		array_unshift($classNames, 'CM_Action_Abstract');
+		foreach ($classNames as $className) {
 			$class = new ReflectionClass($className);
 			$constants = $class->getConstants();
 			unset($constants['TYPE']);
