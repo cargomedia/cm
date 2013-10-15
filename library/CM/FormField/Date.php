@@ -38,13 +38,18 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 
+		$years = range($this->_yearMin, $this->_yearMax);
+		$months = range(1, 12);
+		$days = range(1, 31);
+
+		$this->setTplParam('years', array_combine($years, $years));
+		$this->setTplParam('months', array_combine($months, $months));
+		$this->setTplParam('days', array_combine($days, $days));
+
 		$value = $this->getValue();
 		$this->setTplParam('yy', $value ? $value->format('Y') : null);
 		$this->setTplParam('mm', $value ? $value->format('m') : null);
 		$this->setTplParam('dd', $value ? $value->format('d') : null);
-
-		$this->setTplParam('minYear', $this->_yearMin);
-		$this->setTplParam('maxYear', $this->_yearMax);
 	}
 
 	public function isEmpty($userInput) {
