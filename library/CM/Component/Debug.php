@@ -12,7 +12,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
 		$stats = $debug->getStats();
 		ksort($stats);
 		$this->setTplParam('stats', $stats);
-		$cacheNames = array('CM_Cache', 'CM_CacheLocal', 'CM_Cache_File');
+		$cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
 		$this->_setJsParam('cacheNames', $cacheNames);
 		$this->setTplParam('cacheNames', $cacheNames);
 	}
@@ -22,17 +22,20 @@ class CM_Component_Debug extends CM_Component_Abstract {
 			throw new CM_Exception_NotAllowed();
 		}
 		$cachesCleared = array();
-		if ($params->getBoolean('CM_Cache', false)) {
-			CM_Cache::flush();
-			$cachesCleared[] = 'CM_Cache';
+		if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
+			$cache = new CM_Cache_Storage_Memcache();
+			$cache->flush();
+			$cachesCleared[] = 'CM_Cache_Storage_Memcache';
 		}
-		if ($params->getBoolean('CM_CacheLocal', false)) {
-			CM_CacheLocal::flush();
-			$cachesCleared[] = 'CM_CacheLocal';
+		if ($params->getBoolean('CM_Cache_Storage_Apc', false)) {
+			$cache = new CM_Cache_Storage_Apc();
+			$cache->flush();
+			$cachesCleared[] = 'CM_Cache_Storage_Apc';
 		}
-		if ($params->getBoolean('CM_Cache_File', false)) {
-			CM_Cache_File::flush();
-			$cachesCleared[] = 'CM_Cache_File';
+		if ($params->getBoolean('CM_Cache_Storage_File', false)) {
+			$cache = new CM_Cache_Storage_File();
+			$cache->flush();
+			$cachesCleared[] = 'CM_Cache_Storage_File';
 		}
 		$handler->message('Cleared: ' . implode(', ', $cachesCleared));
 	}

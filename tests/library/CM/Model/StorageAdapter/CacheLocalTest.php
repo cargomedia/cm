@@ -6,7 +6,7 @@ class CM_Model_StorageAdapter_CacheLocalTest extends CMTest_TestCase {
 	}
 
 	public function tearDown() {
-		CM_CacheLocal::flush();
+		CM_Cache_Local::getInstance()->flush();
 	}
 
 	public function testLoadMultiple() {

@@ -13,7 +13,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @param int $id
 	 */
 	public function __construct($level, $id) {
-		$this->_construct(array('id' => (int) $id, 'level' => (int) $level));
+		$this->_construct(array('id' => $id, 'level' => $level));
 	}
 
 	/**
@@ -48,7 +48,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getLevel() {
-		return $this->_getId('level');
+		return (int) $this->_getId('level');
 	}
 
 	/**
@@ -57,7 +57,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public function getId($level = null) {
 		if (null === $level) {
-			return $this->_getId('id');
+			return (int) $this->_getId('id');
 		}
 		$id = $this->_getField($level, 'id');
 		if (null === $id) {
@@ -189,14 +189,15 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public static function findByIp($ip) {
 		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
-		if ((list($level, $id) = CM_CacheLocal::get($cacheKey)) === false) {
+		$cache = CM_Cache_Local::getInstance();
+		if ((list($level, $id) = $cache->get($cacheKey)) === false) {
 			$level = $id = null;
 			if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
 				$level = self::LEVEL_CITY;
 			} elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
 				$level = self::LEVEL_COUNTRY;
 			}
-			CM_CacheLocal::set($cacheKey, array($level, $id));
+			$cache->set($cacheKey, array($level, $id));
 		}
 		if (!$level && !$id) {
 			return null;

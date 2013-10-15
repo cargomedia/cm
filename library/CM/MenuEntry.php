@@ -121,9 +121,9 @@ class CM_MenuEntry {
 		$className = $this->getPageName();
 
 		$cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
-		if (($page = CM_Cache_Runtime::get($cacheKey)) === false) {
+		if (($page = CM_Cache_Storage_Runtime::getInstance()->get($cacheKey)) === false) {
 			$page = new $className($this->getParams(), $viewer);
-			CM_Cache_Runtime::set($cacheKey, $page);
+			CM_Cache_Storage_Runtime::getInstance()->set($cacheKey, $page);
 		}
 
 		return $page;

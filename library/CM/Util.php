@@ -443,13 +443,58 @@ class CM_Util {
 	}
 
 	/**
+	 * @param null $namespace
+	 * @return string
+	 *
+	 * Measures time between two successive calls, sums up multiple measurements and tracks call count
+	 */
+	public static function benchmarkMultiple($namespace = null) {
+		static $timeTotals;
+		if (!$timeTotals) {
+			$timeTotals = array();
+		}
+		static $callCount;
+		if (!$callCount) {
+			$callCount = array();
+		}
+		static $times;
+		if (!$times) {
+			$times = array();
+		}
+		$now = microtime(true) * 1000;
+		$total = 0;
+		if (!array_key_exists($namespace, $callCount)) {
+			$callCount[$namespace] = 0;
+		}
+		if (array_key_exists($namespace, $timeTotals)) {
+			$total = $timeTotals[$namespace];
+		}
+		if (array_key_exists($namespace, $times)) {
+			$difference = $now - $times[$namespace];
+			$total += $difference;
+			$timeTotals[$namespace] = $total;
+			unset($times[$namespace]);
+			$callCount[$namespace] += 1;
+		} else {
+			$times[$namespace] = $now;
+		}
+		$count = $callCount[$namespace];
+		$output = sprintf('called %d times', $count);
+		if ($count) {
+			$output .= sprintf(', Average: %.2f ms, Total: %.2f ms', $total/$count, $total);
+		}
+		return $output;
+	}
+
+	/**
 	 * @param string       $className
 	 * @param boolean|null $includeAbstracts
 	 * @return string[]
 	 */
 	public static function getClassChildren($className, $includeAbstracts = null) {
 		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
-		if (false === ($classNames = CM_CacheLocal::get($key))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($classNames = $cache->get($key))) {
 			$pathsFiltered = array();
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
@@ -473,7 +518,7 @@ class CM_Util {
 				}
 			}
 			$classNames = self::getClasses($pathsFiltered);
-			CM_CacheLocal::set($key, $classNames);
+			$cache->set($key, $classNames);
 		}
 		return $classNames;
 	}
