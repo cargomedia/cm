@@ -18,20 +18,5 @@
 {/if}
 
 {if $display === CM_FormField_Set_Select::DISPLAY_SELECT}
-<select id="{$id}" name="{$name}"  class="{$class}">
-	{if $placeholder}
-		<option value="">- {translate 'Select'} -</option>
-	{/if}
-	{foreach $optionList as $itemValue => $itemLabel}
-		<option value="{$itemValue|escape}" {if $itemValue==$value}selected="selected"{/if}>
-			{block name='label'}
-				{if $translate}
-					{translate "{$translatePrefix}{$itemLabel}"|escape}
-				{else}
-					{$itemLabel|escape}
-				{/if}
-			{/block}
-		</option>
-	{/foreach}
-</select>
+	{select id=$id name=$name class=$class optionList=$optionList translate=$translate translatePrefix=$translatePrefix selectedValue=$value}
 {/if}
