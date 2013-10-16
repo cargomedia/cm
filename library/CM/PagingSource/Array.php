@@ -5,7 +5,7 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
 	/** @var Closure|null */
 	private $_closureFilter, $_closureSortBy;
 
-	/** @var array */
+	/** @var array|null */
 	private $_data;
 
 	/** @var array|null */
@@ -68,24 +68,23 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
 	}
 
 	protected function _getData() {
-		if (isset($this->_data)) {
-			return $this->_data;
-		}
-		if (!isset($this->_dataRaw) && $this->_source) {
-			$this->_dataRaw = $this->_source->getItems();
-		}
-		$this->_data = $this->_dataRaw;
-		if (null !== $this->_closureFilter) {
-			$this->_data = array_filter($this->_data, $this->_closureFilter);
-		}
-		if (null !== $this->_closureSortBy) {
-			$sortArray = array();
-			foreach ($this->_data as $key => $item) {
-				$sortArray[$key] = call_user_func($this->_closureSortBy, $item);
+		if (!isset($this->_data)) {
+			if ($this->_source) {
+				$this->_dataRaw = $this->_source->getItems();
 			}
-			array_multisort($sortArray, $this->_sortOrder, $this->_sortFlags, $this->_data);
+			$this->_data = $this->_dataRaw;
+			if (null !== $this->_closureFilter) {
+				$this->_data = array_filter($this->_data, $this->_closureFilter);
+			}
+			if (null !== $this->_closureSortBy) {
+				$sortArray = array();
+				foreach ($this->_data as $key => $item) {
+					$sortArray[$key] = call_user_func($this->_closureSortBy, $item);
+				}
+				array_multisort($sortArray, $this->_sortOrder, $this->_sortFlags, $this->_data);
+			}
+			unset($this->_dataRaw);
 		}
-		unset($this->_dataRaw);
 		return $this->_data;
 	}
 }
