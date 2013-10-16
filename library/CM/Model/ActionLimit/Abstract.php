@@ -23,6 +23,11 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	abstract public function overshoot(CM_Action_Abstract $action, $role, $first);
 
 	/**
+	 * @return boolean
+	 */
+	abstract public function getOvershootAllowed();
+
+	/**
 	 * @return int
 	 */
 	public function getActionType() {

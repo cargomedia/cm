@@ -79,8 +79,15 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
 			return false;
 		}
-		$actionLimit = $this->getActionLimitsTransgressed();
-		return !$actionLimit;
+		$actionLimitList = $this->getActionLimitsTransgressed();
+		foreach ($actionLimitList as $actionLimitData) {
+			/** @var CM_Model_ActionLimit_Abstract $actionLimit */
+			$actionLimit = $actionLimitData['actionLimit'];
+			if (!$actionLimit->getOvershootAllowed()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	abstract protected function _prepare();
@@ -91,13 +98,18 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
 		}
 		$role = null;
-		$actionLimit = $this->getActionLimitsTransgressed($role);
-		if ($actionLimit) {
-			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
-			if ($isFirst) {
-				$this->_log($actionLimit, $role);
+		$actionLimitList = $this->getActionLimitsTransgressed();
+		if (!empty($actionLimitList)) {
+			foreach ($actionLimitList as $actionLimitData) {
+				/** @var CM_Model_ActionLimit_Abstract $actionLimit */
+				$actionLimit = $actionLimitData['actionLimit'];
+				$role = $actionLimitData['role'];
+				$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
+				if ($isFirst) {
+					$this->_log($actionLimit, $role);
+				}
+				$actionLimit->overshoot($this, $role, $isFirst);
 			}
-			$actionLimit->overshoot($this, $role, $isFirst);
 		} else {
 			$this->_log();
 		}
