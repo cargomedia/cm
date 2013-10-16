@@ -35,7 +35,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function createJavascriptFiles() {
-		$viewClasses = CM_View_Abstract::getClassChildren();
+		$viewClasses = CM_View_Abstract::getClassChildren(true);
 		foreach ($viewClasses as $path => $className) {
 			if ($this->_isValidJavascriptView($className)) {
 				$jsPath = preg_replace('/\.php$/', '.js', $path);
