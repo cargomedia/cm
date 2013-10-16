@@ -46,7 +46,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	}
 
 	$html = '<div class="select-wrapper">';
-	$html .= '<div class="button button-default hasLabel hasIcon hasIconRight" type="button" value="Month" ><span class="label">' . $selectedLabel . '</span><span class="icon icon-arrow-down"></span></div>';
+
 	$html .= '<select';
 	foreach ($htmlAttributes as $name) {
 		if (isset($params[$name])) {
@@ -73,6 +73,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		$html .= '</option>';
 	}
 	$html .= '</select>';
+	$html .= '<div class="button button-default hasLabel hasIconRight" type="button" value="Month" ><span class="label">' . $selectedLabel . '</span><span class="icon icon-arrow-down"></span></div>';
 	$html .= '</div>';
 	return $html;
 }

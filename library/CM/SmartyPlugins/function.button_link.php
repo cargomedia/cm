@@ -48,9 +48,11 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	$iconMarkup = '';
 	if ($icon) {
 		$iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
-		$class .= ' hasIcon';
+
 		if ($iconPosition == 'right') {
 			$class .= ' hasIconRight';
+		} else {
+			$class .= ' hasIcon';
 		}
 	}
 
