@@ -3,7 +3,7 @@
 class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 
 	public function testClearCache() {
-		$pagingMock = $this->getMock('CM_PagingSource_Array', array('clearCache'), array(range(1, 10)));
+		$pagingMock = $this->getMock('CM_PagingSource_Sql', array('clearCache'), array('*', 'table'));
 		$pagingMock->expects($this->once())->method('clearCache');
 		$pagingSource = new CM_PagingSource_Array($pagingMock);
 		$pagingSource->clearCache();
@@ -15,6 +15,15 @@ class CM_PagingSource_ArrayTest extends CMTest_TestCase {
 	 */
 	public function testClearCacheNotImplemented() {
 		$pagingSource = new CM_PagingSource_Array(range(1, 10));
+		$pagingSource->clearCache();
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage does not support caching
+	 */
+	public function testClearCacheNotImplementedOnSource() {
+		$pagingSource = new CM_PagingSource_Array(new CM_PagingSource_Array(range(1, 10)));
 		$pagingSource->clearCache();
 	}
 
