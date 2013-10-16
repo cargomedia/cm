@@ -94,7 +94,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$actionLimit = $this->getActionLimit($role);
 		if ($actionLimit) {
 			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
-			$this->_log($actionLimit, $role);
+			if ($isFirst) {
+				$this->_log($actionLimit, $role);
+			}
 			$actionLimit->overshoot($this, $role, $isFirst);
 		} else {
 			$this->_log();
