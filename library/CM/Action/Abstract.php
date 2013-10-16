@@ -2,18 +2,18 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
-	const CREATE = 'Create';
-	const UPDATE = 'Update';
-	const DELETE = 'Delete';
-	const ONLINE = 'Online';
-	const OFFLINE = 'Offline';
-	const VIEW = 'View';
-	const VISIBLE = 'Visible';
-	const INVISIBLE = 'Invisible';
-	const PUBLISH = 'Pulish';
-	const UNPUBLISH = 'Unpublish';
-	const SUBSCRIBE = 'Subscribe';
-	const UNSUBSCRIBE = 'Unsubscribe';
+	const CREATE = 'CREATE';
+	const UPDATE = 'UPDATE';
+	const DELETE = 'DELETE';
+	const ONLINE = 'ONLINE';
+	const OFFLINE = 'OFFLINE';
+	const VIEW = 'VIEW';
+	const VISIBLE = 'VISIBLE';
+	const INVISIBLE = 'INVISIBLE';
+	const PUBLISH = 'PUBLISH';
+	const UNPUBLISH = 'UNPUBLISH';
+	const SUBSCRIBE = 'SUBSCRIBE';
+	const UNSUBSCRIBE = 'UNSUBSCRIBE';
 
 	/** @var CM_Model_User|int */
 	protected $_actor = null;

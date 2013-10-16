@@ -550,9 +550,8 @@ var CM_View_Abstract = Backbone.View.extend({
 			var match = key.match(/^(\S+)\s+(.+)$/);
 			var actionType = cm.action.types[match[1]];
 			var actionNames = match[2].split(/\s*,\s*/);
-			_.each(actionNames, function(actionName) {
-				var actionVerb = cm.action.verbs[actionName];
-				this.bindAction(actionVerb, actionType, channelKey, channelType, callback);
+			_.each(actionNames, function(actionVerbName) {
+				this.bindAction(actionVerbName, actionType, channelKey, channelType, callback);
 			}, this);
 		}, this);
 	},
