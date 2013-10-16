@@ -38,16 +38,6 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		this.on('destruct', function() {
 			$(window).unbind('keydown.debugBar');
 		});
-
-		if (cm.options.stream.channel) {
-			_.each(cm.action.types, function(actionType, actionTypeName) {
-				_.each(cm.action.verbs, function(actionVerb, actionVerbName) {
-					self.bindAction(actionVerb, actionType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
-						cm.debug.log(actionTypeName + ': <[ACTOR:' + (action.actor ? action.actor.id : null) + '] , ' + actionVerbName + ' , ' + '[' + model._class + ':' + JSON.stringify(model._id) + ']>', '(', data, ')');
-					});
-				});
-			});
-		}
 	},
 
 	toggleDebugBar: function() {
