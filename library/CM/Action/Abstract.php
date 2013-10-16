@@ -79,7 +79,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
 			return false;
 		}
-		$actionLimit = $this->getActionLimit();
+		$actionLimit = $this->getActionLimitsTransgressed();
 		return !$actionLimit;
 	}
 
@@ -91,7 +91,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
 		}
 		$role = null;
-		$actionLimit = $this->getActionLimit($role);
+		$actionLimit = $this->getActionLimitsTransgressed($role);
 		if ($actionLimit) {
 			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
 			if ($isFirst) {
@@ -112,10 +112,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int &$bestRole OPTIONAL reference for storing role associated with limit
-	 * @return CM_Model_ActionLimit_Abstract|null
+	 * @return array ['actionLimit' => CM_Model_ActionLimit_Abstract, 'role' => int]
 	 */
-	public final function getActionLimit(&$bestRole = null) {
+	public final function getActionLimitsTransgressed() {
+		$actionLimitsTransgressed = array();
 		if ($this->_forceAllow) {
 			return null;
 		}
@@ -135,11 +135,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$limit = $actionLimit->getLimit($bestRole);
 			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())
 			) {
-				return $actionLimit;
+				$actionLimitsTransgressed[] = array('actionLimit' => $actionLimit, 'role' => $bestRole);
 			}
 		}
-		$bestRole = null;
-		return null;
+		return $actionLimitsTransgressed;
 	}
 
 	/**
