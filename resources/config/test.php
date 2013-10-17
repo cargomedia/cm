@@ -16,10 +16,8 @@ $config->classConfigCacheEnabled = false;
 
 $config->CM_Model_DeviceCapabilities->adapter = null;
 
-$config->CM_Model_Splittest = new stdClass();
 $config->CM_Model_Splittest->withoutPersistence = true;
 
-$config->CM_Model_Splitfeature = new stdClass();
 $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
