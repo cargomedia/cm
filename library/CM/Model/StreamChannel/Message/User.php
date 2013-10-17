@@ -56,12 +56,12 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 		return $this->hasUser();
 	}
 
-		/**
+	/**
 	 * @param CM_Model_User $user
 	 * @param string        $event
 	 * @param mixed|null    $data
 	 */
-	public static function publish(CM_Model_User $user, $event, $data = null) {
+	public static function publish($user, $event, $data = null) {
 		if (!$user->getOnline()) {
 			return;
 		}
@@ -75,7 +75,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
 	 * @param CM_Model_Abstract  $model
 	 * @param mixed|null         $data
 	 */
-	public static function publishAction(CM_Model_User $user, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
+	public static function publishAction($user, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
 		if (!$user->getOnline()) {
 			return;
 		}
