@@ -8,7 +8,7 @@ class CM_Config {
 	private $_config = null;
 
 	private function _init() {
-		$this->_config = new stdClass();
+		$this->_config = new CM_Config_Note();
 		$this->_loadConfig('internal.php');
 		$this->_loadConfig('default.php');
 		$this->_loadConfig('local.php');
@@ -36,7 +36,7 @@ class CM_Config {
 	}
 
 	/**
-	 * @return stdClass
+	 * @return CM_Config_Note
 	 */
 	public static function get() {
 		$config = self::_getInstance();
@@ -47,9 +47,9 @@ class CM_Config {
 	}
 
 	/**
-	 * @param stdClass $config
+	 * @param CM_Config_Note $config
 	 */
-	public static function set(stdClass $config) {
+	public static function set(CM_Config_Note $config) {
 		self::_getInstance()->_config = $config;
 	}
 
