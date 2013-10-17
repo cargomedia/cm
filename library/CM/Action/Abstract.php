@@ -109,10 +109,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 					$this->_log($actionLimit, $role);
 				}
 				$actionLimit->overshoot($this, $role, $isFirst);
+				if (!$actionLimit->getOvershootAllowed()) {
+					throw new CM_Exception_Invalid('ActionLimit `' . $actionLimit->getType() . '` breached.');
+				}
 			}
-		} else {
-			$this->_log();
 		}
+		$this->_log();
 		$this->_prepare();
 	}
 
@@ -132,7 +134,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			return null;
 		}
 		/** @var CM_Model_ActionLimit_Abstract $actionLimit */
-		foreach (new CM_Paging_ActionLimit_Action($this) as $actionLimit) {
+		foreach ($this->_getActionLimitList() as $actionLimit) {
 			$bestRole = null;
 			if ($this->getActor()) {
 				$bestLimit = 0;
@@ -191,6 +193,13 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
+	 * @return CM_Paging_ActionLimit_Action
+	 */
+	protected function _getActionLimitList() {
+		return new CM_Paging_ActionLimit_Action($this);
+	}
+
+	/**
 	 * @param CM_Model_ActionLimit_Abstract $actionLimit
 	 * @param int                           $role
 	 * @return bool
@@ -198,17 +207,16 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
 		$first = true;
 		if ($actionLimit->getLimit($role)) {
-			$transgressions = $this->_getTransgressions($actionLimit->getType(), $actionLimit->getPeriod($role));
+			$period = $actionLimit->getPeriod($role);
+			$transgressions = $this->_getTransgressions($actionLimit->getType(), $period);
 			if ($transgressions->getCount()) {
-				$actions = $this->_getSiblings($actionLimit->getPeriod($role));
+				$lastTransgression = $transgressions->getItem(0);
+				$actions = $this->_getSiblings($period, $lastTransgression['createStamp']);
 				if ($actions->getCount()) {
-					$lastAction = $actions->getItem(0);
-					$lastTransgression = $transgressions->getItem(0);
-					if ($lastAction['createStamp'] <= $lastTransgression['createStamp']) {
+					$firstAction = $actions->getItem(-1);
+					if (time() <= ($firstAction['createStamp'] + $period)) {
 						$first = false;
 					}
-				} else {
-					$first = false;
 				}
 			}
 		}
@@ -216,17 +224,18 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int $within OPTIONAL
+	 * @param int|null $within
+	 * @param int|null $upperBound
 	 * @return CM_Paging_Action_Ip|CM_Paging_Action_User
 	 * @throws CM_Exception_Invalid
 	 */
-	private final function _getSiblings($within = null) {
+	private final function _getSiblings($within = null, $upperBound = null) {
 		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
 				'Looking for actions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within);
+			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within, $upperBound);
 		} else {
 			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within);
 		}
