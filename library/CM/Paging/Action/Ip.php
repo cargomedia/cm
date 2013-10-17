@@ -2,15 +2,17 @@
 
 class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 
+	/** @var int */
 	private $_ip;
 
 	/**
-	 * @param int $ip
-	 * @param int $actionType OPTIONAL
-	 * @param int $actionVerb OPTIONAL
-	 * @param int $period OPTIONAL
+	 * @param int      $ip
+	 * @param int|null $actionType
+	 * @param int|null $actionVerb
+	 * @param int|null $period
+	 * @param int|null $upperBound
 	 */
-	public function __construct($ip, $actionType = null, $actionVerb = null, $period = null) {
+	public function __construct($ip, $actionType = null, $actionVerb = null, $period = null, $upperBound = null) {
 		$this->_ip = (int) $ip;
 		$period = (int) $period;
 		$where = 'ip=' . $this->_ip . ' AND `actionLimitType` IS NULL';
@@ -23,8 +25,9 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 			$where .= ' AND `verb` = ' . $actionVerb;
 		}
 		if ($period) {
-			$time = time() - $period;
-			$where .= ' AND `createStamp` > ' . $time;
+			$upperBound = (null !== $upperBound) ? (int) $upperBound : time();
+			$lowerBound = $upperBound - $period;
+			$where .= ' AND `createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound;
 		}
 		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', 'cm_action', $where, '`createStamp` DESC');
 		parent::__construct($source);
@@ -32,6 +35,6 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 
 	public function add(CM_Action_Abstract $action) {
 		CM_Db_Db::insertDelayed('cm_action',
-				array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(), 'createStamp' => time()));
+			array('ip' => $this->_ip, 'verb' => $action->getVerb(), 'type' => $action->getType(), 'createStamp' => time()));
 	}
 }

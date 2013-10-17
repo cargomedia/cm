@@ -17,10 +17,11 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param int|null $actionType
 	 * @param int|null $actionVerb
 	 * @param int|null $period
+	 * @param int|null $upperBound
 	 * @return CM_Paging_Action_User
 	 */
-	public function getActions($actionType = null, $actionVerb = null, $period = null) {
-		return new CM_Paging_Action_User($this, $actionType, $actionVerb, $period);
+	public function getActions($actionType = null, $actionVerb = null, $period = null, $upperBound = null) {
+		return new CM_Paging_Action_User($this, $actionType, $actionVerb, $period, $upperBound);
 	}
 
 	/**
