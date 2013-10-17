@@ -22,6 +22,10 @@ class CM_Config_Generator extends CM_Class_Abstract {
 		foreach ($entryList as $key => $value) {
 			if (is_array($value)) {
 				$keyMapped = $mapping->getConfigKey($key);
+				$output .= PHP_EOL;
+				$output .= 'if (!isset($config->' . $keyMapped . ')) {' . PHP_EOL;
+				$output .= '	$config->' . $keyMapped . ' = new stdClass();' . PHP_EOL;
+				$output .= '}' . PHP_EOL;
 				foreach ($value as $subKey => $subValue) {
 					$output .= '$config->' . $keyMapped . '->' . $subKey . ' = ' . var_export($subValue, true) . ';' . PHP_EOL;
 				}
