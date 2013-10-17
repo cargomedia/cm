@@ -184,10 +184,7 @@ class CM_App {
 			$currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
 		}
 
-		$content = 'if (!isset($config->CM_Action_Abstract)) {' . PHP_EOL;
-		$content .= '	$config->CM_Action_Abstract = new stdClass();' . PHP_EOL;
-		$content .= '}' . PHP_EOL;
-		$content .= '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
+		$content = '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
 		foreach ($this->getActionVerbs() as $actionVerb) {
 			if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
 				$maxValue++;
@@ -322,9 +319,6 @@ class CM_App {
 
 		$lines = array();
 		$lines[] = '';
-		$lines[] = 'if (!isset($config->' . $className . ')) {';
-		$lines[] = '	$config->' . $className . ' = new stdClass();';
-		$lines[] = '}';
 		$lines[] = '$config->' . $className . '->types = array();';
 		$lines = array_merge($lines, $declarations);
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
