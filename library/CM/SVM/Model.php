@@ -64,6 +64,7 @@ class CM_SVM_Model {
 		);
 		$trainings = CM_Db_Db::select('cm_svmtraining', array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
 
+		$problem = array();
 		$classCounts = array();
 		foreach ($trainings as $training) {
 			$class = $training['class'];
