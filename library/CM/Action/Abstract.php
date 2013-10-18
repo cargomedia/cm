@@ -147,8 +147,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				}
 			}
 			$limit = $actionLimit->getLimit($bestRole);
-			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())
-			) {
+			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())) {
 				$actionLimitsTransgressed[] = array('actionLimit' => $actionLimit, 'role' => $bestRole);
 			}
 		}
@@ -214,7 +213,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				$actions = $this->_getSiblings($period, $lastTransgression['createStamp']);
 				if ($actions->getCount()) {
 					$firstAction = $actions->getItem(-1);
-					if (time() <= ($firstAction['createStamp'] + $period)) {
+					if (time() < ($firstAction['createStamp'] + $period)) {
 						$first = false;
 					}
 				}
