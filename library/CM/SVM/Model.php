@@ -80,6 +80,9 @@ class CM_SVM_Model {
 		foreach ($classCounts as $class => $count) {
 			$weights[$class] = min($classCounts) / $count;
 		}
+		if (empty($weights)) {
+			$weights = null;
+		}
 
 		$this->_model = $svm->train($problem, $weights);
 		$this->_model->save($this->_getPath());
