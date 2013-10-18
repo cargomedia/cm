@@ -99,19 +99,17 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		}
 		$role = null;
 		$actionLimitList = $this->getActionLimitsTransgressed();
-		if (!empty($actionLimitList)) {
-			foreach ($actionLimitList as $actionLimitData) {
-				/** @var CM_Model_ActionLimit_Abstract $actionLimit */
-				$actionLimit = $actionLimitData['actionLimit'];
-				$role = $actionLimitData['role'];
-				$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
-				if ($isFirst) {
-					$this->_log($actionLimit, $role);
-				}
-				$actionLimit->overshoot($this, $role, $isFirst);
-				if (!$actionLimit->getOvershootAllowed()) {
-					throw new CM_Exception_Invalid('ActionLimit `' . $actionLimit->getType() . '` breached.');
-				}
+		foreach ($actionLimitList as $actionLimitData) {
+			/** @var CM_Model_ActionLimit_Abstract $actionLimit */
+			$actionLimit = $actionLimitData['actionLimit'];
+			$role = $actionLimitData['role'];
+			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
+			if ($isFirst) {
+				$this->_log($actionLimit, $role);
+			}
+			$actionLimit->overshoot($this, $role, $isFirst);
+			if (!$actionLimit->getOvershootAllowed()) {
+				throw new CM_Exception_Invalid('ActionLimit `' . $actionLimit->getType() . '` breached.');
 			}
 		}
 		$this->_log();
