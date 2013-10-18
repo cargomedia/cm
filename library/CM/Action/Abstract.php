@@ -236,7 +236,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		if ($this->getActor()) {
 			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within, $upperBound);
 		} else {
-			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within);
+			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within, $upperBound);
 		}
 	}
 
