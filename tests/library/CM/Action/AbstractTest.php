@@ -61,7 +61,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 		CMTest_TH::timeForward(8);
 		// transgression
 		$action->prepare();
-		CMTest_TH::timeForward(2);
+		CMTest_TH::timeForward(1);
 		// actions within first period, no new transgressions
 		$action->prepare();
 		$action->prepare();
@@ -88,7 +88,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
 		}
-		CMTest_TH::timeForward(29);
+		CMTest_TH::timeForward(30);
 		$action->prepare();
 		$action->prepare();
 		$action->prepare();
