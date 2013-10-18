@@ -55,10 +55,7 @@ class CM_SVM_Model {
 		return (int) $result;
 	}
 
-	/**
-	 * @param boolean $autoWeight OPTIONAL Clone trainings, so that every class has the same amount of trainings
-	 */
-	public function train($autoWeight = true) {
+	public function train() {
 		$svm = new SVM();
 		$svm->setOptions(
 			array(
