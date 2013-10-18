@@ -170,25 +170,6 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 		$this->assertRow('cm_action', array('verb' => 1, 'type' => 1, 'createStamp' => 2, 'count' => 5));
 	}
 
-	public function testForceAllow() {
-		$actor = CMTest_TH::createUser();
-		$action = new CM_Action_Mock('foo', $actor);
-
-		CM_Db_Db::insert('cm_actionLimit', array('type' => 1, 'actionType' => 1, 'actionVerb' => 1, 'role' => null, 'limit' => 0, 'period' => 0));
-
-		$action->forceAllow(false);
-		try {
-			$action->prepare();
-			$this->fail('Limited action did not throw exception');
-		} catch (CM_Exception_ActionLimit $e) {
-			$this->assertSame('Mock overshoot', $e->getMessage());
-		}
-
-		$action->forceAllow(true);
-		$action->prepare();
-		$this->assertTrue(true);
-	}
-
 	public function testGetName() {
 		$actor = CMTest_TH::createUser();
 		$action = new CM_Action_Mock('foo', $actor);

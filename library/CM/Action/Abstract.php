@@ -27,9 +27,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/** @var array */
 	protected $_ignoreLogging = array();
 
-	/** @var bool */
-	private $_forceAllow = false;
-
 	/** @var array */
 	private $_trackingProperties = array();
 
@@ -117,20 +114,10 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param bool $forceAllow
-	 */
-	public function forceAllow($forceAllow) {
-		$this->_forceAllow = (bool) $forceAllow;
-	}
-
-	/**
 	 * @return array ['actionLimit' => CM_Model_ActionLimit_Abstract, 'role' => int]
 	 */
 	public final function getActionLimitsTransgressed() {
 		$actionLimitsTransgressed = array();
-		if ($this->_forceAllow) {
-			return null;
-		}
 		/** @var CM_Model_ActionLimit_Abstract $actionLimit */
 		foreach ($this->_getActionLimitList() as $actionLimit) {
 			$bestRole = null;
