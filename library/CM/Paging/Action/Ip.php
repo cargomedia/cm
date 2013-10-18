@@ -13,6 +13,7 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 	 * @param int|null $upperBound
 	 */
 	public function __construct($ip, $actionType = null, $actionVerb = null, $period = null, $upperBound = null) {
+		$cacheEnabled = false;
 		$this->_ip = (int) $ip;
 		$period = (int) $period;
 		$where = 'ip=' . $this->_ip . ' AND `actionLimitType` IS NULL';
@@ -25,11 +26,19 @@ class CM_Paging_Action_Ip extends CM_Paging_Action_Abstract {
 			$where .= ' AND `verb` = ' . $actionVerb;
 		}
 		if ($period) {
-			$upperBound = (null !== $upperBound) ? (int) $upperBound : time();
+			if (null !== $upperBound) {
+				$upperBound = (int) $upperBound;
+				$cacheEnabled = true;
+			} else {
+				$upperBound = time();
+			}
 			$lowerBound = $upperBound - $period;
 			$where .= ' AND `createStamp` > ' . $lowerBound . ' AND `createStamp` <= ' . $upperBound;
 		}
 		$source = new CM_PagingSource_Sql_Deferred('type, verb, createStamp', 'cm_action', $where, '`createStamp` DESC');
+		if ($cacheEnabled) {
+			$source->enableCacheLocal();
+		}
 		parent::__construct($source);
 	}
 
