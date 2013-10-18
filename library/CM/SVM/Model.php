@@ -59,7 +59,7 @@ class CM_SVM_Model {
 		$svm = new SVM();
 		$svm->setOptions(
 			array(
-				SVM::OPT_KERNEL_TYPE => SVM::KERNEL_LINEAR
+				SVM::OPT_KERNEL_TYPE => SVM::KERNEL_LINEAR,
 			)
 		);
 		$trainings = CM_Db_Db::select('cm_svmtraining', array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
