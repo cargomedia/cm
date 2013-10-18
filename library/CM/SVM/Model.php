@@ -60,31 +60,30 @@ class CM_SVM_Model {
 	 */
 	public function train($autoWeight = true) {
 		$svm = new SVM();
+		$svm->setOptions(
+			array(
+				SVM::OPT_KERNEL_TYPE => SVM::KERNEL_LINEAR
+			)
+		);
 		$trainings = CM_Db_Db::select('cm_svmtraining', array('class', 'values'), array('svmId' => $this->getId()))->fetchAll();
-		$classTrainings = array();
+
+		$classCounts = array();
 		foreach ($trainings as $training) {
-			if (!isset($classTrainings[$training['class']])) {
-				$classTrainings[$training['class']] = array();
+			$class = $training['class'];
+			$values = unserialize($training['values']);
+			if (!isset($classCounts[$class])) {
+				$classCounts[$class] = 0;
 			}
-			$classTrainings[$training['class']][] = unserialize($training['values']);
+			$classCounts[$class]++;
+			$problem[] = array_merge(array(0 => $class), $values);
 		}
 
-		$classCountMax = 0;
-		foreach ($classTrainings as $class => $valueSets) {
-			$classCountMax = max($classCountMax, count($valueSets));
+		$weights = array();
+		foreach ($classCounts as $class => $count) {
+			$weights[$class] = min($classCounts) / $count;
 		}
 
-		$problem = array();
-		foreach ($classTrainings as $class => $valueSets) {
-			while ($autoWeight && count($valueSets) < $classCountMax) {
-				$valueSets = array_merge($valueSets, array_slice($valueSets, -0, ($classCountMax - count($valueSets))));
-			}
-			foreach ($valueSets as $values) {
-				$problem[] = array_merge(array(0 => $class), $values);
-			}
-		}
-
-		$this->_model = $svm->train($problem);
+		$this->_model = $svm->train($problem, $weights);
 		$this->_model->save($this->_getPath());
 		CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 0));
 	}
