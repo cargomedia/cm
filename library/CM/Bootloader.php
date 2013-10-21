@@ -15,6 +15,9 @@ class CM_Bootloader {
 	/** @var array|null */
 	private $_namespacePaths;
 
+	/** @var bool */
+	private $_debug;
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -33,6 +36,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
+		$this->_debug = (bool) getenv('CM_DEBUG');
 	}
 
 	public function defaults() {
@@ -169,11 +173,7 @@ class CM_Bootloader {
 	 * @return bool
 	 */
 	public function isDebug() {
-		static $isDebug;
-		if (null === $isDebug) {
-			$isDebug = (bool) getenv('CM_DEBUG');
-		}
-		return $isDebug;
+		return $this->_debug;
 	}
 
 	/**
