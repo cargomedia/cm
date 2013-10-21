@@ -21,13 +21,13 @@ class CM_Component_Example extends CM_Component_Abstract {
 		}
 	}
 
-	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$x = $params->getString('x');
 		//$response->reloadComponent();
 		return 'x=' . $x;
 	}
 
-	public static function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$status = $params->getInt('status', 200);
 		$message = $params->has('text') ? $params->getString('text') : null;
 		$messagePublic = $params->getBoolean('public', false) ? $message : null;
@@ -43,7 +43,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 		throw new $exception($message, $messagePublic);
 	}
 
-	public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$number = $params->getInt('number');
 		self::stream($response->getViewer(true), 'ping', array("number" => $number, "message" => 'pong'));
 	}

@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Component_Abstract extends CM_View_Abstract {
+abstract class CM_Component_Abstract extends CM_View_Abstract implements CM_View_AccessRestrictable {
 
 	/**
 	 * @var CM_Model_User|null
@@ -122,17 +122,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 		return $this->_viewer;
 	}
 
-	public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		return $response->reloadComponent($params->getAll());
 	}
 
-	/**
-	 * @param string             $className
-	 * @param CM_Params|array    $params
-	 * @param CM_Model_User|null $viewer
-	 * @return CM_Component_Abstract
-	 * @throws CM_Exception
-	 */
 	public static function factory($className, $params = null, CM_Model_User $viewer = null) {
 		if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
 			throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');

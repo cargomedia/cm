@@ -16,15 +16,24 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 			if (!isset($query['params']) || !is_array($query['params'])) {
 				throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
 			}
-			$view = $this->_getViewInfo();
-			$className = $view['className'];
+			$viewInfo = $this->_getViewInfo();
+			$viewClassName = $viewInfo['className'];
+			$viewParams = $viewInfo['params'];
 			$functionName = 'ajax_' . $query['method'];
-			$params = CM_Params::factory($query['params']);
-			$this->_setStringRepresentation($className . '::' . $functionName);
-
+			$functionParams = CM_Params::factory($query['params']);
+			$this->_setStringRepresentation($viewClassName . '::' . $functionName);
 			$componentHandler = new CM_ComponentFrontendHandler();
-			$success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
 
+			$reflection = new ReflectionClass($viewClassName);
+			if ($reflection->getMethod($functionName)->isStatic()) {
+				$success['data'] = CM_Params::encode(call_user_func(array($viewClassName, $functionName), $functionParams, $componentHandler, $this));
+			} else {
+				$viewClass = CM_View_Abstract::factory($viewClassName, $viewParams, $this->getViewer());
+				if ($viewClass instanceof CM_View_AccessRestrictable) {
+					$viewClass->checkAccessible();
+				}
+				$success['data'] = $viewClass->$functionName($functionParams, $componentHandler, $this);
+			}
 
 			$exec = $componentHandler->compile_js('this');
 
