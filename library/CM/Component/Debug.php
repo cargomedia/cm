@@ -10,7 +10,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
 	public function prepare() {
 		$debug = CM_Debug::getInstance();
 		$stats = $debug->getStats();
-        ksort($stats);
+		ksort($stats);
 		$this->setTplParam('stats', $stats);
 		$cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
 		$this->_setJsParam('cacheNames', $cacheNames);
