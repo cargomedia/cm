@@ -46,8 +46,6 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
 
-		define('IS_DEBUG', (bool) CM_Config::get()->debug && !CM_Bootloader::getInstance()->isEnvironment('test'));
-
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
@@ -166,6 +164,17 @@ class CM_Bootloader {
 			exit(1);
 		});
 	}
+
+    /**
+     * @return bool
+     */
+    public function isDebug() {
+        static $isDebug;
+        if (null === $isDebug) {
+            $isDebug = (bool) getenv('CM_DEBUG');
+        }
+        return $isDebug;
+    }
 
 	/**
 	 * @return array

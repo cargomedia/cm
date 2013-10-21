@@ -413,7 +413,7 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return bool
 	 */
 	public function isDebug() {
-		return IS_DEBUG;
+		return CM_Bootloader::getInstance()->isDebug();
 	}
 
 	/**

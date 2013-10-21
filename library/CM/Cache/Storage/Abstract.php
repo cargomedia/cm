@@ -8,7 +8,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @param int|null $lifeTime
 	 */
 	public final function set($key, $value, $lifeTime = null) {
-		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-set', $key);
+		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-set', $key);
 		$key = $this->_getKeyArmored($key);
 		$this->_set($key, $value, $lifeTime);
 	}
@@ -18,7 +18,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return mixed|false
 	 */
 	public final function get($key) {
-		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-get', $key);
+		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-get', $key);
 		$key = $this->_getKeyArmored($key);
 		return $this->_get($key);
 	}
@@ -54,7 +54,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return mixed[]
 	 */
 	public final function getMulti(array $keys) {
-		CM_Debug::get()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
+		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
 		foreach ($keys as &$key) {
 			$key = self::_getKeyArmored($key);
 		}
