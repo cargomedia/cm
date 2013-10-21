@@ -12,7 +12,7 @@ class CM_Debug {
 	 */
 	public static function get() {
 		if (self::$_instance === null) {
-			if (IS_DEBUG) {
+			if (defined('IS_DEBUG') && IS_DEBUG) {
 				self::$_instance = new self();
 			} else {
 				self::$_instance = new CM_DebugDummy();
