@@ -32,7 +32,9 @@ $config->CM_Cache_Local->lifetime = 86400;
 $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
 $config->CM_Cache_Shared->lifetime = 3600;
 
-$config->CM_Memcache_Client->servers = array(array('host' => 'localhost', 'port' => 11211));
+$config->CM_Memcache_Client->servers = array(
+	array('host' => 'localhost', 'port' => 11211),
+);
 
 $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
 
@@ -43,11 +45,9 @@ $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 
 $config->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
 $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-	array(
-		'httpHost'   => 'localhost',
-		'httpPort'   => 8085,
-		'sockjsUrls' => array('http://localhost:8090')
-	),
+	array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
+		'http://localhost:8090',
+	)),
 );
 
 $config->CM_Db_Db->db = 'cm';
