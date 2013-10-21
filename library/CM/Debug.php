@@ -47,4 +47,8 @@ class CM_DebugDummy {
 	public function __call($name, $arguments) {
 		return false;
 	}
+
+    public function getStats() {
+        return array();
+    }
 }
