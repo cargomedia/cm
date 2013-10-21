@@ -77,4 +77,6 @@ class CM_CacheConst {
 	const StreamChannel_Id = 'StreamChannel_Id';
 
 	const TestCase_Site_Mock = 'TestCase_Site_Mock';
+
+	const Config = 'Config';
 }
