@@ -106,7 +106,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			}
 			$actionLimit->overshoot($this, $role, $isFirst);
 			if (!$actionLimit->getOvershootAllowed()) {
-				throw new CM_Exception_Invalid('ActionLimit `' . $actionLimit->getType() . '` breached.');
+				throw new CM_Exception_NotAllowed('ActionLimit `' . $actionLimit->getType() . '` breached.');
 			}
 		}
 		$this->_log();

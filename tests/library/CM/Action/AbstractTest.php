@@ -78,14 +78,14 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 		try {
 			$action->prepare();
 			$this->fail('Action breached hard limit.');
-		} catch (CM_Exception_Invalid $ex) {
+		} catch (CM_Exception_NotAllowed $ex) {
 			$this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
 		}
 		// hard limit reached, transgression not logged
 		try {
 			$action->prepare();
 			$this->fail('Action breached hard limit.');
-		} catch (CM_Exception_Invalid $ex) {
+		} catch (CM_Exception_NotAllowed $ex) {
 			$this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
 		}
 		CMTest_TH::timeForward(30);
@@ -119,13 +119,13 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 		try {
 			$action->prepare();
 			$this->fail('Action breached hard limit.');
-		} catch (CM_Exception_Invalid $ex) {
+		} catch (CM_Exception_NotAllowed $ex) {
 			$this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
 		}
 		try {
 			$action->prepare();
 			$this->fail('Action breached hard limit.');
-		} catch (CM_Exception_Invalid $ex) {
+		} catch (CM_Exception_NotAllowed $ex) {
 			$this->assertContains('ActionLimit `' . $hardLimit->getType() . '` breached', $ex->getMessage());
 		}
 		CMTest_TH::timeForward(10);
