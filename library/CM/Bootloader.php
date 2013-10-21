@@ -15,6 +15,9 @@ class CM_Bootloader {
 	/** @var array|null */
 	private $_namespacePaths;
 
+	/** @var bool */
+	private $_debug;
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -33,6 +36,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		define('DIR_LIBRARY', $dirLibrary);
+		$this->_debug = (bool) getenv('CM_DEBUG');
 	}
 
 	public function defaults() {
@@ -45,8 +49,6 @@ class CM_Bootloader {
 	public function constants() {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
-
-		define('IS_DEBUG', (bool) CM_Config::get()->debug && !CM_Bootloader::getInstance()->isEnvironment('test'));
 
 		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
@@ -165,6 +167,13 @@ class CM_Bootloader {
 			$errorHandler->handleException($exception);
 			exit(1);
 		});
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isDebug() {
+		return $this->_debug;
 	}
 
 	/**

@@ -6,6 +6,6 @@ define('DIR_TEST_DATA', DIR_TESTS . 'data' . DIRECTORY_SEPARATOR);
 
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->setEnvironment('test');
-$bootloader->load(array('constants', 'exceptionHandler', 'errorHandler', 'defaults'));
+$bootloader->load(array('errorHandler', 'constants', 'exceptionHandler', 'defaults'));
 
 CMTest_TH::init();

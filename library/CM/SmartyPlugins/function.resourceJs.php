@@ -19,7 +19,7 @@ function smarty_helper_resourceJs($type, $file, $render) {
 	if (!in_array($type, array('vendor', 'library'))) {
 		throw new CM_Exception_Invalid('Invalid type `' . $type . '` provided');
 	}
-	if ($render->isDebug() && $type === 'library' && $file === 'library.js') {
+	if (CM_Bootloader::getInstance()->isDebug() && $type === 'library' && $file === 'library.js') {
 		return smarty_helper_resourceJs_libraryDebug($render);
 	}
 	$url = $render->getUrlResource($type . '-js', $file);
