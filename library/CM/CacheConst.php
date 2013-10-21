@@ -68,7 +68,7 @@ class CM_CacheConst {
 	const ClassChildren = 'ClassChildren';
 
 	// _className:X
-	const Config = 'Config';
+	const ClassConfig = 'ClassConfig';
 
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';

@@ -47,7 +47,7 @@ abstract class CM_Class_Abstract {
 		if (null === self::$_classConfigCacheEnabled) {
 			self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
 		}
-		$cacheKey = CM_CacheConst::Config . '_className:' . get_called_class();
+		$cacheKey = CM_CacheConst::ClassConfig . '_className:' . get_called_class();
 		$cache = new CM_Cache_Storage_Apc();
 		if (!self::$_classConfigCacheEnabled || false === ($result = $cache->get($cacheKey))) {
 			$result = self::_getConfigRaw();
