@@ -165,16 +165,16 @@ class CM_Bootloader {
 		});
 	}
 
-    /**
-     * @return bool
-     */
-    public function isDebug() {
-        static $isDebug;
-        if (null === $isDebug) {
-            $isDebug = (bool) getenv('CM_DEBUG');
-        }
-        return $isDebug;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isDebug() {
+		static $isDebug;
+		if (null === $isDebug) {
+			$isDebug = (bool) getenv('CM_DEBUG');
+		}
+		return $isDebug;
+	}
 
 	/**
 	 * @return array
