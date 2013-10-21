@@ -2,6 +2,7 @@
 
 class CMTest_TH {
 
+	private static $_timeStart;
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
@@ -61,12 +62,12 @@ class CMTest_TH {
 	}
 
 	public static function timeInit() {
-		runkit_function_copy('time', 'time_original');
+		self::$_timeStart = time();
 		runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 	}
 
 	public static function time() {
-		return time_original() + self::$timeDelta;
+		return self::$_timeStart + self::$timeDelta;
 	}
 
 	public static function timeForward($sec) {

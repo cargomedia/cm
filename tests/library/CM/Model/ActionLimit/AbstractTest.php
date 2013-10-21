@@ -74,4 +74,8 @@ class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {
 		throw new CM_Exception_ActionLimit('Mock overshoot');
 	}
+
+	public function getOvershootAllowed() {
+		return false;
+	}
 }
