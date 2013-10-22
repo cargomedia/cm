@@ -22,7 +22,7 @@
 					$this.removeAttr('title').tooltip('hide');
 					$this.removeData('clickConfirmed.deactivate');
 					clearTimeout(deactivateTimeout);
-					$(document).off('click.clickConfirmed', documentClickHandler);
+					$(document).off('click.clickConfirmed clickConfirmed-activate', documentClickHandler);
 				};
 
 				$this.data('clickConfirmed.deactivate', deactivateButton);
@@ -38,7 +38,7 @@
 				};
 
 				setTimeout(function() {
-					$(document).on('click.clickConfirmed', documentClickHandler);
+					$(document).on('click.clickConfirmed clickConfirmed-activate', documentClickHandler);
 				}, 0);
 			};
 
@@ -47,6 +47,7 @@
 				$this.data('clickConfirmed.deactivate')();
 				return event.handleObj.handler.call(this, event);
 			} else {
+				$(document).trigger('clickConfirmed-activate');
 				activateButton();
 				return false;
 			}
