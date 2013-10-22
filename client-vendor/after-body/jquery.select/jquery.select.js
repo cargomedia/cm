@@ -9,7 +9,7 @@
 			var updateLabel = function() {
 				var index = $select.get(0).selectedIndex;
 				var label = $select.find('option').eq(index).text();
-				$wrapper.find('.button .label').html(label);
+				$wrapper.find('.button .label').text(label);
 			};
 			$select.on('change', function() {
 				updateLabel();
