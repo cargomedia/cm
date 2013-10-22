@@ -44,7 +44,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	protected function _notify() {
 		$arguments = func_get_args();
-		$methodName = '_notify' . $this->getVerbName();
+		$methodName = '_notify' . CM_Util::camelize($this->getVerbName());
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
@@ -60,7 +60,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	protected final function _isAllowed() {
 		$arguments = func_get_args();
-		$methodName = '_isAllowed' . $this->getVerbName();
+		$methodName = '_isAllowed' . CM_Util::camelize($this->getVerbName());
 
 		if (method_exists($this, $methodName)) {
 			return call_user_func_array(array($this, $methodName), $arguments);
