@@ -10,7 +10,7 @@ class CM_ExceptionHandling_Handler_Http extends CM_ExceptionHandling_Handler_Abs
 			header('HTTP/1.1 500 Internal Server Error');
 			header('Content-Type: text/html');
 		}
-		if (!IS_DEBUG) {
+		if (!CM_Bootloader::getInstance()->isDebug()) {
 			$output->writeln('Internal server error');
 		} else {
 			$output->writeln($formatter->formatException($exception));

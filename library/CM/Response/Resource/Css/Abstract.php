@@ -12,7 +12,7 @@ abstract class CM_Response_Resource_Css_Abstract extends CM_Response_Resource_Ab
 	 * @param CM_Asset_Css $asset
 	 */
 	protected function _setAsset(CM_Asset_Css $asset) {
-		$compress = !$this->getRender()->isDebug();
+		$compress = !CM_Bootloader::getInstance()->isDebug();
 		$this->_setContent($asset->get($compress));
 	}
 }

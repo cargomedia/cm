@@ -175,6 +175,7 @@ A typical Apache virtual host configuration for this purpose were:
   </Directory>
 
   <Directory ‹project-dir›/public/>
+    SetEnv CM_DEBUG 1
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php

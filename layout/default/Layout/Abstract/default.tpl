@@ -40,7 +40,7 @@
 				{component name=$viewObj->getPage()}
 			{/block}
 		</div>
-		{if $smarty.const.IS_DEBUG}{component name='CM_Component_Debug'}{/if}
+		{if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
 		{resourceJs file='after-body.js' type="vendor"}
 		{resourceJs file='library.js' type="library"}
 		{if $render->getLanguage()}
