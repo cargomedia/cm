@@ -118,7 +118,7 @@ select {
 	color: lighten(@colorFg, 25);
 	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
 
-	&:hover {
+	&:not(:disabled):hover {
 		border: 1px solid darken(@colorFgBorderEmphasize3, 10);
 		.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 12));
 		color: @colorFg;
@@ -136,7 +136,7 @@ select {
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
 
-	&:hover {
+	&:not(:disabled):hover {
 		.gradient(vertical, spin(@colorBgButtonHighlight, -2), spin(@colorBgButtonHighlight, -8));
 		color: @colorFgTheme;
 	}
@@ -153,7 +153,7 @@ select {
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorOk, -8);
 
-	&:hover {
+	&:not(:disabled):hover {
 		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
 		color: @colorFgTheme;
 	}
@@ -170,7 +170,7 @@ select {
 	color: @colorBg;
 	text-shadow: 1px 1px @colorError;
 
-	&:hover {
+	&:not(:disabled):hover {
 		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
 		color: @colorFgTheme;
 	}
