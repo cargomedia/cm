@@ -8,6 +8,7 @@
 		.icon {
 			font-size: 8px;
 			color: @colorFgBorderEmphasize3;
+			.transition(200ms);
 		}
 	}
 
@@ -22,9 +23,21 @@
 		width: auto;
 		opacity: 0;
 		.appearance(none);
+		cursor: pointer;
 
-		&:focus:not(:disabled) + .button {
-			.input_focus;
+		&:not(:disabled) {
+			&:focus + .button {
+				.input_focus;
+			}
+			&:hover + .button {
+				.icon {
+					color: lighten(@colorNotice, 15);
+				}
+			}
+		}
+
+		&:disabled + .button {
+			opacity: .5;
 		}
 	}
 }
