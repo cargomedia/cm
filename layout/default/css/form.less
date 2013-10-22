@@ -119,7 +119,7 @@ select {
 	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
 
 	&:not(:disabled):hover {
-		border: 1px solid darken(@colorFgBorderEmphasize3, 10);
+		border-color: darken(@colorFgBorderEmphasize3, 10);
 		.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 12));
 		color: @colorFg;
 	}
@@ -154,6 +154,7 @@ select {
 	text-shadow: 1px 1px spin(@colorOk, -8);
 
 	&:not(:disabled):hover {
+		border-color: @colorOk;
 		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
 		color: @colorFgTheme;
 	}
@@ -171,6 +172,7 @@ select {
 	text-shadow: 1px 1px @colorError;
 
 	&:not(:disabled):hover {
+		border-color: @colorError;
 		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
 		color: @colorFgTheme;
 	}
