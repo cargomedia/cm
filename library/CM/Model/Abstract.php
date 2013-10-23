@@ -521,7 +521,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$modelType = (null !== $modelType) ? (int) $modelType : null;
 		$modelList = array();
 		$idTypeMap = array();
-		$originalKeyMap = array();
+		$serializedKeyMap = array();
 		$storageTypeList = array(
 			'cache'       => array(),
 			'persistence' => array()
@@ -546,7 +546,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$idType = array('type' => $type, 'id' => $id);
 
 			$serializedKey = serialize($idType);
-			$originalKeyMap[$originalKey] = $serializedKey;
+			$serializedKeyMap[$originalKey] = $serializedKey;
 			$modelList[$serializedKey] = null;
 			$idTypeMap[$serializedKey] = $idType;
 
@@ -594,8 +594,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			}
 		}
 		$resultList = array();
-		foreach ($originalKeyMap as $originalKey => $serializedKey) {
-			$resultList[] = $modelList[$originalKeyMap[$originalKey]];
+		foreach ($serializedKeyMap as $originalKey => $serializedKey) {
+			$resultList[] = $modelList[$serializedKeyMap[$originalKey]];
 		}
 		return $resultList;
 	}
