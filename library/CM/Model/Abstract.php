@@ -79,12 +79,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function delete() {
-		$this->_onDeleteBefore();
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
 		$containingCacheables = $this->_getContainingCacheables();
+		$this->_onDeleteBefore();
 		$this->_onDelete();
+		$this->_onDeleteAfter();
 		if ($persistence = $this->_getPersistence()) {
 			$persistence->delete($this->getType(), $this->getIdRaw());
 		}
@@ -94,7 +95,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		foreach ($containingCacheables as $cacheable) {
 			$cacheable->_change();
 		}
-		$this->_onDeleteAfter();
 		$this->_data = null;
 		$this->_dataDecoded = array();
 	}
