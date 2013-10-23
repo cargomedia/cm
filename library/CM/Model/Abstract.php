@@ -521,13 +521,14 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$modelType = (null !== $modelType) ? (int) $modelType : null;
 		$modelList = array();
 		$idTypeMap = array();
+		$originalKeyMap = array();
 		$storageTypeList = array(
 			'cache'       => array(),
 			'persistence' => array()
 		);
 		$noPersistenceList = array();
 
-		foreach ($idTypeList as $idType) {
+		foreach ($idTypeList as $originalKey => $idType) {
 			if (null === $modelType) {
 				if (!is_array($idType)) {
 					throw new CM_Exception_Invalid('`idType` should be an array if `modelType` is not defined: `' . CM_Util::var_line($idType) . '`');
@@ -545,6 +546,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 			$idType = array('type' => $type, 'id' => $id);
 
 			$serializedKey = serialize($idType);
+			$originalKeyMap[$originalKey] = $serializedKey;
 			$modelList[$serializedKey] = null;
 			$idTypeMap[$serializedKey] = $idType;
 
@@ -591,7 +593,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 				$modelList[$serializedKey] = $model;
 			}
 		}
-		return array_values($modelList);
+		$resultList = array();
+		foreach ($originalKeyMap as $originalKey => $serializedKey) {
+			$resultList[] = $modelList[$originalKeyMap[$originalKey]];
+		}
+		return $resultList;
 	}
 
 	public function toArray() {
