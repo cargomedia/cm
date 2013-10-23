@@ -25,11 +25,14 @@ class CM_Model_Stream_Subscribe extends CM_Model_Stream_Abstract {
 		return CM_Db_Db::select('cm_stream_subscribe', '*', array('id' => $this->getId()))->fetch();
 	}
 
-	protected function _onDelete() {
+	protected function _onDeleteBefore() {
 		$streamChannel = $this->getStreamChannel();
 		if ($streamChannel->isValid()) {
 			$streamChannel->onUnsubscribe($this);
 		}
+	}
+
+	protected function _onDelete() {
 		CM_Db_Db::delete('cm_stream_subscribe', array('id' => $this->getId()));
 	}
 

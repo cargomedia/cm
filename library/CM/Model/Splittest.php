@@ -129,10 +129,13 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return new static($name);
 	}
 
-	protected function _onDelete() {
-		CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
+	protected function _onDeleteBefore() {
 		CM_Db_Db::delete('cm_splittestVariation', array('splittestId' => $this->getId()));
 		CM_Db_Db::delete('cm_splittestVariation_fixture', array('splittestId' => $this->getId()));
+	}
+
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
 	}
 
 	/**

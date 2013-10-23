@@ -158,11 +158,18 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $cacheables;
 	}
 
-	protected function _onDelete() {
-		CM_Db_Db::delete('cm_language', array('id' => $this->getId()));
+
+	protected function _onDeleteBefore() {
 		CM_Db_Db::delete('cm_languageValue', array('languageId' => $this->getId()));
 		CM_Db_Db::update('cm_language', array('backupId' => null), array('backupId' => $this->getId()));
 		CM_Db_Db::update('cm_user', array('languageId' => null), array('languageId' => $this->getId()));
+	}
+
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_language', array('id' => $this->getId()));
+	}
+
+	protected function _onDeleteAfter() {
 		self::changeAll();
 	}
 
