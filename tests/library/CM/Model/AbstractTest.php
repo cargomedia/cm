@@ -494,6 +494,26 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$this->assertNull($models[4]);
 	}
 
+	public function testFactoryDuplicateModel() {
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+
+		$model1 = new CM_ModelMock3();
+		$model1->_set('foo', 'bar1');
+		$model1->commit();
+		$model2 = new CM_ModelMock3();
+		$model2->_set('foo', 'bar2');
+		$model2->commit();
+
+		/** @var CM_ModelMock[] $models */
+		$models = CM_Model_Abstract::factoryGenericMultiple(array(
+			array('type' => $model1->getType(), 'id' => $model1->getId()),
+			array('type' => $model1->getType(), 'id' => $model2->getId()),
+			array('type' => $model1->getType(), 'id' => $model1->getId()),
+		));
+		$this->assertSame(3, count($models));
+		$this->assertEquals(array($model1, $model2, $model1), $models);
+	}
+
 	public function testFactoryGenericMultiple_idType() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
 		$model = new CM_ModelMock3();
