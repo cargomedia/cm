@@ -190,7 +190,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 */
 	private function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
 		$first = true;
-		if ($actionLimit->getLimit($role)) {
+		if (null !== $actionLimit->getLimit($role) && 0 !== $actionLimit->getLimit($role)) {
 			$period = $actionLimit->getPeriod($role);
 			$transgressions = $this->_getTransgressions($actionLimit->getType(), $period);
 			if ($transgressions->getCount()) {
