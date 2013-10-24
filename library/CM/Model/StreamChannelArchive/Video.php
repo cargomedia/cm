@@ -93,10 +93,13 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		return CM_Db_Db::select('cm_streamChannelArchive_video', '*', array('id' => $this->getId()))->fetch();
 	}
 
-	protected function _onDelete() {
+	protected function _onDeleteBefore() {
 		$this->getVideo()->delete();
 		$thumbDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
 		$thumbDir->delete();
+	}
+
+	protected function _onDelete() {
 		CM_Db_Db::delete('cm_streamChannelArchive_video', array('id' => $this->getId()));
 	}
 

@@ -169,6 +169,8 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 
+		$onDeleteBefore = CMTest_TH::getProtectedMethod('CM_Model_Stream_Subscribe', '_onDeleteBefore');
+		$onDeleteBefore->invoke($streamSubscribe);
 		$onDelete = CMTest_TH::getProtectedMethod('CM_Model_Stream_Subscribe', '_onDelete');
 		$onDelete->invoke($streamSubscribe);
 	}

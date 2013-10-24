@@ -105,9 +105,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		return $data;
 	}
 
+	protected function _onDeleteBefore() {
+		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
+	}
+
 	protected function _onDelete() {
 		CM_Db_Db::delete('cm_splitfeature', array('id' => $this->getId()));
-		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
 	protected static function _createStatic(array $data) {
