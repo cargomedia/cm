@@ -78,7 +78,12 @@ class CM_Response_Page extends CM_Response_Abstract {
 
 	protected function _process() {
 		$this->_site->preprocessPageResponse($this);
-		if ($this->_site->getHost() !== $this->_request->getHeader('host')) {
+		$host = $this->_request->getHeader('host');
+		if (strstr($host, ':')) {
+			$hostParts = explode(':', $host);
+			$host = $hostParts[0];
+		}
+		if ($this->_site->getHost() !== $host) {
 			$path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
 			$this->redirectUrl($this->getRender()->getUrl($path, null, $this->_site));
 		}
