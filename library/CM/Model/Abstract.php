@@ -32,7 +32,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array|null $data
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _construct(array $id = null, array $data = null) {
+	final protected function _construct(array $id = null, array $data = null) {
 		if (null === $id && null === $data) {
 			$data = array();
 			$this->_autoCommit = false;
@@ -78,7 +78,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		$this->_autoCommit = true;
 	}
 
-	public function delete() {
+	final public function delete() {
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
@@ -127,7 +127,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param CM_Comparable|null $model
 	 * @return boolean
 	 */
-	public function equals(CM_Comparable $model = null) {
+	final public function equals(CM_Comparable $model = null) {
 		if (empty($model)) {
 			return false;
 		}
@@ -135,11 +135,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		return (get_class($this) == get_class($model) && $this->_getId() === $model->_getId());
 	}
 
-	public function serialize() {
+	final public function serialize() {
 		return serialize(array($this->getIdRaw(), $this->_getData()));
 	}
 
-	public function unserialize($serialized) {
+	final public function unserialize($serialized) {
 		list($id, $data) = unserialize($serialized);
 		$this->_construct($id, $data);
 	}
@@ -147,7 +147,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	/**
 	 * @return CM_Model_Abstract
 	 */
-	public function _change() {
+	final public function _change() {
 		if ($cache = $this->_getCache()) {
 			$cache->delete($this->getType(), $this->getIdRaw());
 		}
@@ -162,7 +162,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return mixed
 	 * @throws CM_Exception|CM_Exception_Nonexistent
 	 */
-	public function _get($field) {
+	final public function _get($field) {
 		$field = (string) $field;
 		$data = $this->_getData();
 		if (!array_key_exists($field, $data)) {
@@ -178,7 +178,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param string $field
 	 * @return boolean
 	 */
-	public function _has($field) {
+	final public function _has($field) {
 		$data = $this->_getData(); // Make sure data is loaded
 		return array_key_exists($field, $data);
 	}
@@ -188,7 +188,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param mixed|null   $value
 	 * @throws CM_Exception_Invalid
 	 */
-	public function _set($data, $value = null) {
+	final public function _set($data, $value = null) {
 		if (!is_array($data)) {
 			$data = array($data => $value);
 		}
@@ -301,7 +301,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 *
 	 * @throws CM_Exception_Invalid
 	 */
-	protected function _getId($key = null) {
+	final protected function _getId($key = null) {
 		$idRaw = $this->getIdRaw();
 		if (null === $key) {
 			return $idRaw;
@@ -317,7 +317,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param string $className
 	 * @return boolean
 	 */
-	protected function _hasAsset($className) {
+	final protected function _hasAsset($className) {
 		return isset($this->_assets[$className]);
 	}
 
@@ -327,7 +327,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 *
 	 * @throws CM_Exception
 	 */
-	protected function _getAsset($className) {
+	final protected function _getAsset($className) {
 		if (!$this->_hasAsset($className)) {
 			throw new CM_Exception('No such asset `' . $className . '`');
 		}
@@ -407,7 +407,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array|null $data
 	 * @return static
 	 */
-	public static function createStatic(array $data = null) {
+	final public static function createStatic(array $data = null) {
 		if ($data === null) {
 			$data = array();
 		}
@@ -426,7 +426,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @return CM_Model_Abstract
 	 * @throws CM_Exception_Invalid
 	 */
-	public static function createType($type, array $data = null) {
+	final public static function createType($type, array $data = null) {
 		/** @var CM_Model_Abstract $className */
 		$className = static::_getClassName($type);
 		return $className::createStatic($data);
@@ -458,7 +458,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param array $idRaw
 	 * @return array
 	 */
-	protected static function _castIdRaw(array $idRaw) {
+	final protected static function _castIdRaw(array $idRaw) {
 		return array_map(function ($el) {
 			return (string) $el;
 		}, $idRaw);
@@ -495,7 +495,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	 * @param boolean|null $dataFromPersistence
 	 * @return CM_Model_Abstract
 	 */
-	public static function factoryGeneric($type, array $id, array $data = null, $dataFromPersistence = null) {
+	final public static function factoryGeneric($type, array $id, array $data = null, $dataFromPersistence = null) {
 		$className = self::_getClassName($type);
 		/*
 		 * Cannot use __construct(), since signature is unknown.
