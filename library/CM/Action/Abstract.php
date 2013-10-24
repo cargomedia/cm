@@ -102,7 +102,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			$role = $actionLimitData['role'];
 			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
 			if ($isFirst) {
-				$this->_log($actionLimit, $role);
+				$this->_log($actionLimit);
 			}
 			$actionLimit->overshoot($this, $role, $isFirst);
 			if (!$actionLimit->getOvershootAllowed()) {
@@ -244,13 +244,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract $actionLimit OPTIONAL
-	 * @param int                           $role        OPTIONAL
+	 * @param CM_Model_ActionLimit_Abstract|null $actionLimit
 	 */
-	private function _log(CM_Model_ActionLimit_Abstract $actionLimit = null, $role = null) {
+	private function _log(CM_Model_ActionLimit_Abstract $actionLimit = null) {
 		if (!in_array($this->getVerb(), $this->_ignoreLogging)) {
 			if ($actionLimit) {
-				$this->_getTransgressions()->add($this, $actionLimit->getType(), $actionLimit->getPeriod($role));
+				$this->_getTransgressions()->add($this, $actionLimit->getType());
 			} else {
 				$this->_getSiblings()->add($this);
 			}
