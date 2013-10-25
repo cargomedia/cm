@@ -12,7 +12,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	public function __construct($name) {
 		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
-		$this->_construct(array('name' => (string) $name));
+		$this->_construct(array('name' => $name));
 	}
 
 	/**
@@ -129,10 +129,13 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return new static($name);
 	}
 
-	protected function _onDelete() {
-		CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
+	protected function _onDeleteBefore() {
 		CM_Db_Db::delete('cm_splittestVariation', array('splittestId' => $this->getId()));
 		CM_Db_Db::delete('cm_splittestVariation_fixture', array('splittestId' => $this->getId()));
+	}
+
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
 	}
 
 	/**
@@ -185,7 +188,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
 		$cacheKey = CM_CacheConst::Splittest_VariationFixtures . '_id:' . $fixture->getId() . '_type:' . $fixture->getFixtureType();
 		$cacheWrite = false;
-		if (($variationFixtureList = CM_CacheLocal::get($cacheKey)) === false) {
+		$cache = CM_Cache_Local::getInstance();
+		if (($variationFixtureList = $cache->get($cacheKey)) === false) {
 			$variationFixtureList = CM_Db_Db::exec('
 				SELECT `variation`.`splittestId`, `variation`.`name`
 					FROM `cm_splittestVariation_fixture` `fixture`
@@ -206,7 +210,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $variationFixtureList);
+			$cache->set($cacheKey, $variationFixtureList);
 		}
 
 		return $variationFixtureList[$this->getId()];

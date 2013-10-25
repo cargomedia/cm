@@ -17,10 +17,11 @@ class CM_Model_User extends CM_Model_Abstract {
 	 * @param int|null $actionType
 	 * @param int|null $actionVerb
 	 * @param int|null $period
+	 * @param int|null $upperBound
 	 * @return CM_Paging_Action_User
 	 */
-	public function getActions($actionType = null, $actionVerb = null, $period = null) {
-		return new CM_Paging_Action_User($this, $actionType, $actionVerb, $period);
+	public function getActions($actionType = null, $actionVerb = null, $period = null, $upperBound = null) {
+		return new CM_Paging_Action_User($this, $actionType, $actionVerb, $period, $upperBound);
 	}
 
 	/**
@@ -277,7 +278,7 @@ class CM_Model_User extends CM_Model_Abstract {
 		return new static($userId);
 	}
 
-	protected function _onDelete() {
+	protected function _onDeleteBefore() {
 		$this->getTransgressions()->deleteAll();
 		/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 		foreach ($this->getStreamSubscribes() as $streamSubscribe) {
@@ -288,6 +289,9 @@ class CM_Model_User extends CM_Model_Abstract {
 			$streamPublish->unsetUser();
 		}
 		CM_Db_Db::delete('cm_user_online', array('userId' => $this->getId()));
+	}
+
+	protected function _onDelete() {
 		CM_Db_Db::delete('cm_user', array('userId' => $this->getId()));
 	}
 

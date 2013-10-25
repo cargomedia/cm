@@ -9,6 +9,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
 	}
 
+	public function testGetAll() {
+		$this->assertSame(array(), CM_Site_Abstract::getAll());
+	}
+
 	public function testGetEmailAddress() {
 		/** @var CM_Site_Abstract $site */
 		$site = $this->getMockForAbstractClass('CM_Site_Abstract');

@@ -3,11 +3,26 @@
 class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdapter {
 
 	public function load($type, array $id) {
-		return CM_Cache::get($this->_getCacheKey($type, $id));
+		return CM_Cache_Shared::getInstance()->get($this->_getCacheKey($type, $id));
+	}
+
+	public function loadMultiple(array $idTypeList) {
+		$cacheEntryToArrayKey = array();
+		foreach ($idTypeList as $key => $idType) {
+			$cacheKey = $this->_getCacheKey($idType['type'], $idType['id']);
+			$cacheEntryToArrayKey[$cacheKey] = $key;
+		}
+		$result = array();
+		$values = CM_Cache_Shared::getInstance()->getMulti(array_keys($cacheEntryToArrayKey));
+		foreach ($values as $cacheKey => $value) {
+			$key = $cacheEntryToArrayKey[$cacheKey];
+			$result[$key] = $value;
+		}
+		return $result;
 	}
 
 	public function save($type, array $id, array $data) {
-		CM_Cache::set($this->_getCacheKey($type, $id), $data);
+		CM_Cache_Shared::getInstance()->set($this->_getCacheKey($type, $id), $data);
 	}
 
 	public function create($type, array $data) {
@@ -15,7 +30,7 @@ class CM_Model_StorageAdapter_Cache extends CM_Model_StorageAdapter_AbstractAdap
 	}
 
 	public function delete($type, array $id) {
-		CM_Cache::delete($this->_getCacheKey($type, $id));
+		CM_Cache_Shared::getInstance()->delete($this->_getCacheKey($type, $id));
 	}
 
 	/**

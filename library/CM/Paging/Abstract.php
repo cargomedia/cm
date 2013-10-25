@@ -314,6 +314,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
+	 * @param array $itemsRaw
+	 */
+	protected function _onLoadItemsRaw(array $itemsRaw) {
+	}
+
+	/**
 	 * @param mixed $itemRaw
 	 * @return mixed Processed item
 	 * @throws CM_Exception_Nonexistent
@@ -360,6 +366,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 					$this->_itemsRaw[] = $itemRaw;
 				}
 			}
+			$this->_onLoadItemsRaw($this->_itemsRaw);
 		}
 		return $this->_itemsRaw;
 	}

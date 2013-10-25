@@ -2,6 +2,7 @@
 
 class CMTest_TH {
 
+	private static $_timeStart;
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
@@ -36,15 +37,17 @@ class CMTest_TH {
 	}
 
 	public static function clearCache() {
-		CM_Cache::flush();
-		CM_CacheLocal::flush();
+		CM_Cache_Shared::getInstance()->flush();
+		CM_Cache_Local::getInstance()->flush();
 	}
 
 	public static function clearDb() {
 		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+		CM_Db_Db::exec('SET foreign_key_checks = 0;');
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
+		CM_Db_Db::exec('SET foreign_key_checks = 1;');
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
@@ -59,12 +62,12 @@ class CMTest_TH {
 	}
 
 	public static function timeInit() {
-		runkit_function_copy('time', 'time_original');
+		self::$_timeStart = time();
 		runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 	}
 
 	public static function time() {
-		return time_original() + self::$timeDelta;
+		return self::$_timeStart + self::$timeDelta;
 	}
 
 	public static function timeForward($sec) {
@@ -188,8 +191,11 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $user, 'start' => time(),
+			'key'           => rand(1, 10000) . '_' . rand(1, 100),
+		));
 	}
 
 	/**
@@ -202,7 +208,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+															 'key'           => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**

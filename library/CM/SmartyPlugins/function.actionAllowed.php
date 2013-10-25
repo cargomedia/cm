@@ -21,7 +21,7 @@ function smarty_function_actionAllowed(array $params, Smarty_Internal_Template $
 		return false;
 	}
 
-	$action = CM_Action_Abstract::factory($viewer, (int) $params['verb'], (int) $params['type']);
+	$action = CM_Action_Abstract::factory($viewer, $params['verb'], (int) $params['type']);
 
 	return call_user_func_array(array($action, 'isAllowed'), $arguments);
 }

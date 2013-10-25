@@ -175,6 +175,7 @@ A typical Apache virtual host configuration for this purpose were:
   </Directory>
 
   <Directory ‹project-dir›/public/>
+    SetEnv CM_DEBUG 1
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php
@@ -187,7 +188,7 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php app generate-config
+./scripts/cm.php app generate-config-internal
 ```
 
 ### Namespace creation, site setup
@@ -226,7 +227,7 @@ Options:
  --non-interactive
 
 Commands:
- app generate-config
+ app generate-config-internal
  app fill-cache
  console interactive
  css icon-refresh

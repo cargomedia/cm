@@ -2,26 +2,30 @@
 
 class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 
-	/** @var CM_Cache_Redis|null */
-	private $_redis = null;
+	/** @var CM_Redis_Client|null */
+	private $_redisClient = null;
+
+	public function __construct() {
+		$this->_redisClient = CM_Redis_Client::getInstance();
+	}
 
 	public function push($key, $value) {
-		$redis = $this->_getRedisInstance();
+		$redis = $this->_getRedisClient();
 		$redis->lPush($this->_getInternalKey($key), $value);
 	}
 
 	public function pushDelayed($key, $value, $timestamp) {
-		$redis = $this->_getRedisInstance();
+		$redis = $this->_getRedisClient();
 		$redis->zAdd($this->_getInternalKey($key), $timestamp, $value);
 	}
 
 	public function pop($key) {
-		$redis = $this->_getRedisInstance();
+		$redis = $this->_getRedisClient();
 		return $redis->rPop($this->_getInternalKey($key));
 	}
 
 	public function popDelayed($key, $timestampMax) {
-		$redis = $this->_getRedisInstance();
+		$redis = $this->_getRedisClient();
 		$value = $redis->zPopRangeByScore($this->_getInternalKey($key), 0, $timestampMax);
 		return $value;
 	}
@@ -35,12 +39,9 @@ class CM_QueueAdapter_Redis extends CM_QueueAdapter_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_Redis
+	 * @return CM_Redis_Client
 	 */
-	private function _getRedisInstance() {
-		if (null === $this->_redis) {
-			$this->_redis = new CM_Cache_Redis();
-		}
-		return $this->_redis;
+	private function _getRedisClient() {
+		return $this->_redisClient;
 	}
 }

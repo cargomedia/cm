@@ -1,6 +1,5 @@
 & {
 	text-align: center;
-	padding-bottom: 12px;
 }
 
 .previews {
@@ -40,21 +39,22 @@
 }
 
 .dropInfo {
+	display: none;
 	color: @colorFgShy;
 
-	html.touch & {
-		display: none;
+	@media(min-width: 400px) {
+		display: block;
 	}
 
 	.dropInfo-icon {
-		font-size: 5em;
+		font-size: 3em;
 		line-height: 1.2;
 		color: lighten(@colorFgIcon, 30);
 		text-shadow: 1px 1px @colorBg;
 	}
 
 	.dropInfo-message {
-		font-size: 1.5em;
+		font-size: 1.3em;
 	}
 
 	.dropInfo-divide {

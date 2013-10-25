@@ -71,10 +71,7 @@ class CM_App {
 		/** @var CM_Asset_Javascript_Abstract[] $assetList */
 		$assetList = array();
 		$languageList = new CM_Paging_Language_Enabled();
-		$siteClassNameList = CM_Site_Abstract::getClassChildren();
-		foreach ($siteClassNameList as $siteClassName) {
-			/** @var CM_Site_Abstract $site */
-			$site = new $siteClassName();
+		foreach (CM_Site_Abstract::getAll() as $site) {
 			$assetList[] = new CM_Asset_Javascript_Internal($site);
 			$assetList[] = new CM_Asset_Javascript_Library($site);
 			$assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
@@ -131,8 +128,8 @@ class CM_App {
 	 * @return int Number of version bumps
 	 */
 	public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
-		CM_Cache::flush();
-		CM_CacheLocal::flush();
+		CM_Cache_Shared::getInstance()->flush();
+		CM_Cache_Local::getInstance()->flush();
 		$versionBumps = 0;
 		foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
 			$version = $versionStart = $this->getVersion($namespace);
@@ -177,12 +174,27 @@ class CM_App {
 	}
 
 	public function generateConfigActionVerbs() {
-		$content = '$config->CM_Action_Abstract->verbs = array();';
-		foreach ($this->getActionVerbs() as $actionVerb) {
-			$content .= PHP_EOL;
-			$content .= '$config->CM_Action_Abstract->verbs[' . $actionVerb['className'] . '::' . $actionVerb['name'] . '] = \'' .
-					CM_Util::camelize($actionVerb['name']) . '\';';
+		$maxValue = 0;
+		if (isset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue)) {
+			$maxValue = CM_Config::get()->CM_Action_Abstract->verbsMaxValue;
 		}
+
+		$currentVerbs = array();
+		if (isset(CM_Config::get()->CM_Action_Abstract->verbs)) {
+			$currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
+		}
+
+		$content = '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
+		foreach ($this->getActionVerbs() as $actionVerb) {
+			if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
+				$maxValue++;
+				$currentVerbs[$actionVerb['value']] = $maxValue;
+			}
+			$key = $actionVerb['className'] . '::' . $actionVerb['name'];
+			$id = $currentVerbs[$actionVerb['value']];
+			$content .= '$config->CM_Action_Abstract->verbs[' . $key . '] = ' . var_export($id, true) . ';' . PHP_EOL;
+		}
+		$content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';' . PHP_EOL;
 		return $content;
 	}
 
@@ -207,7 +219,9 @@ class CM_App {
 	public function getActionVerbs() {
 		$actionVerbs = array();
 		$actionVerbsValues = array();
-		foreach (CM_Action_Abstract::getClassChildren(true) as $className) {
+		$classNames = CM_Action_Abstract::getClassChildren(true);
+		array_unshift($classNames, 'CM_Action_Abstract');
+		foreach ($classNames as $className) {
 			$class = new ReflectionClass($className);
 			$constants = $class->getConstants();
 			unset($constants['TYPE']);
@@ -215,12 +229,12 @@ class CM_App {
 				if (array_key_exists($constant, $actionVerbsValues) && $actionVerbsValues[$constant] !== $value) {
 					throw new CM_Exception_Invalid(
 						'Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' .
-								$actionVerbsValues[$constant] . '`.');
+						$actionVerbsValues[$constant] . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues) && in_array($value, $actionVerbsValues)) {
 					throw new CM_Exception_Invalid(
 						'Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className .
-								'::' . array_search($value, $actionVerbsValues) . '`.');
+						'::' . array_search($value, $actionVerbsValues) . '`.');
 				}
 				if (!array_key_exists($constant, $actionVerbsValues)) {
 					$actionVerbsValues[$constant] = $value;
@@ -246,7 +260,7 @@ class CM_App {
 				if ($classNameDuplicate = array_search($type, $classTypes)) {
 					throw new CM_Exception_Invalid(
 						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
-								$className . '` type namespace).');
+						$className . '` type namespace).');
 				}
 				$classTypes[$className] = $type;
 			} elseif (!$reflectionClass->isAbstract()) {
