@@ -88,7 +88,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 			$logEntry .= $formatter->formatException($loggerException);
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
 			$logEntry .= $formatter->formatException($exception) . PHP_EOL;
-			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+			error_log($logEntry);
 		}
 	}
 
