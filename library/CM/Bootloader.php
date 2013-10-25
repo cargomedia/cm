@@ -160,19 +160,21 @@ class CM_Bootloader {
 	}
 
 	public function reloadNamespacePaths() {
-		$cacheKey = DIR_ROOT . '_CM_Modules';
-		apc_delete($cacheKey);
+		$cacheKey = CM_CacheConst::Modules;
+		$cache = new CM_Cache_Storage_Apc();
+		$cache->delete($cacheKey);
 	}
 
 	/**
 	 * @return array
 	 */
 	private function _getNamespacePaths() {
-		$cacheKey = DIR_ROOT . '_CM_Modules';
-		if (false === ($namespacePaths = apc_fetch($cacheKey))) {
+		$cacheKey = CM_CacheConst::Modules;
+		$cache = new CM_Cache_Storage_Apc();
+		if (false === ($namespacePaths = $cache->get($cacheKey))) {
 			$installation = new CM_App_Installation();
 			$namespacePaths = $installation->getModulePaths();
-			apc_store($cacheKey, $namespacePaths);
+			$cache->set($cacheKey, $namespacePaths);
 		}
 		return $namespacePaths;
 

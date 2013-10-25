@@ -79,4 +79,6 @@ class CM_CacheConst {
 	const TestCase_Site_Mock = 'TestCase_Site_Mock';
 
 	const Config = 'Config';
+
+	const Modules = 'Modules';
 }
