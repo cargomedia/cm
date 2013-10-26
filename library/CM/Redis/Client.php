@@ -12,14 +12,27 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	/** @var Closure|null */
 	private $_subscribeCallback;
 
-	public function __construct() {
+	/**
+	 * @param string $host
+	 * @param int    $port
+	 * @throws CM_Exception
+	 */
+	public function __construct($host, $port) {
 		$this->_redis = new Redis();
-		$server = self::_getConfig()->server;
 		try {
-			$this->_redis->connect($server['host'], $server['port']);
+			$this->_redis->connect($host, $port);
 		} catch (RedisException $e) {
-			throw new CM_Exception('Cannot connect to redis server `' . $server['host'] . '` on port `' . $server['port'] . '`: ' . $e->getMessage());
+			throw new CM_Exception('Cannot connect to redis server `' . $host . '` on port `' . $port . '`: ' . $e->getMessage());
 		}
+	}
+
+	/**
+	 * @param stdClass $configuration
+	 * @return CM_Redis_Client
+	 */
+	public static function createFromConfiguration($configuration) {
+		$server = $configuration->server;
+		return new self($server['host'], $server['port']);
 	}
 
 	/**
@@ -183,7 +196,8 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	public static function getInstance() {
 		static $instance;
 		if (!$instance) {
-			$instance = new self();
+			$configuration = CM_Config::get()->CM_Redis_Client;
+			$instance = self::createFromConfiguration($configuration);
 		}
 		return $instance;
 	}
