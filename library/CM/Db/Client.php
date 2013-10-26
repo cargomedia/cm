@@ -181,6 +181,15 @@ class CM_Db_Client {
 	}
 
 	/**
+	 * @param CM_Db_Query_Abstract $query
+	 * @return CM_Db_Result
+	 */
+	public function execute(CM_Db_Query_Abstract $query) {
+		$statement = $this->createStatement($query->getSqlTemplate());
+		return $statement->execute($query->getParameters());
+	}
+
+	/**
 	 * @return bool
 	 */
 	private function _getShouldReconnect() {

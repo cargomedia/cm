@@ -70,8 +70,17 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param bool|null  $readOnly
 	 * @return CM_Db_Result
 	 */
-	protected function _exec($sqlTemplate, array $parameters = null, $readOnly = null) {
+	protected function _executeSql($sqlTemplate, array $parameters = null, $readOnly = null) {
 		return $this->_getClient($readOnly)->createStatement($sqlTemplate)->execute($parameters);
+	}
+
+	/**
+	 * @param CM_Db_Query_Abstract $query
+	 * @param bool|null            $readOnly
+	 * @return CM_Db_Result
+	 */
+	protected function _execute(CM_Db_Query_Abstract $query, $readOnly = null) {
+		return $this->_getClient($readOnly)->execute($query);
 	}
 
 	/**
@@ -129,6 +138,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @return CM_Db_Result
 	 */
 	public static function exec($sqlTemplate, array $parameters = null, $readOnly = null) {
+		return self::getInstance()->_executeSql($sqlTemplate, $parameters, $readOnly);
 		$readOnly = (bool) $readOnly;
 		$client = self::_getClient($readOnly);
 		return $client->createStatement($sqlTemplate)->execute($parameters);
