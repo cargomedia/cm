@@ -5,9 +5,9 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	/** @var \Memcache */
 	private $_memcache;
 
-	public function __construct() {
+	public function __construct($servers) {
 		$this->_memcache = new Memcache();
-		foreach (self::_getConfig()->servers as $server) {
+		foreach ($servers as $server) {
 			@$this->_memcache->addServer($server['host'] . ':' . $server['port']);
 		}
 	}
@@ -38,5 +38,21 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 
 	public function flush() {
 		$this->_memcache->flush();
+	}
+
+	/**
+	 * @param stdClass $configuration
+	 * @return CM_Memcache_Client
+	 */
+	public static function createFromConfiguration($configuration) {
+		return new self($configuration->servers);
+	}
+
+	/**
+	 * @return CM_Memcache_Client
+	 */
+	public static function getInstance() {
+		$configuration = CM_Config::get()->CM_Memcache_Client;
+		return self::createFromConfiguration($configuration);
 	}
 }
