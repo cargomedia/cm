@@ -16,9 +16,6 @@ class CM_Config {
 			$this->_extendConfigNodeWithFile($node, 'default.php');
 			$this->_extendConfigNodeWithFile($node, 'local.php');
 			$this->_extendConfigNodeWithFile($node, 'deploy.php');
-			foreach (CM_Bootloader::getInstance()->getEnvironment() as $environment) {
-				$this->_extendConfigNodeWithFile($node, $environment . '.php');
-			}
 			$config = $node->export();
 			$cache->set($cacheKey, $config);
 		}

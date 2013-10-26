@@ -83,14 +83,6 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @param string $environment
-	 * @return boolean
-	 */
-	public function isEnvironment($environment) {
-		return in_array((string) $environment, $this->_environments);
-	}
-
-	/**
 	 * @param string[]|string $environments
 	 * @throws CM_Exception_Invalid
 	 */
