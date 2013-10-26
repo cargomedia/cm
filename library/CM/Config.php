@@ -16,6 +16,9 @@ class CM_Config {
 			$this->_extendConfigNodeWithFile($node, 'default.php');
 			$this->_extendConfigNodeWithFile($node, 'local.php');
 			$this->_extendConfigNodeWithFile($node, 'deploy.php');
+			if (CM_Bootloader::getInstance()->isCli()) {
+				$this->_extendConfigNodeWithFile($node, 'cli.php');
+			}
 			foreach (CM_Bootloader::getInstance()->getEnvironment() as $environment) {
 				$this->_extendConfigNodeWithFile($node, $environment . '.php');
 			}

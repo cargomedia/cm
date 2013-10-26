@@ -3,7 +3,6 @@
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/');
-$bootloader->setEnvironment('cli');
 $bootloader->load();
 
 $manager = new CM_Cli_CommandManager();
