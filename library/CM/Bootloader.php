@@ -24,6 +24,9 @@ class CM_Bootloader {
 	/** @var CM_ExceptionHandling_Handler_Abstract */
 	private $_exceptionHandler;
 
+	/** @var string */
+	protected $_dataPrefix;
+
 	/**
 	 * @param string      $pathRoot
 	 * @throws CM_Exception_Invalid
@@ -35,6 +38,7 @@ class CM_Bootloader {
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
 		$this->_debug = (bool) getenv('CM_DEBUG');
+		$this->_dataPrefix = '';
 	}
 
 	public function defaults() {
@@ -154,6 +158,13 @@ class CM_Bootloader {
 	 */
 	public function isCli() {
 		return PHP_SAPI === 'cli';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDataPrefix() {
+		return $this->_dataPrefix;
 	}
 
 	/**
