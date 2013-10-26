@@ -57,28 +57,6 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @return string[]
-	 */
-	public function getEnvironment() {
-		return $this->_environments;
-	}
-
-	/**
-	 * @param string[]|string $environments
-	 * @throws CM_Exception_Invalid
-	 */
-	public function setEnvironment($environments) {
-		if ($this->_loaded) {
-			throw new CM_Exception_Invalid('Bootloader already loaded.');
-		}
-		$environments = (array) $environments;
-		array_walk($environments, function (&$environment) {
-			$environment = (string) $environment;
-		});
-		$this->_environments = $environments;
-	}
-
-	/**
 	 * @return CM_ExceptionHandling_Handler_Abstract
 	 */
 	public function getExceptionHandler() {
