@@ -11,6 +11,66 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/** @var bool|null */
 	private static $_readOnlyAvailable;
 
+	/** @var CM_Db_Db */
+	private static $_instance;
+
+	/** @var CM_Db_Db */
+	private static $_instanceReadOnly;
+
+	/** @var string */
+	private $_name;
+
+	/** @var CM_Db_Client */
+	private $_dbClient;
+
+	/**
+	 * @param stdClass $configuration
+	 * @param bool $readOnly
+	 * @return CM_Db_Db
+	 */
+	public function createFromConfiguration($configuration, $readOnly) {
+		$server = $configuration->server;
+		if ($readOnly && $configuration->serversReadEnabled && !empty($configuration->serversRead)) {
+			$server = $configuration->serversRead[array_rand($configuration->serversRead)];
+		}
+		return new self($configuration->db, $server['host'], $server['port'], $configuration->username, $configuration->password, $configuration->reconnectTimeout);
+	}
+
+	/**
+	 * @return CM_Db_Db
+	 */
+	public static function getInstance() {
+		if (null === self::$_instance) {
+			$configuration = CM_Config::get()->CM_Db_Db;
+			self::$_instance = self::createFromConfiguration($configuration, false);
+		}
+		return self::$_instance;
+	}
+
+	/**
+	 * @return CM_Db_Db
+	 */
+	public static function getInstanceReadOnly() {
+		if (null === self::$_instanceReadOnly) {
+			$configuration = CM_Config::get()->CM_Db_Db;
+			self::$_instanceReadOnly = self::createFromConfiguration($configuration, true);
+		}
+		return self::$_instanceReadOnly;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $host
+	 * @param string $port
+	 * @param string $username
+	 * @param string $password
+	 * @param int $reconnectTimeout
+	 */
+	public function __construct($name, $host, $port, $username, $password, $reconnectTimeout) {
+		$this->_name = (string) $name;
+		$this->_dbClient = new CM_Db_Client($host, $port, $username, $password, $name, $reconnectTimeout);
+	}
+
 	/**
 	 * @param string            $table
 	 * @param string|array|null $where Associative array field=>value OR string
