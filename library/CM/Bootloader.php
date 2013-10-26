@@ -29,7 +29,7 @@ class CM_Bootloader {
 	 * @param string|null $dirLibrary
 	 * @throws CM_Exception_Invalid
 	 */
-	final public function __construct($pathRoot, $dirLibrary) {
+	public function __construct($pathRoot, $dirLibrary) {
 		if (self::$_instance) {
 			throw new CM_Exception_Invalid('Bootloader already instantiated');
 		}
@@ -50,14 +50,14 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
 
-		define('DIR_DATA', !empty(CM_Config::get()->dirData) ? CM_Config::get()->dirData : DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA', DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
 		define('DIR_DATA_SVM', DIR_DATA . 'svm' . DIRECTORY_SEPARATOR);
 
-		define('DIR_TMP', !empty(CM_Config::get()->dirTmp) ? CM_Config::get()->dirTmp : DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP', DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP_CACHE',  DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_CACHE', DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
 
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
@@ -122,11 +122,10 @@ class CM_Bootloader {
 	 */
 	public function getExceptionHandler() {
 		if (!$this->_exceptionHandler) {
-			$isHttpRequest = !$this->isEnvironment('cli') && !$this->isEnvironment('test');
-			if ($isHttpRequest) {
-				$this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
-			} else {
+			if ($this->isCli()) {
 				$this->_exceptionHandler = new CM_ExceptionHandling_Handler_Cli();
+			} else {
+				$this->_exceptionHandler = new CM_ExceptionHandling_Handler_Http();
 			}
 		}
 		return $this->_exceptionHandler;
@@ -153,6 +152,13 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isCli() {
+		return PHP_SAPI === 'cli';
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function getNamespaces() {
@@ -170,14 +176,17 @@ class CM_Bootloader {
 	 */
 	private function _getNamespacePaths() {
 		$cacheKey = CM_CacheConst::Modules;
-		$cache = new CM_Cache_Storage_Apc();
-		if (false === ($namespacePaths = $cache->get($cacheKey))) {
+		$apcCache = new CM_Cache_Storage_Apc();
+		if (false === ($namespacePaths = $apcCache->get($cacheKey))) {
+			$fileCache = new CM_Cache_Storage_File();
 			$installation = new CM_App_Installation();
-			$namespacePaths = $installation->getModulePaths();
-			$cache->set($cacheKey, $namespacePaths);
+			if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($namespacePaths = $fileCache->get($cacheKey))) {
+				$namespacePaths = $installation->getModulePaths();
+				$fileCache->set($cacheKey, $namespacePaths);
+			}
+			$apcCache->set($cacheKey, $namespacePaths);
 		}
 		return $namespacePaths;
-
 	}
 
 	/**

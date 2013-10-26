@@ -9,10 +9,9 @@ class CM_App_Installation {
 	 * @param \Composer\Composer|null $composer
 	 */
 	public function __construct(\Composer\Composer $composer = null) {
-		if (null === $composer) {
-			$composer = self::composerFactory();
+		if (null !== $composer) {
+			$this->_composer = $composer;
 		}
-		$this->_composer = $composer;
 	}
 
 	/**
@@ -72,13 +71,28 @@ class CM_App_Installation {
 	}
 
 	/**
+	 * @return mixed
+	 */
+	public function getUpdateStamp() {
+		$composerJsonStamp = filemtime(DIR_ROOT . 'composer.json');
+		$cacheKey = CM_CacheConst::ComposerInstalledPath;
+		$fileCache = new CM_Cache_Storage_File();
+		if (false === ($installedJsonPath = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
+			$installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
+			$fileCache->set($cacheKey, $installedJsonPath);
+		}
+		$installedJsonStamp = filemtime($installedJsonPath);
+		return max($composerJsonStamp, $installedJsonStamp);
+	}
+
+	/**
 	 * @return \Composer\Package\CompletePackage[]
 	 */
 	protected function _getComposerPackages() {
-		$repo = $this->_composer->getRepositoryManager()->getLocalRepository();
+		$repo = $this->_getComposer()->getRepositoryManager()->getLocalRepository();
 
 		$packages = $repo->getPackages();
-		$packages[] = $this->_composer->getPackage();
+		$packages[] = $this->_getComposer()->getPackage();
 		return $packages;
 	}
 
@@ -86,7 +100,7 @@ class CM_App_Installation {
 	 * @return string
 	 */
 	protected function _getComposerVendorDir() {
-		return rtrim($this->_composer->getConfig()->get('vendor-dir'), '/') . '/';
+		return rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
 	}
 
 	/**
@@ -107,6 +121,16 @@ class CM_App_Installation {
 
 		}
 		return new CM_App_Package($package->getName(), $pathRelative, $extra['cm-modules']);
+	}
+
+	/**
+	 * @return \Composer\Composer
+	 */
+	private function _getComposer() {
+		if (null === $this->_composer) {
+			$this->_composer = self::composerFactory();
+		}
+		return $this->_composer;
 	}
 
 	/**

@@ -81,4 +81,6 @@ class CM_CacheConst {
 	const Config = 'Config';
 
 	const Modules = 'Modules';
+
+	const ComposerInstalledPath = 'ComposerInstalledPath';
 }
