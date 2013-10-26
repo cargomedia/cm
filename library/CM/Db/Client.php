@@ -45,7 +45,6 @@ class CM_Db_Client {
 		if (null !== $reconnectTimeout) {
 			$this->_reconnectTimeout = (int) $reconnectTimeout;
 		}
-		$this->connect();
 	}
 
 	/**

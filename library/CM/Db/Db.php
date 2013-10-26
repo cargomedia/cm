@@ -23,17 +23,23 @@ class CM_Db_Db extends CM_Class_Abstract {
 	/** @var CM_Db_Client */
 	private $_dbClient;
 
+	/** @var CM_Db_Client */
+	private $_dbClientReadOnly;
+
 	/**
 	 * @param stdClass $configuration
-	 * @param bool $readOnly
 	 * @return CM_Db_Db
 	 */
-	public function createFromConfiguration($configuration, $readOnly) {
+	public function createFromConfiguration($configuration) {
 		$server = $configuration->server;
-		if ($readOnly && $configuration->serversReadEnabled && !empty($configuration->serversRead)) {
-			$server = $configuration->serversRead[array_rand($configuration->serversRead)];
+		$client = new CM_Db_Client($server['host'], $server['port'], $configuration->username, $configuration->password, $configuration->db, $configuration->reconnectTimeout);
+		if ($configuration->serversReadEnabled && !empty($configuration->serversRead)) {
+			$serverReadOnly = $configuration->serversRead[array_rand($configuration->serversRead)];
+			$clientReadOnly = new CM_Db_Client($serverReadOnly['host'], $serverReadOnly['port'], $configuration->username, $configuration->password, $configuration->db, $configuration->reconnectTimeout);
+		} else {
+			$clientReadOnly = $client;
 		}
-		return new self($configuration->db, $server['host'], $server['port'], $configuration->username, $configuration->password, $configuration->reconnectTimeout);
+		return new self($configuration->db, $client, $clientReadOnly);
 	}
 
 	/**
@@ -42,33 +48,30 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function getInstance() {
 		if (null === self::$_instance) {
 			$configuration = CM_Config::get()->CM_Db_Db;
-			self::$_instance = self::createFromConfiguration($configuration, false);
+			self::$_instance = self::createFromConfiguration($configuration);
 		}
 		return self::$_instance;
 	}
 
 	/**
-	 * @return CM_Db_Db
+	 * @param string       $name
+	 * @param CM_Db_Client $client
+	 * @param CM_Db_Client $clientReadOnly
 	 */
-	public static function getInstanceReadOnly() {
-		if (null === self::$_instanceReadOnly) {
-			$configuration = CM_Config::get()->CM_Db_Db;
-			self::$_instanceReadOnly = self::createFromConfiguration($configuration, true);
-		}
-		return self::$_instanceReadOnly;
+	public function __construct($name, CM_Db_Client $client, CM_Db_Client $clientReadOnly) {
+		$this->_name = (string) $name;
+		$this->_dbClient = $client;
+		$this->_dbClientReadOnly = $clientReadOnly;
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $host
-	 * @param string $port
-	 * @param string $username
-	 * @param string $password
-	 * @param int $reconnectTimeout
+	 * @param string     $sqlTemplate
+	 * @param array|null $parameters
+	 * @param bool|null  $readOnly
+	 * @return CM_Db_Result
 	 */
-	public function __construct($name, $host, $port, $username, $password, $reconnectTimeout) {
-		$this->_name = (string) $name;
-		$this->_dbClient = new CM_Db_Client($host, $port, $username, $password, $name, $reconnectTimeout);
+	protected function _exec($sqlTemplate, array $parameters = null, $readOnly = null) {
+		return $this->_getClient($readOnly)->createStatement($sqlTemplate)->execute($parameters);
 	}
 
 	/**
@@ -405,7 +408,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$columnQuoted = $client->quoteIdentifier($column);
 		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
 		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted .
-				' DESC LIMIT 1')->fetchColumn();
+		' DESC LIMIT 1')->fetchColumn();
 
 		if (!$id) {
 			$id = CM_Db_Db::select($table, $column, $where)->fetchColumn();
@@ -421,7 +424,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @throws CM_Db_Exception
 	 * @return CM_Db_Client
 	 */
-	private static function _getClient($readOnly) {
+	private function _getClient($readOnly) {
 		if ($readOnly && !self::_getReadOnlyAvailable()) {
 			$readOnly = false;
 		}
