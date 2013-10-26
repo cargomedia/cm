@@ -27,15 +27,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param stdClass $configuration
-	 * @return CM_Redis_Client
-	 */
-	public static function createFromConfiguration($configuration) {
-		$server = $configuration->server;
-		return new self($server['host'], $server['port']);
-	}
-
-	/**
 	 * Add a value to a list
 	 *
 	 * @param string $key
@@ -188,6 +179,15 @@ class CM_Redis_Client extends CM_Class_Abstract {
 
 	public function flush() {
 		$this->_redis->flushAll();
+	}
+
+	/**
+	 * @param stdClass $configuration
+	 * @return CM_Redis_Client
+	 */
+	public static function createFromConfiguration($configuration) {
+		$server = $configuration->server;
+		return new self($server['host'], $server['port']);
 	}
 
 	/**
