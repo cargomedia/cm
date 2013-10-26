@@ -12,9 +12,6 @@ class CM_Bootloader {
 	/** @var boolean */
 	private $_loaded = false;
 
-	/** @var array|null */
-	private $_namespacePaths;
-
 	/** @var bool */
 	private $_debug;
 
