@@ -26,16 +26,14 @@ class CM_Bootloader {
 
 	/**
 	 * @param string      $pathRoot
-	 * @param string|null $dirLibrary
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($pathRoot, $dirLibrary) {
+	public function __construct($pathRoot) {
 		if (self::$_instance) {
 			throw new CM_Exception_Invalid('Bootloader already instantiated');
 		}
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
-		define('DIR_LIBRARY', $dirLibrary);
 		$this->_debug = (bool) getenv('CM_DEBUG');
 	}
 
