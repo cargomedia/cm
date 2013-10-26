@@ -38,28 +38,12 @@ class CM_Bootloader {
 		$this->_dataPrefix = '';
 	}
 
-	public function defaults() {
-		date_default_timezone_set(CM_Config::get()->timeZone);
-		mb_internal_encoding('UTF-8');
-		umask(0);
-		CMService_Newrelic::getInstance()->setConfig();
-	}
-
-	public function constants() {
-		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
-		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
-
-		define('DIR_DATA', DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_SVM', DIR_DATA . 'svm' . DIRECTORY_SEPARATOR);
-
-		define('DIR_TMP', DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_CACHE',  DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
-
-		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
-				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
+	public function load() {
+		$this->_loaded = true;
+		$this->_exceptionHandler();
+		$this->_errorHandler();
+		$this->_constants();
+		$this->_defaults();
 	}
 
 	/**
@@ -95,20 +79,6 @@ class CM_Bootloader {
 	}
 
 	/**
-	 * @param string[] $functions
-	 * @throws Exception
-	 */
-	public function load(array $functions) {
-		$this->_loaded = true;
-		foreach ($functions as $function) {
-			if (!method_exists($this, $function)) {
-				throw new Exception('Non existent bootload function `' . $function . '`');
-			}
-			$this->$function();
-		}
-	}
-
-	/**
 	 * @return CM_ExceptionHandling_Handler_Abstract
 	 */
 	public function getExceptionHandler() {
@@ -120,19 +90,6 @@ class CM_Bootloader {
 			}
 		}
 		return $this->_exceptionHandler;
-	}
-
-	public function errorHandler() {
-		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
-		set_error_handler(array($this->getExceptionHandler(), 'handleErrorRaw'));
-	}
-
-	public function exceptionHandler() {
-		$errorHandler = $this->getExceptionHandler();
-		set_exception_handler(function (Exception $exception) use ($errorHandler) {
-			$errorHandler->handleException($exception);
-			exit(1);
-		});
 	}
 
 	/**
@@ -167,6 +124,43 @@ class CM_Bootloader {
 		$cacheKey = CM_CacheConst::Modules;
 		$cache = new CM_Cache_Storage_Apc();
 		$cache->delete($cacheKey);
+	}
+
+	protected function _constants() {
+		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
+		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
+
+		define('DIR_DATA', DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
+		define('DIR_DATA_SVM', DIR_DATA . 'svm' . DIRECTORY_SEPARATOR);
+
+		define('DIR_TMP', DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP_CACHE',  DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
+
+		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
+				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
+	}
+
+	protected function _errorHandler() {
+		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
+		set_error_handler(array($this->getExceptionHandler(), 'handleErrorRaw'));
+	}
+
+	protected function _exceptionHandler() {
+		$errorHandler = $this->getExceptionHandler();
+		set_exception_handler(function (Exception $exception) use ($errorHandler) {
+			$errorHandler->handleException($exception);
+			exit(1);
+		});
+	}
+
+	protected function _defaults() {
+		date_default_timezone_set(CM_Config::get()->timeZone);
+		mb_internal_encoding('UTF-8');
+		umask(0);
+		CMService_Newrelic::getInstance()->setConfig();
 	}
 
 	/**
