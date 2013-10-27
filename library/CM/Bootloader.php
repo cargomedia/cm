@@ -34,6 +34,7 @@ class CM_Bootloader {
 		}
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
+		define('DIR_TMP', DIR_ROOT . 'tmp/');
 		$this->_debug = (bool) getenv('CM_DEBUG');
 		$this->_dataPrefix = '';
 	}
@@ -118,21 +119,18 @@ class CM_Bootloader {
 	}
 
 	protected function _constants() {
-		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
-		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
+		define('DIR_VENDOR', DIR_ROOT . 'vendor/');
+		define('DIR_PUBLIC', DIR_ROOT . 'public/');
 
-		define('DIR_DATA', DIR_ROOT . 'data' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_LOCKS', DIR_DATA . 'locks' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_LOG', DIR_DATA . 'logs' . DIRECTORY_SEPARATOR);
-		define('DIR_DATA_SVM', DIR_DATA . 'svm' . DIRECTORY_SEPARATOR);
+		defined('DIR_DATA') || define('DIR_DATA', DIR_ROOT . 'data/');
+		define('DIR_DATA_LOCKS', DIR_DATA . 'locks/');
+		define('DIR_DATA_LOG', DIR_DATA . 'logs/');
+		define('DIR_DATA_SVM', DIR_DATA . 'svm/');
 
-		define('DIR_TMP', DIR_ROOT . 'tmp' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_CACHE',  DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
-		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
+		define('DIR_TMP_CACHE',  DIR_TMP . 'cache/');
+		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty/');
 
-		CM_Bootloader::getInstance()->getNamespaces();
-		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
-				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
+		defined('DIR_USERFILES') || define('DIR_USERFILES', DIR_PUBLIC . 'userfiles/');
 	}
 
 	protected function _errorHandler() {
