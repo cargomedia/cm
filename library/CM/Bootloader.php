@@ -104,6 +104,19 @@ class CM_Bootloader {
 		$cache->delete($cacheKey);
 	}
 
+	/**
+	 * @param string $namespace
+	 * @throws CM_Exception_Invalid
+	 * @return string
+	 */
+	public function getNamespacePath($namespace) {
+		$namespacePaths = $this->_getNamespacePaths();
+		if (!array_key_exists($namespace, $namespacePaths)) {
+			throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
+		}
+		return $namespacePaths[$namespace];
+	}
+
 	protected function _constants() {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor' . DIRECTORY_SEPARATOR);
 		define('DIR_PUBLIC', DIR_ROOT . 'public' . DIRECTORY_SEPARATOR);
@@ -117,6 +130,7 @@ class CM_Bootloader {
 		define('DIR_TMP_CACHE',  DIR_TMP . 'cache' . DIRECTORY_SEPARATOR);
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty' . DIRECTORY_SEPARATOR);
 
+		CM_Bootloader::getInstance()->getNamespaces();
 		define('DIR_USERFILES', !empty(CM_Config::get()->dirUserfiles) ? CM_Config::get()->dirUserfiles :
 				DIR_PUBLIC . 'userfiles' . DIRECTORY_SEPARATOR);
 	}
@@ -157,19 +171,6 @@ class CM_Bootloader {
 			$apcCache->set($cacheKey, $namespacePaths);
 		}
 		return $namespacePaths;
-	}
-
-	/**
-	 * @param string $namespace
-	 * @throws CM_Exception_Invalid
-	 * @return string
-	 */
-	public function getNamespacePath($namespace) {
-		$namespacePaths = $this->_getNamespacePaths();
-		if (!array_key_exists($namespace, $namespacePaths)) {
-			throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
-		}
-		return $namespacePaths[$namespace];
 	}
 
 	/**
