@@ -9,9 +9,6 @@ class CM_Bootloader {
 	/** @var CM_Config|null */
 	private $_config = null;
 
-	/** @var boolean */
-	private $_loaded = false;
-
 	/** @var bool */
 	private $_debug;
 
@@ -37,7 +34,6 @@ class CM_Bootloader {
 	}
 
 	public function load() {
-		$this->_loaded = true;
 		$this->_constants();
 		$this->_exceptionHandler();
 		$this->_errorHandler();
