@@ -38,9 +38,9 @@ class CM_Bootloader {
 
 	public function load() {
 		$this->_loaded = true;
+		$this->_constants();
 		$this->_exceptionHandler();
 		$this->_errorHandler();
-		$this->_constants();
 		$this->_defaults();
 	}
 
