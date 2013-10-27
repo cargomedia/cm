@@ -28,7 +28,6 @@ class CM_Bootloader {
 		}
 		self::$_instance = $this;
 		define('DIR_ROOT', $pathRoot);
-		define('DIR_TMP', DIR_ROOT . 'tmp/');
 		$this->_debug = (bool) getenv('CM_DEBUG');
 		$this->_dataPrefix = '';
 	}
@@ -120,6 +119,7 @@ class CM_Bootloader {
 		define('DIR_DATA_LOG', DIR_DATA . 'logs/');
 		define('DIR_DATA_SVM', DIR_DATA . 'svm/');
 
+		define('DIR_TMP', DIR_ROOT . 'tmp/');
 		define('DIR_TMP_CACHE',  DIR_TMP . 'cache/');
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty/');
 
