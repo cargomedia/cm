@@ -49,8 +49,6 @@ class CMTest_TH {
 
 	public static function clearFilesystem() {
 		CM_App::getInstance()->resetTmp();
-		CM_Util::rmDir(DIR_DATA);
-		CM_Util::rmDir(DIR_USERFILES);
 	}
 
 	public static function clearConfig() {

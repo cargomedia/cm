@@ -16,5 +16,7 @@ class CMTest_TestSuite {
 
 	public function cleanup() {
 		CMTest_TH::clearEnv();
+		CM_Util::rmDir(DIR_DATA);
+		CM_Util::rmDir(DIR_USERFILES);
 	}
 }
