@@ -3,6 +3,9 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
+	/** @var string */
+	protected $_dataPrefix;
+
 	/** @var CM_Config|null */
 	private $_config = null;
 
@@ -12,14 +15,11 @@ class CM_Bootloader {
 	/** @var bool */
 	private $_debug;
 
-	/** @var CM_Bootloader */
-	protected static $_instance;
-
 	/** @var CM_ExceptionHandling_Handler_Abstract */
 	private $_exceptionHandler;
 
-	/** @var string */
-	protected $_dataPrefix;
+	/** @var CM_Bootloader */
+	protected static $_instance;
 
 	/**
 	 * @param string      $pathRoot
