@@ -115,7 +115,7 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor/');
 		define('DIR_PUBLIC', DIR_ROOT . 'public/');
 
-		defined('DIR_DATA') || define('DIR_DATA', DIR_ROOT . 'data/');
+		define('DIR_DATA', DIR_ROOT . $this->getDataPrefix() . 'data/');
 		define('DIR_DATA_LOCKS', DIR_DATA . 'locks/');
 		define('DIR_DATA_LOG', DIR_DATA . 'logs/');
 		define('DIR_DATA_SVM', DIR_DATA . 'svm/');
@@ -123,7 +123,7 @@ class CM_Bootloader {
 		define('DIR_TMP_CACHE',  DIR_TMP . 'cache/');
 		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty/');
 
-		defined('DIR_USERFILES') || define('DIR_USERFILES', DIR_PUBLIC . 'userfiles/');
+		define('DIR_USERFILES', DIR_PUBLIC . $this->getDataPrefix() . 'userfiles/');
 	}
 
 	protected function _errorHandler() {
