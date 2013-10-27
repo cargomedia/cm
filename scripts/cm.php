@@ -7,5 +7,6 @@ $bootloader->setEnvironment('cli');
 $bootloader->load(array('errorHandler', 'constants', 'exceptionHandler', 'defaults'));
 
 $manager = new CM_Cli_CommandManager();
+$manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);
