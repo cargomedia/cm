@@ -33,14 +33,6 @@ abstract class CM_Db_Query_Abstract {
 	}
 
 	/**
-	 * @return CM_Db_Result
-	 */
-	public function execute() {
-		$statement = $this->_getClient()->createStatement($this->getSqlTemplate());
-		return $statement->execute($this->getParameters());
-	}
-
-	/**
 	 * @return CM_Db_Client
 	 */
 	protected function _getClient() {

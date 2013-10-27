@@ -91,7 +91,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function count($table, $where = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Count($client, $table, $where);
-		return (int) $query->execute()->fetchColumn();
+		return (int) $client->execute($query)->fetchColumn();
 	}
 
 	/**
@@ -102,7 +102,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function delete($table, $where = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Delete($client, $table, $where);
-		return $query->execute()->getAffectedRows();
+		return $client->execute($query)->getAffectedRows();
 	}
 
 	/**
@@ -195,7 +195,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		}
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Insert($client, $table, $fields, $values, $onDuplicateKeyValues, $statement);
-		$query->execute();
+		$client->execute($query);
 		return $client->getLastInsertId();
 	}
 
@@ -252,7 +252,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function select($table, $fields, $where = null, $order = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Select($client, $table, $fields, $where, $order);
-		return $query->execute();
+		return $client->execute($query);
 	}
 
 	/**
@@ -265,7 +265,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function selectMultiple($table, $fields, array $whereList, $order = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $whereList, $order);
-		return $query->execute();
+		return $client->execute($query);
 	}
 
 	/**
@@ -274,7 +274,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function truncate($table) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Truncate($client, $table);
-		$query->execute();
+		$client->execute($query);
 	}
 
 	/**
@@ -286,7 +286,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function update($table, array $values, $where = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Update($client, $table, $values, $where);
-		return $query->execute()->getAffectedRows();
+		return $client->execute($query)->getAffectedRows();
 	}
 
 	/**
@@ -298,7 +298,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	public static function updateIgnore($table, array $values, $where = null) {
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_Update($client, $table, $values, $where, 'UPDATE IGNORE');
-		return $query->execute()->getAffectedRows();
+		return $client->execute($query)->getAffectedRows();
 	}
 
 	/**
@@ -340,7 +340,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 		$client = self::getInstance()->_getClient(false);
 		$query = new CM_Db_Query_UpdateSequence($client, $table, $column, $direction, $where, $lowerBound, $upperBound);
-		$query->execute();
+		$client->execute($query);
 
 		self::update($table, array($column => $position), $whereMerged);
 	}
