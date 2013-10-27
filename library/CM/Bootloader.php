@@ -6,9 +6,6 @@ class CM_Bootloader {
 	/** @var CM_Config|null */
 	private $_config = null;
 
-	/** @var string[] */
-	private $_environments = array();
-
 	/** @var boolean */
 	private $_loaded = false;
 
