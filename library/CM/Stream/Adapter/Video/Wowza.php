@@ -45,11 +45,13 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
 			/** @var CM_Model_Stream_Publish $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-			if ($streamPublish->getStart() > $startStampLimit) {
-				continue;
-			}
-			if (!isset($status[$streamChannel->getKey()])) {
-				$this->unpublish($streamChannel->getKey());
+			if ($streamPublish) {
+				if ($streamPublish->getStart() > $startStampLimit) {
+					continue;
+				}
+				if (!isset($status[$streamChannel->getKey()])) {
+					$this->unpublish($streamChannel->getKey());
+				}
 			}
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
