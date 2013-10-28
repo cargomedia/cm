@@ -2,7 +2,7 @@
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.select.php';
 
-class smarty_function_linkTest extends CMTest_TestCase {
+class smarty_function_selectTest extends CMTest_TestCase {
 
 	public function testBasics() {
 		$htmlObject = $this->_createSelect(array(
