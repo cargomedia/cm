@@ -14,6 +14,7 @@ class smarty_function_linkTest extends CMTest_TestCase {
 			'selectedValue' => 1,
 		));
 		$this->assertSame(2, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
 		$this->assertSame('bar', $htmlObject->getText('option[selected]'));
 		$this->assertSame('bar', $htmlObject->getText('.label'));
 	}
@@ -28,6 +29,7 @@ class smarty_function_linkTest extends CMTest_TestCase {
 			'placeholder' => 'please choose',
 		));
 		$this->assertSame(3, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
 		$this->assertSame('please choose', $htmlObject->getText('option[selected]'));
 		$this->assertSame('please choose', $htmlObject->getText('.label'));
 	}
