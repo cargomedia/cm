@@ -1,0 +1,47 @@
+<?php
+
+require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.select.php';
+
+class smarty_function_linkTest extends CMTest_TestCase {
+
+	public function testBasics() {
+		$htmlObject = $this->_createSelect(array(
+			'name' => 'foo',
+			'optionList' => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'selectedValue' => 1,
+		));
+		$this->assertSame(2, $htmlObject->getCount('option'));
+		$this->assertSame('bar', $htmlObject->getText('option[selected]'));
+		$this->assertSame('bar', $htmlObject->getText('.label'));
+	}
+
+	public function testPlaceholder() {
+		$htmlObject = $this->_createSelect(array(
+			'name' => 'foo',
+			'optionList' => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'placeholder' => 'please choose',
+		));
+		$this->assertSame(3, $htmlObject->getCount('option'));
+		$this->assertSame('please choose', $htmlObject->getText('option[selected]'));
+		$this->assertSame('please choose', $htmlObject->getText('.label'));
+	}
+
+	/**
+	 * @param array $params
+	 * @return CMTest_TH_Html
+	 */
+	private function _createSelect(array $params) {
+		$smarty = new Smarty();
+		$render = new CM_Render();
+		$template = $smarty->createTemplate('string:');
+		$template->assignGlobal('render', $render);
+		$html = smarty_function_select($params, $template);
+		return new CMTest_TH_Html($html);
+	}
+}

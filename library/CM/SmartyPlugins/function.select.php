@@ -16,7 +16,6 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		$optionList = $params['optionList'];
 	}
 
-	$selectedValue = null;
 	if (isset($params['selectedValue'])) {
 		$selectedValue = $params['selectedValue'];
 	}
@@ -37,7 +36,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		}
 	}
 
-	if ($selectedValue) {
+	if (isset($selectedValue)) {
 		$selectedLabel = $optionList[$selectedValue];
 	} elseif ($placeholder) {
 		$selectedLabel = $placeholder;
@@ -55,13 +54,17 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	}
 	$html .= '>';
 	if (null !== $placeholder) {
-		$html .= '<option value="">' . $placeholder . '</option>';
+		$html .= '<option';
+		if (!isset($selectedValue)) {
+			$html .= ' selected';
+		}
+		$html .= ' value="">' . $placeholder . '</option>';
 	}
 
 	$template->smarty->loadPlugin('smarty_modifier_escape');
 	foreach ($optionList as $itemValue => $itemLabel) {
 		$html .= '<option value="' . smarty_modifier_escape($itemValue) . '"';
-		if ($itemValue == $selectedValue) {
+		if (isset($selectedValue) && $itemValue === $selectedValue) {
 			$html .= ' selected="selected"';
 		}
 		$html .= '>';
