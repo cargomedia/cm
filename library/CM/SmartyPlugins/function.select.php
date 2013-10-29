@@ -6,11 +6,6 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$htmlAttributes = array('id', 'name', 'class');
 
-	$label = null;
-	if (isset($params['label'])) {
-		$label = (string) $params['label'];
-	}
-
 	$optionList = array();
 	if (isset($params['optionList'])) {
 		$optionList = $params['optionList'];
@@ -49,7 +44,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$html .= '<select';
 	foreach ($htmlAttributes as $name) {
 		if (isset($params[$name])) {
-			$html .= ' ' . $name . '="' . $params[$name] . '"';
+			$html .= ' ' . $name . '="' . CM_Util::htmlspecialchars($params[$name]) . '"';
 		}
 	}
 	$html .= '>';
@@ -63,7 +58,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$template->smarty->loadPlugin('smarty_modifier_escape');
 	foreach ($optionList as $itemValue => $itemLabel) {
-		$html .= '<option value="' . smarty_modifier_escape($itemValue) . '"';
+		$html .= '<option value="' . CM_Util::htmlspecialchars($itemValue) . '"';
 		if (isset($selectedValue) && $itemValue === $selectedValue) {
 			$html .= ' selected="selected"';
 		}
@@ -71,12 +66,13 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		if ($translate) {
 			$html .= $render->getTranslation($translatePrefix . $itemLabel, array());
 		} else {
-			$html .= smarty_modifier_escape($itemLabel);
+			$html .= CM_Util::htmlspecialchars($itemLabel);
 		}
 		$html .= '</option>';
 	}
 	$html .= '</select>';
-	$html .= '<div class="button button-default hasLabel hasIconRight" type="button" value="Month" ><span class="label">' . $selectedLabel . '</span><span class="icon icon-arrow-down"></span></div>';
+	$html .= '<div class="button button-default hasLabel hasIconRight" type="button" value="Month" ><span class="label">' .
+			$selectedLabel . '</span><span class="icon icon-arrow-down"></span></div>';
 	$html .= '</div>';
 	return $html;
 }
