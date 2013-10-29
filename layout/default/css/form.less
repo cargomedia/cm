@@ -1,4 +1,5 @@
 .textinput {
+	display: block;
 	.appearance(none);
 	.box-sizing(border-box);
 	width: 100%;
@@ -57,6 +58,7 @@ select {
 	.box-sizing(border-box);
 	width: auto;
 	height: @sizeButton;
+	line-height: @sizeButton - 2px;
 	min-width: @sizeButton;
 	max-width: 100%;
 	overflow: hidden;
@@ -80,22 +82,22 @@ select {
 	&:disabled {
 		opacity: .5;
 	}
-}
 
-.button.hasIcon {
-	padding: 0;
+	&.hasIcon {
+		padding: 0;
 
-	&.hasLabel {
-		padding: 0 8px;
+		&.hasLabel {
+			padding: 0 8px;
 
-		.icon {
-			margin-right: 5px;
+			.icon {
+				margin-right: 5px;
+			}
 		}
 	}
-}
 
-.button.hasIconRight.hasLabel {
-	padding: 0 1px 0 8px;
+	&.hasIconRight.hasLabel .icon{
+		margin-left: 5px;
+	}
 }
 
 .button.confirmClick {
@@ -116,8 +118,8 @@ select {
 	color: lighten(@colorFg, 25);
 	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
 
-	&:hover {
-		border: 1px solid darken(@colorFgBorderEmphasize3, 10);
+	&:not(:disabled):hover {
+		border-color: darken(@colorFgBorderEmphasize3, 10);
 		.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 12));
 		color: @colorFg;
 	}
@@ -134,7 +136,7 @@ select {
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
 
-	&:hover {
+	&:not(:disabled):hover {
 		.gradient(vertical, spin(@colorBgButtonHighlight, -2), spin(@colorBgButtonHighlight, -8));
 		color: @colorFgTheme;
 	}
@@ -151,7 +153,8 @@ select {
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorOk, -8);
 
-	&:hover {
+	&:not(:disabled):hover {
+		border-color: @colorOk;
 		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
 		color: @colorFgTheme;
 	}
@@ -168,7 +171,8 @@ select {
 	color: @colorBg;
 	text-shadow: 1px 1px @colorError;
 
-	&:hover {
+	&:not(:disabled):hover {
+		border-color: @colorError;
 		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
 		color: @colorFgTheme;
 	}
@@ -211,23 +215,22 @@ input[type=checkbox], input[type=radio] {
 	+ label {
 		position: relative;
 		cursor: pointer;
-		margin-left: 1.5em;
+		margin-left: 1.7em;
 
 		&:before {
 			position: absolute;
 			content: "";
 			display: block;
-			width: 1em;
-			height: 1em;
+			width: 1.2em;
+			height: 1.2em;
 			background-color: @colorBgEmphasize1;
 			top: 0;
-			left: -1.5em;
+			left: -1.7em;
 			border: 1px solid @colorFgBorderEmphasize3;
 		}
 	}
 
 	&:hover, &:focus {
-
 		&:not(:disabled) + label:before {
 			.input_focus;
 		}

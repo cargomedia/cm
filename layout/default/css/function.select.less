@@ -1,0 +1,43 @@
+.select-wrapper {
+	display: inline-block;
+	position: relative;
+
+	.button {
+		display: inline-block;
+
+		.icon {
+			font-size: 8px;
+			color: @colorFgBorderEmphasize3;
+			.transition(200ms);
+		}
+	}
+
+	select {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 100%;
+		min-width: 100%;
+		width: auto;
+		opacity: 0;
+		.appearance(none);
+		cursor: pointer;
+
+		&:not(:disabled) {
+			&:focus + .button {
+				.input_focus;
+			}
+			&:hover + .button {
+				.icon {
+					color: darken(@colorFgBorderEmphasize3, 25);
+				}
+			}
+		}
+
+		&:disabled + .button {
+			opacity: .5;
+		}
+	}
+}
