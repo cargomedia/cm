@@ -139,7 +139,6 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 
 		$streamSubscribe->unsetUser();
 		$this->assertNull($streamSubscribe->getUser());
-		$this->assertFalse($streamSubscribe->hasUser());
 	}
 
 	/**
