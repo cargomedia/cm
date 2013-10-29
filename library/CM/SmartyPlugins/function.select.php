@@ -32,11 +32,11 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		}
 	}
 
-	foreach ($optionList as $itemValue => &$itemLabel) {
+	foreach ($optionList as $itemValue => $itemLabel) {
 		if ($translate) {
-			$itemLabel = $render->getTranslation($translatePrefix . $itemLabel, array());
+			$optionList[$itemValue] = $render->getTranslation($translatePrefix . $itemLabel, array());
 		} else {
-			$itemLabel = CM_Util::htmlspecialchars($itemLabel);
+			$optionList[$itemValue] = CM_Util::htmlspecialchars($itemLabel);
 		}
 	}
 
@@ -59,7 +59,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	}
 	foreach ($optionList as $itemValue => $itemLabel) {
 		$html .= '<option value="' . CM_Util::htmlspecialchars($itemValue) . '"';
-		if ($itemValue == $selectedValue) {
+		if ($itemValue === $selectedValue) {
 			$html .= ' selected';
 			$selectedLabel = $itemLabel;
 		}
