@@ -106,6 +106,7 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 		$streamPublish->unsetUser();
 		$this->assertNull($streamPublish->getUser());
+		$this->assertFalse($streamPublish->hasUser());
 	}
 
 	/**
