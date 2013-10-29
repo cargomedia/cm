@@ -1,6 +1,7 @@
 <?php
 
 class CM_Menu {
+
 	/**
 	 * @var CM_MenuEntry[]
 	 */
@@ -9,13 +10,15 @@ class CM_Menu {
 	/**
 	 * Creates a new menu object with the given menu entries as array
 	 *
-	 * @param array              $menuEntries Menu entries
-	 * @param CM_MenuEntry|null  $parent
+	 * @param array             $menuEntries Menu entries
+	 * @param CM_MenuEntry|null $parent
 	 */
 	public function __construct(array $menuEntries, CM_MenuEntry $parent = null) {
+		$this->_entries = new SplFixedArray(count($menuEntries));
+		$i = 0;
 		foreach ($menuEntries as $menuEntry) {
 			$entry = new CM_MenuEntry($menuEntry, $this, $parent);
-			$this->_entries[] = $entry;
+			$this->_entries[$i++] = $entry;
 		}
 	}
 
@@ -85,7 +88,7 @@ class CM_Menu {
 	 * @return CM_MenuEntry[]
 	 */
 	public final function getEntries(CM_Model_User $viewer = null) {
-		return array_filter($this->_entries, function (CM_MenuEntry $entry) use ($viewer) {
+		return array_filter($this->_entries->toArray(), function (CM_MenuEntry $entry) use ($viewer) {
 			return $entry->isViewable($viewer);
 		});
 	}

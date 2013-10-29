@@ -11,6 +11,6 @@ class CM_Paging_StreamChannel_Abstract extends CM_Paging_Abstract {
 	 * @return boolean
 	 */
 	public function contains(CM_Model_StreamChannel_Abstract $streamChannel) {
-		return in_array(array('id' => $streamChannel->getId(), 'type' => $streamChannel->getType()), $this->getItemsRaw());
+		return $this->_contains(array('id' => $streamChannel->getId(), 'type' => $streamChannel->getType()));
 	}
 }

@@ -6,6 +6,6 @@ abstract class CM_Paging_Ip_Abstract extends CM_Paging_Abstract {
 	 * @return bool
 	 */
 	public function contains($ip) {
-		return in_array($ip, $this->getItems());
+		return $this->_contains($ip);
 	}
 }

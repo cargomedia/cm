@@ -3,7 +3,9 @@
 abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, Countable, CM_Cacheable, CM_ArrayConvertible {
 
 	private $_count = null;
-	private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
+	/** @var SplFixedArray */
+	private $_itemsRaw = null;
+	private $_items = array(), $_itemsRawTree = null;
 	private $_pageOffset = 0;
 	private $_pageSize = null;
 	private $_source = null;
@@ -18,6 +20,19 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 */
 	public function __construct(CM_PagingSource_Abstract $source = null) {
 		$this->_source = $source;
+	}
+
+	/**
+	 * @param mixed $itemRawSearched
+	 * @return bool
+	 */
+	protected function _contains($itemRawSearched) {
+		foreach ($this->getItemsRaw() as $itemRaw) {
+			if ($itemRawSearched == $itemRaw) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -82,12 +97,12 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	/**
 	 * Return Un-processed, un-filtered items
 	 *
-	 * @return array
+	 * @return SplFixedArray
 	 */
 	public function getItemsRaw() {
 		$itemsRaw = $this->_getItemsRaw();
 		if (null !== $this->_pageSize && count($itemsRaw) > $this->_pageSize) {
-			$itemsRaw = array_slice($itemsRaw, 0, $this->_pageSize);
+			$itemsRaw->setSize(min($this->_pageSize, $itemsRaw->getSize()));
 		}
 		return $itemsRaw;
 	}
@@ -97,7 +112,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	 * @return array[]
 	 */
 	public function getItemsRawTree($keyName = null) {
-		return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);
+		return CM_Util::getArrayTree($this->getItemsRaw()->toArray(), 1, true, $keyName);
 	}
 
 	/**
@@ -314,9 +329,9 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @param array $itemsRaw
+	 * @param SplFixedArray $itemsRaw
 	 */
-	protected function _onLoadItemsRaw(array $itemsRaw) {
+	protected function _onLoadItemsRaw(SplFixedArray $itemsRaw) {
 	}
 
 	/**
@@ -349,26 +364,26 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @return array Raw items (might contain more than $this->_pageSize)
+	 * @return SplFixedArray Raw items (might contain more than $this->_pageSize)
 	 */
 	private function _getItemsRaw() {
 		if ($this->_itemsRaw === null) {
-			$this->_itemsRaw = array();
-			if ($this->_source) {
+			if (!$this->_source) {
+				$this->_itemsRaw = new SplFixedArray(0);
+			} else {
 				$count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
-				$itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
-				foreach ($itemsRaw as &$itemRaw) {
-					if ($this->_flattenItems) {
+				$this->_itemsRaw = SplFixedArray::fromArray($this->_source->getItems($this->_getItemOffset(), $count));
+				if ($this->_flattenItems) {
+					foreach ($this->_itemsRaw as $i => $itemRaw) {
 						if (is_array($itemRaw) && count($itemRaw) == 1) {
-							$itemRaw = reset($itemRaw);
+							$this->_itemsRaw[$i] = reset($itemRaw);
 						}
 					}
-					$this->_itemsRaw[] = $itemRaw;
 				}
 			}
 			$this->_onLoadItemsRaw($this->_itemsRaw);
 		}
-		return $this->_itemsRaw;
+		return clone($this->_itemsRaw);
 	}
 
 	/**
