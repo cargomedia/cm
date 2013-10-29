@@ -6,17 +6,13 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$htmlAttributes = array('id', 'name', 'class');
 
-	$label = null;
-	if (isset($params['label'])) {
-		$label = (string) $params['label'];
-	}
-
 	$optionList = array();
 	if (isset($params['optionList'])) {
 		$optionList = $params['optionList'];
 	}
 
-	if (isset($params['selectedValue'])) {
+	$selectedValue = null;
+	if (isset($params['selectedValue']) && isset($optionList[$params['selectedValue']])) {
 		$selectedValue = $params['selectedValue'];
 	}
 
@@ -36,47 +32,44 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		}
 	}
 
-	if (isset($selectedValue)) {
-		$selectedLabel = $optionList[$selectedValue];
-	} elseif ($placeholder) {
-		$selectedLabel = $placeholder;
-	} else {
-		$selectedLabel = reset($optionList);
+	foreach ($optionList as $itemValue => $itemLabel) {
+		if ($translate) {
+			$optionList[$itemValue] = $render->getTranslation($translatePrefix . $itemLabel, array());
+		} else {
+			$optionList[$itemValue] = CM_Util::htmlspecialchars($itemLabel);
+		}
 	}
 
-	$html = '<div class="select-wrapper">';
+	if (null !== $placeholder) {
+		$optionList = array(null => $placeholder) + $optionList;
+	}
 
+	$html = '';
 	$html .= '<select';
 	foreach ($htmlAttributes as $name) {
 		if (isset($params[$name])) {
-			$html .= ' ' . $name . '="' . $params[$name] . '"';
+			$html .= ' ' . $name . '="' . CM_Util::htmlspecialchars($params[$name]) . '"';
 		}
 	}
 	$html .= '>';
-	if (null !== $placeholder) {
-		$html .= '<option';
-		if (!isset($selectedValue)) {
-			$html .= ' selected';
-		}
-		$html .= ' value="">' . $placeholder . '</option>';
+	$selectedLabel = '';
+	if (null === $selectedValue && count($optionList) > 0) {
+		$optionListValues = array_keys($optionList);
+		$selectedValue = reset($optionListValues);
 	}
-
-	$template->smarty->loadPlugin('smarty_modifier_escape');
 	foreach ($optionList as $itemValue => $itemLabel) {
-		$html .= '<option value="' . smarty_modifier_escape($itemValue) . '"';
-		if (isset($selectedValue) && $itemValue === $selectedValue) {
-			$html .= ' selected="selected"';
+		$html .= '<option value="' . CM_Util::htmlspecialchars($itemValue) . '"';
+		if ($itemValue === $selectedValue) {
+			$html .= ' selected';
+			$selectedLabel = $itemLabel;
 		}
-		$html .= '>';
-		if ($translate) {
-			$html .= $render->getTranslation($translatePrefix . $itemLabel, array());
-		} else {
-			$html .= smarty_modifier_escape($itemLabel);
-		}
-		$html .= '</option>';
+		$html .= '>' . $itemLabel . '</option>';
 	}
 	$html .= '</select>';
-	$html .= '<div class="button button-default hasLabel hasIconRight" type="button" value="Month" ><span class="label">' . $selectedLabel . '</span><span class="icon icon-arrow-down"></span></div>';
+
+	$html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
+	$html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-arrow-down"></span>';
 	$html .= '</div>';
-	return $html;
+
+	return '<div class="select-wrapper">' . $html . '</div>';
 }

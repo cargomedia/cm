@@ -4,7 +4,23 @@ require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/functio
 
 class smarty_function_selectTest extends CMTest_TestCase {
 
-	public function testBasics() {
+	public function testNothingSelected() {
+		$htmlObject = $this->_createSelect(array(
+			'name' => 'foo',
+			'optionList' => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+		));
+
+		$this->assertSame(2, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
+		$this->assertSame('foo', $htmlObject->getText('option[selected]'));
+		$this->assertSame('foo', $htmlObject->getText('.label'));
+	}
+
+	public function testSelectedValue() {
 		$htmlObject = $this->_createSelect(array(
 			'name' => 'foo',
 			'optionList' => array(
@@ -15,6 +31,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
 		));
 
 		$this->assertSame(2, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
 		$this->assertSame(1, $htmlObject->getCount('select'));
 		$this->assertSame('bar', $htmlObject->getText('option[selected]'));
 		$this->assertSame('bar', $htmlObject->getText('.label'));
@@ -31,6 +48,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
 		));
 
 		$this->assertSame(3, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
 		$this->assertSame(1, $htmlObject->getCount('select'));
 		$this->assertSame('please choose', $htmlObject->getText('option[selected]'));
 		$this->assertSame('please choose', $htmlObject->getText('.label'));

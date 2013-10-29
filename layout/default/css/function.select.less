@@ -1,11 +1,18 @@
 .select-wrapper {
 	display: inline-block;
 	position: relative;
+	max-width: 100%;
 
 	.button {
+		position: relative;
 		display: inline-block;
+		padding-right: 25px;
 
 		.icon {
+			position: absolute;
+			right: 0;
+			width: 25px;
+			text-align: center;
 			font-size: 8px;
 			color: @colorFgBorderEmphasize3;
 			.transition(200ms);
@@ -14,6 +21,7 @@
 
 	select {
 		position: absolute;
+		z-index: 1;
 		top: 0;
 		left: 0;
 		right: 0;
