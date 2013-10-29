@@ -31,8 +31,12 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		}
 	}
 
-	if (isset($selectedValue)) {
-		$selectedLabel = $optionList[$selectedValue];
+	if (isset($selectedValue) && isset($optionList[$selectedValue])) {
+		if ($translate) {
+			$selectedLabel = $render->getTranslation($translatePrefix . $selectedValue, array());
+		} else {
+			$selectedLabel = $optionList[$selectedValue];
+		}
 	} elseif ($placeholder) {
 		$selectedLabel = $placeholder;
 	} else {
@@ -59,8 +63,8 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$template->smarty->loadPlugin('smarty_modifier_escape');
 	foreach ($optionList as $itemValue => $itemLabel) {
 		$html .= '<option value="' . CM_Util::htmlspecialchars($itemValue) . '"';
-		if (isset($selectedValue) && $itemValue === $selectedValue) {
-			$html .= ' selected="selected"';
+		if (isset($selectedValue) && $itemValue == $selectedValue) {
+			$html .= ' selected';
 		}
 		$html .= '>';
 		if ($translate) {

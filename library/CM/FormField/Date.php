@@ -48,8 +48,8 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 
 		$value = $this->getValue();
 		$this->setTplParam('yy', $value ? $value->format('Y') : null);
-		$this->setTplParam('mm', $value ? $value->format('m') : null);
-		$this->setTplParam('dd', $value ? $value->format('d') : null);
+		$this->setTplParam('mm', $value ? $value->format('n') : null);
+		$this->setTplParam('dd', $value ? $value->format('j') : null);
 	}
 
 	public function isEmpty($userInput) {
