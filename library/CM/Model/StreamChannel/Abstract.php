@@ -3,11 +3,11 @@
 abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @param CM_Model_User $user
-	 * @param int           $allowedUntil
+	 * @param CM_Model_User|null $user
+	 * @param int                $allowedUntil
 	 * @return int
 	 */
-	public function canPublish(CM_Model_User $user, $allowedUntil) {
+	public function canPublish(CM_Model_User $user = null, $allowedUntil) {
 		return $allowedUntil + 1000;
 	}
 
