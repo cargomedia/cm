@@ -351,7 +351,7 @@ DROP TABLE IF EXISTS `cm_streamChannelArchive_video`;
 
 CREATE TABLE `cm_streamChannelArchive_video` (
   `id` int(10) unsigned NOT NULL,
-  `userId` int(10) unsigned NOT NULL,
+  `userId` int(10) unsigned DEFAULT NULL,
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
   `duration` int(10) unsigned NOT NULL,
@@ -390,7 +390,7 @@ CREATE TABLE `cm_stream_publish` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `channelId-key` (`channelId`,`key`),
   KEY `userId` (`userId`),
-  CONSTRAINT `cm_stream_publish-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `cm_stream_publish-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_stream_subscribe`;
@@ -406,7 +406,7 @@ CREATE TABLE `cm_stream_subscribe` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `channelId-key` (`channelId`,`key`),
   KEY `userId` (`userId`),
-  CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `cm_stream_subscribe-cm_streamChannel` FOREIGN KEY (`channelId`) REFERENCES `cm_streamChannel` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_string`;

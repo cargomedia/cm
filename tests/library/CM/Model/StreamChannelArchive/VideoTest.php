@@ -35,6 +35,20 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testNoUser() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$user = CMTest_TH::createUser();
+		$streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
+		$streamPublish->unsetUser();
+
+		/** @var CM_Model_StreamChannelArchive_Video $archive */
+		$archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+
+		$this->assertNull($archive->getUser());
+		$this->assertNull($archive->getUserId());
+	}
+
 	public function testGetUser() {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
