@@ -25,12 +25,9 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
-		if (empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year'])) {
-			throw new CM_Exception_FormFieldValidation("day, month or year not set");
-		}
-		$dd = trim($userInput['day']);
-		$mm = trim($userInput['month']);
-		$yy = trim($userInput['year']);
+		$dd = (int) trim($userInput['day']);
+		$mm = (int) trim($userInput['month']);
+		$yy = (int) trim($userInput['year']);
 
 		return new DateTime($yy . '-' . $mm . '-' . $dd);
 	}
@@ -53,6 +50,6 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	}
 
 	public function isEmpty($userInput) {
-		return empty($userInput['day']) && empty($userInput['month']) && empty($userInput['year']);
+		return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
 	}
 }

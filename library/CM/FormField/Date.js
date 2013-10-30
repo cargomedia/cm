@@ -13,5 +13,9 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 		this.bindJquery(this.$('select'), 'change', function() {
 			this.trigger('change');
 		});
+	},
+
+	isEmpty: function(value) {
+		return _.isEmpty(value['day']) || _.isEmpty(value['month']) || _.isEmpty(value['year']);
 	}
 });
