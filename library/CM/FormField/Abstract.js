@@ -17,6 +17,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
 			success: function() {
 				if (value != this.getValue()) {
+					this.removeError();
 					return false;
 				}
 				this.error();
@@ -95,16 +96,37 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 	 */
 	error: function(message) {
 		var $container = this.$('.messages');
-		$container.html('');
+		var $errorMessage = $container.find('.formField-error');
+		this.$el.removeClass('hasError');
 
 		if (message) {
 			if ($container.length) {
-				$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />').children('.form_field_error').html(message).fadeIn('fast');
+				this.$el[0].offsetWidth;	// Force reflow for CSS-animation
+				this.$el.addClass('hasError');
+
+				if ($errorMessage.length) {
+					$errorMessage.html(message);
+				} else {
+					$errorMessage = $('<div class="formField-error"></div>').hide().appendTo($container);
+					$errorMessage.html(message);
+					$errorMessage.slideDown('fast');
+				}
 			} else {
 				cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
 			}
-
-			this.$('input, select, textarea').focus();
+		} else {
+			$errorMessage.remove();
 		}
+	},
+
+	removeError: function() {
+		var $formInput = this.$('input, select, textarea, .textinput');
+		var $container = this.$('.messages');
+		var $errorMessage = $('<div class="formField-error"></div>');
+
+		$formInput.removeClass('hasError');
+		$errorMessage.slideUp('fast', function() {
+			$container.html('');
+		});
 	}
 });

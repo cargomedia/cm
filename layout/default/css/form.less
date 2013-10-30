@@ -204,7 +204,7 @@ input:disabled {
 	opacity: .5;
 }
 
-input:focus, textinput:focus, .textinput.focus, select:focus, textarea:focus {
+input:focus, .textinput:focus, .textinput.focus, select:focus, textarea:focus {
 	.input_focus;
 }
 
@@ -276,7 +276,6 @@ input[type=checkbox] {
 	}
 }
 
-
 .formField, .formAction {
 	.box-sizing(border-box);
 	max-width: 100%;
@@ -330,10 +329,9 @@ input[type=checkbox] {
 .messages {
 	display: block;
 
-	.form_field_error {
-		.error;
-		display: inline-block;
-		margin: 4px 0 0;
-		padding: 3px 7px;
+	.formField-error {
+		display: none;
+		color: @colorError;
+		padding: 2px;
 	}
 }
