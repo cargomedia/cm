@@ -10,8 +10,8 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 
 	validate: function() {
 		var value = this.getValue();
-		if (_.isEmpty(value)) {
-			this.error();
+		if (this.isEmpty(value)) {
+			this.error(null);
 			return;
 		}
 		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
@@ -116,5 +116,13 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		} else {
 			$errorMessage.remove();
 		}
+	},
+
+	/**
+	 * @param {Object} value
+	 * @returns {Boolean}
+	 */
+	isEmpty: function(value) {
+		return _.isEmpty(value)
 	}
 });
