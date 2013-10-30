@@ -17,7 +17,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
 			success: function() {
 				if (value != this.getValue()) {
-					this.removeError();
 					return false;
 				}
 				this.error();
@@ -117,16 +116,5 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		} else {
 			$errorMessage.remove();
 		}
-	},
-
-	removeError: function() {
-		var $formInput = this.$('input, select, textarea, .textinput');
-		var $container = this.$('.messages');
-		var $errorMessage = $('<div class="formField-error"></div>');
-
-		$formInput.removeClass('hasError');
-		$errorMessage.slideUp('fast', function() {
-			$container.html('');
-		});
 	}
 });
