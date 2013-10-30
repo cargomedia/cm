@@ -155,8 +155,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		var hasErrors = false;
 		_.each(_.keys(action.fields).reverse(), function(fieldName) {
 			var required = action.fields[fieldName];
-			if (required && _.isEmpty(data[fieldName])) {
-				var field = this.getField(fieldName);
+			var field = this.getField(fieldName);
+			if (required && field.isEmpty(data[fieldName])) {
 				var label;
 				var $textInput = field.$('input, textarea');
 				var $labels = $('label[for="' + field.getAutoId() + '-input"]');
