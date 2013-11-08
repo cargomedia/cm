@@ -6,7 +6,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
 
 	public function testNothingSelected() {
 		$htmlObject = $this->_createSelect(array(
-			'name' => 'foo',
+			'name'       => 'foo',
 			'optionList' => array(
 				0 => 'foo',
 				1 => 'bar',
@@ -22,8 +22,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
 
 	public function testSelectedValue() {
 		$htmlObject = $this->_createSelect(array(
-			'name' => 'foo',
-			'optionList' => array(
+			'name'          => 'foo',
+			'optionList'    => array(
 				0 => 'foo',
 				1 => 'bar',
 			),
@@ -39,8 +39,8 @@ class smarty_function_selectTest extends CMTest_TestCase {
 
 	public function testPlaceholder() {
 		$htmlObject = $this->_createSelect(array(
-			'name' => 'foo',
-			'optionList' => array(
+			'name'        => 'foo',
+			'optionList'  => array(
 				0 => 'foo',
 				1 => 'bar',
 			),
@@ -52,6 +52,57 @@ class smarty_function_selectTest extends CMTest_TestCase {
 		$this->assertSame(1, $htmlObject->getCount('select'));
 		$this->assertSame('please choose', $htmlObject->getText('option[selected]'));
 		$this->assertSame('please choose', $htmlObject->getText('.label'));
+	}
+
+	public function testPlaceholder_true() {
+		$htmlObject = $this->_createSelect(array(
+			'name'        => 'foo',
+			'optionList'  => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'placeholder' => true,
+		));
+
+		$this->assertSame(3, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
+		$this->assertSame(' -Select- ', $htmlObject->getText('option[selected]'));
+		$this->assertSame(' -Select- ', $htmlObject->getText('.label'));
+	}
+
+	public function testPlaceholder_false() {
+		$htmlObject = $this->_createSelect(array(
+			'name'        => 'foo',
+			'optionList'  => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'placeholder' => false,
+		));
+
+		$this->assertSame(2, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
+		$this->assertSame('foo', $htmlObject->getText('option[selected]'));
+		$this->assertSame('foo', $htmlObject->getText('.label'));
+	}
+
+	public function testPlaceholder_empty() {
+		$htmlObject = $this->_createSelect(array(
+			'name'        => 'foo',
+			'optionList'  => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'placeholder' => '',
+		));
+
+		$this->assertSame(3, $htmlObject->getCount('option'));
+		$this->assertSame(1, $htmlObject->getCount('option[selected]'));
+		$this->assertSame(1, $htmlObject->getCount('select'));
+		$this->assertSame('', $htmlObject->getText('option[selected]'));
+		$this->assertSame('', $htmlObject->getText('.label'));
 	}
 
 	/**

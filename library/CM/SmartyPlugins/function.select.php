@@ -24,12 +24,10 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	}
 
 	$placeholder = null;
-	if (isset($params['placeholder'])) {
-		if (is_string($params['placeholder'])) {
-			$placeholder = $params['placeholder'];
-		} else {
-			$placeholder = ' -' . $render->getTranslation('Select') . '- ';
-		}
+	if (isset($params['placeholder']) && is_string($params['placeholder'])) {
+		$placeholder = $params['placeholder'];
+	} elseif (!empty($params['placeholder'])) {
+		$placeholder = ' -' . $render->getTranslation('Select') . '- ';
 	}
 
 	foreach ($optionList as $itemValue => $itemLabel) {
