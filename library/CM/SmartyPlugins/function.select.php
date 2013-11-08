@@ -27,7 +27,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	if (isset($params['placeholder'])) {
 		if (is_string($params['placeholder'])) {
 			$placeholder = $params['placeholder'];
-		} else {
+		} elseif ($params['placeholder']) {
 			$placeholder = ' -' . $render->getTranslation('Select') . '- ';
 		}
 	}
