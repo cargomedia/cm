@@ -23,5 +23,5 @@
 {/if}
 
 {if $display === CM_FormField_Set_Select::DISPLAY_SELECT}
-	{select id=$id name=$name class=$class optionList=$optionList translate=$translate translatePrefix=$translatePrefix selectedValue=$value}
+	{select id=$id name=$name class=$class optionList=$optionList translate=$translate translatePrefix=$translatePrefix selectedValue=$value placeholder=$placeholder}
 {/if}
