@@ -137,13 +137,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array('id' => $this->getIdRaw(), 'data' => null));
+		return serialize(array('id' => $this->getIdRaw()));
 	}
 
 	final public function unserialize($serialized) {
 		$unserialized = unserialize($serialized);
 		$id = $unserialized['id'];
-		$data = $unserialized['data'];
+		$data = null;
+		if (isset($unserialized['data'])) {
+			$data = $unserialized['data'];
+		}
 		$this->_construct($id, $data);
 	}
 
