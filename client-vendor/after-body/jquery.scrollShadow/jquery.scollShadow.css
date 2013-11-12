@@ -1,0 +1,32 @@
+.scrollShadow {
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.scrollShadow:before, .scrollShadow:after {
+	position: absolute;
+	content: '';
+	left: 0;
+	width: 100%;
+	height: 10px;
+	z-index: 1;
+	-webkit-transition: 200ms;
+	-moz-transition: 200ms;
+	-ms-transition: 200ms;
+	-o-transition: 200ms;
+	transition: 200ms;
+}
+
+.scrollShadow:before {
+	top: 0;
+	box-shadow: inset 0px 12px 12px -12px rgba(0, 0, 0, 0.3);
+}
+
+.scrollShadow:after {
+	bottom: 0;
+	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.3);
+}
+
+.scrollShadow.scrolledTop:before, .scrollShadow.scrolledBottom:after {
+	opacity: 0;
+}

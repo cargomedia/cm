@@ -1,0 +1,31 @@
+/**
+ * @requires Underscore.js
+ * @author CM
+ */
+(function($) {
+	$.fn.scrollShadow = function() {
+		return this.each(function() {
+			var $this = $(this);
+
+			$(document).ready(function() {
+				toggleShadow();
+			});
+
+			$this.scroll(_.throttle(function() {
+				toggleShadow();
+			}, 200));
+
+			$(window).resize(_.debounce(function() {
+				toggleShadow();
+			}, 200));
+
+			function toggleShadow() {
+				var scrollTop = $this.scrollTop() == 0;
+				$this.toggleClass('scrolledTop', scrollTop);
+
+				var scrolledBottom = $this.innerHeight() + $this.scrollTop() >= $this[0].scrollHeight;
+				$this.toggleClass('scrolledBottom', scrolledBottom);
+			}
+		});
+	};
+})(jQuery);
