@@ -297,7 +297,7 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
-			$dom.find('.select-wrapper').select();
+			$dom.find('.fancySelect').fancySelect();
 		},
 		/**
 		 * @param {jQuery} $element

@@ -69,5 +69,5 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-select"></span>';
 	$html .= '</div>';
 
-	return '<div class="select-wrapper">' . $html . '</div>';
+	return '<div class="fancySelect">' . $html . '</div>';
 }
