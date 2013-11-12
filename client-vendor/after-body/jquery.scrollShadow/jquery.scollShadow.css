@@ -19,6 +19,7 @@
 	-ms-transition: 200ms;
 	-o-transition: 200ms;
 	transition: 200ms;
+	opacity: 0;
 }
 
 .scrollShadow:before {
@@ -31,6 +32,6 @@
 	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
-.scrollShadow.scrolledTop:before, .scrollShadow.scrolledBottom:after {
-	opacity: 0;
+.scrollShadow.notScrolledTop:before, .scrollShadow.notScrolledBottom:after {
+	opacity: 1;
 }

@@ -22,10 +22,10 @@
 
 			function toggleShadow() {
 				var scrollTop = $this.scrollTop() == 0;
-				$this.toggleClass('scrolledTop', scrollTop);
+				$this.toggleClass('notScrolledTop', !scrollTop);
 
 				var scrolledBottom = $this.innerHeight() + $this.scrollTop() >= $this[0].scrollHeight;
-				$this.toggleClass('scrolledBottom', scrolledBottom);
+				$this.toggleClass('notScrolledBottom', !scrolledBottom);
 			}
 		});
 	};
