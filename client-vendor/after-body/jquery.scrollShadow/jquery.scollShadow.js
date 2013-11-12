@@ -6,11 +6,18 @@
 	$.fn.scrollShadow = function() {
 		return this.each(function() {
 			var $this = $(this);
-			$this.wrap( "<div class='scrollShadow-wrapper'></div>" );
+			if ($this.data('toggleShadow')) {
+				return;
+			}
 
-			$(document).ready(function() {
-				toggleShadow();
-			});
+			$this.addClass('scrollShadow');
+			$this.wrap("<div class='scrollShadow-wrapper'></div>");
+
+			function toggleShadow() {
+				var scrollTop = $this.scrollTop();
+				$this.toggleClass('notScrolledTop', scrollTop != 0);
+				$this.toggleClass('notScrolledBottom', scrollTop != $this.prop('scrollHeight') - $this.innerHeight());
+			}
 
 			$this.scroll(_.throttle(function() {
 				toggleShadow();
@@ -20,13 +27,7 @@
 				toggleShadow();
 			}, 200));
 
-			function toggleShadow() {
-				var scrollTop = $this.scrollTop() == 0;
-				$this.toggleClass('notScrolledTop', !scrollTop);
-
-				var scrolledBottom = $this.innerHeight() + $this.scrollTop() >= $this[0].scrollHeight;
-				$this.toggleClass('notScrolledBottom', !scrolledBottom);
-			}
+			$this.data('toggleShadow', true);
 		});
 	};
 })(jQuery);
