@@ -1,3 +1,7 @@
+.scrollShadow-wrapper {
+	position: relative;
+}
+
 .scrollShadow {
 	overflow: auto;
 	-webkit-overflow-scrolling: touch;
@@ -19,12 +23,12 @@
 
 .scrollShadow:before {
 	top: 0;
-	box-shadow: inset 0px 12px 12px -12px rgba(0, 0, 0, 0.3);
+	box-shadow: inset 0px 12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
 .scrollShadow:after {
 	bottom: 0;
-	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.3);
+	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
 .scrollShadow.scrolledTop:before, .scrollShadow.scrolledBottom:after {

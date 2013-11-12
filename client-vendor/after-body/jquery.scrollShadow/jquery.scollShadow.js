@@ -6,6 +6,7 @@
 	$.fn.scrollShadow = function() {
 		return this.each(function() {
 			var $this = $(this);
+			$this.wrap( "<div class='scrollShadow-wrapper'></div>" );
 
 			$(document).ready(function() {
 				toggleShadow();
