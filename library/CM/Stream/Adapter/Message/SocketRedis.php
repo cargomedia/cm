@@ -13,9 +13,6 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 		$server = $servers[array_rand($servers)];
 		$sockjsUrls = $server['sockjsUrls'];
 		$sockjsUrl = $sockjsUrls[array_rand($sockjsUrls)];
-		if (static::_getConfig()->hostPrefix) {
-			$sockjsUrl = preg_replace('~^https?://~', '${0}' . rand(1, 9999) . '.', $sockjsUrl);
-		}
 		return array('sockjsUrl' => $sockjsUrl);
 	}
 
