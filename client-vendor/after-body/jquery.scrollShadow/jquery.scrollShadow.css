@@ -7,7 +7,7 @@
 	-webkit-overflow-scrolling: touch;
 }
 
-.scrollShadow:before, .scrollShadow:after {
+.scrollShadow-before, .scrollShadow-after {
 	position: absolute;
 	content: '';
 	left: 0;
@@ -22,16 +22,16 @@
 	opacity: 0;
 }
 
-.scrollShadow:before {
+.scrollShadow-before {
 	top: 0;
 	box-shadow: inset 0px 12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
-.scrollShadow:after {
+.scrollShadow-after {
 	bottom: 0;
 	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
-.scrollShadow.notScrolledTop:before, .scrollShadow.notScrolledBottom:after {
+.scrollShadow.notScrolledTop .scrollShadow-before, .scrollShadow.notScrolledBottom .scrollShadow-after {
 	opacity: 1;
 }
