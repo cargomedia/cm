@@ -137,16 +137,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array('id' => $this->getIdRaw()));
+		return serialize(array($this->getIdRaw(), $this->_getData()));
 	}
 
 	final public function unserialize($serialized) {
-		$unserialized = unserialize($serialized);
-		$id = $unserialized['id'];
-		$data = null;
-		if (isset($unserialized['data'])) {
-			$data = $unserialized['data'];
-		}
+		list($id, $data) = unserialize($serialized);
 		$this->_construct($id, $data);
 	}
 
@@ -511,7 +506,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		 * Cannot use __construct(), since signature is unknown.
 		 * unserialize() is ~10% slower.
 		 */
-		$serialized = serialize(array('id' => $id, 'data' => $data));
+		$serialized = serialize(array($id, $data));
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 		if ((null !== $data) && $dataFromPersistence && $cache = $model->_getCache()) {
