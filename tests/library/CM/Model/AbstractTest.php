@@ -443,7 +443,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		}
 		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $idRaw);
 		$this->assertEquals($modelMock1, $modelMock2);
-		$this->assertEquals($modelMock1->_get('foo'), $modelMock2->_get('foo'));
 
 		CMTest_TH::clearConfig();
 	}
