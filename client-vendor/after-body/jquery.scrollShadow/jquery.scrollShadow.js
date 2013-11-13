@@ -11,7 +11,6 @@
 			}
 
 			$this.addClass('scrollShadow');
-			$this.append('<div class="scrollShadow-before" /><div class="scrollShadow-after" />');
 			$this.wrap('<div class="scrollShadow-wrapper"></div>');
 
 			function toggleShadow() {
