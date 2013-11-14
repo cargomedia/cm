@@ -9,7 +9,7 @@
 <ul id="{$id}" class="{$class}">
 	{foreach $optionList as $itemValue => $itemLabel}
 		<li class="set-item {$name}_value_{$itemValue}">
-			<input id="{$id}-{$itemValue}" name="{$name}" type="radio" value="{$itemValue|escape}" {if $itemValue==$value}checked="checked"{/if} />
+			<input id="{$id}-{$itemValue}" name="{$name}" type="radio" value="{$itemValue|escape}" {if $itemValue==$value}checked{/if} />
 			<label for="{$id}-{$itemValue}" class="{$name}_label_{$itemValue}">
 				{if $translate}
 					{translate "{$translatePrefix}{$itemLabel}"|escape}
