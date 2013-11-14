@@ -29,6 +29,15 @@ select {
 	max-width: 100%;
 }
 
+label {
+	//Fix for fastclick
+	display: inline-block;
+
+	> * {
+		pointer-events: none;
+	}
+}
+
 .placeholder(@color) {
 	::-webkit-input-placeholder {
 		color: @color;
@@ -95,7 +104,7 @@ select {
 		}
 	}
 
-	&.hasIconRight.hasLabel .icon{
+	&.hasIconRight.hasLabel .icon {
 		margin-left: 5px;
 	}
 }
@@ -215,17 +224,19 @@ input[type=checkbox], input[type=radio] {
 	+ label {
 		position: relative;
 		cursor: pointer;
-		margin-left: 1.7em;
+		margin-left: @sizeCheckbox+4px;
 
 		&:before {
 			position: absolute;
+			.box-sizing(border-box);
 			content: "";
 			display: block;
-			width: 1.2em;
-			height: 1.2em;
+			width: @sizeCheckbox;
+			height: @sizeCheckbox;
 			background-color: @colorBgEmphasize1;
-			top: 0;
-			left: -1.7em;
+			top: 50%;
+			left: -(@sizeCheckbox+4px);
+			margin-top: -@sizeCheckbox/2;
 			border: 1px solid @colorFgBorderEmphasize3;
 		}
 	}
@@ -244,7 +255,6 @@ input[type=checkbox], input[type=radio] {
 	&:disabled + label {
 		opacity: .5;
 	}
-
 }
 
 input[type=radio] {
