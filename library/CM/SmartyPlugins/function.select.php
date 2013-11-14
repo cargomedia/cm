@@ -56,6 +56,9 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		$selectedValue = reset($optionListValues);
 	}
 	foreach ($optionList as $itemValue => $itemLabel) {
+		if (null !== $itemValue) {
+			$itemValue = (string) $itemValue;
+		}
 		$html .= '<option value="' . CM_Util::htmlspecialchars($itemValue) . '"';
 		if ($itemValue === $selectedValue) {
 			$html .= ' selected';
