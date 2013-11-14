@@ -203,10 +203,11 @@ class CM_App {
 	 */
 	public function generateConfigClassTypes() {
 		$content = '';
-		$typeNamespaces = array('CM_Site_Abstract', 'CM_Action_Abstract', 'CM_Model_Abstract', 'CM_Model_ActionLimit_Abstract',
-			'CM_Model_Entity_Abstract', 'CM_Model_StreamChannel_Abstract', 'CM_Mail', 'CM_Paging_Log_Abstract', 'CM_Paging_ContentList_Abstract',);
-		foreach ($typeNamespaces as $typeNamespace) {
-			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typeNamespace));
+		foreach (CM_Class_Abstract::getClassChildren(true) as $childClassName) {
+			$reflectionClass = new ReflectionClass($childClassName);
+			if (preg_match('/\*\s+@typeNamespace\s+/', $reflectionClass->getDocComment())) {
+				$content .= join(PHP_EOL, $this->_generateClassTypesConfig($childClassName));
+			}
 		}
 		return $content;
 	}

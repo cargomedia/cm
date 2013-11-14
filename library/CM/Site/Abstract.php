@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
 	protected $_themes = array();

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 abstract class CM_Model_Entity_Abstract extends CM_Model_Abstract {
 
 	/**
