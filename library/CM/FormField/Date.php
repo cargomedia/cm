@@ -44,9 +44,9 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 		$this->setTplParam('days', array_combine($days, $days));
 
 		$value = $this->getValue();
-		$this->setTplParam('yy', $value ? (int) $value->format('Y') : null);
-		$this->setTplParam('mm', $value ? (int) $value->format('n') : null);
-		$this->setTplParam('dd', $value ? (int) $value->format('j') : null);
+		$this->setTplParam('yy', $value ? $value->format('Y') : null);
+		$this->setTplParam('mm', $value ? $value->format('n') : null);
+		$this->setTplParam('dd', $value ? $value->format('j') : null);
 	}
 
 	public function isEmpty($userInput) {
