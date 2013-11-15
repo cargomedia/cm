@@ -15,4 +15,9 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 	public function testConstructorInvalid() {
 		new CM_Dom_NodeList('<%%%%===**>>> foo');
 	}
+
+	public function getText() {
+		$list = new CM_Dom_NodeList('<div>hello<strong>world</strong></div>');
+		$this->assertSame('hello world', $list->getText());
+	}
 }
