@@ -4,18 +4,23 @@ class CM_Dom_NodeList {
 
 	/** @var DOMDocument */
 	private $_doc;
+
 	/** @var DOMElement */
 	private $_element;
-	/** @var DOMXPath  */
+
+	/** @var DOMXPath */
 	private $_xpath;
 
 	/**
-	 * @param string $html
-	 * @param DOMElement|null $element
+	 * @param string|DOMElement $html
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($html, DOMElement $element = null) {
-		if(!is_object($html)){
+	public function __construct($html) {
+		if ($html instanceof DOMElement) {
+			$this->_element = $html;
+			$this->_doc = $html->ownerDocument;
+		} else {
+			$html = (string) $html;
 			$this->_doc = new DOMDocument();
 			$html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
 			try {
@@ -23,15 +28,19 @@ class CM_Dom_NodeList {
 			} catch (ErrorException $e) {
 				throw new CM_Exception_Invalid('Cannot load html');
 			}
-			$this->_element = $this->_doc->getElementsByTagName('html')->item(0);
-		}else{
-			if($html instanceof DOMDocument){
-				$this->_doc = $html;
-			}
-			if(!is_null($element)){
-				$this->_element = $element;
-			}
+			$this->_element = $this->_doc->documentElement;
 		}
+	}
+
+	/**
+	 * @return CM_Dom_NodeList[]
+	 */
+	public function getChildren() {
+		$childList = array();
+		foreach ($this->_element->childNodes as $childNode) {
+			$childList[] = new self($childNode);
+		}
+		return $childList;
 	}
 
 	/**
@@ -45,17 +54,20 @@ class CM_Dom_NodeList {
 	 * @param string $name
 	 * @return string|null
 	 */
-	public function getAttribute($name){
+	public function getAttribute($name) {
 		$element = $this->_element;
-		if(!$element->hasAttribute($name)){
+		if (!$element->hasAttribute($name)) {
 			return null;
 		}
 		return $element->getAttribute($name);
 	}
 
-	public function getAttributeList(){
+	/**
+	 * @return string[]
+	 */
+	public function getAttributeList() {
 		$attributeList = array();
-		foreach($this->_element->attributes as $key => $attrNode){
+		foreach ($this->_element->attributes as $key => $attrNode) {
 			$attributeList[$key] = $attrNode->value;
 		}
 		return $attributeList;
@@ -65,13 +77,13 @@ class CM_Dom_NodeList {
 	 * @param $selector
 	 * @return CM_Dom_NodeList
 	 */
-	public function findElement($selector){
+	public function findElement($selector) {
 		$elements = $this->_findAll($selector);
 		if ($elements->length < 1) {
 			return null;
 		}
 		$element = $elements->item(0);
-		return new self($this->_doc, $element);
+		return new self($element);
 	}
 
 	/**
