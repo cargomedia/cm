@@ -45,7 +45,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 		$this->assertSame(count($data), $doc->getCount('label'));
 		$this->assertSame(count($data), $doc->getCount('input'));
 		foreach ($data as $value => $label) {
-			$this->assertTrue($doc->exists('li.' . $name . '_value_' . $value));
+			$this->assertTrue($doc->exists('li.' . $name . '-value-' . $value));
 			$spanQuery = 'label[class="' . $name . '-label-' . $value . '"]';
 			$this->assertTrue($doc->exists($spanQuery));
 			$this->assertSame($label, trim($doc->getText($spanQuery)));
