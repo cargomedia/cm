@@ -1,24 +1,33 @@
 <?php
 
-class CM_Dom_NodeList {
+class CM_Dom_NodeList implements Iterator {
+
+	private $_iteratorPosition;
 
 	/** @var DOMDocument */
 	private $_doc;
 
-	/** @var DOMElement */
-	private $_element;
+	/** @var DOMElement[] */
+	private $_elementList;
 
 	/** @var DOMXPath */
 	private $_xpath;
 
 	/**
-	 * @param string|DOMElement $html
+	 * @param string|DOMElement[] $html
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($html) {
-		if ($html instanceof DOMElement) {
-			$this->_element = $html;
-			$this->_doc = $html->ownerDocument;
+		if(is_array($html)) {
+			foreach($html as $element) {
+				if (!$element instanceof DOMElement) {
+					throw new CM_Exception_Invalid('Not all elements are DOMElement');
+				}
+				$this->_elementList[] = $element;
+				if(!$this->_doc) {
+					$this->_doc = $element->ownerDocument;
+				}
+			}
 		} else {
 			$html = (string) $html;
 			$this->_doc = new DOMDocument();
@@ -28,26 +37,32 @@ class CM_Dom_NodeList {
 			} catch (ErrorException $e) {
 				throw new CM_Exception_Invalid('Cannot load html');
 			}
-			$this->_element = $this->_doc->documentElement;
+			$this->_elementList[] = $this->_doc->documentElement;
 		}
 	}
 
 	/**
-	 * @return CM_Dom_NodeList[]
+	 * @return CM_Dom_NodeList
 	 */
 	public function getChildren() {
 		$childList = array();
-		foreach ($this->_element->childNodes as $childNode) {
-			$childList[] = new self($childNode);
+		foreach($this->_elementList as $element) {
+			foreach ($element->childNodes as $childNode) {
+				$childList[] = $childNode;
+			}
 		}
-		return $childList;
+		return new self($childList);
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getText() {
-		return $this->_element->textContent;
+		$text = '';
+		foreach($this->_elementList as $element) {
+			$text .= $element->textContent;
+		}
+		return $text;
 	}
 
 	/**
@@ -55,11 +70,11 @@ class CM_Dom_NodeList {
 	 * @return string|null
 	 */
 	public function getAttribute($name) {
-		$element = $this->_element;
-		if (!$element->hasAttribute($name)) {
+		$attributes = $this->getAttributeList();
+		if(!isset($attributes[$name])){
 			return null;
 		}
-		return $element->getAttribute($name);
+		return $attributes[$name];
 	}
 
 	/**
@@ -67,7 +82,10 @@ class CM_Dom_NodeList {
 	 */
 	public function getAttributeList() {
 		$attributeList = array();
-		foreach ($this->_element->attributes as $key => $attrNode) {
+		if(!isset($this->_elementList[0])) {
+			return $attributeList;
+		}
+		foreach ($this->_elementList[0]->attributes as $key => $attrNode) {
 			$attributeList[$key] = $attrNode->value;
 		}
 		return $attributeList;
@@ -77,13 +95,9 @@ class CM_Dom_NodeList {
 	 * @param string $selector
 	 * @return CM_Dom_NodeList
 	 */
-	public function findElement($selector) {
+	public function find($selector) {
 		$elements = $this->_findAll($selector);
-		if ($elements->length < 1) {
-			return null;
-		}
-		$element = $elements->item(0);
-		return new self($element);
+		return new self($elements);
 	}
 
 	/**
@@ -92,7 +106,7 @@ class CM_Dom_NodeList {
 	 */
 	public function has($selector){
 		$elements = $this->_findAll($selector);
-		return ($elements->length > 0);
+		return (count($elements) > 0);
 	}
 
 	/**
@@ -107,7 +121,8 @@ class CM_Dom_NodeList {
 
 	/**
 	 * @param string $selector
-	 * @return DOMNodeList
+	 * @throws CM_Exception_Invalid
+	 * @return DOMElement[]
 	 */
 	private function _findAll($selector) {
 		$xpath = '//' . preg_replace('-([^>\s])\s+([^>\s])-', '$1//$2', trim($selector));
@@ -120,6 +135,35 @@ class CM_Dom_NodeList {
 		$xpath = preg_replace('/\.([\w-]*)/', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
 		$xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
 		$xpath = preg_replace('-\/\[-', '/*[', $xpath);
-		return $this->_getXPath()->query($xpath, $this->_element);
+		$nodes = array();
+		foreach($this->_elementList as $element) {
+			foreach($this->_getXPath()->query($xpath, $element) as $resultElement){
+				if(!$resultElement instanceof DOMElement) {
+					throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
+				}
+				$nodes[] = $resultElement;
+			}
+		}
+		return $nodes;
+	}
+
+	public function current() {
+		return new self(array($this->_elementList[$this->_iteratorPosition]));
+	}
+
+	public function next() {
+		$this->_iteratorPosition++;
+	}
+
+	public function key() {
+		return $this->_iteratorPosition;
+	}
+
+	public function valid() {
+		return isset($this->_elementList[$this->_iteratorPosition]);
+	}
+
+	public function rewind() {
+		$this->_iteratorPosition = 0;
 	}
 }
