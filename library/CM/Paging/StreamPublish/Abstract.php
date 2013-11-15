@@ -7,7 +7,7 @@ class CM_Paging_StreamPublish_Abstract extends CM_Paging_Abstract {
 	 * @return boolean
 	 */
 	public function contains(CM_Model_Stream_Publish $streamPublish) {
-		return in_array($streamPublish->getId(), $this->getItemsRaw());
+		return $this->_contains($streamPublish->getId());
 	}
 
 	protected function _processItem($item) {

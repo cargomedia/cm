@@ -183,7 +183,7 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 		$this->assertCount(100, $items);
 		$this->assertSame(range(0, 99), $items);
 
-		$itemsRaw = $paging->getItemsRaw();
+		$itemsRaw = $paging->getItemsRaw()->toArray();
 		$this->assertInternalType('array', $itemsRaw);
 		$this->assertCount(100, $itemsRaw);
 		for ($i = 0; $i < 100; $i++) {
@@ -274,12 +274,12 @@ class CM_Paging_AbstractTest extends CMTest_TestCase {
 	public function testStaleness() {
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
 		$paging->setPage(1, 10);
-		$this->assertEquals(range(0, 9), $paging->getItemsRaw());
+		$this->assertEquals(range(0, 9), $paging->getItemsRaw()->toArray());
 		$this->assertSame(array(1, 2, 4, 5, 7, 8, 10, 11, 13, 14), $paging->getItems());
 
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_MockStale(0, 20));
 		$paging->setPage(1, 10);
-		$this->assertEquals(range(0, 9), $paging->getItemsRaw());
+		$this->assertEquals(range(0, 9), $paging->getItemsRaw()->toArray());
 		$this->assertSame(array(null, 1, 2, null, 4, 5, null, 7, 8, null), $paging->getItems(null, null, true));
 
 		$paging = new CM_Paging_Mock_Gaps(new CM_PagingSource_Mock(0, 20));

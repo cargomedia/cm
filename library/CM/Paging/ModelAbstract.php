@@ -15,7 +15,7 @@ abstract class CM_Paging_ModelAbstract extends CM_Paging_Abstract {
 		return null;
 	}
 
-	protected function _onLoadItemsRaw(array $itemsRaw) {
+	protected function _onLoadItemsRaw(SplFixedArray $itemsRaw) {
 		$modelList = CM_Model_Abstract::factoryGenericMultiple($itemsRaw, $this->_getModelType());
 		$this->_modelList = array();
 		foreach ($itemsRaw as $index => $itemRaw) {

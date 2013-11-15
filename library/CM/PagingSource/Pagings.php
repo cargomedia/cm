@@ -36,7 +36,7 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
 		$items = array();
 		/** @var CM_Paging_Abstract $paging */
 		foreach ($this->_pagings as $paging) {
-			$items = array_merge($items, $paging->getItemsRaw());
+			$items = array_merge($items, array_values($paging->getItemsRaw()->toArray()));
 		}
 		if ($this->_distinct) {
 			$items = array_unique($items, SORT_REGULAR);

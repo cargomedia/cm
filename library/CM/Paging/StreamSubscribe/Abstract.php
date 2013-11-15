@@ -11,7 +11,7 @@ abstract class CM_Paging_StreamSubscribe_Abstract extends CM_Paging_Abstract {
 	 * @return bool
 	 */
 	public function contains(CM_Model_Stream_Subscribe $videoStreamSubscribe) {
-		return in_array($videoStreamSubscribe->getId(), $this->getItemsRaw());
+		return $this->_contains($videoStreamSubscribe->getId());
 	}
 
 }
