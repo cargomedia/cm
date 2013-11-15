@@ -74,7 +74,7 @@ class CM_Dom_NodeList {
 	}
 
 	/**
-	 * @param $selector
+	 * @param string $selector
 	 * @return CM_Dom_NodeList
 	 */
 	public function findElement($selector) {
@@ -84,6 +84,15 @@ class CM_Dom_NodeList {
 		}
 		$element = $elements->item(0);
 		return new self($element);
+	}
+
+	/**
+	 * @param string $selector
+	 * @return bool
+	 */
+	public function has($selector){
+		$elements = $this->_findAll($selector);
+		return ($elements->length > 0);
 	}
 
 	/**

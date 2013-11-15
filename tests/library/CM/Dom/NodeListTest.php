@@ -50,4 +50,10 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$this->assertSame('test', $children[2]->getText());
 		$this->assertSame('', $children[3]->getText());
 	}
+
+	public function testHas() {
+		$list = new CM_Dom_NodeList('<div foo="bar" bar="foo"></div>');
+		$this->assertTrue($list->has('div'));
+		$this->assertFalse($list->has('foo'));
+	}
 }
