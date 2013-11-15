@@ -25,4 +25,20 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$list = new CM_Dom_NodeList('<div>hello繁體字<strong>world</strong></div>');
 		$this->assertSame('hello繁體字world', $list->getText());
 	}
+
+	public function testGetAttribute() {
+		$list = new CM_Dom_NodeList('<div foo="bar"><div foo="foo"></div></div>');
+		$this->assertSame('bar', $list->findElement('div')->getAttribute('foo'));
+		$this->assertNull($list->getAttribute('bar'));
+	}
+
+	public function testGetAttributeList() {
+		$list = new CM_Dom_NodeList('<div foo="bar" bar="foo"></div>');
+		$this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $list->findElement('div')->getAttributeList());
+	}
+
+	public function testFindElement(){
+		$list = new CM_Dom_NodeList('<div foo="bar">lorem ipsum dolor <p foo="foo">lorem ipsum</p></div>');
+		$this->assertSame('lorem ipsum', $list->findElement('p')->getText());
+	}
 }

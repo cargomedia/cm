@@ -2,20 +2,35 @@
 
 class CM_Dom_NodeList {
 
-	/** @var \DOMDocument */
+	/** @var DOMDocument */
 	private $_doc;
+	/** @var DOMElement */
+	private $_element;
+	/** @var DOMXPath  */
+	private $_xpath;
 
 	/**
 	 * @param string $html
+	 * @param DOMElement|null $element
 	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($html) {
-		$this->_doc = new DOMDocument();
-		$html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
-		try {
-			$this->_doc->loadHTML($html);
-		} catch (ErrorException $e) {
-			throw new CM_Exception_Invalid('Cannot load html');
+	public function __construct($html, DOMElement $element = null) {
+		if(!is_object($html)){
+			$this->_doc = new DOMDocument();
+			$html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
+			try {
+				$this->_doc->loadHTML($html);
+			} catch (ErrorException $e) {
+				throw new CM_Exception_Invalid('Cannot load html');
+			}
+			$this->_element = $this->_doc->getElementsByTagName('html')->item(0);
+		}else{
+			if($html instanceof DOMDocument){
+				$this->_doc = $html;
+			}
+			if(!is_null($element)){
+				$this->_element = $element;
+			}
 		}
 	}
 
@@ -23,6 +38,67 @@ class CM_Dom_NodeList {
 	 * @return string
 	 */
 	public function getText() {
-		return $this->_doc->textContent;
+		return $this->_element->textContent;
+	}
+
+	/**
+	 * @param string $name
+	 * @return string|null
+	 */
+	public function getAttribute($name){
+		$element = $this->_element;
+		if(!$element->hasAttribute($name)){
+			return null;
+		}
+		return $element->getAttribute($name);
+	}
+
+	public function getAttributeList(){
+		$attributeList = array();
+		foreach($this->_element->attributes as $key => $attrNode){
+			$attributeList[$key] = $attrNode->value;
+		}
+		return $attributeList;
+	}
+
+	/**
+	 * @param $selector
+	 * @return CM_Dom_NodeList
+	 */
+	public function findElement($selector){
+		$elements = $this->_findAll($selector);
+		if ($elements->length < 1) {
+			return null;
+		}
+		$element = $elements->item(0);
+		return new self($this->_doc, $element);
+	}
+
+	/**
+	 * @return DOMXPath
+	 */
+	private function _getXPath() {
+		if (!$this->_xpath) {
+			$this->_xpath = new DOMXPath($this->_doc);
+		}
+		return $this->_xpath;
+	}
+
+	/**
+	 * @param string $selector
+	 * @return DOMNodeList
+	 */
+	private function _findAll($selector) {
+		$xpath = '//' . preg_replace('-([^>\s])\s+([^>\s])-', '$1//$2', trim($selector));
+		$xpath = preg_replace('/([^\s]+)\s*\>\s*([^\s]+)/', '$1/$2', $xpath);
+		$xpath = preg_replace('/\[([^~=\[\]]+)~="([^~=\[\]]+)"\]/', '[contains(concat(" ",@$1," "),concat(" ","$2"," "))]', $xpath);
+		$xpath = preg_replace('/\[([^~=\[\]]+)="([^~=\[\]]+)"\]/', '[@$1="$2"]', $xpath);
+		$xpath = preg_replace('/\[([\w-]+)\]/', '[@$1]', $xpath);
+		$xpath = str_replace(':last', '[last()]', str_replace(':first', '[1]', $xpath));
+		$xpath = preg_replace('/:eq\((\d+)\)/e', '"[".("$1"+1)."]"', $xpath);
+		$xpath = preg_replace('/\.([\w-]*)/', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
+		$xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
+		$xpath = preg_replace('-\/\[-', '/*[', $xpath);
+		return $this->_getXPath()->query($xpath, $this->_element);
 	}
 }
