@@ -20,4 +20,9 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$list = new CM_Dom_NodeList('<div>hello<strong>world</strong></div>');
 		$this->assertSame('helloworld', $list->getText());
 	}
+
+	public function testGetTextEncoding() {
+		$list = new CM_Dom_NodeList('<div>hello繁體字<strong>world</strong></div>');
+		$this->assertSame('hello繁體字world', $list->getText());
+	}
 }

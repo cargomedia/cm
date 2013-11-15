@@ -11,7 +11,7 @@ class CM_Dom_NodeList {
 	 */
 	public function __construct($html) {
 		$this->_doc = new DOMDocument();
-
+		$html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
 		try {
 			$this->_doc->loadHTML($html);
 		} catch (ErrorException $e) {
