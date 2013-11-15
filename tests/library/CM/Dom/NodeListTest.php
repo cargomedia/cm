@@ -60,4 +60,13 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$this->assertTrue($list->has('div'));
 		$this->assertFalse($list->has('foo'));
 	}
+
+	public function testCount() {
+		$list = new CM_Dom_NodeList('<div><span foo="bar">lorem ipsum dolor</span><div foo="foo">lorem ipsum</div><span>test</span><a></a></div>');
+		$this->assertCount(1, $list);
+		$this->assertCount(2, $list->find('div'));
+		$this->assertCount(0, $list->find('p'));
+		$this->assertInstanceOf('Countable', $list);
+		$this->assertSame(2, count($list->find('div')));
+	}
 }

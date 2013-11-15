@@ -1,6 +1,6 @@
 <?php
 
-class CM_Dom_NodeList implements Iterator {
+class CM_Dom_NodeList implements Iterator, Countable {
 
 	private $_iteratorPosition;
 
@@ -18,13 +18,13 @@ class CM_Dom_NodeList implements Iterator {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($html) {
-		if(is_array($html)) {
-			foreach($html as $element) {
+		if (is_array($html)) {
+			foreach ($html as $element) {
 				if (!$element instanceof DOMElement) {
 					throw new CM_Exception_Invalid('Not all elements are DOMElement');
 				}
 				$this->_elementList[] = $element;
-				if(!$this->_doc) {
+				if (!$this->_doc) {
 					$this->_doc = $element->ownerDocument;
 				}
 			}
@@ -46,7 +46,7 @@ class CM_Dom_NodeList implements Iterator {
 	 */
 	public function getChildren() {
 		$childList = array();
-		foreach($this->_elementList as $element) {
+		foreach ($this->_elementList as $element) {
 			foreach ($element->childNodes as $childNode) {
 				$childList[] = $childNode;
 			}
@@ -59,7 +59,7 @@ class CM_Dom_NodeList implements Iterator {
 	 */
 	public function getText() {
 		$text = '';
-		foreach($this->_elementList as $element) {
+		foreach ($this->_elementList as $element) {
 			$text .= $element->textContent;
 		}
 		return $text;
@@ -71,7 +71,7 @@ class CM_Dom_NodeList implements Iterator {
 	 */
 	public function getAttribute($name) {
 		$attributes = $this->getAttributeList();
-		if(!isset($attributes[$name])){
+		if (!isset($attributes[$name])) {
 			return null;
 		}
 		return $attributes[$name];
@@ -82,7 +82,7 @@ class CM_Dom_NodeList implements Iterator {
 	 */
 	public function getAttributeList() {
 		$attributeList = array();
-		if(!isset($this->_elementList[0])) {
+		if (!isset($this->_elementList[0])) {
 			return $attributeList;
 		}
 		foreach ($this->_elementList[0]->attributes as $key => $attrNode) {
@@ -104,7 +104,7 @@ class CM_Dom_NodeList implements Iterator {
 	 * @param string $selector
 	 * @return bool
 	 */
-	public function has($selector){
+	public function has($selector) {
 		$elements = $this->_findAll($selector);
 		return (count($elements) > 0);
 	}
@@ -136,9 +136,9 @@ class CM_Dom_NodeList implements Iterator {
 		$xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
 		$xpath = preg_replace('-\/\[-', '/*[', $xpath);
 		$nodes = array();
-		foreach($this->_elementList as $element) {
-			foreach($this->_getXPath()->query($xpath, $element) as $resultElement){
-				if(!$resultElement instanceof DOMElement) {
+		foreach ($this->_elementList as $element) {
+			foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
+				if (!$resultElement instanceof DOMElement) {
 					throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
 				}
 				$nodes[] = $resultElement;
@@ -165,5 +165,9 @@ class CM_Dom_NodeList implements Iterator {
 
 	public function rewind() {
 		$this->_iteratorPosition = 0;
+	}
+
+	public function count() {
+		return count($this->_elementList);
 	}
 }
