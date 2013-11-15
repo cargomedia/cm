@@ -16,8 +16,8 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		new CM_Dom_NodeList('<%%%%===**>>> foo');
 	}
 
-	public function getText() {
+	public function testGetText() {
 		$list = new CM_Dom_NodeList('<div>hello<strong>world</strong></div>');
-		$this->assertSame('hello world', $list->getText());
+		$this->assertSame('helloworld', $list->getText());
 	}
 }
