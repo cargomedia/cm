@@ -24,7 +24,7 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$text = $usertext->transform($text);
 
 	if ($mode !== 'escape') {
-		$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
+		$text = '<div class="usertext ' . $mode . '">' . $text . '</div>';
 	}
 	return $text;
 }
