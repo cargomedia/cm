@@ -8,9 +8,9 @@
 	var checkScrollHeight = function(element, event) {
 		var $this = $(element);
 		var scrollHeight = $this.is($(window)) ? $('body').prop('scrollHeight') : $this.prop('scrollHeight');
-		var outerHeight = $this.outerHeight();
-		var distanceFromBottom = scrollHeight - outerHeight - $this.scrollTop();
-		var distanceMin = outerHeight * preloadMultiple;
+		var innerHeight = $this.innerHeight();
+		var distanceFromBottom = scrollHeight - innerHeight - $this.scrollTop();
+		var distanceMin = innerHeight * preloadMultiple;
 		if (distanceFromBottom < distanceMin) {
 			$(this).trigger('scrollEnd', [event]);
 			return true;
