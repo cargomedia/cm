@@ -112,6 +112,23 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 		$streamChannel->delete();
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot delete streamChannel with existing streams
+	 */
+	public function testDeleteWithExistingVideoStream() {
+		$channelVideo = CM_Model_StreamChannel_Video::createStatic(array(
+			'key'            => 'video-stream',
+			'width'          => 100,
+			'height'         => 200,
+			'serverId'       => 1,
+			'thumbnailCount' => 2,
+			'adapterType'    => 1,
+		));
+		$channel = new CM_Model_StreamChannel_MockVideo($channelVideo->getId());
+		$channel->delete();
+	}
+
 	public function testGetSubscribers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
 		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
@@ -236,4 +253,9 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
 	}
+}
+
+class CM_Model_StreamChannel_MockVideo extends CM_Model_StreamChannel_Mock {
+
+	const TYPE = 19;
 }
