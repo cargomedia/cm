@@ -110,6 +110,8 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 					$errorMessage.html(message);
 					$errorMessage.slideDown('fast');
 				}
+				this.$('input:first, select:first, textarea:first').focus();
+
 			} else {
 				cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
 			}
