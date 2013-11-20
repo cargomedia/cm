@@ -12,24 +12,18 @@
 	content: '';
 	left: 0;
 	width: 100%;
-	height: 10px;
+	height: 5px;
 	z-index: 1;
-	-webkit-transition: 200ms;
-	-moz-transition: 200ms;
-	-ms-transition: 200ms;
-	-o-transition: 200ms;
-	transition: 200ms;
+	background-color: rgba(0, 0, 0, 0.05);
 	opacity: 0;
 }
 
 .scrollShadow:before {
 	top: 0;
-	box-shadow: inset 0px 12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
 .scrollShadow:after {
 	bottom: 0;
-	box-shadow: inset 0px -12px 12px -12px rgba(0, 0, 0, 0.2);
 }
 
 .scrollShadow.notScrolledTop:before, .scrollShadow.notScrolledBottom:after {
