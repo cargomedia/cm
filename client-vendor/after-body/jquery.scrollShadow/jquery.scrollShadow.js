@@ -3,10 +3,17 @@
  * @author CM
  */
 (function($) {
-	$.fn.scrollShadow = function() {
+	$.fn.scrollShadow = function(action) {
 		return this.each(function() {
 			var $this = $(this);
 			if ($this.data('toggleShadow')) {
+				return;
+			}
+
+			if ( action === 'disable') {
+				$this.removeClass('scrollShadow');
+				$this.closest('.scrollShadow-wrapper').remove();
+				$this.data('toggleShadow', false);
 				return;
 			}
 
