@@ -8,6 +8,7 @@
 			var $this = $(this);
 
 			if ($this.data('toggleShadow') && action === 'disable') {
+				$this.closest('.scrollShadow-wrapper').remove();
 				$this.removeClass('scrollShadow');
 				$this.data('toggleShadow', false);
 				return;
