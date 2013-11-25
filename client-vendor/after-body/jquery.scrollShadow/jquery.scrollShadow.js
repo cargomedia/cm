@@ -3,31 +3,74 @@
  * @author CM
  */
 (function($) {
-	$.fn.scrollShadow = function() {
-		return this.each(function() {
-			var $this = $(this);
-			if ($this.data('toggleShadow')) {
+
+	/**
+	 * @param {jQuery} $element
+	 * @constructor
+	 */
+	var ScrollShadow = function($element) {
+		this.$element = $element;
+		this.initialized = false;
+	};
+
+	ScrollShadow.prototype = {
+		$element: null,
+		initialized: null,
+
+		init: function() {
+			if (this.initialized) {
+				this.updateShadow();
 				return;
 			}
+			var self = this;
 
-			$this.addClass('scrollShadow');
-			$this.wrap('<div class="scrollShadow-wrapper"></div>');
+			this.$element.addClass('scrollShadow');
+			this.$element.wrap('<div class="scrollShadow-wrapper"></div>');
 
-			function toggleShadow() {
-				var scrollTop = $this.scrollTop();
-				$this.toggleClass('notScrolledTop', scrollTop != 0);
-				$this.toggleClass('notScrolledBottom', scrollTop != $this.prop('scrollHeight') - $this.innerHeight());
+			this.$element.on('scroll.scrollShadow', _.throttle(function() {
+				self.updateShadow();
+			}, 200));
+
+			this.updateShadow();
+			this.initialized = true;
+		},
+
+		destroy: function() {
+			this.$element.closest('.scrollShadow-wrapper').remove();
+			this.$element.removeClass('scrollShadow');
+			this.$element.on('scrollShadow.scrollShadow');
+			this.initialized = false;
+		},
+
+		updateShadow: function() {
+			var scrollTop = this.$element.scrollTop();
+			this.$element.toggleClass('notScrolledTop', scrollTop != 0);
+			this.$element.toggleClass('notScrolledBottom', scrollTop != this.$element.prop('scrollHeight') - this.$element.innerHeight());
+		}
+	};
+
+
+	/**
+	 * @param {String} [action]
+	 * @return {jQuery}
+	 */
+	$.fn.scrollShadow = function(action) {
+		return this.each(function() {
+			var $self = $(this);
+			var scrollShadow = $self.data('scrollShadow');
+			if (!scrollShadow) {
+				scrollShadow = new ScrollShadow($self);
+				$self.data('scrollShadow', scrollShadow);
 			}
 
-			$this.scroll(_.throttle(function() {
-				toggleShadow();
-			}, 200));
-
-			$(window).resize(_.debounce(function() {
-				toggleShadow();
-			}, 200));
-
-			$this.data('toggleShadow', true);
+			switch (action) {
+				case 'destroy':
+					scrollShadow.destroy();
+					break;
+				default:
+					scrollShadow.init();
+					break;
+			}
 		});
 	};
 })(jQuery);
