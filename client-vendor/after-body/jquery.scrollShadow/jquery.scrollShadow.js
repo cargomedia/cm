@@ -6,14 +6,14 @@
 	$.fn.scrollShadow = function(action) {
 		return this.each(function() {
 			var $this = $(this);
-			if ($this.data('toggleShadow')) {
+
+			if ($this.data('toggleShadow') && action === 'disable') {
+				$this.removeClass('scrollShadow');
+				$this.data('toggleShadow', false);
 				return;
 			}
 
-			if ( action === 'disable') {
-				$this.removeClass('scrollShadow');
-				$this.closest('.scrollShadow-wrapper').remove();
-				$this.data('toggleShadow', false);
+			if ($this.data('toggleShadow')) {
 				return;
 			}
 
