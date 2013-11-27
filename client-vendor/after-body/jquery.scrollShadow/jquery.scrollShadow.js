@@ -36,8 +36,11 @@
 		},
 
 		destroy: function() {
+			if (!this.initialized) {
+				return;
+			}
 			this.$element.unwrap().removeClass('scrollShadow');
-			this.$element.on('scrollShadow.scrollShadow');
+			this.$element.off('scroll.scrollShadow');
 			this.initialized = false;
 		},
 
