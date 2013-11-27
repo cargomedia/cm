@@ -36,9 +36,11 @@
 		},
 
 		destroy: function() {
-			this.$element.closest('.scrollShadow-wrapper').remove();
-			this.$element.removeClass('scrollShadow');
-			this.$element.on('scrollShadow.scrollShadow');
+			if (!this.initialized) {
+				return;
+			}
+			this.$element.unwrap().removeClass('scrollShadow');
+			this.$element.off('scroll.scrollShadow');
 			this.initialized = false;
 		},
 
@@ -49,7 +51,6 @@
 		}
 	};
 
-
 	/**
 	 * @param {String} [action]
 	 * @return {jQuery}
@@ -58,6 +59,7 @@
 		return this.each(function() {
 			var $self = $(this);
 			var scrollShadow = $self.data('scrollShadow');
+
 			if (!scrollShadow) {
 				scrollShadow = new ScrollShadow($self);
 				$self.data('scrollShadow', scrollShadow);
