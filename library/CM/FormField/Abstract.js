@@ -10,8 +10,8 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 
 	validate: function() {
 		var value = this.getValue();
-		if (_.isEmpty(value)) {
-			this.error();
+		if (this.isEmpty(value)) {
+			this.error(null);
 			return;
 		}
 		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
@@ -95,16 +95,36 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 	 */
 	error: function(message) {
 		var $container = this.$('.messages');
-		$container.html('');
+		var $errorMessage = $container.find('.formField-error');
+		this.$el.removeClass('hasError');
 
 		if (message) {
 			if ($container.length) {
-				$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />').children('.form_field_error').html(message).fadeIn('fast');
+				this.$el[0].offsetWidth;	// Force reflow for CSS-animation
+				this.$el.addClass('hasError');
+
+				if ($errorMessage.length) {
+					$errorMessage.html(message);
+				} else {
+					$errorMessage = $('<div class="formField-error"></div>').hide().appendTo($container);
+					$errorMessage.html(message);
+					$errorMessage.slideDown('fast');
+				}
+				this.$('input:first, select:first, textarea:first').focus();
+
 			} else {
 				cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
 			}
-
-			this.$('input, select, textarea').focus();
+		} else {
+			$errorMessage.remove();
 		}
+	},
+
+	/**
+	 * @param {Object} value
+	 * @returns {Boolean}
+	 */
+	isEmpty: function(value) {
+		return _.isEmpty(value)
 	}
 });

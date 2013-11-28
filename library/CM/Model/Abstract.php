@@ -79,11 +79,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function delete() {
+		$containingCacheables = $this->_getContainingCacheables();
+		$this->_onDeleteBefore();
 		foreach ($this->_assets as $asset) {
 			$asset->_onModelDelete();
 		}
-		$containingCacheables = $this->_getContainingCacheables();
-		$this->_onDeleteBefore();
 		$this->_onDelete();
 		if ($persistence = $this->_getPersistence()) {
 			$persistence->delete($this->getType(), $this->getIdRaw());
@@ -137,11 +137,16 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	final public function serialize() {
-		return serialize(array($this->getIdRaw(), $this->_getData()));
+		return serialize(array('id' => $this->getIdRaw()));
 	}
 
 	final public function unserialize($serialized) {
-		list($id, $data) = unserialize($serialized);
+		$unserialized = unserialize($serialized);
+		$id = $unserialized['id'];
+		$data = null;
+		if (isset($unserialized['data'])) {
+			$data = $unserialized['data'];
+		}
 		$this->_construct($id, $data);
 	}
 
@@ -506,7 +511,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 		 * Cannot use __construct(), since signature is unknown.
 		 * unserialize() is ~10% slower.
 		 */
-		$serialized = serialize(array($id, $data));
+		$serialized = serialize(array('id' => $id, 'data' => $data));
 		/** @var CM_Model_Abstract $model */
 		$model = unserialize('C:' . strlen($className) . ':"' . $className . '":' . strlen($serialized) . ':{' . $serialized . '}');
 		if ((null !== $data) && $dataFromPersistence && $cache = $model->_getCache()) {
