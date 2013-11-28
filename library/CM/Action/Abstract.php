@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
 	const CREATE = 'CREATE';

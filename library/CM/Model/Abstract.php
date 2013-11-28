@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable {
 
 	/** @var array|null */

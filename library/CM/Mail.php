@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 class CM_Mail extends CM_View_Abstract {
 
 	const TYPE = 1;

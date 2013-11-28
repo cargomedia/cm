@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @typeNamespace
+ */
 abstract class CM_Paging_ContentList_Abstract extends CM_Paging_Abstract {
 
 	/**
