@@ -189,7 +189,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 	public function testGetTranslationWithDifferentVariableNamesLoop() {
 		$this->_language->getTranslation('sameKey', array('oneVariable'), true);
 		try {
-			for ($i = 0; $i < 5; $i++) {
+			for ($i = 0; $i < 25; $i++) {
 				$this->_language->getTranslation('sameKey', array('oneVariable', 'secondOne'), true);
 				$this->_language->getTranslation('sameKey', array('oneVariable'), true);
 			}
