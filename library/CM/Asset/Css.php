@@ -120,10 +120,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 	background-image: -ms-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
 }
-.box-shadow(@args...) {
-	box-shadow: @args;
-	-webkit-box-shadow: @args;
-}
 .box-sizing(@args...) {
 	box-sizing: @args;
 	-moz-box-sizing: @args;

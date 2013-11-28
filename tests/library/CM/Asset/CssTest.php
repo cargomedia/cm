@@ -153,23 +153,6 @@ EOD;
 		$this->assertSame('', $css->get());
 	}
 
-	public function testBoxShadow() {
-		$css = <<<'EOD'
-.foo {
-	.box-shadow(0 0 2px #dddddd);
-}
-EOD;
-		$expected = <<<'EOD'
-.foo {
-  box-shadow: 0 0 2px #dddddd;
-  -webkit-box-shadow: 0 0 2px #dddddd;
-}
-
-EOD;
-		$css = new CM_Asset_Css($this->_render, $css);
-		$this->assertSame($expected, $css->get());
-	}
-
 	public function testBoxSizing() {
 		$css = <<<'EOD'
 .foo {
