@@ -2,7 +2,7 @@
 
 class CM_Paging_Log_JsError extends CM_Paging_Log_Abstract {
 
-	const TYPE = 6;
+	const TYPE = 70;
 
 	/**
 	 * @param string     $msg
