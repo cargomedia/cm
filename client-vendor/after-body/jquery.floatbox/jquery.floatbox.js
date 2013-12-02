@@ -104,7 +104,7 @@
 				this.$floatbox.css('min-height', height);
 			} else {
 				var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
-				this.$floatbox.css('margin-top', top);
+				this.$floatbox.css('top', top);
 			}
 		}
 	});

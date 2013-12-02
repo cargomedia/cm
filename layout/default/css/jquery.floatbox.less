@@ -23,7 +23,8 @@
 
 .floatbox {
 	.transform(scale(.5, .5));
-	.transition(200ms);
+	transition: transform 200ms;
+	-webkit-transition: -webkit-transform 200ms;
 
 	&.fadeIn {
 		.transform(scale(1, 1));
