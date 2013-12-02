@@ -2,7 +2,7 @@
 
 class CM_Action_Email extends CM_Action_Abstract {
 
-	const TYPE = 6;
+	const TYPE = 31;
 
 	/**
 	 * @param CM_Model_User $user
