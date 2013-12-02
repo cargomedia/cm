@@ -169,7 +169,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 	 */
 	protected function _isVariationFixture(CM_Splittest_Fixture $fixture, $variationName) {
 		if ($this->_withoutPersistence) {
-			return true;
+			return false;
 		}
 		return ($variationName == $this->_getVariationFixture($fixture));
 	}
