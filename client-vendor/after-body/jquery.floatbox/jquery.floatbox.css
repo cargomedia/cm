@@ -28,7 +28,6 @@ html.floatbox-active {
 	width: 100%;
 	background-color: #000000;
 	opacity: 0.8;
-	filter: alpha(opacity=80);
 }
 
 .floatbox-container {
@@ -52,7 +51,7 @@ html.floatbox-active {
 
 .floatbox.fullscreen {
 	width: 100%;
-	display: block; /* IE8: Some height-affecting styles are inherited from "display: inline-block" to children */
+	display: block;
 }
 
 .floatbox.fullscreen .floatbox-body {
@@ -62,22 +61,4 @@ html.floatbox-active {
 .floatbox-controls {
 	position: absolute;
 	top: 0;
-}
-
-html.floatbox-replaceBody {
-	overflow: visible;
-}
-
-html.floatbox-replaceBody #floatbox-viewport {
-	position: absolute;
-	height: auto;
-	min-height: 100%;
-}
-
-html.floatbox-replaceBody .floatbox-layer:not(.active) {
-	display: none;
-}
-
-html.floatbox-replaceBody .floatbox-container {
-	position: relative;
 }

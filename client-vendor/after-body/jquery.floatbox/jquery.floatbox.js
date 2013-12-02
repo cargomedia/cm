@@ -2,15 +2,10 @@
  * Author: CM
  */
 (function($) {
-	var isOperaMobi = /Opera Mobi/.test(navigator.userAgent);
-	var isOperaMini = /Opera Mini/.test(navigator.userAgent);
-	var isAndroid2or3 = /Android [23]\.\d/.test(navigator.userAgent);
-
 	var defaults = {
 		delay: 200,
 		closable: true,
-		fullscreen: false,
-		replaceBody: isOperaMobi || isOperaMini || isAndroid2or3
+		fullscreen: false
 	};
 
 	$.floatbox = function(options) {
@@ -18,7 +13,6 @@
 	};
 
 	var $viewport = null;
-	var replaceBodyRevert = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -42,17 +36,6 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
-				if (this.options.replaceBody) {
-					$('html').addClass('floatbox-replaceBody');
-					var backupScrollTop = $(document).scrollTop();
-					var $backupBody = $('body > *:visible').detach();
-
-					replaceBodyRevert = function() {
-						$('body').prepend($backupBody);
-						$(document).scrollTop(backupScrollTop);
-						replaceBodyRevert = null;
-					};
-				}
 				$viewport = $('<div id="floatbox-viewport"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
@@ -76,10 +59,6 @@
 			$body.append($element.get(0));
 			this.$floatbox.append($body, $controls);
 			$viewport.append(this.$layer.append($overlay, $container.append(this.$floatbox)));
-
-			if ($('html').hasClass('floatbox-replaceBody')) {
-				$(document).scrollTop(1);
-			}
 
 			var self = this;
 			this.windowResizeCallback = function() {
@@ -117,10 +96,7 @@
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
-				if (replaceBodyRevert) {
-					replaceBodyRevert();
-				}
-				$('html').removeClass('floatbox-active floatbox-replaceBody');
+				$('html').removeClass('floatbox-active');
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
 			$element.trigger('floatbox-close');
