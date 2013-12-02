@@ -2,15 +2,9 @@
  * Author: CM
  */
 (function($) {
-	var isOperaMobi = /Opera Mobi/.test(navigator.userAgent);
-	var isOperaMini = /Opera Mini/.test(navigator.userAgent);
-	var isAndroid2or3 = /Android [23]\.\d/.test(navigator.userAgent);
-
 	var defaults = {
-		delay: 200,
 		closable: true,
-		fullscreen: false,
-		replaceBody: isOperaMobi || isOperaMini || isAndroid2or3
+		fullscreen: false
 	};
 
 	$.floatbox = function(options) {
@@ -18,7 +12,6 @@
 	};
 
 	var $viewport = null;
-	var replaceBodyRevert = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -42,17 +35,6 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
-				if (this.options.replaceBody) {
-					$('html').addClass('floatbox-replaceBody');
-					var backupScrollTop = $(document).scrollTop();
-					var $backupBody = $('body > *:visible').detach();
-
-					replaceBodyRevert = function() {
-						$('body').prepend($backupBody);
-						$(document).scrollTop(backupScrollTop);
-						replaceBodyRevert = null;
-					};
-				}
 				$viewport = $('<div id="floatbox-viewport"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
@@ -77,10 +59,6 @@
 			this.$floatbox.append($body, $controls);
 			$viewport.append(this.$layer.append($overlay, $container.append(this.$floatbox)));
 
-			if ($('html').hasClass('floatbox-replaceBody')) {
-				$(document).scrollTop(1);
-			}
-
 			var self = this;
 			this.windowResizeCallback = function() {
 				self.repaint.apply(self);
@@ -88,16 +66,14 @@
 			$(window).on('resize.floatbox', this.windowResizeCallback);
 			this.repaint();
 
-			this.$floatbox.fadeTo(this.options.delay, 1, function() {
-				self.$floatbox.css('opacity', 'inherit');
-				$container.add($overlay).on('click.floatbox', function(e) {
-					if (this === e.target) {
-						self.close.apply(self);
-					}
-				});
-				$controls.on('click.floatbox', '.icon-close', function() {
+			self.$floatbox.addClass('fadeIn');
+			$container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
+				if (this === e.target) {
 					self.close.apply(self);
-				});
+				}
+			});
+			$controls.on('click.floatbox', '.icon-close', function() {
+				self.close.apply(self);
 			});
 
 			this.$layer.data('floatbox', this);
@@ -117,10 +93,7 @@
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
-				if (replaceBodyRevert) {
-					replaceBodyRevert();
-				}
-				$('html').removeClass('floatbox-active floatbox-replaceBody');
+				$('html').removeClass('floatbox-active');
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
 			$element.trigger('floatbox-close');
@@ -131,7 +104,7 @@
 				this.$floatbox.css('min-height', height);
 			} else {
 				var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
-				this.$floatbox.css('margin-top', top);
+				this.$floatbox.css('top', top);
 			}
 		}
 	});
