@@ -2,17 +2,30 @@
 	right: 1px;
 	top: 1px;
 	font-size: 1.4em;
+
+	.icon-close {
+		display: inline-block;
+		padding: 6px;
+		float: right;
+		color: @colorFgIcon;
+		line-height: 1;
+
+		&:hover {
+			color: @colorClose;
+			text-decoration: none;
+		}
+	}
 }
 
-.floatbox-controls .icon-close {
-	display: inline-block;
-	padding: 6px;
-	float: right;
-	color: @colorFgIcon;
-	line-height: 1;
+.floatbox-overlay {
+	.transition(200ms);
+}
 
-	&:hover {
-		color: @colorClose;
-		text-decoration: none;
+.floatbox {
+	.transform(scale(.5, .5));
+	.transition(200ms);
+
+	&.fadeIn {
+		.transform(scale(1, 1));
 	}
 }

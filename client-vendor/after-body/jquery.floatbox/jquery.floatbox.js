@@ -68,8 +68,8 @@
 			this.repaint();
 
 			this.$floatbox.fadeTo(this.options.delay, 1, function() {
-				self.$floatbox.css('opacity', 'inherit');
-				$container.add($overlay).on('click.floatbox', function(e) {
+				self.$floatbox.addClass('fadeIn');
+				$container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
 					if (this === e.target) {
 						self.close.apply(self);
 					}
