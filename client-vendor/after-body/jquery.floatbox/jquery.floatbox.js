@@ -3,7 +3,6 @@
  */
 (function($) {
 	var defaults = {
-		delay: 200,
 		closable: true,
 		fullscreen: false
 	};
@@ -67,16 +66,14 @@
 			$(window).on('resize.floatbox', this.windowResizeCallback);
 			this.repaint();
 
-			this.$floatbox.fadeTo(this.options.delay, 1, function() {
-				self.$floatbox.addClass('fadeIn');
-				$container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
-					if (this === e.target) {
-						self.close.apply(self);
-					}
-				});
-				$controls.on('click.floatbox', '.icon-close', function() {
+			self.$floatbox.addClass('fadeIn');
+			$container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
+				if (this === e.target) {
 					self.close.apply(self);
-				});
+				}
+			});
+			$controls.on('click.floatbox', '.icon-close', function() {
+				self.close.apply(self);
 			});
 
 			this.$layer.data('floatbox', this);
