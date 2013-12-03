@@ -2,9 +2,12 @@
  * Author: CM
  */
 (function($) {
+	var ieMobile = /IEMobile/.test(navigator.userAgent);
+
 	var defaults = {
 		closable: true,
-		fullscreen: false
+		fullscreen: false,
+		ieMobile: ieMobile
 	};
 
 	$.floatbox = function(options) {
@@ -12,6 +15,7 @@
 	};
 
 	var $viewport = null;
+	var backupScrollTop = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -35,6 +39,11 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
+				if (this.options.ieMobile) {
+					backupScrollTop = $(document).scrollTop();
+					$('html').addClass('ieMobile');
+				}
+
 				$viewport = $('<div id="floatbox-viewport"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
@@ -93,7 +102,11 @@
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
-				$('html').removeClass('floatbox-active');
+
+				$('html').removeClass('floatbox-active ieMobile');
+				if (null !== backupScrollTop) {
+					$(document).scrollTop(backupScrollTop);
+				}
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
 			$element.trigger('floatbox-close');
