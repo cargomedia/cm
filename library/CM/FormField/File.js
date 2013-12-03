@@ -19,6 +19,11 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
 		var inProgressCount = 0;
 
+		if (/IEMobile/.test(navigator.userAgent)) {
+			$input.prop('disabled', true);
+			field.$('.uploadButton').addClass('disabled').after('<div class="notSupported">*' + cm.language.get('Your browser does not support file uploads.') + '</div>');
+		}
+
 		$input.fileupload({
 			dataType: 'json',
 			url: cm.getUrl('/upload/' + cm.getSiteId() + '/', {'field': field.getClass()}),
