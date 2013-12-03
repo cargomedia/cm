@@ -2,11 +2,11 @@ html.floatbox-active {
 	overflow: hidden;
 }
 
-html.floatbox-active.ieMobile {
+html.ieMobile {
 	height: 100%;
 }
 
-html.floatbox-active.ieMobile body {
+html.ieMobile body {
 	overflow: hidden;
 	height: 100%;
 }
