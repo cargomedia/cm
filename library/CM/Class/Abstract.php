@@ -8,8 +8,8 @@ abstract class CM_Class_Abstract {
 	/**
 	 * @return int
 	 */
-	public function getType() {
-		return static::TYPE;
+	public static function getType() {
+		return self::_getConfig()->type;
 	}
 
 	/**

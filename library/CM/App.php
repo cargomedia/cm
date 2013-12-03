@@ -202,13 +202,47 @@ class CM_App {
 	 * @return string
 	 */
 	public function generateConfigClassTypes() {
+		$valueCurrent = 1;
 		$content = '';
-		$typeNamespaces = array('CM_Site_Abstract', 'CM_Action_Abstract', 'CM_Model_Abstract', 'CM_Model_ActionLimit_Abstract',
-			'CM_Model_Entity_Abstract', 'CM_Model_StreamChannel_Abstract', 'CM_Mail', 'CM_Paging_Log_Abstract', 'CM_Paging_ContentList_Abstract',);
-		foreach ($typeNamespaces as $typeNamespace) {
-			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typeNamespace));
+		$typesCurrent = array();
+		$typeNamespaces = $this->_getTypedClasses();
+		foreach ($typeNamespaces as $typedClass) {
+			if (isset(CM_Config::get()->$typedClass) && isset(CM_Config::get()->$typedClass->types)) {
+				foreach (CM_Config::get()->$typedClass->types as $type => $className) {
+					if (isset($typesCurrent[$type])) {
+						throw new CM_Exception_Invalid(
+							'Duplicate `TYPE` constant for `' . $className . '` and `' . $typesCurrent[$type] . '`. Both equal `' . $type . '`.');
+					}
+					$typesCurrent[$type] = $className;
+				}
+			}
+		}
+		foreach ($typeNamespaces as $typedClass) {
+			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typedClass, $typesCurrent, $valueCurrent));
 		}
 		return $content;
+	}
+
+	/**
+	 * @param string $className
+	 * @return array
+	 */
+	public function _getTypedClasses() {
+		$typedClasses = array();
+		foreach (CM_Class_Abstract::getClassChildren(true) as $childClass) {
+			if (is_subclass_of($childClass, 'CM_Typed')) {
+				$isHighestTypedClass = true;
+				foreach (class_parents($childClass) as $parentClass) {
+					if (is_subclass_of($parentClass, 'CM_Typed')) {
+						$isHighestTypedClass = false;
+					}
+				}
+				if ($isHighestTypedClass) {
+					$typedClasses[] = $childClass;
+				}
+			}
+		}
+		return $typedClasses;
 	}
 
 	/**
@@ -271,6 +305,39 @@ class CM_App {
 	}
 
 	/**
+	 * @param string $namespace
+	 * @param array  $typesCurrent
+	 * @param int    $valueCurrent
+	 * @return array
+	 * @throws CM_Exception_Invalid
+	 */
+	private function _generateClassTypesConfig($namespace, $typesCurrent, $valueCurrent) {
+		$content = array();
+		$childContent = array();
+		$content[] = PHP_EOL;
+		$descendants = $namespace::getClassChildren();
+		$typeList = array();
+		foreach ($descendants as $className) {
+			if (!in_array($className, $typesCurrent)) {
+				while (isset($typesCurrent[$valueCurrent])) {
+					$valueCurrent++;
+				}
+				$typesCurrent[$valueCurrent] = $className;
+			}
+			$type = array_search($className, $typesCurrent);
+			$typeList[$type] = $className;
+		}
+		ksort($typeList);
+		$content[] = '$config->' . $namespace . '->types = array();';
+		foreach ($typeList as $type => $className) {
+			$content[] = '$config->' . $namespace . '->types[' . $type . '] = \'' . $className . '\';';
+			$childContent[] = '$config->' . $className . '->type = ' . $type . ';';
+		}
+		$content[] = '';
+		return array_merge($content, $childContent, array(''));
+	}
+
+	/**
 	 * @return string[]
 	 */
 	private function _getUpdateScriptPaths() {
@@ -303,26 +370,5 @@ class CM_App {
 			throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
 		}
 		return $updateScript;
-	}
-
-	/**
-	 * @param string $className
-	 * @return string[]
-	 */
-	private function _generateClassTypesConfig($className) {
-		$declarations = array();
-		$highestTypeUsed = 0;
-		foreach ($this->getClassTypes($className) as $childClassName => $type) {
-			$declarations[$type] = '$config->' . $className . '->types[' . $childClassName . '::TYPE] = \'' . $childClassName . '\'; // #' . $type;
-			$highestTypeUsed = max($highestTypeUsed, $type);
-		}
-
-		$lines = array();
-		$lines[] = '';
-		$lines[] = '$config->' . $className . '->types = array();';
-		$lines = array_merge($lines, $declarations);
-		$lines[] = '// Highest type used: #' . $highestTypeUsed;
-		$lines[] = '';
-		return $lines;
 	}
 }
