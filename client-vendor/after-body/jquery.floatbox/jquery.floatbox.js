@@ -16,6 +16,7 @@
 
 	var $viewport = null;
 	var backupScrollTop = null;
+	var lastFocusedElement = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -44,7 +45,7 @@
 					$('html').addClass('ieMobile');
 				}
 
-				$viewport = $('<div id="floatbox-viewport"/>');
+				$viewport = $('<div id="floatbox-viewport" tabindex="-1"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
 			}
@@ -53,6 +54,7 @@
 			var $container = $('<div class="floatbox-container"/>');
 			var $controls = $('<div class="floatbox-controls"/>');
 			var $body = $('<div class="floatbox-body"/>');
+			lastFocusedElement = document.activeElement;
 			if (this.options.closable) {
 				$controls.append('<a class="icon-close" href="javascript:;"/>');
 			}
@@ -99,6 +101,7 @@
 			this.$layer.removeData('floatbox');
 			this.$layer.remove();
 			$viewport.children('.floatbox-layer:last').addClass('active');
+			lastFocusedElement.focus();
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
