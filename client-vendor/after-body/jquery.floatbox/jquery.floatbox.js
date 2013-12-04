@@ -56,9 +56,9 @@
 			var $body = $('<div class="floatbox-body"/>');
 			lastFocusedElement = document.activeElement;
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close" href="javascript:;"/>');
+				$controls.append('<a class="icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
 			}
-			this.$floatbox = $('<div class="floatbox"/>');
+			this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" tabindex="0"/>');
 
 			if (this.options.fullscreen) {
 				this.$floatbox.addClass('fullscreen');
