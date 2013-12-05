@@ -20,7 +20,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		var inProgressCount = 0;
 
 		// remove attr multiple on iPhone, iPod, iPad to allow upload photos via camera
-		if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i)) {
+		if (navigator.userAgent.match(/iP(ad|hone|od)/i)) {
 			$input.removeAttr('multiple');
 		}
 
