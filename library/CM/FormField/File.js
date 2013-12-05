@@ -21,7 +21,8 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
 		if (!Modernizr.fileinput) {
 			$input.prop('disabled', true);
-			field.$('.uploadButton').addClass('disabled').after('<div class="notSupported">*' + cm.language.get('Your browser does not support file uploads.') + '</div>');
+			field.$('.uploadButton').addClass('disabled');
+			field.$('.notSupported').show();
 		}
 
 		$input.fileupload({
