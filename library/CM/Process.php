@@ -1,0 +1,102 @@
+<?php
+
+class CM_Process {
+
+	const RESPAWN_TIMEOUT = 10;
+
+	/** @var int[] */
+	private $_childPids;
+
+	private function __construct() {}
+
+	/**
+	 * @param int $amount
+	 * @throws CM_Exception
+	 */
+	public function fork($amount) {
+		$this->_installSignalHandlers();
+		for ($i = 0; $i < $amount; $i++) {
+			$pid = $this->_spawnChild();
+			if (!$pid) {
+				return;
+			}
+		}
+		do {
+			$pid = pcntl_wait($status);
+			pcntl_signal_dispatch();
+			if (-1 === $pid) {
+				throw new CM_Exception('Waiting on child processes failed');
+			}
+			unset($this->_childPids[$pid]);
+		} while (count($this->_childPids));
+		exit(0);
+	}
+
+	public function keepalive() {
+		$this->_installSignalHandlers();
+		do {
+			$pid = $this->_spawnChild();
+			if (!$pid) {
+				return;
+			}
+			$pid = pcntl_wait($status);
+			pcntl_signal_dispatch();
+			if (-1 === $pid) {
+				throw new CM_Exception('Waiting on child processes failed');
+			}
+			unset($this->_childPids[$pid]);
+			$warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN);
+			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+			usleep(self::RESPAWN_TIMEOUT * 1000000);
+		} while (true);
+		exit(1);
+	}
+
+	/**
+	 * @param int $signal
+	 */
+	public function killChildren($signal) {
+		foreach ($this->_childPids as $child) {
+			posix_kill($child, $signal);
+		}
+	}
+
+	/**
+	 * @return int
+	 * @throws CM_Exception
+	 */
+	private function _spawnChild() {
+		$pid = pcntl_fork();
+		if ($pid === -1) {
+			throw new CM_Exception('Could not spawn child process');
+		}
+		if ($pid) {
+			$this->_childPids[$pid] = $pid;
+		} else {
+			pcntl_signal(SIGTERM, SIG_DFL);
+			pcntl_signal(SIGINT, SIG_DFL);
+		}
+		return $pid;
+	}
+
+	private function _installSignalHandlers() {
+		$process = $this;
+		$handler = function($signal) use ($process) {
+			$process->killChildren($signal);
+			exit(1);
+		};
+		pcntl_signal(SIGTERM, $handler, false);
+		pcntl_signal(SIGINT, $handler, false);
+	}
+
+	/**
+	 * @return CM_Process
+	 */
+	public static function getInstance() {
+		static $instance;
+		if (!$instance) {
+			$instance = new self();
+		}
+		return $instance;
+	}
+}
