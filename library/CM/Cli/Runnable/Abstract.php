@@ -77,7 +77,7 @@ abstract class CM_Cli_Runnable_Abstract {
 			while (new DateTime() < $nextRun) {
 				sleep(1);
 			}
-			$callback();
+			call_user_func($callback);
 			$nextRun->add($interval);
 		}
 	}
