@@ -3,7 +3,7 @@
 class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null  $indexName
+	 * @param string|null $indexName
 	 */
 	public function create($indexName = null) {
 		if ($indexName) {
@@ -30,35 +30,40 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 		} else {
 			$indexes = $this->_getIndexes($host, $port);
 		}
-		foreach ($indexes as $index) {
-			$this->_getOutput()->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
-			$indexName = $index->getIndex()->getName();
-			$key = 'Search.Updates_' . $index->getType()->getName();
-			try {
-				$ids = CM_Redis_Client::getInstance()->sFlush($key);
-				$ids = array_filter(array_unique($ids));
-				$index->update($ids);
-				$index->getIndex()->refresh();
-			} catch (Exception $e) {
-				$message = $indexName . '-updates failed.' . PHP_EOL;
-				if (isset($ids)) {
-					$message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
-					foreach ($ids as $id) {
-						CM_Redis_Client::getInstance()->sAdd($key, $id);
+		$output = $this->_getOutput();
+		$this->_runInterval(function () use ($indexes, $output) {
+			foreach ($indexes as $index) {
+				$output->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
+				$indexName = $index->getIndex()->getName();
+				$key = 'Search.Updates_' . $index->getType()->getName();
+				try {
+					$ids = CM_Redis_Client::getInstance()->sFlush($key);
+					$ids = array_filter(array_unique($ids));
+					$index->update($ids);
+					$index->getIndex()->refresh();
+				} catch (Exception $e) {
+					$message = $indexName . '-updates failed.' . PHP_EOL;
+					if (isset($ids)) {
+						$message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
+						foreach ($ids as $id) {
+							CM_Redis_Client::getInstance()->sAdd($key, $id);
+						}
 					}
+					$message .= 'Reason: ' . $e->getMessage();
+					throw new CM_Exception_Invalid($message);
 				}
-				$message .= 'Reason: ' . $e->getMessage();
-				throw new CM_Exception_Invalid($message);
 			}
-		}
+		}, new DateInterval('PT1M'), true);
 	}
 
 	public function optimize() {
-		$servers = CM_Config::get()->CM_Search->servers;
-		foreach ($servers as $server) {
-			$client = new Elastica_Client($server);
-			$client->optimizeAll();
-		}
+		$this->_runInterval(function () {
+			$servers = CM_Config::get()->CM_Search->servers;
+			foreach ($servers as $server) {
+				$client = new Elastica_Client($server);
+				$client->optimizeAll();
+			}
+		}, new DateInterval('PT1H'), true);
 	}
 
 	/**
