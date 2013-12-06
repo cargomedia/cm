@@ -58,12 +58,20 @@ abstract class CM_Cli_Runnable_Abstract {
 	/**
 	 * @param callable     $callback
 	 * @param DateInterval $interval
+	 * @param bool|null    $strictIntervals
 	 */
-	protected function _runInterval($callback, DateInterval $interval) {
+	protected function _runInterval($callback, DateInterval $interval, $strictIntervals = null) {
 		$nextRun = new DateTime();
+		if ($strictIntervals) {
+			$nextRun->setTime(0, 0, 0);
+		}
 
 		while (true) {
-			if ($nextRun < new DateTime()) {
+			if ($strictIntervals) {
+				while ($nextRun <= new DateTime()) {
+					$nextRun->add($interval);
+				}
+			} elseif ($nextRun < new DateTime()) {
 				$nextRun = new DateTime();
 			}
 			while (new DateTime() < $nextRun) {
@@ -71,9 +79,6 @@ abstract class CM_Cli_Runnable_Abstract {
 			}
 			$callback();
 			$nextRun->add($interval);
-			$time = new DateTime();
-			$this->_getOutput()->writeln($time->format('Y-m-d H:i:s'));
-			$this->_getOutput()->writeln($nextRun->format('Y-m-d H:i:s'));
 		}
 	}
 }
