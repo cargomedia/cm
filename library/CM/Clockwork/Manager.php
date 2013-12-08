@@ -17,12 +17,11 @@ class CM_Clockwork_Manager {
 	}
 
 	/**
-	 * @param string       $name
 	 * @param DateInterval $interval
 	 * @param callable     $callback
 	 */
-	public function registerCallback($name, DateInterval $interval, $callback) {
-		$event = new CM_Clockwork_Event($name, $interval);
+	public function registerCallback(DateInterval $interval, $callback) {
+		$event = new CM_Clockwork_Event($interval);
 		$event->registerCallback($callback);
 		$this->registerEvent($event);
 	}

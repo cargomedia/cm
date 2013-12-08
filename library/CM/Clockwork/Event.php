@@ -2,24 +2,19 @@
 
 class CM_Clockwork_Event {
 
-	/** @var string */
-	private $_name;
-
 	/** @var DateInterval */
 	private $_interval;
 
 	/** @var DateTime */
-	private $_lastRun;
+	private $_nextRun;
 
 	/** @var callable[] */
 	private $_callbacks;
 
 	/**
-	 * @param string $name
 	 * @param DateInterval $interval
 	 */
-	public function __construct($name, DateInterval $interval) {
-		$this->_name = (string) $name;
+	public function __construct(DateInterval $interval) {
 		$this->_interval = $interval;
 		$this->_callbacks = array();
 	}
@@ -28,17 +23,20 @@ class CM_Clockwork_Event {
 	 * @return bool
 	 */
 	public function shouldRun() {
-		if (null == $this->_lastRun) {
+		if (null === $this->_nextRun) {
 			return true;
 		}
-		$diff = $this->_lastRun->diff(new DateTime());
-		return $diff->s >= $this->_interval->s;
+		return new DateTime() >= $this->_nextRun;
 	}
 
 	/**
 	 * @param callable $callback
+	 * @throws CM_Exception_Invalid
 	 */
 	public function registerCallback($callback) {
+		if (!is_callable($callback)) {
+			throw new CM_Exception_Invalid('$callback needs to be callable');
+		}
 		$this->_callbacks[] = $callback;
 	}
 
@@ -46,6 +44,8 @@ class CM_Clockwork_Event {
 		foreach ($this->_callbacks as $callback) {
 			call_user_func($callback);
 		}
-		$this->_lastRun = new DateTime();
+		$nextRun = new DateTime();
+		$nextRun->add($this->_interval);
+		$this->_nextRun = new DateTime();
 	}
 }
