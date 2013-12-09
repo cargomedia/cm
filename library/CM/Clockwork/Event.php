@@ -23,9 +23,6 @@ class CM_Clockwork_Event {
 	 * @return bool
 	 */
 	public function shouldRun() {
-		if (null === $this->_nextRun) {
-			return true;
-		}
 		return new DateTime() >= $this->_nextRun;
 	}
 
@@ -46,6 +43,6 @@ class CM_Clockwork_Event {
 		}
 		$nextRun = new DateTime();
 		$nextRun->add($this->_interval);
-		$this->_nextRun = new DateTime();
+		$this->_nextRun = $nextRun;
 	}
 }
