@@ -83,7 +83,7 @@ class CM_Process {
 		$process = $this;
 		$handler = function ($signal) use ($process) {
 			$process->killChildren($signal);
-			exit(1);
+			exit(0);
 		};
 		pcntl_signal(SIGTERM, $handler, false);
 		pcntl_signal(SIGINT, $handler, false);
