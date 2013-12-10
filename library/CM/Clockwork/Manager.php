@@ -28,12 +28,12 @@ class CM_Clockwork_Manager {
 
 	public function run() {
 		while (true) {
-			$this->runEventsFor();
+			$this->runEvents();
 			sleep(1);
 		}
 	}
 
-	public function runEventsFor() {
+	public function runEvents() {
 		/** @var CM_Clockwork_Event[] $eventsToRun */
 		$eventsToRun = array();
 		foreach ($this->_events as $event) {
