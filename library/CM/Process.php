@@ -7,7 +7,8 @@ class CM_Process {
 	/** @var int[] */
 	private $_childPids;
 
-	private function __construct() {}
+	private function __construct() {
+	}
 
 	/**
 	 * @param int $amount
@@ -73,6 +74,7 @@ class CM_Process {
 		if ($pid) {
 			$this->_childPids[$pid] = $pid;
 		} else {
+			$this->_childPids = array();
 			pcntl_signal(SIGTERM, SIG_DFL);
 			pcntl_signal(SIGINT, SIG_DFL);
 		}
@@ -81,7 +83,7 @@ class CM_Process {
 
 	private function _installSignalHandlers() {
 		$process = $this;
-		$handler = function($signal) use ($process) {
+		$handler = function ($signal) use ($process) {
 			$process->killChildren($signal);
 			exit(1);
 		};
