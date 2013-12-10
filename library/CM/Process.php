@@ -74,9 +74,7 @@ class CM_Process {
 		if ($pid) {
 			$this->_childPids[$pid] = $pid;
 		} else {
-			$this->_childPids = array();
-			pcntl_signal(SIGTERM, SIG_DFL);
-			pcntl_signal(SIGINT, SIG_DFL);
+			$this->_reset();
 		}
 		return $pid;
 	}
@@ -89,6 +87,12 @@ class CM_Process {
 		};
 		pcntl_signal(SIGTERM, $handler, false);
 		pcntl_signal(SIGINT, $handler, false);
+	}
+
+	private function _reset() {
+		$this->_childPids = array();
+		pcntl_signal(SIGTERM, SIG_DFL);
+		pcntl_signal(SIGINT, SIG_DFL);
 	}
 
 	/**
