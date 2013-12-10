@@ -28,20 +28,21 @@ class CM_Clockwork_Manager {
 
 	public function run() {
 		while (true) {
-			$eventsToRun = $this->_getEventsToRun();
-			foreach ($eventsToRun as $event) {
-				$event->run();
-			}
+			$this->runEventsFor();
 			sleep(1);
 		}
 	}
 
-	/**
-	 * @return CM_Clockwork_Event[]
-	 */
-	private function _getEventsToRun() {
-		return array_filter($this->_events, function (CM_Clockwork_Event $event) {
-			return $event->shouldRun();
-		});
+	public function runEventsFor() {
+		/** @var CM_Clockwork_Event[] $eventsToRun */
+		$eventsToRun = array();
+		foreach ($this->_events as $event) {
+			if ($event->shouldRun()) {
+				$eventsToRun[] = $event;
+			}
+		}
+		foreach ($eventsToRun as $event) {
+			$event->run();
+		}
 	}
 }
