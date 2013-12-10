@@ -2,11 +2,14 @@
 
 class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
+	/** @var callable[] */
+	protected $_callbacks;
+
 	/**
 	 * @synchronized
 	 */
 	public function common() {
-		$this->_executeCallbacks(array(
+		$this->_registerCallbacks(array(
 			'CM_Model_User::offlineOld' => function () {
 				CM_Model_User::offlineOld();
 			},
@@ -46,14 +49,15 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Stream_Message::synchronize' => function () {
 				CM_Stream_Message::getInstance()->synchronize();
 			}
-		), 'common');
+		));
+		$this->_executeCallbacks('common', new DateInterval('PT1M'));
 	}
 
 	/**
 	 * @synchronized
 	 */
 	public function heavy() {
-		$this->_executeCallbacks(array(
+		$this->_registerCallbacks(array(
 			'CM_Mail::processQueue' => function () {
 				CM_Mail::processQueue(500);
 			},
@@ -63,7 +67,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Paging_Log_Abstract::deleteOlder' => function () {
 				CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 			}
-		), 'heavy');
+		));
+		$this->_executeCallbacks('heavy', new DateInterval('PT15M'));
 	}
 
 	public static function getPackageName() {
@@ -71,18 +76,32 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param Closure[] $callbacks
-	 * @param string    $functionName
+	 * @param callable[] $callbacks
 	 */
-	protected function _executeCallbacks($callbacks, $functionName) {
-		foreach ($callbacks as $name => $callback) {
-			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $this->getPackageName() . ' ' . $functionName . ': ' . $name);
-			try {
-				$callback();
-			} catch (CM_Exception $e) {
-				CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
-			}
-			CMService_Newrelic::getInstance()->endTransaction();
+	protected function _registerCallbacks(array $callbacks) {
+		if (!$this->_callbacks) {
+			$this->_callbacks = array();
 		}
+		$this->_callbacks = array_merge($this->_callbacks, $callbacks);
+	}
+
+	/**
+	 * @param string       $namespace
+	 * @param DateInterval $interval
+	 */
+	protected function _executeCallbacks($namespace, DateInterval $interval) {
+		$callbacks = $this->_callbacks;
+		$transactionPrefix = 'cm.php ' . $this->getPackageName() . ' ' . $namespace . ': ';
+		$this->_runInterval(function () use ($callbacks, $transactionPrefix) {
+			foreach ($callbacks as $name => $callback) {
+				CMService_Newrelic::getInstance()->startTransaction($transactionPrefix . $name);
+				try {
+					$callback();
+				} catch (CM_Exception $e) {
+					CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+				}
+				CMService_Newrelic::getInstance()->endTransaction();
+			}
+		}, $interval, true);
 	}
 }

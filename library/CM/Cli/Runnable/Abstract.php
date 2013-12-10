@@ -34,7 +34,7 @@ abstract class CM_Cli_Runnable_Abstract {
 	public function info() {
 		$details = array(
 			'Package name' => static::getPackageName(),
-			'Class name' => get_class($this),
+			'Class name'   => get_class($this),
 		);
 		foreach ($details as $name => $value) {
 			$this->_getOutput()->writeln(str_pad($name . ':', 20) . $value);
@@ -53,5 +53,32 @@ abstract class CM_Cli_Runnable_Abstract {
 	 */
 	protected function _getInput() {
 		return $this->_input;
+	}
+
+	/**
+	 * @param callable     $callback
+	 * @param DateInterval $interval
+	 * @param bool|null    $strictIntervals
+	 */
+	protected function _runInterval($callback, DateInterval $interval, $strictIntervals = null) {
+		$nextRun = new DateTime();
+		if ($strictIntervals) {
+			$nextRun->setTime(0, 0, 0);
+		}
+
+		while (true) {
+			if ($strictIntervals) {
+				while ($nextRun <= new DateTime()) {
+					$nextRun->add($interval);
+				}
+			} elseif ($nextRun < new DateTime()) {
+				$nextRun = new DateTime();
+			}
+			while (new DateTime() < $nextRun) {
+				sleep(1);
+			}
+			call_user_func($callback);
+			$nextRun->add($interval);
+		}
 	}
 }
