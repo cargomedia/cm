@@ -5,7 +5,9 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
 	public function testShouldRun() {
 		$currently = new DateTime();
 		$event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array(new DateInterval('PT2S')))->getMock();
-		$event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnValue($currently));
+		$event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($currently) {
+			return clone $currently;
+		}));
 		/** @var CM_Clockwork_Event $event */
 		$this->assertTrue($event->shouldRun());
 		$event->run();
