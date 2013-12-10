@@ -23,7 +23,7 @@ class CM_Clockwork_Event {
 	 * @return bool
 	 */
 	public function shouldRun() {
-		return new DateTime() >= $this->_nextRun;
+		return $this->_getCurrentDateTime() >= $this->_nextRun;
 	}
 
 	/**
@@ -41,8 +41,15 @@ class CM_Clockwork_Event {
 		foreach ($this->_callbacks as $callback) {
 			call_user_func($callback);
 		}
-		$nextRun = new DateTime();
+		$nextRun = clone $this->_getCurrentDateTime();
 		$nextRun->add($this->_interval);
 		$this->_nextRun = $nextRun;
+	}
+
+	/**
+	 * @return DateTime
+	 */
+	protected function _getCurrentDateTime() {
+		return new DateTime();
 	}
 }
