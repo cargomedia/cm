@@ -18,7 +18,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 
 		for ($i = 0; $i < 100; $i++) {
 			$currently->add(new DateInterval('PT1S'));
-			$manager->runEventsFor($currently);
+			$manager->runEvents();
 		}
 		$this->assertSame(array(
 			'1'  => 100,
@@ -40,7 +40,9 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
 			$counter[$key]++;
 		};
 		$event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array($interval))->getMock();
-		$event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnValue($timeReference));
+		$event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function() use ($timeReference){
+			return clone $timeReference;
+		}));
 		/** @var CM_Clockwork_Event $event */
 		$event->registerCallback($callback);
 		$manager->registerEvent($event);

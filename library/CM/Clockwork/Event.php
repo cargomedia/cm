@@ -41,7 +41,7 @@ class CM_Clockwork_Event {
 		foreach ($this->_callbacks as $callback) {
 			call_user_func($callback);
 		}
-		$nextRun = clone $this->_getCurrentDateTime();
+		$nextRun = $this->_getCurrentDateTime();
 		$nextRun->add($this->_interval);
 		$this->_nextRun = $nextRun;
 	}
