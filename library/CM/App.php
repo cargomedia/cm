@@ -199,53 +199,6 @@ class CM_App {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function generateConfigClassTypes() {
-		$valueCurrent = 1;
-		$content = '';
-		$typesCurrent = array();
-		$typeNamespaces = $this->_getTypedClasses();
-		foreach ($typeNamespaces as $typedClass) {
-			if (isset(CM_Config::get()->$typedClass) && isset(CM_Config::get()->$typedClass->types)) {
-				foreach (CM_Config::get()->$typedClass->types as $type => $className) {
-					if (isset($typesCurrent[$type])) {
-						throw new CM_Exception_Invalid(
-							'Duplicate `TYPE` constant for `' . $className . '` and `' . $typesCurrent[$type] . '`. Both equal `' . $type . '`.');
-					}
-					$typesCurrent[$type] = $className;
-				}
-			}
-		}
-		foreach ($typeNamespaces as $typedClass) {
-			$content .= join(PHP_EOL, $this->_generateClassTypesConfig($typedClass, $typesCurrent, $valueCurrent));
-		}
-		return $content;
-	}
-
-	/**
-	 * @param string $className
-	 * @return array
-	 */
-	public function _getTypedClasses() {
-		$typedClasses = array();
-		foreach (CM_Class_Abstract::getClassChildren(true) as $childClass) {
-			if (is_subclass_of($childClass, 'CM_Typed')) {
-				$isHighestTypedClass = true;
-				foreach (class_parents($childClass) as $parentClass) {
-					if (is_subclass_of($parentClass, 'CM_Typed')) {
-						$isHighestTypedClass = false;
-					}
-				}
-				if ($isHighestTypedClass) {
-					$typedClasses[] = $childClass;
-				}
-			}
-		}
-		return $typedClasses;
-	}
-
-	/**
 	 *
 	 * @throws CM_Exception_Invalid
 	 * @return array
@@ -277,64 +230,6 @@ class CM_App {
 			}
 		}
 		return $actionVerbs;
-	}
-
-	/**
-	 * @param string $className
-	 * @throws CM_Exception_Invalid
-	 * @return string[]
-	 */
-	public function getClassTypes($className) {
-		$classTypes = array();
-		/** @var $className CM_Class_Abstract */
-		foreach ($className::getClassChildren() as $className) {
-			$reflectionClass = new ReflectionClass($className);
-			if ($reflectionClass->hasConstant('TYPE')) {
-				$type = $className::TYPE;
-				if ($classNameDuplicate = array_search($type, $classTypes)) {
-					throw new CM_Exception_Invalid(
-						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '` (within `' .
-						$className . '` type namespace).');
-				}
-				$classTypes[$className] = $type;
-			} elseif (!$reflectionClass->isAbstract()) {
-				throw new CM_Exception_Invalid('`' . $className . '` does not have `TYPE` constant defined');
-			}
-		}
-		return $classTypes;
-	}
-
-	/**
-	 * @param string $namespace
-	 * @param array  $typesCurrent
-	 * @param int    $valueCurrent
-	 * @return array
-	 * @throws CM_Exception_Invalid
-	 */
-	private function _generateClassTypesConfig($namespace, $typesCurrent, $valueCurrent) {
-		$content = array();
-		$childContent = array();
-		$content[] = PHP_EOL;
-		$descendants = $namespace::getClassChildren();
-		$typeList = array();
-		foreach ($descendants as $className) {
-			if (!in_array($className, $typesCurrent)) {
-				while (isset($typesCurrent[$valueCurrent])) {
-					$valueCurrent++;
-				}
-				$typesCurrent[$valueCurrent] = $className;
-			}
-			$type = array_search($className, $typesCurrent);
-			$typeList[$type] = $className;
-		}
-		ksort($typeList);
-		$content[] = '$config->' . $namespace . '->types = array();';
-		foreach ($typeList as $type => $className) {
-			$content[] = '$config->' . $namespace . '->types[' . $type . '] = \'' . $className . '\';';
-			$childContent[] = '$config->' . $className . '->type = ' . $type . ';';
-		}
-		$content[] = '';
-		return array_merge($content, $childContent, array(''));
 	}
 
 	/**
