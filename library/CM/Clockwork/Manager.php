@@ -26,7 +26,7 @@ class CM_Clockwork_Manager {
 		$this->registerEvent($event);
 	}
 
-	public function run() {
+	public function start() {
 		while (true) {
 			$this->runEvents();
 			sleep(1);
