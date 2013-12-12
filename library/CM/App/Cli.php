@@ -29,8 +29,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 		$fileHeader .= '// You should adjust TYPE constants and regenerate file using `config generate` command' . PHP_EOL;
 		$path = DIR_ROOT . 'resources/config/internal.php';
 		$generator = new CM_Config_Generator();
-		$classTypesConfig = $generator->generateClassTypesConfig();
-		$actionVerbsConfig = CM_App::getInstance()->generateConfigActionVerbs();
+		$classTypesConfig = $generator->generateConfigClassTypes();
+		$actionVerbsConfig = $generator->generateConfigActionVerbs();
 		CM_File::create($path, $fileHeader . PHP_EOL . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 

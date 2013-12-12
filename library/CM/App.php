@@ -173,65 +173,6 @@ class CM_App {
 		return 1;
 	}
 
-	public function generateConfigActionVerbs() {
-		$maxValue = 0;
-		if (isset(CM_Config::get()->CM_Action_Abstract->verbsMaxValue)) {
-			$maxValue = CM_Config::get()->CM_Action_Abstract->verbsMaxValue;
-		}
-
-		$currentVerbs = array();
-		if (isset(CM_Config::get()->CM_Action_Abstract->verbs)) {
-			$currentVerbs = CM_Config::get()->CM_Action_Abstract->verbs;
-		}
-
-		$content = '$config->CM_Action_Abstract->verbs = array();' . PHP_EOL;
-		foreach ($this->getActionVerbs() as $actionVerb) {
-			if (!array_key_exists($actionVerb['value'], $currentVerbs)) {
-				$maxValue++;
-				$currentVerbs[$actionVerb['value']] = $maxValue;
-			}
-			$key = $actionVerb['className'] . '::' . $actionVerb['name'];
-			$id = $currentVerbs[$actionVerb['value']];
-			$content .= '$config->CM_Action_Abstract->verbs[' . $key . '] = ' . var_export($id, true) . ';' . PHP_EOL;
-		}
-		$content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';' . PHP_EOL;
-		return $content;
-	}
-
-	/**
-	 *
-	 * @throws CM_Exception_Invalid
-	 * @return array
-	 */
-	public function getActionVerbs() {
-		$actionVerbs = array();
-		$actionVerbsValues = array();
-		$classNames = CM_Action_Abstract::getClassChildren(true);
-		array_unshift($classNames, 'CM_Action_Abstract');
-		foreach ($classNames as $className) {
-			$class = new ReflectionClass($className);
-			$constants = $class->getConstants();
-			unset($constants['TYPE']);
-			foreach ($constants as $constant => $value) {
-				if (array_key_exists($constant, $actionVerbsValues) && $actionVerbsValues[$constant] !== $value) {
-					throw new CM_Exception_Invalid(
-						'Constant `' . $className . '::' . $constant . '` already set. Tried to set value to `' . $value . '` - previously set to `' .
-						$actionVerbsValues[$constant] . '`.');
-				}
-				if (!array_key_exists($constant, $actionVerbsValues) && in_array($value, $actionVerbsValues)) {
-					throw new CM_Exception_Invalid(
-						'Cannot set `' . $className . '::' . $constant . '` to `' . $value . '`. This value is already used for `' . $className .
-						'::' . array_search($value, $actionVerbsValues) . '`.');
-				}
-				if (!array_key_exists($constant, $actionVerbsValues)) {
-					$actionVerbsValues[$constant] = $value;
-					$actionVerbs[] = array('name' => $constant, 'value' => $value, 'className' => $className,);
-				}
-			}
-		}
-		return $actionVerbs;
-	}
-
 	/**
 	 * @return string[]
 	 */
