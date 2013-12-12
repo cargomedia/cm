@@ -61,11 +61,11 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 		}
 	}
 
-	public function maintenance() {
+	public function startMaintenance() {
 		$clockwork = new CM_Clockwork_Manager();
 		$clockwork->registerCallback(new DateInterval('PT1M'), array($this ,'update'));
 		$clockwork->registerCallback(new DateInterval('PT1H'), array($this ,'optimize'));
-		$clockwork->run();
+		$clockwork->start();
 	}
 
 	/**
