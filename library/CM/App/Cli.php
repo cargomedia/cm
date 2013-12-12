@@ -36,8 +36,9 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
 		// Create model class types and action verbs config JS
 		$path = DIR_ROOT . 'resources/config/js/internal.js';
-		$modelTypesConfig = 'cm.model.types = ' . CM_Params::encode($generator->getClassTypes('CM_Model_Abstract'), true) . ';';
-		$actionTypesConfig = 'cm.action.types = ' . CM_Params::encode($generator->getClassTypes('CM_Action_Abstract'), true) . ';';
+		$classTypes = $generator->getNamespaceTypes();
+		$modelTypesConfig = 'cm.model.types = ' . CM_Params::encode($classTypes['CM_Model_Abstract'], true) . ';';
+		$actionTypesConfig = 'cm.action.types = ' . CM_Params::encode($classTypes['CM_Action_Abstract'], true) . ';';
 		CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionTypesConfig . PHP_EOL);
 		$this->_getOutput()->writeln('Created `' . $path . '`');
 	}
