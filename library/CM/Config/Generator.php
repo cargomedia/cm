@@ -2,21 +2,12 @@
 
 class CM_Config_Generator extends CM_Class_Abstract {
 
-	/** @var CM_File */
-	private $_source = null;
-
 	/**
 	 * @param CM_File $source
-	 */
-	public function __construct(CM_File $source) {
-		$this->_source = $source;
-	}
-
-	/**
 	 * @return string
 	 */
-	public function generateOutput() {
-		$entryList = CM_Params::decode($this->_source->read(), true);
+	public function generateOutput(CM_File $source) {
+		$entryList = CM_Params::decode($source->read(), true);
 		$output = '<?php' . PHP_EOL;
 		$mapping = $this->_getMapping();
 		foreach ($entryList as $key => $value) {

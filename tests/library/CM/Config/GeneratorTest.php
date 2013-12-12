@@ -46,9 +46,9 @@ EOD;
 		$sourceFile->expects($this->any())->method('read')->will($this->returnValue($source));
 		$mapping = $this->getMockBuilder('CM_Config_Mapping')->setMethods(array('_getMapping'))->getMock();
 		$mapping->expects($this->any())->method('_getMapping')->will($this->returnValue($map));
-		$generator = $this->getMockBuilder('CM_Config_Generator')->setConstructorArgs(array($sourceFile))->setMethods(array('_getMapping'))->getMock();
+		$generator = $this->getMockBuilder('CM_Config_Generator')->setMethods(array('_getMapping'))->getMock();
 		$generator->expects($this->any())->method('_getMapping')->will($this->returnValue($mapping));
 		/** @var CM_Config_Generator $generator */
-		$this->assertSame($expected, $generator->generateOutput());
+		$this->assertSame($expected, $generator->generateOutput($sourceFile));
 	}
 }
