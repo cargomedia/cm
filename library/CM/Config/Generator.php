@@ -97,6 +97,31 @@ class CM_Config_Generator extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function generateClassTypesConfig() {
+		if (empty($this->_classTypes)) {
+			$this->generateClassTypes();
+		}
+		$output = '';
+		foreach ($this->getNamespaceTypes() as $namespaceClass => $typeList) {
+			ksort($typeList);
+			$output .= '$config->' . $namespaceClass . '->types = array();' . PHP_EOL;
+			foreach ($typeList as $type => $class) {
+				$output .= '$config->' . $namespaceClass . '->types[' . $type . '] = \'' . $class . '\';' . PHP_EOL;
+			}
+			$output .= PHP_EOL;
+		}
+		$classTypes = $this->getClassTypes();
+		ksort($classTypes);
+		$output .= PHP_EOL;
+		foreach ($classTypes as $type => $class) {
+			$output .= '$config->' . $class . '->type = ' . $type . ';' . PHP_EOL;
+		}
+		return $output;
+	}
+
+	/**
 	 * @return CM_Config_Mapping
 	 */
 	protected function _getMapping() {
