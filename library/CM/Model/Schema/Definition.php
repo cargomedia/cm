@@ -108,7 +108,7 @@ class CM_Model_Schema_Definition {
 							if (!is_array($id)) {
 								$id = array('id' => $id);
 							}
-							$value = CM_Model_Abstract::factoryGeneric($type::getType(), $id);
+							$value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
 					}
 				}
 			}

@@ -144,15 +144,15 @@ class CMTest_TH {
 	 */
 	public static function createStreamChannel($type = null, $adapterType = null) {
 		if (null === $type) {
-			$type = CM_Model_StreamChannel_Video::getType();
+			$type = CM_Model_StreamChannel_Video::getTypeStatic();
 		}
 
 		if (null === $adapterType) {
-			$adapterType = CM_Stream_Adapter_Video_Wowza::getType();
+			$adapterType = CM_Stream_Adapter_Video_Wowza::getTypeStatic();
 		}
 
 		$data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-		if (CM_Model_StreamChannel_Video::getType() == $type) {
+		if (CM_Model_StreamChannel_Video::getTypeStatic() == $type) {
 			$data['width'] = 480;
 			$data['height'] = 720;
 			$data['serverId'] = 1;

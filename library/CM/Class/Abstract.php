@@ -9,11 +9,8 @@ abstract class CM_Class_Abstract {
 	 * @return int
 	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
-	public static function getType() {
-		if (!isset(self::_getConfig()->type)) {
-			throw new CM_Class_Exception_TypeNotConfiguredException('Class `' . get_called_class() . '` has no type configured.');
-		}
-		return self::_getConfig()->type;
+	public function getType() {
+		return static::getTypeStatic();
 	}
 
 	/**
@@ -108,5 +105,17 @@ abstract class CM_Class_Abstract {
 	public static function getClassChildren($includeAbstracts = null) {
 		$className = get_called_class();
 		return CM_Util::getClassChildren($className, $includeAbstracts);
+	}
+
+
+	/**
+	 * @return int
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
+	 */
+	public static function getTypeStatic() {
+		if (!isset(self::_getConfig()->type)) {
+			throw new CM_Class_Exception_TypeNotConfiguredException('Class `' . get_called_class() . '` has no type configured.');
+		}
+		return self::_getConfig()->type;
 	}
 }

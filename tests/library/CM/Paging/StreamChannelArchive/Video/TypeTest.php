@@ -13,13 +13,13 @@ class CM_Paging_StreamChannelArchiveVideo_TypeTest extends CMTest_TestCase {
 		$streamChannel->expects($this->any())->method('getType')->will($this->returnValue(3));
 		CMTest_TH::createStreamChannelVideoArchive($streamChannel);
 
-		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::getType());
+		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::getTypeStatic());
 		$this->assertSame(3, $paging->getCount());
 
 		$paging = new CM_Paging_StreamChannelArchiveVideo_Type($streamChannel->getType());
 		$this->assertSame(1, $paging->getCount());
 
-		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::getType(), $archive->getCreated());
+		$paging = new CM_Paging_StreamChannelArchiveVideo_Type(CM_Model_StreamChannel_Video::getTypeStatic(), $archive->getCreated());
 		$this->assertSame(2, $paging->getCount());
 	}
 }

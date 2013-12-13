@@ -170,18 +170,18 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCreate() {
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getType(), array('key'         => 'foo1',
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',
 																												 'adapterType' => 1));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 
 		try {
-			CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getType(), array('key' => 'foo1', 'adapterType' => 1));
+			CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key' => 'foo1', 'adapterType' => 1));
 			$this->fail();
 		} catch (CM_Db_Exception $e) {
 			$this->assertContains('Duplicate entry', $e->getMessage());
 		}
 
-		CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getType(), array('key' => 'foo1', 'adapterType' => 2));
+		CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key' => 'foo1', 'adapterType' => 2));
 	}
 
 	public function testEncryptAndDecryptKey() {
