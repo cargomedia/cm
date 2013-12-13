@@ -56,9 +56,9 @@
 			var $body = $('<div class="floatbox-body"/>');
 			lastFocusedElement = document.activeElement;
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
+				$controls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
 			}
-			this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" tabindex="0"/>');
+			this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" />');
 
 			if (this.options.fullscreen) {
 				this.$floatbox.addClass('fullscreen');
@@ -83,9 +83,17 @@
 					self.close.apply(self);
 				}
 			});
-			$controls.on('click.floatbox', '.icon-close', function() {
+			$controls.on('click.floatbox', '.closeFloatbox', function() {
 				self.close.apply(self);
 			});
+
+			if (this.options.closable) {
+				this.$floatbox.find('.closeFloatbox').focus();
+			} else {
+				this.$floatbox.find('button:first, input:first, textarea:first').focus();
+			}
+
+			this.$floatbox.trap();
 
 			this.$layer.data('floatbox', this);
 			$element.trigger('floatbox-open');
@@ -120,7 +128,7 @@
 				this.$floatbox.css('min-height', height);
 			} else {
 				var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
-				this.$floatbox.css('top', top);
+				this.$floatbox.css('margin-top', top);
 			}
 		}
 	});
