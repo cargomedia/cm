@@ -79,7 +79,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	protected function _registerClockworkCallbacks(DateInterval $interval, $callbacks) {
 		foreach ($callbacks as $name => $callback) {
-			$transactionName = 'cm.php ' . static::getPackageName() . ' run: ' . $name;
+			$transactionName = 'cm.php ' . static::getPackageName() . ' start: ' . $name;
 			$this->_clockworkManager->registerCallback($interval, function () use ($transactionName, $callback) {
 				CMService_Newrelic::getInstance()->startTransaction($transactionName);
 				try {
