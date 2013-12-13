@@ -4,7 +4,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Action_Abstract->verbs['foo'] = 1;
-		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::getType()] = 'CM_Model_ActionLimit_Mock';
+		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::getTypeStatic()] = 'CM_Model_ActionLimit_Mock';
 	}
 
 	public function tearDown() {
@@ -204,6 +204,14 @@ class CM_Action_Mock extends CM_Action_Abstract {
 
 	const TYPE = 1;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	protected function _notify() {
 	}
 
@@ -226,6 +234,14 @@ class CM_Action_Mock extends CM_Action_Abstract {
 class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
 
 	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	public function getOvershootAllowed() {
 		return false;
