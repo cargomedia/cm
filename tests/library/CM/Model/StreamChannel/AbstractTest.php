@@ -205,6 +205,14 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 
 	const TYPE = 1;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
 	}

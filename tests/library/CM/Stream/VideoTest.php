@@ -71,6 +71,16 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 
 class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
 
+	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;
 	}

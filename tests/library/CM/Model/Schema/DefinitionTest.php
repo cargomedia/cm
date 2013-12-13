@@ -410,7 +410,8 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 				'value'       => '{"id": "4", "foo": "bar"}',
 				'schema'      => array('type' => 'CM_Model_Mock_Validation2'),
 				'returnValue' => new CM_Model_Mock_Validation2('4', 'bar'),
-		));
+			)
+		);
 		foreach ($testDataList as $testData) {
 			$schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
 			$value = $schema->decodeField('foo', $testData['value']);
@@ -588,6 +589,14 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 
 	const TYPE = 1;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	public function __construct($id, $foo = null) {
 		$id = array('id' => $id);
 		if (null !== $foo) {
@@ -604,6 +613,14 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
 
 	const TYPE = 2;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	public function getId() {
 		return (string) $this->_getId('id');

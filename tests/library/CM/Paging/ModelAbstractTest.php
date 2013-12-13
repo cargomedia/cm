@@ -67,6 +67,14 @@ class CM_Paging_ModelAbstractTest_ModelMock extends CM_Model_Abstract {
 
 	const TYPE = 1;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	protected function _getSchema() {
 		return new CM_Model_Schema_Definition(array('foo' => array()));
 	}
@@ -86,6 +94,14 @@ class CM_Paging_ModelAbstractTest_ModelMock extends CM_Model_Abstract {
 class CM_Paging_ModelAbstractTest_ModelMock2 extends CM_Model_Abstract {
 
 	const TYPE = 2;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	protected function _getSchema() {
 		return new CM_Model_Schema_Definition(array('bar' => array()));

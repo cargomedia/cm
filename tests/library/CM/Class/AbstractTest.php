@@ -60,4 +60,12 @@ class CM_Class_AbstractMock extends CM_Class_Abstract {
 class CM_Class_Implementation extends CM_Class_AbstractMock {
 
 	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 }
