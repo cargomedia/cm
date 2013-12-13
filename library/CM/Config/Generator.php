@@ -2,6 +2,8 @@
 
 class CM_Config_Generator extends CM_Class_Abstract {
 
+	private $_typesMaxValue = 0;
+
 	/** @var string[] */
 	private $_classTypes = array();
 
@@ -53,7 +55,9 @@ class CM_Config_Generator extends CM_Class_Abstract {
 
 	public function generateClassTypes() {
 		$config = CM_Config::get();
-		$valueCurrent = 1;
+		if (isset(CM_Config::get()->CM_Class_Abstract->typesMaxValue)) {
+			$this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
+		}
 		$typedClasses = CM_Util::getClassChildren('CM_Typed', true);
 		/** @var CM_Class_Abstract[] $namespaceClassList */
 		$namespaceClassList = array();
@@ -91,10 +95,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
 			}
 			foreach ($containedClasses as $class) {
 				if (false === $type = array_search($class, $this->_classTypes)) {
-					while (isset($this->_classTypes[$valueCurrent])) {
-						$valueCurrent++;
-					}
-					$type = $valueCurrent;
+					$type = ++$this->_typesMaxValue;
 					$this->_classTypes[$type] = $class;
 				}
 				$this->_namespaceTypes[$namespaceClass][$type] = $class;
@@ -124,6 +125,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
 		foreach ($classTypes as $type => $class) {
 			$output .= '$config->' . $class . '->type = ' . $type . ';' . PHP_EOL;
 		}
+		$output .= PHP_EOL . '$config->CM_Class_Abstract->typesMaxValue = ' . $this->_typesMaxValue . ';' . PHP_EOL;
 		return $output;
 	}
 
