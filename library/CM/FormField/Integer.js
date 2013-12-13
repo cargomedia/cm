@@ -7,39 +7,32 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 
 	ready: function() {
 		var field = this;
-		var $slider = this.$(".slider");
-		var $input = this.$("input");
-		var input = $input.get(0);
-		$slider.slider({
-			value: $input.val(),
-			min: field.getOption("min"),
-			max: field.getOption("max"),
+		var $input = this.$('input');
+		var $slider = this.$('.noUiSlider');
+		var $sliderValue = field.$('.noUiSlider-value');
+
+		$slider.noUiSlider({
+			range: [field.getOption("min"), field.getOption("max")],
+			start: $input.val(),
 			step: field.getOption("step"),
-			slide: function(event, ui) {
-				var value = ui.value + 0;
-				input.value = value;
-				$(this).children(".ui-slider-handle").text(value);
-			},
-			change: function(event, ui) {
-				var value = ui.value + 0;
-				input.value = value;
-				$(this).children(".ui-slider-handle").text(value);
+			handles: 1,
+			behaviour: 'extend-tap',
+			serialization: {
+				to: [ $sliderValue, 'html' ],
+				resolution: 1
 			}
 		});
-		$slider.children(".ui-slider-handle").text($input.val());
 
 		$input.watch("disabled", function(propName, oldVal, newVal) {
-			$slider.slider("option", "disabled", newVal);
-		});
-
-		$input.watch("value", function(propName, oldVal, newVal) {
-			$slider.slider("option", "value", newVal);
-			field.trigger('change');
+			if (false == newVal) {
+				$slider.removeAttr('disabled');
+			} else {
+				$slider.attr('disabled', 'disabled');
+			}
 		});
 
 		this.on('destruct', function() {
 			$input.unwatch('disabled');
-			$input.unwatch('value');
 		});
 	}
 });
