@@ -213,7 +213,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 	protected static function _createStatic(array $data) {
 		$key = (string) $data ['key'];
 		$adapterType = (int) $data['adapterType'];
-		$id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::getType(), 'adapterType' => $adapterType));
 		$cacheKey = CM_CacheConst::StreamChannel_Id . '_key' . $key . '_adapterType:' . $adapterType;
 		CM_Cache_Shared::getInstance()->delete($cacheKey);
 		return new static($id);

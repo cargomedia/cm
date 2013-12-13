@@ -4,7 +4,7 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
 		CM_Config::get()->CM_Action_Abstract->verbs['foo'] = 1;
-		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::TYPE] = 'CM_Model_ActionLimit_Mock';
+		CM_Config::get()->CM_Model_ActionLimit_Abstract->types[CM_Model_ActionLimit_Mock::getType()] = 'CM_Model_ActionLimit_Mock';
 	}
 
 	public function tearDown() {

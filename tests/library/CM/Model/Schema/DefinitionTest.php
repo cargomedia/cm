@@ -276,8 +276,8 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 	}
 
 	public function testDecode() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::TYPE] = 'CM_Model_Mock_Validation2';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::getType()] = 'CM_Model_Mock_Validation';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::getType()] = 'CM_Model_Mock_Validation2';
 		$testDataList = array(
 			// nothing
 			array(
@@ -423,8 +423,8 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 	}
 
 	public function testEncode() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::TYPE] = 'CM_Model_Mock_Validation';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::TYPE] = 'CM_Model_Mock_Validation2';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::getType()] = 'CM_Model_Mock_Validation';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::getType()] = 'CM_Model_Mock_Validation2';
 		$testDataList = array(
 			// nothing
 			array(

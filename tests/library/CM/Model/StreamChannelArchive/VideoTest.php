@@ -145,7 +145,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		foreach ($filesDeleted as $file) {
 			$this->assertFileExists($file->getPath());
 		}
-		CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::TYPE);
+		CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::getType());
 		foreach ($filesNotDeleted as $file) {
 			$this->assertFileExists($file->getPath());
 		}

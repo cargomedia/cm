@@ -30,7 +30,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		}
 		if ($viewer = $this->getRender()->getViewer()) {
 			$options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
-			$options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::TYPE;
+			$options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getType();
 		}
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 

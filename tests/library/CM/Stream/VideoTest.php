@@ -17,7 +17,7 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		$mockAdapter->expects($this->exactly(2))->method('_stopStream')->will($this->returnValue(1));
 		$mockAdapter->expects($this->any())->method('getType')->will($this->returnValue(1));
 
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getType()] = 'CM_Model_StreamChannel_Video_Mock';
 		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('getAdapter'));
 		$wowza->expects($this->any())->method('getAdapter')->will($this->returnValue($mockAdapter));
 		/** @var $wowza CM_Stream_Video */

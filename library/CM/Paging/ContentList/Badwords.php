@@ -5,7 +5,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 	const TYPE = 73;
 
 	function __construct() {
-		parent::__construct(self::TYPE);
+		parent::__construct(self::getType());
 	}
 
 	/**

@@ -434,14 +434,14 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFactoryGeneric() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getType()] = 'CM_ModelMock';
 
 		$modelMock1 = CM_ModelMock::createStatic(array('foo' => 'bar'));
 		$idRaw = $modelMock1->getIdRaw();
 		foreach ($idRaw as &$idPart) {
 			$idPart = (string) $idPart;
 		}
-		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $idRaw);
+		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::getType(), $idRaw);
 		$this->assertEquals($modelMock1, $modelMock2);
 		$this->assertEquals($modelMock1->_get('foo'), $modelMock2->_get('foo'));
 
@@ -449,19 +449,19 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFactoryGenericWithData() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getType()] = 'CM_ModelMock';
 
 		$modelMock1 = CM_ModelMock::createStatic(array('foo' => 'bar'));
 		/** @var CM_ModelMock $modelMock2 */
-		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::TYPE, $modelMock1->getIdRaw(), array('foo' => 'bla'));
+		$modelMock2 = CM_Model_Abstract::factoryGeneric(CM_ModelMock::getType(), $modelMock1->getIdRaw(), array('foo' => 'bla'));
 		$this->assertSame('bla', $modelMock2->getFoo());
 
 		CMTest_TH::clearConfig();
 	}
 
 	public function testFactoryGenericMultiple() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getType()] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getType()] = 'CM_ModelMock3';
 
 		/** @var CM_ModelMock $modelLoadData */
 		$modelLoadData = CM_ModelMock::createStatic(array('foo' => 'foo1'));
@@ -481,8 +481,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 			array('type' => $modelPersistence->getType(), 'id' => $modelPersistence->getId()),
 			array('type' => $modelLoadData->getType(), 'id' => $modelLoadData->getId()),
 			array('type' => $modelCache->getType(), 'id' => $modelCache->getId()),
-			array('type' => CM_ModelMock3::TYPE, 'id' => 9999),
-			array('type' => CM_ModelMock::TYPE, 'id' => 9999),
+			array('type' => CM_ModelMock3::getType(), 'id' => 9999),
+			array('type' => CM_ModelMock::getType(), 'id' => 9999),
 		));
 		$_getData = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_getData');
 		$this->assertEquals($modelPersistence, $models[0]);
@@ -496,7 +496,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFactoryDuplicateModel() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getType()] = 'CM_ModelMock3';
 
 		$model1 = new CM_ModelMock3();
 		$model1->_set('foo', 'bar1');
@@ -516,7 +516,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testFactoryGenericMultiple_idType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getType()] = 'CM_ModelMock3';
 		$model = new CM_ModelMock3();
 		$id = 1;
 		/** @var CM_Model_StorageAdapter_Cache $cacheAdapter */
@@ -536,13 +536,13 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	 * @expectedExceptionMessage `idType` should be an array if `modelType` is not defined
 	 */
 	public function testFactoryGenericMultipleInvalidInput() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
-			CM_Model_Abstract::factoryGenericMultiple(array(array('id' => CM_ModelMock::TYPE, 'type' => 1), '1'), null);
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getType()] = 'CM_ModelMock';
+			CM_Model_Abstract::factoryGenericMultiple(array(array('id' => CM_ModelMock::getType(), 'type' => 1), '1'), null);
 	}
 
 	public function testFactoryGenericMultipleWithModelType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::TYPE] = 'CM_ModelMock';
-		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::TYPE] = 'CM_ModelMock3';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getType()] = 'CM_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock3::getType()] = 'CM_ModelMock3';
 
 		/** @var CM_ModelMock $model1 */
 		$model1 = CM_ModelMock::createStatic(array('foo' => 'foo1'));
@@ -553,7 +553,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$models = CM_Model_Abstract::factoryGenericMultiple(array(
 			$model1->getId(),
 			$model2->getIdRaw(),
-		), CM_ModelMock::TYPE);
+		), CM_ModelMock::getType());
 
 		$this->assertEquals($model1, $models[0]);
 		$this->assertEquals($model2, $models[1]);
@@ -993,7 +993,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCreateType() {
-		$user = CM_Model_Abstract::createType(CM_Model_User::TYPE);
+		$user = CM_Model_Abstract::createType(CM_Model_User::getType());
 		$this->assertInstanceOf('CM_Model_User', $user);
 	}
 

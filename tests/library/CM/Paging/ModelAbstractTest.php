@@ -16,13 +16,13 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 	}
 
 	public function testPagingFixedType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getType()] = 'CM_Paging_ModelAbstractTest_ModelMock';
 		$model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo1');
 		$model2 = CM_Paging_ModelAbstractTest_ModelMock::create('foo2');
 		$source = new CM_PagingSource_Array(array($model2->getId(), $model1->getId(), 999));
 		$modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setMethods(array('_getModelType'))->setConstructorArgs(array($source))
 				->getMockForAbstractClass();
-		$modelPaging->expects($this->any())->method('_getModelType')->will($this->returnValue(CM_Paging_ModelAbstractTest_ModelMock::TYPE));
+		$modelPaging->expects($this->any())->method('_getModelType')->will($this->returnValue(CM_Paging_ModelAbstractTest_ModelMock::getType()));
 		/** @var CM_Paging_ModelAbstract $modelPaging */
 		$this->assertCount(3, $modelPaging);
 		$this->assertEquals($model2, $modelPaging->getItem(0));
@@ -36,8 +36,8 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 	}
 
 	public function testPagingVariableType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock2';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getType()] = 'CM_Paging_ModelAbstractTest_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::getType()] = 'CM_Paging_ModelAbstractTest_ModelMock2';
 		$model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo');
 		$model2 = CM_Paging_ModelAbstractTest_ModelMock2::create('bar');
 		$source = new CM_PagingSource_Array(array(
