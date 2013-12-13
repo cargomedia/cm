@@ -84,7 +84,12 @@ class CM_Config_Generator extends CM_Class_Abstract {
 		// generate new types
 		foreach ($namespaceClassList as $namespaceClass) {
 			$this->_namespaceTypes[$namespaceClass] = array();
-			foreach ($namespaceClass::getClassChildren() as $class) {
+			$containedClasses = $namespaceClass::getClassChildren();
+			$reflectionClass = new ReflectionClass($namespaceClass);
+			if (!$reflectionClass->isAbstract()) {
+				array_unshift($containedClasses, $namespaceClass);
+			}
+			foreach ($containedClasses as $class) {
 				if (false === $type = array_search($class, $this->_classTypes)) {
 					while (isset($this->_classTypes[$valueCurrent])) {
 						$valueCurrent++;

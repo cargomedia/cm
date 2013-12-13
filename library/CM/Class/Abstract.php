@@ -7,8 +7,12 @@ abstract class CM_Class_Abstract {
 
 	/**
 	 * @return int
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
 	public static function getType() {
+		if (!isset(self::_getConfig()->type)) {
+			throw new CM_Class_Exception_TypeNotConfiguredException('Class `' . get_called_class() . '` has no type configured.');
+		}
 		return self::_getConfig()->type;
 	}
 
