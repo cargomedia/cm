@@ -45,7 +45,6 @@ class CM_Db_Client {
 		if (null !== $reconnectTimeout) {
 			$this->_reconnectTimeout = (int) $reconnectTimeout;
 		}
-		$this->connect();
 	}
 
 	/**
@@ -179,6 +178,15 @@ class CM_Db_Client {
 	 */
 	public function quoteIdentifier($name) {
 		return '`' . str_replace('`', '``', $name) . '`';
+	}
+
+	/**
+	 * @param CM_Db_Query_Abstract $query
+	 * @return CM_Db_Result
+	 */
+	public function execute(CM_Db_Query_Abstract $query) {
+		$statement = $this->createStatement($query->getSqlTemplate());
+		return $statement->execute($query->getParameters());
 	}
 
 	/**

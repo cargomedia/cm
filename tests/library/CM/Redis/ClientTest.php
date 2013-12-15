@@ -15,7 +15,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 	}
 
 	public function testZRangeByScore() {
-		$redis = new CM_Redis_Client();
+		$redis = CM_Redis_Client::getInstance();
 		$key = 'foo';
 		$redis->zAdd($key, 1, 'foo');
 		$redis->zAdd($key, 1.5, 'bar');

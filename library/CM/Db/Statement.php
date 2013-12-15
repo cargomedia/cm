@@ -23,6 +23,7 @@ class CM_Db_Statement {
 	 * @return CM_Db_Result
 	 */
 	public function execute(array $parameters = null) {
+		$this->_client->connect();
 		$retryCount = 1;
 		for ($try = 0; true; $try++) {
 			try {

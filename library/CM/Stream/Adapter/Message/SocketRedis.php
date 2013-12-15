@@ -23,7 +23,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 
 	public function startSynchronization() {
 		$adapter = $this;
-		$redis = new CM_Redis_Client();
+		$redis = CM_Redis_Client::getInstance();
 		$redis->subscribe('socket-redis-up', function ($channel, $message) use ($adapter) {
 			$adapter->onRedisMessage($message);
 		});

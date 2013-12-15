@@ -1,6 +1,7 @@
 {
 	"name": "cargomedia/CM",
 	"require": {
+		"composer/composer": "1.0.0-alpha7",
 		"smarty/smarty": "3.1.14",
 		"leafo/lessphp": "0.3.*",
 		"easybook/geshi": "1.0.8.11",
@@ -31,5 +32,12 @@
 			"CMTest_": "tests/helpers/CMTest/library/"
 		}
 	},
-	"bin": ["scripts/cm.php"]
+	"bin": ["scripts/cm.php"],
+	"extra": {
+		"cm-modules": {
+			"CM": {
+				"path": ""
+			}
+		}
+	}
 }

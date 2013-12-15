@@ -87,7 +87,7 @@ class CM_Db_Schema_Column {
 		}
 		$data = array();
 		$query = new CM_Db_Query_Describe($this->_client, $this->_table, $this->_column);
-		$result = $query->execute();
+		$result = $this->_client->execute($query);
 		$columns = $result->fetch();
 		if (false === $columns) {
 			throw new CM_Db_Exception('Column `' . $this->_column . '` not found');
