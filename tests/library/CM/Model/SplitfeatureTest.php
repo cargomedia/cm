@@ -133,8 +133,8 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splitfeature->withoutPersistence = true;
 		$user = CMTest_TH::createUser();
 
-		$splitfeature = new CM_Model_Splitfeature('NotExicting');
-		$this->assertTrue($splitfeature->getEnabled($user));
+		$splitfeature = new CM_Model_Splitfeature('Nonexistent');
+		$this->assertFalse($splitfeature->getEnabled($user));
 		$this->assertSame(0, $splitfeature->getFixtureCount());
 		$splitfeature->setPercentage(50);
 
