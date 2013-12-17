@@ -87,12 +87,7 @@
 				self.close.apply(self);
 			});
 
-			if (this.options.closable) {
-				this.$floatbox.find('.closeFloatbox').focus();
-			} else {
-				this.$floatbox.find(':focusable:first').focus();
-			}
-
+			this.$floatbox.find(':focusable:first').focus();
 			this.$floatbox.trap();
 
 			this.$layer.data('floatbox', this);
