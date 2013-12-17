@@ -90,7 +90,7 @@
 			if (this.options.closable) {
 				this.$floatbox.find('.closeFloatbox').focus();
 			} else {
-				this.$floatbox.find('button:first, input:first, textarea:first').focus();
+				this.$floatbox.find(':focusable:first').focus();
 			}
 
 			this.$floatbox.trap();
