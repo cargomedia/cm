@@ -21,6 +21,8 @@
 /*jslint white: true */
 /*jslint sub: true */
 
+/* ATTENTION: add this pull-request https://github.com/leongersen/noUiSlider/pull/161  */
+
 (function( $ ){
 
 	'use strict';
@@ -1114,8 +1116,7 @@
 				   ,clsList[10 + options['orientation']] ].join(' '));
 
 				for (i = 0; i < options['handles']; i++ ) {
-
-					handle = $('<div><div/></div>').appendTo(base);
+					handle = $('<div><a href="javascript:;"/></div>').appendTo(base);
 
 					// Add all default and option-specific classes to the
 					// origins and handles.
