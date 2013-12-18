@@ -544,8 +544,23 @@ abstract class CM_Request_Abstract {
 	public static function factoryFromGlobals() {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$uri = $_SERVER['REQUEST_URI'];
-		$headers = getallheaders();
 		$body = file_get_contents('php://input');
+
+		if (function_exists('getallheaders')) {
+			$headers = getallheaders();
+		} else {
+			$headers = array();
+			foreach ($_SERVER as $name => $value) {
+				if (substr($name, 0, 5) == 'HTTP_') {
+					$headers[strtolower(str_replace('_', '-', substr($name, 5)))] = $value;
+				} elseif ($name == 'CONTENT_TYPE') {
+					$headers['content-type'] = $value;
+				} elseif ($name == 'CONTENT_LENGTH') {
+					$headers['content-length'] = $value;
+				}
+			}
+		}
+
 		return self::factory($method, $uri, $headers, $body);
 	}
 }
