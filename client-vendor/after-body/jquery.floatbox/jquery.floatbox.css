@@ -2,6 +2,15 @@ html.floatbox-active {
 	overflow: hidden;
 }
 
+html.ieMobile {
+	height: 100%;
+}
+
+html.ieMobile body {
+	overflow: hidden;
+	height: 100%;
+}
+
 #floatbox-viewport {
 	position: fixed;
 	top: 0;

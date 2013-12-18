@@ -2,9 +2,12 @@
  * Author: CM
  */
 (function($) {
+	var ieMobile = /IEMobile/.test(navigator.userAgent);
+
 	var defaults = {
 		closable: true,
-		fullscreen: false
+		fullscreen: false,
+		ieMobile: ieMobile
 	};
 
 	$.floatbox = function(options) {
@@ -12,6 +15,8 @@
 	};
 
 	var $viewport = null;
+	var backupScrollTop = null;
+	var lastFocusedElement = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -35,7 +40,12 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
-				$viewport = $('<div id="floatbox-viewport"/>');
+				if (this.options.ieMobile) {
+					backupScrollTop = $(document).scrollTop();
+					$('html').addClass('ieMobile');
+				}
+
+				$viewport = $('<div id="floatbox-viewport" tabindex="-1"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
 			}
@@ -44,10 +54,11 @@
 			var $container = $('<div class="floatbox-container"/>');
 			var $controls = $('<div class="floatbox-controls"/>');
 			var $body = $('<div class="floatbox-body"/>');
+			lastFocusedElement = document.activeElement;
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close" href="javascript:;"/>');
+				$controls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
 			}
-			this.$floatbox = $('<div class="floatbox"/>');
+			this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" />');
 
 			if (this.options.fullscreen) {
 				this.$floatbox.addClass('fullscreen');
@@ -72,9 +83,12 @@
 					self.close.apply(self);
 				}
 			});
-			$controls.on('click.floatbox', '.icon-close', function() {
+			$controls.on('click.floatbox', '.closeFloatbox', function() {
 				self.close.apply(self);
 			});
+
+			this.$floatbox.find(':focusable:first').focus();
+			this.$floatbox.trap();
 
 			this.$layer.data('floatbox', this);
 			$element.trigger('floatbox-open');
@@ -90,10 +104,15 @@
 			this.$layer.removeData('floatbox');
 			this.$layer.remove();
 			$viewport.children('.floatbox-layer:last').addClass('active');
+			lastFocusedElement.focus();
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
-				$('html').removeClass('floatbox-active');
+
+				$('html').removeClass('floatbox-active ieMobile');
+				if (null !== backupScrollTop) {
+					$(document).scrollTop(backupScrollTop);
+				}
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
 			$element.trigger('floatbox-close');
@@ -104,7 +123,7 @@
 				this.$floatbox.css('min-height', height);
 			} else {
 				var top = Math.max(0, ($viewport.outerHeight(true) - this.$floatbox.outerHeight()) / 4);
-				this.$floatbox.css('top', top);
+				this.$floatbox.css('margin-top', top);
 			}
 		}
 	});
