@@ -3,7 +3,7 @@
  @author Leon Gersen https://twitter.com/LeonGersen
  @license WTFPL http://www.wtfpl.net/about/
  @documentation http://refreshless.com/nouislider/
-*/
+ */
 
 // ==ClosureCompiler==
 // @externs_url http://refreshless.com/externs/jquery-1.8.js
@@ -21,8 +21,6 @@
 /*jslint white: true */
 /*jslint sub: true */
 
-/* ATTENTION: add this pull-request https://github.com/leongersen/noUiSlider/pull/161  */
-
 (function( $ ){
 
 	'use strict';
@@ -35,93 +33,93 @@
 
 		var
 		// Cache the document and body selectors;
-		 doc = $(document)
-		,body = $('body')
+			doc = $(document)
+			,body = $('body')
 
 		// Namespace for binding and unbinding slider events;
-		,namespace = '.nui'
+			,namespace = '.nui'
 
 		// Copy of the current value function;
-		,$VAL = $.fn.val
+			,$VAL = $.fn.val
 
 		// Re-usable list of classes;
-		,clsList = [
-		/*  0 */  'noUi-base'
-		/*  1 */ ,'noUi-origin'
-		/*  2 */ ,'noUi-handle'
-		/*  3 */ ,'noUi-input'
-		/*  4 */ ,'noUi-active'
-		/*  5 */ ,'noUi-state-tap'
-		/*  6 */ ,'noUi-target'
-		/*  7 */ ,'-lower'
-		/*  8 */ ,'-upper'
-		/*  9 */ ,'noUi-connect'
-		/* 10 */ ,'noUi-horizontal'
-		/* 11 */ ,'noUi-vertical'
-		/* 12 */ ,'noUi-background'
-		/* 13 */ ,'noUi-stacking'
-		/* 14 */ ,'noUi-block'
-		/* 15 */ ,'noUi-state-blocked'
-		/* 16 */ ,'noUi-ltr'
-		/* 17 */ ,'noUi-rtl'
-		/* 18 */ ,'noUi-dragable'
-		/* 19 */ ,'noUi-extended'
-		/* 20 */ ,'noUi-state-drag'
-		]
+			,clsList = [
+				/*  0 */  'noUi-base'
+				/*  1 */ ,'noUi-origin'
+				/*  2 */ ,'noUi-handle'
+				/*  3 */ ,'noUi-input'
+				/*  4 */ ,'noUi-active'
+				/*  5 */ ,'noUi-state-tap'
+				/*  6 */ ,'noUi-target'
+				/*  7 */ ,'-lower'
+				/*  8 */ ,'-upper'
+				/*  9 */ ,'noUi-connect'
+				/* 10 */ ,'noUi-horizontal'
+				/* 11 */ ,'noUi-vertical'
+				/* 12 */ ,'noUi-background'
+				/* 13 */ ,'noUi-stacking'
+				/* 14 */ ,'noUi-block'
+				/* 15 */ ,'noUi-state-blocked'
+				/* 16 */ ,'noUi-ltr'
+				/* 17 */ ,'noUi-rtl'
+				/* 18 */ ,'noUi-dragable'
+				/* 19 */ ,'noUi-extended'
+				/* 20 */ ,'noUi-state-drag'
+			]
 
 		// Determine the events to bind. IE11 implements pointerEvents without
 		// a prefix, which breaks compatibility with the IE10 implementation.
-		,actions = window.navigator['pointerEnabled'] ? {
-			 start: 'pointerdown'
-			,move: 'pointermove'
-			,end: 'pointerup'
-		} : window.navigator['msPointerEnabled'] ? {
-			 start: 'MSPointerDown'
-			,move: 'MSPointerMove'
-			,end: 'MSPointerUp'
-		} : {
-			 start: 'mousedown touchstart'
-			,move: 'mousemove touchmove'
-			,end: 'mouseup touchend'
-		};
+			,actions = window.navigator['pointerEnabled'] ? {
+				start: 'pointerdown'
+				,move: 'pointermove'
+				,end: 'pointerup'
+			} : window.navigator['msPointerEnabled'] ? {
+				start: 'MSPointerDown'
+				,move: 'MSPointerMove'
+				,end: 'MSPointerUp'
+			} : {
+				start: 'mousedown touchstart'
+				,move: 'mousemove touchmove'
+				,end: 'mouseup touchend'
+			};
 
 
-// Percentage calculation
+		// Percentage calculation
 
-	// (percentage) How many percent is this value of this range?
+		// (percentage) How many percent is this value of this range?
 		function fromPercentage ( range, value ) {
 			return (value * 100) / ( range[1] - range[0] );
 		}
 
-	// (percentage) Where is this value on this range?
+		// (percentage) Where is this value on this range?
 		function toPercentage ( range, value ) {
 			return fromPercentage( range, range[0] < 0 ?
 				value + Math.abs(range[0]) :
-					value - range[0] );
+				value - range[0] );
 		}
 
-	// (value) How much is this percentage on this range?
+		// (value) How much is this percentage on this range?
 		function isPercentage ( range, value ) {
 			return ((value * ( range[1] - range[0] )) / 100) + range[0];
 		}
 
 
-// Type tests
+		// Type tests
 
-	// Test in an object is an instance of jQuery or Zepto.
+		// Test in an object is an instance of jQuery or Zepto.
 		function isInstance ( a ) {
 			return a instanceof $ || ( $['zepto'] && $['zepto']['isZ'](a) );
 		}
 
-	// Checks whether a value is numerical.
+		// Checks whether a value is numerical.
 		function isNumeric ( a ) {
 			return !isNaN( parseFloat( a ) ) && isFinite( a );
 		}
 
 
-// General helper functions
+		// General helper functions
 
-	// Test an array of objects, and calls them if they are a function.
+		// Test an array of objects, and calls them if they are a function.
 		function call ( functions, scope ) {
 
 			// Allow the passing of an unwrapped function.
@@ -137,7 +135,7 @@
 			});
 		}
 
-	// Returns a proxy to set a target using the public value method.
+		// Returns a proxy to set a target using the public value method.
 		function setN ( target, number ) {
 
 			return function(){
@@ -152,12 +150,12 @@
 			};
 		}
 
-	// Round a value to the closest 'to'.
+		// Round a value to the closest 'to'.
 		function closest ( value, to ){
 			return Math.round(value / to) * to;
 		}
 
-	// Format output value to specified standards.
+		// Format output value to specified standards.
 		function format ( value, options ) {
 
 			// Round the value to the resolution that was set
@@ -174,7 +172,7 @@
 			return value.replace( '.', options['serialization']['mark'] );
 		}
 
-	// Determine the handle closest to an event.
+		// Determine the handle closest to an event.
 		function closestHandle ( handles, location, style ) {
 
 			if ( handles.length === 1 ) {
@@ -182,19 +180,19 @@
 			}
 
 			var total = handles[0].offset()[style] +
-						handles[1].offset()[style];
+				handles[1].offset()[style];
 
 			return handles[ location < total / 2 ? 0 : 1 ];
 		}
 
-	// Round away small numbers in floating point implementation.
+		// Round away small numbers in floating point implementation.
 		function digits ( value, round ) {
 			return parseFloat(value.toFixed(round));
 		}
 
-// Event abstraction
+		// Event abstraction
 
-	// Provide a clean event with standardized offset values.
+		// Provide a clean event with standardized offset values.
 		function fixEvent ( e ) {
 
 			// Prevent scrolling and panning on touch events, while
@@ -240,13 +238,13 @@
 			}
 
 			return $.extend( event, {
-				 'pointX': x
+				'pointX': x
 				,'pointY': y
 				,cursor: mouse
 			});
 		}
 
-	// Handler for attaching events trough a proxy
+		// Handler for attaching events trough a proxy
 		function attach ( events, element, callback, pass ) {
 
 			var target = pass.target;
@@ -259,7 +257,7 @@
 
 				// jQuery and Zepto handle unset attributes differently.
 				var disabled = target.attr('disabled');
-					disabled = !( disabled === undefined || disabled === null );
+				disabled = !( disabled === undefined || disabled === null );
 
 				// Test if there is anything that should prevent an event
 				// from being handled, such as a disabled state or an active
@@ -275,7 +273,7 @@
 				// Having the slider options as a function parameter prevents
 				// getting it in every function, which muddies things up.
 				callback (
-					 fixEvent( e )
+					fixEvent( e )
 					,pass
 					,target.data('base').data('options')
 				);
@@ -283,9 +281,9 @@
 		}
 
 
-// Serialization and value storage
+		// Serialization and value storage
 
-	// Store a value on all serialization targets, or get the current value.
+		// Store a value on all serialization targets, or get the current value.
 		function serialize ( a ) {
 
 			/*jshint validthis: true */
@@ -323,7 +321,7 @@
 			});
 		}
 
-	// Map serialization to [ element, method ]. Attach events where required.
+		// Map serialization to [ element, method ]. Attach events where required.
 		function storeElement ( handle, item, number ) {
 
 			// Add a change event to the supplied jQuery objects,
@@ -367,7 +365,7 @@
 			return [item];
 		}
 
-	// Access point and abstraction for serialization.
+		// Access point and abstraction for serialization.
 		function store ( handle, i, serialization ) {
 
 			var elements = [];
@@ -383,7 +381,7 @@
 			});
 
 			return {
-				 element: handle
+				element: handle
 				,elements: elements
 				,target: handle.data('target')
 				,'val': serialize
@@ -391,9 +389,9 @@
 		}
 
 
-// Handle placement
+		// Handle placement
 
-	// Fire callback on unsuccessful handle movement.
+		// Fire callback on unsuccessful handle movement.
 		function block ( base, stateless ) {
 
 			var target = base.data('target');
@@ -413,7 +411,7 @@
 			}
 		}
 
-	// Change inline style and apply proper classes.
+		// Change inline style and apply proper classes.
 		function placeHandle ( handle, to ) {
 
 			var settings = handle.data('options');
@@ -442,7 +440,7 @@
 			);
 		}
 
-	// Test suggested values and apply margin, step.
+		// Test suggested values and apply margin, step.
 		function setHandle ( handle, to ) {
 
 			var base = handle.data('base'), settings = base.data('options'),
@@ -481,7 +479,7 @@
 			return true;
 		}
 
-	// Handles movement by tapping
+		// Handles movement by tapping
 		function jump ( base, handle, to, callbacks ) {
 
 			// Flag the slider as it is now in a transitional state.
@@ -502,9 +500,9 @@
 		}
 
 
-// Event handlers
+		// Event handlers
 
-	// Handle movement on document for handle and range drag.
+		// Handle movement on document for handle and range drag.
 		function move ( event, Dt, Op ) {
 
 			// Map event movement to a slider percentage.
@@ -575,7 +573,7 @@
 			call( Op['slide'], Dt.target );
 		}
 
-	// Unbind move events on document, call callbacks.
+		// Unbind move events on document, call callbacks.
 		function end ( event, Dt, Op ) {
 
 			// The handle is no longer active, so remove the class.
@@ -598,7 +596,7 @@
 			call( Op['set'], Dt.target );
 		}
 
-	// Bind move events on document.
+		// Bind move events on document.
 		function start ( event, Dt, Op ) {
 
 			// Mark the handle as 'active' so it can be styled.
@@ -611,19 +609,19 @@
 
 			// Attach the move event.
 			attach ( actions.move, doc, move, {
-				 start: event
+				start: event
 				,base: Dt.base
 				,target: Dt.target
 				,handles: Dt.handles
 				,positions: [ Dt.handles[0].data('pct')
-					   ,Dt.handles[ Dt.handles.length - 1 ].data('pct') ]
+					,Dt.handles[ Dt.handles.length - 1 ].data('pct') ]
 				,point: Op['orientation'] ? 'pointY' : 'pointX'
 				,size: Op['orientation'] ? Dt.base.height() : Dt.base.width()
 			});
 
 			// Unbind all movement when the drag ends.
 			attach ( actions.end, doc, end, {
-				 target: Dt.target
+				target: Dt.target
 				,handles: Dt.handles
 			});
 
@@ -646,7 +644,7 @@
 			}
 		}
 
-	// Move closest handle to tapped location.
+		// Move closest handle to tapped location.
 		function tap ( event, Dt, Op ) {
 
 			var base = Dt.base, handle, to, point, size;
@@ -671,7 +669,7 @@
 			jump( base, handle, to, [ Op['slide'], Op['set'] ]);
 		}
 
-	// Move handle to edges when target gets tapped.
+		// Move handle to edges when target gets tapped.
 		function edge ( event, Dt, Op ) {
 
 			var handles = Dt.base.data('handles'), to, i;
@@ -685,23 +683,23 @@
 			jump ( Dt.base, handles[i], to, [ Op['slide'], Op['set'] ]);
 		}
 
-// API
+		// API
 
-	// Validate and standardize input.
+		// Validate and standardize input.
 		function test ( input, sliders ){
 
-	/*	Every input option is tested and parsed. This'll prevent
-		endless validation in internal methods. These tests are
-		structured with an item for every option available. An
-		option can be marked as required by setting the 'r' flag.
-		The testing function is provided with three arguments:
-			- The provided value for the option;
-			- A reference to the options object;
-			- The name for the option;
+			/*	Every input option is tested and parsed. This'll prevent
+			 endless validation in internal methods. These tests are
+			 structured with an item for every option available. An
+			 option can be marked as required by setting the 'r' flag.
+			 The testing function is provided with three arguments:
+			 - The provided value for the option;
+			 - A reference to the options object;
+			 - The name for the option;
 
-		The testing function returns false when an error is detected,
-		or true when everything is OK. It can also modify the option
-		object, to make sure all values can be correctly looped elsewhere. */
+			 The testing function returns false when an error is detected,
+			 or true when everything is OK. It can also modify the option
+			 object, to make sure all values can be correctly looped elsewhere. */
 
 			function values ( a ) {
 
@@ -726,7 +724,7 @@
 			}
 
 			var serialization = {
-				 resolution: function(q,o){
+				resolution: function(q,o){
 
 					// Parse the syntactic sugar that is the serialization
 					// resolution option to a usable integer.
@@ -776,7 +774,7 @@
 							typeof r === 'function' ||
 							r === false ||
 							( isInstance ( r[0] ) &&
-							  typeof r[0][r[1]] === 'function' );
+								typeof r[0][r[1]] === 'function' );
 					}
 
 					// Flatten the serialization array into a reliable
@@ -853,8 +851,8 @@
 				/*	Handles.
 				 *	Has default, can be 1 or 2.
 				 */
-				 'handles': {
-					 'r': true
+				'handles': {
+					'r': true
 					,'t': function(q){
 						q = parseInt(q, 10);
 						return ( q === 1 || q === 2 );
@@ -865,7 +863,7 @@
 				 *	which can't be identical.
 				 */
 				,'range': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 
 						o[w] = values(q);
@@ -873,14 +871,14 @@
 						// The values can't be identical.
 						return o[w] && o[w][0] !== o[w][1];
 					}
-				 }
+				}
 				/*	Start.
 				 *	Must be an array of two numerical floats when handles = 2;
 				 *	Uses 'range' test.
 				 *	When handles = 1, a single float is also allowed.
 				 */
 				,'start': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 						if( o['handles'] === 1 ){
 							if( $.isArray(q) ){
@@ -900,7 +898,7 @@
 				 *	Can use 'lower' and 'upper' when handles = 1.
 				 */
 				,'connect': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 
 						if ( q === 'lower' ) {
@@ -922,7 +920,7 @@
 				 *	Will default to horizontal, not required.
 				 */
 				,'orientation': {
-					 't': function(q,o,w){
+					't': function(q,o,w){
 						switch (q){
 							case 'horizontal':
 								o[w] = 0;
@@ -939,7 +937,7 @@
 				 *	Must be a float, has a default value.
 				 */
 				,'margin': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 						q = parseFloat(q);
 						o[w] = fromPercentage(o['range'], q);
@@ -950,7 +948,7 @@
 				 *	Required, can be 'ltr' or 'rtl'.
 				 */
 				,'direction': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 
 						switch ( q ) {
@@ -972,11 +970,11 @@
 				 *	dragging elements.
 				 */
 				,'behaviour': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 
 						o[w] = {
-							 'tap': q !== (q = q.replace('tap', ''))
+							'tap': q !== (q = q.replace('tap', ''))
 							,'extend': q !== (q = q.replace('extend', ''))
 							,'drag': q !== (q = q.replace('drag', ''))
 							,'fixed': q !== (q = q.replace('fixed', ''))
@@ -991,19 +989,19 @@
 				 *	one handle. 'mark' can be period (.) or comma (,).
 				 */
 				,'serialization': {
-					 'r': true
+					'r': true
 					,'t': function(q,o,w){
 
 						return serialization.to( q['to'], o, w ) &&
-							   serialization.resolution( q['resolution'], o ) &&
-							   serialization.mark( q['mark'], o, w );
+							serialization.resolution( q['resolution'], o ) &&
+							serialization.mark( q['mark'], o, w );
 					}
 				}
 				/*	Slide.
 				 *	Not required. Must be a function.
 				 */
 				,'slide': {
-					 't': function(q){
+					't': function(q){
 						return $.isFunction(q);
 					}
 				}
@@ -1012,7 +1010,7 @@
 				 *	Tested using the 'slide' test.
 				 */
 				,'set': {
-					 't': function(q){
+					't': function(q){
 						return $.isFunction(q);
 					}
 				}
@@ -1021,7 +1019,7 @@
 				 *	Tested using the 'slide' test.
 				 */
 				,'block': {
-					 't': function(q){
+					't': function(q){
 						return $.isFunction(q);
 					}
 				}
@@ -1029,7 +1027,7 @@
 				 *	Not required.
 				 */
 				,'step': {
-					 't': function(q,o,w){
+					't': function(q,o,w){
 						q = parseFloat(q);
 						o[w] = fromPercentage ( o['range'], q );
 						return isNumeric(q);
@@ -1045,7 +1043,7 @@
 
 				// If the value is required but not set, fail.
 				if( ( test['r'] && !isSet ) ||
-				// If the test returns false, fail.
+					// If the test returns false, fail.
 					( isSet && !test['t']( value, input, name ) ) ){
 
 					// For debugging purposes it might be very useful to know
@@ -1065,7 +1063,7 @@
 			});
 		}
 
-	// Parse options, add classes, attach events, create HTML.
+		// Parse options, add classes, attach events, create HTML.
 		function create ( options ) {
 
 			/*jshint validthis: true */
@@ -1078,7 +1076,7 @@
 
 			// Set defaults where applicable;
 			options = $.extend({
-				 'handles': 2
+				'handles': 2
 				,'margin': 0
 				,'connect': false
 				,'direction': 'ltr'
@@ -1112,11 +1110,12 @@
 				// Apply classes and data to the target.
 				target.data('base', base).addClass([
 					clsList[6]
-				   ,clsList[16 + options['direction']]
-				   ,clsList[10 + options['orientation']] ].join(' '));
+					,clsList[16 + options['direction']]
+					,clsList[10 + options['orientation']] ].join(' '));
 
 				for (i = 0; i < options['handles']; i++ ) {
-					handle = $('<div><a href="javascript:;"/></div>').appendTo(base);
+
+					handle = $('<div><div/></div>').appendTo(base);
 
 					// Add all default and option-specific classes to the
 					// origins and handles.
@@ -1124,12 +1123,12 @@
 
 					handle.children().addClass([
 						clsList[2]
-					   ,clsList[2] + clsList[ 7 + options['direction'] +
-						( options['direction'] ? -1 * i : i ) ]].join(' ') );
+						,clsList[2] + clsList[ 7 + options['direction'] +
+							( options['direction'] ? -1 * i : i ) ]].join(' ') );
 
 					// Make sure every handle has access to all variables.
 					handle.data({
-						 'base': base
+						'base': base
 						,'target': target
 						,'options': options
 						,'grab': handle.children()
@@ -1152,20 +1151,20 @@
 				// renaming and provide a minor compression benefit.
 				switch ( options['connect'] ) {
 					case 1:	target.addClass( clsList[9] );
-							handles[0].addClass( clsList[12] );
-							break;
+						handles[0].addClass( clsList[12] );
+						break;
 					case 3: handles[1].addClass( clsList[12] );
-							/* falls through */
+					/* falls through */
 					case 2: handles[0].addClass( clsList[9] );
-							/* falls through */
+					/* falls through */
 					case 0: target.addClass(clsList[12]);
-							break;
+						break;
 				}
 
 				// Merge base classes with default,
 				// and store relevant data on the base element.
 				base.addClass( clsList[0] ).data({
-					 'target': target
+					'target': target
 					,'options': options
 					,'handles': handles
 				});
@@ -1180,7 +1179,7 @@
 						// These events are only bound to the visual handle
 						// element, not the 'real' origin element.
 						attach ( actions.start, handles[i].children(), start, {
-							 base: base
+							base: base
 							,target: target
 							,handles: [ handles[i] ]
 						});
@@ -1190,7 +1189,7 @@
 				// Attach the tap event to the slider base.
 				if ( options['behaviour']['tap'] ) {
 					attach ( actions.start, base, tap, {
-						 base: base
+						base: base
 						,target: target
 					});
 				}
@@ -1202,7 +1201,7 @@
 
 					if ( options['behaviour']['tap'] ) {
 						attach ( actions.start, target, edge, {
-							 base: base
+							base: base
 							,target: target
 						});
 					}
@@ -1223,7 +1222,7 @@
 					}
 
 					attach ( actions.start, dragable, start, {
-						 base: base
+						base: base
 						,target: target
 						,handles: handles
 					});
@@ -1231,7 +1230,7 @@
 			});
 		}
 
-	// Return value for the slider, relative to 'range'.
+		// Return value for the slider, relative to 'range'.
 		function getValue ( ) {
 
 			/*jshint validthis: true */
@@ -1258,7 +1257,7 @@
 			return answer;
 		}
 
-	// Set value for the slider, relative to 'range'.
+		// Set value for the slider, relative to 'range'.
 		function setValue ( args, set ) {
 
 			/*jshint validthis: true */
@@ -1335,7 +1334,7 @@
 			});
 		}
 
-	// Unbind all attached events, remove classed and HTML.
+		// Unbind all attached events, remove classed and HTML.
 		function destroy ( target ) {
 
 			// Start the list of elements to be unbound with the target.
@@ -1360,8 +1359,8 @@
 			target.empty().removeData('base options');
 		}
 
-	// Merge options with current initialization, destroy slider
-	// and reinitialize.
+		// Merge options with current initialization, destroy slider
+		// and reinitialize.
 		function build ( options ) {
 
 			/*jshint validthis: true */
@@ -1396,9 +1395,9 @@
 			});
 		}
 
-	// Overwrite the native jQuery value function
-	// with a simple handler. noUiSlider will use the internal
-	// value method, anything else will use the standard method.
+		// Overwrite the native jQuery value function
+		// with a simple handler. noUiSlider will use the internal
+		// value method, anything else will use the standard method.
 		$.fn.val = function(){
 
 			// If the function is called without arguments,

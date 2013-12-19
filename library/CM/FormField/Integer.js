@@ -23,10 +23,12 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			}
 		});
 
+		$slider.find('.noUi-handle').attr('tabindex', '0');
+
 		$input.watch('disabled', function(propName, oldVal, newVal) {
 			if (false == newVal) {
 				$slider.removeAttr('disabled');
-				$slider.find('.noUi-handle').removeAttr('tabindex');
+				$slider.find('.noUi-handle').attr('tabindex', '0');
 			} else {
 				$slider.attr('disabled', 'disabled');
 				$slider.find('.noUi-handle').attr('tabindex', '-1');
