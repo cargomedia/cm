@@ -996,13 +996,6 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 		$user = CM_Model_Abstract::createType(CM_Model_User::getTypeStatic());
 		$this->assertInstanceOf('CM_Model_User', $user);
 	}
-
-	public function testTypeConstants() {
-		foreach (CM_Model_Abstract::getClassChildren() as $class) {
-			$classReflection = new ReflectionClass($class);
-			$this->assertArrayHasKey('TYPE', $classReflection->getConstants(), 'No `TYPE` constant defined for `' . $class . '`');
-		}
-	}
 }
 
 class CM_ModelMock extends CM_Model_Abstract {

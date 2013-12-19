@@ -2,8 +2,6 @@
 
 class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
-	const TYPE = 18;
-
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
 	}
 

@@ -2,8 +2,6 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
-	const TYPE = 77;
-
 	public function synchronize() {
 		$startStampLimit = time() - 3;
 		$status = array();
