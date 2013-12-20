@@ -120,6 +120,19 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$hostHeader = $this->getHeader('host');
+		$host = parse_url($hostHeader, PHP_URL_HOST);
+		if (false === $host) {
+			throw new CM_Exception_Invalid('Cannot detect host from `' . $hostHeader . '`.');
+		}
+		return $host;
+	}
+
+	/**
+	 * @return string
 	 */
 	public final function getPath() {
 		return $this->_path;
