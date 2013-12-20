@@ -202,7 +202,7 @@ class CM_App {
 	 * @return string
 	 */
 	public function generateConfigClassTypes() {
-		$this->_ensureTypeUniqueness();
+		// $this->_ensureTypeUniqueness();
 		$content = '';
 		$typeNamespaces = array('CM_Site_Abstract', 'CM_Action_Abstract', 'CM_Model_Abstract', 'CM_Model_ActionLimit_Abstract',
 			'CM_Model_Entity_Abstract', 'CM_Model_StreamChannel_Abstract', 'CM_Mail', 'CM_Paging_Log_Abstract', 'CM_Paging_ContentList_Abstract',);
