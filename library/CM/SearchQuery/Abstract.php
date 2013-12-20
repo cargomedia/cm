@@ -92,13 +92,21 @@ class CM_SearchQuery_Abstract {
 		}
 	}
 
-	public function filterRange($field, $min = null, $max = null) {
+	public function filterRange($field, $from = null, $to = null, $openIntervalMin = null, $openIntervalMax = null) {
 		$range = array();
-		if ($min !== null) {
-			$range['from'] = $min;
+		if ($from !== null) {
+			$operand = 'gte';
+			if ($openIntervalMin) {
+				$operand = 'gt';
+			}
+			$range[$operand] = $from;
 		}
-		if ($max !== null) {
-			$range['to'] = $max;
+		if ($to !== null) {
+			$operand = 'lte';
+			if ($openIntervalMax) {
+				$operand = 'lt';
+			}
+			$range[$operand] = $to;
 		}
 		if (!empty($range)) {
 			$this->_filter(array('range' => array($field => $range)));
