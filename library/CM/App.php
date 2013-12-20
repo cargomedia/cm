@@ -44,6 +44,11 @@ class CM_App {
 		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
 		if (!$databaseExists) {
 			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+		}
+
+		$client->setDb($configDb->db);
+		$databaseHasTables = (bool) $client->createStatement('SHOW TABLES')->execute()->fetchAll();
+		if (!$databaseHasTables) {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Db_Db::runDump($configDb->db, $dump);
 			}
