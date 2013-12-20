@@ -96,21 +96,21 @@ class CM_SearchQuery_Abstract {
 	 * @param string        $field
 	 * @param int|null      $from
 	 * @param int|null      $to
-	 * @param boolean|null  $openIntervalMin
-	 * @param booleant|null $openIntervalMax
+	 * @param boolean|null  $openIntervalFrom
+	 * @param booleant|null $openIntervalTo
 	 */
-	public function filterRange($field, $from = null, $to = null, $openIntervalMin = null, $openIntervalMax = null) {
+	public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
 		$range = array();
 		if ($from !== null) {
 			$operand = 'gte';
-			if ($openIntervalMin) {
+			if ($openIntervalFrom) {
 				$operand = 'gt';
 			}
 			$range[$operand] = $from;
 		}
 		if ($to !== null) {
 			$operand = 'lte';
-			if ($openIntervalMax) {
+			if ($openIntervalTo) {
 				$operand = 'lt';
 			}
 			$range[$operand] = $to;
