@@ -8,8 +8,8 @@ class CM_SearchQuery_Abstract {
 	private $_mode, $_filterMode;
 
 	/**
-	 * @param string|null         $mode       must,must_not,should
-	 * @param string|null         $filterMode or, and, not
+	 * @param string|null $mode       must,must_not,should
+	 * @param string|null $filterMode or, and, not
 	 */
 	function __construct($mode = null, $filterMode = null) {
 		if (is_null($mode)) {
@@ -40,7 +40,7 @@ class CM_SearchQuery_Abstract {
 	/**
 	 * @param string[]    $fields
 	 * @param string      $value
-	 * @param string|null $operator 'or' / 'and'
+	 * @param string|null $operator  'or' / 'and'
 	 * @param float|null  $fuzziness 0 - 1
 	 */
 	public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
@@ -92,6 +92,13 @@ class CM_SearchQuery_Abstract {
 		}
 	}
 
+	/**
+	 * @param string        $field
+	 * @param int|null      $from
+	 * @param int|null      $to
+	 * @param boolean|null  $openIntervalMin
+	 * @param booleant|null $openIntervalMax
+	 */
 	public function filterRange($field, $from = null, $to = null, $openIntervalMin = null, $openIntervalMax = null) {
 		$range = array();
 		if ($from !== null) {
