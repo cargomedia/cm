@@ -730,7 +730,7 @@ var CM_App = CM_Class_Abstract.extend({
 				cm.error.trigger(msg, type, isPublic);
 			}
 		};
-		return $.ajax(url, {
+		var jqXHR = $.ajax(url, {
 			data: JSON.stringify(data),
 			type: 'POST',
 			dataType: 'json',
@@ -749,8 +749,12 @@ var CM_App = CM_Class_Abstract.extend({
 				if (xhr.status == 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
+
 				var msg = xhr.responseText || textStatus;
-				errorHandler(msg, 'XHR', false, callbacks.error);
+				if (!cm.options.debug) {
+					msg = 'Some unexpected connection problem occured. Please try again.'
+				}
+				errorHandler(msg, null, false, callbacks.error);
 			},
 			complete: function() {
 				if (callbacks.complete) {
@@ -758,6 +762,9 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 		});
+		jqXHR.retry({times:3});
+
+		return jqXHR;
 	},
 
 	/**
