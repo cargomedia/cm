@@ -750,9 +750,9 @@ var CM_App = CM_Class_Abstract.extend({
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
 
-				var msg = xhr.responseText || textStatus;
-				if (!cm.options.debug) {
-					msg = 'Some unexpected connection problem occured. Please try again.'
+				var msg = cm.language.get('Some unexpected connection problem occurred.')
+				if (cm.options.debug) {
+					msg = xhr.responseText || textStatus;
 				}
 				errorHandler(msg, null, false, callbacks.error);
 			},
@@ -762,7 +762,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 		});
-		jqXHR.retry({times:3});
+		jqXHR.retry({times: 3});
 
 		return jqXHR;
 	},
