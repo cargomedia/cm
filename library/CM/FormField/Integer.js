@@ -9,7 +9,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 		var field = this;
 		var $input = this.$('input');
 		var $slider = this.$('.noUiSlider');
-		var $sliderValue = field.$('.noUiSlider-value');
+		var $sliderValue = this.$('.noUiSlider-value');
 
 		$slider.noUiSlider({
 			range: [field.getOption('min'), field.getOption('max')],
