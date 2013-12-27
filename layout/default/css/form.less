@@ -68,6 +68,7 @@ label {
 	line-height: @sizeButton - 2px;
 	min-width: @sizeButton;
 	max-width: 100%;
+	padding: 0 8px;
 	overflow: hidden;
 	margin: 1px;
 	font-weight: bold;
@@ -75,11 +76,16 @@ label {
 	vertical-align: top;
 	white-space: nowrap;
 	border-radius: 0;
-	.transition(.1s);
-	padding: 0 8px;
+	background-size: auto 200%;
+	background-position: 0 0;
+	.transition(200ms);
 
 	&:active {
-		box-shadow: inset 0 3 5px rgba(0, 0, 0, 0.125);
+		box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+	}
+
+	&:not(:disabled):hover {
+		background-position: 0 100%;
 	}
 
 	&:focus {
@@ -116,77 +122,50 @@ label {
 }
 
 .button-default-active {
-	.gradient(vertical, darken(@colorBgButtonDefault, 12), darken(@colorBgButtonDefault, 12));
+	background: darken(@colorBgButtonDefault, 8);
 }
 
 .button-default {
+	.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 10));
 	border: 1px solid @colorFgBorderEmphasize3;
-	.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 6));
 	color: lighten(@colorFg, 25);
 	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
 
-	&:not(:disabled):hover {
-		border-color: darken(@colorFgBorderEmphasize3, 10);
-		.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 12));
-		color: @colorFg;
-	}
-
 	&:active {
-		.button-default-active;
+		border-color: darken(@colorFgBorderEmphasize3, 5);
 	}
 }
 
 .button-highlight {
+	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -6));
 	border: 1px solid spin(@colorBgButtonHighlight, -3);
-	background-color: @colorBgButtonHighlight;
-	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -3));
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
 
-	&:not(:disabled):hover {
-		.gradient(vertical, spin(@colorBgButtonHighlight, -2), spin(@colorBgButtonHighlight, -8));
-		color: @colorFgTheme;
-	}
-
 	&:active {
 		border-color: spin(@colorBgButtonHighlight, -15);
-		background: spin(@colorBgButtonHighlight, -12);
 	}
 }
 
 .button-success {
-	border: 1px solid lighten(@colorOk, 3);
 	.gradient(vertical, lighten(@colorOk, 9), lighten(@colorOk, 3));
+	border: 1px solid lighten(@colorOk, 3);
 	color: @colorFgTheme;
 	text-shadow: 1px 1px spin(@colorOk, -8);
 
-	&:not(:disabled):hover {
-		border-color: @colorOk;
-		.gradient(vertical, lighten(@colorOk, 6), @colorOk);
-		color: @colorFgTheme;
-	}
-
 	&:active {
 		border-color: darken(@colorOk, 6);
-		background: @colorOk;
 	}
 }
 
 .button-danger {
-	border: 1px solid @colorError;
 	.gradient(vertical, lighten(@colorError, 10), @colorError);
-	color: @colorBg;
+	border: 1px solid @colorError;
+	color: @colorFgTheme;
 	text-shadow: 1px 1px @colorError;
-
-	&:not(:disabled):hover {
-		border-color: @colorError;
-		.gradient(vertical, lighten(@colorError, 6), darken(@colorError, 6));
-		color: @colorFgTheme;
-	}
 
 	&:active {
 		border-color: darken(@colorError, 12);
-		background: darken(@colorError, 6);
 	}
 }
 
