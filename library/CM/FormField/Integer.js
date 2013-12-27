@@ -18,7 +18,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			handles: 1,
 			behaviour: 'extend-tap',
 			serialization: {
-				to: [ $sliderValue, 'html' ],
+				to: [[$input, [$sliderValue, 'html']]],
 				resolution: 1
 			}
 		});
