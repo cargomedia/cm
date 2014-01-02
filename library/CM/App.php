@@ -47,8 +47,8 @@ class CM_App {
 		}
 
 		$client->setDb($configDb->db);
-		$databaseHasTables = (bool) $client->createStatement('SHOW TABLES')->execute()->fetchAll();
-		if (!$databaseHasTables) {
+		$tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
+		if (0 === count($tables)) {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Db_Db::runDump($configDb->db, $dump);
 			}
