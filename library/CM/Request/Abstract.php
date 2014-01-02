@@ -124,10 +124,7 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getHost() {
 		$hostHeader = $this->getHeader('host');
-		$host = parse_url($hostHeader, PHP_URL_HOST);
-		if (false === $host) {
-			throw new CM_Exception_Invalid('Cannot detect host from `' . $hostHeader . '`.');
-		}
+		$host = preg_replace('#:\d+$#', '', $hostHeader);
 		return $host;
 	}
 
