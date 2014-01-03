@@ -120,6 +120,16 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$hostHeader = $this->getHeader('host');
+		$host = preg_replace('#:\d+$#', '', $hostHeader);
+		return $host;
+	}
+
+	/**
+	 * @return string
 	 */
 	public final function getPath() {
 		return $this->_path;
