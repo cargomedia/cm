@@ -14,7 +14,13 @@
 			var updateLabel = function() {
 				var index = $select.get(0).selectedIndex;
 				var label = $select.find('option').eq(index).text();
-				$this.find('.button .label').text(label);
+
+				var labelPrefix = $select.attr('data-labelPrefix');
+				if (labelPrefix) {
+					label = '<span class="labelPrefix">' + labelPrefix + '</span>' + label;
+				}
+
+				$this.find('.button .label').html(label);
 			};
 			$select.on('change', function() {
 				updateLabel();

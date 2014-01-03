@@ -11,5 +11,6 @@
 	{formField name='boolean' text="{translate 'Bool'}"}
 	{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
 	{formField name='setSelect2' label="{translate 'Set Select'}"}
+	{formField name='setSelect3' label="{translate 'Set Select with Prefix'}" labelPrefix="{translate 'Sex'}"}
 	{formAction action='Go' label="{translate 'Go'}"}
 {/form}

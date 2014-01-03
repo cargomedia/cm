@@ -30,6 +30,11 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		$placeholder = ' -' . $render->getTranslation('Select') . '- ';
 	}
 
+	$labelPrefix = null;
+	if (isset($params['labelPrefix'])) {
+		$labelPrefix = CM_Util::htmlspecialchars($params['labelPrefix']);
+	}
+
 	foreach ($optionList as $itemValue => $itemLabel) {
 		if ($translate) {
 			$optionList[$itemValue] = $render->getTranslation($translatePrefix . $itemLabel, array());
@@ -44,6 +49,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$html = '';
 	$html .= '<select';
+	$html .= $labelPrefix ? ' data-labelPrefix="' . $labelPrefix . '"' : '';
 	foreach ($htmlAttributes as $name) {
 		if (isset($params[$name])) {
 			$html .= ' ' . $name . '="' . CM_Util::htmlspecialchars($params[$name]) . '"';
@@ -72,7 +78,9 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$html .= '</select>';
 
 	$html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
-	$html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-select"></span>';
+	$html .= '<span class="label">';
+	$html .= $labelPrefix ? '<span class="labelPrefix">' . $labelPrefix . '</span>' : '';
+	$html .= $selectedLabel . '</span><span class="icon icon-select"></span>';
 	$html .= '</div>';
 
 	return '<div class="fancySelect">' . $html . '</div>';
