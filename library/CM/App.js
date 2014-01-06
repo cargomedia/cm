@@ -750,7 +750,7 @@ var CM_App = CM_Class_Abstract.extend({
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
 
-				var msg = cm.language.get('Some unexpected connection problem occurred.')
+				var msg = cm.language.get('An unexpected connection problem occurred.');
 				if (cm.options.debug) {
 					msg = xhr.responseText || textStatus;
 				}
