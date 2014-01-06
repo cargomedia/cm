@@ -737,8 +737,7 @@ var CM_App = CM_Class_Abstract.extend({
 			contentType: 'application/json',
 			cache: false
 		});
-		jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]})
-			.done(function(response) {
+		jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
 				if (response.error) {
 					errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
 				} else if (response.success) {
@@ -746,8 +745,7 @@ var CM_App = CM_Class_Abstract.extend({
 						callbacks.success(response.success);
 					}
 				}
-			})
-			.fail(function(xhr, textStatus) {
+			}).fail(function(xhr, textStatus) {
 				if (xhr.status == 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
@@ -757,13 +755,11 @@ var CM_App = CM_Class_Abstract.extend({
 					msg = xhr.responseText || textStatus;
 				}
 				errorHandler(msg, null, false, callbacks.error);
-			})
-			.always(function() {
+			}).always(function() {
 				if (callbacks.complete) {
 					callbacks.complete();
 				}
-			}
-		);
+			});
 
 		return jqXHR;
 	},
