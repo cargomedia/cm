@@ -61,6 +61,12 @@ class CM_App {
 				}, $app->getVersion());
 				$app->setVersion($version, $namespace);
 			}
+			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
+				$path = CM_Util::getNamespacePath($namespace) . 'resources/db/setup.php';
+				if (CM_File::exists($path)) {
+					require $path;
+				}
+			}
 		}
 	}
 
