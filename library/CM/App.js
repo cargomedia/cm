@@ -762,7 +762,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 		});
-		jqXHR.retry({times: 3});
+		jqXHR.retry({times: 3, statusCodes: [405, 500, 502, 504, 522]});
 
 		return jqXHR;
 	},
