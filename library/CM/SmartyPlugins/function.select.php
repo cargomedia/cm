@@ -49,7 +49,11 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$html = '';
 	$html .= '<select';
-	$html .= $labelPrefix ? ' data-labelPrefix="' . $labelPrefix . '"' : '';
+
+	if ($labelPrefix) {
+		$html .= ' data-labelPrefix="' . $labelPrefix . '"';
+	}
+
 	foreach ($htmlAttributes as $name) {
 		if (isset($params[$name])) {
 			$html .= ' ' . $name . '="' . CM_Util::htmlspecialchars($params[$name]) . '"';
@@ -79,7 +83,11 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
 	$html .= '<span class="label">';
-	$html .= $labelPrefix ? '<span class="labelPrefix">' . $labelPrefix . '</span>' : '';
+
+	if ($labelPrefix) {
+		$html .= '<span class="labelPrefix">' . $labelPrefix . '</span>';
+	}
+
 	$html .= $selectedLabel . '</span><span class="icon icon-select"></span>';
 	$html .= '</div>';
 
