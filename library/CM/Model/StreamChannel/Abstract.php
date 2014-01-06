@@ -163,7 +163,7 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
 			if (false === ($type = $cache->get($cacheKey))) {
 				$type = CM_Db_Db::select('cm_streamChannel', 'type', array('id' => $id))->fetchColumn();
 				if (false === $type) {
-					throw new CM_Exception_Invalid('No record found in `cm_streamChannel` for id `' . $id . '`');
+					throw new CM_Exception_NonExistent('No record found in `cm_streamChannel` for id `' . $id . '`');
 				}
 				$cache->set($cacheKey, $type);
 			}
