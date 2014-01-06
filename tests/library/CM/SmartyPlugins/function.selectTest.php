@@ -115,7 +115,6 @@ class smarty_function_selectTest extends CMTest_TestCase {
 			'labelPrefix' => 'foobar',
 		));
 
-		$this->assertContains('data-labelPrefix="foobar"', $htmlObject->getHtml());
 		$this->assertEquals('foobar', $htmlObject->getText('.labelPrefix'));
 	}
 
