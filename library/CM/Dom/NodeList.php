@@ -2,6 +2,7 @@
 
 class CM_Dom_NodeList implements Iterator, Countable {
 
+	/** @var int */
 	private $_iteratorPosition;
 
 	/** @var DOMDocument */
