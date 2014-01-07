@@ -1,7 +1,7 @@
 {
 	"name": "cargomedia/CM",
 	"require": {
-		"smarty/smarty": "3.1.14",
+		"smarty/smarty": "3.1.16",
 		"leafo/lessphp": "0.3.*",
 		"easybook/geshi": "1.0.8.11",
 		"amazonwebservices/aws-sdk-for-php": "1.5.*",

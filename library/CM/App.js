@@ -730,13 +730,14 @@ var CM_App = CM_Class_Abstract.extend({
 				cm.error.trigger(msg, type, isPublic);
 			}
 		};
-		return $.ajax(url, {
+		var jqXHR = $.ajax(url, {
 			data: JSON.stringify(data),
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
-			cache: false,
-			success: function(response) {
+			cache: false
+		});
+		jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
 				if (response.error) {
 					errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
 				} else if (response.success) {
@@ -744,20 +745,23 @@ var CM_App = CM_Class_Abstract.extend({
 						callbacks.success(response.success);
 					}
 				}
-			},
-			error: function(xhr, textStatus) {
+			}).fail(function(xhr, textStatus) {
 				if (xhr.status == 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
-				var msg = xhr.responseText || textStatus;
-				errorHandler(msg, 'XHR', false, callbacks.error);
-			},
-			complete: function() {
+
+				var msg = cm.language.get('An unexpected connection problem occurred.');
+				if (cm.options.debug) {
+					msg = xhr.responseText || textStatus;
+				}
+				errorHandler(msg, null, false, callbacks.error);
+			}).always(function() {
 				if (callbacks.complete) {
 					callbacks.complete();
 				}
-			}
-		});
+			});
+
+		return jqXHR;
 	},
 
 	/**
