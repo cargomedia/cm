@@ -7,7 +7,7 @@ $english->setTranslation('Cancel', 'Cacnel');
 $english->setTranslation('Confirmation', 'Confirmation');
 $english->setTranslation('{$label} is required.', '{$label} is required.', array('label'));
 $english->setTranslation('Required', 'Required');
-$english->setTranslation('Please Confirm', 'Please confirm');
+$english->setTranslation('Please Confirm', 'Please Confirm');
 $english->setTranslation('Year', 'Year');
 $english->setTranslation('Month', 'Month');
 $english->setTranslation('Day', 'Day');
