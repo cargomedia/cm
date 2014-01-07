@@ -336,6 +336,50 @@ class CM_Model_Location extends CM_Model_Abstract {
 	}
 
 	/**
+	 * @param string $name
+	 * @param string $abbreviation
+	 * @return CM_Model_Location
+	 */
+	public static function createCountry ($name, $abbreviation) {
+		$countryId = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => $abbreviation, 'name' => $name));
+		return new self(self::LEVEL_COUNTRY, $countryId);
+	}
+
+	/**
+	 * @param string $name
+	 * @param CM_Model_Location $country
+	 * @return CM_Model_Location
+	 */
+	public static function createState ($name, CM_Model_Location $country) {
+		$countryId = $country->getId(self::LEVEL_COUNTRY);
+		$stateId =  CM_Db_Db::insert('cm_locationState', array('countryId' => $countryId, 'name' => $name));
+		return new self(self::LEVEL_STATE, $stateId);
+	}
+
+	public static function createCity ($name, $latitude, $longitude, CM_Model_Location $country, CM_Model_Location $state = null) {
+		$stateId = null;
+		if ($state) {
+			$stateId = $state->getId(self::LEVEL_STATE);
+		}
+		$countryId = $country->getId(self::LEVEL_COUNTRY);
+		$cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+		return new self(self::LEVEL_CITY, $cityId);
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $latitude
+	 * @param int $longitude
+	 * @param CM_Model_Location $city
+	 * @return CM_Model_Location
+	 */
+	public static function createZip ($name, $latitude, $longitude, CM_Model_Location $city) {
+		$cityId = $city->getId(self::LEVEL_CITY);
+		$zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+		return new self(self::LEVEL_ZIP, $zipId);
+	}
+
+	/**
 	 * @return string[]
 	 */
 	private static function _getUSStateAbbreviationList() {
