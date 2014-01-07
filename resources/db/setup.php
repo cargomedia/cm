@@ -1,16 +1,13 @@
 <?php
 
 $english = CM_Model_Language::create('English', 'en', true);
-$english->setTranslation('You', 'You');
 $english->setTranslation('Ok', 'Ok');
-$english->setTranslation('Cancel', 'Cacnel');
-$english->setTranslation('Confirmation', 'Confirmation');
+$english->setTranslation('Cancel', 'Cancel');
+$english->setTranslation('Close', 'Close');
 $english->setTranslation('{$label} is required.', '{$label} is required.', array('label'));
 $english->setTranslation('Required', 'Required');
 $english->setTranslation('Please Confirm', 'Please Confirm');
-$english->setTranslation('Year', 'Year');
-$english->setTranslation('Month', 'Month');
-$english->setTranslation('Day', 'Day');
+$english->setTranslation('Confirmation', 'Confirmation');
 $english->setTranslation('.date.month.1', 'January');
 $english->setTranslation('.date.month.2', 'February');
 $english->setTranslation('.date.month.3', 'March');
@@ -38,9 +35,8 @@ $english->setTranslation('.date.timeago.month', 'about a month');
 $english->setTranslation('.date.timeago.months', '{$count} months');
 $english->setTranslation('.date.timeago.year', 'about a year');
 $english->setTranslation('.date.timeago.years', '{$count} years');
-$english->setTranslation('The content you tried to interact with has been deleted.', 'The content you tried to interact with has been deleted.');
-$english->setTranslation('Your browser is no longer supported. Click here to upgrade…', 'Your browser is no longer supported. Click here to upgrade…');
 $english->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
 $english->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.', array('file',
 	'extensions'));
+$english->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred');
 
