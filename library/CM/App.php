@@ -61,6 +61,9 @@ class CM_App {
 				}, $app->getVersion());
 				$app->setVersion($version, $namespace);
 			}
+			foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
+				require $setupScript->getPath();
+			}
 		}
 	}
 
