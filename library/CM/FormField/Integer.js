@@ -18,7 +18,9 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			handles: 1,
 			behaviour: 'extend-tap',
 			serialization: {
-				to: [[$input, [$sliderValue, 'html']]],
+				to: [
+					[$input, [$sliderValue, 'html']]
+				],
 				resolution: 1
 			}
 		});
@@ -35,20 +37,10 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			}
 		});
 
-		$(window).bind('keydown.noUiSlider', function(event) {
-			if ($slider.find('.noUi-handle').is(':focus')) {
-				if (event.which === cm.keyCode.LEFT) {
-					field.sliderDown();
-				}
-				if (event.which === cm.keyCode.RIGHT) {
-					field.sliderUp();
-				}
-			}
-		});
+		this.bindJquery($(window), 'keydown.noUiSlider', this._onKeyDown);
 
 		this.on('destruct', function() {
 			$input.unwatch('disabled');
-			$(window).unbind('keydown.noUiSlider');
 		});
 	},
 
@@ -60,5 +52,16 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 	sliderUp: function() {
 		var value = parseInt(this.$('.noUiSlider').val());
 		this.$('.noUiSlider').val(value + this.getOption('step'))
+	},
+
+	_onKeyDown: function(event) {
+		if (this.$('.noUiSlider').find('.noUi-handle').is(':focus')) {
+			if (event.which === cm.keyCode.LEFT) {
+				this.sliderDown();
+			}
+			if (event.which === cm.keyCode.RIGHT) {
+				this.sliderUp();
+			}
+		}
 	}
 });
