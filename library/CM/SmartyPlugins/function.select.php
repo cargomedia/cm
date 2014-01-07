@@ -32,7 +32,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 
 	$labelPrefix = null;
 	if (isset($params['labelPrefix'])) {
-		$labelPrefix = CM_Util::htmlspecialchars($params['labelPrefix']);
+		$labelPrefix = (string) $params['labelPrefix'];
 	}
 
 	foreach ($optionList as $itemValue => $itemLabel) {
@@ -79,7 +79,7 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
 
 	if ($labelPrefix) {
-		$html .= '<span class="labelPrefix">' . $labelPrefix . '</span>';
+		$html .= '<span class="labelPrefix">' . CM_Util::htmlspecialchars($labelPrefix) . '</span>';
 	}
 	$html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-select"></span>';
 	$html .= '</div>';
