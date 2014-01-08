@@ -62,21 +62,13 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 		if (this._$noUiHandle.is(':focus')) {
 			if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
 				this.sliderDown();
-				this._preventDefault(event);
+				event.preventDefault();
 			}
 			if (event.which === cm.keyCode.RIGHT || event.which === cm.keyCode.UP) {
 				this.sliderUp();
-				this._preventDefault(event);
+				event.preventDefault();
 			}
 
-		}
-	},
-
-	_preventDefault: function(event){
-		if (event.preventDefault) {
-			event.preventDefault();
-		} else {
-			event.returnValue = false;
 		}
 	}
 });
