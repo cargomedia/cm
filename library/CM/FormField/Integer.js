@@ -41,7 +41,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			}
 		});
 
-		this.bindJquery($(window), 'keydown.noUiSlider', this._onKeyDown);
+		this.bindJquery($(window), 'keydown', this._onKeyDown);
 
 		this.on('destruct', function() {
 			$input.unwatch('disabled');
