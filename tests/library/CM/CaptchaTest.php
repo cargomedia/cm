@@ -17,9 +17,7 @@ class CM_CaptchaTest extends CMTest_TestCase {
 		try {
 			new CM_Captcha(rand(999, 9999));
 		} catch (CM_Exception_Nonexistent $e) {
-			if($e->getSeverity() != CM_Exception::WARN) {
-				$this->assertFalse(true);
-			}
+			$this->assertSame($e->getSeverity(), CM_Exception::WARN);
 		}
 	}
 
