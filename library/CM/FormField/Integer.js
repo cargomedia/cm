@@ -56,12 +56,23 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 
 	_onKeyDown: function(event) {
 		if (this.$('.noUiSlider').find('.noUi-handle').is(':focus')) {
-			if (event.which === cm.keyCode.LEFT) {
+			if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
 				this.sliderDown();
+				this._preventDefault(event);
 			}
-			if (event.which === cm.keyCode.RIGHT) {
+			if (event.which === cm.keyCode.RIGHT || event.which === cm.keyCode.UP) {
 				this.sliderUp();
+				this._preventDefault(event);
 			}
+
+		}
+	},
+
+	_preventDefault: function(event){
+		if (event.preventDefault) {
+			event.preventDefault();
+		} else {
+			event.returnValue = false;
 		}
 	}
 });
