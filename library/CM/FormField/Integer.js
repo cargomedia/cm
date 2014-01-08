@@ -6,7 +6,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 
 	_class: 'CM_FormField_Integer',
 
-	$noUiHandle: null,
+	_$noUiHandle: null,
 
 	ready: function() {
 		var field = this;
@@ -28,16 +28,16 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 			}
 		});
 
-		this.$noUiHandle = $slider.find('.noUi-handle');
-		this.$noUiHandle.attr('tabindex', '0');
+		this._$noUiHandle = $slider.find('.noUi-handle');
+		this._$noUiHandle.attr('tabindex', '0');
 
 		$input.watch('disabled', function(propName, oldVal, newVal) {
 			if (false == newVal) {
 				$slider.removeAttr('disabled');
-				field.$noUiHandle.attr('tabindex', '0');
+				field._$noUiHandle.attr('tabindex', '0');
 			} else {
 				$slider.attr('disabled', 'disabled');
-				field.$noUiHandle.attr('tabindex', '-1');
+				field._$noUiHandle.attr('tabindex', '-1');
 			}
 		});
 
@@ -59,7 +59,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 	},
 
 	_onKeyDown: function(event) {
-		if (this.$noUiHandle.is(':focus')) {
+		if (this._$noUiHandle.is(':focus')) {
 			if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
 				this.sliderDown();
 				this._preventDefault(event);
