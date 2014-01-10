@@ -2,6 +2,14 @@
 
 class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
+	const COUNTRY_URL = 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv';
+	const REGION_URL = 'http://dev.maxmind.com/static/csv/codes/maxmind/region.csv';
+	const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
+
+	const GEO_IP_CITY_PATH = 'GeoIP-134_20131126.zip';
+
+	const CACHE_LIFETIME = 604800; // Keep downloaded files for one week
+
 	/** @var array */
 	protected
 			$_countryList, $_countryListOld,
@@ -514,7 +522,17 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	 * @throws CM_Exception
 	 */
 	protected function _download($path, $url = null) {
-		if (!CM_File::exists($path)) {
+		if (CM_File::exists($path)) {
+			$modificationTime = filemtime($path);
+			if (time() - $modificationTime > self::CACHE_LIFETIME) {
+				$file = new CM_File($path);
+				$file->delete();
+			}
+		}
+		if (CM_File::exists($path)) {
+			$file = new CM_File($path);
+			$contents = $file->read();
+		} else {
 			if (null === $url) {
 				throw new CM_Exception('File not found: `' . $path . '`');
 			}
@@ -524,11 +542,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			if (false === @file_put_contents($path, $contents)) {
 				throw new CM_Exception('Could not write to file `' . $path . '`');
-			}
-		} else {
-			$contents = @file_get_contents($path);
-			if (false === $contents) {
-				throw new CM_Exception('Could not read from file `' . $path . '`');
 			}
 		}
 		return $contents;
@@ -644,8 +657,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	protected function _updateCountryList() {
 		$this->_getOutput()->writeln('Downloading new country listing…');
-		$countriesFileContents = $this->_download(DIR_TMP .
-			'countries.csv', 'https://raw.github.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv');
+		$countriesFileContents = $this->_download(DIR_TMP . 'countries.csv', self::COUNTRY_URL);
 
 		$this->_getOutput()->writeln('Reading new country listing…');
 		$this->_countryList = array('AN' => 'Netherlands Antilles'); // Adding missing records
@@ -667,13 +679,17 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * Read MaxMind location data from GeoIPCity-134-Location.csv
+	 * Download MaxMind location data
 	 * @throws CM_Exception
 	 */
 	protected function _updateLocationTree() {
 		$this->_getOutput()->writeln('Reading new location tree…');
-		$citiesFileContents = $this->_download('GeoIPCity-134-Location.csv');
-		$citiesFileContents = iconv('ISO-8859-1', 'UTF-8', $citiesFileContents);
+		if (CM_File::exists(self::GEO_IP_CITY_PATH)) {
+			$citiesFileContents = $this->_readLocationData(self::GEO_IP_CITY_PATH);
+		} else {
+			$this->_download(DIR_TMP . 'GeoLiteCity.zip', self::GEO_LITE_CITY_URL);
+			$citiesFileContents = $this->_readLocationData(DIR_TMP . 'GeoLiteCity.zip');
+		}
 		$this->_locationTree = array();
 		$infoListWarning = array();
 		$lines = preg_split('#[\r\n]++#', $citiesFileContents);
@@ -812,7 +828,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	protected function _updateRegionList() {
 		$this->_getOutput()->writeln('Downloading new region listing…');
-		$regionsFileContents = $this->_download(DIR_TMP . 'region.csv', 'http://dev.maxmind.com/static/csv/codes/maxmind/region.csv');
+		$regionsFileContents = $this->_download(DIR_TMP . 'region.csv', self::REGION_URL);
 
 		$this->_getOutput()->writeln('Reading new region listing…');
 		$lines = preg_split('#[\r\n]++#', $regionsFileContents);
@@ -956,6 +972,51 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			$escapeSequence = system('tput sgr0');
 		}
 		return $escapeSequence;
+	}
+
+	/**
+	 * @param $geoIpZipFile
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	private function _readBlocksData($geoIpZipFile) {
+		$zip = zip_open($geoIpZipFile);
+		if (!is_resource($zip)) {
+			throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile . '`');
+		}
+		do {
+			$entry = zip_read($zip);
+		} while ($entry && !preg_match('#Blocks\\.csv\\z#', zip_entry_name($entry)));
+		if (!$entry) {
+			throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpZipFile . '`');
+		}
+		zip_entry_open($zip, $entry, 'r');
+		$contents = zip_entry_read($entry, zip_entry_filesize($entry));
+		zip_close($zip);
+		return $contents;
+	}
+
+	/**
+	 * @param $geoIpZipFile
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	private function _readLocationData($geoIpZipFile) {
+		$zip = zip_open($geoIpZipFile);
+		if (!is_resource($zip)) {
+			throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile . '`');
+		}
+		do {
+			$entry = zip_read($zip);
+		} while ($entry && !preg_match('#Location\\.csv\\z#', zip_entry_name($entry)));
+		if (!$entry) {
+			throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpZipFile . '`');
+		}
+		zip_entry_open($zip, $entry, 'r');
+		$contents = zip_entry_read($entry, zip_entry_filesize($entry));
+		zip_close($zip);
+		$contents = iconv('ISO-8859-1', 'UTF-8', $contents);
+		return $contents;
 	}
 
 	/**
