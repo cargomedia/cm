@@ -23,11 +23,11 @@ class smarty_function_usertextTest extends CMTest_TestCase {
 	}
 
 	public function testModeOneline() {
-		$this->_assertSame('<div class="usertext oneline">foo</div>', array('text' => 'foo', 'mode' => 'oneline'));
+		$this->_assertSame('<span class="usertext oneline">foo</span>', array('text' => 'foo', 'mode' => 'oneline'));
 	}
 
 	public function testModeSimple() {
-		$this->_assertSame("<div class=\"usertext simple\">foo<br />\nbar</div>", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
+		$this->_assertSame("<span class=\"usertext simple\">foo<br />\nbar</span>", array('text' => "foo  \nbar   \n", 'mode' => 'simple'));
 	}
 
 	public function testModeMarkdown() {
@@ -41,14 +41,14 @@ class smarty_function_usertextTest extends CMTest_TestCase {
 	}
 
 	public function testModeMarkdownPlain() {
-		$this->_assertSame("<div class=\"usertext markdownPlain\">Headline\nfoo\n</div>", array('text' => "#Headline#\nfoo\n",
+		$this->_assertSame("<span class=\"usertext markdownPlain\">Headline\nfoo\n</span>", array('text' => "#Headline#\nfoo\n",
 																								  'mode' => 'markdownPlain'));
 	}
 
 	public function testMaxLength() {
-		$this->_assertSame("<div class=\"usertext oneline\">Hello…</div>", array('text' => "Hello World", 'mode' => 'oneline', 'maxLength' => 10));
-		$this->_assertSame("<div class=\"usertext simple\">Hello…</div>", array('text' => "Hello World", 'mode' => 'simple', 'maxLength' => 10));
-		$this->_assertSame("<div class=\"usertext markdownPlain\">Hello…</div>", array('text' => "Hello \n\n* World",
+		$this->_assertSame("<span class=\"usertext oneline\">Hello…</span>", array('text' => "Hello World", 'mode' => 'oneline', 'maxLength' => 10));
+		$this->_assertSame("<span class=\"usertext simple\">Hello…</span>", array('text' => "Hello World", 'mode' => 'simple', 'maxLength' => 10));
+		$this->_assertSame("<span class=\"usertext markdownPlain\">Hello…</span>", array('text' => "Hello \n\n* World",
 																						 'mode' => 'markdownPlain', 'maxLength' => 10));
 		try {
 			smarty_function_usertext(array('text' => 'foo', 'mode' => 'markdown', 'maxLength' => 1), $this->_template);
@@ -77,8 +77,8 @@ class smarty_function_usertextTest extends CMTest_TestCase {
 		$emoticonId = CM_Db_Db::insert('cm_emoticon', array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
 
 		$this->_assertSame(
-			'<div class="usertext oneline">foo <img src="http://www.default.dev/layout//' . CM_App::getInstance()->getDeployVersion() . '/img/emoticon/1.png" class="emoticon emoticon-' .
-					$emoticonId . '" title=":smiley:" height="16" /></div>',
+			'<span class="usertext oneline">foo <img src="http://www.default.dev/layout//' . CM_App::getInstance()->getDeployVersion() . '/img/emoticon/1.png" class="emoticon emoticon-' .
+					$emoticonId . '" title=":smiley:" height="16" /></span>',
 			array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));
 	}
 

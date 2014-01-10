@@ -2,7 +2,7 @@
 
 class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
 
-	const TYPE = 1;
+	const TYPE = 76;
 	const SYNCHRONIZE_DELAY = 10;
 
 	public function getOptions() {
@@ -40,7 +40,7 @@ class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Ab
 			try {
 				$channel = $subscribe->getStreamChannel();
 				$statusChannelKey = $channel->getKey() . ':' . $channel->getType();
-			} catch (CM_Exception_Invalid $e) {
+			} catch (CM_Exception_Nonexistent $e) {
 				// For cases when streamChannel has been deleted during this iteration
 				continue;
 			}

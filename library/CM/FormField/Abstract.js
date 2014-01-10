@@ -84,7 +84,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 	 */
 	getOption: function(name) {
 		var options = this.getOptions();
-		if (!options[name]) {
+		if (null === options[name] || '' === options[name]) {
 			return null;
 		}
 		return options[name];

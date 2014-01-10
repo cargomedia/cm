@@ -24,6 +24,7 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
 
 		$this->setTplParam('placeholder', !empty($params['placeholder']));
 		$this->setTplParam('optionList', $this->_getOptionList());
+		$this->setTplParam('labelPrefix', !empty($params['labelPrefix']) ? $params['labelPrefix'] : null);
 
 		$this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
 		$this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
