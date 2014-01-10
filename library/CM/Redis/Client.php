@@ -3,7 +3,6 @@
 /**
  * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
  */
-
 class CM_Redis_Client extends CM_Class_Abstract {
 
 	/** @var Redis */
@@ -23,13 +22,66 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	}
 
 	/**
-	 * Add a value to a list
+	 * @param string $key
+	 * @return string|false
+	 */
+	public function get($key) {
+		return $this->_redis->get($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 * @return string|null
+	 */
+	public function set($key, $value) {
+		$this->_redis->set($key, $value);
+	}
+
+	/**
+	 * @param string $key
+	 * @return bool
+	 */
+	public function exists($key) {
+		return $this->_redis->exists($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param int    $timestamp
+	 */
+	public function expireAt($key, $timestamp) {
+		$this->_redis->expireAt($key, $timestamp);
+	}
+
+	/**
+	 * Prepend a value to a list
 	 *
 	 * @param string $key
 	 * @param string $value
 	 */
 	public function lPush($key, $value) {
 		$this->_redis->lPush($key, $value);
+	}
+
+	/**
+	 * Prepend a value to a list if the list exists
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function lPushX($key, $value) {
+		$this->_redis->lPushX($key, $value);
+	}
+
+	/**
+	 * Append a value to a list
+	 *
+	 * @param string $key
+	 * @param string $value
+	 */
+	public function rPush($key, $value) {
+		$this->_redis->rPush($key, $value);
 	}
 
 	/**
@@ -44,6 +96,37 @@ class CM_Redis_Client extends CM_Class_Abstract {
 			$result = null;
 		}
 		return $result;
+	}
+
+	/**
+	 * Return values from list
+	 *
+	 * @param string   $key
+	 * @param int|null $start
+	 * @param int|null $stop
+	 * @return array
+	 */
+	public function lRange($key, $start = null, $stop = null) {
+		if (null === $start) {
+			$start = 0;
+		}
+		if (null === $stop) {
+			$stop = -1;
+		}
+		return $this->_redis->lRange($key, $start, $stop);
+	}
+
+	/**
+	 * @param string $key
+	 * @return int
+	 * @throws CM_Exception_Invalid
+	 */
+	public function lLen($key) {
+		$length = $this->_redis->lLen($key);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+		}
+		return $length;
 	}
 
 	/**
