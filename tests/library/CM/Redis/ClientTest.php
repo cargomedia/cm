@@ -14,7 +14,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$this->assertSame('bar', $redis->get('foo'));
 	}
 
-	public function testExists(){
+	public function testExists() {
 		$redis = CM_Redis_Client::getInstance();
 		$this->assertFalse($redis->exists('foo'));
 
@@ -49,6 +49,16 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$redis->lLen('foo');
 	}
 
+	public function testLTrim() {
+		$redis = new CM_Redis_Client();
+		$redis->lPush('foo', 'bar1');
+		$redis->lPush('foo', 'bar2');
+		$redis->lPush('foo', 'bar3');
+
+		$redis->lTrim('foo', 1, 1);
+		$this->assertSame(array('bar2'), $redis->lRange('foo'));
+	}
+
 	public function testLRange() {
 		$redis = new CM_Redis_Client();
 
@@ -67,7 +77,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$redis->zAdd($key, 1.5, 'bar');
 		$redis->zAdd($key, 2, 'foobar');
 		// normal behaviour
-		$this->assertSame(array('foo', 'bar' ,'foobar'), $redis->zRangeByScore($key, 1, 2));
+		$this->assertSame(array('foo', 'bar', 'foobar'), $redis->zRangeByScore($key, 1, 2));
 		// count
 		$this->assertSame(array('foo', 'bar'), $redis->zRangeByScore($key, 1, 2, 2));
 		// offset

@@ -131,6 +131,19 @@ class CM_Redis_Client extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
+	 * @param int    $start
+	 * @param int    $stop
+	 * @throws CM_Exception_Invalid
+	 */
+	public function lTrim($key, $start, $stop) {
+		$result = $this->_redis->lTrim($key, $start, $stop);
+		if (false === $result) {
+			throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+		}
+	}
+
+	/**
+	 * @param string $key
 	 * @param float  $score
 	 * @param string $value
 	 */
