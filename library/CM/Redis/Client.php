@@ -59,19 +59,13 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 *
 	 * @param string $key
 	 * @param string $value
+	 * @throws CM_Exception_Invalid
 	 */
 	public function lPush($key, $value) {
-		$this->_redis->lPush($key, $value);
-	}
-
-	/**
-	 * Prepend a value to a list if the list exists
-	 *
-	 * @param string $key
-	 * @param string $value
-	 */
-	public function lPushX($key, $value) {
-		$this->_redis->lPushX($key, $value);
+		$length = $this->_redis->lPush($key, $value);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+		}
 	}
 
 	/**
@@ -79,9 +73,13 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	 *
 	 * @param string $key
 	 * @param string $value
+	 * @throws CM_Exception_Invalid
 	 */
 	public function rPush($key, $value) {
-		$this->_redis->rPush($key, $value);
+		$length = $this->_redis->rPush($key, $value);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+		}
 	}
 
 	/**

@@ -22,10 +22,41 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$this->assertTrue($redis->exists('foo'));
 	}
 
+	public function testRPush(){
+		$redis = CM_Redis_Client::getInstance();
+		$redis->rPush('foo', 'bar1');
+		$redis->rPush('foo', 'bar2');
+		$this->assertSame(array('bar1', 'bar2'), $redis->lRange('foo'));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 */
+	public function testRPushInvalidEntry() {
+		$redis = CM_Redis_Client::getInstance();
+		$redis->set('foo', 12);
+		$redis->rPush('foo', 'bar1');
+	}
+
+	public function testLPush(){
+		$redis = CM_Redis_Client::getInstance();
+		$redis->lPush('foo', 'bar1');
+		$redis->lPush('foo', 'bar2');
+		$this->assertSame(array('bar2', 'bar1'), $redis->lRange('foo'));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 */
+	public function testLPushInvalidEntry() {
+		$redis = CM_Redis_Client::getInstance();
+		$redis->set('foo', 12);
+		$redis->lPush('foo', 'bar1');
+	}
+
 	public function testRPop() {
 		$redis = CM_Redis_Client::getInstance();
-		$key = 'foo';
-		$redis->lPush($key, 'bar');
+		$redis->lPush('foo', 'bar');
 		$this->assertSame('bar', $redis->rPop('foo'));
 		$this->assertNull($redis->rPop('foo'));
 	}
