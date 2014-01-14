@@ -33,7 +33,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
 
 	/**
 	 * @throws CM_Exception_Invalid
-	 * @return string[][]
+	 * @return array[]
 	 */
 	public function getNamespaceTypes() {
 		if (empty($this->_namespaceTypes)) {
