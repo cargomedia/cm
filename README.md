@@ -225,14 +225,20 @@ Options:
  --quiet
  --quiet-warnings
  --non-interactive
+ --forks=<value>
 
 Commands:
+ app setup
+ app fill-caches
+ app deploy
  app generate-config-internal
- app fill-cache
+ app generate-config-local <source-path>
+ app set-deploy-version [--deploy-version=<value>]
  console interactive
  css icon-refresh
  css emoticon-refresh
- db dump <namespace>
+ db db-to-file <namespace>
+ db file-to-db
  db run-updates
  db run-update <version> [--namespace=<value>]
  generator create-view <class-name>
@@ -240,11 +246,10 @@ Commands:
  generator create-namespace <namespace>
  generator create-javascript-files
  job-distribution start-manager
- maintenance common
- maintenance heavy
+ maintenance start
  search-index create [--index-name=<value>]
  search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
  search-index optimize
+ search-index start-maintenance
  stream start-message-synchronization
- entertainment start-processing [--interval=<value>]
 ```

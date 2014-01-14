@@ -180,6 +180,24 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$this->assertFalse($request->isBotCrawler());
 	}
 
+	public function testGetHost() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	public function testGetHostWithPort() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com:80'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 */
+	public function testGetHostWithoutHeader() {
+		$request = new CM_Request_Get('/');
+		$request->getHost();
+	}
+
 	/**
 	 * @param string             $uri
 	 * @param array|null         $additionalHeaders

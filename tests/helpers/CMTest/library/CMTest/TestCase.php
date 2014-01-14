@@ -117,14 +117,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param array|null           $componentParams
 	 * @param CM_Request_Post|null $request
 	 * @param int|null             $siteId
+	 * @param string|null          $languageAbbreviation
 	 * @return CM_Response_View_Form
 	 */
-	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null) {
+	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null, $languageAbbreviation = null) {
 		if (null === $componentParams) {
 			$componentParams = array();
 		}
 		if (null === $siteId) {
 			$siteId = 'null';
+		}
+		if (null !== $languageAbbreviation) {
+			$languageAbbreviation .= '/';
 		}
 		$session = new CM_Session();
 		if ($viewer) {
@@ -136,7 +140,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
 		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
-		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
+		$request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $body);
 
 		$response = new CM_Response_View_Form($request);
 		$response->process();

@@ -1,7 +1,8 @@
 <?php
 
 class CM_Paging_Log_Fatal extends CM_Paging_Log_Abstract {
-	const TYPE = 5;
+
+	const TYPE = 69;
 
 	/**
 	 * @param string $msg

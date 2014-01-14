@@ -113,7 +113,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 		CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
 		$test = new CM_Model_Splittest_Mock('notExisting');
 
-		$this->assertTrue($test->isVariationFixture($fixture, 'bar'));
+		$this->assertFalse($test->isVariationFixture($fixture, 'bar'));
 		$this->assertSame('', $test->getVariationFixture($fixture));
 		$test->setConversion($fixture);
 
