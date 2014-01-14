@@ -170,4 +170,28 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId2), CM_Model_Location::findByIp(2234567870));
 		$this->assertNull(CM_Model_Location::findByIp(2234567900));
 	}
+
+	public function testCreateCountry() {
+		$country = CM_Model_Location::createCountry('Example Country', 'EC');
+		$this->assertSame(CM_Model_Location::LEVEL_COUNTRY, $country->getLevel());
+		$this->assertSame(1, CM_Db_Db::count('cm_locationCountry', array('abbreviation' => 'EC')));
+	}
+
+	public function testCreateState() {
+		$country = CM_Model_Location::createCountry('Example Country', 'EC');
+		$state = CM_Model_Location::createState($country, 'Example State', 'ES');
+		$this->assertSame($state->getId(CM_Model_Location::LEVEL_COUNTRY), $country->getId());
+	}
+
+	public function testCreateCity() {
+		$country = CM_Model_Location::createCountry('Example Country', 'EC');
+		$cityWithoutState = CM_Model_Location::createCity($country, 'Example City', 50, 50);
+		$this->assertSame($country->getId(), $cityWithoutState->getId(CM_Model_Location::LEVEL_COUNTRY));
+		$this->assertSame(null, $cityWithoutState->getId(CM_Model_Location::LEVEL_STATE));
+
+		$state = CM_Model_Location::createState($country, 'Example State', 'ES');
+		$cityWithState = CM_Model_Location::createCity($state, 'Example City', 50, 50);
+		$this->assertSame($country->getId(), $cityWithoutState->getId(CM_Model_Location::LEVEL_COUNTRY));
+		$this->assertSame($state->getId(), $cityWithState->getId(CM_Model_Location::LEVEL_STATE));
+	}
 }
