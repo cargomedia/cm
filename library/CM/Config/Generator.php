@@ -63,13 +63,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
 		$namespaceClassList = array();
 		// fetch type-namespaces
 		foreach ($typedClasses as $class) {
-			$isHighestTypedClass = true;
-			foreach (class_parents($class) as $parentClass) {
-				if (is_subclass_of($parentClass, 'CM_Typed')) {
-					$isHighestTypedClass = false;
-				}
-			}
-			if ($isHighestTypedClass) {
+			if (!is_subclass_of(get_parent_class($class), 'CM_Typed')) {
 				$namespaceClassList[] = $class;
 			}
 		}
