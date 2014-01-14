@@ -17,3 +17,4 @@
 	<input type="file" name="{$name}-file" multiple />
 	{if isset($text)}{$text}{else}{block name="button-text"}{translate 'Upload Files'}{/block}{/if}
 </div>
+<div class="notSupported">*{translate 'Your browser does not support file uploads.'}</div>

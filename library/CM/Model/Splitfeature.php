@@ -55,7 +55,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function getEnabled(CM_Model_User $user) {
 		if ($this->_withoutPersistence) {
-			return true;
+			return false;
 		}
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;

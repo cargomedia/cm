@@ -36,6 +36,6 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 	}
 
 	public function isEmpty($userInput) {
-		return empty($userInput['latitude']) && empty($userInput['longitude']);
+		return empty($userInput['latitude']) || empty($userInput['longitude']);
 	}
 }

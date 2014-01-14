@@ -13,6 +13,14 @@ class CM_CaptchaTest extends CMTest_TestCase {
 		$this->assertSame($id, $captcha->getId());
 	}
 
+	public function testInvalidId() {
+		try {
+			new CM_Captcha(rand(999, 9999));
+		} catch (CM_Exception_Nonexistent $e) {
+			$this->assertSame($e->getSeverity(), CM_Exception::WARN);
+		}
+	}
+
 	public function testGetText() {
 		$captcha = CM_Captcha::create();
 		$this->assertInternalType('string', $captcha->getText());

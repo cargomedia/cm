@@ -44,6 +44,11 @@ class CM_App {
 		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
 		if (!$databaseExists) {
 			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
+		}
+
+		$client->setDb($configDb->db);
+		$tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
+		if (0 === count($tables)) {
 			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
 				CM_Db_Db::runDump($configDb->db, $dump);
 			}
@@ -55,6 +60,9 @@ class CM_App {
 					return max($initial, (int) $filename);
 				}, $app->getVersion());
 				$app->setVersion($version, $namespace);
+			}
+			foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
+				require $setupScript->getPath();
 			}
 		}
 	}
@@ -202,6 +210,7 @@ class CM_App {
 	 * @return string
 	 */
 	public function generateConfigClassTypes() {
+		$this->_ensureTypeUniqueness();
 		$content = '';
 		$typeNamespaces = array('CM_Site_Abstract', 'CM_Action_Abstract', 'CM_Model_Abstract', 'CM_Model_ActionLimit_Abstract',
 			'CM_Model_Entity_Abstract', 'CM_Model_StreamChannel_Abstract', 'CM_Mail', 'CM_Paging_Log_Abstract', 'CM_Paging_ContentList_Abstract',);
@@ -324,5 +333,21 @@ class CM_App {
 		$lines[] = '// Highest type used: #' . $highestTypeUsed;
 		$lines[] = '';
 		return $lines;
+	}
+
+	private function _ensureTypeUniqueness() {
+		$classTypes = array();
+		/** @var $className CM_Class_Abstract */
+		foreach (CM_Class_Abstract::getClassChildren() as $className) {
+			$reflectionClass = new ReflectionClass($className);
+			if ($reflectionClass->hasConstant('TYPE')) {
+				$type = $className::TYPE;
+				if ($classNameDuplicate = array_search($type, $classTypes)) {
+					throw new CM_Exception_Invalid(
+						'Duplicate `TYPE` constant for `' . $className . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '`');
+				}
+				$classTypes[$className] = $type;
+			}
+		}
 	}
 }

@@ -173,6 +173,20 @@ class CM_Model_Language extends CM_Model_Abstract {
 		self::changeAll();
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $abbreviation
+	 * @param bool $enabled
+	 * @return static
+	 */
+	public static function create($name, $abbreviation, $enabled) {
+		return CM_Model_Language::createStatic(array(
+			'name' => (string) $name,
+			'abbreviation' => (string) $abbreviation,
+			'enabled' => (bool) $enabled,
+		));
+	}
+
 	public static function changeAll() {
 		/** @var CM_Model_Language $language */
 		foreach (new CM_Paging_Language_All() as $language) {
@@ -346,8 +360,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$updateCount = 1;
 		}
 		CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
-		if ($updateCount > 10) {
-			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
+		if ($updateCount > 50) {
+			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
 		}
 
 		CM_Db_Db::delete('cm_languageKey_variable', array('languageKeyId' => $languageKeyId));

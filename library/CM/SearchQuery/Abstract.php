@@ -8,8 +8,8 @@ class CM_SearchQuery_Abstract {
 	private $_mode, $_filterMode;
 
 	/**
-	 * @param string|null         $mode       must,must_not,should
-	 * @param string|null         $filterMode or, and, not
+	 * @param string|null $mode       must,must_not,should
+	 * @param string|null $filterMode or, and, not
 	 */
 	function __construct($mode = null, $filterMode = null) {
 		if (is_null($mode)) {
@@ -40,7 +40,7 @@ class CM_SearchQuery_Abstract {
 	/**
 	 * @param string[]    $fields
 	 * @param string      $value
-	 * @param string|null $operator 'or' / 'and'
+	 * @param string|null $operator  'or' / 'and'
 	 * @param float|null  $fuzziness 0 - 1
 	 */
 	public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
@@ -92,13 +92,28 @@ class CM_SearchQuery_Abstract {
 		}
 	}
 
-	public function filterRange($field, $min = null, $max = null) {
+	/**
+	 * @param string        $field
+	 * @param int|null      $from
+	 * @param int|null      $to
+	 * @param boolean|null  $openIntervalFrom
+	 * @param booleant|null $openIntervalTo
+	 */
+	public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
 		$range = array();
-		if ($min !== null) {
-			$range['from'] = $min;
+		if ($from !== null) {
+			$operand = 'gte';
+			if ($openIntervalFrom) {
+				$operand = 'gt';
+			}
+			$range[$operand] = $from;
 		}
-		if ($max !== null) {
-			$range['to'] = $max;
+		if ($to !== null) {
+			$operand = 'lte';
+			if ($openIntervalTo) {
+				$operand = 'lt';
+			}
+			$range[$operand] = $to;
 		}
 		if (!empty($range)) {
 			$this->_filter(array('range' => array($field => $range)));
