@@ -26,10 +26,10 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
 		try {
 			$age = $userInput->diff(new DateTime())->y;
 		} catch (Exception $e) {
-			throw new CM_Exception_FormFieldValidation('Invalid age');
+			throw new CM_Exception_FormFieldValidation('Invalid birthdate');
 		}
 		if ($age < $this->_minAge || $age > $this->_maxAge) {
-			throw new CM_Exception_FormFieldValidation('Invalid age');
+			throw new CM_Exception_FormFieldValidation('Invalid birthdate');
 		}
 		return $userInput;
 	}
