@@ -28,7 +28,9 @@ class CM_Cli_CommandManager {
 	 * @return CM_Cli_Command[]
 	 */
 	public function getCommands() {
-		return $this->_commands;
+		$commands = $this->_commands;
+		ksort($commands);
+		return $commands;
 	}
 
 	public function autoloadCommands() {
@@ -77,7 +79,6 @@ class CM_Cli_CommandManager {
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
 		$commands = $this->getCommands();
-		ksort($commands);
 		foreach ($commands as $command) {
 			if (!$command->isAbstract() && (!$packageName || $packageName === $command->getPackageName())) {
 				$help .= ' ' . $command->getHelp() . PHP_EOL;
