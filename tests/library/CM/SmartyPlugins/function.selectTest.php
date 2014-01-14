@@ -105,6 +105,19 @@ class smarty_function_selectTest extends CMTest_TestCase {
 		$this->assertSame('', $htmlObject->getText('.label'));
 	}
 
+	public function testLabelPrefix() {
+		$htmlObject = $this->_createSelect(array(
+			'name'        => 'foo',
+			'optionList'  => array(
+				0 => 'foo',
+				1 => 'bar',
+			),
+			'labelPrefix' => 'foobar',
+		));
+
+		$this->assertEquals('foobar', $htmlObject->getText('.labelPrefix'));
+	}
+
 	/**
 	 * @param array $params
 	 * @return CMTest_TH_Html

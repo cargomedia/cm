@@ -171,6 +171,20 @@ class CM_Model_Language extends CM_Model_Abstract {
 		self::changeAll();
 	}
 
+	/**
+	 * @param string $name
+	 * @param string $abbreviation
+	 * @param bool $enabled
+	 * @return static
+	 */
+	public static function create($name, $abbreviation, $enabled) {
+		return CM_Model_Language::createStatic(array(
+			'name' => (string) $name,
+			'abbreviation' => (string) $abbreviation,
+			'enabled' => (bool) $enabled,
+		));
+	}
+
 	public static function changeAll() {
 		/** @var CM_Model_Language $language */
 		foreach (new CM_Paging_Language_All() as $language) {

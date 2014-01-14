@@ -7,16 +7,35 @@
 		position: relative;
 		display: inline-block;
 		margin: 0;
-		padding-right: 25px;
+		padding-right: 15px;
 		background: @colorBgEmphasize1;
+
+		.labelPrefix{
+			margin-right: 5px;
+			font-size: @fontSizeTiny;
+			font-weight: normal;
+			color: lighten(@colorFgShy, 10);
+		}
 
 		.icon {
 			position: absolute;
 			right: 0;
-			width: 25px;
+			width: 15px;
 			text-align: center;
 			color: @colorFgBorderEmphasize3;
 			.transition(200ms);
+		}
+
+		@media (min-width: 400px) {
+			padding-right: 25px;
+
+			.labelPrefix {
+				margin-right: 15px;
+			}
+
+			.icon {
+				width: 25px;
+			}
 		}
 	}
 
