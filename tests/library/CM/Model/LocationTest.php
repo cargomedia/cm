@@ -194,4 +194,14 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$this->assertSame($country->getId(), $cityWithoutState->getId(CM_Model_Location::LEVEL_COUNTRY));
 		$this->assertSame($state->getId(), $cityWithState->getId(CM_Model_Location::LEVEL_STATE));
 	}
+
+	public function testCreateZip() {
+		$country = CM_Model_Location::createCountry('Example Country', 'EC');
+		$state = CM_Model_Location::createState($country, 'Example State', 'ES');
+		$city = CM_Model_Location::createCity($state, 'Example City', 50, 50);
+		$zip = CM_Model_Location::createZip($city, '12333', 50, 50);
+		$this->assertSame($country->getId(), $zip->getId(CM_Model_Location::LEVEL_COUNTRY));
+		$this->assertSame($state->getId(), $zip->getId(CM_Model_Location::LEVEL_STATE));
+		$this->assertSame($city->getId(), $zip->getId(CM_Model_Location::LEVEL_CITY));
+	}
 }
