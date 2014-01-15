@@ -141,11 +141,11 @@ class CM_App_Installation {
 		if (!getenv('COMPOSER_HOME') && !getenv('HOME')) {
 			putenv('COMPOSER_HOME=' . sys_get_temp_dir() . 'composer/');
 		}
-		$oldCwd = getcwd();
+		$cwdBackup = getcwd();
 		chdir(DIR_ROOT);
 		$io = new \Composer\IO\NullIO();
 		$composer = \Composer\Factory::create($io, DIR_ROOT . 'composer.json');
-		chdir($oldCwd);
+		chdir($cwdBackup);
 		return $composer;
 	}
 }
