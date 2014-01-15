@@ -1,9 +1,6 @@
 <?php
 
 $config->debug = false;
-$config->dirData = null;
-$config->dirTmp = null;
-$config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
 
 $config->CM_Render->cdnResource = false;
