@@ -75,12 +75,7 @@ class CM_App_Installation {
 	 */
 	public function getUpdateStamp() {
 		$composerJsonStamp = CM_File::mtime(DIR_ROOT . 'composer.json');
-		$cacheKey = CM_CacheConst::ComposerInstalledPath;
-		$fileCache = new CM_Cache_Storage_File();
-		if (false === ($installedJsonPath = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
-			$installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
-			$fileCache->set($cacheKey, $installedJsonPath);
-		}
+		$installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
 		$installedJsonStamp = CM_File::mtime($installedJsonPath);
 		return max($composerJsonStamp, $installedJsonStamp);
 	}
@@ -90,7 +85,6 @@ class CM_App_Installation {
 	 */
 	protected function _getComposerPackages() {
 		$repo = $this->_getComposer()->getRepositoryManager()->getLocalRepository();
-
 		$packages = $repo->getPackages();
 		$packages[] = $this->_getComposer()->getPackage();
 		return $packages;
@@ -100,7 +94,14 @@ class CM_App_Installation {
 	 * @return string
 	 */
 	protected function _getComposerVendorDir() {
-		return rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
+		$composerJsonStamp = CM_File::mtime(DIR_ROOT . 'composer.json');
+		$cacheKey = CM_CacheConst::ComposerVendorDir;
+		$fileCache = new CM_Cache_Storage_File();
+		if (false === ($vendorDir = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
+			$vendorDir = rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
+			$fileCache->set($cacheKey, $vendorDir);
+		}
+		return $vendorDir;
 	}
 
 	/**

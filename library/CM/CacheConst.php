@@ -82,5 +82,5 @@ class CM_CacheConst {
 
 	const Modules = 'Modules';
 
-	const ComposerInstalledPath = 'ComposerInstalledPath';
+	const ComposerVendorDir = 'ComposerVendorDir';
 }
