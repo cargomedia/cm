@@ -248,6 +248,23 @@ class CM_File extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $path
+	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception_Nonexistent
+	 * @return int
+	 */
+	public static function mtime($path) {
+		if (!CM_File::exists($path)) {
+			throw new CM_Exception_Nonexistent('No such file - `' . $path . '`');
+		}
+		$createStamp = filemtime($path);
+		if (false === $createStamp) {
+			throw new CM_Exception_Invalid('Can\'t get make time of `' . $path . '`');
+		}
+		return $createStamp;
+	}
+
+	/**
 	 * taken from http://stackoverflow.com/a/2668953
 	 *
 	 * @param string $filename
