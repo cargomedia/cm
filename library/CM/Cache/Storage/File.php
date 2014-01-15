@@ -11,14 +11,19 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return int|null
+	 * @throws CM_Exception_Invalid
+	 * @return int
 	 */
 	public function getCreateStamp($key) {
 		$path = $this->_getPath($this->_getKeyArmored($key));
 		if (!CM_File::exists($path)) {
 			return null;
 		}
-		return filemtime($path);
+		$createStamp = filemtime($path);
+		if (false === $createStamp) {
+			throw new CM_Exception_Invalid('Can\'t get make time of `' . $path . '`');
+		}
+		return $createStamp;
 	}
 
 	protected function _getName() {
