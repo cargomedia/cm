@@ -159,6 +159,7 @@ class CM_Bootloader {
 	public function errorHandler() {
 		error_reporting((E_ALL | E_STRICT) & ~(E_NOTICE | E_USER_NOTICE));
 		set_error_handler(array($this->getExceptionHandler(), 'handleErrorRaw'));
+		register_shutdown_function(array($this->getExceptionHandler(), 'handleErrorFatal'));
 	}
 
 	public function exceptionHandler() {
