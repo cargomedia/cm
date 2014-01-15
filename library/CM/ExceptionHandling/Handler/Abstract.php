@@ -25,12 +25,16 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	);
 
 	public function handleErrorFatal() {
+		if (!error_reporting()) {
+			return;
+		}
 		if ($error = error_get_last()) {
 			$code = isset($error['type']) ? $error['type'] : E_CORE_ERROR;
 			$message = isset($error['message']) ? $error['message'] : '';
 			$file = isset($error['file']) ? $error['file'] : 'unknown file';
 			$line = isset($error['line']) ? $error['line'] : 0;
-			$exception = new ErrorException($this->_errorCodes[$code] . ': ' . $message, 0, $code, $file, $line);
+			$message = $this->_errorCodes[$code] . ': ' . $message;
+			$exception = new ErrorException($message, 0, $code, $file, $line);
 			$this->handleException($exception);
 		}
 	}
@@ -44,14 +48,10 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	 * @throws ErrorException
 	 */
 	public function handleErrorRaw($code, $message, $file, $line) {
-		$message = $this->_errorCodes[$code] . ': ' . $message;
-		if (!(error_reporting() & $code)) {
-			// This error code is not included in error_reporting
-			$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-			if ($atSign) {
-				return true;
-			}
+		if (!error_reporting()) {
+			return true;
 		}
+		$message = $this->_errorCodes[$code] . ': ' . $message;
 		throw new ErrorException($message, 0, $code, $file, $line);
 	}
 
