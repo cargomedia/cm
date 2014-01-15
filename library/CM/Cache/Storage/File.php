@@ -9,6 +9,18 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 		$this->_storageDir = DIR_TMP_CACHE;
 	}
 
+	/**
+	 * @param string $key
+	 * @return int|null
+	 */
+	public function getCreateStamp($key) {
+		$path = $this->_getPath($this->_getKeyArmored($key));
+		if (!CM_File::exists($path)) {
+			return null;
+		}
+		return filemtime($path);
+	}
+
 	protected function _getName() {
 		return 'File';
 	}
@@ -40,18 +52,6 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
 	protected function _flush() {
 		CM_Util::rmDirContents($this->_storageDir);
-	}
-
-	/**
-	 * @param string $key
-	 * @return int|null
-	 */
-	public function getCreateStamp($key) {
-		$path = $this->_getPath($this->_getKeyArmored($key));
-		if (!CM_File::exists($path)) {
-			return null;
-		}
-		return filemtime($path);
 	}
 
 	/**
