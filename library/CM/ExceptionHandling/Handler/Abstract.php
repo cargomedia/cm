@@ -5,6 +5,36 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	/** @var int|null */
 	private $_printSeverityMin;
 
+	private $_errorCodes = array(
+		E_ERROR             => 'E_ERROR',
+		E_WARNING           => 'E_WARNING',
+		E_PARSE             => 'E_PARSE',
+		E_NOTICE            => 'E_NOTICE',
+		E_CORE_ERROR        => 'E_CORE_ERROR',
+		E_CORE_WARNING      => 'E_CORE_WARNING',
+		E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+		E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
+		E_USER_ERROR        => 'E_USER_ERROR',
+		E_USER_WARNING      => 'E_USER_WARNING',
+		E_USER_NOTICE       => 'E_USER_NOTICE',
+		E_STRICT            => 'E_STRICT',
+		E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+		E_DEPRECATED        => 'E_DEPRECATED',
+		E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
+		E_ALL               => 'E_ALL',
+	);
+
+	public function handleErrorFatal() {
+		if ($error = error_get_last()) {
+			$code = isset($error['type']) ? $error['type'] : E_CORE_ERROR;
+			$message = isset($error['message']) ? $error['message'] : '';
+			$file = isset($error['file']) ? $error['file'] : 'unknown file';
+			$line = isset($error['line']) ? $error['line'] : 0;
+			$exception = new ErrorException($this->_errorCodes[$code] . ': ' . $message, 0, $code, $file, $line);
+			$this->handleException($exception);
+		}
+	}
+
 	/**
 	 * @param int    $code
 	 * @param string $message
@@ -14,25 +44,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	 * @throws ErrorException
 	 */
 	public function handleErrorRaw($code, $message, $file, $line) {
-		$errorCodes = array(
-			E_ERROR             => 'E_ERROR',
-			E_WARNING           => 'E_WARNING',
-			E_PARSE             => 'E_PARSE',
-			E_NOTICE            => 'E_NOTICE',
-			E_CORE_ERROR        => 'E_CORE_ERROR',
-			E_CORE_WARNING      => 'E_CORE_WARNING',
-			E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
-			E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
-			E_USER_ERROR        => 'E_USER_ERROR',
-			E_USER_WARNING      => 'E_USER_WARNING',
-			E_USER_NOTICE       => 'E_USER_NOTICE',
-			E_STRICT            => 'E_STRICT',
-			E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-			E_DEPRECATED        => 'E_DEPRECATED',
-			E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
-			E_ALL               => 'E_ALL',
-		);
-		$message = $errorCodes[$code] . ': ' . $message;
+		$message = $this->_errorCodes[$code] . ': ' . $message;
 		if (!(error_reporting() & $code)) {
 			// This error code is not included in error_reporting
 			$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
