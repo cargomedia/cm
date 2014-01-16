@@ -252,7 +252,7 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 * @return int
 	 */
-	public static function getModifiedStamp($path) {
+	public static function getModified($path) {
 		$createStamp = filemtime($path);
 		if (false === $createStamp) {
 			throw new CM_Exception_Invalid('Can\'t get modified time of `' . $path . '`');
