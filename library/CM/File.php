@@ -250,12 +250,11 @@ class CM_File extends CM_Class_Abstract {
 	/**
 	 * @param string $path
 	 * @throws CM_Exception_Invalid
-	 * @throws CM_Exception_Nonexistent
 	 * @return int
 	 */
 	public static function getModifiedStamp($path) {
 		if (!CM_File::exists($path)) {
-			throw new CM_Exception_Nonexistent('No such file - `' . $path . '`');
+			throw new CM_Exception_Invalid('No such file - `' . $path . '`');
 		}
 		$createStamp = filemtime($path);
 		if (false === $createStamp) {
