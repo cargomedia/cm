@@ -253,9 +253,6 @@ class CM_File extends CM_Class_Abstract {
 	 * @return int
 	 */
 	public static function getModifiedStamp($path) {
-		if (!CM_File::exists($path)) {
-			throw new CM_Exception_Invalid('No such file - `' . $path . '`');
-		}
 		$createStamp = filemtime($path);
 		if (false === $createStamp) {
 			throw new CM_Exception_Invalid('Can\'t get modified time of `' . $path . '`');
