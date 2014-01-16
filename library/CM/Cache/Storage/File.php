@@ -17,7 +17,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 	public function getCreateStamp($key) {
 		$path = $this->_getPath($this->_getKeyArmored($key));
 		try {
-			$createStamp = CM_File::mtime($path);
+			$createStamp = CM_File::getModifiedStamp($path);
 		} catch (CM_Exception_Nonexistent $e) {
 			return null;
 		}

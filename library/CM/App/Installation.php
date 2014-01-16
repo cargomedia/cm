@@ -74,9 +74,9 @@ class CM_App_Installation {
 	 * @return mixed
 	 */
 	public function getUpdateStamp() {
-		$composerJsonStamp = CM_File::mtime(DIR_ROOT . 'composer.json');
+		$composerJsonStamp = CM_File::getModifiedStamp(DIR_ROOT . 'composer.json');
 		$installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
-		$installedJsonStamp = CM_File::mtime($installedJsonPath);
+		$installedJsonStamp = CM_File::getModifiedStamp($installedJsonPath);
 		return max($composerJsonStamp, $installedJsonStamp);
 	}
 
@@ -94,7 +94,7 @@ class CM_App_Installation {
 	 * @return string
 	 */
 	protected function _getComposerVendorDir() {
-		$composerJsonStamp = CM_File::mtime(DIR_ROOT . 'composer.json');
+		$composerJsonStamp = CM_File::getModifiedStamp(DIR_ROOT . 'composer.json');
 		$cacheKey = CM_CacheConst::ComposerVendorDir;
 		$fileCache = new CM_Cache_Storage_File();
 		if (false === ($vendorDir = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {

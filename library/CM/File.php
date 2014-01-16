@@ -253,13 +253,13 @@ class CM_File extends CM_Class_Abstract {
 	 * @throws CM_Exception_Nonexistent
 	 * @return int
 	 */
-	public static function mtime($path) {
+	public static function getModifiedStamp($path) {
 		if (!CM_File::exists($path)) {
 			throw new CM_Exception_Nonexistent('No such file - `' . $path . '`');
 		}
 		$createStamp = filemtime($path);
 		if (false === $createStamp) {
-			throw new CM_Exception_Invalid('Can\'t get make time of `' . $path . '`');
+			throw new CM_Exception_Invalid('Can\'t get modified time of `' . $path . '`');
 		}
 		return $createStamp;
 	}
