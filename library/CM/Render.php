@@ -213,7 +213,7 @@ class CM_Render extends CM_Class_Abstract {
 		}
 
 		if ($needed) {
-			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespace `' . $this->getSite()->getNamespace() . '` and themes `' .
+			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespaces `' . implode('`, `', $namespaceList) . '` and themes `' .
 				implode(', ', $this->getSite()->getThemes()) . '`');
 		}
 		return null;
