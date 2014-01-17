@@ -4,11 +4,8 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
 
 	protected function _process() {
 		$file = null;
-		foreach ($this->getSite()->getNamespaces() as $namespace) {
-			if ($path = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath(), $namespace, true, false)) {
-				$file = new CM_File($path);
-				break;
-			}
+		if ($path = $this->getRender()->getLayoutPath('resource/' . $this->getRequest()->getPath(), null, true, false)) {
+			$file = new CM_File($path);
 		}
 		if (!$file) {
 			throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`', null, null, CM_Exception::WARN);
