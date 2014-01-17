@@ -168,9 +168,9 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param bool   $absolute      OPTIONAL True if full path required
-	 * @param string $theme         OPTIONAL
-	 * @param string $namespace     OPTIONAL
+	 * @param bool|null   $absolute True if full path required
+	 * @param string|null $theme
+	 * @param string|null $namespace
 	 * @return string Theme base path
 	 */
 	public function getThemeDir($absolute = false, $theme = null, $namespace = null) {
@@ -186,7 +186,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $tpl  Template file name
+	 * @param string      $tpl Template file name
 	 * @param string|null $namespace
 	 * @param bool|null   $absolute
 	 * @param bool|null   $needed
@@ -194,21 +194,27 @@ class CM_Render extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
-		foreach ($this->getSite()->getThemes() as $theme) {
-			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
+		$namespaceList = $this->getSite()->getNamespaces();
+		if ($namespace !== null) {
+			$namespaceList = array($namespace);
+		}
+		foreach ($namespaceList as $namespace) {
+			foreach ($this->getSite()->getThemes() as $theme) {
+				$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
-			if (CM_File::exists($file)) {
-				if ($absolute) {
-					return $file;
-				} else {
-					return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+				if (CM_File::exists($file)) {
+					if ($absolute) {
+						return $file;
+					} else {
+						return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+					}
 				}
 			}
 		}
 
 		if ($needed) {
 			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespace `' . $this->getSite()->getNamespace() . '` and themes `' .
-					implode(', ', $this->getSite()->getThemes()) . '`');
+				implode(', ', $this->getSite()->getThemes()) . '`');
 		}
 		return null;
 	}
