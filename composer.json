@@ -13,12 +13,15 @@
 	},
 	"repositories": [
 		{
-			"type": "composer",
-			"url": "http://satis.cargomedia.ch/source"
-		},
-		{
-			"type": "composer",
-			"url": "http://satis.cargomedia.ch/dist"
+			"type": "package",
+			"package": {
+				"name": "wurfl/tera-wurfl",
+				"version": "2.1.5",
+				"dist": {
+					"url": "http://sourceforge.net/projects/wurfl/files/WURFL%20Database/1.4.2/wurfl-dbapi-1.4.2.0.zip/download",
+					"type": "zip"
+				}
+			}
 		}
 	],
 	"autoload": {
