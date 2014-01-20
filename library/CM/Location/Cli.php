@@ -8,7 +8,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
 	const GEO_IP_CITY_PATH = 'GeoIP-134_20131126.zip';
 
-	const CACHE_LIFETIME = 604800; // Keep downloaded files for one week
+	const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
 
 	/** @var array */
 	protected
@@ -156,6 +156,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 		$this->_cityListByRegionRemoved = array();
 		$this->_cityListByRegionRenamed = array();
 		$this->_cityListByRegionUpdatedCode = array();
+		$this->_cityListUpdatedRegion = array();
 		$this->_zipCodeListByCityAdded = array();
 		$this->_zipCodeListByCityRemoved = array();
 
@@ -379,6 +380,65 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 					}
 				}
 			}
+
+			// Look for cities with updated region
+
+			$regionCodeListByCityOld = array();
+			foreach ($regionCodeListOldByNewCode as $regionCode => $regionCodeOld) {
+				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+				// Retrieve the right city if its code has been updated
+				$cityCodeListOldByNewCode = array();
+				foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
+					$cityCode = $cityCodeOld;
+					if (isset($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld])) {
+						$cityCode = $this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld];
+					}
+					$cityCodeListOldByNewCode[$cityCode] = $cityCodeOld;
+				}
+				$regionCodeListByCityOld += array_fill_keys(array_keys($cityCodeListOldByNewCode), $regionCode);
+			}
+			foreach ($regionCodeList as $regionCode) {
+				$cityList = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+				foreach ($cityList as $cityCode => $cityName) {
+					if (isset($regionCodeListByCityOld[$cityCode]) && ($regionCode != $regionCodeListByCityOld[$cityCode])) {
+						$this->_cityListUpdatedRegion[$countryCode][$cityCode] = array(
+							'regionCode'    => $regionCode,
+							'regionCodeOld' => $regionCodeListOldByNewCode[$regionCodeListByCityOld[$cityCode]],
+						);
+					}
+				}
+			}
+			if (isset($this->_cityListUpdatedRegion[$countryCode])) {
+				foreach ($this->_cityListUpdatedRegion[$countryCode] as $cityCode => $regionCodes) {
+					$regionCode = $regionCodes['regionCode'];
+					$regionCodeOld = $regionCodes['regionCodeOld'];
+					if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+						$regionName = $this->_regionListByCountry[$countryCode][$regionCode] . ' (' . $regionCode . ')';
+					} elseif (strlen($regionCode)) {
+						$regionName = 'Region ' . $regionCode;
+					} else {
+						$regionName = 'Unknown region';
+					}
+					if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
+						$regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld] . ' (' . $regionCodeOld . ')';
+					} elseif (strlen($regionCodeOld)) {
+						$regionNameOld = 'Region ' . $regionCodeOld;
+					} else {
+						$regionNameOld = 'Unknown region';
+					}
+					$cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
+					if ($regionName === 'Unknown region') {
+						$infoListUpdated['Region unset for cities'][$countryName . ' / ' . $regionNameOld][] =
+								$cityName . ' (' . $cityCode . ')';
+					} elseif ($regionNameOld === 'Unknown region') {
+						$infoListUpdated['Region set for cities'][$countryName . ' / ' . $regionName][] =
+								$cityName . ' (' . $cityCode . ')';
+					} else {
+						$infoListUpdated['Cities with updated region'][$countryName . ' / ' . $regionNameOld . ' => ' . $regionName][] =
+								$cityName . ' (' . $cityCode . ')';
+					}
+				}
+			}
 		}
 
 		$this->_printInfoList($infoListWarning, '!');
@@ -400,10 +460,12 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			$regionList = $this->_regionListByCountry[$countryCode];
 			$regionCodeList = array_flip($regionList);
-			$regionCodeListOld = array_flip($regionListOld);
-			foreach (array_intersect_key($regionCodeList, $regionCodeListOld) as $regionName => $regionCode) {
-				$regionCodeOld = $regionCodeListOld[$regionName];
-				if ($regionCode !== $regionCodeOld) {
+			foreach ($regionListOld as $regionCodeOld => $regionNameOld) {
+				if (isset($regionList[$regionCodeOld]) && ($regionNameOld === $regionList[$regionCodeOld])) {
+					continue;
+				}
+				if (isset($regionCodeList[$regionNameOld])) {
+					$regionCode = $regionCodeList[$regionNameOld];
 					$this->_regionListByCountryUpdatedCode[$countryCode][$regionCodeOld] = $regionCode;
 				}
 			}
