@@ -116,15 +116,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 					$infoListWarning['Countries without location data'][] = $countryName . ' (' . $regionCount . ' region' . $s . ')';
 				}
 				foreach ($countryData['regions'] as $regionCode => $regionData) {
-					if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-						$regionName = $this->_regionListByCountry[$countryCode][$regionCode];
-					} elseif (isset($regionData['location']['name'])) {
-						$regionName = $regionData['location']['name'];
-					} elseif (strlen($regionCode)) {
-						$regionName = 'Region ' . $regionCode;
-					} else {
-						$regionName = 'Unknown region';
-					}
+					$regionName = $this->_getRegionName($countryCode, $regionCode);
 					if (!isset($regionData['cities'])) {
 						$infoListWarning['Regions without cities'][$countryName][] = $regionName;
 					} else {
@@ -187,13 +179,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
 			$regionCodeListKept = array_intersect($regionCodeList, array_keys($regionCodeListOldByNewCode));
 			foreach ($regionCodeListKept as $regionCode) {
-				if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-					$regionName = $this->_regionListByCountry[$countryCode][$regionCode];
-				} elseif (strlen($regionCode)) {
-					$regionName = 'Region ' . $regionCode;
-				} else {
-					$regionName = 'Unknown region';
-				}
+				$regionName = $this->_getRegionName($countryCode, $regionCode);
 				$regionCodeOld = $regionCodeListOldByNewCode[$regionCode];
 				$cityList = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
 				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
@@ -261,53 +247,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 					foreach ($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode] as $cityCodeOld => $cityCodeUpdated) {
 						unset($this->_cityListByRegionRenamed[$countryCode][$regionCode][$cityCodeOld]);
 						unset($this->_cityListByRegionRenamed[$countryCode][$regionCode][$cityCodeUpdated]);
-					}
-				}
-
-				// Info
-				$cityCountOld = count($cityListOld);
-				$cityCountAdded = count($cityListAdded);
-				if ($cityCountAdded) {
-					$cityRateAdded = $cityCountOld ? $cityCountAdded / $cityCountOld : null;
-					$cityRateAddedInfo = $cityCountOld ? ' (' . round($cityRateAdded * 100) . '%)' : '';
-					if ($cityRateAdded < 1.0) {
-						$infoListAdded['Cities added'][$countryName][] = $regionName . ', ' . $cityCountAdded . $cityRateAddedInfo;
-					} else {
-						foreach ($cityListAdded as $cityCode => $cityName) {
-							$infoListAdded['Cities added'][
-							$countryName . ' / ' . $regionName . ', ' . $cityCountAdded . ' cities' . $cityRateAddedInfo][] =
-									$cityName . ' (' . $cityCode . ')';
-						}
-					}
-				}
-
-				$cityCountRemoved = count($cityListRemoved);
-				if ($cityCountRemoved) {
-					$cityRateRemoved = $cityCountRemoved / $cityCountOld;
-					$cityRateRemovedInfo = ' (' . round($cityRateRemoved * 100) . '%)';
-					if ($cityRateRemoved < 0.2) {
-						$infoListRemoved['Cities removed'][$countryName][] = $regionName . ', ' . $cityCountRemoved . $cityRateRemovedInfo;
-					} else {
-						foreach ($cityListRemoved as $cityCode => $cityName) {
-							$infoListRemoved['Cities removed'][
-							$countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo][] =
-									$cityName . ' (' . $cityCode . ')';
-						}
-					}
-				}
-
-				if (!empty($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode])) {
-					foreach ($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode] as $cityCodeOld => $cityCode) {
-						$cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
-						$infoListUpdated['Cities with updated code'][$countryName . ' / ' . $regionName][] =
-								$cityName . ' (' . $cityCodeOld . ' => ' . $cityCode . ')';
-					}
-				}
-
-				if (!empty($this->_cityListByRegionRenamed[$countryCode][$regionCode])) {
-					foreach ($this->_cityListByRegionRenamed[$countryCode][$regionCode] as $cityCode => $cityNames) {
-						$infoListUpdated['Cities renamed'][$countryName . ' / ' . $regionName][] =
-								$cityNames['nameOld'] . ' => ' . $cityNames['name'] . ' (' . $cityCode . ')';
 					}
 				}
 
@@ -381,6 +320,62 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				}
 			}
 
+			// Info
+			foreach ($regionCodeListKept as $regionCode) {
+				$regionName = $this->_getRegionName($countryCode, $regionCode);
+				$regionCodeOld = $regionCodeListOldByNewCode[$regionCode];
+				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+				$cityCountOld = count($cityListOld);
+
+				$cityListAdded = isset($this->_cityListByRegionAdded[$countryCode][$regionCode]) ? $this->_cityListByRegionAdded[$countryCode][$regionCode] : array();
+				$cityListRemoved = isset($this->_cityListByRegionRemoved[$countryCode][$regionCode]) ? $this->_cityListByRegionRemoved[$countryCode][$regionCode] : array();
+
+				$cityCountAdded = count($cityListAdded);
+				if ($cityCountAdded) {
+					$cityRateAdded = $cityCountOld ? $cityCountAdded / $cityCountOld : null;
+					$cityRateAddedInfo = $cityCountOld ? ' (' . round($cityRateAdded * 100) . '%)' : '';
+					if ($cityRateAdded < 1.0) {
+						$infoListAdded['Cities added'][$countryName][] = $regionName . ', ' . $cityCountAdded . $cityRateAddedInfo;
+					} else {
+						foreach ($cityListAdded as $cityCode => $cityName) {
+							$infoListAdded['Cities added'][
+							$countryName . ' / ' . $regionName . ', ' . $cityCountAdded . ' cities' . $cityRateAddedInfo][] =
+									$cityName . ' (' . $cityCode . ')';
+						}
+					}
+				}
+
+				$cityCountRemoved = count($cityListRemoved);
+				if ($cityCountRemoved) {
+					$cityRateRemoved = $cityCountRemoved / $cityCountOld;
+					$cityRateRemovedInfo = ' (' . round($cityRateRemoved * 100) . '%)';
+					if ($cityRateRemoved < 0.2) {
+						$infoListRemoved['Cities removed'][$countryName][] = $regionName . ', ' . $cityCountRemoved . $cityRateRemovedInfo;
+					} else {
+						foreach ($cityListRemoved as $cityCode => $cityName) {
+							$infoListRemoved['Cities removed'][
+							$countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo][] =
+									$cityName . ' (' . $cityCode . ')';
+						}
+					}
+				}
+
+				if (!empty($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode])) {
+					foreach ($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode] as $cityCodeOld => $cityCode) {
+						$cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
+						$infoListUpdated['Cities with updated code'][$countryName . ' / ' . $regionName][] =
+								$cityName . ' (' . $cityCodeOld . ' => ' . $cityCode . ')';
+					}
+				}
+
+				if (!empty($this->_cityListByRegionRenamed[$countryCode][$regionCode])) {
+					foreach ($this->_cityListByRegionRenamed[$countryCode][$regionCode] as $cityCode => $cityNames) {
+						$infoListUpdated['Cities renamed'][$countryName . ' / ' . $regionName][] =
+								$cityNames['nameOld'] . ' => ' . $cityNames['name'] . ' (' . $cityCode . ')';
+					}
+				}
+			}
+
 			// Look for cities with updated region
 
 			$regionCodeListByCityOld = array();
@@ -412,20 +407,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				foreach ($this->_cityListUpdatedRegion[$countryCode] as $cityCode => $regionCodes) {
 					$regionCode = $regionCodes['regionCode'];
 					$regionCodeOld = $regionCodes['regionCodeOld'];
-					if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-						$regionName = $this->_regionListByCountry[$countryCode][$regionCode] . ' (' . $regionCode . ')';
-					} elseif (strlen($regionCode)) {
-						$regionName = 'Region ' . $regionCode;
-					} else {
-						$regionName = 'Unknown region';
-					}
-					if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
-						$regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld] . ' (' . $regionCodeOld . ')';
-					} elseif (strlen($regionCodeOld)) {
-						$regionNameOld = 'Region ' . $regionCodeOld;
-					} else {
-						$regionNameOld = 'Unknown region';
-					}
+					$regionName = $this->_getRegionName($countryCode, $regionCode, true);
+					$regionNameOld = $this->_getRegionNameOld($countryCode, $regionCodeOld, true);
 					$cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
 					if ($regionName === 'Unknown region') {
 						$infoListUpdated['Region unset for cities'][$countryName . ' / ' . $regionNameOld][] =
@@ -1034,6 +1017,58 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			$escapeSequence = system('tput sgr0');
 		}
 		return $escapeSequence;
+	}
+
+	/**
+	 * @param string     $countryCode
+	 * @param string|int $regionCode
+	 * @param bool|null  $explicit
+	 * @return string
+	 */
+	private function _getRegionName($countryCode, $regionCode, $explicit = null) {
+		if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+			$regionName = $this->_regionListByCountry[$countryCode][$regionCode];
+			if ($explicit) {
+				$regionName .= ' (' . $regionCode . ')';
+			}
+			return $regionName;
+		} elseif (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'])) {
+			$regionName = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'];
+			if ($explicit) {
+				$regionName .= ' (' . $regionCode . ')';
+			}
+			return $regionName;
+		} elseif (strlen($regionCode)) {
+			return 'Region ' . $regionCode;
+		} else {
+			return 'Unknown region';
+		}
+	}
+
+	/**
+	 * @param string     $countryCode
+	 * @param string|int $regionCodeOld
+	 * @param bool|null  $explicit
+	 * @return string
+	 */
+	private function _getRegionNameOld($countryCode, $regionCodeOld, $explicit = null) {
+		if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
+			$regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld];
+			if ($explicit) {
+				$regionNameOld .= ' (' . $regionCodeOld . ')';
+			}
+			return $regionNameOld;
+		} elseif (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'])) {
+			$regionNameOld = $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'];
+			if ($explicit) {
+				$regionNameOld .= ' (' . $regionCodeOld . ')';
+			}
+			return $regionNameOld;
+		} elseif (strlen($regionCodeOld)) {
+			return 'Region ' . $regionCodeOld;
+		} else {
+			return 'Unknown region';
+		}
 	}
 
 	/**
