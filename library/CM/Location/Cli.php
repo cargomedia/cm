@@ -320,6 +320,37 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				}
 			}
 
+			// Look for cities with updated region
+
+			$regionCodeListByCityOld = array();
+			foreach ($regionCodeListOldByNewCode as $regionCode => $regionCodeOld) {
+				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+				// Retrieve the right city if its code has been updated
+				$cityCodeListOldByNewCode = array();
+				foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
+					$cityCode = $cityCodeOld;
+					if (isset($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld])) {
+						$cityCode = $this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld];
+					}
+					$cityCodeListOldByNewCode[$cityCode] = $cityCodeOld;
+				}
+				$regionCodeListByCityOld += array_fill_keys(array_keys($cityCodeListOldByNewCode), $regionCode);
+			}
+			foreach ($regionCodeList as $regionCode) {
+				$cityList = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+				foreach ($cityList as $cityCode => $cityName) {
+					if (isset($regionCodeListByCityOld[$cityCode]) && ($regionCode != $regionCodeListByCityOld[$cityCode])) {
+						$regionCodeOld = $regionCodeListByCityOld[$cityCode];
+						$this->_cityListUpdatedRegion[$countryCode][$cityCode] = array(
+							'regionCode'    => $regionCode,
+							'regionCodeOld' => $regionCodeListOldByNewCode[$regionCodeOld],
+						);
+						unset($this->_cityListByRegionAdded[$countryCode][$regionCode][$cityCode]);
+						unset($this->_cityListByRegionRemoved[$countryCode][$regionCodeOld][$cityCode]);
+					}
+				}
+			}
+
 			// Info
 			foreach ($regionCodeListKept as $regionCode) {
 				$regionName = $this->_getRegionName($countryCode, $regionCode);
@@ -349,14 +380,10 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				if ($cityCountRemoved) {
 					$cityRateRemoved = $cityCountRemoved / $cityCountOld;
 					$cityRateRemovedInfo = ' (' . round($cityRateRemoved * 100) . '%)';
-					if ($cityRateRemoved < 0.2) {
-						$infoListRemoved['Cities removed'][$countryName][] = $regionName . ', ' . $cityCountRemoved . $cityRateRemovedInfo;
-					} else {
-						foreach ($cityListRemoved as $cityCode => $cityName) {
-							$infoListRemoved['Cities removed'][
-							$countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo][] =
-									$cityName . ' (' . $cityCode . ')';
-						}
+					foreach ($cityListRemoved as $cityCode => $cityName) {
+						$infoListRemoved['Cities removed'][
+						$countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo][] =
+								$cityName . ' (' . $cityCode . ')';
 					}
 				}
 
@@ -376,33 +403,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				}
 			}
 
-			// Look for cities with updated region
-
-			$regionCodeListByCityOld = array();
-			foreach ($regionCodeListOldByNewCode as $regionCode => $regionCodeOld) {
-				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-				// Retrieve the right city if its code has been updated
-				$cityCodeListOldByNewCode = array();
-				foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
-					$cityCode = $cityCodeOld;
-					if (isset($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld])) {
-						$cityCode = $this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld];
-					}
-					$cityCodeListOldByNewCode[$cityCode] = $cityCodeOld;
-				}
-				$regionCodeListByCityOld += array_fill_keys(array_keys($cityCodeListOldByNewCode), $regionCode);
-			}
-			foreach ($regionCodeList as $regionCode) {
-				$cityList = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-				foreach ($cityList as $cityCode => $cityName) {
-					if (isset($regionCodeListByCityOld[$cityCode]) && ($regionCode != $regionCodeListByCityOld[$cityCode])) {
-						$this->_cityListUpdatedRegion[$countryCode][$cityCode] = array(
-							'regionCode'    => $regionCode,
-							'regionCodeOld' => $regionCodeListOldByNewCode[$regionCodeListByCityOld[$cityCode]],
-						);
-					}
-				}
-			}
 			if (isset($this->_cityListUpdatedRegion[$countryCode])) {
 				foreach ($this->_cityListUpdatedRegion[$countryCode] as $cityCode => $regionCodes) {
 					$regionCode = $regionCodes['regionCode'];
