@@ -6,6 +6,11 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		new CM_Dom_NodeList('<html><body><p>hello</p></body></html>');
 		new CM_Dom_NodeList('<p>hello</p>');
 		new CM_Dom_NodeList('<p>hello');
+
+		$domElement1 = new DOMElement('foo');
+		$domElement2 = new DOMElement('foo');
+		new CM_Dom_NodeList(array($domElement1, $domElement2));
+
 		$this->assertTrue(true);
 	}
 
