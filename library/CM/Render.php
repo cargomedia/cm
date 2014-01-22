@@ -214,7 +214,7 @@ class CM_Render extends CM_Class_Abstract {
 
 		if ($needed) {
 			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespaces `' . implode('`, `', $namespaceList) . '` and themes `' .
-				implode(', ', $this->getSite()->getThemes()) . '`');
+				implode('`, `', $this->getSite()->getThemes()) . '`');
 		}
 		return null;
 	}
