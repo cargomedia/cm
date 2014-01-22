@@ -48,13 +48,13 @@ class CM_Dom_NodeList implements Iterator, Countable {
 	 * @return CM_Dom_NodeList
 	 */
 	public function getChildren() {
-		$childList = array();
+		$childNodeList = array();
 		foreach ($this->_elementList as $element) {
 			foreach ($element->childNodes as $childNode) {
-				$childList[] = $childNode;
+				$childNodeList[] = $childNode;
 			}
 		}
-		return new self($childList);
+		return new self($childNodeList);
 	}
 
 	/**
