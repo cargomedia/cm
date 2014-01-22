@@ -18,8 +18,8 @@
 		}]
 	},
 	"Database": {
-		"db": "skadate",
-		"username": "skadate",
+		"db": "cm",
+		"username": "cm",
 		"password": "k290DSkjsfiE02sDjj",
 		"server": {
 			"host": "10.10.10.101",
