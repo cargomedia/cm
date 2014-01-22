@@ -196,7 +196,7 @@ class CM_Render extends CM_Class_Abstract {
 	public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
 		$namespaceList = $this->getSite()->getNamespaces();
 		if ($namespace !== null) {
-			$namespaceList = array($namespace);
+			$namespaceList = array((string) $namespace);
 		}
 		foreach ($namespaceList as $namespace) {
 			foreach ($this->getSite()->getThemes() as $theme) {
