@@ -16,6 +16,14 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		new CM_Dom_NodeList('<%%%%===**>>> foo');
 	}
 
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cant create elementList from empty string
+	 */
+	public function testConstructorEmpty() {
+		new CM_Dom_NodeList('');
+	}
+
 	public function testGetText() {
 		$list = new CM_Dom_NodeList('<div>hello<strong>world</strong></div>');
 		$this->assertSame('helloworld', $list->getText());
@@ -53,6 +61,12 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 			$actual[] = $child->getText();
 		}
 		$this->assertContainsAll($expected, $actual);
+	}
+
+	public function testGetChildrenEmpty() {
+		$list = new CM_Dom_NodeList('<p>hello</p>');
+		$list2 = $list->find('test');
+		$list2->getChildren();
 	}
 
 	public function testHas() {
