@@ -3,7 +3,7 @@
 class CM_Dom_NodeList implements Iterator, Countable {
 
 	/** @var int */
-	private $_iteratorPosition;
+	private $_iteratorPosition = 0;
 
 	/** @var DOMDocument */
 	private $_doc;
@@ -19,8 +19,6 @@ class CM_Dom_NodeList implements Iterator, Countable {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($html) {
-		$this->_iteratorPosition = 0;
-
 		if (is_array($html)) {
 			foreach ($html as $element) {
 				if (!$element instanceof DOMElement) {
