@@ -10,7 +10,7 @@ services:
   - redis-server
 before_script:
   - mkdir -p tests/tmp/data/logs
-  - tests/travis/install-apcu.sh
+  - tests/travis/build-ci.sh
   - phpenv config-add tests/travis/$TRAVIS_PHP_VERSION.ini
   - phpenv config-add tests/travis/apc.ini
   - composer -n install
