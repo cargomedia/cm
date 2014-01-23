@@ -9,6 +9,8 @@ $config->CM_Mail->send = false;
 $config->CM_Search->enabled = false;
 
 $config->CM_Db_Db->db = $config->CM_Db_Db->db . '_test';
+$config->CM_Db_Db->username = 'travis';
+$config->CM_Db_Db->password = '';
 $config->CM_Db_Db->serversReadEnabled = false;
 $config->CM_Db_Db->delayedEnabled = false;
 
