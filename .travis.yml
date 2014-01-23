@@ -17,3 +17,5 @@ before_script:
   - scripts/cm.php app generate-config-local resources/config/local.ci.json
   - scripts/cm.php app set-deploy-version
 script: phpunit -c tests/travis/phpunit.xml
+notifications:
+  email: false
