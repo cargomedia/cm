@@ -7,23 +7,10 @@
 		"amazonwebservices/aws-sdk-for-php": "1.5.*",
 		"ruflin/Elastica": "v0.19.8.0",
 		"phpmailer/phpmailer": "5.2.*",
-		"wurfl/tera-wurfl": "2.1.5",
+		"wurfl/wurfl-api": "1.5.0",
 		"michelf/php-markdown": "1.3-beta5",
 		"lstrojny/functional-php": "1.0.0-alpha2"
 	},
-	"repositories": [
-		{
-			"type": "package",
-			"package": {
-				"name": "wurfl/tera-wurfl",
-				"version": "2.1.5",
-				"dist": {
-					"url": "http://sourceforge.net/projects/wurfl/files/WURFL%20Database/1.4.2/wurfl-dbapi-1.4.2.0.zip/download",
-					"type": "zip"
-				}
-			}
-		}
-	],
 	"autoload": {
 		"psr-0": {
 			"CM_": "library/",
