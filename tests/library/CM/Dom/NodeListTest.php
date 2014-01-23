@@ -16,6 +16,7 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 
 	/**
 	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot load html
 	 */
 	public function testConstructorInvalid() {
 		new CM_Dom_NodeList('<%%%%===**>>> foo');
