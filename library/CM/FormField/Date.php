@@ -3,25 +3,25 @@
 class CM_FormField_Date extends CM_FormField_Abstract {
 
 	/** @var int */
-	protected $_yearMin;
+	protected $_yearFirst;
 
 	/** @var int */
-	protected $_yearMax;
+	protected $_yearLast;
 
 	/**
-	 * @param int|null $yearMin
-	 * @param int|null $yearMax
+	 * @param int|null $yearFirst
+	 * @param int|null $yearLast
 	 */
-	public function __construct($yearMin = null, $yearMax = null) {
-		if (null === $yearMin) {
-			$yearMin = date('Y') - 100;
+	public function __construct($yearFirst = null, $yearLast = null) {
+		if (null === $yearFirst) {
+			$yearFirst = date('Y') - 100;
 		}
-		$this->_yearMin = (int) $yearMin;
+		$this->_yearFirst = (int) $yearFirst;
 
-		if (null === $yearMax) {
-			$yearMax = date('Y');
+		if (null === $yearLast) {
+			$yearLast = date('Y');
 		}
-		$this->_yearMax = (int) $yearMax;
+		$this->_yearLast = (int) $yearLast;
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
@@ -35,7 +35,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 
-		$years = range($this->_yearMin, $this->_yearMax);
+		$years = range($this->_yearFirst, $this->_yearLast);
 		$months = range(1, 12);
 		$days = range(1, 31);
 

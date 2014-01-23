@@ -3,7 +3,6 @@
 /**
  * Uses 'phpredis' extension: https://github.com/nicolasff/phpredis
  */
-
 class CM_Redis_Client extends CM_Class_Abstract {
 
 	/** @var Redis */
@@ -23,13 +22,64 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	}
 
 	/**
-	 * Add a value to a list
+	 * @param string $key
+	 * @return string|false
+	 */
+	public function get($key) {
+		return $this->_redis->get($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $value
+	 * @return string|null
+	 */
+	public function set($key, $value) {
+		$this->_redis->set($key, $value);
+	}
+
+	/**
+	 * @param string $key
+	 * @return bool
+	 */
+	public function exists($key) {
+		return $this->_redis->exists($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param int    $timestamp
+	 */
+	public function expireAt($key, $timestamp) {
+		$this->_redis->expireAt($key, $timestamp);
+	}
+
+	/**
+	 * Prepend a value to a list
 	 *
 	 * @param string $key
 	 * @param string $value
+	 * @throws CM_Exception_Invalid
 	 */
 	public function lPush($key, $value) {
-		$this->_redis->lPush($key, $value);
+		$length = $this->_redis->lPush($key, $value);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+		}
+	}
+
+	/**
+	 * Append a value to a list
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @throws CM_Exception_Invalid
+	 */
+	public function rPush($key, $value) {
+		$length = $this->_redis->rPush($key, $value);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Cannot push to list `' . $key . '`.');
+		}
 	}
 
 	/**
@@ -44,6 +94,50 @@ class CM_Redis_Client extends CM_Class_Abstract {
 			$result = null;
 		}
 		return $result;
+	}
+
+	/**
+	 * Return values from list
+	 *
+	 * @param string   $key
+	 * @param int|null $start
+	 * @param int|null $stop
+	 * @return array
+	 */
+	public function lRange($key, $start = null, $stop = null) {
+		if (null === $start) {
+			$start = 0;
+		}
+		if (null === $stop) {
+			$stop = -1;
+		}
+		return $this->_redis->lRange($key, $start, $stop);
+	}
+
+	/**
+	 * @param string $key
+	 * @return int
+	 * @throws CM_Exception_Invalid
+	 */
+	public function lLen($key) {
+		$length = $this->_redis->lLen($key);
+		if (false === $length) {
+			throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+		}
+		return $length;
+	}
+
+	/**
+	 * @param string $key
+	 * @param int    $start
+	 * @param int    $stop
+	 * @throws CM_Exception_Invalid
+	 */
+	public function lTrim($key, $start, $stop) {
+		$result = $this->_redis->lTrim($key, $start, $stop);
+		if (false === $result) {
+			throw new CM_Exception_Invalid('Key `' . $key . '` does not contain a list');
+		}
 	}
 
 	/**
