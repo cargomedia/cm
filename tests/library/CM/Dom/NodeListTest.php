@@ -73,7 +73,7 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$list = new CM_Dom_NodeList('<p>hello</p>');
 		$list2 = $list->find('foo')->getChildren();
 
-		$this->assertEquals('', $list2->getText());
+		$this->assertEquals(0, $list2->count());
 	}
 
 	public function testHas() {
