@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormTest extends CMTest_TestCase {
+class CM_Form_AbstractTest extends CMTest_TestCase {
 
 	public static $formActionProcessCount = 0;
 
