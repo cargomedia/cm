@@ -51,12 +51,12 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 		$this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $list->find('div')->getAttributeList());
 	}
 
-	public function testFind(){
+	public function testFind() {
 		$list = new CM_Dom_NodeList('<div foo="bar">lorem ipsum dolor <p foo="foo">lorem ipsum</p></div><p foo="foo">lorem</p>');
 		$this->assertSame('lorem ipsumlorem', $list->find('p')->getText());
 	}
 
-	public function testGetChildren(){
+	public function testGetChildren() {
 		$expected = array('lorem ipsum dolor', 'lorem ipsum', 'test', '');
 		$list = new CM_Dom_NodeList('<div><span foo="bar">lorem ipsum dolor</span><p foo="foo">lorem ipsum</p><span>test</span><a></a></div>');
 		$children = $list->find('div')->getChildren();
@@ -71,8 +71,9 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 
 	public function testGetChildrenEmpty() {
 		$list = new CM_Dom_NodeList('<p>hello</p>');
-		$list2 = $list->find('test');
-		$list2->getChildren();
+		$list2 = $list->find('foo')->getChildren();
+
+		$this->assertEquals('', $list2->getText());
 	}
 
 	public function testHas() {
