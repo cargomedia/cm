@@ -8,7 +8,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
 
 	public function testAddGet() {
 		$paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))
-				->disableOriginalConstructor()->getMockForAbstractClass();
+			->disableOriginalConstructor()->getMockForAbstractClass();
 		$paging->expects($this->any())->method('getType')->will($this->returnValue(14));
 		/** @var CM_Paging_Log_Abstract $paging */
 		$paging->__construct();
@@ -29,7 +29,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
 
 	public function testGetInvalidMetaInfo() {
 		$paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))
-				->disableOriginalConstructor()->getMockForAbstractClass();
+			->disableOriginalConstructor()->getMockForAbstractClass();
 		$paging->expects($this->any())->method('getType')->will($this->returnValue(14));
 		/** @var CM_Paging_Log_Abstract $paging */
 		$paging->__construct();
