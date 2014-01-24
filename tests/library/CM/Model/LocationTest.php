@@ -197,7 +197,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 
 		$state = CM_Model_Location::createState($country, 'Example State', 'ES');
 		$cityWithState = CM_Model_Location::createCity($state, 'Example City', 50, 100);
-		$this->assertSame($country->getId(), $cityWithoutState->getId(CM_Model_Location::LEVEL_COUNTRY));
+		$this->assertSame($country->getId(), $cityWithState->getId(CM_Model_Location::LEVEL_COUNTRY));
 		$this->assertSame($state->getId(), $cityWithState->getId(CM_Model_Location::LEVEL_STATE));
 	}
 
