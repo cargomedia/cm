@@ -9,7 +9,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
 	private $_doc;
 
 	/** @var DOMElement[] */
-	private $_elementList;
+	private $_elementList = array();
 
 	/** @var DOMXPath */
 	private $_xpath;
@@ -52,11 +52,9 @@ class CM_Dom_NodeList implements Iterator, Countable {
 	 */
 	public function getChildren() {
 		$childNodeList = array();
-		if (!empty($this->_elementList)) {
-			foreach ($this->_elementList as $element) {
-				foreach ($element->childNodes as $childNode) {
-					$childNodeList[] = $childNode;
-				}
+		foreach ($this->_elementList as $element) {
+			foreach ($element->childNodes as $childNode) {
+				$childNodeList[] = $childNode;
 			}
 		}
 		return new self($childNodeList);
@@ -144,14 +142,12 @@ class CM_Dom_NodeList implements Iterator, Countable {
 		$xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
 		$xpath = preg_replace('-\/\[-', '/*[', $xpath);
 		$nodes = array();
-		if (!empty($this->_elementList)) {
-			foreach ($this->_elementList as $element) {
-				foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
-					if (!$resultElement instanceof DOMElement) {
-						throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
-					}
-					$nodes[] = $resultElement;
+		foreach ($this->_elementList as $element) {
+			foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
+				if (!$resultElement instanceof DOMElement) {
+					throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
 				}
+				$nodes[] = $resultElement;
 			}
 		}
 		return $nodes;
