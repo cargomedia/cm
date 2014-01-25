@@ -114,11 +114,7 @@ class CM_Cli_CommandManager {
 
 			$process = CM_Process::getInstance();
 			if ($this->_forks) {
-				$process->fork($this->_forks);
-			}
-
-			if ($command->getKeepalive()) {
-				$process->keepalive();
+				$process->fork($this->_forks, $command->getKeepalive());
 			}
 
 			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);

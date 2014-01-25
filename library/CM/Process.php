@@ -12,9 +12,10 @@ class CM_Process {
 
 	/**
 	 * @param int $amount
+	 * @param boolean|null $keepAlive
 	 * @throws CM_Exception
 	 */
-	public function fork($amount) {
+	public function fork($amount, $keepAlive = null) {
 		$this->_installSignalHandlers();
 		for ($i = 0; $i < $amount; $i++) {
 			$pid = $this->_spawnChild();
@@ -29,28 +30,18 @@ class CM_Process {
 				throw new CM_Exception('Waiting on child processes failed');
 			}
 			unset($this->_childPids[$pid]);
-		} while (count($this->_childPids));
-		exit(0);
-	}
+			if ($keepAlive) {
+				$warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN);
+				CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+				usleep(self::RESPAWN_TIMEOUT * 1000000);
+				$pid = $this->_spawnChild();
+				if (!$pid) {
+					return;
+				}
 
-	public function keepalive() {
-		$this->_installSignalHandlers();
-		do {
-			$pid = $this->_spawnChild();
-			if (!$pid) {
-				return;
 			}
-			$pid = pcntl_wait($status);
-			pcntl_signal_dispatch();
-			if (-1 === $pid) {
-				throw new CM_Exception('Waiting on child processes failed');
-			}
-			unset($this->_childPids[$pid]);
-			$warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN);
-			CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
-			usleep(self::RESPAWN_TIMEOUT * 1000000);
-		} while (true);
-		exit(1);
+		} while (count($this->_childPids) || $keepAlive);
+		exit(0);
 	}
 
 	/**
