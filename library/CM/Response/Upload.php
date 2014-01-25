@@ -5,9 +5,9 @@ class CM_Response_Upload extends CM_Response_Abstract {
 	/**
 	 * Max file size allowed by the ser
 	 *
-	 * @var int 10MB
+	 * @var int 100MB
 	 */
-	const MAX_FILE_SIZE = 10485760;
+	const MAX_FILE_SIZE = 104857600;
 
 	private static $_uploadErrors = array(
 		UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',

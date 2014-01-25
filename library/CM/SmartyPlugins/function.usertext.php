@@ -23,8 +23,14 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 
 	$text = $usertext->transform($text);
 
-	if ($mode !== 'escape') {
-		$text = '<div class="usertext ' . $mode . '">' . $text . '</div>';
+	switch($mode){
+		case 'escape':
+			return $text;
+			break;
+		case 'markdown':
+			return '<div class="usertext ' . $mode . '">' . $text . '</div>';
+			break;
+		default:
+			return '<span class="usertext ' . $mode . '">' . $text . '</span>';
 	}
-	return $text;
 }

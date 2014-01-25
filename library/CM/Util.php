@@ -199,7 +199,9 @@ class CM_Util {
 		$path = (string) $path;
 		if (!is_dir($path)) {
 			if (false === @mkdir($path, 0777, true)) {
-				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+				if (!is_dir($path)) {	// Might have been created in the meantime
+					throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+				}
 			}
 		}
 		return $path;

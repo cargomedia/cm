@@ -14,7 +14,7 @@ class CM_Captcha {
 		$this->_id = (int) $id;
 		$this->_text = CM_Db_Db::select('cm_captcha', 'number', array('captcha_id' => $this->getId()))->fetchColumn();
 		if (!$this->_text) {
-			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`');
+			throw new CM_Exception_Nonexistent('Invalid captcha id `' . $id . '`', null, null, CM_Exception::WARN);
 		}
 		$this->_fontPath = DIR_PUBLIC . 'static' . DIRECTORY_SEPARATOR . 'font' . DIRECTORY_SEPARATOR . 'comicsans.ttf';
 	}

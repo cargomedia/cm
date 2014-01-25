@@ -30,6 +30,11 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 		$placeholder = ' -' . $render->getTranslation('Select') . '- ';
 	}
 
+	$labelPrefix = null;
+	if (isset($params['labelPrefix'])) {
+		$labelPrefix = (string) $params['labelPrefix'];
+	}
+
 	foreach ($optionList as $itemValue => $itemLabel) {
 		if ($translate) {
 			$optionList[$itemValue] = $render->getTranslation($translatePrefix . $itemLabel, array());
@@ -72,6 +77,10 @@ function smarty_function_select(array $params, Smarty_Internal_Template $templat
 	$html .= '</select>';
 
 	$html .= '<div class="button button-default hasLabel hasIconRight nowrap">';
+
+	if ($labelPrefix) {
+		$html .= '<span class="labelPrefix">' . CM_Util::htmlspecialchars($labelPrefix) . '</span>';
+	}
 	$html .= '<span class="label">' . $selectedLabel . '</span><span class="icon icon-select"></span>';
 	$html .= '</div>';
 
