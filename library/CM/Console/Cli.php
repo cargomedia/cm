@@ -2,6 +2,13 @@
 
 class CM_Console_Cli extends CM_Cli_Runnable_Abstract {
 
+	/**
+	 * @keepalive
+	 */
+	public function test() {
+		$this->_getOutput()->writeln('Test...');
+	}
+
 	public function interactive() {
 		while ('exit' !== ($code = $this->_getInput()->read('php >'))) {
 			$result = null;

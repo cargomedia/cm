@@ -1,6 +1,6 @@
 <?php
 
-class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
+class CM_Cache_Runtime extends CM_Class_Abstract {
 
 	const LIFETIME_MAX = 3;
 	const CLEAR_INTERVAL = 300;
@@ -8,7 +8,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 	/** @var int */
 	private $_lastClearStamp;
 
-	/** @var CM_Cache_Storage_Runtime */
+	/** @var CM_Cache_Runtime */
 	private static $_instance;
 
 	/** @var array */
@@ -18,11 +18,12 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$this->_storage = array();
 	}
 
-	protected function _getName() {
-		return 'Runtime';
-	}
-
-	protected function _set($key, $value, $lifeTime = null) {
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 * @param int|null $lifeTime
+	 */
+	public function set($key, $value, $lifeTime = null) {
 		if (null === $lifeTime) {
 			$lifeTime = self::LIFETIME_MAX;
 		} else {
@@ -35,18 +36,25 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		}
 	}
 
-	protected function _get($key) {
+	/**
+	 * @param string $key
+	 * @return mixed|false
+	 */
+	public function get($key) {
 		if (!array_key_exists($key, $this->_storage) || time() > $this->_storage[$key]['expirationStamp']) {
 			return false;
 		}
 		return $this->_storage[$key]['value'];
 	}
 
-	protected function _delete($key) {
+	/**
+	 * @param string $key
+	 */
+	public function delete($key) {
 		unset($this->_storage[$key]);
 	}
 
-	protected function _flush() {
+	public function flush() {
 		$this->_storage = array();
 	}
 
@@ -54,14 +62,14 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$currentTime = time();
 		foreach ($this->_storage as $key => $data) {
 			if ($currentTime > $data['expirationStamp']) {
-				$this->_delete($key);
+				$this->delete($key);
 			}
 		}
 		$this->_lastClearStamp = $currentTime;
 	}
 
 	/**
-	 * @return CM_Cache_Storage_Runtime
+	 * @return CM_Cache_Runtime
 	 */
 	public static function getInstance() {
 		if (!self::$_instance) {
