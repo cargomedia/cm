@@ -2,7 +2,7 @@
 
 class CM_Cache_Runtime extends CM_Class_Abstract {
 
-	const LIFETIME_MAX = 3;
+	const LIFETIME = 3;
 	const CLEAR_INTERVAL = 300;
 
 	/** @var int */
@@ -21,15 +21,9 @@ class CM_Cache_Runtime extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @param mixed $value
-	 * @param int|null $lifeTime
 	 */
-	public function set($key, $value, $lifeTime = null) {
-		if (null === $lifeTime) {
-			$lifeTime = self::LIFETIME_MAX;
-		} else {
-			$lifeTime = min(self::LIFETIME_MAX, $lifeTime);
-		}
-		$expirationStamp = time() + $lifeTime;
+	public function set($key, $value) {
+		$expirationStamp = time() + self::LIFETIME;
 		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
 		if ($this->_lastClearStamp + self::CLEAR_INTERVAL < time()) {
 			$this->_deleteExpired();
