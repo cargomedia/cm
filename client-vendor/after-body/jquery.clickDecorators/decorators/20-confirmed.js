@@ -2,20 +2,18 @@
  * Author: CM
  */
 (function($) {
-	$.event.special.clickConfirmed = {
-		bindType: "click",
-		delegateType: "click",
 
+	$.clickDecorators.confirmed = {
 		settings: {
 			message: 'Please Confirm'
 		},
 
-		handle: function(event) {
+		before: function(event) {
 			var $this = $(this);
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
-				$this.attr('title', $.event.special.clickConfirmed.settings.message).tooltip({trigger: 'manual'}).tooltip('show');
+				$this.attr('title', $.clickDecorators.confirmed.settings.message).tooltip({trigger: 'manual'}).tooltip('show');
 
 				var deactivateButton = function() {
 					$this.removeClass('confirmClick');
@@ -42,14 +40,13 @@
 				}, 0);
 			};
 
-
 			if ($this.hasClass('confirmClick')) {
 				$this.data('clickConfirmed.deactivate')();
-				return event.handleObj.handler.call(this, event);
 			} else {
 				activateButton();
 				return false;
 			}
 		}
 	};
+
 })(jQuery);
