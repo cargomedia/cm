@@ -1,5 +1,14 @@
+#browserNotSupported {
+	width: 100%;
+	position: fixed;
+	top: 0;
+	padding: 15px;
+	z-index: 100;
+	background-color: lighten(@colorNotice, 40);
+	border-bottom: 1px solid @colorNotice;
+}
+
 .router-placeholder {
-	background-color: @colorBg;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -10,14 +19,6 @@
 		padding: 15px;
 		border-left: 2px solid @colorError;
 		left: -2px;
-	}
-
-	.spinner {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
 	}
 }
 

@@ -2,81 +2,124 @@
 
 abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
 
-	/**
-	 * @var CM_Model_User|int
-	 */
+	const CREATE = 'CREATE';
+	const UPDATE = 'UPDATE';
+	const DELETE = 'DELETE';
+	const ONLINE = 'ONLINE';
+	const OFFLINE = 'OFFLINE';
+	const VIEW = 'VIEW';
+	const VISIBLE = 'VISIBLE';
+	const INVISIBLE = 'INVISIBLE';
+	const PUBLISH = 'PUBLISH';
+	const UNPUBLISH = 'UNPUBLISH';
+	const SUBSCRIBE = 'SUBSCRIBE';
+	const UNSUBSCRIBE = 'UNSUBSCRIBE';
+
+	/** @var CM_Model_User|int */
 	protected $_actor = null;
 
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	protected $_verb;
 
-	/**
-	 * @var int|null
-	 */
+	/** @var int|null */
 	protected $_ip = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $_ignoreLogging = array();
 
-	/**
-	 * @var bool
-	 */
-	private $_forceAllow = false;
+	/** @var array */
+	private $_trackingProperties = array();
+
+	/** @var bool */
+	private $_trackingEnabled = true;
 
 	/**
-	 * @param int               $verb
+	 * @param string            $verbName
 	 * @param CM_Model_User|int $actor
 	 */
-	public final function __construct($verb, $actor) {
+	public function __construct($verbName, $actor) {
 		$this->setActor($actor);
-		$this->_verb = (int) $verb;
+		$this->_verb = CM_Action_Abstract::getVerbByVerbName($verbName);
 	}
 
-	protected function _notify(){
+	protected function _notify() {
 		$arguments = func_get_args();
-		$methodName = '_notify' . $this->getVerbName();
+		$methodName = '_notify' . CM_Util::camelize($this->getVerbName());
 
 		if (method_exists($this, $methodName)) {
 			call_user_func_array(array($this, $methodName), $arguments);
 		}
+
+		if ($this->getActor() && $this->_trackingEnabled) {
+			$this->_track();
+		}
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected function _isAllowed() {
+		$arguments = func_get_args();
+		$methodName = '_isAllowed' . CM_Util::camelize($this->getVerbName());
+
+		if (method_exists($this, $methodName)) {
+			return call_user_func_array(array($this, $methodName), $arguments);
+		}
+		return true;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isAllowed() {
+		$arguments = func_get_args();
+		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
+			return false;
+		}
+		$actionLimitList = $this->getActionLimitsTransgressed();
+		foreach ($actionLimitList as $actionLimitData) {
+			/** @var CM_Model_ActionLimit_Abstract $actionLimit */
+			$actionLimit = $actionLimitData['actionLimit'];
+			if (!$actionLimit->getOvershootAllowed()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	abstract protected function _prepare();
 
-	public final function prepare() {
-		$role = null;
-		$actionLimit = $this->getActionLimit($role);
-		if ($actionLimit) {
-			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
-			$this->_log($actionLimit, $role);
-			$actionLimit->overshoot($this, $role, $isFirst);
-		} else {
-			$this->_log();
+	public function prepare() {
+		$arguments = func_get_args();
+		if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
+			throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
 		}
+		$role = null;
+		$actionLimitList = $this->getActionLimitsTransgressed();
+		foreach ($actionLimitList as $actionLimitData) {
+			/** @var CM_Model_ActionLimit_Abstract $actionLimit */
+			$actionLimit = $actionLimitData['actionLimit'];
+			$role = $actionLimitData['role'];
+			$isFirst = $this->_isFirstActionLimit($actionLimit, $role);
+			if ($isFirst) {
+				$this->_log($actionLimit);
+			}
+			$actionLimit->overshoot($this, $role, $isFirst);
+			if (!$actionLimit->getOvershootAllowed()) {
+				throw new CM_Exception_NotAllowed('ActionLimit `' . $actionLimit->getType() . '` breached.');
+			}
+		}
+		$this->_log();
 		$this->_prepare();
 	}
 
 	/**
-	 * @param bool $forceAllow
+	 * @return array ['actionLimit' => CM_Model_ActionLimit_Abstract, 'role' => int]
 	 */
-	public function forceAllow($forceAllow) {
-		$this->_forceAllow = (bool) $forceAllow;
-	}
-
-	/**
-	 * @param int &$bestRole OPTIONAL reference for storing role associated with limit
-	 * @return CM_Model_ActionLimit_Abstract|null
-	 */
-	public final function getActionLimit(&$bestRole = null) {
-		if ($this->_forceAllow) {
-			return null;
-		}
+	public function getActionLimitsTransgressed() {
+		$actionLimitsTransgressed = array();
 		/** @var CM_Model_ActionLimit_Abstract $actionLimit */
-		foreach (new CM_Paging_ActionLimit_Action($this) as $actionLimit) {
+		foreach ($this->_getActionLimitList() as $actionLimit) {
 			$bestRole = null;
 			if ($this->getActor()) {
 				$bestLimit = 0;
@@ -89,19 +132,17 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 				}
 			}
 			$limit = $actionLimit->getLimit($bestRole);
-			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())
-			) {
-				return $actionLimit;
+			if ($limit !== null && ($limit == 0 || $limit <= $this->_getSiblings($actionLimit->getPeriod($bestRole))->getCount())) {
+				$actionLimitsTransgressed[] = array('actionLimit' => $actionLimit, 'role' => $bestRole);
 			}
 		}
-		$bestRole = null;
-		return null;
+		return $actionLimitsTransgressed;
 	}
 
 	/**
 	 * @return CM_Model_User|null
 	 */
-	public final function getActor() {
+	public function getActor() {
 		return $this->_actor;
 	}
 
@@ -109,7 +150,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @param CM_Model_User|int $actor
 	 * @throws CM_Exception_Invalid
 	 */
-	public final function setActor($actor) {
+	public function setActor($actor) {
 		if ($actor instanceof CM_Model_User) {
 			$this->_actor = $actor;
 			$this->_ip = null;
@@ -124,36 +165,42 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @return int|null
 	 */
-	public final function getIp() {
+	public function getIp() {
 		return $this->_ip;
 	}
 
 	/**
 	 * @return int
 	 */
-	public final function getVerb() {
+	public function getVerb() {
 		return $this->_verb;
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract     $actionLimit
-	 * @param int                               $role
+	 * @return CM_Paging_ActionLimit_Action
+	 */
+	protected function _getActionLimitList() {
+		return new CM_Paging_ActionLimit_Action($this);
+	}
+
+	/**
+	 * @param CM_Model_ActionLimit_Abstract $actionLimit
+	 * @param int                           $role
 	 * @return bool
 	 */
-	private final function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
+	private function _isFirstActionLimit(CM_Model_ActionLimit_Abstract $actionLimit, $role) {
 		$first = true;
-		if ($actionLimit->getLimit($role)) {
-			$transgressions = $this->_getTransgressions($actionLimit->getType(), $actionLimit->getPeriod($role));
+		if (null !== $actionLimit->getLimit($role) && 0 !== $actionLimit->getLimit($role)) {
+			$period = $actionLimit->getPeriod($role);
+			$transgressions = $this->_getTransgressions($actionLimit->getType(), $period);
 			if ($transgressions->getCount()) {
-				$actions = $this->_getSiblings($actionLimit->getPeriod($role));
+				$lastTransgression = $transgressions->getItem(0);
+				$actions = $this->_getSiblings($period, $lastTransgression['createStamp']);
 				if ($actions->getCount()) {
-					$lastAction = $actions->getItem(0);
-					$lastTransgression = $transgressions->getItem(0);
-					if ($lastAction['createStamp'] <= $lastTransgression['createStamp']) {
+					$firstAction = $actions->getItem(-1);
+					if (time() < ($firstAction['createStamp'] + $period)) {
 						$first = false;
 					}
-				} else {
-					$first = false;
 				}
 			}
 		}
@@ -161,19 +208,20 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param int $within OPTIONAL
+	 * @param int|null $within
+	 * @param int|null $upperBound
 	 * @return CM_Paging_Action_Ip|CM_Paging_Action_User
 	 * @throws CM_Exception_Invalid
 	 */
-	private final function _getSiblings($within = null) {
+	private function _getSiblings($within = null, $upperBound = null) {
 		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
 				'Looking for actions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
 		}
 		if ($this->getActor()) {
-			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within);
+			return $this->getActor()->getActions($this->getType(), $this->getVerb(), $within, $upperBound);
 		} else {
-			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within);
+			return new CM_Paging_Action_Ip($this->getIp(), $this->getType(), $this->getVerb(), $within, $upperBound);
 		}
 	}
 
@@ -183,7 +231,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return CM_Paging_Transgression_Ip|CM_Paging_Transgression_User
 	 * @throws CM_Exception_Invalid
 	 */
-	private final function _getTransgressions($actionLimitType = null, $period = null) {
+	private function _getTransgressions($actionLimitType = null, $period = null) {
 		if (in_array($this->getVerb(), $this->_ignoreLogging)) {
 			throw new CM_Exception_Invalid(
 				'Looking for transgressions of verb `' . $this->getVerb() . '` on actionType `' . $this->getType() . '` that is not being logged.');
@@ -196,13 +244,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @param CM_Model_ActionLimit_Abstract $actionLimit OPTIONAL
-	 * @param int                           $role        OPTIONAL
+	 * @param CM_Model_ActionLimit_Abstract|null $actionLimit
 	 */
-	private final function _log(CM_Model_ActionLimit_Abstract $actionLimit = null, $role = null) {
+	private function _log(CM_Model_ActionLimit_Abstract $actionLimit = null) {
 		if (!in_array($this->getVerb(), $this->_ignoreLogging)) {
 			if ($actionLimit) {
-				$this->_getTransgressions()->add($this, $actionLimit->getType(), $actionLimit->getPeriod($role));
+				$this->_getTransgressions()->add($this, $actionLimit->getType());
 			} else {
 				$this->_getSiblings()->add($this);
 			}
@@ -212,30 +259,31 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	/**
 	 * @param int $age Seconds
 	 */
-	public static final function deleteOlder($age) {
+	public static function deleteOlder($age) {
 		$age = (int) $age;
-		CM_Db_Db::delete(TBL_CM_ACTION, '`createStamp` < ' . (time() - $age));
+		CM_Db_Db::delete('cm_action', '`createStamp` < ' . (time() - $age));
 	}
 
-	public final function toArray() {
+	public function toArray() {
 		return array('actor' => $this->getActor(), 'verb' => $this->getVerb(), 'type' => $this->getType());
 	}
 
 	public static function fromArray(array $data) {
-		return self::factory($data['actor'], $data['verb'], $data['type']);
+		$verb = CM_Action_Abstract::getVerbNameByVerb($data['verb']);
+		return self::factory($data['actor'], $verb, $data['type']);
 	}
 
 	/**
 	 * @param CM_Model_User $actor
-	 * @param int           $verb
+	 * @param string        $verbName
 	 * @param int           $type
 	 *
 	 * @return CM_Action_Abstract
 	 * @throws CM_Exception
 	 */
-	public static function factory(CM_Model_User $actor, $verb, $type) {
+	public static function factory(CM_Model_User $actor, $verbName, $type) {
 		$class = self::_getClassName($type);
-		return new $class($verb, $actor);
+		return new $class($verbName, $actor);
 	}
 
 	/**
@@ -257,7 +305,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 		$time = time();
 		foreach (array_reverse($intervals) as $interval) {
-			$timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM TBL_CM_ACTION WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
+			$timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM `cm_action` WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
 			if (false === $timeMin) {
 				return;
 			}
@@ -280,7 +328,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		$timeStamp = floor(($upperBound + $lowerBound) / 2);
 		$where = '`createStamp` >= ' . $lowerBound . ' AND `createStamp` < ' . $upperBound . ' AND `actionLimitType` IS NULL';
 		$result = CM_Db_Db::exec(
-			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM TBL_CM_ACTION WHERE " . $where . " GROUP BY `verb`, `type`");
+			"SELECT `verb`, `type`, COUNT(*) AS `count`, SUM(`count`) AS `sum` FROM `cm_action` WHERE " . $where . " GROUP BY `verb`, `type`");
 		$insert = array();
 		while ($row = $result->fetch()) {
 			if ($row['count'] >= 1) {
@@ -288,8 +336,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			}
 		}
 		if (!empty($insert)) {
-			CM_Db_Db::delete(TBL_CM_ACTION, $where);
-			CM_Db_Db::insert(TBL_CM_ACTION, array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
+			CM_Db_Db::delete('cm_action', $where);
+			CM_Db_Db::insert('cm_action', array('verb', 'type', 'createStamp', 'count', 'interval'), $insert);
 		}
 	}
 
@@ -304,7 +352,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @return string
 	 */
 	public function getName() {
-		return self::getNameByType($this->getType(), $this->_getClassName());
+		return self::getNameByClassName($this->_getClassName());
 	}
 
 	/**
@@ -314,15 +362,35 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 		return $this->getName() . ' ' . $this->getVerbName();
 	}
 
+	protected function _track() {
+		CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+	}
+
 	/**
-	 * @param int         $type
-	 * @param string|null $className
+	 * @param array $properties
+	 */
+	protected function _setTrackingProperties(array $properties) {
+		$this->_trackingProperties = $properties;
+	}
+
+	protected function _disableTracking() {
+		$this->_trackingEnabled = false;
+	}
+
+	/**
+	 * @param int $type
 	 * @return string
 	 */
-	static public function getNameByType($type, $className = null) {
-		if (!$className) {
-			$className = self::_getClassName($type);
-		}
+	static public function getNameByType($type) {
+		$className = self::_getClassName($type);
+		return self::getNameByClassName($className);
+	}
+
+	/**
+	 * @param string $className
+	 * @return string
+	 */
+	static public function getNameByClassName($className) {
 		return str_replace('_', ' ', str_replace(CM_Util::getNamespace($className) . '_Action_', '', $className));
 	}
 
@@ -332,10 +400,23 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	 * @throws CM_Exception_Invalid
 	 */
 	static public function getVerbNameByVerb($verb) {
-		$actionVerbs = self::_getConfig()->verbs;
-		if (!array_key_exists($verb, $actionVerbs)) {
+		$actionVerbNames = array_flip(self::_getConfig()->verbs);
+		if (!array_key_exists($verb, $actionVerbNames)) {
 			throw new CM_Exception_Invalid('The specified Action does not exist!');
 		}
-		return $actionVerbs[$verb];
+		return $actionVerbNames[$verb];
+	}
+
+	/**
+	 * @param string $name
+	 * @return int
+	 * @throws CM_Exception_Invalid
+	 */
+	static public function getVerbByVerbName($name) {
+		$actionVerbs = self::_getConfig()->verbs;
+		if (!array_key_exists($name, $actionVerbs)) {
+			throw new CM_Exception_Invalid('Action `' . $name . '` does not exist!');
+		}
+		return $actionVerbs[$name];
 	}
 }

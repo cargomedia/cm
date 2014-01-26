@@ -31,13 +31,42 @@ class CM_Util {
 	}
 
 	/**
+	 * @param mixed $argument
+	 * @return string
+	 */
+	public static function varDump($argument) {
+		if (is_object($argument)) {
+			if ($argument instanceof stdClass) {
+				return 'object';
+			}
+			$value = get_class($argument);
+			if ($argument instanceof CM_Model_Abstract) {
+				$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
+			}
+			return $value;
+		}
+		if (is_string($argument)) {
+			if (strlen($argument) > 20) {
+				$argument = substr($argument, 0, 20) . '...';
+			}
+			return '\'' . $argument . '\'';
+		}
+		if (is_bool($argument) || is_numeric($argument)) {
+			return var_export($argument, true);
+		}
+		return gettype($argument);
+	}
+
+	/**
 	 * @param string $pattern OPTIONAL
 	 * @param string $path    OPTIONAL
 	 * @return array
 	 */
 	public static function rglob($pattern = '*', $path = './') {
-		$files = glob($path . $pattern);
-		$paths = glob($path . '*', GLOB_MARK | GLOB_ONLYDIR);
+		$files = glob($path . $pattern, GLOB_NOSORT);
+		sort($files); // glob's sort is not reliable (locale dependent?)
+		$paths = glob($path . '*', GLOB_NOSORT | GLOB_MARK | GLOB_ONLYDIR);
+		sort($paths);
 		foreach ($paths as $path) {
 			$files = array_merge($files, self::rglob($pattern, $path));
 		}
@@ -112,6 +141,7 @@ class CM_Util {
 
 		$curlConnection = curl_init();
 		curl_setopt($curlConnection, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curlConnection, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($curlConnection, CURLOPT_TIMEOUT, $timeout);
 		if ($methodPost) {
 			curl_setopt($curlConnection, CURLOPT_POST, 1);
@@ -125,13 +155,20 @@ class CM_Util {
 		}
 		curl_setopt($curlConnection, CURLOPT_URL, $url);
 
-		$contents = curl_exec($curlConnection);
 		$curlError = null;
+		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError = 'Fetching contents from `' . $url . '` failed: `' . curl_error($curlConnection) . '`';
+			$curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
+
+		$info = curl_getinfo($curlConnection);
+		if ((int) $info['http_code'] !== 200) {
+			$curlError .= 'HTTP Code: `' . $info['http_code'] . '`';
+		}
+
 		curl_close($curlConnection);
 		if ($curlError) {
+			$curlError = 'Fetching contents from `' . $url . '` failed: `' . $curlError;
 			throw new CM_Exception_Invalid($curlError);
 		}
 		return $contents;
@@ -161,8 +198,10 @@ class CM_Util {
 	public static function mkDir($path) {
 		$path = (string) $path;
 		if (!is_dir($path)) {
-			if (false === mkdir($path, 0777, true)) {
-				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+			if (false === @mkdir($path, 0777, true)) {
+				if (!is_dir($path)) {	// Might have been created in the meantime
+					throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+				}
 			}
 		}
 		return $path;
@@ -178,28 +217,34 @@ class CM_Util {
 
 	/**
 	 * @param string $path
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public static function rmDir($path) {
 		$path = (string) $path;
 		self::rmDirContents($path);
-		if (!rmdir($path)) {
-			throw new CM_Exception_Invalid('Could not delete directory `' . $path . '`');
+		if (!@rmdir($path)) {
+			throw new CM_Exception('Could not delete directory `' . $path . '`');
 		}
 	}
 
 	/**
 	 * @param string $path
-	 * @throws CM_Exception_Invalid
+	 * @throws CM_Exception
 	 */
 	public static function rmDirContents($path) {
-		$path = (string) $path;
-		foreach (glob($path . '*') as $file) {
-			if (is_dir($file)) {
-				self::rmDir($file . '/');
+		$path = (string) $path . '/';
+		if (!is_dir($path)) {
+			return;
+		}
+		$systemFileList = scandir($path);
+		$userFileList = array_diff($systemFileList, array('.', '..'));
+		foreach ($userFileList as $filename) {
+			$fullpath = $path . $filename;
+			if (is_dir($fullpath)) {
+				self::rmDir($fullpath . '/');
 			} else {
-				if (!unlink($file)) {
-					throw new CM_Exception_Invalid('Could not delete file `' . $file . '`');
+				if (!@unlink($fullpath)) {
+					throw new CM_Exception('Could not delete file `' . $fullpath . '`');
 				}
 			}
 		}
@@ -216,7 +261,9 @@ class CM_Util {
 		if (!empty($params)) {
 			$params = CM_Params::encode($params);
 			$query = http_build_query($params);
-			$link .= '?' . $query;
+			if (strlen($query) > 0) {
+				$link .= '?' . $query;
+			}
 		}
 
 		return $link;
@@ -398,18 +445,62 @@ class CM_Util {
 	}
 
 	/**
+	 * @param null $namespace
+	 * @return string
+	 *
+	 * Measures time between two successive calls, sums up multiple measurements and tracks call count
+	 */
+	public static function benchmarkMultiple($namespace = null) {
+		static $timeTotals;
+		if (!$timeTotals) {
+			$timeTotals = array();
+		}
+		static $callCount;
+		if (!$callCount) {
+			$callCount = array();
+		}
+		static $times;
+		if (!$times) {
+			$times = array();
+		}
+		$now = microtime(true) * 1000;
+		$total = 0;
+		if (!array_key_exists($namespace, $callCount)) {
+			$callCount[$namespace] = 0;
+		}
+		if (array_key_exists($namespace, $timeTotals)) {
+			$total = $timeTotals[$namespace];
+		}
+		if (array_key_exists($namespace, $times)) {
+			$difference = $now - $times[$namespace];
+			$total += $difference;
+			$timeTotals[$namespace] = $total;
+			unset($times[$namespace]);
+			$callCount[$namespace] += 1;
+		} else {
+			$times[$namespace] = $now;
+		}
+		$count = $callCount[$namespace];
+		$output = sprintf('called %d times', $count);
+		if ($count) {
+			$output .= sprintf(', Average: %.2f ms, Total: %.2f ms', $total/$count, $total);
+		}
+		return $output;
+	}
+
+	/**
 	 * @param string       $className
 	 * @param boolean|null $includeAbstracts
 	 * @return string[]
 	 */
 	public static function getClassChildren($className, $includeAbstracts = null) {
 		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
-		if (false === ($classNames = CM_CacheLocal::get($key))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($classNames = $cache->get($key))) {
 			$pathsFiltered = array();
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
 				$namespacePaths = CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/');
-				sort($namespacePaths);
 				$paths = array_merge($paths, $namespacePaths);
 			}
 			$regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';
@@ -420,7 +511,7 @@ class CM_Util {
 					if (class_exists($matches['name'], true)) {
 						$reflectionClass = new ReflectionClass($matches['name']);
 						if (($reflectionClass->isSubclassOf($className) ||
-								interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
+										interface_exists($className) && $reflectionClass->implementsInterface($className)) &&
 								(!$reflectionClass->isAbstract() || $includeAbstracts)
 						) {
 							$pathsFiltered[] = $path;
@@ -429,7 +520,7 @@ class CM_Util {
 				}
 			}
 			$classNames = self::getClasses($pathsFiltered);
-			CM_CacheLocal::set($key, $classNames);
+			$cache->set($key, $classNames);
 		}
 		return $classNames;
 	}

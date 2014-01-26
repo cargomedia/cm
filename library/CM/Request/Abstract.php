@@ -120,6 +120,16 @@ abstract class CM_Request_Abstract {
 
 	/**
 	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$hostHeader = $this->getHeader('host');
+		$host = preg_replace('#:\d+$#', '', $hostHeader);
+		return $host;
+	}
+
+	/**
+	 * @return string
 	 */
 	public final function getPath() {
 		return $this->_path;
@@ -131,7 +141,7 @@ abstract class CM_Request_Abstract {
 	public function getClientId() {
 		if (!$this->hasClientId()) {
 			if (!($this->_clientId = (int) $this->getCookie('clientId')) || !$this->_isValidClientId($this->_clientId)) {
-				$this->_clientId = (int) CM_Db_Db::insert(TBL_CM_REQUESTCLIENT, array());
+				$this->_clientId = (int) CM_Db_Db::insert('cm_requestClient', array());
 			}
 		}
 
@@ -305,7 +315,7 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getSession() {
 		if (!$this->hasSession()) {
-			$this->_session = new CM_Session();
+			$this->_session = new CM_Session(null, $this);
 			$this->_session->start();
 		}
 		return $this->_session;
@@ -436,6 +446,20 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isSupported() {
+		if (!$this->hasHeader('user-agent')) {
+			return true;
+		}
+		$userAgent = $this->getHeader('user-agent');
+		if (preg_match('#MSIE [5678]\.#', $userAgent)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @return CM_Model_Language|null
 	 */
 	private function _getLanguageViewer() {
@@ -452,11 +476,11 @@ abstract class CM_Request_Abstract {
 	private function _isValidClientId($clientId) {
 		$clientId = (int) $clientId;
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
-
-		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
-			$isValid = (bool) CM_Db_Db::count(TBL_CM_REQUESTCLIENT, array('id' => $clientId));
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($isValid = $cache->get($cacheKey))) {
+			$isValid = (bool) CM_Db_Db::count('cm_requestClient', array('id' => $clientId));
 			if ($isValid) {
-				CM_CacheLocal::set($cacheKey, true);
+				$cache->set($cacheKey, true);
 			}
 		}
 
@@ -505,7 +529,7 @@ abstract class CM_Request_Abstract {
 	 * @param array|null  $headers
 	 * @param string|null $body
 	 * @throws CM_Exception_Invalid
-	 * @return CM_Request_Get|CM_Request_Post
+	 * @return CM_Request_Abstract
 	 */
 	public static function factory($method, $uri, array $headers = null, $body = null) {
 		$method = strtolower($method);
@@ -522,5 +546,31 @@ abstract class CM_Request_Abstract {
 			return new CM_Request_Options($uri, $headers);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
+	}
+
+	/**
+	 * @return CM_Request_Abstract
+	 */
+	public static function factoryFromGlobals() {
+		$method = $_SERVER['REQUEST_METHOD'];
+		$uri = $_SERVER['REQUEST_URI'];
+		$body = file_get_contents('php://input');
+
+		if (function_exists('getallheaders')) {
+			$headers = getallheaders();
+		} else {
+			$headers = array();
+			foreach ($_SERVER as $name => $value) {
+				if (substr($name, 0, 5) == 'HTTP_') {
+					$headers[strtolower(str_replace('_', '-', substr($name, 5)))] = $value;
+				} elseif ($name == 'CONTENT_TYPE') {
+					$headers['content-type'] = $value;
+				} elseif ($name == 'CONTENT_LENGTH') {
+					$headers['content-length'] = $value;
+				}
+			}
+		}
+
+		return self::factory($method, $uri, $headers, $body);
 	}
 }

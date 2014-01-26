@@ -78,7 +78,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 		CMTest_TH::createLanguage('en'); // default language
 		$urlLanguage = CMTest_TH::createLanguage('de');
-		CM_Model_Language::flushCacheLocal(); // Need to flush CM_Paging_Languages_Enabled() cache
+		CM_Model_Language::changeAll(); // Need to flush CM_Paging_Languages_Enabled() cache
 		$request = $this->_prepareRequest('/de/home');
 		CM_Response_Abstract::factory($request);
 		$this->assertEquals($request->getLanguage(), $urlLanguage);
@@ -100,7 +100,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testSetUri() {
-		$language = CM_Model_Language::create(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
+		$language = CM_Model_Language::createStatic(array('name' => 'english', 'abbreviation' => 'en', 'enabled' => true));
 		$uri = '/en/foo/bar?foo1=bar1';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		/** @var CM_Request_Abstract $mock */
@@ -178,6 +178,24 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 	public function testIsBotCrawlerWithoutUseragent() {
 		$request = new CM_Request_Get('/foo');
 		$this->assertFalse($request->isBotCrawler());
+	}
+
+	public function testGetHost() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	public function testGetHostWithPort() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com:80'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 */
+	public function testGetHostWithoutHeader() {
+		$request = new CM_Request_Get('/');
+		$request->getHost();
 	}
 
 	/**

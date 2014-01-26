@@ -57,29 +57,4 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 		$namespace = get_called_class() . ':' . $event;
 		CM_Model_StreamChannel_Message_User::publish($user, $namespace, $data);
 	}
-
-	/**
-	 * @param string[] $namespaces
-	 * @param int      $context
-	 * @throws CM_Exception_Invalid
-	 * @return array[]
-	 */
-	public static function getClasses(array $namespaces, $context) {
-		$contextTypes = array(
-			self::CONTEXT_ALL        => array('View', 'Layout', 'Page', 'Component', 'Form', 'FormField'),
-			self::CONTEXT_JAVASCRIPT => array('View', 'Layout', 'Page', 'Component', 'Form', 'FormField'),
-			self::CONTEXT_CSS        => array('Layout', 'Page', 'Component', 'Form', 'FormField'),
-		);
-		if (!array_key_exists($context, $contextTypes)) {
-			throw new CM_Exception_Invalid('Context needs to be one of: `CONTEXT_ALL`, `CONTEXT_JAVASCRIPT`, `CONTEXT_CSS`');
-		}
-		$paths = array();
-		foreach ($namespaces as $namespace) {
-			$libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
-			foreach ($contextTypes[$context] as $contextType) {
-				$paths = array_merge($paths, CM_Util::rglob('*.php', $libraryPath . $contextType . '/'));
-			}
-		}
-		return CM_Util::getClasses($paths);
-	}
 }

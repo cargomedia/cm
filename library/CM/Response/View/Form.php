@@ -1,6 +1,7 @@
 <?php
 
 class CM_Response_View_Form extends CM_Response_View_Abstract {
+
 	/**
 	 * Added errors.
 	 *
@@ -74,14 +75,14 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
 			$query = $this->_request->getQuery();
 			$formInfo = $this->_getViewInfo('form');
 
-			$form = CM_Form_Abstract::factory($formInfo['className']);
-			$action = (string) $query['actionName'];
+			$className = (string) $formInfo['className'];
+			$actionName = (string) $query['actionName'];
 			$data = (array) $query['data'];
+			$this->_setStringRepresentation($className . '::' . $actionName);
 
+			$form = CM_Form_Abstract::factory($className);
 			$form->setup();
-
-			$output = array();
-			$form->process($data, $action, $this);
+			$success['data'] = CM_Params::encode($form->process($data, $actionName, $this));
 
 			if (!empty($this->errors)) {
 				$success['errors'] = $this->errors;

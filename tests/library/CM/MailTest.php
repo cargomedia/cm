@@ -53,16 +53,16 @@ class CM_MailTest extends CMTest_TestCase {
 		$msg->addCc('foo@bar.org', 'foobar');
 		$msg->addBcc('foo@bar.net');
 		$msg->sendDelayed();
-		$this->assertRow(TBL_CM_MAIL, array('subject' => 'testSubject',
+		$this->assertRow('cm_mail', array('subject' => 'testSubject',
 											'text'    => 'hallo',
 											'html'    => '<b>hallo</b>',
 											'to'      => serialize($msg->getTo()),
 											'replyTo' => serialize($msg->getReplyTo()),
 											'cc'      => serialize($msg->getCc()),
 											'bcc'     => serialize($msg->getBcc())));
-		$this->assertEquals(1, CM_Db_Db::count(TBL_CM_MAIL, 'id'));
+		$this->assertEquals(1, CM_Db_Db::count('cm_mail', 'id'));
 		CM_Mail::processQueue(1);
-		$this->assertEquals(0, CM_Db_Db::count(TBL_CM_MAIL, 'id'));
+		$this->assertEquals(0, CM_Db_Db::count('cm_mail', 'id'));
 	}
 
 	public function testSetText() {

@@ -11,7 +11,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function __construct($name) {
 		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
-		$this->_construct(array('name' => (string) $name));
+		$this->_construct(array('name' => $name));
 	}
 
 	/**
@@ -44,7 +44,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 		$percentage = $this->_checkPercentage($percentage);
 
-		CM_Db_Db::update(TBL_CM_SPLITFEATURE, array('percentage' => $percentage), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_splitfeature', array('percentage' => $percentage), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -55,23 +55,24 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function getEnabled(CM_Model_User $user) {
 		if ($this->_withoutPersistence) {
-			return true;
+			return false;
 		}
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
-		if (($fixtures = CM_CacheLocal::get($cacheKey)) === false) {
-			$fixtures = CM_Db_Db::select(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
+		$cache = CM_Cache_Local::getInstance();
+		if (($fixtures = $cache->get($cacheKey)) === false) {
+			$fixtures = CM_Db_Db::select('cm_splitfeature_fixture', array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
 
 		if (!array_key_exists($this->getId(), $fixtures)) {
-			$fixtureId = CM_Db_Db::insert(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
+			$fixtureId = CM_Db_Db::replace('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId(), 'userId' => $user->getId()));
 			$fixtures[$this->getId()] = $fixtureId;
 			$cacheWrite = true;
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $fixtures);
+			$cache->set($cacheKey, $fixtures);
 		}
 
 		return $this->_calculateEnabled($fixtures[$this->getId()]);
@@ -84,7 +85,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if ($this->_withoutPersistence) {
 			return 0;
 		}
-		return CM_Db_Db::count(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+		return CM_Db_Db::count('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
 	/**
@@ -100,20 +101,23 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		if($this->_withoutPersistence) {
 			return array();
 		}
-		$data = CM_Db_Db::select(TBL_CM_SPLITFEATURE, '*', array('name' => $this->getName()))->fetch();
+		$data = CM_Db_Db::select('cm_splitfeature', '*', array('name' => $this->getName()))->fetch();
 		return $data;
 	}
 
-	protected function _onDelete() {
-		CM_Db_Db::delete(TBL_CM_SPLITFEATURE, array('id' => $this->getId()));
-		CM_Db_Db::delete(TBL_CM_SPLITFEATURE_FIXTURE, array('splitfeatureId' => $this->getId()));
+	protected function _onDeleteBefore() {
+		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
-	protected static function _create(array $data) {
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_splitfeature', array('id' => $this->getId()));
+	}
+
+	protected static function _createStatic(array $data) {
 		$name = (string) $data['name'];
 		$percentage = self::_checkPercentage($data['percentage']);
 
-		CM_Db_Db::insert(TBL_CM_SPLITFEATURE, array('name' => $name, 'percentage' => $percentage));
+		CM_Db_Db::insert('cm_splitfeature', array('name' => $name, 'percentage' => $percentage));
 
 		return new static($name);
 	}

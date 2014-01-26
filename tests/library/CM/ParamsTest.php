@@ -108,7 +108,7 @@ class CM_ParamsTest extends CMTest_TestCase {
 	}
 
 	public function testGetObject() {
-		$language = CM_Model_Language::create(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
+		$language = CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => 'en', 'enabled' => '1'));
 		$params = new CM_Params(array('language' => $language, 'languageId' => $language->getId(), 'no-object-param' => 'xyz'));
 		$this->assertEquals($language, $params->getLanguage('language'));
 		$this->assertEquals($language, $params->getLanguage('languageId'));
@@ -117,6 +117,65 @@ class CM_ParamsTest extends CMTest_TestCase {
 			$this->fail('getObject should fail and throw exception');
 		} catch (CM_Exception $e) {
 			$this->assertContains(get_class($language), $e->getMessage());
+		}
+	}
+
+	public function testGetFile() {
+		$file = CM_File::createTmp();
+		$params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
+		$this->assertEquals($file, $params->getFile('file'));
+		$this->assertEquals($file, $params->getFile('filename'));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage does not exist or is not a file
+	 */
+	public function testGetFileException() {
+		$params = new CM_Params(array('nonexistent' => 'foo/bar'));
+		$params->getFile('nonexistent');
+	}
+
+	public function testGetFileGeoPoint() {
+		$point = new CM_Geo_Point(1, 2);
+		$params = new CM_Params(array('point' => $point));
+		$value = $params->getGeoPoint('point');
+		$this->assertInstanceOf('CM_Geo_Point', $value);
+		$this->assertSame(1.0, $value->getLatitude());
+		$this->assertSame(2.0, $value->getLongitude());
+	}
+
+	/**
+	 * @expectedException ErrorException
+	 * @expectedExceptionMessage Missing argument 2
+	 */
+	public function testGetGeoPointException() {
+		$params = new CM_Params(array('point' => 'foo'));
+		$params->getGeoPoint('point');
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Cannot json_decode value `foo`
+	 */
+	public function testDecode() {
+		CM_Params::decode('foo', true);
+	}
+
+	public function testGetDateTime() {
+		$dateTimeList = array(
+			new DateTime('2012-12-12 13:00:00 +0300'),
+			new DateTime('2012-12-12 13:00:00 -0200'),
+			new DateTime('2012-12-12 13:00:00 -0212'),
+			new DateTime('2012-12-12 13:00:00 GMT'),
+			new DateTime('2012-12-12 13:00:00 GMT+2'),
+			new DateTime('2012-12-12 13:00:00 Europe/Zurich'),
+		);
+		foreach ($dateTimeList as $dateTime) {
+			$paramsArray = json_decode(json_encode(array('date' => $dateTime)), true);
+			$params = new CM_Params($paramsArray, true);
+
+			$this->assertEquals($params->getDateTime('date'), $dateTime);
 		}
 	}
 }

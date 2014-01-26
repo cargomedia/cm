@@ -1,29 +1,23 @@
+& {
+	text-align: center;
+}
+
 .previews {
 	overflow: hidden; /* Clearfix */
+	text-align: left;
 
 	.preview {
-		position: relative;
-		float: left;
 		display: block;
+		float: left;
 		margin: 2px;
+		line-height: @sizeButton;
 
-		img {
-			max-height: 50px;
-			max-width: 100px
-		}
+		.deleteButton {
+			margin-left: 5px;
 
-		.actions {
-			display: none;
-			position: absolute;
-			left: 3px;
-			top: 3px;
-			background-color: @colorBg;
-			padding: 1px 3px;
-			border-radius: 2px;
-			color: @colorFg;
-		}
-		&:hover .actions {
-			display: block;
+			&:hover {
+				color: @colorError;
+			}
 		}
 
 		.template {
@@ -39,15 +33,43 @@
 	}
 }
 
+&.dragover {
+	outline: 3px dashed @colorFgBorderEmphasize1;
+	outline-offset: -3px;
+}
+
+.dropInfo {
+	display: none;
+	color: @colorFgShy;
+
+	@media (min-width: 400px) {
+		display: block;
+	}
+
+	.dropInfo-icon {
+		font-size: 3em;
+		line-height: 1.2;
+		color: lighten(@colorFgIcon, 30);
+		text-shadow: 1px 1px @colorBg;
+	}
+
+	.dropInfo-message {
+		font-size: 1.3em;
+	}
+
+	.dropInfo-divide {
+		margin-bottom: 12px;
+		font-size: @fontSizeSmall;
+	}
+}
+
 .uploadButton {
-	.input_button(@heightButton);
-	.input_button_color;
+	.button;
+	.button-default;
 	display: inline-block;
-	height: @heightButton - 2px;
-	line-height: @heightButton - 2px;
+	height: @sizeButton;
+	line-height: @sizeButton;
 	position: relative;
-	overflow: hidden;
-	direction: ltr;
 
 	input {
 		position: absolute;
@@ -60,20 +82,20 @@
 		cursor: pointer;
 		opacity: 0;
 	}
+
+	&.disabled {
+		opacity: .5;
+
+		&:hover {
+			border-color: @colorFgBorderEmphasize3;
+			.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 6));
+			color: lighten(@colorFg, 25);
+		}
+	}
 }
 
-.dropZone {
-	.border(@colorNotice);
-	height: 100px;
-	border-style: dashed;
-	background-color: lighten(@colorNotice, 48);
-	text-align: center;
-	margin-bottom: 5px;
-
-	span {
-		color: @colorFgHeading;
-		font-size: 14px;
-		display: block;
-		margin-top: 40px;
-	}
+.notSupported {
+	display: none;
+	font-size: 0.9em;
+	color: lighten(@colorFg, 50);
 }

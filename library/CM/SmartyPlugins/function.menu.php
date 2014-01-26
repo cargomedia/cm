@@ -21,6 +21,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 		}
 	} elseif (isset($params['data'])) {
 		$menu = new CM_Menu($params['data']);
+		$render->addMenu($menu);
 	}
 	if (!$menu) {
 		return '';

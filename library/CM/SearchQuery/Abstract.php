@@ -1,14 +1,15 @@
 <?php
 
 class CM_SearchQuery_Abstract {
+
 	private $_queries = array();
 	private $_filters = array();
 	private $_sorts = array();
 	private $_mode, $_filterMode;
 
 	/**
-	 * @param string|null         $mode       must,must_not,should
-	 * @param string|null         $filterMode or, and, not
+	 * @param string|null $mode       must,must_not,should
+	 * @param string|null $filterMode or, and, not
 	 */
 	function __construct($mode = null, $filterMode = null) {
 		if (is_null($mode)) {
@@ -36,12 +37,39 @@ class CM_SearchQuery_Abstract {
 		$this->_queries[] = array('field' => array($field => $value));
 	}
 
+	/**
+	 * @param string[]    $fields
+	 * @param string      $value
+	 * @param string|null $operator  'or' / 'and'
+	 * @param float|null  $fuzziness 0 - 1
+	 */
+	public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
+		$query = array('multi_match' => array(
+			'query'  => $value,
+			'fields' => $fields,
+		));
+		if (null !== $operator) {
+			$query['operator'] = (string) $operator;
+		}
+		if (null !== $fuzziness) {
+			$query['fuzziness'] = (float) $fuzziness;
+		}
+		$this->query($query);
+	}
+
 	protected function _filter(array $filter) {
 		$this->_filters[] = $filter;
 	}
 
 	protected function _filterNot(array $filter) {
 		$this->_filters[] = array('not' => array('filter' => $filter));
+	}
+
+	/**
+	 * @param string $field
+	 */
+	public function filterExists($field) {
+		$this->_filter(array('exists' => array('field' => (string) $field)));
 	}
 
 	public function filterPrefix($field, $value) {
@@ -64,13 +92,28 @@ class CM_SearchQuery_Abstract {
 		}
 	}
 
-	public function filterRange($field, $min = null, $max = null) {
+	/**
+	 * @param string        $field
+	 * @param int|null      $from
+	 * @param int|null      $to
+	 * @param boolean|null  $openIntervalFrom
+	 * @param booleant|null $openIntervalTo
+	 */
+	public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
 		$range = array();
-		if ($min !== null) {
-			$range['from'] = $min;
+		if ($from !== null) {
+			$operand = 'gte';
+			if ($openIntervalFrom) {
+				$operand = 'gt';
+			}
+			$range[$operand] = $from;
 		}
-		if ($max !== null) {
-			$range['to'] = $max;
+		if ($to !== null) {
+			$operand = 'lte';
+			if ($openIntervalTo) {
+				$operand = 'lt';
+			}
+			$range[$operand] = $to;
 		}
 		if (!empty($range)) {
 			$this->_filter(array('range' => array($field => $range)));
@@ -133,8 +176,19 @@ class CM_SearchQuery_Abstract {
 		return $this->_sorts;
 	}
 
+	/**
+	 * @param array $sort
+	 */
 	protected function _sort(array $sort) {
-		$this->_sorts[] = $sort;
+		$sortNew = array();
+		foreach ($sort as $key => $value) {
+			$key = (string) $key;
+			if (null === $value) {
+				$value = 'desc';
+			}
+			$sortNew[$key] = $value;
+		}
+		$this->_sorts[] = $sortNew;
 	}
 
 	protected function _sortDefault() {

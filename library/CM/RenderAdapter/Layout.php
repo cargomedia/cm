@@ -13,15 +13,15 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$this->getRender()->pushStack('pages', $layout->getPage());
 
 		$options = array();
-		$options['releaseStamp'] = CM_App::getInstance()->getReleaseStamp();
+		$options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
 		$options['renderStamp'] = floor(microtime(true) * 1000);
-		$options['siteId'] = $this->getRender()->getSite()->getId();
+		$options['site'] = CM_Params::encode($this->getRender()->getSite());
 		$options['url'] = $this->getRender()->getUrl();
 		$options['urlStatic'] = $this->getRender()->getUrlStatic();
 		$options['urlUserContent'] = $this->getRender()->getUrlUserContent();
 		$options['urlResource'] = $this->getRender()->getUrlResource();
 		$options['language'] = $this->getRender()->getLanguage();
-		$options['debug'] = $this->getRender()->isDebug();
+		$options['debug'] = CM_Bootloader::getInstance()->isDebug();
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream_Message::getInstance()->getEnabled();
 		if (CM_Stream_Message::getInstance()->getEnabled()) {
@@ -41,8 +41,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$js->onloadHeaderJs('cm.ready();');
 
 		$this->getRender()->getJs()->registerLayout($layout);
-		$js->onloadReadyJs('cm.findView("CM_Layout_Abstract")._ready();');
-		$js->onloadReadyJs('cm.router.start();');
+		$js->onloadReadyJs('cm.getLayout()._ready();');
 
 		$renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $layout->getPage());
 		$pageTitle = $renderAdapterPage->fetchTitle();

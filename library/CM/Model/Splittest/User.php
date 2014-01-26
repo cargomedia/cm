@@ -10,14 +10,14 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
 	 * @return bool
 	 */
 	public function isVariationFixture(CM_Model_User $user, $variationName) {
-		return $this->_isVariationFixture($user->getId(), $variationName);
+		return $this->_isVariationFixture(new CM_Splittest_Fixture($user), $variationName);
 	}
 
 	/**
 	 * @param CM_Model_User $user
 	 * @param float|null    $weight
 	 */
-	public function setConversion($user, $weight = null) {
-		$this->_setConversion($user->getId(), $weight);
+	public function setConversion(CM_Model_User $user, $weight = null) {
+		$this->_setConversion(new CM_Splittest_Fixture($user), $weight);
 	}
 }

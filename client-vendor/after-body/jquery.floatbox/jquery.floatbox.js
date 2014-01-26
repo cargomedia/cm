@@ -2,10 +2,12 @@
  * Author: CM
  */
 (function($) {
+	var ieMobile = /IEMobile/.test(navigator.userAgent);
+
 	var defaults = {
-		delay: 200,
 		closable: true,
-		fullscreen: false
+		fullscreen: false,
+		ieMobile: ieMobile
 	};
 
 	$.floatbox = function(options) {
@@ -13,7 +15,8 @@
 	};
 
 	var $viewport = null;
-	var replaceBodyRevert = null;
+	var backupScrollTop = null;
+	var lastFocusedElement = null;
 
 	$(document).on('keydown.floatbox', function(e) {
 		if (e.which == 27) { // Escape
@@ -37,18 +40,12 @@
 
 			this.$parent = $element.parent();
 			if (!$viewport) {
-				if ($('html').hasClass('no-fixed')) {
-					$('html').addClass('floatbox-replaceBody');
-					var backupScrollTop = $(document).scrollTop();
-					var $backupBody = $('body > *:visible').detach();
-
-					replaceBodyRevert = function() {
-						$('body').prepend($backupBody);
-						$(document).scrollTop(backupScrollTop);
-						replaceBodyRevert = null;
-					};
+				if (this.options.ieMobile) {
+					backupScrollTop = $(document).scrollTop();
+					$('html').addClass('ieMobile');
 				}
-				$viewport = $('<div id="floatbox-viewport"/>');
+
+				$viewport = $('<div id="floatbox-viewport" tabindex="-1"/>');
 				$viewport.appendTo($('body'));
 				$('html').addClass('floatbox-active');
 			}
@@ -57,10 +54,11 @@
 			var $container = $('<div class="floatbox-container"/>');
 			var $controls = $('<div class="floatbox-controls"/>');
 			var $body = $('<div class="floatbox-body"/>');
+			lastFocusedElement = document.activeElement;
 			if (this.options.closable) {
-				$controls.append('<a class="icon-close clickable" href="javascript:;"/>');
+				$controls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
 			}
-			this.$floatbox = $('<div class="floatbox"/>');
+			this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" />');
 
 			if (this.options.fullscreen) {
 				this.$floatbox.addClass('fullscreen');
@@ -72,10 +70,6 @@
 			this.$floatbox.append($body, $controls);
 			$viewport.append(this.$layer.append($overlay, $container.append(this.$floatbox)));
 
-			if ($('html').hasClass('floatbox-replaceBody')) {
-				$(document).scrollTop(1);
-			}
-
 			var self = this;
 			this.windowResizeCallback = function() {
 				self.repaint.apply(self);
@@ -83,17 +77,18 @@
 			$(window).on('resize.floatbox', this.windowResizeCallback);
 			this.repaint();
 
-			this.$floatbox.fadeTo(this.options.delay, 1, function() {
-				self.$floatbox.css('opacity', 'inherit');
-				$container.add($overlay).on('click.floatbox', function(e) {
-					if (this === e.target) {
-						self.close.apply(self);
-					}
-				});
-				$controls.on('click.floatbox', '.icon-close', function() {
+			self.$floatbox.addClass('fadeIn');
+			$container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
+				if (this === e.target) {
 					self.close.apply(self);
-				});
+				}
 			});
+			$controls.on('click.floatbox', '.closeFloatbox', function() {
+				self.close.apply(self);
+			});
+
+			this.$floatbox.find(':focusable:first').focus();
+			this.$floatbox.trap();
 
 			this.$layer.data('floatbox', this);
 			$element.trigger('floatbox-open');
@@ -109,13 +104,15 @@
 			this.$layer.removeData('floatbox');
 			this.$layer.remove();
 			$viewport.children('.floatbox-layer:last').addClass('active');
+			lastFocusedElement.focus();
 			if (!$viewport.children().length) {
 				$viewport.remove();
 				$viewport = null;
-				if (replaceBodyRevert) {
-					replaceBodyRevert();
+
+				$('html').removeClass('floatbox-active ieMobile');
+				if (null !== backupScrollTop) {
+					$(document).scrollTop(backupScrollTop);
 				}
-				$('html').removeClass('floatbox-active floatbox-replaceBody');
 			}
 			$(window).off('resize.floatbox', this.windowResizeCallback);
 			$element.trigger('floatbox-close');

@@ -20,7 +20,7 @@ class CM_CacheConst {
 	// _text:X_filter:X
 	const Usertext = 'Usertext';
 
-	const Usertext_Filter_BadwordRegexp = 'Usertext_Filter_BadwordRegexp';
+	const ContentList_BadwordRegex = 'ContentList_BadwordRegex';
 
 	// _fixedHeight:X
 	const Usertext_Filter_EmoticonList = 'Usertext_Filter_EmoticonList';
@@ -30,23 +30,29 @@ class CM_CacheConst {
 	// _id:X
 	const Request_Client = 'Request_Client';
 
-	// _class:X_id:X
-	const Model = 'Model';
+	// _type:X_id:X
+	const CM_Model_StorageAdapter_Cache = 'CM_Model_StorageAdapter_Cache';
 
 	const Option = 'Option';
 
 	// _splitfeatureId:X_userId:X
 	const SplitFeature_Fixtures = 'SplitFeature_Fixtures';
 
-	// _userId:X
+	// _id:X_type:X
 	const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
+
+	// _id:X
+	const Splittest_Variation = 'Splittest_Variation';
 
 	//_md5:X
 	//_md5:X_languageId:X
 	const Css = 'Css';
 
 	//_md5:X
-	const Response_Resource_JS = 'Response_Resource_JS';
+	//_md5:X_compress:X
+	//_md5:X_compress:X_siteId:X
+	//_md5:X_compress:X_siteId:X_languageId:X
+	const App_Resource = 'App_Resource';
 
 	//_lock:X
 	const Lock = 'Lock';
@@ -61,6 +67,9 @@ class CM_CacheConst {
 	// _className:X_abstracts:X
 	const ClassChildren = 'ClassChildren';
 
+	// _className:X
+	const ClassConfig = 'ClassConfig';
+
 	// _id:X
 	const StreamChannel_Type = 'StreamChannel_Type';
 
@@ -68,4 +77,6 @@ class CM_CacheConst {
 	const StreamChannel_Id = 'StreamChannel_Id';
 
 	const TestCase_Site_Mock = 'TestCase_Site_Mock';
+
+	const Config = 'Config';
 }

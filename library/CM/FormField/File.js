@@ -14,15 +14,26 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 	ready: function() {
 		var field = this;
 		var $input = this.$('input[type="file"]');
-		var $dropZone = this.$('.dropZone');
+		var dropZoneEnabled = this.$('.dropInfo').length > 0;
 		var allowedExtensions = field.getOption("allowedExtensions");
 		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
 		var inProgressCount = 0;
 
+		if (!Modernizr.fileinput) {
+			$input.prop('disabled', true);
+			field.$('.uploadButton').addClass('disabled');
+			field.$('.notSupported').show();
+		}
+
+		// remove attr multiple on iPhone, iPod, iPad to allow upload photos via camera
+		if (navigator.userAgent.match(/iP(ad|hone|od)/i)) {
+			$input.removeAttr('multiple');
+		}
+
 		$input.fileupload({
 			dataType: 'json',
-			url: cm.getUrl('/upload/' + cm.options.siteId + '/', {'field': field.getClass()}),
-			dropZone: $dropZone,
+			url: cm.getUrl('/upload/' + cm.getSiteId() + '/', {'field': field.getClass()}),
+			dropZone: dropZoneEnabled ? this.$el : null,
 			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
 			formData: function(form) {
 				return $input;
@@ -68,20 +79,22 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			always: function(e, data) {
 				inProgressCount--;
 				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
-					field.trigger("uploadComplete");
+					field.trigger("uploadComplete", data.files);
 				}
 			}
 		});
 
-		this.bindJquery($(document), 'dragenter', function() {
-			$dropZone.show();
-		});
-		this.bindJquery($(document), 'drop', function() {
-			$dropZone.hide();
-		});
-		this.bindJquery($(document), 'drop dragover', function(e) {
-			e.preventDefault();
-		});
+		if (dropZoneEnabled) {
+			this.bindJquery($(document), 'dragenter', function() {
+				field.$el.addClass('dragover')
+			});
+			this.bindJquery($(document), 'drop', function() {
+				field.$el.removeClass('dragover')
+			});
+			this.bindJquery($(document), 'drop dragover', function(e) {
+				e.preventDefault();
+			});
+		}
 	},
 
 	/**
@@ -89,5 +102,9 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 	 */
 	getCountUploaded: function() {
 		return this.$('.previews .preview').length;
+	},
+
+	reset: function() {
+		this.$('.previews').empty();
 	}
 });

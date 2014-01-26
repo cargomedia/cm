@@ -13,7 +13,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
 		CMTest_TH::timeForward(10);
 		/** @var CM_Model_StreamChannelArchive_Video $archive */
-		$archive = CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+		$archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 		$this->assertInstanceOf('CM_Model_StreamChannelArchive_Video', $archive);
 		$this->assertSame($streamChannel->getId(), $archive->getId());
 		$this->assertSame($user->getId(), $archive->getUserId());
@@ -28,11 +28,25 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 
 		$streamChannel = CMTest_TH::createStreamChannel();
 		try {
-			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+			CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 			$this->fail('StreamChannelArchive_Video created without StreamPublish.');
 		} catch (CM_Exception_Invalid $ex) {
 			$this->assertTrue(true);
 		}
+	}
+
+	public function testNoUser() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$user = CMTest_TH::createUser();
+		$streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
+		$streamPublish->unsetUser();
+
+		/** @var CM_Model_StreamChannelArchive_Video $archive */
+		$archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+
+		$this->assertNull($archive->getUser());
+		$this->assertNull($archive->getUserId());
 	}
 
 	public function testGetUser() {
@@ -49,7 +63,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$archive = CMTest_TH::createStreamChannelVideoArchive();
 		$videoFile = $archive->getVideo();
 		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
-				'-original.mp4', $videoFile->getPathRelative());
+		'-original.mp4', $videoFile->getPathRelative());
 	}
 
 	public function testGetThumbnails() {
@@ -172,5 +186,4 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$files[] = CM_File::create($archive->getVideo()->getPath());
 		return $files;
 	}
-
 }

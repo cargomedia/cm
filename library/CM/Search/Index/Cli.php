@@ -3,7 +3,7 @@
 class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null  $indexName Index name, if not provided all application indexes will be created.
+	 * @param string|null  $indexName
 	 */
 	public function create($indexName = null) {
 		if ($indexName) {
@@ -19,7 +19,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param string|null $indexName Index name, if not provided all indexes will be updated.
+	 * @param string|null $indexName
 	 * @param string|null $host      Elasticsearch host
 	 * @param int|null    $port      Elasticsearch port
 	 * @throws CM_Exception_Invalid
@@ -35,7 +35,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 			$indexName = $index->getIndex()->getName();
 			$key = 'Search.Updates_' . $index->getType()->getName();
 			try {
-				$ids = CM_Cache_Redis::sFlush($key);
+				$ids = CM_Redis_Client::getInstance()->sFlush($key);
 				$ids = array_filter(array_unique($ids));
 				$index->update($ids);
 				$index->getIndex()->refresh();
@@ -44,7 +44,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 				if (isset($ids)) {
 					$message .= 'Re-adding ' . count($ids) . ' ids to queue.' . PHP_EOL;
 					foreach ($ids as $id) {
-						CM_Cache_Redis::sAdd($key, $id);
+						CM_Redis_Client::getInstance()->sAdd($key, $id);
 					}
 				}
 				$message .= 'Reason: ' . $e->getMessage();
@@ -59,6 +59,13 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 			$client = new Elastica_Client($server);
 			$client->optimizeAll();
 		}
+	}
+
+	public function startMaintenance() {
+		$clockwork = new CM_Clockwork_Manager();
+		$clockwork->registerCallback(new DateInterval('PT1M'), array($this ,'update'));
+		$clockwork->registerCallback(new DateInterval('PT1H'), array($this ,'optimize'));
+		$clockwork->start();
 	}
 
 	/**

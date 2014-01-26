@@ -7,6 +7,7 @@ function smarty_function_money($params, Smarty_Internal_Template $template) {
 	$amount = (float) $params['amount'];
 	$currency = isset($params['currency']) ? (string) $params['currency'] : 'USD';
 	$format = isset($params['format']) ? (string) $params['format'] : null;
+	$round = isset($params['round']) ? (float) $params['round'] : null;
 
 	if ('discount' == $format) {
 		$amountsRounded = array();
@@ -19,6 +20,10 @@ function smarty_function_money($params, Smarty_Internal_Template $template) {
 				break;
 			}
 		}
+	}
+
+	if ($round) {
+		$amount = round($amount / $round) * $round;
 	}
 
 	return $render->getFormatterCurrency()->formatCurrency($amount, $currency);

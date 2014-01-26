@@ -8,6 +8,9 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	/** @type Boolean */
 	active: false,
 
+	/** @type Object */
+	cacheNames: null,
+
 	events: {
 		'click .toggleDebugBar': 'toggleDebugBar',
 		'click .clearCache': 'clearCache',
@@ -20,6 +23,9 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 		var self = this;
 
 		$(window).bind('keydown.debugBar', function(event) {
+			if (event.ctrlKey || event.metaKey) {
+				return;
+			}
 			if (event.which === 68) { // d Key
 				var tagName = event.target.tagName.toLowerCase();
 				if (tagName === 'input' || tagName === 'textarea') {
@@ -27,21 +33,14 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 				}
 				self.toggleDebugBar();
 			}
+			if (self.active && event.which === 67) { // c Key
+				self.clearCache();
+			}
 		});
 
 		this.on('destruct', function() {
 			$(window).unbind('keydown.debugBar');
 		});
-
-		if (cm.options.stream.channel) {
-			_.each(cm.model.types, function(modelType, modelName) {
-				_.each(cm.action.verbs, function(actionVerb, actionName) {
-					self.bindAction(actionVerb, modelType, cm.options.stream.channel.key, cm.options.stream.channel.type, function(action, model, data) {
-						cm.debug.log('ACTION: <[ACTOR:' + (action.actor ? action.actor.id : null) + '] , ' + actionName + ' , ' + '[' + modelName + ':' + JSON.stringify(model._id) + ']>', '(', data, ')');
-					});
-				});
-			});
-		}
 	},
 
 	toggleDebugBar: function() {
@@ -67,10 +66,11 @@ var CM_Component_Debug = CM_Component_Abstract.extend({
 	},
 
 	clearCache: function() {
-		this.ajax('clearCache', {
-			'CM_Cache': this.$('.CM_Cache').is(':checked'),
-			'CM_CacheLocal': this.$('.CM_CacheLocal').is(':checked')
-		}, {
+		var clearCacheArguments = {};
+		_.each(this.cacheNames, function(cacheName) {
+			clearCacheArguments[cacheName] = this.$('.' + cacheName).is(':checked');
+		});
+		this.ajax('clearCache', clearCacheArguments, {
 			success: function() {
 				location.reload();
 			}

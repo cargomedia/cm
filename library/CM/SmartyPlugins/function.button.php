@@ -9,10 +9,23 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 		trigger_error('Param `action` missing.');
 	}
 	$action = $form->getAction($params['action']);
+	$title = isset($params['title']) ? (string) $params['title'] : null;
+	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
 
-	$class = '';
+	$class = 'button ' . 'button-' . $theme;
 	if (isset($params['class'])) {
-		$class = trim($params['class']);
+		$class .= ' ' . trim($params['class']);
+	}
+
+	$data = array();
+	if (isset($params['data'])) {
+		$data = $params['data'];
+		unset($params['data']);
+	}
+
+	if (isset($params['event'])) {
+		$data['event'] = (string) $params['event'];
+		unset($params['event']);
 	}
 
 	$icon = null;
@@ -31,15 +44,21 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 	if ($icon) {
 		$class .= ' hasIcon';
 	}
+	if ($title) {
+		$class .= ' showTooltip';
+	}
 
 	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
 
-	$type = $form->getActionDefaultName() ? 'submit' : 'button';
-
 	$html = '';
-	$html .= '<button class="' . $class . '" id="' . $id . '" type="' . $type . '" value="' . $label . '"';
-	if (isset($params['title'])) {
-		$html .= ' title="' . $params['title'] . '"';
+	$html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '"';
+	if ($title) {
+		$html .= ' title="' . $title . '"';
+	}
+	if (!empty($data)) {
+		foreach ($data as $name => $value) {
+			$html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+		}
 	}
 	$html .= '>';
 	if ($icon) {

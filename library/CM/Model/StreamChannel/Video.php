@@ -11,6 +11,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	public function onUnpublish(CM_Model_Stream_Publish $streamPublish) {
+		CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $this));
 	}
 
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
@@ -21,7 +22,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	 */
 	public function setThumbnailCount($thumbnailCount) {
 		$thumbnailCount = (int) $thumbnailCount;
-		CM_Db_Db::update(TBL_CM_STREAMCHANNEL_VIDEO, array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
+		CM_Db_Db::update('cm_streamChannel_video', array('thumbnailCount' => $thumbnailCount), array('id' => $this->getId()));
 		$this->_change();
 	}
 
@@ -84,6 +85,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	public function toArray() {
 		$array = parent::toArray();
+		$array['key'] = $this->getKey();
 		if ($this->hasStreamPublish()) {
 			$array['user'] = $this->getStreamPublish()->getUser();
 		}
@@ -104,19 +106,13 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return new CM_Paging_FileUserContent_StreamChannelVideoThumbnails($this);
 	}
 
-	protected function _onBeforeDelete() {
-		if ($this->hasStreamPublish()) {
-			CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $this));
-		}
-	}
-
 	protected function _onDelete() {
-		CM_Db_Db::delete(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $this->getId()));
+		CM_Db_Db::delete('cm_streamChannel_video', array('id' => $this->getId()));
 		parent::_onDelete();
 	}
 
 	protected function _loadData() {
-		return CM_Db_Db::exec("SELECT * FROM TBL_CM_STREAMCHANNEL JOIN TBL_CM_STREAMCHANNEL_VIDEO USING (`id`)
+		return CM_Db_Db::exec("SELECT * FROM `cm_streamChannel` JOIN `cm_streamChannel_video` USING (`id`)
 								WHERE `id` = ?", array($this->getId()))->fetch();
 	}
 
@@ -129,19 +125,19 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 		return self::findByKeyAndAdapter($key, $adapterType);
 	}
 
-	protected static function _create(array $data) {
+	protected static function _createStatic(array $data) {
 		$key = (string) $data['key'];
 		$width = (int) $data['width'];
 		$height = (int) $data['height'];
 		$serverId = $data['serverId'];
 		$thumbnailCount = (int) $data['thumbnailCount'];
 		$adapterType = (int) $data['adapterType'];
-		$id = CM_Db_Db::insert(TBL_CM_STREAMCHANNEL, array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
+		$id = CM_Db_Db::insert('cm_streamChannel', array('key' => $key, 'type' => static::TYPE, 'adapterType' => $adapterType));
 		try {
-			CM_Db_Db::insert(TBL_CM_STREAMCHANNEL_VIDEO, array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
+			CM_Db_Db::insert('cm_streamChannel_video', array('id' => $id, 'width' => $width, 'height' => $height, 'serverId' => $serverId,
 				'thumbnailCount' => $thumbnailCount));
 		} catch (CM_Exception $ex) {
-			CM_Db_Db::delete(TBL_CM_STREAMCHANNEL, array('id' => $id));
+			CM_Db_Db::delete('cm_streamChannel', array('id' => $id));
 			throw $ex;
 		}
 		return new static($id);

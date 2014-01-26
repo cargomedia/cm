@@ -11,7 +11,7 @@ class CM_Paging_ActionLimit_All extends CM_Paging_ActionLimit_Abstract {
 			$type = (int) $type;
 			$where = '`type` = ' . $type;
 		}
-		$source = new CM_PagingSource_Sql('DISTINCT `actionType`, `actionVerb`, `type`', TBL_CM_ACTIONLIMIT,
+		$source = new CM_PagingSource_Sql('DISTINCT `actionType`, `actionVerb`, `type`', 'cm_actionLimit',
 			$where, '`type`, `actionType`, `actionVerb`');
 		$source->enableCacheLocal();
 		parent::__construct($source);

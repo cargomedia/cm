@@ -2,7 +2,6 @@
 
 class CM_Session implements CM_Comparable {
 
-	const ACTIVITY_EXPIRATION = 240; // 4 mins
 	const LIFETIME_DEFAULT = 3600;
 
 	/** @var string */
@@ -14,6 +13,9 @@ class CM_Session implements CM_Comparable {
 	/** @var int */
 	private $_expires;
 
+	/** @var CM_Request_Abstract|null */
+	private $_request;
+
 	/** @var boolean */
 	private $_write = false;
 
@@ -21,10 +23,11 @@ class CM_Session implements CM_Comparable {
 	private $_isPersistent = false;
 
 	/**
-	 * @param string|null $id
+	 * @param string|null              $id
+	 * @param CM_Request_Abstract|null $request
 	 * @throws CM_Exception_Nonexistent
 	 */
-	public function __construct($id = null) {
+	public function __construct($id = null, CM_Request_Abstract $request = null) {
 		if (null !== $id) {
 			$this->_id = (string) $id;
 			$data = self::_findDataById($this->getId());
@@ -43,6 +46,7 @@ class CM_Session implements CM_Comparable {
 		}
 		$this->_data = $data;
 		$this->_expires = $expires;
+		$this->_request = $request;
 	}
 
 	public function __destruct() {
@@ -126,6 +130,13 @@ class CM_Session implements CM_Comparable {
 	}
 
 	/**
+	 * @return CM_Request_Abstract|null
+	 */
+	public function getRequest() {
+		return $this->_request;
+	}
+
+	/**
 	 * @param bool|null $needed
 	 * @throws CM_Exception_AuthRequired
 	 * @return CM_Model_User|null
@@ -150,6 +161,9 @@ class CM_Session implements CM_Comparable {
 		$user->setOnline(true);
 		$this->set('userId', $user->getId());
 		$this->regenerateId();
+		if ($request = $this->getRequest()) {
+			CM_Splittest_Fixture::setUserForRequestClient($request, $user);
+		}
 	}
 
 	/**
@@ -184,7 +198,7 @@ class CM_Session implements CM_Comparable {
 	public function regenerateId() {
 		$newId = self::_generateId();
 		if ($this->_isPersistent) {
-			CM_Db_Db::update(TBL_CM_SESSION, array('sessionId' => $newId), array('sessionId' => $this->getId()));
+			CM_Db_Db::update('cm_session', array('sessionId' => $newId), array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 		$this->_id = $newId;
@@ -202,9 +216,7 @@ class CM_Session implements CM_Comparable {
 				$this->deleteUser();
 				return;
 			}
-			if ($user->getLatestactivity() < time() - self::ACTIVITY_EXPIRATION / 3) {
-				$user->updateLatestactivity();
-			}
+			$user->updateLatestactivity();
 			if (!$user->getOnline()) {
 				$user->setOnline(true);
 			}
@@ -213,12 +225,12 @@ class CM_Session implements CM_Comparable {
 
 	public function write() {
 		if (!$this->isEmpty()) {
-			CM_Db_Db::replace(TBL_CM_SESSION, array('sessionId' => $this->getId(),
+			CM_Db_Db::replace('cm_session', array('sessionId' => $this->getId(),
 													'data'      => serialize($this->_data),
 													'expires'   => time() + $this->getLifetime()));
 			$this->_change();
 		} elseif ($this->_isPersistent) {
-			CM_Db_Db::delete(TBL_CM_SESSION, array('sessionId' => $this->getId()));
+			CM_Db_Db::delete('cm_session', array('sessionId' => $this->getId()));
 			$this->_change();
 		}
 	}
@@ -237,7 +249,7 @@ class CM_Session implements CM_Comparable {
 
 	private function _change() {
 		if ($this->_isPersistent) {
-			CM_Cache::delete(self::_getCacheKey($this->getId()));
+			CM_Cache_Shared::getInstance()->delete(self::_getCacheKey($this->getId()));
 		}
 	}
 
@@ -253,7 +265,7 @@ class CM_Session implements CM_Comparable {
 	}
 
 	public static function deleteExpired() {
-		CM_Db_Db::delete(TBL_CM_SESSION, '`expires` < ' . time());
+		CM_Db_Db::delete('cm_session', '`expires` < ' . time());
 	}
 
 	/**
@@ -262,12 +274,13 @@ class CM_Session implements CM_Comparable {
 	 */
 	private static function _findDataById($id) {
 		$cacheKey = self::_getCacheKey($id);
-		if (($data = CM_Cache::get($cacheKey)) === false) {
-			$data = CM_Db_Db::select(TBL_CM_SESSION, array('data', 'expires'), array('sessionId' => $id))->fetch();
+		$cache = CM_Cache_Shared::getInstance();
+		if (($data = $cache->get($cacheKey)) === false) {
+			$data = CM_Db_Db::select('cm_session', array('data', 'expires'), array('sessionId' => $id))->fetch();
 			if (!$data) {
 				return null;
 			}
-			CM_Cache::set($cacheKey, $data, self::LIFETIME_DEFAULT);
+			$cache->set($cacheKey, $data, self::LIFETIME_DEFAULT);
 		}
 		return $data;
 	}

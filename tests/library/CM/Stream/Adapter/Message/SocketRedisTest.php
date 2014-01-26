@@ -7,14 +7,13 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 	}
 
 	public function testGetOptions() {
-		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->hostPrefix = true;
 		CM_Config::get()->CM_Stream_Adapter_Message_SocketRedis->servers = array(
 			array('httpHost' => 'foo', 'httpPort' => 8085, 'sockjsUrls' => array('http://stream:8090'))
 		);
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
 		$options = $adapter->getOptions();
 		$this->assertArrayHasKey('sockjsUrl', $options);
-		$this->assertRegExp('#http://[0-9]+.stream:8090#', $options['sockjsUrl']);
+		$this->assertSame('http://stream:8090', $options['sockjsUrl']);
 	}
 
 	public function testOnRedisMessageSubscribe() {
@@ -31,7 +30,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertNotNull($streamSubscribe);
 		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
 		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
-		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
+		$this->assertSameTime($streamChannel->canSubscribe(null, time()), $streamSubscribe->getAllowedUntil());
 		$this->assertNull($streamSubscribe->getUser());
 
 		CMTest_TH::timeForward(CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY);
@@ -41,7 +40,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 		$this->assertSame(1, $streamChannel->getStreamSubscribes()->getCount());
 		CMTest_TH::reinstantiateModel($streamSubscribe);
 		$this->assertSameTime($timeStarted, $streamSubscribe->getStart());
-		$this->assertSameTime(null, $streamSubscribe->getAllowedUntil());
+		$this->assertSameTime($streamChannel->canSubscribe(null, $timeStarted), $streamSubscribe->getAllowedUntil());
 	}
 
 	public function testOnRedisMessageSubscribeUser() {
@@ -72,9 +71,9 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 
 	public function testOnRedisMessageUnsubscribe() {
 		$adapter = new CM_Stream_Adapter_Message_SocketRedis();
-		$streamChannel = CM_Model_StreamChannel_Message::create(array('key' => 'foo', 'adapterType' => $adapter->getType()));
-		CM_Model_Stream_Subscribe::create(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
-		CM_Model_Stream_Subscribe::create(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time(), 'allowedUntil' => null));
+		$streamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'foo', 'adapterType' => $adapter->getType()));
+		CM_Model_Stream_Subscribe::createStatic(array('key' => 'foo', 'streamChannel' => $streamChannel, 'start' => time()));
+		CM_Model_Stream_Subscribe::createStatic(array('key' => 'bar', 'streamChannel' => $streamChannel, 'start' => time()));
 
 		$message = array('type' => 'unsubscribe', 'data' => array('channel' => 'foo:' . CM_Model_StreamChannel_Message::TYPE, 'clientKey' => 'foo'));
 		$adapter->onRedisMessage(json_encode($message));
@@ -168,7 +167,7 @@ class CM_Stream_Adapter_Message_SocketRedisTest extends CMTest_TestCase {
 				$subscribe = CM_Model_Stream_Subscribe::findByKeyAndChannel($clientKey, $streamChannel);
 				$this->assertInstanceOf('CM_Model_Stream_Subscribe', $subscribe);
 				$this->assertSameTime(time() - CM_Stream_Adapter_Message_SocketRedis::SYNCHRONIZE_DELAY - 1, $subscribe->getStart());
-				$this->assertNull($subscribe->getAllowedUntil());
+				$this->assertSameTime($streamChannel->canSubscribe(null, time()), $subscribe->getAllowedUntil());
 			}
 		}
 	}

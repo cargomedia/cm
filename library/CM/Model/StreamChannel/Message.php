@@ -30,7 +30,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	 * @throws CM_Exception_Invalid
 	 * @return array ['key' => string, 'type' => int]
 	 */
-	public static function getChannelData($channel) {
+	public static function extractStatusChannelData($channel) {
 		$channelParts = explode(':', $channel);
 		if (count($channelParts) !== 2) {
 			throw new CM_Exception_Invalid('Cannot extract key, type from channel `' . $channel . '`');
@@ -40,12 +40,12 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @param string     $streamChannel
-	 * @param string     $namespace
+	 * @param string     $event
 	 * @param mixed|null $data
 	 */
-	public static function publish($streamChannel, $namespace, $data = null) {
+	public static function publish($streamChannel, $event, $data = null) {
 		$streamChannel = $streamChannel . ':' . static::TYPE;
-		CM_Stream_Message::getInstance()->publish($streamChannel, array('namespace' => $namespace, 'data' => $data));
+		CM_Stream_Message::getInstance()->publish($streamChannel, $event, $data);
 	}
 
 	/**
@@ -55,7 +55,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	 * @param mixed|null         $data
 	 */
 	public static function publishAction($streamChannel, CM_Action_Abstract $action, CM_Model_Abstract $model, $data = null) {
-		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerb() . ':' . $model->getType();
+		$namespace = 'CM_Action_Abstract' . ':' . $action->getVerbName() . ':' . $action->getType();
 		self::publish($streamChannel, $namespace, array('action' => $action, 'model' => $model, 'data' => $data));
 	}
 

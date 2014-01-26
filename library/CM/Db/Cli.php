@@ -5,7 +5,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 	/**
 	 * @param string $namespace
 	 */
-	public function dump($namespace) {
+	public function dbToFile($namespace) {
 		$namespace = (string) $namespace;
 		$tables = CM_Db_Db::exec("SHOW TABLES LIKE ?", array(strtolower($namespace) . '_%'))->fetchAllColumn();
 		sort($tables);
@@ -13,17 +13,17 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 		CM_File::create(CM_Util::getNamespacePath($namespace) . '/resources/db/structure.sql', $dump);
 	}
 
+	public function fileToDb() {
+		CM_App::getInstance()->setupDatabase(true);
+	}
+
 	public function runUpdates() {
 		$app = CM_App::getInstance();
 		$output = $this->_getOutput();
-		$versionBumps = $app->runUpdateScripts(function ($version) use ($output) {
-			$output->writeln('Running update ' . $version . '...');
+		$output->writeln('Running database updates…');
+		$app->runUpdateScripts(function ($version) use ($output) {
+			$output->writeln('  Running update ' . $version . '…');
 		});
-		if ($versionBumps > 0) {
-			$db = CM_Config::get()->CM_Db_Db->db;
-			CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
-		}
-		$app->setReleaseStamp();
 	}
 
 	/**

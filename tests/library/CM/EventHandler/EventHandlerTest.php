@@ -35,28 +35,28 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
 
 class CM_JobMock_1 extends CM_Jobdistribution_Job_Abstract {
 
-	protected function _run(CM_Params $params) {
+	protected function _execute(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_foo .= $params->getString('text');
 	}
 }
 
 class CM_JobMock_2 extends CM_Jobdistribution_Job_Abstract {
 
-	protected function _run(CM_Params $params) {
+	protected function _execute(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter++;
 	}
 }
 
 class CM_JobMock_3 extends CM_Jobdistribution_Job_Abstract {
 
-	protected function _run(CM_Params $params) {
+	protected function _execute(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('i');
 	}
 }
 
 class CM_JobMock_4 extends CM_Jobdistribution_Job_Abstract {
 
-	protected function _run(CM_Params $params) {
+	protected function _execute(CM_Params $params) {
 		CM_EventHandler_EventHandlerTest::$_counter += $params->getInt('a');
 	}
 }

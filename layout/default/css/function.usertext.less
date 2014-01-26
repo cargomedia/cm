@@ -7,6 +7,11 @@
 
 .usertext {
 	.word_wrap;
+	.hyphens(auto);
+
+	&.oneline {
+		.hyphens(none) // Bug: Safari wraps words although white-space: nowrap is set
+	}
 
 	img:not(.emoticon) {
 		.box-sizing(border-box);

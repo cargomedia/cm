@@ -17,6 +17,17 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	}
 
 	/**
+	 * @return CM_Site_Abstract[]
+	 */
+	public static function getAll() {
+		$siteList = array();
+		foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
+			$siteList[] = new $siteClassName();
+		}
+		return $siteList;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getEmailAddress() {
@@ -62,23 +73,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	}
 
 	/**
-	 * @param CM_Page_Abstract $page
-	 * @return CM_MenuEntry[]
-	 */
-	public function getMenuEntriesActive(CM_Page_Abstract $page) {
-		$menuEntries = array();
-		foreach ($this->getMenus() as $menu) {
-			foreach ($menu->findEntries($page) as $menuEntry) {
-				$menuEntries[] = $menuEntry;
-				foreach ($menuEntry->getParents() as $parentEntry) {
-					$menuEntries[] = $parentEntry;
-				}
-			}
-		}
-		return $menuEntries;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getName() {
@@ -111,6 +105,18 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	 */
 	public function getUrl() {
 		return self::_getConfig()->url;
+	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
+		if (false === $siteHost) {
+			throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
+		}
+		return $siteHost;
 	}
 
 	/**

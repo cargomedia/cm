@@ -4,8 +4,9 @@
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 $bootloader = new CM_Bootloader(dirname(__DIR__) . '/', null);
 $bootloader->setEnvironment('cli');
-$bootloader->load(array('constants', 'exceptionHandler', 'errorHandler', 'defaults'));
+$bootloader->load(array('errorHandler', 'constants', 'exceptionHandler', 'defaults'));
 
 $manager = new CM_Cli_CommandManager();
+$manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);

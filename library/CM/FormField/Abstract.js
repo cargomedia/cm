@@ -7,15 +7,15 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 
 	ready: function() {
 	},
-	
+
 	validate: function() {
 		var value = this.getValue();
-		if (_.isEmpty(value)) {
-			this.error();
+		if (this.isEmpty(value)) {
+			this.error(null);
 			return;
 		}
-		this.ajax('validate', {'userInput': value} , {
-			success: function () {
+		this.ajax('validate', {'userInput': value, 'form': this.getForm().getClass(), 'fieldName': this.getName()}, {
+			success: function() {
 				if (value != this.getValue()) {
 					return false;
 				}
@@ -32,14 +32,17 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 			}
 		});
 	},
-	
+
+	reset: function() {
+	},
+
 	/**
 	 * @return CM_Form_Abstract
 	 */
 	getForm: function() {
 		return this.getParent();
 	},
-	
+
 	/**
 	 * @return jQuery
 	 */
@@ -49,14 +52,14 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		}
 		return $(selector, this.el);
 	},
-	
+
 	/**
 	 * @return String
 	 */
 	getName: function() {
 		return this.options.name;
 	},
-	
+
 	/**
 	 * @return string|null
 	 */
@@ -67,42 +70,61 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 		}
 		return formData[this.getName()];
 	},
-	
+
 	/**
 	 * @return Object
 	 */
 	getOptions: function() {
 		return this.options.options;
 	},
-	
+
 	/**
 	 * @param {String} name
 	 * @return mixed|null
 	 */
 	getOption: function(name) {
 		var options = this.getOptions();
-		if (!options[name]) {
+		if (null === options[name] || '' === options[name]) {
 			return null;
 		}
 		return options[name];
 	},
-	
+
 	/**
 	 * @param {String|Null} message
 	 */
 	error: function(message) {
 		var $container = this.$('.messages');
-		$container.html('');
-	
+		var $errorMessage = $container.find('.formField-error');
+		this.$el.removeClass('hasError');
+
 		if (message) {
 			if ($container.length) {
-				$container.append('<div class="form_field_error" style="display:none"></div><br clear="all" />')
-				.children('.form_field_error').html(message).fadeIn('fast');
+				this.$el[0].offsetWidth;	// Force reflow for CSS-animation
+				this.$el.addClass('hasError');
+
+				if ($errorMessage.length) {
+					$errorMessage.html(message);
+				} else {
+					$errorMessage = $('<div class="formField-error"></div>').hide().appendTo($container);
+					$errorMessage.html(message);
+					$errorMessage.slideDown('fast');
+				}
+				this.$('input:first, select:first, textarea:first').focus();
+
 			} else {
 				cm.error.trigger('FormField `' + this.getName() + '`: ' + message);
 			}
-	
-			this.$('input, select, textarea').focus();
+		} else {
+			$errorMessage.remove();
 		}
+	},
+
+	/**
+	 * @param {Object} value
+	 * @returns {Boolean}
+	 */
+	isEmpty: function(value) {
+		return _.isEmpty(value)
 	}
 });

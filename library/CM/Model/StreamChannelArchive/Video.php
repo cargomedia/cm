@@ -65,18 +65,26 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	 * @return CM_Model_User|null
 	 */
 	public function getUser() {
+		$userId = $this->getUserId();
+		if (null === $userId) {
+			return null;
+		}
 		try {
-			return CM_Model_User::factory($this->getUserId());
+			return CM_Model_User::factory($userId);
 		} catch (CM_Exception_Nonexistent $ex) {
 			return null;
 		}
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
 	public function getUserId() {
-		return (int) $this->_get('userId');
+		$userId = $this->_get('userId');
+		if (null === $userId) {
+			return null;
+		}
+		return (int) $userId;
 	}
 
 	/**
@@ -90,17 +98,20 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 	 * @return array
 	 */
 	protected function _loadData() {
-		return CM_Db_Db::select(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, '*', array('id' => $this->getId()))->fetch();
+		return CM_Db_Db::select('cm_streamChannelArchive_video', '*', array('id' => $this->getId()))->fetch();
 	}
 
-	protected function _onDelete() {
+	protected function _onDeleteBefore() {
 		$this->getVideo()->delete();
 		$thumbDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
 		$thumbDir->delete();
-		CM_Db_Db::delete(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $this->getId()));
 	}
 
-	protected static function _create(array $data) {
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_streamChannelArchive_video', array('id' => $this->getId()));
+	}
+
+	protected static function _createStatic(array $data) {
 		/** @var CM_Model_StreamChannel_Video $streamChannel */
 		$streamChannel = $data['streamChannel'];
 		$streamPublish = $streamChannel->getStreamPublish();
@@ -108,8 +119,15 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 		$thumbnailCount = $streamChannel->getThumbnailCount();
 		$end = time();
 		$duration = $end - $createStamp;
-		CM_Db_Db::insert(TBL_CM_STREAMCHANNELARCHIVE_VIDEO, array('id' => $streamChannel->getId(), 'userId' => $streamPublish->getUser()->getId(), 'width' => $streamChannel->getWidth(), 'height' => $streamChannel->getHeight(),
-			'duration' => $duration, 'thumbnailCount' => $thumbnailCount, 'hash' => $streamChannel->getHash(), 'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp));
+		CM_Db_Db::insert('cm_streamChannelArchive_video', array(
+			'id'                => $streamChannel->getId(),
+			'userId'            => $streamPublish->getUserId(),
+			'width'             => $streamChannel->getWidth(),
+			'height'            => $streamChannel->getHeight(),
+			'duration'          => $duration, 'thumbnailCount' => $thumbnailCount,
+			'hash'              => $streamChannel->getHash(),
+			'streamChannelType' => $streamChannel->getType(), 'createStamp' => $createStamp,
+		));
 		return new self($streamChannel->getId());
 	}
 

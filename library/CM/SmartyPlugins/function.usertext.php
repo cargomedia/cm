@@ -3,6 +3,7 @@
 /**
  * Supported modes:
  * =====================================================
+ * escape = escape, remove badwords
  * oneline = escape, remove badwords, add emoticons
  * simple = escape, remove badwords, nl2br, add emoticons
  * markdown = escape, remove badwords, create html markdown, add emoticons
@@ -15,12 +16,21 @@ function smarty_function_usertext($params, Smarty_Internal_Template $template) {
 	$mode = (string) $params['mode'];
 	$maxLength = isset($params['maxLength']) ? (int) $params['maxLength'] : null;
 	$isMail = isset($params['isMail']) ? (bool) $params['isMail'] : null;
+	$skipAnchors = isset($params['skipAnchors']) ? (bool) $params['skipAnchors'] : null;
 
-	$usertext = new CM_Usertext_Usertext($render);
-	$usertext->setMode($mode, $maxLength, $isMail);
+	$usertext = CM_Usertext_Usertext::factory($render);
+	$usertext->setMode($mode, $maxLength, $isMail, $skipAnchors);
 
 	$text = $usertext->transform($text);
 
-	$text = '<span class="usertext ' . $mode . '">' . $text . '</span>';
-	return $text;
+	switch($mode){
+		case 'escape':
+			return $text;
+			break;
+		case 'markdown':
+			return '<div class="usertext ' . $mode . '">' . $text . '</div>';
+			break;
+		default:
+			return '<span class="usertext ' . $mode . '">' . $text . '</span>';
+	}
 }

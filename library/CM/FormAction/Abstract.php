@@ -1,105 +1,63 @@
 <?php
 
 abstract class CM_FormAction_Abstract {
-	/**
-	 * The name of an action.
-	 *
-	 * @var string
-	 */
-	private $name;
+
+	/** @var string */
+	private $_name;
+
+	/** @var CM_Form_Abstract */
+	private $_form;
+
+	/** @var CM_FormField_Abstract[]|null */
+	private $_fieldList = null;
 
 	/**
-	 * The list of $field_key=>$required pairs for the this action.
-	 *
-	 * @var array
+	 * @param CM_Form_Abstract $form
+	 * @throws CM_Exception
 	 */
-	private $_fields = array();
-
-	/**
-	 * The list of fields which are required for this action.
-	 *
-	 * @var array
-	 */
-	protected $required_fields = array();
-
-	/**
-	 * Confirmation message language address.
-	 *
-	 * @var string
-	 */
-	private $confirm_msg_lang_addr;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param string $action_name
-	 */
-	protected function __construct($action_name) {
-		$this->name = $action_name;
+	public function __construct(CM_Form_Abstract $form) {
+		$this->_form = $form;
+		if (!preg_match('/^\w+_FormAction_[^_]+_(.+)$/', get_class($this), $matches)) {
+			throw new CM_Exception("Cannot detect action name from form action class name");
+		}
+		$this->_name = $matches[1];
 	}
 
 	/**
-	 * Set a confirmation message for the action.
-	 *
-	 * @param string $lang_addr
-	 */
-	protected function setConfirmation($lang_addr) {
-		$this->confirm_msg_lang_addr = $lang_addr;
-	}
-
-	/**
-	 * Get a confirmation message of the action.
-	 *
-	 * @return string
-	 */
-	public function getConfirmation() {
-		return $this->confirm_msg_lang_addr;
-	}
-
-	/**
-	 * Returns the name of an action.
-	 *
 	 * @return string
 	 */
 	public function getName() {
-		return $this->name;
+		return $this->_name;
 	}
 
 	/**
-	 * @return array name => required
+	 * @return array [string => bool]
 	 */
-	public function getFields() {
-		return $this->_fields;
-	}
-
-	public function setup(CM_Form_Abstract $form) {
-		foreach ($form->getFields() as $fieldName => $field) {
-			$this->_fields[$fieldName] = in_array($fieldName, $this->required_fields);
+	public function getFieldList() {
+		if (null === $this->_fieldList) {
+			$this->_fieldList = array();
+			foreach ($this->_form->getFields() as $fieldName => $field) {
+				$this->_fieldList[$fieldName] = in_array($fieldName, $this->_getRequiredFields());
+			}
 		}
-
+		return $this->_fieldList;
 	}
 
+	/**
+	 * @return CM_Form_Abstract
+	 */
+	public function getForm() {
+		return $this->_form;
+	}
+
+	/**
+	 * @return string
+	 */
 	final public function js_presentation() {
 		$data = array();
-		$data['fields'] = $this->_fields;
-
-		if ($this->confirm_msg_lang_addr) {
-			$data['confirm_msg'] = $this->confirm_msg_lang_addr;
-		}
+		$data['fields'] = (object) $this->getFieldList();
 
 		return json_encode($data);
-
-	}
-
-	/**
-	 * An optional abstraction method for action entry data validation.
-	 *
-	 * @param array $data
-	 * @param CM_Response_View_Form $response
-	 * @param CM_Form_Abstract $form
-	 */
-	public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-		$this->_checkData(CM_Params::factory($data), $response, $form);
 	}
 
 	/**
@@ -107,8 +65,25 @@ abstract class CM_FormAction_Abstract {
 	 * @param CM_Response_View_Form $response
 	 * @param CM_Form_Abstract      $form
 	 */
-	public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-		$this->_process(CM_Params::factory($data), $response, $form);
+	final public function checkData(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+		$this->_checkData(CM_Params::factory($data), $response, $form);
+	}
+
+	/**
+	 * @param array                 $data
+	 * @param CM_Response_View_Form $response
+	 * @param CM_Form_Abstract      $form
+	 * @return mixed
+	 */
+	final public function process(array $data, CM_Response_View_Form $response, CM_Form_Abstract $form) {
+		return $this->_process(CM_Params::factory($data), $response, $form);
+	}
+
+	/**
+	 * @return string[]
+	 */
+	protected function _getRequiredFields() {
+		return array();
 	}
 
 	/**
@@ -117,16 +92,14 @@ abstract class CM_FormAction_Abstract {
 	 * @param CM_Form_Abstract      $form
 	 */
 	protected function _checkData(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-
 	}
 
 	/**
 	 * @param CM_Params             $params
 	 * @param CM_Response_View_Form $response
 	 * @param CM_Form_Abstract      $form
+	 * @return mixed
 	 */
 	protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-
 	}
-
 }

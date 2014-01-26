@@ -29,13 +29,11 @@ class CM_Render extends CM_Class_Abstract {
 	/* @var CM_Model_User|null */
 	private $_viewer;
 
-	public static $block_cap = '';
-
-	/* @var array */
-	public static $block_stack = array();
-
 	/* @var array */
 	protected $_stack = array();
+
+	/** @var CM_Menu[] */
+	private $_menuList = array();
 
 	/**
 	 * @param CM_Site_Abstract|null  $site
@@ -101,6 +99,9 @@ class CM_Render extends CM_Class_Abstract {
 	 * @return mixed|null
 	 */
 	public function popStack($key) {
+		if (!isset($this->_stack[$key])) {
+			return null;
+		}
 		$last = array_pop($this->_stack[$key]);
 		return $last;
 	}
@@ -167,9 +168,9 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param bool   $absolute      OPTIONAL True if full path required
-	 * @param string $theme         OPTIONAL
-	 * @param string $namespace     OPTIONAL
+	 * @param bool|null   $absolute True if full path required
+	 * @param string|null $theme
+	 * @param string|null $namespace
 	 * @return string Theme base path
 	 */
 	public function getThemeDir($absolute = false, $theme = null, $namespace = null) {
@@ -185,7 +186,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $tpl  Template file name
+	 * @param string      $tpl Template file name
 	 * @param string|null $namespace
 	 * @param bool|null   $absolute
 	 * @param bool|null   $needed
@@ -193,21 +194,27 @@ class CM_Render extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
-		foreach ($this->getSite()->getThemes() as $theme) {
-			$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
+		$namespaceList = $this->getSite()->getNamespaces();
+		if ($namespace !== null) {
+			$namespaceList = array((string) $namespace);
+		}
+		foreach ($namespaceList as $namespace) {
+			foreach ($this->getSite()->getThemes() as $theme) {
+				$file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
 
-			if (CM_File::exists($file)) {
-				if ($absolute) {
-					return $file;
-				} else {
-					return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+				if (CM_File::exists($file)) {
+					if ($absolute) {
+						return $file;
+					} else {
+						return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+					}
 				}
 			}
 		}
 
 		if ($needed) {
-			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespace `' . $this->getSite()->getNamespace() . '` and themes `' .
-					implode(', ', $this->getSite()->getThemes()) . '`');
+			throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespaces `' . implode('`, `', $namespaceList) . '` and themes `' .
+				implode('`, `', $this->getSite()->getThemes()) . '`');
 		}
 		return null;
 	}
@@ -304,7 +311,7 @@ class CM_Render extends CM_Class_Abstract {
 			if ($this->getLanguage()) {
 				$urlPath .= '/' . $this->getLanguage()->getAbbreviation();
 			}
-			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getReleaseStamp() . '/' . $path;
+			$urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -329,7 +336,7 @@ class CM_Render extends CM_Class_Abstract {
 	public function getUrlStatic($path = null) {
 		$urlPath = '/static';
 		if (null !== $path) {
-			$urlPath .= $path . '?' . CM_App::getInstance()->getReleaseStamp();
+			$urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
 		}
 		return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
 	}
@@ -409,13 +416,6 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function isDebug() {
-		return IS_DEBUG;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getLocale() {
@@ -424,6 +424,20 @@ class CM_Render extends CM_Class_Abstract {
 			$locale = $this->getLanguage()->getAbbreviation();
 		}
 		return $locale;
+	}
+
+	/**
+	 * @param CM_Menu $menu
+	 */
+	public function addMenu(CM_Menu $menu) {
+		$this->_menuList[] = $menu;
+	}
+
+	/**
+	 * @return CM_MenuEntry[]
+	 */
+	public function getMenuList() {
+		return $this->_menuList;
 	}
 
 	/**
@@ -436,7 +450,7 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
 			self::$_smarty->_file_perms = 0666;
 			self::$_smarty->_dir_perms = 0777;
-			self::$_smarty->compile_check = $this->isDebug();
+			self::$_smarty->compile_check = CM_Bootloader::getInstance()->isDebug();
 			self::$_smarty->caching = false;
 			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
 		}

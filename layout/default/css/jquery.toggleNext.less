@@ -1,0 +1,20 @@
+.toggleNext {
+
+	.icon-arrow-right {
+		margin-right: 6px;
+		display: inline-block;
+		.transition(200ms);
+	}
+
+	&:hover, &.active {
+		background-color: @colorBgEmphasize3;
+	}
+
+	&.active {
+		font-weight: bold;
+
+		.icon-arrow-right {
+			.transform(rotate(90deg));
+		}
+	}
+}

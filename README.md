@@ -23,21 +23,109 @@ A view (extending `CM_View_Abstract`) can be rendered, usually as HTML. The foll
 * `CM_Mail`: E-mail.
 
 ### Model
-A model (extending `CM_Model_Abstract`) represents a "real-world" object, stores state persistently and provides functionality.
+A model (extending `CM_Model_Abstract`) represents a "real-world" object, reads and writes data from a key-value store and provides functionality on top of that.
 
-Every model is identified by an *id*. The default constructor implements an integer-id.
-Internally the id is stored as a key-value structure (array), which can be exposed if there's need for more complex model-identification.
+Every model is identified by an *id*, with which in can be instantiated:
+```php
+$foo = new Foo(123);
+```
+By default, the constructor expects an integer value for the ID.
+Internally, it is stored as a key-value store (array), which can be exposed if there's need for a more complex model identification.
 
-All loaded data (implement `_loadData()`) is accessible as a key-value store with `_get()` and `_set()`.
-The key-value store is cached with Memcache by default.
+#### Schema
+To validate and enforce type casting of your models' fields, define an appropriate schema definition:
+```php
+	protected function _getSchema() {
+		return new CM_Model_Schema_Definition(array(
+			'fieldA' => array('type' => 'int'),
+			'fieldB' => array('type' => 'string', 'optional' => true),
+			'fieldC' => array('type' => 'CM_Model_Example'),
+		));
+	}
+```
+Fields with a model's class name as a type will be converted forth and back between an *object* and a *json representation of its ID* when reading and writing from the data store.
 
-Model lifecycle uses the methods `create()` and `delete()`.
+#### Persisting data
+If present, the *persistence* storage adapter will be used to load and save a model's data.
+```php
+	public static function getPersistenceClass() {
+		return 'CM_Model_StorageAdapter_Database';
+	}
+```
+In this example, the database adapter's `load()` and `save()` methods will be called whenever you instantiate an existing model or update schema fields.
 
-To create a fully-functional model implement the following:
-* `_create()`: Create the model, return an instance
-* `_loadData()`: Return key-value store as array, or FALSE on error
-* `_onDelete()`: Delete the model
-* Getters and Setters: Can use the internal `_get()` and `_set()` to access the key-value store. Setters should call `_change()` to invalidate caches.
+The `CM_Model_StorageAdapter_Database` will make use of following naming conventions to persist models in a database:
+- Table name: Lower-case class name of the model
+- Column names: Name of the schema fields
+
+You can access a model's fields with `_get()` and `_set()`, which will consider the schema for type coercion.
+It is recommended to implement a pair of getter and setter for each field in order to keep field names internal:
+```php
+ 	/**
+ 	 * @return string|null
+ 	 */
+ 	public function getFieldB() {
+ 		return $this->_get('fieldB');
+ 	}
+
+ 	/**
+ 	 * @param string|null $fieldB
+ 	 */
+ 	public function setFieldB($fieldB) {
+ 		$this->_set('fieldB', $fieldB);
+ 	}
+
+ 	/**
+ 	 * @return CM_Model_Example
+ 	 */
+ 	public function getFieldC() {
+ 		return $this->_get('fieldC');
+ 	}
+
+ 	/**
+ 	 * @param CM_Model_Example $fieldC
+ 	 */
+ 	public function setFieldC($fieldC) {
+ 		$this->_set('fieldC', $fieldC);
+ 	}
+```
+
+By default, the data is cached between multiple reads in Memcache. Use `getCacheClass()` to change this behaviour:
+```php
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
+	}
+```
+
+Alternatively if you're not using a *persistence* storage adapter, you can implement a custom method `_loadData()` which should return an array of the model's key-value data.
+In this case, your setters are responsible for persistence and should still call `_set()` for caching.
+
+#### Creating and deleting
+Models with a *persistence* storage adapter can be created by using their setters followed by a `commit()`:
+```php
+	$foo = new Foo();
+	$foo->setFieldA(23);
+	$foo->setFieldB('bar');
+	$foo->commit();
+```
+
+For deleting models, just call:
+```php
+	$foo = new Foo(123);
+	$foo->delete();
+```
+
+Alternatively, if you're not using a *persistence* storage adapter, you can implement your own creation logic in `_createStatic(array $data)` and then create models with:
+```php
+	$foo = Foo::createStatic(array('fieldA' => 1, 'fieldB' => 'hello world'));
+```
+In this case, make sure to delete the corresponding records within `_onDelete()` (see below).
+
+#### Event handling
+The following methods will be called for different events in the lifetime of a model:
+* `_onCreate()`: After persistence, when a model was created.
+* `_onChange()`: After persistence, when a field's value was changed. Also after the model was created.
+* `_onDelete()`: Before persistence, when a model is deleted.
 
 ### Paging
 A paging is an ordered collection with pagination-capabilities.
@@ -61,7 +149,7 @@ CM_Paging_User_Country                         # All users from a given country
 
 In your workspace, run:
 ```bash
-composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch" <project-name>
+composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch/source" --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
@@ -87,6 +175,7 @@ A typical Apache virtual host configuration for this purpose were:
   </Directory>
 
   <Directory ‹project-dir›/public/>
+    SetEnv CM_DEBUG 1
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php
@@ -99,7 +188,7 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php config generate
+./scripts/cm.php app generate-config-internal
 ```
 
 ### Namespace creation, site setup
@@ -108,10 +197,7 @@ CM framework provides a base which should be extended. Our own libraries should 
 ```bash
 ./scripts/cm.php generator create-namespace <namespace>
 ```
-Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader` and add following line before it:
-```php
-require_once dirname(__DIR__) . '/library/<namespace>/library/<namespace>/Bootloader.php';
-```
+Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader`.
 
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
@@ -137,19 +223,33 @@ Usage:
 
 Options:
  --quiet
+ --quiet-warnings
  --non-interactive
+ --forks=<value>
 
 Commands:
- config generate
+ app setup
+ app fill-caches
+ app deploy
+ app generate-config-internal
+ app generate-config-local <source-path>
+ app set-deploy-version [--deploy-version=<value>]
+ console interactive
+ css icon-refresh
+ css emoticon-refresh
+ db db-to-file <namespace>
+ db file-to-db
+ db run-updates
+ db run-update <version> [--namespace=<value>]
  generator create-view <class-name>
  generator create-class <class-name>
  generator create-namespace <namespace>
  generator create-javascript-files
  job-distribution start-manager
- db dump <namespace>
- db run-updates
- db run-update <version> [--namespace=<value>]
+ maintenance start
  search-index create [--index-name=<value>]
  search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
  search-index optimize
+ search-index start-maintenance
+ stream start-message-synchronization
 ```

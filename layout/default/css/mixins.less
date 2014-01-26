@@ -12,22 +12,6 @@
 	text-overflow: ellipsis;
 }
 
-.border(@color) {
-	border: 1px solid @color;
-}
-
-.message() {
-	color: @colorFg;
-	.border(lighten(@colorNotice, 42));
-	background-color: lighten(@colorNotice, 48);
-}
-
-.error() {
-	border-color: @colorError;
-	background: @colorError;
-	color: white;
-}
-
 .notice() {
 	border-color: @colorNotice;
 	background: @colorNotice;
@@ -40,13 +24,16 @@
 	color: @colorFgShy;
 }
 
+.hyphens(@arg) {
+	-webkit-hyphens: @arg;
+	-moz-hyphens: @arg;
+	hyphens: @arg;
+}
+
 .word_wrap() {
 	word-break: break-all;
 	word-break: break-word;
 	overflow-wrap: break-word;
-	-webkit-hyphens: auto;
-	-moz-hyphens: auto;
-	hyphens: auto;
 }
 
 .input_focus() {
@@ -54,75 +41,141 @@
 	border: 1px solid lighten(@colorNotice, 15);
 }
 
-.input_button(@size) {
-	width: auto;
-	min-width: @size;
-	max-width: 100%;
-	height: @size;
-	margin: 1px;
-	padding: 1px @size / 3;
-	font-weight: bold;
-	font-size: @fontSizeButton;
-	cursor: pointer;
-	overflow: visible;
-	vertical-align: top;
-	white-space: nowrap;
+.triangle(@colorDirectionBottom: transparent, @colorDirectionLeft: transparent, @colorDirectionTop: transparent, @colorDirectionRight: transparent, @size: 5px) {
+	position: absolute;
+	width: 0;
+	height: 0;
+	content: "";
+	border: @size solid transparent;
+	border-top-color: @colorDirectionBottom;
+	border-right-color: @colorDirectionLeft;
+	border-bottom-color: @colorDirectionTop;
+	border-left-color: @colorDirectionRight;
+	top: 50%;
+	margin-top: -@size;
+	left: -8px;
+}
 
-	.label {
-		display: inline-block;
-		max-width: 100%;
-		.nowrap;
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = top) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		bottom: 100%;
+		left: 50%;
 	}
 
-	.icon {
-		font-size: @iconSizeClickable;
-		line-height: @size - 2px;
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-bottom-color: @colorInner;
 	}
-	&.hasIcon.hasLabel {
-		.label {
-			vertical-align: top;
-			line-height: @size - 2px;
-		}
-	}
-}
 
-.input_button_color() {
-	color: @colorFgButtonFont;
-	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 6));
-	border: 1px solid lighten(@colorFgButton, 60);
-}
-
-.input_button_hover() {
-	border: 1px solid lighten(@colorFgButton, 50);
-	.gradient(vertical, @colorBgButton, darken(@colorBgButton, 12));
-	color: @colorFgButton;
-}
-
-.input_button_active() {
-	background: darken(@colorBg, 12);
-	border: 1px solid darken(@colorFgBorderEmphasize2, 30);
-}
-
-.input_button_alt() {
-	.gradient(vertical, darken(@colorFgButtonAlt, 10), darken(@colorFgButtonAlt, 10));
-	border: 1px solid darken(@colorFgButtonAlt, 10);
-	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
-	color: @colorFgButtonAltFont;
-	font-size: @fontSizeButton + 1px;
-
-	.icon {
-		color: @colorFgButtonAltFont;
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-bottom-color: @colorBorder;
 	}
 }
 
-.input_button_alt_hover() {
-	.gradient(vertical, @colorBgButtonAlt, @colorBgButtonAlt);
-	border: 1px solid @colorFgButtonAlt;
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = bottom) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		left: 50%;
+		top: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-left: -@size;
+		border-top-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-left: -(@size + @borderSize);
+		border-top-color: @colorBorder;
+	}
 }
 
-.input_button_alt_active() {
-	.gradient(vertical, lighten(@colorFgButtonAlt, 2), lighten(@colorFgButtonAlt, 2));
-	border: 1px solid darken(@colorFgButtonAlt, 10);
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = left) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		right: 100%;
+	}
+
+	&:after {
+		border-color: transparent;
+		border-width: @size;
+		margin-top: -@size;
+		border-right-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-right-color: @colorBorder;
+	}
+}
+
+.triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = right) {
+	&:after, &:before {
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		left: 100%;
+	}
+
+	&:after {
+		border-width: @size;
+		border-color: transparent;
+		margin-top: -@size;
+		border-left-color: @colorInner;
+	}
+
+	&:before {
+		border-width: @size + @borderSize;
+		margin-top: -(@size + @borderSize);
+		border-left-color: @colorBorder;
+	}
+}
+
+.clipper(@height: 20px, @colorBg: @colorBg) {
+	&:after {
+		pointer-events: none;
+		position: absolute;
+		content: "";
+		width: 100%;
+		height: @height;
+		bottom: 0;
+		left: 0;
+		.gradient(vertical, fadeout(@colorBg, 100), @colorBg, 0, 80%);
+	}
+}
+
+.background-size(@value) {
+	background-size: @value;
+	-webkit-background-size: @value;
 }
 
 .appearance(@value) {
@@ -135,4 +188,12 @@
 	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+}
+
+.transform-origin (@x:center, @y:center) {
+	-webkit-transform-origin: @x @y;
+	-moz-transform-origin: @x @y;
+	-ms-transform-origin: @x @y;
+	-o-transform-origin: @x @y;
+	transform-origin: @x @y;
 }

@@ -5,6 +5,9 @@ class CM_Cli_CommandManager {
 	/** @var CM_Cli_Command[]|null */
 	private $_commands = null;
 
+	/** @var int */
+	private $_forks = null;
+
 	/** @var CM_InputStream_Interface */
 	private $_streamInput;
 
@@ -15,6 +18,7 @@ class CM_Cli_CommandManager {
 	private $_streamError;
 
 	public function __construct() {
+		$this->_commands = array();
 		$this->_setStreamInput(new CM_InputStream_Readline());
 		$this->_setStreamOutput(new CM_OutputStream_Stream_StandardOutput());
 		$this->_setStreamError(new CM_OutputStream_Stream_StandardError());
@@ -24,21 +28,36 @@ class CM_Cli_CommandManager {
 	 * @return CM_Cli_Command[]
 	 */
 	public function getCommands() {
-		if (null === $this->_commands) {
-			$classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
-			foreach ($classes as $className) {
-				$class = new ReflectionClass($className);
-				if (!$class->isAbstract()) {
-					foreach ($class->getMethods() as $method) {
-						if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
-							$command = new CM_Cli_Command($method, $class);
-							$this->_commands[$command->getName()] = $command;
-						}
-					}
-				}
+		$commands = $this->_commands;
+		ksort($commands);
+		return $commands;
+	}
+
+	public function autoloadCommands() {
+		$classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
+		foreach ($classes as $className) {
+			$this->addRunnable($className);
+		}
+	}
+
+	/**
+	 * @param string $className
+	 * @throws CM_Exception_Invalid
+	 */
+	public function addRunnable($className) {
+		$class = new ReflectionClass($className);
+		if (!$class->isSubclassOf('CM_Cli_Runnable_Abstract')) {
+			throw new CM_Exception_Invalid('Can only add subclasses of `CM_Cli_Runnable_Abstract`');
+		}
+		if ($class->isAbstract()) {
+			throw new CM_Exception_Invalid('Cannot add abstract runnable');
+		}
+		foreach ($class->getMethods() as $method) {
+			if (!$method->isConstructor() && $method->isPublic() && !$method->isStatic()) {
+				$command = new CM_Cli_Command($method, $class);
+				$this->_commands[$command->getName()] = $command;
 			}
 		}
-		return $this->_commands;
 	}
 
 	/**
@@ -52,13 +71,15 @@ class CM_Cli_CommandManager {
 		$helpHeader .= ' [options] <command> [arguments]' . PHP_EOL;
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Options:' . PHP_EOL;
-		$helpHeader .= ' --quiet' . PHP_EOL;
-		$helpHeader .= ' --quiet-warnings' . PHP_EOL;
-		$helpHeader .= ' --non-interactive' . PHP_EOL;
+		$reflectionMethod = new ReflectionMethod($this, 'configure');
+		foreach (CM_Cli_Arguments::getNamedForMethod($reflectionMethod) as $paramString) {
+			$helpHeader .= ' ' . $paramString . PHP_EOL;
+		}
 		$helpHeader .= PHP_EOL;
 		$helpHeader .= 'Commands:' . PHP_EOL;
 		$help = '';
-		foreach ($this->getCommands() as $command) {
+		$commands = $this->getCommands();
+		foreach ($commands as $command) {
 			if (!$command->isAbstract() && (!$packageName || $packageName === $command->getPackageName())) {
 				$help .= ' ' . $command->getHelp() . PHP_EOL;
 			}
@@ -80,6 +101,7 @@ class CM_Cli_CommandManager {
 		try {
 			$packageName = $arguments->getNumeric()->shift();
 			$methodName = $arguments->getNumeric()->shift();
+
 			if (!$packageName) {
 				$this->_streamError->writeln($this->getHelp());
 				return 1;
@@ -89,6 +111,15 @@ class CM_Cli_CommandManager {
 				return 1;
 			}
 			$command = $this->_getCommand($packageName, $methodName);
+
+			$keepalive = $command->getKeepalive();
+			if ($keepalive || $this->_forks) {
+				$forks = max($this->_forks, (int) $keepalive);
+				$fork = new CM_Process_Fork($forks, $keepalive);
+				$fork->fork();
+			}
+
+			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
@@ -99,8 +130,8 @@ class CM_Cli_CommandManager {
 				$this->_streamError->writeln($this->getHelp());
 			}
 			return 1;
-		} catch (Exception $e) {
-			CM_Bootloader::getInstance()->handleException($e, $this->_streamError);
+		} catch (CM_Cli_Exception_Internal $e) {
+			$this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
 			return 1;
 		}
 	}
@@ -109,16 +140,21 @@ class CM_Cli_CommandManager {
 	 * @param boolean|null $quiet
 	 * @param boolean|null $quietWarnings
 	 * @param boolean|null $nonInteractive
+	 * @param int|null     $forks
 	 */
-	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null) {
+	public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
+		$forks = (int) $forks;
 		if ($quiet) {
 			$this->_setStreamOutput(new CM_OutputStream_Null());
 		}
 		if ($quietWarnings) {
-			CM_Bootloader::getInstance()->setExceptionOutputSeverityMin(CM_Exception::ERROR);
+			CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
 		}
 		if ($nonInteractive) {
 			$this->_setStreamInput(new CM_InputStream_Null());
+		}
+		if ($forks > 1) {
+			$this->_forks = $forks;
 		}
 	}
 

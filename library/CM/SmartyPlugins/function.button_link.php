@@ -21,31 +21,43 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	}
 	unset($params['iconPosition']);
 
-
+	$title = null;
 	if (isset($params['title'])) {
-		$attrs .= ' title="' . CM_Util::htmlspecialchars($params['title']) . '"';
-		unset($params['title']);
+		$title = (string) $params['title'];
+		$attrs .= ' title="' . CM_Util::htmlspecialchars($title) . '"';
 	}
+	unset($params['title']);
 
 	if (isset($params['id'])) {
 		$attrs .= ' id="' . $params['id'] . '"';
 	}
 	unset($params['id']);
 
-	$class = '';
+	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+	$class = 'button ' . 'button-' . $theme . ' ';
 	if (isset($params['class'])) {
-		$class = $params['class'];
+		$class .= $params['class'];
 	}
+	unset($params['theme']);
 	unset($params['class']);
+
 	if ($label) {
 		$class .= ' hasLabel';
 	}
+
+	$iconMarkup = '';
 	if ($icon) {
 		$iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
-		$class .= ' hasIcon';
+
 		if ($iconPosition == 'right') {
 			$class .= ' hasIconRight';
+		} else {
+			$class .= ' hasIcon';
 		}
+	}
+
+	if ($title) {
+		$class .= ' showTooltip';
 	}
 
 	$onclick = false;
@@ -75,6 +87,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 	if ($label) {
 		$html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
 	}
+
 	if ($icon && $iconPosition == 'right') {
 		$html .= $iconMarkup;
 	}

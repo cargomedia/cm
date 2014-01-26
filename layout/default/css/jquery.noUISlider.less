@@ -1,0 +1,23 @@
+.noUiSlider-wrapper {
+	overflow: hidden;
+	padding: 6px 1px 8px 1px;
+
+	.noUiSlider {
+		background-color: @colorBgTheme;
+		box-shadow: none;
+
+		&[disabled] {
+			opacity: 0.5;
+			background-color: @colorBgEmphasize1;
+		}
+
+		.noUi-origin {
+			background-color: @colorBgEmphasize1;
+		}
+
+		.noUi-handle:focus, .noUi-active {
+			outline: none;
+			.input_focus;
+		}
+	}
+}

@@ -6,9 +6,11 @@
 	{formField name='file' label="{translate 'Upload Files'}"}
 	{formField name='image' label="{translate 'Upload {$count} Photos' count='0-2'}"}
 	{formField name='color' label="{translate 'Color'}"}
+	{formField name='date' label="{translate 'Date'}"}
 	{formField name='set' label="{translate 'Set'}"}
 	{formField name='boolean' text="{translate 'Bool'}"}
 	{formField name='setSelect1' label="{translate 'Set Select'}" display='radios'}
 	{formField name='setSelect2' label="{translate 'Set Select'}"}
-	{formAction action='go' label="{translate 'Go'}"}
+	{formField name='setSelect3' label="{translate 'Set Select with Prefix'}" labelPrefix="{translate 'Sex'}"}
+	{formAction action='Go' label="{translate 'Go'}"}
 {/form}

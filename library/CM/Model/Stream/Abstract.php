@@ -3,19 +3,17 @@
 abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 
 	/**
-	 * @param int|null $timeStamp
+	 * @param int $timeStamp
 	 */
 	abstract public function setAllowedUntil($timeStamp);
 
+	abstract public function unsetUser();
+
 	/**
-	 * @return int|null
+	 * @return int
 	 */
 	public function getAllowedUntil() {
-		$allowedUntil = $this->_get('allowedUntil');
-		if (null === $allowedUntil) {
-			return null;
-		}
-		return (int) $allowedUntil;
+		return (int) $this->_get('allowedUntil');
 	}
 
 	/**
@@ -47,9 +45,12 @@ abstract class CM_Model_Stream_Abstract extends CM_Model_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_User
+	 * @return CM_Model_User|null
 	 */
 	public function getUser() {
+		if (is_null($this->getUserId())) {
+			return null;
+		}
 		return CM_Model_User::factory($this->getUserId());
 	}
 

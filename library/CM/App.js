@@ -16,7 +16,16 @@ var CM_App = CM_Class_Abstract.extend({
 		this.dom.ready();
 		this.window.ready();
 		this.date.ready();
+		this.ui.ready();
 		this.template.ready();
+		this.router.ready();
+	},
+
+	/**
+	 * @return {Number}
+	 */
+	getSiteId: function() {
+		return cm.options.site.type;
 	},
 
 	/**
@@ -29,7 +38,7 @@ var CM_App = CM_Class_Abstract.extend({
 				return !view.getParent();
 			});
 			if (!view) {
-				cm.error.trigger('Cannot find root component');
+				cm.error.triggerThrow('Cannot find root component');
 			}
 			return view;
 		}
@@ -49,6 +58,17 @@ var CM_App = CM_Class_Abstract.extend({
 		return _.filter(this.views, function(view) {
 			return view.hasClass(className);
 		});
+	},
+
+	/**
+	 * @return {CM_Layout_Abstract}
+	 */
+	getLayout: function() {
+		var layout = this.findView('CM_Layout_Abstract');
+		if (!layout) {
+			cm.error.triggerThrow('Cannot find layout');
+		}
+		return layout;
 	},
 
 	/**
@@ -98,7 +118,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	/**
 	 * @param {String} [path]
-	 * @param {Array} [params]
+	 * @param {Object} [params]
 	 * @return {String}
 	 */
 	getUrl: function(path, params) {
@@ -117,7 +137,7 @@ var CM_App = CM_Class_Abstract.extend({
 	getUrlStatic: function(path) {
 		var url = cm.options.urlStatic;
 		if (path) {
-			url += path + '?' + cm.options.releaseStamp;
+			url += path + '?' + cm.options.deployVersion;
 		}
 		return url;
 	},
@@ -134,7 +154,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (cm.options.language) {
 				urlPath += '/' + cm.options.language.abbreviation;
 			}
-			urlPath += '/' + cm.options.siteId + '/' + cm.options.releaseStamp + '/' + path;
+			urlPath += '/' + cm.getSiteId() + '/' + cm.options.deployVersion + '/' + path;
 		}
 		return cm.options.urlResource + urlPath;
 	},
@@ -157,7 +177,7 @@ var CM_App = CM_Class_Abstract.extend({
 		if (cm.options.language) {
 			path += '/' + cm.options.language.abbreviation;
 		}
-		path += '/' + this.options.siteId;
+		path += '/' + this.getSiteId();
 		return this.getUrl(path);
 	},
 
@@ -273,16 +293,24 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.timeago').timeago();
 			$dom.find('textarea.autosize, .autosize textarea').autosize();
 			$dom.find('.clipSlide').clipSlide();
-			$dom.find('button[title]').tooltip();
+			$dom.find('.scrollShadow').scrollShadow();
+			$dom.find('.showTooltip[title]').tooltip();
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
+			$dom.find('.fancySelect').fancySelect();
 		},
 		/**
 		 * @param {jQuery} $element
 		 * @param {Function} [success] fn(MediaElement, Element)
+		 * @param {Boolean} [preferPlugins]
 		 */
-		setupVideo: function($element, success) {
+		setupVideo: function($element, success, preferPlugins) {
+			var mode = 'auto';
+			if (preferPlugins) {
+				mode = 'auto_plugin';
+			}
+
 			$element.mediaelementplayer({
 				flashName: cm.getUrlResource('layout', 'swf/flashmediaelement.swf'),
 				silverlightName: cm.getUrlResource('layout', 'swf/silverlightmediaelement.xap'),
@@ -290,6 +318,7 @@ var CM_App = CM_Class_Abstract.extend({
 				videoHeight: '100%',
 				defaultVideoWidth: '100%',
 				defaultVideoHeight: '100%',
+				mode: mode,
 				success: function(mediaElement, domObject) {
 					var mediaElementMuted = cm.storage.get('mediaElement-muted');
 					var mediaElementVolume = cm.storage.get('mediaElement-volume');
@@ -434,18 +463,22 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	ui: {
+		ready: function() {
+			$.event.special.clickConfirmed.settings.message = cm.language.get('Please Confirm');
+		},
+
 		/**
 		 * @param {String} question
 		 * @param {Function} callback
 		 * @param {Object} [context]
 		 */
 		confirm: function(question, callback, context) {
-			var $ok = $('<input type="button" />').val(cm.language.get('Ok'));
-			var $cancel = $('<input type="button" />').val(cm.language.get('Cancel'));
-			var $html = $('<div><div class="box_cap clearfix nowrap"><h2></h2></div><div class="box_body"></div><div class="box_bottom"></div></div>');
-			$html.find('.box_cap h2').text(cm.language.get('Confirmation'));
-			$html.find('.box_body').text(question);
-			$html.find('.box_bottom').append($ok, $cancel);
+			var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
+			var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
+			var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
+			$html.find('.box-header h2').text(cm.language.get('Confirmation'));
+			$html.find('.box-body').text(question);
+			$html.find('.box-footer').append($ok, $cancel);
 
 			$html.floatOut();
 			$ok.click(function() {
@@ -481,12 +514,84 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	window: {
+		/** @var {String|Null} */
+		_id: null,
+
+		/** @var {Boolean} */
 		_hasFocus: true,
+
+		/** @var {jQuery|Null} */
 		_$hidden: null,
+
+		/**
+		 * @returns {String}
+		 */
+		getId: function() {
+			if (!this._id) {
+				this._id = cm.getUuid();
+			}
+			return this._id;
+		},
+
+		focus: {
+			/**
+			 * @return {Array}
+			 */
+			_get: function() {
+				var windows = cm.storage.get('focusWindows');
+				if (windows === null) {
+					windows = [];
+				}
+				return windows;
+			},
+			/**
+			 * @param {Array} focusWindows
+			 */
+			_set: function(focusWindows) {
+				cm.storage.set('focusWindows', focusWindows)
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			add: function(uuid) {
+				if (this.isLast(uuid)) {
+					return;
+				}
+				this.remove(uuid);
+				var windows = this._get();
+				windows.push(uuid);
+				this._set(windows);
+			},
+			/**
+			 * @param {String} uuid
+			 */
+			remove: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				if (index !== -1) {
+					windows.splice(index, 1);
+					this._set(windows);
+				}
+			},
+			/**
+			 * @param {String} uuid
+			 * @returns {Boolean}
+			 */
+			isLast: function(uuid) {
+				var windows = this._get();
+				var index = windows.indexOf(uuid);
+				return index !== -1 && index === windows.length - 1;
+			}
+		},
 
 		ready: function() {
 			var handler = this;
+			handler.focus.add(handler.getId());
+			$(window).on('beforeunload', function() {
+				handler.focus.remove(handler.getId());
+			});
 			$(window).focus(function() {
+				handler.focus.add(handler.getId());
 				handler._hasFocus = true;
 			}).blur(function() {
 					handler._hasFocus = false;
@@ -494,10 +599,23 @@ var CM_App = CM_Class_Abstract.extend({
 			this.title.ready();
 		},
 
+		/**
+		 * @return {Boolean}
+		 */
+		isLastFocus: function() {
+			return this.focus.isLast(this.getId());
+		},
+
+		/**
+		 * @return {Boolean}
+		 */
 		hasFocus: function() {
 			return this._hasFocus;
 		},
 
+		/**
+		 * @param {String|jQuery} html
+		 */
 		appendHidden: function(html) {
 			if (!this._$hidden) {
 				this._$hidden = $('<div style="display:none;" />').appendTo('body');
@@ -516,6 +634,9 @@ var CM_App = CM_Class_Abstract.extend({
 			return $.contains(this._$hidden[0], element);
 		},
 
+		/**
+		 * @param {String} content
+		 */
 		hint: function(content) {
 			$.windowHint(content);
 		},
@@ -569,22 +690,31 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			$.jStorage.set(key, value);
+			try {
+				localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			} catch (e) {
+				// iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
+			}
 		},
 
 		/**
 		 * @param {String} key
-		 * @return {*}
+		 * @return {*|Null}
 		 */
 		get: function(key) {
-			return $.jStorage.get(key);
+			var value = localStorage.getItem(cm.getSiteId() + ':' + key);
+			if (value === null) {
+				// See: https://code.google.com/p/android/issues/detail?id=11973
+				return null;
+			}
+			return JSON.parse(value);
 		},
 
 		/**
 		 * @param {String} key
 		 */
 		del: function(key) {
-			$.jStorage.deleteKey(key);
+			localStorage.removeItem(cm.getSiteId() + ':' + key);
 		}
 	},
 
@@ -600,13 +730,14 @@ var CM_App = CM_Class_Abstract.extend({
 				cm.error.trigger(msg, type, isPublic);
 			}
 		};
-		return $.ajax(url, {
+		var jqXHR = $.ajax(url, {
 			data: JSON.stringify(data),
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
-			cache: false,
-			success: function(response) {
+			cache: false
+		});
+		jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
 				if (response.error) {
 					errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
 				} else if (response.success) {
@@ -614,20 +745,23 @@ var CM_App = CM_Class_Abstract.extend({
 						callbacks.success(response.success);
 					}
 				}
-			},
-			error: function(xhr, textStatus) {
+			}).fail(function(xhr, textStatus) {
 				if (xhr.status == 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
-				var msg = xhr.responseText || textStatus;
-				errorHandler(msg, 'XHR', false, callbacks.error);
-			},
-			complete: function() {
+
+				var msg = cm.language.get('An unexpected connection problem occurred.');
+				if (cm.options.debug) {
+					msg = xhr.responseText || textStatus;
+				}
+				errorHandler(msg, null, false, callbacks.error);
+			}).always(function() {
 				if (callbacks.complete) {
 					callbacks.complete();
 				}
-			}
-		});
+			});
+
+		return jqXHR;
 	},
 
 	/**
@@ -664,8 +798,9 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {String} namespace
 		 * @param {Function} callback fn(array data)
 		 * @param {Object} [context]
+		 * @param {Boolean} [allowClientMessage]
 		 */
-		bind: function(channelKey, channelType, namespace, callback, context) {
+		bind: function(channelKey, channelType, namespace, callback, context, allowClientMessage) {
 			var channel = channelKey + ':' + channelType;
 			if (!cm.options.stream.enabled) {
 				return;
@@ -676,7 +811,7 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!this._channelDispatchers[channel]) {
 				this._subscribe(channel);
 			}
-			this._channelDispatchers[channel].on(namespace, callback, context);
+			this._channelDispatchers[channel].on(this._getEventNames(namespace, allowClientMessage), callback, context);
 		},
 
 		/**
@@ -694,10 +829,33 @@ var CM_App = CM_Class_Abstract.extend({
 			if (!channelKey || !channelType) {
 				cm.error.triggerThrow('No channel provided');
 			}
-			this._channelDispatchers[channel].off(namespace, callback, context);
+			this._channelDispatchers[channel].off(this._getEventNames(namespace, true), callback, context);
 			if (this._getBindCount(channel) === 0) {
 				this._unsubscribe(channel);
 			}
+		},
+
+		/**
+		 * @param {String} channelKey
+		 * @param {Number} channelType
+		 * @param {String} event
+		 * @param {Object} data
+		 */
+		publish: function(channelKey, channelType, event, data) {
+			var channel = channelKey + ':' + channelType;
+			this._getAdapter().publish(channel, event, data);
+		},
+
+		/**
+		 * @param {String} [namespace]
+		 * @param {Boolean} [allowClientMessage]
+		 */
+		_getEventNames: function(namespace, allowClientMessage) {
+			var eventName = namespace;
+			if (namespace && allowClientMessage) {
+				eventName += ' client-' + namespace;
+			}
+			return eventName;
 		},
 
 		/**
@@ -727,10 +885,10 @@ var CM_App = CM_Class_Abstract.extend({
 		_subscribe: function(channel) {
 			var handler = this;
 			this._channelDispatchers[channel] = _.clone(Backbone.Events);
-			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(message) {
+			this._getAdapter().subscribe(channel, {sessionId: $.cookie('sessionId')}, function(event, data) {
 				if (handler._channelDispatchers[channel]) {
-					handler._channelDispatchers[channel].trigger(message.namespace, message.data);
-					cm.debug.log('Stream channel (' + channel + '): message: ', message);
+					handler._channelDispatchers[channel].trigger(event, data);
+					cm.debug.log('Stream channel (' + channel + '): event `' + event + '`: ', data);
 				}
 			});
 			cm.debug.log('Stream channel (' + channel + '): subscribe');
@@ -806,28 +964,29 @@ var CM_App = CM_Class_Abstract.extend({
 
 	action: {
 		verbs: {},
+		types: {},
 
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} callback fn(CM_Action_Abstract action, CM_Model_Abstract model, array data)
 		 * @param {Object} [context]
 		 */
-		bind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		bind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.bind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		},
 		/**
 		 * @param {Number} actionVerb
-		 * @param {Number} modelType
+		 * @param {Number} actionType
 		 * @param {String} channelKey
 		 * @param {Number} channelType
 		 * @param {Function} [callback]
 		 * @param {Object} [context]
 		 */
-		unbind: function(actionVerb, modelType, channelKey, channelType, callback, context) {
-			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + modelType, callback, context);
+		unbind: function(actionVerb, actionType, channelKey, channelType, callback, context) {
+			cm.stream.unbind(channelKey, channelType, 'CM_Action_Abstract:' + actionVerb + ':' + actionType, callback, context);
 		}
 	},
 
@@ -867,56 +1026,8 @@ var CM_App = CM_Class_Abstract.extend({
 	},
 
 	router: {
-		_$placeholder: null,
-		_request: null,
-
-		/**
-		 * @param {String} fragment
-		 */
-		_navigate: function(fragment) {
-			var handler = this;
-			if (!this._$placeholder) {
-				this._$placeholder = $('<div class="router-placeholder" />');
-				var page = cm.findView('CM_Page_Abstract');
-				page.$().replaceWith(this._$placeholder);
-				page.remove(true);
-				cm.router.onTeardown();
-			} else {
-				this._$placeholder.removeClass('error').html('');
-			}
-			var timeoutLoading = window.setTimeout(function() {
-				handler._$placeholder.html('<div class="spinner" />')
-			}, 750);
-			if (this._request) {
-				this._request.abort();
-			}
-			this._request = cm.findView().loadPage(fragment, {
-				success: function(response) {
-					var fragment = response.url.substr(cm.getUrl().length);
-					var currentLayout = cm.findView('CM_Layout_Abstract');
-					var reload = currentLayout && (currentLayout.getClass() != response.layoutClass);
-					if (reload) {
-						window.location.replace(response.url);
-						return;
-					}
-					handler._$placeholder.replaceWith(this.$());
-					handler._$placeholder = null;
-					window.history.replaceState(null, null, fragment);
-					cm.router.onSetup(this, response.title, response.url, response.menuEntryHashList);
-				},
-				error: function(msg, type, isPublic) {
-					handler._$placeholder.addClass('error').html('<pre>' + msg + '</pre>');
-					cm.router.onError();
-					return false;
-				},
-				complete: function() {
-					window.clearTimeout(timeoutLoading);
-				}
-			});
-		},
-
-		start: function() {
-			var urlBase = cm.getUrl();
+		ready: function() {
+			var router = this;
 			var skipInitialFire = false;
 
 			$(window).on('popstate', function(event) {
@@ -926,7 +1037,7 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 				var location = window.history.location || document.location;
 				var fragment = location.pathname + location.search;
-				cm.router._navigate(location.pathname + location.search);
+				cm.getLayout().loadPage(location.pathname + location.search);
 			});
 
 			var hash = window.location.hash.substr(1);
@@ -941,11 +1052,12 @@ var CM_App = CM_Class_Abstract.extend({
 				}
 			}
 
+			var urlBase = cm.getUrl();
 			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
 				if (0 === this.href.indexOf(urlBase)) {
 					var fragment = this.href.substr(urlBase.length);
 					var forceReload = $(this).data('force-reload');
-					cm.router.route(fragment, forceReload);
+					router.route(fragment, forceReload);
 					event.preventDefault();
 				}
 			});
@@ -953,10 +1065,12 @@ var CM_App = CM_Class_Abstract.extend({
 
 		/**
 		 * @param {String} url
-		 * @param {Boolean} [forceReload]
+		 * @param {Boolean|Null} [forceReload]
+		 * @param {Boolean|Null} [replaceState]
 		 */
-		route: function(url, forceReload) {
+		route: function(url, forceReload, replaceState) {
 			forceReload = forceReload || false;
+			replaceState = replaceState || false;
 			var urlBase = cm.getUrl();
 			var fragment = url;
 			if ('/' == url.charAt(0)) {
@@ -968,33 +1082,26 @@ var CM_App = CM_Class_Abstract.extend({
 				window.location.assign(url);
 				return;
 			}
-			window.history.pushState(null, null, fragment);
-			cm.router._navigate(fragment);
-			cm.findView('CM_Layout_Abstract').trigger('route', url);
+			if (replaceState) {
+				this.replaceState(fragment);
+			} else {
+				this.pushState(fragment);
+			}
+			cm.getLayout().loadPage(fragment);
 		},
 
 		/**
-		 * @param {CM_Page_Abstract} page
-		 * @param {String} title
-		 * @param {String} url
-		 * @param {String[]} menuEntryHashList
+		 * @param {String|Null} [url] Absolute or relative URL
 		 */
-		onSetup: function(page, title, url, menuEntryHashList) {
-			document.title = title;
-			$('[data-menu-entry-hash]').removeClass('active');
-			var menuEntrySelectors = _.map(menuEntryHashList, function(menuEntryHash) {
-				return '[data-menu-entry-hash=' + menuEntryHash + ']';
-			});
-			$(menuEntrySelectors.join(',')).addClass('active');
+		pushState: function(url) {
+			window.history.pushState(null, null, url);
 		},
 
-		onTeardown: function() {
-			$(document).scrollTop(0);
-			$('.floatbox-layer').floatIn();
-		},
-
-		onError: function() {
-			$('[data-menu-entry-hash]').removeClass('active');
+		/**
+		 * @param {String|Null} [url] Absolute or relative URL
+		 */
+		replaceState: function(url) {
+			window.history.replaceState(null, null, url);
 		}
 	}
 });

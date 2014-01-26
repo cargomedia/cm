@@ -11,7 +11,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$render->pushStack('views', $form);
 
 		$class = implode(' ', $form->getClassHierarchy()) . ' ' . $form->getName();
-		$html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;">';
+		$html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
 
 		return $html;
 	} else {
@@ -19,10 +19,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$render->popStack('views');
 
 		/** @var CM_FormField_Abstract $field */
-		foreach ($form->getFields() as $field) {
+		foreach ($form->getFields() as $fieldName => $field) {
 			if ($field instanceof CM_FormField_Hidden) {
 				$field->prepare(array());
-				$content .= $render->render($field, array('form' => $form));
+				$content .= $render->render($field, array('form' => $form, 'fieldName' => $fieldName));
 			}
 		}
 

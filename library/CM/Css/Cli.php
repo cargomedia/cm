@@ -27,10 +27,10 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 		}
 
 		$dirBuild = $dirWork . 'build/';
-		CM_Util::exec('fontcustom', array('compile', '--nohash', '--name=icon-webfont', '--output=' . $dirBuild, $dirWork));
+		CM_Util::exec('fontcustom', array('compile', $dirWork, '--no-hash', '--font-name=icon-webfont', '--output=' . $dirBuild));
 
-		$cssFile = new CM_File($dirBuild . '/fontcustom.css');
-		$less = preg_replace('/url\("(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
+		$cssFile = new CM_File($dirBuild . '/icon-webfont.css');
+		$less = preg_replace('/url\("(?:.*?\/)(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
 		CM_File::create(DIR_PUBLIC . 'static/css/library/icon.less', $less);
 
 		foreach (glob($dirBuild . 'icon-webfont.*') as $fontPath) {
@@ -60,7 +60,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 			$insertList[] = array(':' . $emoticon['name'] . ':', $emoticon['fileName']);
 		}
 
-		CM_Db_Db::insertIgnore(TBL_CM_EMOTICON, array('code', 'file'), $insertList);
+		CM_Db_Db::insertIgnore('cm_emoticon', array('code', 'file'), $insertList);
 		$this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
 
 		$this->_checkEmoticonValidity();

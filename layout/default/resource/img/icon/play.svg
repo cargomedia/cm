@@ -3,9 +3,15 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="300px" height="300px" viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
-<path d="M32.5,51.822L267.5,150l-235,98.178V51.822z"/>
 <g id="Restricted">
 </g>
 <g id="Help">
+</g>
+<g>
+	<path d="M93.312,86.136L246.178,150L93.312,213.864V86.136z"/>
+	<g>
+		<path d="M150,295C70.047,295,5,229.953,5,150S70.047,5,150,5s145,65.047,145,145S229.953,295,150,295z M150,33.006
+			C85.491,33.006,33.006,85.491,33.006,150S85.491,266.994,150,266.994S266.994,214.509,266.994,150S214.509,33.006,150,33.006z"/>
+	</g>
 </g>
 </svg>

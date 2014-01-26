@@ -6,7 +6,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	public function _onModelDelete() {
-		CM_Db_Db::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId()));
+		CM_Db_Db::delete('cm_role', array('userId' => $this->_model->getId()));
 	}
 
 	/**
@@ -40,10 +40,24 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @return array
+	 * @return int[]
 	 */
 	public function get() {
 		return array_keys($this->_getAll());
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function getPersistent() {
+		return array_keys($this->_getPersistent());
+	}
+
+	/**
+	 * @return int[]
+	 */
+	public function getDefault() {
+		return $this->_model->getDefaultRoles();
 	}
 
 	/**
@@ -58,12 +72,12 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 		self::deleteOld($this->_model);
 		if ($duration) {
 			CM_Db_Db::exec('
-				INSERT INTO TBL_CM_ROLE (`userId`, `role`, `startStamp`, `expirationStamp`)
+				INSERT INTO `cm_role` (`userId`, `role`, `startStamp`, `expirationStamp`)
 				VALUES(?, ?, ?, ?)
 				ON DUPLICATE KEY UPDATE `expirationStamp` = `expirationStamp` + ?',
 				array($this->_model->getId(), $role, time(), time() + $duration, $duration));
 		} else {
-			CM_Db_Db::insert(TBL_CM_ROLE, array('userId', 'role', 'startStamp'),
+			CM_Db_Db::insert('cm_role', array('userId', 'role', 'startStamp'),
 				array($this->_model->getId(), $role, time()), array('expirationStamp' => null));
 		}
 		$this->_change();
@@ -73,15 +87,8 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	 * @param int $role
 	 */
 	public function delete($role) {
-		CM_Db_Db::delete(TBL_CM_ROLE, array('userId' => $this->_model->getId(), 'role' => $role));
+		CM_Db_Db::delete('cm_role', array('userId' => $this->_model->getId(), 'role' => $role));
 		$this->_change();
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getDefault() {
-		return $this->_model->getDefaultRoles();
 	}
 
 	/**
@@ -101,13 +108,24 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 		return $values[$role][$key];
 	}
 
-	private function _getAll() {
+	/**
+	 * @return array[]
+	 */
+	private function _getPersistent() {
 		if (($values = $this->_cacheGet('roles')) === false) {
-			$values = CM_Db_Db::select(TBL_CM_ROLE, array('role', 'startStamp', 'expirationStamp'),
+			$values = CM_Db_Db::select('cm_role', array('role', 'startStamp', 'expirationStamp'),
 					'`userId`=' . $this->_model->getId() . ' AND (`expirationStamp` > ' . time() . ' OR `expirationStamp` IS NULL)')
 					->fetchAllTree();
 			$this->_cacheSet('roles', $values);
 		}
+		return $values;
+	}
+
+	/**
+	 * @return array[]
+	 */
+	private function _getAll() {
+		$values = $this->_getPersistent();
 		foreach ($this->getDefault() as $role) {
 			$values[$role] = array(null, null);
 		}
@@ -119,7 +137,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	 */
 	public static function deleteOld(CM_Model_User $user = null) {
 		$userWhere = $user ? ' AND `userId` = ' . (int) $user->getId() : '';
-		$result = CM_Db_Db::exec("SELECT `userId`, `role` FROM TBL_CM_ROLE WHERE `expirationStamp` < ?" . $userWhere, array(time()));
+		$result = CM_Db_Db::exec("SELECT `userId`, `role` FROM `cm_role` WHERE `expirationStamp` < ?" . $userWhere, array(time()));
 		while ($row = $result->fetch()) {
 			$user = CM_Model_User::factory($row['userId']);
 			$user->getRoles()->delete($row['role']);

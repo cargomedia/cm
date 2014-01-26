@@ -13,8 +13,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @param int $id
 	 */
 	public function __construct($level, $id) {
-		$this->_setCacheLocal();
-		$this->_construct(array('id' => (int) $id, 'level' => (int) $level));
+		$this->_construct(array('id' => $id, 'level' => $level));
 	}
 
 	/**
@@ -49,7 +48,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @return int
 	 */
 	public function getLevel() {
-		return $this->_getId('level');
+		return (int) $this->_getId('level');
 	}
 
 	/**
@@ -58,7 +57,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public function getId($level = null) {
 		if (null === $level) {
-			return $this->_getId('id');
+			return (int) $this->_getId('id');
 		}
 		$id = $this->_getField($level, 'id');
 		if (null === $id) {
@@ -122,8 +121,10 @@ class CM_Model_Location extends CM_Model_Abstract {
 		$againstCoordinates['lon'] *= $pi180;
 
 		$earthRadius = 6371009;
-		$arcCosine = acos(sin($currentCoordinates['lat']) * sin($againstCoordinates['lat']) +
-				cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon']));
+		$arcCosine = acos(
+			sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
+			+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
+		);
 
 		return (int) round($earthRadius * $arcCosine);
 	}
@@ -132,34 +133,34 @@ class CM_Model_Location extends CM_Model_Abstract {
 		switch ($this->getLevel()) {
 			case self::LEVEL_ZIP:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 						`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
-					FROM TBL_CM_LOCATIONZIP AS `4`
-					LEFT JOIN TBL_CM_LOCATIONCITY AS `3` ON(`4`.`cityId`=`3`.`id`)
-					LEFT JOIN TBL_CM_LOCATIONSTATE AS `2` ON(`3`.`stateId`=`2`.`id`)
-					LEFT JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
+					FROM `cm_locationZip` AS `4`
+					LEFT JOIN `cm_locationCity` AS `3` ON(`4`.`cityId`=`3`.`id`)
+					LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
+					LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
 					WHERE `4`.`id` = ?';
 				break;
 			case self::LEVEL_CITY:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`,
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`
-					FROM TBL_CM_LOCATIONCITY AS `3`
-					LEFT JOIN TBL_CM_LOCATIONSTATE AS `2` ON(`3`.`stateId`=`2`.`id`)
-					LEFT JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`3`.`countryId`=`1`.`id`)
+					FROM `cm_locationCity` AS `3`
+					LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
+					LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
 					WHERE `3`.`id` = ?';
 				break;
 			case self::LEVEL_STATE:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
-						`2`.`id` `2.id`, `2`.`name` `2.name`
-					FROM TBL_CM_LOCATIONSTATE AS `2`
-					LEFT JOIN TBL_CM_LOCATIONCOUNTRY AS `1` ON(`2`.`countryId`=`1`.`id`)
+						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`
+					FROM `cm_locationState` AS `2`
+					LEFT JOIN `cm_locationCountry` AS `1` ON(`2`.`countryId`=`1`.`id`)
 					WHERE `2`.`id` = ?';
 				break;
 			case self::LEVEL_COUNTRY:
 				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`
-					FROM TBL_CM_LOCATIONCOUNTRY AS `1`
+					FROM `cm_locationCountry` AS `1`
 					WHERE `1`.`id` = ?';
 				break;
 			default:
@@ -188,19 +189,57 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 */
 	public static function findByIp($ip) {
 		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
-		if ((list($level, $id) = CM_CacheLocal::get($cacheKey)) === false) {
+		$cache = CM_Cache_Local::getInstance();
+		if ((list($level, $id) = $cache->get($cacheKey)) === false) {
 			$level = $id = null;
-			if ($id = self::_getLocationIdByIp(TBL_CM_LOCATIONCITYIP, 'cityId', $ip)) {
+			if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
 				$level = self::LEVEL_CITY;
-			} elseif ($id = self::_getLocationIdByIp(TBL_CM_LOCATIONCOUNTRYIP, 'countryId', $ip)) {
+			} elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
 				$level = self::LEVEL_COUNTRY;
 			}
-			CM_CacheLocal::set($cacheKey, array($level, $id));
+			$cache->set($cacheKey, array($level, $id));
 		}
 		if (!$level && !$id) {
 			return null;
 		}
 		return new self($level, $id);
+	}
+
+	/**
+	 * @param float $lat
+	 * @param float $lon
+	 * @return string[]|null
+	 */
+	public static function findByCoordinates($lat, $lon) {
+		$lat = (float) $lat;
+		$lon = (float) $lon;
+		$searchRadius = 100000;
+		$metersPerDegree = 111100;
+
+		$result = CM_Db_Db::execRead("
+			SELECT `id`, `level`
+			FROM `cm_tmp_location_coordinates`
+			WHERE
+				MBRContains(
+					GeomFromText(
+						'LineString(
+							" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon + $searchRadius / $metersPerDegree) . ",
+							" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
+							" . ($lon - $searchRadius / $metersPerDegree) . "
+						)'
+					), coordinates
+				)
+			ORDER BY
+				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
+			LIMIT 1"
+		)->fetch();
+
+		if (!$result) {
+			return null;
+		}
+
+		return $result;
 	}
 
 	/**
@@ -230,29 +269,189 @@ class CM_Model_Location extends CM_Model_Abstract {
 		return new self($data['level'], $data['id']);
 	}
 
-	public static function dumpToTable() {
-		CM_Db_Db::truncate(TBL_CM_TMP_LOCATION);
-		CM_Db_Db::exec('INSERT INTO `' . TBL_CM_TMP_LOCATION . '` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+	public static function getCacheClass() {
+		return 'CM_Model_StorageAdapter_CacheLocal';
+	}
+
+	public static function createUSStatesAbbreviation() {
+		$idUS = CM_Db_Db::select('cm_locationCountry', 'id', array('abbreviation' => 'US'))->fetchColumn();
+		if (false === $idUS) {
+			throw new CM_Exception_Invalid('No country with abbreviation `US` found');
+		}
+		$idUS = (int) $idUS;
+
+		$stateMilitaryId = CM_Db_Db::select('cm_locationState', 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
+																			  'countryId' => $idUS))->fetchColumn();
+		if (false === $stateMilitaryId) {
+			$stateMilitaryId = CM_Db_Db::insert('cm_locationState', array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
+																			'abbreviation' => 'AE'));
+		}
+		$stateMilitaryId = (int) $stateMilitaryId;
+
+		foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
+			CM_Db_Db::update('cm_locationCity', array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
+		}
+
+		foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
+			CM_Db_Db::update('cm_locationState', array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
+		}
+
+		self::createAggregation();
+	}
+
+	public static function createAggregation() {
+		CM_Db_Db::truncate('cm_tmp_location');
+		CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
-			FROM `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1`
+			FROM `cm_locationCountry` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
-					`2`.`name`, NULL, NULL, NULL
-			FROM `' . TBL_CM_LOCATIONSTATE . '` AS `2`
-			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`2`.`countryId`=`1`.`id`)
+					`2`.`name`, `2`.`abbreviation`, NULL, NULL
+			FROM `cm_locationState` AS `2`
+			LEFT JOIN `cm_locationCountry` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 3, `3`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, NULL,
 					`3`.`name`, NULL, `3`.`lat`, `3`.`lon`
-			FROM `' . TBL_CM_LOCATIONCITY . '` AS `3`
-			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)
+			FROM `cm_locationCity` AS `3`
+			LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
+			LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`,
 					`4`.`name`, NULL, `4`.`lat`, `4`.`lon`
-			FROM `' . TBL_CM_LOCATIONZIP . '` AS `4`
-			LEFT JOIN `' . TBL_CM_LOCATIONCITY . '` AS `3` ON(`4`.`cityId`=`3`.`id`)
-			LEFT JOIN `' . TBL_CM_LOCATIONSTATE . '` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			LEFT JOIN `' . TBL_CM_LOCATIONCOUNTRY . '` AS `1` ON(`3`.`countryId`=`1`.`id`)');
+			FROM `cm_locationZip` AS `4`
+			LEFT JOIN `cm_locationCity` AS `3` ON(`4`.`cityId`=`3`.`id`)
+			LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
+			LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)');
+
+		CM_Db_Db::truncate('cm_tmp_location_coordinates');
+		CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
+			SELECT 3, `id`, POINT(lat, lon)
+			FROM `cm_locationCity`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
+			UNION
+			SELECT 4, `id`, POINT(lat, lon)
+			FROM `cm_locationZip`
+			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $abbreviation
+	 * @return CM_Model_Location
+	 */
+	public static function createCountry ($name, $abbreviation) {
+		$countryId = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => $abbreviation, 'name' => $name));
+		return new self(self::LEVEL_COUNTRY, $countryId);
+	}
+
+	/**
+	 * @param CM_Model_Location $parentLocation
+	 * @param string $name
+	 * @param string|null $abbreviation
+	 * @throws CM_Exception_Invalid
+	 * @return CM_Model_Location
+	 */
+	public static function createState (CM_Model_Location $parentLocation, $name, $abbreviation = null) {
+		if ($parentLocation->getLevel() !== CM_Model_Location::LEVEL_COUNTRY) {
+			throw new CM_Exception_Invalid('Need to pass CM_Model_Location::LEVEL_COUNTRY instance');
+		}
+		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+		$stateId =  CM_Db_Db::insert('cm_locationState', array('countryId' => $countryId, 'name' => $name, 'abbreviation' => $abbreviation));
+		return new self(self::LEVEL_STATE, $stateId);
+	}
+
+	/**
+	 * @param CM_Model_Location $parentLocation
+	 * @param string $name
+	 * @param float $latitude
+	 * @param float $longitude
+	 * @return CM_Model_Location
+	 */
+	public static function createCity (CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
+		$stateId = null;
+		$stateId = $parentLocation->getId(self::LEVEL_STATE);
+		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+		$cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+		return new self(self::LEVEL_CITY, $cityId);
+	}
+
+	/**
+	 * @param CM_Model_Location $city
+	 * @param string $name
+	 * @param float $latitude
+	 * @param float $longitude
+	 * @return CM_Model_Location
+	 */
+	public static function createZip (CM_Model_Location $city, $name, $latitude, $longitude) {
+		$cityId = $city->getId(self::LEVEL_CITY);
+		$zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+		return new self(self::LEVEL_ZIP, $zipId);
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSStateAbbreviationList() {
+		return array(
+			'Alabama'              => 'AL',
+			'Alaska'               => 'AK',
+			'Arizona'              => 'AZ',
+			'Arkansas'             => 'AR',
+			'California'           => 'CA',
+			'Colorado'             => 'CO',
+			'Connecticut'          => 'CT',
+			'Delaware'             => 'DE',
+			'District of Columbia' => 'DC',
+			'Florida'              => 'FL',
+			'Georgia'              => 'GA',
+			'Hawaii'               => 'HI',
+			'Idaho'                => 'ID',
+			'Illinois'             => 'IL',
+			'Indiana'              => 'IN',
+			'Iowa'                 => 'IA',
+			'Kansas'               => 'KS',
+			'Kentucky'             => 'KY',
+			'Louisiana'            => 'LA',
+			'Maine'                => 'ME',
+			'Maryland'             => 'MD',
+			'Massachusetts'        => 'MA',
+			'Michigan'             => 'MI',
+			'Minnesota'            => 'MN',
+			'Mississippi'          => 'MS',
+			'Missouri'             => 'MO',
+			'Montana'              => 'MT',
+			'Nebraska'             => 'NE',
+			'Nevada'               => 'NV',
+			'New Hampshire'        => 'NH',
+			'New Jersey'           => 'NJ',
+			'New Mexico'           => 'NM',
+			'New York'             => 'NY',
+			'North Carolina'       => 'NC',
+			'North Dakota'         => 'ND',
+			'Ohio'                 => 'OH',
+			'Oklahoma'             => 'OK',
+			'Oregon'               => 'OR',
+			'Pennsylvania'         => 'PA',
+			'Rhode Island'         => 'RI',
+			'South Carolina'       => 'SC',
+			'South Dakota'         => 'SD',
+			'Tennessee'            => 'TN',
+			'Texas'                => 'TX',
+			'Utah'                 => 'UT',
+			'Vermont'              => 'VT',
+			'Virginia'             => 'VA',
+			'Washington'           => 'WA',
+			'West Virginia'        => 'WV',
+			'Wisconsin'            => 'WI',
+			'Wyoming'              => 'WY'
+		);
+	}
+
+	/**
+	 * @return string[]
+	 */
+	private static function _getUSCityMilitrayBasisList() {
+		return array('T3 R1 Nbpp', 'Apo', 'Fpo');
 	}
 }

@@ -10,16 +10,6 @@ class CM_ComponentFrontendHandler {
 	protected $operations = array();
 
 	/**
-	 * Add a property set action.
-	 *
-	 * @param string $property
-	 * @param mixed $value
-	 */
-	public function __set($property, $value) {
-		$this->setParam($property, $value);
-	}
-
-	/**
 	 * @param string $property
 	 * @param mixed $value
 	 */
@@ -27,19 +17,6 @@ class CM_ComponentFrontendHandler {
 		$this->operations[] = "$property = " . CM_Params::encode($value, true);
 	}
 
-	/**
-	 * Add a handler method call.
-	 *
-	 * @param string $method
-	 * @param array $args
-	 */
-	public function __call($method, array $args) {
-		foreach ($args as &$arg) {
-			$arg = CM_Params::encode($arg, true);
-		}
-		$this->operations[] = "$method(" . implode(', ', $args) . ")";
-	}
-	
 	/**
 	* @param string $js
 	*/
@@ -76,29 +53,27 @@ class CM_ComponentFrontendHandler {
 	}
 
 	/**
-	 * Show a MACOS-like error message.
-	 *
 	 * @param string $msg_text
 	 */
 	public function error($msg_text) {
-		$this->__call('error', array($msg_text));
+		$this->operations[] = "error(" . CM_Params::encode($msg_text, true) . ")";
 	}
 
 	/**
-	 * Show a MACOS-like message.
-	 *
 	 * @param string $msg_text
 	 */
 	public function message($msg_text) {
-		$this->__call('message', array($msg_text));
+		$this->operations[] = "message(" . CM_Params::encode($msg_text, true) . ")";
+
 	}
 
 	/**
-	 * Debug a variable value.
-	 *
-	 * @param mixed $var
+	 * @param mixed $varList
 	 */
-	public function debug($var) {
-		$this->__call('debug', array($var));
+	public function debug($varList) {
+		foreach ($varList as &$var) {
+			$var = CM_Params::encode($var, true);
+		}
+		$this->operations[] = "message(" . implode(', ', $varList) . ")";
 	}
 }

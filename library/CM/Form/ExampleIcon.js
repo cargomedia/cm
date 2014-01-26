@@ -14,14 +14,10 @@ var CM_Form_ExampleIcon = CM_Form_Abstract.extend({
 	},
 
 	ready: function() {
-		var self = this;
 		this.on('change', function() {
-			self._updateCss();
-		});
-		this.$('input[type="text"], input[type="color"]').changetext(function() {
-			self.trigger('change')
-		});
-		this.trigger('change');
+			this._updateCss();
+		}, this);
+		this._updateCss();
 	},
 
 	/**

@@ -20,7 +20,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	public function getMockForm() {
 		$formMock = $this->getMockForAbstractClass('CM_Form_Abstract');
 		$formMock->expects($this->any())->method('getName')->will($this->returnValue('formName'));
-		$formMock->frontend_data['auto_id'] = 'formId';
 		return $formMock;
 	}
 
@@ -118,14 +117,18 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	 * @param array|null           $componentParams
 	 * @param CM_Request_Post|null $request
 	 * @param int|null             $siteId
+	 * @param string|null          $languageAbbreviation
 	 * @return CM_Response_View_Form
 	 */
-	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null) {
+	public function getResponseForm($formClassName, $actionName, array $data, $componentClassName = null, CM_Model_User $viewer = null, array $componentParams = null, &$request = null, $siteId = null, $languageAbbreviation = null) {
 		if (null === $componentParams) {
 			$componentParams = array();
 		}
 		if (null === $siteId) {
 			$siteId = 'null';
+		}
+		if (null !== $languageAbbreviation) {
+			$languageAbbreviation .= '/';
 		}
 		$session = new CM_Session();
 		if ($viewer) {
@@ -137,7 +140,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
 		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
-		$request = new CM_Request_Post('/form/' . $siteId, $headers, $body);
+		$request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $body);
 
 		$response = new CM_Response_View_Form($request);
 		$response->process();
@@ -172,18 +175,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param CM_Form_Abstract      $form
 	 * @param CM_FormField_Abstract $formField
+	 * @param string                $fieldName
 	 * @param array|null            $params
 	 * @param CM_Model_User|null    $viewer
 	 * @param CM_Site_Abstract|null $site
 	 * @return CMTest_TH_Html
 	 */
-	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, array $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+	protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, $fieldName, array $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
 		if (null === $params) {
 			$params = array();
 		}
 		$formField->prepare($params);
 		$render = new CM_Render($site, $viewer);
-		$html = $render->render($formField, array('form' => $form));
+		$html = $render->render($formField, array('form' => $form, 'fieldName' => $fieldName));
 		return new CMTest_TH_Html($html);
 	}
 

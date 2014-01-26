@@ -2,7 +2,7 @@
 
 class CM_Mail extends CM_View_Abstract {
 
-	const TYPE = 1;
+	const TYPE = 75;
 
 	/** @var CM_Model_User|null */
 	private $_recipient;
@@ -242,27 +242,39 @@ class CM_Mail extends CM_View_Abstract {
 	}
 
 	/**
-	 * @param boolean|null $delayed
-	 * @return array|null  ($subject, $html, $text)
-	 * @throws CM_Exception_Invalid
+	 * @return array array($subject, $html, $text)
 	 */
-	public function send($delayed = null) {
-		$delayed = (boolean) $delayed;
-		if (empty($this->_to)) {
-			throw new CM_Exception_Invalid('No recipient specified.');
-		}
-		if ($this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified()) {
-			return null;
-		}
+	public function render() {
 		$language = null;
 		if ($this->_recipient) {
 			$language = $this->_recipient->getLanguage();
 		}
-		list($subject, $html, $text) = $this->_render($language);
-		if ($delayed) {
-			$this->_queue($subject, $text, $html);
-		} else {
-			$this->_send($subject, $text, $html);
+		return $this->_render($language);
+	}
+
+	/**
+	 * @param boolean|null $delayed
+	 * @param boolean|null $renderRequired
+	 * @throws CM_Exception_Invalid
+	 * @return array|null  array($subject, $html, $text)
+	 */
+	public function send($delayed = null, $renderRequired = null) {
+		$delayed = (boolean) $delayed;
+		if (empty($this->_to)) {
+			throw new CM_Exception_Invalid('No recipient specified.');
+		}
+		$verificationMissing = $this->_verificationRequired && $this->_recipient && !$this->_recipient->getEmailVerified();
+		if ($verificationMissing && !$renderRequired) {
+			return null;
+		}
+
+		list($subject, $html, $text) = $this->render();
+		if (!$verificationMissing) {
+			if ($delayed) {
+				$this->_queue($subject, $text, $html);
+			} else {
+				$this->_send($subject, $text, $html);
+			}
 		}
 		return array($subject, $html, $text);
 	}
@@ -275,7 +287,7 @@ class CM_Mail extends CM_View_Abstract {
 	 * @return int
 	 */
 	public static function getQueueSize() {
-		return CM_Db_Db::count(TBL_CM_MAIL);
+		return CM_Db_Db::count('cm_mail');
 	}
 
 	/**
@@ -283,7 +295,7 @@ class CM_Mail extends CM_View_Abstract {
 	 */
 	public static function processQueue($limit) {
 		$limit = (int) $limit;
-		$result = CM_Db_Db::execRead('SELECT * FROM TBL_CM_MAIL ORDER BY `createStamp` LIMIT ' . $limit);
+		$result = CM_Db_Db::execRead('SELECT * FROM `cm_mail` ORDER BY `createStamp` LIMIT ' . $limit);
 		while ($row = $result->fetch()) {
 			$mail = new CM_Mail();
 			foreach (unserialize($row['to']) as $to) {
@@ -301,15 +313,22 @@ class CM_Mail extends CM_View_Abstract {
 			$sender = unserialize($row['sender']);
 			$mail->setSender($sender['address'], $sender['name']);
 			$mail->_send($row['subject'], $row['text'], $row['html']);
-			CM_Db_Db::delete(TBL_CM_MAIL, array('id' => $row['id']));
+			CM_Db_Db::delete('cm_mail', array('id' => $row['id']));
 		}
 	}
 
 	private function _queue($subject, $text, $html) {
-		CM_Db_Db::insert(TBL_CM_MAIL, array('subject' => $subject, 'text' => $text, 'html' => $html, 'createStamp' => time(),
-											'sender'  => serialize($this->getSender()), 'replyTo' => serialize($this->getReplyTo()),
-											'to'      => serialize($this->getTo()),
-											'cc'      => serialize($this->getCc()), 'bcc' => serialize($this->getBcc())));
+		CM_Db_Db::insert('cm_mail', array(
+			'subject'     => $subject,
+			'text'        => $text,
+			'html'        => $html,
+			'createStamp' => time(),
+			'sender'      => serialize($this->getSender()),
+			'replyTo'     => serialize($this->getReplyTo()),
+			'to'          => serialize($this->getTo()),
+			'cc'          => serialize($this->getCc()),
+			'bcc'         => serialize($this->getBcc()),
+		));
 	}
 
 	private function _log($subject, $text) {
@@ -338,6 +357,9 @@ class CM_Mail extends CM_View_Abstract {
 			foreach ($this->_bcc as $bcc) {
 				$mail->AddBCC($bcc['address'], $bcc['name']);
 			}
+			if ($mailDeliveryAgent = $this->_getConfig()->mailDeliveryAgent) {
+				$mail->AddCustomHeader('X-MDA: ' . $mailDeliveryAgent);
+			}
 			$mail->SetFrom($this->_sender['address'], $this->_sender['name']);
 
 			$mail->Subject = $subject;
@@ -355,7 +377,7 @@ class CM_Mail extends CM_View_Abstract {
 
 	/**
 	 * @param CM_Model_Language|null $language
-	 * @return string
+	 * @return array array($subject, $html, $text)
 	 */
 	protected function _render($language) {
 		$render = new CM_Render($this->_site, $this->_recipient, $language);

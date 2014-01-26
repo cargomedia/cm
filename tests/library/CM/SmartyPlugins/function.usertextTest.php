@@ -2,11 +2,9 @@
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.usertext.php';
 
-class smarty_modifier_usertextTest extends CMTest_TestCase {
+class smarty_function_usertextTest extends CMTest_TestCase {
 
-	/**
-	 * @var Smarty_Internal_Template
-	 */
+	/** @var Smarty_Internal_Template */
 	private $_template;
 
 	public function setUp() {
@@ -20,6 +18,10 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 		CMTest_TH::clearEnv();
 	}
 
+	public function testModeEscape() {
+		$this->_assertSame('foo&lt;', array('text' => 'foo<', 'mode' => 'escape'));
+	}
+
 	public function testModeOneline() {
 		$this->_assertSame('<span class="usertext oneline">foo</span>', array('text' => 'foo', 'mode' => 'oneline'));
 	}
@@ -29,8 +31,13 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 	}
 
 	public function testModeMarkdown() {
-		$this->_assertSame("<span class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></span>", array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n",
-																															  'mode' => 'markdown'));
+		$this->_assertSame("<div class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p><a href=\"http://www.google.com\">google.com</a></p></div>",
+			array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n", 'mode' => 'markdown'));
+	}
+
+	public function testModeMarkdownSkipAnchors() {
+		$this->_assertSame("<div class=\"usertext markdown\"><h1>Headline</h1>\n<p>foo</p>\n<p>google.com</p></div>",
+			array('text' => "#Headline#\nfoo\n[google.com](http://www.google.com)\n\n", 'mode' => 'markdown', 'skipAnchors' => true));
 	}
 
 	public function testModeMarkdownPlain() {
@@ -67,10 +74,10 @@ class smarty_modifier_usertextTest extends CMTest_TestCase {
 	}
 
 	public function testIsMail() {
-		$emoticonId = CM_Db_Db::insert(TBL_CM_EMOTICON, array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
+		$emoticonId = CM_Db_Db::insert('cm_emoticon', array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
 
 		$this->_assertSame(
-			'<span class="usertext oneline">foo <img src="http://www.default.dev/layout//0/img/emoticon/1.png" class="emoticon emoticon-' .
+			'<span class="usertext oneline">foo <img src="http://www.default.dev/layout//' . CM_App::getInstance()->getDeployVersion() . '/img/emoticon/1.png" class="emoticon emoticon-' .
 					$emoticonId . '" title=":smiley:" height="16" /></span>',
 			array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));
 	}

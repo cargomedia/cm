@@ -108,8 +108,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
-	 * @param int[]|null  $default
+	 * @param string     $key
+	 * @param int[]|null $default
 	 * @return int[]
 	 */
 	public function getIntArray($key, array $default = null) {
@@ -151,6 +151,35 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
+	 * @param string $key
+	 * @throws CM_Exception_InvalidParam
+	 * @return DateTime
+	 */
+	public function getDateTime($key) {
+		$value = $this->get($key);
+		if (is_array($value) && isset($value['date']) && isset($value['timezone_type']) && isset($value['timezone'])) {
+			$date = (string) $value['date'];
+			$timezone = (string) $value['timezone'];
+			$timezoneType = (int) $value['timezone_type'];
+			switch ($timezoneType) {
+				case 1:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 2:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 3:
+					$datetime = new DateTime($date, new DateTimeZone($timezone));
+					break;
+				default:
+					throw new CM_Exception_InvalidParam('Invalid timezone type `' . $timezoneType . '`');
+			}
+			return $datetime;
+		}
+		return $this->_getObject($key, 'DateTime');
+	}
+
+	/**
 	 * @param string   $key
 	 * @param int|null $default
 	 * @return int
@@ -180,11 +209,11 @@ class CM_Params extends CM_Class_Abstract {
 			};
 		}
 		$param = $this->_get($key, $default);
-		if (ctype_digit($param) || is_int($param)) {
-			return $getter($className, $param);
-		}
 		if (!($param instanceof $className)) {
-			throw new CM_Exception_InvalidParam('Not a ' . $className);
+			if (is_object($param)) {
+				throw new CM_Exception_InvalidParam(get_class($param) . ' is not a ' . $className);
+			}
+			return $getter($className, $param);
 		}
 		return $param;
 	}
@@ -229,8 +258,8 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string                   $key
-	 * @param CM_Model_User|null       $default
+	 * @param string             $key
+	 * @param CM_Model_User|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Model_User
 	 */
@@ -252,6 +281,14 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getLocation($key) {
 		return $this->_getObject($key, 'CM_Model_Location');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Model_ActionLimit_Abstract
+	 */
+	public function getActionLimit($key) {
+		return $this->_getObject($key, 'CM_Model_ActionLimit_Abstract');
 	}
 
 	/**
@@ -305,6 +342,24 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public function getStreamChannelVideo($key) {
 		return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_File
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getFile($key) {
+		return $this->_getObject($key, 'CM_File');
+	}
+
+	/**
+	 * @param string $key
+	 * @return CM_Geo_Point
+	 * @throws CM_Exception_InvalidParam
+	 */
+	public function getGeoPoint($key) {
+		return $this->_getObject($key, 'CM_Geo_Point');
 	}
 
 	/**
@@ -408,9 +463,10 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public static function decode($value, $json = null) {
 		if ($json) {
-			$value = json_decode($value, true);
+			$valueString = (string) $value;
+			$value = json_decode($valueString, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . CM_Util::var_line($value) . '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString. '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {
@@ -431,11 +487,10 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param array $params
 	 * @param bool  $decode OPTIONAL
-	 * @return CM_Params
+	 * @return static
 	 */
 	public static function factory(array $params = array(), $decode = true) {
 		$className = self::_getClassName();
 		return new $className($params, $decode);
 	}
-
 }

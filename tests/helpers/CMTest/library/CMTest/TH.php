@@ -2,6 +2,7 @@
 
 class CMTest_TH {
 
+	private static $_timeStart;
 	private static $timeDelta = 0;
 	private static $initialized = false;
 	private static $_configBackup;
@@ -13,24 +14,13 @@ class CMTest_TH {
 		if (self::$initialized) {
 			return;
 		}
-		$configDb = CM_Config::get()->CM_Db_Db;
-		$client = new CM_Db_Client($configDb->server['host'], $configDb->server['port'], $configDb->username, $configDb->password);
-
-		if (CM_Config::get()->CMTest_TH->dropDatabase) {
-			$client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($configDb->db))->execute();
-		}
-
-		$databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($configDb->db))->fetch();
-		if (!$databaseExists) {
-			$client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($configDb->db))->execute();
-			foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-				CM_Db_Db::runDump($configDb->db, $dump);
-			}
-		}
+		$forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
+		CM_App::getInstance()->setupDatabase($forceReload);
 
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
+		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
@@ -47,22 +37,24 @@ class CMTest_TH {
 	}
 
 	public static function clearCache() {
-		CM_Cache::flush();
-		CM_CacheLocal::flush();
+		CM_Cache_Shared::getInstance()->flush();
+		CM_Cache_Local::getInstance()->flush();
 	}
 
 	public static function clearDb() {
 		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+		CM_Db_Db::exec('SET foreign_key_checks = 0;');
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
+		CM_Db_Db::exec('SET foreign_key_checks = 1;');
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
 	}
 
 	public static function clearTmp() {
-		CM_Util::rmDirContents(DIR_TMP);
+		CM_App::getInstance()->resetTmp();
 	}
 
 	public static function clearConfig() {
@@ -70,12 +62,12 @@ class CMTest_TH {
 	}
 
 	public static function timeInit() {
-		runkit_function_copy('time', 'time_original');
+		self::$_timeStart = time();
 		runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 	}
 
 	public static function time() {
-		return time_original() + self::$timeDelta;
+		return self::$_timeStart + self::$timeDelta;
 	}
 
 	public static function timeForward($sec) {
@@ -104,7 +96,7 @@ class CMTest_TH {
 	 * @return CM_Model_User
 	 */
 	public static function createUser() {
-		return CM_Model_User::create();
+		return CM_Model_User::createStatic();
 	}
 
 	/**
@@ -117,7 +109,7 @@ class CMTest_TH {
 				$abbreviation = self::_randStr(5);
 			} while (CM_Model_Language::findByAbbreviation($abbreviation));
 		}
-		return CM_Model_Language::create(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
+		return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
 	}
 
 	/**
@@ -184,7 +176,7 @@ class CMTest_TH {
 		if (!$streamChannel->hasStreamPublish()) {
 			self::createStreamPublish($user, $streamChannel);
 		}
-		return CM_Model_StreamChannelArchive_Video::create(array('streamChannel' => $streamChannel));
+		return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
 	}
 
 	/**
@@ -199,8 +191,11 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $user, 'start' => time(),
+			'key'           => rand(1, 10000) . '_' . rand(1, 100),
+		));
 	}
 
 	/**
@@ -212,8 +207,8 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Subscribe::create(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
+															 'key'           => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -224,10 +219,39 @@ class CMTest_TH {
 	 */
 	public static function createResponsePage($uri, array $headers = null, CM_Model_User $viewer = null) {
 		if (!$headers) {
-			$headers = array();
+			$site = CM_Site_Abstract::factory();
+			$headers = array('host' => $site->getHost());
 		}
 		$request = new CM_Request_Get($uri, $headers, $viewer);
 		return new CM_Response_Page($request);
+	}
+
+	/**
+	 * @param int|null $level
+	 * @return CM_Model_Location
+	 */
+	public static function createLocation($level = null) {
+		$country = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+		$state =  CM_Db_Db::insert('cm_locationState', array('countryId' => $country, 'name' => 'stateFoo'));
+		$city = CM_Db_Db::insert('cm_locationCity', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+															'lon'     => 15));
+		$zip = CM_Db_Db::insert('cm_locationZip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+
+		CM_Model_Location::createAggregation();
+
+		switch ($level) {
+			case CM_Model_Location::LEVEL_COUNTRY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $country);
+
+			case CM_Model_Location::LEVEL_CITY:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $city);
+
+			case CM_Model_Location::LEVEL_STATE:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_STATE, $state);
+
+			default:
+				return new CM_Model_Location(CM_Model_Location::LEVEL_ZIP, $zip);
+		}
 	}
 
 	/**
@@ -256,6 +280,18 @@ class CMTest_TH {
 	 */
 	public static function reinstantiateModel(CM_Model_Abstract &$model) {
 		$model = CM_Model_Abstract::factoryGeneric($model->getType(), $model->getIdRaw());
+	}
+
+	/**
+	 * @param string $className
+	 * @param string $methodName
+	 * @return ReflectionMethod
+	 */
+	public static function getProtectedMethod($className, $methodName) {
+		$class = new ReflectionClass($className);
+		$method = $class->getMethod($methodName);
+		$method->setAccessible(true);
+		return $method;
 	}
 
 	/**

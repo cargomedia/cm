@@ -1,7 +1,7 @@
 html {
 	font-family: @fontFamily;
 	font-size: @fontSize;
-	line-height: 1.5;
+	line-height: @fontLineHeight;
 	color: @colorFg;
 }
 
@@ -14,8 +14,8 @@ a, a:visited {
 	text-decoration: none;
 }
 
-a:hover {
-	text-decoration: underline;
+a:hover, a:active {
+	text-decoration: none;
 }
 
 h1, h2, h3, h4, h5 {
@@ -60,7 +60,7 @@ q {
 
 hr {
 	height: 1px;
-	.border(@colorFgBorderEmphasize1);
+	border: 1px solid @colorFgBorderEmphasize1;
 	border-width: 1px 0 0 0;
 }
 

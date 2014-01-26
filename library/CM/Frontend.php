@@ -93,7 +93,6 @@ class CM_Frontend {
 		foreach ($form->getActions() as $action_name => $action) {
 			$action_list[] = '"' . $action_name . '":' . $action->js_presentation();
 		}
-		$default_action = $form->getActionDefaultName();
 
 		$auto_var = 'cm.views["' . $form->getAutoId() . '"]';
 		$js = $auto_var . ' = new ' . $className . '({';
@@ -101,8 +100,7 @@ class CM_Frontend {
 		$js .= 'parent:cm.views["' . $parentView->getAutoId() . '"],';
 		$js .= 'name:"' . $form->getName() . '",';
 		$js .= 'fields:{' . implode(',', $field_list) . '},';
-		$js .= 'actions:{' . implode(',', $action_list) . '},';
-		$js .= 'default_action:"' . $default_action . '"';
+		$js .= 'actions:{' . implode(',', $action_list) . '}';
 		$js .= '});' . PHP_EOL;
 
 		$this->onloadPrepareJs($js, true);
