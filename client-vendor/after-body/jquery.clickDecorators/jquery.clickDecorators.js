@@ -20,16 +20,18 @@
 		});
 
 		for (i = 0; i < before.length; i++) {
-			if (false === before[i].call(this, event)) {
-				return false;
+			var beforeValue = before[i].call(this, event);
+			if (false === beforeValue || true === beforeValue) {
+				return beforeValue;
 			}
 		}
 
 		var returnValue = event.handleObj.handler.call(this, event);
 
 		for (i = 0; i < after.length; i++) {
-			if (false === after[i].call(this, event, returnValue)) {
-				return false;
+			var afterValue = after[i].call(this, event, returnValue);
+			if (false === afterValue) {
+				return afterValue;
 			}
 		}
 
