@@ -208,7 +208,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 	/**
 	 * @param float $lat
 	 * @param float $lon
-	 * @return static|null
+	 * @return CM_Model_Location|null
 	 */
 	public static function findByCoordinates($lat, $lon) {
 		$lat = (float) $lat;
@@ -239,7 +239,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 			return null;
 		}
 
-		return new static($result['level'], $result['id']);
+		return new CM_Model_Location($result['level'], $result['id']);
 	}
 
 	/**

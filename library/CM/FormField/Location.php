@@ -30,10 +30,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			$names[] = $location->getName($level);
 		}
 		return array(
-			'id'   => $location->getLevel() . '.' . $location->getId(),
-			'name' => implode(', ', array_filter($names)),
-			'img'  => $render->getUrlResource('layout',
-					'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
+				'id'   => $location->getLevel() . '.' . $location->getId(),
+				'name' => implode(', ', array_filter($names)),
+				'img'  => $render->getUrlResource('layout',
+								'img/flags/' . strtolower($location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) . '.png'),
 		);
 	}
 
@@ -105,7 +105,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		return $location;
 	}
 
-	public static function ajax_lookupCoordinates(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+	public static function ajax_getSuggestionByCoordinates(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$lat = $params->getFloat('lat');
 		$lon = $params->getFloat('lon');
 		$levelMin = $params->getInt('levelMin');
@@ -115,13 +115,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		$field = new static($levelMin, $levelMax);
 
 		$location = CM_Model_Location::findByCoordinates($lat, $lon);
-		if (!$location) {
-			$location = $field->_getRequestLocationByRequest($response->getRequest());
-		}
 		$location = $field->_squashLocationInConstraints($location);
 
 		if (!$location) {
-			return null;
+			throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
 		}
 
 		return $field->getSuggestion($location, $response->getRender());

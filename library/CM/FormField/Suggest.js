@@ -122,6 +122,13 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
 	},
 
 	/**
+	 * @param {Array} value
+	 */
+	setValue: function(value) {
+		this._$input.select2('data', value);
+	},
+
+	/**
 	 * @param {Object} item
 	 * @return String
 	 */
