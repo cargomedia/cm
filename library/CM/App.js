@@ -464,7 +464,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	ui: {
 		ready: function() {
-			$.event.special.clickConfirmed.settings.message = cm.language.get('Please Confirm');
+			$.clickDecorators.confirmed.settings.message = cm.language.get('Please Confirm');
 		},
 
 		/**
