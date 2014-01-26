@@ -52,6 +52,10 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
 	 * @param {Number} lon
 	 */
 	_lookupCoordinates: function(lat, lon) {
-		console.log('Coords: ', lat, lon);
+		this.ajax('lookupCoordinates', {lat: lat, lon: lon, levelMin: this.getOption('levelMin'), levelMax: this.getOption('levelMax')}, {
+			success: function(data) {
+				console.log(data);
+			}
+		});
 	}
 });

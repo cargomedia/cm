@@ -54,19 +54,11 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 	 * @param CM_Request_Abstract $request
 	 */
 	public function setValueByRequest(CM_Request_Abstract $request) {
-		$requestLocation = $this->_getRequestLocationByRequest($request);
-		if (null === $requestLocation || $requestLocation->getLevel() < $this->_options['levelMin']) {
-			return;
+		$location = $this->_getRequestLocationByRequest($request);
+		$location = $this->_squashLocationInConstraints($location);
+		if ($location) {
+			$this->setValue($location);
 		}
-
-		if ($requestLocation->getLevel() > $this->_options['levelMax']) {
-			$requestLocation = $requestLocation->get($this->_options['levelMax']);
-			if (null === $requestLocation) {
-				return;
-			}
-		}
-
-		$this->setValue($requestLocation);
 	}
 
 	/**
@@ -91,5 +83,47 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 			$out[] = $this->getSuggestion($location, $render);
 		}
 		return $out;
+	}
+
+	/**
+	 * @param CM_Model_Location $location
+	 * @return CM_Model_Location|null
+	 */
+	private function _squashLocationInConstraints(CM_Model_Location $location = null) {
+		if (null === $location) {
+			return null;
+		}
+
+		if ($location->getLevel() < $this->_options['levelMin']) {
+			return null;
+		}
+
+		if ($location->getLevel() > $this->_options['levelMax']) {
+			$location = $location->get($this->_options['levelMax']);
+		}
+
+		return $location;
+	}
+
+	public static function ajax_lookupCoordinates(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+		$lat = $params->getFloat('lat');
+		$lon = $params->getFloat('lon');
+		$levelMin = $params->getInt('levelMin');
+		$levelMax = $params->getInt('levelMax');
+
+		/** @var CM_FormField_Location $field */
+		$field = new static($levelMin, $levelMax);
+
+		$location = CM_Model_Location::findByCoordinates($lat, $lon);
+		if (!$location) {
+			$location = $field->_getRequestLocationByRequest($response->getRequest());
+		}
+		$location = $field->_squashLocationInConstraints($location);
+
+		if (!$location) {
+			return null;
+		}
+
+		return $field->getSuggestion($location, $response->getRender());
 	}
 }
