@@ -27,6 +27,31 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
 	},
 
 	detectLocation: function() {
-		console.log('detectLocation');
+		if (!'geolocation' in navigator) {
+			// todo: Hide button with modernizr?
+			cm.error.triggerThrow('Geolocation support unavailable');
+		}
+		this.$('.detect-location').addClass('waiting');
+
+		var self = this;
+		var deferred = $.Deferred();
+		navigator.geolocation.getCurrentPosition(deferred.resolve, deferred.reject);
+
+		deferred.then(function(position) {
+			self._lookupCoordinates(position.coords.latitude, position.coords.longitude);
+		}, function(error) {
+			cm.error.trigger('Unable to detect location: ' + error.message);
+		});
+		deferred.always(function() {
+			self.$('.detect-location').removeClass('waiting');
+		});
+	},
+
+	/**
+	 * @param {Number} lat
+	 * @param {Number} lon
+	 */
+	_lookupCoordinates: function(lat, lon) {
+		console.log('Coords: ', lat, lon);
 	}
 });
