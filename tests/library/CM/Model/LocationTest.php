@@ -139,14 +139,16 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 			'name'      => 'test',
 			'lat'       => 20, 'lon' => 20));
 
-		$expected = CM_Db_Db::insert('cm_locationCity', array(
+		$expectedId = CM_Db_Db::insert('cm_locationCity', array(
 			'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
 			'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
 			'name'      => 'test',
 			'lat'       => 20.1, 'lon' => 20.2));
 
+		$expected = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $expectedId);
+
 		CM_Model_Location::createAggregation();
-		$this->assertSame(array('id' => $expected, 'level' => (string) CM_Model_Location::LEVEL_CITY), CM_Model_Location::findByCoordinates(20, 20.3));
+		$this->assertEquals($expected, CM_Model_Location::findByCoordinates(20, 20.3));
 		$this->assertNull(CM_Model_Location::findByCoordinates(100, 100));
 	}
 
