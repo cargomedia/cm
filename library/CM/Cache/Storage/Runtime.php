@@ -19,12 +19,10 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 	}
 
 	public function set($key, $value, $lifetime = null) {
-		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-set', $key);
 		$this->_set($key, $value, $lifetime);
 	}
 
 	public function get($key) {
-		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-get', $key);
 		return $this->_get($key);
 	}
 
@@ -37,7 +35,6 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 	}
 
 	public function getMulti(array $keys) {
-		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
 		return $this->_getMulti($keys);
 	}
 
