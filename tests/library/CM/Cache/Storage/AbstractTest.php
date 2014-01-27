@@ -3,7 +3,7 @@
 class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		CM_Cache_Runtime::getInstance()->flush();
+		CM_Cache_Storage_Runtime::getInstance()->flush();
 	}
 
 	public function testGetSet() {
@@ -18,7 +18,7 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 			}
 			return $localStorage[$key];
 		}));
-		$cacheRuntime = new CM_Cache_Runtime();
+		$cacheRuntime = new CM_Cache_Storage_Runtime();
 		$cacheStorage->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
 
 		/** @var CM_Cache_Abstract $cacheStorage */
@@ -30,7 +30,7 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testGetMulti() {
-		$cacheRuntime = new CM_Cache_Runtime();
+		$cacheRuntime = new CM_Cache_Storage_Runtime();
 		$cacheStorage = $this->getMockBuilder('CM_Cache_Storage_Memcache')->setMethods(array('_getRuntime'))->getMock();
 		$cacheStorage->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
 

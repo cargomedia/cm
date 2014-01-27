@@ -2,11 +2,11 @@
 
 abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 
-	/** @var CM_Cache_Runtime */
+	/** @var CM_Cache_Storage_Runtime */
 	protected  $_runtime;
 
 	public function __construct() {
-		$this->_runtime = CM_Cache_Runtime::getInstance();
+		$this->_runtime = CM_Cache_Storage_Runtime::getInstance();
 	}
 
 	/**
@@ -14,7 +14,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @param mixed    $value
 	 * @param int|null $lifeTime
 	 */
-	public final function set($key, $value, $lifeTime = null) {
+	public function set($key, $value, $lifeTime = null) {
 		$this->_getRuntime()->set($key, $value);
 		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-set', $key);
 		$this->_set($this->_getKeyArmored($key), $value, $lifeTime);
@@ -24,7 +24,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @param string $key
 	 * @return mixed|false
 	 */
-	public final function get($key) {
+	public function get($key) {
 		if (false !== ($value = $this->_getRuntime()->get($key))) {
 			return $value;
 		}
@@ -39,12 +39,12 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 */
-	public final function delete($key) {
+	public function delete($key) {
 		$this->_getRuntime()->delete($key);
 		$this->_delete($this->_getKeyArmored($key));
 	}
 
-	public final function flush() {
+	public function flush() {
 		$this->_getRuntime()->flush();
 		$this->_flush();
 	}
@@ -67,7 +67,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @param string[] $keys
 	 * @return mixed[]
 	 */
-	public final function getMulti(array $keys) {
+	public function getMulti(array $keys) {
 		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
 		foreach ($keys as &$key) {
 			$key = self::_getKeyArmored($key);
@@ -148,7 +148,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_Cache_Runtime
+	 * @return CM_Cache_Storage_Runtime
 	 */
 	protected function _getRuntime() {
 		return $this->_runtime;
