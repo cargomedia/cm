@@ -36,7 +36,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$this->_flush();
 	}
 
-	public function getMulti($keys) {
+	public function getMulti(array $keys) {
 		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
 		return $this->_getMulti($keys);
 	}
