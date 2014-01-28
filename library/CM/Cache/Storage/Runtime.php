@@ -22,13 +22,13 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		return 'Runtime';
 	}
 
-	protected function _set($key, $value, $lifetime = null) {
-		if (null === $lifetime) {
-			$lifetime = self::LIFETIME_MAX;
+	protected function _set($key, $value, $lifeTime = null) {
+		if (null === $lifeTime) {
+			$lifeTime = self::LIFETIME_MAX;
 		} else {
-			$lifetime = max($lifetime, self::LIFETIME_MAX);
+			$lifeTime = min($lifeTime, self::LIFETIME_MAX);
 		}
-		$expirationStamp = time() + $lifetime;
+		$expirationStamp = time() + $lifeTime;
 		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
 		if ($this->_lastClearStamp + self::CLEAR_INTERVAL < time()) {
 			$this->_deleteExpired();
