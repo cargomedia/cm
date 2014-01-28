@@ -5,37 +5,39 @@
 
 	/**
 	 * @param {Function} callback
+	 * @param {Function} [callbackClose]
 	 * @returns {jQuery}
 	 */
-	$.fn.toggleModal = function(callback) {
-		callback = callback || function() { $(this).toggle(); };
+	$.fn.toggleModal = function(callback, callbackClose) {
+		var callbackOpen = callback || function() { $(this).toggle(); };
+		callbackClose = callbackClose || callbackOpen;
 		var $self = this;
 		if ($self.length) {
 			return $self;
 		}
 
-		var callbackClose = function(e) {
+		var close = function() {
 			if (!$self.data('toggleModal')) {
 				return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
 			}
-			callback.call($self);
+			callbackClose.call($self);
 			$(document).removeData('toggleModal').off('.toggleModal');
 			$self.removeData('toggleModal').off('.toggleModal');
 		};
 
 		if (!$self.data('toggleModal')) {
-			callback.call($self);
+			callbackOpen.call($self);
 			$(document).data('toggleModal', true);
-			$self.data('toggleModal', callbackClose);
+			$self.data('toggleModal', close);
 			setTimeout(function() {
 				$(document).on('click.toggleModal', function(e) {
 					if (!$self.length || e.target !== $self[0] && !$.contains($self[0], e.target)) {
-						callbackClose();
+						close();
 					}
 				});
 				$(document).on('keydown.toggleModal', function(e) {
 					if (e.which == 27) {
-						callbackClose();
+						close();
 					}
 				});
 			}, 0);
@@ -46,9 +48,9 @@
 
 	$.fn.toggleModalClose = function() {
 		return this.each(function() {
-			var callbackClose = $(this).data('toggleModal');
-			if (callbackClose) {
-				setTimeout(function() { callbackClose(); }, 0);
+			var close = $(this).data('toggleModal');
+			if (close) {
+				setTimeout(function() { close(); }, 0);
 			}
 		});
 	};
