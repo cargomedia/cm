@@ -2,10 +2,15 @@
  * Author: CM
  */
 (function($) {
+
+	/**
+	 * @param {Function} callback
+	 * @returns {jQuery}
+	 */
 	$.fn.toggleModal = function(callback) {
 		callback = callback || function() { $(this).toggle(); };
 		var $self = this;
-		if (!$self.length) {
+		if ($self.length) {
 			return $self;
 		}
 
@@ -35,6 +40,8 @@
 				});
 			}, 0);
 		}
+
+		return $self;
 	};
 
 	$.fn.toggleModalClose = function() {
