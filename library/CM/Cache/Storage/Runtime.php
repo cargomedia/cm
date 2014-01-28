@@ -54,7 +54,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$currentTime = time();
 		foreach ($this->_storage as $key => $data) {
 			if ($currentTime > $data['expirationStamp']) {
-				$this->delete($key);
+				$this->_delete($key);
 			}
 		}
 		$this->_lastClearStamp = $currentTime;
