@@ -12,7 +12,7 @@
 		var callbackOpen = callback || function() { $(this).toggle(); };
 		callbackClose = callbackClose || callbackOpen;
 		var $self = this;
-		if ($self.length) {
+		if (!$self.length) {
 			return $self;
 		}
 
