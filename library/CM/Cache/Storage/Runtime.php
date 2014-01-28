@@ -18,26 +18,6 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$this->_storage = array();
 	}
 
-	public function set($key, $value, $lifetime = null) {
-		$this->_set($key, $value, $lifetime);
-	}
-
-	public function get($key) {
-		return $this->_get($key);
-	}
-
-	public function delete($key) {
-		$this->_delete($key);
-	}
-
-	public function flush() {
-		$this->_flush();
-	}
-
-	public function getMulti(array $keys) {
-		return $this->_getMulti($keys);
-	}
-
 	protected function _getName() {
 		return 'Runtime';
 	}
@@ -68,10 +48,6 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 
 	protected function _flush() {
 		$this->_storage = array();
-	}
-
-	protected function _getRuntime() {
-		throw new CM_Exception_Invalid('Cannot use Runtime cache within Runtime');
 	}
 
 	private function _deleteExpired() {
