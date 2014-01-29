@@ -4,14 +4,12 @@
 (function($) {
 
 	/**
-	 * @param {Function} callback fn(state)
-	 * @param {Function} [callbackClose] fn(state)
+	 * @param {Function} callback fn(state, callbackOptions)
 	 * @param {Object} [callbackOptions]
 	 * @returns {jQuery}
 	 */
-	$.fn.toggleModal = function(callback, callbackClose, callbackOptions) {
-		var callbackOpen = callback || function(state) { $(this).toggle(); };
-		callbackClose = callbackClose || callbackOpen;
+	$.fn.toggleModal = function(callback, callbackOptions) {
+		callback = callback || function(state) { $(this).toggle(); };
 		callbackOptions = callbackOptions || {};
 		var $self = this;
 		if (!$self.length) {
@@ -26,13 +24,13 @@
 			if (!$self.data('toggleModal')) {
 				return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
 			}
-			callbackClose.call($self, false, callbackOptions);
+			callback.call($self, false, callbackOptions);
 			$(document).removeData('toggleModal').off('.toggleModal');
 			$self.removeData('toggleModal').off('.toggleModal');
 		};
 
 		if (!$self.data('toggleModal')) {
-			callbackOpen.call($self, true, callbackOptions);
+			callback.call($self, true, callbackOptions);
 			$(document).data('toggleModal', true);
 			$self.data('toggleModal', close);
 			setTimeout(function() {
