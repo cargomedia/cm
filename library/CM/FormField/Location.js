@@ -28,7 +28,6 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
 
 	detectLocation: function() {
 		if (!'geolocation' in navigator) {
-			// todo: Hide button with modernizr?
 			cm.error.triggerThrow('Geolocation support unavailable');
 		}
 		this.$('.detect-location').addClass('waiting');
