@@ -123,10 +123,10 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public function testDeleteOnUnpublish() {
 		$streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
-				->setMethods(array('getStreamChannel', 'getId'))->getMock();
+			->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
 		$streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
-				->setMethods(array('isValid', 'onUnpublish'))->getMock();
+			->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
 		$streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
 
@@ -144,10 +144,10 @@ class CM_Model_Stream_PublishTest extends CMTest_TestCase {
 
 	public function testDeleteOnUnpublishInvalid() {
 		$streamPublish = $this->getMockBuilder('CM_Model_Stream_Publish')
-				->setMethods(array('getStreamChannel', 'getId'))->getMock();
+			->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
 		$streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
-				->setMethods(array('isValid', 'onUnpublish'))->getMock();
+			->setMethods(array('isValid', 'onUnpublish'))->getMock();
 
 		$streamPublish->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
 

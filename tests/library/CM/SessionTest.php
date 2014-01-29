@@ -62,8 +62,8 @@ class CM_SessionTest extends CMTest_TestCase {
 		$this->assertEquals($expiration + 10, $session->getExpiration(), null, 1);
 
 		//test that session is only persisted when data changed
-		CM_Db_Db::update('cm_session', array('data' => serialize(array('foo'    => 'foo',
-																		 'foobar' => 'foobar'))), array('sessionId' => $session->getId()));
+		CM_Db_Db::update('cm_session', array('data' => serialize(array('foo' => 'foo', 'foobar' => 'foobar'))),
+			array('sessionId' => $session->getId()));
 		CMTest_TH::clearCache();
 		unset($session);
 		$session = new CM_Session($sessionId);

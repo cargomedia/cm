@@ -8,7 +8,7 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 	public function testGetSet() {
 		$cacheStorage = $this->getMockBuilder('CM_Cache_Storage_Abstract')
-				->setMethods(array('_set', '_get', '_getKeyArmored'))->getMockForAbstractClass();
+			->setMethods(array('_set', '_get', '_getKeyArmored'))->getMockForAbstractClass();
 		$cacheStorage->expects($this->any())->method('_getKeyArmored')->will($this->returnCallback(function ($key) {
 			return 'armor-' . $key;
 		}));
@@ -17,7 +17,8 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 		$cacheRuntime = new CM_Cache_Storage_Runtime();
 
-		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage', '_getRuntime'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage', '_getRuntime'))
+			->disableOriginalConstructor()->getMockForAbstractClass();
 		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($cacheStorage));
 		$cache->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
 		/** @var CM_Cache_Abstract $cache */
@@ -34,7 +35,8 @@ class CM_Cache_Storage_AbstractTest extends CMTest_TestCase {
 
 		$cacheRuntime = new CM_Cache_Storage_Runtime();
 
-		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage', '_getRuntime'))->disableOriginalConstructor()->getMockForAbstractClass();
+		$cache = $this->getMockBuilder('CM_Cache_Abstract')->setMethods(array('_getStorage', '_getRuntime'))
+			->disableOriginalConstructor()->getMockForAbstractClass();
 		$cache->expects($this->any())->method('_getStorage')->will($this->returnValue($cacheStorage));
 		$cache->expects($this->any())->method('_getRuntime')->will($this->returnValue($cacheRuntime));
 		/** @var CM_Cache_Abstract $cache */

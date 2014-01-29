@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_StreamChannelArchive_Video_UserTest extends CMTest_TestCase {
+class CM_Paging_StreamChannelArchiveVideo_UserTest extends CMTest_TestCase {
 
 	public function tearDown() {
 		CMTest_TH::clearEnv();

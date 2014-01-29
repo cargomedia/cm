@@ -1,6 +1,7 @@
 <?php
 
 class CM_SVM_ModelTest extends CMTest_TestCase {
+
 	/**
 	 * @var CM_SVM_Model
 	 */
@@ -118,5 +119,4 @@ class CM_SVM_ModelTest extends CMTest_TestCase {
 
 		$svm->flush();
 	}
-
 }

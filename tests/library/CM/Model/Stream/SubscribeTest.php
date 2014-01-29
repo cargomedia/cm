@@ -156,10 +156,10 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 
 	public function testDeleteOnUnsubscribe() {
 		$streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
-				->setMethods(array('getStreamChannel', 'getId'))->getMock();
+			->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
 		$streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
-				->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
+			->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
 
 		$streamSubscribe->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
 
@@ -177,10 +177,10 @@ class CM_Model_Stream_SubscribeTest extends CMTest_TestCase {
 
 	public function testDeleteOnUnsubscribeInvalid() {
 		$streamSubscribe = $this->getMockBuilder('CM_Model_Stream_Subscribe')
-				->setMethods(array('getStreamChannel', 'getId'))->getMock();
+			->setMethods(array('getStreamChannel', 'getId'))->getMock();
 
 		$streamChannel = $this->getMockBuilder('CM_Model_StreamChannel_Video')
-				->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
+			->setMethods(array('isValid', 'onUnsubscribe'))->getMock();
 
 		$streamSubscribe->expects($this->any())->method('getStreamChannel')->will($this->returnValue($streamChannel));
 

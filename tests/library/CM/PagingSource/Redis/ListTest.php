@@ -1,6 +1,6 @@
 <?php
 
-class CM_PagingSource_Redis_Test extends CMTest_TestCase {
+class CM_PagingSource_Redis_ListTest extends CMTest_TestCase {
 
 	/** @var CM_Redis_Client */
 	private $_client;

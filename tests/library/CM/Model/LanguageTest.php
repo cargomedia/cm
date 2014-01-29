@@ -134,8 +134,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		CM_Model_Language::deleteKey($key);
 		$this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
 		$this->assertSame(0, CM_Db_Db::count('cm_languageKey', array('name' => $key)));
-		$this->assertSame(0, CM_Db_Db::count('cm_languageValue', array('languageKeyId' => $languageKeyId,
-																		 'languageId'    => $this->_language->getId())));
+		$this->assertSame(0, CM_Db_Db::count('cm_languageValue', array(
+			'languageKeyId' => $languageKeyId,
+			'languageId'    => $this->_language->getId(),
+		)));
 	}
 
 	public function testUnsetTranslation() {
