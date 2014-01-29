@@ -15,7 +15,7 @@
 				var index = $activeTab.index();
 				$activeTab.addClass('active').siblings().removeClass('active');
 				var $activeTabContent = $contentContainer.find('> *').eq(index);
-				$activeTabContent.addClass('active').show();
+				$activeTabContent.addClass('active').show().find(':focusable:first').focus();
 				$activeTabContent.siblings().removeClass('active').hide();
 			});
 
