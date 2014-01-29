@@ -25,13 +25,12 @@
 				return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
 			}
 			callback.call($self, false, callbackOptions);
-			$(document).removeData('toggleModal').off('.toggleModal');
+			$(document).off('.toggleModal');
 			$self.removeData('toggleModal').off('.toggleModal');
 		};
 
 		if (!$self.data('toggleModal')) {
 			callback.call($self, true, callbackOptions);
-			$(document).data('toggleModal', true);
 			$self.data('toggleModal', close);
 			setTimeout(function() {
 				$(document).on('click.toggleModal', function(e) {
