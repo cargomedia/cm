@@ -6,5 +6,6 @@ $bootloader = new CM_Bootloader(dirname(__DIR__) . '/');
 $bootloader->load();
 
 $manager = new CM_Cli_CommandManager();
+$manager->autoloadCommands();
 $returnCode = $manager->run(new CM_Cli_Arguments($argv));
 exit($returnCode);

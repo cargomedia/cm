@@ -4,7 +4,7 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Config::get()->CM_Stream_Video->servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109',
-			'privateIp' => '10.0.3.108'));
+																	  'privateIp'  => '10.0.3.108'));
 	}
 
 	public function tearDown() {
@@ -56,13 +56,15 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 		$adapter = new CM_Stream_Adapter_Video_Wowza();
 		$ipAddresses = array('10.0.3.109', '10.0.3.108');
 		foreach ($ipAddresses as $ipAddress) {
-			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp', 'getHost'));
+			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp',
+				'getHost'));
 			$request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
 			$this->assertEquals(1, $adapter->getServerId($request));
 		}
 		try {
 			$ipAddress = '66.66.66.66';
-			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp', 'getHost'));
+			$request = $this->getMockForAbstractClass('CM_Request_Abstract', array($ipAddress), 'CM_Request_Mock', true, true, true, array('getIp',
+				'getHost'));
 			$request->expects($this->any())->method('getIp')->will($this->returnValue(sprintf('%u', ip2long($ipAddress))));
 			$adapter->getServerId($request);
 			$this->fail('Found server with incorrect ipAddress');
@@ -82,13 +84,22 @@ class CM_Stream_Adapter_Video_WowzaTest extends CMTest_TestCase {
 			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
 			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
 				$session = CMTest_TH::createSession($streamSubscribe->getUser());
-				$subscribes[$streamSubscribe->getKey()] = array('startTimeStamp' => $streamSubscribe->getStart(),
-					'clientId' => $streamSubscribe->getKey(), 'data' => json_encode(array('sessionId' => $session->getId())));
+				$subscribes[$streamSubscribe->getKey()] = array(
+					'startTimeStamp' => $streamSubscribe->getStart(),
+					'clientId'       => $streamSubscribe->getKey(),
+					'data'           => json_encode(array('sessionId' => $session->getId())),
+				);
 			}
 			$session = CMTest_TH::createSession($streamPublish->getUser());
-			$jsonData[$streamChannel->getKey()] = array('startTimeStamp' => $streamPublish->getStart(), 'clientId' => $streamPublish->getKey(),
-				'data' => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
-				'subscribers' => $subscribes, 'thumbnailCount' => 2, 'width' => 480, 'height' => 720, 'wowzaIp' => ip2long('192.168.0.1'));
+			$jsonData[$streamChannel->getKey()] = array(
+				'startTimeStamp' => $streamPublish->getStart(),
+				'clientId'       => $streamPublish->getKey(),
+				'data'           => json_encode(array('sessionId' => $session->getId(), 'streamChannelType' => $streamChannel->getType())),
+				'subscribers'    => $subscribes,
+				'thumbnailCount' => 2,
+				'width'          => 480,
+				'height'         => 720,
+				'wowzaIp'        => ip2long('192.168.0.1'));
 		}
 		return json_encode($jsonData);
 	}

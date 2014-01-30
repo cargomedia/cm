@@ -45,7 +45,10 @@ class CM_Db_Query_SelectMultipleTest extends CMTest_TestCase {
 		$this->assertSame('SELECT `f``oo`,`bar` FROM `t``est` WHERE `foo` = ?', $query->getSqlTemplate());
 		$this->assertSame(array('foo1'), $query->getParameters());
 
-		$query = new CM_Db_Query_SelectMultiple(self::$_client, 't`est', array('f`oo', 'bar'), array(array('foo' => 'foo1','poo' => 'poo1'),array('foo' => 'foo1','poo' => 'poo1')));
+		$query = new CM_Db_Query_SelectMultiple(self::$_client, 't`est', array('f`oo', 'bar'), array(
+			array('foo' => 'foo1', 'poo' => 'poo1'),
+			array('foo' => 'foo1', 'poo' => 'poo1'),
+		));
 		$this->assertSame('SELECT `f``oo`,`bar` FROM `t``est` WHERE `foo` = ? AND `poo` = ?', $query->getSqlTemplate());
 		$this->assertSame(array('foo1', 'poo1'), $query->getParameters());
 	}
