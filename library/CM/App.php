@@ -96,6 +96,7 @@ class CM_App {
 		foreach ($assetList as $asset) {
 			$asset->get(true);
 		}
+		CM_Bootloader::getInstance()->getNamespaces();
 	}
 
 	/**
