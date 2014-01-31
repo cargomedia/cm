@@ -196,7 +196,7 @@ class CM_Model_SplittestVariationTest extends CMTest_TestCase {
 	 */
 	protected function _getVariationMock($fixture, $conversion, $weight) {
 		$variation = $this->getMockBuilder('CM_Model_SplittestVariation')->disableOriginalConstructor()
-				->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
+			->setMethods(array('getFixtureCount', 'getConversionCount', 'getConversionWeight'))->getMock();
 		$variation->expects($this->any())->method('getFixtureCount')->will($this->returnValue($fixture));
 		$variation->expects($this->any())->method('getConversionCount')->will($this->returnValue($conversion));
 		$variation->expects($this->any())->method('getConversionWeight')->will($this->returnValue($weight));

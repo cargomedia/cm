@@ -9,7 +9,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 	public function testNotify() {
 		$actor = CMTest_TH::createUser();
 		$action = $this->getMockBuilder('CM_Action_Abstract')->setMethods(array('_notifyFoo', '_track'))
-				->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
+			->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
 		// Cannot check due to https://github.com/sebastianbergmann/phpunit-mock-objects/issues/139
 		// $action->expects($this->once())->method('_notifyFoo')->with('bar');
 		$action->expects($this->once())->method('_track');
@@ -34,22 +34,26 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 
 	public function testPrepareActionUser() {
 		$user = CMTest_TH::createUser();
-		$hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
+		$hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
+			->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
 		$hardLimit->expects($this->any())->method('getType')->will($this->returnValue(1));
 		$hardLimit->expects($this->any())->method('getLimit')->will($this->returnValue(12));
 		$hardLimit->expects($this->any())->method('getPeriod')->will($this->returnValue(60));
 		$hardLimit->expects($this->any())->method('getOvershootAllowed')->will($this->returnValue(false));
 		/** @var CM_Model_ActionLimit_Abstract $hardLimit */
-		$softLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
+		$softLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
+			->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
 		$softLimit->expects($this->any())->method('getType')->will($this->returnValue(2));
 		$softLimit->expects($this->any())->method('getLimit')->will($this->returnValue(3));
 		$softLimit->expects($this->any())->method('getPeriod')->will($this->returnValue(10));
 		$softLimit->expects($this->any())->method('getOvershootAllowed')->will($this->returnValue(true));
 		/** @var CM_Model_ActionLimit_Abstract $softLimit */
 
-		$actionLimitPaging = $this->getMockBuilder('CM_Paging_Abstract')->setConstructorArgs(array(new CM_PagingSource_Array(array($softLimit, $hardLimit))))->getMockForAbstractClass();
+		$actionLimitPaging = $this->getMockBuilder('CM_Paging_Abstract')
+			->setConstructorArgs(array(new CM_PagingSource_Array(array($softLimit, $hardLimit))))->getMockForAbstractClass();
 
-		$action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array(CM_Action_Abstract::CREATE, $user))->setMethods(array('_getActionLimitList', 'getType'))->getMockForAbstractClass();
+		$action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array(CM_Action_Abstract::CREATE, $user))
+			->setMethods(array('_getActionLimitList', 'getType'))->getMockForAbstractClass();
 		$action->expects($this->any())->method('getType')->will($this->returnValue(999));
 		$action->expects($this->any())->method('_getActionLimitList')->will($this->returnValue($actionLimitPaging));
 		/** @var CM_Action_Abstract $action */
@@ -99,7 +103,8 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 
 	public function testPrepareActionIP() {
 		$ip = 1237865;
-		$hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
+		$hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
+			->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
 		$hardLimit->expects($this->any())->method('getType')->will($this->returnValue(1));
 		$hardLimit->expects($this->any())->method('getLimit')->will($this->returnValue(3));
 		$hardLimit->expects($this->any())->method('getPeriod')->will($this->returnValue(10));
@@ -108,7 +113,8 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 
 		$actionLimitPaging = $this->getMockBuilder('CM_Paging_Abstract')->setConstructorArgs(array(new CM_PagingSource_Array(array($hardLimit))))->getMockForAbstractClass();
 
-		$action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array(CM_Action_Abstract::CREATE, $ip))->setMethods(array('_getActionLimitList', 'getType'))->getMockForAbstractClass();
+		$action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array(CM_Action_Abstract::CREATE, $ip))
+			->setMethods(array('_getActionLimitList', 'getType'))->getMockForAbstractClass();
 		$action->expects($this->any())->method('getType')->will($this->returnValue(999));
 		$action->expects($this->any())->method('_getActionLimitList')->will($this->returnValue($actionLimitPaging));
 		/** @var CM_Action_Abstract $action */
