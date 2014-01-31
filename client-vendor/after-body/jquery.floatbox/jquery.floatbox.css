@@ -1,12 +1,9 @@
 html.floatbox-active {
 	overflow: hidden;
-}
-
-html.ieMobile {
 	height: 100%;
 }
 
-html.ieMobile body {
+html.floatbox-active body {
 	overflow: hidden;
 	height: 100%;
 }
