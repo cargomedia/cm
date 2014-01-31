@@ -1,9 +1,4 @@
-html.floatbox-active {
-	overflow: hidden;
-	height: 100%;
-}
-
-html.floatbox-active body {
+html.floatbox-active, html.floatbox-active body {
 	overflow: hidden;
 	height: 100%;
 }
