@@ -44,8 +44,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				event = 'click';
 			}
 			$btn.on(event, {action: name}, function(event) {
-				handler.submit(event.data.action);
-				return false;
+				event.preventDefault();
+				return handler.submit(event.data.action);
 			});
 		}, this);
 
@@ -138,6 +138,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		return data;
 	},
 
+	/**
+	 * @param actionName
+	 * @return jqXHR|Boolean
+	 */
 	submit: function(actionName) {
 		actionName = actionName || _.first(_.keys(this.options.actions));
 
@@ -183,7 +187,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		var handler = this;
 		this.disable();
 		this.trigger('submit', [data]);
-		cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
+		return cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
 			success: function(response) {
 				if (response.errors) {
 					for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {

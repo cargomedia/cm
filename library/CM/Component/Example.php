@@ -23,7 +23,7 @@ class CM_Component_Example extends CM_Component_Abstract {
 
 	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$x = $params->getString('x');
-		//$response->reloadComponent();
+		sleep(2);
 		return 'x=' . $x;
 	}
 
