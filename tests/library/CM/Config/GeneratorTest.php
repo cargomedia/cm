@@ -39,7 +39,7 @@ $config->CM_FooBar->foo = array (
 
 EOD;
 		$map = array(
-			'foo' => 'CM_Foo',
+			'foo'    => 'CM_Foo',
 			'foobar' => 'CM_FooBar'
 		);
 		$sourceFile = $this->getMockBuilder('CM_File')->disableOriginalConstructor()->setMethods(array('read'))->getMock();

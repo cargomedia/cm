@@ -1,6 +1,6 @@
 <?php
 
-class CM_PagingSourceTest extends CMTest_TestCase {
+class CM_PagingSource_AbstractTest extends CMTest_TestCase {
 
 	public function setUp() {
 		CM_Db_Db::exec('CREATE TABLE `test` (

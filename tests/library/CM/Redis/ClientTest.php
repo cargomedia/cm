@@ -22,7 +22,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$this->assertTrue($redis->exists('foo'));
 	}
 
-	public function testRPush(){
+	public function testRPush() {
 		$redis = CM_Redis_Client::getInstance();
 		$redis->rPush('foo', 'bar1');
 		$redis->rPush('foo', 'bar2');
@@ -38,7 +38,7 @@ class CM_Redis_ClientTest extends CMTest_TestCase {
 		$redis->rPush('foo', 'bar1');
 	}
 
-	public function testLPush(){
+	public function testLPush() {
 		$redis = CM_Redis_Client::getInstance();
 		$redis->lPush('foo', 'bar1');
 		$redis->lPush('foo', 'bar2');

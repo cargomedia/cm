@@ -63,7 +63,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$archive = CMTest_TH::createStreamChannelVideoArchive();
 		$videoFile = $archive->getVideo();
 		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
-		'-original.mp4', $videoFile->getPathRelative());
+			'-original.mp4', $videoFile->getPathRelative());
 	}
 
 	public function testGetThumbnails() {
@@ -176,7 +176,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 	 */
 	private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
 		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' .
-				$archive->getHash() . '-thumbs';
+			$archive->getHash() . '-thumbs';
 		CM_Util::mkDir($thumbPath);
 		$files = array();
 		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {

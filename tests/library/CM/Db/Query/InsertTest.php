@@ -48,7 +48,7 @@ class CM_Db_Query_InsertTest extends CMTest_TestCase {
 		$query = new CM_Db_Query_Insert(self::$_client, 't`est', array('foo', 'bar'), array('foo9', 'bar9'));
 		$this->assertSame('INSERT INTO `t``est` (`foo`,`bar`) VALUES (?,?)', $query->getSqlTemplate());
 		$this->assertEquals(array('foo9', 'bar9'), $query->getParameters());
-		$query = new CM_Db_Query_Insert(self::$_client, 't`est', array('foo', 'bar'), array('foo9', 'bar9'), array('foo' => 'fooX','bar' => 'barX'));
+		$query = new CM_Db_Query_Insert(self::$_client, 't`est', array('foo', 'bar'), array('foo9', 'bar9'), array('foo' => 'fooX', 'bar' => 'barX'));
 		$this->assertSame('INSERT INTO `t``est` (`foo`,`bar`) VALUES (?,?) ON DUPLICATE KEY UPDATE `foo` = ?,`bar` = ?', $query->getSqlTemplate());
 		$this->assertEquals(array('foo9', 'bar9', 'fooX', 'barX'), $query->getParameters());
 

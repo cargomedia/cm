@@ -6,12 +6,12 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_paging_modelabstracttest_modelmock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
-			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=" . rand(1, 1000) . " DEFAULT CHARSET=utf8;
 		");
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_paging_modelabstracttest_modelmock2` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`bar` VARCHAR(32)
-			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=" . rand(1, 1000) . " DEFAULT CHARSET=utf8;
 		");
 	}
 
@@ -41,12 +41,12 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 		$model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo');
 		$model2 = CM_Paging_ModelAbstractTest_ModelMock2::create('bar');
 		$source = new CM_PagingSource_Array(array(
-			array('type' => $model1->getType(),'id' => $model1->getId()),
-			array('type' => $model2->getType(),'id' => $model2->getId()),
-			array('type' => $model1->getType(),'id' => 9999)
+			array('type' => $model1->getType(), 'id' => $model1->getId()),
+			array('type' => $model2->getType(), 'id' => $model2->getId()),
+			array('type' => $model1->getType(), 'id' => 9999)
 		));
 		$modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setConstructorArgs(array($source))
-				->getMockForAbstractClass();
+			->getMockForAbstractClass();
 		/** @var CM_Paging_ModelAbstract $modelPaging */
 		$this->assertCount(3, $modelPaging);
 		$this->assertEquals($model1, $modelPaging->getItem(0));

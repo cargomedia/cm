@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormTest extends CMTest_TestCase {
+class CM_Form_AbstractTest extends CMTest_TestCase {
 
 	public static $formActionProcessCount = 0;
 
@@ -53,6 +53,6 @@ class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
 	}
 
 	protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
-		CM_FormTest::$formActionProcessCount++;
+		CM_Form_AbstractTest::$formActionProcessCount++;
 	}
 }
