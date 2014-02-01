@@ -6,7 +6,7 @@ class CM_DeviceCapabilitiesAdapter_Wurfl extends CM_DeviceCapabilitiesAdapter_Ab
 	private static $_dirWurfl;
 
 	public static function init() {
-		self::$_dirWurfl = DIR_VENDOR . 'wurfl/tera-wurfl/';
+		self::$_dirWurfl = DIR_VENDOR . 'wurfl/wurfl-dbapi/';
 		require_once self::$_dirWurfl . 'TeraWurfl.php';
 		$config = CM_Config::get()->CM_Db_Db;
 		TeraWurflConfig::$DB_HOST = implode(':', $config->server);

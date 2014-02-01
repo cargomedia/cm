@@ -1,0 +1,21 @@
+language: php
+php:
+  - "5.5"
+  - "5.4"
+  - "5.3"
+services:
+  - mysql
+  - memcached
+  - elasticsearch
+  - redis-server
+before_script:
+  - mkdir -p tests/tmp/data/logs
+  - tests/travis/build-ci.sh
+  - phpenv config-add tests/travis/$TRAVIS_PHP_VERSION.ini
+  - phpenv config-add tests/travis/apc.ini
+  - composer -n install
+  - scripts/cm.php app generate-config-local resources/config/local.ci.json
+  - scripts/cm.php app set-deploy-version
+script: phpunit -c tests/travis/phpunit.xml
+notifications:
+  email: false
