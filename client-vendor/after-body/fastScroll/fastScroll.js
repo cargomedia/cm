@@ -11,7 +11,7 @@ var fastScroll = (function() {
 	window.addEventListener('scroll', function() {
 		clearTimeout(enableTimer);
 		removeHoverClass();
-		enableTimer = setTimeout(addHoverClass, 200); // 200 is a bit snappier
+		enableTimer = setTimeout(addHoverClass, 500);
 	}, false);
 
 	/**
@@ -19,7 +19,9 @@ var fastScroll = (function() {
 	 * are reliant on this class being present
 	 */
 	function removeHoverClass() {
-		document.body.style.pointerEvents = 'none';
+		if ('none' !== document.body.style.pointerEvents) {
+			document.body.style.pointerEvents = 'none';
+		}
 	}
 
 	/**

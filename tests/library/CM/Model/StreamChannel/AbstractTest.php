@@ -3,7 +3,7 @@
 class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[1] = 'CM_Model_StreamChannel_Mock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
 	}
 
 	public function setup() {
@@ -27,24 +27,24 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetKey() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foo', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foo', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$this->assertEquals('foo', $streamChannel->getKey());
 	}
 
 	public function testGetAdapterType() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foobar', 'adapterType' => 1));
-		$this->assertEquals(1, $streamChannel->getAdapterType());
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'foobar', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
+		$this->assertEquals(CM_Stream_Adapter_Message_SocketRedis::getTypeStatic(), $streamChannel->getAdapterType());
 	}
 
 	public function testFactory() {
-		$streamChannel1 = CM_Model_StreamChannel_Video::createStatic(array('key'    => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => 1,
+		$streamChannel1 = CM_Model_StreamChannel_Video::createStatic(array('key'    => 'dsljkfk34asdd', 'serverId' => 1, 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic(),
 																		   'width'  => 100,
 																		   'height' => 100, 'thumbnailCount' => 0));
 		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
 		$this->assertEquals($streamChannel1, $streamChannel2);
 
-		$streamChannel1 = CM_Model_StreamChannel_Message::createStatic(array('key' => 'asdasdaasadgss', 'adapterType' => 1));
+		$streamChannel1 = CM_Model_StreamChannel_Message::createStatic(array('key' => 'asdasdaasadgss', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$streamChannel2 = CM_Model_StreamChannel_Abstract::factory($streamChannel1->getId());
 		$this->assertEquals($streamChannel1, $streamChannel2);
 	}
@@ -54,7 +54,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 * @expectedExceptionMessage Unexpected instance of
 	 */
 	public function testFactoryInvalidInstance() {
-		$messageStreamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'message-stream-channel', 'adapterType' => 1));
+		$messageStreamChannel = CM_Model_StreamChannel_Message::createStatic(array('key' => 'message-stream-channel', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		CM_Model_StreamChannel_Video::factory($messageStreamChannel->getId());
 	}
 
@@ -76,7 +76,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testDelete() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$streamChannel->delete();
 		new CM_Model_StreamChannel_Mock($streamChannel->getId());
 	}
@@ -87,7 +87,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testDeleteWithSubscribes() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar-with-subscribers', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar-with-subscribers', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
 													'key'           => '123123_1',));
 		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(), 'start' => 123123,
@@ -114,7 +114,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetSubscribers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$this->assertEquals(0, $streamChannel->getSubscribers()->getCount());
 		$streamSubscribe = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 																		 'start'         => 123123,
@@ -133,7 +133,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetPublishers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar1', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar1', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$this->assertEquals(0, $streamChannel->getPublishers()->getCount());
 		$streamPublish = CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
 																	 'start'         => 123123,
@@ -152,7 +152,7 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 	public function testGetUsers() {
 		/** @var CM_Model_StreamChannel_Mock $streamChannel */
-		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar2', 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Mock::createStatic(array('key' => 'bar2', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$this->assertEquals(0, $streamChannel->getUsers()->getCount());
 		$user = CMTest_TH::createUser();
 		CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => 123123,
@@ -170,18 +170,18 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testCreate() {
-		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key'         => 'foo1',
-																												 'adapterType' => 1));
+		$streamChannel = CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key'         => 'foo1',
+																												 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Message', $streamChannel);
 
 		try {
-			CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1', 'adapterType' => 1));
+			CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key' => 'foo1', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
 			$this->fail();
 		} catch (CM_Db_Exception $e) {
 			$this->assertContains('Duplicate entry', $e->getMessage());
 		}
 
-		CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::TYPE, array('key' => 'foo1', 'adapterType' => 2));
+		CM_Model_StreamChannel_Abstract::createType(CM_Model_StreamChannel_Message::getTypeStatic(), array('key' => 'foo1', 'adapterType' => 2));
 	}
 
 	public function testEncryptAndDecryptKey() {
@@ -204,6 +204,14 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 
 	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;

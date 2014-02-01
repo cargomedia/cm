@@ -71,6 +71,14 @@ class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
 
 	const TYPE = 3;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {
 		throw new CM_Exception_ActionLimit('Mock overshoot');
 	}

@@ -86,6 +86,14 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
 	const TYPE = 1;
 
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
+
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
 

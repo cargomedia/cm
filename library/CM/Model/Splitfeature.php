@@ -1,7 +1,6 @@
 <?php
 
 class CM_Model_Splitfeature extends CM_Model_Abstract {
-	CONST TYPE = 28;
 
 	/** @var bool */
 	private $_withoutPersistence;

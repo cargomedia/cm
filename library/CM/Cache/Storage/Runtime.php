@@ -26,7 +26,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		if (null === $lifeTime) {
 			$lifeTime = self::LIFETIME_MAX;
 		} else {
-			$lifeTime = min(self::LIFETIME_MAX, $lifeTime);
+			$lifeTime = min($lifeTime, self::LIFETIME_MAX);
 		}
 		$expirationStamp = time() + $lifeTime;
 		$this->_storage[$key] = array('value' => $value, 'expirationStamp' => $expirationStamp);
@@ -50,7 +50,7 @@ class CM_Cache_Storage_Runtime extends CM_Cache_Storage_Abstract {
 		$this->_storage = array();
 	}
 
-	private function _deleteExpired() {
+	protected function _deleteExpired() {
 		$currentTime = time();
 		foreach ($this->_storage as $key => $data) {
 			if ($currentTime > $data['expirationStamp']) {

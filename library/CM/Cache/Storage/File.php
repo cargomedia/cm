@@ -7,6 +7,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
 	public function __construct() {
 		$this->_storageDir = DIR_TMP_CACHE;
+		parent::__construct();
 	}
 
 	/**

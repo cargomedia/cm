@@ -2,15 +2,24 @@
 
 abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 
+	/** @var CM_Cache_Storage_Runtime|null */
+	protected  $_runtime;
+
+	public function __construct() {
+		$this->_runtime = CM_Cache_Storage_Runtime::getInstance();
+	}
+
 	/**
 	 * @param string   $key
 	 * @param mixed    $value
 	 * @param int|null $lifeTime
 	 */
 	public final function set($key, $value, $lifeTime = null) {
+		if ($runtime = $this->_getRuntime()) {
+			$runtime->set($key, $value);
+		}
 		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-set', $key);
-		$key = $this->_getKeyArmored($key);
-		$this->_set($key, $value, $lifeTime);
+		$this->_set($this->_getKeyArmored($key), $value, $lifeTime);
 	}
 
 	/**
@@ -18,20 +27,33 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return mixed|false
 	 */
 	public final function get($key) {
+		$runtime = $this->_getRuntime();
+		if ($runtime && false !== ($value = $runtime->get($key))) {
+			return $value;
+		}
+
 		CM_Debug::getInstance()->incStats(strtolower($this->_getName()) . '-get', $key);
-		$key = $this->_getKeyArmored($key);
-		return $this->_get($key);
+		$value = $this->_get($this->_getKeyArmored($key));
+		if ($runtime && false !== $value) {
+			$runtime->set($key, $value);
+		}
+		return $value;
 	}
 
 	/**
 	 * @param string $key
 	 */
 	public final function delete($key) {
-		$key = $this->_getKeyArmored($key);
-		$this->_delete($key);
+		if ($runtime = $this->_getRuntime()) {
+			$runtime->delete($key);
+		}
+		$this->_delete($this->_getKeyArmored($key));
 	}
 
 	public final function flush() {
+		if ($runtime = $this->_getRuntime()) {
+			$runtime->flush();
+		}
 		$this->_flush();
 	}
 
@@ -60,8 +82,13 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 		}
 		$values = $this->_getMulti($keys);
 		$result = array();
+		$runtime = $this->_getRuntime();
 		foreach ($values as $armoredKey => $value) {
-			$result[$this->_extractKeyArmored($armoredKey)] = $value;
+			$key = $this->_extractKeyArmored($armoredKey);
+			$result[$key] = $value;
+			if ($runtime) {
+				$runtime->set($key, $value);
+			}
 		}
 		return $result;
 	}
@@ -130,5 +157,12 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 			throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
 		}
 		return $matches[1];
+	}
+
+	/**
+	 * @return CM_Cache_Storage_Runtime
+	 */
+	protected function _getRuntime() {
+		return $this->_runtime;
 	}
 }

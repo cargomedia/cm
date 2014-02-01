@@ -2,8 +2,6 @@
 
 class CM_Model_Splittest_User extends CM_Model_Splittest {
 
-	const TYPE = 27;
-
 	/**
 	 * @param CM_Model_User $user
 	 * @param string        $variationName
