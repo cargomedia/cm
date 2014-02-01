@@ -19,7 +19,9 @@ var fastScroll = (function() {
 	 * are reliant on this class being present
 	 */
 	function removeHoverClass() {
-		document.body.style.pointerEvents = 'none';
+		if ('none' !== document.body.style.pointerEvents) {
+			document.body.style.pointerEvents = 'none';
+		}
 	}
 
 	/**
