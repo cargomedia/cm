@@ -20,7 +20,7 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		$mockAdapter->expects($this->exactly(2))->method('_stopStream')->will($this->returnValue(1));
 		$mockAdapter->expects($this->any())->method('getType')->will($this->returnValue(1));
 
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('getAdapter'));
 		$wowza->expects($this->any())->method('getAdapter')->will($this->returnValue($mockAdapter));
 		/** @var $wowza CM_Stream_Video */
@@ -102,6 +102,16 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 }
 
 class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
+
+	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;

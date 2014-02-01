@@ -2,8 +2,6 @@
 
 class CM_Model_DeviceCapabilities extends CM_Model_Abstract {
 
-	const TYPE = 20;
-
 	/**
 	 * @param string $userAgent
 	 */
