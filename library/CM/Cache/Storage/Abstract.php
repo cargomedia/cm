@@ -143,7 +143,7 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @return string
 	 */
 	protected function _getKeyArmored($key) {
-		return DIR_ROOT . '_' . $key;
+		return CM_Bootloader::getInstance()->getDataPrefix() . DIR_ROOT . '_' . $key;
 	}
 
 	/**
@@ -152,7 +152,8 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	protected static final function _extractKeyArmored($keyArmored) {
-		if (!preg_match('/^' . preg_quote(DIR_ROOT, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
+		$prefix = CM_Bootloader::getInstance()->getDataPrefix() . DIR_ROOT;
+		if (!preg_match('/^' . preg_quote($prefix, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
 			throw new CM_Exception_Invalid('Cannot extract key from `' . $keyArmored . '`');
 		}
 		return $matches[1];

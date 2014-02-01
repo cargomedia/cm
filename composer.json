@@ -27,5 +27,12 @@
 			"CMTest_": "tests/helpers/CMTest/library/"
 		}
 	},
-	"bin": ["scripts/cm.php"]
+	"bin": ["scripts/cm.php"],
+	"extra": {
+		"cm-modules": {
+			"CM": {
+				"path": ""
+			}
+		}
+	}
 }

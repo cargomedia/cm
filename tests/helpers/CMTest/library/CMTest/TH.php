@@ -4,16 +4,12 @@ class CMTest_TH {
 
 	private static $_timeStart;
 	private static $timeDelta = 0;
-	private static $initialized = false;
 	private static $_configBackup;
 
 	/** @var CM_Db_Client|null */
 	private static $_dbClient = null;
 
 	public static function init() {
-		if (self::$initialized) {
-			return;
-		}
 		$forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
 		CM_App::getInstance()->setupDatabase($forceReload);
 
@@ -24,15 +20,13 @@ class CMTest_TH {
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
-
-		self::$initialized = true;
 	}
 
 	public static function clearEnv() {
 		self::clearDb();
 		self::clearCache();
 		self::timeReset();
-		self::clearTmp();
+		self::clearFilesystem();
 		self::clearConfig();
 	}
 
@@ -53,7 +47,7 @@ class CMTest_TH {
 		}
 	}
 
-	public static function clearTmp() {
+	public static function clearFilesystem() {
 		CM_App::getInstance()->resetTmp();
 	}
 
