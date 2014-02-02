@@ -11,6 +11,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		/** @var CM_Request_Abstract $mock */
 		$this->assertNull($mock->getViewer());
 
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=a1d2726e5b3801226aafd12fd62496c8');
@@ -31,7 +32,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals($user, $mock->getViewer(true));
 
 		$user2 = CMTest_TH::createUser();
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, $user2));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, null, $user2));
 		$this->assertEquals($user2, $mock->getViewer(true));
 	}
 
