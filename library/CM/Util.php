@@ -211,7 +211,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function mkDirTmp() {
-		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid() . DIRECTORY_SEPARATOR;
 		return self::mkDir($path);
 	}
 

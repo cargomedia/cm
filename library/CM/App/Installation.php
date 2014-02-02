@@ -146,7 +146,7 @@ class CM_App_Installation {
 
 		// Configuration defaults
 		$config = new Composer\Config();
-		$config->merge(array('config' => array('home' => DIR_TMP . 'composer/')));
+		$config->merge(array('config' => array('home' => CM_Bootloader::getInstance()->getDirTmp() . 'composer/')));
 		$config->merge($localConfig);
 
 		$vendorDir = DIR_ROOT . $config->get('vendor-dir');

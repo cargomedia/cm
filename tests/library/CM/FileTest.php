@@ -118,7 +118,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testCopy() {
-		$path = DIR_TMP . 'filecopytest.txt';
+		$path = CM_Bootloader::getInstance()->getDirTmp() . 'filecopytest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$this->assertFileNotExists($path);
 		$file->copy($path);
@@ -135,7 +135,7 @@ class CM_FileTest extends CMTest_TestCase {
 	}
 
 	public function testMove() {
-		$newPath = DIR_TMP . 'filemovetest.txt';
+		$newPath = CM_Bootloader::getInstance()->getDirTmp() . 'filemovetest.txt';
 		$file = new CM_File($this->_testFilePath);
 		$oldPath = $file->getPath();
 
