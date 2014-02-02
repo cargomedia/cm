@@ -92,6 +92,13 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getServer() {
+		return $this->_server;
+	}
+
+	/**
 	 * @return CM_Model_DeviceCapabilities
 	 */
 	public function getDeviceCapabilities() {
