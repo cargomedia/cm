@@ -3,7 +3,8 @@
 class CM_Response_View_AbstractTest extends CMTest_TestCase {
 
 	public function testLoadPage() {
-		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()));
+		$viewer = CMTest_TH::createUser();
+		$response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()), $viewer);
 		$this->assertAjaxResponseSuccess($response);
 		$responseContent = CM_Params::decode($response->getContent(), true);
 		$this->assertArrayHasKey('js', $responseContent['success']['data']);
