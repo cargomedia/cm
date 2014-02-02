@@ -119,7 +119,6 @@ class CM_App_Installation {
 		$extra = $package->getExtra();
 		if (!array_key_exists('cm-modules', $extra)) {
 			throw new CM_Exception_Invalid('Missing `cm-modules` in `' . $package->getName() . '` package composer extra');
-
 		}
 		return new CM_App_Package($package->getName(), $pathRelative, $extra['cm-modules']);
 	}
@@ -138,14 +137,44 @@ class CM_App_Installation {
 	 * @return \Composer\Composer
 	 */
 	public static function composerFactory() {
-		if (!getenv('COMPOSER_HOME') && !getenv('HOME')) {
-			putenv('COMPOSER_HOME=' . sys_get_temp_dir() . 'composer/');
-		}
-		$cwdBackup = getcwd();
-		chdir(DIR_ROOT);
 		$io = new \Composer\IO\NullIO();
-		$composer = \Composer\Factory::create($io, DIR_ROOT . 'composer.json');
-		chdir($cwdBackup);
+
+		$composerPath = DIR_ROOT . 'composer.json';
+		$composerFile = new Composer\Json\JsonFile($composerPath);
+		$composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
+		$localConfig = $composerFile->read();
+
+		// Configuration defaults
+		$config = new Composer\Config();
+		$config->merge(array('config' => array('home' => DIR_TMP . 'composer/')));
+		$config->merge($localConfig);
+
+		$vendorDir = DIR_ROOT . $config->get('vendor-dir');
+
+		// initialize repository manager
+		$rm = new Composer\Repository\RepositoryManager($io, $config);
+		$rm->setRepositoryClass('composer', 'Composer\Repository\ComposerRepository');
+		$rm->setRepositoryClass('vcs', 'Composer\Repository\VcsRepository');
+		$rm->setRepositoryClass('package', 'Composer\Repository\PackageRepository');
+		$rm->setRepositoryClass('pear', 'Composer\Repository\PearRepository');
+		$rm->setRepositoryClass('git', 'Composer\Repository\VcsRepository');
+		$rm->setRepositoryClass('svn', 'Composer\Repository\VcsRepository');
+		$rm->setRepositoryClass('hg', 'Composer\Repository\VcsRepository');
+		$rm->setRepositoryClass('artifact', 'Composer\Repository\ArtifactRepository');
+
+		// load local repository
+		$rm->setLocalRepository(new Composer\Repository\InstalledFilesystemRepository(new Composer\Json\JsonFile($vendorDir . '/composer/installed.json')));
+
+		// load package
+		$loader = new Composer\Package\Loader\RootPackageLoader($rm, $config);
+		$package = $loader->load($localConfig);
+
+		// initialize composer
+		$composer = new Composer\Composer();
+		$composer->setConfig($config);
+		$composer->setPackage($package);
+		$composer->setRepositoryManager($rm);
+
 		return $composer;
 	}
 }
