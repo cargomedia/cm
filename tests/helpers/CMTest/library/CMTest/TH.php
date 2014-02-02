@@ -216,7 +216,7 @@ class CMTest_TH {
 			$site = CM_Site_Abstract::factory();
 			$headers = array('host' => $site->getHost());
 		}
-		$request = new CM_Request_Get($uri, $headers, $viewer);
+		$request = new CM_Request_Get($uri, $headers, null, $viewer);
 		return new CM_Response_Page($request);
 	}
 
