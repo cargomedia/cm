@@ -203,7 +203,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$site = CM_Site_Abstract::factory();
 		}
 		$host = parse_url($site->getUrl(), PHP_URL_HOST);
-		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
+		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
 		$response = new CM_Response_Page($request);
 		$page->prepareResponse($response);
 		$page->checkAccessible();
