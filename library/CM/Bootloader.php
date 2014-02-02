@@ -27,6 +27,10 @@ class CM_Bootloader {
 			throw new CM_Exception_Invalid('Bootloader already instantiated');
 		}
 		self::$_instance = $this;
+
+		mb_internal_encoding('UTF-8');
+		umask(0);
+
 		define('DIR_ROOT', $pathRoot);
 		$this->_debug = (bool) getenv('CM_DEBUG');
 		$this->_dataPrefix = '';
@@ -141,8 +145,6 @@ class CM_Bootloader {
 
 	protected function _defaults() {
 		date_default_timezone_set(CM_Config::get()->timeZone);
-		mb_internal_encoding('UTF-8');
-		umask(0);
 		CMService_Newrelic::getInstance()->setConfig();
 	}
 
