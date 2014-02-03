@@ -78,8 +78,6 @@ $config->CM_Response_RPC->catch = array(
 	'CM_Exception_NotAllowed',
 );
 
-$config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
-
 $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
 $config->CM_Stream_Video->servers = array(
 	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
