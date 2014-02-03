@@ -114,7 +114,7 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	private function _getPidFilePath() {
-		$dirLocks = CM_Bootloader::getInstance()->getDirTmp() . 'locks/';
+		$dirLocks = CM_Bootloader::getInstance()->getDirData() . 'locks/';
 		CM_Util::mkDir($dirLocks);
 		return $dirLocks . $this->_class->getName() . ':' . $this->_method->getName();
 	}
