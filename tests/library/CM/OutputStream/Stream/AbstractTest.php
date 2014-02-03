@@ -7,7 +7,7 @@ class CM_OutputStream_Stream_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testWrite() {
-		$streamPath = DIR_TMP . 'bar';
+		$streamPath = CM_Bootloader::getInstance()->getDirTmp() . 'bar';
 		$outputStream = $this->getMockBuilder('CM_OutputStream_Stream_Abstract')->setConstructorArgs(array($streamPath))->getMockForAbstractClass();
 
 		/** @var CM_OutputStream_Stream_Abstract $outputStream */

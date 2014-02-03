@@ -72,7 +72,6 @@ class CM_App {
 		CM_Util::rmDirContents(CM_Bootloader::getInstance()->getDirTmp());
 		CM_Util::mkDir(DIR_TMP_SMARTY);
 		CM_Util::mkDir(DIR_TMP_CACHE);
-		CM_Util::mkDir(DIR_TMP_SMARTY);
 	}
 
 	public function fillCaches() {
