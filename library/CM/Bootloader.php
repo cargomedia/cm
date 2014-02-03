@@ -138,8 +138,6 @@ class CM_Bootloader {
 		define('DIR_DATA_LOCKS', $this->getDirData() . 'locks/');
 		define('DIR_DATA_LOG', $this->getDirData() . 'logs/');
 		define('DIR_DATA_SVM', $this->getDirData() . 'svm/');
-
-		define('DIR_TMP_CACHE', $this->getDirTmp() . 'cache/');
 	}
 
 	protected function _errorHandler() {

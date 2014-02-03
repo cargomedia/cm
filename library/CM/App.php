@@ -71,7 +71,7 @@ class CM_App {
 		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
 		CM_Util::mkDir($dirTmp);
 		CM_Util::rmDirContents($dirTmp);
-		CM_Util::mkDir(DIR_TMP_CACHE);
+		CM_Cache_Storage_File::resetStorage();
 		CM_Render::resetSmartyTmp();
 	}
 
