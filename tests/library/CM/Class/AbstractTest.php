@@ -4,7 +4,7 @@ class CM_Class_AbstractTest extends CMTest_TestCase {
 
 	public static function setupBeforeClass() {
 		CM_Config::get()->CM_Class_AbstractMock = new stdClass();
-		CM_Config::get()->CM_Class_AbstractMock->types[CM_Class_Implementation::TYPE] = 'CM_Class_Implementation';
+		CM_Config::get()->CM_Class_AbstractMock->types[CM_Class_Implementation::getTypeStatic()] = 'CM_Class_Implementation';
 	}
 
 	public function testGetConfig() {
@@ -60,4 +60,12 @@ class CM_Class_AbstractMock extends CM_Class_Abstract {
 class CM_Class_Implementation extends CM_Class_AbstractMock {
 
 	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 }

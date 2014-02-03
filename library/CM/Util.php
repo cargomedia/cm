@@ -31,6 +31,33 @@ class CM_Util {
 	}
 
 	/**
+	 * @param mixed $argument
+	 * @return string
+	 */
+	public static function varDump($argument) {
+		if (is_object($argument)) {
+			if ($argument instanceof stdClass) {
+				return 'object';
+			}
+			$value = get_class($argument);
+			if ($argument instanceof CM_Model_Abstract) {
+				$value .= '(' . implode(', ', (array) $argument->getId()) . ')';
+			}
+			return $value;
+		}
+		if (is_string($argument)) {
+			if (strlen($argument) > 20) {
+				$argument = substr($argument, 0, 20) . '...';
+			}
+			return '\'' . $argument . '\'';
+		}
+		if (is_bool($argument) || is_numeric($argument)) {
+			return var_export($argument, true);
+		}
+		return gettype($argument);
+	}
+
+	/**
 	 * @param string $pattern OPTIONAL
 	 * @param string $path    OPTIONAL
 	 * @return array
@@ -131,7 +158,7 @@ class CM_Util {
 		$curlError = null;
 		$contents = curl_exec($curlConnection);
 		if ($contents === false) {
-			$curlError =  'Curl error: `' . curl_error($curlConnection) . '` ';
+			$curlError = 'Curl error: `' . curl_error($curlConnection) . '` ';
 		}
 
 		$info = curl_getinfo($curlConnection);
@@ -172,7 +199,9 @@ class CM_Util {
 		$path = (string) $path;
 		if (!is_dir($path)) {
 			if (false === @mkdir($path, 0777, true)) {
-				throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+				if (!is_dir($path)) {	// Might have been created in the meantime
+					throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+				}
 			}
 		}
 		return $path;
@@ -182,7 +211,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function mkDirTmp() {
-		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid() . DIRECTORY_SEPARATOR;
 		return self::mkDir($path);
 	}
 
@@ -204,7 +233,7 @@ class CM_Util {
 	 */
 	public static function rmDirContents($path) {
 		$path = (string) $path . '/';
-		if(!is_dir($path)) {
+		if (!is_dir($path)) {
 			return;
 		}
 		$systemFileList = scandir($path);
@@ -232,7 +261,9 @@ class CM_Util {
 		if (!empty($params)) {
 			$params = CM_Params::encode($params);
 			$query = http_build_query($params);
-			$link .= '?' . $query;
+			if (strlen($query) > 0) {
+				$link .= '?' . $query;
+			}
 		}
 
 		return $link;
@@ -414,13 +445,58 @@ class CM_Util {
 	}
 
 	/**
+	 * @param null $namespace
+	 * @return string
+	 *
+	 * Measures time between two successive calls, sums up multiple measurements and tracks call count
+	 */
+	public static function benchmarkMultiple($namespace = null) {
+		static $timeTotals;
+		if (!$timeTotals) {
+			$timeTotals = array();
+		}
+		static $callCount;
+		if (!$callCount) {
+			$callCount = array();
+		}
+		static $times;
+		if (!$times) {
+			$times = array();
+		}
+		$now = microtime(true) * 1000;
+		$total = 0;
+		if (!array_key_exists($namespace, $callCount)) {
+			$callCount[$namespace] = 0;
+		}
+		if (array_key_exists($namespace, $timeTotals)) {
+			$total = $timeTotals[$namespace];
+		}
+		if (array_key_exists($namespace, $times)) {
+			$difference = $now - $times[$namespace];
+			$total += $difference;
+			$timeTotals[$namespace] = $total;
+			unset($times[$namespace]);
+			$callCount[$namespace] += 1;
+		} else {
+			$times[$namespace] = $now;
+		}
+		$count = $callCount[$namespace];
+		$output = sprintf('called %d times', $count);
+		if ($count) {
+			$output .= sprintf(', Average: %.2f ms, Total: %.2f ms', $total/$count, $total);
+		}
+		return $output;
+	}
+
+	/**
 	 * @param string       $className
 	 * @param boolean|null $includeAbstracts
 	 * @return string[]
 	 */
 	public static function getClassChildren($className, $includeAbstracts = null) {
 		$key = CM_CacheConst::ClassChildren . '_className:' . $className . '_abstracts:' . (int) $includeAbstracts;
-		if (false === ($classNames = CM_CacheLocal::get($key))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($classNames = $cache->get($key))) {
 			$pathsFiltered = array();
 			$paths = array();
 			foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
@@ -444,7 +520,7 @@ class CM_Util {
 				}
 			}
 			$classNames = self::getClasses($pathsFiltered);
-			CM_CacheLocal::set($key, $classNames);
+			$cache->set($key, $classNames);
 		}
 		return $classNames;
 	}

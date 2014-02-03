@@ -8,12 +8,13 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 		}
 		CM_Config::get()->CM_Jobdistribution_Job_Abstract->gearmanEnabled = true;
 
-		/** @var CM_Jobdistribution_Job_Abstract $job  */
-		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true, array('_getGearmanClient', '_execute'));
+		/** @var CM_Jobdistribution_Job_Abstract $job */
+		$job = $this->getMockForAbstractClass('CM_Jobdistribution_Job_Abstract', array(), '', true, true, true,
+			array('_getGearmanClient', '_execute'));
 		$gearmanClientMock = $this->getMock('GearmanClient', array('doNormal', 'returnCode'));
 		$that = $this;
 		$gearmanJobMock = $gearmanJobMock = $this->getMock('GearmanJob', array('sendFail', 'workload'));
-		$gearmanClientMock->expects($this->any())->method('doNormal')->will($this->returnCallback(function($jobName, $workload) use ($job, $gearmanClientMock, &$gearmanJobMock, $that) {
+		$gearmanClientMock->expects($this->any())->method('doNormal')->will($this->returnCallback(function ($jobName, $workload) use ($job, $gearmanClientMock, &$gearmanJobMock, $that) {
 			$gearmanJobMock->expects($that->any())->method('workload')->will($that->returnValue($workload));
 			$gearmanJobMock->expects($that->any())->method('sendFail')->will($that->returnCallback(function () use ($gearmanClientMock, $that) {
 				$gearmanClientMock->expects($that->any())->method('returnCode')->will($that->returnValue(GEARMAN_WORK_FAIL));
@@ -77,5 +78,4 @@ class CM_Jobdistribution_Job_AbstractTest extends CMTest_TestCase {
 
 		CMTest_TH::clearConfig();
 	}
-
 }

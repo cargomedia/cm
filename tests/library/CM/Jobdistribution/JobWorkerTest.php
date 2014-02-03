@@ -8,16 +8,16 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 		}
 		$counter = 0;
 		$gearmanWorkerMock = $this->getMock('GearmanWorker', array('work'));
-		$gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function() use (&$counter) {
+		$gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function () use (&$counter) {
 			if (++$counter >= 2) {
 				return false;
 			}
-			throw new Exception();
+			throw new Exception('foo-bar');
 		}));
-		/** @var CM_JobDistribution_JobWorker $jobWorkerMock */
-		$jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker'), array(), '', false);
+		$jobWorkerMock = $this->getMock('CM_Jobdistribution_JobWorker', array('_getGearmanWorker', '_handleException'), array(), '', false);
 		$jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
-		ob_start();
+		$jobWorkerMock->expects($this->once())->method('_handleException')->with(new PHPUnit_Framework_Constraint_ExceptionMessage('foo-bar'));
+		/** @var CM_JobDistribution_JobWorker $jobWorkerMock */
 		try {
 			$jobWorkerMock->run();
 		} catch (CM_Exception_Invalid $ex) {
@@ -26,7 +26,5 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 		} catch (Exception $ex) {
 			$this->fail('Exception not caught.');
 		}
-		ob_end_clean();
 	}
-
 }

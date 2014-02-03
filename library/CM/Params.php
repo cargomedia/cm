@@ -152,9 +152,30 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
+	 * @throws CM_Exception_InvalidParam
 	 * @return DateTime
 	 */
 	public function getDateTime($key) {
+		$value = $this->get($key);
+		if (is_array($value) && isset($value['date']) && isset($value['timezone_type']) && isset($value['timezone'])) {
+			$date = (string) $value['date'];
+			$timezone = (string) $value['timezone'];
+			$timezoneType = (int) $value['timezone_type'];
+			switch ($timezoneType) {
+				case 1:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 2:
+					$datetime = new DateTime($date . ' ' . $timezone);
+					break;
+				case 3:
+					$datetime = new DateTime($date, new DateTimeZone($timezone));
+					break;
+				default:
+					throw new CM_Exception_InvalidParam('Invalid timezone type `' . $timezoneType . '`');
+			}
+			return $datetime;
+		}
 		return $this->_getObject($key, 'DateTime');
 	}
 
@@ -442,9 +463,10 @@ class CM_Params extends CM_Class_Abstract {
 	 */
 	public static function decode($value, $json = null) {
 		if ($json) {
-			$value = json_decode($value, true);
+			$valueString = (string) $value;
+			$value = json_decode($valueString, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . CM_Util::var_line($value) . '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString. '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {

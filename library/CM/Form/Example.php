@@ -15,6 +15,7 @@ class CM_Form_Example extends CM_Form_Abstract {
 		$this->registerField('boolean', new CM_FormField_Boolean());
 		$this->registerField('setSelect1', new CM_FormField_Set_Select(array(1 => 'Eins', 2 => 'Zwei'), true));
 		$this->registerField('setSelect2', new CM_FormField_Set_Select(array(1 => 'Eins', 2 => 'Zwei'), true));
+		$this->registerField('setSelect3', new CM_FormField_Set_Select(array(1 => 'Female', 2 => 'Male'), true));
 
 		$this->registerAction(new CM_FormAction_Example_Go($this));
 	}

@@ -11,7 +11,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 		$render->pushStack('views', $form);
 
 		$class = implode(' ', $form->getClassHierarchy()) . ' ' . $form->getName();
-		$html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;">';
+		$html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
 
 		return $html;
 	} else {

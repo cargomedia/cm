@@ -34,7 +34,6 @@ class smarty_prefilter_translateTest extends CMTest_TestCase {
 		$this->_assertSame('{translateVariable key="hello {$foo} there"}', '{translate "hello {$foo} there"}');
 		$this->_assertSame('{translateVariable key={anything_here}}', '{translate {anything_here}}');
 
-
 		$this->_assertSame('{translateVariable key="hello {foo} there"}', '{translate "hello {foo} there"}');
 		$this->_assertSame("{translateVariable key='hello {\$a} there' a=\$a}", "{translate 'hello {\$a} there' a=\$a}");
 		$this->_assertSame("{translateVariable key='hello {\$a} there' a=\$a->foo()}", "{translate 'hello {\$a} there' a=\$a->foo()}");

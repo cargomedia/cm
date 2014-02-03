@@ -8,8 +8,14 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::createStatic(array('key'            => 'foo', 'width' => 100, 'height' => 200, 'serverId' => 1,
-															  'thumbnailCount' => 2, 'adapterType' => 1));
+		$channel = CM_Model_StreamChannel_Video::createStatic(array(
+			'key'            => 'foo',
+			'width'          => 100,
+			'height'         => 200,
+			'serverId'       => 1,
+			'thumbnailCount' => 2,
+			'adapterType'    => 1,
+		));
 		$this->assertInstanceOf('CM_Model_StreamChannel_Video', $channel);
 		$this->assertSame(100, $channel->getWidth());
 		$this->assertSame(200, $channel->getHeight());
@@ -22,8 +28,14 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public function testCreateWithoutServerId() {
 		try {
-			CM_Model_StreamChannel_Video::createStatic(array('key'            => 'bar', 'width' => 100, 'height' => 200, 'serverId' => null,
-													   'thumbnailCount' => 2, 'adapterType' => 1));
+			CM_Model_StreamChannel_Video::createStatic(array(
+				'key'            => 'bar',
+				'width'          => 100,
+				'height'         => 200,
+				'serverId'       => null,
+				'thumbnailCount' => 2,
+				'adapterType'    => 1,
+			));
 			$this->fail('Can create streamChannel without serverId');
 		} catch (CM_Exception $ex) {
 			$this->assertContains("Column 'serverId' cannot be null", $ex->getMessage());
@@ -32,8 +44,14 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 
 	public function testNonexistentServerId() {
 		/** @var CM_Model_StreamChannel_Video $channel */
-		$channel = CM_Model_StreamChannel_Video::createStatic(array('key'            => 'foobar', 'width' => 100, 'height' => 200, 'serverId' => 800,
-															  'thumbnailCount' => 2, 'adapterType' => 1));
+		$channel = CM_Model_StreamChannel_Video::createStatic(array(
+			'key'            => 'foobar',
+			'width'          => 100,
+			'height'         => 200,
+			'serverId'       => 800,
+			'thumbnailCount' => 2,
+			'adapterType'    => 1,
+		));
 
 		try {
 			$channel->getPublicHost();
@@ -82,31 +100,21 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 		$this->assertNotRow('cm_streamChannel_video', array('id' => $streamChannel->getId()));
 	}
 
-	public function testOnBeforeDelete() {
+	public function testOnUnpublish() {
 		$streamChannel = CMTest_TH::createStreamChannel();
-		CMTest_TH::createStreamPublish(null, $streamChannel);
+		$streamPublish = CMTest_TH::createStreamPublish(null, $streamChannel);
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
 			$this->fail('Archive exists before StreamChannel deleted.');
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-		$streamChannel->delete();
+		$streamChannel->onUnpublish($streamPublish);
 		try {
 			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
 			$this->assertTrue(true);
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->fail('Archive was not created.');
-		}
-
-		//without streamPublish
-		$streamChannel = CMTest_TH::createStreamChannel();
-		$streamChannel->delete();
-		try {
-			new CM_Model_StreamChannelArchive_Video($streamChannel->getId());
-			$this->fail('Archive created despite missing streamPublish.');
-		} catch (CM_Exception_Nonexistent $ex) {
-			$this->assertTrue(true);
 		}
 	}
 
@@ -117,9 +125,9 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
 		$this->assertSame(array(), $streamChannel->getThumbnails()->getItems());
 		$streamChannel->setThumbnailCount(2);
 		$thumb1 = new CM_File_UserContent('streamChannels',
-				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.png', $streamChannel->getId());
+			$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/1.png', $streamChannel->getId());
 		$thumb2 = new CM_File_UserContent('streamChannels',
-				$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/2.png', $streamChannel->getId());
+			$streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/2.png', $streamChannel->getId());
 		$this->assertEquals(array($thumb1, $thumb2), $streamChannel->getThumbnails()->getItems());
 	}
 }

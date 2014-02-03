@@ -2,8 +2,6 @@
 
 class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
-	const TYPE = 2;
-
 	public function synchronize() {
 		$startStampLimit = time() - 3;
 		$status = array();
@@ -38,28 +36,28 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
 
 		/** @var CM_Model_StreamChannel_Abstract $streamChannel */
 		foreach ($streamChannels as $streamChannel) {
-			$streamPublishs = $streamChannel->getStreamPublishs();
-			if (!$streamPublishs->getCount()) {
+			if (!$streamChannel->hasStreams()) {
 				$streamChannel->delete();
 				continue;
 			}
 
 			/** @var CM_Model_Stream_Publish $streamPublish */
 			$streamPublish = $streamChannel->getStreamPublishs()->getItem(0);
-			if ($streamPublish->getStart() > $startStampLimit) {
-				continue;
+			if ($streamPublish) {
+				if ($streamPublish->getStart() > $startStampLimit) {
+					continue;
+				}
+				if (!isset($status[$streamChannel->getKey()])) {
+					$this->unpublish($streamChannel->getKey());
+				}
 			}
-			if (!isset($status[$streamChannel->getKey()])) {
-				$this->unpublish($streamChannel->getKey());
-			} else {
-				/** @var CM_Model_Stream_Subscribe $streamSubscribe */
-				foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
-					if ($streamSubscribe->getStart() > $startStampLimit) {
-						continue;
-					}
-					if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
-						$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
-					}
+			/** @var CM_Model_Stream_Subscribe $streamSubscribe */
+			foreach ($streamChannel->getStreamSubscribes() as $streamSubscribe) {
+				if ($streamSubscribe->getStart() > $startStampLimit) {
+					continue;
+				}
+				if (!isset($status[$streamChannel->getKey()]['subscribers'][$streamSubscribe->getKey()])) {
+					$this->unsubscribe($streamChannel->getKey(), $streamSubscribe->getKey());
 				}
 			}
 		}

@@ -12,18 +12,6 @@
 	text-overflow: ellipsis;
 }
 
-.message() {
-	color: @colorFg;
-	border: 1px solid lighten(@colorNotice, 42);
-	background-color: lighten(@colorNotice, 48);
-}
-
-.error() {
-	border-color: @colorError;
-	background: @colorError;
-	color: white;
-}
-
 .notice() {
 	border-color: @colorNotice;
 	background: @colorNotice;
@@ -174,6 +162,7 @@
 
 .clipper(@height: 20px, @colorBg: @colorBg) {
 	&:after {
+		pointer-events: none;
 		position: absolute;
 		content: "";
 		width: 100%;
@@ -182,19 +171,6 @@
 		left: 0;
 		.gradient(vertical, fadeout(@colorBg, 100), @colorBg, 0, 80%);
 	}
-}
-
-.clickable(@fontSize: 1.25em) {
-	cursor: pointer;
-	font-size: @fontSize;
-
-	html.touch & {
-		font-size: @fontSize * 1.12;
-	}
-}
-
-.clickable {
-	.clickable(1.25em);
 }
 
 .background-size(@value) {

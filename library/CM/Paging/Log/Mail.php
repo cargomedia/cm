@@ -1,7 +1,6 @@
 <?php
 
 class CM_Paging_Log_Mail extends CM_Paging_Log_Abstract {
-	const TYPE = 3;
 
 	/**
 	 * @param CM_Mail $mail

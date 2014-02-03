@@ -75,7 +75,8 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 		if ($render->getLanguage()) {
 			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
 		}
-		if (false === ($contentTransformed = CM_Cache_File::get($cacheKey))) {
+		$cache = new CM_Cache_Storage_File();
+		if (false === ($contentTransformed = $cache->get($cacheKey))) {
 			$lessCompiler = new lessc();
 			$lessCompiler->registerFunction('image', function ($arg) use ($render) {
 				/** @var CM_Render $render */
@@ -91,7 +92,7 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 				$lessCompiler->setFormatter('compressed');
 			}
 			$contentTransformed = $lessCompiler->compile($this->_getMixins() . $content);
-			CM_Cache_File::set($cacheKey, $contentTransformed);
+			$cache->set($cacheKey, $contentTransformed);
 		}
 		return $contentTransformed;
 	}
@@ -118,10 +119,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 	background-image: -o-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -ms-linear-gradient(top,@color1 @pos1,@color2 @pos2);
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(@pos1, @color1),color-stop(@pos2, @color2));
-}
-.box-shadow(@args...) {
-	box-shadow: @args;
-	-webkit-box-shadow: @args;
 }
 .box-sizing(@args...) {
 	box-sizing: @args;

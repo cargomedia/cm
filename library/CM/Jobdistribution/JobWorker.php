@@ -23,12 +23,19 @@ class CM_Jobdistribution_JobWorker extends CM_Class_Abstract {
 			try {
 				$workFailed = !$this->_getGearmanWorker()->work();
 			} catch (Exception $ex) {
-				CM_Bootloader::getInstance()->handleException($ex);
+				$this->_handleException($ex);
 			}
 			if ($workFailed) {
 				throw new CM_Exception_Invalid('Worker failed');
 			}
 		}
+	}
+
+	/**
+	 * @param Exception $exception
+	 */
+	protected function _handleException(Exception $exception) {
+		CM_Bootloader::getInstance()->getExceptionHandler()->handleException($exception);
 	}
 
 	/**

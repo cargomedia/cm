@@ -11,6 +11,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$uri = '/';
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive');
 		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers));
+		/** @var CM_Request_Abstract $mock */
 		$this->assertNull($mock->getViewer());
 
 		$headers = array('Host' => 'example.ch', 'Connection' => 'keep-alive', 'Cookie' => 'sessionId=a1d2726e5b3801226aafd12fd62496c8');
@@ -31,7 +32,7 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 		$this->assertEquals($user, $mock->getViewer(true));
 
 		$user2 = CMTest_TH::createUser();
-		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, $user2));
+		$mock = $this->getMockForAbstractClass('CM_Request_Abstract', array($uri, $headers, null, $user2));
 		$this->assertEquals($user2, $mock->getViewer(true));
 	}
 
@@ -165,9 +166,9 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 
 	public function testIsBotCrawler() {
 		$useragents = array(
-			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => true,
+			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'   => true,
 			'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)' => false,
-			'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' => true,
+			'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'    => true,
 		);
 		foreach ($useragents as $useragent => $expected) {
 			$request = new CM_Request_Get('/foo', array('user-agent' => $useragent));
@@ -178,6 +179,24 @@ class CM_Request_AbstractTest extends CMTest_TestCase {
 	public function testIsBotCrawlerWithoutUseragent() {
 		$request = new CM_Request_Get('/foo');
 		$this->assertFalse($request->isBotCrawler());
+	}
+
+	public function testGetHost() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	public function testGetHostWithPort() {
+		$request = new CM_Request_Get('/', array('host' => 'www.example.com:80'));
+		$this->assertSame('www.example.com', $request->getHost());
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 */
+	public function testGetHostWithoutHeader() {
+		$request = new CM_Request_Get('/');
+		$request->getHost();
 	}
 
 	/**

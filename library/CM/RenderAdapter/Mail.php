@@ -16,7 +16,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			$htmlBody = $this->_renderTemplate('body.tpl', $mail->getTplParams());
 		}
 		if ($mail->getRenderLayout()) {
-			$tplPath = $this->getRender()->getLayoutPath('Mail/mailHtml.tpl');
+			$tplPath = $this->_getTplPathLayout('mailHtml.tpl');
 			$assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $htmlBody));
 			$html = $this->getRender()->renderTemplate($tplPath, $assign);
 		} else {
@@ -44,10 +44,22 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 			$text = trim($text);
 		}
 		if ($mail->getRenderLayout()) {
-			$tplPath = $this->getRender()->getLayoutPath('Mail/mailText.tpl');
+			$tplPath = $this->_getTplPathLayout('mailText.tpl');
 			$assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $text));
 			$text = $this->getRender()->renderTemplate($tplPath, $assign);
 		}
 		return array($subject, $html, $text);
+	}
+
+	/**
+	 * @param string $tplName
+	 * @throws CM_Exception_Invalid
+	 * @return string
+	 */
+	private function _getTplPathLayout($tplName) {
+		if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, false)) {
+			return $path;
+		}
+		throw new CM_Exception_Invalid('Cannot find layout template `' . $tplName . '`');
 	}
 }

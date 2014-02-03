@@ -2,8 +2,6 @@
 
 class CM_Model_Language extends CM_Model_Abstract {
 
-	const TYPE = 23;
-
 	/** @var CM_Model_Language|null $_backup */
 	private $_backup;
 
@@ -44,11 +42,12 @@ class CM_Model_Language extends CM_Model_Abstract {
 	public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
 		$key = (string) $key;
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-		if ($skipCacheLocal || false === ($translations = CM_CacheLocal::get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if ($skipCacheLocal || false === ($translations = $cache->get($cacheKey))) {
 			$translations = $this->getTranslations()->getAssociativeArray();
 
 			if (!$skipCacheLocal) {
-				CM_CacheLocal::set($cacheKey, $translations);
+				$cache->set($cacheKey, $translations);
 			}
 		}
 
@@ -147,7 +146,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
 	protected function _onChange() {
 		$cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
-		CM_CacheLocal::delete($cacheKey);
+		CM_Cache_Local::getInstance()->delete($cacheKey);
 	}
 
 	protected function _getContainingCacheables() {
@@ -157,12 +156,33 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $cacheables;
 	}
 
-	protected function _onDelete() {
-		CM_Db_Db::delete('cm_language', array('id' => $this->getId()));
+
+	protected function _onDeleteBefore() {
 		CM_Db_Db::delete('cm_languageValue', array('languageId' => $this->getId()));
 		CM_Db_Db::update('cm_language', array('backupId' => null), array('backupId' => $this->getId()));
 		CM_Db_Db::update('cm_user', array('languageId' => null), array('languageId' => $this->getId()));
+	}
+
+	protected function _onDelete() {
+		CM_Db_Db::delete('cm_language', array('id' => $this->getId()));
+	}
+
+	protected function _onDeleteAfter() {
 		self::changeAll();
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $abbreviation
+	 * @param bool $enabled
+	 * @return static
+	 */
+	public static function create($name, $abbreviation, $enabled) {
+		return CM_Model_Language::createStatic(array(
+			'name' => (string) $name,
+			'abbreviation' => (string) $abbreviation,
+			'enabled' => (bool) $enabled,
+		));
 	}
 
 	public static function changeAll() {
@@ -190,9 +210,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function findDefault() {
 		$cacheKey = CM_CacheConst::Language_Default;
-		if (false === ($languageId = CM_CacheLocal::get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($languageId = $cache->get($cacheKey))) {
 			$languageId = CM_Db_Db::select('cm_language', 'id', array('enabled' => true, 'backupId' => null))->fetchColumn();
-			CM_CacheLocal::set($cacheKey, $languageId);
+			$cache->set($cacheKey, $languageId);
 		}
 		if (!$languageId) {
 			return null;
@@ -219,9 +240,10 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 */
 	public static function getTree() {
 		$cacheKey = CM_CacheConst::Language_Tree;
-		if (false === ($tree = CM_CacheLocal::get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($tree = $cache->get($cacheKey))) {
 			$tree = new CM_Tree_Language();
-			CM_CacheLocal::set($cacheKey, $tree);
+			$cache->set($cacheKey, $tree);
 		}
 		return $tree;
 	}
@@ -336,8 +358,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 			$updateCount = 1;
 		}
 		CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
-		if ($updateCount > 10) {
-			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 10 times since release');
+		if ($updateCount > 50) {
+			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
 		}
 
 		CM_Db_Db::delete('cm_languageKey_variable', array('languageKeyId' => $languageKeyId));

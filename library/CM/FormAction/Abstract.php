@@ -35,6 +35,7 @@ abstract class CM_FormAction_Abstract {
 	 */
 	public function getFieldList() {
 		if (null === $this->_fieldList) {
+			$this->_fieldList = array();
 			foreach ($this->_form->getFields() as $fieldName => $field) {
 				$this->_fieldList[$fieldName] = in_array($fieldName, $this->_getRequiredFields());
 			}
@@ -54,7 +55,7 @@ abstract class CM_FormAction_Abstract {
 	 */
 	final public function js_presentation() {
 		$data = array();
-		$data['fields'] = $this->getFieldList();
+		$data['fields'] = (object) $this->getFieldList();
 
 		return json_encode($data);
 	}

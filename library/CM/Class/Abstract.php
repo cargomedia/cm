@@ -7,9 +7,10 @@ abstract class CM_Class_Abstract {
 
 	/**
 	 * @return int
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
 	 */
 	public function getType() {
-		return static::TYPE;
+		return static::getTypeStatic();
 	}
 
 	/**
@@ -47,10 +48,11 @@ abstract class CM_Class_Abstract {
 		if (null === self::$_classConfigCacheEnabled) {
 			self::$_classConfigCacheEnabled = CM_Config::get()->classConfigCacheEnabled;
 		}
-		$cacheKey = CM_CacheConst::Config . '_className:' . get_called_class();
-		if (!self::$_classConfigCacheEnabled || false === ($result = CM_CacheLocal::get($cacheKey))) {
+		$cacheKey = CM_CacheConst::ClassConfig . '_className:' . get_called_class();
+		$cache = new CM_Cache_Storage_Apc();
+		if (!self::$_classConfigCacheEnabled || false === ($result = $cache->get($cacheKey))) {
 			$result = self::_getConfigRaw();
-			CM_CacheLocal::set($cacheKey, $result);
+			$cache->set($cacheKey, $result);
 		}
 		return $result;
 	}
@@ -103,5 +105,17 @@ abstract class CM_Class_Abstract {
 	public static function getClassChildren($includeAbstracts = null) {
 		$className = get_called_class();
 		return CM_Util::getClassChildren($className, $includeAbstracts);
+	}
+
+
+	/**
+	 * @return int
+	 * @throws CM_Class_Exception_TypeNotConfiguredException
+	 */
+	public static function getTypeStatic() {
+		if (!isset(self::_getConfig()->type)) {
+			throw new CM_Class_Exception_TypeNotConfiguredException('Class `' . get_called_class() . '` has no type configured.');
+		}
+		return self::_getConfig()->type;
 	}
 }

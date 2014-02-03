@@ -2,8 +2,6 @@
 
 class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
-	CONST TYPE = 17;
-
 	/**
 	 * @return string
 	 */
@@ -151,7 +149,8 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 	 */
 	protected function _getAggregationData($refreshCache = null) {
 		$cacheKey = $this->_getCacheKeyAggregation();
-		if ($refreshCache || false === ($aggregationData = CM_CacheLocal::get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if ($refreshCache || false === ($aggregationData = $cache->get($cacheKey))) {
 			$conversionData = CM_Db_Db::execRead('SELECT COUNT(1) as `conversionCount`, SUM(`conversionWeight`) as `conversionWeight` FROM `cm_splittestVariation_fixture`
 				WHERE `splittestId`=? AND `variationId`=? AND `conversionStamp` IS NOT NULL',
 				array($this->_getSplittestId(), $this->getId()))->fetch();
@@ -163,7 +162,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 				'conversionWeight' => (float) $conversionData['conversionWeight'],
 				'fixtureCount'     => $fixtureCount,
 			);
-			CM_CacheLocal::set($cacheKey, $aggregationData, 30);
+			$cache->set($cacheKey, $aggregationData, 30);
 		}
 		return $aggregationData;
 	}

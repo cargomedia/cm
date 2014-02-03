@@ -14,7 +14,7 @@ class CM_Model_Schema_Definition {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return mixed
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
@@ -48,12 +48,20 @@ class CM_Model_Schema_Definition {
 							$value = $value->getTimestamp();
 							break;
 						default:
+							if (!(class_exists($type) && is_subclass_of($type, 'CM_Model_Abstract'))) {
+								throw new CM_Model_Exception_Validation('Field `' . $key . '` is not a valid model');
+							}
+							if (!$value instanceof $type) {
+								throw new CM_Model_Exception_Validation(
+									'Value `' . CM_Util::var_line($value) . '` is not an instance of `' . $type . '`');
+							}
 							/** @var CM_Model_Abstract $value */
 							$id = $value->getIdRaw();
 							if (count($id) == 1) {
-								$id = reset($id);
+								$value = $value->getId();
+							} else {
+								$value = CM_Params::encode($id, true);
 							}
-							$value = CM_Params::encode($id, true);
 					}
 				}
 			}
@@ -63,7 +71,7 @@ class CM_Model_Schema_Definition {
 
 	/**
 	 * @param string $key
-	 * @param mixed $value
+	 * @param mixed  $value
 	 * @return mixed
 	 * @throws CM_Exception_Invalid
 	 * @throws CM_Model_Exception_Validation
@@ -100,7 +108,7 @@ class CM_Model_Schema_Definition {
 							if (!is_array($id)) {
 								$id = array('id' => $id);
 							}
-							$value = CM_Model_Abstract::factoryGeneric($type::TYPE, $id);
+							$value = CM_Model_Abstract::factoryGeneric($type::getTypeStatic(), $id);
 					}
 				}
 			}
@@ -123,7 +131,7 @@ class CM_Model_Schema_Definition {
 		if (is_array($key)) {
 			return count(array_intersect($key, array_keys($this->_schema))) > 0;
 		}
-		return array_key_exists($key, $this->_schema);
+		return isset($this->_schema[$key]);
 	}
 
 	/**
@@ -258,5 +266,4 @@ class CM_Model_Schema_Definition {
 	protected function _isString($value) {
 		return is_string($value);
 	}
-
 }

@@ -1,7 +1,6 @@
 <?php
 
 class CM_Model_Splitfeature extends CM_Model_Abstract {
-	CONST TYPE = 28;
 
 	/** @var bool */
 	private $_withoutPersistence;
@@ -11,7 +10,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function __construct($name) {
 		$this->_withoutPersistence = !empty(self::_getConfig()->withoutPersistence);
-		$this->_construct(array('name' => (string) $name));
+		$this->_construct(array('name' => $name));
 	}
 
 	/**
@@ -55,11 +54,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 	 */
 	public function getEnabled(CM_Model_User $user) {
 		if ($this->_withoutPersistence) {
-			return true;
+			return false;
 		}
 		$cacheKey = CM_CacheConst::SplitFeature_Fixtures . '_userId:' . $user->getId();
 		$cacheWrite = false;
-		if (($fixtures = CM_CacheLocal::get($cacheKey)) === false) {
+		$cache = CM_Cache_Local::getInstance();
+		if (($fixtures = $cache->get($cacheKey)) === false) {
 			$fixtures = CM_Db_Db::select('cm_splitfeature_fixture', array('splitfeatureId', 'fixtureId'), array('userId' => $user->getId()))->fetchAllTree();
 			$cacheWrite = true;
 		}
@@ -71,7 +71,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		}
 
 		if ($cacheWrite) {
-			CM_CacheLocal::set($cacheKey, $fixtures);
+			$cache->set($cacheKey, $fixtures);
 		}
 
 		return $this->_calculateEnabled($fixtures[$this->getId()]);
@@ -104,9 +104,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		return $data;
 	}
 
+	protected function _onDeleteBefore() {
+		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
+	}
+
 	protected function _onDelete() {
 		CM_Db_Db::delete('cm_splitfeature', array('id' => $this->getId()));
-		CM_Db_Db::delete('cm_splitfeature_fixture', array('splitfeatureId' => $this->getId()));
 	}
 
 	protected static function _createStatic(array $data) {

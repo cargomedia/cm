@@ -19,6 +19,17 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 		var allowedExtensionsRegexp = _.isEmpty(allowedExtensions) ? null : new RegExp('\.(' + allowedExtensions.join('|') + ')$', 'i');
 		var inProgressCount = 0;
 
+		if (!Modernizr.fileinput) {
+			$input.prop('disabled', true);
+			field.$('.uploadButton').addClass('disabled');
+			field.$('.notSupported').show();
+		}
+
+		// remove attr multiple on iPhone, iPod, iPad to allow upload photos via camera
+		if (navigator.userAgent.match(/iP(ad|hone|od)/i)) {
+			$input.removeAttr('multiple');
+		}
+
 		$input.fileupload({
 			dataType: 'json',
 			url: cm.getUrl('/upload/' + cm.getSiteId() + '/', {'field': field.getClass()}),
@@ -68,7 +79,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			always: function(e, data) {
 				inProgressCount--;
 				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
-					field.trigger("uploadComplete");
+					field.trigger("uploadComplete", data.files);
 				}
 			}
 		});

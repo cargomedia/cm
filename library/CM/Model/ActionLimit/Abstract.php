@@ -23,6 +23,11 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	abstract public function overshoot(CM_Action_Abstract $action, $role, $first);
 
 	/**
+	 * @return boolean
+	 */
+	abstract public function getOvershootAllowed();
+
+	/**
 	 * @return int
 	 */
 	public function getActionType() {
@@ -149,7 +154,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	 */
 	public static function getAll($type = null) {
 		if (!$type) {
-			$type = static::TYPE;
+			$type = static::getTypeStatic();
 		}
 		return new CM_Paging_ActionLimit_All($type);
 	}

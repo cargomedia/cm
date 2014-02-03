@@ -147,15 +147,17 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		}
 		var data = this.getData(actionName);
 
-		this.resetErrors();
+		var errorList = {};
+		_.each(this._fields, function(field, fieldName) {
+			errorList[fieldName] = null;
+		});
 
 		var hasErrors = false;
 		_.each(_.keys(action.fields).reverse(), function(fieldName) {
 			var required = action.fields[fieldName];
-			if (required && _.isEmpty(data[fieldName])) {
-				var field = this.getField(fieldName);
+			var field = this.getField(fieldName);
+			if (required && field.isEmpty(data[fieldName])) {
 				var label;
-				var errorMessage = cm.language.get('Required');
 				var $textInput = field.$('input, textarea');
 				var $labels = $('label[for="' + field.getAutoId() + '-input"]');
 				if ($labels.length) {
@@ -164,12 +166,16 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 					label = $textInput.attr('placeholder');
 				}
 				if (label) {
-					errorMessage = cm.language.get('{$label} is required.', {label: label});
+					errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+				} else {
+					errorList[fieldName] = cm.language.get('Required')
 				}
-				field.error(errorMessage);
 				hasErrors = true;
 			}
 		}, this);
+
+		this.setErrors(errorList);
+
 		if (hasErrors) {
 			return false;
 		}
@@ -242,5 +248,14 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 		_.each(this._fields, function(field) {
 			field.error(null);
 		});
+	},
+
+	/**
+	 * @param {Object} errorList
+	 */
+	setErrors: function(errorList) {
+		_.each(errorList, function(error, fieldName) {
+			this.getField(fieldName).error(error);
+		}, this);
 	}
 });

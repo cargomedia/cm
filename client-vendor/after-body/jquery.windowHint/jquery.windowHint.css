@@ -9,7 +9,12 @@
 
 #windowHint .windowHint-content {
 	display: inline-block;
-	background-color: black;
-	color: white;
+	padding: 2px 15px;
 	text-align: left;
+	border: 1px solid #d7d7d7;
+	border-top: 0;
+	border-radius: 0 0 3px 3px;
+	background-color: #f1f1f1;
+	color: #333;
+	font-size: 1.1rem;
 }

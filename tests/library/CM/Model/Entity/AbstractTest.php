@@ -49,7 +49,7 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 		} catch (CM_Exception_Nonexistent $ex) {
 			$this->assertTrue(true);
 		}
-		$this->assertNull($entityMock->getUser(true));
+		$this->assertNull($entityMock->getUserIfExists());
 	}
 
 	public function testIsOwner() {
@@ -85,6 +85,14 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
 	const TYPE = 1;
+
+	public function getType() {
+		return self::TYPE;
+	}
+
+	public static function getTypeStatic() {
+		return self::TYPE;
+	}
 
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;

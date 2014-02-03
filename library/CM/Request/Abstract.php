@@ -25,6 +25,11 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @var array
 	 */
+	protected $_server = array();
+
+	/**
+	 * @var array
+	 */
 	protected $_cookies;
 
 	/**
@@ -60,14 +65,16 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @param string             $uri
 	 * @param array|null         $headers OPTIONAL
+	 * @param array|null         $server
 	 * @param CM_Model_User|null $viewer
-	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
-		if (is_null($headers)) {
-			$headers = array();
+	public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
+		if (null !== $headers) {
+			$this->_headers = array_change_key_case($headers);
 		}
-		$this->_headers = array_change_key_case($headers);
+		if (null !== $server) {
+			$this->_server = array_change_key_case($server);
+		}
 
 		$this->setUri($uri);
 
@@ -82,6 +89,13 @@ abstract class CM_Request_Abstract {
 		}
 
 		self::$_instance = $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getServer() {
+		return $this->_server;
 	}
 
 	/**
@@ -116,6 +130,16 @@ abstract class CM_Request_Abstract {
 			throw new CM_Exception_Invalid('Header `' . $name . '` not set.');
 		}
 		return (string) $this->_headers[$name];
+	}
+
+	/**
+	 * @return string
+	 * @throws CM_Exception_Invalid
+	 */
+	public function getHost() {
+		$hostHeader = $this->getHeader('host');
+		$host = preg_replace('#:\d+$#', '', $hostHeader);
+		return $host;
 	}
 
 	/**
@@ -353,14 +377,10 @@ abstract class CM_Request_Abstract {
 	 * @return string|null    very long number (string used)
 	 */
 	public function getIp() {
-		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
-			$ip = CM_Config::get()->testIp;
-		} else {
-			if (!isset($_SERVER['REMOTE_ADDR'])) {
-				return null;
-			}
-			$ip = $_SERVER['REMOTE_ADDR'];
+		if (!isset($this->_server['remote_addr'])) {
+			return null;
 		}
+		$ip = $this->_server['remote_addr'];
 		$long = sprintf('%u', ip2long($ip));
 		if (0 == $long) {
 			return null;
@@ -466,11 +486,11 @@ abstract class CM_Request_Abstract {
 	private function _isValidClientId($clientId) {
 		$clientId = (int) $clientId;
 		$cacheKey = CM_CacheConst::Request_Client . '_id:' . $clientId;
-
-		if (false === ($isValid = CM_CacheLocal::get($cacheKey))) {
+		$cache = CM_Cache_Local::getInstance();
+		if (false === ($isValid = $cache->get($cacheKey))) {
 			$isValid = (bool) CM_Db_Db::count('cm_requestClient', array('id' => $clientId));
 			if ($isValid) {
-				CM_CacheLocal::set($cacheKey, true);
+				$cache->set($cacheKey, true);
 			}
 		}
 
@@ -514,26 +534,27 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param string      $method
-	 * @param string      $uri
-	 * @param array|null  $headers
+	 * @param string $method
+	 * @param string $uri
+	 * @param array|null $headers
+	 * @param array|null $server
 	 * @param string|null $body
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Abstract
 	 */
-	public static function factory($method, $uri, array $headers = null, $body = null) {
+	public static function factory($method, $uri, array $headers = null, array $server = null, $body = null) {
 		$method = strtolower($method);
 		if ($method === 'post') {
-			return new CM_Request_Post($uri, $headers, $body);
+			return new CM_Request_Post($uri, $headers, $server, $body);
 		}
 		if ($method === 'get') {
-			return new CM_Request_Get($uri, $headers);
+			return new CM_Request_Get($uri, $headers, $server);
 		}
 		if ($method === 'head') {
-			return new CM_Request_Head($uri, $headers);
+			return new CM_Request_Head($uri, $headers, $server);
 		}
 		if ($method === 'options') {
-			return new CM_Request_Options($uri, $headers);
+			return new CM_Request_Options($uri, $headers, $server);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}
@@ -544,8 +565,24 @@ abstract class CM_Request_Abstract {
 	public static function factoryFromGlobals() {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$uri = $_SERVER['REQUEST_URI'];
-		$headers = getallheaders();
 		$body = file_get_contents('php://input');
-		return self::factory($method, $uri, $headers, $body);
+		$server = $_SERVER;
+
+		if (function_exists('getallheaders')) {
+			$headers = getallheaders();
+		} else {
+			$headers = array();
+			foreach ($_SERVER as $name => $value) {
+				if (substr($name, 0, 5) == 'HTTP_') {
+					$headers[strtolower(str_replace('_', '-', substr($name, 5)))] = $value;
+				} elseif ($name == 'CONTENT_TYPE') {
+					$headers['content-type'] = $value;
+				} elseif ($name == 'CONTENT_LENGTH') {
+					$headers['content-length'] = $value;
+				}
+			}
+		}
+
+		return self::factory($method, $uri, $headers, $server, $body);
 	}
 }

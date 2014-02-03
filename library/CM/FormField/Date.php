@@ -3,34 +3,31 @@
 class CM_FormField_Date extends CM_FormField_Abstract {
 
 	/** @var int */
-	protected $_yearMin;
+	protected $_yearFirst;
 
 	/** @var int */
-	protected $_yearMax;
+	protected $_yearLast;
 
 	/**
-	 * @param int|null $yearMin
-	 * @param int|null $yearMax
+	 * @param int|null $yearFirst
+	 * @param int|null $yearLast
 	 */
-	public function __construct($yearMin = null, $yearMax = null) {
-		if (null === $yearMin) {
-			$yearMin = date('Y') - 100;
+	public function __construct($yearFirst = null, $yearLast = null) {
+		if (null === $yearFirst) {
+			$yearFirst = date('Y') - 100;
 		}
-		$this->_yearMin = (int) $yearMin;
+		$this->_yearFirst = (int) $yearFirst;
 
-		if (null === $yearMax) {
-			$yearMax = date('Y');
+		if (null === $yearLast) {
+			$yearLast = date('Y');
 		}
-		$this->_yearMax = (int) $yearMax;
+		$this->_yearLast = (int) $yearLast;
 	}
 
 	public function validate($userInput, CM_Response_Abstract $response) {
-		if (empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year'])) {
-			throw new CM_Exception_FormFieldValidation("day, month or year not set");
-		}
-		$dd = trim($userInput['day']);
-		$mm = trim($userInput['month']);
-		$yy = trim($userInput['year']);
+		$dd = (int) trim($userInput['day']);
+		$mm = (int) trim($userInput['month']);
+		$yy = (int) trim($userInput['year']);
 
 		return new DateTime($yy . '-' . $mm . '-' . $dd);
 	}
@@ -38,16 +35,21 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 	public function prepare(array $params) {
 		$this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
 
+		$years = range($this->_yearFirst, $this->_yearLast);
+		$months = range(1, 12);
+		$days = range(1, 31);
+
+		$this->setTplParam('years', array_combine($years, $years));
+		$this->setTplParam('months', array_combine($months, $months));
+		$this->setTplParam('days', array_combine($days, $days));
+
 		$value = $this->getValue();
 		$this->setTplParam('yy', $value ? $value->format('Y') : null);
-		$this->setTplParam('mm', $value ? $value->format('m') : null);
-		$this->setTplParam('dd', $value ? $value->format('d') : null);
-
-		$this->setTplParam('minYear', $this->_yearMin);
-		$this->setTplParam('maxYear', $this->_yearMax);
+		$this->setTplParam('mm', $value ? $value->format('n') : null);
+		$this->setTplParam('dd', $value ? $value->format('j') : null);
 	}
 
 	public function isEmpty($userInput) {
-		return empty($userInput['day']) && empty($userInput['month']) && empty($userInput['year']);
+		return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
 	}
 }

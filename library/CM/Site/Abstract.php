@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
+abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
 
 	protected $_themes = array();
 	protected $_namespaces = array();
@@ -14,6 +14,17 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
 	 */
 	public function __construct() {
 		$this->_setNamespace('CM');
+	}
+
+	/**
+	 * @return CM_Site_Abstract[]
+	 */
+	public static function getAll() {
+		$siteList = array();
+		foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
+			$siteList[] = new $siteClassName();
+		}
+		return $siteList;
 	}
 
 	/**

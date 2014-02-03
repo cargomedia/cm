@@ -35,6 +35,20 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		}
 	}
 
+	public function testNoUser() {
+		/** @var CM_Model_StreamChannel_Video $streamChannel */
+		$streamChannel = CMTest_TH::createStreamChannel();
+		$user = CMTest_TH::createUser();
+		$streamPublish = CMTest_TH::createStreamPublish($user, $streamChannel);
+		$streamPublish->unsetUser();
+
+		/** @var CM_Model_StreamChannelArchive_Video $archive */
+		$archive = CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
+
+		$this->assertNull($archive->getUser());
+		$this->assertNull($archive->getUserId());
+	}
+
 	public function testGetUser() {
 		$user = CMTest_TH::createUser();
 		$streamChannel = CMTest_TH::createStreamChannel();
@@ -49,7 +63,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		$archive = CMTest_TH::createStreamChannelVideoArchive();
 		$videoFile = $archive->getVideo();
 		$this->assertSame('streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() .
-		'-original.mp4', $videoFile->getPathRelative());
+				'-original.mp4', $videoFile->getPathRelative());
 	}
 
 	public function testGetThumbnails() {
@@ -131,7 +145,7 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 		foreach ($filesDeleted as $file) {
 			$this->assertFileExists($file->getPath());
 		}
-		CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::TYPE);
+		CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
 		foreach ($filesNotDeleted as $file) {
 			$this->assertFileExists($file->getPath());
 		}
@@ -161,8 +175,9 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
 	 * @return CM_File[]
 	 */
 	private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
-		$thumbPath = DIR_USERFILES . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR . $archive->getId() . '-' .
-				$archive->getHash() . '-thumbs';
+		$thumbPath =
+				CM_Bootloader::getInstance()->getDirUserfiles() . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR .
+				$archive->getId() . '-' . $archive->getHash() . '-thumbs';
 		CM_Util::mkDir($thumbPath);
 		$files = array();
 		for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {

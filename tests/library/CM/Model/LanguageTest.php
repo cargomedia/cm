@@ -134,8 +134,10 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		CM_Model_Language::deleteKey($key);
 		$this->assertSame(array(), $this->_language->getTranslations()->getAssociativeArray());
 		$this->assertSame(0, CM_Db_Db::count('cm_languageKey', array('name' => $key)));
-		$this->assertSame(0, CM_Db_Db::count('cm_languageValue', array('languageKeyId' => $languageKeyId,
-																		 'languageId'    => $this->_language->getId())));
+		$this->assertSame(0, CM_Db_Db::count('cm_languageValue', array(
+			'languageKeyId' => $languageKeyId,
+			'languageId'    => $this->_language->getId(),
+		)));
 	}
 
 	public function testUnsetTranslation() {
@@ -182,14 +184,14 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 		$this->_language->setData($this->_language->getName(), $this->_language->getAbbreviation(), false);
 		$this->assertEquals($this->_language, CM_Model_Language::findDefault());
 
-		CM_CacheLocal::flush();
+		CM_Cache_Local::getInstance()->flush();
 		$this->assertNull(CM_Model_Language::findDefault());
 	}
 
 	public function testGetTranslationWithDifferentVariableNamesLoop() {
 		$this->_language->getTranslation('sameKey', array('oneVariable'), true);
 		try {
-			for ($i = 0; $i < 5; $i++) {
+			for ($i = 0; $i < 25; $i++) {
 				$this->_language->getTranslation('sameKey', array('oneVariable', 'secondOne'), true);
 				$this->_language->getTranslation('sameKey', array('oneVariable'), true);
 			}

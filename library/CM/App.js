@@ -293,10 +293,12 @@ var CM_App = CM_Class_Abstract.extend({
 			$dom.find('.timeago').timeago();
 			$dom.find('textarea.autosize, .autosize textarea').autosize();
 			$dom.find('.clipSlide').clipSlide();
+			$dom.find('.scrollShadow').scrollShadow();
 			$dom.find('.showTooltip[title]').tooltip();
 			$dom.find('.toggleNext').toggleNext();
 			$dom.find('.tabs').tabs();
 			$dom.find('.openx-ad').openx();
+			$dom.find('.fancySelect').fancySelect();
 		},
 		/**
 		 * @param {jQuery} $element
@@ -471,28 +473,22 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} [context]
 		 */
 		confirm: function(question, callback, context) {
-			if (Modernizr.touch) {
-				if (window.confirm(question)) {
-					callback.call(context);
-				}
-			} else {
-				var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
-				var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
-				var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
-				$html.find('.box-header h2').text(cm.language.get('Confirmation'));
-				$html.find('.box-body').text(question);
-				$html.find('.box-footer').append($ok, $cancel);
+			var $ok = $('<input type="button" class="button button-default" />').val(cm.language.get('Ok'));
+			var $cancel = $('<input type="button" class="button button-default" />').val(cm.language.get('Cancel'));
+			var $html = $('<div class="box"><div class="box-header nowrap"><h2></h2></div><div class="box-body"></div><div class="box-footer"></div></div>');
+			$html.find('.box-header h2').text(cm.language.get('Confirmation'));
+			$html.find('.box-body').text(question);
+			$html.find('.box-footer').append($ok, $cancel);
 
-				$html.floatOut();
-				$ok.click(function() {
-					$html.floatIn();
-					callback.call(context);
-				});
-				$cancel.click(function() {
-					$html.floatIn();
-				});
-				$ok.focus();
-			}
+			$html.floatOut();
+			$ok.click(function() {
+				$html.floatIn();
+				callback.call(context);
+			});
+			$cancel.click(function() {
+				$html.floatIn();
+			});
+			$ok.focus();
 		}
 	},
 
@@ -694,7 +690,11 @@ var CM_App = CM_Class_Abstract.extend({
 		 * @param {Object} value
 		 */
 		set: function(key, value) {
-			localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			try {
+				localStorage.setItem(cm.getSiteId() + ':' + key, JSON.stringify(value));
+			} catch (e) {
+				// iOS5 Private Browsing mode which throws QUOTA_EXCEEDED_ERR: DOM Exception 22
+			}
 		},
 
 		/**
@@ -730,13 +730,14 @@ var CM_App = CM_Class_Abstract.extend({
 				cm.error.trigger(msg, type, isPublic);
 			}
 		};
-		return $.ajax(url, {
+		var jqXHR = $.ajax(url, {
 			data: JSON.stringify(data),
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
-			cache: false,
-			success: function(response) {
+			cache: false
+		});
+		jqXHR.retry({times: 3, statusCodes: [405, 500, 503, 504]}).done(function(response) {
 				if (response.error) {
 					errorHandler(response.error.msg, response.error.type, response.error.isPublic, callbacks.error);
 				} else if (response.success) {
@@ -744,20 +745,23 @@ var CM_App = CM_Class_Abstract.extend({
 						callbacks.success(response.success);
 					}
 				}
-			},
-			error: function(xhr, textStatus) {
+			}).fail(function(xhr, textStatus) {
 				if (xhr.status == 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
-				var msg = xhr.responseText || textStatus;
-				errorHandler(msg, 'XHR', false, callbacks.error);
-			},
-			complete: function() {
+
+				var msg = cm.language.get('An unexpected connection problem occurred.');
+				if (cm.options.debug) {
+					msg = xhr.responseText || textStatus;
+				}
+				errorHandler(msg, null, false, callbacks.error);
+			}).always(function() {
 				if (callbacks.complete) {
 					callbacks.complete();
 				}
-			}
-		});
+			});
+
+		return jqXHR;
 	},
 
 	/**
@@ -843,12 +847,12 @@ var CM_App = CM_Class_Abstract.extend({
 		},
 
 		/**
-		 * @param {String} namespace
+		 * @param {String} [namespace]
 		 * @param {Boolean} [allowClientMessage]
 		 */
 		_getEventNames: function(namespace, allowClientMessage) {
 			var eventName = namespace;
-			if (allowClientMessage) {
+			if (namespace && allowClientMessage) {
 				eventName += ' client-' + namespace;
 			}
 			return eventName;

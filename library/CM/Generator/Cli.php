@@ -66,7 +66,7 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	public function createJavascriptFiles() {
-		$viewClasses = CM_View_Abstract::getClassChildren();
+		$viewClasses = CM_View_Abstract::getClassChildren(true);
 		foreach ($viewClasses as $path => $className) {
 			if ($this->_isValidJavascriptView($className)) {
 				$jsPath = preg_replace('/\.php$/', '.js', $path);
@@ -97,8 +97,8 @@ class CM_Generator_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	private function _createNamespaceDirectories($namespace) {
 		$paths = array();
-		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/library/' . $namespace;
-		$paths[] = DIR_ROOT . DIR_LIBRARY . $namespace . '/layout/default';
+		$paths[] = DIR_ROOT . 'library/' . $namespace . '/library/' . $namespace;
+		$paths[] = DIR_ROOT . 'library/' . $namespace . '/layout/default';
 		foreach ($paths as $path) {
 			CM_Util::mkDir($path);
 			$this->_getOutput()->writeln('Created `' . $path . '`');

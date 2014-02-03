@@ -2,11 +2,20 @@
 
 class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
+	/** CM_Clockwork_Manager */
+	protected $_clockworkManager;
+
+	public function start() {
+		$this->_clockworkManager = new CM_Clockwork_Manager();
+		$this->_registerCallbacks();
+		$this->_clockworkManager->start();
+	}
+
 	/**
 	 * @synchronized
 	 */
-	public function common() {
-		$this->_executeCallbacks(array(
+	protected function _registerCallbacks() {
+		$this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
 			'CM_Model_User::offlineOld' => function () {
 				CM_Model_User::offlineOld();
 			},
@@ -46,14 +55,8 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Stream_Message::synchronize' => function () {
 				CM_Stream_Message::getInstance()->synchronize();
 			}
-		), 'common');
-	}
-
-	/**
-	 * @synchronized
-	 */
-	public function heavy() {
-		$this->_executeCallbacks(array(
+		));
+		$this->_registerClockworkCallbacks(new DateInterval('PT15M'), array(
 			'CM_Mail::processQueue' => function () {
 				CM_Mail::processQueue(500);
 			},
@@ -63,7 +66,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 			'CM_Paging_Log_Abstract::deleteOlder' => function () {
 				CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
 			}
-		), 'heavy');
+		));
 	}
 
 	public static function getPackageName() {
@@ -71,18 +74,21 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 	}
 
 	/**
-	 * @param Closure[] $callbacks
-	 * @param string    $functionName
+	 * @param DateInterval  $interval
+	 * @param Closure[]     $callbacks
 	 */
-	protected function _executeCallbacks($callbacks, $functionName) {
+	protected function _registerClockworkCallbacks(DateInterval $interval, $callbacks) {
 		foreach ($callbacks as $name => $callback) {
-			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $this->getPackageName() . ' ' . $functionName . ': ' . $name);
-			try {
-				$callback();
-			} catch (CM_Exception $e) {
-				CM_Bootloader::getInstance()->handleException($e);
-			}
-			CMService_Newrelic::getInstance()->endTransaction();
+			$transactionName = 'cm.php ' . static::getPackageName() . ' start: ' . $name;
+			$this->_clockworkManager->registerCallback($interval, function () use ($transactionName, $callback) {
+				CMService_Newrelic::getInstance()->startTransaction($transactionName);
+				try {
+					$callback();
+				} catch (CM_Exception $e) {
+					CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
+				}
+				CMService_Newrelic::getInstance()->endTransaction();
+			});
 		}
 	}
 }

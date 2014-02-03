@@ -2,56 +2,48 @@
 
 class CMTest_TH {
 
+	private static $_timeStart;
 	private static $timeDelta = 0;
-	private static $initialized = false;
 	private static $_configBackup;
 
 	/** @var CM_Db_Client|null */
 	private static $_dbClient = null;
 
 	public static function init() {
-		if (self::$initialized) {
-			return;
-		}
 		$forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
 		CM_App::getInstance()->setupDatabase($forceReload);
 
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
-		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
-
-		self::$initialized = true;
 	}
 
 	public static function clearEnv() {
+		CM_App::getInstance()->setupFilesystem();
 		self::clearDb();
 		self::clearCache();
 		self::timeReset();
-		self::clearTmp();
 		self::clearConfig();
 	}
 
 	public static function clearCache() {
-		CM_Cache::flush();
-		CM_CacheLocal::flush();
+		CM_Cache_Shared::getInstance()->flush();
+		CM_Cache_Local::getInstance()->flush();
 	}
 
 	public static function clearDb() {
 		$alltables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
+		CM_Db_Db::exec('SET foreign_key_checks = 0;');
 		foreach ($alltables as $table) {
 			CM_Db_Db::delete($table);
 		}
+		CM_Db_Db::exec('SET foreign_key_checks = 1;');
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
-	}
-
-	public static function clearTmp() {
-		CM_App::getInstance()->resetTmp();
 	}
 
 	public static function clearConfig() {
@@ -59,12 +51,12 @@ class CMTest_TH {
 	}
 
 	public static function timeInit() {
-		runkit_function_copy('time', 'time_original');
+		self::$_timeStart = time();
 		runkit_function_redefine('time', '', 'return CMTest_TH::time();');
 	}
 
 	public static function time() {
-		return time_original() + self::$timeDelta;
+		return self::$_timeStart + self::$timeDelta;
 	}
 
 	public static function timeForward($sec) {
@@ -141,15 +133,15 @@ class CMTest_TH {
 	 */
 	public static function createStreamChannel($type = null, $adapterType = null) {
 		if (null === $type) {
-			$type = CM_Model_StreamChannel_Video::TYPE;
+			$type = CM_Model_StreamChannel_Video::getTypeStatic();
 		}
 
 		if (null === $adapterType) {
-			$adapterType = CM_Stream_Adapter_Video_Wowza::TYPE;
+			$adapterType = CM_Stream_Adapter_Video_Wowza::getTypeStatic();
 		}
 
 		$data = array('key' => rand(1, 10000) . '_' . rand(1, 100));
-		if (CM_Model_StreamChannel_Video::TYPE == $type) {
+		if (CM_Model_StreamChannel_Video::getTypeStatic() == $type) {
 			$data['width'] = 480;
 			$data['height'] = 720;
 			$data['serverId'] = 1;
@@ -188,8 +180,11 @@ class CMTest_TH {
 		if (is_null($streamChannel)) {
 			$streamChannel = self::createStreamChannel();
 		}
-		return CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													 'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+		return CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $user, 'start' => time(),
+			'key'           => rand(1, 10000) . '_' . rand(1, 100),
+		));
 	}
 
 	/**
@@ -202,7 +197,7 @@ class CMTest_TH {
 			$streamChannel = self::createStreamChannel();
 		}
 		return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
-													   'allowedUntil'  => time() + 100, 'key' => rand(1, 10000) . '_' . rand(1, 100)));
+															 'key'           => rand(1, 10000) . '_' . rand(1, 100)));
 	}
 
 	/**
@@ -216,7 +211,7 @@ class CMTest_TH {
 			$site = CM_Site_Abstract::factory();
 			$headers = array('host' => $site->getHost());
 		}
-		$request = new CM_Request_Get($uri, $headers, $viewer);
+		$request = new CM_Request_Get($uri, $headers, null, $viewer);
 		return new CM_Response_Page($request);
 	}
 

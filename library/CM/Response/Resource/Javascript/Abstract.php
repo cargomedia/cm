@@ -12,7 +12,7 @@ abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Reso
 	 * @param CM_Asset_Javascript_Abstract $resource
 	 */
 	protected function _setAsset(CM_Asset_Javascript_Abstract $resource) {
-		$transform = !$this->getRender()->isDebug();
+		$transform = !CM_Bootloader::getInstance()->isDebug();
 		$this->_setContent($resource->get($transform));
 	}
 }

@@ -30,21 +30,29 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	public function setMode($mode, $maxLength = null, $isMail = null, $skipAnchors = null) {
-		$acceptedModes = array('oneline', 'simple', 'markdown', 'markdownPlain');
+		$acceptedModes = array('escape', 'oneline', 'simple', 'markdown', 'markdownPlain');
 		if (!in_array($mode, $acceptedModes)) {
 			throw new CM_Exception_Invalid('Invalid mode `' . $mode . '`');
 		}
 		$mode = (string) $mode;
 		$this->_clearFilters();
+		$emoticonFixedHeight = null;
+		if ($isMail) {
+			$emoticonFixedHeight = 16;
+		}
 		$this->addFilter(new CM_Usertext_Filter_Badwords());
 		$this->addFilter(new CM_Usertext_Filter_Escape());
 		switch ($mode) {
+			case 'escape':
+				break;
 			case 'oneline':
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+				$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 				break;
 			case 'simple':
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
 				$this->addFilter(new CM_Usertext_Filter_NewlineToLinebreak(3));
+				$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 				break;
 			case 'markdown':
 				if (null !== $maxLength) {
@@ -54,6 +62,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 				$this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
 				$this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
+				$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 				break;
 			case 'markdownPlain':
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
@@ -61,14 +70,9 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 				$this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
 				$this->addFilter(new CM_Usertext_Filter_Striptags());
 				$this->addFilter(new CM_Usertext_Filter_MaxLength($maxLength));
+				$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 				break;
 		}
-
-		$emoticonFixedHeight = null;
-		if ($isMail) {
-			$emoticonFixedHeight = 16;
-		}
-		$this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
 
 		if ('markdownPlain' != $mode) {
 			$this->addFilter(new CM_Usertext_Filter_CutWhitespace());
@@ -81,15 +85,16 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
 	 */
 	public function transform($text) {
 		$cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+		$cache = CM_Cache_Local::getInstance();
 		if (0 !== count($this->_getFilters())) {
-			$cacheKey .= '_filter:' . call_user_func_array('CM_Cache_Abstract::key', $this->_getFilters());
+			$cacheKey .= '_filter:' . call_user_func_array(array($cache, 'key'), $this->_getFilters());
 		}
-		if (($result = CM_CacheLocal::get($cacheKey)) === false) {
+		if (($result = $cache->get($cacheKey)) === false) {
 			$result = $text;
 			foreach ($this->_getFilters() as $filter) {
 				$result = $filter->transform($result, $this->_render);
 			}
-			CM_CacheLocal::set($cacheKey, $result);
+			$cache->set($cacheKey, $result);
 		}
 		return $result;
 	}

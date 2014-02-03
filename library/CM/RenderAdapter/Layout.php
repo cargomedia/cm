@@ -21,7 +21,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		$options['urlUserContent'] = $this->getRender()->getUrlUserContent();
 		$options['urlResource'] = $this->getRender()->getUrlResource();
 		$options['language'] = $this->getRender()->getLanguage();
-		$options['debug'] = $this->getRender()->isDebug();
+		$options['debug'] = CM_Bootloader::getInstance()->isDebug();
 		$options['stream'] = array();
 		$options['stream']['enabled'] = CM_Stream_Message::getInstance()->getEnabled();
 		if (CM_Stream_Message::getInstance()->getEnabled()) {
@@ -30,7 +30,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 		}
 		if ($viewer = $this->getRender()->getViewer()) {
 			$options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
-			$options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::TYPE;
+			$options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();
 		}
 		$js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
 

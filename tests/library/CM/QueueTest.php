@@ -3,7 +3,7 @@
 class CM_QueueTest extends CMTest_TestCase {
 
 	public function tearDown() {
-		CM_Cache_Redis::flush();
+		CM_Redis_Client::getInstance()->flush();
 	}
 
 	public function testConstructor() {
@@ -57,5 +57,4 @@ class CM_QueueTest extends CMTest_TestCase {
 		$this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
 		$this->assertSame(array(), $queue->pop($timeStamp3));
 	}
-
 }
