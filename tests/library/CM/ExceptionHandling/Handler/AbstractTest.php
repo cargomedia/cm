@@ -15,18 +15,18 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testLogExceptionFileLog() {
-		$errorLog = DIR_DATA_LOG . 'error.log';
-
+		$errorLog = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$log = $this->getMockBuilder('CM_Paging_Log_Error')->setMethods(array('add'))->disableOriginalConstructor()->getMock();
 		$log->expects($this->any())->method('add')->will($this->throwException(new Exception('foo')));
 
 		$exception = $this->getMockBuilder('CM_Exception')->setMethods(array('getLog'))->disableOriginalConstructor()->getMock();
 		$exception->expects($this->any())->method('getLog')->will($this->returnValue($log));
 
-		$this->assertFileNotExists($errorLog);
-
 		$method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', '_logException');
-		$exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->getMockForAbstractClass();
+		$exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->setMethods(array('_getLogPath'))->getMockForAbstractClass();
+		$exceptionHandler->expects($this->any())->method('_getLogPath')->will($this->returnValue($errorLog));
+
+		$this->assertFileNotExists($errorLog);
 		$method->invoke($exceptionHandler, $exception);
 
 		$logContents = file_get_contents($errorLog);

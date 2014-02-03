@@ -19,9 +19,8 @@ class CM_App {
 
 	public function setupFilesystem() {
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
-		CM_Util::mkDir(DIR_DATA_LOG);
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-		CM_Util::rmDir(CM_Bootloader::getInstance()->getDirTmp());
+		CM_Util::rmDirContents(CM_Bootloader::getInstance()->getDirTmp());
 	}
 
 	/**
