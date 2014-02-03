@@ -10,7 +10,6 @@ $config->CM_Action_Abstract->types = array();
 $config->CM_Action_Abstract->types[3] = 'CM_Action_Email';
 
 $config->CM_Model_Abstract->types = array();
-$config->CM_Model_Abstract->types[4] = 'CM_Model_DeviceCapabilities';
 $config->CM_Model_Abstract->types[5] = 'CM_Model_Language';
 $config->CM_Model_Abstract->types[6] = 'CM_Model_Location';
 $config->CM_Model_Abstract->types[7] = 'CM_Model_Splitfeature';
