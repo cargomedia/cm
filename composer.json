@@ -15,12 +15,6 @@
 	"require-dev": {
 		"phpunit/phpunit": "~3.7.10"
 	},
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://satis.cargomedia.ch/dist"
-        }
-    ],
     "autoload": {
         "psr-0": {
             "CM_": "library/",
