@@ -23,7 +23,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 		if (null !== $lifeTime) {
 			throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
 		}
-		CM_Util::mkDir(self::_getDirStorage());
+		CM_Util::mkDir($this->_getDirStorage());
 		CM_File::create($this->_getPath($key), serialize($value));
 	}
 
@@ -45,7 +45,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 	}
 
 	protected function _flush() {
-		self::resetStorage();
+		CM_Util::rmDirContents($this->_getDirStorage());
 	}
 
 	/**
@@ -59,13 +59,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 	/**
 	 * @return string
 	 */
-	private static function _getDirStorage() {
+	private function _getDirStorage() {
 		return CM_Bootloader::getInstance()->getDirTmp() . 'cache/';
-	}
-
-	public static function resetStorage() {
-		$dirStorage = self::_getDirStorage();
-		CM_Util::mkDir($dirStorage);
-		CM_Util::rmDirContents($dirStorage);
 	}
 }
