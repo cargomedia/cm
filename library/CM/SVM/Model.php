@@ -101,11 +101,9 @@ class CM_SVM_Model {
 	 * @return string
 	 */
 	private function _getPath() {
-		$basePath = DIR_DATA_SVM;
-		if (!is_dir($basePath)) {
-			CM_Util::mkDir($basePath);
-		}
-		return $basePath . $this->getId() . '.svm';
+		$dirDataSvm = CM_Bootloader::getInstance()->getDirData() . 'svm/';
+		CM_Util::mkDir($dirDataSvm);
+		return $dirDataSvm . $this->getId() . '.svm';
 	}
 
 	/**
