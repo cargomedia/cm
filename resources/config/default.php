@@ -1,6 +1,5 @@
 <?php
 
-$config->debug = false;
 $config->timeZone = 'US/Central';
 
 $config->CM_Render->cdnResource = false;
