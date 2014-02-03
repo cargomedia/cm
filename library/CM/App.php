@@ -22,7 +22,6 @@ class CM_App {
 		CM_Util::mkDir(DIR_DATA_SVM);
 		CM_Util::mkDir(DIR_DATA_LOG);
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-		CM_Cli_Command::setupDirLocks();
 		CM_Util::rmDir(CM_Bootloader::getInstance()->getDirTmp());
 	}
 

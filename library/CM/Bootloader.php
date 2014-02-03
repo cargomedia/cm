@@ -135,7 +135,6 @@ class CM_Bootloader {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor/');
 		define('DIR_PUBLIC', DIR_ROOT . 'public/');
 
-		define('DIR_DATA_LOCKS', $this->getDirData() . 'locks/');
 		define('DIR_DATA_LOG', $this->getDirData() . 'logs/');
 		define('DIR_DATA_SVM', $this->getDirData() . 'svm/');
 	}
