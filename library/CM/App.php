@@ -30,7 +30,6 @@ class CM_App {
 		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
 		CM_Util::mkDir($dirTmp);
 		CM_Util::rmDirContents($dirTmp);
-		CM_Render::resetSmartyTmp();
 	}
 
 	/**
