@@ -236,7 +236,7 @@ class CM_File extends CM_Class_Abstract {
 			$extension = '.' . $extension;
 		}
 		$extension = (string) $extension;
-		return static::create(DIR_TMP . uniqid() . $extension, $content);
+		return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content);
 	}
 
 	/**

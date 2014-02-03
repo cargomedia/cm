@@ -16,17 +16,16 @@ class CMTest_TH {
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
-		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
 	}
 
 	public static function clearEnv() {
+		CM_App::getInstance()->setupFilesystem();
 		self::clearDb();
 		self::clearCache();
 		self::timeReset();
-		self::clearFilesystem();
 		self::clearConfig();
 	}
 
@@ -45,10 +44,6 @@ class CMTest_TH {
 		if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
 			CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
 		}
-	}
-
-	public static function clearFilesystem() {
-		CM_App::getInstance()->resetTmp();
 	}
 
 	public static function clearConfig() {

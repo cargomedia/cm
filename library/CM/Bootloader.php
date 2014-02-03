@@ -3,9 +3,6 @@ require_once 'Util.php';
 
 class CM_Bootloader {
 
-	/** @var string */
-	protected $_dataPrefix;
-
 	/** @var CM_Config|null */
 	private $_config = null;
 
@@ -19,7 +16,7 @@ class CM_Bootloader {
 	protected static $_instance;
 
 	/**
-	 * @param string      $pathRoot
+	 * @param string $pathRoot
 	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($pathRoot) {
@@ -33,7 +30,6 @@ class CM_Bootloader {
 
 		define('DIR_ROOT', $pathRoot);
 		$this->_debug = (bool) getenv('CM_DEBUG');
-		$this->_dataPrefix = '';
 	}
 
 	public function load() {
@@ -85,7 +81,7 @@ class CM_Bootloader {
 	 * @return string
 	 */
 	public function getDataPrefix() {
-		return $this->_dataPrefix;
+		return '';
 	}
 
 	/**
@@ -99,6 +95,27 @@ class CM_Bootloader {
 		$cacheKey = CM_CacheConst::Modules;
 		$cache = new CM_Cache_Storage_Apc();
 		$cache->delete($cacheKey);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDirUserfiles() {
+		return DIR_PUBLIC . 'userfiles/';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDirData() {
+		return DIR_ROOT . 'data/';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDirTmp() {
+		return DIR_ROOT . 'tmp/';
 	}
 
 	/**
@@ -117,17 +134,6 @@ class CM_Bootloader {
 	protected function _constants() {
 		define('DIR_VENDOR', DIR_ROOT . 'vendor/');
 		define('DIR_PUBLIC', DIR_ROOT . 'public/');
-
-		define('DIR_DATA', DIR_ROOT . $this->getDataPrefix() . 'data/');
-		define('DIR_DATA_LOCKS', DIR_DATA . 'locks/');
-		define('DIR_DATA_LOG', DIR_DATA . 'logs/');
-		define('DIR_DATA_SVM', DIR_DATA . 'svm/');
-
-		define('DIR_TMP', DIR_ROOT . 'tmp/');
-		define('DIR_TMP_CACHE',  DIR_TMP . 'cache/');
-		define('DIR_TMP_SMARTY', DIR_TMP . 'smarty/');
-
-		define('DIR_USERFILES', DIR_PUBLIC . $this->getDataPrefix() . 'userfiles/');
 	}
 
 	protected function _errorHandler() {

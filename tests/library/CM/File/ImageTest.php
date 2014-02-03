@@ -73,7 +73,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testRotate() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->rotate(90, $pathNew);
@@ -84,7 +84,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testRotateAnimatedGif() {
 		$path = DIR_TEST_DATA . 'img/animated.gif';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->rotate(90, $pathNew, CM_File_Image::FORMAT_GIF);
@@ -129,7 +129,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testIsAnimatedConvertingToNonAnimated() {
 		$file = new CM_File(DIR_TEST_DATA . 'img/animated.gif');
-		$path = DIR_TMP . uniqid();
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$file->copy($path);
 		$image = new CM_File_Image($path);
 		$this->assertTrue($image->isAnimated());
@@ -172,7 +172,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testConvert() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->convert(CM_File_Image::FORMAT_GIF, $pathNew);
@@ -194,7 +194,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		);
 		foreach ($pathList as $path) {
 			foreach ($formatList as $format) {
-				$pathNew = DIR_TMP . uniqid();
+				$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 				$image = new CM_File_Image($path);
 
 				$image->convert($format, $pathNew);
@@ -217,7 +217,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 		);
 		$path = DIR_TEST_DATA . 'img/test.gif';
 		foreach ($qualityList as $quality => $expectedFileSize) {
-			$pathNew = DIR_TMP . uniqid();
+			$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 			$image = new CM_File_Image($path);
 
 			$image->setCompressionQuality($quality);
@@ -230,7 +230,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testConvertSamePath() {
 		$file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
-		$path = DIR_TMP . uniqid();
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$file->copy($path);
 		$image = new CM_File_Image($path);
 		$imageWidth = $image->getWidth();
@@ -246,7 +246,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testConvertSamePathSameFormat() {
 		$file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
-		$path = DIR_TMP . uniqid();
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$file->copy($path);
 		$image = new CM_File_Image($path);
 		$imageHash = $image->getHash();
@@ -258,7 +258,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResize() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, false, $pathNew);
@@ -272,7 +272,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeSquare() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, true, $pathNew);
@@ -283,7 +283,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeSquareNoBlowup() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(5000, 5000, true, $pathNew);
@@ -295,7 +295,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeFileSize() {
 		$path = DIR_TEST_DATA . 'img/test.jpg';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 		$this->assertEquals(17661, $image->getSize(), '', 300);
 
@@ -307,7 +307,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeAnimatedGif() {
 		$path = DIR_TEST_DATA . 'img/animated.gif';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, true, $pathNew, CM_File_Image::FORMAT_GIF);
@@ -320,7 +320,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testResizeAnimatedGifToJpeg() {
 		$path = DIR_TEST_DATA . 'img/animated.gif';
-		$pathNew = DIR_TMP . uniqid();
+		$pathNew = CM_Bootloader::getInstance()->getDirTmp() . uniqid();
 		$image = new CM_File_Image($path);
 
 		$image->resize(50, 50, true, $pathNew, CM_File_Image::FORMAT_JPEG);
@@ -347,7 +347,7 @@ class CM_File_ImageTest extends CMTest_TestCase {
 
 	public function testCreate() {
 		$rawImageData = file_get_contents(DIR_TEST_DATA . 'img/test.jpg', 'r');
-		$image = CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
+		$image = CM_File_Image::create(CM_Bootloader::getInstance()->getDirTmp() . 'test.jpg', $rawImageData);
 		$this->assertEquals('image/jpeg', $image->getMimeType());
 		$image->delete();
 	}
@@ -358,6 +358,6 @@ class CM_File_ImageTest extends CMTest_TestCase {
 	 */
 	public function testCreateFailure() {
 		$rawImageData = 'false image data';
-		CM_File_Image::create(DIR_TMP . 'test.jpg', $rawImageData);
+		CM_File_Image::create(CM_Bootloader::getInstance()->getDirTmp() . 'test.jpg', $rawImageData);
 	}
 }
