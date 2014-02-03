@@ -16,18 +16,17 @@ class CMTest_TH {
 		self::$_configBackup = serialize(CM_Config::get());
 
 		// Reset environment
-		CM_App::getInstance()->setupFilesystem();
 		self::clearEnv();
 		self::randomizeAutoincrement();
 		self::timeInit();
 	}
 
 	public static function clearEnv() {
+		CM_App::getInstance()->setupFilesystem();
 		self::clearDb();
 		self::clearCache();
 		self::timeReset();
 		self::clearConfig();
-		CM_App::getInstance()->resetTmp();
 	}
 
 	public static function clearCache() {

@@ -20,10 +20,17 @@ class CM_App {
 	public function setupFilesystem() {
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
 		CM_Util::mkDir(DIR_DATA_SVM);
-		CM_Util::mkDir(DIR_DATA_LOCKS);
 		CM_Util::mkDir(DIR_DATA_LOG);
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-		$this->resetTmp();
+		CM_Cli_Command::setupDirLocks();
+
+	}
+
+	public function resetTmp() {
+		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+		CM_Util::mkDir($dirTmp);
+		CM_Util::rmDirContents($dirTmp);
+		CM_Render::resetSmartyTmp();
 	}
 
 	/**
@@ -67,14 +74,6 @@ class CM_App {
 		}
 	}
 
-	public function resetTmp() {
-		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-		CM_Util::mkDir($dirTmp);
-		CM_Util::rmDirContents($dirTmp);
-		CM_Cache_Storage_File::resetStorage();
-		CM_Render::resetSmartyTmp();
-	}
-
 	public function fillCaches() {
 		/** @var CM_Asset_Javascript_Abstract[] $assetList */
 		$assetList = array();
@@ -112,7 +111,7 @@ class CM_App {
 	}
 
 	/**
-	 * @param int         $version
+	 * @param int $version
 	 * @param string|null $namespace
 	 */
 	public function setVersion($version, $namespace = null) {
@@ -133,7 +132,7 @@ class CM_App {
 
 	/**
 	 * @param Closure|null $callbackBefore fn($version)
-	 * @param Closure|null $callbackAfter  fn($version)
+	 * @param Closure|null $callbackAfter fn($version)
 	 * @return int Number of version bumps
 	 */
 	public function runUpdateScripts(Closure $callbackBefore = null, Closure $callbackAfter = null) {
@@ -160,8 +159,8 @@ class CM_App {
 	}
 
 	/**
-	 * @param string       $namespace
-	 * @param int          $version
+	 * @param string $namespace
+	 * @param int $version
 	 * @param Closure|null $callbackBefore
 	 * @param Closure|null $callbackAfter
 	 * @return int
@@ -200,7 +199,7 @@ class CM_App {
 	}
 
 	/**
-	 * @param int         $version
+	 * @param int $version
 	 * @param string|null $namespace
 	 * @return string
 	 * @throws CM_Exception_Invalid
