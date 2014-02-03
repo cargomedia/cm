@@ -140,7 +140,6 @@ class CM_Bootloader {
 		define('DIR_DATA_SVM', $this->getDirData() . 'svm/');
 
 		define('DIR_TMP_CACHE', $this->getDirTmp() . 'cache/');
-		define('DIR_TMP_SMARTY', $this->getDirTmp() . 'smarty/');
 	}
 
 	protected function _errorHandler() {

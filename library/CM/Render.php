@@ -2,9 +2,6 @@
 
 class CM_Render extends CM_Class_Abstract {
 
-	/* @var Smarty */
-	private static $_smarty = null;
-
 	/* @var CM_Frontend */
 	protected $_js = null;
 
@@ -34,6 +31,9 @@ class CM_Render extends CM_Class_Abstract {
 
 	/** @var CM_Menu[] */
 	private $_menuList = array();
+
+	/* @var Smarty */
+	private static $_smarty = null;
 
 	/**
 	 * @param CM_Site_Abstract|null  $site
@@ -447,7 +447,7 @@ class CM_Render extends CM_Class_Abstract {
 		if (!isset(self::$_smarty)) {
 			self::$_smarty = new Smarty();
 			self::$_smarty->setTemplateDir(DIR_ROOT);
-			self::$_smarty->setCompileDir(DIR_TMP_SMARTY);
+			self::$_smarty->setCompileDir(self::_getDirSmarty());
 			self::$_smarty->_file_perms = 0666;
 			self::$_smarty->_dir_perms = 0777;
 			self::$_smarty->compile_check = CM_Bootloader::getInstance()->isDebug();
@@ -472,5 +472,18 @@ class CM_Render extends CM_Class_Abstract {
 	 */
 	private function _parseVariables($phrase, array $variables) {
 		return preg_replace('~\{\$(\w+)\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1'] : ''", $phrase);
+	}
+
+	/**
+	 * @return string
+	 */
+	private static function _getDirSmarty() {
+		return CM_Bootloader::getInstance()->getDirTmp() . 'smarty/';
+	}
+
+	public static function resetSmartyTmp() {
+		$dirSmarty = self::_getDirSmarty();
+		CM_Util::mkDir($dirSmarty);
+		CM_Util::rmDirContents($dirSmarty);
 	}
 }

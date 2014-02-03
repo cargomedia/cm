@@ -68,10 +68,11 @@ class CM_App {
 	}
 
 	public function resetTmp() {
-		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirTmp());
-		CM_Util::rmDirContents(CM_Bootloader::getInstance()->getDirTmp());
-		CM_Util::mkDir(DIR_TMP_SMARTY);
+		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+		CM_Util::mkDir($dirTmp);
+		CM_Util::rmDirContents($dirTmp);
 		CM_Util::mkDir(DIR_TMP_CACHE);
+		CM_Render::resetSmartyTmp();
 	}
 
 	public function fillCaches() {
