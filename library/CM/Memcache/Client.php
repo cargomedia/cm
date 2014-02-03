@@ -8,7 +8,8 @@ class CM_Memcache_Client extends CM_Class_Abstract {
 	public function __construct() {
 		$this->_memcache = new Memcache();
 		foreach (self::_getConfig()->servers as $server) {
-			@$this->_memcache->addServer($server['host'] . ':' . $server['port']);
+			$this->_memcache->addServer($server['host'], $server['port'], true, 1, 1, 15, true, function ($host, $port) {
+			});
 		}
 	}
 
