@@ -23,13 +23,7 @@ class CM_App {
 		CM_Util::mkDir(DIR_DATA_LOG);
 		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
 		CM_Cli_Command::setupDirLocks();
-
-	}
-
-	public function resetTmp() {
-		$dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-		CM_Util::mkDir($dirTmp);
-		CM_Util::rmDirContents($dirTmp);
+		CM_Util::rmDir(CM_Bootloader::getInstance()->getDirTmp());
 	}
 
 	/**
