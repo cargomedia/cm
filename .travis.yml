@@ -23,6 +23,7 @@ before_script:
   - pecl install mcrypt
   - pecl install gearman
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; echo "yes" | pecl install apcu-beta; fi"
+  - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
 
   - composer self-update
