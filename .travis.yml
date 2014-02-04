@@ -12,7 +12,7 @@ services:
   - redis-server
 
 before_script:
-  - pecl install runkit
+  - tests/travis/ext-runkit.sh
   - pecl install intl
   - pecl install gd
   - pecl install imagick
