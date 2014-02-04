@@ -12,11 +12,8 @@ services:
   - redis-server
 
 before_script:
-  - sudo apt-get install autoconf
-  - tests/travis/install-apcu.sh
-  - phpenv config-add tests/travis/$TRAVIS_PHP_VERSION.ini
-  - phpenv config-add tests/travis/apc.ini
-  - phpenv config-add tests/travis/memcache.ini
+  - sh -c "if [ `php-config --vernum` -ge 50500 ]; echo "yes" | pecl install apcu-beta; fi"
+  - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
 
   - composer self-update
   - composer install --dev
