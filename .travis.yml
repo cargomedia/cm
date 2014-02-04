@@ -1,13 +1,16 @@
 language: php
+
 php:
   - "5.5"
   - "5.4"
   - "5.3"
+
 services:
   - mysql
   - memcached
   - elasticsearch
   - redis-server
+
 before_script:
   - sudo apt-get install autoconf
   - tests/travis/install-apcu.sh
@@ -18,6 +21,8 @@ before_script:
   - composer --no-interaction install --prefer-dist --no-dev
   - scripts/cm.php app generate-config-local tests/travis/config.json
   - scripts/cm.php app set-deploy-version
+
 script: phpunit
+
 notifications:
   email: false
