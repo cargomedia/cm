@@ -9,9 +9,6 @@ services:
   - elasticsearch
   - redis-server
 before_script:
-  # php-memcache
-  - pecl install memcache
-
   # php-apc or php-apcu
   - sudo apt-get install autoconf
   - tests/travis/install-apcu.sh
