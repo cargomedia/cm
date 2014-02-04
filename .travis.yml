@@ -16,7 +16,7 @@ before_script:
   - tests/travis/install-php-svm.sh
   - printf "\n" | pecl install imagick
   - pecl install stats
-  - sudo apt-get install libgearman-dev && pecl install gearman
+  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
@@ -26,7 +26,7 @@ before_script:
   - scripts/cm.php app generate-config-local tests/travis/config.json
   - scripts/cm.php app set-deploy-version
 
-script: phpunit --debug
+script: phpunit
 
 matrix:
   allow_failures:
