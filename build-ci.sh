@@ -10,7 +10,7 @@ DIR=$(ssh ${USER}@${HOST} "mktemp -d /tmp/build.XXXXXX")
 scp -qr . ${USER}@${HOST}:${DIR}
 ssh ${USER}@${HOST} "
  cd ${DIR} &&
- composer -n install &&
+ composer --no-interaction install --prefer-dist --no-dev &&
  scripts/cm.php app generate-config-local resources/config/local.ci.json &&
  scripts/cm.php app set-deploy-version &&
  phpunit -d display_errors=1
