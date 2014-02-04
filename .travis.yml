@@ -1,9 +1,9 @@
 language: php
 
 php:
-  - "5.5"
-  - "5.4"
-  - "5.3"
+  - 5.3
+  - 5.4
+  - 5.5
 
 services:
   - mysql
@@ -27,6 +27,11 @@ before_script:
   - scripts/cm.php app set-deploy-version
 
 script: phpunit --debug
+
+matrix:
+  allow_failures:
+    - php: 5.4
+    - php: 5.5
 
 notifications:
   email: false
