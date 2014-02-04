@@ -12,7 +12,6 @@ services:
   - redis-server
 
 before_script:
-  - php -m
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - printf "\n" | pecl install imagick
@@ -27,7 +26,7 @@ before_script:
   - scripts/cm.php app generate-config-local tests/travis/config.json
   - scripts/cm.php app set-deploy-version
 
-script: phpunit
+script: phpunit --debug
 
 notifications:
   email: false
