@@ -1,9 +1,10 @@
 #!/bin/bash -e
 
-VERSION="1.0.3"
+VERSION="5e179e978af79444d3c877d5681ea91d15134a01"
 
-curl -sL https://github.com/downloads/zenovich/runkit/runkit-${VERSION}.tgz | tar -xzf -
-cd runkit-${VERSION}
+git clone http://github.com/zenovich/runkit.git runkit
+cd runkit
+git checkout ${VERSION}
 phpize
 ./configure
 make
