@@ -14,11 +14,11 @@ services:
 before_script:
   - php -m
   - tests/travis/ext-runkit.sh
-  - pecl install imagick
+  - printf "\n" | pecl install imagick
   - pecl install stats
   - pecl install svm
   - pecl install gearman
-  - sh -c "if [ `php-config --vernum` -ge 50500 ]; echo "yes" | pecl install apcu-beta; fi"
+  - sh -c "if [ `php-config --vernum` -ge 50500 ]; printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
 
