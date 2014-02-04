@@ -16,7 +16,7 @@ before_script:
   - phpenv config-add tests/travis/apc.ini
 
   - composer --no-interaction install --prefer-dist --no-dev
-  - scripts/cm.php app generate-config-local resources/config/local.ci.json
+  - scripts/cm.php app generate-config-local tests/travis/config.json
   - scripts/cm.php app set-deploy-version
 script: phpunit
 notifications:
