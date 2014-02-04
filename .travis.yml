@@ -13,7 +13,6 @@ services:
 
 before_script:
   - tests/travis/ext-runkit.sh
-  - pecl install intl
   - pecl install gd
   - pecl install imagick
   - pecl install curl
