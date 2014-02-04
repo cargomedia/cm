@@ -12,6 +12,8 @@ services:
   - redis-server
 
 before_script:
+  - pecl install redis
+  - pecl install runkit
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; echo "yes" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
 
