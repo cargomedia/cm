@@ -12,6 +12,7 @@ services:
   - redis-server
 
 before_script:
+  - php -m
   - tests/travis/ext-runkit.sh
   - pecl install gd
   - pecl install imagick
