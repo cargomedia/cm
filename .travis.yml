@@ -10,8 +10,8 @@ services:
   - redis-server
 before_script:
   - sudo apt-get install autoconf
+  - pecl install memcache
   - tests/travis/install-apcu.sh
-  - tests/travis/install-memcache.sh
   - phpenv config-add tests/travis/$TRAVIS_PHP_VERSION.ini
   - phpenv config-add tests/travis/apc.ini
   - composer --no-interaction install --prefer-dist --no-dev
