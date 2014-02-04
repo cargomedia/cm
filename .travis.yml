@@ -18,7 +18,8 @@ before_script:
   - phpenv config-add tests/travis/apc.ini
   - phpenv config-add tests/travis/memcache.ini
 
-  - composer --no-interaction install --prefer-dist --no-dev
+  - composer self-update
+  - composer install --dev
   - scripts/cm.php app generate-config-local tests/travis/config.json
   - scripts/cm.php app set-deploy-version
 
