@@ -9,11 +9,15 @@ services:
   - elasticsearch
   - redis-server
 before_script:
-  - sudo apt-get install autoconf
+  # php-memcache
   - pecl install memcache
+
+  # php-apc or php-apcu
+  - sudo apt-get install autoconf
   - tests/travis/install-apcu.sh
   - phpenv config-add tests/travis/$TRAVIS_PHP_VERSION.ini
   - phpenv config-add tests/travis/apc.ini
+
   - composer --no-interaction install --prefer-dist --no-dev
   - scripts/cm.php app generate-config-local resources/config/local.ci.json
   - scripts/cm.php app set-deploy-version
