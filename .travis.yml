@@ -13,6 +13,15 @@ services:
 
 before_script:
   - pecl install runkit
+  - pecl install intl
+  - pecl install gd
+  - pecl install imagick
+  - pecl install curl
+  - pecl install runkit
+  - pecl install stats
+  - pecl install svm
+  - pecl install mcrypt
+  - pecl install gearman
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; echo "yes" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
 
