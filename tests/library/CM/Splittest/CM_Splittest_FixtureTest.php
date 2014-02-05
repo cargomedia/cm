@@ -203,8 +203,6 @@ class CM_Splittest_FixtureTest extends CMTest_TestCase {
 
 class CM_Model_Splittest_RequestClient_Mock extends CM_Model_Splittest_RequestClient {
 
-	const TYPE = 1;
-
 	/**
 	 * @param CM_Request_Abstract $request
 	 * @return string
@@ -215,8 +213,6 @@ class CM_Model_Splittest_RequestClient_Mock extends CM_Model_Splittest_RequestCl
 }
 
 class CM_Model_Splittest_User_Mock extends CM_Model_Splittest_User {
-
-	const TYPE = 1;
 
 	/**
 	 * @param CM_Model_User $user

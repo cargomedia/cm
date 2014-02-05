@@ -203,16 +203,6 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
 class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
-	}
-
 	public function canPublish(CM_Model_User $user, $allowedUntil) {
 		return $user->getId() != 1 ? $allowedUntil + 100 : $allowedUntil;
 	}
@@ -243,5 +233,9 @@ class CM_Model_StreamChannel_Mock extends CM_Model_StreamChannel_Abstract {
 	 * @param CM_Model_Stream_Subscribe $streamSubscribe
 	 */
 	public function onUnsubscribe(CM_Model_Stream_Subscribe $streamSubscribe) {
+	}
+
+	public static function getTypeStatic() {
+		return 1;
 	}
 }
