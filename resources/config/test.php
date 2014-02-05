@@ -10,8 +10,6 @@ $config->CM_Db_Db->delayedEnabled = false;
 
 $config->classConfigCacheEnabled = false;
 
-$config->CM_Model_DeviceCapabilities->adapter = null;
-
 $config->CM_Model_Splittest->withoutPersistence = true;
 
 $config->CM_Model_Splitfeature->withoutPersistence = true;

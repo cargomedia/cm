@@ -38,11 +38,6 @@ abstract class CM_Request_Abstract {
 	protected $_viewer = false;
 
 	/**
-	 * @var CM_Model_DeviceCapabilities
-	 */
-	private $_capabilities;
-
-	/**
 	 * @var CM_Session|null
 	 */
 	private $_session;
@@ -96,20 +91,6 @@ abstract class CM_Request_Abstract {
 	 */
 	public function getServer() {
 		return $this->_server;
-	}
-
-	/**
-	 * @return CM_Model_DeviceCapabilities
-	 */
-	public function getDeviceCapabilities() {
-		if (!isset($this->_capabilities)) {
-			$userAgent = '';
-			if ($this->hasHeader('user-agent')) {
-				$userAgent = $this->getHeader('user-agent');
-			}
-			$this->_capabilities = new CM_Model_DeviceCapabilities($userAgent);
-		}
-		return $this->_capabilities;
 	}
 
 	/**
