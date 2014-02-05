@@ -123,8 +123,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
 
-	const TYPE = 1;
-
 	/**
 	 * @param CM_Splittest_Fixture $fixture
 	 * @param string               $variationName

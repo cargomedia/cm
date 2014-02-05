@@ -587,16 +587,6 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
 class CM_Model_Mock_Validation extends CM_Model_Abstract {
 
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
-	}
-
 	public function __construct($id, $foo = null) {
 		$id = array('id' => $id);
 		if (null !== $foo) {
@@ -608,21 +598,19 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 	protected function _loadData() {
 		return array('id' => $this->getId());
 	}
+
+	public static function getTypeStatic() {
+		return 1;
+	}
 }
 
 class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
 
-	const TYPE = 2;
-
-	public function getType() {
-		return self::TYPE;
+	public function getId() {
+		return (string) $this->_getId('id');
 	}
 
 	public static function getTypeStatic() {
-		return self::TYPE;
-	}
-
-	public function getId() {
-		return (string) $this->_getId('id');
+		return 2;
 	}
 }

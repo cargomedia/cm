@@ -202,16 +202,6 @@ class CM_Action_ActionTest extends CMTest_TestCase {
 
 class CM_Action_Mock extends CM_Action_Abstract {
 
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
-	}
-
 	protected function _notify() {
 	}
 
@@ -229,19 +219,13 @@ class CM_Action_Mock extends CM_Action_Abstract {
 	public function getVerbName() {
 		return 'Test';
 	}
+
+	public static function getTypeStatic() {
+		return 1;
+	}
 }
 
 class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
-
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
-	}
 
 	public function getOvershootAllowed() {
 		return false;
@@ -249,5 +233,9 @@ class CM_Model_ActionLimit_Mock extends CM_Model_ActionLimit_Abstract {
 
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {
 		throw new CM_Exception_ActionLimit('Mock overshoot');
+	}
+
+	public static function getTypeStatic() {
+		return 1;
 	}
 }

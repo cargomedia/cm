@@ -84,16 +84,6 @@ class CM_Model_Entity_AbstractTest extends CMTest_TestCase {
 
 class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
-	}
-
 	public $onLoadCounter = 0;
 	public $onChangeCounter = 0;
 
@@ -121,5 +111,9 @@ class CM_Model_Entity_Mock extends CM_Model_Entity_Abstract {
 
 	protected static function _createStatic(array $data) {
 		return new self(CM_Db_Db::insert('entityMock', array('userId' => $data['userId'], 'foo' => $data['foo'])));
+	}
+
+	public static function getTypeStatic() {
+		return 1;
 	}
 }
