@@ -536,7 +536,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 	 */
 	public function testFactoryGenericMultipleInvalidInput() {
 		CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getTypeStatic()] = 'CM_ModelMock';
-		CM_Model_Abstract::factoryGenericMultiple(array(array('id' => CM_ModelMock::TYPE, 'type' => 1), '1'), null);
+		CM_Model_Abstract::factoryGenericMultiple(array(array('id' => CM_ModelMock::getTypeStatic(), 'type' => 1), '1'), null);
 	}
 
 	public function testFactoryGenericMultipleWithModelType() {
@@ -996,14 +996,8 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
 class CM_ModelMock extends CM_Model_Abstract {
 
-	const TYPE = 1;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
 	public static function getTypeStatic() {
-		return self::TYPE;
+		return 1;
 	}
 
 	public $onChangeCounter = 0;
@@ -1047,10 +1041,8 @@ class CM_ModelMock extends CM_Model_Abstract {
 
 class CM_ModelThasIsAnAssetMock extends CM_Model_Abstract {
 
-	const TYPE = 2;
-
-	public function getType() {
-		return self::TYPE;
+	public static function getTypeStatic() {
+		return 2;
 	}
 
 	public function getBar() {
@@ -1126,10 +1118,8 @@ class CM_ModelAsset_ModelMock_ModelThasIsAnAssetMock extends CM_ModelAsset_Abstr
 
 class CM_ModelMock2 extends CM_Model_Abstract {
 
-	const TYPE = 3;
-
-	public function getType() {
-		return self::TYPE;
+	public static function getTypeStatic() {
+		return 3;
 	}
 
 	protected function _loadData() {
@@ -1167,21 +1157,15 @@ class CM_ModelAsset_ModelMock_ModelAssetMock extends CM_ModelAsset_Abstract {
 
 class CM_ModelMock3 extends CM_Model_Abstract {
 
-	const TYPE = 4;
-
-	public function getType() {
-		return self::TYPE;
-	}
-
-	public static function getTypeStatic() {
-		return self::TYPE;
+	public function _getSchema() {
+		return new CM_Model_Schema_Definition(array('foo' => array('type' => 'string')));
 	}
 
 	public static function getPersistenceClass() {
 		return 'CM_Model_StorageAdapter_Database';
 	}
 
-	public function _getSchema() {
-		return new CM_Model_Schema_Definition(array('foo' => array('type' => 'string')));
+	public static function getTypeStatic() {
+		return 4;
 	}
 }
