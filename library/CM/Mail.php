@@ -1,8 +1,6 @@
 <?php
 
-class CM_Mail extends CM_View_Abstract {
-
-	const TYPE = 75;
+class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
 	/** @var CM_Model_User|null */
 	private $_recipient;

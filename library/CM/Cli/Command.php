@@ -114,7 +114,7 @@ class CM_Cli_Command {
 	 * @return string
 	 */
 	private function _getPidFilePath() {
-		return DIR_DATA_LOCKS . $this->_class->getName() . ':' . $this->_method->getName();
+		return CM_Bootloader::getInstance()->getDirData() . 'locks/' . $this->_class->getName() . ':' . $this->_method->getName();
 	}
 
 	/**
@@ -138,6 +138,8 @@ class CM_Cli_Command {
 	 */
 	private function _createPidFile() {
 		$pid = posix_getpid();
-		return CM_File::create($this->_getPidFilePath(), $pid);
+		$pidFilePath = $this->_getPidFilePath();
+		CM_Util::mkDir(dirname($pidFilePath));
+		return CM_File::create($pidFilePath, $pid);
 	}
 }

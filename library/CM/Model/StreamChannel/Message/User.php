@@ -2,7 +2,6 @@
 
 class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message {
 
-	const TYPE = 29;
 	const SALT = 'd98*2jflq74fcr8gfoqwm&dsowrds93l';
 
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {

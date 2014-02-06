@@ -101,7 +101,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
 		$viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
 		$body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
-		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, $body);
+		$request = new CM_Request_Post('/ajax/' . $siteId, $headers, null, $body);
 
 		$response = new CM_Response_View_Ajax($request);
 		$response->process();
@@ -135,12 +135,13 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$session->setUser($viewer);
 		}
 		$headers = array('Cookie' => 'sessionId=' . $session->getId());
+		$server = array('remote_addr' => '1.2.3.4');
 		unset($session); // Make sure session is stored persistently
 
 		$formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
 		$viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
 		$body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
-		$request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $body);
+		$request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
 
 		$response = new CM_Response_View_Form($request);
 		$response->process();
@@ -202,7 +203,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 			$site = CM_Site_Abstract::factory();
 		}
 		$host = parse_url($site->getUrl(), PHP_URL_HOST);
-		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), $viewer);
+		$request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
 		$response = new CM_Response_Page($request);
 		$page->prepareResponse($response);
 		$page->checkAccessible();

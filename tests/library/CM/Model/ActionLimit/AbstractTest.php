@@ -69,13 +69,15 @@ class CM_Model_ActionLimit_AbstractTest extends CMTest_TestCase {
 
 class CM_Model_ActionLimit_AbstractMock extends CM_Model_ActionLimit_Abstract {
 
-	const TYPE = 3;
-
 	public function overshoot(CM_Action_Abstract $action, $role, $first) {
 		throw new CM_Exception_ActionLimit('Mock overshoot');
 	}
 
 	public function getOvershootAllowed() {
 		return false;
+	}
+
+	public static function getTypeStatic() {
+		return 3;
 	}
 }

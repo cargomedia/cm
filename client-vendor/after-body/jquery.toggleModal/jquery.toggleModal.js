@@ -16,34 +16,39 @@
 			return $self;
 		}
 
-		/**
-		 * @param {Object} [callbackOptions]
-		 */
-		var close = function(callbackOptions) {
-			callbackOptions = callbackOptions || {};
-			if (!$self.data('toggleModal')) {
-				return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
-			}
-			callback.call($self, false, callbackOptions);
-			$(document).removeData('toggleModal').off('.toggleModal');
-			$self.removeData('toggleModal').off('.toggleModal');
-		};
-
 		if (!$self.data('toggleModal')) {
+
+			var documentClick = function(e) {
+				if (!$self.length || e.target !== $self[0] && !$.contains($self[0], e.target)) {
+					close();
+				}
+			};
+
+			var documentKeydown = function(e) {
+				if (e.which == 27) {
+					close();
+				}
+			};
+
+			/**
+			 * @param {Object} [callbackOptions]
+			 */
+			var close = function(callbackOptions) {
+				callbackOptions = callbackOptions || {};
+				if (!$self.data('toggleModal')) {
+					return;	// Dont close twice (eg. if toggleModalClose() was called from the same event which was triggering the close)
+				}
+				callback.call($self, false, callbackOptions);
+				$self.removeData('toggleModal').off('.toggleModal');
+				$(document).off('click.toggleModal', documentClick);
+				$(document).off('keydown.toggleModal', documentKeydown);
+			};
+
 			callback.call($self, true, callbackOptions);
-			$(document).data('toggleModal', true);
 			$self.data('toggleModal', close);
 			setTimeout(function() {
-				$(document).on('click.toggleModal', function(e) {
-					if (!$self.length || e.target !== $self[0] && !$.contains($self[0], e.target)) {
-						close();
-					}
-				});
-				$(document).on('keydown.toggleModal', function(e) {
-					if (e.which == 27) {
-						close();
-					}
-				});
+				$(document).on('click.toggleModal', documentClick);
+				$(document).on('keydown.toggleModal', documentKeydown);
 			}, 0);
 		}
 

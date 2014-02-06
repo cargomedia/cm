@@ -2,8 +2,6 @@
 
 class CM_Model_Splittest extends CM_Model_Abstract {
 
-	CONST TYPE = 16;
-
 	/** @var bool */
 	private $_withoutPersistence;
 
