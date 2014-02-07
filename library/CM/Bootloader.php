@@ -64,6 +64,17 @@ class CM_Bootloader {
 	}
 
 	/**
+	 * @return CM_EventHandler_EventHandler
+	 */
+	public function getEventHandler() {
+		static $eventHandler;
+		if (!$eventHandler) {
+			$eventHandler = new CM_EventHandler_EventHandler();
+		}
+		return $eventHandler;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function isDebug() {
