@@ -113,7 +113,7 @@ label {
 }
 
 .button[data-click-spinner] {
-	*:not(.spinner) {
+	:not(.spinner) {
 		.transition(200ms);
 	}
 
@@ -124,7 +124,7 @@ label {
 			.spinner-expanded;
 		}
 
-		*:not(.spinner) {
+		:not(.spinner) {
 			opacity: 0;
 		}
 	}
