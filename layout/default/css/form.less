@@ -112,10 +112,22 @@ label {
 	}
 }
 
-.button .spinner {
-	margin-left: 5px;
-	height: @sizeButton - 2px;
-	vertical-align: top;
+.button[data-click-spinner] {
+	*:not(.spinner) {
+		.transition(200ms);
+	}
+
+	&.hasSpinner {
+		position: relative;
+
+		.spinner {
+			.spinner-expanded;
+		}
+
+		*:not(.spinner) {
+			opacity: 0;
+		}
+	}
 }
 
 .button.confirmClick {
