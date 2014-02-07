@@ -32,11 +32,22 @@ final class CM_EventHandler_EventHandler {
 	}
 
 	/**
-	 * @param string $event
+	 * @param string        $event
+	 * @param callable|null $callback
 	 */
-	public function unbind($event) {
+	public function unbind($event, Closure $callback = null) {
 		$event = (string) $event;
-		unset($this->_callbacks[$event]);
+		if (null === $callback) {
+			unset($this->_callbacks[$event]);
+		} else {
+			$callbacks = $this->_callbacks[$event];
+			foreach ($callbacks as $key => $c) {
+				if ($c === $callback) {
+					unset($this->_callbacks[$event][$key]);
+				}
+			}
+		}
+
 	}
 
 	/**

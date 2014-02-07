@@ -37,6 +37,25 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
 	public function testUnbind() {
 		$counter = 0;
 		$eventHandler = new CM_EventHandler_EventHandler();
+		$callback = function() use (&$counter) {
+			$counter++;
+		};
+		$eventHandler->bind('foo', $callback);
+		$eventHandler->trigger('foo');
+		$this->assertSame(1, $counter);
+
+		$eventHandler->unbind('foo', function() {});
+		$eventHandler->trigger('foo');
+		$this->assertSame(2, $counter);
+
+		$eventHandler->unbind('foo', $callback);
+		$eventHandler->trigger('foo');
+		$this->assertSame(2, $counter);
+	}
+
+	public function testUnbindAll() {
+		$counter = 0;
+		$eventHandler = new CM_EventHandler_EventHandler();
 		$eventHandler->bind('foo', function() use (&$counter) {
 			$counter++;
 		});
