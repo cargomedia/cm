@@ -10,11 +10,24 @@ final class CM_EventHandler_EventHandler {
 	/**
 	 * @param string                          $event
 	 * @param CM_Jobdistribution_Job_Abstract $job
-	 * @param array|null                      $params
+	 * @param array                           $jobParams
 	 */
-	public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $params = null) {
+	public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $jobParams = null) {
 		$event = (string) $event;
-		$this->_callbacks[$event][] = array('job' => $job, 'params' => $params);
+		$jobParams = (array) $jobParams;
+		$this->bind($event, function($params) use ($job, $jobParams) {
+			$params = array_merge($jobParams, $params);
+			$job->queue($params);
+		});
+	}
+
+	/**
+	 * @param string $event
+	 * @param closure $callback
+	 */
+	public function bind($event, Closure $callback) {
+		$event = (string) $event;
+		$this->_callbacks[$event][] = $callback;
 	}
 
 	/**
@@ -36,13 +49,7 @@ final class CM_EventHandler_EventHandler {
 		}
 		if (!empty($this->_callbacks[$event])) {
 			foreach ($this->_callbacks[$event] as $callback) {
-				$jobParams = $params;
-				if (!empty($callback['params'])) {
-					$jobParams = array_merge($callback['params'], $jobParams);
-				}
-				/** @var CM_Jobdistribution_Job_Abstract $job */
-				$job = $callback['job'];
-				$job->queue($jobParams);
+				call_user_func($callback, $params);
 			}
 		}
 	}
