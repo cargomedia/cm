@@ -41,7 +41,7 @@ class CM_UtilTest extends CMTest_TestCase {
 		$testCases = array(
 			'foo'     => 'Foo',
 			'Foo'     => 'Foo',
-			'foo bar' => 'Foo bar',
+			'foo bar' => 'Foo Bar',
 			'foo-bar' => 'Foo Bar',
 			'foo.bar' => 'Foo.bar',
 		);

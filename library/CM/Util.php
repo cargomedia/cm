@@ -332,7 +332,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function titleize($string) {
-		return preg_replace('/[-_]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
+		return preg_replace('/[-_ ]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
 	}
 
 	/**
