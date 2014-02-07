@@ -12,7 +12,7 @@ final class CM_EventHandler_EventHandler {
 	 * @param CM_Jobdistribution_Job_Abstract $job
 	 * @param array|null                      $params
 	 */
-	public function bind($event, CM_Jobdistribution_Job_Abstract $job, array $params = null) {
+	public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $params = null) {
 		$event = (string) $event;
 		$this->_callbacks[$event][] = array('job' => $job, 'params' => $params);
 	}
