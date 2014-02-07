@@ -10,15 +10,15 @@ final class CM_EventHandler_EventHandler {
 	/**
 	 * @param string                          $event
 	 * @param CM_Jobdistribution_Job_Abstract $job
-	 * @param array                           $jobParams
+	 * @param array                           $defaultJobParams
 	 */
-	public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $jobParams = null) {
+	public function bindJob($event, CM_Jobdistribution_Job_Abstract $job, array $defaultJobParams = null) {
 		$event = (string) $event;
-		$jobParams = (array) $jobParams;
-		$this->bind($event, function (array $params = null) use ($job, $jobParams) {
-			$params = (array) $params;
-			$params = array_merge($jobParams, $params);
-			$job->queue($params);
+		$defaultJobParams = (array) $defaultJobParams;
+		$this->bind($event, function (array $jobParams = null) use ($job, $defaultJobParams) {
+			$jobParams = (array) $jobParams;
+			$jobParams = array_merge($defaultJobParams, $jobParams);
+			$job->queue($jobParams);
 		});
 	}
 
@@ -44,7 +44,7 @@ final class CM_EventHandler_EventHandler {
 	 * @param mixed|null $param1
 	 * @param mixed|null $param2 ...
 	 */
-	public function trigger($event, array $param1 = null, $param2 = null) {
+	public function trigger($event, $param1 = null, $param2 = null) {
 		$event = (string) $event;
 		$params = func_get_args();
 		array_shift($params);
