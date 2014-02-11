@@ -188,14 +188,14 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-bin/cm.php app generate-config-internal
+bin/cm app generate-config-internal
 ```
 
 ### Namespace creation, site setup
 
 CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
 ```bash
-bin/cm.php generator create-namespace <namespace>
+bin/cm generator create-namespace <namespace>
 ```
 
 ### Adding new modules
@@ -214,7 +214,7 @@ Creates new <class-name> class.
 ## Command line tools
 
 CM framework comes with its own set of command line tools to easily run common php routines.
-To see full list of available commands simply execute `bin/cm.php`.
+To see full list of available commands simply execute `bin/cm`.
 
 ```
 Usage:
