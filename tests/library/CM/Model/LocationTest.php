@@ -11,10 +11,20 @@ class CM_Model_LocationTest extends CMTest_TestCase {
 		$baselStadt = CM_Db_Db::insert('cm_locationState', array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
 		$zuerich = CM_Db_Db::insert('cm_locationState', array('countryId' => $switzerland, 'name' => 'Zürich'));
 
-		$basel = CM_Db_Db::insert('cm_locationCity', array('stateId' => $baselStadt, 'countryId' => $switzerland, 'name' => 'Basel',
-															 'lat'     => 47.569535, 'lon' => 7.574063));
-		$winterthur = CM_Db_Db::insert('cm_locationCity', array('stateId' => $zuerich, 'countryId' => $switzerland, 'name' => 'Winterthur',
-																  'lat'     => 47.502315, 'lon' => 8.724947));
+		$basel = CM_Db_Db::insert('cm_locationCity', array(
+			'stateId' => $baselStadt,
+			'countryId' => $switzerland,
+			'name' => 'Basel',
+			'lat'     => 47.569535,
+			'lon' => 7.574063,
+		));
+		$winterthur = CM_Db_Db::insert('cm_locationCity', array(
+			'stateId' => $zuerich,
+			'countryId' => $switzerland,
+			'name' => 'Winterthur',
+			'lat'     => 47.502315,
+			'lon' => 8.724947,
+		));
 
 		CM_Db_Db::insert('cm_locationZip', array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
 		CM_Db_Db::insert('cm_locationZip', array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
