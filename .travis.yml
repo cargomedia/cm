@@ -27,8 +27,7 @@ before_script:
   - scripts/cm.php app set-deploy-version
 
 after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
+  - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
 
 script: phpunit --coverage-clover=coverage.clover
 
