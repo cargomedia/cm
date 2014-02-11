@@ -15,9 +15,9 @@
     "require-dev": {
         "phpunit/phpunit": "~3.7.10"
     },
-	"config": {
-		"bin-dir": "bin/"
-	},
+    "config": {
+        "bin-dir": "bin/"
+    },
     "autoload": {
         "psr-0": {
             "CM_": "library/",
