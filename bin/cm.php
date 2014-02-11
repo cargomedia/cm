@@ -1,14 +1,18 @@
 #!/usr/bin/env php
 <?php
 
-function includeIfExists($file) {
-	return file_exists($file) && include $file;
+$dirVendor = null;
+foreach (array(__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php') as $file) {
+	if (file_exists($file)) {
+		require $file;
+		$dirVendor = realpath(dirname($file));
+	}
 }
-if (!includeIfExists(__DIR__.'/../vendor/autoload.php') && !includeIfExists(__DIR__.'/../../../autoload.php')) {
+if (!$dirVendor) {
 	die('Please install project dependencies with `composer install`.' . PHP_EOL);
 }
 
-$bootloader = new CM_Bootloader(dirname(__DIR__) . '/');
+$bootloader = new CM_Bootloader(dirname($dirVendor) . '/');
 $bootloader->load();
 
 $manager = new CM_Cli_CommandManager();
