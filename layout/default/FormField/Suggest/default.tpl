@@ -4,5 +4,5 @@
 		{$prePopulate[] = $field->getSuggestion($valueItem, $render)}
 	{/foreach}
 {/if}
-{block name='item-before'}{/block}
 {tag el="input" name=$name type="text" class="textinput {$class}" data-pre-populate="{$prePopulate|@json_encode}" data-placeholder=$placeholder}
+{block name='item-after'}{/block}
