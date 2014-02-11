@@ -188,16 +188,15 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php app generate-config-internal
+bin/cm.php app generate-config-internal
 ```
 
 ### Namespace creation, site setup
 
 CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
 ```bash
-./scripts/cm.php generator create-namespace <namespace>
+bin/cm.php generator create-namespace <namespace>
 ```
-Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader`.
 
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
@@ -215,7 +214,7 @@ Creates new <class-name> class.
 ## Command line tools
 
 CM framework comes with its own set of command line tools to easily run common php routines.
-To see full list of available commands simply execute `./scripts/cm.php`.
+To see full list of available commands simply execute `bin/cm.php`.
 
 ```
 Usage:
