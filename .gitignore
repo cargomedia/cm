@@ -1,5 +1,7 @@
 /vendor
 /composer.lock
+/bin
+!/bin/cm.php
 
 /data
 /resources/config/local.php
