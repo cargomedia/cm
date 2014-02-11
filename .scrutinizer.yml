@@ -11,3 +11,6 @@ tools:
     php_analyzer: true
 
     js_hint: true
+
+    external_code_coverage:
+        timeout: 600
