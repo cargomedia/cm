@@ -88,8 +88,17 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 			$logEntry .= $formatter->formatException($loggerException);
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
 			$logEntry .= $formatter->formatException($exception) . PHP_EOL;
-			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+			$logPath = $this->_getLogPath();
+			CM_Util::mkDir(dirname($logPath));
+			error_log($logEntry, 3, $logPath);
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _getLogPath() {
+		return CM_Bootloader::getInstance()->getDirData() . 'logs/error.log';
 	}
 
 	/**

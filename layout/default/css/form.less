@@ -1,5 +1,4 @@
 .textinput {
-	display: block;
 	.appearance(none);
 	.box-sizing(border-box);
 	width: 100%;
@@ -19,7 +18,7 @@
 
 textarea.textinput {
 	height: @heightInputTextarea;
-	padding-top: 7px;
+	padding-top: 6px;
 	overflow: auto;
 	resize: vertical;
 }
@@ -111,6 +110,12 @@ label {
 	&.hasIconRight.hasLabel .icon {
 		margin-left: 5px;
 	}
+}
+
+.button .spinner {
+	margin-left: 5px;
+	height: @sizeButton - 2px;
+	vertical-align: top;
 }
 
 .button.confirmClick {

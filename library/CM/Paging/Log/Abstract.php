@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract {
+abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_Typed {
 
 	/**
 	 * @param boolean $aggregate

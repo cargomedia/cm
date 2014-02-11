@@ -57,5 +57,4 @@ class CM_QueueTest extends CMTest_TestCase {
 		$this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
 		$this->assertSame(array(), $queue->pop($timeStamp3));
 	}
-
 }

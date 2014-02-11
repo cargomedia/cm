@@ -2,7 +2,6 @@
 
 class CM_Model_User extends CM_Model_Abstract {
 
-	const TYPE = 13;
 	const ONLINE_EXPIRATION = 1800;
 	const ACTIVITY_EXPIRATION = 60;
 

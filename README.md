@@ -1,5 +1,5 @@
-# CM Framework
-
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
+============
 
 ## Major concepts
 
@@ -149,7 +149,7 @@ CM_Paging_User_Country                         # All users from a given country
 
 In your workspace, run:
 ```bash
-composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch/source" --stability=dev <project-name>
+composer create-project cargomedia/cm-project --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 

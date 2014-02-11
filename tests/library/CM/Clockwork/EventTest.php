@@ -24,11 +24,11 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
 			'bar' => 0,
 		);
 		$event = new CM_Clockwork_Event(new DateInterval('PT1S'));
-		$event->registerCallback(function() use (&$counter) {
+		$event->registerCallback(function () use (&$counter) {
 			$counter['foo']++;
 		});
 		$event->run();
-		$event->registerCallback(function() use (&$counter) {
+		$event->registerCallback(function () use (&$counter) {
 			$counter['bar']++;
 		});
 		$event->run();

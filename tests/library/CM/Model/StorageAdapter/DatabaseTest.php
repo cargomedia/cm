@@ -114,8 +114,8 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
 		/** @var CM_Model_StorageAdapter_Database $adapter */
 
 		$idsTypes = array(
-			1 => array('type' => 1, 'id' => array('id' => $id1)),
-			'2' => array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
+			1     => array('type' => 1, 'id' => array('id' => $id1)),
+			'2'   => array('type' => 2, 'id' => array('id' => 3, 'foo' => 'foo3')),
 			'foo' => array('type' => 2, 'id' => array('id' => 8, 'foo' => 'foo8')),
 			'bar' => array('type' => 3, 'id' => array('id' => $id10))
 		);
