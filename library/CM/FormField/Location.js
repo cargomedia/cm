@@ -44,6 +44,8 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
 		deferred.always(function() {
 			self.$('.detect-location').removeClass('waiting');
 		});
+
+		return deferred;
 	},
 
 	/**
