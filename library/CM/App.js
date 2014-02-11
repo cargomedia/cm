@@ -464,7 +464,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	ui: {
 		ready: function() {
-			$.event.special.clickConfirmed.settings.message = cm.language.get('Please Confirm');
+			$.clickDecorators.confirmed.settings.message = cm.language.get('Please Confirm');
 		},
 
 		/**
@@ -722,6 +722,7 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @param {String} type
 	 * @param {Object} data
 	 * @param {Object} callbacks
+	 * @return jqXHR
 	 */
 	ajax: function(type, data, callbacks) {
 		var url = this.getUrlAjax(type);
@@ -768,10 +769,11 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @param {String} methodName
 	 * @param {Object} params
 	 * @param {Object|Null} callbacks
+	 * @return jqXHR
 	 */
 	rpc: function(methodName, params, callbacks) {
 		callbacks = callbacks || {};
-		this.ajax('rpc', {method: methodName, params: params}, {
+		return this.ajax('rpc', {method: methodName, params: params}, {
 			success: function(response) {
 				if (typeof(response.result) === 'undefined') {
 					cm.error.trigger('RPC response has undefined result');

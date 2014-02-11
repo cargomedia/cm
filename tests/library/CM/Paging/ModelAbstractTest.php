@@ -6,23 +6,23 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_paging_modelabstracttest_modelmock` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`foo` VARCHAR(32)
-			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=" . rand(1, 1000) . " DEFAULT CHARSET=utf8;
 		");
 		CM_Db_Db::exec("CREATE TABLE IF NOT EXISTS `cm_paging_modelabstracttest_modelmock2` (
 				`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 				`bar` VARCHAR(32)
-			) ENGINE=MyISAM AUTO_INCREMENT=".rand(1,1000)." DEFAULT CHARSET=utf8;
+			) ENGINE=MyISAM AUTO_INCREMENT=" . rand(1, 1000) . " DEFAULT CHARSET=utf8;
 		");
 	}
 
 	public function testPagingFixedType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock';
 		$model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo1');
 		$model2 = CM_Paging_ModelAbstractTest_ModelMock::create('foo2');
 		$source = new CM_PagingSource_Array(array($model2->getId(), $model1->getId(), 999));
 		$modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setMethods(array('_getModelType'))->setConstructorArgs(array($source))
 				->getMockForAbstractClass();
-		$modelPaging->expects($this->any())->method('_getModelType')->will($this->returnValue(CM_Paging_ModelAbstractTest_ModelMock::TYPE));
+		$modelPaging->expects($this->any())->method('_getModelType')->will($this->returnValue(CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()));
 		/** @var CM_Paging_ModelAbstract $modelPaging */
 		$this->assertCount(3, $modelPaging);
 		$this->assertEquals($model2, $modelPaging->getItem(0));
@@ -36,17 +36,17 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 	}
 
 	public function testPagingVariableType() {
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock';
-		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::TYPE] = 'CM_Paging_ModelAbstractTest_ModelMock2';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock';
+		CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock2::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock2';
 		$model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo');
 		$model2 = CM_Paging_ModelAbstractTest_ModelMock2::create('bar');
 		$source = new CM_PagingSource_Array(array(
-			array('type' => $model1->getType(),'id' => $model1->getId()),
-			array('type' => $model2->getType(),'id' => $model2->getId()),
-			array('type' => $model1->getType(),'id' => 9999)
+			array('type' => $model1->getType(), 'id' => $model1->getId()),
+			array('type' => $model2->getType(), 'id' => $model2->getId()),
+			array('type' => $model1->getType(), 'id' => 9999)
 		));
 		$modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setConstructorArgs(array($source))
-				->getMockForAbstractClass();
+			->getMockForAbstractClass();
 		/** @var CM_Paging_ModelAbstract $modelPaging */
 		$this->assertCount(3, $modelPaging);
 		$this->assertEquals($model1, $modelPaging->getItem(0));
@@ -65,8 +65,6 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
 
 class CM_Paging_ModelAbstractTest_ModelMock extends CM_Model_Abstract {
 
-	const TYPE = 1;
-
 	protected function _getSchema() {
 		return new CM_Model_Schema_Definition(array('foo' => array()));
 	}
@@ -81,11 +79,13 @@ class CM_Paging_ModelAbstractTest_ModelMock extends CM_Model_Abstract {
 	public static function getPersistenceClass() {
 		return 'CM_Model_StorageAdapter_Database';
 	}
+
+	public static function getTypeStatic() {
+		return 1;
+	}
 }
 
 class CM_Paging_ModelAbstractTest_ModelMock2 extends CM_Model_Abstract {
-
-	const TYPE = 2;
 
 	protected function _getSchema() {
 		return new CM_Model_Schema_Definition(array('bar' => array()));
@@ -100,5 +100,9 @@ class CM_Paging_ModelAbstractTest_ModelMock2 extends CM_Model_Abstract {
 
 	public static function getPersistenceClass() {
 		return 'CM_Model_StorageAdapter_Database';
+	}
+
+	public static function getTypeStatic() {
+		return 2;
 	}
 }

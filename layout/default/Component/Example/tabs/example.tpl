@@ -10,8 +10,8 @@
 	{button_link class="removeComponent" label="remove()"}
 <hr />
 
-	{button_link class="callRpcTime" label="rpc: time()"}
-	{button_link class="callAjaxTest" label="ajax: test()"}
+	{button_link class="callRpcTime" label="rpc: time()" data=['click-spinner' => true]}
+	{button_link class="callAjaxTest" label="ajax: test()" data=['click-spinner' => true]}
 <hr />
 
 	{button_link class="throwError_500_text_callback" label="err: 500+text+callback"}

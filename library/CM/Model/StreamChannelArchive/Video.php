@@ -2,8 +2,6 @@
 
 class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_Abstract {
 
-	const TYPE = 25;
-
 	/**
 	 * @return int
 	 */

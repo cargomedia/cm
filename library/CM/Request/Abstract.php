@@ -25,17 +25,17 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @var array
 	 */
+	protected $_server = array();
+
+	/**
+	 * @var array
+	 */
 	protected $_cookies;
 
 	/**
 	 * @var bool|CM_Model_User|null
 	 */
 	protected $_viewer = false;
-
-	/**
-	 * @var CM_Model_DeviceCapabilities
-	 */
-	private $_capabilities;
 
 	/**
 	 * @var CM_Session|null
@@ -60,14 +60,16 @@ abstract class CM_Request_Abstract {
 	/**
 	 * @param string             $uri
 	 * @param array|null         $headers OPTIONAL
+	 * @param array|null         $server
 	 * @param CM_Model_User|null $viewer
-	 * @throws CM_Exception_Invalid
 	 */
-	public function __construct($uri, array $headers = null, CM_Model_User $viewer = null) {
-		if (is_null($headers)) {
-			$headers = array();
+	public function __construct($uri, array $headers = null, array $server = null, CM_Model_User $viewer = null) {
+		if (null !== $headers) {
+			$this->_headers = array_change_key_case($headers);
 		}
-		$this->_headers = array_change_key_case($headers);
+		if (null !== $server) {
+			$this->_server = array_change_key_case($server);
+		}
 
 		$this->setUri($uri);
 
@@ -85,17 +87,10 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_DeviceCapabilities
+	 * @return array
 	 */
-	public function getDeviceCapabilities() {
-		if (!isset($this->_capabilities)) {
-			$userAgent = '';
-			if ($this->hasHeader('user-agent')) {
-				$userAgent = $this->getHeader('user-agent');
-			}
-			$this->_capabilities = new CM_Model_DeviceCapabilities($userAgent);
-		}
-		return $this->_capabilities;
+	public function getServer() {
+		return $this->_server;
 	}
 
 	/**
@@ -363,14 +358,10 @@ abstract class CM_Request_Abstract {
 	 * @return string|null    very long number (string used)
 	 */
 	public function getIp() {
-		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
-			$ip = CM_Config::get()->testIp;
-		} else {
-			if (!isset($_SERVER['REMOTE_ADDR'])) {
-				return null;
-			}
-			$ip = $_SERVER['REMOTE_ADDR'];
+		if (!isset($this->_server['remote_addr'])) {
+			return null;
 		}
+		$ip = $this->_server['remote_addr'];
 		$long = sprintf('%u', ip2long($ip));
 		if (0 == $long) {
 			return null;
@@ -524,26 +515,27 @@ abstract class CM_Request_Abstract {
 	}
 
 	/**
-	 * @param string      $method
-	 * @param string      $uri
-	 * @param array|null  $headers
+	 * @param string $method
+	 * @param string $uri
+	 * @param array|null $headers
+	 * @param array|null $server
 	 * @param string|null $body
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Request_Abstract
 	 */
-	public static function factory($method, $uri, array $headers = null, $body = null) {
+	public static function factory($method, $uri, array $headers = null, array $server = null, $body = null) {
 		$method = strtolower($method);
 		if ($method === 'post') {
-			return new CM_Request_Post($uri, $headers, $body);
+			return new CM_Request_Post($uri, $headers, $server, $body);
 		}
 		if ($method === 'get') {
-			return new CM_Request_Get($uri, $headers);
+			return new CM_Request_Get($uri, $headers, $server);
 		}
 		if ($method === 'head') {
-			return new CM_Request_Head($uri, $headers);
+			return new CM_Request_Head($uri, $headers, $server);
 		}
 		if ($method === 'options') {
-			return new CM_Request_Options($uri, $headers);
+			return new CM_Request_Options($uri, $headers, $server);
 		}
 		throw new CM_Exception_Invalid('Invalid request method `' . $method . '`');
 	}
@@ -555,6 +547,7 @@ abstract class CM_Request_Abstract {
 		$method = $_SERVER['REQUEST_METHOD'];
 		$uri = $_SERVER['REQUEST_URI'];
 		$body = file_get_contents('php://input');
+		$server = $_SERVER;
 
 		if (function_exists('getallheaders')) {
 			$headers = getallheaders();
@@ -571,6 +564,6 @@ abstract class CM_Request_Abstract {
 			}
 		}
 
-		return self::factory($method, $uri, $headers, $body);
+		return self::factory($method, $uri, $headers, $server, $body);
 	}
 }

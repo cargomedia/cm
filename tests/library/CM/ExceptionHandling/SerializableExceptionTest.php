@@ -8,8 +8,7 @@ class CM_ExceptionHandling_SerializableExceptionTest extends CMTest_TestCase {
 				'file'     => 'test.php',
 				'line'     => 18,
 				'function' => 'foo',
-				'args'     =>
-				array(),
+				'args'     => array(),
 			),
 			array(
 				'file'     => 'test.php',
@@ -17,15 +16,13 @@ class CM_ExceptionHandling_SerializableExceptionTest extends CMTest_TestCase {
 				'function' => 'bar',
 				'class'    => 'Foo',
 				'type'     => '->',
-				'args'     =>
-				array(),
+				'args'     => array(),
 			),
 			array(
 				'file'     => 'test.php(28) : eval()\'d code',
 				'line'     => 1,
 				'function' => '{closure}',
-				'args'     =>
-				array(),
+				'args'     => array(),
 			),
 			array(
 				'file'     => 'test.php',

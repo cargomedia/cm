@@ -3,8 +3,11 @@
 class CM_Stream_VideoTest extends CMTest_TestCase {
 
 	public function setUp() {
-		CM_Config::get()->CM_Stream_Video->servers = array(1 => array('publicHost' => 'video.example.com', 'publicIp' => '10.0.3.109',
-			'privateIp' => '10.0.3.108'));
+		CM_Config::get()->CM_Stream_Video->servers = array(1 => array(
+			'publicHost' => 'video.example.com',
+			'publicIp'   => '10.0.3.109',
+			'privateIp'  => '10.0.3.108'),
+		);
 	}
 
 	public function tearDown() {
@@ -17,7 +20,7 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		$mockAdapter->expects($this->exactly(2))->method('_stopStream')->will($this->returnValue(1));
 		$mockAdapter->expects($this->any())->method('getType')->will($this->returnValue(1));
 
-		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::TYPE] = 'CM_Model_StreamChannel_Video_Mock';
+		CM_Config::get()->CM_Model_StreamChannel_Abstract->types[CM_Model_StreamChannel_Video_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Video_Mock';
 		$wowza = $wowza = $this->getMock('CM_Stream_Video', array('getAdapter'));
 		$wowza->expects($this->any())->method('getAdapter')->will($this->returnValue($mockAdapter));
 		/** @var $wowza CM_Stream_Video */
@@ -25,20 +28,49 @@ class CM_Stream_VideoTest extends CMTest_TestCase {
 		// allowedUntil will be updated, if stream has expired and its user isn't $userUnchanged, hardcoded in CM_Model_StreamChannel_Video_Mock::canSubscribe() using getOnline()
 		$userUnchanged = CMTest_TH::createUser();
 		$userUnchanged->setOnline();
-		$streamChannel = CM_Model_StreamChannel_Video_Mock::createStatic(array('key' => 'foo1', 'serverId' => 1, 'adapterType' => 1, 'width' => 100,
-			'height' => 100, 'thumbnailCount' => 0));
+		$streamChannel = CM_Model_StreamChannel_Video_Mock::createStatic(array(
+			'key'            => 'foo1',
+			'serverId'       => 1,
+			'adapterType'    => 1,
+			'width'          => 100,
+			'height'         => 100,
+			'thumbnailCount' => 0,
+		));
 
-		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
-			'key' => 'foo1_2', 'start' => time()));
-		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
-			'key' => 'foo1_4', 'start' => time()));
-		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
-			'key' => 'foo1_3', 'start' => time()));
-		$streamPublishUnchanged1 = CM_Model_Stream_Publish::createStatic(array('streamChannel' => $streamChannel, 'user' => $userUnchanged,
-			'key' => 'foo1_2', 'start' => time()));
-		$streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array('streamChannel' => CM_Model_StreamChannel_Video_Mock::createStatic(array('key' => 'foo2',
-			'serverId' => 1, 'adapterType' => 1, 'width' => 100, 'height' => 100, 'thumbnailCount' => 0)), 'user' => CMTest_TH::createUser(),
-			'key' => 'foo2_1', 'start' => time()));
+		$streamSubscribeUnchanged1 = CM_Model_Stream_Subscribe::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => $userUnchanged,
+			'key'           => 'foo1_2',
+			'start'         => time(),
+		));
+		$streamSubscribeUnchanged2 = CM_Model_Stream_Subscribe::createStatic(array(
+			'streamChannel' => $streamChannel,
+			'user'          => CMTest_TH::createUser(),
+			'key'           => 'foo1_4',
+			'start'         => time(),
+		));
+		$streamSubscribeChanged1 = CM_Model_Stream_Subscribe::createStatic(array(
+			'streamChannel' => $streamChannel, 'user' => CMTest_TH::createUser(),
+			'key'           => 'foo1_3',
+			'start'         => time(),
+		));
+		$streamPublishUnchanged1 = CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => $streamChannel, 'user' => $userUnchanged,
+			'key'           => 'foo1_2',
+			'start'         => time(),
+		));
+		$streamPublishChanged1 = CM_Model_Stream_Publish::createStatic(array(
+			'streamChannel' => CM_Model_StreamChannel_Video_Mock::createStatic(array(
+					'key'            => 'foo2',
+					'serverId'       => 1,
+					'adapterType'    => 1,
+					'width'          => 100,
+					'height'         => 100,
+					'thumbnailCount' => 0,
+				)),
+			'user'          => CMTest_TH::createUser(),
+			'key'           => 'foo2_1', 'start' => time(),
+		));
 
 		$this->assertSameTime($streamSubscribeUnchanged1->getAllowedUntil(), time() + 10);
 		$this->assertSameTime($streamSubscribeUnchanged2->getAllowedUntil(), time() + 100);
@@ -77,5 +109,9 @@ class CM_Model_StreamChannel_Video_Mock extends CM_Model_StreamChannel_Video {
 
 	public function canSubscribe(CM_Model_User $user, $allowedUntil) {
 		return $user->getOnline() ? $allowedUntil + 10 : $allowedUntil + 100;
+	}
+
+	public static function getTypeStatic() {
+		return 1;
 	}
 }

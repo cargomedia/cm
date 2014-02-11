@@ -8,7 +8,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
 		}
 		$counter = 0;
 		$gearmanWorkerMock = $this->getMock('GearmanWorker', array('work'));
-		$gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function() use (&$counter) {
+		$gearmanWorkerMock->expects($this->exactly(2))->method('work')->will($this->returnCallback(function () use (&$counter) {
 			if (++$counter >= 2) {
 				return false;
 			}

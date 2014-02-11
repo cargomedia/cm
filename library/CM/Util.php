@@ -211,7 +211,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function mkDirTmp() {
-		$path = DIR_TMP . uniqid() . DIRECTORY_SEPARATOR;
+		$path = CM_Bootloader::getInstance()->getDirTmp() . uniqid() . DIRECTORY_SEPARATOR;
 		return self::mkDir($path);
 	}
 
@@ -332,7 +332,7 @@ class CM_Util {
 	 * @return string
 	 */
 	public static function titleize($string) {
-		return preg_replace('/[-_]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
+		return preg_replace('/[-_ ]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
 	}
 
 	/**
