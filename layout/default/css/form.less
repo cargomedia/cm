@@ -113,13 +113,13 @@ label {
 }
 
 .button[data-click-spinner] {
+	position: relative;
+
 	:not(.spinner) {
 		.transition(200ms);
 	}
 
 	&.hasSpinner {
-		position: relative;
-
 		.spinner {
 			.spinner-expanded;
 		}
