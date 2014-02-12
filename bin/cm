@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$autoloadPath = reset(array_filter(array(__DIR__ . '/../vendor/autoldoad.php', __DIR__ . '/../../../autoload.php'), function ($path) {
+$autoloadPath = reset(array_filter(array(__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'), function ($path) {
 	return file_exists($path);
 }));
 if (false === $autoloadPath) {
