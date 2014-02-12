@@ -119,7 +119,7 @@ class CM_Cli_CommandManager {
 				$process->fork($forks, $keepAlive);
 			}
 
-			CMService_Newrelic::getInstance()->startTransaction('cm.php ' . $packageName . ' ' . $methodName);
+			CMService_Newrelic::getInstance()->startTransaction('cm ' . $packageName . ' ' . $methodName);
 			$command->run($arguments, $this->_streamInput, $this->_streamOutput);
 			return 0;
 		} catch (CM_Cli_Exception_InvalidArguments $e) {
