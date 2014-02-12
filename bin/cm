@@ -1,18 +1,15 @@
 #!/usr/bin/env php
 <?php
 
-$dirVendor = null;
-foreach (array(__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php') as $file) {
-	if (file_exists($file)) {
-		require $file;
-		$dirVendor = realpath(dirname($file));
-	}
-}
-if (!$dirVendor) {
-	die('Please install project dependencies with `composer install`.' . PHP_EOL);
+$autoloadPath = reset(array_filter(array(__DIR__ . '/../vendor/autoldoad.php', __DIR__ . '/../../../autoload.php'), function ($path) {
+	return file_exists($path);
+}));
+if (false === $autoloadPath) {
+	die('ERROR: Please install project dependencies with `composer install`.' . PHP_EOL);
 }
 
-$bootloader = new CM_Bootloader(dirname($dirVendor) . '/');
+require $autoloadPath;
+$bootloader = new CM_Bootloader(dirname(dirname(realpath($autoloadPath))) . '/');
 $bootloader->load();
 
 $manager = new CM_Cli_CommandManager();
