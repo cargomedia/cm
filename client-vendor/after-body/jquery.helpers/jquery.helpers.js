@@ -4,7 +4,7 @@
 (function($) {
 	$.fn.extend({
 		disable: function(message) {
-			$.blockUI.defaults.overlayCSS = {opacity: 0.3};
+			$.blockUI.defaults.overlayCSS = {opacity: 0};
 			$.blockUI.defaults.css = {};
 			return this.each(function() {
 				$(this).block({
