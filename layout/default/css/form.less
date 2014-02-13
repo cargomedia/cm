@@ -23,13 +23,6 @@ textarea.textinput {
 	resize: vertical;
 }
 
-label {
-	//Fix for fastclick
-	> * {
-		pointer-events: none;
-	}
-}
-
 .input_focus {
 	outline: none;
 	border: 1px solid lighten(@colorNotice, 15);
@@ -200,6 +193,13 @@ label {
 			margin-right: 10px;
 			font-size: 1em;
 		}
+	}
+}
+
+label {
+	//Fix for fastclick
+	> * {
+		pointer-events: none;
 	}
 }
 
