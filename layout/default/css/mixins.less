@@ -18,12 +18,6 @@
 	color: white;
 }
 
-.hyphens(@arg) {
-	-webkit-hyphens: @arg;
-	-moz-hyphens: @arg;
-	hyphens: @arg;
-}
-
 .word_wrap() {
 	word-break: break-all;
 	word-wrap: break-word;
@@ -167,11 +161,7 @@
 	}
 }
 
-.background-size(@value) {
-	background-size: @value;
-	-webkit-background-size: @value;
-}
-
+// Vendor prefixing
 .appearance(@value) {
 	-webkit-appearance: @value;
 	-moz-appearance: @value;
@@ -182,6 +172,17 @@
 	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+}
+
+.background-size(@value) {
+	background-size: @value;
+	-webkit-background-size: @value;
+}
+
+.hyphens(@arg) {
+	-webkit-hyphens: @arg;
+	-moz-hyphens: @arg;
+	hyphens: @arg;
 }
 
 .transform-origin (@x:center, @y:center) {
