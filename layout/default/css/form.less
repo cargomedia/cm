@@ -23,16 +23,9 @@ textarea.textinput {
 	resize: vertical;
 }
 
-select {
-	border: 1px solid @colorFgBorderEmphasize3;
-	max-width: 100%;
-}
-
-label {
-	//Fix for fastclick
-	> * {
-		pointer-events: none;
-	}
+.input_focus {
+	outline: none;
+	border: 1px solid lighten(@colorNotice, 15);
 }
 
 .placeholder(@color) {
@@ -200,6 +193,13 @@ label {
 			margin-right: 10px;
 			font-size: 1em;
 		}
+	}
+}
+
+label {
+	//Fix for fastclick
+	> * {
+		pointer-events: none;
 	}
 }
 
