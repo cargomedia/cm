@@ -69,7 +69,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 	/**
 	 * @param string $key
 	 * @param mixed  $value
-	 * @return CM_Component_Abstract
+	 * @return CM_FormField_Abstract
 	 */
 	public function setTplParam($key, $value) {
 		$this->_tplParams[$key] = $value;

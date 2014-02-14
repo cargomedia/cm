@@ -46,7 +46,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 	}
 
 	/**
-	 * @return CM_Model_Stream_Publish
+	 * @return integer|null
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getStreamPublish() {
@@ -116,7 +116,7 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return CM_Model_StreamChannel_Video|null
+	 * @return null|CM_Model_StreamChannel_Abstract
 	 */
 	public static function findByKey($key) {
 		$adapterType = CM_Stream_Video::getInstance()->getAdapter()->getType();

@@ -2,6 +2,9 @@
 
 abstract class CM_Response_Resource_Javascript_Abstract extends CM_Response_Resource_Abstract {
 
+	/**
+	 * @param string $content
+	 */
 	protected function _setContent($content) {
 		$this->enableCache();
 		$this->setHeader('Content-Type', 'application/x-javascript');

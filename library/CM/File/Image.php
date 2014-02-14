@@ -15,6 +15,9 @@ class CM_File_Image extends CM_File {
 	/** @var bool */
 	private $_animated = false;
 
+	/**
+	 * @param CM_File $file
+	 */
 	public function __construct($file) {
 		parent::__construct($file);
 
@@ -287,7 +290,7 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @param Imagick  $imagick
-	 * @param callable $callback fn(Imagick)
+	 * @param Closure $callback fn(Imagick)
 	 * @param int      $format
 	 */
 	private function _invokeOnEveryFrame(Imagick $imagick, Closure $callback, $format) {

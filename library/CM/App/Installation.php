@@ -71,7 +71,7 @@ class CM_App_Installation {
 	}
 
 	/**
-	 * @return mixed
+	 * @return integer
 	 */
 	public function getUpdateStamp() {
 		$composerJsonStamp = CM_File::getModified(DIR_ROOT . 'composer.json');
@@ -81,7 +81,7 @@ class CM_App_Installation {
 	}
 
 	/**
-	 * @return \Composer\Package\CompletePackage[]
+	 * @return Composer\Package\RootPackageInterface[]
 	 */
 	protected function _getComposerPackages() {
 		$repo = $this->_getComposer()->getRepositoryManager()->getLocalRepository();

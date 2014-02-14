@@ -37,7 +37,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param mixed  $value
+	 * @param string  $value
 	 */
 	public function set($key, $value) {
 		if ($this->_decode) {
@@ -292,7 +292,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_Language|string      $key
+	 * @param string      $key
 	 * @param CM_Model_Language|string|null $default
 	 * @return CM_Model_Language
 	 */
@@ -301,7 +301,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Site_Abstract|int      $key
+	 * @param string      $key
 	 * @param CM_Site_Abstract|int|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Site_Abstract
