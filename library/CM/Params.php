@@ -189,7 +189,6 @@ class CM_Params extends CM_Class_Abstract {
 			$default = 1;
 		}
 		$page = $this->getInt($key, $default);
-		$page = min(1000, $page);
 		$page = max(1, $page);
 		return $page;
 	}
