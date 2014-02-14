@@ -174,7 +174,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	private function _getMenuEntryHashList(array $menuList, CM_Page_Abstract $page) {
 		$menuEntryHashList = array();
 		foreach ($menuList as $menu) {
-			if ($menuEntries = $menu->findEntries($page)) {
+			if (is_array($menuEntries = $menu->findEntries($page))) {
 				foreach ($menuEntries as $menuEntry) {
 					$menuEntryHashList[] = $menuEntry->getHash();
 					foreach ($menuEntry->getParents() as $parentEntry) {
