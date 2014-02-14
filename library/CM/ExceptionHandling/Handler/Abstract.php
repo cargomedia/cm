@@ -25,11 +25,11 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	);
 
 	public function handleErrorFatal() {
-		if (!error_reporting()) {
-			return;
-		}
 		if ($error = error_get_last()) {
 			$code = isset($error['type']) ? $error['type'] : E_CORE_ERROR;
+			if (0 === ($code & error_reporting())) {
+				return;
+			}
 			$message = isset($error['message']) ? $error['message'] : '';
 			$file = isset($error['file']) ? $error['file'] : 'unknown file';
 			$line = isset($error['line']) ? $error['line'] : 0;
@@ -50,8 +50,8 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	 * @throws ErrorException
 	 */
 	public function handleErrorRaw($code, $message, $file, $line) {
-		if (!error_reporting()) {
-			return true;
+		if (0 === ($code & error_reporting())) {
+			return;
 		}
 		if (isset($this->_errorCodes[$code])) {
 			$message = $this->_errorCodes[$code] . ': ' . $message;
