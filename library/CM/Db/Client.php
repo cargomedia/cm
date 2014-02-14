@@ -95,7 +95,7 @@ class CM_Db_Client {
 	/**
 	 * @param bool $enabled
 	 */
-	public function setBuffered($enabled){
+	public function setBuffered($enabled) {
 		$this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
 	}
 
