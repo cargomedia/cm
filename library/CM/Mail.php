@@ -153,7 +153,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string|null
+	 * @return string
 	 */
 	public function getHtml() {
 		return $this->_htmlBody;
@@ -184,7 +184,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string|null
+	 * @return string
 	 */
 	public function getSubject() {
 		return $this->_subject;
@@ -198,7 +198,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string|null
+	 * @return string
 	 */
 	public function getText() {
 		return $this->_textBody;
@@ -240,7 +240,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return array array($subject, $html, $text)
+	 * @return string array($subject, $html, $text)
 	 */
 	public function render() {
 		$language = null;
@@ -375,7 +375,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
 	/**
 	 * @param CM_Model_Language|null $language
-	 * @return array array($subject, $html, $text)
+	 * @return string array($subject, $html, $text)
 	 */
 	protected function _render($language) {
 		$render = new CM_Render($this->_site, $this->_recipient, $language);

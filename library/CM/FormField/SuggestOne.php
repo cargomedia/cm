@@ -9,6 +9,9 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 		parent::__construct(1, $enableChoiceCreate);
 	}
 
+	/**
+	 * @param CM_Model_Location $value
+	 */
 	public function setValue($value) {
 		$value = $value ? array($value) : null;
 		parent::setValue($value);

@@ -36,7 +36,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 	}
 
 	/**
-	 * @param CM_Page_Abstract|string $page
+	 * @param CM_Page_Abstract $page
 	 * @param array|null              $params
 	 */
 	public function redirect($page, array $params = null) {

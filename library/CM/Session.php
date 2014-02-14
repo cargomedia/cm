@@ -75,7 +75,7 @@ class CM_Session implements CM_Comparable {
 
 	/**
 	 * @param string $key
-	 * @return mixed|null
+	 * @return integer
 	 */
 	public function get($key) {
 		if (isset($this->_data[$key])) {
@@ -86,7 +86,7 @@ class CM_Session implements CM_Comparable {
 
 	/**
 	 * @param string $key
-	 * @param mixed  $value
+	 * @param integer  $value
 	 */
 	public function set($key, $value) {
 		$this->_data[$key] = $value;

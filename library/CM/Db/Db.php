@@ -128,7 +128,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
-	 * @param string|array      $fields
+	 * @param string[]      $fields
 	 * @param string|array|null $values
 	 * @return string|null
 	 */
@@ -184,7 +184,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string       $table
-	 * @param string|array $fields     Column-name OR Column-names array
+	 * @param string $fields     Column-name OR Column-names array
 	 * @param array[]      $whereList  Outer array-entries are combined using OR, inner arrays using AND
 	 * @param string|null  $order
 	 * @return CM_Db_Result
@@ -336,7 +336,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param string      $table
 	 * @param string      $column
 	 * @param string|null $where
-	 * @return int
+	 * @return string
 	 * @throws CM_DB_Exception
 	 */
 	public static function getRandId($table, $column, $where = null) {

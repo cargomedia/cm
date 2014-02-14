@@ -24,7 +24,7 @@ class CM_MenuEntry {
 
 	/**
 	 * @param array              $data
-	 * @param CM_Menu|null       $menu
+	 * @param CM_Menu       $menu
 	 * @param CM_MenuEntry|null  $parent
 	 * @throws CM_Exception_Invalid
 	 */
@@ -60,7 +60,7 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return CM_Menu|null
+	 * @return CM_Menu
 	 */
 	public final function getChildren() {
 		return $this->_submenu;

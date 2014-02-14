@@ -96,7 +96,7 @@ class CM_Render extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return mixed|null
+	 * @return CM_View_Abstract
 	 */
 	public function popStack($key) {
 		if (!isset($this->_stack[$key])) {
@@ -434,7 +434,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_MenuEntry[]
+	 * @return CM_Menu[]
 	 */
 	public function getMenuList() {
 		return $this->_menuList;

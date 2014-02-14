@@ -72,6 +72,10 @@ class CM_SearchQuery_Abstract {
 		$this->_filter(array('exists' => array('field' => (string) $field)));
 	}
 
+	/**
+	 * @param string $field
+	 * @param string $value
+	 */
 	public function filterPrefix($field, $value) {
 		$this->_filter(array('prefix' => array($field => $value)));
 	}

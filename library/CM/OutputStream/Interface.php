@@ -9,6 +9,7 @@ interface CM_OutputStream_Interface {
 
 	/**
 	 * @param string $message
+	 * @return void
 	 */
 	public function writeln($message);
 

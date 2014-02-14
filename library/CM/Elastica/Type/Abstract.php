@@ -6,6 +6,9 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 
 	protected $_source = false; // Don't store json-source
 
+	/**
+	 * @param integer $version
+	 */
 	public function __construct($host = null, $port = null, $version = null) {
 		$this->_indexName = CM_Bootloader::getInstance()->getDataPrefix();
 		$this->_indexName .= static::INDEX_NAME;

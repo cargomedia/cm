@@ -46,7 +46,7 @@ class CM_Set {
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
 	 */
 	public function flush() {
 		$values = $this->_adapter->flush($this->getKey());
