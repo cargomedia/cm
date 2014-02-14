@@ -145,13 +145,13 @@ textarea.textinput {
 }
 
 .button-highlight {
-	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -6));
-	border: 1px solid spin(@colorBgButtonHighlight, -3);
+	.gradient(vertical, @colorHighlight, spin(@colorHighlight, -6));
+	border: 1px solid spin(@colorHighlight, -3);
 	color: @colorFgTheme;
-	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
+	text-shadow: 1px 1px spin(@colorHighlight, -8);
 
 	&:not(:disabled):active {
-		border-color: spin(@colorBgButtonHighlight, -15);
+		border-color: spin(@colorHighlight, -15);
 	}
 }
 
