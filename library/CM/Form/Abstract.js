@@ -172,7 +172,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 				if (label) {
 					errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
 				} else {
-					errorList[fieldName] = cm.language.get('Required')
+					errorList[fieldName] = cm.language.get('Required');
 				}
 				hasErrors = true;
 			}

@@ -78,7 +78,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 			},
 			always: function(e, data) {
 				inProgressCount--;
-				if (inProgressCount == 0 && field.getCountUploaded() > 0) {
+				if (inProgressCount === 0 && field.getCountUploaded() > 0) {
 					field.trigger("uploadComplete", data.files);
 				}
 			}
@@ -86,10 +86,10 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
 
 		if (dropZoneEnabled) {
 			this.bindJquery($(document), 'dragenter', function() {
-				field.$el.addClass('dragover')
+				field.$el.addClass('dragover');
 			});
 			this.bindJquery($(document), 'drop', function() {
-				field.$el.removeClass('dragover')
+				field.$el.removeClass('dragover');
 			});
 			this.bindJquery($(document), 'drop dragover', function(e) {
 				e.preventDefault();

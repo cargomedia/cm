@@ -548,7 +548,7 @@ var CM_App = CM_Class_Abstract.extend({
 			 * @param {Array} focusWindows
 			 */
 			_set: function(focusWindows) {
-				cm.storage.set('focusWindows', focusWindows)
+				cm.storage.set('focusWindows', focusWindows);
 			},
 			/**
 			 * @param {String} uuid
@@ -747,7 +747,7 @@ var CM_App = CM_Class_Abstract.extend({
 					}
 				}
 			}).fail(function(xhr, textStatus) {
-				if (xhr.status == 0) {
+				if (xhr.status === 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
 
