@@ -240,7 +240,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string array($subject, $html, $text)
+	 * @return array array($subject, $html, $text)
 	 */
 	public function render() {
 		$language = null;
@@ -375,10 +375,11 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
 	/**
 	 * @param CM_Model_Language|null $language
-	 * @return string array($subject, $html, $text)
+	 * @return array array($subject, $html, $text)
 	 */
 	protected function _render($language) {
 		$render = new CM_Render($this->_site, $this->_recipient, $language);
-		return $render->render($this);
+		$renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+		return $renderAdapter->fetch();
 	}
 }

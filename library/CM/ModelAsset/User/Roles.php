@@ -26,7 +26,7 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	}
 
 	/**
-	 * @param int $role
+	 * @param int $role...
 	 * @return boolean
 	 */
 	public function contains($role) {

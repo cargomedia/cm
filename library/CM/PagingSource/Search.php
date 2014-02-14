@@ -54,7 +54,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	/**
 	 * @param int|null $offset
 	 * @param int|null $count
-	 * @return mixed
+	 * @return array
 	 */
 	private function _getResult($offset = null, $count = null) {
 		$cacheKey = array($this->_query->getSort(), $offset, $count);
