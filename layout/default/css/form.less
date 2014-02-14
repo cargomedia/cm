@@ -104,13 +104,13 @@ textarea.textinput {
 }
 
 .button[data-click-spinner] {
+	position: relative;
+
 	:not(.spinner) {
 		.transition(200ms);
 	}
 
 	&.hasSpinner {
-		position: relative;
-
 		.spinner {
 			.spinner-expanded;
 		}
@@ -142,6 +142,11 @@ textarea.textinput {
 	&:not(:disabled):active {
 		border-color: darken(@colorFgBorderEmphasize3, 5);
 	}
+}
+
+.button-transparent {
+	background: none;
+	border: 1px solid transparent;
 }
 
 .button-highlight {
