@@ -61,7 +61,7 @@ class CM_Stream_Video extends CM_Stream_Abstract {
 	 * @param int     $height
 	 * @param int     $thumbnailCount
 	 * @param string  $data
-	 * @return integer
+	 * @return int
 	 */
 	public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
 		$request = CM_Request_Abstract::getInstance();

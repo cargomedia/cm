@@ -100,7 +100,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return integer
+	 * @return int
 	 */
 	public function getId() {
 		return (int) $this->_getId('id');

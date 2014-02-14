@@ -35,7 +35,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
 	/**
 	 * @param string            $verbName
-	 * @param CM_Model_User $actor
+	 * @param CM_Model_User|int $actor
 	 */
 	public function __construct($verbName, $actor) {
 		$this->setActor($actor);
@@ -138,7 +138,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	/**
-	 * @return CM_Model_User
+	 * @return CM_Model_User|null
 	 */
 	public function getActor() {
 		return $this->_actor;

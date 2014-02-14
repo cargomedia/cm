@@ -3,7 +3,7 @@
 class CM_Paging_StreamChannel_AdapterType extends CM_Paging_StreamChannel_Abstract {
 
 	/**
-	 * @param integer $adapterTypes
+	 * @param int|int[] $adapterTypes
 	 */
 	public function __construct($adapterTypes) {
 		$adapterTypes = (array) $adapterTypes;

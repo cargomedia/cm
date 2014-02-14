@@ -15,9 +15,6 @@ class CM_File_Image extends CM_File {
 	/** @var bool */
 	private $_animated = false;
 
-	/**
-	 * @param CM_File $file
-	 */
 	public function __construct($file) {
 		parent::__construct($file);
 

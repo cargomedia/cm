@@ -102,7 +102,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/**
 	 * @param int $offset Negative: from end
-	 * @return integer|null Item at given index
+	 * @return mixed|null Item at given index
 	 */
 	public function getItem($offset) {
 		$items = $this->getItems($offset, 1);
@@ -162,7 +162,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 
 	/**
 	 * @param string $field
-	 * @return integer
+	 * @return int|float
 	 * @throws CM_Exception_Invalid
 	 */
 	public function getSum($field) {
@@ -181,7 +181,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @return double
+	 * @return int
 	 */
 	public function getPage() {
 		return ($this->_pageOffset + 1);
@@ -304,7 +304,7 @@ abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator,
 	}
 
 	/**
-	 * @return integer Chance that an item contains stale (non-processable) data (0-1)
+	 * @return float Chance that an item contains stale (non-processable) data (0-1)
 	 */
 	protected function _getStalenessChance() {
 		if ($this->_source) {

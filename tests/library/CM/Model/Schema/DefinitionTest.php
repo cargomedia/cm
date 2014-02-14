@@ -606,6 +606,9 @@ class CM_Model_Mock_Validation extends CM_Model_Abstract {
 
 class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
 
+	/**
+	 * @return string
+	 */
 	public function getId() {
 		return (string) $this->_getId('id');
 	}

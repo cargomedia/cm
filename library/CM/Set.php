@@ -1,18 +1,16 @@
 <?php
 
 class CM_Set {
-	/**
-	 * @var string
-	 */
+
+	/** @var string */
 	private $_key;
 
-	/**
-	 * @var CM_SetAdapter_Abstract
-	 */
+	/** @var CM_SetAdapter_Abstract */
 	private $_adapter;
 
 	/**
 	 * @param string $key
+	 * @throws CM_Exception_Invalid
 	 */
 	public function __construct($key) {
 		$this->_key = (string) $key;
@@ -55,5 +53,4 @@ class CM_Set {
 		}
 		return $values;
 	}
-
 }

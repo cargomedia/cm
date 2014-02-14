@@ -39,7 +39,7 @@ class CM_Option {
 
 	/**
 	 * @param string $key
-	 * @param integer  $value
+	 * @param mixed  $value
 	 */
 	public function set($key, $value) {
 		CM_Db_Db::replace('cm_option', array('key' => $key, 'value' => serialize($value)));

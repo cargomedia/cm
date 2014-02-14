@@ -536,7 +536,7 @@ class CM_Util {
 	 * @param array[]              $items
 	 * @param int|null             $level           The number of columns that are used as indexes.
 	 * @param bool|null            $distinctLeaves  Whether or not the leaves are unique given the specified indexes
-	 * @param string|null $keyNames
+	 * @param string|string[]|null $keyNames
 	 * @throws CM_Exception_Invalid
 	 * @return array[]
 	 */

@@ -81,7 +81,7 @@ class CM_App_Installation {
 	}
 
 	/**
-	 * @return Composer\Package\RootPackageInterface[]
+	 * @return \Composer\Package\CompletePackage[]
 	 */
 	protected function _getComposerPackages() {
 		$repo = $this->_getComposer()->getRepositoryManager()->getLocalRepository();

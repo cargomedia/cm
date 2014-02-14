@@ -243,7 +243,7 @@ class CM_Redis_Client extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string $channels
+	 * @param string|string[] $channels
 	 * @param Closure         $callback
 	 */
 	public function subscribe($channels, Closure $callback) {

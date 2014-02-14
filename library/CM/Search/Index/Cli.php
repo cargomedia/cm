@@ -75,7 +75,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string|null $host
-	 * @param integer|null $port
+	 * @param int|null    $port
 	 * @return CM_Elastica_Type_Abstract[]
 	 */
 	private function _getIndexes($host = null, $port = null) {

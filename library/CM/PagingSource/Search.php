@@ -15,9 +15,9 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	private $_returnType;
 
 	/**
-	 * @param CM_Elastica_Type_Location $types
+	 * @param CM_Elastica_Type_Abstract|CM_Elastica_Type_Abstract[] $types
 	 * @param CM_SearchQuery_Abstract                               $query
-	 * @param string[]                                            $fields
+	 * @param array|null                                            $fields
 	 * @param bool|null                                             $returnType
 	 * @throws CM_Exception_Invalid
 	 */
@@ -52,8 +52,9 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 	}
 
 	/**
-	 * @param integer $offset
-	 * @param integer $count
+	 * @param int|null $offset
+	 * @param int|null $count
+	 * @return mixed
 	 */
 	private function _getResult($offset = null, $count = null) {
 		$cacheKey = array($this->_query->getSort(), $offset, $count);

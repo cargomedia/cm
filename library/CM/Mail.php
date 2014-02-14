@@ -23,14 +23,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	/** @var array */
 	private $_sender;
 
-	/** @var string */
-	private $_subject;
+	/** @var string|null */
+	private $_subject = null;
 
-	/** @var string */
-	private $_textBody;
+	/** @var string|null */
+	private $_textBody = null;
 
-	/** @var string */
-	private $_htmlBody;
+	/** @var string|null */
+	private $_htmlBody = null;
 
 	/** @var boolean */
 	private $_verificationRequired = true;
@@ -153,7 +153,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getHtml() {
 		return $this->_htmlBody;
@@ -184,7 +184,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getSubject() {
 		return $this->_subject;
@@ -198,7 +198,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	public function getText() {
 		return $this->_textBody;

@@ -37,7 +37,7 @@ class CM_Params extends CM_Class_Abstract {
 
 	/**
 	 * @param string $key
-	 * @param string  $value
+	 * @param mixed  $value
 	 */
 	public function set($key, $value) {
 		if ($this->_decode) {
@@ -292,7 +292,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
+	 * @param CM_Model_Language|string      $key
 	 * @param CM_Model_Language|string|null $default
 	 * @return CM_Model_Language
 	 */
@@ -301,7 +301,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string      $key
+	 * @param CM_Site_Abstract|int      $key
 	 * @param CM_Site_Abstract|int|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Site_Abstract
@@ -466,7 +466,7 @@ class CM_Params extends CM_Class_Abstract {
 			$valueString = (string) $value;
 			$value = json_decode($valueString, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString. '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {

@@ -110,8 +110,8 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
-	 * @param string|array      $fields               Column-name OR Column-names array OR associative field=>value pair
-	 * @param string|array|null $values               Column-value OR Column-values array OR Multiple Column-values array(array)
+	 * @param string|array      $fields Column-name OR Column-names array OR associative field=>value pair
+	 * @param string|array|null $values Column-value OR Column-values array OR Multiple Column-values array(array)
 	 * @param array|null        $onDuplicateKeyValues
 	 * @param string|null       $statement
 	 * @return string|null
@@ -128,7 +128,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 
 	/**
 	 * @param string            $table
-	 * @param string[]      $fields
+	 * @param string|string[]   $fields
 	 * @param string|array|null $values
 	 * @return string|null
 	 */
@@ -183,10 +183,10 @@ class CM_Db_Db extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param string       $table
-	 * @param string $fields     Column-name OR Column-names array
-	 * @param array[]      $whereList  Outer array-entries are combined using OR, inner arrays using AND
-	 * @param string|null  $order
+	 * @param string          $table
+	 * @param string|string[] $fields    Column-name OR Column-names array
+	 * @param array[]         $whereList Outer array-entries are combined using OR, inner arrays using AND
+	 * @param string|null     $order
 	 * @return CM_Db_Result
 	 */
 	public static function selectMultiple($table, $fields, array $whereList, $order = null) {
@@ -336,7 +336,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 	 * @param string      $table
 	 * @param string      $column
 	 * @param string|null $where
-	 * @return string
+	 * @return int
 	 * @throws CM_DB_Exception
 	 */
 	public static function getRandId($table, $column, $where = null) {
@@ -345,7 +345,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$columnQuoted = $client->quoteIdentifier($column);
 		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
 		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted .
-				' DESC LIMIT 1')->fetchColumn();
+			' DESC LIMIT 1')->fetchColumn();
 
 		if (!$id) {
 			$id = CM_Db_Db::select($table, $column, $where)->fetchColumn();
@@ -353,7 +353,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		if (!$id) {
 			throw new CM_Db_Exception('Cannot find random id');
 		}
-		return $id;
+		return (int) $id;
 	}
 
 	/**
