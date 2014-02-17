@@ -1,6 +1,9 @@
 {
     "name": "cargomedia/cm",
     "license": "MIT",
+    "config": {
+        "bin-dir": "bin/"
+    },
     "require": {
         "composer/composer": "1.0.0-alpha7",
         "smarty/smarty": "3.1.16",
@@ -22,7 +25,7 @@
             "CMTest_": "tests/helpers/CMTest/library/"
         }
     },
-    "bin": ["scripts/cm.php"],
+    "bin": ["bin/cm"],
     "extra": {
         "cm-modules": {
             "CM": {

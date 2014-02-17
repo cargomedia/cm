@@ -23,10 +23,13 @@ before_script:
 
   - composer self-update
   - composer install --dev
-  - scripts/cm.php app generate-config-local tests/travis/config.json
-  - scripts/cm.php app set-deploy-version
+  - bin/cm app generate-config-local tests/travis/config.json
+  - bin/cm app set-deploy-version
 
-script: phpunit
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
+
+script: bin/phpunit --coverage-clover=coverage.clover
 
 matrix:
   allow_failures:

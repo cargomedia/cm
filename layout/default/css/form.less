@@ -1,6 +1,5 @@
 .textinput {
 	.appearance(none);
-	.box-sizing(border-box);
 	width: 100%;
 	height: @heightInputText;
 	overflow: hidden;
@@ -23,16 +22,9 @@ textarea.textinput {
 	resize: vertical;
 }
 
-select {
-	border: 1px solid @colorFgBorderEmphasize3;
-	max-width: 100%;
-}
-
-label {
-	//Fix for fastclick
-	> * {
-		pointer-events: none;
-	}
+.input_focus {
+	outline: none;
+	border: 1px solid lighten(@colorNotice, 15);
 }
 
 .placeholder(@color) {
@@ -61,7 +53,6 @@ label {
 .placeholder(lighten(@colorFgShy, 10));
 
 .button {
-	.box-sizing(border-box);
 	width: auto;
 	height: @sizeButton;
 	line-height: @sizeButton - 2px;
@@ -112,10 +103,22 @@ label {
 	}
 }
 
-.button .spinner {
-	margin-left: 5px;
-	height: @sizeButton - 2px;
-	vertical-align: top;
+.button[data-click-spinner] {
+	position: relative;
+
+	:not(.spinner) {
+		.transition(200ms);
+	}
+
+	&.hasSpinner {
+		.spinner {
+			.spinner-expanded;
+		}
+
+		:not(.spinner) {
+			opacity: 0;
+		}
+	}
 }
 
 .button.confirmClick {
@@ -139,6 +142,11 @@ label {
 	&:not(:disabled):active {
 		border-color: darken(@colorFgBorderEmphasize3, 5);
 	}
+}
+
+.button-transparent {
+	background: none;
+	border: 1px solid transparent;
 }
 
 .button-highlight {
@@ -191,6 +199,13 @@ label {
 	}
 }
 
+label {
+	//Fix for fastclick
+	> * {
+		pointer-events: none;
+	}
+}
+
 input:disabled {
 	opacity: .5;
 }
@@ -210,7 +225,6 @@ input[type=checkbox], input[type=radio] {
 
 		&:before {
 			position: absolute;
-			.box-sizing(border-box);
 			content: "";
 			display: block;
 			width: @sizeCheckbox;
@@ -269,14 +283,12 @@ input[type=checkbox] {
 }
 
 .formField, .formAction {
-	.box-sizing(border-box);
 	max-width: 100%;
 	padding: 6px;
 }
 
 .formField {
 	> label {
-		.box-sizing(border-box);
 		color: @colorFgLinkLight;
 		font-weight: bold;
 		padding-left: 2px;

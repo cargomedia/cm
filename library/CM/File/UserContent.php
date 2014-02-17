@@ -68,6 +68,7 @@ class CM_File_UserContent extends CM_File {
 	 * @return string
 	 */
 	protected function _getDir() {
+		$dirs = array();
 		$dirs[] = $this->_namespace;
 		if (null !== $this->_sequence) {
 			$dirs[] = $this->_sequence % self::BUCKETS_COUNT;

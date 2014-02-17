@@ -3,7 +3,7 @@
 class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
-	 * @param string|null  $indexName
+	 * @param string|null $indexName
 	 */
 	public function create($indexName = null) {
 		if ($indexName) {
@@ -20,8 +20,8 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	/**
 	 * @param string|null $indexName
-	 * @param string|null $host      Elasticsearch host
-	 * @param int|null    $port      Elasticsearch port
+	 * @param string|null $host Elasticsearch host
+	 * @param int|null    $port Elasticsearch port
 	 * @throws CM_Exception_Invalid
 	 */
 	public function update($indexName = null, $host = null, $port = null) {
@@ -47,7 +47,12 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 						CM_Redis_Client::getInstance()->sAdd($key, $id);
 					}
 				}
-				$message .= 'Reason: ' . $e->getMessage();
+				$message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
+				if ($e instanceof Elastica_Exception_BulkResponse) {
+					foreach ($e->getFailures() as $i => $error) {
+						$message .= 'Error ' . $i . ': ' . CM_Util::var_line($error) . PHP_EOL;
+					}
+				}
 				throw new CM_Exception_Invalid($message);
 			}
 		}
@@ -63,8 +68,8 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
 
 	public function startMaintenance() {
 		$clockwork = new CM_Clockwork_Manager();
-		$clockwork->registerCallback(new DateInterval('PT1M'), array($this ,'update'));
-		$clockwork->registerCallback(new DateInterval('PT1H'), array($this ,'optimize'));
+		$clockwork->registerCallback(new DateInterval('PT1M'), array($this, 'update'));
+		$clockwork->registerCallback(new DateInterval('PT1H'), array($this, 'optimize'));
 		$clockwork->start();
 	}
 

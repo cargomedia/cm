@@ -125,6 +125,6 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
 	 * @returns {Boolean}
 	 */
 	isEmpty: function(value) {
-		return _.isEmpty(value)
+		return _.isEmpty(value);
 	}
 });
