@@ -32,7 +32,7 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 		this._$noUiHandle.attr('tabindex', '0');
 
 		$input.watch('disabled', function(propName, oldVal, newVal) {
-			if (false == newVal) {
+			if (false === newVal) {
 				$slider.removeAttr('disabled');
 				field._$noUiHandle.attr('tabindex', '0');
 			} else {
@@ -50,12 +50,12 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
 
 	sliderDown: function() {
 		var value = parseInt(this.$('.noUiSlider').val());
-		this.$('.noUiSlider').val(value - this.getOption('step'))
+		this.$('.noUiSlider').val(value - this.getOption('step'));
 	},
 
 	sliderUp: function() {
 		var value = parseInt(this.$('.noUiSlider').val());
-		this.$('.noUiSlider').val(value + this.getOption('step'))
+		this.$('.noUiSlider').val(value + this.getOption('step'));
 	},
 
 	_onKeyDown: function(event) {
