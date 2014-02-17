@@ -52,7 +52,7 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 			'JobManager'   => 'CM_Jobdistribution_JobManager',
 			'JobWorker'    => 'CM_Jobdistribution_JobWorker',
 			'Job'          => 'CM_Jobdistribution_Job_Abstract',
-			'Splitest'     => 'CM_Model_Splittest',
+			'Splittest'    => 'CM_Model_Splittest',
 			'Splitfeature' => 'CM_Model_Splitfeature'
 		);
 	}
