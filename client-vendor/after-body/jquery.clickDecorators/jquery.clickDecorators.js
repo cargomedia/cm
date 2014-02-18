@@ -21,8 +21,8 @@
 
 		for (i = 0; i < before.length; i++) {
 			var beforeValue = before[i].call(this, event);
-			if (false === beforeValue || true === beforeValue) {
-				return beforeValue;
+			if (event.isImmediatePropagationStopped()) {
+				return;
 			}
 		}
 
@@ -30,8 +30,8 @@
 
 		for (i = 0; i < after.length; i++) {
 			var afterValue = after[i].call(this, event, returnValue);
-			if (false === afterValue) {
-				return afterValue;
+			if (event.isImmediatePropagationStopped()) {
+				return;
 			}
 		}
 

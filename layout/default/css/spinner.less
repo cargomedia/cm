@@ -16,3 +16,21 @@
 	bottom: 0;
 	left: 0;
 }
+
+[data-click-spinner] {
+	position: relative;
+
+	:not(.spinner) {
+		.transition(200ms);
+	}
+
+	&.hasSpinner {
+		.spinner {
+			.spinner-expanded;
+		}
+
+		:not(.spinner) {
+			opacity: 0;
+		}
+	}
+}
