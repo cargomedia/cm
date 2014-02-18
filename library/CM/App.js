@@ -1055,8 +1055,10 @@ var CM_App = CM_Class_Abstract.extend({
 			}
 
 			var urlBase = cm.getUrl();
-			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
-				if (0 === this.href.indexOf(urlBase)) {
+			$(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
+				var metaPressed = (event.ctrlKey || event.metaKey);
+				var partOfUrlBase = 0 === this.href.indexOf(urlBase);
+				if (!metaPressed && partOfUrlBase) {
 					var fragment = this.href.substr(urlBase.length);
 					var forceReload = $(this).data('force-reload');
 					router.route(fragment, forceReload);
