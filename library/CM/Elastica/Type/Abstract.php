@@ -91,7 +91,9 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		}
 
 		$query = $this->_getQuery($ids, $limit);
+		CM_Db_Db::getClient(true)->setBuffered(false);
 		$result = CM_Db_Db::exec($query, null, $useSlave);
+		CM_Db_Db::getClient(true)->setBuffered(true);
 
 		$docs = array();
 		$i = 0;

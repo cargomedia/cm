@@ -44,7 +44,8 @@
 				$this.data('clickConfirmed.deactivate')();
 			} else {
 				activateButton();
-				return false;
+				event.preventDefault();
+				event.stopImmediatePropagation();
 			}
 		}
 	};
