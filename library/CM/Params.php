@@ -300,7 +300,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Site_Abstract|int      $key
+	 * @param string                    $key
 	 * @param CM_Site_Abstract|int|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Site_Abstract
