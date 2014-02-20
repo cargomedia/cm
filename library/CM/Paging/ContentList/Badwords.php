@@ -73,7 +73,7 @@ class CM_Paging_ContentList_Badwords extends CM_Paging_ContentList_Abstract {
 
 	/**
 	 * @param string $badword
-	 * @return mixed
+	 * @return string
 	 */
 	private function _transformItemToHumanreadable($badword) {
 		return str_replace(array('*', '|'), '', $badword);

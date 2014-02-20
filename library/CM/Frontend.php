@@ -141,7 +141,7 @@ class CM_Frontend {
 	}
 
 	/**
-	 * @return array
+	 * @return string
 	 */
 	public function getJs() {
 		$return = '';

@@ -434,7 +434,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_MenuEntry[]
+	 * @return CM_Menu[]
 	 */
 	public function getMenuList() {
 		return $this->_menuList;
@@ -452,7 +452,7 @@ class CM_Render extends CM_Class_Abstract {
 			self::$_smarty->_dir_perms = 0777;
 			self::$_smarty->compile_check = CM_Bootloader::getInstance()->isDebug();
 			self::$_smarty->caching = false;
-			self::$_smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
+			self::$_smarty->error_reporting = error_reporting();
 		}
 
 		$pluginDirs = array(SMARTY_PLUGINS_DIR);

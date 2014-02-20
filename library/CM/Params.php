@@ -277,7 +277,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_Model_Location
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getLocation($key) {
 		return $this->_getObject($key, 'CM_Model_Location');
@@ -292,7 +291,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Model_Language|string      $key
+	 * @param string                        $key
 	 * @param CM_Model_Language|string|null $default
 	 * @return CM_Model_Language
 	 */
@@ -301,7 +300,7 @@ class CM_Params extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param CM_Site_Abstract|int      $key
+	 * @param string                    $key
 	 * @param CM_Site_Abstract|int|null $default
 	 * @throws CM_Exception_InvalidParam
 	 * @return CM_Site_Abstract
@@ -320,7 +319,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_Model_Stream_Publish
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getStreamPublish($key) {
 		return $this->_getObject($key, 'CM_Model_Stream_Publish');
@@ -329,7 +327,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_Model_Stream_Subscribe
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getStreamSubscribe($key) {
 		return $this->_getObject($key, 'CM_Model_Stream_Subscribe');
@@ -338,7 +335,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_Model_StreamChannel_Video
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getStreamChannelVideo($key) {
 		return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
@@ -347,7 +343,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_File
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getFile($key) {
 		return $this->_getObject($key, 'CM_File');
@@ -356,7 +351,6 @@ class CM_Params extends CM_Class_Abstract {
 	/**
 	 * @param string $key
 	 * @return CM_Geo_Point
-	 * @throws CM_Exception_InvalidParam
 	 */
 	public function getGeoPoint($key) {
 		return $this->_getObject($key, 'CM_Geo_Point');
@@ -466,7 +460,7 @@ class CM_Params extends CM_Class_Abstract {
 			$valueString = (string) $value;
 			$value = json_decode($valueString, true);
 			if (json_last_error() > 0) {
-				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString. '`.');
+				throw new CM_Exception_Invalid('Cannot json_decode value `' . $valueString . '`.');
 			}
 		}
 		if (is_array($value) && isset($value['_class'])) {

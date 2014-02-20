@@ -23,9 +23,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 			throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) ||
-				!('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
+			!('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
 		) {
-			throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] . '`.', null, null, CM_Exception::WARN);
+			throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] .
+			'`.', null, null, CM_Exception::WARN);
 		}
 		if (!isset($viewInfo['params'])) {
 			throw new CM_Exception_Invalid('View params `' . $key . '` not set.', null, null, CM_Exception::WARN);
@@ -173,10 +174,12 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 	private function _getMenuEntryHashList(array $menuList, CM_Page_Abstract $page) {
 		$menuEntryHashList = array();
 		foreach ($menuList as $menu) {
-			foreach ($menu->findEntries($page) as $menuEntry) {
-				$menuEntryHashList[] = $menuEntry->getHash();
-				foreach ($menuEntry->getParents() as $parentEntry) {
-					$menuEntryHashList[] = $parentEntry->getHash();
+			if (is_array($menuEntries = $menu->findEntries($page))) {
+				foreach ($menuEntries as $menuEntry) {
+					$menuEntryHashList[] = $menuEntry->getHash();
+					foreach ($menuEntry->getParents() as $parentEntry) {
+						$menuEntryHashList[] = $parentEntry->getHash();
+					}
 				}
 			}
 		}

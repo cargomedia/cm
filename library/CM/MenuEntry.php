@@ -2,30 +2,22 @@
 
 class CM_MenuEntry {
 
-	/**
-	 * @var CM_Menu
-	 */
+	/**  @var CM_Menu|null */
 	protected $_submenu = null;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $_data = array();
 
-	/**
-	 * @var CM_MenuEntry
-	 */
+	/** @var CM_MenuEntry|null */
 	protected $_parent = null;
 
-	/**
-	 * @var CM_Menu
-	 */
+	/** @var CM_Menu */
 	protected $_menu = null;
 
 	/**
-	 * @param array              $data
-	 * @param CM_Menu|null       $menu
-	 * @param CM_MenuEntry|null  $parent
+	 * @param array             $data
+	 * @param CM_Menu           $menu
+	 * @param CM_MenuEntry|null $parent
 	 * @throws CM_Exception_Invalid
 	 */
 	public final function __construct(array $data, CM_Menu $menu, CM_MenuEntry $parent = null) {
@@ -148,7 +140,7 @@ class CM_MenuEntry {
 	}
 
 	/**
-	 * @return CM_MenuEntry
+	 * @return CM_MenuEntry|null
 	 */
 	public final function getParent() {
 		return $this->_parent;

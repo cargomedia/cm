@@ -57,10 +57,16 @@ class CM_SearchQuery_Abstract {
 		$this->query($query);
 	}
 
+	/**
+	 * @param array $filter
+	 */
 	protected function _filter(array $filter) {
 		$this->_filters[] = $filter;
 	}
 
+	/**
+	 * @param array $filter
+	 */
 	protected function _filterNot(array $filter) {
 		$this->_filters[] = array('not' => array('filter' => $filter));
 	}
@@ -72,10 +78,18 @@ class CM_SearchQuery_Abstract {
 		$this->_filter(array('exists' => array('field' => (string) $field)));
 	}
 
+	/**
+	 * @param string $field
+	 * @param string $value
+	 */
 	public function filterPrefix($field, $value) {
 		$this->_filter(array('prefix' => array($field => $value)));
 	}
 
+	/**
+	 * @param string $field
+	 * @param string $value
+	 */
 	public function filterTerm($field, $value) {
 		if (is_array($value)) {
 			$this->_filter(array('terms' => array($field => $value)));
@@ -84,6 +98,10 @@ class CM_SearchQuery_Abstract {
 		}
 	}
 
+	/**
+	 * @param string $field
+	 * @param string $value
+	 */
 	public function filterTermNot($field, $value) {
 		if (is_array($value)) {
 			$this->_filterNot(array('terms' => array($field => $value)));
@@ -93,11 +111,11 @@ class CM_SearchQuery_Abstract {
 	}
 
 	/**
-	 * @param string        $field
-	 * @param int|null      $from
-	 * @param int|null      $to
-	 * @param boolean|null  $openIntervalFrom
-	 * @param booleant|null $openIntervalTo
+	 * @param string    $field
+	 * @param int|null  $from
+	 * @param int|null  $to
+	 * @param bool|null $openIntervalFrom
+	 * @param bool|null $openIntervalTo
 	 */
 	public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
 		$range = array();

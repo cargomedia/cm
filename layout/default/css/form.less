@@ -103,24 +103,6 @@ textarea.textinput {
 	}
 }
 
-.button[data-click-spinner] {
-	:not(.spinner) {
-		.transition(200ms);
-	}
-
-	&.hasSpinner {
-		position: relative;
-
-		.spinner {
-			.spinner-expanded;
-		}
-
-		:not(.spinner) {
-			opacity: 0;
-		}
-	}
-}
-
 .button.confirmClick {
 	.button-success;
 }
@@ -142,6 +124,11 @@ textarea.textinput {
 	&:not(:disabled):active {
 		border-color: darken(@colorFgBorderEmphasize3, 5);
 	}
+}
+
+.button-transparent {
+	background: none;
+	border: 1px solid transparent;
 }
 
 .button-highlight {

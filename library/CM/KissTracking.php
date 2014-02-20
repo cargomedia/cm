@@ -106,7 +106,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
 	 */
 	protected function _getEvents() {
 		return $this->_getSet()->flush();
