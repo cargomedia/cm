@@ -287,7 +287,7 @@ class CM_File_Image extends CM_File {
 
 	/**
 	 * @param Imagick  $imagick
-	 * @param callable $callback fn(Imagick)
+	 * @param Closure $callback fn(Imagick)
 	 * @param int      $format
 	 */
 	private function _invokeOnEveryFrame(Imagick $imagick, Closure $callback, $format) {

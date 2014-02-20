@@ -434,7 +434,7 @@ class CM_Render extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return CM_MenuEntry[]
+	 * @return CM_Menu[]
 	 */
 	public function getMenuList() {
 		return $this->_menuList;

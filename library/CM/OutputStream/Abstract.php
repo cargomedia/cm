@@ -8,5 +8,4 @@ abstract class CM_OutputStream_Abstract implements CM_OutputStream_Interface {
 	public function writeln($message) {
 		$this->write($message . PHP_EOL);
 	}
-
 }
