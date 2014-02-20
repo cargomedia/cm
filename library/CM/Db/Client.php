@@ -112,7 +112,7 @@ class CM_Db_Client {
 	}
 
 	/**
-	 * @param $sqlTemplate
+	 * @param string $sqlTemplate
 	 * @throws CM_Db_Exception
 	 * @return PDOStatement
 	 */

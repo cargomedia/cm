@@ -67,7 +67,7 @@ class CM_Menu {
 
 	/**
 	 * @param CM_Page_Abstract $page
-	 * @return CM_MenuEntry[]
+	 * @return CM_MenuEntry|CM_MenuEntry[]|null
 	 */
 	public final function findEntries(CM_Page_Abstract $page) {
 		return $this->findEntry($page, null, null, true);

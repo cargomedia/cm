@@ -20,9 +20,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		return $this->_getId('name');
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getId() {
 		return (int) $this->_get('id');
 	}

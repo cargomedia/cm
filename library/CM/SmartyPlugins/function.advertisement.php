@@ -2,7 +2,7 @@
 /**
  * @param array                    $params
  * @param Smarty_Internal_Template $template
- * @return bool
+ * @return string
  */
 function smarty_function_advertisement(array $params, Smarty_Internal_Template $template) {
 	if (!isset($params['zone'])) {

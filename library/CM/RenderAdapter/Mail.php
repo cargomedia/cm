@@ -2,6 +2,11 @@
 
 class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 
+	/**
+	 * @param array $params
+	 * @return array array($subject, $html, $text)
+	 * @throws CM_Exception_Invalid
+	 */
 	public function fetch(array $params = array()) {
 		/** @var CM_Mail $mail */
 		$mail = $this->_getView();

@@ -114,8 +114,8 @@ class CM_ModelAsset_User_Roles extends CM_ModelAsset_User_Abstract {
 	private function _getPersistent() {
 		if (($values = $this->_cacheGet('roles')) === false) {
 			$values = CM_Db_Db::select('cm_role', array('role', 'startStamp', 'expirationStamp'),
-					'`userId`=' . $this->_model->getId() . ' AND (`expirationStamp` > ' . time() . ' OR `expirationStamp` IS NULL)')
-					->fetchAllTree();
+				'`userId`=' . $this->_model->getId() . ' AND (`expirationStamp` > ' . time() . ' OR `expirationStamp` IS NULL)')
+				->fetchAllTree();
 			$this->_cacheSet('roles', $values);
 		}
 		return $values;

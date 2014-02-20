@@ -21,7 +21,7 @@ class CM_Db_Result {
 
 	/**
 	 * @param int|null $index
-	 * @return mixed|false
+	 * @return string|false
 	 */
 	public function fetchColumn($index = null) {
 		$index = (int) $index;

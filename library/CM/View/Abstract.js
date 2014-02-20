@@ -405,7 +405,7 @@ var CM_View_Abstract = Backbone.View.extend({
 	bindJquery: function($element, event, callback) {
 		var self = this;
 		var callbackWithContext = function() {
-			callback.apply(self, arguments)
+			callback.apply(self, arguments);
 		};
 		$element.on(event, callbackWithContext);
 		this.on('destruct', function() {

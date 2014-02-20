@@ -37,6 +37,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
 		);
 	}
 
+	/**
+	 * @param string               $userInput
+	 * @param CM_Response_Abstract $response
+	 * @throws CM_Exception_FormFieldValidation
+	 * @return CM_Model_Location
+	 */
 	public function validate($userInput, CM_Response_Abstract $response) {
 		$value = parent::validate($userInput, $response);
 		if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {

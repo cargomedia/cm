@@ -23,14 +23,14 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	/** @var array */
 	private $_sender;
 
-	/** @var string */
-	private $_subject;
+	/** @var string|null */
+	private $_subject = null;
 
-	/** @var string */
-	private $_textBody;
+	/** @var string|null */
+	private $_textBody = null;
 
-	/** @var string */
-	private $_htmlBody;
+	/** @var string|null */
+	private $_htmlBody = null;
 
 	/** @var boolean */
 	private $_verificationRequired = true;
@@ -379,6 +379,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 	 */
 	protected function _render($language) {
 		$render = new CM_Render($this->_site, $this->_recipient, $language);
-		return $render->render($this);
+		$renderAdapter = new CM_RenderAdapter_Mail($render, $this);
+		return $renderAdapter->fetch();
 	}
 }
