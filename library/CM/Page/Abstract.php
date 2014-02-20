@@ -21,12 +21,12 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	}
 
 	/**
-	 * @param string $namespace
-	 * @param string $path
+	 * @param CM_Site_Abstract $site
+	 * @param string           $path
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	public static final function getClassnameByPath($namespace, $path) {
-		$namespace = (string) $namespace;
+	public static final function getClassnameByPath($site, $path) {
 		$path = (string) $path;
 
 		$pathTokens = explode('/', $path);
@@ -37,7 +37,20 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			$pathToken = CM_Util::camelize($pathToken);
 		}
 
-		return $namespace . '_Page_' . implode('_', $pathTokens);
+		$classname = '';
+		foreach ($site->getNamespaces() as $namespace) {
+			$classPath = DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'library/' . $namespace . '/Page/'.implode('/', $pathTokens).'.php';
+			if (CM_File::exists($classPath)) {
+				$classname = $namespace . '_Page_' . implode('_', $pathTokens);
+				break;
+			}
+		}
+
+		if (empty($classname)) {
+			throw new CM_Exception_Invalid('page `'.implode('_', $pathTokens).'` is not defined in any namespace');
+		}
+
+		return $classname;
 	}
 
 	/**
