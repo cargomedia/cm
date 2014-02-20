@@ -12,6 +12,7 @@ class CM_Response_EmailTracking extends CM_Response_Abstract {
 			$action->prepare();
 			$action->notify($user, $mailType);
 		} catch (CM_Exception_Nonexistent $e) {
+			// will be ignored
 		}
 
 		$this->setHeader('Content-Type', 'image/gif');

@@ -146,6 +146,7 @@ class CM_Session implements CM_Comparable {
 			try {
 				return CM_Model_User::factory($this->get('userId'));
 			} catch (CM_Exception_Nonexistent $ex) {
+				// will be ignored
 			}
 		}
 		if ($needed) {
