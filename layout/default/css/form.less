@@ -50,7 +50,7 @@ textarea.textinput {
 	}
 }
 
-.placeholder(lighten(@colorFgShy, 10));
+.placeholder(lighten(@colorFgSubtle, 10));
 
 .button {
 	width: auto;
@@ -112,11 +112,11 @@ textarea.textinput {
 }
 
 .button-default-active {
-	background: darken(@colorBgButtonDefault, 8);
+	background: darken(@colorBg, 8);
 }
 
 .button-default {
-	.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 10));
+	.gradient(vertical, @colorBg, darken(@colorBg, 10));
 	border: 1px solid @colorFgBorderEmphasize3;
 	color: lighten(@colorFg, 25);
 	text-shadow: 1px 1px fadeout(@colorFgTheme, 80);
@@ -132,13 +132,13 @@ textarea.textinput {
 }
 
 .button-highlight {
-	.gradient(vertical, @colorBgButtonHighlight, spin(@colorBgButtonHighlight, -6));
-	border: 1px solid spin(@colorBgButtonHighlight, -3);
+	.gradient(vertical, @colorHighlight, spin(@colorHighlight, -6));
+	border: 1px solid spin(@colorHighlight, -3);
 	color: @colorFgTheme;
-	text-shadow: 1px 1px spin(@colorBgButtonHighlight, -8);
+	text-shadow: 1px 1px spin(@colorHighlight, -8);
 
 	&:not(:disabled):active {
-		border-color: spin(@colorBgButtonHighlight, -15);
+		border-color: spin(@colorHighlight, -15);
 	}
 }
 
@@ -271,7 +271,7 @@ input[type=checkbox] {
 
 .formField {
 	> label {
-		color: @colorFgLinkLight;
+		color: @colorFgLinkSubtle;
 		font-weight: bold;
 		padding-left: 2px;
 
