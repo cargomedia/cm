@@ -3,29 +3,11 @@
 class CM_App_ComposerFactory extends CM_Class_Abstract {
 
 	/**
-	 * @return \Composer\Composer
-	 */
-	public static function createComposerLocal() {
-		$composerPath = DIR_ROOT . 'composer.json';
-		$composerFile = new Composer\Json\JsonFile($composerPath);
-		$composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
-		$localConfig = $composerFile->read();
-
-		$composerFactory = new CM_App_ComposerFactory();
-		$composer = $composerFactory->createComposer($localConfig);
-
-		$vendorDir = DIR_ROOT . $composer->getConfig()->get('vendor-dir');
-		$vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
-		$vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
-		$composer->getRepositoryManager()->setLocalRepository($vendorRepository);
-		return $composer;
-	}
-
-	/**
 	 * @param array $localConfig
 	 * @return \Composer\Composer
 	 */
 	public function createComposer(array $localConfig) {
+		$io = new \Composer\IO\NullIO();
 		$composer = new \Composer\Composer();
 
 		$composerConfig = new \Composer\Config();
@@ -33,7 +15,18 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
 		$composerConfig->merge($localConfig);
 		$composer->setConfig($composerConfig);
 
-		$rm = $this->createRepositoryManager($composer);
+		$im = $this->createInstallationManager();
+		$composer->setInstallationManager($im);
+
+		$this->createDefaultInstallers($im, $composer, $io);
+
+		$dispatcher = new \Composer\Script\EventDispatcher($composer, $io);
+		$composer->setEventDispatcher($dispatcher);
+
+		$generator = new \Composer\Autoload\AutoloadGenerator($dispatcher);
+		$composer->setAutoloadGenerator($generator);
+
+		$rm = $this->createRepositoryManager($composer, $io);
 		$composer->setRepositoryManager($rm);
 
 		$loader = new \Composer\Package\Loader\RootPackageLoader($rm, $composerConfig);
@@ -44,11 +37,11 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @param Composer\Composer $composer
+	 * @param Composer\Composer       $composer
+	 * @param Composer\IO\IOInterface $io
 	 * @return \Composer\Repository\RepositoryManager
 	 */
-	public function createRepositoryManager(\Composer\Composer $composer) {
-		$io = new \Composer\IO\NullIO();
+	public function createRepositoryManager(\Composer\Composer $composer, Composer\IO\IOInterface $io) {
 		$config = $composer->getConfig();
 		$rm = new \Composer\Repository\RepositoryManager($io, $config);
 
@@ -61,5 +54,24 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
 		$rm->setRepositoryClass('hg', 'Composer\Repository\VcsRepository');
 		$rm->setRepositoryClass('artifact', 'Composer\Repository\ArtifactRepository');
 		return $rm;
+	}
+
+	/**
+	 * @param \Composer\Installer\InstallationManager $im
+	 * @param \Composer\Composer                      $composer
+	 * @param \Composer\IO\IOInterface                $io
+	 */
+	public function createDefaultInstallers(Composer\Installer\InstallationManager $im, Composer\Composer $composer, \Composer\IO\IOInterface $io) {
+		$im->addInstaller(new \Composer\Installer\LibraryInstaller($io, $composer, null));
+		$im->addInstaller(new \Composer\Installer\PearInstaller($io, $composer, 'pear-library'));
+//		$im->addInstaller(new \Composer\Installer\InstallerInstaller($io, $composer));
+		$im->addInstaller(new \Composer\Installer\MetapackageInstaller($io));
+	}
+
+	/**
+	 * @return \Composer\Installer\InstallationManager
+	 */
+	public function createInstallationManager() {
+		return new \Composer\Installer\InstallationManager();
 	}
 }
