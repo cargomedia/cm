@@ -37,12 +37,10 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			$pathToken = CM_Util::camelize($pathToken);
 		}
 
-		$pagePath = implode('/', $pathTokens);
 		foreach ($site->getNamespaces() as $namespace) {
-			$classPath =
-				DIR_ROOT . CM_Bootloader::getInstance()->getNamespacePath($namespace) . 'library/' . $namespace . '/Page/' . $pagePath . '.php';
-			if (CM_File::exists($classPath)) {
-				return $namespace . '_Page_' . implode('_', $pathTokens);
+			$classname = $namespace . '_Page_' . implode('_', $pathTokens);
+			if (class_exists($classname)) {
+				return $classname;
 			}
 		}
 
