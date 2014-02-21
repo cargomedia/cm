@@ -3,7 +3,7 @@
 final class CM_EventHandler_EventHandler {
 
 	/**
-	 * @var Closure[] $_callbacks
+	 * @var Array[] $_callbacks
 	 */
 	private $_callbacks = array();
 
@@ -40,12 +40,9 @@ final class CM_EventHandler_EventHandler {
 		if (null === $callback) {
 			unset($this->_callbacks[$event]);
 		} else {
-			$callbacks = $this->_callbacks[$event];
-			foreach ($callbacks as $key => $c) {
-				if ($c === $callback) {
-					unset($this->_callbacks[$event][$key]);
-				}
-			}
+			$this->_callbacks[$event] = \Functional\reject($this->_callbacks[$event], function($element) use ($callback) {
+				return $callback === $element;
+			});
 		}
 
 	}
