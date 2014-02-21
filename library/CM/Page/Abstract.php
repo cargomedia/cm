@@ -26,7 +26,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
-	public static final function getClassnameByPath($site, $path) {
+	public static final function getClassnameByPath(CM_Site_Abstract $site, $path) {
 		$path = (string) $path;
 
 		$pathTokens = explode('/', $path);
