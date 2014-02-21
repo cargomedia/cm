@@ -23,7 +23,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	/**
 	 * @param CM_Site_Abstract $site
 	 * @param string           $path
-	 * @throws CM_Exception_Nonexistent
+	 * @throws CM_Exception_Invalid
 	 * @return string
 	 */
 	public static final function getClassnameByPath($site, $path) {
@@ -44,7 +44,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 			}
 		}
 
-		throw new CM_Exception_Nonexistent('page `' . implode('_', $pathTokens) . '` is not defined in any namespace');
+		throw new CM_Exception_Invalid('page `' . implode('_', $pathTokens) . '` is not defined in any namespace');
 	}
 
 	/**

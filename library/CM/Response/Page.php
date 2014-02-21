@@ -102,7 +102,11 @@ class CM_Response_Page extends CM_Response_Abstract {
 	private function _processPage(CM_Request_Abstract $request) {
 		try {
 			$this->getSite()->rewrite($request);
-			$className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
+			try {
+				$className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
+			} catch (CM_Exception $ex) {
+				throw new CM_Exception_Nonexistent($ex->getMessage());
+			}
 
 			$query = $request->getQuery();
 			$viewer = $request->getViewer();
