@@ -2,8 +2,6 @@
 
 class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
-	const TYPE = 18;
-
 	public function onPublish(CM_Model_Stream_Publish $streamPublish) {
 	}
 
@@ -18,7 +16,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 
 	/**
 	 * @param string $key
-	 * @return CM_Model_StreamChannel_Message|null
+	 * @return CM_Model_StreamChannel_Abstract|null
 	 */
 	public static function findByKey($key) {
 		$adapterType = CM_Stream_Message::getInstance()->getAdapter()->getType();
@@ -44,7 +42,7 @@ class CM_Model_StreamChannel_Message extends CM_Model_StreamChannel_Abstract {
 	 * @param mixed|null $data
 	 */
 	public static function publish($streamChannel, $event, $data = null) {
-		$streamChannel = $streamChannel . ':' . static::TYPE;
+		$streamChannel = $streamChannel . ':' . static::getTypeStatic();
 		CM_Stream_Message::getInstance()->publish($streamChannel, $event, $data);
 	}
 

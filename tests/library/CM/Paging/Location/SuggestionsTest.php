@@ -44,10 +44,10 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
 
 	public function testSearch() {
 		$source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-		$this->assertSame(8, $source->getCount());
+		$this->assertEquals(8, $source->getCount());
 
 		$source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-		$this->assertSame(2, $source->getCount());
+		$this->assertEquals(2, $source->getCount());
 	}
 
 	public function testSearchDistance() {
@@ -56,5 +56,15 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
 		$locationList = $source->getItems();
 		$locationNext = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 2);
 		$this->assertEquals($locationNext, reset($locationList));
+	}
+
+	public function testSearchWithoutSearchEnabled() {
+		CM_Config::get()->CM_Search->enabled = false;
+
+		$source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
+		$this->assertEquals(8, $source->getCount());
+
+		$source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
+		$this->assertEquals(3, $source->getCount());
 	}
 }

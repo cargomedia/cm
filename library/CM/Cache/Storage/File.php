@@ -2,11 +2,17 @@
 
 class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 
-	/** @var string */
-	protected $_storageDir;
-
-	public function __construct() {
-		$this->_storageDir = DIR_TMP_CACHE;
+	/**
+	 * @param string $key
+	 * @throws CM_Exception_Invalid
+	 * @return int
+	 */
+	public function getCreateStamp($key) {
+		$path = $this->_getPath($this->_getKeyArmored($key));
+		if (!CM_File::exists($path)) {
+			return null;
+		}
+		return CM_File::getModified($path);
 	}
 
 	protected function _getName() {
@@ -17,7 +23,8 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 		if (null !== $lifeTime) {
 			throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
 		}
-		CM_File::create($this->_getPath($key), $value);
+		CM_Util::mkDir($this->_getDirStorage());
+		CM_File::create($this->_getPath($key), serialize($value));
 	}
 
 	protected function _get($key) {
@@ -26,7 +33,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 			return false;
 		}
 		$file = new CM_File($path);
-		return $file->read();
+		return unserialize($file->read());
 	}
 
 	protected function _delete($key) {
@@ -38,7 +45,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 	}
 
 	protected function _flush() {
-		CM_Util::rmDirContents($this->_storageDir);
+		CM_Util::rmDirContents($this->_getDirStorage());
 	}
 
 	/**
@@ -46,6 +53,13 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
 	 * @return string
 	 */
 	private function _getPath($key) {
-		return $this->_storageDir . md5($key);
+		return self::_getDirStorage() . md5($key);
+	}
+
+	/**
+	 * @return string
+	 */
+	private function _getDirStorage() {
+		return CM_Bootloader::getInstance()->getDirTmp() . 'cache/';
 	}
 }

@@ -1,5 +1,5 @@
-# CM Framework
-
+CM Framework  [![Build Status](https://travis-ci.org/cargomedia/CM.png)](https://travis-ci.org/cargomedia/CM)
+============
 
 ## Major concepts
 
@@ -149,7 +149,7 @@ CM_Paging_User_Country                         # All users from a given country
 
 In your workspace, run:
 ```bash
-composer create-project cargomedia/CM-project --repository-url="http://satis.cargomedia.ch/source" --stability=dev <project-name>
+composer create-project cargomedia/cm-project --stability=dev <project-name>
 ```
 This will create a new directory `<project-name>` containing a project based on CM.
 
@@ -188,16 +188,15 @@ A typical Apache virtual host configuration for this purpose were:
 
 In your project directory, run:
 ```bash
-./scripts/cm.php app generate-config-internal
+bin/cm app generate-config-internal
 ```
 
 ### Namespace creation, site setup
 
 CM framework provides a base which should be extended. Our own libraries should be part of different namespace. To create one simply run:
 ```bash
-./scripts/cm.php generator create-namespace <namespace>
+bin/cm generator create-namespace <namespace>
 ```
-Once completed you need to manually adjust entry points (`public/index.php`, `scripts/cm.php`). Replace current `CM_Bootloader` usage with `<namespace>_Bootloader`.
 
 ### Adding new modules
 To simplify creation of common framework modules, but also to help understanding of its structure there is a generator tool. It helps with scaffolding framework views and simple classes. It also allows easy addition of new namespace or site.
@@ -215,7 +214,7 @@ Creates new <class-name> class.
 ## Command line tools
 
 CM framework comes with its own set of command line tools to easily run common php routines.
-To see full list of available commands simply execute `./scripts/cm.php`.
+To see full list of available commands simply execute `bin/cm`.
 
 ```
 Usage:
@@ -225,14 +224,20 @@ Options:
  --quiet
  --quiet-warnings
  --non-interactive
+ --forks=<value>
 
 Commands:
+ app setup
+ app fill-caches
+ app deploy
  app generate-config-internal
- app fill-cache
+ app generate-config-local <source-path>
+ app set-deploy-version [--deploy-version=<value>]
  console interactive
  css icon-refresh
  css emoticon-refresh
- db dump <namespace>
+ db db-to-file <namespace>
+ db file-to-db
  db run-updates
  db run-update <version> [--namespace=<value>]
  generator create-view <class-name>
@@ -240,11 +245,10 @@ Commands:
  generator create-namespace <namespace>
  generator create-javascript-files
  job-distribution start-manager
- maintenance common
- maintenance heavy
+ maintenance start
  search-index create [--index-name=<value>]
  search-index update [--index-name=<value>] [--host=<Elasticsearch host>] [--port=<Elasticsearch port>]
  search-index optimize
+ search-index start-maintenance
  stream start-message-synchronization
- entertainment start-processing [--interval=<value>]
 ```

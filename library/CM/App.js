@@ -464,7 +464,7 @@ var CM_App = CM_Class_Abstract.extend({
 
 	ui: {
 		ready: function() {
-			$.event.special.clickConfirmed.settings.message = cm.language.get('Please Confirm');
+			$.clickDecorators.confirmed.settings.message = cm.language.get('Please Confirm');
 		},
 
 		/**
@@ -548,7 +548,7 @@ var CM_App = CM_Class_Abstract.extend({
 			 * @param {Array} focusWindows
 			 */
 			_set: function(focusWindows) {
-				cm.storage.set('focusWindows', focusWindows)
+				cm.storage.set('focusWindows', focusWindows);
 			},
 			/**
 			 * @param {String} uuid
@@ -722,6 +722,7 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @param {String} type
 	 * @param {Object} data
 	 * @param {Object} callbacks
+	 * @return jqXHR
 	 */
 	ajax: function(type, data, callbacks) {
 		var url = this.getUrlAjax(type);
@@ -746,7 +747,7 @@ var CM_App = CM_Class_Abstract.extend({
 					}
 				}
 			}).fail(function(xhr, textStatus) {
-				if (xhr.status == 0) {
+				if (xhr.status === 0) {
 					return; // Ignore interrupted ajax-request caused by leaving a page
 				}
 
@@ -768,10 +769,11 @@ var CM_App = CM_Class_Abstract.extend({
 	 * @param {String} methodName
 	 * @param {Object} params
 	 * @param {Object|Null} callbacks
+	 * @return jqXHR
 	 */
 	rpc: function(methodName, params, callbacks) {
 		callbacks = callbacks || {};
-		this.ajax('rpc', {method: methodName, params: params}, {
+		return this.ajax('rpc', {method: methodName, params: params}, {
 			success: function(response) {
 				if (typeof(response.result) === 'undefined') {
 					cm.error.trigger('RPC response has undefined result');
@@ -1053,8 +1055,10 @@ var CM_App = CM_Class_Abstract.extend({
 			}
 
 			var urlBase = cm.getUrl();
-			$(document).on('clickNoMeta', 'a[href]:not([data-router-disabled=true])', function(event) {
-				if (0 === this.href.indexOf(urlBase)) {
+			$(document).on('click', 'a[href]:not([data-router-disabled=true])', function(event) {
+				var metaPressed = (event.ctrlKey || event.metaKey);
+				var partOfUrlBase = 0 === this.href.indexOf(urlBase);
+				if (!metaPressed && partOfUrlBase) {
 					var fragment = this.href.substr(urlBase.length);
 					var forceReload = $(this).data('force-reload');
 					router.route(fragment, forceReload);

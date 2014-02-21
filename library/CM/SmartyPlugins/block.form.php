@@ -15,6 +15,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
 		return $html;
 	} else {
+		/** @var CM_Form_Abstract $form */
 		$form = $render->popStack('forms');
 		$render->popStack('views');
 

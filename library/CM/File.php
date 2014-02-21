@@ -236,7 +236,7 @@ class CM_File extends CM_Class_Abstract {
 			$extension = '.' . $extension;
 		}
 		$extension = (string) $extension;
-		return static::create(DIR_TMP . uniqid() . $extension, $content);
+		return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content);
 	}
 
 	/**
@@ -245,6 +245,19 @@ class CM_File extends CM_Class_Abstract {
 	 */
 	public static function exists($path) {
 		return is_file($path);
+	}
+
+	/**
+	 * @param string $path
+	 * @throws CM_Exception_Invalid
+	 * @return int
+	 */
+	public static function getModified($path) {
+		$createStamp = filemtime($path);
+		if (false === $createStamp) {
+			throw new CM_Exception_Invalid('Can\'t get modified time of `' . $path . '`');
+		}
+		return $createStamp;
 	}
 
 	/**

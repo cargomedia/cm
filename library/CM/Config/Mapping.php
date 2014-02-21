@@ -22,7 +22,7 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 	final public function getMapping() {
 		$mapping = $this->_getMapping();
 		foreach (self::getClassChildren() as $childClass) {
-			/** @var CM_Config_Mapping $child  */
+			/** @var CM_Config_Mapping $child */
 			$child = new $childClass();
 			$mappingChild = $child->_getMapping();
 			if ($duplicateKeys = array_intersect_key($mapping, $mappingChild)) {
@@ -38,20 +38,22 @@ class CM_Config_Mapping extends CM_Class_Abstract {
 	 */
 	protected function _getMapping() {
 		return array(
-			'Testhelper'=> 'CMTest_TH',
-			'Render' => 'CM_Render',
-			'Mail' => 'CM_Mail',
-			'Tracking' => 'CM_Tracking_Abstract',
-			'Newrelic' => 'CMService_Newrelic',
-			'Redis' => 'CM_Redis_Client',
-			'SocketRedis' => 'CM_Stream_Adapter_Message_SocketRedis',
-			'Search' => 'CM_Search',
-			'Memcache' => 'CM_Memcache_Client',
-			'Database' => 'CM_Db_Db',
-			'Wowza' => 'CM_Stream_Video',
-			'JobManager' => 'CM_Jobdistribution_JobManager',
-			'JobWorker' => 'CM_Jobdistribution_JobWorker',
-			'Job' => 'CM_Jobdistribution_Job_Abstract'
+			'Testhelper'   => 'CMTest_TH',
+			'Render'       => 'CM_Render',
+			'Mail'         => 'CM_Mail',
+			'Tracking'     => 'CM_Tracking_Abstract',
+			'Newrelic'     => 'CMService_Newrelic',
+			'Redis'        => 'CM_Redis_Client',
+			'SocketRedis'  => 'CM_Stream_Adapter_Message_SocketRedis',
+			'Search'       => 'CM_Search',
+			'Memcache'     => 'CM_Memcache_Client',
+			'Database'     => 'CM_Db_Db',
+			'Wowza'        => 'CM_Stream_Video',
+			'JobManager'   => 'CM_Jobdistribution_JobManager',
+			'JobWorker'    => 'CM_Jobdistribution_JobWorker',
+			'Job'          => 'CM_Jobdistribution_Job_Abstract',
+			'Splittest'    => 'CM_Model_Splittest',
+			'Splitfeature' => 'CM_Model_Splitfeature'
 		);
 	}
 }

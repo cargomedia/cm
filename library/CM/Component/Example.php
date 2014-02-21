@@ -16,14 +16,14 @@ class CM_Component_Example extends CM_Component_Abstract {
 	}
 
 	public function checkAccessible() {
-		if (!CM_Bootloader::getInstance()->isDebug() && !CM_Bootloader::getInstance()->isEnvironment('test')) {
+		if (!CM_Bootloader::getInstance()->isDebug()) {
 			throw new CM_Exception_NotAllowed();
 		}
 	}
 
 	public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
 		$x = $params->getString('x');
-		//$response->reloadComponent();
+		sleep(2);
 		return 'x=' . $x;
 	}
 

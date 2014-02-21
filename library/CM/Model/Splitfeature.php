@@ -1,7 +1,6 @@
 <?php
 
 class CM_Model_Splitfeature extends CM_Model_Abstract {
-	CONST TYPE = 28;
 
 	/** @var bool */
 	private $_withoutPersistence;
@@ -21,9 +20,6 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
 		return $this->_getId('name');
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getId() {
 		return (int) $this->_get('id');
 	}

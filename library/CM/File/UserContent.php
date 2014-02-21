@@ -42,7 +42,7 @@ class CM_File_UserContent extends CM_File {
 	 * @return string
 	 */
 	public function getPath() {
-		return DIR_USERFILES . $this->getPathRelative();
+		return CM_Bootloader::getInstance()->getDirUserfiles() . $this->getPathRelative();
 	}
 
 	/**
@@ -53,7 +53,7 @@ class CM_File_UserContent extends CM_File {
 	}
 
 	public function mkDir() {
-		CM_Util::mkDir(DIR_USERFILES . $this->_getDir());
+		CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles() . $this->_getDir());
 	}
 
 	public function delete() {
@@ -68,6 +68,7 @@ class CM_File_UserContent extends CM_File {
 	 * @return string
 	 */
 	protected function _getDir() {
+		$dirs = array();
 		$dirs[] = $this->_namespace;
 		if (null !== $this->_sequence) {
 			$dirs[] = $this->_sequence % self::BUCKETS_COUNT;

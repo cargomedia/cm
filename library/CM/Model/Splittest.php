@@ -2,8 +2,6 @@
 
 class CM_Model_Splittest extends CM_Model_Abstract {
 
-	CONST TYPE = 16;
-
 	/** @var bool */
 	private $_withoutPersistence;
 
@@ -22,9 +20,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 		return $this->_getId('name');
 	}
 
-	/**
-	 * @return int
-	 */
 	public function getId() {
 		return (int) $this->_get('id');
 	}

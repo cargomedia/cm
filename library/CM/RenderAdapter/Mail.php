@@ -2,6 +2,11 @@
 
 class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 
+	/**
+	 * @param array $params
+	 * @return array array($subject, $html, $text)
+	 * @throws CM_Exception_Invalid
+	 */
 	public function fetch(array $params = array()) {
 		/** @var CM_Mail $mail */
 		$mail = $this->_getView();
@@ -57,10 +62,8 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 	 * @return string
 	 */
 	private function _getTplPathLayout($tplName) {
-		foreach ($this->getRender()->getSite()->getNamespaces() as $namespace) {
-			if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, $namespace, null, false)) {
-				return $path;
-			}
+		if ($path = $this->getRender()->getLayoutPath('Mail/' . $tplName, null, null, false)) {
+			return $path;
 		}
 		throw new CM_Exception_Invalid('Cannot find layout template `' . $tplName . '`');
 	}

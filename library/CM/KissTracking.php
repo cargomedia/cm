@@ -91,7 +91,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	 * @return string
 	 */
 	protected function _getFileName() {
-		return DIR_TMP . 'kiss-tracking.csv';
+		return CM_Bootloader::getInstance()->getDirTmp() . 'kiss-tracking.csv';
 	}
 
 	/**
@@ -106,7 +106,7 @@ class CM_KissTracking extends CM_Class_Abstract {
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
 	 */
 	protected function _getEvents() {
 		return $this->_getSet()->flush();

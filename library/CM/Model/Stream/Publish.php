@@ -2,8 +2,6 @@
 
 class CM_Model_Stream_Publish extends CM_Model_Stream_Abstract {
 
-	const TYPE = 21;
-
 	public function setAllowedUntil($timeStamp) {
 		CM_Db_Db::update('cm_stream_publish', array('allowedUntil' => $timeStamp), array('id' => $this->getId()));
 		$this->_change();

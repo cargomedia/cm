@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible {
+abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
 
 	const CREATE = 'CREATE';
 	const UPDATE = 'UPDATE';
@@ -50,9 +50,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 			call_user_func_array(array($this, $methodName), $arguments);
 		}
 
-		if ($this->getActor() && $this->_trackingEnabled) {
-			$this->_track();
-		}
+		$this->_track();
 	}
 
 	/**
@@ -363,7 +361,9 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 	}
 
 	protected function _track() {
-		CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+		if ($this->_trackingEnabled && $this->getActor()) {
+			CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+		}
 	}
 
 	/**

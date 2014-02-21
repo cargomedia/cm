@@ -2,7 +2,6 @@
 
 class CM_Stream_Adapter_Message_SocketRedis extends CM_Stream_Adapter_Message_Abstract {
 
-	const TYPE = 76;
 	const SYNCHRONIZE_DELAY = 10;
 
 	public function getOptions() {

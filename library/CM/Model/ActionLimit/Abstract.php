@@ -154,7 +154,7 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
 	 */
 	public static function getAll($type = null) {
 		if (!$type) {
-			$type = static::TYPE;
+			$type = static::getTypeStatic();
 		}
 		return new CM_Paging_ActionLimit_All($type);
 	}

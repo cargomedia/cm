@@ -17,7 +17,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 		'click .loadComponent_callback': 'loadExampleInline',
 		'click .removeComponent': 'myRemove',
 		'click .callRpcTime': 'callRpc',
-		'click .callAjaxTest': 'callAjax',
+		'click .callAjaxTest': 'callAjaxTest',
 		'click .throwError_500_text_callback': 'error_500_text_callback',
 		'click .throwError_599_text': 'error_599_text',
 		'click .throwError_CM_Exception_public_callback': 'error_CM_Exception_public_callback',
@@ -27,7 +27,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 		'click .throwError_CM_Exception_AuthRequired_public': 'error_CM_Exception_AuthRequired_public',
 		'click .throwError_CM_Exception_AuthRequired': 'error_CM_Exception_AuthRequired',
 		'click .callAjaxPing': 'ping',
-		'clickConfirmed .confirmAction': 'confirmAction',
+		'click .confirmAction': 'confirmAction',
 		'click .toggleWindow': function(e) {
 			var $opener = $(e.currentTarget);
 			this.toggleWindow($opener);
@@ -65,8 +65,8 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 		});
 	},
 
-	callAjax: function() {
-		this.ajax('test', {x: 'myX'}, {
+	callAjaxTest: function() {
+		return this.ajax('test', {x: 'myX'}, {
 			success: function(data) {
 				this.message('ajax_test(): ' + data);
 			}
@@ -74,7 +74,7 @@ var CM_Component_Example = CM_Component_Abstract.extend({
 	},
 
 	callRpc: function() {
-		cm.rpc('CM_Component_Example.time', [], {
+		return cm.rpc('CM_Component_Example.time', [], {
 			success: function(timestamp) {
 				cm.window.hint("Time: " + timestamp);
 			}

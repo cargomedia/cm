@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable {
+abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Comparable, CM_ArrayConvertible, CM_Cacheable, Serializable, CM_Typed {
 
 	/** @var array|null */
 	protected $_id;
@@ -100,7 +100,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getId() {
 		return (int) $this->_getId('id');
@@ -443,7 +443,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
 	}
 
 	/**
-	 * @return string|null
+	 * @return string
 	 */
 	public static function getCacheClass() {
 		return 'CM_Model_StorageAdapter_Cache';

@@ -6,8 +6,14 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 
 	protected $_source = false; // Don't store json-source
 
+	/**
+	 * @param string|null    $host
+	 * @param string|null    $port
+	 * @param int|null $version
+	 */
 	public function __construct($host = null, $port = null, $version = null) {
-		$this->_indexName = static::INDEX_NAME;
+		$this->_indexName = CM_Bootloader::getInstance()->getDataPrefix();
+		$this->_indexName .= static::INDEX_NAME;
 		$this->_typeName = static::INDEX_NAME;
 
 		$servers = CM_Config::get()->CM_Search->servers;
@@ -23,10 +29,6 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		if ($version) {
 			$this->_indexName .= '.' . $version;
 		}
-		if (CM_Bootloader::getInstance()->isEnvironment('test')) {
-			$this->_indexName .= '.test';
-		}
-
 		parent::__construct($client);
 	}
 
@@ -94,7 +96,9 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 		}
 
 		$query = $this->_getQuery($ids, $limit);
+		CM_Db_Db::getClient(true)->setBuffered(false);
 		$result = CM_Db_Db::exec($query, null, $useSlave);
+		CM_Db_Db::getClient(true)->setBuffered(true);
 
 		$docs = array();
 		$i = 0;

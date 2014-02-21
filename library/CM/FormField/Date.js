@@ -16,6 +16,6 @@ var CM_FormField_Date = CM_FormField_Abstract.extend({
 	},
 
 	isEmpty: function(value) {
-		return _.isEmpty(value['day']) || _.isEmpty(value['month']) || _.isEmpty(value['year']);
+		return _.isEmpty(value.day) || _.isEmpty(value.month) || _.isEmpty(value.year);
 	}
 });

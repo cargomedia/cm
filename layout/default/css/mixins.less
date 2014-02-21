@@ -12,33 +12,10 @@
 	text-overflow: ellipsis;
 }
 
-.notice() {
-	border-color: @colorNotice;
-	background: @colorNotice;
-	color: white;
-}
-
-/* Fonts */
-.font_placeholder() {
-	font-style: italic;
-	color: @colorFgShy;
-}
-
-.hyphens(@arg) {
-	-webkit-hyphens: @arg;
-	-moz-hyphens: @arg;
-	hyphens: @arg;
-}
-
-.word_wrap() {
+.word_wrap {
 	word-break: break-all;
-	word-break: break-word;
+	word-wrap: break-word;
 	overflow-wrap: break-word;
-}
-
-.input_focus() {
-	outline: none;
-	border: 1px solid lighten(@colorNotice, 15);
 }
 
 .triangle(@colorDirectionBottom: transparent, @colorDirectionLeft: transparent, @colorDirectionTop: transparent, @colorDirectionRight: transparent, @size: 5px) {
@@ -173,11 +150,7 @@
 	}
 }
 
-.background-size(@value) {
-	background-size: @value;
-	-webkit-background-size: @value;
-}
-
+// Vendor prefixing
 .appearance(@value) {
 	-webkit-appearance: @value;
 	-moz-appearance: @value;
@@ -188,6 +161,17 @@
 	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+}
+
+.background-size(@value) {
+	-webkit-background-size: @value;
+	background-size: @value;
+}
+
+.hyphens(@arg) {
+	-webkit-hyphens: @arg;
+	-moz-hyphens: @arg;
+	hyphens: @arg;
 }
 
 .transform-origin (@x:center, @y:center) {

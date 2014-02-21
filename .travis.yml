@@ -1,0 +1,40 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+services:
+  - mysql
+  - memcached
+  - elasticsearch
+  - redis-server
+
+before_script:
+  - tests/travis/install-php-runkit.sh
+  - tests/travis/install-php-svm.sh
+  - printf "\n" | pecl install imagick
+  - pecl install stats
+  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
+  - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
+  - phpenv config-add tests/travis/php.ini
+  - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
+
+  - composer self-update
+  - composer install --dev
+  - bin/cm app generate-config-local tests/travis/config.json
+  - bin/cm app set-deploy-version
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
+
+script: bin/phpunit --coverage-clover=coverage.clover
+
+matrix:
+  allow_failures:
+    - php: 5.4
+    - php: 5.5
+
+notifications:
+  email: false

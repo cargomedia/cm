@@ -27,10 +27,16 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	public function handleErrorFatal() {
 		if ($error = error_get_last()) {
 			$code = isset($error['type']) ? $error['type'] : E_CORE_ERROR;
+			if (0 === ($code & error_reporting())) {
+				return;
+			}
 			$message = isset($error['message']) ? $error['message'] : '';
 			$file = isset($error['file']) ? $error['file'] : 'unknown file';
 			$line = isset($error['line']) ? $error['line'] : 0;
-			$exception = new ErrorException($this->_errorCodes[$code] . ': ' . $message, 0, $code, $file, $line);
+			if (isset($this->_errorCodes[$code])) {
+				$message = $this->_errorCodes[$code] . ': ' . $message;
+			}
+			$exception = new ErrorException($message, 0, $code, $file, $line);
 			$this->handleException($exception);
 		}
 	}
@@ -44,13 +50,11 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 	 * @throws ErrorException
 	 */
 	public function handleErrorRaw($code, $message, $file, $line) {
-		$message = $this->_errorCodes[$code] . ': ' . $message;
-		if (!(error_reporting() & $code)) {
-			// This error code is not included in error_reporting
-			$atSign = (0 === error_reporting()); // http://php.net/manual/en/function.set-error-handler.php
-			if ($atSign) {
-				return true;
-			}
+		if (0 === ($code & error_reporting())) {
+			return;
+		}
+		if (isset($this->_errorCodes[$code])) {
+			$message = $this->_errorCodes[$code] . ': ' . $message;
 		}
 		throw new ErrorException($message, 0, $code, $file, $line);
 	}
@@ -100,8 +104,17 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
 			$logEntry .= $formatter->formatException($loggerException);
 			$logEntry .= '### Original Exception: ' . PHP_EOL;
 			$logEntry .= $formatter->formatException($exception) . PHP_EOL;
-			file_put_contents(DIR_DATA_LOG . 'error.log', $logEntry, FILE_APPEND);
+			$logPath = $this->_getLogPath();
+			CM_Util::mkDir(dirname($logPath));
+			error_log($logEntry, 3, $logPath);
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function _getLogPath() {
+		return CM_Bootloader::getInstance()->getDirData() . 'logs/error.log';
 	}
 
 	/**

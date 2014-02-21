@@ -1,11 +1,6 @@
 <?php
 
-$config->debug = false;
-$config->dirData = null;
-$config->dirTmp = null;
-$config->dirUserfiles = null;
 $config->timeZone = 'US/Central';
-$config->testIp = '162.23.39.73';
 
 $config->CM_Render->cdnResource = false;
 $config->CM_Render->cdnUserContent = false;
@@ -82,8 +77,6 @@ $config->CM_Response_RPC->catch = array(
 	'CM_Exception_AuthRequired',
 	'CM_Exception_NotAllowed',
 );
-
-$config->CM_Model_DeviceCapabilities->adapter = 'CM_DeviceCapabilitiesAdapter_Wurfl';
 
 $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
 $config->CM_Stream_Video->servers = array(
