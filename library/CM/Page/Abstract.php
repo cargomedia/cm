@@ -69,11 +69,25 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	}
 
 	/**
+	 * @param CM_Site_Abstract $site
+	 * @param string|null      $layoutName
+	 * @throws CM_Exception_Invalid
 	 * @return CM_Layout_Abstract
 	 */
-	public function getLayout() {
-		$layoutname = 'Default';
-		$classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
-		return new $classname($this);
+	public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
+
+		if (null === $layoutName) {
+			$layoutName = 'Default';
+		}
+		$layoutName = (string) $layoutName;
+
+		foreach ($site->getNamespaces() as $namespace) {
+			$classname = $namespace . '_Layout_' . $layoutName;
+			if (class_exists($classname)) {
+				return new $classname($this);
+			}
+		}
+
+		throw new CM_Exception_Invalid('layout `' . $layoutName . '` is not defined in any namespace');
 	}
 }
