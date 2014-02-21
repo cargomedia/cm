@@ -102,20 +102,17 @@ class CM_Response_Page extends CM_Response_Abstract {
 	private function _processPage(CM_Request_Abstract $request) {
 		try {
 			$this->getSite()->rewrite($request);
+			$query = $request->getQuery();
+			$viewer = $request->getViewer();
+
 			try {
 				$className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
+				/** @var CM_Page_Abstract $page */
+				$page = CM_Page_Abstract::factory($className, $query, $viewer);
 			} catch (CM_Exception $ex) {
 				throw new CM_Exception_Nonexistent($ex->getMessage());
 			}
 
-			$query = $request->getQuery();
-			$viewer = $request->getViewer();
-			try {
-				/** @var CM_Page_Abstract $page */
-				$page = CM_Page_Abstract::factory($className, $query, $viewer);
-			} catch (CM_Exception $ex) {
-				throw new CM_Exception_Nonexistent('Cannot load page `' . $className . '`: ' . $ex->getMessage());
-			}
 			$this->_setStringRepresentation(get_class($page));
 			if ($this->getViewer() && $request->getLanguageUrl()) {
 				$this->redirect($page);

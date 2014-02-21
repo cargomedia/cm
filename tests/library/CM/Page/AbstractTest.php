@@ -3,7 +3,7 @@
 class CM_Page_AbstractTest extends CMTest_TestCase {
 
 	public function testGetClassnameByPath() {
-		$site = $this->getMockBuilder('CM_Page_Abstract')->setMethods(array('getNamespaces'))->getMock();
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
 		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
 
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Bar_Page_Test', false);
@@ -18,8 +18,8 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
 	 * @expectedExceptionMessage page `Test` is not defined in any namespace
 	 */
 	public function testGetClassnameByPathNotExists() {
-		$site = $this->getMockBuilder('CM_Page_Abstract')->setMethods(array('getNamespaces'))->getMock();
-		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo')));
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('FooBar')));
 
 		CM_Page_Abstract::getClassnameByPath($site, '/test');
 	}
