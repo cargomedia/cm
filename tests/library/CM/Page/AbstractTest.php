@@ -30,4 +30,30 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
 		$this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Test_Page_Index', false);
 		$this->assertSame('/', Test_Page_Index::getPath());
 	}
+
+	public function testGetLayout() {
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
+		/** @var CM_Page_Abstract $page */
+		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
+
+		$this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Bar_Layout_Default', false);
+		$this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($site)));
+
+		$this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Foo_Layout_Default', false);
+		$this->assertEquals('Foo_Layout_Default', get_class($page->getLayout($site)));
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage layout `Default` is not defined in any namespace
+	 */
+	public function testGetLayoutNotExists() {
+		$site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
+		$site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('FooBar')));
+		/** @var CM_Page_Abstract $page */
+		$page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
+
+		$this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($site)));
+	}
 }
