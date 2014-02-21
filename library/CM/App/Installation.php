@@ -20,6 +20,13 @@ class CM_App_Installation {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getDirRoot() {
+		return $this->_dirRoot;
+	}
+
+	/**
 	 * @return array [namespace => pathRelative]
 	 */
 	public function getModulePaths() {
@@ -122,10 +129,11 @@ class CM_App_Installation {
 		}
 
 		$extra = $package->getExtra();
-		if (!array_key_exists('cm-modules', $extra)) {
-			throw new CM_Exception_Invalid('Missing `cm-modules` in `' . $package->getName() . '` package composer extra');
+		$modules = array();
+		if (array_key_exists('cm-modules', $extra)) {
+			$modules = $extra['cm-modules'];
 		}
-		return new CM_App_Package($package->getName(), $pathRelative, $extra['cm-modules']);
+		return new CM_App_Package($package->getName(), $pathRelative, $modules);
 	}
 
 	/**
