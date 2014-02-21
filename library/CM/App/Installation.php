@@ -5,10 +5,15 @@ class CM_App_Installation {
 	/** @var \Composer\Composer */
 	private $_composer;
 
+	/** @var string */
+	protected $_dirRoot;
+
 	/**
+	 * @param string                  $dirRoot
 	 * @param \Composer\Composer|null $composer
 	 */
-	public function __construct(\Composer\Composer $composer = null) {
+	public function __construct($dirRoot, \Composer\Composer $composer = null) {
+		$this->_dirRoot = (string) $dirRoot;
 		if (null !== $composer) {
 			$this->_composer = $composer;
 		}
@@ -74,8 +79,8 @@ class CM_App_Installation {
 	 * @return integer
 	 */
 	public function getUpdateStamp() {
-		$composerJsonStamp = CM_File::getModified(DIR_ROOT . 'composer.json');
-		$installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
+		$composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
+		$installedJsonPath = $this->_dirRoot . $this->_getComposerVendorDir() . 'composer/installed.json';
 		$installedJsonStamp = CM_File::getModified($installedJsonPath);
 		return max($composerJsonStamp, $installedJsonStamp);
 	}
@@ -94,7 +99,7 @@ class CM_App_Installation {
 	 * @return string
 	 */
 	protected function _getComposerVendorDir() {
-		$composerJsonStamp = CM_File::getModified(DIR_ROOT . 'composer.json');
+		$composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
 		$cacheKey = CM_CacheConst::ComposerVendorDir;
 		$fileCache = new CM_Cache_Storage_File();
 		if (false === ($vendorDir = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
@@ -128,7 +133,7 @@ class CM_App_Installation {
 	 */
 	protected function _getComposer() {
 		if (null === $this->_composer) {
-			$this->_composer = self::_createComposerDefault();
+			$this->_composer = $this->_createComposerDefault();
 		}
 		return $this->_composer;
 	}
@@ -136,8 +141,8 @@ class CM_App_Installation {
 	/**
 	 * @return \Composer\Composer
 	 */
-	private static function _createComposerDefault() {
-		$composerPath = DIR_ROOT . 'composer.json';
+	private function _createComposerDefault() {
+		$composerPath = $this->_dirRoot . 'composer.json';
 		$composerFile = new Composer\Json\JsonFile($composerPath);
 		$composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
 		$localConfig = $composerFile->read();
@@ -145,7 +150,7 @@ class CM_App_Installation {
 		$composerFactory = new CM_App_ComposerFactory();
 		$composer = $composerFactory->createComposer($localConfig);
 
-		$vendorDir = DIR_ROOT . $composer->getConfig()->get('vendor-dir');
+		$vendorDir = $this->_dirRoot . $composer->getConfig()->get('vendor-dir');
 		$vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
 		$vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
 		$composer->getRepositoryManager()->setLocalRepository($vendorRepository);
