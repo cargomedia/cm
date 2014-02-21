@@ -82,7 +82,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
 	 * @return CM_Layout_Abstract
 	 */
 	public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
-
 		if (null === $layoutName) {
 			$layoutName = 'Default';
 		}
