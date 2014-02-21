@@ -110,7 +110,7 @@ class CM_Response_Page extends CM_Response_Abstract {
 				/** @var CM_Page_Abstract $page */
 				$page = CM_Page_Abstract::factory($className, $query, $viewer);
 			} catch (CM_Exception $ex) {
-				throw new CM_Exception_Nonexistent($ex->getMessage());
+				throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
 			}
 
 			$this->_setStringRepresentation(get_class($page));
