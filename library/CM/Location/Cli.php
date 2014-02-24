@@ -42,6 +42,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	 */
 	public function upgrade() {
 		$this->update();
+		$this->_upgradeCountryList();
 		$this->_getOutput()->writeln('Updating search index…');
 		CM_Model_Location::createAggregation();
 	}
@@ -885,6 +886,16 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			list($countryCode, $regionCode, $regionName) = $csv;
 			$this->_regionListByCountry[$countryCode][$regionCode] = $this->_normalizeRegionName($regionName);
+		}
+	}
+
+	protected function _upgradeCountryList() {
+		foreach ($this->_countryListRenamed as $countryCode => $countryNames) {
+			$countryName = $countryNames['name'];
+			CM_Db_Db::update('cm_locationCountry', array('name' => $countryName), array('abbreviation' => $countryCode));
+		}
+		foreach ($this->_countryListAdded as $countryCode => $countryName) {
+			CM_Model_Location::createCountry($countryName, $countryCode);
 		}
 	}
 
