@@ -122,7 +122,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 		$responsePage->getRender()->getJs()->clear();
 
 		$title = $responsePage->getTitle();
-		$layoutClass = get_class($page->getLayout());
+		$layoutClass = get_class($page->getLayout($this->getSite()));
 		$menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
 		$menuEntryHashList = $this->_getMenuEntryHashList($menuList, $page);
 
