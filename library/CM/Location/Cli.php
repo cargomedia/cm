@@ -14,6 +14,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	protected
 			$_countryList, $_countryListOld,
 			$_countryListAdded, $_countryListRemoved, $_countryListRenamed,
+			$_countryIdList,
 			$_regionListByCountry, $_regionListByCountryOld,
 			$_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode,
 			$_cityListByRegion, $_cityListByRegionOld,
@@ -43,6 +44,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	public function upgrade() {
 		$this->update();
 		$this->_upgradeCountryList();
+		$this->_upgradeRegionList();
 		$this->_getOutput()->writeln('Updating search index…');
 		CM_Model_Location::createAggregation();
 	}
@@ -680,10 +682,12 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 	protected function _readCountryListOld() {
 		$this->_getOutput()->writeln('Reading old country listing…');
 		$this->_countryListOld = array();
-		$result = CM_Db_Db::exec('SELECT `country`.`abbreviation`, `country`.`name` FROM `cm_locationCountry` `country`');
+		$this->_countryIdList = array();
+		$result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_locationCountry`');
 		while (false !== ($row = $result->fetch())) {
-			list($countryCode, $countryName) = array_values($row);
+			list($countryId, $countryCode, $countryName) = array_values($row);
 			$this->_countryListOld[$countryCode] = $countryName;
+			$this->_countryIdList[$countryCode] = $countryId;
 		}
 	}
 
@@ -895,7 +899,26 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			CM_Db_Db::update('cm_locationCountry', array('name' => $countryName), array('abbreviation' => $countryCode));
 		}
 		foreach ($this->_countryListAdded as $countryCode => $countryName) {
-			CM_Model_Location::createCountry($countryName, $countryCode);
+			$country = CM_Model_Location::createCountry($countryName, $countryCode);
+			$countryId = $country->getId();
+			$this->_countryIdList[$countryCode] = $countryId;
+		}
+	}
+
+	protected function _upgradeRegionList() {
+		foreach ($this->_regionListByCountryRenamed as $countryCode => $regionListRenamed) {
+			foreach ($regionListRenamed as $regionCode => $regionNames) {
+				$regionName = $regionNames['name'];
+				$maxMindRegion = $countryCode . $regionCode;
+				if (!CM_Db_Db::update('cm_locationState', array('name' => $regionName), array('_maxmind' => $maxMindRegion))) {
+					// For the USA, where the old numeric region codes in _maxmind have been removed from the new region database
+					$countryId = $this->_countryIdList[$countryCode];
+					CM_Db_Db::update('cm_locationState', array('name' => $regionName), array(
+							'countryId'    => $countryId,
+							'abbreviation' => $regionCode
+					));
+				}
+			}
 		}
 	}
 
