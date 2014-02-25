@@ -17,6 +17,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			$_countryIdList,
 			$_regionListByCountry, $_regionListByCountryOld,
 			$_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode,
+			$_regionIdListByCountry,
 			$_cityListByRegion, $_cityListByRegionOld,
 			$_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
 			$_locationTree, $_locationTreeOld,
@@ -446,6 +447,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			$regionList = $this->_regionListByCountry[$countryCode];
 			$regionCodeList = array_flip($regionList);
+			$regionIdListUpdated = array();
 			foreach ($regionListOld as $regionCodeOld => $regionNameOld) {
 				if (isset($regionList[$regionCodeOld]) && ($regionNameOld === $regionList[$regionCodeOld])) {
 					continue;
@@ -453,7 +455,11 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				if (isset($regionCodeList[$regionNameOld])) {
 					$regionCode = $regionCodeList[$regionNameOld];
 					$this->_regionListByCountryUpdatedCode[$countryCode][$regionCodeOld] = $regionCode;
+					$regionIdListUpdated[$regionCode] = $this->_regionIdListByCountry[$countryCode][$regionCodeOld];
 				}
+			}
+			foreach ($regionIdListUpdated as $regionCode => $regionId) {
+				$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionIdListUpdated[$regionCode];
 			}
 		}
 
@@ -699,6 +705,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			list($regionId, $countryCode, $maxMind, $regionAbbreviation, $regionName) = array_values($row);
 			$regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
 			$this->_regionListByCountryOld[$countryCode][$regionCode] = $regionName;
+			$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
 		}
 	}
 
@@ -911,13 +918,29 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				$regionName = $regionNames['name'];
 				$maxMindRegion = $countryCode . $regionCode;
 				if (!CM_Db_Db::update('cm_locationState', array('name' => $regionName), array('_maxmind' => $maxMindRegion))) {
-					// For the USA, where the old numeric region codes in _maxmind have been removed from the new region database
+					// For the USA, where the old numeric region codes in _maxmind have been removed from MaxMind's newer region databases
 					$countryId = $this->_countryIdList[$countryCode];
 					CM_Db_Db::update('cm_locationState', array('name' => $regionName), array(
 							'countryId'    => $countryId,
 							'abbreviation' => $regionCode
 					));
 				}
+			}
+		}
+		foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
+			$countryId = $this->_countryIdList[$countryCode];
+			$country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
+			foreach ($regionListAdded as $regionCode => $regionName) {
+				$region = CM_Model_Location::createState($country, $regionName, null, $countryCode . $regionCode);
+				$regionId = $region->getId();
+				$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
+			}
+		}
+		foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
+			foreach ($regionListUpdatedCode as $regionCode) {
+				$regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
+				$maxMindRegion = $countryCode . $regionCode;
+				CM_Db_Db::update('cm_locationState', array('_maxmind' => $maxMindRegion), array('id' => $regionId));
 			}
 		}
 	}

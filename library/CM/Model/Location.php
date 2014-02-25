@@ -121,8 +121,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 
 		$earthRadius = 6371009;
 		$arcCosine = acos(
-			sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
-			+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
+				sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
+				+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
 		);
 
 		return (int) round($earthRadius * $arcCosine);
@@ -313,50 +313,57 @@ class CM_Model_Location extends CM_Model_Abstract {
 	 * @param string $abbreviation
 	 * @return CM_Model_Location
 	 */
-	public static function createCountry ($name, $abbreviation) {
+	public static function createCountry($name, $abbreviation) {
 		$countryId = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => $abbreviation, 'name' => $name));
 		return new self(self::LEVEL_COUNTRY, $countryId);
 	}
 
 	/**
 	 * @param CM_Model_Location $parentLocation
-	 * @param string $name
-	 * @param string|null $abbreviation
+	 * @param string            $name
+	 * @param string|null       $abbreviation
+	 * @param string|null       $_maxmind
 	 * @throws CM_Exception_Invalid
 	 * @return CM_Model_Location
 	 */
-	public static function createState (CM_Model_Location $parentLocation, $name, $abbreviation = null) {
+	public static function createState(CM_Model_Location $parentLocation, $name, $abbreviation = null, $_maxmind = null) {
 		if ($parentLocation->getLevel() !== CM_Model_Location::LEVEL_COUNTRY) {
 			throw new CM_Exception_Invalid('Need to pass CM_Model_Location::LEVEL_COUNTRY instance');
 		}
 		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
-		$stateId =  CM_Db_Db::insert('cm_locationState', array('countryId' => $countryId, 'name' => $name, 'abbreviation' => $abbreviation));
+		$stateId = CM_Db_Db::insert('cm_locationState', array(
+				'countryId'    => $countryId,
+				'name'         => $name,
+				'abbreviation' => $abbreviation,
+				'_maxmind'     => $_maxmind,
+		));
 		return new self(self::LEVEL_STATE, $stateId);
 	}
 
 	/**
 	 * @param CM_Model_Location $parentLocation
-	 * @param string $name
-	 * @param float $latitude
-	 * @param float $longitude
+	 * @param string            $name
+	 * @param float             $latitude
+	 * @param float             $longitude
 	 * @return CM_Model_Location
 	 */
-	public static function createCity (CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
+	public static function createCity(CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
 		$stateId = null;
 		$stateId = $parentLocation->getId(self::LEVEL_STATE);
 		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
-		$cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+		$cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude,
+															'lon'     => $longitude));
 		return new self(self::LEVEL_CITY, $cityId);
 	}
 
 	/**
 	 * @param CM_Model_Location $city
-	 * @param string $name
-	 * @param float $latitude
-	 * @param float $longitude
+	 * @param string            $name
+	 * @param float             $latitude
+	 * @param float             $longitude
 	 * @return CM_Model_Location
 	 */
-	public static function createZip (CM_Model_Location $city, $name, $latitude, $longitude) {
+	public static function createZip(CM_Model_Location $city, $name, $latitude, $longitude) {
 		$cityId = $city->getId(self::LEVEL_CITY);
 		$zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
 		return new self(self::LEVEL_ZIP, $zipId);
