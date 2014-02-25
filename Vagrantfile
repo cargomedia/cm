@@ -16,4 +16,10 @@ Vagrant.configure('2') do |config|
     puppet.module_path = 'puppet/modules'
     puppet.manifests_path = 'puppet/manifests'
   end
+
+  config.vm.provision 'shell', inline: [
+    'sudo service redis start || true',	# Workaround for https://github.com/cargomedia/puppet-packages/issues/488
+    'cd /home/vagrant/cm',
+    'composer --no-interaction install --dev',
+  ].join(' && ')
 end
