@@ -12,6 +12,9 @@ class smarty_function_usertextTest extends CMTest_TestCase {
 		$render = new CM_Render();
 		$this->_template = $smarty->createTemplate('string:');
 		$this->_template->assignGlobal('render', $render);
+
+		CM_Config::get()->CM_Render->cdnResource = false;
+		CM_Config::get()->CM_Render->cdnUserContent = false;
 	}
 
 	public function tearDown() {
