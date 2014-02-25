@@ -6,4 +6,8 @@ node default {
     development => true,
   }
 
+  environment::variable {'PHP_IDE_CONFIG':
+    value => 'serverName=www.cm.dev',
+  }
+
 }

@@ -3,6 +3,8 @@ Vagrant.configure('2') do |config|
   config.vm.box = 'debian-7-amd64-cm'
   config.vm.box_url = 'http://vagrant-boxes.cargomedia.ch/virtualbox/debian-7-amd64-cm.box'
 
+  config.vm.hostname = 'www.cm.dev'
+
   config.vm.network :private_network, ip: '10.10.10.13'
   config.vm.synced_folder '.', '/home/vagrant/cm', :type => 'nfs'
 
