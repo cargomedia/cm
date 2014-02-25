@@ -63,6 +63,8 @@ class CM_App {
 			foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
 				require $setupScript->getPath();
 			}
+			$searchCli = new CM_Search_Index_Cli();
+			$searchCli->create();
 		}
 	}
 
