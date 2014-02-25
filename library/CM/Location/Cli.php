@@ -12,13 +12,11 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
 	/** @var array */
 	protected
-			$_countryList, $_countryListOld,
+			$_countryList, $_countryListOld, $_countryIdList,
 			$_countryListAdded, $_countryListRemoved, $_countryListRenamed,
-			$_countryIdList,
-			$_regionListByCountry, $_regionListByCountryOld,
+			$_regionListByCountry, $_regionListByCountryOld, $_regionIdListByCountry,
 			$_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode,
-			$_regionIdListByCountry,
-			$_cityListByRegion, $_cityListByRegionOld,
+			$_cityListByRegion, $_cityListByRegionOld, $_cityIdList,
 			$_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
 			$_locationTree, $_locationTreeOld,
 			$_zipCodeListByCityAdded, $_zipCodeListByCityRemoved;
@@ -46,6 +44,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 		$this->update();
 		$this->_upgradeCountryList();
 		$this->_upgradeRegionList();
+		$this->_upgradeCityList();
 		$this->_getOutput()->writeln('Updating search index…');
 		CM_Model_Location::createAggregation();
 	}
@@ -189,6 +188,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				$cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
 
 				// Cities with updated code (name lookup within the region)
+				$cityIdListUpdatedCode = array();
 				foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
 					if (isset($cityList[$cityCodeOld]) && ($cityList[$cityCodeOld] === $cityNameOld)) {
 						continue;
@@ -203,11 +203,16 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 						continue;
 					}
 					if (1 === count($cityCodeListNew)) {
-						$this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld] = reset($cityCodeListNew);
+						$cityCode = reset($cityCodeListNew);
+						$this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld] = $cityCode;
+						$cityIdListUpdatedCode[$cityCode] = $this->_cityIdList[$cityCodeOld];
 					} else {
 						$infoListWarning['Cities with ambiguous updated code'][$countryName . ' / ' . $regionName][] =
 								$cityNameOld . ' (' . $cityCodeOld . ' => ' . implode(', ', $cityCodeListNew) . ')';
 					}
+				}
+				foreach($cityIdListUpdatedCode as $cityCode => $cityId) {
+					$this->_cityIdList[$cityCode] = $cityId;
 				}
 
 				// Cities added (new code that doesn't come from a code update)
@@ -447,7 +452,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			$regionList = $this->_regionListByCountry[$countryCode];
 			$regionCodeList = array_flip($regionList);
-			$regionIdListUpdated = array();
+			$regionIdListUpdatedCode = array();
 			foreach ($regionListOld as $regionCodeOld => $regionNameOld) {
 				if (isset($regionList[$regionCodeOld]) && ($regionNameOld === $regionList[$regionCodeOld])) {
 					continue;
@@ -455,11 +460,11 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				if (isset($regionCodeList[$regionNameOld])) {
 					$regionCode = $regionCodeList[$regionNameOld];
 					$this->_regionListByCountryUpdatedCode[$countryCode][$regionCodeOld] = $regionCode;
-					$regionIdListUpdated[$regionCode] = $this->_regionIdListByCountry[$countryCode][$regionCodeOld];
+					$regionIdListUpdatedCode[$regionCode] = $this->_regionIdListByCountry[$countryCode][$regionCodeOld];
 				}
 			}
-			foreach ($regionIdListUpdated as $regionCode => $regionId) {
-				$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionIdListUpdated[$regionCode];
+			foreach ($regionIdListUpdatedCode as $regionCode => $regionId) {
+				$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
 			}
 		}
 
@@ -623,8 +628,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			LEFT JOIN `cm_locationState` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `city`.`countryId`');
 		while (false !== ($row = $result->fetch())) {
-			list($cityId, $maxMind, $cityName, $lat, $lon, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
-			if (null === $maxMind) {
+			list($cityId, $cityCode, $cityName, $lat, $lon, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+			if (null === $cityCode) {
 				throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
 			}
 			if (null === $regionId) {
@@ -634,15 +639,16 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			}
 			if (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])) {
 				$region = isset($regionName) ? $regionName . ', ' . $countryCode : $countryCode;
-				throw new CM_Exception('City `' . $cityName . '` (' . $maxMind . ') found twice in ' . $region);
+				throw new CM_Exception('City `' . $cityName . '` (' . $cityCode . ') found twice in ' . $region);
 			}
 			$this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
 					'name'    => (string) $cityName,
 					'lat'     => (float) $lat,
 					'lon'     => (float) $lon,
-					'maxMind' => (int) $maxMind,
+					'maxMind' => (int) $cityCode,
 			);
-			$this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind] = (string) $cityName;
+			$this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode] = (string) $cityName;
+			$this->_cityIdList[$cityCode] = $cityId;
 		}
 		$result = CM_Db_Db::exec('
 			SELECT
@@ -941,6 +947,25 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				$regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
 				$maxMindRegion = $countryCode . $regionCode;
 				CM_Db_Db::update('cm_locationState', array('_maxmind' => $maxMindRegion), array('id' => $regionId));
+			}
+		}
+	}
+
+	protected function _upgradeCityList() {
+		foreach ($this->_cityListByRegionRenamed as $cityListByRegionRenamed) {
+			foreach ($cityListByRegionRenamed as $cityListRenamed) {
+				foreach ($cityListRenamed as $cityCode => $cityNames) {
+					$cityName = $cityNames['name'];
+					CM_Db_Db::update('cm_locationCity', array('name' => $cityName), array('_maxmind' => $cityCode));
+				}
+			}
+		}
+		foreach ($this->_cityListByRegionUpdatedCode as $cityListByRegionUpdatedCode) {
+			foreach ($cityListByRegionUpdatedCode as $cityListUpdatedCode) {
+				foreach ($cityListUpdatedCode as $cityCode) {
+					$cityId = $this->_cityIdList[$cityCode];
+					CM_Db_Db::update('cm_locationCity', array('_maxmind' => $cityCode), array('id' => $cityId));
+				}
 			}
 		}
 	}
