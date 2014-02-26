@@ -211,7 +211,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 								$cityNameOld . ' (' . $cityCodeOld . ' => ' . implode(', ', $cityCodeListNew) . ')';
 					}
 				}
-				foreach($cityIdListUpdatedCode as $cityCode => $cityId) {
+				foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
 					$this->_cityIdList[$cityCode] = $cityId;
 				}
 
@@ -965,6 +965,19 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				foreach ($cityListUpdatedCode as $cityCode) {
 					$cityId = $this->_cityIdList[$cityCode];
 					CM_Db_Db::update('cm_locationCity', array('_maxmind' => $cityCode), array('id' => $cityId));
+				}
+			}
+		}
+		foreach ($this->_cityListUpdatedRegion as $countryCode => $cityListUpdatedRegion) {
+			foreach ($cityListUpdatedRegion as $cityCode => $regionCodes) {
+				$cityId = $this->_cityIdList[$cityCode];
+				$regionCode = $regionCodes['regionCode'];
+				$regionName = $this->_getRegionName($countryCode, $regionCode);
+				if ($regionName === 'Unknown region') {
+					CM_Db_Db::update('cm_locationCity', array('stateId' => null), array('id' => $cityId));
+				} else {
+					$regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
+					CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId), array('id' => $cityId));
 				}
 			}
 		}
