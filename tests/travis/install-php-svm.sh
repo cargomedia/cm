@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# sudo apt-get install re2c g++ php5 php5-dev
+
 LIBSVM_VERSION="3.17"
 PHPSVM_VERSION="0.1.9"
 
@@ -11,10 +13,10 @@ sudo install -D -m755 svm-train /usr/bin/svm-train
 sudo install -D -m755 svm-predict /usr/bin/svm-predict
 sudo install -D -m755 svm-scale /usr/bin/svm-scale
 sudo install -D -m644 libsvm.so.2 /usr/lib/libsvm.so.2
+sudo ln -s /usr/lib/libsvm.so.2 /usr/lib/libsvm.so
 sudo ldconfig
 sudo ldconfig --print | grep libsvm
-sudo cp * /usr/include/
-sudo cp * /usr/lib/
+sudo cp svm.h /usr/include/
 cd ..
 
 curl -L https://github.com/ianbarber/php-svm/archive/${PHPSVM_VERSION}.tar.gz | tar xz
