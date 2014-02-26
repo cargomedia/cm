@@ -1,9 +1,7 @@
 language: php
 
 php:
-  - 5.3
   - 5.4
-  - 5.5
 
 services:
   - mysql
@@ -28,14 +26,9 @@ before_script:
   - bin/cm app set-deploy-version
 
 after_script:
-  - cat script.gdb | sudo gdb --args /home/travis/.phpenv/versions/5.4.25/bin/php /home/travis/.phpenv/versions/5.4.25/bin/phpunit
   - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
 
-script: bin/phpunit --coverage-clover=coverage.clover
-
-matrix:
-  allow_failures:
-    - php: 5.5
+script: cat script.gdb | sudo gdb --args /home/travis/.phpenv/versions/5.4.25/bin/php /home/travis/.phpenv/versions/5.4.25/bin/phpunit --coverage-clover=coverage.clover
 
 notifications:
   email: false
