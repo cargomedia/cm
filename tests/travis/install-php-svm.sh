@@ -12,7 +12,7 @@ sudo install -D -m755 svm-predict /usr/bin/svm-predict
 sudo install -D -m755 svm-scale /usr/bin/svm-scale
 sudo install -D -m644 libsvm.so.2 /usr/lib/libsvm.so.2
 sudo ldconfig
-cd ..
+sudo ldconfig --print | grep libsvm
 
 curl -L https://github.com/ianbarber/php-svm/archive/${PHPSVM_VERSION}.tar.gz | tar xz
 cd php-svm-${PHPSVM_VERSION}
