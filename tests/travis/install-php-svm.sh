@@ -1,11 +1,18 @@
 #!/bin/bash -e
 
-VERSION="0.1.9"
+LIBSVM_VERSION="3.17"
+PHPSVM_VERSION="0.1.9"
 
-sudo apt-get install -y libsvm-dev re2c
+curl http://www.csie.ntu.edu.tw/~cjlin/libsvm/libsvm-${LIBSVM_VERSION}.tar.gz | tar xz
+cd libsvm-${LIBSVM_VERSION}
+make lib
+sudo cp libsvm.so.2 /usr/lib
+sudo ln -sf /usr/lib/libsvm.so.2 /usr/lib/libsvm.so
+ldconfig
+ldconfig --print | grep libsvm
 
-curl -sL https://github.com/ianbarber/php-svm/archive/${VERSION}.tar.gz | tar -xzf -
-cd php-svm-${VERSION}
+curl -L https://github.com/ianbarber/php-svm/archive/${PHPSVM_VERSION}.tar.gz | tar xz
+cd php-svm-${PHPSVM_VERSION}
 phpize
 ./configure
 make
