@@ -1,6 +1,6 @@
 <?php
 
-class CM_KissTrackingTest extends CMTest_TestCase {
+class CM_KissTrackingTest {
 
 	/** @var CM_KissTracking $kissTracking */
 	private $_kissTracking;
