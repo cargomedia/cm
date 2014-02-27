@@ -3,7 +3,7 @@
 final class CM_EventHandler_EventHandler {
 
 	/**
-	 * @var Array[] $_callbacks
+	 * @var array[] $_callbacks
 	 */
 	private $_callbacks = array();
 
