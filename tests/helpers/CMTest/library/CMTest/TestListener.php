@@ -25,9 +25,7 @@ class CMTest_TestListener implements PHPUnit_Framework_TestListener {
 
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) {
 		if ('CM' === $suite->getName()) {
-			CM_Db_Db::getClient(false)->disconnect();
-			CM_Db_Db::getClient(true)->disconnect();
-			gc_collect_cycles();
+			CM_Db_Db::disconnect();
 			print "PDO Disconnected";
 		}
 	}
