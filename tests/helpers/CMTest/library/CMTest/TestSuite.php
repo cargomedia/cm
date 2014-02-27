@@ -11,7 +11,7 @@ class CMTest_TestSuite {
 
 	public function bootstrap() {
 		CMTest_TH::init();
-		register_shutdown_function(array($this, 'cleanup'));
+//		register_shutdown_function(array($this, 'cleanup'));
 	}
 
 	public function cleanup() {
