@@ -31,7 +31,7 @@ class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 
 class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 
-	public function getLayout() {
+	public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
 		$layoutname = 'Mock1';
 		$classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
 		return new $classname($this);

@@ -2,8 +2,8 @@
 
 $config->timeZone = 'US/Central';
 
-$config->CM_Render->cdnResource = false;
-$config->CM_Render->cdnUserContent = false;
+$config->CM_Render->cdnResource = true;
+$config->CM_Render->cdnUserContent = true;
 
 $config->CM_Mail->send = true;
 $config->CM_Mail->mailDeliveryAgent = null;
@@ -46,7 +46,7 @@ $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
 
 $config->CM_Db_Db->db = 'cm';
 $config->CM_Db_Db->username = 'root';
-$config->CM_Db_Db->password = 'root';
+$config->CM_Db_Db->password = '';
 $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Db_Db->serversRead = array();
 $config->CM_Db_Db->serversReadEnabled = true;

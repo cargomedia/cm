@@ -3,8 +3,8 @@
 class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 
 	public static function setUpBeforeClass() {
-		CM_Db_Db::insert('cm_user_preferenceDefault', array('section' => 'test', 'key' => 'foo', 'defaultValue' => 0, 'configurable' => 1));
-		CM_Db_Db::insert('cm_user_preferenceDefault', array('section' => 'test', 'key' => 'bar', 'defaultValue' => 1, 'configurable' => 1));
+		CM_ModelAsset_User_Preferences::setDefault('test', 'foo', false, true);
+		CM_ModelAsset_User_Preferences::setDefault('test', 'bar', true, true);
 	}
 
 	public static function tearDownAfterClass() {

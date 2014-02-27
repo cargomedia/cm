@@ -40,7 +40,7 @@
 
 .dropInfo {
 	display: none;
-	color: @colorFgShy;
+	color: @colorFgSubtle;
 
 	@media (min-width: 400px) {
 		display: block;
@@ -49,7 +49,7 @@
 	.dropInfo-icon {
 		font-size: 3em;
 		line-height: 1.2;
-		color: lighten(@colorFgIcon, 30);
+		color: lighten(@colorFgSubtle, 30);
 		text-shadow: 1px 1px @colorBg;
 	}
 
@@ -88,7 +88,7 @@
 
 		&:hover {
 			border-color: @colorFgBorderEmphasize3;
-			.gradient(vertical, @colorBgButtonDefault, darken(@colorBgButtonDefault, 6));
+			.gradient(vertical, @colorBg, darken(@colorBg, 6));
 			color: lighten(@colorFg, 25);
 		}
 	}
