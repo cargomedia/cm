@@ -11,7 +11,7 @@ services:
 
 before_script:
   - sudo apt-get update
-  - sudo apt-get upgrade -y
+  - sudo apt-get upgrade -y || true
   - sudo apt-get install gdb
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
