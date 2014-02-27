@@ -21,11 +21,14 @@ class CMTest_TestListener implements PHPUnit_Framework_TestListener {
 	}
 
 	public function startTestSuite(PHPUnit_Framework_TestSuite $suite) {
-		printf("TestSuite '%s' started.\n", $suite->getName());
 	}
 
 	public function endTestSuite(PHPUnit_Framework_TestSuite $suite) {
-		printf("TestSuite '%s' ended.\n", $suite->getName());
-		CM_Db_Db::getClient(false)->disconnect();
+		if ('CM' === $suite->getName()) {
+			CM_Db_Db::getClient(false)->disconnect();
+			CM_Db_Db::getClient(true)->disconnect();
+			gc_collect_cycles();
+			print "PDO Disconnected";
+		}
 	}
 }

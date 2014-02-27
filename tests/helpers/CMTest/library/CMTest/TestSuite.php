@@ -18,6 +18,5 @@ class CMTest_TestSuite {
 		CMTest_TH::clearEnv();
 		CM_Util::rmDir(CM_Bootloader::getInstance()->getDirData());
 		CM_Util::rmDir(CM_Bootloader::getInstance()->getDirUserfiles());
-		CM_Db_Db::getClient(false)->disconnect();
 	}
 }
