@@ -10,7 +10,6 @@ services:
   - redis-server
 
 before_script:
-  - sudo apt-get install gdb
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
   - printf "\n" | pecl install imagick
@@ -19,16 +18,15 @@ before_script:
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
-  - echo "memory_limit=4096M" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer self-update
   - composer install --dev
   - bin/cm app generate-config-local tests/travis/config.json
   - bin/cm app set-deploy-version
 
 after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
+  - (wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover) || true
 
-script: cat script.gdb | sudo gdb --args ~/.phpenv/versions/$(phpenv version-name)/bin/php ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit --coverage-clover=coverage.clover
+script: ~/.phpenv/versions/$(phpenv version-name)/bin/php ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit --coverage-clover=coverage.clover
 
 notifications:
   email: false
