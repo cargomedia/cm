@@ -38,8 +38,11 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 		if ($value == $defaults[$section][$key]['value']) {
 			CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
 		} else {
-			CM_Db_Db::replace('cm_user_preference', array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id'],
-					'value' => $value));
+			CM_Db_Db::replace('cm_user_preference', array(
+				'userId'       => $this->_model->getId(),
+				'preferenceId' => $defaults[$section][$key]['id'],
+				'value'        => $value,
+			));
 		}
 		$this->_change();
 	}
@@ -83,12 +86,32 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 				if (!isset($defaults[$default['section']])) {
 					$defaults[$default['section']] = array();
 				}
-				$defaults[$default['section']][$default['key']] = array('id' => (int) $default['preferenceId'],
-					'value' => (bool) $default['defaultValue'], 'configurable' => (boolean) $default['configurable']);
+				$defaults[$default['section']][$default['key']] = array(
+					'id'           => (int) $default['preferenceId'],
+					'value'        => (bool) $default['defaultValue'],
+					'configurable' => (boolean) $default['configurable'],
+				);
 			}
 			$cache->set($cacheKey, $defaults);
 		}
 		return $defaults;
+	}
+
+	public static function setDefault($section, $key, $defaultValue, $configurable) {
+		$where = array(
+			'section' => (string) $section,
+			'key'     => (string) $key
+		);
+		$values = array(
+			'defaultValue' => (int) (bool) $defaultValue,
+			'configurable' => (int) (bool) $configurable
+		);
+		if (CM_Db_Db::count('cm_user_preferenceDefault', $where)) {
+			CM_Db_Db::update('cm_user_preferenceDefault', $values, $where);
+		} else {
+			$values = array_merge($values, $where);
+			CM_Db_Db::insert('cm_user_preferenceDefault', $values);
+		}
 	}
 
 	/**
