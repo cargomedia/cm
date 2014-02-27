@@ -12,6 +12,9 @@ class CM_Bootloader {
 	/** @var CM_ExceptionHandling_Handler_Abstract */
 	private $_exceptionHandler;
 
+	/** @var CM_EventHandler_EventHandler */
+	private $_eventHandler;
+
 	/** @var CM_Bootloader */
 	protected static $_instance;
 
@@ -61,6 +64,16 @@ class CM_Bootloader {
 			}
 		}
 		return $this->_exceptionHandler;
+	}
+
+	/**
+	 * @return CM_EventHandler_EventHandler
+	 */
+	public function getEventHandler() {
+		if (null === $this->_eventHandler) {
+			$this->_eventHandler = new CM_EventHandler_EventHandler();
+		}
+		return $this->_eventHandler;
 	}
 
 	/**
