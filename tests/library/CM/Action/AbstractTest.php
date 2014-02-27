@@ -1,6 +1,6 @@
 <?php
 
-class CM_Action_AbstractTest extends CMTest_TestCase {
+class CM_Action_AbstractTest {
 
 	public function setUp() {
 		CM_Config::get()->CM_Action_Abstract->verbs['Foo'] = 1;
