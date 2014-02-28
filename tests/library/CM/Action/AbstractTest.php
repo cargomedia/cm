@@ -3,6 +3,9 @@
 class CM_Action_AbstractTest extends CMTest_TestCase {
 
 	public function setUp() {
+		if (getenv('TRAVIS')) {
+			$this->markTestSkipped('Disabled on Travis because of a connection issue');
+		}
 		CM_Config::get()->CM_Action_Abstract->verbs['Foo'] = 1;
 	}
 
@@ -19,9 +22,6 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testTrack() {
-		if (getenv('TRAVIS')) {
-			$this->markTestSkipped('Disabled on Travis because of a connection issue');
-		}
 		CM_Config::get()->CM_KissTracking->enabled = true;
 		$tracking = CM_KissTracking::getInstance();
 		$getEventsMethod = CMTest_TH::getProtectedMethod('CM_KissTracking', '_getEvents');
