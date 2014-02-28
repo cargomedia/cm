@@ -156,7 +156,6 @@ class CM_Model_Language extends CM_Model_Abstract {
 		return $cacheables;
 	}
 
-
 	protected function _onDeleteBefore() {
 		CM_Db_Db::delete('cm_languageValue', array('languageId' => $this->getId()));
 		CM_Db_Db::update('cm_language', array('backupId' => null), array('backupId' => $this->getId()));
@@ -174,14 +173,14 @@ class CM_Model_Language extends CM_Model_Abstract {
 	/**
 	 * @param string $name
 	 * @param string $abbreviation
-	 * @param bool $enabled
+	 * @param bool   $enabled
 	 * @return static
 	 */
 	public static function create($name, $abbreviation, $enabled) {
 		return CM_Model_Language::createStatic(array(
-			'name' => (string) $name,
+			'name'         => (string) $name,
 			'abbreviation' => (string) $abbreviation,
-			'enabled' => (bool) $enabled,
+			'enabled'      => (bool) $enabled,
 		));
 	}
 
@@ -346,8 +345,8 @@ class CM_Model_Language extends CM_Model_Abstract {
 	 * @throws CM_Exception_Invalid
 	 */
 	private static function _setKeyVariables($name, array $variableNames) {
-		$languageKeyParams = CM_Db_Db::select('cm_languageKey', array('id', 'updateCountResetVersion',
-			'updateCount'), array('name' => $name))->fetch();
+		$languageKeyParams = CM_Db_Db::select('cm_languageKey',
+			array('id', 'updateCountResetVersion', 'updateCount'), array('name' => $name))->fetch();
 		if (!$languageKeyParams) {
 			throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
 		}
@@ -357,15 +356,28 @@ class CM_Model_Language extends CM_Model_Abstract {
 		if ($deployVersion > $languageKeyParams['updateCountResetVersion']) {
 			$updateCount = 1;
 		}
-		CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
-		if ($updateCount > 50) {
-			throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
-		}
 
-		CM_Db_Db::delete('cm_languageKey_variable', array('languageKeyId' => $languageKeyId));
-		foreach ($variableNames as $variableName) {
-			CM_Db_Db::insert('cm_languageKey_variable', array('languageKeyId' => $languageKeyId, 'name' => $variableName));
+		$variableNamesDb = CM_Db_Db::exec("
+			SELECT `v`.`name` FROM `cm_languageKey` AS k
+			LEFT JOIN `cm_languageKey_variable` AS v ON `k`.`id` = `v`.`languageKeyId`
+			WHERE `k`.`name` LIKE '".$name."'
+		")->fetchAllColumn();
+
+		sort($variableNames);
+		sort($variableNamesDb);
+
+		if ($variableNames !== $variableNamesDb){
+			CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
+
+			if ($updateCount > 50) {
+				throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
+			}
+
+			CM_Db_Db::delete('cm_languageKey_variable', array('languageKeyId' => $languageKeyId));
+			foreach ($variableNames as $variableName) {
+				CM_Db_Db::insert('cm_languageKey_variable', array('languageKeyId' => $languageKeyId, 'name' => $variableName));
+			}
+			self::changeAll();
 		}
-		self::changeAll();
 	}
 }

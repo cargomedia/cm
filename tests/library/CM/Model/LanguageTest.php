@@ -251,4 +251,22 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
 			'variableKey' => array('value' => 'value', 'variables' => array('bar', 'foo', 'more')),
 		), $this->_language->getTranslations()->getAssociativeArray());
 	}
+
+	public function testUpdateCount() {
+		$this->_language->setTranslation('key', 'value', array('foo', 'bar'));
+		for ($i = 0; $i < 50; $i++) {
+			CM_Model_Language::updateKey('key', null, array('foo', 'bar'));
+		}
+	}
+
+	/**
+	 * @expectedException CM_Exception_Invalid
+	 * @expectedExceptionMessage Variables for languageKey `key` have been already updated over 50 times since release
+	 */
+	public function testUpdateCountDifferentVariables() {
+		$this->_language->setTranslation('key', 'value', array('foo'));
+		for ($i = 0; $i < 50; $i++) {
+			CM_Model_Language::updateKey('key', null, array('foo' . $i));
+		}
+	}
 }
