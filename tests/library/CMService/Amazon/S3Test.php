@@ -1,6 +1,6 @@
 <?php
 
-class CMService_Amazon_S3Test extends CMTest_TestCase {
+class CMService_Amazon_S3Test {
 
 	public function setUp() {
 		if (getenv('TRAVIS')) {
