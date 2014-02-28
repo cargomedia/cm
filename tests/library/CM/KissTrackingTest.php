@@ -9,7 +9,7 @@ class CM_KissTrackingTest extends CMTest_TestCase {
 	private $_filePath;
 
 	public function setUp() {
-		if (empty($_ENV['TRAVIS'])) {
+		if (!empty($_ENV['TRAVIS'])) {
 			$this->markTestSkipped('Disabled on Travis because of a connection issue');
 		}
 		CM_Config::get()->CM_KissTracking->enabled = true;
