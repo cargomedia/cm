@@ -59,6 +59,17 @@ class CM_Db_Db extends CM_Class_Abstract {
 		return new CM_Db_Schema_Column(self::getClient(false), $table, $column);
 	}
 
+	public static function disconnect() {
+		if (self::$_client) {
+			self::$_client->disconnect();
+			self::$_client = null;
+		}
+		if (self::$_clientReadOnly) {
+			self::$_clientReadOnly->disconnect();
+			self::$_clientReadOnly = null;
+		}
+	}
+
 	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
@@ -345,7 +356,7 @@ class CM_Db_Db extends CM_Class_Abstract {
 		$columnQuoted = $client->quoteIdentifier($column);
 		$whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
 		$id = CM_Db_Db::exec('SELECT ' . $columnQuoted . ' FROM ' . $table . ' WHERE ' . $whereGuessId . ' ORDER BY ' . $columnQuoted .
-			' DESC LIMIT 1')->fetchColumn();
+				' DESC LIMIT 1')->fetchColumn();
 
 		if (!$id) {
 			$id = CM_Db_Db::select($table, $column, $where)->fetchColumn();
