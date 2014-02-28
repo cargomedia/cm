@@ -122,8 +122,6 @@ class CM_Response_Page extends CM_Response_Abstract {
 				$request->setUri($this->getRedirectUrl());
 				return null;
 			}
-			$page->checkAccessible();
-			$page->prepare();
 			$html = $this->_renderPage($page);
 			$this->_page = $page;
 			return $html;
