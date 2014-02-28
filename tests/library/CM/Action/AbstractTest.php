@@ -19,7 +19,7 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testTrack() {
-		if (!empty($_ENV['TRAVIS'])) {
+		if (getenv('TRAVIS')) {
 			$this->markTestSkipped('Disabled on Travis because of a connection issue');
 		}
 		CM_Config::get()->CM_KissTracking->enabled = true;

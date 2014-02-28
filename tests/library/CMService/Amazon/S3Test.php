@@ -3,7 +3,7 @@
 class CMService_Amazon_S3Test extends CMTest_TestCase {
 
 	public function setUp() {
-		if (!empty($_ENV['TRAVIS'])) {
+		if (getenv('TRAVIS')) {
 			$this->markTestSkipped('Disabled on Travis because of a connection issue');
 		}
 	}

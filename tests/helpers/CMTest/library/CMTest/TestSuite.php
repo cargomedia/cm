@@ -11,7 +11,7 @@ class CMTest_TestSuite {
 
 	public function bootstrap() {
 		CMTest_TH::init();
-		if (empty($_ENV['TRAVIS'])) {
+		if (!getenv('TRAVIS')) {
 			register_shutdown_function(array($this, 'cleanup'));
 		}
 	}
