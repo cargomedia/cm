@@ -4,4 +4,9 @@
       <directory>tests/</directory>
     </testsuite>
   </testsuites>
+  <listeners>
+    <listener class="CMTest_TestListener">
+      <arguments/>
+    </listener>
+  </listeners>
 </phpunit>
