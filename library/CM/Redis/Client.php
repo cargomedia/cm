@@ -21,11 +21,6 @@ class CM_Redis_Client extends CM_Class_Abstract {
     }
   }
 
-  public function close() {
-    $this->_redis->close();
-    $this->_redis = null;
-  }
-
   /**
    * @param string $key
    * @return string|false
