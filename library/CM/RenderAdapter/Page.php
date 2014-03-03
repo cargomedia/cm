@@ -2,12 +2,6 @@
 
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
-  public function fetch(array $params = array()) {
-    $this->_getView()->setTplParam('pageTitle', $this->fetchTitle());
-
-    return parent::fetch($params);
-  }
-
   /**
    * @return string
    */
@@ -31,6 +25,10 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
   protected function _getStackKey() {
     return 'pages';
+  }
+
+  protected function _fetchAdditional() {
+    $this->_getView()->setTplParam('pageTitle', $this->fetchTitle());
   }
 
   /**
