@@ -110,4 +110,3 @@ EOD;
     $kissTracking->exportEvents();
   }
 }
-
