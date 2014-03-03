@@ -2,7 +2,7 @@
 
 class CM_KissTrackingTest extends CMTest_TestCase {
 
-  /** @var CM_KissTracking $kissTracking */
+  /** @var CM_KissTracking */
   private $_kissTracking;
 
   /** @var string */
