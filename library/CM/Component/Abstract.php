@@ -47,10 +47,11 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
    *
    * Access for everyone is default. Should be overloaded by every component
    *
+   * @param CM_Render $render
    * @throws CM_Exception_AuthRequired
    * @throws CM_Exception_Nonexistent
    */
-  abstract public function checkAccessible();
+  abstract public function checkAccessible(CM_Render $render);
 
   /**
    * @return CM_ComponentFrontendHandler
