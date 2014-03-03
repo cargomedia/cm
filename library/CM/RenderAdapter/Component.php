@@ -12,6 +12,10 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
     /** @var CM_Component_Abstract $component */
     $component = $this->_getView();
+    $component->checkAccessible();
+    $component->prepare();
+
+    $this->_fetchAdditional();
 
     $this->getRender()->pushStack($this->_getStackKey(), $component);
     $this->getRender()->pushStack('views', $component);
@@ -46,6 +50,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     /** @var CM_Component_Abstract $component */
     $component = $this->_getView();
     return $this->_renderTemplate($tplName, $params, true);
+  }
+
+  protected function _fetchAdditional() {
   }
 
   /**
