@@ -1,6 +1,6 @@
 <?php
 
-class CMService_Amazon_S3Test extends PHPUnit_Framework_TestCase {
+class CMService_Amazon_S3Test extends CMTest_TestCase {
 
 	public function tearDown() {
 		CMTest_TH::clearEnv();
