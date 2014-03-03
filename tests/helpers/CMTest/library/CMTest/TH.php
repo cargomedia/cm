@@ -24,7 +24,6 @@ class CMTest_TH {
   public static function clearEnv() {
     CM_App::getInstance()->setupFilesystem();
     self::clearDb();
-    self::clearRedis();
     self::clearCache();
     self::timeReset();
     self::clearConfig();
@@ -49,10 +48,6 @@ class CMTest_TH {
 
   public static function clearConfig() {
     CM_Config::set(unserialize(self::$_configBackup));
-  }
-
-  public static function clearRedis() {
-    CM_Redis_Client::getInstance()->flush();
   }
 
   public static function timeInit() {
