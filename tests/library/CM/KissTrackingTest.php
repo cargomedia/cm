@@ -21,9 +21,9 @@ class CM_KissTrackingTest extends CMTest_TestCase {
     if (getenv('TRAVIS')) {
       $this->markTestSkipped('Disabled on Travis because of a connection issue');
     }
-    /** @var CM_KissTracking $kissTracking */
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
+    /** @var CM_KissTracking $kissTracking */
 
     $testRecords1 = array(array('test_event_2', 1, null, array('Smart' => true, 'Hired' => 'yes')));
     $time = time();
@@ -64,9 +64,9 @@ EOD;
       $this->markTestSkipped('Disabled on Travis because of a connection issue');
     }
     $user = CMTest_TH::createUser();
-    /** @var CM_KissTracking $kissTracking */
     $kissTracking = $this->getMockBuilder('CM_KissTracking')->setMethods(array('track'))->getMock();
     $kissTracking->expects($this->once())->method('track')->with($this->equalTo('foo'), $this->equalTo($user->getId()));
+    /** @var CM_KissTracking $kissTracking */
     $kissTracking->trackUser('foo', $user);
   }
 
@@ -74,11 +74,11 @@ EOD;
     if (getenv('TRAVIS')) {
       $this->markTestSkipped('Disabled on Travis because of a connection issue');
     }
-    /** @var CM_KissTracking $kissTracking */
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
-    CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
     $kissTracking->expects($this->once())->method('_uploadCsv')->will($this->returnValue(true));
+    /** @var CM_KissTracking $kissTracking */
+    CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
     $kissTracking->exportEvents();
     $kissTracking->exportEvents();
   }
@@ -87,11 +87,11 @@ EOD;
     if (getenv('TRAVIS')) {
       $this->markTestSkipped('Disabled on Travis because of a connection issue');
     }
-    /** @var CM_KissTracking $kissTracking */
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
-    CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
     $kissTracking->expects($this->exactly(2))->method('_uploadCsv')->will($this->returnValue(true));
+    /** @var CM_KissTracking $kissTracking */
+    CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
     $kissTracking->exportEvents();
 
     CMTest_TH::timeForward(CM_KissTracking::UPLOAD_INTERVAL + 1);
@@ -103,10 +103,10 @@ EOD;
     if (getenv('TRAVIS')) {
       $this->markTestSkipped('Disabled on Travis because of a connection issue');
     }
-    /** @var CM_KissTracking $kissTracking */
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
     $kissTracking->expects($this->never())->method('_uploadCsv')->will($this->returnValue(true));
+    /** @var CM_KissTracking $kissTracking */
     $kissTracking->exportEvents();
   }
 }
