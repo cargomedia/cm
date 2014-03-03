@@ -8,6 +8,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
     $fieldName = $params['fieldName'];
     /** @var CM_FormField_Abstract $field */
     $field = $this->_getView();
+    $field->prepare($params['params']);
 
     $field->setTplParam('field', $field);
     $field->setTplParam('id', $form->getTagAutoId($fieldName . '-input'));
