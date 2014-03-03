@@ -3,11 +3,11 @@
  * @extends CM_FormField_Set
  */
 var CM_FormField_Set_Select = CM_FormField_Set.extend({
-	_class: 'CM_FormField_Set_Select',
+  _class: 'CM_FormField_Set_Select',
 
-	events: {
-		'change select': function() {
-			this.trigger('change');
-		}
-	}
+  events: {
+    'change select': function() {
+      this.trigger('change');
+    }
+  }
 });
