@@ -7,9 +7,6 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
 	}
 
 	public function testNotify() {
-		if (getenv('TRAVIS')) {
-			$this->markTestSkipped('Disabled on Travis because of a connection issue');
-		}
 		$actor = CMTest_TH::createUser();
 		$action = $this->getMockBuilder('CM_Action_Abstract')->setMethods(array('_notifyFoo', '_track'))
 			->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
