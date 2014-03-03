@@ -1,6 +1,6 @@
 <?php
 
-class CM_Action_AbstractTest {
+class CM_Action_AbstractTest extends CMTest_TestCase {
 
 	public function setUp() {
 		if (getenv('TRAVIS')) {
