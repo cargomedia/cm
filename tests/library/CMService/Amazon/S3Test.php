@@ -1,12 +1,6 @@
 <?php
 
-class CMService_Amazon_S3Test {
-
-	public function setUp() {
-		if (getenv('TRAVIS')) {
-			$this->markTestSkipped('Disabled on Travis because of a connection issue');
-		}
-	}
+class CMService_Amazon_S3Test extends PHPUnit_Framework_TestCase {
 
 	public function tearDown() {
 		CMTest_TH::clearEnv();
