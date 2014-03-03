@@ -59,17 +59,6 @@ class CM_Db_Db extends CM_Class_Abstract {
 		return new CM_Db_Schema_Column(self::getClient(false), $table, $column);
 	}
 
-	public static function disconnect() {
-		if (self::$_client) {
-			self::$_client->disconnect();
-			self::$_client = null;
-		}
-		if (self::$_clientReadOnly) {
-			self::$_clientReadOnly->disconnect();
-			self::$_clientReadOnly = null;
-		}
-	}
-
 	/**
 	 * @param string     $sqlTemplate
 	 * @param array|null $parameters
