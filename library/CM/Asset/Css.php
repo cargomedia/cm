@@ -2,106 +2,106 @@
 
 class CM_Asset_Css extends CM_Asset_Abstract {
 
-	/** @var CM_Render */
-	protected $_render;
+  /** @var CM_Render */
+  protected $_render;
 
-	/** @var string|null */
-	protected $_content;
+  /** @var string|null */
+  protected $_content;
 
-	/** @var string|null */
-	private $_prefix;
+  /** @var string|null */
+  private $_prefix;
 
-	/** @var CM_Asset_Css[] */
-	private $_children = array();
+  /** @var CM_Asset_Css[] */
+  private $_children = array();
 
-	/**
-	 * @param CM_Render   $render
-	 * @param string|null $content
-	 * @param string|null $prefix
-	 */
-	public function __construct(CM_Render $render, $content = null, $prefix = null) {
-		$this->_render = $render;
-		if (null !== $content) {
-			$this->_content = (string) $content;
-		}
-		if (null !== $prefix) {
-			$this->_prefix = (string) $prefix;
-		}
-	}
+  /**
+   * @param CM_Render   $render
+   * @param string|null $content
+   * @param string|null $prefix
+   */
+  public function __construct(CM_Render $render, $content = null, $prefix = null) {
+    $this->_render = $render;
+    if (null !== $content) {
+      $this->_content = (string) $content;
+    }
+    if (null !== $prefix) {
+      $this->_prefix = (string) $prefix;
+    }
+  }
 
-	/**
-	 * @param string      $content
-	 * @param string|null $prefix
-	 */
-	public function add($content, $prefix = null) {
-		$this->_children[] = new self($this->_render, $content, $prefix);
-	}
+  /**
+   * @param string      $content
+   * @param string|null $prefix
+   */
+  public function add($content, $prefix = null) {
+    $this->_children[] = new self($this->_render, $content, $prefix);
+  }
 
-	public function get($compress = null) {
-		$content = $this->_getContent();
-		return $this->_compile($content, $compress);
-	}
+  public function get($compress = null) {
+    $content = $this->_getContent();
+    return $this->_compile($content, $compress);
+  }
 
-	protected function _getContent() {
-		$content = '';
-		if ($this->_prefix) {
-			$content .= $this->_prefix . ' {' . PHP_EOL;
-		}
-		if ($this->_content) {
-			$content .= $this->_content . PHP_EOL;
-		}
-		foreach ($this->_children as $css) {
-			$content .= $css->_getContent();
-		}
-		if ($this->_prefix) {
-			$content .= '}' . PHP_EOL;
-		}
-		return $content;
-	}
+  protected function _getContent() {
+    $content = '';
+    if ($this->_prefix) {
+      $content .= $this->_prefix . ' {' . PHP_EOL;
+    }
+    if ($this->_content) {
+      $content .= $this->_content . PHP_EOL;
+    }
+    foreach ($this->_children as $css) {
+      $content .= $css->_getContent();
+    }
+    if ($this->_prefix) {
+      $content .= '}' . PHP_EOL;
+    }
+    return $content;
+  }
 
-	/**
-	 * @param string       $content
-	 * @param boolean|null $compress
-	 * @return string
-	 */
-	private function _compile($content, $compress = null) {
-		$content = (string) $content;
-		$compress = (bool) $compress;
-		$render = $this->_render;
+  /**
+   * @param string       $content
+   * @param boolean|null $compress
+   * @return string
+   */
+  private function _compile($content, $compress = null) {
+    $content = (string) $content;
+    $compress = (bool) $compress;
+    $render = $this->_render;
 
-		$cacheKey = CM_CacheConst::App_Resource . '_md5:' . md5($content);
-		$cacheKey .= '_compress:' . (int) $compress;
-		$cacheKey .= '_siteId:' . $render->getSite()->getId();
-		if ($render->getLanguage()) {
-			$cacheKey .= '_languageId:' . $render->getLanguage()->getId();
-		}
-		$cache = new CM_Cache_Storage_File();
-		if (false === ($contentTransformed = $cache->get($cacheKey))) {
-			$lessCompiler = new lessc();
-			$lessCompiler->registerFunction('image', function ($arg) use ($render) {
-				/** @var CM_Render $render */
-				list($type, $delimiter, $values) = $arg;
-				return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
-			});
-			$lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
-				/** @var CM_Render $render */
-				list($type, $delimiter, $values) = $arg;
-				return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
-			});
-			if ($compress) {
-				$lessCompiler->setFormatter('compressed');
-			}
-			$contentTransformed = $lessCompiler->compile($this->_getMixins() . $content);
-			$cache->set($cacheKey, $contentTransformed);
-		}
-		return $contentTransformed;
-	}
+    $cacheKey = CM_CacheConst::App_Resource . '_md5:' . md5($content);
+    $cacheKey .= '_compress:' . (int) $compress;
+    $cacheKey .= '_siteId:' . $render->getSite()->getId();
+    if ($render->getLanguage()) {
+      $cacheKey .= '_languageId:' . $render->getLanguage()->getId();
+    }
+    $cache = new CM_Cache_Storage_File();
+    if (false === ($contentTransformed = $cache->get($cacheKey))) {
+      $lessCompiler = new lessc();
+      $lessCompiler->registerFunction('image', function ($arg) use ($render) {
+        /** @var CM_Render $render */
+        list($type, $delimiter, $values) = $arg;
+        return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
+      });
+      $lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
+        /** @var CM_Render $render */
+        list($type, $delimiter, $values) = $arg;
+        return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
+      });
+      if ($compress) {
+        $lessCompiler->setFormatter('compressed');
+      }
+      $contentTransformed = $lessCompiler->compile($this->_getMixins() . $content);
+      $cache->set($cacheKey, $contentTransformed);
+    }
+    return $contentTransformed;
+  }
 
-	/**
-	 * @return string
-	 */
-	private function _getMixins() {
-		$mixins = <<< 'EOD'
+  /**
+   * @return string
+   */
+  private function _getMixins() {
+    $mixins = <<< 'EOD'
 .gradient(@direction, @color1, @color2, @pos1: 0%, @pos2: 100%) when (@direction = horizontal) and (iscolor(@color1)) and (iscolor(@color2)) {
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=rgbahex(@color1),endColorstr=rgbahex(@color2));
 	background-image: linear-gradient(left,@color1 @pos1,@color2 @pos2);
@@ -144,6 +144,6 @@ class CM_Asset_Css extends CM_Asset_Abstract {
 	-webkit-transition: @args;
 }
 EOD;
-		return $mixins;
-	}
+    return $mixins;
+  }
 }
