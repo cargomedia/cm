@@ -165,9 +165,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
    * @return CMTest_TH_Html
    */
   protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-    $component->checkAccessible();
-    $component->prepare();
     $render = new CM_Render($site, $viewer);
+    $component->checkAccessible($render);
+    $component->prepare();
     $componentHtml = $render->render($component);
     $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
     return new CMTest_TH_Html($html);
@@ -205,10 +205,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     $host = parse_url($site->getUrl(), PHP_URL_HOST);
     $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
     $response = new CM_Response_Page($request);
-    $page->prepareResponse($response);
-    $page->checkAccessible();
-    $page->prepare();
     $render = new CM_Render($site, $viewer);
+    $page->prepareResponse($response);
+    $page->checkAccessible($render);
+    $page->prepare();
     $html = $render->render($page);
     return new CMTest_TH_Html($html);
   }
@@ -241,11 +241,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
   /**
    * @param CM_Component_Abstract $cmp
-   * @throws CM_Exception_AuthRequired
+   * @param CM_Render|null        $render
    */
-  public static function assertComponentAccessible(CM_Component_Abstract $cmp) {
+  public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
+    if (null === $render) {
+      $render = new CM_Render();
+    }
     try {
-      $cmp->checkAccessible();
+      $cmp->checkAccessible($render);
       self::assertTrue(true);
     } catch (CM_Exception_AuthRequired $e) {
       self::fail('should be accessible');
@@ -256,10 +259,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
   /**
    * @param CM_Component_Abstract $cmp
+   * @param CM_Render|null        $render
    */
-  public static function assertComponentNotAccessible(CM_Component_Abstract $cmp) {
+  public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
+    if (null === $render) {
+      $render = new CM_Render();
+    }
     try {
-      $cmp->checkAccessible();
+      $cmp->checkAccessible($render);
       self::fail('checkAccessible should throw exception');
     } catch (CM_Exception_AuthRequired $e) {
       self::assertTrue(true);
