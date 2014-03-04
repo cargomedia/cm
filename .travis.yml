@@ -14,6 +14,7 @@ services:
 before_script:
   - tests/travis/install-php-runkit.sh
   - tests/travis/install-php-svm.sh
+  - tests/travis/install-php-redis.sh
   - printf "\n" | pecl install imagick
   - pecl install stats
   - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
@@ -33,7 +34,6 @@ script: bin/phpunit --coverage-clover=coverage.clover
 
 matrix:
   allow_failures:
-    - php: 5.4
     - php: 5.5
 
 notifications:
