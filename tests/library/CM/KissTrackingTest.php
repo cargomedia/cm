@@ -19,7 +19,7 @@ class CM_KissTrackingTest extends CMTest_TestCase {
 
   public function testProcess() {
     if (getenv('TRAVIS')) {
-      $this->markTestSkipped('Disabled on Travis because of a connection issue');
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
     }
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
@@ -61,7 +61,7 @@ EOD;
 
   public function testTrackUser() {
     if (getenv('TRAVIS')) {
-      $this->markTestSkipped('Disabled on Travis because of a connection issue');
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
     }
     $user = CMTest_TH::createUser();
     $kissTracking = $this->getMockBuilder('CM_KissTracking')->setMethods(array('track'))->getMock();
@@ -72,7 +72,7 @@ EOD;
 
   public function testExportEvents() {
     if (getenv('TRAVIS')) {
-      $this->markTestSkipped('Disabled on Travis because of a connection issue');
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
     }
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
@@ -85,7 +85,7 @@ EOD;
 
   public function testExportEventsTwice() {
     if (getenv('TRAVIS')) {
-      $this->markTestSkipped('Disabled on Travis because of a connection issue');
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
     }
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
@@ -101,7 +101,7 @@ EOD;
 
   public function testExportEventsEmpty() {
     if (getenv('TRAVIS')) {
-      $this->markTestSkipped('Disabled on Travis because of a connection issue');
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
     }
     $kissTracking = $this->getMock('CM_KissTracking', array('_uploadCsv', '_getFileName'));
     $kissTracking->expects($this->any())->method('_getFileName')->will($this->returnValue($this->_filePath));
