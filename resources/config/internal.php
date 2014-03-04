@@ -41,7 +41,6 @@ $config->CM_Stream_Adapter_Abstract->types = array();
 $config->CM_Stream_Adapter_Abstract->types[25] = 'CM_Stream_Adapter_Message_SocketRedis';
 $config->CM_Stream_Adapter_Abstract->types[26] = 'CM_Stream_Adapter_Video_Wowza';
 
-
 $config->CM_Mail->type = 1;
 $config->CM_Mail_Welcome->type = 2;
 $config->CM_Action_Email->type = 3;
@@ -69,7 +68,6 @@ $config->CM_Stream_Adapter_Message_SocketRedis->type = 25;
 $config->CM_Stream_Adapter_Video_Wowza->type = 26;
 
 $config->CM_Class_Abstract->typesMaxValue = 26;
-
 
 $config->CM_Action_Abstract->verbs = array();
 $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;

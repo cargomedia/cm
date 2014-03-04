@@ -2,515 +2,515 @@
 
 abstract class CM_Paging_Abstract extends CM_Class_Abstract implements Iterator, Countable, CM_Cacheable, CM_ArrayConvertible {
 
-	private $_count = null;
-	private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
-	private $_pageOffset = 0;
-	private $_pageSize = null;
-	private $_source = null;
-	private $_iteratorItems, $_iteratorPosition = 0;
-	private $_filters = array();
+  private $_count = null;
+  private $_itemsRaw = null, $_items = array(), $_itemsRawTree = null;
+  private $_pageOffset = 0;
+  private $_pageSize = null;
+  private $_source = null;
+  private $_iteratorItems, $_iteratorPosition = 0;
+  private $_filters = array();
 
-	/** @var boolean */
-	private $_flattenItems = true;
+  /** @var boolean */
+  private $_flattenItems = true;
 
-	/**
-	 * @param CM_PagingSource_Abstract $source
-	 */
-	public function __construct(CM_PagingSource_Abstract $source = null) {
-		$this->_source = $source;
-	}
+  /**
+   * @param CM_PagingSource_Abstract $source
+   */
+  public function __construct(CM_PagingSource_Abstract $source = null) {
+    $this->_source = $source;
+  }
 
-	/**
-	 * @param int|null  $offset Negative: from end
-	 * @param int|null  $length
-	 * @param bool|null $returnNonexistentItems
-	 * @return array
-	 */
-	public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
-		$negativeOffset = false;
-		$itemsRaw = $this->_getItemsRaw();
+  /**
+   * @param int|null  $offset Negative: from end
+   * @param int|null  $length
+   * @param bool|null $returnNonexistentItems
+   * @return array
+   */
+  public function getItems($offset = null, $length = null, $returnNonexistentItems = false) {
+    $negativeOffset = false;
+    $itemsRaw = $this->_getItemsRaw();
 
-		// Count of available items
-		$count = count($itemsRaw);
-		if (null !== $this->_pageSize) {
-			$count = min($count, $this->_pageSize);
-		}
+    // Count of available items
+    $count = count($itemsRaw);
+    if (null !== $this->_pageSize) {
+      $count = min($count, $this->_pageSize);
+    }
 
-		// Offset
-		if (null === $offset) {
-			$offset = 0;
-		}
-		if ($offset < 0) {
-			$negativeOffset = true;
-			$offset = $count - (-$offset);
-		}
-		$offset = max(0, min($offset, $count));
+    // Offset
+    if (null === $offset) {
+      $offset = 0;
+    }
+    if ($offset < 0) {
+      $negativeOffset = true;
+      $offset = $count - (-$offset);
+    }
+    $offset = max(0, min($offset, $count));
 
-		// Length
-		if (null === $length) {
-			$length = $count - $offset;
-		}
-		$length = max(0, min($length, $count - $offset));
+    // Length
+    if (null === $length) {
+      $length = $count - $offset;
+    }
+    $length = max(0, min($length, $count - $offset));
 
-		if ($this->_canContainUnprocessableItems() || $this->_hasFilters()) {
-			$items = $this->_getItems($offset, $length, $returnNonexistentItems, $negativeOffset);
-		} else {
-			$items = $this->_getItemsInstantiable($offset, $length);
-		}
-		return array_values($items);
-	}
+    if ($this->_canContainUnprocessableItems() || $this->_hasFilters()) {
+      $items = $this->_getItems($offset, $length, $returnNonexistentItems, $negativeOffset);
+    } else {
+      $items = $this->_getItemsInstantiable($offset, $length);
+    }
+    return array_values($items);
+  }
 
-	/**
-	 * @param int $countMax
-	 * @return array
-	 */
-	public function getItemsEvenlyDistributed($countMax) {
-		$countMax = (int) $countMax;
-		$countMax = min($countMax, $this->getCount());
-		$count = $this->getCount();
-		$items = array();
-		if ($countMax > 0) {
-			$interval = ($countMax == 1) ? 1 : ($count - 1) / ($countMax - 1);
-			for ($i = 0; $i < $countMax; $i++) {
-				$index = (int) round($i * $interval);
-				$items[] = $this->getItem($index);
-			}
-		}
-		return $items;
-	}
+  /**
+   * @param int $countMax
+   * @return array
+   */
+  public function getItemsEvenlyDistributed($countMax) {
+    $countMax = (int) $countMax;
+    $countMax = min($countMax, $this->getCount());
+    $count = $this->getCount();
+    $items = array();
+    if ($countMax > 0) {
+      $interval = ($countMax == 1) ? 1 : ($count - 1) / ($countMax - 1);
+      for ($i = 0; $i < $countMax; $i++) {
+        $index = (int) round($i * $interval);
+        $items[] = $this->getItem($index);
+      }
+    }
+    return $items;
+  }
 
-	/**
-	 * Return Un-processed, un-filtered items
-	 *
-	 * @return array
-	 */
-	public function getItemsRaw() {
-		$itemsRaw = $this->_getItemsRaw();
-		if (null !== $this->_pageSize && count($itemsRaw) > $this->_pageSize) {
-			$itemsRaw = array_slice($itemsRaw, 0, $this->_pageSize);
-		}
-		return $itemsRaw;
-	}
+  /**
+   * Return Un-processed, un-filtered items
+   *
+   * @return array
+   */
+  public function getItemsRaw() {
+    $itemsRaw = $this->_getItemsRaw();
+    if (null !== $this->_pageSize && count($itemsRaw) > $this->_pageSize) {
+      $itemsRaw = array_slice($itemsRaw, 0, $this->_pageSize);
+    }
+    return $itemsRaw;
+  }
 
-	/**
-	 * @param string|null $keyName
-	 * @return array[]
-	 */
-	public function getItemsRawTree($keyName = null) {
-		return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);
-	}
+  /**
+   * @param string|null $keyName
+   * @return array[]
+   */
+  public function getItemsRawTree($keyName = null) {
+    return CM_Util::getArrayTree($this->getItemsRaw(), 1, true, $keyName);
+  }
 
-	/**
-	 * @param int $offset Negative: from end
-	 * @return mixed|null Item at given index
-	 */
-	public function getItem($offset) {
-		$items = $this->getItems($offset, 1);
-		return array_shift($items);
-	}
+  /**
+   * @param int $offset Negative: from end
+   * @return mixed|null Item at given index
+   */
+  public function getItem($offset) {
+    $items = $this->getItems($offset, 1);
+    return array_shift($items);
+  }
 
-	/**
-	 * @param float $mean Mean item index normalized between 0 and .5 (default)
-	 * @throws CM_Exception_Invalid
-	 * @throws CM_Exception_NotImplemented
-	 * @return mixed|null
-	 */
-	public function getItemRand($mean = null) {
-		if (null !== $this->getPageSize()) {
-			throw new CM_Exception_Invalid('Can\'t get random item on a paged Paging.');
-		}
-		if (null === $mean) {
-			$mean = .5;
-		}
-		$mean = (float) $mean;
-		$p = rand(0, getrandmax() - 1) / getrandmax();
-		$N = $this->getCount();
-		if (.5 === $mean) {
-			$n = (int) floor($N * $p);
-		} else {
-			if ($mean < 0) {
-				throw new CM_Exception_Invalid('Normalized mean item index must be positive.');
-			}
-			if ($mean > .5) {
-				throw new CM_Exception_NotImplemented('Normalized mean item index cannot be greater than .5.');
-			}
-			if ($N <= 1) {
-				$n = 0;
-			} else {
-				$x = 1 + 1 / (($N - 1) * $mean);
-				$n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
-			}
-		}
-		$this->setPage($n + 1, 1);
-		$item = $this->getItem(0);
-		$this->_pageOffset = 0;
-		$this->_pageSize = null;
-		$this->_clearItems();
-		return $item;
-	}
+  /**
+   * @param float $mean Mean item index normalized between 0 and .5 (default)
+   * @throws CM_Exception_Invalid
+   * @throws CM_Exception_NotImplemented
+   * @return mixed|null
+   */
+  public function getItemRand($mean = null) {
+    if (null !== $this->getPageSize()) {
+      throw new CM_Exception_Invalid('Can\'t get random item on a paged Paging.');
+    }
+    if (null === $mean) {
+      $mean = .5;
+    }
+    $mean = (float) $mean;
+    $p = rand(0, getrandmax() - 1) / getrandmax();
+    $N = $this->getCount();
+    if (.5 === $mean) {
+      $n = (int) floor($N * $p);
+    } else {
+      if ($mean < 0) {
+        throw new CM_Exception_Invalid('Normalized mean item index must be positive.');
+      }
+      if ($mean > .5) {
+        throw new CM_Exception_NotImplemented('Normalized mean item index cannot be greater than .5.');
+      }
+      if ($N <= 1) {
+        $n = 0;
+      } else {
+        $x = 1 + 1 / (($N - 1) * $mean);
+        $n = (int) floor(-log(1 - $p * (1 - pow($x, -$N))) / log($x));
+      }
+    }
+    $this->setPage($n + 1, 1);
+    $item = $this->getItem(0);
+    $this->_pageOffset = 0;
+    $this->_pageSize = null;
+    $this->_clearItems();
+    return $item;
+  }
 
-	/**
-	 * @return int
-	 */
-	public function getCount() {
-		if ($this->_count === null && $this->_source) {
-			$count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
-			$this->_setCount($this->_source->getCount($this->_getItemOffset(), $count));
-		}
-		return (int) $this->_count;
-	}
+  /**
+   * @return int
+   */
+  public function getCount() {
+    if ($this->_count === null && $this->_source) {
+      $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
+      $this->_setCount($this->_source->getCount($this->_getItemOffset(), $count));
+    }
+    return (int) $this->_count;
+  }
 
-	/**
-	 * @param string $field
-	 * @return int|float
-	 * @throws CM_Exception_Invalid
-	 */
-	public function getSum($field) {
-		$field = (string) $field;
-		$sum = 0;
-		if ($this->_source) {
-			$itemsRaw = $this->_source->getItems(null, null);
-			foreach ($itemsRaw as $itemRaw) {
-				if (!array_key_exists($field, $itemRaw)) {
-					throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
-				}
-				$sum += $itemRaw[$field];
-			}
-		}
-		return $sum;
-	}
+  /**
+   * @param string $field
+   * @return int|float
+   * @throws CM_Exception_Invalid
+   */
+  public function getSum($field) {
+    $field = (string) $field;
+    $sum = 0;
+    if ($this->_source) {
+      $itemsRaw = $this->_source->getItems(null, null);
+      foreach ($itemsRaw as $itemRaw) {
+        if (!array_key_exists($field, $itemRaw)) {
+          throw new CM_Exception_Invalid(get_called_class() . ' has no field `' . $field . '`.');
+        }
+        $sum += $itemRaw[$field];
+      }
+    }
+    return $sum;
+  }
 
-	/**
-	 * @return int
-	 */
-	public function getPage() {
-		return ($this->_pageOffset + 1);
-	}
+  /**
+   * @return int
+   */
+  public function getPage() {
+    return ($this->_pageOffset + 1);
+  }
 
-	/**
-	 * @param int $page
-	 * @param int $size
-	 * @return CM_Paging_Abstract
-	 */
-	public function setPage($page, $size) {
-		$this->_clearItems();
-		$this->_pageOffset = max(((int) $page - 1), 0);
-		$this->_pageSize = max((int) $size, 0);
-		$this->_validatePageOffset();
-		return $this;
-	}
+  /**
+   * @param int $page
+   * @param int $size
+   * @return CM_Paging_Abstract
+   */
+  public function setPage($page, $size) {
+    $this->_clearItems();
+    $this->_pageOffset = max(((int) $page - 1), 0);
+    $this->_pageSize = max((int) $size, 0);
+    $this->_validatePageOffset();
+    return $this;
+  }
 
-	/**
-	 * @return int|null
-	 */
-	public function getPageSize() {
-		return $this->_pageSize;
-	}
+  /**
+   * @return int|null
+   */
+  public function getPageSize() {
+    return $this->_pageSize;
+  }
 
-	/**
-	 * @return int
-	 */
-	public function getPageCount() {
-		if (!$this->getCount()) {
-			return 0;
-		}
-		if (!$this->_pageSize) {
-			return 0;
-		}
-		return (int) ceil($this->getCount() / $this->_pageSize);
-	}
+  /**
+   * @return int
+   */
+  public function getPageCount() {
+    if (!$this->getCount()) {
+      return 0;
+    }
+    if (!$this->_pageSize) {
+      return 0;
+    }
+    return (int) ceil($this->getCount() / $this->_pageSize);
+  }
 
-	/**
-	 * @return bool
-	 */
-	public function isEmpty() {
-		return $this->getCount() == 0;
-	}
+  /**
+   * @return bool
+   */
+  public function isEmpty() {
+    return $this->getCount() == 0;
+  }
 
-	/**
-	 * Filter result of getItems() by a callback
-	 *
-	 * @param Closure $filter function(mixed $item): boolean
-	 */
-	public function filter(Closure $filter) {
-		$this->_clearItems();
-		$this->_filters[] = $filter;
-	}
+  /**
+   * Filter result of getItems() by a callback
+   *
+   * @param Closure $filter function(mixed $item): boolean
+   */
+  public function filter(Closure $filter) {
+    $this->_clearItems();
+    $this->_filters[] = $filter;
+  }
 
-	/**
-	 * @param array|mixed $items
-	 * @return static
-	 */
-	public function exclude($items) {
-		if (!is_array($items)) {
-			$items = array($items);
-		}
-		if (count($items) === 0) {
-			return $this;
-		}
+  /**
+   * @param array|mixed $items
+   * @return static
+   */
+  public function exclude($items) {
+    if (!is_array($items)) {
+      $items = array($items);
+    }
+    if (count($items) === 0) {
+      return $this;
+    }
 
-		$comparable = true;
-		foreach ($items as $item) {
-			$comparable &= ($item instanceof CM_Comparable);
-		}
+    $comparable = true;
+    foreach ($items as $item) {
+      $comparable &= ($item instanceof CM_Comparable);
+    }
 
-		if ($comparable) {
-			$filter = function ($item) use ($items) {
-				foreach ($items as $itemExcluded) {
-					if ($item->equals($itemExcluded)) {
-						return false;
-					}
-				}
-				return true;
-			};
-		} else {
-			$filter = function ($item) use ($items) {
-				return !in_array($item, $items);
-			};
-		}
+    if ($comparable) {
+      $filter = function ($item) use ($items) {
+        foreach ($items as $itemExcluded) {
+          if ($item->equals($itemExcluded)) {
+            return false;
+          }
+        }
+        return true;
+      };
+    } else {
+      $filter = function ($item) use ($items) {
+        return !in_array($item, $items);
+      };
+    }
 
-		$this->filter($filter);
-		return $this;
-	}
+    $this->filter($filter);
+    return $this;
+  }
 
-	/**
-	 * Items in the underlying source have changed
-	 */
-	public function _change() {
-		if (!$this->_source) {
-			throw new CM_Exception('Cannot change paging without source');
-		}
-		$this->_source->clearCache();
-		$this->_clearItems();
-		$this->_clearCount();
-	}
+  /**
+   * Items in the underlying source have changed
+   */
+  public function _change() {
+    if (!$this->_source) {
+      throw new CM_Exception('Cannot change paging without source');
+    }
+    $this->_source->clearCache();
+    $this->_clearItems();
+    $this->_clearCount();
+  }
 
-	/**
-	 * @param boolean $state
-	 */
-	public function setFlattenItems($state) {
-		$this->_flattenItems = (bool) $state;
-	}
+  /**
+   * @param boolean $state
+   */
+  public function setFlattenItems($state) {
+    $this->_flattenItems = (bool) $state;
+  }
 
-	public function toArray() {
-		return $this->getItems();
-	}
+  public function toArray() {
+    return $this->getItems();
+  }
 
-	/**
-	 * @return int Multiple of items per page to load from CM_PagingSource_Abstract
-	 */
-	protected function _getPageFillRate() {
-		return 1 + $this->_getStalenessChance();
-	}
+  /**
+   * @return int Multiple of items per page to load from CM_PagingSource_Abstract
+   */
+  protected function _getPageFillRate() {
+    return 1 + $this->_getStalenessChance();
+  }
 
-	/**
-	 * @return float Chance that an item contains stale (non-processable) data (0-1)
-	 */
-	protected function _getStalenessChance() {
-		if ($this->_source) {
-			return $this->_source->getStalenessChance();
-		}
-		return 0;
-	}
+  /**
+   * @return float Chance that an item contains stale (non-processable) data (0-1)
+   */
+  protected function _getStalenessChance() {
+    if ($this->_source) {
+      return $this->_source->getStalenessChance();
+    }
+    return 0;
+  }
 
-	/**
-	 * @param array $itemsRaw
-	 */
-	protected function _onLoadItemsRaw(array $itemsRaw) {
-	}
+  /**
+   * @param array $itemsRaw
+   */
+  protected function _onLoadItemsRaw(array $itemsRaw) {
+  }
 
-	/**
-	 * @param mixed $itemRaw
-	 * @return mixed Processed item
-	 * @throws CM_Exception_Nonexistent
-	 */
-	protected function _processItem($itemRaw) {
-		return $itemRaw;
-	}
+  /**
+   * @param mixed $itemRaw
+   * @return mixed Processed item
+   * @throws CM_Exception_Nonexistent
+   */
+  protected function _processItem($itemRaw) {
+    return $itemRaw;
+  }
 
-	/**
-	 * @param mixed $item
-	 * @return boolean Whether the item is matched by any of the registered filters
-	 */
-	private function _isFilterMatch($item) {
-		foreach ($this->_filters as $filter) {
-			if (false === $filter($item)) {
-				return true;
-			}
-		}
-		return false;
-	}
+  /**
+   * @param mixed $item
+   * @return boolean Whether the item is matched by any of the registered filters
+   */
+  private function _isFilterMatch($item) {
+    foreach ($this->_filters as $filter) {
+      if (false === $filter($item)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	/**
-	 * @return bool
-	 */
-	private function _hasFilters() {
-		return count($this->_filters) > 0;
-	}
+  /**
+   * @return bool
+   */
+  private function _hasFilters() {
+    return count($this->_filters) > 0;
+  }
 
-	/**
-	 * @return array Raw items (might contain more than $this->_pageSize)
-	 */
-	private function _getItemsRaw() {
-		if ($this->_itemsRaw === null) {
-			$this->_itemsRaw = array();
-			if ($this->_source) {
-				$count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
-				$itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
-				foreach ($itemsRaw as &$itemRaw) {
-					if ($this->_flattenItems) {
-						if (is_array($itemRaw) && count($itemRaw) == 1) {
-							$itemRaw = reset($itemRaw);
-						}
-					}
-					$this->_itemsRaw[] = $itemRaw;
-				}
-			}
-			$this->_onLoadItemsRaw($this->_itemsRaw);
-		}
-		return $this->_itemsRaw;
-	}
+  /**
+   * @return array Raw items (might contain more than $this->_pageSize)
+   */
+  private function _getItemsRaw() {
+    if ($this->_itemsRaw === null) {
+      $this->_itemsRaw = array();
+      if ($this->_source) {
+        $count = ($this->_pageSize === null) ? null : (int) ceil($this->_pageSize * $this->_getPageFillRate());
+        $itemsRaw = $this->_source->getItems($this->_getItemOffset(), $count);
+        foreach ($itemsRaw as &$itemRaw) {
+          if ($this->_flattenItems) {
+            if (is_array($itemRaw) && count($itemRaw) == 1) {
+              $itemRaw = reset($itemRaw);
+            }
+          }
+          $this->_itemsRaw[] = $itemRaw;
+        }
+      }
+      $this->_onLoadItemsRaw($this->_itemsRaw);
+    }
+    return $this->_itemsRaw;
+  }
 
-	/**
-	 * @return int OR null if no pageSize set
-	 */
-	private function _getItemOffset() {
-		if ($this->_pageSize === null) {
-			return null;
-		}
-		return (int) $this->_pageOffset * $this->_pageSize;
-	}
+  /**
+   * @return int OR null if no pageSize set
+   */
+  private function _getItemOffset() {
+    if ($this->_pageSize === null) {
+      return null;
+    }
+    return (int) $this->_pageOffset * $this->_pageSize;
+  }
 
-	private function _clearItems() {
-		$this->_items = array();
-		$this->_itemsRaw = null;
-		$this->_itemsRawTree = null;
-		$this->_iteratorPosition = 0;
-		$this->_iteratorItems = null;
-	}
+  private function _clearItems() {
+    $this->_items = array();
+    $this->_itemsRaw = null;
+    $this->_itemsRawTree = null;
+    $this->_iteratorPosition = 0;
+    $this->_iteratorItems = null;
+  }
 
-	private function _clearCount() {
-		$this->_count = null;
-	}
+  private function _clearCount() {
+    $this->_count = null;
+  }
 
-	/**
-	 * @param int  $offset
-	 * @param int  $length
-	 * @param bool $returnNonexistentItems
-	 * @param bool $allowBackwardsLookup
-	 * @return array
-	 */
-	private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
-		$itemsRaw = $this->_getItemsRaw();
-		$itemsRawCount = count($itemsRaw);
-		$items = array();
-		$direction = 1;
-		$i = 0;
-		while (count($items) < $length) {
-			$index = $offset + ($i * $direction);
-			if (array_key_exists($index, $this->_items)) {
-				$item = $this->_items[$index];
-			} else {
-				try {
-					$item = $this->_processItem($itemsRaw[$index]);
-				} catch (CM_Exception_Nonexistent $e) {
-					$item = null;
-				}
-				$this->_items[$index] = $item;
-			}
-			if ((is_null($item) && $returnNonexistentItems) || (!is_null($item) && !$this->_isFilterMatch($item))) {
-				$items[$index] = $item;
-			}
+  /**
+   * @param int  $offset
+   * @param int  $length
+   * @param bool $returnNonexistentItems
+   * @param bool $allowBackwardsLookup
+   * @return array
+   */
+  private function _getItems($offset, $length, $returnNonexistentItems, $allowBackwardsLookup) {
+    $itemsRaw = $this->_getItemsRaw();
+    $itemsRawCount = count($itemsRaw);
+    $items = array();
+    $direction = 1;
+    $i = 0;
+    while (count($items) < $length) {
+      $index = $offset + ($i * $direction);
+      if (array_key_exists($index, $this->_items)) {
+        $item = $this->_items[$index];
+      } else {
+        try {
+          $item = $this->_processItem($itemsRaw[$index]);
+        } catch (CM_Exception_Nonexistent $e) {
+          $item = null;
+        }
+        $this->_items[$index] = $item;
+      }
+      if ((is_null($item) && $returnNonexistentItems) || (!is_null($item) && !$this->_isFilterMatch($item))) {
+        $items[$index] = $item;
+      }
 
-			if (0 == $index && -1 == $direction) {
-				break;
-			}
-			if ($index == $itemsRawCount - 1) {
-				if ($offset == 0 || !$allowBackwardsLookup) {
-					break;
-				}
-				$i = 0;
-				$direction = -1;
-			}
-			$i++;
-		}
-		ksort($items);
-		return $items;
-	}
+      if (0 == $index && -1 == $direction) {
+        break;
+      }
+      if ($index == $itemsRawCount - 1) {
+        if ($offset == 0 || !$allowBackwardsLookup) {
+          break;
+        }
+        $i = 0;
+        $direction = -1;
+      }
+      $i++;
+    }
+    ksort($items);
+    return $items;
+  }
 
-	/**
-	 * @param int $offset
-	 * @param int $length
-	 * @return array
-	 */
-	private function _getItemsInstantiable($offset, $length) {
-		$itemsRaw = $this->_getItemsRaw();
-		$items = array();
-		for ($i = $offset; $i < $offset + $length; $i++) {
-			if (!array_key_exists($i, $this->_items)) {
-				$this->_items[$i] = $this->_processItem($itemsRaw[$i]);
-			}
-			$items[$i] = $this->_items[$i];
-		}
-		return $items;
-	}
+  /**
+   * @param int $offset
+   * @param int $length
+   * @return array
+   */
+  private function _getItemsInstantiable($offset, $length) {
+    $itemsRaw = $this->_getItemsRaw();
+    $items = array();
+    for ($i = $offset; $i < $offset + $length; $i++) {
+      if (!array_key_exists($i, $this->_items)) {
+        $this->_items[$i] = $this->_processItem($itemsRaw[$i]);
+      }
+      $items[$i] = $this->_items[$i];
+    }
+    return $items;
+  }
 
-	/**
-	 * @return bool
-	 */
-	private function _canContainUnprocessableItems() {
-		return ($this->_getStalenessChance() != 0);
-	}
+  /**
+   * @return bool
+   */
+  private function _canContainUnprocessableItems() {
+    return ($this->_getStalenessChance() != 0);
+  }
 
-	/**
-	 * @param int $count
-	 * @return CM_Paging_Abstract
-	 */
-	public function _setCount($count) {
-		$this->_count = max((int) $count, 0);
-		$this->_validatePageOffset();
-		return $this;
-	}
+  /**
+   * @param int $count
+   * @return CM_Paging_Abstract
+   */
+  public function _setCount($count) {
+    $this->_count = max((int) $count, 0);
+    $this->_validatePageOffset();
+    return $this;
+  }
 
-	private function _validatePageOffset() {
-		if ($this->_pageSize !== null) {
-			if ($this->_pageOffset * $this->_pageSize >= $this->getCount()) {
-				if ($this->_pageSize == 0 || $this->getCount() == 0) {
-					$this->_pageOffset = 0;
-				} else {
-					$this->_pageOffset = (int) ceil($this->getCount() / $this->_pageSize) - 1;
-				}
-			}
-		}
-	}
+  private function _validatePageOffset() {
+    if ($this->_pageSize !== null) {
+      if ($this->_pageOffset * $this->_pageSize >= $this->getCount()) {
+        if ($this->_pageSize == 0 || $this->getCount() == 0) {
+          $this->_pageOffset = 0;
+        } else {
+          $this->_pageOffset = (int) ceil($this->getCount() / $this->_pageSize) - 1;
+        }
+      }
+    }
+  }
 
-	/* Iterator functions */
-	function rewind() {
-		$this->_iteratorItems = $this->getItems();
-		$this->_iteratorPosition = 0;
-	}
+  /* Iterator functions */
+  function rewind() {
+    $this->_iteratorItems = $this->getItems();
+    $this->_iteratorPosition = 0;
+  }
 
-	function current() {
-		return $this->_iteratorItems[$this->_iteratorPosition];
-	}
+  function current() {
+    return $this->_iteratorItems[$this->_iteratorPosition];
+  }
 
-	function key() {
-		return $this->_iteratorPosition;
-	}
+  function key() {
+    return $this->_iteratorPosition;
+  }
 
-	function next() {
-		++$this->_iteratorPosition;
-	}
+  function next() {
+    ++$this->_iteratorPosition;
+  }
 
-	function valid() {
-		return isset($this->_iteratorItems[$this->_iteratorPosition]);
-	}
+  function valid() {
+    return isset($this->_iteratorItems[$this->_iteratorPosition]);
+  }
 
-	public function count() {
-		return $this->getCount();
-	}
+  public function count() {
+    return $this->getCount();
+  }
 
-	public static function fromArray(array $array) {
-		throw new CM_Exception_NotImplemented();
-	}
+  public static function fromArray(array $array) {
+    throw new CM_Exception_NotImplemented();
+  }
 }

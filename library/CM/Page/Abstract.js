@@ -4,6 +4,6 @@
  */
 var CM_Page_Abstract = CM_Component_Abstract.extend({
 
-	/** @type String */
-	_class: 'CM_Page_Abstract'
+  /** @type String */
+  _class: 'CM_Page_Abstract'
 });
