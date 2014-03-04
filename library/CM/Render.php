@@ -471,6 +471,8 @@ class CM_Render extends CM_Class_Abstract {
    * @return string
    */
   private function _parseVariables($phrase, array $variables) {
-    return preg_replace('~\{\$(\w+)\}~ie', "isset(\$variables['\\1']) ? \$variables['\\1'] : ''", $phrase);
+    return preg_replace_callback('~\{\$(\w+)\}~', function ($matches) use ($variables) {
+      return isset($variables[$matches[1]]) ? $variables[$matches[1]] : '';
+    }, $phrase);
   }
 }
