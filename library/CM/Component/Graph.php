@@ -41,6 +41,6 @@ class CM_Component_Graph extends CM_Component_Abstract {
     $this->_setJsParam('flotOptions', $flotOptions);
   }
 
-  public function checkAccessible() {
+  public function checkAccessible(CM_Render $render) {
   }
 }
