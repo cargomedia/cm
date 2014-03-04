@@ -7,6 +7,9 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
   }
 
   public function testNotify() {
+    if (getenv('TRAVIS')) {
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
+    }
     $actor = CMTest_TH::createUser();
     $action = $this->getMockBuilder('CM_Action_Abstract')->setMethods(array('_notifyFoo', '_track'))
       ->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
@@ -19,6 +22,9 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
   }
 
   public function testTrack() {
+    if (getenv('TRAVIS')) {
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
+    }
     CM_Config::get()->CM_KissTracking->enabled = true;
     $tracking = CM_KissTracking::getInstance();
     $getEventsMethod = CMTest_TH::getProtectedMethod('CM_KissTracking', '_getEvents');
@@ -33,6 +39,9 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
   }
 
   public function testPrepareActionUser() {
+    if (getenv('TRAVIS')) {
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
+    }
     $user = CMTest_TH::createUser();
     $hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
       ->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
@@ -102,6 +111,9 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
   }
 
   public function testPrepareActionIP() {
+    if (getenv('TRAVIS')) {
+      $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
+    }
     $ip = 1237865;
     $hardLimit = $this->getMockBuilder('CM_Model_ActionLimit_Abstract')->disableOriginalConstructor()
       ->setMethods(array('getType', 'getLimit', 'getPeriod', 'getOvershootAllowed', 'overshoot'))->getMockForAbstractClass();
