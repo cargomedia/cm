@@ -117,7 +117,9 @@ class CMTest_TH_Html {
     $xpath = preg_replace('/\[([^~=\[\]]+)="([^~=\[\]]+)"\]/', '[@$1="$2"]', $xpath);
     $xpath = preg_replace('/\[([\w-]+)\]/', '[@$1]', $xpath);
     $xpath = str_replace(':last', '[last()]', str_replace(':first', '[1]', $xpath));
-    $xpath = preg_replace('/:eq\((\d+)\)/e', '"[".("$1"+1)."]"', $xpath);
+    $xpath = preg_replace_callback('/:eq\((\d+)\)/', function ($matches) {
+      return '[' . ($matches[1] + 1) . ']';
+    }, $xpath);
     $xpath = preg_replace('/\.([\w-]*)/', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
     $xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
     $xpath = preg_replace('-\/\[-', '/*[', $xpath);
