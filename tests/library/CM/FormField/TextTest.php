@@ -46,6 +46,13 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     } catch (CM_Exception_FormFieldValidation $ex) {
       $this->assertContains('Too short', $ex->getMessagePublic($render));
     }
+    try {
+      // this string is 3 bytes long
+      $field->validate('fó', $response);
+      $this->fail('Expected value to be too short');
+    } catch (CM_Exception_FormFieldValidation $ex) {
+      $this->assertContains('Too short', $ex->getMessagePublic($render));
+    }
   }
 
   public function testValidateMaxLength() {
@@ -62,6 +69,12 @@ class CM_FormField_TextTest extends CMTest_TestCase {
       $this->fail('Expected value to be too long');
     } catch (CM_Exception_FormFieldValidation $ex) {
       $this->assertContains('Too long', $ex->getMessagePublic($render));
+    }
+    try {
+      // this string is actually 5 bytes long
+      $field->validate('fóó', $response);
+    } catch (CM_Exception_FormFieldValidation $ex) {
+      $this->fail('Expected value not to be too long');
     }
   }
 
