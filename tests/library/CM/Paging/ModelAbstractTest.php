@@ -19,7 +19,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
     CM_Config::get()->CM_Model_Abstract->types[CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()] = 'CM_Paging_ModelAbstractTest_ModelMock';
     $model1 = CM_Paging_ModelAbstractTest_ModelMock::create('foo1');
     $model2 = CM_Paging_ModelAbstractTest_ModelMock::create('foo2');
-    $source = new CM_PagingSource_Array(array($model2->getId(), $model1->getId(), 999));
+    $source = new CM_PagingSource_Array(array($model2->getId(), $model1->getId(), 2000));
     $modelPaging = $this->getMockBuilder('CM_Paging_ModelAbstract')->setMethods(array('_getModelType'))->setConstructorArgs(array($source))
       ->getMockForAbstractClass();
     $modelPaging->expects($this->any())->method('_getModelType')->will($this->returnValue(CM_Paging_ModelAbstractTest_ModelMock::getTypeStatic()));
@@ -31,7 +31,7 @@ class CM_Paging_ModelAbstractTest extends CMTest_TestCase {
       $modelPaging->getItem(2);
       $this->fail('Can access nonexistent item.');
     } catch (CM_Exception_Nonexistent $ex) {
-      $this->assertContains('Model itemRaw: `999` has no data', $ex->getMessage());
+      $this->assertContains('Model itemRaw: `2000` has no data', $ex->getMessage());
     }
   }
 
