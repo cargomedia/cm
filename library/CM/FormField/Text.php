@@ -14,8 +14,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
   }
 
   public function validate($userInput, CM_Response_Abstract $response) {
-    // get rid of broken UTF chars
-    $userInput = mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
+
 
     if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
       throw new CM_Exception_FormFieldValidation('Too long');

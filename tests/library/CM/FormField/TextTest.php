@@ -103,28 +103,27 @@ class CM_FormField_TextTest extends CMTest_TestCase {
       $this->fail('Badword-validation shouldn\'t be activated');
     }
   }
-
   /**
    * checks if an invalid chars that are stripped (as opposed to being converted to ? by mb_convert_encoding)
+   *
+   * NOTE: temporarily removed due to differences in how such chars are treated across PHP versions.
    */
   public function testValidateIsEmpty() {
     $field = new CM_FormField_Text();
     $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-    $render = new CM_Render();
-    $validated = $field->validate(chr(240), $response);
+    $validated = $field->validate(chr(9*16), $response);
     $this->assertTrue($field->isEmpty($validated));
   }
+
 
   /*
    * checks if an invalid UTF char is properly converted to substitute character
    */
   public function testValidateInvalidUTF() {
-    //mb_substitute_character(ord('?'));
     $substituteChar = chr(mb_substitute_character());
     $field = new CM_FormField_Text();
     $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-    $render = new CM_Render();
-    $validated = $field->validate(chr(192), $response);
+    $validated = $field->validate(chr(255), $response);
     $this->assertEquals($validated, $substituteChar);
   }
 }
