@@ -2,9 +2,6 @@
 
 $config->timeZone = 'US/Central';
 
-$config->CM_Render->cdnResource = true;
-$config->CM_Render->cdnUserContent = true;
-
 $config->CM_Mail->send = true;
 $config->CM_Mail->mailDeliveryAgent = null;
 

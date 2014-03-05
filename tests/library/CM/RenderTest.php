@@ -2,11 +2,6 @@
 
 class CM_RenderTest extends CMTest_TestCase {
 
-  public function setUp() {
-    CM_Config::get()->CM_Render->cdnResource = false;
-    CM_Config::get()->CM_Render->cdnUserContent = false;
-  }
-
   public function tearDown() {
     CMTest_TH::clearEnv();
   }

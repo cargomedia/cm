@@ -22,9 +22,6 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
       $emoticonData['code'] = $emoticonCode;
       $this->_emoticonId[$emoticonCode] = CM_Db_Db::insert('cm_emoticon', $emoticonData);
     }
-
-    CM_Config::get()->CM_Render->cdnResource = false;
-    CM_Config::get()->CM_Render->cdnUserContent = false;
   }
 
   public function tearDown() {
