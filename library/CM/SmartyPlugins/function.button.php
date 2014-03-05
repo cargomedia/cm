@@ -29,8 +29,13 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
   }
 
   $icon = null;
+  $iconConfirm = null;
   if (isset($params['icon'])) {
     $icon = $params['icon'];
+
+    if (isset($params['iconConfirm'])) {
+      $iconConfirm = $params['iconConfirm'];
+    }
   }
 
   $label = '';
@@ -62,7 +67,12 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
   }
   $html .= '>';
   if ($icon) {
-    $html .= '<span class="icon icon-' . $icon . '"></span>';
+    if ($iconConfirm) {
+      $html .= '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
+        . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+    } else {
+      $html .= '<span class="icon icon-' . $icon . '"></span>';
+    }
   }
   if ($label) {
     $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
