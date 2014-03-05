@@ -37,25 +37,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     $this->assertEquals('http://www.cdn.com', $site->getUrlCdn());
   }
 
-  public function testFindByRequest() {
-    $siteClassMatchFoo = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockFoo');
-    $siteClassMatchFoo::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
-      return '/foo' === $request->getPath();
-    }));
-
-    $siteClassMatchBar = $this->getMockClass('CM_Site_Abstract', array('match'), array(), 'CM_Site_MockBar');
-    $siteClassMatchBar::staticExpects($this->any())->method('match')->will($this->returnCallback(function (CM_Request_Abstract $request) {
-      return '/bar' === $request->getPath();
-    }));
-
-    $site = $this->getMockClass('CM_Site_Abstract', array('getClassChildren'));
-    $site::staticExpects($this->any())->method('getClassChildren')->will($this->returnValue(array($siteClassMatchFoo, $siteClassMatchBar)));
-
-    $this->assertInstanceOf($siteClassMatchFoo, $site::findByRequest(new CM_Request_Get('/foo')));
-    $this->assertInstanceOf($siteClassMatchBar, $site::findByRequest(new CM_Request_Get('/bar')));
-    $this->assertInstanceOf(get_class(CM_Site_Abstract::factory()), $site::findByRequest(new CM_Request_Get('/somethingelse')));
-  }
-
   public function testMatch() {
     $siteClassMatchFoo = $this->getMockBuilder('CM_Site_Abstract')
       ->setMethods(array('getUrl'))
@@ -73,19 +54,13 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     /** @var CM_Site_Abstract $siteClassMatchBar */
 
-    $site = $this->getMockClass('CM_Site_Abstract', array('getClassChildren'), array(), 'CM_Site_Mock');
-    $site::staticExpects($this->any())->method('getClassChildren')->will($this->returnValue(array($siteClassMatchFoo, $siteClassMatchBar)));
-
     $requestCom = new CM_Request_Get('/', array('host' => 'www.example.com'));
-
     $this->assertTrue($siteClassMatchFoo->match($requestCom));
 
     $requestXxx = new CM_Request_Get('/', array('host' => 'www.example.xxx'));
-
     $this->assertTrue($siteClassMatchBar->match($requestXxx));
 
     $requestNot = new CM_Request_Get('/', array('host' => 'www.example.foo'));
-
     $this->assertFalse($siteClassMatchBar->match($requestNot));
   }
 
