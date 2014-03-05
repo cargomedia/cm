@@ -140,13 +140,14 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
     $formData = array();
     foreach ($action->getFieldList() as $fieldName => $required) {
-      $field = (string)$this->getField($fieldName);
+      $field = $this->getField($fieldName);
       $formData[$fieldName] = null;
 
       $isEmpty = true;
       if (array_key_exists($fieldName, $data)) {
         // get rid of broken UTF chars
-        $fieldValue = mb_convert_encoding($data[$fieldName], 'UTF-8', 'UTF-8');
+        $fieldValue = (string)$data[$fieldName];
+        $fieldValue = mb_convert_encoding($fieldValue, 'UTF-8', 'UTF-8');
 
         if (!$field->isEmpty($fieldValue)) {
           $isEmpty = false;
