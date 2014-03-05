@@ -16,7 +16,6 @@ var CM_App = CM_Class_Abstract.extend({
     this.dom.ready();
     this.window.ready();
     this.date.ready();
-    this.ui.ready();
     this.template.ready();
     this.router.ready();
   },
@@ -463,10 +462,6 @@ var CM_App = CM_Class_Abstract.extend({
   },
 
   ui: {
-    ready: function() {
-      $.clickDecorators.confirmed.settings.message = cm.language.get('Please Confirm');
-    },
-
     /**
      * @param {String} question
      * @param {Function} callback
