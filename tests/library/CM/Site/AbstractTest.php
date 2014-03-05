@@ -43,7 +43,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
       ->setMockClassName('CM_Site_MockFoo')
       ->getMockForAbstractClass();
     $siteClassMatchFoo->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
-
     /** @var CM_Site_Abstract $siteClassMatchFoo */
 
     $siteClassMatchBar = $this->getMockBuilder('CM_Site_Abstract')
@@ -51,7 +50,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
       ->setMockClassName('CM_Site_MockBar')
       ->getMockForAbstractClass();
     $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
-
     /** @var CM_Site_Abstract $siteClassMatchBar */
 
     $requestCom = new CM_Request_Get('/', array('host' => 'www.example.com'));
