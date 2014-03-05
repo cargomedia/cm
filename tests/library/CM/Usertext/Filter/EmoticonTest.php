@@ -17,7 +17,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
   protected $_mockSite;
 
   public function setUp() {
-    $this->_mockSite = $this->getMockSite(24, null, 'http://www.default.dev');
+    $this->_mockSite = $this->getMockSite(24, null, 'http://www.default.dev', 'http://cdn.default.dev');
     foreach ($this->_emoticonData as $emoticonCode => $emoticonData) {
       $emoticonData['code'] = $emoticonCode;
       $this->_emoticonId[$emoticonCode] = CM_Db_Db::insert('cm_emoticon', $emoticonData);
@@ -66,13 +66,13 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
   }
 
   protected function _getEmoticonImg($emoticonCode, $height = null) {
-    $siteUrl = $this->_mockSite->getUrl();
+    $urlCdn = $this->_mockSite->getUrlCdn();
     $siteType = $this->_mockSite->getId();
     $deployVersion = CM_App::getInstance()->getDeployVersion();
     $emoticonFile = $this->_emoticonData[$emoticonCode]['file'];
     $emoticonId = $this->_emoticonId[$emoticonCode];
     $heightAttribute = $height ? ' height="' . $height . '"' : '';
-    return '<img src="' . $siteUrl . '/layout/' . $siteType . '/' . $deployVersion . '/img/emoticon/' . $emoticonFile .
+    return '<img src="' . $urlCdn . '/layout/' . $siteType . '/' . $deployVersion . '/img/emoticon/' . $emoticonFile .
     '" class="emoticon emoticon-' . $emoticonId . '" title="' . $emoticonCode . '"' . $heightAttribute . ' />';
   }
 }
