@@ -338,7 +338,7 @@ class CM_Render extends CM_Class_Abstract {
     if (null !== $path) {
       $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
     }
-    return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+    return $this->getUrl($urlPath, true);
   }
 
   /**
