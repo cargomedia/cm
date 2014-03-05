@@ -14,10 +14,13 @@ class CM_FormField_Text extends CM_FormField_Abstract {
   }
 
   public function validate($userInput, CM_Response_Abstract $response) {
-    if (isset($this->_options['lengthMax']) && strlen($userInput) > $this->_options['lengthMax']) {
+    // get rid of broken UTF chars
+    $userInput = mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
+
+    if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
       throw new CM_Exception_FormFieldValidation('Too long');
     }
-    if (isset($this->_options['lengthMin']) && strlen($userInput) < $this->_options['lengthMin']) {
+    if (isset($this->_options['lengthMin']) && mb_strlen($userInput) < $this->_options['lengthMin']) {
       throw new CM_Exception_FormFieldValidation('Too short');
     }
     if (!empty($this->_options['forbidBadwords'])) {
