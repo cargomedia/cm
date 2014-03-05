@@ -119,16 +119,12 @@ class CM_FormField_TextTest extends CMTest_TestCase {
    * checks if an invalid UTF char is properly converted to substitute character
    */
   public function testValidateInvalidUTF() {
-    ini_set('mbstring.substitute_character', "z");
-    $substituteChar = ini_get('mbstring.substitute_character');
-    var_dump($substituteChar);
-
-
+    //mb_substitute_character(ord('?'));
+    $substituteChar = chr(mb_substitute_character());
     $field = new CM_FormField_Text();
     $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
     $render = new CM_Render();
     $validated = $field->validate(chr(192), $response);
-    var_dump($validated);
     $this->assertEquals($validated, $substituteChar);
   }
 }
