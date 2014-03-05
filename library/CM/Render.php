@@ -347,9 +347,9 @@ class CM_Render extends CM_Class_Abstract {
    */
   public function getUrlUserContent(CM_File_UserContent $file = null) {
     if (is_null($file)) {
-      return $this->getUrl('/userfiles', self::_getConfig()->cdnUserContent);
+      return $this->getUrl('/userfiles', true);
     }
-    return $this->getUrl('/userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+    return $this->getUrl('/userfiles/' . $file->getPathRelative(), true);
   }
 
   /**

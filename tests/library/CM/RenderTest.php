@@ -125,8 +125,6 @@ class CM_RenderTest extends CMTest_TestCase {
     $render = new CM_Render();
     $userFile = $this->getMock('CM_File_UserContent', array('getPathRelative'), array(), '', false);
     $userFile->expects($this->any())->method('getPathRelative')->will($this->returnValue('foo/bar.jpg'));
-    $this->assertSame('http://www.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
-    CM_Config::get()->CM_Render->cdnUserContent = true;
     $this->assertSame('http://cdn.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
   }
 
