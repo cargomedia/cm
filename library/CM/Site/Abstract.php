@@ -113,7 +113,7 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
    */
   public function getHost() {
     $siteHost = parse_url($this->getUrl(), PHP_URL_HOST);
-    if (false === $siteHost) {
+    if (false === $siteHost || null === $siteHost) {
       throw new CM_Exception_Invalid('Cannot detect host from `' . $this->getUrl() . '`.');
     }
     return $siteHost;
@@ -162,8 +162,10 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
    * @param CM_Request_Abstract $request
    * @return boolean
    */
-  public static function match(CM_Request_Abstract $request) {
-    return false;
+  public function match(CM_Request_Abstract $request) {
+    $urlRequest = $request->getHost();
+    $urlSite = $this->getHost();
+    return 0 === strpos(preg_replace('/^www\./', '', $urlRequest), preg_replace('/^www\./', '', $urlSite));
   }
 
   /**
@@ -193,10 +195,11 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
    * @throws CM_Exception_Invalid
    */
   public static function findByRequest(CM_Request_Abstract $request) {
-    /** @var CM_Site_Abstract $className */
     foreach (array_reverse(static::getClassChildren()) as $className) {
-      if ($className::match($request)) {
-        return new $className();
+      /** @var CM_Site_Abstract $site */
+      $site = new $className();
+      if ($site->match($request)) {
+        return $site;
       }
     }
     return self::factory();
