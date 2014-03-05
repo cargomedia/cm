@@ -312,7 +312,10 @@ class CM_Util {
    * @return string
    */
   public static function camelize($string) {
-    return preg_replace('/[-_]([a-z])/e', 'strtoupper("$1")', ucfirst(strtolower($string)));
+    return preg_replace_callback('/[-_]([a-z])/',
+      function ($matches) {
+        return strtoupper($matches[1]);
+      }, ucfirst(strtolower($string)));
   }
 
   /**
@@ -332,7 +335,9 @@ class CM_Util {
    * @return string
    */
   public static function titleize($string) {
-    return preg_replace('/[-_ ]([a-z])/e', 'strtoupper(" $1")', ucfirst(strtolower($string)));
+    return preg_replace_callback('/[-_ ]([a-z])/', function ($matches) {
+      return ' ' . strtoupper($matches[1]);
+    }, ucfirst(strtolower($string)));
   }
 
   /**
