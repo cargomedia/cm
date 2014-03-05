@@ -313,7 +313,7 @@ class CM_Render extends CM_Class_Abstract {
       }
       $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
     }
-    return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+    return $this->getUrl($urlPath, true);
   }
 
   /**
