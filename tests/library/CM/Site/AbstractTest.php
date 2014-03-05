@@ -56,6 +56,39 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     $this->assertInstanceOf(get_class(CM_Site_Abstract::factory()), $site::findByRequest(new CM_Request_Get('/somethingelse')));
   }
 
+  public function testMatch() {
+    $siteClassMatchFoo = $this->getMockBuilder('CM_Site_Abstract')
+      ->setMethods(array('getUrl'))
+      ->setMockClassName('CM_Site_MockFoo')
+      ->getMockForAbstractClass();
+    $siteClassMatchFoo->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.com'));
+
+    /** @var CM_Site_Abstract $siteClassMatchFoo */
+
+    $siteClassMatchBar = $this->getMockBuilder('CM_Site_Abstract')
+      ->setMethods(array('getUrl'))
+      ->setMockClassName('CM_Site_MockBar')
+      ->getMockForAbstractClass();
+    $siteClassMatchBar->expects($this->any())->method('getUrl')->will($this->returnValue('http://www.example.xxx'));
+
+    /** @var CM_Site_Abstract $siteClassMatchBar */
+
+    $site = $this->getMockClass('CM_Site_Abstract', array('getClassChildren'), array(), 'CM_Site_Mock');
+    $site::staticExpects($this->any())->method('getClassChildren')->will($this->returnValue(array($siteClassMatchFoo, $siteClassMatchBar)));
+
+    $requestCom = new CM_Request_Get('/', array('host' => 'www.example.com'));
+
+    $this->assertTrue($siteClassMatchFoo->match($requestCom));
+
+    $requestXxx = new CM_Request_Get('/', array('host' => 'www.example.xxx'));
+
+    $this->assertTrue($siteClassMatchBar->match($requestXxx));
+
+    $requestNot = new CM_Request_Get('/', array('host' => 'www.example.foo'));
+
+    $this->assertFalse($siteClassMatchBar->match($requestNot));
+  }
+
   public function testFactory() {
     try {
       CM_Site_Abstract::factory(9999);
