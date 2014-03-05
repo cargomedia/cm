@@ -5,13 +5,6 @@ class CM_Asset_CssTest extends CMTest_TestCase {
   /** @var CM_Render */
   private $_render;
 
-  public static function setUpBeforeClass() {
-    CM_Config::get()->CM_Render->cdnResource = false;
-    CM_Config::get()->CM_Render->cdnUserContent = false;
-    CM_Config::get()->CM_Site_MockCss = new stdClass;
-    CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
-  }
-
   public function testAdd() {
     $render = new CM_Render();
     $css = new CM_Asset_Css($render, 'font-size: 12;', '#foo');
