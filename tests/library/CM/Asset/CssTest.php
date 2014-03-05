@@ -58,7 +58,7 @@ EOD;
   }
 
   public function testUrlFont() {
-	  $render = new CM_Render();
+    $render = new CM_Render();
     $css = new CM_Asset_Css($render, "src: url(urlFont('file.eot'));");
     $url = $render->getUrlStatic('/font/file.eot');
     $expected = <<<EOD
