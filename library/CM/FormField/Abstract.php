@@ -53,6 +53,15 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
   }
 
   /**
+   * Filter-out invalid input data depending on of the field type.
+   * For text field this will remove invalid UTF8 chars etc.
+   * @param $userInput
+   */
+  public function filterInput($userInput) {
+    return $userInput;
+  }
+
+  /**
    * @param string|array         $userInput
    * @param CM_Response_Abstract $response
    * @return mixed Internal value

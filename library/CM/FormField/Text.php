@@ -13,6 +13,24 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     $this->_options['forbidBadwords'] = (boolean) $forbidBadwords;
   }
 
+  public function filterInput($userInput) {
+    $this->ensureValidEncoding($userInput);
+    return $userInput;
+  }
+
+  protected function ensureValidEncoding(&$userInput) {
+    if (is_scalar($userInput)) {
+      $userInput = mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
+    } else {
+      if (is_array($userInput)) {
+        foreach ($userInput as $key => &$value) {
+          self::ensureValidEncoding($value);
+        }
+        unset($value);
+      }
+    }
+  }
+
   public function validate($userInput, CM_Response_Abstract $response) {
     if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
       throw new CM_Exception_FormFieldValidation('Too long');
