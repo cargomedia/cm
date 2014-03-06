@@ -304,7 +304,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     $time = time();
     foreach (array_reverse($intervals) as $interval) {
       $timeMin = CM_Db_Db::exec('SELECT MIN(`createStamp`) FROM `cm_action` WHERE `actionLimitType` IS NULL AND `interval` < ?', array($interval['interval']))->fetchColumn();
-      if (false === $timeMin) {
+      if (null === $timeMin) {
         return;
       }
       $timeMin -= $timeMin % $interval['interval'];
