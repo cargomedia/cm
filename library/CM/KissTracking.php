@@ -9,8 +9,6 @@ class CM_KissTracking extends CM_Class_Abstract {
   /** @var CM_KissTracking */
   private static $_instance;
 
-  /** @var CM_Set */
-  private $_set;
 
   /**
    * @param string        $event
@@ -41,7 +39,6 @@ class CM_KissTracking extends CM_Class_Abstract {
       $record['Prop:' . $propName] = (string) $propValue;
     }
 
-    $this->_getSet()->add($record);
   }
 
   public function exportEvents() {
@@ -104,18 +101,8 @@ class CM_KissTracking extends CM_Class_Abstract {
    * @return string[]
    */
   protected function _getEvents() {
-    return $this->_getSet()->flush();
   }
 
-  /**
-   * @return CM_Set
-   */
-  private function _getSet() {
-    if (!$this->_set instanceof CM_Set) {
-      $this->_set = new CM_Set(self::SET_NAME);
-    }
-    return $this->_set;
-  }
 
   /**
    * @return boolean
