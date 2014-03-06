@@ -13,6 +13,10 @@ services:
 
 before_script:
   - tests/travis/install-php-runkit.sh
+  - tests/travis/install-php-svm.sh
+  - printf "\n" | pecl install imagick
+  - pecl install stats
+  - sudo apt-get install libgearman-dev && pecl install gearman-1.0.3
   - sh -c "if [ `php-config --vernum` -ge 50500 ]; then printf "yes\n" | pecl install apcu-beta; fi"
   - phpenv config-add tests/travis/php.ini
   - phpenv config-add tests/travis/php-$TRAVIS_PHP_VERSION.ini
@@ -22,7 +26,7 @@ before_script:
   - bin/cm app generate-config-local tests/travis/config.json
   - bin/cm app set-deploy-version
 
-script: bin/phpunit tests/library/CM/KissTrackingTest.php
+script: bin/phpunit
 
 notifications:
   email: false
