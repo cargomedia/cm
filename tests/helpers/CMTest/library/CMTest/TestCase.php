@@ -4,7 +4,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
   public function runBare() {
     if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
-      $siteDefault = $this->getMockSite(null, null, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
+      $siteDefault = $this->getMockSite(null, null, null, 'http://www.default.dev', 'http://cdn.default.dev', 'Default', 'default@default.dev');
       CM_Config::get()->CM_Site_Abstract->class = get_class($siteDefault);
     }
     parent::runBare();
@@ -24,6 +24,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @param string|null $classname
    * @param int|null    $type
    * @param array|null  $methods
    * @param string|null $url
@@ -33,8 +34,19 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
    * @throws CM_Exception_Invalid
    * @return CM_Site_Abstract|PHPUnit_Framework_MockObject_MockObject
    */
-  public function getMockSite($type = null, array $methods = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
-    $types = CM_Config::get()->CM_Site_Abstract->types;
+  public function getMockSite($classname = null, $type = null, array $methods = null, $url = null, $urlCdn = null, $name = null, $emailAddress = null) {
+    if (null === $classname) {
+      $classname = 'CM_Site_Abstract';
+    }
+    $classname = (string) $classname;
+    $config = CM_Config::get();
+
+    if (!property_exists($config, $classname)) {
+      $config->$classname = new stdClass();
+      $config->$classname->types = array();
+    }
+
+    $types = $config->$classname->types;
     if (null === $type) {
       for ($i = 1; $i <= 255; $i++) {
         if (!isset($types[$i])) {
@@ -59,16 +71,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     $name = is_null($name) ? null : (string) $name;
     $emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 
-    $site = $this->getMockBuilder('CM_Site_Abstract')->setMockClassName('CM_Site_Mock' . $type)->setMethods($methods)->getMock();
+    $site = $this->getMockBuilder($classname)->setMockClassName('CM_Site_Mock' . $type)->setMethods($methods)->getMock();
     $site->expects($this->any())->method('getType')->will($this->returnValue($type));
 
     $siteClassName = get_class($site);
-    CM_Config::get()->CM_Site_Abstract->types[$type] = $siteClassName;
-    CM_Config::get()->$siteClassName = new stdClass;
-    CM_Config::get()->$siteClassName->url = $url;
-    CM_Config::get()->$siteClassName->urlCdn = $urlCdn;
-    CM_Config::get()->$siteClassName->name = $name;
-    CM_Config::get()->$siteClassName->emailAddress = $emailAddress;
+    $config->$classname->types[$type] = $siteClassName;
+    $config->$siteClassName = new stdClass;
+    $config->$siteClassName->url = $url;
+    $config->$siteClassName->urlCdn = $urlCdn;
+    $config->$siteClassName->name = $name;
+    $config->$siteClassName->emailAddress = $emailAddress;
 
     return $site;
   }

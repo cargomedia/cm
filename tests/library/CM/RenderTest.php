@@ -56,7 +56,7 @@ class CM_RenderTest extends CMTest_TestCase {
     $render = new CM_Render();
     $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-    $site = $this->getMockSite(null, null, 'http://www.test.dev', 'http://cdn.test.dev', 'Test', 'test@test.dev');
+    $site = $this->getMockSite(null, null, null, 'http://www.test.dev', 'http://cdn.test.dev', 'Test', 'test@test.dev');
     $renderSite = new CM_Render($site);
 
     $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
