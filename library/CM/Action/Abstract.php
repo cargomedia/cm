@@ -362,6 +362,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
 
   protected function _track() {
     if ($this->_trackingEnabled && $this->getActor()) {
+      CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
     }
   }
 
