@@ -98,11 +98,6 @@ class CM_KissTracking extends CM_Class_Abstract {
    * @param CM_File_Csv $file
    */
   protected function _uploadCsv(CM_File_Csv $file) {
-    $bucketName = self::_getConfig()->awsBucketName;
-    $targetFilename = self::_getConfig()->awsFilePrefix . '.' . date('YmdHis') . '.csv';
-
-    $amazonS3 = new CMService_Amazon_S3();
-    $amazonS3->upload($file, $bucketName, $targetFilename, array('6acb81d7742ac437833f51ecb2a40c74cd831ce26909e5f72354fa6af42cfb1f' => 'full-control'));
   }
 
   /**
