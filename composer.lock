@@ -3,8 +3,57 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6e80b5f52a962b1afa10a5a468f0a138",
+    "hash": "34e42f9b8118303413a2be77d24e0eeb",
     "packages": [
+        {
+            "name": "amazonwebservices/aws-sdk-for-php",
+            "version": "1.5.17.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amazonwebservices/aws-sdk-for-php.git",
+                "reference": "42d86270e9458acffff721a661f62d818ca7282f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://satis.cargomedia.ch/dist/dist/amazonwebservices-aws-sdk-for-php-42d86270e9458acffff721a661f62d818ca7282f-zip-5cd94d.zip",
+                "reference": "42d86270e9458acffff721a661f62d818ca7282f",
+                "shasum": "0c41e551cc1caee9b45bd220eb2eb46f6226bc9e"
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "authentication/",
+                    "extensions/",
+                    "lib/",
+                    "services/",
+                    "utilities/",
+                    "sdk.class.php"
+                ]
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP",
+            "homepage": "http://aws.amazon.com/sdkforphp/",
+            "keywords": [
+                "amazon",
+                "aws",
+                "dynamodb",
+                "ec2",
+                "s3",
+                "sdk"
+            ],
+            "time": "2012-11-26 23:59:55"
+        },
         {
             "name": "composer/composer",
             "version": "1.0.0-alpha8",
