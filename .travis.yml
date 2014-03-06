@@ -26,7 +26,7 @@ before_script:
   - bin/cm app generate-config-local tests/travis/config.json
   - bin/cm app set-deploy-version
 
-script: bin/phpunit
+script: bin/phpunit tests/library/CM/
 
 notifications:
   email: false
