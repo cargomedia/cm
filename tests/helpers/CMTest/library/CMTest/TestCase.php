@@ -41,12 +41,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     $classname = (string) $classname;
     $config = CM_Config::get();
 
-    if (!property_exists($config, $classname)) {
-      $config->$classname = new stdClass();
-      $config->$classname->types = array();
-    }
-
-    $types = $config->$classname->types;
+    $types = $config->CM_Site_Abstract->types;
     if (null === $type) {
       for ($i = 1; $i <= 255; $i++) {
         if (!isset($types[$i])) {
@@ -75,7 +70,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     $site->expects($this->any())->method('getType')->will($this->returnValue($type));
 
     $siteClassName = get_class($site);
-    $config->$classname->types[$type] = $siteClassName;
+    $config->CM_Site_Abstract->types[$type] = $siteClassName;
     $config->$siteClassName = new stdClass;
     $config->$siteClassName->url = $url;
     $config->$siteClassName->urlCdn = $urlCdn;
