@@ -24,12 +24,12 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
     $getEventsMethod = CMTest_TH::getProtectedMethod('CM_KissTracking', '_getEvents');
 
     $actor = CMTest_TH::createUser();
-//    $action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
+    $action = $this->getMockBuilder('CM_Action_Abstract')->setConstructorArgs(array('Foo', $actor))->getMockForAbstractClass();
 
     $getEventsMethod->invoke($tracking);
     $nofifyMethod = CMTest_TH::getProtectedMethod('CM_Action_Abstract', '_notify');
-//    $nofifyMethod->invoke($action, 'bar');
-//    $this->assertCount(1, $getEventsMethod->invoke($tracking));
+    $nofifyMethod->invoke($action, 'bar');
+    $this->assertCount(1, $getEventsMethod->invoke($tracking));
   }
 
   public function testPrepareActionUser() {
