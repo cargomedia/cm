@@ -13,22 +13,16 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     $this->_options['forbidBadwords'] = (boolean) $forbidBadwords;
   }
 
-  public function filterInput($userInput) {
-    $this->ensureValidEncoding($userInput);
-    return $userInput;
+  /**
+   * @param mixed $value Internal value
+   */
+  public function setValue($value) {
+    parent::setValue((string) $value);
   }
 
-  protected function ensureValidEncoding(&$userInput) {
-    if (is_scalar($userInput)) {
-      $userInput = mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
-    } else {
-      if (is_array($userInput)) {
-        foreach ($userInput as $key => &$value) {
-          self::ensureValidEncoding($value);
-        }
-        unset($value);
-      }
-    }
+  public function filterInput($userInput) {
+    $userInput = (string) $userInput;
+    return mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
   }
 
   public function validate($userInput, CM_Response_Abstract $response) {

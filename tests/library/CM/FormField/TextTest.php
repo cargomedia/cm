@@ -105,29 +105,11 @@ class CM_FormField_TextTest extends CMTest_TestCase {
   }
 
   function testArrayInputInvalidCharsRemoval() {
-    $input = array(
-      'invalid1' => chr(220),
-      'invalid2' => chr(200),
-      'valid'    => 'valid string',
-      'level2'   => array(
-        'invalid1' => chr(250),
-        'invalid2' => 'test with an invalid char: ' . chr(250),
-        'valid'    => 'valid string',
-        'level3'   => array(
-          'invalid' => chr(250)
-        )
-      )
-    );
+    $invalidInputs = array(chr(240), chr(192), chr(200) . chr(210), 'something' . chr(244));
     $field = new CM_FormField_Text();
-    $filtered = $field->filterInput($input);
-    $this->assertNotSame($filtered['invalid1'], $input['invalid1']);
-    $this->assertNotSame($filtered['invalid2'], $input['invalid2']);
-    $this->assertSame($filtered['valid'], $input['valid']);
-
-    $this->assertNotSame($filtered['level2']['invalid1'], $input['level2']['invalid1']);
-    $this->assertNotSame($filtered['level2']['invalid2'], $input['level2']['invalid2']);
-    $this->assertSame($filtered['level2']['valid'], $input['level2']['valid']);
-
-    $this->assertNotSame($filtered['level2']['level3']['invalid'], $input['level2']['level3']['invalid']);
+    foreach ($invalidInputs as $input) {
+      $filtered = $field->filterInput($input);
+      $this->assertNotSame($filtered, $input);
+    }
   }
 }

@@ -57,7 +57,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
     return array(
       'action'    => 'TestExampleAction',
       'classname' => 'CM_Form_MockForm',
-      'data'      => array('color' => '#123123', 'must_check' => 'checked', 'text' => 'foo', 'array' => array('a', 'b')));
+      'data'      => array('color' => '#123123', 'must_check' => 'checked', 'text' => 'foo'));
   }
 }
 
@@ -75,7 +75,7 @@ class CM_Form_MockForm extends CM_Form_Abstract {
 class CM_FormAction_MockForm_TestExampleAction extends CM_FormAction_Abstract {
 
   protected function _getRequiredFields() {
-    return array('must_check', 'text', 'array');
+    return array('must_check', 'text');
   }
 
   protected function _process(CM_Params $params, CM_Response_View_Form $response, CM_Form_Abstract $form) {
