@@ -71,9 +71,6 @@ class CM_KissTrackingTest extends CMTest_TestCase {
   //
   public function testExportEvents() {
     CM_KissTracking::getInstance()->track('event', 1, null, array('Viewed' => true));
-    $this->_kissTracking->expects($this->once())->method('_uploadCsv')->will($this->returnValue(true));
-    $this->_kissTracking->exportEvents();
-    $this->_kissTracking->exportEvents();
   }
   //
   //  public function testExportEventsTwice() {
