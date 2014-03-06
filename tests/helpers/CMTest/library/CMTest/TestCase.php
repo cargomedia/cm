@@ -71,7 +71,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     $name = is_null($name) ? null : (string) $name;
     $emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 
-    $site = $this->getMockBuilder($classname)->setMockClassName('CM_Site_Mock' . $type)->setMethods($methods)->getMock();
+    $site = $this->getMockBuilder($classname)->setMockClassName($classname . '_Mock' . $type)->setMethods($methods)->getMock();
     $site->expects($this->any())->method('getType')->will($this->returnValue($type));
 
     $siteClassName = get_class($site);
