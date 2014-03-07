@@ -141,7 +141,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $formData = array();
         foreach ($action->getFieldList() as $fieldName => $required) {
             $field = $this->getField($fieldName);
-            $fieldValue = null;
 
             $isEmpty = true;
             if (array_key_exists($fieldName, $data)) {
@@ -150,16 +149,19 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
                 if (!$field->isEmpty($fieldValue)) {
                     $isEmpty = false;
                     try {
-                        $fieldValue = $field->validate($fieldValue, $response);
+                        $formData[$fieldName] = $field->validate($fieldValue, $response);
                     } catch (CM_Exception_FormFieldValidation $e) {
                         $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
                     }
                 }
             }
-            $formData[$fieldName] = $fieldValue;
 
-            if ($isEmpty && $required) {
-                $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
+            if ($isEmpty) {
+                if ($required) {
+                    $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
+                } else {
+                    $formData[$fieldName] = null;
+                }
             }
         }
         if (!$response->hasErrors()) {
