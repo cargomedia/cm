@@ -104,26 +104,12 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
   }
 
-  /**
-   * checks if an invalid chars that are stripped (as opposed to being converted to ? by mb_convert_encoding)
-   */
-  public function testValidateIsEmpty() {
+  function testArrayInputInvalidCharsRemoval() {
+    $invalidInputs = array(chr(240), chr(192), chr(200) . chr(210), 'something' . chr(244));
     $field = new CM_FormField_Text();
-    $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-    $render = new CM_Render();
-    $validated = $field->validate(chr(240), $response);
-    $this->assertTrue($field->isEmpty($validated));
-  }
-
-  /*
-   * checks if an invalid UTF char is properly converted to substitute character
-   */
-  public function testValidateInvalidUTF() {
-    $substituteChar = ini_get('mbstring.substitute_character');
-    $field = new CM_FormField_Text();
-    $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-    $render = new CM_Render();
-    $validated = $field->validate(chr(220), $response);
-    $this->assertEquals($validated, $substituteChar);
+    foreach ($invalidInputs as $input) {
+      $filtered = $field->filterInput($input);
+      $this->assertNotSame($filtered, $input);
+    }
   }
 }

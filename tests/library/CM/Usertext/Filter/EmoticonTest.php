@@ -17,7 +17,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
   protected $_mockSite;
 
   public function setUp() {
-    $this->_mockSite = $this->getMockSite(24, null, 'http://www.default.dev');
+    $this->_mockSite = $this->getMockSite(null, 24, null, 'http://www.default.dev');
     foreach ($this->_emoticonData as $emoticonCode => $emoticonData) {
       $emoticonData['code'] = $emoticonCode;
       $this->_emoticonId[$emoticonCode] = CM_Db_Db::insert('cm_emoticon', $emoticonData);
