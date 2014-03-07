@@ -37,6 +37,6 @@ $english->setTranslation('.date.timeago.year', 'about a year');
 $english->setTranslation('.date.timeago.years', '{$count} years', array('count'));
 $english->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
 $english->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.', array('file',
-  'extensions'));
+    'extensions'));
 $english->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred');
 
