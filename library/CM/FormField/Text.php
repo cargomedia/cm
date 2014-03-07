@@ -13,13 +13,6 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     $this->_options['forbidBadwords'] = (boolean) $forbidBadwords;
   }
 
-  /**
-   * @param mixed $value Internal value
-   */
-  public function setValue($value) {
-    parent::setValue((string) $value);
-  }
-
   public function filterInput($userInput) {
     $userInput = (string) $userInput;
     return mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
