@@ -2,122 +2,122 @@
 
 class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
 
-  public function _loadAsset() {
-  }
-
-  public function _onModelDelete() {
-    CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId()));
-  }
-
-  /**
-   * @param string $section
-   * @param string $key
-   * @throws CM_Exception
-   * @return boolean
-   */
-  public function get($section, $key) {
-    $values = $this->getAll();
-    if (!isset($values[$section][$key])) {
-      throw new CM_Exception("Invalid preference ($section.$key)");
+    public function _loadAsset() {
     }
-    return $values[$section][$key]['value'];
-  }
 
-  /**
-   * @param string  $section
-   * @param string  $key
-   * @param boolean $value
-   * @throws CM_Exception
-   */
-  public function set($section, $key, $value) {
-    $value = (bool) $value;
-    $defaults = self::getDefaults();
-    if (!isset($defaults[$section][$key])) {
-      throw new CM_Exception("Invalid preference ($section.$key)");
+    public function _onModelDelete() {
+        CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId()));
     }
-    if ($value == $defaults[$section][$key]['value']) {
-      CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
-    } else {
-      CM_Db_Db::replace('cm_user_preference', array(
-        'userId'       => $this->_model->getId(),
-        'preferenceId' => $defaults[$section][$key]['id'],
-        'value'        => $value,
-      ));
-    }
-    $this->_change();
-  }
 
-  /**
-   * @return array
-   */
-  public function getAll() {
-    if (($values = $this->_cacheGet('values')) === false) {
-      $values = self::getDefaults();
-      $valuesSpecific = CM_Db_Db::select('cm_user_preference', array('preferenceId',
-        'value'), array('userId' => $this->_model->getId()))->fetchAllTree();
-      foreach ($values as &$section) {
-        foreach ($section as &$key) {
-          if (isset($valuesSpecific[$key['id']])) {
-            $key['value'] = (bool) $valuesSpecific[$key['id']];
-          }
+    /**
+     * @param string $section
+     * @param string $key
+     * @throws CM_Exception
+     * @return boolean
+     */
+    public function get($section, $key) {
+        $values = $this->getAll();
+        if (!isset($values[$section][$key])) {
+            throw new CM_Exception("Invalid preference ($section.$key)");
         }
-      }
-      $this->_cacheSet('values', $values);
+        return $values[$section][$key]['value'];
     }
-    return $values;
-  }
 
-  public function reset() {
-    CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId()));
-    $this->_change();
-  }
-
-  /**
-   * @return array of arrays
-   */
-  public static function getDefaults() {
-    $cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
-    $cache = CM_Cache_Local::getInstance();
-    if (($defaults = $cache->get($cacheKey)) === false) {
-      $defaults = array();
-      $rows = CM_Db_Db::select('cm_user_preferenceDefault', array('section', 'key', 'preferenceId', 'defaultValue',
-        'configurable'))->fetchAll();
-      foreach ($rows as $default) {
-        if (!isset($defaults[$default['section']])) {
-          $defaults[$default['section']] = array();
+    /**
+     * @param string  $section
+     * @param string  $key
+     * @param boolean $value
+     * @throws CM_Exception
+     */
+    public function set($section, $key, $value) {
+        $value = (bool) $value;
+        $defaults = self::getDefaults();
+        if (!isset($defaults[$section][$key])) {
+            throw new CM_Exception("Invalid preference ($section.$key)");
         }
-        $defaults[$default['section']][$default['key']] = array(
-          'id'           => (int) $default['preferenceId'],
-          'value'        => (bool) $default['defaultValue'],
-          'configurable' => (boolean) $default['configurable'],
+        if ($value == $defaults[$section][$key]['value']) {
+            CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId(), 'preferenceId' => $defaults[$section][$key]['id']));
+        } else {
+            CM_Db_Db::replace('cm_user_preference', array(
+                'userId'       => $this->_model->getId(),
+                'preferenceId' => $defaults[$section][$key]['id'],
+                'value'        => $value,
+            ));
+        }
+        $this->_change();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll() {
+        if (($values = $this->_cacheGet('values')) === false) {
+            $values = self::getDefaults();
+            $valuesSpecific = CM_Db_Db::select('cm_user_preference', array('preferenceId',
+                'value'), array('userId' => $this->_model->getId()))->fetchAllTree();
+            foreach ($values as &$section) {
+                foreach ($section as &$key) {
+                    if (isset($valuesSpecific[$key['id']])) {
+                        $key['value'] = (bool) $valuesSpecific[$key['id']];
+                    }
+                }
+            }
+            $this->_cacheSet('values', $values);
+        }
+        return $values;
+    }
+
+    public function reset() {
+        CM_Db_Db::delete('cm_user_preference', array('userId' => $this->_model->getId()));
+        $this->_change();
+    }
+
+    /**
+     * @return array of arrays
+     */
+    public static function getDefaults() {
+        $cacheKey = CM_CacheConst::User_Asset_Preferences_Defaults;
+        $cache = CM_Cache_Local::getInstance();
+        if (($defaults = $cache->get($cacheKey)) === false) {
+            $defaults = array();
+            $rows = CM_Db_Db::select('cm_user_preferenceDefault', array('section', 'key', 'preferenceId', 'defaultValue',
+                'configurable'))->fetchAll();
+            foreach ($rows as $default) {
+                if (!isset($defaults[$default['section']])) {
+                    $defaults[$default['section']] = array();
+                }
+                $defaults[$default['section']][$default['key']] = array(
+                    'id'           => (int) $default['preferenceId'],
+                    'value'        => (bool) $default['defaultValue'],
+                    'configurable' => (boolean) $default['configurable'],
+                );
+            }
+            $cache->set($cacheKey, $defaults);
+        }
+        return $defaults;
+    }
+
+    public static function setDefault($section, $key, $defaultValue, $configurable) {
+        $where = array(
+            'section' => (string) $section,
+            'key'     => (string) $key
         );
-      }
-      $cache->set($cacheKey, $defaults);
+        $values = array(
+            'defaultValue' => (int) (bool) $defaultValue,
+            'configurable' => (int) (bool) $configurable
+        );
+        if (CM_Db_Db::count('cm_user_preferenceDefault', $where)) {
+            CM_Db_Db::update('cm_user_preferenceDefault', $values, $where);
+        } else {
+            $values = array_merge($values, $where);
+            CM_Db_Db::insert('cm_user_preferenceDefault', $values);
+        }
     }
-    return $defaults;
-  }
 
-  public static function setDefault($section, $key, $defaultValue, $configurable) {
-    $where = array(
-      'section' => (string) $section,
-      'key'     => (string) $key
-    );
-    $values = array(
-      'defaultValue' => (int) (bool) $defaultValue,
-      'configurable' => (int) (bool) $configurable
-    );
-    if (CM_Db_Db::count('cm_user_preferenceDefault', $where)) {
-      CM_Db_Db::update('cm_user_preferenceDefault', $values, $where);
-    } else {
-      $values = array_merge($values, $where);
-      CM_Db_Db::insert('cm_user_preferenceDefault', $values);
+    /**
+     * @return array
+     */
+    public static function getStats() {
+        return CM_Db_Db::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM `cm_user_preference` GROUP BY `preferenceId`, `value`")->fetchAllTree();
     }
-  }
-
-  /**
-   * @return array
-   */
-  public static function getStats() {
-    return CM_Db_Db::exec("SELECT `preferenceId`, COUNT(*) AS `count`, `value` FROM `cm_user_preference` GROUP BY `preferenceId`, `value`")->fetchAllTree();
-  }
 }
