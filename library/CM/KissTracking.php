@@ -2,140 +2,140 @@
 
 class CM_KissTracking extends CM_Class_Abstract {
 
-  const SET_NAME = 'kisstracking';
+    const SET_NAME = 'kisstracking';
 
-  const UPLOAD_INTERVAL = 7200;
+    const UPLOAD_INTERVAL = 7200;
 
-  /** @var CM_KissTracking */
-  private static $_instance;
+    /** @var CM_KissTracking */
+    private static $_instance;
 
-  /** @var CM_Set */
-  private $_set;
+    /** @var CM_Set */
+    private $_set;
 
-  /**
-   * @param string        $event
-   * @param CM_Model_User $user
-   * @param string|null   $alias
-   * @param array|null    $properties
-   */
-  public function trackUser($event, CM_Model_User $user, $alias = null, array $properties = null) {
-    $this->track($event, $user->getId(), $alias, $properties);
-  }
-
-  /**
-   * @param string      $event
-   * @param string      $identity
-   * @param string|null $alias
-   * @param array|null  $properties
-   */
-  public function track($event, $identity, $alias = null, array $properties = null) {
-    if (!$this->_getEnabled()) {
-      return;
-    }
-    $event = (string) $event;
-    $identity = (string) $identity;
-    $alias = (string) $alias;
-    $properties = (array) $properties;
-    $record = array('Identity' => $identity, 'Alias' => $alias, 'Timestamp' => time(), 'Event' => $event);
-    foreach ($properties as $propName => &$propValue) {
-      $record['Prop:' . $propName] = (string) $propValue;
+    /**
+     * @param string        $event
+     * @param CM_Model_User $user
+     * @param string|null   $alias
+     * @param array|null    $properties
+     */
+    public function trackUser($event, CM_Model_User $user, $alias = null, array $properties = null) {
+        $this->track($event, $user->getId(), $alias, $properties);
     }
 
-    $this->_getSet()->add($record);
-  }
+    /**
+     * @param string      $event
+     * @param string      $identity
+     * @param string|null $alias
+     * @param array|null  $properties
+     */
+    public function track($event, $identity, $alias = null, array $properties = null) {
+        if (!$this->_getEnabled()) {
+            return;
+        }
+        $event = (string) $event;
+        $identity = (string) $identity;
+        $alias = (string) $alias;
+        $properties = (array) $properties;
+        $record = array('Identity' => $identity, 'Alias' => $alias, 'Timestamp' => time(), 'Event' => $event);
+        foreach ($properties as $propName => &$propValue) {
+            $record['Prop:' . $propName] = (string) $propValue;
+        }
 
-  public function exportEvents() {
-    if (!$this->_getEnabled()) {
-      return;
-    }
-    $file = $this->generateCsv();
-    $lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
-    if (time() - $lastUploadAt > self::UPLOAD_INTERVAL && trim($file->read())) {
-      $this->_uploadCsv($file);
-      $file->delete();
-      CM_Option::getInstance()->set('kissTracking.lastUpload', time());
-    }
-  }
-
-  /**
-   * @return CM_File_Csv
-   */
-  public function generateCsv() {
-    $filename = $this->_getFileName();
-    $records = $this->_getEvents();
-    $header = array();
-    foreach ($records as $record) {
-      foreach ($record as $key => $value) {
-        $header[$key] = $key;
-      }
+        $this->_getSet()->add($record);
     }
 
-    if (!CM_File::exists($filename)) {
-      /** @var $file CM_File_Csv */
-      $file = CM_File_Csv::create($filename);
-      $file->appendRow($header);
-    } else {
-      $file = new CM_File_Csv($filename);
-      $file->mergeHeader($header);
+    public function exportEvents() {
+        if (!$this->_getEnabled()) {
+            return;
+        }
+        $file = $this->generateCsv();
+        $lastUploadAt = CM_Option::getInstance()->get('kissTracking.lastUpload');
+        if (time() - $lastUploadAt > self::UPLOAD_INTERVAL && trim($file->read())) {
+            $this->_uploadCsv($file);
+            $file->delete();
+            CM_Option::getInstance()->set('kissTracking.lastUpload', time());
+        }
     }
 
-    $headerMap = array_fill_keys($file->getHeader(), null);
-    foreach ($records as $record) {
-      $record = array_merge($headerMap, $record);
-      $file->appendRow($record);
+    /**
+     * @return CM_File_Csv
+     */
+    public function generateCsv() {
+        $filename = $this->_getFileName();
+        $records = $this->_getEvents();
+        $header = array();
+        foreach ($records as $record) {
+            foreach ($record as $key => $value) {
+                $header[$key] = $key;
+            }
+        }
+
+        if (!CM_File::exists($filename)) {
+            /** @var $file CM_File_Csv */
+            $file = CM_File_Csv::create($filename);
+            $file->appendRow($header);
+        } else {
+            $file = new CM_File_Csv($filename);
+            $file->mergeHeader($header);
+        }
+
+        $headerMap = array_fill_keys($file->getHeader(), null);
+        foreach ($records as $record) {
+            $record = array_merge($headerMap, $record);
+            $file->appendRow($record);
+        }
+        return $file;
     }
-    return $file;
-  }
 
-  /**
-   * @return string
-   */
-  protected function _getFileName() {
-    return CM_Bootloader::getInstance()->getDirTmp() . 'kiss-tracking.csv';
-  }
-
-  /**
-   * @param CM_File_Csv $file
-   */
-  protected function _uploadCsv(CM_File_Csv $file) {
-    $bucketName = self::_getConfig()->awsBucketName;
-    $targetFilename = self::_getConfig()->awsFilePrefix . '.' . date('YmdHis') . '.csv';
-
-    $amazonS3 = new CMService_Amazon_S3();
-    $amazonS3->upload($file, $bucketName, $targetFilename, array('6acb81d7742ac437833f51ecb2a40c74cd831ce26909e5f72354fa6af42cfb1f' => 'full-control'));
-  }
-
-  /**
-   * @return string[]
-   */
-  protected function _getEvents() {
-    return $this->_getSet()->flush();
-  }
-
-  /**
-   * @return CM_Set
-   */
-  private function _getSet() {
-    if (!$this->_set instanceof CM_Set) {
-      $this->_set = new CM_Set(self::SET_NAME);
+    /**
+     * @return string
+     */
+    protected function _getFileName() {
+        return CM_Bootloader::getInstance()->getDirTmp() . 'kiss-tracking.csv';
     }
-    return $this->_set;
-  }
 
-  /**
-   * @return boolean
-   */
-  private function _getEnabled() {
-    return (bool) self::_getConfig()->enabled;
-  }
+    /**
+     * @param CM_File_Csv $file
+     */
+    protected function _uploadCsv(CM_File_Csv $file) {
+        $bucketName = self::_getConfig()->awsBucketName;
+        $targetFilename = self::_getConfig()->awsFilePrefix . '.' . date('YmdHis') . '.csv';
 
-  /**
-   * @return CM_KissTracking
-   */
-  public static function getInstance() {
-    if (!self::$_instance) {
-      self::$_instance = new static();
+        $amazonS3 = new CMService_Amazon_S3();
+        $amazonS3->upload($file, $bucketName, $targetFilename, array('6acb81d7742ac437833f51ecb2a40c74cd831ce26909e5f72354fa6af42cfb1f' => 'full-control'));
     }
-    return self::$_instance;
-  }
+
+    /**
+     * @return string[]
+     */
+    protected function _getEvents() {
+        return $this->_getSet()->flush();
+    }
+
+    /**
+     * @return CM_Set
+     */
+    private function _getSet() {
+        if (!$this->_set instanceof CM_Set) {
+            $this->_set = new CM_Set(self::SET_NAME);
+        }
+        return $this->_set;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function _getEnabled() {
+        return (bool) self::_getConfig()->enabled;
+    }
+
+    /**
+     * @return CM_KissTracking
+     */
+    public static function getInstance() {
+        if (!self::$_instance) {
+            self::$_instance = new static();
+        }
+        return self::$_instance;
+    }
 }

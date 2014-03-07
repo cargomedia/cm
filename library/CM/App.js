@@ -594,8 +594,8 @@ var CM_App = CM_Class_Abstract.extend({
         handler.focus.add(handler.getId());
         handler._hasFocus = true;
       }).blur(function() {
-        handler._hasFocus = false;
-      });
+          handler._hasFocus = false;
+        });
       this.title.ready();
     },
 
@@ -747,20 +747,20 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }
     }).fail(function(xhr, textStatus) {
-      if (xhr.status === 0) {
-        return; // Ignore interrupted ajax-request caused by leaving a page
-      }
+        if (xhr.status === 0) {
+          return; // Ignore interrupted ajax-request caused by leaving a page
+        }
 
-      var msg = cm.language.get('An unexpected connection problem occurred.');
-      if (cm.options.debug) {
-        msg = xhr.responseText || textStatus;
-      }
-      errorHandler(msg, null, false, callbacks.error);
-    }).always(function() {
-      if (callbacks.complete) {
-        callbacks.complete();
-      }
-    });
+        var msg = cm.language.get('An unexpected connection problem occurred.');
+        if (cm.options.debug) {
+          msg = xhr.responseText || textStatus;
+        }
+        errorHandler(msg, null, false, callbacks.error);
+      }).always(function() {
+        if (callbacks.complete) {
+          callbacks.complete();
+        }
+      });
 
     return jqXHR;
   },

@@ -2,152 +2,152 @@
 
 class CM_RenderTest extends CMTest_TestCase {
 
-  public function tearDown() {
-    CMTest_TH::clearEnv();
-  }
-
-  public function testGetSiteName() {
-    $render = new CM_Render();
-    $this->assertSame('Default', $render->getSiteName());
-  }
-
-  public function testGetUrl() {
-    $render = new CM_Render();
-    $this->assertSame('http://www.default.dev', $render->getUrl());
-    $this->assertSame('http://cdn.default.dev', $render->getUrl(null, true));
-    $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
-    $this->assertSame('http://cdn.default.dev/foo/bar', $render->getUrl('/foo/bar', true));
-    $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
-    $this->assertSame('http://cdn.default.dev/0', $render->getUrl('/0', true));
-  }
-
-  public function testGetUrlPage() {
-    $render = new CM_Render();
-    $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
-
-    $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
-      $render->getUrlPage('CM_Page_Foo_Bar_FooBar'));
-    $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
-      $render->getUrlPage($page));
-    $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
-    $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
-  }
-
-  public function testGetUrlPageInvalidNamespace() {
-    $render = new CM_Render();
-
-    $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDNAMESPACE_Page_Test', false);
-    try {
-      $render->getUrlPage('INVALIDNAMESPACE_Page_Test');
-      $this->fail('Can compute path of page with invalid namespace');
-    } catch (CM_Exception_Invalid $ex) {
-      $this->assertTrue(true);
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
-  }
 
-  public function testGetUrlPageDifferentSite() {
-    $render = new CM_Render();
-    $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
+    public function testGetSiteName() {
+        $render = new CM_Render();
+        $this->assertSame('Default', $render->getSiteName());
+    }
 
-    $site = $this->getMockSite(null, null, 'http://www.test.dev', 'http://cdn.test.dev', 'Test', 'test@test.dev');
-    $renderSite = new CM_Render($site);
+    public function testGetUrl() {
+        $render = new CM_Render();
+        $this->assertSame('http://www.default.dev', $render->getUrl());
+        $this->assertSame('http://cdn.default.dev', $render->getUrl(null, true));
+        $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
+        $this->assertSame('http://cdn.default.dev/foo/bar', $render->getUrl('/foo/bar', true));
+        $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
+        $this->assertSame('http://cdn.default.dev/0', $render->getUrl('/0', true));
+    }
 
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
-      $render->getUrlPage('CM_Page_Foo_Bar_FooBar', null, $site));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
-      $render->getUrlPage($page, null, $site));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar'), $site));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar'), $site));
+    public function testGetUrlPage() {
+        $render = new CM_Render();
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
-      $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar'));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
-      $renderSite->getUrlPage($page));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
-    $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
-      $renderSite->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
-  }
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
+            $render->getUrlPage('CM_Page_Foo_Bar_FooBar'));
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar',
+            $render->getUrlPage($page));
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
+        $this->assertSame('http://www.default.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
+    }
 
-  public function testGetUrlPageLanguageRewrite() {
-    $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
-    $baseUrl = 'http://www.default.dev';
+    public function testGetUrlPageInvalidNamespace() {
+        $render = new CM_Render();
 
-    $render = new CM_Render();
-    $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-    $render = new CM_Render(null, null, null, true); // This should never happen in application, but lets test it
-    $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
+        $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'INVALIDNAMESPACE_Page_Test', false);
+        try {
+            $render->getUrlPage('INVALIDNAMESPACE_Page_Test');
+            $this->fail('Can compute path of page with invalid namespace');
+        } catch (CM_Exception_Invalid $ex) {
+            $this->assertTrue(true);
+        }
+    }
 
-    $language = CMTest_TH::createLanguage('en');
+    public function testGetUrlPageDifferentSite() {
+        $render = new CM_Render();
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-    $render = new CM_Render();
-    $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-    $render = new CM_Render(null, null, null, true); // This should never happen in application, but lets test it
-    $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
+        $site = $this->getMockSite(null, null, null, 'http://www.test.dev', 'http://cdn.test.dev', 'Test', 'test@test.dev');
+        $renderSite = new CM_Render($site);
 
-    $render = new CM_Render(null, null, $language, null);
-    $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
-    $render = new CM_Render(null, null, $language, true);
-    $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
-  }
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
+            $render->getUrlPage('CM_Page_Foo_Bar_FooBar', null, $site));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
+            $render->getUrlPage($page, null, $site));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $render->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar'), $site));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $render->getUrlPage($page, array('userId' => 15, 'foo' => 'bar'), $site));
 
-  public function testGetUrlResource() {
-    $render = new CM_Render();
-    $siteType = CM_Site_Abstract::factory()->getType();
-    $deployVersion = CM_App::getInstance()->getDeployVersion();
-    $this->assertSame('http://cdn.default.dev', $render->getUrlResource());
-    $this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
-    $this->assertSame('http://cdn.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
-    $this->assertSame(
-      'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-    $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
-    $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
-  }
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
+            $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar'));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
+            $renderSite->getUrlPage($page));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $renderSite->getUrlPage('CM_Page_Foo_Bar_FooBar', array('userId' => 15, 'foo' => 'bar')));
+        $this->assertSame('http://www.test.dev/foo/bar/foo-bar?userId=15&foo=bar',
+            $renderSite->getUrlPage($page, array('userId' => 15, 'foo' => 'bar')));
+    }
 
-  public function testGetUrlStatic() {
-    $render = new CM_Render();
-    $deployVersion = CM_App::getInstance()->getDeployVersion();
-    $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
-    $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
-    $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
-  }
+    public function testGetUrlPageLanguageRewrite() {
+        $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Test', false);
+        $baseUrl = 'http://www.default.dev';
 
-  public function testGetUrlUserContent() {
-    $render = new CM_Render();
-    $userFile = $this->getMock('CM_File_UserContent', array('getPathRelative'), array(), '', false);
-    $userFile->expects($this->any())->method('getPathRelative')->will($this->returnValue('foo/bar.jpg'));
-    $this->assertSame('http://cdn.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
-  }
+        $render = new CM_Render();
+        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
+        $render = new CM_Render(null, null, null, true); // This should never happen in application, but lets test it
+        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
 
-  public function testGetTranslation() {
-    $render = new CM_Render();
-    $this->assertSame('abc', $render->getTranslation('abc'));
-    $this->assertSame('abc cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
-    $this->assertSame('abc ', $render->getTranslation('abc {$variable}'));
-    $this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
+        $language = CMTest_TH::createLanguage('en');
 
-    /** @var CM_Model_Language $language */
-    $language = CM_Model_Language::createStatic(array(
-      'name'         => 'Test language',
-      'abbreviation' => 'test',
-      'enabled'      => true
-    ));
-    $render = new CM_Render(null, null, $language);
-    $language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
-    CM_Model_Language::changeAll();
-    $this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
-  }
+        $render = new CM_Render();
+        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
+        $render = new CM_Render(null, null, null, true); // This should never happen in application, but lets test it
+        $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
 
-  public function testGetViewer() {
-    $viewer = CMTest_TH::createUser();
-    $render = new CM_Render(null, $viewer);
-    $this->assertEquals($viewer, $render->getViewer());
+        $render = new CM_Render(null, null, $language, null);
+        $this->assertSame($baseUrl . '/test', $render->getUrlPage($page));
+        $render = new CM_Render(null, null, $language, true);
+        $this->assertSame($baseUrl . '/en/test', $render->getUrlPage($page));
+    }
 
-    $render = new CM_Render();
-    $this->assertNull($render->getViewer());
-  }
+    public function testGetUrlResource() {
+        $render = new CM_Render();
+        $siteType = CM_Site_Abstract::factory()->getType();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame('http://cdn.default.dev', $render->getUrlResource());
+        $this->assertSame('http://cdn.default.dev', $render->getUrlResource('layout'));
+        $this->assertSame('http://cdn.default.dev', $render->getUrlResource(null, 'foo/bar.jpg'));
+        $this->assertSame(
+            'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+        $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
+        $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+    }
+
+    public function testGetUrlStatic() {
+        $render = new CM_Render();
+        $deployVersion = CM_App::getInstance()->getDeployVersion();
+        $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
+        $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
+        $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
+    }
+
+    public function testGetUrlUserContent() {
+        $render = new CM_Render();
+        $userFile = $this->getMock('CM_File_UserContent', array('getPathRelative'), array(), '', false);
+        $userFile->expects($this->any())->method('getPathRelative')->will($this->returnValue('foo/bar.jpg'));
+        $this->assertSame('http://cdn.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
+    }
+
+    public function testGetTranslation() {
+        $render = new CM_Render();
+        $this->assertSame('abc', $render->getTranslation('abc'));
+        $this->assertSame('abc cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+        $this->assertSame('abc ', $render->getTranslation('abc {$variable}'));
+        $this->assertSame('abc ', $render->getTranslation('abc {$variable}', array('foo' => 'bar')));
+
+        /** @var CM_Model_Language $language */
+        $language = CM_Model_Language::createStatic(array(
+            'name'         => 'Test language',
+            'abbreviation' => 'test',
+            'enabled'      => true
+        ));
+        $render = new CM_Render(null, null, $language);
+        $language->setTranslation('abc {$variable}', 'translated stuff is {$variable}');
+        CM_Model_Language::changeAll();
+        $this->assertSame('translated stuff is cool', $render->getTranslation('abc {$variable}', array('variable' => 'cool')));
+    }
+
+    public function testGetViewer() {
+        $viewer = CMTest_TH::createUser();
+        $render = new CM_Render(null, $viewer);
+        $this->assertEquals($viewer, $render->getViewer());
+
+        $render = new CM_Render();
+        $this->assertNull($render->getViewer());
+    }
 }

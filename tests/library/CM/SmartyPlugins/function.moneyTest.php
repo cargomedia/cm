@@ -4,60 +4,60 @@ require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/functio
 
 class smarty_function_moneyTest extends CMTest_TestCase {
 
-  /**
-   * @var Smarty_Internal_Template
-   */
-  private $_template;
+    /**
+     * @var Smarty_Internal_Template
+     */
+    private $_template;
 
-  public function setUp() {
-    $smarty = new Smarty();
-    $render = new CM_Render();
-    $this->_template = $smarty->createTemplate('string:');
-    $this->_template->assignGlobal('render', $render);
-  }
+    public function setUp() {
+        $smarty = new Smarty();
+        $render = new CM_Render();
+        $this->_template = $smarty->createTemplate('string:');
+        $this->_template->assignGlobal('render', $render);
+    }
 
-  public function testFormat() {
-    $this->_assertSame("$23.33", array('amount' => 23.33333));
-    $this->_assertSame("$23.00", array('amount' => 23));
-  }
+    public function testFormat() {
+        $this->_assertSame("$23.33", array('amount' => 23.33333));
+        $this->_assertSame("$23.00", array('amount' => 23));
+    }
 
-  public function testCurrency() {
-    $this->_assertSame("$23.00", array('amount' => 23, 'currency' => 'USD'));
-    $this->_assertSame("€23.00", array('amount' => 23, 'currency' => 'EUR'));
-    $this->_assertSame("CHF23.00", array('amount' => 23, 'currency' => 'CHF'));
-    $this->_assertSame("£23.00", array('amount' => 23, 'currency' => 'GBP'));
-  }
+    public function testCurrency() {
+        $this->_assertSame("$23.00", array('amount' => 23, 'currency' => 'USD'));
+        $this->_assertSame("€23.00", array('amount' => 23, 'currency' => 'EUR'));
+        $this->_assertSame("CHF23.00", array('amount' => 23, 'currency' => 'CHF'));
+        $this->_assertSame("£23.00", array('amount' => 23, 'currency' => 'GBP'));
+    }
 
-  public function testNiceDiscount() {
-    $this->_assertSame("$99.95", array('amount' => 96, 'format' => 'discount'));
-    $this->_assertSame("$16.95", array('amount' => 17, 'format' => 'discount'));
-    $this->_assertSame("$12.95", array('amount' => 13, 'format' => 'discount'));
-    $this->_assertSame("$1.50", array('amount' => 1.5, 'format' => 'discount'));
-    $this->_assertSame("$2.95", array('amount' => 3.1, 'format' => 'discount'));
-  }
+    public function testNiceDiscount() {
+        $this->_assertSame("$99.95", array('amount' => 96, 'format' => 'discount'));
+        $this->_assertSame("$16.95", array('amount' => 17, 'format' => 'discount'));
+        $this->_assertSame("$12.95", array('amount' => 13, 'format' => 'discount'));
+        $this->_assertSame("$1.50", array('amount' => 1.5, 'format' => 'discount'));
+        $this->_assertSame("$2.95", array('amount' => 3.1, 'format' => 'discount'));
+    }
 
-  public function testRound() {
-    $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.01));
-    $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.01));
-    $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.01));
-    $this->_assertSame("$3.16", array('amount' => 3.16, 'round' => 0.01));
+    public function testRound() {
+        $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.01));
+        $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.01));
+        $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.01));
+        $this->_assertSame("$3.16", array('amount' => 3.16, 'round' => 0.01));
 
-    $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.05));
-    $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.05));
-    $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.05));
-    $this->_assertSame("$3.15", array('amount' => 3.16, 'round' => 0.05));
+        $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.05));
+        $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.05));
+        $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.05));
+        $this->_assertSame("$3.15", array('amount' => 3.16, 'round' => 0.05));
 
-    $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.10));
-    $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.10));
-    $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.10));
-    $this->_assertSame("$3.20", array('amount' => 3.16, 'round' => 0.10));
-  }
+        $this->_assertSame("$13.00", array('amount' => 13, 'round' => 0.10));
+        $this->_assertSame("$1.50", array('amount' => 1.5, 'round' => 0.10));
+        $this->_assertSame("$3.10", array('amount' => 3.1, 'round' => 0.10));
+        $this->_assertSame("$3.20", array('amount' => 3.16, 'round' => 0.10));
+    }
 
-  /**
-   * @param string $expected
-   * @param array  $params
-   */
-  private function _assertSame($expected, array $params) {
-    $this->assertSame($expected, smarty_function_money($params, $this->_template));
-  }
+    /**
+     * @param string $expected
+     * @param array  $params
+     */
+    private function _assertSame($expected, array $params) {
+        $this->assertSame($expected, smarty_function_money($params, $this->_template));
+    }
 }
