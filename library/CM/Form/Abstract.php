@@ -141,22 +141,27 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $formData = array();
         foreach ($action->getFieldList() as $fieldName => $required) {
             $field = $this->getField($fieldName);
+            $fieldValue = null;
 
-            if (array_key_exists($fieldName, $data) && !$field->isEmpty($data[$fieldName])) {
-                try {
-                    $formData[$fieldName] = $field->validate($data[$fieldName], $response);
-                } catch (CM_Exception_FormFieldValidation $e) {
-                    $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
-                }
-            } else {
-                if ($required) {
-                    $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
-                } else {
-                    $formData[$fieldName] = null;
+            $isEmpty = true;
+            if (array_key_exists($fieldName, $data)) {
+                $fieldValue = $field->filterInput($data[$fieldName]);
+
+                if (!$field->isEmpty($fieldValue)) {
+                    $isEmpty = false;
+                    try {
+                        $fieldValue = $field->validate($fieldValue, $response);
+                    } catch (CM_Exception_FormFieldValidation $e) {
+                        $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
+                    }
                 }
             }
-        }
+            $formData[$fieldName] = $fieldValue;
 
+            if ($isEmpty && $required) {
+                $response->addError($response->getRender()->getTranslation('Required'), $fieldName);
+            }
+        }
         if (!$response->hasErrors()) {
             $action->checkData($formData, $response, $this);
         }
@@ -164,7 +169,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         if ($response->hasErrors()) {
             return null;
         }
-
         return $action->process($formData, $response, $this);
     }
 }

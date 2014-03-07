@@ -103,4 +103,13 @@ class CM_FormField_TextTest extends CMTest_TestCase {
             $this->fail('Badword-validation shouldn\'t be activated');
         }
     }
+
+    function testArrayInputInvalidCharsRemoval() {
+        $invalidInputs = array(chr(240), chr(192), chr(200) . chr(210), 'something' . chr(244));
+        $field = new CM_FormField_Text();
+        foreach ($invalidInputs as $input) {
+            $filtered = $field->filterInput($input);
+            $this->assertNotSame($filtered, $input);
+        }
+    }
 }
