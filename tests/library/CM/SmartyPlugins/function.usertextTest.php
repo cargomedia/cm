@@ -12,9 +12,6 @@ class smarty_function_usertextTest extends CMTest_TestCase {
         $render = new CM_Render();
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);
-
-        CM_Config::get()->CM_Render->cdnResource = false;
-        CM_Config::get()->CM_Render->cdnUserContent = false;
     }
 
     public function tearDown() {
@@ -80,7 +77,7 @@ class smarty_function_usertextTest extends CMTest_TestCase {
         $emoticonId = CM_Db_Db::insert('cm_emoticon', array('code' => ':smiley:', 'codeAdditional' => ':-)', 'file' => '1.png'));
 
         $this->_assertSame(
-            '<span class="usertext oneline">foo <img src="http://www.default.dev/layout//' . CM_App::getInstance()->getDeployVersion() .
+            '<span class="usertext oneline">foo <img src="http://cdn.default.dev/layout//' . CM_App::getInstance()->getDeployVersion() .
             '/img/emoticon/1.png" class="emoticon emoticon-' .
             $emoticonId . '" title=":smiley:" height="16" /></span>',
             array('text' => 'foo :-)', 'mode' => 'oneline', 'isMail' => true));

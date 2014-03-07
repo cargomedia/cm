@@ -5,21 +5,9 @@ class CM_Asset_CssTest extends CMTest_TestCase {
     /** @var CM_Render */
     private $_render;
 
-    public static function setUpBeforeClass() {
-        CM_Config::get()->CM_Render->cdnResource = false;
-        CM_Config::get()->CM_Render->cdnUserContent = false;
-        CM_Config::get()->CM_Site_MockCss = new stdClass;
-        CM_Config::get()->CM_Site_MockCss->url = 'http://www.example.dev';
-    }
-
-    public function setUp() {
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract', array(), 'CM_Site_MockCss', true, true, true, array('getId'));
-        $site->expects($this->any())->method('getId')->will($this->returnValue(1));
-        $this->_render = new CM_Render($site);
-    }
-
     public function testAdd() {
-        $css = new CM_Asset_Css($this->_render, 'font-size: 12;', '#foo');
+        $render = new CM_Render();
+        $css = new CM_Asset_Css($render, 'font-size: 12;', '#foo');
         $css1 = <<<'EOD'
 .test:visible {
 	color: black;
@@ -43,8 +31,9 @@ EOD;
     }
 
     public function testImage() {
-        $css = new CM_Asset_Css($this->_render, "background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
-        $url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
+        $render = new CM_Render();
+        $css = new CM_Asset_Css($render, "background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
+        $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
 background: url('$url') no-repeat 66px 7px;
 EOD;
@@ -52,8 +41,9 @@ EOD;
     }
 
     public function testBackgroundImage() {
-        $css = new CM_Asset_Css($this->_render, "background-image: image('icon/mailbox_read.png');");
-        $url = $this->_render->getUrlResource('layout', 'img/icon/mailbox_read.png');
+        $render = new CM_Render();
+        $css = new CM_Asset_Css($render, "background-image: image('icon/mailbox_read.png');");
+        $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
 background-image: url('$url');
 EOD;
@@ -61,8 +51,9 @@ EOD;
     }
 
     public function testUrlFont() {
-        $css = new CM_Asset_Css($this->_render, "src: url(urlFont('file.eot'));");
-        $url = $this->_render->getUrlStatic('/font/file.eot');
+        $render = new CM_Render();
+        $css = new CM_Asset_Css($render, "src: url(urlFont('file.eot'));");
+        $url = $render->getUrlStatic('/font/file.eot');
         $expected = <<<EOD
 src: url('$url');
 EOD;
@@ -70,6 +61,7 @@ EOD;
     }
 
     public function testMixin() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .mixin() {
 	font-size:5;
@@ -83,7 +75,7 @@ EOD;
 	.mixin;
 }
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $expected = <<<'EOD'
 .foo {
   color: red;
@@ -99,6 +91,7 @@ EOD;
     }
 
     public function testLinearGradient() {
+        $render = new CM_Render();
         //horizontal
         $css = <<<'EOD'
 .foo {
@@ -117,7 +110,7 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
         //vertical
         $css = <<<'EOD'
@@ -137,7 +130,7 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
         //illegal parameters
         $css = <<<'EOD'
@@ -149,11 +142,12 @@ EOD;
 	.gradient(foo, #000000, rgba(30, 50,30, 0.4));
 }
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame('', $css->get());
     }
 
     public function testBoxSizing() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .foo {
 	.box-sizing(border-box);
@@ -167,11 +161,12 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
     }
 
     public function testUserSelect() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .foo {
 	.user-select(none);
@@ -186,11 +181,12 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
     }
 
     public function testTransform() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .foo {
 	.transform(matrix(0.866,0.5,-0.5,0.866,0,0));
@@ -206,11 +202,12 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
     }
 
     public function testTransition() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .foo {
 	.transition(width 2s ease-in 2s);
@@ -224,11 +221,12 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
     }
 
     public function testMedia() {
+        $render = new CM_Render();
         $css = <<<'EOD'
 .foo {
 	color: blue;
@@ -248,7 +246,7 @@ EOD;
 }
 
 EOD;
-        $css = new CM_Asset_Css($this->_render, $css);
+        $css = new CM_Asset_Css($render, $css);
         $this->assertSame($expected, $css->get());
     }
 }

@@ -313,7 +313,7 @@ class CM_Render extends CM_Class_Abstract {
             }
             $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+        return $this->getUrl($urlPath, true);
     }
 
     /**
@@ -338,7 +338,7 @@ class CM_Render extends CM_Class_Abstract {
         if (null !== $path) {
             $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        return $this->getUrl($urlPath, self::_getConfig()->cdnResource);
+        return $this->getUrl($urlPath, true);
     }
 
     /**
@@ -347,9 +347,9 @@ class CM_Render extends CM_Class_Abstract {
      */
     public function getUrlUserContent(CM_File_UserContent $file = null) {
         if (is_null($file)) {
-            return $this->getUrl('/userfiles', self::_getConfig()->cdnUserContent);
+            return $this->getUrl('/userfiles', true);
         }
-        return $this->getUrl('/userfiles/' . $file->getPathRelative(), self::_getConfig()->cdnUserContent);
+        return $this->getUrl('/userfiles/' . $file->getPathRelative(), true);
     }
 
     /**
