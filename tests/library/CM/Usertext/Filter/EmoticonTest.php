@@ -24,6 +24,10 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
         }
     }
 
+    public function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testProcess() {
         $text = 'foo :) bar :smiley:';
         $expected = 'foo ' . $this->_getEmoticonImg(':smiley:') . ' bar ' . $this->_getEmoticonImg(':smiley:');
