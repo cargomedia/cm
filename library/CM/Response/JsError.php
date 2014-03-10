@@ -2,29 +2,29 @@
 
 class CM_Response_JsError extends CM_Response_Abstract {
 
-  protected function _process() {
-    $request = $this->getRequest();
-    $query = $request->getQuery();
-    $counter = (int) $query['counter'];
-    $url = (string) $query['url'];
-    $message = (string) $query['message'];
-    $fileUrl = (string) $query['fileUrl'];
-    $fileLine = (int) $query['fileLine'];
+    protected function _process() {
+        $request = $this->getRequest();
+        $query = $request->getQuery();
+        $counter = (int) $query['counter'];
+        $url = (string) $query['url'];
+        $message = (string) $query['message'];
+        $fileUrl = (string) $query['fileUrl'];
+        $fileLine = (int) $query['fileLine'];
 
-    $suppressLogging = $request->isBotCrawler() || !$request->isSupported();
-    if (!$suppressLogging) {
-      $text = $message . PHP_EOL;
-      $text .= '## ' . $fileUrl . '(' . $fileLine . ')' . PHP_EOL;
+        $suppressLogging = $request->isBotCrawler() || !$request->isSupported();
+        if (!$suppressLogging) {
+            $text = $message . PHP_EOL;
+            $text .= '## ' . $fileUrl . '(' . $fileLine . ')' . PHP_EOL;
 
-      $log = new CM_Paging_Log_JsError();
-      $log->add($text, array('url' => $url, 'errorCounter' => $counter));
+            $log = new CM_Paging_Log_JsError();
+            $log->add($text, array('url' => $url, 'errorCounter' => $counter));
+        }
+
+        $this->setHeader('Content-Type', 'text/javascript');
+        $this->_setContent('');
     }
 
-    $this->setHeader('Content-Type', 'text/javascript');
-    $this->_setContent('');
-  }
-
-  public static function match(CM_Request_Abstract $request) {
-    return $request->getPathPart(0) === 'jserror';
-  }
+    public static function match(CM_Request_Abstract $request) {
+        return $request->getPathPart(0) === 'jserror';
+    }
 }
