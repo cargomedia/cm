@@ -1,6 +1,7 @@
 .tabs-content > * {
-	display: none;
+  display: none;
 }
+
 .tabs-content > *:first-child {
-	display: block;
+  display: block;
 }

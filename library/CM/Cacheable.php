@@ -2,6 +2,5 @@
 
 interface CM_Cacheable {
 
-	public function _change();
-
+    public function _change();
 }

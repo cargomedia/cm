@@ -2,9 +2,9 @@
 
 class CM_Component_Notfound extends CM_Component_Abstract {
 
-	public function prepare() {
-	}
+    public function prepare() {
+    }
 
-	public function checkAccessible() {
-	}
+    public function checkAccessible(CM_Render $render) {
+    }
 }

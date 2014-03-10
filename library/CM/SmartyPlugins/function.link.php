@@ -2,66 +2,66 @@
 require_once 'function.linkUrl.php';
 
 function smarty_function_link(array $params, Smarty_Internal_Template $template) {
-	$label = '';
-	if (isset($params['label'])) {
-		$label = $params['label'];
-	}
-	unset($params['label']);
+    $label = '';
+    if (isset($params['label'])) {
+        $label = $params['label'];
+    }
+    unset($params['label']);
 
-	$class = 'link';
-	if (isset($params['class'])) {
-		$class .= ' ' . $params['class'];
-	}
-	unset($params['class']);
+    $class = 'link';
+    if (isset($params['class'])) {
+        $class .= ' ' . $params['class'];
+    }
+    unset($params['class']);
 
-	$title = '';
-	if (isset($params['title'])) {
-		$title = $params['title'];
-	}
-	unset($params['title']);
+    $title = '';
+    if (isset($params['title'])) {
+        $title = $params['title'];
+    }
+    unset($params['title']);
 
-	if (isset($params['icon'])) {
-		$icon = $params['icon'];
-	}
-	unset($params['icon']);
+    if (isset($params['icon'])) {
+        $icon = $params['icon'];
+    }
+    unset($params['icon']);
 
-	$data = array();
-	if (isset($params['data'])) {
-		$data = (array) $params['data'];
-	}
-	unset($params['data']);
+    $data = array();
+    if (isset($params['data'])) {
+        $data = (array) $params['data'];
+    }
+    unset($params['data']);
 
-	$href = 'javascript:;';
-	if (isset($params['page'])) {
-		$href = smarty_function_linkUrl($params, $template);
-	}
+    $href = 'javascript:;';
+    if (isset($params['page'])) {
+        $href = smarty_function_linkUrl($params, $template);
+    }
 
-	if (empty($label) && empty($icon) && empty($title) && (0 !== strpos($href, 'javascript:'))) {
-		$label = $href;
-	}
+    if (empty($label) && empty($icon) && empty($title) && (0 !== strpos($href, 'javascript:'))) {
+        $label = $href;
+    }
 
-	$html = '';
-	if (!empty($label)) {
-		$html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
-		$class .= ' hasLabel';
-	}
+    $html = '';
+    if (!empty($label)) {
+        $html = '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $class .= ' hasLabel';
+    }
 
-	if (!empty($icon)) {
-		$html = '<span class="icon icon-' . $icon . '"></span>' . $html;
-		$class .= ' hasIcon';
-	}
+    if (!empty($icon)) {
+        $html = '<span class="icon icon-' . $icon . '"></span>' . $html;
+        $class .= ' hasIcon';
+    }
 
-	$titleAttr = '';
-	if (!empty($title)) {
-		$titleAttr = ' title="' . CM_Util::htmlspecialchars($title) . '"';
-	}
+    $titleAttr = '';
+    if (!empty($title)) {
+        $titleAttr = ' title="' . CM_Util::htmlspecialchars($title) . '"';
+    }
 
-	$dataAttr = '';
-	foreach ($data as $name => $value) {
-		$dataAttr .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
-	}
+    $dataAttr = '';
+    foreach ($data as $name => $value) {
+        $dataAttr .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+    }
 
-	$html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
+    $html = '<a href="' . $href . '" class="' . $class . '"' . $titleAttr . $dataAttr . '>' . $html . '</a>';
 
-	return $html;
+    return $html;
 }
