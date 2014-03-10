@@ -10,10 +10,16 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
     $attrs = '';
     $icon = null;
+    $iconConfirm = null;
     if (isset($params['icon'])) {
         $icon = $params['icon'];
+
+        if (isset($params['iconConfirm'])) {
+            $iconConfirm = $params['iconConfirm'];
+        }
     }
     unset($params['icon']);
+    unset($params['iconConfirm']);
 
     $iconPosition = 'left';
     if (!empty($params['iconPosition']) && $params['iconPosition'] == 'right') {
@@ -47,7 +53,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
     $iconMarkup = '';
     if ($icon) {
-        $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+        if ($iconConfirm) {
+            $iconMarkup = '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
+                . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+        } else {
+            $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+        }
 
         if ($iconPosition == 'right') {
             $class .= ' hasIconRight';
