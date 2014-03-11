@@ -111,6 +111,41 @@ class CM_SearchQuery_Abstract {
     }
 
     /**
+     * @param string    $field
+     * @param int|null  $from
+     * @param int|null  $to
+     * @param bool|null $openIntervalFrom
+     * @param bool|null $openIntervalTo
+     */
+    public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
+        $range = array();
+        if ($from !== null) {
+            $operand = 'gte';
+            if ($openIntervalFrom) {
+                $operand = 'gt';
+            }
+            $range[$operand] = $from;
+        }
+        if ($to !== null) {
+            $operand = 'lte';
+            if ($openIntervalTo) {
+                $operand = 'lt';
+            }
+            $range[$operand] = $to;
+        }
+        if (!empty($range)) {
+            $this->_filter(array('range' => array($field => $range)));
+        }
+    }
+
+    /**
+     * @param string $field
+     */
+    public function filterMissing($field) {
+        $this->_filter(array('missing' => array('field' => (string) $field, 'existence' => true, 'null_value' => true)));
+    }
+
+    /**
      * @param string            $field
      * @param CM_Model_Location $location
      * @param int               $distance
@@ -178,6 +213,17 @@ class CM_SearchQuery_Abstract {
             $sortNew[$key] = $value;
         }
         $this->_sorts[] = $sortNew;
+    }
+
+    protected function _sortDefault() {
+    }
+
+    /**
+     * @param int $timestamp
+     * @return string
+     */
+    public static function formatDate($timestamp) {
+        return date('Y-m-d', $timestamp);
     }
 
     /**
