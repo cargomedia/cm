@@ -87,8 +87,8 @@ class CM_SearchQuery_Abstract {
     }
 
     /**
-     * @param string $field
-     * @param string $value
+     * @param string          $field
+     * @param string|string[] $value
      */
     public function filterTerm($field, $value) {
         if (is_array($value)) {
@@ -99,8 +99,8 @@ class CM_SearchQuery_Abstract {
     }
 
     /**
-     * @param string $field
-     * @param string $value
+     * @param string          $field
+     * @param string|string[] $value
      */
     public function filterTermNot($field, $value) {
         if (is_array($value)) {
@@ -173,6 +173,9 @@ class CM_SearchQuery_Abstract {
         $this->_sort(array('_score' => 'desc'));
     }
 
+    /**
+     * @return array
+     */
     public function getQuery() {
         if (count($this->_queries) == 0) {
             $query = array('match_all' => new stdClass());
@@ -187,6 +190,9 @@ class CM_SearchQuery_Abstract {
         return $query;
     }
 
+    /**
+     * @return array
+     */
     public function getSort() {
         if (empty($this->_sorts)) {
             $this->_sortDefault();
