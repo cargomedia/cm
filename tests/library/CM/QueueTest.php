@@ -2,59 +2,59 @@
 
 class CM_QueueTest extends CMTest_TestCase {
 
-  public function tearDown() {
-    CM_Redis_Client::getInstance()->flush();
-  }
-
-  public function testConstructor() {
-    try {
-      $queue = new CM_Queue('');
-      $this->fail('No error with empty key');
-    } catch (CM_Exception_Invalid $e) {
-      $this->assertTrue(true);
+    public function tearDown() {
+        CM_Redis_Client::getInstance()->flush();
     }
 
-    $queue = new CM_Queue('foo');
-    $this->assertSame('foo', $queue->getKey());
-  }
+    public function testConstructor() {
+        try {
+            $queue = new CM_Queue('');
+            $this->fail('No error with empty key');
+        } catch (CM_Exception_Invalid $e) {
+            $this->assertTrue(true);
+        }
 
-  public function testPushPop() {
-    $queue1 = new CM_Queue('foo');
-    $queue2 = new CM_Queue('bar');
+        $queue = new CM_Queue('foo');
+        $this->assertSame('foo', $queue->getKey());
+    }
 
-    $queue1->push(12);
-    $this->assertSame(12, $queue1->pop());
-    $this->assertSame(false, $queue1->pop());
-    $this->assertSame(false, $queue2->pop());
+    public function testPushPop() {
+        $queue1 = new CM_Queue('foo');
+        $queue2 = new CM_Queue('bar');
 
-    $queue2->push(1);
-    $queue2->push('two');
-    $queue2->push(array(3 => 'three'));
-    $this->assertSame(1, $queue2->pop());
-    $this->assertSame('two', $queue2->pop());
-    $this->assertSame(array(3 => 'three'), $queue2->pop());
-    $this->assertSame(false, $queue2->pop());
-    $this->assertSame(false, $queue1->pop());
-  }
+        $queue1->push(12);
+        $this->assertSame(12, $queue1->pop());
+        $this->assertSame(false, $queue1->pop());
+        $this->assertSame(false, $queue2->pop());
 
-  public function testPushPopDelayed() {
-    $queue = new CM_Queue('foo');
-    $timestamp = time();
-    $queue->push('bla', $timestamp);
+        $queue2->push(1);
+        $queue2->push('two');
+        $queue2->push(array(3 => 'three'));
+        $this->assertSame(1, $queue2->pop());
+        $this->assertSame('two', $queue2->pop());
+        $this->assertSame(array(3 => 'three'), $queue2->pop());
+        $this->assertSame(false, $queue2->pop());
+        $this->assertSame(false, $queue1->pop());
+    }
 
-    $this->assertSame(array('bla'), $queue->pop($timestamp));
-    $this->assertSame(array(), $queue->pop($timestamp));
+    public function testPushPopDelayed() {
+        $queue = new CM_Queue('foo');
+        $timestamp = time();
+        $queue->push('bla', $timestamp);
 
-    $timeStamp1 = time();
-    $timeStamp2 = time() + 10;
-    $timeStamp3 = time() + 20;
-    $queue->push(1, $timeStamp1);
-    $queue->push('two', $timeStamp2);
-    $queue->push(array(3 => 'three'), $timeStamp3);
-    $this->assertSame(array(1), $queue->pop($timeStamp1));
-    $this->assertSame(array(), $queue->pop($timeStamp1));
+        $this->assertSame(array('bla'), $queue->pop($timestamp));
+        $this->assertSame(array(), $queue->pop($timestamp));
 
-    $this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
-    $this->assertSame(array(), $queue->pop($timeStamp3));
-  }
+        $timeStamp1 = time();
+        $timeStamp2 = time() + 10;
+        $timeStamp3 = time() + 20;
+        $queue->push(1, $timeStamp1);
+        $queue->push('two', $timeStamp2);
+        $queue->push(array(3 => 'three'), $timeStamp3);
+        $this->assertSame(array(1), $queue->pop($timeStamp1));
+        $this->assertSame(array(), $queue->pop($timeStamp1));
+
+        $this->assertSame(array('two', array(3 => 'three')), $queue->pop($timeStamp3));
+        $this->assertSame(array(), $queue->pop($timeStamp3));
+    }
 }
