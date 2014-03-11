@@ -1,6 +1,9 @@
 <?php
 
-$english = CM_Model_Language::create('English', 'en', true);
+$english = CM_Model_Language::findByAbbreviation('en');
+if (!$english) {
+	$english = CM_Model_Language::create('English', 'en', true);
+}
 $english->setTranslation('Ok', 'Ok');
 $english->setTranslation('Cancel', 'Cancel');
 $english->setTranslation('Close', 'Close');
