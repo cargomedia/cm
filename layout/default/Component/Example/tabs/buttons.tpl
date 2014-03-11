@@ -16,4 +16,4 @@
 <hr />
 <h3>Confirmation</h3>
 {button_link class="confirmAction" label="With Confirmation" data=['click-confirmed' => true]}
-{button_link class="confirmAction warning" label="With Warning" data=['click-confirmed' => true]}
+{button_link icon='delete' iconConfirm='delete-confirm' class="confirmAction warning" label="With Warning" data=['click-confirmed' => true]}
