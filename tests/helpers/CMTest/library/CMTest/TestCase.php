@@ -41,41 +41,33 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $classname = (string) $classname;
         $config = CM_Config::get();
 
-        $types = $config->CM_Site_Abstract->types;
         if (null === $type) {
-            for ($i = 1; $i <= 255; $i++) {
-                if (!isset($types[$i])) {
-                    $type = $i;
-                    break;
-                }
-            }
-            if (null === $type) {
-                throw new CM_Exception_Invalid('Cannot find unused site type');
-            }
+            $type = $config->CM_Class_Abstract->typesMaxValue + 1;
         }
         $type = (int) $type;
+        $types = $config->CM_Site_Abstract->types;
         if (isset($types[$type])) {
             throw new CM_Exception_Invalid('Site type ' . $type . ' already used');
         }
         $methods = (array) $methods;
-        if (!in_array('getTypes', $methods, true)) {
-            $methods[] = 'getType';
-        }
         $url = is_null($url) ? null : (string) $url;
         $urlCdn = is_null($urlCdn) ? null : (string) $urlCdn;
         $name = is_null($name) ? null : (string) $name;
         $emailAddress = is_null($emailAddress) ? null : (string) $emailAddress;
 
-        $site = $this->getMockBuilder($classname)->setMockClassName($classname . '_Mock' . $type)->setMethods($methods)->getMock();
-        $site->expects($this->any())->method('getType')->will($this->returnValue($type));
+        $site = $this->getMockForAbstractClass($classname, array(), $classname . '_Mock' . $type, true, true, true, $methods);
 
         $siteClassName = get_class($site);
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
+        $config->$siteClassName->type = $type;
+        $config->$siteClassName->name = $name;
         $config->$siteClassName->url = $url;
         $config->$siteClassName->urlCdn = $urlCdn;
-        $config->$siteClassName->name = $name;
         $config->$siteClassName->emailAddress = $emailAddress;
+        $config->$siteClassName->emailAddressSupport = $emailAddress;
+        $config->$siteClassName->emailAddressComplaints = $emailAddress;
+        $config->CM_Class_Abstract->typesMaxValue = $type;
 
         return $site;
     }
