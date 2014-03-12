@@ -13,6 +13,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
         $this->_construct(array('name' => $name));
     }
 
+    protected function _getContainingCacheables() {
+        $cacheables = parent::_getContainingCacheables();
+        $cacheables[] = new CM_Paging_Splitfeature_All();
+        return $cacheables;
+    }
+
     /**
      * @return string
      */
@@ -132,5 +138,28 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
         }
 
         return $percentage;
+    }
+
+    /**
+     * @param string        $name
+     * @param CM_Model_User $user
+     * @return bool
+     */
+    public static function getEnabledByName($name, CM_Model_User $user) {
+        $splitfeatureList = new CM_Paging_Splitfeature_All();
+        $splitfeature = $splitfeatureList->find($name);
+        if (!$splitfeature) {
+            return false;
+        }
+        return $splitfeature->getEnabled($user);
+    }
+
+    /**
+     * @param string $name
+     * @return CM_Model_Splitfeature
+     */
+    public static function factory($name) {
+        $className = self::_getClassName();
+        return new $className($name);
     }
 }

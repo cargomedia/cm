@@ -26,7 +26,7 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
         $splitfeature->delete();
     }
 
-    public function testCreateNegativPercentage() {
+    public function testCreateNegativePercentage() {
         try {
             CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => -1));
             $this->fail('Could create splitfeature with negativ percentage');
@@ -139,6 +139,19 @@ class CM_Model_SplitfeatureTest extends CMTest_TestCase {
         $splitfeature->setPercentage(50);
 
         CMTest_TH::clearConfig();
+    }
+
+    public function testGetEnabledByName() {
+        $user = CMTest_TH::createUser();
+        $this->assertFalse(CM_Model_Splitfeature::getEnabledByName('foo', $user));
+
+        CM_Cache_Local::getInstance()->flush();
+        CM_Model_Splitfeature::createStatic(array('name' => 'foo', 'percentage' => 0));
+        $this->assertFalse(CM_Model_Splitfeature::getEnabledByName('foo', $user));
+
+        CM_Cache_Local::getInstance()->flush();
+        CM_Model_Splitfeature::createStatic(array('name' => 'bar', 'percentage' => 100));
+        $this->assertTrue(CM_Model_Splitfeature::getEnabledByName('bar', $user));
     }
 
     /**
