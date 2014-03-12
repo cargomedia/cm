@@ -97,6 +97,12 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
         return $defaults;
     }
 
+    /**
+     * @param string  $section
+     * @param string  $key
+     * @param boolean $defaultValue
+     * @param boolean $configurable
+     */
     public static function setDefault($section, $key, $defaultValue, $configurable) {
         $where = array(
             'section' => (string) $section,
@@ -106,12 +112,7 @@ class CM_ModelAsset_User_Preferences extends CM_ModelAsset_User_Abstract {
             'defaultValue' => (int) (bool) $defaultValue,
             'configurable' => (int) (bool) $configurable
         );
-        if (CM_Db_Db::count('cm_user_preferenceDefault', $where)) {
-            CM_Db_Db::update('cm_user_preferenceDefault', $values, $where);
-        } else {
-            $values = array_merge($values, $where);
-            CM_Db_Db::insert('cm_user_preferenceDefault', $values);
-        }
+        CM_Db_Db::insert('cm_user_preferenceDefault', array_merge($values, $where), null, $values);
     }
 
     /**
