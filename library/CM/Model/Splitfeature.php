@@ -13,6 +13,12 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
         $this->_construct(array('name' => $name));
     }
 
+    protected function _getContainingCacheables() {
+        $cacheables = parent::_getContainingCacheables();
+        $cacheables[] = new CM_Paging_Splitfeature_All();
+        return $cacheables;
+    }
+
     /**
      * @return string
      */

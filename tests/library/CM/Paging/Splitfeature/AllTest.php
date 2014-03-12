@@ -13,14 +13,12 @@ class CM_Paging_Splitfeature_AllTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Model_Splitfeature', $paging->getItem(0));
         $this->assertSame(2, count($paging->getItems()));
 
-        CM_Cache_Local::getInstance()->flush();
         CM_Model_Splitfeature::createStatic(array('name' => 'foobar', 'percentage' => 30));
         $splitfeature = CM_Model_Splitfeature::createStatic(array('name' => 'foofoobar', 'percentage' => 88));
         $paging = new CM_Paging_Splitfeature_All();
         $this->assertSame(4, count($paging->getItems()));
 
         $splitfeature->delete();
-        CM_Cache_Local::getInstance()->flush();
         $paging = new CM_Paging_Splitfeature_All();
         $this->assertSame(3, count($paging->getItems()));
     }
