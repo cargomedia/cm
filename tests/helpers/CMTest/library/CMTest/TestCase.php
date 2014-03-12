@@ -67,7 +67,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $config->$siteClassName->emailAddress = $emailAddress;
         $config->$siteClassName->emailAddressSupport = $emailAddress;
         $config->$siteClassName->emailAddressComplaints = $emailAddress;
-        $config->CM_Class_Abstract->typesMaxValue = $type + 1;
+        $config->CM_Class_Abstract->typesMaxValue = $type;
 
         return $site;
     }
