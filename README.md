@@ -231,7 +231,6 @@ Commands:
  app fill-caches
  app deploy
  app generate-config-internal
- app generate-config-local <source-path>
  app set-deploy-version [--deploy-version=<value>]
  console interactive
  css icon-refresh
