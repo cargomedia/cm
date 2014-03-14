@@ -10,7 +10,9 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetAll() {
-        $this->assertSame(array(), CM_Site_Abstract::getAll());
+        $site = $this->getMockSite('CM_Site_Abstract', 12345);
+        CM_Config::get()->CM_Site_Abstract->types = array(12345 => 'CM_Site_Abstract_Mock12345');
+        $this->assertEquals(array($site), CM_Site_Abstract::getAll());
     }
 
     public function testGetEmailAddress() {
