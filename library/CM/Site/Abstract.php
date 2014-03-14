@@ -21,8 +21,8 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
      */
     public static function getAll() {
         $siteList = array();
-        foreach (CM_Site_Abstract::getClassChildren() as $siteClassName) {
-            $siteList[] = new $siteClassName();
+        foreach (CM_Config::get()->CM_Site_Abstract->types as $className) {
+            $siteList[] = new $className();
         }
         return $siteList;
     }
