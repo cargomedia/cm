@@ -49,6 +49,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if (method_exists($this, $methodName)) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
+
+        $this->_track();
     }
 
     /**
@@ -356,6 +358,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function getLabel() {
         return $this->getName() . ' ' . $this->getVerbName();
+    }
+
+    protected function _track() {
+        if ($this->_trackingEnabled && $this->getActor()) {
+            CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
+        }
     }
 
     /**
