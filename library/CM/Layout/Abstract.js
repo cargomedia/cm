@@ -51,7 +51,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     var timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
-    $loadingTag = $('<script src="' + cm.getUrl() + '/jsonp' + path + '" id="lol" />');
+    $loadingTag = $('<iframe style="display: none" src="' + cm.getUrl() + '/jsonp' + path + '" id="lol"></iframe');
     $('body').append($loadingTag);
 
     if (this._pageRequest) {

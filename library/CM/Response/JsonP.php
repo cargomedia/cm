@@ -11,9 +11,6 @@ class CM_Response_JsonP extends CM_Response_Abstract {
 
 
     protected function _process() {
-        sleep(2);
-//        echo "LOOOOOOOOOOL";
-//        return;
         $request = new CM_Request_Get($this->getRequest()->getPath(), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
 
         $count = 0;
@@ -56,8 +53,7 @@ class CM_Response_JsonP extends CM_Response_Abstract {
                       'layoutClass'       => $layoutClass,
                       'menuEntryHashList' => $menuEntryHashList);
 
-//        return $data;
-        $content = "cm.findView('CM_Layout_Abstract').injectPage(" . CM_Params::encode($data, true) . ");";
+        $content = '<script type="text/javascript">parent.cm.findView(\'CM_Layout_Abstract\').injectPage(' . CM_Params::encode($data, true) . ');</script>';
         $this->_setContent($content);
     }
 
