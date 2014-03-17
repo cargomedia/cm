@@ -26,12 +26,9 @@ before_script:
   - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
-  - sh -c "if [ `php-config --vernum` -ge 50400 -a `php-config --vernum` -lt 50500 ]; then rm tests/library/CM/KissTrackingTest.php; fi" # Causes a Segfault on Travis after code coverage (PDO: Broken pipe). Skipping the test doesn't help!
+  - sh -c "if [ `php-config --vernum` -ge 50400 -a `php-config --vernum` -lt 50500 ]; then rm tests/library/CM/KissTrackingTest.php; fi" # Causes a Segfault on Travis when the PHP process shuts down (PDO: Broken pipe). Skipping the test doesn't help!
 
-after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --access-token="8e18d81355fc64223f420eda064f7d1ac8ad27bc18228aa1c3a37116b9d8cc40" --format=php-clover coverage.clover
-
-script: bin/phpunit --coverage-clover=coverage.clover
+script: bin/phpunit
 
 notifications:
   email: false
