@@ -13,6 +13,26 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jqXHR|Null */
   _pageRequest: null,
 
+  injectPage: function(response) {
+    if (response.redirectExternal) {
+      cm.router.route(response.redirectExternal);
+      return;
+    }
+    var layout = this;
+    this._injectView(response, function(response) {
+      var fragment = response.url.substr(cm.getUrl().length);
+      var reload = (layout.getClass() != response.layoutClass);
+      if (reload) {
+        window.location.replace(response.url);
+        return;
+      }
+      layout._$pagePlaceholder.replaceWith(this.$el);
+      layout._$pagePlaceholder = null;
+      window.history.replaceState(null, null, fragment);
+      layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
+    });
+  },
+
   /**
    * @param {String} path
    */
@@ -31,10 +51,13 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     var timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
+    $loadingTag = $('<script src="' + cm.getUrl() + '/jsonp' + path + '" id="lol" />');
+    $('body').append($loadingTag);
 
     if (this._pageRequest) {
       this._pageRequest.abort();
     }
+    return;
     this._pageRequest = this.ajaxModal('loadPage', {path: path}, {
       success: function(response) {
         if (response.redirectExternal) {
