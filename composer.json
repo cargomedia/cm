@@ -4,6 +4,15 @@
   "config": {
     "bin-dir": "bin/"
   },
+  "repositories": [
+    {
+      "packagist": false
+    },
+    {
+      "type": "composer",
+      "url": "http://satis.cargomedia.ch/dist"
+    }
+  ],
   "require": {
     "composer/composer": "1.0.0-alpha8",
     "smarty/smarty": "3.1.16",
