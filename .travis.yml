@@ -23,7 +23,7 @@ before_script:
 
   - composer self-update
   - composer install --dev
-  - bin/cm app generate-config-local tests/travis/config.json
+  - cp tests/travis/config.php resources/config/local.php
   - bin/cm app set-deploy-version
 
   - sh -c "if [ `php-config --vernum` -ge 50400 -a `php-config --vernum` -lt 50500 ]; then rm tests/library/CM/KissTrackingTest.php; fi" # Causes a Segfault on Travis after code coverage (PDO: Broken pipe). Skipping the test doesn't help!
