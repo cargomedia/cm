@@ -9,6 +9,11 @@
   .word_wrap;
   .hyphens(auto);
 
+  &.oneline {
+    display: inline-block;
+    word-break: break-all; // needed for IE9
+  }
+
   img:not(.emoticon) {
     max-width: 100%;
     max-height: 1500px;
