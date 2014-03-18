@@ -72,7 +72,7 @@ class CM_App {
             $path = 'translations/' . $language->getAbbreviation() . '.php';
             foreach (CM_Util::getResourceFiles($path) as $translationsFile) {
                 $translationsSetter = require $translationsFile->getPath();
-                if (!is_callable($translationsSetter)) {
+                if (!$translationsSetter instanceof Closure) {
                     throw new CM_Exception_Invalid('Invalid translation file. `' . $translationsFile->getPath() . '` must return callable');
                 }
                 $translationsSetter($language);
