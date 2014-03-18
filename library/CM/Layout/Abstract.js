@@ -13,6 +13,8 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jqXHR|Null */
   _pageRequest: null,
 
+  _timeOutLoading: null,
+
   injectPage: function(response) {
     if (response.redirectExternal) {
       cm.router.route(response.redirectExternal);
@@ -31,6 +33,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       window.history.replaceState(null, null, fragment);
       layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
     });
+    window.clearTimeout(this._timeoutLoading);
   },
 
   /**
@@ -48,7 +51,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     } else {
       this._$pagePlaceholder.removeClass('error').html('');
     }
-    var timeoutLoading = this.setTimeout(function() {
+    this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
     $loadingTag = $('<iframe style="display: none" src="' + cm.getUrl() + '/jsonp' + path + '" id="lol"></iframe');
