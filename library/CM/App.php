@@ -68,7 +68,7 @@ class CM_App {
 
     public function setupTranslations() {
         /** @var CM_Model_Language $language */
-        foreach (new CM_Paging_Language_Enabled() as $language) {
+        foreach (new CM_Paging_Language_All() as $language) {
             $path = 'translations/' . $language->getAbbreviation() . '.php';
             foreach (CM_Util::getResourceFiles($path) as $translationsFile) {
                 $translationsSetter = require $translationsFile->getPath();
