@@ -7,6 +7,8 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         CM_App::getInstance()->setupFilesystem();
         $this->_getOutput()->writeln('Setting up database…');
         CM_App::getInstance()->setupDatabase();
+        $this->_getOutput()->writeln('Setting up translations…');
+        CM_App::getInstance()->setupTranslations();
     }
 
     public function fillCaches() {
