@@ -9,7 +9,6 @@ class CM_Response_JsonP extends CM_Response_Abstract {
         $this->_site = CM_Site_Abstract::findByRequest($request);
     }
 
-
     protected function _process() {
         $request = new CM_Request_Get($this->getRequest()->getPath(), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
 
@@ -55,58 +54,6 @@ class CM_Response_JsonP extends CM_Response_Abstract {
 
         $content = '<script type="text/javascript">parent.cm.findView(\'CM_Layout_Abstract\').injectPage(' . CM_Params::encode($data, true) . ');</script>';
         $this->_setContent($content);
-    }
-
-    /**
-     * @param CM_Params                                 $params
-     * @param \CM_Response_JsonP|\CM_Response_View_Ajax $response
-     * @throws CM_Exception_Invalid
-     * @return array
-     */
-    public function loadPage(CM_Params $params, CM_Response_JsonP $response) {
-        $request = new CM_Request_Get($params->getString('path'), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
-
-        $count = 0;
-        $paths = array($request->getPath());
-        do {
-            $url = $this->getRender()->getUrl(CM_Util::link($request->getPath(), $request->getQuery()));
-            if ($count++ > 10) {
-                throw new CM_Exception_Invalid('Page redirect loop detected (' . implode(' -> ', $paths) . ').');
-            }
-            $responsePage = new CM_Response_Page_Embed($request);
-            $responsePage->process();
-            $paths[] = $request->getPath();
-
-            if ($redirectUrl = $responsePage->getRedirectUrl()) {
-                $redirectExternal = (0 !== mb_stripos($redirectUrl, $this->getRender()->getUrl()));
-                if ($redirectExternal) {
-                    return array('redirectExternal' => $redirectUrl);
-                }
-            }
-        } while ($redirectUrl);
-
-        foreach ($responsePage->getCookies() as $name => $cookieParameters) {
-            $response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
-        }
-
-        $page = $responsePage->getPage();
-
-        $this->_setStringRepresentation(get_class($page));
-
-        $html = $responsePage->getContent();
-        $js = $responsePage->getRender()->getJs()->getJs();
-        $responsePage->getRender()->getJs()->clear();
-
-        $title = $responsePage->getTitle();
-        $layoutClass = get_class($page->getLayout($this->getSite()));
-        $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
-        $menuEntryHashList = $this->_getMenuEntryHashList($menuList, $page);
-
-        $data = array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
-                      'layoutClass'       => $layoutClass,
-                      'menuEntryHashList' => $menuEntryHashList);
-
-        return $data;
     }
 
     /**
