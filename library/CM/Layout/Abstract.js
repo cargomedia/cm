@@ -15,6 +15,8 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
   _timeOutLoading: null,
 
+  _$iframeLoader: null,
+
   injectPage: function(response) {
     if (response.redirectExternal) {
       cm.router.route(response.redirectExternal);
@@ -34,6 +36,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
       layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
     });
     window.clearTimeout(this._timeoutLoading);
+    this._$iframeLoader.remove();
   },
 
   /**
@@ -54,8 +57,11 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
-    $loadingTag = $('<iframe style="display: none" src="' + cm.getUrl() + '/jsonp' + path + '" id="lol"></iframe');
-    $('body').append($loadingTag);
+    if (this._$iframeLoader) {
+      this._$iframeLoader.remove();
+    }
+    this._$iframeLoader = $('<iframe style="display: none" src="' + cm.getUrl() + '/jsonp' + path + '" class="data-loader-iframe"></iframe');
+    $('body').append(this._$iframeLoader);
 
     if (this._pageRequest) {
       this._pageRequest.abort();
