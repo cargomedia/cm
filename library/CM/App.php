@@ -75,7 +75,7 @@ class CM_App {
                 if (!is_callable($translationsSetter)) {
                     throw new CM_Exception_Invalid('Invalid translation file. `' . $translationsFile->getPath() . '` must return callable');
                 }
-                call_user_func($translationsSetter, $language);
+                $translationsSetter($language);
             }
         }
     }
