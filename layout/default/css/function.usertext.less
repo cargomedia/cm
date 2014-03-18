@@ -8,6 +8,8 @@
 .usertext {
   .word_wrap;
   .hyphens(auto);
+  font-size: @usertextFontSize;
+  line-height: 1.5;
 
   &.oneline {
     .hyphens(none) // Bug: Safari wraps words although white-space: nowrap is set
@@ -65,14 +67,12 @@
   }
 
   p {
-    font-size: @usertextFontSizeP;
-    line-height: 1.5;
-    margin-bottom: @usertextFontSizeP*0.7;
+    margin: 8px 0;
   }
 
   ul, ol {
-    font-size: @usertextFontSizeP;
-    margin: 0 0 @usertextFontSizeP*0.5 @usertextFontSizeP*1.5;
+    margin: 15px 0;
+    padding-left: 30px;
   }
 
   ul {
@@ -84,21 +84,14 @@
   }
 
   li {
-    padding: @usertextFontSizeP*0.1 0;
+    line-height: 1.7;
   }
 
   blockquote {
-    margin-left: 0px;
-    margin-right: 0px;
-    color: lighten(@colorFg, 50);
+    margin: 15px 0;
+    padding: 4px 10px;
+    border-left: 3px solid lighten(@colorFg, 50);
     background-color: @colorBgEmphasize1;
-
-    p {
-      padding-left: 8px;
-      border-left: 3px solid lighten(@colorFg, 50);
-      margin-bottom: 0;
-      padding-bottom: @usertextFontSizeP*0.15;
-      padding-top: @usertextFontSizeP*0.15;
-    }
+    color: lighten(@colorFg, 30);
   }
 }
