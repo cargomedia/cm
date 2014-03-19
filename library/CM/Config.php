@@ -31,10 +31,15 @@ class CM_Config {
     /**
      * @param CM_Config_Node $config
      * @param string         $filenameRelative
+     * @throws CM_Exception_Invalid
      */
     private function _extendConfigNodeWithFile(CM_Config_Node $config, $filenameRelative) {
-        foreach (CM_Util::getResourceFiles('config/' . $filenameRelative) as $file) {
-            require $file->getPath();
+        foreach (CM_Util::getResourceFiles('config/' . $filenameRelative) as $configFile) {
+            $configSetter = require $configFile->getPath();
+            if (!$configSetter instanceof Closure) {
+                throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
+            }
+            $configSetter($config);
         }
     }
 
