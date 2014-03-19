@@ -12,7 +12,8 @@
   line-height: 1.5;
 
   &.oneline {
-    .hyphens(none) // Bug: Safari wraps words although white-space: nowrap is set
+    display: inline-block;
+    word-break: break-all; // needed for IE9
   }
 
   img:not(.emoticon) {
