@@ -1,33 +1,33 @@
 .spinner {
-	display: inline-block;
-	min-height: 16px;
-	min-width: 16px;
-	background: image('spinner.svg') center no-repeat;
+  display: inline-block;
+  min-height: 16px;
+  min-width: 16px;
+  background: image('spinner.svg') center no-repeat;
 
-	html.no-svg & {
-		background: image('spinner.gif') center no-repeat;
-	}
+  html.no-svg & {
+    background: image('spinner.gif') center no-repeat;
+  }
 }
 
 .spinner-expanded {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 [data-click-spinner] {
-	position: relative;
+  position: relative;
 
-	:not(.spinner) {
-		.transition(200ms);
-	}
+  :not(.spinner) {
+    .transition(200ms);
+  }
 
-	&.hasSpinner {
-		.spinner {
-			.spinner-expanded;
-			background-color: fadeout(@colorBg, 30);
-		}
-	}
+  &.hasSpinner {
+    .spinner {
+      .spinner-expanded;
+      background-color: fadeout(@colorBg, 30);
+    }
+  }
 }

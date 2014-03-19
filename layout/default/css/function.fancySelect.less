@@ -1,59 +1,59 @@
 .fancySelect {
-	display: inline-block;
-	position: relative;
-	max-width: 100%;
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
 
-	.button {
-		position: relative;
-		display: inline-block;
-		margin: 0;
-		padding-right: 25px;
-		background: @colorBgEmphasize1;
+  .button {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    padding-right: 25px;
+    background: @colorBgEmphasize1;
 
-		.labelPrefix{
-			margin-right: 15px;
-			font-size: @fontSizeTiny;
-			font-weight: normal;
-			color: lighten(@colorFgSubtle, 10);
-		}
+    .labelPrefix {
+      margin-right: 15px;
+      font-size: @fontSizeTiny;
+      font-weight: normal;
+      color: lighten(@colorFgSubtle, 10);
+    }
 
-		.icon {
-			position: absolute;
-			right: 0;
-			width: 25px;
-			text-align: center;
-			color: @colorFgBorderEmphasize3;
-			.transition(200ms);
-		}
-	}
+    .icon {
+      position: absolute;
+      right: 0;
+      width: 25px;
+      text-align: center;
+      color: @colorFgBorderEmphasize3;
+      .transition(200ms);
+    }
+  }
 
-	select {
-		position: absolute;
-		z-index: 1;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		height: 100%;
-		min-width: 100%;
-		width: auto;
-		opacity: 0;
-		.appearance(none);
-		cursor: pointer;
+  select {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    min-width: 100%;
+    width: auto;
+    opacity: 0;
+    .appearance(none);
+    cursor: pointer;
 
-		&:not(:disabled) {
-			&:focus + .button {
-				.input_focus;
-			}
-			&:hover + .button {
-				.icon {
-					color: darken(@colorFgBorderEmphasize3, 25);
-				}
-			}
-		}
+    &:not(:disabled) {
+      &:focus + .button {
+        .input_focus;
+      }
+      &:hover + .button {
+        .icon {
+          color: darken(@colorFgBorderEmphasize3, 25);
+        }
+      }
+    }
 
-		&:disabled + .button {
-			opacity: .5;
-		}
-	}
+    &:disabled + .button {
+      opacity: .5;
+    }
+  }
 }
