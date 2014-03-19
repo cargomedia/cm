@@ -16,8 +16,8 @@ class CMTest_TH {
         self::$_configBackup = serialize(CM_Config::get());
 
         // Reset environment
-        self::randomizeAutoincrement();
         self::clearEnv();
+        self::randomizeAutoincrement();
         self::timeInit();
     }
 
