@@ -1,10 +1,9 @@
 {if isset($recipient)}
-{translate 'Dear {$username}' username=$recipient->getDisplayName()|escape},
+  {translate 'Dear {$username}' username=$recipient->getDisplayName()|escape},
 {else}
-{translate 'Dear user'},
+  {translate 'Dear user'},
 {/if}
 
 {$body}
 
-{translate 'Thanks'},
- {$siteName}
+{translate 'Thanks'},{$siteName}
