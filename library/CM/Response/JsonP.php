@@ -17,7 +17,7 @@ class CM_Response_JsonP extends CM_Response_Abstract {
     }
 
     protected function _loadPage() {
-        $request = new CM_Request_Get($this->getRequest()->getPath(), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
+        $request = new CM_Request_Get(CM_Util::link($this->getRequest()->getPath(), $this->getRequest()->getQuery()), $this->getRequest()->getHeaders(), $this->getRequest()->getServer(), $this->getRequest()->getViewer());
 
         $count = 0;
         $paths = array($request->getPath());
