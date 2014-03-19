@@ -1,101 +1,101 @@
 & {
-	text-align: center;
+  text-align: center;
 }
 
 .previews {
-	overflow: hidden; /* Clearfix */
-	text-align: left;
+  overflow: hidden; /* Clearfix */
+  text-align: left;
 
-	.preview {
-		display: block;
-		float: left;
-		margin: 2px;
-		line-height: @sizeButton;
+  .preview {
+    display: block;
+    float: left;
+    margin: 2px;
+    line-height: @sizeButton;
 
-		.deleteButton {
-			margin-left: 5px;
+    .deleteButton {
+      margin-left: 5px;
 
-			&:hover {
-				color: @colorError;
-			}
-		}
+      &:hover {
+        color: @colorError;
+      }
+    }
 
-		.template {
-			width: 48px;
-			height: 48px;
-			background-color: @colorBgEmphasize1;
-			border: 1px solid @colorFgBorderEmphasize1;
+    .template {
+      width: 48px;
+      height: 48px;
+      background-color: @colorBgEmphasize1;
+      border: 1px solid @colorFgBorderEmphasize1;
 
-			.spinner {
-				margin-top: 16px;
-			}
-		}
-	}
+      .spinner {
+        margin-top: 16px;
+      }
+    }
+  }
 }
 
 &.dragover {
-	outline: 3px dashed @colorFgBorderEmphasize1;
-	outline-offset: -3px;
+  outline: 3px dashed @colorFgBorderEmphasize1;
+  outline-offset: -3px;
 }
 
 .dropInfo {
-	display: none;
-	color: @colorFgSubtle;
+  display: none;
+  color: @colorFgSubtle;
 
-	@media (min-width: 400px) {
-		display: block;
-	}
+  @media (min-width: 400px) {
+    display: block;
+  }
 
-	.dropInfo-icon {
-		font-size: 3em;
-		line-height: 1.2;
-		color: lighten(@colorFgSubtle, 30);
-		text-shadow: 1px 1px @colorBg;
-	}
+  .dropInfo-icon {
+    font-size: 3em;
+    line-height: 1.2;
+    color: lighten(@colorFgSubtle, 30);
+    text-shadow: 1px 1px @colorBg;
+  }
 
-	.dropInfo-message {
-		font-size: 1.3em;
-	}
+  .dropInfo-message {
+    font-size: 1.3em;
+  }
 
-	.dropInfo-divide {
-		margin-bottom: 12px;
-		font-size: @fontSizeSmall;
-	}
+  .dropInfo-divide {
+    margin-bottom: 12px;
+    font-size: @fontSizeSmall;
+  }
 }
 
 .uploadButton {
-	.button;
-	.button-default;
-	display: inline-block;
-	height: @sizeButton;
-	line-height: @sizeButton;
-	position: relative;
+  .button;
+  .button-default;
+  display: inline-block;
+  height: @sizeButton;
+  line-height: @sizeButton;
+  position: relative;
 
-	input {
-		position: absolute;
-		right: 0;
-		top: 0;
-		font-family: Arial;
-		font-size: 118px;
-		margin: 0;
-		padding: 0;
-		cursor: pointer;
-		opacity: 0;
-	}
+  input {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-family: Arial;
+    font-size: 118px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+  }
 
-	&.disabled {
-		opacity: .5;
+  &.disabled {
+    opacity: .5;
 
-		&:hover {
-			border-color: @colorFgBorderEmphasize3;
-			.gradient(vertical, @colorBg, darken(@colorBg, 6));
-			color: lighten(@colorFg, 25);
-		}
-	}
+    &:hover {
+      border-color: @colorFgBorderEmphasize3;
+      .gradient(vertical, @colorBg, darken(@colorBg, 6));
+      color: lighten(@colorFg, 25);
+    }
+  }
 }
 
 .notSupported {
-	display: none;
-	font-size: 0.9em;
-	color: lighten(@colorFg, 50);
+  display: none;
+  font-size: 0.9em;
+  color: lighten(@colorFg, 50);
 }
