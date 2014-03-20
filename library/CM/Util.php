@@ -583,4 +583,13 @@ class CM_Util {
         }
         return $result;
     }
+
+    /**
+     * @param string $content
+     * @param string $indentation
+     * @return string
+     */
+    public static function indent($content, $indentation) {
+        return preg_replace('/(:?^|[\n])/', '$1' . $indentation, $content);
+    }
 }
