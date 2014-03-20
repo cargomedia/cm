@@ -132,9 +132,9 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $content
+     * @param string|null $content
      */
-    public function writeln($content) {
+    public function appendLine($content = null) {
         $this->append($content . PHP_EOL);
     }
 
