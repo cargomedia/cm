@@ -131,6 +131,13 @@ class CM_File extends CM_Class_Abstract {
         fclose($resource);
     }
 
+    /**
+     * @param string $content
+     */
+    public function writeln($content) {
+        $this->append($content . PHP_EOL);
+    }
+
     public function truncate() {
         $this->write('');
     }
