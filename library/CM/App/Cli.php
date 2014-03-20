@@ -4,10 +4,22 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setup() {
         $this->_getOutput()->writeln('Setting up filesystem…');
-        CM_App::getInstance()->setupFilesystem();
+        $this->setupFilesystem();
         $this->_getOutput()->writeln('Setting up database…');
-        CM_App::getInstance()->setupDatabase();
+        $this->setupDatabase();
         $this->_getOutput()->writeln('Setting up translations…');
+        $this->setupTranslations();
+    }
+
+    public function setupFilesystem() {
+        CM_App::getInstance()->setupFilesystem();
+    }
+
+    public function setupDatabase() {
+        CM_App::getInstance()->setupDatabase();
+    }
+
+    public function setupTranslations() {
         CM_App::getInstance()->setupTranslations();
     }
 
