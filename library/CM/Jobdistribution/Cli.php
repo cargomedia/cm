@@ -5,7 +5,7 @@ class CM_Jobdistribution_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @keepalive
      */
-    public function startManager() {
+    public function startWorker() {
         $worker = new CM_Jobdistribution_JobWorker();
         $worker->run();
     }
