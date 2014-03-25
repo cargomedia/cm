@@ -9,6 +9,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     $render = $template->smarty->getTemplateVars('render');
     unset($params['name']);
     if ($name instanceof CM_Component_Abstract) {
+        $componentParams = CM_Params::factory($params['params']);
         $component = $name;
     } else {
         $componentParams = CM_Params::factory($params);

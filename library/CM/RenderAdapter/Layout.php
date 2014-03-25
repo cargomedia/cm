@@ -11,7 +11,6 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         /** @var CM_Layout_Abstract $layout */
         $layout = $this->_getView();
         $page->checkAccessible();
-        $page->prepare($pageParams);
 
         $js = $this->getRender()->getJs();
 
@@ -58,7 +57,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $layout->setTplParam('title', $this->fetchTitle($pageTitle));
 
         $assign = $layout->getTplParams();
-        $assign['viewObj'] = $layout;
+        $assign['pagej'] = $page;
+        $assign['pageParams'] = $pageParams;
         $html = $this->_renderTemplate('default.tpl', $assign);
 
         $this->getRender()->popStack('layouts');
