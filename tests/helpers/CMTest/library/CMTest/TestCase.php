@@ -466,18 +466,25 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string $table
-     * @param array  $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
-     * @param int    $rowCount
+     * @param string            $table
+     * @param array|string|null $where WHERE conditions: ('attr' => 'value', 'attr2' => 'value')
+     * @param int|null          $rowCount
      */
-    public static function assertRow($table, $where = null, $rowCount = 1) {
+    public static function assertRow($table, $where = null, $rowCount = null) {
+        if (null === $rowCount) {
+            $rowCount = 1;
+        }
         $result = CM_Db_Db::select($table, '*', $where);
         $rowCountActual = count($result->fetchAll());
         self::assertEquals($rowCount, $rowCountActual);
     }
 
-    public static function assertNotRow($table, $columns) {
-        self::assertRow($table, $columns, 0);
+    /**
+     * @param string            $table
+     * @param array|string|null $where
+     */
+    public static function assertNotRow($table, $where = null) {
+        self::assertRow($table, $where, 0);
     }
 
     /**
