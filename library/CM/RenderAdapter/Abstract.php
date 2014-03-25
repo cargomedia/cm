@@ -29,12 +29,6 @@ abstract class CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param array $params
-     * @return string
-     */
-    abstract public function fetch(array $params = array());
-
-    /**
      * @param string|null $tplName
      * @param array|null  $variables
      * @param bool|null   $isolated
