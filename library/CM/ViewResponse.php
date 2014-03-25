@@ -9,7 +9,7 @@ class CM_ViewResponse extends CM_Class_Abstract {
     protected $_templateName = 'default.tpl';
 
     /** @var array */
-    protected $_templateParams = array();
+    protected $_data = array();
 
     /** @var CM_ComponentFrontendHandler */
     protected $_frontendHandler = null;
@@ -47,15 +47,22 @@ class CM_ViewResponse extends CM_Class_Abstract {
      * @param string $key
      * @param mixed  $value
      */
-    public function setTplParam($key, $value) {
-        $this->_templateParams[$key] = $value;
+    public function addData($key, $value) {
+        $this->_data[$key] = $value;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data) {
+        $this->_data = $data;
     }
 
     /**
      * @return array
      */
-    public function getTemplateParams() {
-        return $this->_templateParams;
+    public function getData() {
+        return $this->_data;
     }
 
     /**
