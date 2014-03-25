@@ -8,7 +8,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         }
     }
 
-    public function prepare($params) {
+    public function prepare(CM_Params $params) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);
