@@ -28,6 +28,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         unset($data['data']['color']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
         $this->assertFormResponseSuccess($response);
+        $this->assertFalse(self::$formActionData->has('color'));
     }
 
     function testProcessInvalidCharsRequired() {
