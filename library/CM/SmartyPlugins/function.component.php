@@ -18,5 +18,5 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     }
 
     $renderAdapter = new CM_RenderAdapter_Component($render, $component);
-    $renderAdapter->fetch($params);
+    return $renderAdapter->fetch($params);
 }
