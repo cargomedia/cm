@@ -83,4 +83,11 @@ class CM_ViewResponse extends CM_Class_Abstract {
         }
         $this->_templateName = $filename;
     }
+
+    /**
+     * @param string $code
+     */
+    public function callJs($code) {
+        $this->getFrontendHandler()->exec($code);
+    }
 }
