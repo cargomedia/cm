@@ -27,7 +27,8 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
         /** @var CM_FormField_Abstract $field */
         $field = $form->getField($inputName);
         $field->prepare($params);
-        $input .= $render->render($field, array('form' => $form, 'fieldName' => $inputName));
+        $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
+        $input .= $renderAdapter->fetch(array('form' => $form, 'fieldName' => $inputName));
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];

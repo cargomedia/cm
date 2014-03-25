@@ -23,7 +23,8 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         foreach ($form->getFields() as $fieldName => $field) {
             if ($field instanceof CM_FormField_Hidden) {
                 $field->prepare(array());
-                $content .= $render->render($field, array('form' => $form, 'fieldName' => $fieldName));
+                $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
+                $content .= $renderAdapter->fetch(array('form' => $form, 'fieldName' => $fieldName));
             }
         }
 
