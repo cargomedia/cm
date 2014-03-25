@@ -3,15 +3,16 @@
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
     public function fetch(CM_Params $viewParams) {
+        /** @var CM_Component_Abstract $component */
+        $component = $this->_getView();
+        $component->checkAccessible();
+
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
             /** @var CM_View_Abstract $parentView */
             $parentView = $this->getRender()->getStackLast('views');
             $parentViewId = $parentView->getAutoId();
         }
-
-        /** @var CM_Component_Abstract $component */
-        $component = $this->_getView();
 
         $this->getRender()->pushStack($this->_getStackKey(), $component);
         $this->getRender()->pushStack('views', $component);

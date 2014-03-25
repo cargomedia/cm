@@ -167,7 +167,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Render($site, $viewer);
-        $component->checkAccessible();
         $component->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch($params);
@@ -211,7 +210,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $response = new CM_Response_Page($request);
         $render = new CM_Render($site, $viewer);
         $page->prepareResponse($response);
-        $page->checkAccessible();
         $page->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch($params);
@@ -246,12 +244,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $cmp
-     * @param CM_Render|null        $render
      */
-    public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
-        if (null === $render) {
-            $render = new CM_Render();
-        }
+    public static function assertComponentAccessible(CM_Component_Abstract $cmp) {
         try {
             $cmp->checkAccessible();
             self::assertTrue(true);
@@ -264,12 +258,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $cmp
-     * @param CM_Render|null        $render
      */
-    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
-        if (null === $render) {
-            $render = new CM_Render();
-        }
+    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp) {
         try {
             $cmp->checkAccessible();
             self::fail('checkAccessible should throw exception');
