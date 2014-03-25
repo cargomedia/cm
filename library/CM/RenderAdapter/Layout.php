@@ -5,12 +5,14 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     public function fetch() {
         /** @var CM_Layout_Abstract $layout */
         $layout = $this->_getView();
+        $page = $layout->getPage();
+        $page->checkAccessible();
 
         $js = $this->getRender()->getJs();
 
         $this->getRender()->pushStack('layouts', $layout);
         $this->getRender()->pushStack('views', $layout);
-        $this->getRender()->pushStack('pages', $layout->getPage());
+        $this->getRender()->pushStack('pages', $page);
 
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
@@ -43,7 +45,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $this->getRender()->getJs()->registerLayout($layout);
         $js->onloadReadyJs('cm.getLayout()._ready();');
 
-        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $layout->getPage());
+        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
         $pageTitle = $renderAdapterPage->fetchTitle();
         $layout->setTplParam('pageDescription', $renderAdapterPage->fetchDescription());
         $layout->setTplParam('pageKeywords', $renderAdapterPage->fetchKeywords());
