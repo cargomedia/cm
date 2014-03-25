@@ -22,9 +22,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         /** @var CM_FormField_Abstract $field */
         foreach ($form->getFields() as $fieldName => $field) {
             if ($field instanceof CM_FormField_Hidden) {
-                $field->prepare(array());
+                $viewParams = array();
+                $field->prepare($viewParams);
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-                $content .= $renderAdapter->fetch(array('form' => $form, 'fieldName' => $fieldName));
+                $content .= $renderAdapter->fetch($viewParams, array('form' => $form, 'fieldName' => $fieldName));
             }
         }
 

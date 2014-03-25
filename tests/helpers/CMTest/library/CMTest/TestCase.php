@@ -191,7 +191,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $formField->prepare($params);
         $render = new CM_Render($site, $viewer);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch(array('form' => $form, 'fieldName' => $fieldName));
+        $html = $renderAdapter->fetch($params, array('form' => $form, 'fieldName' => $fieldName));
         return new CMTest_TH_Html($html);
     }
 
