@@ -2,12 +2,9 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $viewParams = null, array $params = null) {
+    public function fetch(array $viewParams = null, CM_Form_Abstract $form, $fieldName) {
         $viewParams = (array) $viewParams;
-        $params = (array) $params;
-        /** @var CM_Form_Abstract $form */
-        $form = $params['form'];
-        $fieldName = $params['fieldName'];
+        $fieldName = (string) $fieldName;
         /** @var CM_FormField_Abstract $field */
         $field = $this->_getView();
 

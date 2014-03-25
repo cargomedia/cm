@@ -25,7 +25,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
                 $viewParams = array();
                 $field->prepare($viewParams);
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-                $content .= $renderAdapter->fetch($viewParams, array('form' => $form, 'fieldName' => $fieldName));
+                $content .= $renderAdapter->fetch($viewParams, $form, $fieldName);
             }
         }
 
