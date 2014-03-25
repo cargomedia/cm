@@ -51,7 +51,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $componentParams = CM_Params::factory($componentParams);
 
         $component = CM_Component_Abstract::factory($componentInfo['className'], $this->getRender(), $componentParams, $this->getViewer());
-        $component->prepare($componentParams);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch($componentParams);
@@ -71,7 +70,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
      */
     public function loadComponent(CM_Params $params) {
         $component = CM_Component_Abstract::factory($params->getString('className'), $this->getRender(), $params, $this->getViewer());
-        $component->prepare($params);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch($params);

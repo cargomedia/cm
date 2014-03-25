@@ -6,6 +6,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         /** @var CM_Component_Abstract $component */
         $component = $this->_getView();
         $component->checkAccessible();
+        $component->prepare($viewParams);
 
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {

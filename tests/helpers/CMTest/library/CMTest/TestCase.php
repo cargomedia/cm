@@ -167,7 +167,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Render($site, $viewer);
-        $component->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch($params);
         $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
@@ -210,7 +209,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $response = new CM_Response_Page($request);
         $render = new CM_Render($site, $viewer);
         $page->prepareResponse($response);
-        $page->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch($params);
         return new CMTest_TH_Html($html);
