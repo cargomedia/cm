@@ -160,14 +160,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $component
+     * @param CM_Params             $params
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
      * @return CMTest_TH_Html
      */
-    protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+    protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Render($site, $viewer);
         $component->checkAccessible($render);
-        $component->prepare();
+        $component->prepare($params);
         $componentHtml = $render->render($component);
         $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
         return new CMTest_TH_Html($html);
@@ -194,11 +195,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Page_Abstract      $page
+     * @param CM_Params             $params
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
      * @return CMTest_TH_Html
      */
-    protected function _renderPage(CM_Page_Abstract $page, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+    protected function _renderPage(CM_Page_Abstract $page, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
@@ -208,7 +210,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $render = new CM_Render($site, $viewer);
         $page->prepareResponse($response);
         $page->checkAccessible($render);
-        $page->prepare();
+        $page->prepare($params);
         $html = $render->render($page);
         return new CMTest_TH_Html($html);
     }
@@ -277,15 +279,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $component
+     * @param CM_Params             $params
      * @param string|null           $expectedExceptionClass
      * @param CM_Model_User|null    $viewer
      */
-    public function assertComponentNotRenderable(CM_Component_Abstract $component, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
+    public function assertComponentNotRenderable(CM_Component_Abstract $component, CM_Params $params, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
         try {
-            $this->_renderComponent($component, $viewer);
+            $this->_renderComponent($component, $params, $viewer);
             $this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
         } catch (Exception $e) {
             $this->assertInstanceOf($expectedExceptionClass, $e);
@@ -450,15 +453,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Page_Abstract   $page
+     * @param CM_Params          $params
      * @param string|null        $expectedExceptionClass
      * @param CM_Model_User|null $viewer
      */
-    public function assertPageNotRenderable(CM_Page_Abstract $page, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
+    public function assertPageNotRenderable(CM_Page_Abstract $page, CM_Params $params, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
         try {
-            $this->_renderPage($page, $viewer);
+            $this->_renderPage($page, $params, $viewer);
             $this->fail('Rendering page `' . get_class($page) . '` did not throw an exception');
         } catch (Exception $e) {
             $this->assertInstanceOf($expectedExceptionClass, $e);

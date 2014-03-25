@@ -11,9 +11,10 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     if ($name instanceof CM_Component_Abstract) {
         $component = $name;
     } else {
-        $component = CM_Component_Abstract::factory($name, CM_Params::factory($params), $render->getViewer());
+        $componentParams = CM_Params::factory($params);
+        $component = CM_Component_Abstract::factory($name, $componentParams, $render->getViewer());
         $component->checkAccessible($render);
-        $component->prepare();
+        $component->prepare($componentParams);
     }
 
     return $render->render($component);
