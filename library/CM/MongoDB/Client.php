@@ -3,7 +3,7 @@
 /**
  * Class CM_Mongodb_Client
  */
-class CM_Mongodb_Client extends CM_Class_Abstract {
+class CM_MongoDB_Client extends CM_Class_Abstract {
 
     /** @var \MongoClient */
     private $_mongodb = null;
