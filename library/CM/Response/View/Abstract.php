@@ -55,7 +55,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $component->prepare($componentParams);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch();
+        $html = $renderAdapter->fetch($componentParams);
 
         $this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
         $this->getRender()->getJs()->onloadPrepareJs(
@@ -76,7 +76,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $component->prepare($params);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch();
+        $html = $renderAdapter->fetch($params);
         $js = $this->getRender()->getJs()->getJs();
 
         $this->getRender()->getJs()->clear();

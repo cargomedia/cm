@@ -70,12 +70,13 @@ class CM_Response_Page extends CM_Response_Abstract {
 
     /**
      * @param CM_Page_Abstract $page
+     * @param CM_Params        $pageParams
      * @return string
      */
-    protected function _renderPage(CM_Page_Abstract $page) {
+    protected function _renderPage(CM_Page_Abstract $page, CM_Params $pageParams) {
         $layout = $page->getLayout($this->getSite());
         $renderAdapter = new CM_RenderAdapter_Page($this->getRender(), $layout);
-        return $renderAdapter->fetch();
+        return $renderAdapter->fetch($pageParams);
     }
 
     protected function _process() {
@@ -104,13 +105,13 @@ class CM_Response_Page extends CM_Response_Abstract {
     private function _processPage(CM_Request_Abstract $request) {
         try {
             $this->getSite()->rewrite($request);
-            $componentParams = CM_Params::factory($request->getQuery());
+            $pageParams = CM_Params::factory($request->getQuery());
             $viewer = $request->getViewer();
 
             try {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
                 /** @var CM_Page_Abstract $page */
-                $page = CM_Page_Abstract::factory($className, $componentParams, $viewer);
+                $page = CM_Page_Abstract::factory($className, $pageParams, $viewer);
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
             }
@@ -125,8 +126,8 @@ class CM_Response_Page extends CM_Response_Abstract {
                 return null;
             }
             $page->checkAccessible($this->getRender());
-            $page->prepare($componentParams);
-            $html = $this->_renderPage($page);
+            $page->prepare($pageParams);
+            $html = $this->_renderPage($page, $pageParams);
             $this->_page = $page;
             return $html;
         } catch (CM_Exception $e) {

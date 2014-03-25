@@ -2,7 +2,7 @@
 
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params = array()) {
+    public function fetch(CM_Params $viewParams) {
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
             /** @var CM_View_Abstract $parentView */

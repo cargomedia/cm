@@ -170,7 +170,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $component->checkAccessible($render);
         $component->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
-        $componentHtml = $renderAdapter->fetch();
+        $componentHtml = $renderAdapter->fetch($params);
         $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
         return new CMTest_TH_Html($html);
     }
@@ -214,7 +214,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $page->checkAccessible($render);
         $page->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
-        $html = $renderAdapter->fetch();
+        $html = $renderAdapter->fetch($params);
         return new CMTest_TH_Html($html);
     }
 
