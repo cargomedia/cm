@@ -167,7 +167,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Render($site, $viewer);
-        $component->checkAccessible($render);
+        $component->checkAccessible();
         $component->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch($params);
@@ -211,7 +211,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $response = new CM_Response_Page($request);
         $render = new CM_Render($site, $viewer);
         $page->prepareResponse($response);
-        $page->checkAccessible($render);
+        $page->checkAccessible();
         $page->prepare($params);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch($params);
@@ -253,7 +253,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             $render = new CM_Render();
         }
         try {
-            $cmp->checkAccessible($render);
+            $cmp->checkAccessible();
             self::assertTrue(true);
         } catch (CM_Exception_AuthRequired $e) {
             self::fail('should be accessible');
@@ -271,7 +271,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
             $render = new CM_Render();
         }
         try {
-            $cmp->checkAccessible($render);
+            $cmp->checkAccessible();
             self::fail('checkAccessible should throw exception');
         } catch (CM_Exception_AuthRequired $e) {
             self::assertTrue(true);

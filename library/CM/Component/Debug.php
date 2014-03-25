@@ -2,7 +2,7 @@
 
 class CM_Component_Debug extends CM_Component_Abstract {
 
-    public function checkAccessible(CM_Render $render) {
+    public function checkAccessible() {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
