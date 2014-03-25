@@ -12,7 +12,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
         $component = $name;
     } else {
         $componentParams = CM_Params::factory($params);
-        $component = CM_Component_Abstract::factory($name, $componentParams, $render->getViewer());
+        $component = CM_Component_Abstract::factory($name, $render, $componentParams, $render->getViewer());
         $component->checkAccessible($render);
         $component->prepare($componentParams);
     }

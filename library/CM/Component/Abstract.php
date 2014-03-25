@@ -2,31 +2,28 @@
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
 
-    /**
-     * @var CM_Model_User|null
-     */
+    /** @var CM_Model_User|null */
     protected $_viewer;
 
-    /**
-     * @var string
-     */
+    /** @var CM_Render */
+    protected $_render;
+
+    /** @var string */
     protected $_tplName = 'default.tpl';
 
-    /**
-     * @var CM_ComponentFrontendHandler
-     */
+    /** @var CM_ComponentFrontendHandler */
     protected $_js = null;
 
-    /**
-     * @var CM_Params
-     */
+    /** @var CM_Params */
     protected $_params;
 
     /**
+     * @param CM_Render            $render
      * @param CM_Params|array|null $params
      * @param CM_Model_User|null   $viewer
      */
-    public function __construct($params = null, CM_Model_User $viewer = null) {
+    public function __construct(CM_Render $render, $params = null, CM_Model_User $viewer = null) {
+        $this->_render = $render;
         $this->_viewer = $viewer;
         if (is_null($params)) {
             $params = CM_Params::factory();
@@ -129,12 +126,13 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
     /**
      * @param string             $className
+     * @param CM_Render          $render
      * @param CM_Params|array    $params
      * @param CM_Model_User|null $viewer
-     * @return CM_Component_Abstract
      * @throws CM_Exception
+     * @return CM_Component_Abstract
      */
-    public static function factory($className, $params = null, CM_Model_User $viewer = null) {
+    public static function factory($className, CM_Render $render, $params = null, CM_Model_User $viewer = null) {
         if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
             throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
         }
