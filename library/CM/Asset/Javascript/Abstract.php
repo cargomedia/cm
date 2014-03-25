@@ -21,7 +21,13 @@ class CM_Asset_Javascript_Abstract extends CM_Asset_Abstract {
         $cacheKey = CM_CacheConst::App_Resource . '_md5:' . $md5;
         $cache = new CM_Cache_Storage_File();
         if (false === ($contentMinified = $cache->get($cacheKey))) {
-            $contentMinified = CM_Util::exec('uglifyjs --no-copyright', null, $content);
+            $uglifyCommand = 'uglifyjs --no-copyright';
+            /**
+             * Quote keys in literal objects, otherwise some browsers break.
+             * E.g. "select2.js" on "Android 4.0.4"
+             */
+            $uglifyCommand .= ' --beautify beautify=false,quote-keys=true';
+            $contentMinified = CM_Util::exec($uglifyCommand, null, $content);
             $cache->set($cacheKey, $contentMinified);
         }
         return $contentMinified;
