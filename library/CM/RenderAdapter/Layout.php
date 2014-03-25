@@ -2,11 +2,12 @@
 
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
-    public function fetch() {
+    public function fetch(CM_Params $pageParams) {
         /** @var CM_Layout_Abstract $layout */
         $layout = $this->_getView();
         $page = $layout->getPage();
         $page->checkAccessible();
+        $page->prepare($pageParams);
 
         $js = $this->getRender()->getJs();
 
