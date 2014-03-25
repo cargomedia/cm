@@ -2,7 +2,7 @@
 
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params = array()) {
+    public function fetch() {
         /** @var CM_Layout_Abstract $layout */
         $layout = $this->_getView();
 
