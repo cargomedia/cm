@@ -90,7 +90,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
         foreach ($site->getNamespaces() as $namespace) {
             $classname = $namespace . '_Layout_' . $layoutName;
             if (class_exists($classname)) {
-                return new $classname($this);
+                return new $classname();
             }
         }
 
