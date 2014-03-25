@@ -57,7 +57,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $layout->setTplParam('title', $this->fetchTitle($pageTitle));
 
         $assign = $layout->getTplParams();
-        $assign['pagej'] = $page;
+        $assign['page'] = $page;
         $assign['pageParams'] = $pageParams;
         $html = $this->_renderTemplate('default.tpl', $assign);
 
