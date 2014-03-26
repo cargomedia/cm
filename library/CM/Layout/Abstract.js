@@ -13,6 +13,32 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   /** @type jqXHR|Null */
   _pageRequest: null,
 
+  _timeOutLoading: null,
+
+  _$iframeLoader: null,
+
+  injectPage: function(response) {
+    if (response.redirectExternal) {
+      cm.router.route(response.redirectExternal);
+      return;
+    }
+    var layout = this;
+    this._injectView(response, function(response) {
+      var fragment = response.url.substr(cm.getUrl().length);
+      var reload = (layout.getClass() != response.layoutClass);
+      if (reload) {
+        window.location.replace(response.url);
+        return;
+      }
+      layout._$pagePlaceholder.replaceWith(this.$el);
+      layout._$pagePlaceholder = null;
+      window.history.replaceState(null, null, fragment);
+      layout._onPageSetup(this, response.title, response.url, response.menuEntryHashList);
+    });
+    window.clearTimeout(this._timeoutLoading);
+    this._$iframeLoader.remove();
+  },
+
   /**
    * @param {String} path
    */
@@ -28,13 +54,19 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
     } else {
       this._$pagePlaceholder.removeClass('error').html('');
     }
-    var timeoutLoading = this.setTimeout(function() {
+    this._timeoutLoading = this.setTimeout(function() {
       this._$pagePlaceholder.html('<div class="spinner spinner-expanded" />');
     }, 750);
+    if (this._$iframeLoader) {
+      this._$iframeLoader.remove();
+    }
+    this._$iframeLoader = $('<iframe style="display: none" src="' + cm.getUrl() + '/jsonp' + path + '" class="data-loader-iframe"></iframe');
+    $('body').append(this._$iframeLoader);
 
     if (this._pageRequest) {
       this._pageRequest.abort();
     }
+    return;
     this._pageRequest = this.ajaxModal('loadPage', {path: path}, {
       success: function(response) {
         if (response.redirectExternal) {
