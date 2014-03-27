@@ -89,6 +89,18 @@ class CM_MongoDB_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param string     $collection
+     * @param array      $criteria
+     * @param array      $newObject
+     * @param array|null $options
+     * @return MongoCursor
+     */
+    public function update($collection, $criteria, $newObject, $options = null) {
+        $options = ($options !== null) ? $options : array();
+        return $this->getCollection($collection)->update($criteria, $newObject, $options);
+    }
+
+    /**
      * @return CM_Mongodb_Client
      */
     public static function getInstance() {
