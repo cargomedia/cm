@@ -54,7 +54,9 @@ class CM_Config_Generator extends CM_Class_Abstract {
                         throw new CM_Exception_Invalid(
                             'Duplicate `TYPE` constant for `' . $class . '` and `' . $classNameDuplicate . '`. Both equal `' . $type . '`.');
                     }
-                    $this->_classTypes[$type] = $class;
+                    if (class_exists($class)) {
+                        $this->_classTypes[$type] = $class;
+                    }
                 }
             }
         }
