@@ -29,9 +29,6 @@ abstract class CM_Paging_Emoticon_Abstract extends CM_Paging_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setAliases($code, array $aliases) {
-        if (!count($aliases)) {
-            throw new CM_Exception_Invalid('Need to provide aliases');
-        }
         CM_Db_Db::update('cm_emoticon', array('codeAdditional' => join(',', $aliases)), array('code' => $code));
         $this->_change();
     }
