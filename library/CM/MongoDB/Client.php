@@ -21,7 +21,7 @@ class CM_MongoDB_Client extends CM_Class_Abstract {
      */
     public function getNewId() {
         $mongoId = new MongoId();
-        return $mongoId;
+        return (string)$mongoId;
     }
 
     /**
