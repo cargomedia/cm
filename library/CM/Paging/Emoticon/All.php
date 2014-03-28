@@ -12,10 +12,10 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
         $item = array();
         $item['id'] = (int) $itemRaw['id'];
         $item['code'] = (string) $itemRaw['code'];
-        $item['codes'] = array($itemRaw['code']);
-        if ($itemRaw['codeAdditional']) {
-            $item['codes'] = array_merge($item['codes'], explode(',', $itemRaw['codeAdditional']));
-        }
+        $item['codes'] = array_merge(
+            array($itemRaw['code']),
+            $this->_decodeCodeAdditional($itemRaw['codeAdditional'])
+        );
         $item['file'] = $itemRaw['file'];
         return $item;
     }
@@ -23,9 +23,11 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
     /**
      * @param string $code
      * @param string $file
+     * @param array|null  $aliases
      */
-    public function add($code, $file) {
-        CM_Db_Db::insertIgnore('cm_emoticon', array('code' => $code, 'file' => $file));
+    public function add($code, $file, array $aliases = null) {
+        $aliases = (array) $aliases;
+        CM_Db_Db::insertIgnore('cm_emoticon', array('code' => $code, 'file' => $file, 'codeAdditional' => $this->_encodeCodeAdditional($aliases)));
         $this->_change();
     }
 
@@ -35,7 +37,7 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setAliases($code, array $aliases) {
-        CM_Db_Db::update('cm_emoticon', array('codeAdditional' => join(',', $aliases)), array('code' => $code));
+        CM_Db_Db::update('cm_emoticon', array('codeAdditional' => $this->_encodeCodeAdditional($aliases)), array('code' => $code));
         $this->_change();
     }
 
@@ -45,7 +47,7 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
      */
     public function addAlias($code, $alias) {
         $alias = (string) $alias;
-        $aliases = array_merge($this->_getAliases($code), array($alias));
+        $aliases = array_merge($this->getAliases($code), array($alias));
         $this->setAliases($code, $aliases);
     }
 
@@ -53,11 +55,33 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
      * @param string $code
      * @return array
      */
-    protected function _getAliases($code) {
+    public function getAliases($code) {
         foreach ($this->getItemsRaw() as $itemRaw) {
             if ($itemRaw['code'] === $code) {
-                return explode(',', $itemRaw['codeAdditional']);
+                return $this->_decodeCodeAdditional($itemRaw['codeAdditional']);
             }
         }
+    }
+
+    /**
+     * @param string|null $codeAdditional
+     * @return array
+     */
+    protected function _decodeCodeAdditional($codeAdditional) {
+        if (null === $codeAdditional) {
+            return array();
+        }
+        return CM_Params::decode($codeAdditional, true);
+    }
+
+    /**
+     * @param array $aliases
+     * @return null|string
+     */
+    protected function _encodeCodeAdditional(array $aliases){
+        if (!count($aliases)) {
+            return null;
+        }
+        return CM_Params::encode($aliases, true);
     }
 }
