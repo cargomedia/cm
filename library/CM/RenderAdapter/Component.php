@@ -6,6 +6,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         /** @var CM_Component_Abstract $component */
         $component = $this->_getView();
         $component->checkAccessible();
+
+        $viewResponse = new CM_ViewResponse($component);
+        $viewResponse->setTemplateName('default');
         $component->prepare($viewParams);
 
         $parentViewId = null;
@@ -19,7 +22,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $this->getRender()->pushStack('views', $component);
 
         $cssClass = implode(' ', $component->getClassHierarchy());
-        if (preg_match('#([^/]+)\.tpl$#', $component->getTplName(), $match)) {
+        if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
             if ($match[1] != 'default') {
                 $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
             }
@@ -28,7 +31,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $assign = $component->getTplParams();
         $assign['viewObj'] = $component;
-        $html .= $this->_renderTemplate($component->getTplName(), $assign, true);
+        $html .= $this->_renderTemplate($viewResponse->getTemplateName(), $assign, true);
 
         $html .= '</div>';
 
