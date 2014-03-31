@@ -87,7 +87,7 @@ class CM_Menu {
      */
     public final function getEntries(CM_Model_User $viewer = null) {
         return array_filter($this->_entries, function (CM_MenuEntry $entry) use ($viewer) {
-            return $entry->isViewable($viewer);
+            return $entry->isViewable();
         });
     }
 }

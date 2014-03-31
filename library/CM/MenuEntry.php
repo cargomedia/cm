@@ -44,8 +44,9 @@ class CM_MenuEntry {
      * @return bool True if path/queries match
      */
     public final function compare($path, array $params = array()) {
-        $page = $this->getPage();
-        if ($path == $page::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
+        /** @var CM_Page_Abstract $pageClass */
+        $pageClass = $this->getPageName();
+        if ($path == $pageClass::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
             return true;
         }
         return false;
@@ -102,23 +103,6 @@ class CM_MenuEntry {
      */
     public final function getLabel() {
         return $this->_data['label'];
-    }
-
-    /**
-     * @param CM_Model_User|null $viewer
-     * @return CM_Page_Abstract Page object
-     */
-    public final function getPage(CM_Model_User $viewer = null) {
-        $viewerId = $viewer ? $viewer->getId() : 0;
-        $className = $this->getPageName();
-
-        $cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
-        if (($page = CM_Cache_Storage_Runtime::getInstance()->get($cacheKey)) === false) {
-            $page = new $className($this->getParams(), $viewer);
-            CM_Cache_Storage_Runtime::getInstance()->set($cacheKey, $page);
-        }
-
-        return $page;
     }
 
     /**
@@ -211,10 +195,10 @@ class CM_MenuEntry {
     }
 
     /**
-     * @param CM_Model_User|null $viewer
      * @return bool
      */
-    public final function isViewable(CM_Model_User $viewer = null) {
-        return $this->getPage($viewer)->isViewable();
+    public final function isViewable() {
+        $params = $this->getParams();
+        return !isset($params['viewable']) || true === $params['viewable'];
     }
 }
