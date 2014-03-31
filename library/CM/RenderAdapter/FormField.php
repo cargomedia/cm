@@ -7,6 +7,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $fieldName = (string) $fieldName;
         /** @var CM_FormField_Abstract $field */
         $field = $this->_getView();
+        $field->prepare($viewParams);
 
         $field->setTplParam('field', $field);
         $field->setTplParam('id', $form->getTagAutoId($fieldName . '-input'));
@@ -15,7 +16,10 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $field->setTplParam('options', $field->getOptions());
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
-        $html .= trim($this->_renderTemplate('default.tpl', $field->getTplParams(), true));
+        $viewResponse = new CM_ViewResponse($this->_getView());
+        $viewResponse->setTemplateName('default');
+        $viewResponse->setData($field->getTplParams());
+        $html .= trim($this->getRender()->renderViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
