@@ -36,7 +36,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-        {component name=$page params=$pageParams}
+        {component name=$pageName params=$pageParams->getAll()}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
