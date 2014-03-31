@@ -142,7 +142,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
             throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
         }
-        $component = new $className($params, $viewer);
+        $component = new $className($render, $params, $viewer);
         return $component;
     }
 
