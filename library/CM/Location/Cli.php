@@ -933,6 +933,13 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				}
 			}
 		}
+		foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
+			foreach ($regionListUpdatedCode as $regionCode) {
+				$regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
+				$maxMindRegion = $countryCode . $regionCode;
+				CM_Db_Db::update('cm_locationState', array('_maxmind' => $maxMindRegion), array('id' => $regionId));
+			}
+		}
 		foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
 			$countryId = $this->_countryIdList[$countryCode];
 			$country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
@@ -940,13 +947,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 				$region = CM_Model_Location::createState($country, $regionName, null, $countryCode . $regionCode);
 				$regionId = $region->getId();
 				$this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
-			}
-		}
-		foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
-			foreach ($regionListUpdatedCode as $regionCode) {
-				$regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
-				$maxMindRegion = $countryCode . $regionCode;
-				CM_Db_Db::update('cm_locationState', array('_maxmind' => $maxMindRegion), array('id' => $regionId));
 			}
 		}
 	}
