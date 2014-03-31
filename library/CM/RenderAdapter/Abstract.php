@@ -51,7 +51,7 @@ abstract class CM_RenderAdapter_Abstract {
      * @throws CM_Exception
      */
     protected function _getTplPath($tplName) {
-        $this->getRender()->getTemplatePath($this->_getView(), $tplName);
+        return $this->getRender()->getTemplatePath($this->_getView(), $tplName);
     }
 
     /**
