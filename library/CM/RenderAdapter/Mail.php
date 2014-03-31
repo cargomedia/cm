@@ -9,15 +9,15 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
     public function fetch() {
         /** @var CM_Mail $mail */
         $mail = $this->_getView();
+        $viewParams = CM_Params::factory($mail->getTplParams());
         if (!($subject = $mail->getSubject())) {
             if (!$mail->hasTemplate()) {
                 throw new CM_Exception_Invalid('Trying to render mail with neither subject nor template');
             }
-            $subject = $this->_renderTemplate('subject.tpl', $mail->getTplParams());
-            $subject = trim($subject);
+            $subject = trim($this->_fetchTemplate('subject', $viewParams));
         }
         if (!($htmlBody = $mail->getHtml()) && $mail->hasTemplate()) {
-            $htmlBody = $this->_renderTemplate('body.tpl', $mail->getTplParams());
+            $htmlBody = trim($this->_fetchTemplate('body', $viewParams));
         }
         if ($mail->getRenderLayout()) {
             $tplPath = $this->_getTplPathLayout('mailHtml.tpl');
@@ -65,5 +65,17 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
             return $path;
         }
         throw new CM_Exception_Invalid('Cannot find layout template `' . $tplName . '`');
+    }
+
+    /**
+     * @param string    $templateName
+     * @param CM_Params $pageParams
+     * @return string
+     */
+    private function _fetchTemplate($templateName, CM_Params $pageParams) {
+        $viewResponse = new CM_ViewResponse($this->_getView());
+        $viewResponse->setTemplateName($templateName);
+        $viewResponse->setData($pageParams->getAll());
+        return trim($this->getRender()->renderViewResponse($viewResponse));
     }
 }
