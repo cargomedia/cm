@@ -33,10 +33,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         }
         $this->_params = $params;
         $this->_js = new CM_ComponentFrontendHandler();
-
-        if ($this->_params->has('template')) {
-            $this->setTplName($this->_params->getString('template'));
-        }
     }
 
     /**
@@ -78,18 +74,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
      */
     public function getTplName() {
         return $this->_tplName;
-    }
-
-    /**
-     * @param string $filename
-     * @throws CM_Exception_Invalid
-     */
-    public function setTplName($filename) {
-        $filename = (string) $filename . '.tpl';
-        if (preg_match('/[^\w\.-]/', $filename)) {
-            throw new CM_Exception_Invalid('Invalid tpl-name `' . $filename . '`');
-        }
-        $this->_tplName = $filename;
     }
 
     /**
