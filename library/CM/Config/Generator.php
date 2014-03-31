@@ -7,29 +7,45 @@ class CM_Config_Generator extends CM_Class_Abstract {
     /** @var string[] */
     private $_classTypes = array();
 
+    /** @var string[] */
+    private $_classTypesAdded = array();
+
+    /** @var string[] */
+    private $_classTypesRemoved = array();
+
     /** @var string[][] */
     private $_namespaceTypes = array();
 
     /**
-     * @throws CM_Exception_Invalid
-     * @return array[]
+     * @return string[]
      */
     public function getNamespaceTypes() {
-        if (empty($this->_namespaceTypes)) {
-            throw new CM_Exception_Invalid('Class Types have not been generated.');
-        }
+        $this->_checkTypesGenerated();
         return $this->_namespaceTypes;
     }
 
     /**
      * @return string[]
-     * @throws CM_Exception_Invalid
      */
     public function getClassTypes() {
-        if (empty($this->_classTypes)) {
-            throw new CM_Exception_Invalid('Class Types have not been generated.');
-        }
+        $this->_checkTypesGenerated();
         return $this->_classTypes;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getClassTypesAdded() {
+        $this->_checkTypesGenerated();
+        return $this->_classTypesAdded;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getClassTypesRemoved() {
+        $this->_checkTypesGenerated();
+        return $this->_classTypesRemoved;
     }
 
     public function generateClassTypes() {
@@ -56,6 +72,8 @@ class CM_Config_Generator extends CM_Class_Abstract {
                     }
                     if (class_exists($class)) {
                         $this->_classTypes[$type] = $class;
+                    } else {
+                        $this->_classTypesRemoved[] = $class;
                     }
                 }
             }
@@ -72,6 +90,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
                 if (false === $type = array_search($class, $this->_classTypes)) {
                     $type = ++$this->_typesMaxValue;
                     $this->_classTypes[$type] = $class;
+                    $this->_classTypesAdded[$type] = $class;
                 }
                 $this->_namespaceTypes[$namespaceClass][$type] = $class;
             }
@@ -161,5 +180,14 @@ class CM_Config_Generator extends CM_Class_Abstract {
             }
         }
         return $actionVerbs;
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     */
+    private function _checkTypesGenerated() {
+        if (empty($this->_namespaceTypes)) {
+            throw new CM_Exception_Invalid('Class Types have not been generated.');
+        }
     }
 }
