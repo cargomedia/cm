@@ -16,6 +16,10 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     }
     $component = CM_Component_Abstract::factory($name, $render, $componentParams, $render->getViewer());
 
-    $renderAdapter = new CM_RenderAdapter_Component($render, $component);
+    if ($component instanceof CM_Page_Abstract) {
+        $renderAdapter = new CM_RenderAdapter_Page($render, $component);
+    } else {
+        $renderAdapter = new CM_RenderAdapter_Component($render, $component);
+    }
     return $renderAdapter->fetch(CM_Params::factory($componentParams));
 }
