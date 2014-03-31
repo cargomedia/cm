@@ -51,15 +51,18 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
         $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
         $pageTitle = $renderAdapterPage->fetchTitle($pageParams);
-        $layout->setTplParam('pageDescription', $renderAdapterPage->fetchDescription($pageParams));
-        $layout->setTplParam('pageKeywords', $renderAdapterPage->fetchKeywords($pageParams));
-        $layout->setTplParam('title', $this->fetchTitle($pageTitle));
 
-        $assign = $layout->getTplParams();
-        $assign['viewObj'] = $this;
-        $assign['pageName'] = get_class($page);
-        $assign['pageParams'] = $pageParams;
-        $html = $this->_renderTemplate('default.tpl', $assign);
+        $viewResponse = new CM_ViewResponse($this->_getView());
+        $viewResponse->setTemplateName('default');
+        $viewResponse->setData(array(
+            'viewObj'         => $this->_getView(),
+            'title'           => $this->fetchTitle($pageTitle),
+            'pageName'        => get_class($page),
+            'pageParams'      => $pageParams,
+            'pageDescription' => $renderAdapterPage->fetchDescription($pageParams),
+            'pageKeywords'    => $renderAdapterPage->fetchKeywords($pageParams),
+        ));
+        $html = $this->getRender()->renderViewResponse($viewResponse);
 
         $this->getRender()->popStack('layouts');
         $this->getRender()->popStack('views');
