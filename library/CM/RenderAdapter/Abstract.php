@@ -51,18 +51,7 @@ abstract class CM_RenderAdapter_Abstract {
      * @throws CM_Exception
      */
     protected function _getTplPath($tplName) {
-        $tplName = (string) $tplName;
-        foreach ($this->_getView()->getClassHierarchy() as $className) {
-            if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
-                throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
-            }
-            $tpl = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $tplName;
-            if ($tplPath = $this->getRender()->getLayoutPath($tpl, $matches[1], false, false)) {
-                return $tplPath;
-            }
-        }
-
-        throw new CM_Exception('Cannot find template `' . $tplName . '` for `' . get_class($this->_getView()) . '`.');
+        $this->getRender()->getTemplatePath($this->_getView(), $tplName);
     }
 
     /**
