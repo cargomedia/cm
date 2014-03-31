@@ -1,72 +1,82 @@
 <?php
 
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
-	/** @var CM_Render $render */
-	$render = $template->smarty->getTemplateVars('render');
-	/** @var CM_Form_Abstract $form */
-	$form = $render->getStackLast('forms');
-	if (empty($params['action'])) {
-		trigger_error('Param `action` missing.');
-	}
-	$action = $form->getAction($params['action']);
-	$title = isset($params['title']) ? (string) $params['title'] : null;
-	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+    /** @var CM_Render $render */
+    $render = $template->smarty->getTemplateVars('render');
+    /** @var CM_Form_Abstract $form */
+    $form = $render->getStackLast('forms');
+    if (empty($params['action'])) {
+        trigger_error('Param `action` missing.');
+    }
+    $action = $form->getAction($params['action']);
+    $title = isset($params['title']) ? (string) $params['title'] : null;
+    $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
 
-	$class = 'button ' . 'button-' . $theme;
-	if (isset($params['class'])) {
-		$class .= ' ' . trim($params['class']);
-	}
+    $class = 'button ' . 'button-' . $theme;
+    if (isset($params['class'])) {
+        $class .= ' ' . trim($params['class']);
+    }
 
-	$data = array();
-	if (isset($params['data'])) {
-		$data = $params['data'];
-		unset($params['data']);
-	}
+    $data = array();
+    if (isset($params['data'])) {
+        $data = $params['data'];
+        unset($params['data']);
+    }
 
-	if (isset($params['event'])) {
-		$data['event'] = (string) $params['event'];
-		unset($params['event']);
-	}
+    if (isset($params['event'])) {
+        $data['event'] = (string) $params['event'];
+        unset($params['event']);
+    }
 
-	$icon = null;
-	if (isset($params['icon'])) {
-		$icon = $params['icon'];
-	}
+    $icon = null;
+    $iconConfirm = null;
+    if (isset($params['icon'])) {
+        $icon = $params['icon'];
 
-	$label = '';
-	if (isset($params['label'])) {
-		$label = $params['label'];
-	}
+        if (isset($params['iconConfirm'])) {
+            $iconConfirm = $params['iconConfirm'];
+        }
+    }
 
-	if ($label) {
-		$class .= ' hasLabel';
-	}
-	if ($icon) {
-		$class .= ' hasIcon';
-	}
-	if ($title) {
-		$class .= ' showTooltip';
-	}
+    $label = '';
+    if (isset($params['label'])) {
+        $label = $params['label'];
+    }
 
-	$id = $form->getAutoId() . '-' . $action->getName() . '-button';
+    if ($label) {
+        $class .= ' hasLabel';
+    }
+    if ($icon) {
+        $class .= ' hasIcon';
+    }
+    if ($title) {
+        $class .= ' showTooltip';
+    }
 
-	$html = '';
-	$html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '" data-click-spinner="true"';
-	if ($title) {
-		$html .= ' title="' . $title . '"';
-	}
-	if (!empty($data)) {
-		foreach ($data as $name => $value) {
-			$html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
-		}
-	}
-	$html .= '>';
-	if ($icon) {
-		$html .= '<span class="icon icon-' . $icon . '"></span>';
-	}
-	if ($label) {
-		$html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
-	}
-	$html .= '</button>';
-	return $html;
+    $id = $form->getAutoId() . '-' . $action->getName() . '-button';
+
+    $html = '';
+    $html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '" data-click-spinner="true"';
+    if ($title) {
+        $html .= ' title="' . $title . '"';
+    }
+    if (!empty($data)) {
+        foreach ($data as $name => $value) {
+            $html .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+        }
+    }
+    $html .= '>';
+    if ($icon) {
+        if ($iconConfirm) {
+            $html .= '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
+                . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+        } else {
+            $html .= '<span class="icon icon-' . $icon . '"></span>';
+        }
+    }
+    if ($label) {
+        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+    }
+    $html .= '</button>';
+    return $html;
 }

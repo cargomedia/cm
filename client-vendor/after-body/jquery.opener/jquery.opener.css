@@ -1,13 +1,13 @@
 .openerDropdown {
-	position: relative;
+  position: relative;
 }
 
 .openerDropdown-panel {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .openerDropdown-window {
-	display: none;
-	z-index: 1;
-	position: absolute;
+  display: none;
+  z-index: 1;
+  position: absolute;
 }

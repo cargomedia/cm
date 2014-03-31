@@ -2,5 +2,5 @@
 
 interface CM_Typed {
 
-	public function getType();
+    public function getType();
 }

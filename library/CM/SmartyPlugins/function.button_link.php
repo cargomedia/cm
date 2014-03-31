@@ -2,95 +2,106 @@
 require_once 'function.linkUrl.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
-	$label = '';
-	if (isset($params['label'])) {
-		$label = CM_Util::htmlspecialchars($params['label']);
-		unset($params['label']);
-	}
+    $label = '';
+    if (isset($params['label'])) {
+        $label = CM_Util::htmlspecialchars($params['label']);
+        unset($params['label']);
+    }
 
-	$attrs = '';
-	$icon = null;
-	if (isset($params['icon'])) {
-		$icon = $params['icon'];
-	}
-	unset($params['icon']);
+    $attrs = '';
+    $icon = null;
+    $iconConfirm = null;
+    if (isset($params['icon'])) {
+        $icon = $params['icon'];
 
-	$iconPosition = 'left';
-	if (!empty($params['iconPosition']) && $params['iconPosition'] == 'right') {
-		$iconPosition = 'right';
-	}
-	unset($params['iconPosition']);
+        if (isset($params['iconConfirm'])) {
+            $iconConfirm = $params['iconConfirm'];
+        }
+    }
+    unset($params['icon']);
+    unset($params['iconConfirm']);
 
-	$title = null;
-	if (isset($params['title'])) {
-		$title = (string) $params['title'];
-		$attrs .= ' title="' . CM_Util::htmlspecialchars($title) . '"';
-	}
-	unset($params['title']);
+    $iconPosition = 'left';
+    if (!empty($params['iconPosition']) && $params['iconPosition'] == 'right') {
+        $iconPosition = 'right';
+    }
+    unset($params['iconPosition']);
 
-	if (isset($params['id'])) {
-		$attrs .= ' id="' . $params['id'] . '"';
-	}
-	unset($params['id']);
+    $title = null;
+    if (isset($params['title'])) {
+        $title = (string) $params['title'];
+        $attrs .= ' title="' . CM_Util::htmlspecialchars($title) . '"';
+    }
+    unset($params['title']);
 
-	$theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
-	$class = 'button ' . 'button-' . $theme . ' ';
-	if (isset($params['class'])) {
-		$class .= $params['class'];
-	}
-	unset($params['theme']);
-	unset($params['class']);
+    if (isset($params['id'])) {
+        $attrs .= ' id="' . $params['id'] . '"';
+    }
+    unset($params['id']);
 
-	if ($label) {
-		$class .= ' hasLabel';
-	}
+    $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+    $class = 'button ' . 'button-' . $theme . ' ';
+    if (isset($params['class'])) {
+        $class .= $params['class'];
+    }
+    unset($params['theme']);
+    unset($params['class']);
 
-	$iconMarkup = '';
-	if ($icon) {
-		$iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+    if ($label) {
+        $class .= ' hasLabel';
+    }
 
-		if ($iconPosition == 'right') {
-			$class .= ' hasIconRight';
-		} else {
-			$class .= ' hasIcon';
-		}
-	}
+    $iconMarkup = '';
+    if ($icon) {
+        if ($iconConfirm) {
+            $iconMarkup = '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
+                . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+        } else {
+            $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+        }
 
-	if ($title) {
-		$class .= ' showTooltip';
-	}
+        if ($iconPosition == 'right') {
+            $class .= ' hasIconRight';
+        } else {
+            $class .= ' hasIcon';
+        }
+    }
 
-	$onclick = false;
-	if (isset($params['onclick'])) {
-		$onclick = $params['onclick'];
-		unset($params['onclick']);
-	}
-	if (isset($params['page'])) {
-		$onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
-	}
+    if ($title) {
+        $class .= ' showTooltip';
+    }
 
-	if ($onclick) {
-		$attrs .= ' onclick="' . $onclick . '"';
-	}
+    $onclick = false;
+    if (isset($params['onclick'])) {
+        $onclick = $params['onclick'];
+        unset($params['onclick']);
+    }
+    if (isset($params['page'])) {
+        $onclick .= ' cm.router.route(\'' . smarty_function_linkUrl($params, $template) . '\');';
+    }
 
-	if (isset($params['data'])) {
-		foreach ($params['data'] as $name => $value) {
-			$attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
-		}
-	}
+    if ($onclick) {
+        $attrs .= ' onclick="' . $onclick . '"';
+    }
 
-	$html = '';
-	$html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
-	if ($icon && $iconPosition == 'left') {
-		$html .= $iconMarkup;
-	}
-	if ($label) {
-		$html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
-	}
+    if (isset($params['data'])) {
+        foreach ($params['data'] as $name => $value) {
+            $attrs .= ' data-' . $name . '="' . CM_Util::htmlspecialchars($value) . '"';
+        }
+    }
 
-	if ($icon && $iconPosition == 'right') {
-		$html .= $iconMarkup;
-	}
-	$html .= '</button>';
-	return $html;
+    $html = '';
+    $html .= '<button class="' . $class . '" type="button" value="' . $label . '" ' . $attrs . '>';
+    if ($icon && $iconPosition == 'left') {
+        $html .= $iconMarkup;
+    }
+    if ($label) {
+        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+    }
+
+    if ($icon && $iconPosition == 'right') {
+        $html .= $iconMarkup;
+    }
+    $html .= '</button>';
+    return $html;
 }

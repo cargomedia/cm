@@ -4,20 +4,14 @@
 (function($) {
 
 	$.clickDecorators.confirmed = {
-		settings: {
-			message: 'Please Confirm'
-		},
-
 		before: function(event) {
 			var $this = $(this);
 
 			var activateButton = function() {
 				$this.addClass('confirmClick');
-				$this.attr('title', $.clickDecorators.confirmed.settings.message).tooltip({trigger: 'manual'}).tooltip('show');
 
 				var deactivateButton = function() {
 					$this.removeClass('confirmClick');
-					$this.removeAttr('title').tooltip('hide');
 					$this.removeData('clickConfirmed.deactivate');
 					clearTimeout(deactivateTimeout);
 					$(document).off('click.clickConfirmed', documentClickHandler);
@@ -27,7 +21,7 @@
 
 				var deactivateTimeout = setTimeout(function() {
 					deactivateButton();
-				}, 5000);
+				}, 3000);
 
 				var documentClickHandler = function(e) {
 					if (!$this.length || e.target !== $this[0] && !$.contains($this[0], e.target)) {

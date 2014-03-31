@@ -1,13 +1,58 @@
 @keyframes highlightErrorField {
-	40% { outline-color: @colorError; }
+  0% {
+    outline-color: transparent;
+  }
+  40% {
+    outline-color: @colorError;
+    background-color: lighten(@colorError, 57);
+  }
+  100% {
+    outline-color: transparent;
+  }
 }
-@-webkit-keyframes highlightErrorField {
-	40% { outline-color: @colorError;
-		background-color: lighten(@colorError, 57);}
-}
-@-moz-keyframes highlightErrorField {
-	40% { outline-color: @colorError; }
-}
-@-ms-keyframes highlightErrorField {
-	40% { outline-color: @colorError; }
+
+@keyframes clickConfirm {
+  0% {
+    .transform(scale(1));
+  }
+  4% {
+    .transform(scale(1.3));
+  }
+  7% {
+    .transform(scale(1));
+  }
+  45% {
+    .transform(scale(.95));
+  }
+  50% {
+    .transform(scale(1));
+    opacity: 1;
+  }
+  60% {
+    .transform(scale(.95));
+    opacity: .5;
+  }
+  70% {
+    .transform(scale(1));
+    opacity: 1;
+  }
+  80% {
+    .transform(scale(.95));
+    opacity: 0.5;
+  }
+  90% {
+    .transform(scale(1));
+    opacity: 1;
+  }
+  91% {
+    .transform(scale(1.05));
+  }
+  94% {
+    .transform(scale(.7));
+    opacity: 1;
+  }
+  100% {
+    .transform(scale(1.4));
+    opacity: .1;
+  }
 }
