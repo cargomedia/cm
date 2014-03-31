@@ -2,12 +2,6 @@
 
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
-    public function fetch(CM_Params $viewParams) {
-        $this->_getView()->setTplParam('pageTitle', $this->fetchTitle($viewParams));
-
-        return parent::fetch($viewParams);
-    }
-
     /**
      * @param CM_Params $pageParams
      * @return string
@@ -33,6 +27,12 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         $viewResponse->setTemplateName('title');
         $viewResponse->setData($pageParams->getAll());
         return trim($this->getRender()->renderViewResponse($viewResponse));
+    }
+
+    protected function _getPreparedViewResponse(CM_Params $viewParams) {
+        $viewResponse = parent::_getPreparedViewResponse($viewParams);
+        $viewResponse->addData('pageTitle', $this->fetchTitle($viewParams));
+        return $viewResponse;
     }
 
     protected function _getStackKey() {
