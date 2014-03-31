@@ -66,14 +66,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         return $this->_params;
     }
 
-    public function prepare(CM_Params $params) {
-    }
-
     /**
-     * @return string
+     * @param CM_Params $params
      */
-    public function getTplName() {
-        return $this->_tplName;
+    public function prepare(CM_Params $params) {
     }
 
     /**
