@@ -73,6 +73,9 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      * @return string
      */
     public function fetchTitle($pageTitle) {
-        return trim($this->_renderTemplate('title.tpl', array('pageTitle' => $pageTitle)));
+        $viewResponse = new CM_ViewResponse($this->_getView());
+        $viewResponse->setTemplateName('title');
+        $viewResponse->addData('pageTitle', $pageTitle);
+        return trim($this->getRender()->renderViewResponse($viewResponse));
     }
 }
