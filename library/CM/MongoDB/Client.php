@@ -101,6 +101,17 @@ class CM_MongoDB_Client extends CM_Class_Abstract {
     }
 
     /**
+     * @param string     $collection
+     * @param array     $criteria
+     * @param array|null $options
+     * @return mixed
+     */
+    public function remove($collection, $criteria, $options = null) {
+        $options = ($options !== null) ? $options : array();
+        return $this->getCollection($collection)->remove($criteria, $options);
+    }
+
+    /**
      * @return CM_Mongodb_Client
      */
     public static function getInstance() {

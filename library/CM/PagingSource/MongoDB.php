@@ -4,14 +4,24 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
 
     private $_fields, $_collection, $_query;
     private $_fieldFilter = null;
+    private $_processItemCallback = null;
 
     /** @var array */
     private $_parameters = array();
 
-    function __construct($fields, $collection, $query, $params = array()) {
+    /**
+     * @param null|array    $fields
+     * @param string        $collection
+     * @param array         $query
+     * @param array         $parameters
+     * @param null|function $processItemCallback
+     */
+    function __construct($fields, $collection, $query, $parameters = array(), $processItemCallback = null) {
         $this->_collection = $collection;
         $this->_query = $query;
         $this->_fields = $fields;
+        $this->_parameters = $parameters;
+        $this->_processItemCallback = $processItemCallback;
 
         if ($this->_fields) {
             $this->_fieldFilter = array_flip($this->_fields);
@@ -35,6 +45,11 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
                 $result[] = $item;
             }
         }
+
+        if ($this->_processItemCallback !== null) {
+            $result = array_map($this->_processItemCallback, $result);
+        }
+
         return $result;
     }
 
