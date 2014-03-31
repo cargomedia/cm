@@ -3,7 +3,7 @@
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
     public function fetch(CM_Params $viewParams) {
-        $this->_getView()->setTplParam('pageTitle', $this->fetchTitle());
+        $this->_getView()->setTplParam('pageTitle', $this->fetchTitle($viewParams));
 
         return parent::fetch($viewParams);
     }
