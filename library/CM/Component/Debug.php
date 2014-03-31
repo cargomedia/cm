@@ -12,10 +12,10 @@ class CM_Component_Debug extends CM_Component_Abstract {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);
-        $this->setTplParam('stats', $stats);
+        $viewResponse->addData('stats', $stats);
         $cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
         $this->_setJsParam('cacheNames', $cacheNames);
-        $this->setTplParam('cacheNames', $cacheNames);
+        $viewResponse->addData('cacheNames', $cacheNames);
     }
 
     public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {

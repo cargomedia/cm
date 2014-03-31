@@ -7,10 +7,12 @@ class CM_Component_Example extends CM_Component_Abstract {
         $colorStyles = $this->_getColorStyles();
         $icons = $this->_getIcons();
 
-        $this->setTplParam('now', time());
-        $this->setTplParam('foo', $foo);
-        $this->setTplParam('colorStyles', $colorStyles);
-        $this->setTplParam('icons', $icons);
+        $viewResponse->setData(array(
+            'now'         => time(),
+            'foo'         => $foo,
+            'colorStyles' => $colorStyles,
+            'icons'       => $icons,
+        ));
 
         $this->_setJsParam('uname', 'uname');
     }

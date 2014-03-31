@@ -29,9 +29,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         }
         $html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
 
-        $assign = $component->getTplParams();
-        $assign['viewObj'] = $component;
-        $html .= $this->_renderTemplate($viewResponse->getTemplateName(), $assign, true);
+        $viewResponse->addData('viewOjb', $component);
+        $html .= $this->_renderTemplate($viewResponse->getTemplateName(), $viewResponse->getData(), true);
 
         $html .= '</div>';
 
