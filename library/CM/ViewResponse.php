@@ -14,8 +14,15 @@ class CM_ViewResponse extends CM_Class_Abstract {
     /** @var CM_ComponentFrontendHandler */
     protected $_frontendHandler = null;
 
-    public function __construct() {
+    /** @var CM_View_Abstract */
+    protected $_view;
+
+    /**
+     * @param CM_View_Abstract $view
+     */
+    public function __construct(CM_View_Abstract $view) {
         $this->_frontendHandler = new CM_ComponentFrontendHandler();
+        $this->_view = $view;
     }
 
     /**
@@ -70,6 +77,13 @@ class CM_ViewResponse extends CM_Class_Abstract {
      */
     public function getTemplateName() {
         return $this->_templateName;
+    }
+
+    /**
+     * @return CM_View_Abstract
+     */
+    public function getView() {
+        return $this->_view;
     }
 
     /**
