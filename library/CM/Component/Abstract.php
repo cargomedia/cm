@@ -67,9 +67,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param CM_Params $params
+     * @param CM_Params       $params
+     * @param CM_ViewResponse $viewResponse
      */
-    public function prepare(CM_Params $params) {
+    public function prepare(CM_Params $params, CM_ViewResponse $viewResponse) {
     }
 
     /**

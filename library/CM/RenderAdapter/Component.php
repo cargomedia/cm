@@ -9,7 +9,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $viewResponse = new CM_ViewResponse($component);
         $viewResponse->setTemplateName('default');
-        $component->prepare($viewParams);
+        $component->prepare($viewParams, $viewResponse);
 
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
