@@ -165,14 +165,16 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
     }
 
     /**
-     * @param CM_Menu[]        $menuList
-     * @param CM_Page_Abstract $page
+     * @param CM_Menu[] $menuList
+     * @param string $pageName
+     * @param CM_Params $pageParams
      * @return string[]
      */
-    private function _getMenuEntryHashList(array $menuList, CM_Page_Abstract $page) {
+    private function _getMenuEntryHashList(array $menuList, $pageName, CM_Params $pageParams) {
+        $pageName = (string) $pageName;
         $menuEntryHashList = array();
         foreach ($menuList as $menu) {
-            if (is_array($menuEntries = $menu->findEntries($page))) {
+            if (is_array($menuEntries = $menu->findEntries($pageName, $pageParams))) {
                 foreach ($menuEntries as $menuEntry) {
                     $menuEntryHashList[] = $menuEntry->getHash();
                     foreach ($menuEntry->getParents() as $parentEntry) {

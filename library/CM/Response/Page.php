@@ -5,6 +5,9 @@ class CM_Response_Page extends CM_Response_Abstract {
     /** @var CM_Page_Abstract|null */
     private $_page;
 
+    /** @var CM_Params */
+    private $_pageParams;
+
     /** @var string|null */
     private $_redirectUrl;
 
@@ -19,6 +22,13 @@ class CM_Response_Page extends CM_Response_Abstract {
      */
     public function getPage() {
         return $this->_page;
+    }
+
+    /**
+     * @return CM_Params
+     */
+    public function getPageParams() {
+        return $this->_pageParams;
     }
 
     /**
@@ -127,6 +137,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             }
             $html = $this->_renderPage($page, $pageParams);
             $this->_page = $page;
+            $this->_pageParams = $pageParams;
             return $html;
         } catch (CM_Exception $e) {
             if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {

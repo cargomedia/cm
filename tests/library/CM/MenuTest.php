@@ -4,22 +4,23 @@ class CM_MenuTest extends CMTest_TestCase {
 
     public function testFindNull() {
         $menu = $this->_getMenu();
-        $page = new CM_Page_Mock3();
+        $pageName = 'CM_Page_Mock3';
+        $pageParams = new CM_Params();
 
-        $entry = $menu->findEntry($page, 3, 3);
+        $entry = $menu->findEntry($pageName, $pageParams, 3, 3);
         $this->assertNull($entry);
 
-        $entry = $menu->findEntry($page, 2);
+        $entry = $menu->findEntry($pageName, $pageParams, 2);
         $this->assertNull($entry);
     }
 
     public function testFindEntry() {
         $menu = $this->_getMenu();
-        $page = new CM_Page_Mock3();
+        $pageName = 'CM_Page_Mock3';
+        $pageParams = new CM_Params();
 
-        $entry = $menu->findEntry($page);
-
-        $this->assertInstanceOf('CM_Page_Mock3', $entry->getPage());
+        $entry = $menu->findEntry($pageName, $pageParams);
+        $this->assertSame('CM_Page_Mock3', $entry->getPageName());
     }
 
     public function testGetInstance() {
@@ -33,13 +34,14 @@ class CM_MenuTest extends CMTest_TestCase {
 
     public function testFindEntries() {
         $menu = $this->_getMenu();
-        $page = new CM_Page_Mock3();
+        $pageName = 'CM_Page_Mock3';
+        $pageParams = new CM_Params();
 
-        $entries = $menu->findEntries($page);
+        $entries = $menu->findEntries($pageName, $pageParams);
         $this->assertSame(2, count($entries));
-        $this->assertSame(array($menu->findEntry($page), $menu->findEntry($page, 1)), $entries);
+        $this->assertSame(array($menu->findEntry($pageName, $pageParams), $menu->findEntry($pageName, $pageParams, 1)), $entries);
 
-        $this->assertSame(array(), $menu->findEntries(new CM_Page_Mock6()));
+        $this->assertSame(array(), $menu->findEntries('CM_Page_Mock6', $pageParams));
     }
 
     /**

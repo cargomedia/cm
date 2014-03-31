@@ -21,14 +21,16 @@ class CM_Menu {
     }
 
     /**
-     * @param CM_Page_Abstract $page
-     * @param int|null         $depthMin
-     * @param int|null         $depthMax
-     * @param boolean|null     $findAll
-     * @param int              $_currentDepth
+     * @param string       $pageName
+     * @param CM_Params    $pageParams
+     * @param int|null     $depthMin
+     * @param int|null     $depthMax
+     * @param boolean|null $findAll
+     * @param int          $_currentDepth
      * @return CM_MenuEntry|CM_MenuEntry[]|null
      */
-    public final function findEntry(CM_Page_Abstract $page, $depthMin = null, $depthMax = null, $findAll = null, $_currentDepth = 0) {
+    public final function findEntry($pageName, CM_Params $pageParams, $depthMin = null, $depthMax = null, $findAll = null, $_currentDepth = 0) {
+        $pageName = (string) $pageName;
         if (is_null($depthMin)) {
             $depthMin = 0;
         }
@@ -39,7 +41,7 @@ class CM_Menu {
         foreach ($this->getAllEntries() as $entry) {
             // Page found
             if ($findAll || $_currentDepth >= $depthMin) {
-                if ($entry->compare($page::getPath(), $page->getParams()->getAllOriginal())) {
+                if ($entry->compare($pageName::getPath(), $pageParams->getAllOriginal())) {
                     if (!$findAll) {
                         return $entry;
                     }
@@ -49,7 +51,7 @@ class CM_Menu {
 
             if (($findAll || null === $depthMax || $_currentDepth < $depthMax) && $entry->hasChildren()) {
                 // Checks sub tree
-                $foundEntry = $entry->getChildren()->findEntry($page, $depthMin, $depthMax, $findAll, $_currentDepth + 1);
+                $foundEntry = $entry->getChildren()->findEntry($pageName, $pageParams, $depthMin, $depthMax, $findAll, $_currentDepth + 1);
 
                 // Entry was found
                 if ($foundEntry) {
@@ -67,11 +69,13 @@ class CM_Menu {
     }
 
     /**
-     * @param CM_Page_Abstract $page
+     * @param string    $pageName
+     * @param CM_Params $pageParams
      * @return CM_MenuEntry|CM_MenuEntry[]|null
      */
-    public final function findEntries(CM_Page_Abstract $page) {
-        return $this->findEntry($page, null, null, true);
+    public final function findEntries($pageName, CM_Params $pageParams) {
+        $pageName = (string) $pageName;
+        return $this->findEntry($pageName, $pageParams, null, null, true);
     }
 
     /**
