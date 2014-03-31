@@ -45,6 +45,12 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $generator = new CM_Config_Generator();
         $classTypesConfig = $generator->generateConfigClassTypes();
         $actionVerbsConfig = $generator->generateConfigActionVerbs();
+        foreach ($generator->getClassTypesRemoved() as $classRemoved) {
+            $this->_getOutput()->writeln('Removed `' . $classRemoved . '`');
+        }
+        foreach ($generator->getClassTypesAdded() as $type => $classAdded) {
+            $this->_getOutput()->writeln('Added `' . $classAdded . '` with type `' . $type . '`');
+        }
         CM_File::create($path, $fileHeader . PHP_EOL . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig . PHP_EOL);
         $this->_getOutput()->writeln('Created `' . $path . '`');
 
