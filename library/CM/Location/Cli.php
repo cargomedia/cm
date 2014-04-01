@@ -18,7 +18,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode,
         $_cityListByRegion, $_cityListByRegionOld, $_cityIdList,
         $_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
-        $_locationTree, $_locationTreeOld,
+        $_locationTree, $_locationTreeOld, $_zipIdList,
         $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved;
 
     /**
@@ -45,6 +45,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_upgradeCountryList();
         $this->_upgradeRegionList();
         $this->_upgradeCityList();
+        $this->_upgradeZipCodeList();
         $this->_getOutput()->writeln('Updating search index…');
         CM_Model_Location::createAggregation();
     }
@@ -291,6 +292,16 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                     ksort($zipCodeListRemoved);
                     if (!empty($zipCodeListRemoved)) {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCode][$cityCode] = $zipCodeListRemoved;
+                    }
+
+                    // Store IDs of kept zip codes
+                    foreach ($zipCodeList as $zipCode => $zipCodeData) {
+                        if (isset($zipCodeListOld[$zipCode])) {
+                            $zipCodeDataOld = $zipCodeListOld[$zipCode];
+                            $maxMind = $zipCodeData['maxMind'];
+                            $zipId = $zipCodeDataOld['id'];
+                            $this->_zipIdList[$maxMind] = $zipId;
+                        }
                     }
 
                     // Info
@@ -652,6 +663,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         }
         $result = CM_Db_Db::exec('
 			SELECT
+				`zip`.`id` AS `zipId`,
 				`zip`.`name` AS `zipCode`,
 				`zip`.`cityId` AS `cityId`,
 				`zip`.`lat` AS `lat`,
@@ -667,7 +679,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 			LEFT JOIN `cm_locationState` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `city`.`countryId`');
         while (false !== ($row = $result->fetch())) {
-            list($zipCode, $cityId, $lat, $lon, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+            list($zipId, $zipCode, $cityId, $lat, $lon, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
             if (null === $cityId) {
                 throw new CM_Exception('Zip code `' . $zipCode . '` is not associated with any city');
             }
@@ -687,6 +699,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                 'name' => (string) $zipCode,
                 'lat'  => (float) $lat,
                 'lon'  => (float) $lon,
+                'id'   => (int) $zipId,
             );
         }
     }
@@ -995,6 +1008,23 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                     $city = CM_Model_Location::createCity($parentLocation, $cityName, $cityData['lat'], $cityData['lon']);
                     $cityId = $city->getId();
                     $this->_cityIdList[$cityCode] = $cityId;
+                }
+            }
+        }
+    }
+
+    protected function _upgradeZipCodeList() {
+        foreach ($this->_zipCodeListByCityAdded as $countryCode => $zipCodeListByRegionAdded) {
+            foreach ($zipCodeListByRegionAdded as $regionCode => $zipCodeListByCityAdded) {
+                foreach ($zipCodeListByCityAdded as $cityCode => $zipCodeListAdded) {
+                    $cityId = $this->_cityIdList[$cityCode];
+                    $city = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId);
+                    foreach ($zipCodeListAdded as $zipCode => $zipCodeData) {
+                        $zip = CM_Model_Location::createZip($city, $zipCodeData['name'], $zipCodeData['lat'], $zipCodeData['lon']);
+                        $zipId = $zip->getId();
+                        $maxMind = $zipCodeData['maxMind'];
+                        $this->_zipIdList[$maxMind] = $zipId;
+                    }
                 }
             }
         }
