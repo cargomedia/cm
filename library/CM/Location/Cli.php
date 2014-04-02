@@ -19,7 +19,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $_cityListByRegion, $_cityListByRegionOld, $_cityIdList,
         $_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
         $_locationTree, $_locationTreeOld, $_zipIdList,
-        $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved;
+        $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved,
+        $_ipBlockListByCountry, $_ipBlockListByCity;
 
     /**
      * @synchronized
@@ -46,6 +47,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_upgradeRegionList();
         $this->_upgradeCityList();
         $this->_upgradeZipCodeList();
+        $this->_upgradeIpBlocks();
         $this->_getOutput()->writeln('Updating search index…');
         CM_Model_Location::createAggregation();
         $type = new CM_Elastica_Type_Location();
@@ -758,6 +760,26 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
+     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
+     */
+    protected function _updateRegionList() {
+        $this->_getOutput()->writeln('Downloading new region listing…');
+        $regionsFileContents = $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'region.csv', self::REGION_URL);
+
+        $this->_getOutput()->writeln('Reading new region listing…');
+        $lines = preg_split('#[\r\n]++#', $regionsFileContents);
+        $this->_regionListByCountry = array();
+        foreach ($lines as $line) {
+            $csv = str_getcsv(trim($line));
+            if (count($csv) <= 1) {
+                continue; // Skip empty lines
+            }
+            list($countryCode, $regionCode, $regionName) = $csv;
+            $this->_regionListByCountry[$countryCode][$regionCode] = $this->_normalizeRegionName($regionName);
+        }
+    }
+
+    /**
      * Download MaxMind location data
      * @throws CM_Exception
      */
@@ -766,8 +788,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         if (CM_File::exists(self::GEO_IP_CITY_PATH)) {
             $citiesFileContents = $this->_readLocationData(self::GEO_IP_CITY_PATH);
         } else {
-            $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip', self::GEO_LITE_CITY_URL);
-            $citiesFileContents = $this->_readLocationData(CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip');
+            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
+            $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
+            $citiesFileContents = $this->_readLocationData($geoLiteCityPath);
         }
         $this->_locationTree = array();
         $infoListWarning = array();
@@ -902,27 +925,40 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_printInfoList($infoListWarning, '!');
     }
 
-    /**
-     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
-     */
-    protected function _updateRegionList() {
-        $this->_getOutput()->writeln('Downloading new region listing…');
-        $regionsFileContents = $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'region.csv', self::REGION_URL);
-
-        $this->_getOutput()->writeln('Reading new region listing…');
-        $lines = preg_split('#[\r\n]++#', $regionsFileContents);
-        $this->_regionListByCountry = array();
-        foreach ($lines as $line) {
+    protected function _updateIpBlocks() {
+        $this->_getOutput()->writeln('Reading new IP blocks…');
+        if (CM_File::exists(self::GEO_IP_CITY_PATH)) {
+            $blocksFileContents = $this->_readBlocksData(self::GEO_IP_CITY_PATH);
+        } else {
+            $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
+            $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
+            $blocksFileContents = $this->_readBlocksData($geoLiteCityPath);
+        }
+        $lines = preg_split('#[\r\n]++#', $blocksFileContents);
+        foreach ($lines as $i => $line) {
+            if ($i < 2) {
+                continue; // Skip column names and examples
+            }
             $csv = str_getcsv(trim($line));
             if (count($csv) <= 1) {
                 continue; // Skip empty lines
             }
-            list($countryCode, $regionCode, $regionName) = $csv;
-            $this->_regionListByCountry[$countryCode][$regionCode] = $this->_normalizeRegionName($regionName);
+            list($ipStart, $ipEnd, $maxMind) = $csv;
+            $ipStart = (int) $ipStart;
+            $ipEnd = (int) $ipEnd;
+            $maxMind = (int) $maxMind;
+            if (isset($this->_cityIdList[$maxMind])) {
+                $cityId = $this->_cityIdList[$maxMind];
+                $this->_ipBlockListByCity[$cityId][$ipEnd] = $ipStart;
+            } elseif (isset($this->_countryIdList[$maxMind])) {
+                $countryId = $this->_countryIdList[$maxMind];
+                $this->_ipBlockListByCountry[$countryId][$ipEnd] = $ipStart;
+            }
         }
     }
 
     protected function _upgradeCountryList() {
+        $this->_getOutput()->writeln('Updating countries database…');
         foreach ($this->_countryListRenamed as $countryCode => $countryNames) {
             $countryName = $countryNames['name'];
             CM_Db_Db::update('cm_locationCountry', array('name' => $countryName), array('abbreviation' => $countryCode));
@@ -932,9 +968,14 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             $countryId = $country->getId();
             $this->_countryIdList[$countryCode] = $countryId;
         }
+        foreach ($this->_countryListRemoved as $countryCode => $countryName) {
+            $countryId = $this->_countryIdList[$countryCode];
+            CM_Db_Db::delete('cm_locationCountryIp', array('countryId' => $countryId));
+        }
     }
 
     protected function _upgradeRegionList() {
+        $this->_getOutput()->writeln('Updating regions database…');
         foreach ($this->_regionListByCountryRenamed as $countryCode => $regionListRenamed) {
             foreach ($regionListRenamed as $regionCode => $regionNames) {
                 $regionName = $regionNames['name'];
@@ -968,6 +1009,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     protected function _upgradeCityList() {
+        $this->_getOutput()->writeln('Updating cities database…');
         foreach ($this->_cityListByRegionRenamed as $cityListByRegionRenamed) {
             foreach ($cityListByRegionRenamed as $cityListRenamed) {
                 foreach ($cityListRenamed as $cityCode => $cityNames) {
@@ -1014,9 +1056,18 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                 }
             }
         }
+        foreach ($this->_cityListByRegionRemoved as $countryCode => $cityListByRegionRemoved) {
+            foreach ($cityListByRegionRemoved as $regionCode => $cityListRemoved) {
+                foreach ($cityListRemoved as $cityCode => $cityName) {
+                    $cityId = $this->_cityIdList[$cityCode];
+                    CM_Db_Db::delete('cm_locationCityIp', array('cityId' => $cityId));
+                }
+            }
+        }
     }
 
     protected function _upgradeZipCodeList() {
+        $this->_getOutput()->writeln('Updating zip codes database…');
         foreach ($this->_zipCodeListByCityAdded as $countryCode => $zipCodeListByRegionAdded) {
             foreach ($zipCodeListByRegionAdded as $regionCode => $zipCodeListByCityAdded) {
                 foreach ($zipCodeListByCityAdded as $cityCode => $zipCodeListAdded) {
@@ -1029,6 +1080,23 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                         $this->_zipIdList[$maxMind] = $zipId;
                     }
                 }
+            }
+        }
+    }
+
+    protected function _upgradeIpBlocks() {
+        $this->_updateIpBlocks();
+        $this->_getOutput()->writeln('Updating IP blocks database…');
+        foreach ($this->_ipBlockListByCountry as $countryId => $ipBlockList) {
+            CM_Db_Db::delete('cm_locationCountryIp', array('countryId' => $countryId));
+            foreach ($ipBlockList as $ipEnd => $ipStart) {
+                CM_Db_Db::insertIgnore('cm_locationCountryIp', array('countryId' => $countryId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
+            }
+        }
+        foreach ($this->_ipBlockListByCity as $cityId => $ipBlockList) {
+            CM_Db_Db::delete('cm_locationCityIp', array('cityId' => $cityId));
+            foreach ($ipBlockList as $ipEnd => $ipStart) {
+                CM_Db_Db::insertIgnore('cm_locationCityIp', array('cityId' => $cityId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
             }
         }
     }
