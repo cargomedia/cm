@@ -6,8 +6,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     const REGION_URL = 'http://dev.maxmind.com/static/csv/codes/maxmind/region.csv';
     const GEO_LITE_CITY_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip';
 
-    const GEO_IP_CITY_PATH = 'GeoIP-134_20131126.zip';
-
     const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
 
     /** @var array */
@@ -22,10 +20,14 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved,
         $_ipBlockListByCountry, $_ipBlockListByCity;
 
+    protected $_geoIpFile = null;
+
     /**
+     * @param string|null $geoIpFile
      * @synchronized
      */
-    public function update() {
+    public function update($geoIpFile = null) {
+        $this->_setGeoIpFile($geoIpFile);
         $this->_getOutput()->writeln('Updating locations database…');
         $this->_readCountryListOld();
         $this->_updateCountryList();
@@ -39,10 +41,11 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
+     * @param string|null $geoIpFile
      * @synchronized
      */
-    public function upgrade() {
-        $this->update();
+    public function upgrade($geoIpFile = null) {
+        $this->update($geoIpFile);
         $this->_upgradeCountryList();
         $this->_upgradeRegionList();
         $this->_upgradeCityList();
@@ -785,8 +788,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      */
     protected function _updateLocationTree() {
         $this->_getOutput()->writeln('Reading new location tree…');
-        if (CM_File::exists(self::GEO_IP_CITY_PATH)) {
-            $citiesFileContents = $this->_readLocationData(self::GEO_IP_CITY_PATH);
+        if (null !== $this->_geoIpFile) {
+            $citiesFileContents = $this->_readLocationData($this->_geoIpFile);
         } else {
             $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
             $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
@@ -927,8 +930,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
     protected function _updateIpBlocks() {
         $this->_getOutput()->writeln('Reading new IP blocks…');
-        if (CM_File::exists(self::GEO_IP_CITY_PATH)) {
-            $blocksFileContents = $this->_readBlocksData(self::GEO_IP_CITY_PATH);
+        if (null !== $this->_geoIpFile) {
+            $blocksFileContents = $this->_readBlocksData($this->_geoIpFile);
         } else {
             $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
             $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
@@ -1327,6 +1330,20 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         zip_close($zip);
         $contents = iconv('ISO-8859-1', 'UTF-8', $contents);
         return $contents;
+    }
+
+    /**
+     * @param string|null $geoIpFile
+     * @throws CM_Exception_Invalid
+     */
+    private function _setGeoIpFile($geoIpFile = null) {
+        if (null !== $geoIpFile) {
+            $geoIpFile = (string) $geoIpFile;
+            if (!CM_File::exists($geoIpFile)) {
+                throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile);
+            }
+        }
+        $this->_geoIpFile = $geoIpFile;
     }
 
     /**
