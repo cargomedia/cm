@@ -102,6 +102,141 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_printInfoList($infoListRemoved, '-');
     }
 
+    /**
+     * @throws CM_Exception
+     */
+    protected function _compareRegionLists() {
+        $this->_getOutput()->writeln('Comparing both region listings…');
+
+        $this->_regionListByCountryUpdatedCode = array();
+        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
+            if (!isset($this->_regionListByCountry[$countryCode])) {
+                continue;
+            }
+            $regionList = $this->_regionListByCountry[$countryCode];
+            $regionCodeList = array_flip($regionList);
+            $regionIdListUpdatedCode = array();
+            foreach ($regionListOld as $regionCodeOld => $regionNameOld) {
+                if (isset($regionList[$regionCodeOld]) && ($regionNameOld === $regionList[$regionCodeOld])) {
+                    continue;
+                }
+                if (isset($regionCodeList[$regionNameOld])) {
+                    $regionCode = $regionCodeList[$regionNameOld];
+                    $this->_regionListByCountryUpdatedCode[$countryCode][$regionCodeOld] = $regionCode;
+                    $regionIdListUpdatedCode[$regionCode] = $this->_regionIdListByCountry[$countryCode][$regionCodeOld];
+                }
+            }
+            foreach ($regionIdListUpdatedCode as $regionCode => $regionId) {
+                $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
+            }
+        }
+
+        $this->_regionListByCountryAdded = array();
+        foreach ($this->_regionListByCountry as $countryCode => $regionList) {
+            $regionListOld = isset($this->_regionListByCountryOld[$countryCode]) ? $this->_regionListByCountryOld[$countryCode] : array();
+            $regionListAdded = array_diff_key($regionList, $regionListOld);
+            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
+                foreach ($this->_regionListByCountryUpdatedCode[$countryCode] as $regionCodeUpdated) {
+                    unset($regionListAdded[$regionCodeUpdated]);
+                }
+            }
+            asort($regionListAdded);
+            if (!empty($regionListAdded)) {
+                $this->_regionListByCountryAdded[$countryCode] = $regionListAdded;
+            }
+        }
+
+        $this->_regionListByCountryRemoved = array();
+        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
+            $regionList = isset($this->_regionListByCountry[$countryCode]) ? $this->_regionListByCountry[$countryCode] : array();
+            $regionListRemoved = array_diff_key($regionListOld, $regionList);
+            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
+                foreach (array_keys($this->_regionListByCountryUpdatedCode[$countryCode]) as $regionCodeOld) {
+                    unset($regionListRemoved[$regionCodeOld]);
+                }
+            }
+            asort($regionListRemoved);
+            if (!empty($regionListRemoved)) {
+                $this->_regionListByCountryRemoved[$countryCode] = $regionListRemoved;
+            }
+        }
+
+        $this->_regionListByCountryRenamed = array();
+        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
+            if (!isset($this->_regionListByCountry[$countryCode])) {
+                continue;
+            }
+            foreach ($regionListOld as $regionCode => $regionNameOld) {
+                if (isset($this->_regionListByCountry[$countryCode][$regionCode]) &&
+                    ($this->_regionListByCountry[$countryCode][$regionCode] !== $regionNameOld)
+                ) {
+                    $this->_regionListByCountryRenamed[$countryCode][$regionCode] = array(
+                        'name'    => $this->_regionListByCountry[$countryCode][$regionCode],
+                        'nameOld' => $regionNameOld,
+                    );
+                }
+            }
+            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
+                foreach ($this->_regionListByCountryUpdatedCode[$countryCode] as $regionCodeOld => $regionCodeUpdated) {
+                    unset($this->_regionListByCountryRenamed[$countryCode][$regionCodeOld]);
+                    unset($this->_regionListByCountryRenamed[$countryCode][$regionCodeUpdated]);
+                }
+            }
+        }
+
+        $infoListWarning = array();
+        $infoListAdded = array();
+        $infoListUpdated = array();
+        $infoListRemoved = array();
+
+        foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
+            if (!isset($this->_countryList[$countryCode])) {
+                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
+            }
+            $countryName = $this->_countryList[$countryCode];
+            foreach ($regionListAdded as $regionCode => $regionName) {
+                $infoListAdded['Regions added'][$countryName][] = $regionName . ' (' . $regionCode . ')';
+            }
+        }
+
+        foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
+            if (!isset($this->_countryListOld[$countryCode])) {
+                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
+            }
+            $countryName = $this->_countryListOld[$countryCode];
+            foreach ($regionListRemoved as $regionCode => $regionName) {
+                $infoListRemoved['Regions removed'][$countryName][] = $regionName . ' (' . $regionCode . ')';
+            }
+        }
+
+        foreach ($this->_regionListByCountryRenamed as $countryCode => $regionListRenamed) {
+            if (!isset($this->_countryList[$countryCode])) {
+                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
+            }
+            $countryName = $this->_countryList[$countryCode];
+            foreach ($regionListRenamed as $regionCode => $regionNames) {
+                $infoListUpdated['Regions renamed'][$countryName][] =
+                    $regionNames['nameOld'] . ' => ' . $regionNames['name'] . ' (' . $regionCode . ')';
+            }
+        }
+
+        foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
+            if (!isset($this->_countryList[$countryCode])) {
+                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
+            }
+            $countryName = $this->_countryList[$countryCode];
+            foreach ($regionListUpdatedCode as $regionCodeOld => $regionCode) {
+                $infoListUpdated['Regions with updated code'][$countryName][] =
+                    $this->_regionListByCountry[$countryCode][$regionCode] . ' (' . $regionCodeOld . ' => ' . $regionCode . ')';
+            }
+        }
+
+        $this->_printInfoList($infoListWarning, '!');
+        $this->_printInfoList($infoListAdded, '+');
+        $this->_printInfoList($infoListUpdated, '~');
+        $this->_printInfoList($infoListRemoved, '-');
+    }
+
     protected function _compareLocationTrees() {
         $this->_getOutput()->writeln('Comparing both location trees…');
 
@@ -459,141 +594,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @throws CM_Exception
-     */
-    protected function _compareRegionLists() {
-        $this->_getOutput()->writeln('Comparing both region listings…');
-
-        $this->_regionListByCountryUpdatedCode = array();
-        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
-            if (!isset($this->_regionListByCountry[$countryCode])) {
-                continue;
-            }
-            $regionList = $this->_regionListByCountry[$countryCode];
-            $regionCodeList = array_flip($regionList);
-            $regionIdListUpdatedCode = array();
-            foreach ($regionListOld as $regionCodeOld => $regionNameOld) {
-                if (isset($regionList[$regionCodeOld]) && ($regionNameOld === $regionList[$regionCodeOld])) {
-                    continue;
-                }
-                if (isset($regionCodeList[$regionNameOld])) {
-                    $regionCode = $regionCodeList[$regionNameOld];
-                    $this->_regionListByCountryUpdatedCode[$countryCode][$regionCodeOld] = $regionCode;
-                    $regionIdListUpdatedCode[$regionCode] = $this->_regionIdListByCountry[$countryCode][$regionCodeOld];
-                }
-            }
-            foreach ($regionIdListUpdatedCode as $regionCode => $regionId) {
-                $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
-            }
-        }
-
-        $this->_regionListByCountryAdded = array();
-        foreach ($this->_regionListByCountry as $countryCode => $regionList) {
-            $regionListOld = isset($this->_regionListByCountryOld[$countryCode]) ? $this->_regionListByCountryOld[$countryCode] : array();
-            $regionListAdded = array_diff_key($regionList, $regionListOld);
-            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
-                foreach ($this->_regionListByCountryUpdatedCode[$countryCode] as $regionCodeUpdated) {
-                    unset($regionListAdded[$regionCodeUpdated]);
-                }
-            }
-            asort($regionListAdded);
-            if (!empty($regionListAdded)) {
-                $this->_regionListByCountryAdded[$countryCode] = $regionListAdded;
-            }
-        }
-
-        $this->_regionListByCountryRemoved = array();
-        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
-            $regionList = isset($this->_regionListByCountry[$countryCode]) ? $this->_regionListByCountry[$countryCode] : array();
-            $regionListRemoved = array_diff_key($regionListOld, $regionList);
-            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
-                foreach (array_keys($this->_regionListByCountryUpdatedCode[$countryCode]) as $regionCodeOld) {
-                    unset($regionListRemoved[$regionCodeOld]);
-                }
-            }
-            asort($regionListRemoved);
-            if (!empty($regionListRemoved)) {
-                $this->_regionListByCountryRemoved[$countryCode] = $regionListRemoved;
-            }
-        }
-
-        $this->_regionListByCountryRenamed = array();
-        foreach ($this->_regionListByCountryOld as $countryCode => $regionListOld) {
-            if (!isset($this->_regionListByCountry[$countryCode])) {
-                continue;
-            }
-            foreach ($regionListOld as $regionCode => $regionNameOld) {
-                if (isset($this->_regionListByCountry[$countryCode][$regionCode]) &&
-                    ($this->_regionListByCountry[$countryCode][$regionCode] !== $regionNameOld)
-                ) {
-                    $this->_regionListByCountryRenamed[$countryCode][$regionCode] = array(
-                        'name'    => $this->_regionListByCountry[$countryCode][$regionCode],
-                        'nameOld' => $regionNameOld,
-                    );
-                }
-            }
-            if (isset($this->_regionListByCountryUpdatedCode[$countryCode])) {
-                foreach ($this->_regionListByCountryUpdatedCode[$countryCode] as $regionCodeOld => $regionCodeUpdated) {
-                    unset($this->_regionListByCountryRenamed[$countryCode][$regionCodeOld]);
-                    unset($this->_regionListByCountryRenamed[$countryCode][$regionCodeUpdated]);
-                }
-            }
-        }
-
-        $infoListWarning = array();
-        $infoListAdded = array();
-        $infoListUpdated = array();
-        $infoListRemoved = array();
-
-        foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
-            if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
-            }
-            $countryName = $this->_countryList[$countryCode];
-            foreach ($regionListAdded as $regionCode => $regionName) {
-                $infoListAdded['Regions added'][$countryName][] = $regionName . ' (' . $regionCode . ')';
-            }
-        }
-
-        foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
-            if (!isset($this->_countryListOld[$countryCode])) {
-                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
-            }
-            $countryName = $this->_countryListOld[$countryCode];
-            foreach ($regionListRemoved as $regionCode => $regionName) {
-                $infoListRemoved['Regions removed'][$countryName][] = $regionName . ' (' . $regionCode . ')';
-            }
-        }
-
-        foreach ($this->_regionListByCountryRenamed as $countryCode => $regionListRenamed) {
-            if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
-            }
-            $countryName = $this->_countryList[$countryCode];
-            foreach ($regionListRenamed as $regionCode => $regionNames) {
-                $infoListUpdated['Regions renamed'][$countryName][] =
-                    $regionNames['nameOld'] . ' => ' . $regionNames['name'] . ' (' . $regionCode . ')';
-            }
-        }
-
-        foreach ($this->_regionListByCountryUpdatedCode as $countryCode => $regionListUpdatedCode) {
-            if (!isset($this->_countryList[$countryCode])) {
-                throw new CM_Exception('Unknown country code `' . $countryCode . '`');
-            }
-            $countryName = $this->_countryList[$countryCode];
-            foreach ($regionListUpdatedCode as $regionCodeOld => $regionCode) {
-                $infoListUpdated['Regions with updated code'][$countryName][] =
-                    $this->_regionListByCountry[$countryCode][$regionCode] . ' (' . $regionCodeOld . ' => ' . $regionCode . ')';
-            }
-        }
-
-        $this->_printInfoList($infoListWarning, '!');
-        $this->_printInfoList($infoListAdded, '+');
-        $this->_printInfoList($infoListUpdated, '~');
-        $this->_printInfoList($infoListRemoved, '-');
-    }
-
-    /**
      * @param string      $path
      * @param string|null $url
      * @return string
@@ -623,6 +623,30 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             }
         }
         return $contents;
+    }
+
+    protected function _readCountryListOld() {
+        $this->_getOutput()->writeln('Reading old country listing…');
+        $this->_countryListOld = array();
+        $this->_countryIdList = array();
+        $result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_locationCountry`');
+        while (false !== ($row = $result->fetch())) {
+            list($countryId, $countryCode, $countryName) = array_values($row);
+            $this->_countryListOld[$countryCode] = $countryName;
+            $this->_countryIdList[$countryCode] = $countryId;
+        }
+    }
+
+    protected function _readRegionListOld() {
+        $this->_getOutput()->writeln('Reading old region listing…');
+        $this->_regionListByCountryOld = array();
+        $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_locationState` `state` LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `state`.`countryId`');
+        while (false !== ($row = $result->fetch())) {
+            list($regionId, $countryCode, $maxMind, $regionAbbreviation, $regionName) = array_values($row);
+            $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
+            $this->_regionListByCountryOld[$countryCode][$regionCode] = $regionName;
+            $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
+        }
     }
 
     /**
@@ -709,30 +733,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                 'lon'  => (float) $lon,
                 'id'   => (int) $zipId,
             );
-        }
-    }
-
-    protected function _readCountryListOld() {
-        $this->_getOutput()->writeln('Reading old country listing…');
-        $this->_countryListOld = array();
-        $this->_countryIdList = array();
-        $result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_locationCountry`');
-        while (false !== ($row = $result->fetch())) {
-            list($countryId, $countryCode, $countryName) = array_values($row);
-            $this->_countryListOld[$countryCode] = $countryName;
-            $this->_countryIdList[$countryCode] = $countryId;
-        }
-    }
-
-    protected function _readRegionListOld() {
-        $this->_getOutput()->writeln('Reading old region listing…');
-        $this->_regionListByCountryOld = array();
-        $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_locationState` `state` LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `state`.`countryId`');
-        while (false !== ($row = $result->fetch())) {
-            list($regionId, $countryCode, $maxMind, $regionAbbreviation, $regionName) = array_values($row);
-            $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
-            $this->_regionListByCountryOld[$countryCode][$regionCode] = $regionName;
-            $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
         }
     }
 
