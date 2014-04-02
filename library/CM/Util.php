@@ -41,7 +41,7 @@ class CM_Util {
             }
             $value = get_class($argument);
             if ($argument instanceof CM_Model_Abstract) {
-                if ($argument->hasId()) {
+                if ($argument->hasIdRaw()) {
                     $value .= '(' . implode(', ', (array) $argument->getIdRaw()) . ')';
                 }
             }
