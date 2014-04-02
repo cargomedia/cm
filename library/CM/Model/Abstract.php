@@ -624,10 +624,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     public function toArray() {
-        $id = $this->getIdRaw();
-        $array = array('_type' => $this->getType(), '_id' => $id);
-        if (array_key_exists('id', $id)) {
-            $array['id'] = (int) $id['id'];
+        $array = array('_type' => $this->getType(), '_id' => $this->getIdRaw());
+        if ($this->hasId()) {
+            $array['id'] = $this->getId();
         }
         return $array;
     }
