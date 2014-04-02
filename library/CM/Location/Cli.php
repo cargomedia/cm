@@ -48,6 +48,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_upgradeZipCodeList();
         $this->_getOutput()->writeln('Updating search index…');
         CM_Model_Location::createAggregation();
+        $type = new CM_Elastica_Type_Location();
+        $searchIndexCli = new CM_Search_Index_Cli();
+        $searchIndexCli->create($type->getIndex()->getName());
     }
 
     public static function getPackageName() {
