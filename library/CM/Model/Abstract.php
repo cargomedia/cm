@@ -140,7 +140,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             return false;
         }
         /** @var CM_Model_Abstract $model */
-        return (get_class($this) == get_class($model) && $this->_getId() === $model->_getId());
+        return (get_class($this) == get_class($model) && $this->getIdRaw() === $model->getIdRaw());
     }
 
     final public function serialize() {
@@ -258,7 +258,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                     }
                 }
                 if (null === $this->_data) {
-                    throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->_getId(), true) . '` has no data.');
+                    throw new CM_Exception_Nonexistent(get_called_class() . ' `' . CM_Util::var_line($this->getIdRaw(), true) . '` has no data.');
                 }
 
                 if ($cache) {
@@ -313,17 +313,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     /**
-     * @param string|null $key
+     * @param string $key
      * @return array|mixed
-     *
      * @throws CM_Exception_Invalid
      */
-    final protected function _getId($key = null) {
-        $idRaw = $this->getIdRaw();
-        if (null === $key) {
-            return $idRaw;
-        }
+    final protected function _getId($key) {
         $key = (string) $key;
+        $idRaw = $this->getIdRaw();
         if (!$this->_hasIdKey($key)) {
             throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
         }
@@ -334,7 +330,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @param string $key
      * @return bool
      */
-    protected function _hasIdKey($key){
+    protected function _hasIdKey($key) {
+        $key = (string) $key;
         $idRaw = $this->getIdRaw();
         return array_key_exists($key, $idRaw);
     }
@@ -627,7 +624,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     public function toArray() {
-        $id = $this->_getId();
+        $id = $this->getIdRaw();
         $array = array('_type' => $this->getType(), '_id' => $id);
         if (array_key_exists('id', $id)) {
             $array['id'] = (int) $id['id'];
