@@ -1011,7 +1011,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             $countryId = $this->_countryIdList[$countryCode];
             $country = new CM_Model_Location(CM_Model_Location::LEVEL_COUNTRY, $countryId);
             foreach ($regionListAdded as $regionCode => $regionName) {
-                $region = CM_Model_Location::createState($country, $regionName, null, $countryCode . $regionCode);
+                $abbreviationRegion = ('US' === $countryCode) ? $regionCode : null;
+                $maxMindRegion = $countryCode . $regionCode;
+                $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $maxMindRegion);
                 $regionId = $region->getId();
                 $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
             }
