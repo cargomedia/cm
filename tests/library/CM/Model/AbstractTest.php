@@ -340,6 +340,21 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $this->assertFalse($model2->hasIdRaw());
     }
 
+    public function testHasId() {
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('getType'))
+            ->disableOriginalConstructor()->getMockForAbstractClass();
+        $model->expects($this->any())->method('getType')->will($this->returnValue(11));
+        /** @var CM_Model_Abstract $model */
+
+        $_construct = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_construct');
+        $_construct->invoke($model, array('id' => 12), array('foobar' => 12));
+
+        $this->assertTrue($model->hasId());
+
+        $_construct->invoke($model, array('foo' => 12, 'bar' => 13), array('foobar' => 12));
+        $this->assertFalse($model->hasId());
+    }
+
     public function testCache() {
         $modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
         $modelMock = new CM_ModelMock($modelMock->getId());

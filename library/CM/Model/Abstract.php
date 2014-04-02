@@ -107,6 +107,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     }
 
     /**
+     * @return bool
+     */
+    public function hasId() {
+        return $this->_hasIdKey('id');
+    }
+
+    /**
      * @return array
      * @throws CM_Exception_Invalid
      */
@@ -317,10 +324,19 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             return $idRaw;
         }
         $key = (string) $key;
-        if (!array_key_exists($key, $idRaw)) {
+        if (!$this->_hasIdKey($key)) {
             throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
         }
         return $idRaw[$key];
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    protected function _hasIdKey($key){
+        $idRaw = $this->getIdRaw();
+        return array_key_exists($key, $idRaw);
     }
 
     /**
