@@ -13,7 +13,7 @@ class CM_MailTest extends CMTest_TestCase {
 
         $templateVariabels = array('foo' => 'bar');
         $msg = new CM_Mail_Welcome($user, $templateVariabels);
-        list($subject, $html, $text) = $msg->send();
+        list($subject, $html, $text) = $msg->render();
         $this->assertNotEmpty($subject);
         $this->assertNotEmpty($html);
         $this->assertNotEmpty($text);
@@ -35,7 +35,7 @@ class CM_MailTest extends CMTest_TestCase {
             $this->assertTrue(true);
         }
         $msg->setHtml('<a href="http://www.foo.bar">Hello</a>');
-        list($subject, $html, $text) = $msg->send();
+        list($subject, $html, $text) = $msg->render();
         $this->assertEquals('blabla', $subject);
         $this->assertEquals('<a href="http://www.foo.bar">Hello</a>', $html);
         $this->assertEquals('Hello (http://www.foo.bar)', $text);

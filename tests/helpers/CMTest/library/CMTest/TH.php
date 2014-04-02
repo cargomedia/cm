@@ -10,8 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        $forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
-        CM_App::getInstance()->setupDatabase($forceReload);
+        CM_App::getInstance()->setupDatabase(true);
 
         self::$_configBackup = serialize(CM_Config::get());
 

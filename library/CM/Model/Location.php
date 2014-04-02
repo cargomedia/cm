@@ -47,7 +47,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return int
      */
     public function getLevel() {
-        return (int) $this->_getId('level');
+        return (int) $this->_getIdKey('level');
     }
 
     /**
@@ -56,7 +56,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      */
     public function getId($level = null) {
         if (null === $level) {
-            return (int) $this->_getId('id');
+            return (int) $this->_getIdKey('id');
         }
         $id = $this->_getField($level, 'id');
         if (null === $id) {
