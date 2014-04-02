@@ -10,7 +10,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
     /** @var array */
     protected
-        $_countryList, $_countryListOld, $_countryIdList,
+        $_countryList, $_countryListOld, $_countryIdList, $_countryCodeListByMaxMind,
         $_countryListAdded, $_countryListRemoved, $_countryListRenamed,
         $_regionListByCountry, $_regionListByCountryOld, $_regionIdListByCountry,
         $_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode,
@@ -796,6 +796,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             $citiesFileContents = $this->_readLocationData($geoLiteCityPath);
         }
         $this->_locationTree = array();
+        $this->_countryCodeListByMaxMind = array();
         $infoListWarning = array();
         $lines = preg_split('#[\r\n]++#', $citiesFileContents);
         foreach ($lines as $i => $line) {
@@ -904,6 +905,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                             'lon'     => $lon,
                             'maxMind' => $maxMind,
                         );
+                        $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
                     }
                 }
             }
@@ -938,6 +940,8 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             $blocksFileContents = $this->_readBlocksData($geoLiteCityPath);
         }
         $lines = preg_split('#[\r\n]++#', $blocksFileContents);
+        $this->_ipBlockListByCity = array();
+        $this->_ipBlockListByCountry = array();
         foreach ($lines as $i => $line) {
             if ($i < 2) {
                 continue; // Skip column names and examples
@@ -953,9 +957,12 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             if (isset($this->_cityIdList[$maxMind])) {
                 $cityId = $this->_cityIdList[$maxMind];
                 $this->_ipBlockListByCity[$cityId][$ipEnd] = $ipStart;
-            } elseif (isset($this->_countryIdList[$maxMind])) {
-                $countryId = $this->_countryIdList[$maxMind];
-                $this->_ipBlockListByCountry[$countryId][$ipEnd] = $ipStart;
+            } elseif (isset($this->_countryCodeListByMaxMind[$maxMind])) {
+                $countryCode = $this->_countryCodeListByMaxMind[$maxMind];
+                if (isset($this->_countryIdList[$countryCode])) {
+                    $countryId = $this->_countryIdList[$countryCode];
+                    $this->_ipBlockListByCountry[$countryId][$ipEnd] = $ipStart;
+                }
             }
         }
     }
