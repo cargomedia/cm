@@ -103,7 +103,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return int
      */
     public function getId() {
-        return (int) $this->_getId('id');
+        return (int) $this->_getIdKey('id');
     }
 
     /**
@@ -317,7 +317,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return array|mixed
      * @throws CM_Exception_Invalid
      */
-    final protected function _getId($key) {
+    final protected function _getIdKey($key) {
         $key = (string) $key;
         $idRaw = $this->getIdRaw();
         if (!$this->_hasIdKey($key)) {

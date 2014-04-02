@@ -31,14 +31,14 @@ abstract class CM_Model_ActionLimit_Abstract extends CM_Model_Abstract {
      * @return int
      */
     public function getActionType() {
-        return (int) $this->_getId('actionType');
+        return (int) $this->_getIdKey('actionType');
     }
 
     /**
      * @return int
      */
     public function getActionVerb() {
-        return (int) $this->_getId('actionVerb');
+        return (int) $this->_getIdKey('actionVerb');
     }
 
     /**
