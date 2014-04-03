@@ -930,6 +930,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_printInfoList($infoListWarning, '!');
     }
 
+    /**
+     * Download MaxMind GeoIP data
+     */
     protected function _updateIpBlocks() {
         $this->_getOutput()->writeln('Reading new IP blocks…');
         if (null !== $this->_geoIpFile) {
@@ -1113,6 +1116,10 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         }
     }
 
+    /**
+     * @param int $color
+     * @return string
+     */
     private function _getEscapeSequenceHighlighted($color) {
         static $escapeSequence = array();
         if (!isset($escapeSequence[$color])) {
@@ -1122,6 +1129,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         return $escapeSequence[$color];
     }
 
+    /**
+     * @return string
+     */
     private function _getEscapeSequenceNormal() {
         static $escapeSequence = null;
         if (null === $escapeSequence) {
@@ -1230,11 +1240,20 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         return trim($name);
     }
 
+    /**
+     * @param string $fullName
+     * @return string
+     */
     private function _normalizeRegionName($fullName) {
         $name = preg_replace('#, [^&,][^,]*\z#', '', $fullName); // Remove prefix, like in "London, City of". Considering the special case of "Armed Forces Europe, Middle East, & Canada".
         return trim($name);
     }
 
+    /**
+     * @param string      $fullName
+     * @param string|null $nameOld
+     * @return string
+     */
     private function _normalizeCityName($fullName, $nameOld = null) {
         $name = preg_replace('#\s*\(\([^)]*\)\)#', '', $fullName); // Remove non-existent cities, like "(( Mantjurgiai ))"
         if ((null !== $nameOld) && ($nameOld !== $name)) {
@@ -1297,7 +1316,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param $geoIpZipFile
+     * @param string $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      */
@@ -1319,7 +1338,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param $geoIpZipFile
+     * @param string $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      */
@@ -1356,7 +1375,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param $text
+     * @param string $text
      * @return string
      */
     private function _stripAccents($text) {
