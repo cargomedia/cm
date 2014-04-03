@@ -421,7 +421,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                     $cityName = $cityList[$cityCode];
                     $cityNameOld = $cityListOld[$cityCodeOld];
                     $zipCodeList = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'] : array();
-                    $zipCodeListOld = isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityNameOld]['zipCodes']) ? $this->_locationTree[$countryCode]['regions'][$regionCodeOld]['cities'][$cityNameOld]['zipCodes'] : array();
+                    $zipCodeListOld = isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityNameOld]['zipCodes']) ? $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityNameOld]['zipCodes'] : array();
 
                     // Zip codes added
                     $zipCodeListAdded = array_diff_key($zipCodeList, $zipCodeListOld);
@@ -896,7 +896,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                     !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
                     || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
                 ) {
-                    $name = $this->_normalizeCityName($cityName, isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind]) ? isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind]) : null);
+                    $name = $this->_normalizeCityName($cityName);
                     // Keep old city record if possible
                     if (
                         !isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])
@@ -924,7 +924,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                     || !empty($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location']['fromZipCode'])
                     || isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind])
                 ) {
-                    $name = $this->_normalizeCityName($cityName, isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind]) ? isset($this->_cityListByRegionOld[$countryCode][$regionCode][$maxMind]) : null);
+                    $name = $this->_normalizeCityName($cityName);
                     if (strlen($name)) {
                         $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
                             'name'    => $name,
@@ -1318,17 +1318,11 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string      $fullName
-     * @param string|null $nameOld
+     * @param string $fullName
      * @return string
      */
-    private function _normalizeCityName($fullName, $nameOld = null) {
+    private function _normalizeCityName($fullName) {
         $name = preg_replace('#\s*\(\([^)]*\)\)#', '', $fullName); // Remove non-existent cities, like "(( Mantjurgiai ))"
-        if ((null !== $nameOld) && ($nameOld !== $name)) {
-            if ($name === $this->_stripAccents($nameOld)) {
-                $name = $nameOld; // Ignore MaxMind's "cleaning up" of the diacritics
-            }
-        }
         return trim($name);
     }
 
@@ -1440,34 +1434,5 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             }
         }
         $this->_geoIpFile = $geoIpFile;
-    }
-
-    /**
-     * @param string $text
-     * @return string
-     */
-    private function _stripAccents($text) {
-        foreach (
-            array(
-                'àáâãä' => 'a',
-                'ç'     => 'c',
-                'èéêë'  => 'e',
-                'ìíîï'  => 'i',
-                'ñ'     => 'n',
-                'òóôõö' => 'o',
-                'ùúûü'  => 'u',
-                'ýÿ'    => 'y',
-                'ÀÁÂÃÄ' => 'A',
-                'Ç'     => 'C',
-                'ÈÉÊË'  => 'E',
-                'ÌÍÎÏ'  => 'I',
-                'Ñ'     => 'N',
-                'ÒÓÔÕÖ' => 'O',
-                'ÙÚÛÜ'  => 'U',
-                'Ý'     => 'Y',
-            ) as $search => $replace) {
-            $text = preg_replace('/[' . $search . ']/u', $replace, $text);
-        }
-        return $text;
     }
 }
