@@ -12,8 +12,9 @@ class CM_MongoDB_Client extends CM_Class_Abstract {
     private $_db = null;
 
     public function __construct() {
-        $this->_mongodb = new MongoClient();
-        $this->useDatabase('fuckbook');
+        $config = CM_Config::get()->CM_MongoDB;
+        $this->_mongodb = new MongoClient($config->server);
+        $this->useDatabase($config->database);
     }
 
     /**
