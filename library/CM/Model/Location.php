@@ -319,18 +319,18 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
-     * @param CM_Model_Location $parentLocation
+     * @param CM_Model_Location $country
      * @param string            $name
      * @param string|null       $abbreviation
      * @param string|null       $_maxmind
      * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
-    public static function createState(CM_Model_Location $parentLocation, $name, $abbreviation = null, $_maxmind = null) {
-        if ($parentLocation->getLevel() !== CM_Model_Location::LEVEL_COUNTRY) {
-            throw new CM_Exception_Invalid('Need to pass CM_Model_Location::LEVEL_COUNTRY instance');
+    public static function createState(CM_Model_Location $country, $name, $abbreviation = null, $_maxmind = null) {
+        if (CM_Model_Location::LEVEL_COUNTRY !== $country->getLevel()) {
+            throw new CM_Exception_Invalid('The parent location should be a country');
         }
-        $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        $countryId = $country->getId(self::LEVEL_COUNTRY);
         $stateId = CM_Db_Db::insert('cm_locationState', array(
             'countryId'    => $countryId,
             'name'         => $name,
@@ -346,12 +346,19 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param float             $latitude
      * @param float             $longitude
      * @param string|null       $_maxmind
+     * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
     public static function createCity(CM_Model_Location $parentLocation, $name, $latitude, $longitude, $_maxmind = null) {
-        $stateId = null;
-        $stateId = $parentLocation->getId(self::LEVEL_STATE);
-        $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        if (CM_Model_Location::LEVEL_STATE === $parentLocation->getLevel()) {
+            $stateId = $parentLocation->getId(self::LEVEL_STATE);
+            $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        } elseif (CM_Model_Location::LEVEL_COUNTRY === $parentLocation->getLevel()) {
+            $stateId = null;
+            $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        } else {
+            throw new CM_Exception_Invalid('The parent location should be a state or a country');
+        }
         $cityId = CM_Db_Db::insert('cm_locationCity', array(
             'stateId'   => $stateId,
             'countryId' => $countryId,
@@ -368,9 +375,13 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param float             $latitude
      * @param float             $longitude
+     * @throws CM_Exception_Invalid
      * @return CM_Model_Location
      */
     public static function createZip(CM_Model_Location $city, $name, $latitude, $longitude) {
+        if (CM_Model_Location::LEVEL_CITY !== $city->getLevel()) {
+            throw new CM_Exception_Invalid('The parent location should be a city');
+        }
         $cityId = $city->getId(self::LEVEL_CITY);
         $zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
         return new self(self::LEVEL_ZIP, $zipId);
