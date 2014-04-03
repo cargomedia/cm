@@ -587,6 +587,74 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             }
         }
 
+        // Look for cities without region in countries that have been added
+        foreach ($this->_countryListAdded as $countryCode => $countryName) {
+            $regionCode = null;
+            $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+            asort($cityListAdded);
+            if (!empty($cityListAdded)) {
+                $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
+            }
+        }
+
+        // Look for cities in regions that have been added
+        foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
+            foreach ($regionListAdded as $regionCode => $regionName) {
+                $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+                asort($cityListAdded);
+                if (!empty($cityListAdded)) {
+                    $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
+                }
+            }
+        }
+
+        // Look for zip codes in cities that have been added
+        foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
+            foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
+                foreach ($cityListAdded as $cityCode => $cityName) {
+                    $zipCodeListAdded = isset($this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes']) ? $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['zipCodes'] : array();
+                    ksort($zipCodeListAdded);
+                    if (!empty($zipCodeListAdded)) {
+                        $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
+                    }
+                }
+            }
+        }
+
+        // Look for cities without region in countries that have been removed
+        foreach ($this->_countryListRemoved as $countryCode => $countryName) {
+            $regionCodeOld = null;
+            $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+            asort($cityListRemoved);
+            if (!empty($cityListRemoved)) {
+                $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
+            }
+        }
+
+        // Look for cities in regions that have been removed
+        foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
+            foreach ($regionListRemoved as $regionCodeOld => $regionName) {
+                $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+                asort($cityListRemoved);
+                if (!empty($cityListRemoved)) {
+                    $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
+                }
+            }
+        }
+
+        // Look for zip codes in cities that have been removed
+        foreach ($this->_cityListByRegionRemoved as $countryCode => $cityListByRegionRemoved) {
+            foreach ($cityListByRegionRemoved as $regionCodeOld => $cityListRemoved) {
+                foreach ($cityListRemoved as $cityCode => $cityName) {
+                    $zipCodeListRemoved = isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes']) ? $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'][$cityName]['zipCodes'] : array();
+                    ksort($zipCodeListRemoved);
+                    if (!empty($zipCodeListRemoved)) {
+                        $this->_zipCodeListByCityRemoved[$countryCode][$regionCodeOld][$cityCode] = $zipCodeListRemoved;
+                    }
+                }
+            }
+        }
+
         $this->_printInfoList($infoListWarning, '!');
         $this->_printInfoList($infoListAdded, '+');
         $this->_printInfoList($infoListUpdated, '~');
@@ -1065,7 +1133,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                 }
                 foreach ($cityListAdded as $cityCode => $cityName) {
                     $cityData = $this->_locationTree[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'];
-                    $city = CM_Model_Location::createCity($parentLocation, $cityName, $cityData['lat'], $cityData['lon']);
+                    $city = CM_Model_Location::createCity($parentLocation, $cityName, $cityData['lat'], $cityData['lon'], $cityData['maxMind']);
                     $cityId = $city->getId();
                     $this->_cityIdList[$cityCode] = $cityId;
                 }
