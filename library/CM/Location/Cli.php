@@ -1303,7 +1303,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                 break;
             default:
                 $name = preg_replace('#\s*\([^)]*\)#', '', $fullName); // Remove details, like in "Saint Martin (French part)"
-                $name = preg_replace('#, [^&,][^,]*\z#', '', $name); // Remove prefix, like in "Congo, The Democratic Republic of the"
+                $name = preg_replace('#, [^&,][^,]*\z#', '', $name); // Remove suffix, like in "Congo, The Democratic Republic of the"
         }
         return trim($name);
     }
@@ -1313,7 +1313,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @return string
      */
     private function _normalizeRegionName($fullName) {
-        $name = preg_replace('#, [^&,][^,]*\z#', '', $fullName); // Remove prefix, like in "London, City of". Considering the special case of "Armed Forces Europe, Middle East, & Canada".
+        $name = preg_replace('#, [^&,][^,]*\z#', '', $fullName); // Remove suffix, like in "London, City of". Considering the special case of "Armed Forces Europe, Middle East, & Canada".
         return trim($name);
     }
 
