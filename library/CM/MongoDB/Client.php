@@ -11,6 +11,20 @@ class CM_MongoDB_Client extends CM_Class_Abstract {
     /** @var MongoDB */
     private $_db = null;
 
+    /**
+     * @return MongoDB
+     */
+    public function getDb() {
+        return $this->_db;
+    }
+
+    /**
+     * @return MongoClient
+     */
+    public function getMongodb() {
+        return $this->_mongodb;
+    }
+
     public function __construct() {
         $config = CM_Config::get()->CM_MongoDB;
         $this->_mongodb = new MongoClient($config->server);
