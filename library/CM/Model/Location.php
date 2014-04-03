@@ -345,14 +345,21 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @param string            $name
      * @param float             $latitude
      * @param float             $longitude
+     * @param string|null       $_maxmind
      * @return CM_Model_Location
      */
-    public static function createCity(CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
+    public static function createCity(CM_Model_Location $parentLocation, $name, $latitude, $longitude, $_maxmind = null) {
         $stateId = null;
         $stateId = $parentLocation->getId(self::LEVEL_STATE);
         $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
-        $cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude,
-                                                            'lon'     => $longitude));
+        $cityId = CM_Db_Db::insert('cm_locationCity', array(
+            'stateId'   => $stateId,
+            'countryId' => $countryId,
+            'name'      => $name,
+            'lat'       => $latitude,
+            'lon'       => $longitude,
+            '_maxmind'  => $_maxmind
+        ));
         return new self(self::LEVEL_CITY, $cityId);
     }
 
