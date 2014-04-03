@@ -60,11 +60,12 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
 
     public function testSearchWithoutSearchEnabled() {
         CM_Config::get()->CM_Search->enabled = false;
+        CM_Cache_Local::getInstance()->flush();
 
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(8, $source->getCount());
+        $this->assertEquals(0, $source->getCount());
 
         $source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(3, $source->getCount());
+        $this->assertEquals(0, $source->getCount());
     }
 }
