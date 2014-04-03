@@ -1113,6 +1113,23 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         }
     }
 
+    private function _getEscapeSequenceHighlighted($color) {
+        static $escapeSequence = array();
+        if (!isset($escapeSequence[$color])) {
+            $escapeSequence[$color] = system('tput setab ' . $color);
+            system('tput sgr0');
+        }
+        return $escapeSequence[$color];
+    }
+
+    private function _getEscapeSequenceNormal() {
+        static $escapeSequence = null;
+        if (null === $escapeSequence) {
+            $escapeSequence = system('tput sgr0');
+        }
+        return $escapeSequence;
+    }
+
     /**
      * @param string $regionAbbreviation
      * @param string $maxMindRegion
@@ -1139,6 +1156,58 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
             throw new CM_Exception('The region `' . $regionName . '` (' . $regionId . ') has no region code');
         }
         return $regionCode;
+    }
+
+    /**
+     * @param string     $countryCode
+     * @param string|int $regionCode
+     * @param bool|null  $explicit
+     * @return string
+     */
+    private function _getRegionName($countryCode, $regionCode, $explicit = null) {
+        if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+            $regionName = $this->_regionListByCountry[$countryCode][$regionCode];
+            if ($explicit) {
+                $regionName .= ' (' . $regionCode . ')';
+            }
+            return $regionName;
+        } elseif (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'])) {
+            $regionName = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'];
+            if ($explicit) {
+                $regionName .= ' (' . $regionCode . ')';
+            }
+            return $regionName;
+        } elseif (strlen($regionCode)) {
+            return 'Region ' . $regionCode;
+        } else {
+            return 'Unknown region';
+        }
+    }
+
+    /**
+     * @param string     $countryCode
+     * @param string|int $regionCodeOld
+     * @param bool|null  $explicit
+     * @return string
+     */
+    private function _getRegionNameOld($countryCode, $regionCodeOld, $explicit = null) {
+        if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
+            $regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld];
+            if ($explicit) {
+                $regionNameOld .= ' (' . $regionCodeOld . ')';
+            }
+            return $regionNameOld;
+        } elseif (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'])) {
+            $regionNameOld = $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'];
+            if ($explicit) {
+                $regionNameOld .= ' (' . $regionCodeOld . ')';
+            }
+            return $regionNameOld;
+        } elseif (strlen($regionCodeOld)) {
+            return 'Region ' . $regionCodeOld;
+        } else {
+            return 'Unknown region';
+        }
     }
 
     /**
@@ -1225,75 +1294,6 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
         $this->_getOutput()->writeln('');
         $this->_getOutput()->writeln(str_repeat(' *', 10));
         $this->_getOutput()->writeln('');
-    }
-
-    private function _getEscapeSequenceHighlighted($color) {
-        static $escapeSequence = array();
-        if (!isset($escapeSequence[$color])) {
-            $escapeSequence[$color] = system('tput setab ' . $color);
-            system('tput sgr0');
-        }
-        return $escapeSequence[$color];
-    }
-
-    private function _getEscapeSequenceNormal() {
-        static $escapeSequence = null;
-        if (null === $escapeSequence) {
-            $escapeSequence = system('tput sgr0');
-        }
-        return $escapeSequence;
-    }
-
-    /**
-     * @param string     $countryCode
-     * @param string|int $regionCode
-     * @param bool|null  $explicit
-     * @return string
-     */
-    private function _getRegionName($countryCode, $regionCode, $explicit = null) {
-        if (isset($this->_regionListByCountry[$countryCode][$regionCode])) {
-            $regionName = $this->_regionListByCountry[$countryCode][$regionCode];
-            if ($explicit) {
-                $regionName .= ' (' . $regionCode . ')';
-            }
-            return $regionName;
-        } elseif (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'])) {
-            $regionName = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'];
-            if ($explicit) {
-                $regionName .= ' (' . $regionCode . ')';
-            }
-            return $regionName;
-        } elseif (strlen($regionCode)) {
-            return 'Region ' . $regionCode;
-        } else {
-            return 'Unknown region';
-        }
-    }
-
-    /**
-     * @param string     $countryCode
-     * @param string|int $regionCodeOld
-     * @param bool|null  $explicit
-     * @return string
-     */
-    private function _getRegionNameOld($countryCode, $regionCodeOld, $explicit = null) {
-        if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
-            $regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld];
-            if ($explicit) {
-                $regionNameOld .= ' (' . $regionCodeOld . ')';
-            }
-            return $regionNameOld;
-        } elseif (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'])) {
-            $regionNameOld = $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'];
-            if ($explicit) {
-                $regionNameOld .= ' (' . $regionCodeOld . ')';
-            }
-            return $regionNameOld;
-        } elseif (strlen($regionCodeOld)) {
-            return 'Region ' . $regionCodeOld;
-        } else {
-            return 'Unknown region';
-        }
     }
 
     /**
