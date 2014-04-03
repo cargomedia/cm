@@ -10,6 +10,7 @@ services:
   - memcached
   - elasticsearch
   - redis-server
+  - mongodb
 
 before_script:
   - tests/travis/install-php-runkit.sh
