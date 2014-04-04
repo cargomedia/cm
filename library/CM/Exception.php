@@ -15,18 +15,23 @@ class CM_Exception extends Exception {
     /** @var int */
     protected $_severity = self::ERROR;
 
+    /** @var array */
+    private $_metaInfo;
+
     /**
      * @param string|null $message
      * @param string|null $messagePublic
      * @param array|null  $variables
      * @param int|null    $severity
+     * @param array|null  $metaInfo
      */
-    public function __construct($message = null, $messagePublic = null, array $variables = null, $severity = null) {
+    public function __construct($message = null, $messagePublic = null, array $variables = null, $severity = null, array $metaInfo = null) {
         $this->_messagePublic = $messagePublic;
         $this->_variables = (array) $variables;
         if (null !== $severity) {
             $this->setSeverity($severity);
         }
+        $this->_metaInfo = (array) $metaInfo;
         parent::__construct($message);
     }
 
@@ -64,6 +69,13 @@ class CM_Exception extends Exception {
             throw new CM_Exception_Invalid('Invalid severity `' . $severity . '`');
         }
         $this->_severity = $severity;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaInfo() {
+        return $this->_metaInfo;
     }
 
     /**
