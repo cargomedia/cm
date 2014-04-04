@@ -93,8 +93,7 @@ class CM_Tracking extends CM_Tracking_Abstract {
         $html .= 'var _gaq = _gaq || [];';
         $html .= "_gaq.push(['_setAccount', '" . $this->getCode() . "']);";
 
-        $trackingDomain = str_replace(array('http://', 'https://'), '', $site->getUrl());
-        $html .= "_gaq.push(['_setDomainName', '" . $trackingDomain . "']);";
+        $html .= "_gaq.push(['_setDomainName', '" . $site->getHost() . "']);";
 
         $html .= $this->getJs();
 
