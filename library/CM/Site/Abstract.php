@@ -35,16 +35,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return string|null
-     */
-    public function getTrackingDomain() {
-        if (property_exists(self::_getConfig(), 'trackingDomain')) {
-            return self::_getConfig()->trackingDomain;
-        }
-        return null;
-    }
-
-    /**
      * @return CM_EventHandler_EventHandler
      */
     public function getEventHandler() {

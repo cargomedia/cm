@@ -21,15 +21,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('foo@foo.com', $site->getEmailAddress());
     }
 
-    public function testGetTrackingDomain() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertNull($site->getTrackingDomain());
-
-        CM_Config::get()->CM_Site_Abstract->trackingDomain = 'www.foo.com';
-        $this->assertEquals('www.foo.com', $site->getTrackingDomain());
-    }
-
     public function testGetName() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
