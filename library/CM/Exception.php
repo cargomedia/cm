@@ -9,8 +9,8 @@ class CM_Exception extends Exception {
     /** @var string|null */
     private $_messagePublic;
 
-    /** @var array */
-    private $_variables;
+    /** @var array|null */
+    private $_messagePublicVariables;
 
     /** @var int */
     protected $_severity = self::ERROR;
@@ -20,18 +20,16 @@ class CM_Exception extends Exception {
 
     /**
      * @param string|null $message
-     * @param string|null $messagePublic
-     * @param array|null  $variables
-     * @param int|null    $severity
      * @param array|null  $metaInfo
+     * @param array|null  $params
      */
-    public function __construct($message = null, $messagePublic = null, array $variables = null, $severity = null, array $metaInfo = null) {
-        $this->_messagePublic = $messagePublic;
-        $this->_variables = (array) $variables;
-        if (null !== $severity) {
-            $this->setSeverity($severity);
+    public function __construct($message = null, array $metaInfo = null, array $params = null) {
+        $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
+        $this->_messagePublic = isset($params['messagePublic']) ? (string) $params['messagePublic'] : null;
+        $this->_messagePublicVariables = isset($params['messagePublicVariables']) ? (array) $params['messagePublicVariables'] : null;
+        if (isset($params['severity'])) {
+            $this->setSeverity($params['severity']);
         }
-        $this->_metaInfo = (array) $metaInfo;
         parent::__construct($message);
     }
 
@@ -43,7 +41,7 @@ class CM_Exception extends Exception {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }
-        return $render->getTranslation($this->_messagePublic, $this->_variables);
+        return $render->getTranslation($this->_messagePublic, $this->_messagePublicVariables);
     }
 
     /**
