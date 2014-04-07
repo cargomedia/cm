@@ -263,6 +263,37 @@ class CM_Location_CliTest extends CMTest_TestCase {
         );
     }
 
+    public function testAddCountry() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $cmLocationCli = $this->getMock('CM_Location_Cli', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $cmLocationCli->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
