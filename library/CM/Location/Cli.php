@@ -1003,7 +1003,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                         } else {
                             $countryName = $countryCode;
                         }
-                        $infoListWarning['Ignoring unknown regions'][$countryName][] = $regionCode . ' (' . $row . ')';
+                        $infoListWarning['Ignoring unknown regions'][$countryName][] = $regionCode . ' (' . implode(', ', $row) . ')';
                         continue;
                     }
                     $name = $this->_regionListByCountry[$countryCode][$regionCode];
@@ -1023,7 +1023,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
                         continue;
                     }
                     if (!isset($this->_countryList[$countryCode])) {
-                        $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . $row . ')';
+                        $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . implode(', ', $row) . ')';
                         continue;
                     }
                     $name = $this->_countryList[$countryCode];
