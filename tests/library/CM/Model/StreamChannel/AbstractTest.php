@@ -2,17 +2,14 @@
 
 class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
-    public static function setUpBeforeClass() {
-        CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
-    }
-
     public function setup() {
+        CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
         if (!class_exists('CM_Model_StreamChannel_Mock')) {
             $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(), 'CM_Model_StreamChannel_Mock', false);
         }
     }
 
-    public static function tearDownAfterClass() {
+    public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
