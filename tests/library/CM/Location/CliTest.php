@@ -16,11 +16,13 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testEmpty() {
-        $this->_runTestCase(
+        $this->_import(
             array(),
             array(),
             array(),
-            array(),
+            array()
+        );
+        $this->_verify(
             array(),
             array(),
             array(),
@@ -31,13 +33,15 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testCountry() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
             array(),
             array(),
-            array(),
+            array()
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -50,7 +54,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testRegion() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
@@ -58,7 +62,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(),
-            array(),
+            array()
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -73,7 +79,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testCity() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
@@ -83,7 +89,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
             array(
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
-            array(),
+            array()
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -100,7 +108,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testZipCode() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
@@ -111,7 +119,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
-            array(),
+            array()
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -130,7 +140,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testIpBlockCountry() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
@@ -140,7 +150,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
             ),
             array(
                 array('33555968', '33556223', '75'),
-            ),
+            )
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -155,7 +167,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     public function testIpBlockCity() {
-        $this->_runTestCase(
+        $this->_import(
             array(
                 array('France', 'FR'),
             ),
@@ -167,7 +179,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
             ),
             array(
                 array('87097600', '87097855', '50221'),
-            ),
+            )
+        );
+        $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
@@ -185,7 +199,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
         );
     }
 
-    protected function _runTestCase($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataCountryExpected, $ipDataCityExpected) {
+    protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $cmLocationCli = $this->getMock('CM_Location_Cli', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $cmLocationCli->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $cmLocationCli->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
@@ -193,6 +207,9 @@ class CM_Location_CliTest extends CMTest_TestCase {
         $cmLocationCli->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
         /** @var CM_Location_Cli $cmLocationCli */
         $cmLocationCli->upgrade();
+    }
+
+    protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataCountryExpected, $ipDataCityExpected) {
         $countryDataActual = CM_Db_Db::select('cm_locationCountry', '*')->fetchAll();
         $this->assertEquals($countryDataExpected, $countryDataActual);
         $regionDataActual = CM_Db_Db::select('cm_locationState', '*')->fetchAll();
