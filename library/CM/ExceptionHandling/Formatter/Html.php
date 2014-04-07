@@ -21,4 +21,17 @@ class CM_ExceptionHandling_Formatter_Html extends CM_ExceptionHandling_Formatter
         $traceString .= '</pre>';
         return $traceString;
     }
+
+    public function getMetaInfo(CM_ExceptionHandling_SerializableException $exception) {
+        if (empty($exception->metaInfo)) {
+            return '';
+        }
+
+        $metaInfoString = '<pre>';
+        foreach ($exception->metaInfo as $key => $value) {
+            $metaInfoString .= $key . ': ' . $value . PHP_EOL;
+        }
+        $metaInfoString = '</pre>';
+        return $metaInfoString;
+    }
 }
