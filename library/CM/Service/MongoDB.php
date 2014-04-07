@@ -15,11 +15,26 @@ class CM_Service_MongoDB {
      */
     public function getClient() {
         if (empty($this->_client)) {
-            echo "Creating instance of MongoClient connected to: {$this->_config['host']}" . PHP_EOL;
-            $this->_client = new MongoClient();
-        } else {
-            echo "Using cached instance of MongoClient connected to: {$this->_config['host']}" . PHP_EOL;
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
         }
         return $this->_client;
+    }
+
+    /**
+     * @param string|null $dbName
+     * @return MongoDB
+     * @throws CM_Exception_Nonexistent
+     */
+    public function getDatabase($dbName = null) {
+        $client = $this->getClient();
+
+        if ($dbName === null) {
+            if (empty($this->_config['dbName'])) {
+                throw new CM_Exception_Nonexistent('MongoDB service dbName not set.');
+            }
+            $dbName = $this->_config['dbName'];
+        }
+
+        return $client->{$dbName};
     }
 }

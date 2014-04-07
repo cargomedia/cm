@@ -109,7 +109,9 @@ $config->CM_Services->list = array(
         'class' => 'CM_Service_MongoDB',
         'args'  => array(
             array(
-                'host' => 'localhost'
+                'server'  => 'mongodb://localhost:27017',
+                'options' => array("connect" => true),
+                'dbName' => 'sk'
             )
         )
     )
