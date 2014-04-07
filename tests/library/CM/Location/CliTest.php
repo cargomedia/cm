@@ -266,7 +266,7 @@ class CM_Location_CliTest extends CMTest_TestCase {
     public function testAddCountry() {
         $this->_import(
             array(
-                array('France', 'FR'),
+                array('United States', 'US'),
             ),
             array(),
             array(),
@@ -283,8 +283,8 @@ class CM_Location_CliTest extends CMTest_TestCase {
         );
         $this->_verify(
             array(
-                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
-                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+                array('id' => 2, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
             array(),
             array(),
