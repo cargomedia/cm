@@ -3,17 +3,16 @@
 class CMService_MaxMindTest extends CMTest_TestCase {
 
     public function setUp() {
-        // Reset auto-increment
-        foreach (array(
-                     'cm_locationCityIp',
-                     'cm_locationCountryIp',
-                     'cm_locationZip',
-                     'cm_locationCity',
-                     'cm_locationState',
-                     'cm_locationCountry',
-                 ) as $locationTable) {
-            CM_Db_Db::truncate($locationTable);
-        }
+        CM_Db_Db::exec('ALTER TABLE cm_locationCityIp AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_locationCountryIp AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_locationZip AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_locationCity AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_locationState AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_locationCountry AUTO_INCREMENT = 1');
+    }
+
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testEmpty() {
