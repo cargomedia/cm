@@ -479,6 +479,41 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateRegionName() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Normandie'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCityCode() {
         $this->_import(
             array(
