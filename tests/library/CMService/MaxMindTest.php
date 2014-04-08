@@ -1,6 +1,6 @@
 <?php
 
-class CM_Location_CliTest extends CMTest_TestCase {
+class CMService_MaxMindTest extends CMTest_TestCase {
 
     public function setUp() {
         foreach (array(
@@ -295,13 +295,13 @@ class CM_Location_CliTest extends CMTest_TestCase {
     }
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
-        $cmLocationCli = $this->getMock('CM_Location_Cli', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
-        $cmLocationCli->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
-        $cmLocationCli->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
-        $cmLocationCli->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
-        $cmLocationCli->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
-        /** @var CM_Location_Cli $cmLocationCli */
-        $cmLocationCli->upgrade();
+        $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
+        $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
+        $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
+        $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
+        $maxMind->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
+        /** @var CMService_MaxMind $maxMind */
+        $maxMind->upgrade();
     }
 
     protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataCountryExpected, $ipDataCityExpected) {
