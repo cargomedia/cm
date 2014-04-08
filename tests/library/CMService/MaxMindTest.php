@@ -164,6 +164,37 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testZipCode_withoutCity() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.4938, 'lon' => 0.1077, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+    }
+
     public function testIpBlockCountry() {
         $this->_import(
             array(
