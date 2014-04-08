@@ -174,6 +174,33 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testRegion_countryWithoutLocation() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testCity() {
         $this->_import(
             array(
@@ -752,6 +779,54 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'countryId' => 1, 'name' => 'Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
             ),
             array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testAddCity() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+                array('id' => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+            ),
             array(),
             array(),
             array()
