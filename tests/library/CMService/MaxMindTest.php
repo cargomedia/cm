@@ -1152,6 +1152,54 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testAddZipCode() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+    }
+
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Unknown country code
