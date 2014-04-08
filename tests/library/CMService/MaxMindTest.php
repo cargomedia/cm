@@ -396,6 +396,48 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testRemoveRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 3, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCityCode() {
         $this->_import(
             array(
