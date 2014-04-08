@@ -76,6 +76,25 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testCountry_unknown() {
+        $this->_import(
+            array(),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testRegion() {
         $this->_import(
             array(
@@ -124,6 +143,30 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
             ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_unknown() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(),
             array(),
             array(),
             array(),
