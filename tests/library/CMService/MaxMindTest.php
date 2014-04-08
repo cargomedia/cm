@@ -677,6 +677,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
             array()
         );
@@ -694,6 +695,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'AA', '', '', '49.4333', '1.0833'),
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CF', '', '', '34.0522', '-118.243'),
+                array('11532', 'US', 'CF', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
             array()
         );
@@ -706,7 +708,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRAA', 'abbreviation' => null),
                 array('id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCF', 'abbreviation' => 'CF'),
             ),
-            array(),
+            array(
+                array('id' => 1, 'stateId' => 2, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+            ),
             array(),
             array(),
             array()
