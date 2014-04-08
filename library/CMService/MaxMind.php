@@ -298,6 +298,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_cityListUpdatedRegion = array();
         $this->_zipCodeListByCityAdded = array();
         $this->_zipCodeListByCityRemoved = array();
+        $cityIdListUpdatedCode = array();
 
         // Look for changes in countries that have been kept
         $countryCodeList = array_keys($this->_locationTree);
@@ -332,7 +333,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
 
                 // Cities with updated code (name lookup within the region)
-                $cityIdListUpdatedCode = array();
                 foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
                     if (isset($cityList[$cityCodeOld]) && ($cityList[$cityCodeOld] === $cityNameOld)) {
                         continue;
@@ -354,9 +354,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         $infoListWarning['Cities with ambiguous updated code'][$countryName . ' / ' . $regionName][] =
                             $cityNameOld . ' (' . $cityCodeOld . ' => ' . implode(', ', $cityCodeListNew) . ')';
                     }
-                }
-                foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
-                    $this->_cityIdList[$cityCode] = $cityId;
                 }
 
                 // Cities added (new code that doesn't come from a code update)
@@ -585,6 +582,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     }
                 }
             }
+        }
+        foreach ($cityIdListUpdatedCode as $cityCode => $cityId) {
+            $this->_cityIdList[$cityCode] = $cityId;
         }
 
         // Look for cities without region in countries that have been added

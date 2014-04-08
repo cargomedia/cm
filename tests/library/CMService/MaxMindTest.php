@@ -470,6 +470,87 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateCityCode_swapAcrossRegions() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'NV', 'Nevada'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
+            ),
+            array(
+                array('69089280', '69090303', '11532'),
+                array('81910016', '81910271', '5718'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5718),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+            )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'NV', 'Nevada'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('5718', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('11532', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
+            ),
+            array(
+                array('69089280', '69090303', '5718'),
+                array('70988544', '70988799', '5718'),
+                array('81910016', '81910271', '11532'),
+                array('202915072', '202915327', '11532'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5718),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 11532),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
+            )
+        );
+    }
+
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
