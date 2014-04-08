@@ -2,7 +2,7 @@
 
 class CMService_MaxMindTest extends CMTest_TestCase {
 
-    public function setUp() {
+    public function tearDown() {
         foreach (array(
                      'cm_locationCityIp',
                      'cm_locationCountryIp',
