@@ -771,6 +771,21 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Unknown country code
+     */
+    public function testExceptionAddRegionInUnknownCountry() {
+        $this->_import(
+            array(),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(),
+            array()
+        );
+    }
+
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
