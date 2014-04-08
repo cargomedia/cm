@@ -294,6 +294,37 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testRemoveCountry() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCountryName() {
         $this->_import(
             array(
