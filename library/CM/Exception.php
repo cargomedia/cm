@@ -21,14 +21,14 @@ class CM_Exception extends Exception {
     /**
      * @param string|null $message
      * @param array|null  $metaInfo
-     * @param array|null  $params
+     * @param array|null  $options
      */
-    public function __construct($message = null, array $metaInfo = null, array $params = null) {
+    public function __construct($message = null, array $metaInfo = null, array $options = null) {
         $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
-        $this->_messagePublic = isset($params['messagePublic']) ? (string) $params['messagePublic'] : null;
-        $this->_messagePublicVariables = isset($params['messagePublicVariables']) ? (array) $params['messagePublicVariables'] : null;
-        if (isset($params['severity'])) {
-            $this->setSeverity($params['severity']);
+        $this->_messagePublic = isset($options['messagePublic']) ? (string) $options['messagePublic'] : null;
+        $this->_messagePublicVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : null;
+        if (isset($options['severity'])) {
+            $this->setSeverity($options['severity']);
         }
         parent::__construct($message);
     }
