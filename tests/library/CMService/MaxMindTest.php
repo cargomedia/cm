@@ -833,6 +833,54 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testRemoveCity() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id'       => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCityCode() {
         $this->_import(
             array(
