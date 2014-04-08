@@ -107,6 +107,31 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testCity_withoutRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('50221', 'FR', '', 'Le Havre', '', '49.5', '0.1333'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(),
+            array(
+                array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testZipCode() {
         $this->_import(
             array(
