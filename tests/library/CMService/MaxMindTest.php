@@ -297,7 +297,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
-                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
             array()
         );
@@ -330,7 +330,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
-                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
             array()
         );
@@ -342,7 +342,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
             ),
             array(
-                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.4938, 'lon' => 0.1077, '_maxmind' => 50221),
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.4938, 'lon' => 0.1077, '_maxmind' => 384603),
             ),
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
@@ -429,7 +429,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
-                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
@@ -1178,7 +1178,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
-                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
             array()
         );
@@ -1198,6 +1198,41 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array()
         );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384564', 'FR', 'A7', 'Le Havre', '76600', '49.4938', '0.1077'),
+                array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 2, 'name' => '76600', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 3, 'name' => '76610', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
+            ),
+            array(),
+            array()
+        );
     }
 
     public function testRemoveZipCode() {
@@ -1212,7 +1247,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
-                array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
             array()
         );
