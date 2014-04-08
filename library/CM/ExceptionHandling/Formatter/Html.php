@@ -31,7 +31,7 @@ class CM_ExceptionHandling_Formatter_Html extends CM_ExceptionHandling_Formatter
         foreach ($exception->metaInfo as $key => $value) {
             $metaInfoString .= $key . ': ' . $value . PHP_EOL;
         }
-        $metaInfoString = '</pre>';
+        $metaInfoString .= '</pre>';
         return $metaInfoString;
     }
 }
