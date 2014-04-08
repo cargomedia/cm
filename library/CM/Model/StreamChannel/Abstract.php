@@ -90,18 +90,42 @@ abstract class CM_Model_StreamChannel_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @param CM_Model_User                  $user
-     * @param CM_Model_Stream_Subscribe|null $excludedStreamSubscribe
+     * @param CM_Model_User                 $user
+     * @param CM_Model_Stream_Abstract|null $excludedStream
      * @return bool
      */
-    public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Subscribe $excludedStreamSubscribe = null) {
-        /** @var $streamSubscribeItem CM_Model_Stream_Subscribe */
-        foreach ($this->getStreamSubscribes() as $streamSubscribeItem) {
-            if (!$streamSubscribeItem->equals($excludedStreamSubscribe) && $streamSubscribeItem->getUserId() == $user->getId()) {
+    public function isSubscriber(CM_Model_User $user, CM_Model_Stream_Abstract $excludedStream = null) {
+        /** @var $stream CM_Model_Stream_Subscribe */
+        foreach ($this->getStreamSubscribes() as $stream) {
+            if (!$stream->equals($excludedStream) && $stream->getUserId() == $user->getId()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @param CM_Model_User                 $user
+     * @param CM_Model_Stream_Abstract|null $excludedStream
+     * @return bool
+     */
+    public function isPublisher(CM_Model_User $user, CM_Model_Stream_Abstract $excludedStream = null) {
+        /** @var $stream CM_Model_Stream_Publish */
+        foreach ($this->getStreamPublishs() as $stream) {
+            if (!$stream->equals($excludedStream) && $stream->getUserId() == $user->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param CM_Model_User                 $user
+     * @param CM_Model_Stream_Abstract|null $excludedStream
+     * @return bool
+     */
+    public function isSubscriberOrPublisher(CM_Model_User $user, CM_Model_Stream_Abstract $excludedStream = null) {
+        return $this->isPublisher($user, $excludedStream) || $this->isSubscriber($user, $excludedStream);
     }
 
     /**
