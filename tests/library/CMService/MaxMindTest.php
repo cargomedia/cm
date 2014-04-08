@@ -38,6 +38,29 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('France', 'FR'),
             ),
             array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testCountry_withoutLocation() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
             array(),
             array()
         );
@@ -61,7 +84,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
             array()
         );
         $this->_verify(
@@ -78,7 +104,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testRegion_withoutCity() {
+    public function testRegion_withoutLocation() {
         $this->_import(
             array(
                 array('France', 'FR'),
@@ -87,7 +113,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(
-                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
             array()
         );
@@ -114,6 +140,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
             array()
@@ -141,6 +169,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('50221', 'FR', '', 'Le Havre', '', '49.5', '0.1333'),
             ),
             array()
@@ -168,6 +197,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
@@ -200,6 +231,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
             array()
@@ -258,6 +291,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
             array(
@@ -295,9 +330,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('50221', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('608', 'US', 'CA', 'San Francisco', '94124', '37.7312', '-122.3826'),
                 array('757', 'US', 'CA', 'San Francisco', '94105', '37.7898', '-122.3942'),
@@ -352,7 +389,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('United States', 'US'),
             ),
             array(),
-            array(),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
             array()
         );
         $this->_import(
@@ -361,7 +400,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('United States', 'US'),
             ),
             array(),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
             array()
         );
         $this->_verify(
@@ -384,7 +426,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('United States', 'US'),
             ),
             array(),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
             array()
         );
         $this->_import(
@@ -392,7 +437,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('United States', 'US'),
             ),
             array(),
-            array(),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
             array()
         );
         $this->_verify(
@@ -414,7 +461,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('France', 'FR'),
             ),
             array(),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+            ),
             array()
         );
         $this->_import(
@@ -422,7 +471,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('République Française', 'FR'),
             ),
             array(),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+            ),
             array()
         );
         $this->_verify(
@@ -446,7 +497,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('US', 'CA', 'California'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+            ),
             array()
         );
         $this->_import(
@@ -459,7 +514,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('US', 'CA', 'California'),
                 array('US', 'HI', 'Hawaii'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+            ),
             array()
         );
         $this->_verify(
@@ -490,7 +551,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('US', 'CA', 'California'),
                 array('US', 'HI', 'Hawaii'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+            ),
             array()
         );
         $this->_import(
@@ -501,7 +568,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('US', 'CA', 'California'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+            ),
             array()
         );
         $this->_verify(
@@ -531,7 +602,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
                 array('US', 'CA', 'California'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+            ),
             array()
         );
         $this->_import(
@@ -543,7 +619,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'AA', 'Haute-Normandie'),
                 array('US', 'CF', 'California'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'AA', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CF', '', '', '34.0522', '-118.243'),
+            ),
             array()
         );
         $this->_verify(
@@ -570,7 +651,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
             array()
         );
         $this->_import(
@@ -580,7 +664,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('FR', 'A7', 'Normandie'),
             ),
-            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
             array()
         );
         $this->_verify(
@@ -608,7 +695,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('8029', 'US', 'NV', '', '', '36.175', '-115.1372'),
                 array('5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
             ),
             array(
@@ -645,7 +734,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11111', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('8029', 'US', 'NV', '', '', '36.175', '-115.1372'),
                 array('5555', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
             ),
             array(
@@ -688,6 +779,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('608', 'US', 'CA', 'San Francisco', '94124', '37.7312', '-122.3826'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
@@ -731,6 +823,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('23653', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('608', 'US', 'CA', 'San Francisco', '94124', '37.7312', '-122.3826'),
                 array('11101', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
@@ -784,7 +877,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('8029', 'US', 'NV', '', '', '36.175', '-115.1372'),
                 array('5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
             ),
             array(
@@ -821,7 +916,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('5718', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('8029', 'US', 'NV', '', '', '36.175', '-115.1372'),
                 array('11532', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
             ),
             array(
