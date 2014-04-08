@@ -294,6 +294,35 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateCountryName() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('République Française', 'FR'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'République Française'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCityCode() {
         $this->_import(
             array(
