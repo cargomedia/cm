@@ -527,7 +527,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('223', 'US', '', '', '', '38', '-97'),
             ),
-            array()
+            array(
+                array('33555968', '33556223', '75'),
+            )
         );
         $this->_import(
             array(
@@ -847,7 +849,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
-            array()
+            array(
+                array('69089280', '69090303', '11532'),
+            )
         );
         $this->_import(
             array(
