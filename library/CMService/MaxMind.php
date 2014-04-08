@@ -455,9 +455,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                                 $cityName . ', ' . $zipCodeCountAdded . $zipCodeRateAddedInfo;
                         } else {
                             foreach (array_keys($zipCodeListAdded) as $zipCode) {
-                                $infoListAdded['Zip codes added'][
-                                $countryName . ' / ' . $regionName . ' / ' . $cityName . ', ' . $zipCodeCountAdded . ' zip codes' .
-                                $zipCodeRateAddedInfo][] = $zipCode;
+                                $infoTitle = $countryName . ' / ' . $regionName . ' / ' . $cityName . ', ' . $zipCodeCountAdded . ' zip codes' .
+                                    $zipCodeRateAddedInfo;
+                                $infoListAdded['Zip codes added'][$infoTitle][] = $zipCode;
                             }
                         }
                     }
@@ -471,9 +471,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
                                 $cityName . ', ' . $zipCodeCountRemoved . $zipCodeRateRemovedInfo;
                         } else {
                             foreach (array_keys($zipCodeListRemoved) as $zipCode) {
-                                $infoListRemoved['Zip codes removed'][
-                                $countryName . ' / ' . $regionName . ' / ' . $cityName . ', ' . $zipCodeCountRemoved . ' zip codes' .
-                                $zipCodeRateRemovedInfo][] = $zipCode;
+                                $infoTitle = $countryName . ' / ' . $regionName . ' / ' . $cityName . ', ' . $zipCodeCountRemoved . ' zip codes' .
+                                    $zipCodeRateRemovedInfo;
+                                $infoListRemoved['Zip codes removed'][$infoTitle][] = $zipCode;
                             }
                         }
                     }
