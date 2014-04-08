@@ -9,7 +9,6 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder '.', '/home/vagrant/cm', :type => 'nfs'
 
   config.phpstorm_tunnel.project_home = '/home/vagrant/cm'
-  config.phpstorm_tunnel.command_prefix = 'sudo'
 
   config.librarian_puppet.puppetfile_dir = 'puppet'
   config.librarian_puppet.placeholder_filename = '.gitkeep'
