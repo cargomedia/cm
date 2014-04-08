@@ -295,6 +295,101 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateCityCode_circular() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('608', 'US', 'CA', 'San Francisco', '94124', '37.7312', '-122.3826'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('23653', 'US', 'CA', 'Long Beach', '', '33.767', '-118.1892'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('69089280', '69090303', '11532'),
+                array('71797504', '71797759', '23653'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Long Beach', 'lat' => 33.767, 'lon' => -118.189, '_maxmind' => 23653),
+                array('id' => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id'       => 3, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(
+                array('id' => 1, 'name' => '94124', 'cityId' => 3, 'lat' => 37.7312, 'lon' => -122.383),
+            ),
+            array(),
+            array(
+                array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
+            )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('23653', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('608', 'US', 'CA', 'San Francisco', '94124', '37.7312', '-122.3826'),
+                array('11101', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('11532', 'US', 'CA', 'Long Beach', '', '33.767', '-118.1892'),
+            ),
+            array(
+                array('68444672', '68444735', '23653'),
+                array('68444800', '68444927', '23653'),
+                array('69089280', '69090303', '11101'),
+                array('70988544', '70988799', '11101'),
+                array('71797504', '71797759', '11532'),
+                array('201805824', '201806079', '11532'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Long Beach', 'lat' => 33.767, 'lon' => -118.189, '_maxmind' => 11532),
+                array('id' => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11101),
+                array('id'       => 3, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 23653),
+            ),
+            array(
+                array('id' => 1, 'name' => '94124', 'cityId' => 3, 'lat' => 37.7312, 'lon' => -122.383),
+            ),
+            array(),
+            array(
+                array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
+                array('cityId' => 3, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('cityId' => 2, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 1, 'ipStart' => 201805824, 'ipEnd' => 201806079),
+            )
+        );
+    }
+
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
