@@ -790,6 +790,31 @@ class CMService_MaxMindTest extends CMTest_TestCase {
      * @expectedException CM_Exception
      * @expectedExceptionMessage Unknown country code
      */
+    public function testExceptionUpdateRegionCodeInUnknownCountry() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(),
+            array(
+                array('FR', 'AA', 'Haute-Normandie'),
+            ),
+            array(),
+            array()
+        );
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Unknown country code
+     */
     public function testExceptionUpdateRegionNameInUnknownCountry() {
         $this->_import(
             array(
