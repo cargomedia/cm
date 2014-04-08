@@ -37,4 +37,11 @@ class CM_Service_MongoDB {
 
         return $client->{$dbName};
     }
+
+    /**
+     * @return string
+     */
+    public static function getNewId() {
+        return (string)new MongoId();
+    }
 }
