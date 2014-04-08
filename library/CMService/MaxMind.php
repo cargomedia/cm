@@ -1118,7 +1118,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($regionListUpdatedCode as $regionCode) {
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
                 $maxMindRegion = $countryCode . $regionCode;
-                CM_Db_Db::update('cm_locationState', array('_maxmind' => $maxMindRegion), array('id' => $regionId));
+                $abbreviationRegion = ('US' === $countryCode) ? $regionCode : null;
+                CM_Db_Db::update('cm_locationState',
+                    array('_maxmind' => $maxMindRegion, 'abbreviation' => $abbreviationRegion),
+                    array('id' => $regionId));
             }
         }
         foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {

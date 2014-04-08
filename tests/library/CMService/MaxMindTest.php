@@ -438,6 +438,47 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateRegionCode() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'AA', 'Haute-Normandie'),
+                array('US', 'CF', 'California'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRAA', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCF', 'abbreviation' => 'CF'),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateCityCode() {
         $this->_import(
             array(
