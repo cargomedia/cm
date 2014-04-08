@@ -294,6 +294,87 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateCityCode() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'NV', 'Nevada'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('5718', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
+            ),
+            array(
+                array('69089280', '69090303', '11532'),
+                array('81910016', '81910271', '5718'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5718),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+            )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'NV', 'Nevada'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('11111', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('5555', 'US', 'NV', 'Las Vegas', '', '36.175', '-115.1372'),
+            ),
+            array(
+                array('69089280', '69090303', '11111'),
+                array('70988544', '70988799', '11111'),
+                array('81910016', '81910271', '5555'),
+                array('202915072', '202915327', '5555'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11111),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5555),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
+            )
+        );
+    }
+
     public function testUpdateCityCode_circular() {
         $this->_import(
             array(
