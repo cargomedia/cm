@@ -1827,6 +1827,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('295514', 'LT', '61', '(( Mantjurgiai ))', '', '49.5', '0.1333'),
                 array('298374', 'TW', '4', 'Erhchiehtsun (1)', '', '24.7833', '121.6667'),
+                array('298375', 'TW', '4', 'Erhchiehtsun (1)', '12345', '24.7833', '121.6667'),
+                array('300421', 'TW', '4', 'Chihtan (2)', '12345', '24.9333', '121.65'),
             ),
             array()
         );

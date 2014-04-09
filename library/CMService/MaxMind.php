@@ -1053,8 +1053,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     continue;
                 }
                 foreach ($regionData['cities'] as $cityName => $cityData) {
-                    $cityCode = $cityData['location']['maxMind'];
-                    $this->_cityListByRegion[$countryCode][$regionCode][$cityCode] = $cityName;
+                    if (isset($cityData['location'])) {
+                        $cityCode = $cityData['location']['maxMind'];
+                        $this->_cityListByRegion[$countryCode][$regionCode][$cityCode] = $cityName;
+                    }
                 }
             }
         }
@@ -1374,7 +1376,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     private function _normalizeCityName($fullName) {
         $name = trim($fullName);
-        if(preg_match('#\A\(\( .* \)\)\z#', $name) || preg_match('#\(\d++\)\z#', $name)) {
+        if (preg_match('#\A\(\( .* \)\)\z#', $name) || preg_match('#\(\d++\)\z#', $name)) {
             return ''; // Remove non-existent cities, like "(( Mantjurgiai ))" and "Erhchiehtsun (1)"
         }
         return $name;
