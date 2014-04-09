@@ -999,37 +999,35 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             $countryName = $countryCode;
                         }
                         $infoListWarning['Ignoring unknown regions'][$countryName][] = $regionCode . ' (' . implode(', ', $row) . ')';
-                        continue;
-                    }
-                    $name = $this->_regionListByCountry[$countryCode][$regionCode];
-                    if (strlen($name)) {
-                        $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
-                            'name'      => $name,
-                            'latitude'  => $latitude,
-                            'longitude' => $longitude,
-                            'maxMind'   => $maxMind,
-                        );
+                    } else {
+                        $name = $this->_regionListByCountry[$countryCode][$regionCode];
+                        if (strlen($name)) {
+                            $this->_locationTree[$countryCode]['regions'][$regionCode]['location'] = array(
+                                'name'      => $name,
+                                'latitude'  => $latitude,
+                                'longitude' => $longitude,
+                                'maxMind'   => $maxMind,
+                            );
+                        }
                     }
                 }
             } elseif (strlen($countryCode)) { // Country record
                 if (!isset($this->_locationTree[$countryCode]['location'])) {
                     if (in_array($countryCode, array('A1', 'A2', 'AP', 'EU'), true)) {
                         $infoListWarning['Ignoring proprietary MaxMind country codes'][] = $countryCode;
-                        continue;
-                    }
-                    if (!isset($this->_countryList[$countryCode])) {
+                    } elseif (!isset($this->_countryList[$countryCode])) {
                         $infoListWarning['Ignoring unknown countries'][] = $countryCode . ' (' . implode(', ', $row) . ')';
-                        continue;
-                    }
-                    $name = $this->_countryList[$countryCode];
-                    if (strlen($name)) {
-                        $this->_locationTree[$countryCode]['location'] = array(
-                            'name'      => $name,
-                            'latitude'  => $latitude,
-                            'longitude' => $longitude,
-                            'maxMind'   => $maxMind,
-                        );
-                        $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
+                    } else {
+                        $name = $this->_countryList[$countryCode];
+                        if (strlen($name)) {
+                            $this->_locationTree[$countryCode]['location'] = array(
+                                'name'      => $name,
+                                'latitude'  => $latitude,
+                                'longitude' => $longitude,
+                                'maxMind'   => $maxMind,
+                            );
+                            $this->_countryCodeListByMaxMind[$maxMind] = $countryCode;
+                        }
                     }
                 }
             }
