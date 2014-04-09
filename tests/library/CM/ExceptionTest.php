@@ -12,7 +12,7 @@ class CM_ExceptionTest extends CMTest_TestCase {
         $this->assertSame('foo', $exception->getMessage());
         $this->assertSame('foo foo', $exception->getMessagePublic($render));
         $this->assertSame(CM_Exception::ERROR, $exception->getSeverity());
-        $this->assertSame(array('meta' => '\'foo\'', 'user' => 'CM_Model_User(' . $user->getId() . ')'), $exception->getMetaInfo());
+        $this->assertSame(array('meta' => CM_Util::varDump('foo'), 'user' => CM_Util::varDump($user)), $exception->getMetaInfo());
     }
 
     public function testGetSetSeverity() {
