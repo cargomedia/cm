@@ -70,14 +70,9 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @param bool|null $raw
      * @return array
      */
-    public function getMetaInfo($raw = null) {
-        if ($raw) {
-            return $this->_metaInfo;
-        }
-
+    public function getMetaInfo() {
         $metaInfoFormatted = array();
         foreach ($this->_metaInfo as $key => $value) {
             $metaInfoFormatted[$key] = CM_Util::varDump($value);
