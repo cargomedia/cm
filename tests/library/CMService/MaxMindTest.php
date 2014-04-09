@@ -1753,6 +1753,99 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testNormalizeCountryName() {
+        $this->_import(
+            array(
+                array('Korea, Democratic People\'s Republic of', 'KP'),
+                array('Korea, Republic of', 'KR'),
+                array('Virgin Islands, British', 'VG'),
+                array('Virgin Islands, U.S.', 'VI'),
+                array('Saint Martin (French part)', 'MF'),
+                array('Congo, The Democratic Republic of the', 'CD'),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'VG', 'name' => 'British Virgin Islands'),
+                array('id' => 2, 'abbreviation' => 'CD', 'name' => 'Congo'),
+                array('id' => 3, 'abbreviation' => 'KR', 'name' => 'Korea'),
+                array('id' => 4, 'abbreviation' => 'KP', 'name' => 'North Korea'),
+                array('id' => 5, 'abbreviation' => 'MF', 'name' => 'Saint Martin'),
+                array('id' => 6, 'abbreviation' => 'VI', 'name' => 'Virgin Islands'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testNormalizeRegionName() {
+        $this->_import(
+            array(
+                array('United Kingdom', 'GB'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('GB', 'H9', 'London, City of'),
+                array('US', 'AE', 'Armed Forces Europe, Middle East, & Canada'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'GB', 'name' => 'United Kingdom'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'London', '_maxmind' => 'GBH9', 'abbreviation' => null),
+                array('id'           => 2, 'countryId' => 2, 'name' => 'Armed Forces Europe, Middle East, & Canada', '_maxmind' => 'USAE',
+                      'abbreviation' => 'AE'),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testNormalizeCityName() {
+        $this->_import(
+            array(
+                array('Lithuania', 'LT'),
+                array('Taiwan, Province of China', 'TW'),
+            ),
+            array(
+                array('LT', '61', 'Siauliu Apskritis'),
+                array('TW', '4', 'T\'ai-wan'),
+            ),
+            array(
+                array('295514', 'LT', '61', '(( Mantjurgiai ))', '', '49.5', '0.1333'),
+                array('298374', 'TW', '4', 'Erhchiehtsun (1)', '', '24.7833', '121.6667'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'LT', 'name' => 'Lithuania'),
+                array('id' => 2, 'abbreviation' => 'TW', 'name' => 'Taiwan'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Siauliu Apskritis', '_maxmind' => 'LT61', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 2, 'name' => 'T\'ai-wan', '_maxmind' => 'TW4', 'abbreviation' => null),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
         $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));

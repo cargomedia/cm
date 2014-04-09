@@ -1373,8 +1373,11 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @return string
      */
     private function _normalizeCityName($fullName) {
-        $name = preg_replace('#\s*\(\([^)]*\)\)#', '', $fullName); // Remove non-existent cities, like "(( Mantjurgiai ))"
-        return trim($name);
+        $name = trim($fullName);
+        if(preg_match('#\A\(\( .* \)\)\z#', $name) || preg_match('#\(\d++\)\z#', $name)) {
+            return ''; // Remove non-existent cities, like "(( Mantjurgiai ))" and "Erhchiehtsun (1)"
+        }
+        return $name;
     }
 
     /**
