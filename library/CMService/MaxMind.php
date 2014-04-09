@@ -1383,6 +1383,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /**
      * @param array       $infoList
      * @param string|null $symbol
+     * @codeCoverageIgnore
      */
     private function _printInfoList($infoList, $symbol = null) {
         if (empty($infoList)) {
@@ -1425,6 +1426,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function _printSeparator() {
         $this->_writeln('');
         $this->_writeln(str_repeat(' *', 10));
@@ -1435,6 +1439,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @param string $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
+     * @codeCoverageIgnore
      */
     private function _readBlocksData($geoIpZipFile) {
         $zip = zip_open($geoIpZipFile);
@@ -1457,6 +1462,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @param string $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
+     * @codeCoverageIgnore
      */
     private function _readLocationData($geoIpZipFile) {
         $zip = zip_open($geoIpZipFile);
@@ -1479,6 +1485,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /**
      * @param string|null $geoIpFile
      * @throws CM_Exception_Invalid
+     * @codeCoverageIgnore
      */
     private function _setGeoIpFile($geoIpFile = null) {
         if (null !== $geoIpFile) {
@@ -1492,6 +1499,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     /**
      * @param string $text
+     * @codeCoverageIgnore
      */
     private function _writeln($text) {
         if ($this->_outputStream) {
