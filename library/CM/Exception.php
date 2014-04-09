@@ -70,7 +70,7 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getMetaInfo() {
         $metaInfoFormatted = Functional\map($this->_metaInfo, function ($value) {
