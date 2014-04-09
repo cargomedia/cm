@@ -31,7 +31,7 @@ class CM_Process {
             }
             unset($this->_childPids[$pid]);
             if ($keepAlive) {
-                $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, null, CM_Exception::WARN);
+                $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
                 $pid = $this->_spawnChild();

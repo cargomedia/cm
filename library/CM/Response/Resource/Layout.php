@@ -8,7 +8,7 @@ class CM_Response_Resource_Layout extends CM_Response_Resource_Abstract {
             $file = new CM_File($path);
         }
         if (!$file) {
-            throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Nonexistent('Invalid filename: `' . $this->getRequest()->getPath() . '`', null, array('severity' => CM_Exception::WARN));
         }
         $this->enableCache();
         $this->setHeader('Content-Type', $file->getMimeType());
