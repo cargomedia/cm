@@ -664,6 +664,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @param string|null $url
      * @return string
      * @throws CM_Exception
+     * @codeCoverageIgnore
      */
     protected function _download($path, $url = null) {
         if (CM_File::exists($path)) {
@@ -695,6 +696,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download ISO-3166-2 countries listing (from a handy but unofficial source)
      *
      * @return array List of array($countryName, $countryCode)
+     * @codeCoverageIgnore
      */
     protected function _getCountryData() {
         $this->_writeln('Downloading new country listing…');
@@ -723,6 +725,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download MaxMind GeoIP data
      *
      * @return array List of array($ipStart, $ipEnd, $maxMind)
+     * @codeCoverageIgnore
      */
     protected function _getIpData() {
         $this->_writeln('Reading new IP blocks…');
@@ -752,6 +755,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download MaxMind location data
      *
      * @return array List of array($maxMind, $countryCode, $regionCode, $cityName, $zipCode, $latitude, $longitude)
+     * @codeCoverageIgnore
      */
     protected function _getLocationData() {
         $this->_writeln('Reading new location tree…');
@@ -781,6 +785,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
      *
      * @return array List of array($countryCode, $regionCode, $regionName)
+     * @codeCoverageIgnore
      */
     protected function _getRegionData() {
         $this->_writeln('Downloading new region listing…');
