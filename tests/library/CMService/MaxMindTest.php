@@ -319,6 +319,38 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testAddZipCode_unknownRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('385175', 'FR', 'B8', 'Marseille', '13000', '43.3', '5.4'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(),
+            array(
+                array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id' => 2, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 2, 'name' => '13000', 'cityId' => 2, 'lat' => 43.3, 'lon' => 5.4),
+            ),
+            array(),
+            array()
+        );
+    }
+
     public function testZipCode_withoutCity() {
         $this->_import(
             array(
