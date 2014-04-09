@@ -1307,7 +1307,31 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384564', 'FR', 'A7', 'Le Havre', '76600', '49.4938', '0.1077'),
+                array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('484564', 'FR', 'A7', 'Le Havre', '76630', '49.4938', '0.1077'),
+                array('485389', 'FR', 'A7', 'Le Havre', '76640', '49.5213', '0.1581'),
+                array('484603', 'FR', 'A7', 'Le Havre', '76650', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384564', 'FR', 'A7', 'Le Havre', '76600', '49.4938', '0.1077'),
+                array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('484564', 'FR', 'A7', 'Le Havre', '76630', '49.4938', '0.1077'),
+                array('485389', 'FR', 'A7', 'Le Havre', '76640', '49.5213', '0.1581'),
             ),
             array()
         );
@@ -1336,7 +1360,12 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
             array(
-                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 1, 'name' => '76600', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 2, 'name' => '76610', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
+                array('id' => 3, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 4, 'name' => '76630', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 5, 'name' => '76640', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
+                array('id' => 6, 'name' => '76650', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
             array(),
             array()
