@@ -898,6 +898,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('671', 'US', 'CA', 'Los Angeles', '90015', '34.0396', '-118.2661'),
             ),
             array(
                 array('69089280', '69090303', '11532'),
@@ -929,7 +930,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id'       => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
             ),
-            array(),
+            array(
+                array('id' => 1, 'name' => '90015', 'cityId' => 1, 'lat' => 34.0396, 'lon' => -118.266),
+            ),
             array(),
             array()
         );
