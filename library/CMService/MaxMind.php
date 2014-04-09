@@ -529,9 +529,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         $infoListAdded['Cities added'][$countryName][] = $regionName . ', ' . $cityCountAdded . $cityRateAddedInfo;
                     } else {
                         foreach ($cityListAdded as $cityCode => $cityName) {
-                            $infoListAdded['Cities added'][
-                            $countryName . ' / ' . $regionName . ', ' . $cityCountAdded . ' cities' . $cityRateAddedInfo][] =
-                                $cityName . ' (' . $cityCode . ')';
+                            $infoTitle = $countryName . ' / ' . $regionName . ', ' . $cityCountAdded . ' cities' . $cityRateAddedInfo;
+                            $infoListAdded['Cities added'][$infoTitle][] = $cityName . ' (' . $cityCode . ')';
                         }
                     }
                 }

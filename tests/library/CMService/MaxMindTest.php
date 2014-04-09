@@ -817,6 +817,22 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array()
         );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('23653', 'US', 'CA', 'Long Beach', '', '33.767', '-118.1892'),
+            ),
+            array()
+        );
         $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
@@ -828,6 +844,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
                 array('id' => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id' => 3, 'stateId' => 1, 'countryId' => 1, 'name' => 'Long Beach', 'lat' => 33.767, 'lon' => -118.189, '_maxmind' => 23653),
             ),
             array(),
             array(),
