@@ -540,9 +540,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     $cityRateRemoved = $cityCountRemoved / $cityCountOld;
                     $cityRateRemovedInfo = ' (' . round($cityRateRemoved * 100) . '%)';
                     foreach ($cityListRemoved as $cityCode => $cityName) {
-                        $infoListRemoved['Cities removed'][
-                        $countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo][] =
-                            $cityName . ' (' . $cityCode . ')';
+                        $infoTitle = $countryName . ' / ' . $regionName . ', ' . $cityCountRemoved . ' cities' . $cityRateRemovedInfo;
+                        $infoListRemoved['Cities removed'][$infoTitle][] = $cityName . ' (' . $cityCode . ')';
                     }
                 }
 
