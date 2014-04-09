@@ -73,10 +73,9 @@ class CM_Exception extends Exception {
      * @return array
      */
     public function getMetaInfo() {
-        $metaInfoFormatted = array();
-        foreach ($this->_metaInfo as $key => $value) {
-            $metaInfoFormatted[$key] = CM_Util::varDump($value);
-        }
+        $metaInfoFormatted = Functional\map($this->_metaInfo, function ($value) {
+            return CM_Util::varDump($value);
+        });
 
         return $metaInfoFormatted;
     }
