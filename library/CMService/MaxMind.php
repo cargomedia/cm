@@ -1236,6 +1236,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /**
      * @param int $color
      * @return string
+     * @codeCoverageIgnore
      */
     private function _getEscapeSequenceHighlighted($color) {
         static $escapeSequence = array();
@@ -1248,6 +1249,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     /**
      * @return string
+     * @codeCoverageIgnore
      */
     private function _getEscapeSequenceNormal() {
         static $escapeSequence = null;
