@@ -357,6 +357,7 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @param string $name
      * @param array  $variableNames
      * @throws CM_Exception_Invalid
+     * @throws CM_Exception_Duplicate
      */
     private static function _setKeyVariables($name, array $variableNames) {
         $languageKeyParams = CM_Db_Db::select('cm_languageKey', array('id', 'updateCountResetVersion', 'updateCount'),
@@ -373,6 +374,10 @@ class CM_Model_Language extends CM_Model_Abstract {
         CM_Db_Db::update('cm_languageKey', array('updateCountResetVersion' => $deployVersion, 'updateCount' => $updateCount), array('name' => $name));
         if ($updateCount > 50) {
             throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
+        }
+
+        if (count($variableNames) !== count(array_unique($variableNames))) {
+            throw new CM_Exception_Duplicate('Duplicate variable name declaration `' . json_encode($variableNames) . '`');
         }
 
         CM_Db_Db::update('cm_languageKey', array('variables' => json_encode($variableNames)), array('id' => $languageKeyId));
