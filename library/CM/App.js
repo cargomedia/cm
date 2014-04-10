@@ -1032,9 +1032,7 @@ var CM_App = CM_Class_Abstract.extend({
           skipInitialFire = false;
           return;
         }
-        var location = window.history.location || document.location;
-        var fragment = location.pathname + location.search;
-        router._handleLocationChange(fragment);
+        router._handleLocationChange(router._getFragment());
       });
 
       var hash = window.location.hash.substr(1);
@@ -1081,10 +1079,12 @@ var CM_App = CM_Class_Abstract.extend({
         window.location.assign(url);
         return;
       }
-      if (replaceState) {
-        this.replaceState(fragment);
-      } else {
-        this.pushState(fragment);
+      if (fragment !== this._getFragment()) {
+        if (replaceState) {
+          this.replaceState(fragment);
+        } else {
+          this.pushState(fragment);
+        }
       }
       this._handleLocationChange(fragment);
     },
@@ -1101,6 +1101,21 @@ var CM_App = CM_Class_Abstract.extend({
      */
     replaceState: function(url) {
       window.history.replaceState(null, null, url);
+    },
+
+    /**
+     * @returns Location
+     */
+    _getLocation: function() {
+      return window.history.location || document.location;
+    },
+
+    /**
+     * @returns string
+     */
+    _getFragment: function() {
+      var location = this._getLocation();
+      return location.pathname + location.search;
     },
 
     /**
@@ -1122,7 +1137,7 @@ var CM_App = CM_Class_Abstract.extend({
       var paramsStateNext = null;
       var pageCurrent = cm.getLayout().findPage();
 
-      if (pageCurrent) {
+      if (pageCurrent && pageCurrent.hasStateParams()) {
         var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
         var locationNext = this._getLocationByFragment(fragment);
 
