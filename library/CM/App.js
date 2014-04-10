@@ -265,8 +265,8 @@ var CM_App = CM_Class_Abstract.extend({
       }
       var messages = _.toArray(arguments);
       messages.unshift('[CM]');
-      if (console && console.log) {
-        var log = console.log;
+      if (window.console && window.console.log) {
+        var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
           log = Function.prototype.bind.call(console.log, console);
         }
