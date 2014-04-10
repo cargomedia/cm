@@ -11,7 +11,7 @@
     this.$buttonsContainer = $buttonsContainer;
     this.$contentContainer = this.$buttonsContainer.next('.tabs-content');
     if (!this.$contentContainer.length) {
-      throw 'No tabs contents found';
+      throw new Error('No tabs contents found');
     }
 
     var self = this;
@@ -34,7 +34,7 @@
     showTabByName: function(tab) {
       var $tab = this.$buttonsContainer.children('[data-tab="' + tab + '"]:first');
       if (!$tab.length) {
-        throw 'No tab with name `' + tab + '` found';
+        throw new Error('No tab with name `' + tab + '` found');
       }
       this.showTab($tab);
     },
