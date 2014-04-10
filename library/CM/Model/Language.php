@@ -34,13 +34,13 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string     $key
+     * @param string     $name
      * @param array|null $variableNames
      * @param bool|null  $skipCacheLocal
      * @return string
      */
-    public function getTranslation($key, array $variableNames = null, $skipCacheLocal = null) {
-        $key = (string) $key;
+    public function getTranslation($name, array $variableNames = null, $skipCacheLocal = null) {
+        $name = (string) $name;
         $cacheKey = CM_CacheConst::Language_Translations . '_languageId:' . $this->getId();
         $cache = CM_Cache_Local::getInstance();
         if ($skipCacheLocal || false === ($translations = $cache->get($cacheKey))) {
@@ -52,47 +52,47 @@ class CM_Model_Language extends CM_Model_Abstract {
         }
 
         // Check if translation exists and if variables provided match the ones in database
-        if (!array_key_exists($key, $translations)) {
-            static::_setKey($key, $variableNames);
+        if (!array_key_exists($name, $translations)) {
+            static::_setKey($name, $variableNames);
             $this->_change();
         } elseif ($variableNames !== null) {
             sort($variableNames);
-            if ($variableNames !== $translations[$key]['variables']) {
-                static::_setKey($key, $variableNames);
+            if ($variableNames !== $translations[$name]['variables']) {
+                static::_setKey($name, $variableNames);
                 $this->_change();
             }
         }
         // Getting value from backup language if backup is present and value does not exist
-        if (!isset($translations[$key]['value'])) {
+        if (!isset($translations[$name]['value'])) {
             if (!$this->getBackup()) {
-                return $key;
+                return $name;
             }
-            return $this->getBackup()->getTranslation($key, $variableNames, $skipCacheLocal);
+            return $this->getBackup()->getTranslation($name, $variableNames, $skipCacheLocal);
         }
-        return $translations[$key]['value'];
+        return $translations[$name]['value'];
     }
 
     /**
-     * @param string      $key
+     * @param string      $name
      * @param string|null $value
      * @param array|null  $variables
      */
-    public function setTranslation($key, $value = null, array $variables = null) {
+    public function setTranslation($name, $value = null, array $variables = null) {
         if (null === $value) {
-            $value = $key;
+            $value = $name;
         }
 
-        $languageKeyId = static::_setKey($key, $variables);
+        $languageKeyId = static::_setKey($name, $variables);
         CM_Db_Db::insert('cm_languageValue',
             array('value' => $value, 'languageKeyId' => $languageKeyId, 'languageId' => $this->getId()), null, array('value' => $value));
         $this->_change();
     }
 
     /**
-     * @param string $key
+     * @param string $name
      */
-    public function unsetTranslation($key) {
-        $languageKeyId = static::_setKey($key);
+    public function unsetTranslation($name) {
+        $languageKeyId = static::_setKey($name);
         CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $languageKeyId, 'languageId' => $this->getId()));
         $this->_change();
     }
