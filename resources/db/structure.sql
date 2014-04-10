@@ -95,18 +95,6 @@ CREATE TABLE `cm_languageKey` (
   KEY `javascript` (`javascript`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_languageKey_variable`;
-
-
-CREATE TABLE `cm_languageKey_variable` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `languageKeyId` int(10) unsigned NOT NULL,
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`languageKeyId`),
-  KEY `languageKeyId` (`languageKeyId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 DROP TABLE IF EXISTS `cm_languageValue`;
 
 
