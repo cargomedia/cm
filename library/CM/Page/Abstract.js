@@ -7,7 +7,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   /** @type String */
   _class: 'CM_Page_Abstract',
 
-  /** @type String[] */
+  /** @type String[]|Null */
   _stateParams: null,
 
   /** @type String|Null */
