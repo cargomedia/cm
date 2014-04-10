@@ -589,8 +589,8 @@ var CM_App = CM_Class_Abstract.extend({
         handler.focus.add(handler.getId());
         handler._hasFocus = true;
       }).blur(function() {
-          handler._hasFocus = false;
-        });
+        handler._hasFocus = false;
+      });
       this.title.ready();
     },
 
@@ -742,20 +742,20 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }
     }).fail(function(xhr, textStatus) {
-        if (xhr.status === 0) {
-          return; // Ignore interrupted ajax-request caused by leaving a page
-        }
+      if (xhr.status === 0) {
+        return; // Ignore interrupted ajax-request caused by leaving a page
+      }
 
-        var msg = cm.language.get('An unexpected connection problem occurred.');
-        if (cm.options.debug) {
-          msg = xhr.responseText || textStatus;
-        }
-        errorHandler(msg, null, false, callbacks.error);
-      }).always(function() {
-        if (callbacks.complete) {
-          callbacks.complete();
-        }
-      });
+      var msg = cm.language.get('An unexpected connection problem occurred.');
+      if (cm.options.debug) {
+        msg = xhr.responseText || textStatus;
+      }
+      errorHandler(msg, null, false, callbacks.error);
+    }).always(function() {
+      if (callbacks.complete) {
+        callbacks.complete();
+      }
+    });
 
     return jqXHR;
   },
@@ -1034,7 +1034,7 @@ var CM_App = CM_Class_Abstract.extend({
         }
         var location = window.history.location || document.location;
         var fragment = location.pathname + location.search;
-        cm.getLayout().loadPage(location.pathname + location.search);
+        router._handleLocationChange(fragment);
       });
 
       var hash = window.location.hash.substr(1);
@@ -1086,7 +1086,7 @@ var CM_App = CM_Class_Abstract.extend({
       } else {
         this.pushState(fragment);
       }
-      cm.getLayout().loadPage(fragment);
+      this._handleLocationChange(fragment);
     },
 
     /**
@@ -1101,6 +1101,51 @@ var CM_App = CM_Class_Abstract.extend({
      */
     replaceState: function(url) {
       window.history.replaceState(null, null, url);
+    },
+
+    /**
+     * @param {String} fragment
+     * @returns Location
+     */
+    _getLocationByFragment: function(fragment) {
+      var location = document.createElement('a');
+      if (fragment) {
+        location.href = fragment;
+      }
+      return location;
+    },
+
+    /**
+     * @param {String} fragment
+     */
+    _handleLocationChange: function(fragment) {
+      var paramsStateNext = null;
+      var pageCurrent = cm.getLayout().findPage();
+
+      if (pageCurrent) {
+        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
+        var locationNext = this._getLocationByFragment(fragment);
+
+        if (locationCurrent.pathname === locationNext.pathname) {
+          var paramsCurrent = queryString.parse(locationCurrent.search);
+          var paramsNext = queryString.parse(locationNext.search);
+
+          var stateParamNames = pageCurrent.getStateParams();
+
+          var paramsNonStateCurrent = _.pick(paramsCurrent, _.difference(_.keys(paramsCurrent), stateParamNames));
+          var paramsNonStateNext = _.pick(paramsNext, _.difference(_.keys(paramsNext), stateParamNames));
+
+          if (_.isEqual(paramsNonStateCurrent, paramsNonStateNext)) {
+            paramsStateNext = _.pick(paramsNext, _.intersection(_.keys(paramsNext), stateParamNames));
+          }
+        }
+      }
+
+      if (paramsStateNext) {
+        cm.getLayout().getPage().routeToState(paramsStateNext, fragment);
+      } else {
+        cm.getLayout().loadPage(fragment);
+      }
     }
   }
 });
