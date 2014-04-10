@@ -267,19 +267,26 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @throws CM_Exception_Duplicate
      */
     public static function updateKey($name, $nameNew = null, array $variableNamesNew = null) {
-        if ($variableNamesNew !== null) {
-            self::_setKeyVariables($name, $variableNamesNew);
+        $name = (string) $name;
+        if (!CM_Db_Db::count('cm_languageKey', array('name' => $name))) {
+            throw new CM_Exception_Nonexistent('LanguageKey `' . $name . '` does not exist');
         }
-        if ($nameNew !== null) {
-            if (!CM_Db_Db::count('cm_languageKey', array('name' => $name))) {
-                throw new CM_Exception_Nonexistent('LanguageKey `' . $name . '` does not exist');
-            }
+
+        if ($variableNamesNew !== null) {
+            $variableNamesNew = json_encode($variableNamesNew);
+        }
+
+        if (null !== $nameNew) {
+            $nameNew = (string) $nameNew;
             if (CM_Db_Db::count('cm_languageKey', array('name' => $nameNew))) {
                 throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
             }
-            CM_Db_Db::update('cm_languageKey', array('name' => $nameNew), array('name' => $name));
-            self::changeAll();
+
+            CM_Db_Db::update('cm_languageKey', array('name' => $nameNew, 'variables' => $variableNamesNew), array('name' => $name));
+        } else {
+            CM_Db_Db::update('cm_languageKey', array('variables' => $variableNamesNew), array('name' => $name));
         }
+        self::changeAll();
     }
 
     /**
@@ -311,8 +318,12 @@ class CM_Model_Language extends CM_Model_Abstract {
     protected static function _createStatic(array $data) {
         $params = CM_Params::factory($data);
         $backupId = ($params->has('backup')) ? $params->getLanguage('backup')->getId() : null;
-        $id = CM_Db_Db::insert('cm_language', array('name'    => $params->getString('name'), 'abbreviation' => $params->getString('abbreviation'),
-                                                    'enabled' => $params->getBoolean('enabled'), 'backupId' => $backupId));
+        $id = CM_Db_Db::insert('cm_language', array(
+            'name'         => $params->getString('name'),
+            'abbreviation' => $params->getString('abbreviation'),
+            'enabled'      => $params->getBoolean('enabled'),
+            'backupId'     => $backupId,
+        ));
         return new static($id);
     }
 
@@ -336,7 +347,7 @@ class CM_Model_Language extends CM_Model_Abstract {
 
             self::changeAll();
         }
-        if ($variableNames !== null) {
+        if (null !== $variableNames) {
             self::_setKeyVariables($name, $variableNames);
         }
         return $languageKeyId;
@@ -348,8 +359,8 @@ class CM_Model_Language extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     private static function _setKeyVariables($name, array $variableNames) {
-        $languageKeyParams = CM_Db_Db::select('cm_languageKey', array('id', 'updateCountResetVersion',
-            'updateCount'), array('name' => $name))->fetch();
+        $languageKeyParams = CM_Db_Db::select('cm_languageKey', array('id', 'updateCountResetVersion', 'updateCount'),
+            array('name' => $name))->fetch();
         if (!$languageKeyParams) {
             throw new CM_Exception_Invalid('Language key `' . $name . '` was not found');
         }
@@ -364,10 +375,8 @@ class CM_Model_Language extends CM_Model_Abstract {
             throw new CM_Exception_Invalid('Variables for languageKey `' . $name . '` have been already updated over 50 times since release');
         }
 
-        CM_Db_Db::delete('cm_languageKey_variable', array('languageKeyId' => $languageKeyId));
-        foreach ($variableNames as $variableName) {
-            CM_Db_Db::insert('cm_languageKey_variable', array('languageKeyId' => $languageKeyId, 'name' => $variableName));
-        }
+        CM_Db_Db::update('cm_languageKey', array('variables' => json_encode($variableNames)), array('id' => $languageKeyId));
+
         self::changeAll();
     }
 }
