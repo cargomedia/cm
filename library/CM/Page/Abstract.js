@@ -14,8 +14,10 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   _fragment: null,
 
   _ready: function() {
-    this._fragment = window.location.pathname + window.location.search;
-    // @todo routeToState
+    var location = window.location;
+    var params = queryString.parse(location.search);
+    var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
+    this.routeToState(state, location.pathname + location.search);
 
     CM_Component_Abstract.prototype._ready.call(this);
   },
