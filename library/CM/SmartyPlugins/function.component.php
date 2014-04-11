@@ -14,7 +14,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
     if (isset($params['params'])) {
         $componentParams = array_merge($componentParams, $params['params']);
     }
-    $component = CM_Component_Abstract::factory($name, $render, $componentParams, $render->getViewer());
+    $component = CM_Component_Abstract::factory($name, $componentParams, $render->getViewer());
 
     if ($component instanceof CM_Page_Abstract) {
         $renderAdapter = new CM_RenderAdapter_Page($render, $component);

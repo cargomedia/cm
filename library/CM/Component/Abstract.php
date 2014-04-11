@@ -104,17 +104,17 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
     /**
      * @param string             $className
-     * @param CM_Render          $render
      * @param CM_Params|array    $params
      * @param CM_Model_User|null $viewer
      * @throws CM_Exception
+     * @internal param \CM_Render $render
      * @return CM_Component_Abstract
      */
-    public static function factory($className, CM_Render $render, $params = null, CM_Model_User $viewer = null) {
+    public static function factory($className, $params = null, CM_Model_User $viewer = null) {
         if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
             throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
         }
-        $component = new $className($render, $params, $viewer);
+        $component = new $className($params, $viewer);
         return $component;
     }
 
