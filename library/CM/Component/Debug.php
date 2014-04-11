@@ -8,7 +8,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         }
     }
 
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);

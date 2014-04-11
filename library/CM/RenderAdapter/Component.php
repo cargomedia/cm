@@ -10,7 +10,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $renderEnvironment = $this->getRender()->getEnvironment();
         $component->checkAccessible($renderEnvironment);
 
-        $viewResponse = $this->_getPreparedViewResponse($component, $renderEnvironment);
+        $frontendHandler = new CM_ComponentFrontendHandler();
+        $viewResponse = $this->_getPreparedViewResponse($component, $renderEnvironment, $frontendHandler);
 
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
@@ -28,14 +29,14 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
                 $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
             }
         }
-        $html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
+        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
 
         $viewResponse->addData('viewOjb', $component);
         $html .=  $this->getRender()->renderViewResponse($viewResponse);
 
         $html .= '</div>';
 
-        $this->getRender()->getJs()->registerComponent($component, $parentViewId);
+        $this->getRender()->getJs()->registerComponent($viewResponse, $frontendHandler, $parentViewId);
         $this->getRender()->popStack($this->_getStackKey());
         $this->getRender()->popStack('views');
 
@@ -59,15 +60,16 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_Component_Abstract $component
-     * @param CM_RenderEnvironment  $environment
+     * @param CM_Component_Abstract       $component
+     * @param CM_RenderEnvironment        $environment
+     * @param CM_ComponentFrontendHandler $frontendHandler
      * @return CM_ViewResponse
      */
-    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment) {
+    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
         /** @var CM_Component_Abstract $component */
         $viewResponse = new CM_ViewResponse($component);
         $viewResponse->setTemplateName('default');
-        $component->prepare($environment, $viewResponse);
+        $component->prepare($environment, $viewResponse, $frontendHandler);
         return $viewResponse;
     }
 }

@@ -29,8 +29,8 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         return trim($this->getRender()->renderViewResponse($viewResponse));
     }
 
-    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment) {
-        $viewResponse = parent::_getPreparedViewResponse($component, $environment);
+    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
+        $viewResponse = parent::_getPreparedViewResponse($component, $environment, $frontendHandler);
         $viewResponse->addData('pageTitle', $this->fetchTitle());
         return $viewResponse;
     }

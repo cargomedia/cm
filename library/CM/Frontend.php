@@ -107,17 +107,20 @@ class CM_Frontend {
     }
 
     /**
-     * @param CM_Component_Abstract $component
-     * @param string                $parentAutoId OPTIONAL
+     * @param CM_ViewResponse             $viewResponse
+     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param string                      $parentAutoId OPTIONAL
+     * @throws CM_Exception_Invalid
      */
-    public function registerComponent(CM_Component_Abstract $component, $parentAutoId = null) {
-        $auto_var = 'cm.views["' . $component->getAutoId() . '"]';
-        $cmpClass = get_class($component);
-        $handler = $component->getFrontendHandler();
-
+    public function registerComponent(CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler, $parentAutoId = null) {
+        $component = $viewResponse->getView();
+        if (!$component instanceof CM_Component_Abstract) {
+            throw new CM_Exception_Invalid('Can only register component view responses');
+        }
+        $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
         $cmpJs = '';
-        $cmpJs .= $auto_var . ' = new ' . $cmpClass . '({';
-        $cmpJs .= 'el:$("#' . $component->getAutoId() . '").get(0),';
+        $cmpJs .= $reference . ' = new ' . get_class($component) . '({';
+        $cmpJs .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
         $cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAll(), true);
         if ($parentAutoId) {
             $cmpJs .= ',parent:cm.views["' . $parentAutoId . '"]';
@@ -125,7 +128,7 @@ class CM_Frontend {
         $cmpJs .= '});' . PHP_EOL;
 
         $this->onloadPrepareJs($cmpJs, true);
-        $this->onloadJs($handler->compile_js($auto_var));
+        $this->onloadJs($frontendHandler->compile_js($reference));
     }
 
     /**
