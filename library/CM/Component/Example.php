@@ -2,7 +2,7 @@
 
 class CM_Component_Example extends CM_Component_Abstract {
 
-    public function prepare(CM_Params $params, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_RenderEnvironment $environment, CM_Params $params, CM_ViewResponse $viewResponse) {
         $foo = $this->_params->getString('foo', 'value1');
         $colorStyles = $this->_getColorStyles();
         $icons = $this->_getIcons();

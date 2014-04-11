@@ -67,10 +67,11 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param CM_Params       $params
-     * @param CM_ViewResponse $viewResponse
+     * @param CM_RenderEnvironment $environment
+     * @param CM_Params            $params
+     * @param CM_ViewResponse      $viewResponse
      */
-    public function prepare(CM_Params $params, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_RenderEnvironment $environment, CM_Params $params, CM_ViewResponse $viewResponse) {
     }
 
     /**

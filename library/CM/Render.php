@@ -32,6 +32,9 @@ class CM_Render extends CM_Class_Abstract {
     /** @var CM_Menu[] */
     private $_menuList = array();
 
+    /** @var CM_RenderEnvironment */
+    private $_environment;
+
     /* @var Smarty */
     private static $_smarty = null;
 
@@ -50,6 +53,7 @@ class CM_Render extends CM_Class_Abstract {
         }
         $this->_site = $site;
         $this->_viewer = $viewer;
+        $this->_environment = new CM_RenderEnvironment($viewer, $site);
         $this->_language = $language;
         $this->_languageRewrite = (bool) $languageRewrite;
     }
@@ -59,6 +63,13 @@ class CM_Render extends CM_Class_Abstract {
      */
     public function getSite() {
         return $this->_site;
+    }
+
+    /**
+     * @return CM_RenderEnvironment
+     */
+    public function getEnvironment() {
+        return $this->_environment;
     }
 
     /**
