@@ -2,9 +2,6 @@
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
 
-    /** @var CM_Model_User|null */
-    protected $_viewer;
-
     /** @var string */
     protected $_tplName = 'default.tpl';
 
@@ -16,11 +13,8 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
     /**
      * @param CM_Params|array|null $params
-     * @param CM_Model_User|null   $viewer
-     * @internal param \CM_Render $render
      */
-    public function __construct($params = null, CM_Model_User $viewer = null) {
-        $this->_viewer = $viewer;
+    public function __construct($params = null) {
         if (is_null($params)) {
             $params = CM_Params::factory();
         }
@@ -79,23 +73,8 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
      *
      * @throws CM_Exception_AuthRequired If no user is set
      */
-    protected function _checkViewer() {
-        $this->_getViewer(true);
-    }
-
-    /**
-     * @param boolean $needed OPTIONAL Throw a CM_Exception_AuthRequired if not authenticated
-     * @return CM_Model_User|null
-     * @throws CM_Exception_AuthRequired
-     */
-    protected function _getViewer($needed = false) {
-        if (!$this->_viewer) {
-            if ($needed) {
-                throw new CM_Exception_AuthRequired();
-            }
-            return null;
-        }
-        return $this->_viewer;
+    protected function _checkViewer(CM_RenderEnvironment $environment) {
+        $environment->getViewer(true);
     }
 
     public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
