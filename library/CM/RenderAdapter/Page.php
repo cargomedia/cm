@@ -3,19 +3,19 @@
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
     /**
-     * @param CM_Params $pageParams
+     * @param CM_Page_Abstract $page
      * @return string
      */
-    public function fetchDescription(CM_Params $pageParams) {
-        return $this->_fetchTemplate('meta-description', $pageParams);
+    public function fetchDescription(CM_Page_Abstract $page) {
+        return $this->_fetchTemplate($page, 'meta-description');
     }
 
     /**
-     * @param CM_Params $pageParams
+     * @param CM_Page_Abstract $page
      * @return string
      */
-    public function fetchKeywords(CM_Params $pageParams) {
-        return $this->_fetchTemplate('meta-keywords', $pageParams);
+    public function fetchKeywords(CM_Page_Abstract $page) {
+        return $this->_fetchTemplate($page, 'meta-keywords');
     }
 
     /**
@@ -40,14 +40,14 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     }
 
     /**
-     * @param string    $templateName
-     * @param CM_Params $pageParams
+     * @param CM_Page_Abstract $page
+     * @param string           $templateName
      * @return string
      */
-    private function _fetchTemplate($templateName, CM_Params $pageParams) {
-        $viewResponse = new CM_ViewResponse($this->_getView());
+    private function _fetchTemplate(CM_Page_Abstract $page, $templateName) {
+        $viewResponse = new CM_ViewResponse($page);
         $viewResponse->setTemplateName($templateName);
-        $viewResponse->setData($pageParams->getAll());
+        $viewResponse->setData($page->getParams()->getAll());
         return trim($this->getRender()->renderViewResponse($viewResponse));
     }
 }
