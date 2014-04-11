@@ -84,6 +84,13 @@ class CM_Bootloader {
     }
 
     /**
+     * @param bool $state
+     */
+    public function setDebug($state) {
+        $this->_debug = $state;
+    }
+
+    /**
      * @return bool
      */
     public function isCli() {
