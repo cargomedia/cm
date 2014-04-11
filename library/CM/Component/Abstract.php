@@ -5,9 +5,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     /** @var CM_Model_User|null */
     protected $_viewer;
 
-    /** @var CM_Render */
-    protected $_render;
-
     /** @var string */
     protected $_tplName = 'default.tpl';
 
@@ -18,12 +15,11 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     protected $_params;
 
     /**
-     * @param CM_Render            $render
      * @param CM_Params|array|null $params
      * @param CM_Model_User|null   $viewer
+     * @internal param \CM_Render $render
      */
-    public function __construct(CM_Render $render, $params = null, CM_Model_User $viewer = null) {
-        $this->_render = $render;
+    public function __construct($params = null, CM_Model_User $viewer = null) {
         $this->_viewer = $viewer;
         if (is_null($params)) {
             $params = CM_Params::factory();
@@ -45,13 +41,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
      * @return mixed
      */
     abstract public function checkAccessible(CM_RenderEnvironment $environment);
-
-    /**
-     * @return CM_Render
-     */
-    public function getRender() {
-        return $this->_render;
-    }
 
     /**
      * @return CM_ComponentFrontendHandler
