@@ -87,15 +87,15 @@ class CM_ViewResponse extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $filename
+     * @param string $name
      * @throws CM_Exception_Invalid
      */
-    public function setTemplateName($filename) {
-        $filename = (string) $filename . '.tpl';
-        if (preg_match('/[^\w\.-]/', $filename)) {
-            throw new CM_Exception_Invalid('Invalid tpl-name `' . $filename . '`');
+    public function setTemplateName($name) {
+        $name = (string) $name . '.tpl';
+        if (preg_match('/[^\w\.-]/', $name)) {
+            throw new CM_Exception_Invalid('Invalid tpl-name `' . $name . '`');
         }
-        $this->_templateName = $filename;
+        $this->_templateName = $name;
     }
 
     /**
