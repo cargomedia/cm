@@ -53,7 +53,7 @@ class CM_Render extends CM_Class_Abstract {
         }
         $this->_site = $site;
         $this->_viewer = $viewer;
-        $this->_environment = new CM_RenderEnvironment($viewer, $site);
+        $this->_environment = new CM_RenderEnvironment($site, $viewer);
         $this->_language = $language;
         $this->_languageRewrite = (bool) $languageRewrite;
     }

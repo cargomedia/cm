@@ -2,17 +2,17 @@
 
 class CM_RenderEnvironment extends CM_Class_Abstract {
 
-    /** @var CM_Model_User */
+    /** @var CM_Model_User|null */
     protected $_viewer;
 
     /** @var CM_Site_Abstract */
     protected $_site;
 
     /**
-     * @param CM_Model_User    $viewer
-     * @param CM_Site_Abstract $site
+     * @param CM_Site_Abstract   $site
+     * @param CM_Model_User|null $viewer
      */
-    public function __construct(CM_Model_User $viewer, CM_Site_Abstract $site) {
+    public function __construct(CM_Site_Abstract $site, CM_Model_User $viewer = null) {
         $this->_viewer = $viewer;
         $this->_site = $site;
     }
@@ -25,9 +25,17 @@ class CM_RenderEnvironment extends CM_Class_Abstract {
     }
 
     /**
-     * @return \CM_Model_User
+     * @param boolean|null $needed
+     * @return CM_Model_User|null
+     * @throws CM_Exception_AuthRequired
      */
-    public function getViewer() {
+    public function getViewer($needed = null) {
+        if (!$this->_viewer) {
+            if ($needed) {
+                throw new CM_Exception_AuthRequired();
+            }
+            return null;
+        }
         return $this->_viewer;
     }
 }
