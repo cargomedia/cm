@@ -19,19 +19,19 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     }
 
     /**
-     * @param CM_Params $pageParams
+     * @internal param \CM_Params $pageParams
      * @return string
      */
-    public function fetchTitle(CM_Params $pageParams) {
+    public function fetchTitle() {
         $viewResponse = new CM_ViewResponse($this->_getView());
         $viewResponse->setTemplateName('title');
-        $viewResponse->setData($pageParams->getAll());
+        $viewResponse->setData($this->_getView()->getParams()->getAll());
         return trim($this->getRender()->renderViewResponse($viewResponse));
     }
 
-    protected function _getPreparedViewResponse(CM_Params $viewParams) {
-        $viewResponse = parent::_getPreparedViewResponse($viewParams);
-        $viewResponse->addData('pageTitle', $this->fetchTitle($viewParams));
+    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment) {
+        $viewResponse = parent::_getPreparedViewResponse($component, $environment);
+        $viewResponse->addData('pageTitle', $this->fetchTitle());
         return $viewResponse;
     }
 

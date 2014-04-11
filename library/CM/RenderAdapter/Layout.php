@@ -3,14 +3,14 @@
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
     /**
-     * @param CM_Page_Abstract $page
-     * @param CM_Params        $pageParams
+     * @param CM_Layout_Abstract $layout
+     * @param CM_Page_Abstract   $page
      * @return string
      */
-    public function fetch(CM_Page_Abstract $page, CM_Params $pageParams) {
-        /** @var CM_Layout_Abstract $layout */
-        $layout = $this->_getView();
+    public function fetch(CM_Layout_Abstract $layout, CM_Page_Abstract $page) {
+
         $page->checkAccessible($this->getRender()->getEnvironment());
+        $pageParams = $page->getParams();
 
         $js = $this->getRender()->getJs();
 
@@ -50,7 +50,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $js->onloadReadyJs('cm.getLayout()._ready();');
 
         $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
-        $pageTitle = $renderAdapterPage->fetchTitle($pageParams);
+        $pageTitle = $renderAdapterPage->fetchTitle();
 
         $viewResponse = new CM_ViewResponse($this->_getView());
         $viewResponse->setTemplateName('default');

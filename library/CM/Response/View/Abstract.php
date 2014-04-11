@@ -50,10 +50,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         }
         $componentParams = CM_Params::factory($componentParams);
 
-        $component = CM_Component_Abstract::factory($componentInfo['className'], $componentParams, $this->getViewer());
+        $component = CM_Component_Abstract::factory($componentInfo['className'], $componentParams);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch($componentParams);
+        $html = $renderAdapter->fetch($component);
 
         $this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
         $this->getRender()->getJs()->onloadPrepareJs(
@@ -69,10 +69,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
      * @return array
      */
     public function loadComponent(CM_Params $params) {
-        $component = CM_Component_Abstract::factory($params->getString('className'), $params, $this->getViewer());
+        $component = CM_Component_Abstract::factory($params->getString('className'), $params);
 
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
-        $html = $renderAdapter->fetch($params);
+        $html = $renderAdapter->fetch($component);
         $js = $this->getRender()->getJs()->getJs();
 
         $this->getRender()->getJs()->clear();

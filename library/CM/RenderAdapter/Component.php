@@ -2,14 +2,15 @@
 
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
-    public function fetch(CM_Params $viewParams) {
+    /**
+     * @param CM_Component_Abstract $component
+     * @return string
+     */
+    public function fetch(CM_Component_Abstract $component) {
         $renderEnvironment = $this->getRender()->getEnvironment();
-
-        /** @var CM_Component_Abstract $component */
-        $component = $this->_getView();
         $component->checkAccessible($renderEnvironment);
 
-        $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $viewParams);
+        $viewResponse = $this->_getPreparedViewResponse($component, $renderEnvironment);
 
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
@@ -58,13 +59,12 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_RenderEnvironment $environment
-     * @param CM_Params            $viewParams
+     * @param CM_Component_Abstract $component
+     * @param CM_RenderEnvironment  $environment
      * @return CM_ViewResponse
      */
-    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_Params $viewParams) {
+    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment) {
         /** @var CM_Component_Abstract $component */
-        $component = $this->_getView();
         $viewResponse = new CM_ViewResponse($component);
         $viewResponse->setTemplateName('default');
         $component->prepare($environment, $viewResponse);
