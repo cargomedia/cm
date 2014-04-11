@@ -17,7 +17,7 @@ class CM_Component_Example extends CM_Component_Abstract {
         $this->_setJsParam('uname', 'uname');
     }
 
-    public function checkAccessible() {
+    public function checkAccessible(CM_RenderEnvironment $environment) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }

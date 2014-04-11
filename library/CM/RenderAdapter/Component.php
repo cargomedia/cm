@@ -3,11 +3,12 @@
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
     public function fetch(CM_Params $viewParams) {
+        $renderEnvironment = $this->getRender()->getEnvironment();
+
         /** @var CM_Component_Abstract $component */
         $component = $this->_getView();
-        $component->checkAccessible();
+        $component->checkAccessible($renderEnvironment);
 
-        $renderEnvironment = $this->getRender()->getEnvironment();
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $viewParams);
 
         $parentViewId = null;
