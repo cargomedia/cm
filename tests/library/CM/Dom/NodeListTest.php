@@ -16,10 +16,15 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Cannot load html
+     * @expectedExceptionMessage Cannot load html: htmlParseStartTag: invalid element name
      */
     public function testConstructorInvalid() {
-        new CM_Dom_NodeList('<%%%%===**>>> foo');
+        $list = new CM_Dom_NodeList('<%%%%===**>>> foo');
+    }
+
+    public function testConstructorInvalidIgnoreErrors() {
+        $list = new CM_Dom_NodeList('<%%%%===**>>> foo', true);
+        $this->assertSame('<html><body><p>&gt;&gt; foo</p></body></html>', $list->getHtml());
     }
 
     /**
@@ -56,6 +61,11 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertSame('lorem ipsumlorem', $list->find('p')->getText());
     }
 
+    public function testFindChained() {
+        $list = new CM_Dom_NodeList('<div foo="bar">lorem ipsum dolor <p foo="foo">lorem ipsum</p></div><p foo="foo">lorem</p>');
+        $this->assertSame('lorem ipsum', $list->find('[foo="bar"]')->find('[foo="foo"]')->getText());
+    }
+
     public function testGetChildren() {
         $expected = array('lorem ipsum dolor', 'lorem ipsum', 'test', '');
         $list = new CM_Dom_NodeList('<div><span foo="bar">lorem ipsum dolor</span><p foo="foo">lorem ipsum</p><span>test</span><a></a></div>');
@@ -76,6 +86,18 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertEquals(0, $list2->count());
     }
 
+    public function testGetChildrenFilterType() {
+        $list = new CM_Dom_NodeList('<div><b>mega</b><i>cool</i>hello</div>');
+
+        $childrenText = $list->find('div')->getChildren(XML_TEXT_NODE);
+        $this->assertSame(1, $childrenText->count());
+        $this->assertSame('hello', $childrenText->getText());
+
+        $childrenElement = $list->find('div')->getChildren(XML_ELEMENT_NODE);
+        $this->assertSame(2, $childrenElement->count());
+        $this->assertSame('megacool', $childrenElement->getText());
+    }
+
     public function testHas() {
         $list = new CM_Dom_NodeList('<div foo="bar" bar="foo"></div>');
         $this->assertTrue($list->has('div'));
@@ -89,5 +111,11 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertCount(0, $list->find('p'));
         $this->assertInstanceOf('Countable', $list);
         $this->assertSame(2, count($list->find('div')));
+    }
+
+    public function testGetHtml() {
+        $list = new CM_Dom_NodeList('<div id="myDiv"><b>hello <i>there</i></b> <i>world</i></div>');
+        $this->assertSame('<b>hello <i>there</i></b>', $list->find('b')->getHtml());
+        $this->assertSame('<i>there</i><i>world</i>', $list->find('i')->getHtml());
     }
 }
