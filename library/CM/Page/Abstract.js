@@ -10,6 +10,9 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   /** @type String[]|Null */
   _stateParams: null,
 
+  /** @type Object|Null */
+  _state: null,
+
   /** @type String|Null */
   _fragment: null,
 
@@ -20,6 +23,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
       var location = window.location;
       var params = queryString.parse(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
+      this.setState(state);
       this.routeToState(state, location.pathname + location.search);
     }
   },
@@ -49,11 +53,32 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   },
 
   /**
+   * @returns {Object}
+   */
+  getState: function() {
+    if (!this.hasStateParams()) {
+      cm.error.triggerThrow('Page has no state params');
+    }
+    return this._state;
+  },
+
+  /**
+   * @param {Object} state
+   */
+  setState: function(state) {
+    if (!_.isEmpty(_.difference(_.keys(state), this.getStateParams()))) {
+      cm.error.triggerThrow('Invalid state');
+    }
+    this._state = state;
+  },
+
+  /**
    * @param {Object} state
    * @param {String} fragment
    */
   routeToState: function(state, fragment) {
     this._fragment = fragment;
+    this.setState(state);
     this._changeState(state);
   },
 
