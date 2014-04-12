@@ -61,6 +61,11 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertSame('lorem ipsumlorem', $list->find('p')->getText());
     }
 
+    public function testFindChained() {
+        $list = new CM_Dom_NodeList('<div foo="bar">lorem ipsum dolor <p foo="foo">lorem ipsum</p></div><p foo="foo">lorem</p>');
+        $this->assertSame('lorem ipsum', $list->find('[foo="bar"]')->find('[foo="foo"]')->getText());
+    }
+
     public function testGetChildren() {
         $expected = array('lorem ipsum dolor', 'lorem ipsum', 'test', '');
         $list = new CM_Dom_NodeList('<div><span foo="bar">lorem ipsum dolor</span><p foo="foo">lorem ipsum</p><span>test</span><a></a></div>');

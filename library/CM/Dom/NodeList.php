@@ -167,7 +167,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
         $xpath = preg_replace('-\/\[-', '/*[', $xpath);
         $nodes = array();
         foreach ($this->_elementList as $element) {
-            foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
+            foreach ($this->_getXPath()->query('.' . $xpath, $element) as $resultElement) {
                 if (!$resultElement instanceof DOMElement) {
                     throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
                 }
