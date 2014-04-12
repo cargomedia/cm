@@ -72,6 +72,17 @@ class CM_Dom_NodeList implements Iterator, Countable {
     }
 
     /**
+     * @return string
+     */
+    public function getHtml() {
+        $html = '';
+        foreach ($this->_elementList as $element) {
+            $html .= $this->_doc->saveHTML($element);
+        }
+        return $html;
+    }
+
+    /**
      * @param string $name
      * @return string|null
      */

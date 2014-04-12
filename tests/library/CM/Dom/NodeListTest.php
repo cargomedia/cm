@@ -90,4 +90,10 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertInstanceOf('Countable', $list);
         $this->assertSame(2, count($list->find('div')));
     }
+
+    public function testGetHtml() {
+        $list = new CM_Dom_NodeList('<div id="myDiv"><b>hello <i>there</i></b> <i>world</i></div>');
+        $this->assertSame('<b>hello <i>there</i></b>', $list->find('b')->getHtml());
+        $this->assertSame('<i>there</i><i>world</i>', $list->find('i')->getHtml());
+    }
 }
