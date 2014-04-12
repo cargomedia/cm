@@ -8,7 +8,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
     /** @var DOMDocument */
     private $_doc;
 
-    /** @var DOMElement[] */
+    /** @var DOMNode[] */
     private $_elementList = array();
 
     /** @var DOMXPath */
@@ -22,8 +22,8 @@ class CM_Dom_NodeList implements Iterator, Countable {
     public function __construct($html, $ignoreErrors = null) {
         if (is_array($html)) {
             foreach ($html as $element) {
-                if (!$element instanceof DOMElement) {
-                    throw new CM_Exception_Invalid('Not all elements are DOMElement');
+                if (!$element instanceof DOMNode) {
+                    throw new CM_Exception_Invalid('Not all elements are DOMNode');
                 }
                 $this->_elementList[] = $element;
                 if (!$this->_doc) {
@@ -59,13 +59,16 @@ class CM_Dom_NodeList implements Iterator, Countable {
     }
 
     /**
+     * @param int|null $filterType
      * @return CM_Dom_NodeList
      */
-    public function getChildren() {
+    public function getChildren($filterType = null) {
         $childNodeList = array();
         foreach ($this->_elementList as $element) {
             foreach ($element->childNodes as $childNode) {
-                $childNodeList[] = $childNode;
+                if (null === $filterType || $childNode->nodeType === $filterType) {
+                    $childNodeList[] = $childNode;
+                }
             }
         }
         return new self($childNodeList);

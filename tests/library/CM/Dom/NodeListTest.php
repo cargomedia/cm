@@ -86,6 +86,18 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertEquals(0, $list2->count());
     }
 
+    public function testGetChildrenFilterType() {
+        $list = new CM_Dom_NodeList('<div><b>mega</b><i>cool</i>hello</div>');
+
+        $childrenText = $list->find('div')->getChildren(XML_TEXT_NODE);
+        $this->assertSame(1, $childrenText->count());
+        $this->assertSame('hello', $childrenText->getText());
+
+        $childrenElement = $list->find('div')->getChildren(XML_ELEMENT_NODE);
+        $this->assertSame(2, $childrenElement->count());
+        $this->assertSame('megacool', $childrenElement->getText());
+    }
+
     public function testHas() {
         $list = new CM_Dom_NodeList('<div foo="bar" bar="foo"></div>');
         $this->assertTrue($list->has('div'));
