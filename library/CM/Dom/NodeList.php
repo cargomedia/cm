@@ -45,10 +45,10 @@ class CM_Dom_NodeList implements Iterator, Countable {
             $errors = libxml_get_errors();
             if (!empty($errors)) {
                 libxml_clear_errors();
-                $errorMessages = array_map(function (libXMLError $error) {
-                    return trim($error->message);
-                }, $errors);
                 if (!$ignoreErrors) {
+                    $errorMessages = array_map(function (libXMLError $error) {
+                        return trim($error->message);
+                    }, $errors);
                     throw new CM_Exception_Invalid('Cannot load html: ' . implode(', ', $errorMessages));
                 }
             }
