@@ -16,10 +16,15 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Cannot load html
+     * @expectedExceptionMessage Cannot load html: htmlParseStartTag: invalid element name
      */
     public function testConstructorInvalid() {
-        new CM_Dom_NodeList('<%%%%===**>>> foo');
+        $list = new CM_Dom_NodeList('<%%%%===**>>> foo');
+    }
+
+    public function testConstructorInvalidIgnoreErrors() {
+        $list = new CM_Dom_NodeList('<%%%%===**>>> foo', true);
+        $this->assertSame('<html><body><p>&gt;&gt; foo</p></body></html>', $list->getHtml());
     }
 
     /**

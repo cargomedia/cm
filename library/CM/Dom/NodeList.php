@@ -16,9 +16,10 @@ class CM_Dom_NodeList implements Iterator, Countable {
 
     /**
      * @param string|DOMElement[] $html
+     * @param bool|null           $ignoreErrors
      * @throws CM_Exception_Invalid
      */
-    public function __construct($html) {
+    public function __construct($html, $ignoreErrors = null) {
         if (is_array($html)) {
             foreach ($html as $element) {
                 if (!$element instanceof DOMElement) {
@@ -38,11 +39,21 @@ class CM_Dom_NodeList implements Iterator, Countable {
 
             $this->_doc = new DOMDocument();
             $html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
-            try {
-                $this->_doc->loadHTML($html);
-            } catch (ErrorException $e) {
-                throw new CM_Exception_Invalid('Cannot load html');
+
+            $libxmlUseErrorsBackup = libxml_use_internal_errors(true);
+            $this->_doc->loadHTML($html);
+            $errors = libxml_get_errors();
+            if (!empty($errors)) {
+                libxml_clear_errors();
+                $errorMessages = array_map(function (libXMLError $error) {
+                    return trim($error->message);
+                }, $errors);
+                if (!$ignoreErrors) {
+                    throw new CM_Exception_Invalid('Cannot load html: ' . implode(', ', $errorMessages));
+                }
             }
+            libxml_use_internal_errors($libxmlUseErrorsBackup);
+
             $this->_elementList[] = $this->_doc->documentElement;
         }
     }
