@@ -151,6 +151,13 @@ class CM_Bootloader {
         return $namespacePaths[$namespace];
     }
 
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        return new DateTimeZone(CM_Config::get()->timeZone);
+    }
+
     protected function _constants() {
         define('DIR_VENDOR', DIR_ROOT . 'vendor/');
         define('DIR_PUBLIC', DIR_ROOT . 'public/');
@@ -171,7 +178,7 @@ class CM_Bootloader {
     }
 
     protected function _defaults() {
-        date_default_timezone_set(CM_Config::get()->timeZone);
+        date_default_timezone_set($this->getTimeZone()->getName());
         CMService_Newrelic::getInstance()->setConfig();
     }
 

@@ -2,37 +2,34 @@
 
 class CM_Render extends CM_Class_Abstract {
 
-    /* @var CM_Frontend */
+    /** @var CM_Frontend */
     protected $_js = null;
 
-    /* @var CM_Site_Abstract */
+    /** @var CM_Site_Abstract */
     protected $_site = null;
 
-    /* @var CM_Model_Language|null */
+    /** @var CM_Model_Language|null */
     private $_language;
 
-    /* @var IntlDateFormatter */
-    private $_formatterDate;
-
-    /* @var IntlDateFormatter */
-    private $_formatterDateTime;
+    /** @var DateTimeZone|null */
+    private $_timeZone;
 
     /** @var NumberFormatter */
     private $_formatterCurrency;
 
-    /* @var bool */
+    /** @var bool */
     private $_languageRewrite;
 
-    /* @var CM_Model_User|null */
+    /** @var CM_Model_User|null */
     private $_viewer;
 
-    /* @var array */
+    /** @var array */
     protected $_stack = array();
 
     /** @var CM_Menu[] */
     private $_menuList = array();
 
-    /* @var Smarty */
+    /** @var Smarty */
     private static $_smarty = null;
 
     /**
@@ -367,6 +364,16 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        if (!$this->_timeZone) {
+            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        return $this->_timeZone;
+    }
+
+    /**
      * @param string     $key
      * @param array|null $params
      * @return string
@@ -386,23 +393,13 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
+     * @param int         $dateType
+     * @param int         $timeType
+     * @param string|null $pattern
      * @return IntlDateFormatter
      */
-    public function getFormatterDate() {
-        if (!$this->_formatterDate) {
-            $this->_formatterDate = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-        }
-        return $this->_formatterDate;
-    }
-
-    /**
-     * @return IntlDateFormatter
-     */
-    public function getFormatterDateTime() {
-        if (!$this->_formatterDateTime) {
-            $this->_formatterDateTime = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-        }
-        return $this->_formatterDateTime;
+    public function getFormatterDate($dateType, $timeType, $pattern = null) {
+        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getTimeZone()->getName(), null, $pattern);
     }
 
     /**
