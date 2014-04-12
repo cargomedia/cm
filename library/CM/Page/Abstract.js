@@ -23,7 +23,6 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
       var location = window.location;
       var params = queryString.parse(location.search);
       var state = _.pick(params, _.intersection(_.keys(params), this.getStateParams()));
-      this.setState(state);
       this.routeToState(state, location.pathname + location.search);
     }
   },
