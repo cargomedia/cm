@@ -78,7 +78,7 @@ var CM_Page_Abstract = CM_Component_Abstract.extend({
   routeToState: function(state, fragment) {
     this._fragment = fragment;
     this.setState(state);
-    this._changeState(state);
+    return this._changeState(state);
   },
 
   /**
