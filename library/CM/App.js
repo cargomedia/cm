@@ -636,6 +636,24 @@ var CM_App = CM_Class_Abstract.extend({
       $.windowHint(content);
     },
 
+    fastScroll: {
+      /** @var {FastScroll|Null} */
+      _instance: null,
+
+      enable: function() {
+        if (!this._instance) {
+          this._instance = new FastScroll();
+        }
+      },
+
+      disable: function() {
+        if (this._instance) {
+          this._instance.destroy();
+          this._instance = null;
+        }
+      }
+    },
+
     title: {
       _messageStop: function() {
       },
