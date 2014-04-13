@@ -1157,7 +1157,7 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        if (cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
           return;
         }
       }
