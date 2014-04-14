@@ -132,19 +132,19 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @param string     $tplPath
+     * @param string     $path
      * @param array|null $variables
      * @param bool|null  $isolated
      * @return string
      */
-    public function renderTemplate($tplPath, $variables = null, $isolated = null) {
+    public function fetchTemplate($path, $variables = null, $isolated = null) {
         $compileId = $this->getSite()->getId();
         if ($this->getLanguage()) {
             $compileId .= '_' . $this->getLanguage()->getAbbreviation();
         }
         /** @var Smarty_Internal_TemplateBase $template */
         if ($isolated) {
-            $template = $this->_getSmarty()->createTemplate($tplPath, null, $compileId);
+            $template = $this->_getSmarty()->createTemplate($path, null, $compileId);
         } else {
             $template = $this->_getSmarty();
         }
@@ -156,7 +156,7 @@ class CM_Render extends CM_Class_Abstract {
         if ($isolated) {
             return $template->fetch();
         } else {
-            return $template->fetch($tplPath, null, $compileId);
+            return $template->fetch($path, null, $compileId);
         }
     }
 
@@ -459,17 +459,17 @@ class CM_Render extends CM_Class_Abstract {
      * @param array|null       $data
      * @return string
      */
-    public function renderViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
+    public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
         $templatePath = $this->getTemplatePath($view, $templateName);
-        return $this->renderTemplate($templatePath, $data, true);
+        return $this->fetchTemplate($templatePath, $data, true);
     }
 
     /**
      * @param CM_ViewResponse $viewResponse
      * @return string
      */
-    public function renderViewResponse(CM_ViewResponse $viewResponse) {
-        return $this->renderViewTemplate($viewResponse->getView(), $viewResponse->getTemplateName(), $viewResponse->getData());
+    public function fetchViewResponse(CM_ViewResponse $viewResponse) {
+        return $this->fetchViewTemplate($viewResponse->getView(), $viewResponse->getTemplateName(), $viewResponse->getData());
     }
 
     /**

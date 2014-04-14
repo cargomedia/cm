@@ -22,7 +22,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
         if ($mail->getRenderLayout()) {
             $tplPath = $this->_getTplPathLayout('mailHtml.tpl');
             $assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $htmlBody));
-            $html = $this->getRender()->renderTemplate($tplPath, $assign);
+            $html = $this->getRender()->fetchTemplate($tplPath, $assign);
         } else {
             $html = $htmlBody;
         }
@@ -50,7 +50,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
         if ($mail->getRenderLayout()) {
             $tplPath = $this->_getTplPathLayout('mailText.tpl');
             $assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $text));
-            $text = $this->getRender()->renderTemplate($tplPath, $assign);
+            $text = $this->getRender()->fetchTemplate($tplPath, $assign);
         }
         return array($subject, $html, $text);
     }

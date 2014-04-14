@@ -58,7 +58,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             'pageDescription' => $renderAdapterPage->fetchDescription(),
             'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
         ));
-        $html = $this->getRender()->renderViewResponse($viewResponse);
+        $html = $this->getRender()->fetchViewResponse($viewResponse);
 
         $this->getRender()->popStack('layouts');
         $this->getRender()->popStack('views');

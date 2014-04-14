@@ -56,7 +56,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
                 $viewResponse = new CM_ViewResponse($field);
                 $viewResponse->setTemplateName('preview');
                 $viewResponse->addData('file', $file);
-                $preview = $this->getRender()->renderViewResponse($viewResponse);
+                $preview = $this->getRender()->fetchViewResponse($viewResponse);
             }
             $return['success'] = array('id' => $file->getUniqid(), 'preview' => $preview);
         } catch (CM_Exception_FormFieldValidation $ex) {

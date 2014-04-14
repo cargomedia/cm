@@ -31,7 +31,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
 
         $viewResponse->addData('viewObj', $this->_getComponent());
-        $html .=  $this->getRender()->renderViewResponse($viewResponse);
+        $html .=  $this->getRender()->fetchViewResponse($viewResponse);
 
         $html .= '</div>';
 

@@ -17,7 +17,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $viewResponse = new CM_ViewResponse($field);
         $viewResponse->setTemplateName('default');
         $viewResponse->setData($field->getTplParams());
-        $html .= trim($this->getRender()->renderViewResponse($viewResponse));
+        $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
