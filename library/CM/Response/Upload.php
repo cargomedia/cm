@@ -52,7 +52,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
                 /** @var $field CM_FormField_File */
                 $field = CM_FormField_File::factory($query['field']);
                 $field->validateFile($file);
-                $preview = $this->getRender()->fetchViewTemplate($field, 'preview', ['file' => $file]);
+                $preview = $this->getRender()->fetchViewTemplate($field, 'preview', array('file' => $file));
             }
             $return['success'] = array('id' => $file->getUniqid(), 'preview' => $preview);
         } catch (CM_Exception_FormFieldValidation $ex) {
