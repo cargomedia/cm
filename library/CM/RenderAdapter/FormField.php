@@ -14,7 +14,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $field->setTplParam('options', $field->getOptions());
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
-        $viewResponse = new CM_ViewResponse($this->_getView());
+        $viewResponse = new CM_ViewResponse($field);
         $viewResponse->setTemplateName('default');
         $viewResponse->setData($field->getTplParams());
         $html .= trim($this->getRender()->renderViewResponse($viewResponse));
