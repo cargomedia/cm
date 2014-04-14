@@ -8,15 +8,6 @@ class CM_FormField_Set extends CM_FormField_Abstract {
     /** @var bool */
     private $_labelsInValues = false;
 
-    /**
-     * @param array|null $values
-     * @param bool|null  $labelsInValues
-     */
-    public function __construct(array $values = null, $labelsInValues = null) {
-        $this->_values = (array) $values;
-        $this->_labelsInValues = (bool) $labelsInValues;
-    }
-
     public function validate($userInput, CM_Response_Abstract $response) {
         foreach ($userInput as $key => $value) {
             if (!in_array($value, $this->_getValues())) {
@@ -49,5 +40,22 @@ class CM_FormField_Set extends CM_FormField_Abstract {
      */
     protected function _getValues() {
         return array_keys($this->_getOptionList());
+    }
+
+    protected function _setup() {
+        $this->_values = $this->_params->getArray('values', array());
+        $this->_labelsInValues = $this->_params->getBoolean('labelsInValues', false);
+    }
+
+    /**
+     * @param array|null $values
+     * @param bool|null  $labelsInValues
+     * @return CM_FormField_Set
+     */
+    public static function create(array $values = null, $labelsInValues = null) {
+        return new static(array(
+            'values' => $values,
+            'labelsInValues' => $labelsInValues,
+        ));
     }
 }

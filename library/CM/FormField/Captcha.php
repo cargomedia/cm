@@ -25,4 +25,7 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
     public function ajax_createNumber(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return CM_Captcha::create()->getId();
     }
+
+    protected function _setup() {
+    }
 }

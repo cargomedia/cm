@@ -87,7 +87,7 @@ class CM_Frontend {
         $field_list = array();
         foreach ($form->getFields() as $field_key => $field) {
             $field_list[] =
-                '"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . ',"params":' . CM_Params::encode($field->getParams()->getAll(), true) . '}';
+                '"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . ',"params":' . CM_Params::encode($field->getParams()->getAllOriginal(), true) . '}';
         }
         $action_list = array();
         foreach ($form->getActions() as $action_name => $action) {
@@ -121,7 +121,7 @@ class CM_Frontend {
         $cmpJs = '';
         $cmpJs .= $reference . ' = new ' . get_class($component) . '({';
         $cmpJs .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
-        $cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAll(), true);
+        $cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAllOriginal(), true);
         if ($parentAutoId) {
             $cmpJs .= ',parent:cm.views["' . $parentAutoId . '"]';
         }

@@ -2,17 +2,6 @@
 
 class CM_FormField_Integer extends CM_FormField_Abstract {
 
-    /**
-     * @param int $min  OPTIONAL
-     * @param int $max  OPTIONAL
-     * @param int $step OPTIONAL
-     */
-    public function __construct($min = 0, $max = 100, $step = 1) {
-        $this->_options['min'] = (int) $min;
-        $this->_options['max'] = (int) $max;
-        $this->_options['step'] = (int) $step;
-    }
-
     public function prepare(array $params) {
         $this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
     }
@@ -26,5 +15,26 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
             throw new CM_Exception_FormFieldValidation('Value not in range.');
         }
         return $value;
+    }
+
+    protected function _setup() {
+        $this->_options['min'] = $this->_params->getInt('min', 0);
+        $this->_options['max'] = $this->_params->getInt('max', 100);
+        $this->_options['step'] = $this->_params->getInt('step', 1);
+        parent::_setup();
+    }
+
+    /**
+     * @param int|null $min
+     * @param int|null $max
+     * @param int|null $step
+     * @return static
+     */
+    public static function create($min = null, $max = null, $step = null) {
+        return new static(array(
+            'min' => $min,
+            'max' => $max,
+            'step' => $step,
+        ));
     }
 }

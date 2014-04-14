@@ -12,4 +12,7 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
         $this->setTplParam('checked', $this->getValue() ? 'checked' : null);
         $this->setTplParam('text', isset($params['text']) ? $params['text'] : null);
     }
+
+    protected function _setup() {
+    }
 }

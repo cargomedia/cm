@@ -8,4 +8,7 @@ class CM_FormField_Color extends CM_FormField_Abstract {
         }
         return (string) $userInput;
     }
+
+    protected function _setup() {
+    }
 }

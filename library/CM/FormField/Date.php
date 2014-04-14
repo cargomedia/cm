@@ -8,22 +8,6 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     /** @var int */
     protected $_yearLast;
 
-    /**
-     * @param int|null $yearFirst
-     * @param int|null $yearLast
-     */
-    public function __construct($yearFirst = null, $yearLast = null) {
-        if (null === $yearFirst) {
-            $yearFirst = date('Y') - 100;
-        }
-        $this->_yearFirst = (int) $yearFirst;
-
-        if (null === $yearLast) {
-            $yearLast = date('Y');
-        }
-        $this->_yearLast = (int) $yearLast;
-    }
-
     public function validate($userInput, CM_Response_Abstract $response) {
         $dd = (int) trim($userInput['day']);
         $mm = (int) trim($userInput['month']);
@@ -51,5 +35,23 @@ class CM_FormField_Date extends CM_FormField_Abstract {
 
     public function isEmpty($userInput) {
         return empty($userInput['day']) || empty($userInput['month']) || empty($userInput['year']);
+    }
+
+    protected function _setup() {
+        $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
+        $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
+        parent::_setup();
+    }
+
+    /**
+     * @param int|null $yearFirst
+     * @param int|null $yearLast
+     * @return static
+     */
+    public static function create($yearFirst = null, $yearLast = null) {
+        return new static(array(
+            'yearFirst' => $yearFirst,
+            'yearLast' => $yearLast,
+        ));
     }
 }

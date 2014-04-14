@@ -2,10 +2,6 @@
 
 class CM_FormField_FileImage extends CM_FormField_File {
 
-    public function __construct($cardinality = 1) {
-        parent::__construct($cardinality);
-    }
-
     protected function _getAllowedExtensions() {
         return array('jpg', 'jpeg', 'gif', 'png');
     }

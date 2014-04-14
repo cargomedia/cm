@@ -17,6 +17,8 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
      */
     protected $_tplParams = array();
 
+    abstract protected function _setup();
+
     /**
      * @return mixed|null Internal value
      */
@@ -117,6 +119,13 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
         $field = $form->getField($fieldName);
 
         $field->validate($userInput, $response);
+    }
+
+    /**
+     * @return static
+     */
+    public static function create() {
+        return new static();
     }
 }
 

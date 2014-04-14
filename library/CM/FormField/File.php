@@ -3,14 +3,6 @@
 class CM_FormField_File extends CM_FormField_Abstract {
 
     /**
-     * @param int $cardinality
-     */
-    public function __construct($cardinality = 1) {
-        $this->_options['cardinality'] = (int) $cardinality;
-        $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
-    }
-
-    /**
      * @return array List of allowed extension (empty = all)
      */
     protected function _getAllowedExtensions() {
@@ -53,5 +45,21 @@ class CM_FormField_File extends CM_FormField_Abstract {
 
         $this->setTplParam('text', $text);
         $this->setTplParam('skipDropZone', $skipDropZone);
+    }
+
+    protected function _setup() {
+        $this->_options['cardinality'] = $this->_params->getInt('cardinality', 1);
+        $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
+        parent::_setup();
+    }
+
+    /**
+     * @param int|null $cardinality
+     * @return static
+     */
+    public static function create($cardinality = null) {
+        return new static(array(
+            'cardinality' => $cardinality,
+        ));
     }
 }

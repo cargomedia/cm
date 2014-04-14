@@ -2,28 +2,6 @@
 
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
-    /**
-     * @param int|null    $minLevel
-     * @param int|null    $maxLevel
-     * @param string|null $fieldNameDistance
-     */
-    public function __construct($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
-        parent::__construct();
-
-        if (is_null($minLevel)) {
-            $minLevel = CM_Model_Location::LEVEL_COUNTRY;
-        }
-        if (is_null($maxLevel)) {
-            $maxLevel = CM_Model_Location::LEVEL_ZIP;
-        }
-        $this->_options['levelMin'] = (int) $minLevel;
-        $this->_options['levelMax'] = (int) $maxLevel;
-        if ($fieldNameDistance) {
-            $this->_options['distanceName'] = $fieldNameDistance;
-            $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
-        }
-    }
-
     public function getSuggestion($location, CM_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
@@ -128,5 +106,29 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
 
         return $field->getSuggestion($location, $response->getRender());
+    }
+
+    protected function _setup() {
+        $this->_options['levelMin'] = $this->_params->getInt('minLevel', CM_Model_Location::LEVEL_COUNTRY);
+        $this->_options['levelMax'] = $this->_params->getInt('maxLevel', CM_Model_Location::LEVEL_ZIP);
+        if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
+            $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
+            $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
+        }
+        parent::_setup();
+    }
+
+    /**
+     * @param int|null $minLevel
+     * @param int|null $maxLevel
+     * @param string|null $fieldNameDistance
+     * @return static
+     */
+    public static function create($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
+        return new static(array(
+            'minLevel' => $minLevel,
+            'maxLevel' => $maxLevel,
+            'fieldNameDistance' => $fieldNameDistance,
+        ));
     }
 }

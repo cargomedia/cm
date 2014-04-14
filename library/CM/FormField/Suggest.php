@@ -3,15 +3,6 @@
 abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
     /**
-     * @param int|null  $cardinality
-     * @param bool|null $enableChoiceCreate
-     */
-    public function __construct($cardinality = null, $enableChoiceCreate = null) {
-        $this->_options['cardinality'] = isset($cardinality) ? ((int) $cardinality) : null;
-        $this->_options['enableChoiceCreate'] = isset($enableChoiceCreate) ? ((bool) $enableChoiceCreate) : false;
-    }
-
-    /**
      * @param string    $term
      * @param array     $options
      * @param CM_Render $render
@@ -47,5 +38,22 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         $field = new static(null);
         $suggestions = $field->_getSuggestions($params->getString('term'), $params->getArray('options'), $response->getRender());
         return $suggestions;
+    }
+
+    protected function _setup() {
+        $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
+        $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
+    }
+
+    /**
+     * @param int|null  $cardinality
+     * @param bool|null $enableChoiceCreate
+     * @return static
+     */
+    public static function create($cardinality = null, $enableChoiceCreate = null) {
+        return new static(array(
+            'cardinality'        => $cardinality,
+            'enableChoiceCreate' => $enableChoiceCreate,
+        ));
     }
 }

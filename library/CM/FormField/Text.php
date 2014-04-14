@@ -2,17 +2,6 @@
 
 class CM_FormField_Text extends CM_FormField_Abstract {
 
-    /**
-     * @param int|null     $lengthMin
-     * @param int|null     $lengthMax
-     * @param boolean|null $forbidBadwords
-     */
-    public function __construct($lengthMin = null, $lengthMax = null, $forbidBadwords = null) {
-        $this->_options['lengthMin'] = isset($lengthMin) ? (int) $lengthMin : null;
-        $this->_options['lengthMax'] = isset($lengthMax) ? (int) $lengthMax : null;
-        $this->_options['forbidBadwords'] = (boolean) $forbidBadwords;
-    }
-
     public function filterInput($userInput) {
         $userInput = (string) $userInput;
         return mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
@@ -40,5 +29,25 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         $this->setTplParam('tabindex', isset($params['tabindex']) ? $params['tabindex'] : null);
         $this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
         $this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
+    }
+
+    protected function _setup() {
+        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->get('lengthMin') : null;
+        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->get('lengthMax') : null;
+        $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords');
+    }
+
+    /**
+     * @param int|null     $lengthMin
+     * @param int|null     $lengthMax
+     * @param boolean|null $forbidBadwords
+     * @return static
+     */
+    public static function create($lengthMin = null, $lengthMax = null, $forbidBadwords = null) {
+        return new static(array(
+            'lengthMin' => $lengthMin,
+            'lengthMax' => $lengthMax,
+            'forbidBadwords' => $forbidBadwords,
+        ));
     }
 }
