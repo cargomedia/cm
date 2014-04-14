@@ -704,6 +704,68 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testAddRegion_duplicate() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('FR', 'A8', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+                array('US', 'CB', 'California'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('436884', 'FR', 'A8', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('2221', 'US', 'CB', '', '', '34.0522', '-118.243'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null),
+                array('id' => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 2, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testRemoveRegion() {
         $this->_import(
             array(
