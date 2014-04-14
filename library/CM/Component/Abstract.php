@@ -8,9 +8,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     /** @var CM_ComponentFrontendHandler */
     protected $_js = null;
 
-    /** @var CM_Params */
-    protected $_params;
-
     /**
      * @param CM_Params|array|null $params
      */
@@ -44,13 +41,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @return CM_Params
-     */
-    public function getParams() {
-        return $this->_params;
-    }
-
-    /**
      * @param CM_RenderEnvironment        $environment
      * @param CM_ViewResponse             $viewResponse
      * @param CM_ComponentFrontendHandler $frontendHandler
@@ -78,22 +68,8 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         $environment->getViewer(true);
     }
 
-    public static function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->reloadComponent($params->getAll());
-    }
-
-    /**
-     * @param string          $className
-     * @param CM_Params|array $params
-     * @throws CM_Exception
-     * @return CM_Component_Abstract
-     */
-    public static function factory($className, $params = null) {
-        if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-            throw new CM_Exception('Cannot find valid class definition for component `' . $className . '`.');
-        }
-        $component = new $className($params);
-        return $component;
     }
 
     /**

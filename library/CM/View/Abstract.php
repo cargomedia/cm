@@ -8,10 +8,18 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 
     private $_autoId;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $_tplParams = array();
+
+    /** @var CM_Params */
+    protected $_params;
+
+    /**
+     * @param CM_Params|array|null $params
+     */
+    public function __construct($params = null) {
+        $this->_params = CM_Params::factory($params);
+    }
 
     /**
      * @param string $key
@@ -31,6 +39,13 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Params
+     */
+    public function getParams() {
+        return $this->_params;
+    }
+
+    /**
      * @return string
      */
     public function getAutoId() {
@@ -40,11 +55,11 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         return $this->_autoId;
     }
 
-    public static function ajax_loadComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->loadComponent($params);
     }
 
-    public static function ajax_loadPage(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadPage(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->loadPage($params, $response);
     }
 
@@ -56,5 +71,19 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     public static function stream(CM_Model_User $user, $event, $data = null) {
         $namespace = get_called_class() . ':' . $event;
         CM_Model_StreamChannel_Message_User::publish($user, $namespace, $data);
+    }
+
+    /**
+     * @param string          $className
+     * @param CM_Params|array $params
+     * @throws CM_Exception
+     * @return CM_Component_Abstract
+     */
+    public static function factory($className, $params = null) {
+        if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
+            throw new CM_Exception('Cannot find valid class definition for view `' . $className . '`.');
+        }
+        $view = new $className($params);
+        return $view;
     }
 }

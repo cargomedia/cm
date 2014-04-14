@@ -16,14 +16,19 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
             if (!isset($query['params']) || !is_array($query['params'])) {
                 throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
             }
-            $view = $this->_getViewInfo();
-            $className = $view['className'];
-            $functionName = 'ajax_' . $query['method'];
+            $viewInfo = $this->_getViewInfo();
+            $className = $viewInfo['className'];
+            $view = CM_View_Abstract::factory($viewInfo['className'], $viewInfo['params']);
+            if ($view instanceof CM_Component_Abstract) {
+                $view->checkAccessible($this->getRender()->getEnvironment());
+            }
+            $ajaxMethodName = 'ajax_' . $query['method'];
             $params = CM_Params::factory($query['params']);
-            $this->_setStringRepresentation($className . '::' . $functionName);
-
             $componentHandler = new CM_ComponentFrontendHandler();
-            $success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
+
+            $this->_setStringRepresentation($className . '::' . $ajaxMethodName);
+            $data = $view->$ajaxMethodName($params, $componentHandler, $this);
+            $success['data'] = CM_Params::encode($data);
 
             $exec = $componentHandler->compile_js('this');
 
