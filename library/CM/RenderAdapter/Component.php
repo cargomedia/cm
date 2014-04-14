@@ -44,15 +44,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param string $tplName
-     * @param array  $params
-     * @return string
-     */
-    public function fetchTemplate($tplName, array $params) {
-        return $this->_renderTemplate($tplName, $params, true);
-    }
-
-    /**
      * @return string
      */
     protected function _getStackKey() {

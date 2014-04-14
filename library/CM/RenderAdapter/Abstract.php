@@ -29,32 +29,6 @@ abstract class CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param string|null $tplName
-     * @param array|null  $variables
-     * @param bool|null   $isolated
-     * @return string
-     */
-    protected function _renderTemplate($tplName = null, array $variables = null, $isolated = null) {
-        $tplPath = $this->_getTplPath($tplName);
-        return $this->getRender()->renderTemplate($tplPath, $variables, $isolated);
-    }
-
-    /**
-     * Return tpl path
-     *
-     * First try theme for current component
-     * try all themes
-     * Then try parents -> for all themes again
-     *
-     * @param string $tplName
-     * @return string
-     * @throws CM_Exception
-     */
-    protected function _getTplPath($tplName) {
-        return $this->getRender()->getTemplatePath($this->_getView(), $tplName);
-    }
-
-    /**
      * @return CM_View_Abstract
      */
     protected function _getView() {
