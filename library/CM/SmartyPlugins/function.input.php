@@ -8,10 +8,7 @@ function smarty_function_input(array $params, Smarty_Internal_Template $template
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Form_Abstract $form */
     $form = $render->getStackLast('forms');
-    /** @var CM_FormField_Abstract $field */
     $field = $form->getField($params['name']);
-
-    $field->prepare($params);
     $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-    return $renderAdapter->fetch($params, $form, $params['name']);
+    return $renderAdapter->fetch($params, $field, $form, $params['name']);
 }
