@@ -300,6 +300,48 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_zipCodeListByCityRemoved = array();
         $cityIdListUpdatedCode = array();
 
+        // Look for cities without region in countries that have been added
+        foreach ($this->_countryListAdded as $countryCode => $countryName) {
+            $regionCode = null;
+            $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+            asort($cityListAdded);
+            if (!empty($cityListAdded)) {
+                $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
+            }
+        }
+
+        // Look for cities in regions that have been added
+        foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
+            foreach ($regionListAdded as $regionCode => $regionName) {
+                $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
+                asort($cityListAdded);
+                if (!empty($cityListAdded)) {
+                    $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
+                }
+            }
+        }
+
+        // Look for cities without region in countries that have been removed
+        foreach ($this->_countryListRemoved as $countryCode => $countryName) {
+            $regionCodeOld = null;
+            $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+            asort($cityListRemoved);
+            if (!empty($cityListRemoved)) {
+                $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
+            }
+        }
+
+        // Look for cities in regions that have been removed
+        foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
+            foreach ($regionListRemoved as $regionCodeOld => $regionName) {
+                $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
+                asort($cityListRemoved);
+                if (!empty($cityListRemoved)) {
+                    $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
+                }
+            }
+        }
+
         // Look for changes in countries that have been kept
         $countryCodeList = array_keys($this->_locationTree);
         $countryCodeListOld = array_keys($this->_locationTreeOld);
@@ -575,27 +617,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $this->_cityIdList[$cityCode] = $cityId;
         }
 
-        // Look for cities without region in countries that have been added
-        foreach ($this->_countryListAdded as $countryCode => $countryName) {
-            $regionCode = null;
-            $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-            asort($cityListAdded);
-            if (!empty($cityListAdded)) {
-                $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
-            }
-        }
-
-        // Look for cities in regions that have been added
-        foreach ($this->_regionListByCountryAdded as $countryCode => $regionListAdded) {
-            foreach ($regionListAdded as $regionCode => $regionName) {
-                $cityListAdded = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
-                asort($cityListAdded);
-                if (!empty($cityListAdded)) {
-                    $this->_cityListByRegionAdded[$countryCode][$regionCode] = $cityListAdded;
-                }
-            }
-        }
-
         // Look for zip codes in cities that have been added
         foreach ($this->_cityListByRegionAdded as $countryCode => $cityListByRegionAdded) {
             foreach ($cityListByRegionAdded as $regionCode => $cityListAdded) {
@@ -605,27 +626,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     if (!empty($zipCodeListAdded)) {
                         $this->_zipCodeListByCityAdded[$countryCode][$regionCode][$cityCode] = $zipCodeListAdded;
                     }
-                }
-            }
-        }
-
-        // Look for cities without region in countries that have been removed
-        foreach ($this->_countryListRemoved as $countryCode => $countryName) {
-            $regionCodeOld = null;
-            $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-            asort($cityListRemoved);
-            if (!empty($cityListRemoved)) {
-                $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
-            }
-        }
-
-        // Look for cities in regions that have been removed
-        foreach ($this->_regionListByCountryRemoved as $countryCode => $regionListRemoved) {
-            foreach ($regionListRemoved as $regionCodeOld => $regionName) {
-                $cityListRemoved = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
-                asort($cityListRemoved);
-                if (!empty($cityListRemoved)) {
-                    $this->_cityListByRegionRemoved[$countryCode][$regionCodeOld] = $cityListRemoved;
                 }
             }
         }

@@ -1622,48 +1622,22 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testUpdateCityRegion_replaceDuplicateCity() {
+    public function testUpdateCityRegion_newRegion() {
         $this->_import(
             array(
                 array('United States', 'US'),
             ),
             array(
                 array('US', 'CA', 'California'),
-                array('US', 'HI', 'Hawaii'),
             ),
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
-                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
-                array('11102', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-                array('68445000', '68445100', '11102'),
-            )
-        );
-        $this->_verify(
-            array(
-                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
-            ),
-            array(
-                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
-                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
-            ),
-            array(
-                array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
-                      '_maxmind' => 11101),
-                array('id'       => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
-                      '_maxmind' => 11102),
-            ),
-            array(),
-            array(),
-            array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 2, 'ipStart' => 68445000, 'ipEnd' => 68445100),
             )
         );
         $this->_import(
@@ -1694,17 +1668,234 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
             ),
             array(
-                array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                array('id'       => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
-                array('id'       => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+            )
+        );
+    }
+
+    public function testUpdateCityRegion_deletedRegion() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+            )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+            )
+        );
+    }
+
+    public function testUpdateCityRegion_replaceDuplicateCity() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('5718', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('11102', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('5719', 'US', 'HI', 'Los Angeles', '', '34.0522', '-118.2437'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+                array('68445000', '68445100', '11102'),
+                array('69089280', '69090303', '5718'),
+                array('70988544', '70988799', '5718'),
+                array('70989000', '70989100', '5719'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5718),
+                array('id'       => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+                array('id' => 3, 'stateId' => 2, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5719),
+                array('id'       => 4, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11102),
             ),
             array(),
             array(),
             array(
                 array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
                 array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('cityId' => 4, 'ipStart' => 68445000, 'ipEnd' => 68445100),
+                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 3, 'ipStart' => 70989000, 'ipEnd' => 70989100),
             )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('5719', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+                array('70989000', '70989100', '5719'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5719),
+                array('id'       => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+                array('id' => 3, 'stateId' => 2, 'countryId' => 1, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 5719),
+                array('id'       => 4, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 4, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 4, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('cityId' => 1, 'ipStart' => 70989000, 'ipEnd' => 70989100),
+            )
+        );
+    }
+
+    public function testUpdateCityRegion_duplicateRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('FR', 'A8', 'Haute-Normandie'),
+                array('US', 'CA', 'California'),
+                array('US', 'CB', 'California'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('436884', 'FR', 'A8', '', '', '49.4333', '1.0833'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('2221', 'US', 'CB', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CB', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 3, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA8', 'abbreviation' => null),
+                array('id' => 4, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCB', 'abbreviation' => 'CB'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 4, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array()
         );
     }
 
