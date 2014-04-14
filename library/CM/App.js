@@ -1175,10 +1175,11 @@ var CM_App = CM_Class_Abstract.extend({
       }
 
       if (paramsStateNext) {
-        cm.getLayout().getPage().routeToState(paramsStateNext, fragment);
-      } else {
-        cm.getLayout().loadPage(fragment);
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+          return;
+        }
       }
+      cm.getLayout().loadPage(fragment);
     }
   }
 });
