@@ -8,8 +8,5 @@ function smarty_function_componentTemplate(array $params, Smarty_Internal_Templa
 
     $tplName = (string) $params['file'];
     unset($params['file']);
-
-    $renderAdapter = new CM_RenderAdapter_Component($render, $view);
-
-    return $renderAdapter->fetchTemplate($tplName, $params);
+    return $render->renderViewTemplate($view, $tplName, $params);
 }

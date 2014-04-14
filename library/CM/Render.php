@@ -454,12 +454,22 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
+     * @param CM_View_Abstract $view
+     * @param string           $templateName
+     * @param array|null       $data
+     * @return string
+     */
+    public function renderViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
+        $templatePath = $this->getTemplatePath($view, $templateName);
+        return $this->renderTemplate($templatePath, $data, true);
+    }
+
+    /**
      * @param CM_ViewResponse $viewResponse
      * @return string
      */
     public function renderViewResponse(CM_ViewResponse $viewResponse) {
-        $templatePath = $this->getTemplatePath($viewResponse->getView(), $viewResponse->getTemplateName());
-        return $this->renderTemplate($templatePath, $viewResponse->getData(), true);
+        return $this->renderViewTemplate($viewResponse->getView(), $viewResponse->getTemplateName(), $viewResponse->getData());
     }
 
     /**
