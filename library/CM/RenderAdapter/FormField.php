@@ -2,9 +2,9 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params, CM_FormField_Abstract $field, CM_Form_Abstract $form, $fieldName) {
+    public function fetch(array $params, CM_Form_Abstract $form, $fieldName) {
         $fieldName = (string) $fieldName;
-        /** @var CM_FormField_Abstract $field */
+        $field = $this->_getFormField();
         $field->prepare($params);
 
         $field->setTplParam('field', $field);
@@ -24,5 +24,12 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $html .= '</div>';
 
         return $html;
+    }
+
+    /**
+     * @return CM_FormField_Abstract
+     */
+    private function _getFormField() {
+        return $this->_getView();
     }
 }
