@@ -3,11 +3,11 @@
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
     /**
-     * @param CM_Layout_Abstract $layout
-     * @param CM_Page_Abstract   $page
+     * @param CM_Page_Abstract $page
      * @return string
      */
-    public function fetch(CM_Layout_Abstract $layout, CM_Page_Abstract $page) {
+    public function fetch(CM_Page_Abstract $page) {
+        $layout = $this->_getView();
         $page->checkAccessible($this->getRender()->getEnvironment());
         $js = $this->getRender()->getJs();
 
@@ -53,7 +53,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->setTemplateName('default');
         $viewResponse->setData(array(
             'viewObj'         => $layout,
-            'title'           => $this->fetchTitle($layout, $pageTitle),
+            'title'           => $this->fetchTitle($pageTitle),
             'page'            => $page,
             'pageDescription' => $renderAdapterPage->fetchDescription(),
             'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
@@ -68,11 +68,10 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_Layout_Abstract $layout
-     * @param string             $pageTitle
+     * @param string $pageTitle
      * @return string
      */
-    public function fetchTitle(CM_Layout_Abstract $layout, $pageTitle) {
-        return trim($this->getRender()->renderViewTemplate($layout, 'title', array('pageTitle' => $pageTitle)));
+    public function fetchTitle($pageTitle) {
+        return $this->_fetchTemplate('title', array('pageTitle' => $pageTitle));
     }
 }

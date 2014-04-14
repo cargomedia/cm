@@ -29,11 +29,10 @@ class CM_Response_Page_Embed extends CM_Response_Page {
      * @return string
      */
     protected function _renderPage(CM_Page_Abstract $page, CM_Params $pageParams) {
-        $layout = $page->getLayout($this->getSite());
         $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
-        $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $layout);
+        $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page->getLayout($this->getSite()));
         $pageTitle = $renderAdapterPage->fetchTitle();
-        $this->_title = $renderAdapterLayout->fetchTitle($layout, $pageTitle);
+        $this->_title = $renderAdapterLayout->fetchTitle($pageTitle);
         return $renderAdapterPage->fetch();
     }
 
