@@ -1560,6 +1560,92 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testUpdateCityRegion_replaceDuplicateCity() {
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('11102', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+                array('68445000', '68445100', '11102'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+                array('id'       => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11102),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('cityId' => 2, 'ipStart' => 68445000, 'ipEnd' => 68445100),
+            )
+        );
+        $this->_import(
+            array(
+                array('United States', 'US'),
+            ),
+            array(
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('11101', 'US', 'HI', 'San Francisco', '', '37.7749', '-122.4194'),
+            ),
+            array(
+                array('68444672', '68444735', '11101'),
+                array('68444800', '68444927', '11101'),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id'       => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+                array('id'       => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array(
+                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+            )
+        );
+    }
+
     public function testAddZipCode() {
         $this->_import(
             array(
