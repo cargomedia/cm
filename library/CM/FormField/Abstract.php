@@ -100,20 +100,6 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
         return $this->_tplParams;
     }
 
-    /**
-     * @param string $className
-     * @return CM_FormField_Abstract
-     * @throws CM_Exception
-     */
-    public static function factory($className) {
-        $className = (string) $className;
-        if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-            throw new CM_Exception_Invalid('Illegal field name `' . $className . '`.');
-        }
-        $field = new $className();
-        return $field;
-    }
-
     public function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         $formName = $params->getString('form');
         $fieldName = $params->getString('fieldName');
