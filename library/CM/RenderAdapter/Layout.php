@@ -7,7 +7,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      * @return string
      */
     public function fetch(CM_Page_Abstract $page) {
-        $layout = $this->_getView();
+        $layout = $this->_getLayout();
         $page->checkAccessible($this->getRender()->getEnvironment());
         $js = $this->getRender()->getJs();
 
@@ -73,5 +73,12 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      */
     public function fetchTitle($pageTitle) {
         return $this->_fetchTemplate('title', array('pageTitle' => $pageTitle));
+    }
+
+    /**
+     * @return CM_Layout_Abstract
+     */
+    private function _getLayout() {
+        return $this->_getView();
     }
 }
