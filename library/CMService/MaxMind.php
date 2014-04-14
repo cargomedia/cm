@@ -1079,7 +1079,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _upgradeCountryList() {
         $this->_writeln('Updating countries database…');
-        $count = $this->_count(array($this->_countryListRenamed, $this->_countryListAdded, $this->_countryListRemoved), 2);
+        $count = $this->_count(array($this->_countryListRenamed, $this->_countryListAdded), 2);
         $item = 0;
         foreach ($this->_countryListRenamed as $countryCode => $countryNames) {
             $countryName = $countryNames['name'];
@@ -1090,11 +1090,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $country = CM_Model_Location::createCountry($countryName, $countryCode);
             $countryId = $country->getId();
             $this->_countryIdList[$countryCode] = $countryId;
-            $this->_printProgressCounter(++$item, $count);
-        }
-        foreach ($this->_countryListRemoved as $countryCode => $countryName) {
-            $countryId = $this->_countryIdList[$countryCode];
-            CM_Db_Db::delete('cm_locationCountryIp', array('countryId' => $countryId));
             $this->_printProgressCounter(++$item, $count);
         }
     }
@@ -1146,7 +1141,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _upgradeCityList() {
         $this->_writeln('Updating cities database…');
-        $count = $this->_count(array($this->_cityListByRegionRenamed, $this->_cityListByRegionUpdatedCode, $this->_cityListByRegionRemoved,
+        $count = $this->_count(array($this->_cityListByRegionRenamed, $this->_cityListByRegionUpdatedCode,
                 $this->_cityListByRegionAdded), 4) + $this->_count($this->_cityListUpdatedRegion, 2);
         $item = 0;
         foreach ($this->_cityListByRegionRenamed as $cityListByRegionRenamed) {
@@ -1199,15 +1194,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 }
             }
         }
-        foreach ($this->_cityListByRegionRemoved as $countryCode => $cityListByRegionRemoved) {
-            foreach ($cityListByRegionRemoved as $regionCode => $cityListRemoved) {
-                foreach ($cityListRemoved as $cityCode => $cityName) {
-                    $cityId = $this->_cityIdList[$cityCode];
-                    CM_Db_Db::delete('cm_locationCityIp', array('cityId' => $cityId));
-                    $this->_printProgressCounter(++$item, $count);
-                }
-            }
-        }
     }
 
     protected function _upgradeZipCodeList() {
@@ -1233,15 +1219,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_writeln('Updating IP blocks database…');
         $count = $this->_count(array($this->_ipBlockListByCountry, $this->_ipBlockListByCity), 3);
         $item = 0;
+        CM_Db_Db::truncate('cm_locationCountryIp');
         foreach ($this->_ipBlockListByCountry as $countryId => $ipBlockList) {
-            CM_Db_Db::delete('cm_locationCountryIp', array('countryId' => $countryId));
             foreach ($ipBlockList as $ipEnd => $ipStart) {
                 CM_Db_Db::insertIgnore('cm_locationCountryIp', array('countryId' => $countryId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
                 $this->_printProgressCounter(++$item, $count);
             }
         }
+        CM_Db_Db::truncate('cm_locationCityIp');
         foreach ($this->_ipBlockListByCity as $cityId => $ipBlockList) {
-            CM_Db_Db::delete('cm_locationCityIp', array('cityId' => $cityId));
             foreach ($ipBlockList as $ipEnd => $ipStart) {
                 CM_Db_Db::insertIgnore('cm_locationCityIp', array('cityId' => $cityId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
                 $this->_printProgressCounter(++$item, $count);

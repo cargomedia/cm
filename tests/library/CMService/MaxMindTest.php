@@ -1156,8 +1156,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
                 array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
                 array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
             )
         );
@@ -1251,10 +1251,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
                 array('cityId' => 3, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
                 array('cityId' => 2, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
                 array('cityId' => 1, 'ipStart' => 201805824, 'ipEnd' => 201806079),
             )
         );
@@ -1338,8 +1338,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
                 array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
                 array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
             )
         );
@@ -1444,8 +1444,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
                 array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -1499,8 +1499,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
                 array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -1554,8 +1554,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
                 array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
