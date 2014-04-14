@@ -3,15 +3,14 @@
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
     /**
-     * @param CM_Component_Abstract $component
      * @return string
      */
-    public function fetch(CM_Component_Abstract $component) {
+    public function fetch() {
         $renderEnvironment = $this->getRender()->getEnvironment();
-        $component->checkAccessible($renderEnvironment);
+        $this->_getComponent()->checkAccessible($renderEnvironment);
 
         $frontendHandler = new CM_ComponentFrontendHandler();
-        $viewResponse = $this->_getPreparedViewResponse($component, $renderEnvironment, $frontendHandler);
+        $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
 
         $parentViewId = null;
         if (count($this->getRender()->getStack('views'))) {
@@ -20,10 +19,10 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
             $parentViewId = $parentView->getAutoId();
         }
 
-        $this->getRender()->pushStack($this->_getStackKey(), $component);
-        $this->getRender()->pushStack('views', $component);
+        $this->getRender()->pushStack($this->_getStackKey(), $this->_getComponent());
+        $this->getRender()->pushStack('views', $this->_getComponent());
 
-        $cssClass = implode(' ', $component->getClassHierarchy());
+        $cssClass = implode(' ', $this->_getComponent()->getClassHierarchy());
         if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
             if ($match[1] != 'default') {
                 $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
@@ -31,7 +30,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         }
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
 
-        $viewResponse->addData('viewOjb', $component);
+        $viewResponse->addData('viewObj', $this->_getComponent());
         $html .=  $this->getRender()->renderViewResponse($viewResponse);
 
         $html .= '</div>';
@@ -51,16 +50,22 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_Component_Abstract       $component
      * @param CM_RenderEnvironment        $environment
      * @param CM_ComponentFrontendHandler $frontendHandler
      * @return CM_ViewResponse
      */
-    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
+    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
         /** @var CM_Component_Abstract $component */
-        $viewResponse = new CM_ViewResponse($component);
+        $viewResponse = new CM_ViewResponse($this->_getComponent());
         $viewResponse->setTemplateName('default');
         $component->prepare($environment, $viewResponse, $frontendHandler);
         return $viewResponse;
+    }
+
+    /**
+     * @return CM_Component_Abstract
+     */
+    private function _getComponent() {
+        return $this->_getView();
     }
 }

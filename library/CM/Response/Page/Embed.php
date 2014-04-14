@@ -34,7 +34,7 @@ class CM_Response_Page_Embed extends CM_Response_Page {
         $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $layout);
         $pageTitle = $renderAdapterPage->fetchTitle();
         $this->_title = $renderAdapterLayout->fetchTitle($layout, $pageTitle);
-        return $renderAdapterPage->fetch($page);
+        return $renderAdapterPage->fetch();
     }
 
     protected function _process() {

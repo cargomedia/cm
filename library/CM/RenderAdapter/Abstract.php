@@ -34,4 +34,13 @@ abstract class CM_RenderAdapter_Abstract {
     protected function _getView() {
         return $this->_view;
     }
+
+    /**
+     * @param string     $templateName
+     * @param array|null $data
+     * @return string
+     */
+    protected function _fetchTemplate($templateName, array $data = null) {
+        return $this->getRender()->renderViewTemplate($this->_getView(), $templateName, $data);
+    }
 }

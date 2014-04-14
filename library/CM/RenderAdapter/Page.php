@@ -3,30 +3,24 @@
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
     /**
-     * @param CM_Page_Abstract $page
      * @return string
      */
-    public function fetchDescription(CM_Page_Abstract $page) {
-        return $this->_fetchTemplate($page, 'meta-description');
+    public function fetchDescription() {
+        return $this->_fetchMetaTemplate('meta-description');
     }
 
     /**
-     * @param CM_Page_Abstract $page
      * @return string
      */
-    public function fetchKeywords(CM_Page_Abstract $page) {
-        return $this->_fetchTemplate($page, 'meta-keywords');
+    public function fetchKeywords() {
+        return $this->_fetchMetaTemplate('meta-keywords');
     }
 
     /**
-     * @internal param \CM_Params $pageParams
      * @return string
      */
     public function fetchTitle() {
-        $viewResponse = new CM_ViewResponse($this->_getView());
-        $viewResponse->setTemplateName('title');
-        $viewResponse->setData($this->_getView()->getParams()->getAll());
-        return trim($this->getRender()->renderViewResponse($viewResponse));
+        return $this->_fetchMetaTemplate('title');
     }
 
     protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
@@ -40,14 +34,10 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     }
 
     /**
-     * @param CM_Page_Abstract $page
-     * @param string           $templateName
+     * @param string $templateName
      * @return string
      */
-    private function _fetchTemplate(CM_Page_Abstract $page, $templateName) {
-        $viewResponse = new CM_ViewResponse($page);
-        $viewResponse->setTemplateName($templateName);
-        $viewResponse->setData($page->getParams()->getAll());
-        return trim($this->getRender()->renderViewResponse($viewResponse));
+    private function _fetchMetaTemplate($templateName) {
+        return trim(parent::_fetchTemplate($templateName, $this->_getView()->getParams()->getAll()));
     }
 }

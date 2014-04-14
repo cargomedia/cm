@@ -55,8 +55,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             'viewObj'         => $layout,
             'title'           => $this->fetchTitle($layout, $pageTitle),
             'page'            => $page,
-            'pageDescription' => $renderAdapterPage->fetchDescription($page),
-            'pageKeywords'    => $renderAdapterPage->fetchKeywords($page),
+            'pageDescription' => $renderAdapterPage->fetchDescription(),
+            'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
         ));
         $html = $this->getRender()->renderViewResponse($viewResponse);
 
