@@ -19,6 +19,11 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
     abstract protected function _setup();
 
+    public function __construct($params = null) {
+        parent::__construct($params);
+        $this->_setup();
+    }
+
     /**
      * @return mixed|null Internal value
      */
