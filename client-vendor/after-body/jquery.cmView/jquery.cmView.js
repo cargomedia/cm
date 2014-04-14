@@ -4,15 +4,17 @@
 (function($) {
 
   /**
+   * @param {String} [className]
    * @return {CM_View_Abstract}
    */
-  $.fn.cmView = function() {
+  $.fn.cmView = function(className) {
     if (1 != this.length) {
       throw new Error('Can only operate on single jQuery element')
     }
     var $element = this.first();
 
-    var viewId = $element.closest('.CM_View_Abstract').attr('id');
+    className = className || 'CM_View_Abstract';
+    var viewId = $element.closest('.' + className).attr('id');
     if (!viewId) {
       throw new Error('Cannot detect view-id');
     }
