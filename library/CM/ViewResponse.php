@@ -1,18 +1,12 @@
 <?php
 
-class CM_ViewResponse extends CM_Class_Abstract {
+class CM_ViewResponse extends CM_DataResponse {
 
     /** @var string */
     private $_autoId;
 
     /** @var string */
     protected $_templateName = 'default.tpl';
-
-    /** @var array */
-    protected $_data = array();
-
-    /** @var CM_ComponentFrontendHandler */
-    protected $_frontendHandler = null;
 
     /** @var CM_View_Abstract */
     protected $_view;
@@ -21,7 +15,6 @@ class CM_ViewResponse extends CM_Class_Abstract {
      * @param CM_View_Abstract $view
      */
     public function __construct(CM_View_Abstract $view) {
-        $this->_frontendHandler = new CM_ComponentFrontendHandler();
         $this->_view = $view;
     }
 
@@ -41,13 +34,6 @@ class CM_ViewResponse extends CM_Class_Abstract {
             $this->_autoId = uniqid();
         }
         return $this->_autoId;
-    }
-
-    /**
-     * @return CM_ComponentFrontendHandler
-     */
-    public function getFrontendHandler() {
-        return $this->_frontendHandler;
     }
 
     /**
@@ -96,12 +82,5 @@ class CM_ViewResponse extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Invalid tpl-name `' . $name . '`');
         }
         $this->_templateName = $name;
-    }
-
-    /**
-     * @param string $code
-     */
-    public function callJs($code) {
-        $this->getFrontendHandler()->exec($code);
     }
 }
