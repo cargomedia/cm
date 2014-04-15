@@ -5,9 +5,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     /** @var string */
     protected $_tplName = 'default.tpl';
 
-    /** @var CM_ComponentFrontendHandler */
-    protected $_js = null;
-
     /**
      * @param CM_Params|array|null $params
      */
@@ -19,7 +16,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
             $params = CM_Params::factory($params);
         }
         $this->_params = $params;
-        $this->_js = new CM_ComponentFrontendHandler();
     }
 
     /**
@@ -62,13 +58,5 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
 
     public function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->reloadComponent($params->getAll());
-    }
-
-    /**
-     * @param string $property
-     * @param mixed  $value
-     */
-    protected function _setJsParam($property, $value) {
-        $this->_js->setParam($property, $value);
     }
 }
