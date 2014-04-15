@@ -80,8 +80,8 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      * @return static
      */
     public static function factory($className, $params = null) {
-        if (!class_exists($className) || !is_subclass_of($className, get_called_class())) {
-            throw new CM_Exception('Cannot find valid class definition for view `' . $className . '`.');
+        if (!class_exists($className) || !is_a($className, get_called_class(), true)) {
+            throw new CM_Exception_Invalid('Cannot find valid class definition for view `' . $className . '`.');
         }
         $view = new $className($params);
         return $view;

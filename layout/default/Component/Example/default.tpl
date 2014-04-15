@@ -16,21 +16,21 @@
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/menus.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/menus.tpl'}
+      {viewTemplate file='tabs/menus'}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/buttons.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/buttons.tpl'}
+      {viewTemplate file='tabs/buttons'}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/forms.tpl' namespace='CM' parse=false}{/code}
-      {viewTemplate file='tabs/forms.tpl'}
+      {viewTemplate file='tabs/forms'}
     </div>
     <div>
-      {viewTemplate file='tabs/variables.tpl' colorStyles=$colorStyles}
+      {viewTemplate file='tabs/variables' colorStyles=$colorStyles}
     </div>
     <div>
-      {viewTemplate file='tabs/icons.tpl' icons=$icons}
+      {viewTemplate file='tabs/icons' icons=$icons}
     </div>
   {/block}
 </div>

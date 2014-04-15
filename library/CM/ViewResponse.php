@@ -6,7 +6,7 @@ class CM_ViewResponse extends CM_DataResponse {
     private $_autoId;
 
     /** @var string */
-    protected $_templateName = 'default.tpl';
+    protected $_templateName = 'default';
 
     /** @var CM_View_Abstract */
     protected $_view;
@@ -77,7 +77,6 @@ class CM_ViewResponse extends CM_DataResponse {
      * @throws CM_Exception_Invalid
      */
     public function setTemplateName($name) {
-        $name = (string) $name . '.tpl';
         if (preg_match('/[^\w\.-]/', $name)) {
             throw new CM_Exception_Invalid('Invalid tpl-name `' . $name . '`');
         }

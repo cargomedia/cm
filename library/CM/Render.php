@@ -445,9 +445,9 @@ class CM_Render extends CM_Class_Abstract {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
                 throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
             }
-            $tpl = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName;
-            if ($tplPath = $this->getLayoutPath($tpl, $matches[1], false, false)) {
-                return $tplPath;
+            $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
+            if ($templatePath = $this->getLayoutPath($templatePathRelative, $matches[1], false, false)) {
+                return $templatePath;
             }
         }
         throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');

@@ -25,10 +25,9 @@ class CM_Response_Page_Embed extends CM_Response_Page {
 
     /**
      * @param CM_Page_Abstract $page
-     * @param CM_Params        $pageParams
      * @return string
      */
-    protected function _renderPage(CM_Page_Abstract $page, CM_Params $pageParams) {
+    protected function _renderPage(CM_Page_Abstract $page) {
         $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
         $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page->getLayout($this->getSite()));
         $pageTitle = $renderAdapterPage->fetchTitle();

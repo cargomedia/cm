@@ -22,9 +22,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         if (!isset($viewInfo['id'])) {
             throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, null, CM_Exception::WARN);
         }
-        if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) ||
-            !('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
-        ) {
+        if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
             throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] .
                 '`.', null, null, CM_Exception::WARN);
         }

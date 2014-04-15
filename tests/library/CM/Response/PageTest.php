@@ -50,9 +50,7 @@ class CM_Response_PageTest extends CMTest_TestCase {
 class CM_Page_Mock5 extends CM_Page_Abstract {
 
     public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
-        $layoutname = 'Mock';
-        $classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
-        return new $classname($this);
+        return new CM_Layout_Mock();
     }
 }
 

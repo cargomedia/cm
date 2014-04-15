@@ -3,7 +3,7 @@
 class CM_FormField_FloatTest extends CMTest_TestCase {
 
     public function testValidate() {
-        $field = new CM_FormField_Float('foo');
+        $field = new CM_FormField_Float();
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
 
         $validationResult = $field->validate(1.3, $response);

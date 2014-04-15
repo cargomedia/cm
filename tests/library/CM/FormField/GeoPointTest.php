@@ -3,7 +3,7 @@
 class CM_FormField_GeoPointTest extends CMTest_TestCase {
 
     public function testValidate() {
-        $field = new CM_FormField_GeoPoint('foo');
+        $field = new CM_FormField_GeoPoint();
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
 
         $value = $field->validate(array('latitude' => -30.2, 'longitude' => -122.2), $response);

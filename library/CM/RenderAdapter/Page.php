@@ -23,8 +23,8 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         return $this->_fetchMetaTemplate('title');
     }
 
-    protected function _getPreparedViewResponse(CM_Component_Abstract $component, CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
-        $viewResponse = parent::_getPreparedViewResponse($component, $environment, $frontendHandler);
+    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
+        $viewResponse = parent::_getPreparedViewResponse($environment, $frontendHandler);
         $viewResponse->addData('pageTitle', $this->fetchTitle());
         return $viewResponse;
     }

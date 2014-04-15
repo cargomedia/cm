@@ -8,7 +8,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testRender() {
         $form = $this->getMockForm();
-        $field = new CM_FormField_Text('foo');
+        $field = new CM_FormField_Text();
         $fieldName = 'foo';
         $doc = $this->_renderFormField($form, $field, $fieldName);
         $this->assertSame(1, $doc->getCount('input'));
@@ -20,7 +20,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testRenderValue() {
         $form = $this->getMockForm();
-        $field = new CM_FormField_Text('foo');
+        $field = new CM_FormField_Text();
         $field->setValue('bar');
         $fieldName = 'foo';
         $doc = $this->_renderFormField($form, $field, $fieldName);
@@ -32,7 +32,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testValidateMinLength() {
-        $field = new CM_FormField_Text(3);
+        $field = new CM_FormField_Text(['lengthMin' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
@@ -56,7 +56,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testValidateMaxLength() {
-        $field = new CM_FormField_Text(null, 3);
+        $field = new CM_FormField_Text(['lengthMax' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
@@ -80,7 +80,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateBadwords() {
         $badwordsList = new CM_Paging_ContentList_Badwords();
-        $field = new CM_FormField_Text(null, null, true);
+        $field = new CM_FormField_Text(['forbidBadwords' => true]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
