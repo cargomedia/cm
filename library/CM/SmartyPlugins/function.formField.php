@@ -23,11 +23,10 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
         $input .= (string) $params['prepend'];
     }
     if (isset($params['name'])) {
-        $renderParams = CM_Params::factory($params);
         $inputName = (string) $params['name'];
         $field = $form->getField($inputName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-        $input .= $renderAdapter->fetch($renderParams, $form, $inputName);
+        $input .= $renderAdapter->fetch(CM_Params::factory($params), $form, $inputName);
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];
