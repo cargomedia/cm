@@ -7,6 +7,6 @@ class CM_FormField_Set_Select_Radio extends CM_FormField_Set_Select {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('itemValue', $renderParams->getString('item'));
+        $viewResponse->set('itemValue', $renderParams->getString('item'));
     }
 }

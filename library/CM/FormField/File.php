@@ -40,8 +40,8 @@ class CM_FormField_File extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('text', $renderParams->getString('text', ''));
-        $this->setTplParam('skipDropZone', $renderParams->getBoolean('skipDropZone', false));
+        $viewResponse->set('text', $renderParams->getString('text', ''));
+        $viewResponse->set('skipDropZone', $renderParams->getBoolean('skipDropZone', false));
     }
 
     protected function _setup() {

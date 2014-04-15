@@ -17,16 +17,16 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
         if (!in_array($display, array(self::DISPLAY_SELECT, self::DISPLAY_RADIOS), true)) {
             throw new CM_Exception_InvalidParam('Display needs to be either `select` or `radios`');
         }
-        $this->setTplParam('display', $display);
-        $this->setTplParam('class', $renderParams->getString('class', ''));
+        $viewResponse->set('display', $display);
+        $viewResponse->set('class', $renderParams->getString('class', ''));
 
-        $this->setTplParam('placeholder', $renderParams->getBoolean('placeholder', false));
-        $this->setTplParam('optionList', $this->_getOptionList());
+        $viewResponse->set('placeholder', $renderParams->getBoolean('placeholder', false));
+        $viewResponse->set('optionList', $this->_getOptionList());
         if ($renderParams->has('labelPrefix')) {
-            $this->setTplParam('labelPrefix', $renderParams->getString('labelPrefix'));
+            $viewResponse->set('labelPrefix', $renderParams->getString('labelPrefix'));
         }
 
-        $this->setTplParam('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
-        $this->setTplParam('translatePrefix', $renderParams->getString('translatePrefix', ''));
+        $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
+        $viewResponse->set('translatePrefix', $renderParams->getString('translatePrefix', ''));
     }
 }

@@ -13,7 +13,7 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('tree', $this->_tree);
+        $viewResponse->set('tree', $this->_tree);
     }
 
     protected function _setup() {

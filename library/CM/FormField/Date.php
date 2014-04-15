@@ -17,20 +17,20 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('class', $renderParams->getString('class', ''));
+        $viewResponse->set('class', $renderParams->getString('class', ''));
 
         $years = range($this->_yearFirst, $this->_yearLast);
         $months = range(1, 12);
         $days = range(1, 31);
 
-        $this->setTplParam('years', array_combine($years, $years));
-        $this->setTplParam('months', array_combine($months, $months));
-        $this->setTplParam('days', array_combine($days, $days));
+        $viewResponse->set('years', array_combine($years, $years));
+        $viewResponse->set('months', array_combine($months, $months));
+        $viewResponse->set('days', array_combine($days, $days));
 
         $value = $this->getValue();
-        $this->setTplParam('yy', $value ? $value->format('Y') : null);
-        $this->setTplParam('mm', $value ? $value->format('n') : null);
-        $this->setTplParam('dd', $value ? $value->format('j') : null);
+        $viewResponse->set('yy', $value ? $value->format('Y') : null);
+        $viewResponse->set('mm', $value ? $value->format('n') : null);
+        $viewResponse->set('dd', $value ? $value->format('j') : null);
     }
 
     public function isEmpty($userInput) {
