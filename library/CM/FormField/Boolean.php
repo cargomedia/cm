@@ -7,10 +7,10 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('tabindex', isset($renderParams['tabindex']) ? (int) $renderParams['tabindex'] : null);
-        $this->setTplParam('class', isset($renderParams['class']) ? $renderParams['class'] : null);
+        $this->setTplParam('tabindex', $renderParams->getString('tabindex', ''));
+        $this->setTplParam('class', $renderParams->getString('class', ''));
         $this->setTplParam('checked', $this->getValue() ? 'checked' : null);
-        $this->setTplParam('text', isset($renderParams['text']) ? $renderParams['text'] : null);
+        $this->setTplParam('text', $renderParams->getString('text', ''));
     }
 
     protected function _setup() {

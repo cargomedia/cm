@@ -24,11 +24,11 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $this->setTplParam('autocorrect', isset($renderParams['autocorrect']) ? $renderParams['autocorrect'] : null);
-        $this->setTplParam('autocapitalize', isset($renderParams['autocapitalize']) ? $renderParams['autocapitalize'] : null);
-        $this->setTplParam('tabindex', isset($renderParams['tabindex']) ? $renderParams['tabindex'] : null);
-        $this->setTplParam('class', isset($renderParams['class']) ? $renderParams['class'] : null);
-        $this->setTplParam('placeholder', isset($renderParams['placeholder']) ? $renderParams['placeholder'] : null);
+        $this->setTplParam('autocorrect', $renderParams->getString('autocorrect', ''));
+        $this->setTplParam('autocapitalize', $renderParams->getString('autocapitalize', ''));
+        $this->setTplParam('tabindex', $renderParams->getString('tabindex', ''));
+        $this->setTplParam('class', $renderParams->getString('class', ''));
+        $this->setTplParam('placeholder', $renderParams->getString('placeholder', ''));
     }
 
     protected function _setup() {
