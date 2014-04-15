@@ -358,6 +358,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
             // Retrieve the right region if its code has been updated
             $regionCodeList = isset($this->_locationTree[$countryCode]['regions']) ? array_keys($this->_locationTree[$countryCode]['regions']) : array();
             $regionCodeListOld = isset($this->_locationTreeOld[$countryCode]['regions']) ? array_keys($this->_locationTreeOld[$countryCode]['regions']) : array();
+            $regionCodeList[] = null;
+            $regionCodeListOld[] = null;
             $regionCodeListOldByNewCode = array();
             foreach ($regionCodeListOld as $regionCodeOld) {
                 $regionCode = $regionCodeOld;
