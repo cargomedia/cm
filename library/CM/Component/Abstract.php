@@ -27,7 +27,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
      *
      * Access for everyone is default. Should be overloaded by every component
      *
-     * @internal param \CM_Render $render
      * @param CM_RenderEnvironment $environment
      * @return mixed
      */
