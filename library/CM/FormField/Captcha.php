@@ -2,7 +2,7 @@
 
 class CM_FormField_Captcha extends CM_FormField_Abstract {
 
-    public function prepare(array $params) {
+    public function prepare(CM_Params $renderParams) {
         $this->setTplParam('imageId', CM_Captcha::create()->getId());
     }
 

@@ -2,8 +2,8 @@
 
 class CM_FormField_Integer extends CM_FormField_Abstract {
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
+    public function prepare(CM_Params $renderParams) {
+        $this->setTplParam('class', isset($renderParams['class']) ? (string) $renderParams['class'] : null);
     }
 
     public function validate($userInput, CM_Response_Abstract $response) {

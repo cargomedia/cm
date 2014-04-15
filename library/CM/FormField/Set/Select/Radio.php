@@ -6,10 +6,10 @@ class CM_FormField_Set_Select_Radio extends CM_FormField_Set_Select {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        if (!isset($params['item'])) {
+    public function prepare(CM_Params $renderParams) {
+        if (!isset($renderParams['item'])) {
             throw new CM_Exception_InvalidParam('`item` param required');
         }
-        $this->setTplParam('itemValue', $params['item']);
+        $this->setTplParam('itemValue', $renderParams['item']);
     }
 }

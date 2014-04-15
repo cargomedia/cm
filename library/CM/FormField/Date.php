@@ -16,8 +16,8 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         return new DateTime($yy . '-' . $mm . '-' . $dd);
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
+    public function prepare(CM_Params $renderParams) {
+        $this->setTplParam('class', isset($renderParams['class']) ? $renderParams['class'] : null);
 
         $years = range($this->_yearFirst, $this->_yearLast);
         $months = range(1, 12);

@@ -23,12 +23,12 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('autocorrect', isset($params['autocorrect']) ? $params['autocorrect'] : null);
-        $this->setTplParam('autocapitalize', isset($params['autocapitalize']) ? $params['autocapitalize'] : null);
-        $this->setTplParam('tabindex', isset($params['tabindex']) ? $params['tabindex'] : null);
-        $this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
-        $this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
+    public function prepare(CM_Params $renderParams) {
+        $this->setTplParam('autocorrect', isset($renderParams['autocorrect']) ? $renderParams['autocorrect'] : null);
+        $this->setTplParam('autocapitalize', isset($renderParams['autocapitalize']) ? $renderParams['autocapitalize'] : null);
+        $this->setTplParam('tabindex', isset($renderParams['tabindex']) ? $renderParams['tabindex'] : null);
+        $this->setTplParam('class', isset($renderParams['class']) ? $renderParams['class'] : null);
+        $this->setTplParam('placeholder', isset($renderParams['placeholder']) ? $renderParams['placeholder'] : null);
     }
 
     protected function _setup() {

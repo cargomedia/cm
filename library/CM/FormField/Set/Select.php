@@ -12,21 +12,21 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        if (!isset($params['display'])) {
-            $params['display'] = self::DISPLAY_SELECT;
+    public function prepare(CM_Params $renderParams) {
+        if (!isset($renderParams['display'])) {
+            $renderParams['display'] = self::DISPLAY_SELECT;
         }
-        if ($params['display'] !== self::DISPLAY_SELECT && $params['display'] !== self::DISPLAY_RADIOS) {
+        if ($renderParams['display'] !== self::DISPLAY_SELECT && $renderParams['display'] !== self::DISPLAY_RADIOS) {
             throw new CM_Exception_InvalidParam('Display needs to be either `select` or `radios`');
         }
-        $this->setTplParam('display', $params['display']);
-        $this->setTplParam('class', !empty($params['class']) ? $params['class'] : null);
+        $this->setTplParam('display', $renderParams['display']);
+        $this->setTplParam('class', !empty($renderParams['class']) ? $renderParams['class'] : null);
 
-        $this->setTplParam('placeholder', !empty($params['placeholder']));
+        $this->setTplParam('placeholder', !empty($renderParams['placeholder']));
         $this->setTplParam('optionList', $this->_getOptionList());
-        $this->setTplParam('labelPrefix', !empty($params['labelPrefix']) ? $params['labelPrefix'] : null);
+        $this->setTplParam('labelPrefix', !empty($renderParams['labelPrefix']) ? $renderParams['labelPrefix'] : null);
 
-        $this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
-        $this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
+        $this->setTplParam('translate', !empty($renderParams['translate']) || !empty($renderParams['translatePrefix']));
+        $this->setTplParam('translatePrefix', !empty($renderParams['translatePrefix']) ? $renderParams['translatePrefix'] : '');
     }
 }

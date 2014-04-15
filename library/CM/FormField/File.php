@@ -39,9 +39,9 @@ class CM_FormField_File extends CM_FormField_Abstract {
         return (array) $files;
     }
 
-    public function prepare(array $params) {
-        $text = isset($params['text']) ? (string) $params['text'] : null;
-        $skipDropZone = !empty($params['skipDropZone']);
+    public function prepare(CM_Params $renderParams) {
+        $text = isset($renderParams['text']) ? (string) $renderParams['text'] : null;
+        $skipDropZone = !empty($renderParams['skipDropZone']);
 
         $this->setTplParam('text', $text);
         $this->setTplParam('skipDropZone', $skipDropZone);

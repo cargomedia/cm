@@ -25,7 +25,7 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
         return $point;
     }
 
-    public function prepare(array $params) {
+    public function prepare(CM_Params $renderParams) {
         /** @var CM_Geo_Point $value */
         $value = $this->getValue();
         $latitude = $value ? $value->getLatitude() : null;

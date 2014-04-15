@@ -78,9 +78,9 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     abstract public function validate($userInput, CM_Response_Abstract $response);
 
     /**
-     * @param array $params
+     * @param CM_Params $renderParams
      */
-    public function prepare(array $params) {
+    public function prepare(CM_Params $renderParams) {
     }
 
     /**

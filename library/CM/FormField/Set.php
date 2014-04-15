@@ -17,11 +17,11 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', !empty($params['class']) ? $params['class'] : null);
+    public function prepare(CM_Params $renderParams) {
+        $this->setTplParam('class', !empty($renderParams['class']) ? $renderParams['class'] : null);
         $this->setTplParam('optionList', $this->_getOptionList());
-        $this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
-        $this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
+        $this->setTplParam('translate', !empty($renderParams['translate']) || !empty($renderParams['translatePrefix']));
+        $this->setTplParam('translatePrefix', !empty($renderParams['translatePrefix']) ? $renderParams['translatePrefix'] : '');
     }
 
     /**
