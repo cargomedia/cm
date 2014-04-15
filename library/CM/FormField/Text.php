@@ -23,7 +23,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         $this->setTplParam('autocorrect', isset($renderParams['autocorrect']) ? $renderParams['autocorrect'] : null);
         $this->setTplParam('autocapitalize', isset($renderParams['autocapitalize']) ? $renderParams['autocapitalize'] : null);
         $this->setTplParam('tabindex', isset($renderParams['tabindex']) ? $renderParams['tabindex'] : null);

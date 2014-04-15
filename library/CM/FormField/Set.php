@@ -17,7 +17,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         $this->setTplParam('class', !empty($renderParams['class']) ? $renderParams['class'] : null);
         $this->setTplParam('optionList', $this->_getOptionList());
         $this->setTplParam('translate', !empty($renderParams['translate']) || !empty($renderParams['translatePrefix']));

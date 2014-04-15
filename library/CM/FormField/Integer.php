@@ -2,7 +2,7 @@
 
 class CM_FormField_Integer extends CM_FormField_Abstract {
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         $this->setTplParam('class', isset($renderParams['class']) ? (string) $renderParams['class'] : null);
     }
 

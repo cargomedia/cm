@@ -6,7 +6,7 @@ class CM_FormField_Set_Select_Radio extends CM_FormField_Set_Select {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         if (!isset($renderParams['item'])) {
             throw new CM_Exception_InvalidParam('`item` param required');
         }

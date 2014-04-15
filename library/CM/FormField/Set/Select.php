@@ -12,7 +12,7 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         if (!isset($renderParams['display'])) {
             $renderParams['display'] = self::DISPLAY_SELECT;
         }

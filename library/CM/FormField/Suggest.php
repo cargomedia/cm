@@ -20,7 +20,7 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
      */
     abstract public function getSuggestion($item, CM_Render $render);
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         $this->setTplParam('class', isset($renderParams['class']) ? (string) $renderParams['class'] : null);
         $this->setTplParam('placeholder', isset($renderParams['placeholder']) ? $renderParams['placeholder'] : null);
     }
