@@ -12,11 +12,6 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
      */
     protected $_options = array();
 
-    /**
-     * @var array
-     */
-    protected $_tplParams = array();
-
     abstract protected function _setup();
 
     public function __construct($params = null) {
@@ -82,23 +77,6 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
      * @param CM_ViewResponse $viewResponse
      */
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     * @return CM_FormField_Abstract
-     */
-    public function setTplParam($key, $value) {
-        $this->_tplParams[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTplParams() {
-        return $this->_tplParams;
     }
 
     public function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {

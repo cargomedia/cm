@@ -10,14 +10,14 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $viewResponse->setTemplateName('default');
         $field->prepare($renderParams, $viewResponse);
 
-        $field->setTplParam('field', $field);
-        $field->setTplParam('id', $form->getTagAutoId($fieldName . '-input'));
-        $field->setTplParam('name', $fieldName);
-        $field->setTplParam('value', $field->getValue());
-        $field->setTplParam('options', $field->getOptions());
+
+        $viewResponse->set('field', $field);
+        $viewResponse->set('id', $form->getTagAutoId($fieldName . '-input'));
+        $viewResponse->set('name', $fieldName);
+        $viewResponse->set('value', $field->getValue());
+        $viewResponse->set('options', $field->getOptions());
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
-        $viewResponse->setData($field->getTplParams());
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
