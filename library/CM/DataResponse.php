@@ -9,7 +9,7 @@ class CM_DataResponse extends CM_Class_Abstract {
      * @param string $key
      * @param mixed  $value
      */
-    public function addData($key, $value) {
+    public function set($key, $value) {
         $this->_data[$key] = $value;
     }
 

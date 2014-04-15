@@ -37,28 +37,6 @@ class CM_ViewResponse extends CM_DataResponse {
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function addData($key, $value) {
-        $this->_data[$key] = $value;
-    }
-
-    /**
-     * @param array $data
-     */
-    public function setData(array $data) {
-        $this->_data = $data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getData() {
-        return $this->_data;
-    }
-
-    /**
      * @return string
      */
     public function getTemplateName() {
