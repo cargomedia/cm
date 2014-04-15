@@ -520,15 +520,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($regionCodeListOldByNewCode as $regionCode => $regionCodeOld) {
                 $cityListOld = isset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]) ? $this->_cityListByRegionOld[$countryCode][$regionCodeOld] : array();
                 // Retrieve the right city if its code has been updated
-                $cityCodeListOldByNewCode = array();
                 foreach ($cityListOld as $cityCodeOld => $cityNameOld) {
                     $cityCode = $cityCodeOld;
                     if (isset($this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld])) {
                         $cityCode = $this->_cityListByRegionUpdatedCode[$countryCode][$regionCode][$cityCodeOld];
                     }
-                    $cityCodeListOldByNewCode[$cityCode] = $cityCodeOld;
+                    $regionCodeListByCityOld[$cityCode] = $regionCode;
                 }
-                $regionCodeListByCityOld += array_fill_keys(array_keys($cityCodeListOldByNewCode), $regionCode);
             }
             foreach ($regionCodeList as $regionCode) {
                 $cityList = isset($this->_cityListByRegion[$countryCode][$regionCode]) ? $this->_cityListByRegion[$countryCode][$regionCode] : array();
@@ -1170,11 +1168,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $cityId = $this->_cityIdList[$cityCode];
                 $regionCode = $regionCodes['regionCode'];
                 $regionName = $this->_getRegionName($countryCode, $regionCode);
+                $cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
                 if ($regionName === 'Unknown region') {
-                    CM_Db_Db::update('cm_locationCity', array('stateId' => null), array('id' => $cityId));
+                    CM_Db_Db::update('cm_locationCity', array('stateId' => null, 'name' => $cityName), array('id' => $cityId));
                 } else {
                     $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
-                    CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId), array('id' => $cityId));
+                    CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId, 'name' => $cityName), array('id' => $cityId));
                 }
                 $this->_printProgressCounter(++$item, $count);
             }
