@@ -14,7 +14,7 @@ class CM_Component_Example extends CM_Component_Abstract {
             'icons'       => $icons,
         ));
 
-        $this->_setJsParam('uname', 'uname');
+        $frontendHandler->setParam('uname', 'uname');
     }
 
     public function checkAccessible(CM_RenderEnvironment $environment) {

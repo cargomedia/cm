@@ -33,13 +33,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     abstract public function checkAccessible(CM_RenderEnvironment $environment);
 
     /**
-     * @return CM_ComponentFrontendHandler
-     */
-    public function getFrontendHandler() {
-        return $this->_js;
-    }
-
-    /**
      * @param CM_RenderEnvironment        $environment
      * @param CM_ViewResponse             $viewResponse
      * @param CM_ComponentFrontendHandler $frontendHandler
