@@ -1060,6 +1060,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $ipData = $this->_getIpData();
         $this->_ipBlockListByCity = array();
         $this->_ipBlockListByCountry = array();
+        $count = count($ipData);
+        $item = 0;
         foreach ($ipData as $row) {
             list($ipStart, $ipEnd, $maxMind) = $row;
             $ipStart = (int) $ipStart;
@@ -1075,6 +1077,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     $this->_ipBlockListByCountry[$countryId][$ipEnd] = $ipStart;
                 }
             }
+            $this->_printProgressCounter(++$item, $count);
         }
     }
 
