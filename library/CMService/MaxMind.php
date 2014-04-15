@@ -837,12 +837,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`state`.`_maxmind` AS `maxMindRegion`,
 				`state`.`abbreviation` AS `regionAbbreviation`,
 				`state`.`name` AS `regionName`,
-				`country`.`abbreviation` AS `countryCode`
+				`country`.`abbreviation` AS `countryCode`,
+				`country`.`name` AS `countryName`
 			FROM `cm_locationCity` `city`
 			LEFT JOIN `cm_locationState` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `city`.`countryId`');
         while (false !== ($row = $result->fetch())) {
-            list($cityId, $cityCode, $cityName, $latitude, $longitude, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+            list($cityId, $cityCode, $cityName, $latitude, $longitude, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
             if (null === $cityCode) {
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityId . ') has no MaxMind code');
             }
@@ -852,7 +853,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMindRegion, $countryCode, $regionId, $regionName);
             }
             if (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'])) {
-                $region = isset($regionName) ? $regionName . ', ' . $countryCode : $countryCode;
+                $region = isset($regionName) ? $regionName . ', ' . $countryName : $countryName;
                 throw new CM_Exception('City `' . $cityName . '` (' . $cityCode . ') found twice in ' . $region);
             }
             $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName]['location'] = array(
@@ -1265,7 +1266,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     private function _getEscapeSequenceHighlighted($color) {
         static $escapeSequence = array();
         if (!isset($escapeSequence[$color])) {
-            $escapeSequence[$color] = system('tput setab ' . $color);
+            $escapeSequence[$color] = system('tput setab ' . $color) . system('tput setaf 15');
             system('tput sgr0');
         }
         return $escapeSequence[$color];
