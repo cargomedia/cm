@@ -12,7 +12,7 @@ class CM_FormField_AbstractTest extends CMTest_TestCase {
     public function testFactoryInvalid() {
         $className = 'file';
         try {
-            $field = CM_FormField_Abstract::factory($className);
+            CM_FormField_Abstract::factory($className);
             $this->fail('should throw exception because invalid file');
         } catch (CM_Exception_Invalid $e) {
             $this->assertTrue(true);
