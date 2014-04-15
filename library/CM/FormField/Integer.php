@@ -23,18 +23,4 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         $this->_options['step'] = $this->_params->getInt('step', 1);
         parent::_setup();
     }
-
-    /**
-     * @param int|null $min
-     * @param int|null $max
-     * @param int|null $step
-     * @return static
-     */
-    public static function create($min = null, $max = null, $step = null) {
-        return new static(array(
-            'min' => $min,
-            'max' => $max,
-            'step' => $step,
-        ));
-    }
 }

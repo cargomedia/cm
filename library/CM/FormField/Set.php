@@ -46,16 +46,4 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         $this->_values = $this->_params->getArray('values', array());
         $this->_labelsInValues = $this->_params->getBoolean('labelsInValues', false);
     }
-
-    /**
-     * @param array|null $values
-     * @param bool|null  $labelsInValues
-     * @return CM_FormField_Set
-     */
-    public static function create(array $values = null, $labelsInValues = null) {
-        return new static(array(
-            'values' => $values,
-            'labelsInValues' => $labelsInValues,
-        ));
-    }
 }

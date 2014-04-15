@@ -19,14 +19,4 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract {
     protected function _setup() {
         $this->_tree = $this->_params->get('tree');
     }
-
-    /**
-     * @param CM_Tree_Abstract $tree
-     * @return static
-     */
-    public static function create(CM_Tree_Abstract $tree) {
-        return new static(array(
-            'tree' => $tree,
-        ));
-    }
 }

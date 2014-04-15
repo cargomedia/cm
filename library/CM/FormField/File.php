@@ -52,14 +52,4 @@ class CM_FormField_File extends CM_FormField_Abstract {
         $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
         parent::_setup();
     }
-
-    /**
-     * @param int|null $cardinality
-     * @return static
-     */
-    public static function create($cardinality = null) {
-        return new static(array(
-            'cardinality' => $cardinality,
-        ));
-    }
 }

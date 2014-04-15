@@ -111,12 +111,5 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
         $field->validate($userInput, $response);
     }
-
-    /**
-     * @return static
-     */
-    public static function create() {
-        return new static();
-    }
 }
 

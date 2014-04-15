@@ -7,11 +7,4 @@ class CM_FormField_Password extends CM_FormField_Text {
         $this->_params->set('lengthMax', 100);
         parent::_setup();
     }
-
-    /**
-     * @return static
-     */
-    public static function create() {
-        return new static();
-    }
 }

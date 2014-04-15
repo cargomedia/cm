@@ -36,18 +36,4 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->get('lengthMax') : null;
         $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords');
     }
-
-    /**
-     * @param int|null     $lengthMin
-     * @param int|null     $lengthMax
-     * @param boolean|null $forbidBadwords
-     * @return static
-     */
-    public static function create($lengthMin = null, $lengthMax = null, $forbidBadwords = null) {
-        return new static(array(
-            'lengthMin' => $lengthMin,
-            'lengthMax' => $lengthMax,
-            'forbidBadwords' => $forbidBadwords,
-        ));
-    }
 }

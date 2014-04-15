@@ -42,16 +42,4 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
         parent::_setup();
     }
-
-    /**
-     * @param int|null $yearFirst
-     * @param int|null $yearLast
-     * @return static
-     */
-    public static function create($yearFirst = null, $yearLast = null) {
-        return new static(array(
-            'yearFirst' => $yearFirst,
-            'yearLast' => $yearLast,
-        ));
-    }
 }

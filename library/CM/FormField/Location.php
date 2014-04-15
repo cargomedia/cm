@@ -117,18 +117,4 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
         parent::_setup();
     }
-
-    /**
-     * @param int|null $minLevel
-     * @param int|null $maxLevel
-     * @param string|null $fieldNameDistance
-     * @return static
-     */
-    public static function create($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
-        return new static(array(
-            'minLevel' => $minLevel,
-            'maxLevel' => $maxLevel,
-            'fieldNameDistance' => $fieldNameDistance,
-        ));
-    }
 }

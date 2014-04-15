@@ -21,14 +21,4 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
         $this->_params->set('cardinality', 1);
         parent::_setup();
     }
-
-    /**
-     * @param bool|null $enableChoiceCreate
-     * @return static
-     */
-    public static function create($enableChoiceCreate = null) {
-        return new static(array(
-            'enableChoiceCreate' => $enableChoiceCreate,
-        ));
-    }
 }

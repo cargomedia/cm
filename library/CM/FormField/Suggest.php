@@ -44,16 +44,4 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
         $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
     }
-
-    /**
-     * @param int|null  $cardinality
-     * @param bool|null $enableChoiceCreate
-     * @return static
-     */
-    public static function create($cardinality = null, $enableChoiceCreate = null) {
-        return new static(array(
-            'cardinality'        => $cardinality,
-            'enableChoiceCreate' => $enableChoiceCreate,
-        ));
-    }
 }
