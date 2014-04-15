@@ -2,9 +2,6 @@
 
 abstract class CM_Component_Abstract extends CM_View_Abstract {
 
-    /** @var string */
-    protected $_tplName = 'default.tpl';
-
     /**
      * @param CM_Params|array|null $params
      */
