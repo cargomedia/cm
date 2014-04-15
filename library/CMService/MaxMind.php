@@ -14,6 +14,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /** @var CM_OutputStream_Interface|null */
     protected $_outputStream;
 
+    /** @var bool */
+    protected $_verbose;
+
     /** @var array */
     protected
         $_countryList, $_countryListOld, $_countryIdList, $_countryCodeListByMaxMind,
@@ -29,10 +32,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /**
      * @param string|null                    $geoIpFile
      * @param CM_OutputStream_Interface|null $outputStream
+     * @param bool|null                      $verbose
      */
-    public function __construct($geoIpFile = null, CM_OutputStream_Interface $outputStream = null) {
+    public function __construct($geoIpFile = null, CM_OutputStream_Interface $outputStream = null, $verbose = null) {
         $this->_setGeoIpFile($geoIpFile);
         $this->_outputStream = $outputStream;
+        $this->_verbose = (bool) $verbose;
     }
 
     public function update() {
@@ -1413,6 +1418,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     private function _printInfoList($infoList, $symbol = null) {
+        if (!$this->_verbose) {
+            return;
+        }
         if (empty($infoList)) {
             return;
         }
