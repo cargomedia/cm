@@ -24,11 +24,12 @@ class CM_FormField_Text extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $viewResponse->set('autocorrect', $renderParams->getString('autocorrect', ''));
-        $viewResponse->set('autocapitalize', $renderParams->getString('autocapitalize', ''));
-        $viewResponse->set('tabindex', $renderParams->getString('tabindex', ''));
-        $viewResponse->set('class', $renderParams->getString('class', ''));
-        $viewResponse->set('placeholder', $renderParams->getString('placeholder', ''));
+        $viewResponse->set('autocorrect', $renderParams->has('autocorrect') ? $renderParams->getString('autocorrect') : null);
+        $viewResponse->set('autocapitalize', $renderParams->has('autocapitalize') ? $renderParams->getString('autocapitalize') : null);
+
+        $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getString('tabindex') : null);
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class', '') : null);
+        $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 
     protected function _setup() {

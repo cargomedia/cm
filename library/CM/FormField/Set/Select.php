@@ -18,15 +18,13 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
             throw new CM_Exception_InvalidParam('Display needs to be either `select` or `radios`');
         }
         $viewResponse->set('display', $display);
-        $viewResponse->set('class', $renderParams->getString('class', ''));
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
 
         $viewResponse->set('placeholder', $renderParams->getBoolean('placeholder', false));
         $viewResponse->set('optionList', $this->_getOptionList());
-        if ($renderParams->has('labelPrefix')) {
-            $viewResponse->set('labelPrefix', $renderParams->getString('labelPrefix'));
-        }
+        $viewResponse->set('labelPrefix', $renderParams->has('') ? $renderParams->getString('labelPrefix') : null);
 
         $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
-        $viewResponse->set('translatePrefix', $renderParams->getString('translatePrefix', ''));
+        $viewResponse->set('translatePrefix', $renderParams->has('') ? $renderParams->getString('translatePrefix') : null);
     }
 }

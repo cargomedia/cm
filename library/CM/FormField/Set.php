@@ -18,10 +18,10 @@ class CM_FormField_Set extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $viewResponse->set('class', $renderParams->getString('class', ''));
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('optionList', $this->_getOptionList());
         $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
-        $viewResponse->set('translatePrefix', $renderParams->getString('translatePrefix', ''));
+        $viewResponse->set('translatePrefix', $renderParams->has('translatePrefix') ? $renderParams->getString('translatePrefix') : null);
     }
 
     /**

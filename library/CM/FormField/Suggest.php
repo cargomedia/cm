@@ -21,8 +21,8 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
     abstract public function getSuggestion($item, CM_Render $render);
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $viewResponse->set('class', $renderParams->getString('class', ''));
-        $viewResponse->set('placeholder', $renderParams->getString('placeholder', ''));
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
+        $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 
     public function validate($userInput, CM_Response_Abstract $response) {

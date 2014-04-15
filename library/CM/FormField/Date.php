@@ -17,7 +17,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     }
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
-        $viewResponse->set('class', $renderParams->getString('class', ''));
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
 
         $years = range($this->_yearFirst, $this->_yearLast);
         $months = range(1, 12);
