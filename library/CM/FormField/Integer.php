@@ -21,6 +21,5 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         $this->_options['min'] = $this->_params->getInt('min', 0);
         $this->_options['max'] = $this->_params->getInt('max', 100);
         $this->_options['step'] = $this->_params->getInt('step', 1);
-        parent::_setup();
     }
 }

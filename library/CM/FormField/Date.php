@@ -40,6 +40,5 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     protected function _setup() {
         $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
         $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
-        parent::_setup();
     }
 }
