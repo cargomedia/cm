@@ -119,6 +119,14 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
         CMTest_TH::clearConfig();
     }
+
+    public function testWithoutPersistenceDelete() {
+        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
+        $test = new CM_Model_Splittest_Mock('foo');
+        $test->delete();
+
+        CMTest_TH::clearConfig();
+    }
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
