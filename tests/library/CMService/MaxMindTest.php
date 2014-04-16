@@ -822,6 +822,97 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testRemoveRegion_codeInUse() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+                array('FR', '99', 'Basse-Normandie'),
+                array('US', 'CA', 'California'),
+                array('US', 'HI', 'Hawaii'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('436884', 'FR', '99', '', '', '49.1972', '-0.3268'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
+                array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
+                array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FR99', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 3, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id' => 2, 'stateId' => 3, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
+                array('id'       => 3, 'stateId' => 3, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(
+                array('FR', 'A7', 'Basse-Normandie'),
+                array('US', 'CA', 'Hawaii'),
+                array('US', 'NV', 'Nevada'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.1972', '-0.3268'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('223', 'US', '', '', '', '38', '-97'),
+                array('14550', 'US', 'CA', '', '', '21.3629', '-157.8727'),
+                array('8029', 'US', 'NV', '', '', '36.175', '-115.1372'),
+                array('11101', 'US', 'NV', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('11532', 'US', '', 'Los Angeles', '', '34.0522', '-118.2437'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
+                array('id' => 5, 'countryId' => 2, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id'       => 2, 'stateId' => null, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244,
+                      '_maxmind' => 11532),
+                array('id'       => 3, 'stateId' => 5, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                      '_maxmind' => 11101),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
     public function testUpdateRegionCode() {
         $this->_import(
             array(
