@@ -752,7 +752,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $countriesFileContents = $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv', self::COUNTRY_URL);
 
         $this->_writeln('Reading new country listing…');
-        $countryData = array('Netherlands Antilles', 'AN'); // Adding missing records
+        $countryData = array();
+        $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
         $rows = preg_split('#[\r\n]++#', $countriesFileContents);
         foreach ($rows as $i => $row) {
             if ($i === 0) {
