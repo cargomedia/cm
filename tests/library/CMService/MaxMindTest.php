@@ -904,8 +904,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('23653', 'US', 'NV', 'Very Long Beach', '', '33.767', '-118.1892'),
                 array('11532', 'US', '', 'Los Angeles', '', '34.0522', '-118.2437'),
                 array('11101', 'US', 'NV', 'San Francisco', '', '37.7749', '-122.4194'),
-                array('412930', 'VN', '44', '', '', '21.033', '105.85'),
                 array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
+                array('412930', 'VN', '44', '', '', '21.033', '105.85'),
             ),
             array()
         );
