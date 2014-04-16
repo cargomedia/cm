@@ -827,12 +827,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('France', 'FR'),
                 array('United States', 'US'),
+                array('Viet Nam', 'VN'),
             ),
             array(
                 array('FR', 'A7', 'Haute-Normandie'),
                 array('FR', '99', 'Basse-Normandie'),
                 array('US', 'CA', 'California'),
                 array('US', 'HI', 'Hawaii'),
+                array('VN', '44', 'Dac Lac'),
+                array('VN', '51', 'Ha Noi'),
             ),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
@@ -846,6 +849,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
+                array('46410', 'VN', '44', '', '', '21.033', '105.85'),
+                array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
+                array('412930', 'VN', '51', '', '', '21.033', '105.85'),
             ),
             array()
         );
@@ -853,12 +859,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
                 array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+                array('id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam'),
             ),
             array(
                 array('id' => 1, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FR99', 'abbreviation' => null),
                 array('id' => 2, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
                 array('id' => 3, 'countryId' => 2, 'name' => 'California', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
                 array('id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USHI', 'abbreviation' => 'HI'),
+                array('id' => 5, 'countryId' => 3, 'name' => 'Dac Lac', '_maxmind' => 'VN44', 'abbreviation' => null),
+                array('id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN51', 'abbreviation' => null),
             ),
             array(
                 array('id' => 1, 'stateId' => 2, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
@@ -867,6 +876,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 4, 'stateId' => 3, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
                 array('id'       => 5, 'stateId' => 3, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
+                array('id' => 6, 'stateId' => 5, 'countryId' => 3, 'name' => 'Hanoi', 'lat' => 21.033, 'lon' => 105.85, '_maxmind' => 46418),
             ),
             array(),
             array(),
@@ -876,11 +886,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('France', 'FR'),
                 array('United States', 'US'),
+                array('Viet Nam', 'VN'),
             ),
             array(
                 array('FR', 'A7', 'Basse-Normandie'),
                 array('US', 'CA', 'Hawaii'),
                 array('US', 'NV', 'Nevada'),
+                array('VN', '44', 'Ha Noi'),
             ),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
@@ -892,6 +904,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('23653', 'US', 'NV', 'Very Long Beach', '', '33.767', '-118.1892'),
                 array('11532', 'US', '', 'Los Angeles', '', '34.0522', '-118.2437'),
                 array('11101', 'US', 'NV', 'San Francisco', '', '37.7749', '-122.4194'),
+                array('412930', 'VN', '44', '', '', '21.033', '105.85'),
+                array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
             ),
             array()
         );
@@ -899,21 +913,24 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
                 array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+                array('id' => 3, 'abbreviation' => 'VN', 'name' => 'Viet Nam'),
             ),
             array(
                 array('id' => 1, 'countryId' => 1, 'name' => 'Basse-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
                 array('id' => 4, 'countryId' => 2, 'name' => 'Hawaii', '_maxmind' => 'USCA', 'abbreviation' => 'CA'),
-                array('id' => 5, 'countryId' => 2, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
+                array('id' => 6, 'countryId' => 3, 'name' => 'Ha Noi', '_maxmind' => 'VN44', 'abbreviation' => null),
+                array('id' => 7, 'countryId' => 2, 'name' => 'Nevada', '_maxmind' => 'USNV', 'abbreviation' => 'NV'),
             ),
             array(
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
                 array('id' => 2, 'stateId' => 4, 'countryId' => 2, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5718),
-                array('id'       => 3, 'stateId' => 5, 'countryId' => 2, 'name' => 'Very Long Beach', 'lat' => 33.767, 'lon' => -118.189,
+                array('id'       => 3, 'stateId' => 7, 'countryId' => 2, 'name' => 'Very Long Beach', 'lat' => 33.767, 'lon' => -118.189,
                       '_maxmind' => 23653),
                 array('id'       => 4, 'stateId' => null, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244,
                       '_maxmind' => 11532),
-                array('id'       => 5, 'stateId' => 5, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
+                array('id'       => 5, 'stateId' => 7, 'countryId' => 2, 'name' => 'San Francisco', 'lat' => 37.7749, 'lon' => -122.419,
                       '_maxmind' => 11101),
+                array('id' => 6, 'stateId' => 6, 'countryId' => 3, 'name' => 'Hanoi', 'lat' => 21.033, 'lon' => 105.85, '_maxmind' => 46418),
             ),
             array(),
             array(),
