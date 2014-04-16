@@ -265,8 +265,8 @@ var CM_App = CM_Class_Abstract.extend({
       }
       var messages = _.toArray(arguments);
       messages.unshift('[CM]');
-      if (console && console.log) {
-        var log = console.log;
+      if (window.console && window.console.log) {
+        var log = window.console.log;
         if (typeof log == "object" && Function.prototype.bind) {
           log = Function.prototype.bind.call(console.log, console);
         }
@@ -589,8 +589,8 @@ var CM_App = CM_Class_Abstract.extend({
         handler.focus.add(handler.getId());
         handler._hasFocus = true;
       }).blur(function() {
-          handler._hasFocus = false;
-        });
+        handler._hasFocus = false;
+      });
       this.title.ready();
     },
 
@@ -634,6 +634,24 @@ var CM_App = CM_Class_Abstract.extend({
      */
     hint: function(content) {
       $.windowHint(content);
+    },
+
+    fastScroll: {
+      /** @var {FastScroll|Null} */
+      _instance: null,
+
+      enable: function() {
+        if (!this._instance) {
+          this._instance = new FastScroll();
+        }
+      },
+
+      disable: function() {
+        if (this._instance) {
+          this._instance.destroy();
+          this._instance = null;
+        }
+      }
     },
 
     title: {
@@ -742,20 +760,20 @@ var CM_App = CM_Class_Abstract.extend({
         }
       }
     }).fail(function(xhr, textStatus) {
-        if (xhr.status === 0) {
-          return; // Ignore interrupted ajax-request caused by leaving a page
-        }
+      if (xhr.status === 0) {
+        return; // Ignore interrupted ajax-request caused by leaving a page
+      }
 
-        var msg = cm.language.get('An unexpected connection problem occurred.');
-        if (cm.options.debug) {
-          msg = xhr.responseText || textStatus;
-        }
-        errorHandler(msg, null, false, callbacks.error);
-      }).always(function() {
-        if (callbacks.complete) {
-          callbacks.complete();
-        }
-      });
+      var msg = cm.language.get('An unexpected connection problem occurred.');
+      if (cm.options.debug) {
+        msg = xhr.responseText || textStatus;
+      }
+      errorHandler(msg, null, false, callbacks.error);
+    }).always(function() {
+      if (callbacks.complete) {
+        callbacks.complete();
+      }
+    });
 
     return jqXHR;
   },
@@ -1032,9 +1050,7 @@ var CM_App = CM_Class_Abstract.extend({
           skipInitialFire = false;
           return;
         }
-        var location = window.history.location || document.location;
-        var fragment = location.pathname + location.search;
-        cm.getLayout().loadPage(location.pathname + location.search);
+        router._handleLocationChange(router._getFragment());
       });
 
       var hash = window.location.hash.substr(1);
@@ -1081,12 +1097,14 @@ var CM_App = CM_Class_Abstract.extend({
         window.location.assign(url);
         return;
       }
-      if (replaceState) {
-        this.replaceState(fragment);
-      } else {
-        this.pushState(fragment);
+      if (fragment !== this._getFragment()) {
+        if (replaceState) {
+          this.replaceState(fragment);
+        } else {
+          this.pushState(fragment);
+        }
       }
-      cm.getLayout().loadPage(fragment);
+      this._handleLocationChange(fragment);
     },
 
     /**
@@ -1101,6 +1119,67 @@ var CM_App = CM_Class_Abstract.extend({
      */
     replaceState: function(url) {
       window.history.replaceState(null, null, url);
+    },
+
+    /**
+     * @returns Location
+     */
+    _getLocation: function() {
+      return window.history.location || document.location;
+    },
+
+    /**
+     * @returns string
+     */
+    _getFragment: function() {
+      var location = this._getLocation();
+      return location.pathname + location.search;
+    },
+
+    /**
+     * @param {String} fragment
+     * @returns Location
+     */
+    _getLocationByFragment: function(fragment) {
+      var location = document.createElement('a');
+      if (fragment) {
+        location.href = fragment;
+      }
+      return location;
+    },
+
+    /**
+     * @param {String} fragment
+     */
+    _handleLocationChange: function(fragment) {
+      var paramsStateNext = null;
+      var pageCurrent = cm.getLayout().findPage();
+
+      if (pageCurrent && pageCurrent.hasStateParams()) {
+        var locationCurrent = this._getLocationByFragment(pageCurrent.getFragment());
+        var locationNext = this._getLocationByFragment(fragment);
+
+        if (locationCurrent.pathname === locationNext.pathname) {
+          var paramsCurrent = queryString.parse(locationCurrent.search);
+          var paramsNext = queryString.parse(locationNext.search);
+
+          var stateParamNames = pageCurrent.getStateParams();
+
+          var paramsNonStateCurrent = _.pick(paramsCurrent, _.difference(_.keys(paramsCurrent), stateParamNames));
+          var paramsNonStateNext = _.pick(paramsNext, _.difference(_.keys(paramsNext), stateParamNames));
+
+          if (_.isEqual(paramsNonStateCurrent, paramsNonStateNext)) {
+            paramsStateNext = _.pick(paramsNext, _.intersection(_.keys(paramsNext), stateParamNames));
+          }
+        }
+      }
+
+      if (paramsStateNext) {
+        if (false !== cm.getLayout().getPage().routeToState(paramsStateNext, fragment)) {
+          return;
+        }
+      }
+      cm.getLayout().loadPage(fragment);
     }
   }
 });

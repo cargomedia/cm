@@ -226,6 +226,22 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param CM_Response_View_Ajax $response
+     * @param string|null           $type
+     * @param string|null           $message
+     */
+    public static function assertAjaxResponseError(CM_Response_View_Ajax $response, $type = null, $message = null) {
+        $responseContent = json_decode($response->getContent(), true);
+        self::assertArrayHasKey('error', $responseContent, 'AjaxCall successful');
+        if (null !== $type) {
+            self::assertSame($type, $responseContent['error']['type']);
+        }
+        if (null !== $message) {
+            self::assertSame($message, $responseContent['error']['msg']);
+        }
+    }
+
+    /**
      *
      * @param array $needles
      * @param array $haystacks

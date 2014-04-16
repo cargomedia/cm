@@ -1,11 +1,11 @@
-<ul class="tabs menu-tabs">
+<ul class="tabs menu-tabs example-navigation">
   {block name="tabs"}
-    <li><a href="javascript:;">Components</a></li>
-    <li><a href="javascript:;">Menus</a></li>
-    <li><a href="javascript:;">Buttons</a></li>
-    <li><a href="javascript:;">Forms</a></li>
-    <li><a href="javascript:;">Variables</a></li>
-    <li><a href="javascript:;">Icons</a></li>
+    <li data-tab="components"><a href="{linkUrl page='CM_Page_Example' tab='components'}">Components</a></li>
+    <li data-tab="menus"><a href="{linkUrl page='CM_Page_Example' tab='menus'}">Menus</a></li>
+    <li data-tab="button"><a href="{linkUrl page='CM_Page_Example' tab='button'}">Buttons</a></li>
+    <li data-tab="forms"><a href="{linkUrl page='CM_Page_Example' tab='forms'}">Forms</a></li>
+    <li data-tab="variables"><a href="{linkUrl page='CM_Page_Example' tab='variables'}">Variables</a></li>
+    <li data-tab="icons"><a href="{linkUrl page='CM_Page_Example' tab='icons'}">Icons</a></li>
   {/block}
 </ul>
 
