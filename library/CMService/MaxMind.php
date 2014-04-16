@@ -334,6 +334,31 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_zipCodeListByCityRemoved = array();
         $cityIdListUpdatedCode = array();
 
+        // Merge contents of deleted regions into the regions that are going to replace them
+        foreach ($this->_regionListByCountryRemovedCodeInUse as $countryCode => $regionListRemovedCodeInUse) {
+            foreach ($regionListRemovedCodeInUse as $regionIdOld => $regionCodeOld) {
+                $regionCode = null;
+                foreach ($this->_regionListByCountryUpdatedCode[$countryCode] as $regionCode => $regionCodeUpdated) {
+                    if ($regionCodeUpdated == $regionCodeOld) {
+                        break;
+                    }
+                }
+                foreach ($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['cities'] as $cityName => $cityData) {
+                    if (!isset($this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName])) {
+                        $this->_locationTreeOld[$countryCode]['regions'][$regionCode]['cities'][$cityName] = $cityData;
+                    }
+                }
+                foreach ($this->_cityListByRegionOld[$countryCode][$regionCodeOld] as $cityCode => $cityName) {
+                    if (!isset($this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode])) {
+                        $this->_cityListByRegionOld[$countryCode][$regionCode][$cityCode] = $cityName;
+                    }
+                }
+                unset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]);
+                unset($this->_cityListByRegionOld[$countryCode][$regionCodeOld]);
+                unset($this->_regionListByCountryOld[$countryCode][$regionCodeOld]);
+            }
+        }
+
         // Look for cities without region in countries that have been added
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
             $regionCode = null;
@@ -377,8 +402,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
 
         // Look for changes in countries that have been kept
-        $countryCodeList = array_keys($this->_locationTree);
-        $countryCodeListOld = array_keys($this->_locationTreeOld);
+        $countryCodeList = array_keys($this->_countryList);
+        $countryCodeListOld = array_keys($this->_countryListOld);
         $countryCodeListKept = array_intersect($countryCodeList, $countryCodeListOld);
         foreach ($countryCodeListKept as $countryCode) {
             if (isset($this->_countryList[$countryCode])) {
@@ -390,8 +415,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
             // Look for changes in regions that have been kept
 
             // Retrieve the right region if its code has been updated
-            $regionCodeList = isset($this->_locationTree[$countryCode]['regions']) ? array_keys($this->_locationTree[$countryCode]['regions']) : array();
-            $regionCodeListOld = isset($this->_locationTreeOld[$countryCode]['regions']) ? array_keys($this->_locationTreeOld[$countryCode]['regions']) : array();
+            $regionCodeList = isset($this->_regionListByCountry[$countryCode]) ? array_keys($this->_regionListByCountry[$countryCode]) : array();
+            $regionCodeListOld = isset($this->_regionListByCountryOld[$countryCode]) ? array_keys($this->_regionListByCountryOld[$countryCode]) : array();
             $regionCodeList[] = null;
             $regionCodeListOld[] = null;
             $regionCodeListOldByNewCode = array();
@@ -1372,12 +1397,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $regionName .= ' (' . $regionCode . ')';
             }
             return $regionName;
-        } elseif (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'])) {
-            $regionName = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['name'];
-            if ($explicit) {
-                $regionName .= ' (' . $regionCode . ')';
-            }
-            return $regionName;
         } elseif (strlen($regionCode)) {
             return 'Region ' . $regionCode;
         } else {
@@ -1394,12 +1413,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
     private function _getRegionNameOld($countryCode, $regionCodeOld, $explicit = null) {
         if (isset($this->_regionListByCountryOld[$countryCode][$regionCodeOld])) {
             $regionNameOld = $this->_regionListByCountryOld[$countryCode][$regionCodeOld];
-            if ($explicit) {
-                $regionNameOld .= ' (' . $regionCodeOld . ')';
-            }
-            return $regionNameOld;
-        } elseif (isset($this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'])) {
-            $regionNameOld = $this->_locationTreeOld[$countryCode]['regions'][$regionCodeOld]['location']['name'];
             if ($explicit) {
                 $regionNameOld .= ' (' . $regionCodeOld . ')';
             }
