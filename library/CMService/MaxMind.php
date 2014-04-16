@@ -15,7 +15,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected $_outputStream;
 
     /** @var bool */
-    protected $_verbose;
+    protected $_withoutIpBlocks, $_verbose;
 
     /** @var array */
     protected
@@ -32,11 +32,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
     /**
      * @param string|null                    $geoIpFile
      * @param CM_OutputStream_Interface|null $outputStream
+     * @param bool|null                      $withoutIpBlocks
      * @param bool|null                      $verbose
      */
-    public function __construct($geoIpFile = null, CM_OutputStream_Interface $outputStream = null, $verbose = null) {
+    public function __construct($geoIpFile = null, CM_OutputStream_Interface $outputStream = null, $withoutIpBlocks = null, $verbose = null) {
         $this->_setGeoIpFile($geoIpFile);
         $this->_outputStream = $outputStream;
+        $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
         $this->_verbose = (bool) $verbose;
     }
 
@@ -1259,6 +1261,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _upgradeIpBlocks() {
+        if ($this->_withoutIpBlocks) {
+            return;
+        }
         $this->_updateIpBlocks();
         $this->_writeln('Updating IP blocks database…');
         $count = $this->_count(array($this->_ipBlockListByCountry, $this->_ipBlockListByCity), 3);
