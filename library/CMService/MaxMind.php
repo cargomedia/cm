@@ -1180,6 +1180,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 CM_Db_Db::delete('cm_locationState', array('id' => $regionIdOld));
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
                 CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId), array('stateId' => $regionIdOld));
+                $this->_printProgressCounter(++$item, $count);
             }
         }
     }
