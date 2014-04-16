@@ -80,6 +80,13 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
+     * @return string
+     */
+    public function getApplicationName() {
+        return $this->_getConfig()->applicationName;
+    }
+
+    /**
      * @return string Theme
      */
     public function getTheme() {
