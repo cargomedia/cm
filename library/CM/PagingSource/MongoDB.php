@@ -10,7 +10,7 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
     private $_parameters = array();
 
     /**
-     * @param null|array    $fields
+     * @param null|array $fields Array of field which to include/exclude, see http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
      * @param string        $collection
      * @param array         $query
      * @param array         $parameters
@@ -29,21 +29,17 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
     }
 
     public function getCount($offset = null, $count = null) {
-        $mdb = CM_Services::getInstance()->getMongoDB()->getDatabase();
-        return $mdb->{$this->_collection}->count($this->_query);
+        $mdb = CM_Services::getInstance()->getMongoDB();
+        return $mdb->count($this->_collection, $this->_query);
     }
 
     public function getItems($offset = null, $count = null) {
-        $mdb = CM_Services::getInstance()->getMongoDB()->getDatabase();
+        $mdb = CM_Services::getInstance()->getMongoDB();
         $result = array();
-        $cursor = $mdb->{$this->_collection}->find($this->_query);
+        $cursor = $mdb->find($this->_collection, $this->_query, $this->_fields);
         foreach ($cursor as $item) {
             $item['id'] = $item['_id'];
-            if ($this->_fieldFilter) {
-                $result[] = array_intersect_key($item, $this->_fieldFilter);
-            } else {
-                $result[] = $item;
-            }
+            $result[] = $item;
         }
 
         if ($this->_processItemCallback !== null) {

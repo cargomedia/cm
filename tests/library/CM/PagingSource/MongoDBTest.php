@@ -2,6 +2,7 @@
 
 class CM_PagingSource_MongoDB_Test extends CMTest_TestCase {
 
+    /** @var CM_Service_MongoDB $_mongodb */
     private $_mongodb;
     private $_collection = 'unitTest';
 
@@ -34,28 +35,27 @@ class CM_PagingSource_MongoDB_Test extends CMTest_TestCase {
     }
 
     public function setUp() {
-        $this->_mongodb = CM_Services::getInstance()->getMongoDB()->getDatabase();
+        $this->_mongodb = CM_Services::getInstance()->getMongoDB();
         $this->tearDown(); // cleanup all failed tests leftovers
 
-        $collection = $this->_mongodb->{$this->_collection};
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
-        $collection->insert($this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
+        $this->_mongodb->insert($this->_collection, $this->_getConversationObject());
 
         $sentConversation = $this->_getConversationObject();
         $sentConversation['userId'] = 1001;
         $sentConversation['recipients'][0]['userId'] = 1001;
         $sentConversation['recipients'][0]['sentStamp'] = 123123;
         $sentConversation['messages'][] = 'testing';
-        $collection->insert($sentConversation);
+        $this->_mongodb->insert($this->_collection, $sentConversation);
     }
 
     public function tearDown() {
-        $this->_mongodb->{$this->_collection}->drop();
+        $this->_mongodb->drop($this->_collection);
     }
 
     public function testCount() {
