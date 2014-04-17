@@ -1,65 +1,65 @@
 html.floatbox-active {
-	overflow: hidden;
+  overflow: hidden;
 }
 
 html.ieMobile {
-	height: 100%;
+  height: 100%;
 }
 
 html.ieMobile body {
-	overflow: hidden;
-	height: 100%;
+  overflow: hidden;
+  height: 100%;
 }
 
 #floatbox-viewport {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	width: 100%;
-	z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 100;
 }
 
 .floatbox-layer {
-	position: absolute;
-	top: 0;
-	left: 0;
-	min-height: 100%;
-	width: 100%;
-	z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  width: 100%;
+  z-index: 1;
 }
 
 .floatbox-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	min-height: 100%;
-	width: 100%;
-	background-color: #000000;
-	opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  width: 100%;
+  background-color: #000000;
+  opacity: 0;
 }
 
 .floatbox-overlay.fadeIn {
-	opacity: 0.8;
+  opacity: 0.8;
 }
 
 .floatbox-container {
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	height: 100%;
-	overflow: auto;
-	text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  overflow: auto;
+  text-align: center;
 }
 
 .floatbox {
-	position: relative;
-	opacity: 0;
-	max-width: 100%;
-	text-align: left;
-	display: inline-block;
+  position: relative;
+  opacity: 0;
+  max-width: 100%;
+  text-align: left;
+  display: inline-block;
 }
 
 .floatbox-body > * {
@@ -67,19 +67,19 @@ html.ieMobile body {
 }
 
 .floatbox.fadeIn {
-	opacity: 1;
+  opacity: 1;
 }
 
 .floatbox.fullscreen {
-	width: 100%;
-	display: block;
+  width: 100%;
+  display: block;
 }
 
 .floatbox.fullscreen .floatbox-body {
-	min-height: 100%;
+  min-height: 100%;
 }
 
 .floatbox-controls {
-	position: absolute;
-	top: 0;
+  position: absolute;
+  top: 0;
 }
