@@ -152,12 +152,17 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {Boolean} [skipDomRemoval]
-   * @param {Boolean} [skipTriggerRemove]
+   * @param {Boolean} [skipDomRemoval]  Internal use only
    */
-  remove: function(skipDomRemoval, skipTriggerRemove) {
+  remove: function(skipDomRemoval) {
+    this.trigger('destruct');
+
+    if (!skipDomRemoval) {
+      this.$el.detach();  // Detach from DOM to prevent reflows when removing children
+    }
+
     _.each(_.clone(this.getChildren()), function(child) {
-      child.remove(skipDomRemoval, skipTriggerRemove);
+      child.remove(skipDomRemoval);
     });
 
     if (this.getParent()) {
@@ -171,14 +176,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
     delete cm.views[this.getAutoId()];
 
-    this.trigger('destruct');
-    if (!skipTriggerRemove) {
-      this.trigger('remove');
-    }
-
-    if (skipDomRemoval) {
-      this.undelegateEvents();
-    } else {
+    if (!skipDomRemoval) {
       this.$el.remove();
     }
 
@@ -190,8 +188,15 @@ var CM_View_Abstract = Backbone.View.extend({
    */
   replaceWith: function(view) {
     this.getParent().registerChild(view);
-    this.$el.replaceWith(view.$el);
-    this.remove(true, true);
+    this.replaceWithHtml(view.$el);
+  },
+
+  /**
+   * @param {jQuery} $html
+   */
+  replaceWithHtml: function($html) {
+    this.remove(true);
+    this.$el.replaceWith($html);
   },
 
   disable: function() {
