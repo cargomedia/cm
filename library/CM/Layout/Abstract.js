@@ -39,9 +39,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
-      var page = this.getPage();
-      page.$el.replaceWith(this._$pagePlaceholder);
-      page.remove(true);
+      this.getPage().replaceWithHtml(this._$pagePlaceholder);
       this._onPageTeardown();
     } else {
       this._$pagePlaceholder.removeClass('error').html('');
