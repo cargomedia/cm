@@ -70,8 +70,6 @@ class CM_Service_MongoDB {
      * @return array
      */
     public function findOne($collection, $query, $fields = null) {
-        $e = new Exception();
-
         $fields = ($fields !== null) ? $fields : array();
         CM_Debug::getInstance()->incStats('mongo',
             "findOne in {$collection}: " . serialize(array('fields' => $fields) + $query));
