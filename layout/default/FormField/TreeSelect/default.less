@@ -1,95 +1,95 @@
 & {
-	position: relative;
+  position: relative;
 }
 
 .selector {
-	.label {
-		display: inline-block;
-		text-align: left;
-	}
-	.icon {
-		font-size: 11px;
-	}
+  .label {
+    display: inline-block;
+    text-align: left;
+  }
+  .icon {
+    font-size: 11px;
+  }
 }
 
 .options {
-	display: none;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	padding-right: 10px;
-	max-height: 500px;
-	overflow-y: auto;
-	border: 1px solid @colorBgEmphasize3;
-	background-color: white;
-	z-index: 1;
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding-right: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid @colorBgEmphasize3;
+  background-color: white;
+  z-index: 1;
 
-	ul {
-		padding-left: 14px;
-	}
+  ul {
+    padding-left: 14px;
+  }
 
-	ul ul {
-		display: none;
-	}
+  ul ul {
+    display: none;
+  }
 
-	li {
-		padding: 4px;
-		position: relative;
+  li {
+    padding: 4px;
+    position: relative;
 
-		.icon-arrow-right {
-			position: absolute;
-			display: none;
-			left: -10px;
-			top: 4px;
-			font-size: .8em;
-		}
+    .icon-arrow-right {
+      position: absolute;
+      display: none;
+      left: -10px;
+      top: 4px;
+      font-size: .8em;
+    }
 
-		.node {
-			cursor: pointer;
-			.nowrap;
+    .node {
+      cursor: pointer;
+      .nowrap;
 
-			&:hover {
-				text-decoration: underline;
-			}
+      &:hover {
+        text-decoration: underline;
+      }
 
-			&.selected {
-				font-weight: bold;
-			}
-		}
+      &.selected {
+        font-weight: bold;
+      }
+    }
 
-		&.unselect {
-			cursor: pointer;
-			color: @colorFgLinkLight;
-			.nowrap;
-		}
+    &.unselect {
+      cursor: pointer;
+      color: @colorFgLinkSubtle;
+      .nowrap;
+    }
 
-		.count {
-			display: none;
-		}
-	}
+    .count {
+      display: none;
+    }
+  }
 
-	li.hasChildren {
-		> .icon-arrow-right, > .node .count {
-			display: inline-block;
-		}
+  li.hasChildren {
+    > .icon-arrow-right, > .node .count {
+      display: inline-block;
+    }
 
-		.icon-arrow-right {
-			cursor: pointer;
+    .icon-arrow-right {
+      cursor: pointer;
 
-			&:hover {
-				color: @colorFgIconHover;
-			}
-		}
-	}
+      &:hover {
+        color: @colorFgHeading;
+      }
+    }
+  }
 
-	li.active {
-		> ul {
-			display: block;
-		}
+  li.active {
+    > ul {
+      display: block;
+    }
 
-		> .icon-arrow-right {
-			.transform(rotate(90deg));
-			color: @colorFgIconHover;
-		}
-	}
+    > .icon-arrow-right {
+      .transform(rotate(90deg));
+      color: @colorFgHeading;
+    }
+  }
 }

@@ -1,32 +1,32 @@
 .floatbox-controls {
-	right: 1px;
-	top: 1px;
+  right: 1px;
+  top: 1px;
 
-	.icon-close {
-		display: inline-block;
-		padding: 6px;
-		float: right;
-		color: @colorFgIcon;
-		line-height: 1;
-		font-size: 20px;
+  .icon-close {
+    display: inline-block;
+    padding: 6px;
+    float: right;
+    color: @colorFgSubtle;
+    line-height: 1;
+    font-size: 20px;
 
-		&:hover {
-			color: @colorClose;
-			text-decoration: none;
-		}
-	}
+    &:hover {
+      color: @colorClose;
+      text-decoration: none;
+    }
+  }
 }
 
 .floatbox-overlay {
-	.transition(200ms);
+  .transition(200ms);
 }
 
 .floatbox {
-	.transform(scale(.5, .5));
-	transition: transform 200ms;
-	-webkit-transition: -webkit-transform 200ms;
+  .transform(scale(.5, .5));
+  transition: transform 200ms;
+  -webkit-transition: -webkit-transform 200ms;
 
-	&.fadeIn {
-		.transform(scale(1, 1));
-	}
+  &.fadeIn {
+    .transform(scale(1, 1));
+  }
 }

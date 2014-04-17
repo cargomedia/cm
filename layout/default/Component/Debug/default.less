@@ -1,83 +1,83 @@
 .debugBar {
-	position: fixed;
-	z-index: 9999;
-	bottom: 0;
-	left: 0;
-	.transform(translate3d(-100%, 0, 0));
-	background-color: lighten(@colorNotice, 40);
-	border-left: 5px solid @colorNotice;
-	white-space: nowrap;
+  position: fixed;
+  z-index: 9999;
+  bottom: 0;
+  left: 0;
+  .transform(translate3d(-100%, 0, 0));
+  background-color: lighten(@colorNotice, 40);
+  border-left: 5px solid @colorNotice;
+  white-space: nowrap;
 
-	> .panel {
-		display: inline-block;
-		height: 22px;
-		margin-right: -4px;
-		line-height: 22px;
-		padding: 0 8px;
-		border-top: 1px solid @colorNotice;
-		border-right: 1px solid @colorNotice;
-		color: @colorFg;
+  > .panel {
+    display: inline-block;
+    height: 22px;
+    margin-right: -4px;
+    line-height: 22px;
+    padding: 0 8px;
+    border-top: 1px solid @colorNotice;
+    border-right: 1px solid @colorNotice;
+    color: @colorFg;
 
-		&:hover, &.active {
-			background-color: @colorNotice;
-			color: @colorFgTheme;
-			text-decoration: none;
+    &:hover, &.active {
+      background-color: @colorNotice;
+      color: @colorFgTheme;
+      text-decoration: none;
 
-			.count {
-				color: @colorFg;
-			}
-		}
+      .count {
+        color: @colorFg;
+      }
+    }
 
-		.count {
-			color: @colorFgShy;
-		}
+    .count {
+      color: @colorFgSubtle;
+    }
 
-		&.actions {
-			text-transform: uppercase;
-		}
-	}
+    &.actions {
+      text-transform: uppercase;
+    }
+  }
 
-	.window {
-		display: none;
-		box-sizing: border-box;
-		position: absolute;
-		left: 0;
-		bottom: 100%;
-		margin-bottom: -1px;
-		max-height: 500px;
-		width: 100%;
-		padding: 5px;
-		overflow: auto;
-		background-color: lighten(@colorNotice, 45);
-		border: 1px solid @colorNotice;
-		white-space: nowrap;
+  .window {
+    display: none;
+    box-sizing: border-box;
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    margin-bottom: -1px;
+    max-height: 500px;
+    width: 100%;
+    padding: 5px;
+    overflow: auto;
+    background-color: lighten(@colorNotice, 45);
+    border: 1px solid @colorNotice;
+    white-space: nowrap;
 
-		li {
-			padding: 2px;
+    li {
+      padding: 2px;
 
-			&:nth-child(odd) {
-				background-color: lighten(@colorNotice, 42);
-			}
+      &:nth-child(odd) {
+        background-color: lighten(@colorNotice, 42);
+      }
 
-			.entryList {
-				li:not(:first-child) {
-					padding-left: 12px;
-				}
-			}
-		}
-	}
+      .entryList {
+        li:not(:first-child) {
+          padding-left: 12px;
+        }
+      }
+    }
+  }
 
-	.debugIndication {
-		position: absolute;
-		display: block;
-		top: 0;
-		right: 0;
-		.transform(translate3d(100%, 0, 0));
-		padding: 0 5px;
-		line-height: 22px;
-		background-color: @colorNotice;
-		color: @colorFgTheme;
-		border-top: 1px solid @colorNotice;
-		border-left: 1px solid @colorNotice;
-	}
+  .debugIndication {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    .transform(translate3d(100%, 0, 0));
+    padding: 0 5px;
+    line-height: 22px;
+    background-color: @colorNotice;
+    color: @colorFgTheme;
+    border-top: 1px solid @colorNotice;
+    border-left: 1px solid @colorNotice;
+  }
 }

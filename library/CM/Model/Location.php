@@ -2,136 +2,136 @@
 
 class CM_Model_Location extends CM_Model_Abstract {
 
-	const LEVEL_COUNTRY = 1;
-	const LEVEL_STATE = 2;
-	const LEVEL_CITY = 3;
-	const LEVEL_ZIP = 4;
+    const LEVEL_COUNTRY = 1;
+    const LEVEL_STATE = 2;
+    const LEVEL_CITY = 3;
+    const LEVEL_ZIP = 4;
 
-	/**
-	 * @param int $level A LEVEL_*-const
-	 * @param int $id
-	 */
-	public function __construct($level, $id) {
-		$this->_construct(array('id' => $id, 'level' => $level));
-	}
+    /**
+     * @param int $level A LEVEL_*-const
+     * @param int $id
+     */
+    public function __construct($level, $id) {
+        $this->_construct(array('id' => $id, 'level' => $level));
+    }
 
-	/**
-	 * @param int    $level
-	 * @param string $key
-	 * @return mixed|null
-	 */
-	private function _getField($level, $key) {
-		$level = (int) $level;
-		$fields = $this->_get('fields');
-		if (!array_key_exists($level, $fields)) {
-			return null;
-		}
-		if (!array_key_exists($key, $fields[$level])) {
-			return null;
-		}
-		return $fields[$level][$key];
-	}
+    /**
+     * @param int    $level
+     * @param string $key
+     * @return mixed|null
+     */
+    private function _getField($level, $key) {
+        $level = (int) $level;
+        $fields = $this->_get('fields');
+        if (!array_key_exists($level, $fields)) {
+            return null;
+        }
+        if (!array_key_exists($key, $fields[$level])) {
+            return null;
+        }
+        return $fields[$level][$key];
+    }
 
-	/**
-	 * @param int $level
-	 * @return CM_Model_Location|null
-	 */
-	public function get($level) {
-		if (!$this->getId($level)) {
-			return null;
-		}
-		return new self($level, $this->getId($level));
-	}
+    /**
+     * @param int $level
+     * @return CM_Model_Location|null
+     */
+    public function get($level) {
+        if (!$this->getId($level)) {
+            return null;
+        }
+        return new self($level, $this->getId($level));
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getLevel() {
-		return (int) $this->_getId('level');
-	}
+    /**
+     * @return int
+     */
+    public function getLevel() {
+        return (int) $this->_getIdKey('level');
+    }
 
-	/**
-	 * @param int $level OPTIONAL
-	 * @return int|null
-	 */
-	public function getId($level = null) {
-		if (null === $level) {
-			return (int) $this->_getId('id');
-		}
-		$id = $this->_getField($level, 'id');
-		if (null === $id) {
-			return null;
-		}
-		return (int) $id;
-	}
+    /**
+     * @param int $level OPTIONAL
+     * @return int|null
+     */
+    public function getId($level = null) {
+        if (null === $level) {
+            return (int) $this->_getIdKey('id');
+        }
+        $id = $this->_getField($level, 'id');
+        if (null === $id) {
+            return null;
+        }
+        return (int) $id;
+    }
 
-	/**
-	 * @param int $level OPTIONAL
-	 * @return string|null
-	 */
-	public function getName($level = null) {
-		if (null === $level) {
-			$level = $this->getLevel();
-		}
-		return $this->_getField($level, 'name');
-	}
+    /**
+     * @param int $level OPTIONAL
+     * @return string|null
+     */
+    public function getName($level = null) {
+        if (null === $level) {
+            $level = $this->getLevel();
+        }
+        return $this->_getField($level, 'name');
+    }
 
-	/**
-	 * @param int $level OPTIONAL
-	 * @return string|null
-	 */
-	public function getAbbreviation($level = null) {
-		if (null === $level) {
-			$level = $this->getLevel();
-		}
-		return $this->_getField($level, 'abbreviation');
-	}
+    /**
+     * @param int $level OPTIONAL
+     * @return string|null
+     */
+    public function getAbbreviation($level = null) {
+        if (null === $level) {
+            $level = $this->getLevel();
+        }
+        return $this->_getField($level, 'abbreviation');
+    }
 
-	/**
-	 * @return float[]|null
-	 */
-	public function getCoordinates() {
-		for ($level = $this->getLevel(); $level >= self::LEVEL_CITY; $level--) {
-			$lat = $this->_getField($level, 'lat');
-			$lon = $this->_getField($level, 'lon');
-			if ($lat && $lon) {
-				return array('lat' => (float) $lat, 'lon' => (float) $lon);
-			}
-		}
-		return null;
-	}
+    /**
+     * @return float[]|null
+     */
+    public function getCoordinates() {
+        for ($level = $this->getLevel(); $level >= self::LEVEL_CITY; $level--) {
+            $lat = $this->_getField($level, 'lat');
+            $lon = $this->_getField($level, 'lon');
+            if ($lat && $lon) {
+                return array('lat' => (float) $lat, 'lon' => (float) $lon);
+            }
+        }
+        return null;
+    }
 
-	/**
-	 * @param CM_Model_Location $location
-	 * @return int|null
-	 */
-	public function getDistance(CM_Model_Location $location) {
-		$currentCoordinates = $this->getCoordinates();
-		$againstCoordinates = $location->getCoordinates();
+    /**
+     * @param CM_Model_Location $location
+     * @return int|null
+     */
+    public function getDistance(CM_Model_Location $location) {
+        $currentCoordinates = $this->getCoordinates();
+        $againstCoordinates = $location->getCoordinates();
 
-		if (!$currentCoordinates || !$againstCoordinates) {
-			return null;
-		}
+        if (!$currentCoordinates || !$againstCoordinates) {
+            return null;
+        }
 
-		$pi180 = M_PI / 180;
-		$currentCoordinates['lat'] *= $pi180;
-		$currentCoordinates['lon'] *= $pi180;
-		$againstCoordinates['lat'] *= $pi180;
-		$againstCoordinates['lon'] *= $pi180;
+        $pi180 = M_PI / 180;
+        $currentCoordinates['lat'] *= $pi180;
+        $currentCoordinates['lon'] *= $pi180;
+        $againstCoordinates['lat'] *= $pi180;
+        $againstCoordinates['lon'] *= $pi180;
 
-		$earthRadius = 6371009;
-		$arcCosine = acos(
-			sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
-			+ cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
-		);
+        $earthRadius = 6371009;
+        $arcCosine = acos(
+            sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
+            + cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
+        );
 
-		return (int) round($earthRadius * $arcCosine);
-	}
+        return (int) round($earthRadius * $arcCosine);
+    }
 
-	protected function _loadData() {
-		switch ($this->getLevel()) {
-			case self::LEVEL_ZIP:
-				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
+    protected function _loadData() {
+        switch ($this->getLevel()) {
+            case self::LEVEL_ZIP:
+                $query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
 						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 						`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
@@ -140,82 +140,82 @@ class CM_Model_Location extends CM_Model_Abstract {
 					LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
 					LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
 					WHERE `4`.`id` = ?';
-				break;
-			case self::LEVEL_CITY:
-				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
+                break;
+            case self::LEVEL_CITY:
+                $query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
 						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`,
 						`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`
 					FROM `cm_locationCity` AS `3`
 					LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
 					LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
 					WHERE `3`.`id` = ?';
-				break;
-			case self::LEVEL_STATE:
-				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
+                break;
+            case self::LEVEL_STATE:
+                $query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`,
 						`2`.`id` `2.id`, `2`.`name` `2.name`, `2`.`abbreviation` `2.abbreviation`
 					FROM `cm_locationState` AS `2`
 					LEFT JOIN `cm_locationCountry` AS `1` ON(`2`.`countryId`=`1`.`id`)
 					WHERE `2`.`id` = ?';
-				break;
-			case self::LEVEL_COUNTRY:
-				$query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`
+                break;
+            case self::LEVEL_COUNTRY:
+                $query = 'SELECT `1`.`id` `1.id`, `1`.`name` `1.name`, `1`.`abbreviation` `1.abbreviation`
 					FROM `cm_locationCountry` AS `1`
 					WHERE `1`.`id` = ?';
-				break;
-			default:
-				throw new CM_Exception_Invalid('Invalid level `' . $this->getLevel() . '`.');
-				break;
-		}
+                break;
+            default:
+                throw new CM_Exception_Invalid('Invalid level `' . $this->getLevel() . '`.');
+                break;
+        }
 
-		$row = CM_Db_Db::execRead($query, array($this->getId()))->fetch();
-		if (!$row) {
-			throw new CM_Exception_Invalid('Cannot load location `' . $this->getId() . '` on level `' . $this->getLevel() . '`.');
-		}
-		$fields = array();
-		foreach ($row as $key => $value) {
-			list($level, $field) = explode('.', $key);
-			if (!array_key_exists($level, $fields)) {
-				$fields[$level] = array();
-			}
-			$fields[$level][$field] = $value;
-		}
-		return array('fields' => $fields);
-	}
+        $row = CM_Db_Db::execRead($query, array($this->getId()))->fetch();
+        if (!$row) {
+            throw new CM_Exception_Invalid('Cannot load location `' . $this->getId() . '` on level `' . $this->getLevel() . '`.');
+        }
+        $fields = array();
+        foreach ($row as $key => $value) {
+            list($level, $field) = explode('.', $key);
+            if (!array_key_exists($level, $fields)) {
+                $fields[$level] = array();
+            }
+            $fields[$level][$field] = $value;
+        }
+        return array('fields' => $fields);
+    }
 
-	/**
-	 * @param int $ip
-	 * @return CM_Model_Location|null
-	 */
-	public static function findByIp($ip) {
-		$cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
-		$cache = CM_Cache_Local::getInstance();
-		if ((list($level, $id) = $cache->get($cacheKey)) === false) {
-			$level = $id = null;
-			if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
-				$level = self::LEVEL_CITY;
-			} elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
-				$level = self::LEVEL_COUNTRY;
-			}
-			$cache->set($cacheKey, array($level, $id));
-		}
-		if (!$level && !$id) {
-			return null;
-		}
-		return new self($level, $id);
-	}
+    /**
+     * @param int $ip
+     * @return CM_Model_Location|null
+     */
+    public static function findByIp($ip) {
+        $cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
+        $cache = CM_Cache_Local::getInstance();
+        if ((list($level, $id) = $cache->get($cacheKey)) === false) {
+            $level = $id = null;
+            if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
+                $level = self::LEVEL_CITY;
+            } elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
+                $level = self::LEVEL_COUNTRY;
+            }
+            $cache->set($cacheKey, array($level, $id));
+        }
+        if (!$level && !$id) {
+            return null;
+        }
+        return new self($level, $id);
+    }
 
-	/**
-	 * @param float $lat
-	 * @param float $lon
-	 * @return string[]|null
-	 */
-	public static function findByCoordinates($lat, $lon) {
-		$lat = (float) $lat;
-		$lon = (float) $lon;
-		$searchRadius = 100000;
-		$metersPerDegree = 111100;
+    /**
+     * @param float $lat
+     * @param float $lon
+     * @return CM_Model_Location|null
+     */
+    public static function findByCoordinates($lat, $lon) {
+        $lat = (float) $lat;
+        $lon = (float) $lon;
+        $searchRadius = 100000;
+        $metersPerDegree = 111100;
 
-		$result = CM_Db_Db::execRead("
+        $result = CM_Db_Db::execRead("
 			SELECT `id`, `level`
 			FROM `cm_tmp_location_coordinates`
 			WHERE
@@ -232,75 +232,75 @@ class CM_Model_Location extends CM_Model_Abstract {
 			ORDER BY
 				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
 			LIMIT 1"
-		)->fetch();
+        )->fetch();
 
-		if (!$result) {
-			return null;
-		}
+        if (!$result) {
+            return null;
+        }
 
-		return $result;
-	}
+        return new CM_Model_Location($result['level'], $result['id']);
+    }
 
-	/**
-	 * @param string $db_table
-	 * @param string $db_column
-	 * @param int    $ip
-	 * @return int|false
-	 */
-	private static function _getLocationIdByIp($db_table, $db_column, $ip) {
-		$result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
+    /**
+     * @param string $db_table
+     * @param string $db_column
+     * @param int    $ip
+     * @return int|false
+     */
+    private static function _getLocationIdByIp($db_table, $db_column, $ip) {
+        $result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
 			WHERE `ipEnd` >= ?
 			ORDER BY `ipEnd` ASC
 			LIMIT 1", array($ip))->fetch();
-		if ($result) {
-			if ($result['ipStart'] <= $ip) {
-				return (int) $result[$db_column];
-			}
-		}
-		return false;
-	}
+        if ($result) {
+            if ($result['ipStart'] <= $ip) {
+                return (int) $result[$db_column];
+            }
+        }
+        return false;
+    }
 
-	public function toArray() {
-		return array('level' => $this->getLevel(), 'id' => $this->getId());
-	}
+    public function toArray() {
+        return array('level' => $this->getLevel(), 'id' => $this->getId());
+    }
 
-	public static function fromArray(array $data) {
-		return new self($data['level'], $data['id']);
-	}
+    public static function fromArray(array $data) {
+        return new self($data['level'], $data['id']);
+    }
 
-	public static function getCacheClass() {
-		return 'CM_Model_StorageAdapter_CacheLocal';
-	}
+    public static function getCacheClass() {
+        return 'CM_Model_StorageAdapter_CacheLocal';
+    }
 
-	public static function createUSStatesAbbreviation() {
-		$idUS = CM_Db_Db::select('cm_locationCountry', 'id', array('abbreviation' => 'US'))->fetchColumn();
-		if (false === $idUS) {
-			throw new CM_Exception_Invalid('No country with abbreviation `US` found');
-		}
-		$idUS = (int) $idUS;
+    public static function createUSStatesAbbreviation() {
+        $idUS = CM_Db_Db::select('cm_locationCountry', 'id', array('abbreviation' => 'US'))->fetchColumn();
+        if (false === $idUS) {
+            throw new CM_Exception_Invalid('No country with abbreviation `US` found');
+        }
+        $idUS = (int) $idUS;
 
-		$stateMilitaryId = CM_Db_Db::select('cm_locationState', 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
-																			  'countryId' => $idUS))->fetchColumn();
-		if (false === $stateMilitaryId) {
-			$stateMilitaryId = CM_Db_Db::insert('cm_locationState', array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
-																			'abbreviation' => 'AE'));
-		}
-		$stateMilitaryId = (int) $stateMilitaryId;
+        $stateMilitaryId = CM_Db_Db::select('cm_locationState', 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
+                                                                            'countryId' => $idUS))->fetchColumn();
+        if (false === $stateMilitaryId) {
+            $stateMilitaryId = CM_Db_Db::insert('cm_locationState', array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
+                                                                          'abbreviation' => 'AE'));
+        }
+        $stateMilitaryId = (int) $stateMilitaryId;
 
-		foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
-			CM_Db_Db::update('cm_locationCity', array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
-		}
+        foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
+            CM_Db_Db::update('cm_locationCity', array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
+        }
 
-		foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
-			CM_Db_Db::update('cm_locationState', array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
-		}
+        foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
+            CM_Db_Db::update('cm_locationState', array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
+        }
 
-		self::createAggregation();
-	}
+        self::createAggregation();
+    }
 
-	public static function createAggregation() {
-		CM_Db_Db::truncate('cm_tmp_location');
-		CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+    public static function createAggregation() {
+        CM_Db_Db::truncate('cm_tmp_location');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
 					`1`.`name`, `1`.`abbreviation`, NULL, NULL
 			FROM `cm_locationCountry` AS `1`
@@ -323,8 +323,8 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)');
 
-		CM_Db_Db::truncate('cm_tmp_location_coordinates');
-		CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
+        CM_Db_Db::truncate('cm_tmp_location_coordinates');
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location_coordinates` (`level`,`id`,`coordinates`)
 			SELECT 3, `id`, POINT(lat, lon)
 			FROM `cm_locationCity`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL
@@ -332,125 +332,126 @@ class CM_Model_Location extends CM_Model_Abstract {
 			SELECT 4, `id`, POINT(lat, lon)
 			FROM `cm_locationZip`
 			WHERE `lat` IS NOT NULL AND `lon` IS NOT NULL');
-	}
+    }
 
-	/**
-	 * @param string $name
-	 * @param string $abbreviation
-	 * @return CM_Model_Location
-	 */
-	public static function createCountry ($name, $abbreviation) {
-		$countryId = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => $abbreviation, 'name' => $name));
-		return new self(self::LEVEL_COUNTRY, $countryId);
-	}
+    /**
+     * @param string $name
+     * @param string $abbreviation
+     * @return CM_Model_Location
+     */
+    public static function createCountry($name, $abbreviation) {
+        $countryId = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => $abbreviation, 'name' => $name));
+        return new self(self::LEVEL_COUNTRY, $countryId);
+    }
 
-	/**
-	 * @param CM_Model_Location $parentLocation
-	 * @param string $name
-	 * @param string|null $abbreviation
-	 * @throws CM_Exception_Invalid
-	 * @return CM_Model_Location
-	 */
-	public static function createState (CM_Model_Location $parentLocation, $name, $abbreviation = null) {
-		if ($parentLocation->getLevel() !== CM_Model_Location::LEVEL_COUNTRY) {
-			throw new CM_Exception_Invalid('Need to pass CM_Model_Location::LEVEL_COUNTRY instance');
-		}
-		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
-		$stateId =  CM_Db_Db::insert('cm_locationState', array('countryId' => $countryId, 'name' => $name, 'abbreviation' => $abbreviation));
-		return new self(self::LEVEL_STATE, $stateId);
-	}
+    /**
+     * @param CM_Model_Location $parentLocation
+     * @param string            $name
+     * @param string|null       $abbreviation
+     * @throws CM_Exception_Invalid
+     * @return CM_Model_Location
+     */
+    public static function createState(CM_Model_Location $parentLocation, $name, $abbreviation = null) {
+        if ($parentLocation->getLevel() !== CM_Model_Location::LEVEL_COUNTRY) {
+            throw new CM_Exception_Invalid('Need to pass CM_Model_Location::LEVEL_COUNTRY instance');
+        }
+        $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        $stateId = CM_Db_Db::insert('cm_locationState', array('countryId' => $countryId, 'name' => $name, 'abbreviation' => $abbreviation));
+        return new self(self::LEVEL_STATE, $stateId);
+    }
 
-	/**
-	 * @param CM_Model_Location $parentLocation
-	 * @param string $name
-	 * @param float $latitude
-	 * @param float $longitude
-	 * @return CM_Model_Location
-	 */
-	public static function createCity (CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
-		$stateId = null;
-		$stateId = $parentLocation->getId(self::LEVEL_STATE);
-		$countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
-		$cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
-		return new self(self::LEVEL_CITY, $cityId);
-	}
+    /**
+     * @param CM_Model_Location $parentLocation
+     * @param string            $name
+     * @param float             $latitude
+     * @param float             $longitude
+     * @return CM_Model_Location
+     */
+    public static function createCity(CM_Model_Location $parentLocation, $name, $latitude, $longitude) {
+        $stateId = null;
+        $stateId = $parentLocation->getId(self::LEVEL_STATE);
+        $countryId = $parentLocation->getId(self::LEVEL_COUNTRY);
+        $cityId = CM_Db_Db::insert('cm_locationCity', array('stateId' => $stateId, 'countryId' => $countryId, 'name' => $name, 'lat' => $latitude,
+                                                            'lon'     => $longitude));
+        return new self(self::LEVEL_CITY, $cityId);
+    }
 
-	/**
-	 * @param CM_Model_Location $city
-	 * @param string $name
-	 * @param float $latitude
-	 * @param float $longitude
-	 * @return CM_Model_Location
-	 */
-	public static function createZip (CM_Model_Location $city, $name, $latitude, $longitude) {
-		$cityId = $city->getId(self::LEVEL_CITY);
-		$zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
-		return new self(self::LEVEL_ZIP, $zipId);
-	}
+    /**
+     * @param CM_Model_Location $city
+     * @param string            $name
+     * @param float             $latitude
+     * @param float             $longitude
+     * @return CM_Model_Location
+     */
+    public static function createZip(CM_Model_Location $city, $name, $latitude, $longitude) {
+        $cityId = $city->getId(self::LEVEL_CITY);
+        $zipId = CM_Db_Db::insert('cm_locationZip', array('cityId' => $cityId, 'name' => $name, 'lat' => $latitude, 'lon' => $longitude));
+        return new self(self::LEVEL_ZIP, $zipId);
+    }
 
-	/**
-	 * @return string[]
-	 */
-	private static function _getUSStateAbbreviationList() {
-		return array(
-			'Alabama'              => 'AL',
-			'Alaska'               => 'AK',
-			'Arizona'              => 'AZ',
-			'Arkansas'             => 'AR',
-			'California'           => 'CA',
-			'Colorado'             => 'CO',
-			'Connecticut'          => 'CT',
-			'Delaware'             => 'DE',
-			'District of Columbia' => 'DC',
-			'Florida'              => 'FL',
-			'Georgia'              => 'GA',
-			'Hawaii'               => 'HI',
-			'Idaho'                => 'ID',
-			'Illinois'             => 'IL',
-			'Indiana'              => 'IN',
-			'Iowa'                 => 'IA',
-			'Kansas'               => 'KS',
-			'Kentucky'             => 'KY',
-			'Louisiana'            => 'LA',
-			'Maine'                => 'ME',
-			'Maryland'             => 'MD',
-			'Massachusetts'        => 'MA',
-			'Michigan'             => 'MI',
-			'Minnesota'            => 'MN',
-			'Mississippi'          => 'MS',
-			'Missouri'             => 'MO',
-			'Montana'              => 'MT',
-			'Nebraska'             => 'NE',
-			'Nevada'               => 'NV',
-			'New Hampshire'        => 'NH',
-			'New Jersey'           => 'NJ',
-			'New Mexico'           => 'NM',
-			'New York'             => 'NY',
-			'North Carolina'       => 'NC',
-			'North Dakota'         => 'ND',
-			'Ohio'                 => 'OH',
-			'Oklahoma'             => 'OK',
-			'Oregon'               => 'OR',
-			'Pennsylvania'         => 'PA',
-			'Rhode Island'         => 'RI',
-			'South Carolina'       => 'SC',
-			'South Dakota'         => 'SD',
-			'Tennessee'            => 'TN',
-			'Texas'                => 'TX',
-			'Utah'                 => 'UT',
-			'Vermont'              => 'VT',
-			'Virginia'             => 'VA',
-			'Washington'           => 'WA',
-			'West Virginia'        => 'WV',
-			'Wisconsin'            => 'WI',
-			'Wyoming'              => 'WY'
-		);
-	}
+    /**
+     * @return string[]
+     */
+    private static function _getUSStateAbbreviationList() {
+        return array(
+            'Alabama'              => 'AL',
+            'Alaska'               => 'AK',
+            'Arizona'              => 'AZ',
+            'Arkansas'             => 'AR',
+            'California'           => 'CA',
+            'Colorado'             => 'CO',
+            'Connecticut'          => 'CT',
+            'Delaware'             => 'DE',
+            'District of Columbia' => 'DC',
+            'Florida'              => 'FL',
+            'Georgia'              => 'GA',
+            'Hawaii'               => 'HI',
+            'Idaho'                => 'ID',
+            'Illinois'             => 'IL',
+            'Indiana'              => 'IN',
+            'Iowa'                 => 'IA',
+            'Kansas'               => 'KS',
+            'Kentucky'             => 'KY',
+            'Louisiana'            => 'LA',
+            'Maine'                => 'ME',
+            'Maryland'             => 'MD',
+            'Massachusetts'        => 'MA',
+            'Michigan'             => 'MI',
+            'Minnesota'            => 'MN',
+            'Mississippi'          => 'MS',
+            'Missouri'             => 'MO',
+            'Montana'              => 'MT',
+            'Nebraska'             => 'NE',
+            'Nevada'               => 'NV',
+            'New Hampshire'        => 'NH',
+            'New Jersey'           => 'NJ',
+            'New Mexico'           => 'NM',
+            'New York'             => 'NY',
+            'North Carolina'       => 'NC',
+            'North Dakota'         => 'ND',
+            'Ohio'                 => 'OH',
+            'Oklahoma'             => 'OK',
+            'Oregon'               => 'OR',
+            'Pennsylvania'         => 'PA',
+            'Rhode Island'         => 'RI',
+            'South Carolina'       => 'SC',
+            'South Dakota'         => 'SD',
+            'Tennessee'            => 'TN',
+            'Texas'                => 'TX',
+            'Utah'                 => 'UT',
+            'Vermont'              => 'VT',
+            'Virginia'             => 'VA',
+            'Washington'           => 'WA',
+            'West Virginia'        => 'WV',
+            'Wisconsin'            => 'WI',
+            'Wyoming'              => 'WY'
+        );
+    }
 
-	/**
-	 * @return string[]
-	 */
-	private static function _getUSCityMilitrayBasisList() {
-		return array('T3 R1 Nbpp', 'Apo', 'Fpo');
-	}
+    /**
+     * @return string[]
+     */
+    private static function _getUSCityMilitrayBasisList() {
+        return array('T3 R1 Nbpp', 'Apo', 'Fpo');
+    }
 }

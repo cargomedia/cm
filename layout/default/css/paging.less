@@ -1,25 +1,25 @@
 .paging {
-	margin-top: 10px;
-	text-align: center;
+  padding: 10px;
+  text-align: center;
 
-	a {
-		display: inline-block;
-		padding: 2px 10px;
-		font-size: 1.2em;
-		text-align: center;
-		text-transform: uppercase;
-		font-weight: bold;
-		text-decoration: none;
-		color: @colorFgLinkLight;
+  a {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 1.2em;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-decoration: none;
+    color: @colorFgLinkSubtle;
 
-		&.active {
-			background-color: rgba(0,0,0,0.07);
-			box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.2);
-			border-radius: 4px;
-		}
+    &.active {
+      background-color: rgba(0, 0, 0, 0.07);
+      box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
 
-		&:not(.active):hover {
-			color: @colorFgHeading;
-		}
-	}
+    &:not(.active):hover {
+      color: @colorFgHeading;
+    }
+  }
 }

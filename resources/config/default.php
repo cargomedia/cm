@@ -2,9 +2,6 @@
 
 $config->timeZone = 'US/Central';
 
-$config->CM_Render->cdnResource = false;
-$config->CM_Render->cdnUserContent = false;
-
 $config->CM_Mail->send = true;
 $config->CM_Mail->mailDeliveryAgent = null;
 
@@ -18,7 +15,7 @@ $config->CM_Splittesting_Abstract->enabled = false;
 
 $config->CM_Search->enabled = true;
 $config->CM_Search->servers = array(
-	array('host' => 'localhost', 'port' => 9200),
+    array('host' => 'localhost', 'port' => 9200),
 );
 
 $config->CM_Cache_Local->storage = 'CM_Cache_Storage_Apc';
@@ -28,7 +25,7 @@ $config->CM_Cache_Shared->storage = 'CM_Cache_Storage_Memcache';
 $config->CM_Cache_Shared->lifetime = 3600;
 
 $config->CM_Memcache_Client->servers = array(
-	array('host' => 'localhost', 'port' => 11211),
+    array('host' => 'localhost', 'port' => 11211),
 );
 
 $config->CM_Redis_Client->server = array('host' => 'localhost', 'port' => 6379);
@@ -39,14 +36,14 @@ $config->CM_Stream_Message->enabled = true;
 $config->CM_Stream_Message->adapter = 'CM_Stream_Adapter_Message_SocketRedis';
 
 $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
-	array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
-		'http://localhost:8090',
-	)),
+    array('httpHost' => 'localhost', 'httpPort' => 8085, 'sockjsUrls' => array(
+        'http://localhost:8090',
+    )),
 );
 
 $config->CM_Db_Db->db = 'cm';
 $config->CM_Db_Db->username = 'root';
-$config->CM_Db_Db->password = 'root';
+$config->CM_Db_Db->password = '';
 $config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
 $config->CM_Db_Db->serversRead = array();
 $config->CM_Db_Db->serversReadEnabled = true;
@@ -60,27 +57,27 @@ $config->CM_Params->class = 'CM_Params';
 $config->CM_Usertext_Usertext->class = 'CM_Usertext_Usertext';
 
 $config->CM_Response_Page->catch = array(
-	'CM_Exception_Nonexistent'  => '/error/not-found',
-	'CM_Exception_InvalidParam' => '/error/not-found',
-	'CM_Exception_AuthRequired' => '/error/auth-required',
-	'CM_Exception_NotAllowed'   => '/error/not-allowed',
+    'CM_Exception_Nonexistent'  => '/error/not-found',
+    'CM_Exception_InvalidParam' => '/error/not-found',
+    'CM_Exception_AuthRequired' => '/error/auth-required',
+    'CM_Exception_NotAllowed'   => '/error/not-allowed',
 );
 
 $config->CM_Response_View_Abstract->catch = array(
-	'CM_Exception_AuthRequired',
-	'CM_Exception_Blocked',
-	'CM_Exception_ActionLimit',
-	'CM_Exception_Nonexistent',
+    'CM_Exception_AuthRequired',
+    'CM_Exception_Blocked',
+    'CM_Exception_ActionLimit',
+    'CM_Exception_Nonexistent',
 );
 
 $config->CM_Response_RPC->catch = array(
-	'CM_Exception_AuthRequired',
-	'CM_Exception_NotAllowed',
+    'CM_Exception_AuthRequired',
+    'CM_Exception_NotAllowed',
 );
 
 $config->CM_Stream_Video->adapter = 'CM_Stream_Adapter_Video_Wowza';
 $config->CM_Stream_Video->servers = array(
-	array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
+    array('publicHost' => 'localhost', 'publicIp' => '127.0.0.1', 'privateIp' => '127.0.0.1'),
 );
 
 $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';

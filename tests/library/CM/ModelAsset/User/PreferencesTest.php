@@ -2,51 +2,77 @@
 
 class CM_ModelAsset_User_PreferencesTest extends CMTest_TestCase {
 
-	public static function setUpBeforeClass() {
-		CM_Db_Db::insert('cm_user_preferenceDefault', array('section' => 'test', 'key' => 'foo', 'defaultValue' => 0, 'configurable' => 1));
-		CM_Db_Db::insert('cm_user_preferenceDefault', array('section' => 'test', 'key' => 'bar', 'defaultValue' => 1, 'configurable' => 1));
-	}
+    public function tearDown() {
+        CM_Db_Db::truncate('cm_user_preferenceDefault');
+    }
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-		CM_Db_Db::truncate('cm_user_preferenceDefault');
-	}
+    public function testSetDefault() {
+        $this->assertSame(array(), CM_ModelAsset_User_Preferences::getDefaults());
 
-	public function testGetSet() {
-		$preferences = CMTest_TH::createUser()->getPreferences();
-		$defaults = $preferences->getDefaults();
-		$sections = array_keys($defaults);
-		$section = reset($sections);
-		$keys = array_keys($defaults[$section]);
-		$key = reset($keys);
+        CM_ModelAsset_User_Preferences::setDefault('foo', 'bar', true, false);
+        CM_Cache_Local::getInstance()->flush();
+        $preferences = CM_ModelAsset_User_Preferences::getDefaults();
+        $this->assertCount(1, $preferences);
+        $this->assertTrue($preferences['foo']['bar']['value']);
+        $this->assertFalse($preferences['foo']['bar']['configurable']);
+        $id = $preferences['foo']['bar']['id'];
 
-		$this->assertEquals($defaults[$section][$key]['value'], $preferences->get($section, $key));
+        CM_ModelAsset_User_Preferences::setDefault('foo', 'bar', false, false);
+        CM_Cache_Local::getInstance()->flush();
+        $preferences = CM_ModelAsset_User_Preferences::getDefaults();
+        $this->assertCount(1, $preferences);
+        $this->assertSame($id, $preferences['foo']['bar']['id']);
+        $this->assertFalse($preferences['foo']['bar']['value']);
 
-		$preferences->set($section, $key, true);
-		$this->assertEquals(true, $preferences->get($section, $key));
-		$preferences->set($section, $key, false);
-		$this->assertEquals(false, $preferences->get($section, $key));
-	}
+        CM_ModelAsset_User_Preferences::setDefault('bar', 'foo', false, false);
+        CM_Cache_Local::getInstance()->flush();
+        $preferences = CM_ModelAsset_User_Preferences::getDefaults();
+        $this->assertCount(2, $preferences);
 
-	public function testReset() {
-		$preferences = CMTest_TH::createUser()->getPreferences();
-		$defaults = $preferences->getDefaults();
-		$sections = array_keys($defaults);
-		$section = reset($sections);
-		$keys = array_keys($defaults[$section]);
-		$key = reset($keys);
+    }
 
-		$preferences->set($section, $key, !$preferences->get($section, $key));
-		$this->assertNotEquals($preferences->getAll(), $defaults);
+    public function testGetSet() {
+        CM_ModelAsset_User_Preferences::setDefault('test', 'foo', false, true);
+        CM_ModelAsset_User_Preferences::setDefault('test', 'bar', true, true);
 
-		$preferences->reset();
-		$this->assertEquals($preferences->getAll(), $defaults);
-	}
+        $preferences = CMTest_TH::createUser()->getPreferences();
+        $defaults = $preferences->getDefaults();
+        $sections = array_keys($defaults);
+        $section = reset($sections);
+        $keys = array_keys($defaults[$section]);
+        $key = reset($keys);
 
-	public function testInvalidatedModel() {
-		$user = CMTest_TH::createUser();
-		$user->_change();
-		$user->getPreferences()->getAll();
-		$user->getLatestactivity();
-	}
+        $this->assertEquals($defaults[$section][$key]['value'], $preferences->get($section, $key));
+
+        $preferences->set($section, $key, true);
+        $this->assertEquals(true, $preferences->get($section, $key));
+        $preferences->set($section, $key, false);
+        $this->assertEquals(false, $preferences->get($section, $key));
+    }
+
+    public function testReset() {
+        CM_ModelAsset_User_Preferences::setDefault('test', 'foo', false, true);
+        CM_ModelAsset_User_Preferences::setDefault('test', 'bar', true, true);
+        $preferences = CMTest_TH::createUser()->getPreferences();
+        $defaults = $preferences->getDefaults();
+        $sections = array_keys($defaults);
+        $section = reset($sections);
+        $keys = array_keys($defaults[$section]);
+        $key = reset($keys);
+
+        $preferences->set($section, $key, !$preferences->get($section, $key));
+        $this->assertNotEquals($preferences->getAll(), $defaults);
+
+        $preferences->reset();
+        $this->assertEquals($preferences->getAll(), $defaults);
+    }
+
+    public function testInvalidatedModel() {
+        CM_ModelAsset_User_Preferences::setDefault('test', 'foo', false, true);
+        CM_ModelAsset_User_Preferences::setDefault('test', 'bar', true, true);
+        $user = CMTest_TH::createUser();
+        $user->_change();
+        $user->getPreferences()->getAll();
+        $user->getLatestactivity();
+    }
 }
