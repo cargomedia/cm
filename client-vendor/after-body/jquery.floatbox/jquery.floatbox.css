@@ -62,6 +62,10 @@ html.ieMobile body {
 	display: inline-block;
 }
 
+.floatbox-body > * {
+  max-width: 100%;
+}
+
 .floatbox.fadeIn {
 	opacity: 1;
 }
