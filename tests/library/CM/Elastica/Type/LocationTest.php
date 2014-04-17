@@ -28,7 +28,7 @@ class CM_Elastica_Type_LocationTest extends CMTest_TestCase {
                   '_maxmind' => '209961')
         );
 
-        CM_Db_Db::insert('cm_locationCity', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
+        CM_Db_Db::insert('cm_model_location_city', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
         CM_Model_Location::createAggregation();
         CM_Config::get()->CM_Search->enabled = true;
 
