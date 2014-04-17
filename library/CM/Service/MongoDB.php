@@ -74,7 +74,7 @@ class CM_Service_MongoDB {
 
         $fields = ($fields !== null) ? $fields : array();
         CM_Debug::getInstance()->incStats('mongo',
-            "findOne in {$collection}: " . serialize(array('fields' => $fields) + $query) . "\n" . $e->getTraceAsString());
+            "findOne in {$collection}: " . serialize(array('fields' => $fields) + $query));
         return $this->getCollection($collection)->findOne($query, $fields);
     }
 
