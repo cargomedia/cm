@@ -27,6 +27,10 @@ abstract class CM_Model_Location_Abstract extends CM_Model_Abstract {
         $this->_set('name', $name);
     }
 
+    public static function getCacheClass() {
+        return 'CM_Model_StorageAdapter_CacheLocal';
+    }
+
     public static function getPersistenceClass() {
         return 'CM_Model_StorageAdapter_Database';
     }
