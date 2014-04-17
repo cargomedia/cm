@@ -1,34 +1,42 @@
-var fastScroll = (function() {
+(function() {
 
-	// Used to track the enabling of hover effects
-	var enableTimer = 0;
+  var FastScroll = function(delay) {
+    this.delay = delay || 500;
+    this.enableTimer = 0;
 
-	/*
-	 * Listen for a scroll and use that to remove
-	 * the possibility of hover effects
-	 */
+    var self = this;
+    this.scrollCallback = function() {
+      self._onScroll();
+    };
+    window.addEventListener('scroll', this.scrollCallback, false);
+  };
 
-	window.addEventListener('scroll', function() {
-		clearTimeout(enableTimer);
-		removeHoverClass();
-		enableTimer = setTimeout(addHoverClass, 500);
-	}, false);
+  FastScroll.prototype = {
+    enableTimer: null,
+    delay: null,
+    scrollCallback: null,
 
-	/**
-	 * Removes the hover class from the body. Hover styles
-	 * are reliant on this class being present
-	 */
-	function removeHoverClass() {
-		if ('none' !== document.body.style.pointerEvents) {
-			document.body.style.pointerEvents = 'none';
-		}
-	}
+    removeHoverClass: function() {
+      if ('none' !== document.body.style.pointerEvents) {
+        document.body.style.pointerEvents = 'none';
+      }
+    },
 
-	/**
-	 * Adds the hover class to the body. Hover styles
-	 * are reliant on this class being present
-	 */
-	function addHoverClass() {
-		document.body.style.pointerEvents = 'auto';
-	}
+    addHoverClass: function() {
+      document.body.style.pointerEvents = 'auto';
+    },
+
+    destroy: function() {
+      window.removeEventListener('scroll', this.scrollCallback, false);
+    },
+
+    _onScroll: function() {
+      clearTimeout(this.enableTimer);
+      this.removeHoverClass();
+      this.enableTimer = setTimeout(this.addHoverClass, this.delay);
+    }
+  };
+
+  window.FastScroll = FastScroll;
+
 })();

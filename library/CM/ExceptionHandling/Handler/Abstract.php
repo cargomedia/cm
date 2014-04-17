@@ -94,10 +94,12 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
         try {
             if ($exception instanceof CM_Exception) {
                 $log = $exception->getLog();
+                $metaInfo = $exception->getMetaInfo();
             } else {
                 $log = new CM_Paging_Log_Error();
+                $metaInfo = null;
             }
-            $log->add($formatter->formatException($exception));
+            $log->add($formatter->formatException($exception), $metaInfo);
         } catch (Exception $loggerException) {
             $logEntry = '[' . date('d.m.Y - H:i:s', time()) . ']' . PHP_EOL;
             $logEntry .= '### Cannot log error: ' . PHP_EOL;

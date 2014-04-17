@@ -20,6 +20,9 @@ class CM_ExceptionHandling_SerializableException {
     /** @var array */
     public $traceString;
 
+    /** @var array */
+    public $metaInfo = array();
+
     /**
      * @param Exception $exception
      */
@@ -32,6 +35,13 @@ class CM_ExceptionHandling_SerializableException {
      */
     public function getClass() {
         return $this->class;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMeta() {
+        return $this->metaInfo;
     }
 
     /**
@@ -77,6 +87,9 @@ class CM_ExceptionHandling_SerializableException {
         $this->message = $exception->getMessage();
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
+        if ($exception instanceof CM_Exception) {
+            $this->metaInfo = $exception->getMetaInfo();
+        }
 
         try {
             $trace = array();
