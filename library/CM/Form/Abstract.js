@@ -7,6 +7,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   _fields: {},
 
+  _stopErrorPropagation: false,
+
   events: {
     'reset': function() {
       _.each(this._fields, function(field) {
@@ -198,7 +200,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               handler.error(error);
             }
           }
-          handler.trigger('error');
+          handler.trigger('error error.' + actionName, error);
         }
 
         if (response.exec) {
@@ -216,11 +218,20 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           handler.trigger('success success.' + actionName, response.data);
         }
       },
+      error: function(msg, type, isPublic) {
+        handler._stopErrorPropagation = false;
+        handler.trigger('error error.' + actionName, msg, type, isPublic);
+        return !handler._stopErrorPropagation;
+      },
       complete: function() {
         handler.enable();
         handler.trigger('complete');
       }
     });
+  },
+
+  stopErrorPropagation: function() {
+    this._stopErrorPropagation = true;
   },
 
   reset: function() {
