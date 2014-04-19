@@ -24,11 +24,16 @@
         $toggler.toggleClass('active', state);
         icon.toggleClass('active', state);
         $content.slideToggle(100, function() {
-          $toggler.trigger('toggleNext', {
-            state: state,
+          var eventData = {
             toggler: $toggler,
             content: $content
-          });
+          };
+          $toggler.trigger('toggleNext', eventData);
+          if (state) {
+            $toggler.trigger('toggleNext-open', eventData);
+          } else {
+            $toggler.trigger('toggleNext-close', eventData);
+          }
         });
       });
       $toggler.data('toggleNext', true);
