@@ -20,9 +20,16 @@
       }
 
       $toggler.on('click.toggleNext', function() {
-        $toggler.toggleClass('active');
-        icon.toggleClass('active');
-        content.slideToggle(100);
+        var state = !$toggler.hasClass('active');
+        $toggler.toggleClass('active', state);
+        icon.toggleClass('active', state);
+        content.slideToggle(100, function() {
+          $toggler.trigger('toggleNext', {
+            state: state,
+            toggler: $toggler,
+            content: content
+          });
+        });
       });
       $toggler.data('toggleNext', true);
     });
