@@ -5,9 +5,9 @@
   $.fn.toggleNext = function() {
     return this.each(function() {
       var $toggler = $(this);
-      var content = $toggler.next('.toggleNext-content');
+      var $content = $toggler.next('.toggleNext-content');
 
-      if (!content.length || $toggler.data('toggleNext')) {
+      if (!$content.length || $toggler.data('toggleNext')) {
         return;
       }
 
@@ -16,18 +16,18 @@
 
       if ($toggler.hasClass('active')) {
         icon.addClass('active');
-        content.show();
+        $content.show();
       }
 
       $toggler.on('click.toggleNext', function() {
         var state = !$toggler.hasClass('active');
         $toggler.toggleClass('active', state);
         icon.toggleClass('active', state);
-        content.slideToggle(100, function() {
+        $content.slideToggle(100, function() {
           $toggler.trigger('toggleNext', {
             state: state,
             toggler: $toggler,
-            content: content
+            content: $content
           });
         });
       });
