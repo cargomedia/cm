@@ -44,17 +44,17 @@ class CM_SearchQuery_Abstract {
      * @param float|null  $fuzziness 0 - 1
      */
     public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
-        $query = array('multi_match' => array(
+        $data = array(
             'query'  => $value,
             'fields' => $fields,
-        ));
+        );
         if (null !== $operator) {
-            $query['operator'] = (string) $operator;
+            $data['operator'] = (string) $operator;
         }
         if (null !== $fuzziness) {
-            $query['fuzziness'] = (float) $fuzziness;
+            $data['fuzziness'] = (float) $fuzziness;
         }
-        $this->query($query);
+        $this->query(array('multi_match' => $data));
     }
 
     /**
