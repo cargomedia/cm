@@ -154,13 +154,20 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
      * @param mixed $item
      */
     public static function updateItem($item) {
-        self::_updateItem(self::getIdForItem($item));
+        if (!CM_Search::getInstance()->getEnabled()) {
+            return;
+        }
+        $id = self::getIdForItem($item);
+        CM_Redis_Client::getInstance()->sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
     }
 
     /**
      * @param mixed $item
      */
     public static function updateItemWithJob($item) {
+        if (!CM_Search::getInstance()->getEnabled()) {
+            return;
+        }
         $job = new CM_Elasticsearch_UpdateDocumentJob();
         $job->queue(array(
             'indexClassName' => get_called_class(),
@@ -186,12 +193,5 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
             return (string) $id;
         }
         return CM_Params::encode($id, true);
-    }
-
-    /**
-     * @param string $id
-     */
-    protected static function _updateItem($id) {
-        CM_Redis_Client::getInstance()->sAdd('Search.Updates_' . static::INDEX_NAME, (string) $id);
     }
 }
