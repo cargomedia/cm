@@ -43,6 +43,23 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
         $this->assertSame(1, $source->getCount());
         $this->assertEquals(array($id1), $source->getItems());
     }
+
+    public function testUpdateItemWithJob() {
+        $query = new CM_Elasticsearch_Query();
+        $query->queryMatch(array('name'), 'foo');
+        $source = new CM_PagingSource_Search($this->_type, $query);
+        $this->assertSame(0, $source->getCount());
+
+        $id1 = $this->_type->createEntry('foo');
+        $id2 = $this->_type->createEntry('foo bar');
+        $this->assertSame(2, $source->getCount());
+        $this->assertEquals(array($id1, $id2), $source->getItems());
+
+        CM_Db_Db::update('index_mock', array('name' => 'bar'), array('id' => $id2));
+        $this->_type->updateItemWithJob(array('id' => $id2));
+        $this->assertSame(1, $source->getCount());
+        $this->assertEquals(array($id1), $source->getItems());
+    }
 }
 
 class CM_Elastica_Type_AbstractMock extends CM_Elastica_Type_Abstract {
