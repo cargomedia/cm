@@ -151,10 +151,21 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
     }
 
     /**
-     * @param mixed $entity
+     * @param mixed $item
      */
-    public static function updateItem($entity) {
-        self::_updateItem(self::getIdForItem($entity));
+    public static function updateItem($item) {
+        self::_updateItem(self::getIdForItem($item));
+    }
+
+    /**
+     * @param mixed $item
+     */
+    public static function updateItemWithJob($item) {
+        $job = new CM_Elasticsearch_UpdateDocumentJob();
+        $job->queue(array(
+            'indexClassName' => get_called_class(),
+            'id'             => static::getIdForItem($item),
+        ));
     }
 
     /**

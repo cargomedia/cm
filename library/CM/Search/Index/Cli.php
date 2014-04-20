@@ -19,13 +19,15 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string|null $indexName
-     * @param string|null $host Elasticsearch host
-     * @param int|null    $port Elasticsearch port
+     * @param string|CM_Elastica_Type_Abstract|null $indexName
+     * @param string|null                           $host Elasticsearch host
+     * @param int|null                              $port Elasticsearch port
      * @throws CM_Exception_Invalid
      */
     public function update($indexName = null, $host = null, $port = null) {
-        if ($indexName) {
+        if ($indexName instanceof CM_Elastica_Type_Abstract) {
+            $indexes = array($indexName);
+        } elseif ($indexName) {
             $indexes = array($this->_getIndex($indexName, $host, $port));
         } else {
             $indexes = $this->_getIndexes($host, $port);
