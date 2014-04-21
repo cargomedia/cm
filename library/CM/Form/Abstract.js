@@ -143,7 +143,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} [actionName]
-   * @return jQuery.Deferred
+   * @return $.Deferred
    */
   submit: function(actionName) {
     var action = this._getAction(actionName);
