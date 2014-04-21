@@ -156,6 +156,16 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
     var errorList = this._getErrorList(actionName);
 
+    if (options.handleErrors) {
+      _.each(this._fields, function(field, fieldName) {
+        if (errorList[fieldName]) {
+          field.error(errorList[fieldName]);
+        } else {
+          field.error(null);
+        }
+      }, this);
+    }
+
     if (_.size(errorList)) {
       deferred.reject();
 
