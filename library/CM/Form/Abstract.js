@@ -143,7 +143,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param actionName
-   * @return jqXHR|Boolean
+   * @return jQuery.Deferred
    */
   submit: function(actionName) {
     actionName = actionName || _.first(_.keys(this.options.actions));
@@ -184,7 +184,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     this.setErrors(errorList);
 
     if (hasErrors) {
-      return false;
+      return $.Deferred(function() {
+        this.reject();
+      });
     }
 
     var handler = this;
