@@ -147,7 +147,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @return Promise
    */
   submit: function(actionName, options) {
-    options = _.defaults(options, {
+    options = _.defaults(options || {}, {
       handleErrors: true
     });
     var action = this._getAction(actionName);
