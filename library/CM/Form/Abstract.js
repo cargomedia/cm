@@ -143,69 +143,74 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   /**
    * @param {String} [actionName]
-   * @return $.Deferred
+   * @param {Object} [options]
+   * @return Promise
    */
-  submit: function(actionName) {
+  submit: function(actionName, options) {
+    options = _.defaults(options, {
+      handleErrors: true
+    });
     var action = this._getAction(actionName);
     var data = this.getData(actionName);
+    var deferred = $.Deferred();
 
     var errorList = this._getErrorList(actionName);
 
-    _.each(this._fields, function(field, fieldName) {
-      if (errorList[fieldName]) {
-        field.error(errorList[fieldName]);
-      } else {
-        field.error(null);
-      }
-    });
-
     if (_.size(errorList)) {
-      return $.Deferred(function() {
-        this.reject();
+      deferred.reject();
+
+    } else {
+      this.disable();
+      this.trigger('submit', [data]);
+
+      var handler = this;
+      cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
+        success: function(response) {
+          if (response.errors) {
+            if (options.handleErrors) {
+              for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
+                if (_.isArray(error)) {
+                  handler.getField(error[1]).error(error[0]);
+                } else {
+                  handler.error(error);
+                }
+              }
+            }
+
+            handler.trigger('error error.' + actionName);
+            deferred.reject();
+          }
+
+          if (response.exec) {
+            handler.evaluation = new Function(response.exec);
+            handler.evaluation();
+          }
+
+          if (response.messages) {
+            for (var i = 0, msg; msg = response.messages[i]; i++) {
+              handler.message(msg);
+            }
+          }
+
+          if (!response.errors) {
+            handler.trigger('success success.' + actionName, response.data);
+            deferred.resolve(response.data);
+          }
+        },
+        error: function(msg, type, isPublic) {
+          handler._stopErrorPropagation = false;
+          handler.trigger('error error.' + actionName, msg, type, isPublic);
+          deferred.reject();
+          return !handler._stopErrorPropagation;
+        },
+        complete: function() {
+          handler.enable();
+          handler.trigger('complete');
+        }
       });
     }
 
-    var handler = this;
-    this.disable();
-    this.trigger('submit', [data]);
-    return cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
-      success: function(response) {
-        if (response.errors) {
-          for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
-            if (_.isArray(error)) {
-              handler.getField(error[1]).error(error[0]);
-            } else {
-              handler.error(error);
-            }
-          }
-          handler.trigger('error error.' + actionName, error);
-        }
-
-        if (response.exec) {
-          handler.evaluation = new Function(response.exec);
-          handler.evaluation();
-        }
-
-        if (response.messages) {
-          for (var i = 0, msg; msg = response.messages[i]; i++) {
-            handler.message(msg);
-          }
-        }
-
-        if (!response.errors) {
-          handler.trigger('success success.' + actionName, response.data);
-        }
-      },
-      error: function(msg, type, isPublic) {
-        handler._stopErrorPropagation = false;
-        handler.trigger('error error.' + actionName, msg, type, isPublic);
-        return !handler._stopErrorPropagation;
-      },
-      complete: function() {
-        handler.enable();
-        handler.trigger('complete');
-      }
-    });
+    return deferred.promise();
   },
 
   stopErrorPropagation: function() {
