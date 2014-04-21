@@ -142,48 +142,24 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param actionName
+   * @param {String} [actionName]
    * @return jQuery.Deferred
    */
   submit: function(actionName) {
-    actionName = actionName || _.first(_.keys(this.options.actions));
-
-    var action = this.options.actions[actionName];
-    if (!action) {
-      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
-    }
+    var action = this._getAction(actionName);
     var data = this.getData(actionName);
 
-    var errorList = {};
+    var errorList = this._getErrorList(actionName);
+
     _.each(this._fields, function(field, fieldName) {
-      errorList[fieldName] = null;
+      if (errorList[fieldName]) {
+        field.error(errorList[fieldName]);
+      } else {
+        field.error(null);
+      }
     });
 
-    var hasErrors = false;
-    _.each(_.keys(action.fields).reverse(), function(fieldName) {
-      var required = action.fields[fieldName];
-      var field = this.getField(fieldName);
-      if (required && field.isEmpty(data[fieldName])) {
-        var label;
-        var $textInput = field.$('input, textarea');
-        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-        if ($labels.length) {
-          label = $labels.first().text();
-        } else if ($textInput.attr('placeholder')) {
-          label = $textInput.attr('placeholder');
-        }
-        if (label) {
-          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
-        } else {
-          errorList[fieldName] = cm.language.get('Required');
-        }
-        hasErrors = true;
-      }
-    }, this);
-
-    this.setErrors(errorList);
-
-    if (hasErrors) {
+    if (_.size(errorList)) {
       return $.Deferred(function() {
         this.reject();
       });
@@ -269,11 +245,48 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {Object} errorList
+   * @param {String} [actionName]
+   * @returns {Object}
    */
-  setErrors: function(errorList) {
-    _.each(errorList, function(error, fieldName) {
-      this.getField(fieldName).error(error);
+  _getAction: function(actionName) {
+    actionName = actionName || _.first(_.keys(this.options.actions));
+    var action = this.options.actions[actionName];
+    if (!action) {
+      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+    }
+    return action;
+  },
+
+  /**
+   * @param {String} [actionName]
+   * @returns {Object}
+   */
+  _getErrorList: function(actionName) {
+    var action = this._getAction(actionName);
+    var data = this.getData(actionName);
+
+    var errorList = {};
+
+    _.each(_.keys(action.fields).reverse(), function(fieldName) {
+      var required = action.fields[fieldName];
+      var field = this.getField(fieldName);
+      if (required && field.isEmpty(data[fieldName])) {
+        var label;
+        var $textInput = field.$('input, textarea');
+        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
+        if ($labels.length) {
+          label = $labels.first().text();
+        } else if ($textInput.attr('placeholder')) {
+          label = $textInput.attr('placeholder');
+        }
+        if (label) {
+          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+        } else {
+          errorList[fieldName] = cm.language.get('Required');
+        }
+      }
     }, this);
+
+    return errorList;
   }
 });
