@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
+abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
 
     const INDEX_NAME = '';
 
@@ -47,7 +47,7 @@ abstract class CM_Elastica_Type_Abstract extends Elastica_Type_Abstract {
 
         // Create new index and switch alias
         $version = time();
-        /** @var $indexNew CM_Elastica_Type_Abstract */
+        /** @var $indexNew CM_Elasticsearch_Type_Abstract */
         $indexNew = new static($this->_client->getHost(), $this->_client->getPort(), $version);
         $indexNew->create(true);
         $indexNew->getIndex()->addAlias($this->_indexName . '.tmp');

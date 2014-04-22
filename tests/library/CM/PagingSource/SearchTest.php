@@ -22,9 +22,9 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        $type1 = new CM_Elastica_Type_Mock1();
-        $type2 = new CM_Elastica_Type_Mock2();
-        $type3 = new CM_Elastica_Type_Mock3();
+        $type1 = new CM_Elasticsearch_Type_Mock1();
+        $type2 = new CM_Elasticsearch_Type_Mock2();
+        $type3 = new CM_Elasticsearch_Type_Mock3();
         $type1->createVersioned();
         $type2->createVersioned();
         $type3->createVersioned();
@@ -34,7 +34,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
     }
 
     public function testGet() {
-        $type1 = new CM_Elastica_Type_Mock1();
+        $type1 = new CM_Elasticsearch_Type_Mock1();
         $source = new CM_PagingSource_Search($type1, new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -42,7 +42,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
         $this->assertSame(1, $source->getCount());
         $this->assertSame(array((string) $id), $source->getItems());
 
-        $type3 = new CM_Elastica_Type_Mock3();
+        $type3 = new CM_Elasticsearch_Type_Mock3();
         $source = new CM_PagingSource_Search($type3, new CM_Elasticsearch_Query(), array('price'));
         $this->assertSame(0, $source->getCount());
 
@@ -52,8 +52,8 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
     }
 
     public function testMultiGet() {
-        $type1 = new CM_Elastica_Type_Mock1();
-        $type2 = new CM_Elastica_Type_Mock2();
+        $type1 = new CM_Elasticsearch_Type_Mock1();
+        $type2 = new CM_Elasticsearch_Type_Mock2();
         $source = new CM_PagingSource_Search(array($type1, $type2), new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
@@ -67,7 +67,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
             array('id' => (string) $id2, 'type' => 'index_2')
         ), $source->getItems());
 
-        $type3 = new CM_Elastica_Type_Mock3();
+        $type3 = new CM_Elasticsearch_Type_Mock3();
         $source = new CM_PagingSource_Search(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
         $id3 = $type3->createEntry(5);
 
@@ -80,7 +80,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
     }
 }
 
-class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'index_1';
 
@@ -121,7 +121,7 @@ class CM_Elastica_Type_Mock1 extends CM_Elastica_Type_Abstract {
     }
 }
 
-class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'index_2';
 
@@ -162,7 +162,7 @@ class CM_Elastica_Type_Mock2 extends CM_Elastica_Type_Abstract {
     }
 }
 
-class CM_Elastica_Type_Mock3 extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'index_3';
 

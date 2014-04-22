@@ -20,7 +20,7 @@ class CM_Search extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Elastica_Type_Abstract[] $types
+     * @param CM_Elasticsearch_Type_Abstract[] $types
      * @param array|null                  $data
      * @return array
      */

@@ -1,6 +1,6 @@
 <?php
 
-class CM_Elastica_Type_Location extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'location';
 

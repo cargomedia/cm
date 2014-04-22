@@ -1,8 +1,8 @@
 <?php
 
-class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
+class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
-    /** @var CM_Elastica_Type_AbstractMock */
+    /** @var CM_Elasticsearch_Type_AbstractMock */
     private $_type;
 
     public static function setUpBeforeClass() {
@@ -15,7 +15,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        $this->_type = new CM_Elastica_Type_AbstractMock();
+        $this->_type = new CM_Elasticsearch_Type_AbstractMock();
         $this->_type->createVersioned();
         $this->_type->getIndex()->refresh();
     }
@@ -62,7 +62,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     }
 }
 
-class CM_Elastica_Type_AbstractMock extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'index_mock';
 

@@ -8,14 +8,14 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
     /** @var array|null */
     private $_fields;
 
-    /** @var CM_Elastica_Type_Abstract[] */
+    /** @var CM_Elasticsearch_Type_Abstract[] */
     private $_types;
 
     /** @var boolean */
     private $_returnType;
 
     /**
-     * @param CM_Elastica_Type_Abstract|CM_Elastica_Type_Abstract[] $types
+     * @param CM_Elasticsearch_Type_Abstract|CM_Elasticsearch_Type_Abstract[] $types
      * @param CM_SearchQuery_Abstract                               $query
      * @param array|null                                            $fields
      * @param bool|null                                             $returnType
@@ -26,8 +26,8 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
             $types = array($types);
         }
         array_walk($types, function ($type) {
-            if (!$type instanceof CM_Elastica_Type_Abstract) {
-                throw new CM_Exception_Invalid("Type is not an instance of CM_Elastica_Type_Abstract");
+            if (!$type instanceof CM_Elasticsearch_Type_Abstract) {
+                throw new CM_Exception_Invalid("Type is not an instance of CM_Elasticsearch_Type_Abstract");
             }
         });
         if (empty($types)) {
