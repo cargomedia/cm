@@ -44,12 +44,10 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
         $this->_typeName = static::INDEX_NAME;
 
-        $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
-        $server = $servers[array_rand($servers)];
-        if (!$host) {
+        if (!$host || !$port) {
+            $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
+            $server = $servers[array_rand($servers)];
             $host = $server['host'];
-        }
-        if (!$port) {
             $port = $server['port'];
         }
         $this->_client = new Elastica_Client(array('host' => $host, 'port' => $port));
