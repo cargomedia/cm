@@ -19,7 +19,7 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
             if ($location) {
                 $query->sortDistance($location);
             }
-            $source = new CM_PagingSource_Search_Location($query);
+            $source = new CM_PagingSource_Elasticsearch_Location($query);
         } else {
             $source = new CM_PagingSource_Sql_Deferred('level,id', 'cm_tmp_location',
                 "level >= ? AND level <= ? AND `name` LIKE ?", 'level', null, null, array($minLevel, $maxLevel, '%' . $term . '%'));

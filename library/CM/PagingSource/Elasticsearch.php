@@ -1,6 +1,6 @@
 <?php
 
-class CM_PagingSource_Search extends CM_PagingSource_Abstract {
+class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
 
     /** @var CM_Elasticsearch_Query */
     private $_query;

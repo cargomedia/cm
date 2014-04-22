@@ -28,7 +28,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     public function testUpdateItem() {
         $query = new CM_Elasticsearch_Query();
         $query->queryMatch(array('name'), 'foo');
-        $source = new CM_PagingSource_Search($this->_type, $query);
+        $source = new CM_PagingSource_Elasticsearch($this->_type, $query);
         $this->assertSame(0, $source->getCount());
 
         $id1 = $this->_type->createEntry('foo');
@@ -47,7 +47,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
     public function testUpdateItemWithJob() {
         $query = new CM_Elasticsearch_Query();
         $query->queryMatch(array('name'), 'foo');
-        $source = new CM_PagingSource_Search($this->_type, $query);
+        $source = new CM_PagingSource_Elasticsearch($this->_type, $query);
         $this->assertSame(0, $source->getCount());
 
         $id1 = $this->_type->createEntry('foo');

@@ -44,7 +44,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
 
     public function testSearch() {
         $searchQuery = new CM_Elasticsearch_Query_Location();
-        $source = new CM_PagingSource_Search_Location($searchQuery);
+        $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
         $this->assertSame(8, $source->getCount());
     }
 
@@ -52,7 +52,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         $searchQuery = new CM_Elasticsearch_Query_Location();
         $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 1);
         $searchQuery->sortDistance($location);
-        $source = new CM_PagingSource_Search_Location($searchQuery);
+        $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
         $locationList = $source->getItems();
         $this->assertEquals(array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY), reset($locationList));
     }

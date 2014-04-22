@@ -1,6 +1,6 @@
 <?php
 
-class CM_PagingSource_SearchTest extends CMTest_TestCase {
+class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `indexTest_1` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(8))");
@@ -35,7 +35,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
 
     public function testGet() {
         $type1 = new CM_Elasticsearch_Type_Mock1();
-        $source = new CM_PagingSource_Search($type1, new CM_Elasticsearch_Query());
+        $source = new CM_PagingSource_Elasticsearch($type1, new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
         $id = $type1->createEntry('foo');
@@ -43,7 +43,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
         $this->assertSame(array((string) $id), $source->getItems());
 
         $type3 = new CM_Elasticsearch_Type_Mock3();
-        $source = new CM_PagingSource_Search($type3, new CM_Elasticsearch_Query(), array('price'));
+        $source = new CM_PagingSource_Elasticsearch($type3, new CM_Elasticsearch_Query(), array('price'));
         $this->assertSame(0, $source->getCount());
 
         $id2 = $type3->createEntry(3);
@@ -54,7 +54,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
     public function testMultiGet() {
         $type1 = new CM_Elasticsearch_Type_Mock1();
         $type2 = new CM_Elasticsearch_Type_Mock2();
-        $source = new CM_PagingSource_Search(array($type1, $type2), new CM_Elasticsearch_Query());
+        $source = new CM_PagingSource_Elasticsearch(array($type1, $type2), new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
         $id1 = $type1->createEntry('foo');
@@ -68,7 +68,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
         ), $source->getItems());
 
         $type3 = new CM_Elasticsearch_Type_Mock3();
-        $source = new CM_PagingSource_Search(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
+        $source = new CM_PagingSource_Elasticsearch(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
         $id3 = $type3->createEntry(5);
 
         $this->assertSame(3, $source->getCount());
