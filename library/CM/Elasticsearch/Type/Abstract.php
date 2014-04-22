@@ -6,12 +6,6 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     const MAX_DOCS_PER_REQUEST = 1000;
 
-    /** @var string */
-    protected $_indexName;
-
-    /** @var string */
-    protected $_typeName;
-
     /** @var array */
     protected $_mapping = array();
 
@@ -41,11 +35,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Index name has to be set');
         }
 
-        $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
+        $indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
         if ($version) {
-            $this->_indexName .= '.' . $version;
+            $indexName .= '.' . $version;
         }
-        $this->_typeName = static::INDEX_NAME;
+        $typeName = static::INDEX_NAME;
 
         if (!$host || !$port) {
             $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
@@ -55,8 +49,8 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
         $this->_client = new Elastica_Client(array('host' => $host, 'port' => $port));
 
-        $this->_index = new Elastica_Index($this->_client, $this->_indexName);
-        $this->_type = new Elastica_Type($this->_index, $this->_typeName);
+        $this->_index = new Elastica_Index($this->_client, $indexName);
+        $this->_type = new Elastica_Type($this->_index, $typeName);
     }
 
     /**
