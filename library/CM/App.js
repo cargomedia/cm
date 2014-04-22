@@ -745,10 +745,11 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {Object} data
-   * @param {Object} callbacks
+   * @param {Object} [callbacks]
    * @return jqXHR
    */
   ajax: function(type, data, callbacks) {
+    callbacks = callbacks || {};
     var url = this.getUrlAjax(type);
     var errorHandler = function(msg, type, isPublic, callback) {
       if (!callback || callback(msg, type, isPublic) !== false) {
