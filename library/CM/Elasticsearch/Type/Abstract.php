@@ -42,6 +42,9 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
 
         $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
+        if ($version) {
+            $this->_indexName .= '.' . $version;
+        }
         $this->_typeName = static::INDEX_NAME;
 
         if (!$host || !$port) {
@@ -51,10 +54,6 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             $port = $server['port'];
         }
         $this->_client = new Elastica_Client(array('host' => $host, 'port' => $port));
-
-        if ($version) {
-            $this->_indexName .= '.' . $version;
-        }
 
         $this->_index = new Elastica_Index($this->_client, $this->_indexName);
         $this->_type = new Elastica_Type($this->_index, $this->_typeName);
