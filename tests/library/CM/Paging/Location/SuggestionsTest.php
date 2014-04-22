@@ -30,7 +30,7 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
 
         CM_Db_Db::insert('cm_locationCity', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
         CM_Model_Location::createAggregation();
-        CM_Config::get()->CM_Search->enabled = true;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
 
         self::$_type = new CM_Elasticsearch_Type_Location();
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
@@ -59,7 +59,7 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public function testSearchWithoutSearchEnabled() {
-        CM_Config::get()->CM_Search->enabled = false;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = false;
 
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
         $this->assertEquals(8, $source->getCount());

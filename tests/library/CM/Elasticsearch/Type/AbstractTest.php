@@ -7,7 +7,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `index_mock` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(100))");
-        CM_Config::get()->CM_Search->enabled = true;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
     }
 
     public static function tearDownAfterClass() {

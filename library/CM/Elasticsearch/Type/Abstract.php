@@ -16,7 +16,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
         $this->_indexName .= static::INDEX_NAME;
         $this->_typeName = static::INDEX_NAME;
 
-        $servers = CM_Config::get()->CM_Search->servers;
+        $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
         $server = $servers[array_rand($servers)];
         if (!$host) {
             $host = $server['host'];
@@ -154,7 +154,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
      * @param mixed $item
      */
     public static function updateItem($item) {
-        if (!CM_Search::getInstance()->getEnabled()) {
+        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
             return;
         }
         $id = self::getIdForItem($item);
@@ -165,7 +165,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
      * @param mixed $item
      */
     public static function updateItemWithJob($item) {
-        if (!CM_Search::getInstance()->getEnabled()) {
+        if (!CM_Elasticsearch_Client::getInstance()->getEnabled()) {
             return;
         }
         $job = new CM_Elasticsearch_UpdateDocumentJob();

@@ -30,7 +30,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
 
         CM_Db_Db::insert('cm_locationCity', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
         CM_Model_Location::createAggregation();
-        CM_Config::get()->CM_Search->enabled = true;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
 
         self::$_type = new CM_Elasticsearch_Type_Location();
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();

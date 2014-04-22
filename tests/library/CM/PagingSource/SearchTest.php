@@ -7,7 +7,7 @@ class CM_PagingSource_SearchTest extends CMTest_TestCase {
         CM_Db_Db::exec("CREATE TABLE `indexTest_2` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `price` INT UNSIGNED)");
         CM_Db_Db::exec("CREATE TABLE `indexTest_3` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `price` INT UNSIGNED)");
         $config = CM_Config::get();
-        $config->CM_Search->enabled = true;
+        $config->CM_Elasticsearch_Client->enabled = true;
         CM_Config::set($config);
     }
 
