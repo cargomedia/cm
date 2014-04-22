@@ -1,20 +1,52 @@
 <?php
 
-abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
+abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     const INDEX_NAME = '';
 
-    protected $_source = false; // Don't store json-source
+    const MAX_DOCS_PER_REQUEST = 1000;
+
+    /** @var string */
+    protected $_indexName;
+
+    /** @var string */
+    protected $_typeName;
+
+    /** @var array */
+    protected $_mapping = array();
+
+    /** @var array */
+    protected $_indexParams = array();
+
+    /** @var bool */
+    protected $_source = false;
+
+    /** @var Elastica_Client */
+    protected $_client = null;
+
+    /** @var Elastica_Index */
+    protected $_index = null;
+
+    /** @var Elastica_Type */
+    protected $_type = null;
 
     /**
      * @param string|null $host
      * @param string|null $port
      * @param int|null    $version
+     * @throws CM_Exception_Invalid
      */
     public function __construct($host = null, $port = null, $version = null) {
-        $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix();
-        $this->_indexName .= static::INDEX_NAME;
+        $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
         $this->_typeName = static::INDEX_NAME;
+
+        if (empty($this->_indexName)) {
+            throw new CM_Exception_Invalid('Index name has to be set');
+        }
+
+        if (empty($this->_typeName)) {
+            throw new CM_Exception_Invalid('Type name has to be set');
+        }
 
         $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
         $server = $servers[array_rand($servers)];
@@ -24,23 +56,59 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
         if (!$port) {
             $port = $server['port'];
         }
-        $client = new Elastica_Client(array('host' => $host, 'port' => $port));
+        $this->_client = new Elastica_Client(array('host' => $host, 'port' => $port));
 
         if ($version) {
             $this->_indexName .= '.' . $version;
         }
-        parent::__construct($client);
+
+        $this->_index = new Elastica_Index($this->_client, $this->_indexName);
+        $this->_type = new Elastica_Type($this->_index, $this->_typeName);
+    }
+
+    /**
+     * @return Elastica_Index
+     */
+    public function getIndex() {
+        return $this->_index;
+    }
+
+    /**
+     * @return Elastica_Type
+     */
+    public function getType() {
+        return $this->_type;
+    }
+
+    /**
+     * @param  int|string $date
+     * @return string
+     */
+    public function convertDate($date) {
+        return Elastica_Util::convertDate($date);
+    }
+
+    /**
+     * @param bool|null $recreate
+     */
+    public function create($recreate = null) {
+        $this->getIndex()->create($this->_indexParams, $recreate);
+
+        $mapping = new Elastica_Type_Mapping($this->getType());
+        $mapping->setProperties($this->_mapping);
+        $mapping->setSource(array('enabled' => $this->_source));
+        $mapping->send();
     }
 
     public function createVersioned() {
         // Remove old unfinished indices
-        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->_indexName . '.tmp') as $index) {
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName() . '.tmp') as $index) {
             /** @var Elastica_Index $index */
             $index->delete();
         }
 
         // Set current index to read-only
-        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->_indexName) as $index) {
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
             /** @var Elastica_Index $index */
             $index->getSettings()->setBlocksWrite(true);
         }
@@ -50,7 +118,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
         /** @var $indexNew CM_Elasticsearch_Type_Abstract */
         $indexNew = new static($this->_client->getHost(), $this->_client->getPort(), $version);
         $indexNew->create(true);
-        $indexNew->getIndex()->addAlias($this->_indexName . '.tmp');
+        $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
 
         $settings = $indexNew->getIndex()->getSettings();
         $refreshInterval = $settings->getRefreshInterval();
@@ -64,11 +132,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
         //$settings->setMergePolicy('merge_factor', $mergeFactor);
         $settings->setRefreshInterval($refreshInterval);
 
-        $indexNew->getIndex()->addAlias($this->_indexName);
-        $indexNew->getIndex()->removeAlias($this->_indexName . '.tmp');
+        $indexNew->getIndex()->addAlias($this->getIndex()->getName());
+        $indexNew->getIndex()->removeAlias($this->getIndex()->getName() . '.tmp');
 
         // Remove old index
-        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->_indexName) as $index) {
+        foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
             /** @var Elastica_Index $index */
             if ($index->getName() != $indexNew->getIndex()->getName()) {
                 $index->delete();
@@ -125,7 +193,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends Elastica_Type_Abstract {
         // Delete documents that were not updated (=not found)
         if (!empty($idsDelete)) {
             $idsDelete = array_keys($idsDelete);
-            $this->getIndex()->getClient()->deleteIds($idsDelete, $this->_indexName, $this->_typeName);
+            $this->getIndex()->getClient()->deleteIds($idsDelete, $this->getIndex()->getName(), $this->getType()->getName());
         }
     }
 
