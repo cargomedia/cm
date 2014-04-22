@@ -5,7 +5,7 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     /** @var CM_Elasticsearch_Type_Location */
     protected static $_type;
 
-    /** @var CM_Search_Index_Cli */
+    /** @var CM_Elasticsearch_Index_Cli */
     protected static $_searchIndexCli;
 
     public static function setUpBeforeClass() {
@@ -33,7 +33,7 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
         CM_Config::get()->CM_Search->enabled = true;
 
         self::$_type = new CM_Elasticsearch_Type_Location();
-        self::$_searchIndexCli = new CM_Search_Index_Cli();
+        self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
         self::$_searchIndexCli->create(self::$_type->getIndex()->getName());
     }
 

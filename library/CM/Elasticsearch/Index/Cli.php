@@ -1,6 +1,6 @@
 <?php
 
-class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $indexName
