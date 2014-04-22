@@ -1,6 +1,6 @@
 <?php
 
-class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query_Abstract {
+class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query {
 
     /**
      * @param int $levelMin

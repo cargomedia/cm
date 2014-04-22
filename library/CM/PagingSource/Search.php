@@ -2,7 +2,7 @@
 
 class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 
-    /** @var CM_Elasticsearch_Query_Abstract */
+    /** @var CM_Elasticsearch_Query */
     private $_query;
 
     /** @var array|null */
@@ -16,12 +16,12 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
 
     /**
      * @param CM_Elasticsearch_Type_Abstract|CM_Elasticsearch_Type_Abstract[] $types
-     * @param CM_Elasticsearch_Query_Abstract                               $query
+     * @param CM_Elasticsearch_Query                               $query
      * @param array|null                                            $fields
      * @param bool|null                                             $returnType
      * @throws CM_Exception_Invalid
      */
-    function __construct($types, CM_Elasticsearch_Query_Abstract $query, array $fields = null, $returnType = null) {
+    function __construct($types, CM_Elasticsearch_Query $query, array $fields = null, $returnType = null) {
         if (!is_array($types)) {
             $types = array($types);
         }
