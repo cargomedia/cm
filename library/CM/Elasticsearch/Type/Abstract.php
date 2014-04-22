@@ -2,7 +2,7 @@
 
 abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
-    const INDEX_NAME = '';
+    const INDEX_NAME = null;
 
     const MAX_DOCS_PER_REQUEST = 1000;
 
