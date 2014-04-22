@@ -1,6 +1,6 @@
 <?php
 
-class CM_SearchQuery_Abstract {
+class CM_Elasticsearch_Query_Abstract {
 
     private $_queries = array();
     private $_filters = array();
@@ -23,7 +23,7 @@ class CM_SearchQuery_Abstract {
     }
 
     public function query($query) {
-        if ($query instanceof CM_SearchQuery_Abstract) {
+        if ($query instanceof CM_Elasticsearch_Query_Abstract) {
             $query = $query->getQuery();
         }
         $this->_queries[] = $query;

@@ -43,13 +43,13 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
     }
 
     public function testSearch() {
-        $searchQuery = new CM_SearchQuery_Location();
+        $searchQuery = new CM_Elasticsearch_Query_Location();
         $source = new CM_PagingSource_Search_Location($searchQuery);
         $this->assertSame(8, $source->getCount());
     }
 
     public function testSearchDistance() {
-        $searchQuery = new CM_SearchQuery_Location();
+        $searchQuery = new CM_Elasticsearch_Query_Location();
         $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 1);
         $searchQuery->sortDistance($location);
         $source = new CM_PagingSource_Search_Location($searchQuery);
