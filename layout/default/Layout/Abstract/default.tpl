@@ -10,6 +10,7 @@
     <meta name="msapplication-TileImage" content="{resourceUrl path='img/tileImage.png' type='layout'}">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="{$render->getSite()->getName()|escape}" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" href="{resourceUrl path='img/touch-icon-57.png' type='layout'}" />
     <link rel="apple-touch-icon" sizes="72x72" href="{resourceUrl path='img/touch-icon-72.png' type='layout'}" />
     <link rel="apple-touch-icon" sizes="76x76" href="{resourceUrl path='img/touch-icon-76.png' type='layout'}" />
