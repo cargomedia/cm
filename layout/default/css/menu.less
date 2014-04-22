@@ -1,0 +1,36 @@
+.menu-tabs {
+  padding: 0 10px;
+  text-align: right;
+
+  > li {
+    display: inline-block;
+    vertical-align: bottom;
+
+    > a {
+      display: block;
+      .nowrap;
+      padding: 7px 10px;
+      color: @colorFgLinkSubtle;
+      opacity: .8;
+
+      &:hover {
+        opacity: 1;
+
+        .icon {
+          color: @colorFgHeading;
+        }
+      }
+    }
+    &.hasIcon.hasLabel > a > .label {
+      margin-left: 4px;
+    }
+
+    &.active a, &.active a:hover {
+      opacity: 1;
+
+      .icon {
+        color: @colorFgHeading;
+      }
+    }
+  }
+}
