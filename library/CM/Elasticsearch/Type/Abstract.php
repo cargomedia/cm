@@ -37,16 +37,12 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function __construct($host = null, $port = null, $version = null) {
-        $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
-        $this->_typeName = static::INDEX_NAME;
-
-        if (empty($this->_indexName)) {
+        if (null === static::INDEX_NAME) {
             throw new CM_Exception_Invalid('Index name has to be set');
         }
 
-        if (empty($this->_typeName)) {
-            throw new CM_Exception_Invalid('Type name has to be set');
-        }
+        $this->_indexName = CM_Bootloader::getInstance()->getDataPrefix() . static::INDEX_NAME;
+        $this->_typeName = static::INDEX_NAME;
 
         $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
         $server = $servers[array_rand($servers)];
