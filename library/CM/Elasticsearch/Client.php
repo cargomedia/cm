@@ -1,11 +1,11 @@
 <?php
 
-class CM_Search extends CM_Class_Abstract {
+class CM_Elasticsearch_Client extends CM_Class_Abstract {
 
     /** @var Elastica_Client */
     private $_client;
 
-    /** @var CM_Search */
+    /** @var CM_Elasticsearch_Client */
     private static $_instance;
 
     public function __construct() {
@@ -20,7 +20,7 @@ class CM_Search extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Elastica_Type_Abstract[] $types
+     * @param CM_Elasticsearch_Type_Abstract[] $types
      * @param array|null                  $data
      * @return array
      */
@@ -40,7 +40,7 @@ class CM_Search extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Search
+     * @return CM_Elasticsearch_Client
      */
     public static function getInstance() {
         if (!self::$_instance) {

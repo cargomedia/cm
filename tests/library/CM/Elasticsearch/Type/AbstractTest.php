@@ -1,13 +1,13 @@
 <?php
 
-class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
+class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
-    /** @var CM_Elastica_Type_AbstractMock */
+    /** @var CM_Elasticsearch_Type_AbstractMock */
     private $_type;
 
     public static function setUpBeforeClass() {
         CM_Db_Db::exec("CREATE TABLE `index_mock` (`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, `name` VARCHAR(100))");
-        CM_Config::get()->CM_Search->enabled = true;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
     }
 
     public static function tearDownAfterClass() {
@@ -15,7 +15,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     }
 
     public function setUp() {
-        $this->_type = new CM_Elastica_Type_AbstractMock();
+        $this->_type = new CM_Elasticsearch_Type_AbstractMock();
         $this->_type->createVersioned();
         $this->_type->getIndex()->refresh();
     }
@@ -28,7 +28,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     public function testUpdateItem() {
         $query = new CM_Elasticsearch_Query();
         $query->queryMatch(array('name'), 'foo');
-        $source = new CM_PagingSource_Search($this->_type, $query);
+        $source = new CM_PagingSource_Elasticsearch($this->_type, $query);
         $this->assertSame(0, $source->getCount());
 
         $id1 = $this->_type->createEntry('foo');
@@ -38,7 +38,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
 
         CM_Db_Db::update('index_mock', array('name' => 'bar'), array('id' => $id2));
         $this->_type->updateItem(array('id' => $id2));
-        $searchCli = new CM_Search_Index_Cli();
+        $searchCli = new CM_Elasticsearch_Index_Cli();
         $searchCli->update($this->_type);
         $this->assertSame(1, $source->getCount());
         $this->assertEquals(array($id1), $source->getItems());
@@ -47,7 +47,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     public function testUpdateItemWithJob() {
         $query = new CM_Elasticsearch_Query();
         $query->queryMatch(array('name'), 'foo');
-        $source = new CM_PagingSource_Search($this->_type, $query);
+        $source = new CM_PagingSource_Elasticsearch($this->_type, $query);
         $this->assertSame(0, $source->getCount());
 
         $id1 = $this->_type->createEntry('foo');
@@ -62,7 +62,7 @@ class CM_Elastica_Type_AbstractTest extends CMTest_TestCase {
     }
 }
 
-class CM_Elastica_Type_AbstractMock extends CM_Elastica_Type_Abstract {
+class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract {
 
     const INDEX_NAME = 'index_mock';
 
