@@ -3,7 +3,6 @@
 class CM_Service_MongoDBTest extends CMTest_TestCase {
 
     private $_collectionPrefix = 'UnitTest_';
-    private $_usedCollections = array();
 
     /**
      * Generate a name of a collection and ensure it's empty
@@ -14,7 +13,6 @@ class CM_Service_MongoDBTest extends CMTest_TestCase {
         $collectionName = $this->_collectionPrefix . $testName;
         $mdb = CM_Services::getInstance()->getMongoDB();
         $mdb->getCollection($collectionName)->drop();
-        $this->_usedCollections[] = $collectionName;
 
         return $collectionName;
     }
