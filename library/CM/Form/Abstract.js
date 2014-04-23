@@ -151,10 +151,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       handleErrors: true
     });
     var action = this._getAction(actionName);
-    var data = this.getData(actionName);
+    var data = this.getData(action.name);
     var deferred = $.Deferred();
 
-    var errorList = this._getErrorList(actionName);
+    var errorList = this._getErrorList(action.name);
 
     if (options.handleErrors) {
       _.each(this._fields, function(field, fieldName) {
@@ -174,7 +174,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
+      cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: action.name, data: data}, {
         success: function(response) {
           if (response.errors) {
             if (options.handleErrors) {
@@ -187,7 +187,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
               }
             }
 
-            handler.trigger('error error.' + actionName);
+            handler.trigger('error error.' + action.name);
             deferred.reject();
           }
 
@@ -203,13 +203,13 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           }
 
           if (!response.errors) {
-            handler.trigger('success success.' + actionName, response.data);
+            handler.trigger('success success.' + action.name, response.data);
             deferred.resolve(response.data);
           }
         },
         error: function(msg, type, isPublic) {
           handler._stopErrorPropagation = false;
-          handler.trigger('error error.' + actionName, msg, type, isPublic);
+          handler.trigger('error error.' + action.name, msg, type, isPublic);
           deferred.reject();
           return !handler._stopErrorPropagation;
         },
@@ -269,6 +269,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     if (!action) {
       cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
     }
+    action.name = actionName;
     return action;
   },
 
@@ -278,7 +279,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   _getErrorList: function(actionName) {
     var action = this._getAction(actionName);
-    var data = this.getData(actionName);
+    var data = this.getData(action.name);
 
     var errorList = {};
 
