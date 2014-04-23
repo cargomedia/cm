@@ -5,13 +5,6 @@ class CM_Service_MongoDBTest extends CMTest_TestCase {
     private $_collectionPrefix = 'UnitTest_';
     private $_usedCollections = array();
 
-    public function tearDown() {
-        $mdb = CM_Services::getInstance()->getMongoDB();
-        foreach ($this->_usedCollections as $collectionName) {
-            $mdb->drop($collectionName);
-        }
-    }
-
     /**
      * Generate a name of a collection and ensure it's empty
      * @param string $testName
@@ -22,6 +15,7 @@ class CM_Service_MongoDBTest extends CMTest_TestCase {
         $mdb = CM_Services::getInstance()->getMongoDB();
         $mdb->getCollection($collectionName)->drop();
         $this->_usedCollections[] = $collectionName;
+
         return $collectionName;
     }
 

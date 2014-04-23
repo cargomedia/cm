@@ -110,8 +110,8 @@ $config->CM_Services->list = array(
         'args'  => array(
             array(
                 'server'  => 'mongodb://localhost:27017',
-                'options' => array("connect" => true),
-                'dbName' => 'sk'
+                'options' => array('connect' => true),
+                'dbName'  => 'sk'
             )
         )
     )

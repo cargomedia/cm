@@ -24,6 +24,7 @@ class CMTest_TH {
         CM_App::getInstance()->setupFilesystem();
         self::clearDb();
         self::clearCache();
+        self::clearMongoDB();
         self::timeReset();
         self::clearConfig();
     }
@@ -31,6 +32,13 @@ class CMTest_TH {
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
+    }
+
+    public static function clearMongoDB() {
+        $mdb = CM_Services::getInstance()->getMongoDB();
+        foreach ($mdb->listCollections() as $collection) {
+            $collection->drop();
+        }
     }
 
     public static function clearDb() {
@@ -97,6 +105,7 @@ class CMTest_TH {
                 $abbreviation = self::_randStr(5);
             } while (CM_Model_Language::findByAbbreviation($abbreviation));
         }
+
         return CM_Model_Language::createStatic(array('name' => 'English', 'abbreviation' => $abbreviation, 'enabled' => 1));
     }
 
@@ -108,6 +117,7 @@ class CMTest_TH {
      */
     public static function createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
         $request = new CM_Request_Get('?' . http_build_query($params), array(), $viewer);
+
         return new $pageClass(CM_Params::factory($request->getQuery()), $request->getViewer());
     }
 
@@ -122,6 +132,7 @@ class CMTest_TH {
         $session = new CM_Session();
         $session->setUser($user);
         $session->write();
+
         return $session;
     }
 
@@ -164,6 +175,7 @@ class CMTest_TH {
         if (!$streamChannel->hasStreamPublish()) {
             self::createStreamPublish($user, $streamChannel);
         }
+
         return CM_Model_StreamChannelArchive_Video::createStatic(array('streamChannel' => $streamChannel));
     }
 
@@ -179,6 +191,7 @@ class CMTest_TH {
         if (is_null($streamChannel)) {
             $streamChannel = self::createStreamChannel();
         }
+
         return CM_Model_Stream_Publish::createStatic(array(
             'streamChannel' => $streamChannel,
             'user'          => $user, 'start' => time(),
@@ -195,6 +208,7 @@ class CMTest_TH {
         if (is_null($streamChannel)) {
             $streamChannel = self::createStreamChannel();
         }
+
         return CM_Model_Stream_Subscribe::createStatic(array('streamChannel' => $streamChannel, 'user' => $user, 'start' => time(),
                                                              'key'           => rand(1, 10000) . '_' . rand(1, 100)));
     }
@@ -211,6 +225,7 @@ class CMTest_TH {
             $headers = array('host' => $site->getHost());
         }
         $request = new CM_Request_Get($uri, $headers, null, $viewer);
+
         return new CM_Response_Page($request);
     }
 
@@ -251,6 +266,7 @@ class CMTest_TH {
         }
         $config = CM_Config::get()->CM_Db_Db;
         self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+
         return self::$_dbClient;
     }
 
@@ -279,6 +295,7 @@ class CMTest_TH {
         $class = new ReflectionClass($className);
         $method = $class->getMethod($methodName);
         $method->setAccessible(true);
+
         return $method;
     }
 
@@ -293,6 +310,7 @@ class CMTest_TH {
         while ($length--) {
             $str .= $charset[mt_rand(0, $count - 1)];
         }
+
         return $str;
     }
 }
