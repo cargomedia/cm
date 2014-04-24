@@ -13,8 +13,8 @@ $config->CM_Tracking_Abstract->code = '';
 
 $config->CM_Splittesting_Abstract->enabled = false;
 
-$config->CM_Search->enabled = true;
-$config->CM_Search->servers = array(
+$config->CM_Elasticsearch_Client->enabled = true;
+$config->CM_Elasticsearch_Client->servers = array(
     array('host' => 'localhost', 'port' => 9200),
 );
 

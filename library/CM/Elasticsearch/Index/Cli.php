@@ -1,6 +1,6 @@
 <?php
 
-class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
+class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|null $indexName
@@ -19,13 +19,15 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string|null $indexName
-     * @param string|null $host Elasticsearch host
-     * @param int|null    $port Elasticsearch port
+     * @param string|CM_Elasticsearch_Type_Abstract|null $indexName
+     * @param string|null                           $host Elasticsearch host
+     * @param int|null                              $port Elasticsearch port
      * @throws CM_Exception_Invalid
      */
     public function update($indexName = null, $host = null, $port = null) {
-        if ($indexName) {
+        if ($indexName instanceof CM_Elasticsearch_Type_Abstract) {
+            $indexes = array($indexName);
+        } elseif ($indexName) {
             $indexes = array($this->_getIndex($indexName, $host, $port));
         } else {
             $indexes = $this->_getIndexes($host, $port);
@@ -59,7 +61,7 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function optimize() {
-        $servers = CM_Config::get()->CM_Search->servers;
+        $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
         foreach ($servers as $server) {
             $client = new Elastica_Client($server);
             $client->optimizeAll();
@@ -76,10 +78,10 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param string|null $host
      * @param int|null    $port
-     * @return CM_Elastica_Type_Abstract[]
+     * @return CM_Elasticsearch_Type_Abstract[]
      */
     private function _getIndexes($host = null, $port = null) {
-        $indexTypes = CM_Util::getClassChildren('CM_Elastica_Type_Abstract');
+        $indexTypes = CM_Util::getClassChildren('CM_Elasticsearch_Type_Abstract');
         return array_map(function ($indexType) use ($host, $port) {
             return new $indexType($host, $port);
         }, $indexTypes);
@@ -90,10 +92,10 @@ class CM_Search_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $host
      * @param int|null    $port
      * @throws CM_Exception_Invalid
-     * @return CM_Elastica_Type_Abstract
+     * @return CM_Elasticsearch_Type_Abstract
      */
     private function _getIndex($indexName, $host = null, $port = null) {
-        $indexes = array_filter($this->_getIndexes($host, $port), function (CM_Elastica_Type_Abstract $index) use ($indexName) {
+        $indexes = array_filter($this->_getIndexes($host, $port), function (CM_Elasticsearch_Type_Abstract $index) use ($indexName) {
             return $index->getIndex()->getName() == $indexName;
         });
         if (!$indexes) {
