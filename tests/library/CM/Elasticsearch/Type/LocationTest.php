@@ -1,11 +1,11 @@
 <?php
 
-class CM_Elastica_Type_LocationTest extends CMTest_TestCase {
+class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
 
-    /** @var CM_Elastica_Type_Location */
+    /** @var CM_Elasticsearch_Type_Location */
     protected static $_type;
 
-    /** @var CM_Search_Index_Cli */
+    /** @var CM_Elasticsearch_Index_Cli */
     protected static $_searchIndexCli;
 
     public static function setUpBeforeClass() {
@@ -30,10 +30,10 @@ class CM_Elastica_Type_LocationTest extends CMTest_TestCase {
 
         CM_Db_Db::insert('cm_model_location_city', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
         CM_Model_Location::createAggregation();
-        CM_Config::get()->CM_Search->enabled = true;
+        CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
 
-        self::$_type = new CM_Elastica_Type_Location();
-        self::$_searchIndexCli = new CM_Search_Index_Cli();
+        self::$_type = new CM_Elasticsearch_Type_Location();
+        self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
         self::$_searchIndexCli->create(self::$_type->getIndex()->getName());
     }
 
@@ -43,16 +43,16 @@ class CM_Elastica_Type_LocationTest extends CMTest_TestCase {
     }
 
     public function testSearch() {
-        $searchQuery = new CM_SearchQuery_Location();
-        $source = new CM_PagingSource_Search_Location($searchQuery);
+        $searchQuery = new CM_Elasticsearch_Query_Location();
+        $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
         $this->assertSame(8, $source->getCount());
     }
 
     public function testSearchDistance() {
-        $searchQuery = new CM_SearchQuery_Location();
+        $searchQuery = new CM_Elasticsearch_Query_Location();
         $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 1);
         $searchQuery->sortDistance($location);
-        $source = new CM_PagingSource_Search_Location($searchQuery);
+        $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
         $locationList = $source->getItems();
         $this->assertEquals(array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY), reset($locationList));
     }

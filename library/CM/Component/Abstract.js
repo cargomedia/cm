@@ -91,8 +91,7 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
     var handler = this;
     options = _.defaults(options || {}, {
       'success': function() {
-        handler.$el.replaceWith(this.$el);
-        handler.remove(true);
+        handler.replaceWithHtml(this.$el);
       },
       'modal': false
     });

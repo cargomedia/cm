@@ -25,6 +25,12 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
           [$input, [$sliderValue, 'html']]
         ],
         resolution: 1
+      },
+      slide: function() {
+        field._onChange();
+      },
+      set: function() {
+        field._onChange();
       }
     });
 
@@ -48,24 +54,33 @@ var CM_FormField_Integer = CM_FormField_Abstract.extend({
     });
   },
 
-  sliderDown: function() {
-    var value = parseInt(this.$('.noUiSlider').val());
-    this.$('.noUiSlider').val(value - this.getOption('step'));
+  /**
+   * @param {Number} value
+   */
+  setValue: function(value) {
+    this.$('.noUiSlider').val(value);
+    this._onChange();
   },
 
-  sliderUp: function() {
-    var value = parseInt(this.$('.noUiSlider').val());
-    this.$('.noUiSlider').val(value + this.getOption('step'));
+  /**
+   * @returns {Number}
+   */
+  getValue: function() {
+    return parseInt(this.$('.noUiSlider').val());
+  },
+
+  _onChange: function() {
+    this.trigger('change');
   },
 
   _onKeyDown: function(event) {
     if (this._$noUiHandle.is(':focus')) {
       if (event.which === cm.keyCode.LEFT || event.which === cm.keyCode.DOWN) {
-        this.sliderDown();
+        this.setValue(this.getValue() - this.getOption('step'));
         event.preventDefault();
       }
       if (event.which === cm.keyCode.RIGHT || event.which === cm.keyCode.UP) {
-        this.sliderUp();
+        this.setValue(this.getValue() + this.getOption('step'));
         event.preventDefault();
       }
 

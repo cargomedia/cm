@@ -392,9 +392,10 @@ var CM_App = CM_Class_Abstract.extend({
     },
     /**
      * @param {Number} [timestamp]
+     * @param {String} [cssClass]
      * @return {jQuery}
      */
-    timeago: function(timestamp) {
+    timeago: function(timestamp, cssClass) {
       var date;
       if (timestamp) {
         date = new Date(timestamp * 1000);
@@ -403,7 +404,8 @@ var CM_App = CM_Class_Abstract.extend({
       }
       var print = date.toLocaleString();
       var iso8601 = this.iso8601(date);
-      return '<abbr class="timeago" title="' + iso8601 + '">' + print + '</abbr>';
+      cssClass += ' timeago';
+      return '<time datetime="' + iso8601 + '" class="' + cssClass + '">' + print + '</time>';
     }
   },
 
@@ -502,9 +504,18 @@ var CM_App = CM_Class_Abstract.extend({
      * @return {jQuery}
      */
     render: function(template, variables) {
-      var $output = $(_.template(template, variables).replace(/^\s+|\s+$/g, ''));
+      var $output = $(this.renderHtml(template, variables));
       cm.dom.setup($output);
       return $output;
+    },
+
+    /**
+     * @param {String} template
+     * @param {Object} variables
+     * @return {String}
+     */
+    renderHtml: function(template, variables) {
+      return _.template(template, variables).replace(/^\s+|\s+$/g, '');
     }
   },
 
@@ -734,10 +745,11 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {Object} data
-   * @param {Object} callbacks
+   * @param {Object} [callbacks]
    * @return jqXHR
    */
   ajax: function(type, data, callbacks) {
+    callbacks = callbacks || {};
     var url = this.getUrlAjax(type);
     var errorHandler = function(msg, type, isPublic, callback) {
       if (!callback || callback(msg, type, isPublic) !== false) {
@@ -1124,7 +1136,7 @@ var CM_App = CM_Class_Abstract.extend({
     /**
      * @returns Location
      */
-    _getLocation: function() {
+    getLocation: function() {
       return window.history.location || document.location;
     },
 
@@ -1132,7 +1144,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = this._getLocation();
+      var location = this.getLocation();
       return location.pathname + location.search;
     },
 
