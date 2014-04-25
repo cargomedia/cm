@@ -103,3 +103,7 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
+
+$config->CM_MongoDB->server = 'mongodb://localhost:27017';
+$config->CM_MongoDB->database = 'sk';
+
