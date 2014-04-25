@@ -157,9 +157,9 @@ class CM_Model_Location extends CM_Model_Abstract {
         $cache = CM_Cache_Local::getInstance();
         if ((list($level, $id) = $cache->get($cacheKey)) === false) {
             $level = $id = null;
-            if ($id = self::_getLocationIdByIp('cm_locationCityIp', 'cityId', $ip)) {
+            if ($id = self::_getLocationIdByIp('cm_model_location_city_ip', 'cityId', $ip)) {
                 $level = self::LEVEL_CITY;
-            } elseif ($id = self::_getLocationIdByIp('cm_locationCountryIp', 'countryId', $ip)) {
+            } elseif ($id = self::_getLocationIdByIp('cm_model_location_country_ip', 'countryId', $ip)) {
                 $level = self::LEVEL_COUNTRY;
             }
             $cache->set($cacheKey, array($level, $id));

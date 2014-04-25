@@ -134,10 +134,10 @@ CREATE TABLE `cm_model_location_city` (
   KEY `countryId` (`countryId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCityIp`;
+DROP TABLE IF EXISTS `cm_model_location_city_ip`;
 
 
-CREATE TABLE `cm_locationCityIp` (
+CREATE TABLE `cm_model_location_city_ip` (
   `cityId` int(10) unsigned NOT NULL,
   `ipStart` int(10) unsigned NOT NULL,
   `ipEnd` int(10) unsigned NOT NULL,
@@ -155,10 +155,10 @@ CREATE TABLE `cm_model_location_country` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCountryIp`;
+DROP TABLE IF EXISTS `cm_model_location_country_ip`;
 
 
-CREATE TABLE `cm_locationCountryIp` (
+CREATE TABLE `cm_model_location_country_ip` (
   `countryId` int(10) unsigned NOT NULL,
   `ipStart` int(10) unsigned NOT NULL,
   `ipEnd` int(10) unsigned NOT NULL,
