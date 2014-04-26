@@ -94,7 +94,6 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     });
 
     this.onChange(this._$input.select2("data"));
-    this.trigger('change');
   },
 
   /**
