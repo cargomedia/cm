@@ -143,6 +143,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         return (get_class($this) == get_class($model) && $this->getIdRaw() === $model->getIdRaw());
     }
 
+    /**
+     * @param bool $state
+     */
+    public function setAutoCommit($state) {
+        $this->_autoCommit = (bool) $state;
+    }
+
     final public function serialize() {
         return serialize(array('id' => $this->getIdRaw()));
     }
