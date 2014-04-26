@@ -64,14 +64,11 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
           field.$el.popover('destroy').popoverInfo(cm.language.get('You can only select {$cardinality} items.', {'cardinality': cardinality}), 2000);
           return false;
         }
-        field.onAdd(e.added);
         field.trigger('add', e.added);
       }
       if (!_.isUndefined(e.removed)) {
-        field.onDelete(e.removed);
         field.trigger('delete', e.removed);
       }
-      field.onChange(field._$input.select2("data"));
       field.trigger('change');
     });
 
@@ -92,32 +89,19 @@ var CM_FormField_Suggest = CM_FormField_Abstract.extend({
     this.getForm().$el.bind("reset", function() {
       field._$input.select2('data', null);
     });
-
-    this.onChange(this._$input.select2("data"));
-  },
-
-  /**
-   * @param {Object} item
-   */
-  onAdd: function(item) {
-  },
-
-  /**
-   * @param {Object} item
-   */
-  onDelete: function(item) {
-  },
-
-  /**
-   * @param {Object[]} items
-   */
-  onChange: function(items) {
   },
 
   blur: function() {
     this.setTimeout(function() {
       this.$('input.select2-input').blur();
     }, 10);
+  },
+
+  /**
+   * @return {Array}
+   */
+  getValue: function() {
+    return this._$input.select2('data');
   },
 
   /**
