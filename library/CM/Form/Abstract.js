@@ -148,7 +148,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   submit: function(actionName, options) {
     options = _.defaults(options || {}, {
-      handleErrors: true
+      handleErrors: true,
+      disableUI: true
     });
     var action = this._getAction(actionName);
     var data = this.getData(action.name);
@@ -170,7 +171,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       deferred.reject();
 
     } else {
-      this.disable();
+      if (options.disableUI) {
+        this.disable();
+      }
       this.trigger('submit', [data]);
 
       var handler = this;
@@ -214,7 +217,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
           return !handler._stopErrorPropagation;
         },
         complete: function() {
-          handler.enable();
+          if (options.disableUI) {
+            handler.enable();
+          }
           handler.trigger('complete');
         }
       });
