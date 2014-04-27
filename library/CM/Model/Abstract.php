@@ -229,7 +229,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                 $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
             }
             if ($persistence = $this->_getPersistence()) {
-                if ($schema->isEmpty()) {
+                if (!$schema->hasDefinition()) {
                     throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
                 }
                 if ($schema->hasField(array_keys($data))) {
@@ -390,7 +390,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return CM_Model_Schema_Definition
      */
     protected function _getSchema() {
-        return new CM_Model_Schema_Definition(array());
+        return new CM_Model_Schema_Definition();
     }
 
     /**
@@ -403,7 +403,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $data = $this->_getData();
         }
         $schema = $this->_getSchema();
-        if ($schema->isEmpty()) {
+        if (!$schema->hasDefinition()) {
             throw new CM_Exception_Invalid('Cannot get schema-data with an empty schema');
         }
         return array_intersect_key($data, array_flip($schema->getFieldNames()));
