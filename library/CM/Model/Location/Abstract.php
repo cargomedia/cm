@@ -3,15 +3,15 @@
 abstract class CM_Model_Location_Abstract extends CM_Model_Abstract {
 
     /**
-     * @param int $level
-     * @return CM_Model_Location_Abstract|null
-     */
-    abstract public function get($level);
-
-    /**
      * @return int
      */
     abstract public function getLevel();
+
+    /**
+     * @param int|null $level
+     * @return CM_Model_Location_Abstract|null
+     */
+    abstract public function getParent($level = null);
 
     /**
      * @return string

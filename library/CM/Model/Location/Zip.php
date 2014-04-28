@@ -2,27 +2,6 @@
 
 class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
 
-    public function get($level) {
-        $level = (int) $level;
-        switch ($level) {
-            case CM_Model_Location::LEVEL_COUNTRY:
-                if ($city = $this->getCity()) {
-                    return $city->getCountry();
-                }
-                break;
-            case CM_Model_Location::LEVEL_STATE:
-                if ($city = $this->getCity()) {
-                    return $city->getState();
-                }
-                break;
-            case CM_Model_Location::LEVEL_CITY:
-                return $this->getCity();
-            case CM_Model_Location::LEVEL_ZIP:
-                return $this;
-        }
-        return null;
-    }
-
     /**
      * @return CM_Model_Location_City
      */
@@ -79,6 +58,30 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
 
     public function getLevel() {
         return CM_Model_Location::LEVEL_ZIP;
+    }
+
+    public function getParent($level = null) {
+        if (null === $level) {
+            $level = CM_Model_Location::LEVEL_CITY;
+        }
+        $level = (int) $level;
+        switch ($level) {
+            case CM_Model_Location::LEVEL_COUNTRY:
+                if ($city = $this->getCity()) {
+                    return $city->getCountry();
+                }
+                break;
+            case CM_Model_Location::LEVEL_STATE:
+                if ($city = $this->getCity()) {
+                    return $city->getState();
+                }
+                break;
+            case CM_Model_Location::LEVEL_CITY:
+                return $this->getCity();
+            case CM_Model_Location::LEVEL_ZIP:
+                return $this;
+        }
+        return null;
     }
 
     public function _getSchema() {

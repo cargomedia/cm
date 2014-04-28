@@ -31,8 +31,7 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return int
      */
     public function getLevel() {
-        $location = $this->_getLocation();
-        return $location->getLevel();
+        return (int) $this->_getIdKey('level');
     }
 
     /**
@@ -40,6 +39,9 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return int|null
      */
     public function getId($level = null) {
+        if (null === $level) {
+            return (int) $this->_getIdKey('id');
+        }
         if ($location = $this->_getLocation($level)) {
             return $location->getId();
         }
@@ -117,18 +119,21 @@ class CM_Model_Location extends CM_Model_Abstract {
      * @return CM_Model_Location_Abstract|null
      */
     protected function _getLocation($level = null) {
-        /** @var CM_Model_Location_Abstract $location */
-        $location = $this->_get('location');
+        /** @var CM_Model_Location_Abstract[] $locationList */
+        $locationList = $this->_get('locationList');
         if (null === $level) {
-            return $location;
+            $level = $this->getLevel();
         }
-        return $location->get($level);
+        $level = (int) $level;
+        if (!isset($locationList[$level])) {
+            return null;
+        }
+        return $locationList[$level];
     }
 
     protected function _loadData() {
-        $idRaw = $this->getIdRaw();
-        $id = (int) $idRaw['id'];
-        $level = (int) $idRaw['level'];
+        $id = $this->getId();
+        $level = $this->getLevel();
         switch ($level) {
             case self::LEVEL_COUNTRY:
                 $location = new CM_Model_Location_Country($id);
@@ -145,7 +150,11 @@ class CM_Model_Location extends CM_Model_Abstract {
             default:
                 throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
         }
-        return array('location' => $location);
+        $locationList = array();
+        do {
+            $locationList[$location->getLevel()] = $location;
+        } while ($location = $location->getParent());
+        return array('locationList' => $locationList);
     }
 
     /**

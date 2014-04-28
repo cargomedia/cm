@@ -2,14 +2,6 @@
 
 class CM_Model_Location_Country extends CM_Model_Location_Abstract {
 
-    public function get($level) {
-        $level = (int) $level;
-        if ($level === CM_Model_Location::LEVEL_COUNTRY) {
-            return $this;
-        }
-        return null;
-    }
-
     /**
      * @return string
      */
@@ -26,6 +18,17 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
 
     public function getLevel() {
         return CM_Model_Location::LEVEL_COUNTRY;
+    }
+
+    public function getParent($level = null) {
+        if (null === $level) {
+            return null;
+        }
+        $level = (int) $level;
+        if ($level === CM_Model_Location::LEVEL_COUNTRY) {
+            return $this;
+        }
+        return null;
     }
 
     public function _getSchema() {

@@ -2,19 +2,6 @@
 
 class CM_Model_Location_City extends CM_Model_Location_Abstract {
 
-    public function get($level) {
-        $level = (int) $level;
-        switch ($level) {
-            case CM_Model_Location::LEVEL_COUNTRY:
-                return $this->getCountry();
-            case CM_Model_Location::LEVEL_STATE:
-                return $this->getState();
-            case CM_Model_Location::LEVEL_CITY:
-                return $this;
-        }
-        return null;
-    }
-
     /**
      * @return CM_Model_Location_Country
      */
@@ -99,6 +86,25 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
 
     public function getLevel() {
         return CM_Model_Location::LEVEL_CITY;
+    }
+
+    public function getParent($level = null) {
+        if (null === $level) {
+            if ($state = $this->getState()) {
+                return $state;
+            }
+            $level = CM_Model_Location::LEVEL_COUNTRY;
+        }
+        $level = (int) $level;
+        switch ($level) {
+            case CM_Model_Location::LEVEL_COUNTRY:
+                return $this->getCountry();
+            case CM_Model_Location::LEVEL_STATE:
+                return $this->getState();
+            case CM_Model_Location::LEVEL_CITY:
+                return $this;
+        }
+        return null;
     }
 
     public function _getSchema() {
