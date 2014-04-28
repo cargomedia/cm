@@ -650,11 +650,4 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     public static function fromArray(array $data) {
         return self::factoryGeneric($data['_type'], $data['_id']);
     }
-
-    /**
-     * @return CM_ModelAsset_Abstract[]
-     */
-    public function getAssets() {
-        return $this->_assets;
-    }
 }
