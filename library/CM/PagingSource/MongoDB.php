@@ -30,6 +30,7 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
 
     public function getCount($offset = null, $count = null) {
         $mdb = CM_Services::getInstance()->getMongoDB();
+
         return $mdb->count($this->_collection, $this->_query);
     }
 
@@ -57,4 +58,3 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
         return 0.01;
     }
 }
-
