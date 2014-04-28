@@ -78,6 +78,27 @@ class CM_Frontend {
     }
 
     /**
+     * @param CM_ViewResponse             $viewResponse
+     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param null                        $parentAutoId
+     */
+    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler, $parentAutoId = null) {
+        $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
+        $view = $viewResponse->getView();
+        $cmpJs = '';
+        $cmpJs .= $reference . ' = new ' . get_class($view) . '({';
+        $cmpJs .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
+        $cmpJs .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
+        if ($parentAutoId) {
+            $cmpJs .= ',parent: cm.views["' . $parentAutoId . '"]';
+        }
+        $cmpJs .= '});' . PHP_EOL;
+
+        $this->onloadPrepareJs($cmpJs, true);
+        $this->onloadJs($frontendHandler->compile_js($reference));
+    }
+
+    /**
      * @param CM_Form_Abstract $form
      * @param CM_View_Abstract $parentView
      */
