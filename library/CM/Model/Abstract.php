@@ -70,9 +70,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                 $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
-            foreach ($this->_getContainingCacheables() as $cacheable) {
-                $cacheable->_change();
-            }
+            $this->_changeContainingCacheables();
             $this->_onCreate();
         }
         $this->_autoCommit = true;
