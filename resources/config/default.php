@@ -64,10 +64,11 @@ $config->CM_Response_Page->catch = array(
 );
 
 $config->CM_Response_View_Abstract->catch = array(
+    'CM_Exception_Nonexistent',
     'CM_Exception_AuthRequired',
+    'CM_Exception_NotAllowed',
     'CM_Exception_Blocked',
     'CM_Exception_ActionLimit',
-    'CM_Exception_Nonexistent',
 );
 
 $config->CM_Response_RPC->catch = array(

@@ -276,18 +276,25 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param CM_Component_Abstract $cmp
      * @param CM_Render|null        $render
+     * @param string|null           $expectedExceptionClass
      */
-    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
+    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null, $expectedExceptionClass = null) {
         if (null === $render) {
             $render = new CM_Render();
+        }
+        $expectedExceptionClassList = array(
+            'CM_Exception_AuthRequired',
+            'CM_Exception_Nonexistent',
+            'CM_Exception_NotAllowed',
+        );
+        if (null !== $expectedExceptionClass) {
+            $expectedExceptionClassList = array($expectedExceptionClass);
         }
         try {
             $cmp->checkAccessible($render);
             self::fail('checkAccessible should throw exception');
-        } catch (CM_Exception_AuthRequired $e) {
-            self::assertTrue(true);
-        } catch (CM_Exception_Nonexistent $e) {
-            self::assertTrue(true);
+        } catch (Exception $e) {
+            self::assertTrue(in_array(get_class($e), $expectedExceptionClassList));
         }
     }
 
