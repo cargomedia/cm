@@ -447,9 +447,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         }
         $model = static::_createStatic($data);
         $model->_onChange();
-        foreach ($model->_getContainingCacheables() as $cacheable) {
-            $cacheable->_change();
-        }
+        $model->_changeContainingCacheables();
         $model->_onCreate();
         return $model;
     }
