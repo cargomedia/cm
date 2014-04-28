@@ -70,9 +70,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                 $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
             }
             $this->_onChange();
-            foreach ($this->_getContainingCacheables() as $cacheable) {
-                $cacheable->_change();
-            }
+            $this->_changeContainingCacheables();
             $this->_onCreate();
         }
         $this->_autoCommit = true;
@@ -386,6 +384,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         return array();
     }
 
+    protected function _changeContainingCacheables(){
+        foreach ($this->_getContainingCacheables() as $cacheable) {
+            $cacheable->_change();
+        }
+    }
+
     /**
      * @return CM_Model_Schema_Definition
      */
@@ -443,9 +447,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         }
         $model = static::_createStatic($data);
         $model->_onChange();
-        foreach ($model->_getContainingCacheables() as $cacheable) {
-            $cacheable->_change();
-        }
+        $model->_changeContainingCacheables();
         $model->_onCreate();
         return $model;
     }
