@@ -9,7 +9,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $renderEnvironment = $this->getRender()->getEnvironment();
         $this->_getComponent()->checkAccessible($renderEnvironment);
 
-        $frontendHandler = new CM_ComponentFrontendHandler();
+        $frontendHandler = new CM_ViewFrontendHandler();
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
 
         $parentViewId = null;
@@ -51,10 +51,10 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
     /**
      * @param CM_RenderEnvironment        $environment
-     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param CM_ViewFrontendHandler $frontendHandler
      * @return CM_ViewResponse
      */
-    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
+    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ViewFrontendHandler $frontendHandler) {
         $component = $this->_getComponent();
         $viewResponse = new CM_ViewResponse($component);
         $viewResponse->setTemplateName('default');

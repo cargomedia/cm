@@ -8,7 +8,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         }
     }
 
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);
@@ -18,7 +18,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         $viewResponse->set('cacheNames', $cacheNames);
     }
 
-    public function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_clearCache(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }

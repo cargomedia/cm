@@ -79,10 +79,10 @@ class CM_Frontend {
 
     /**
      * @param CM_ViewResponse             $viewResponse
-     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param CM_ViewFrontendHandler $frontendHandler
      * @param null                        $parentAutoId
      */
-    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler, $parentAutoId = null) {
+    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler, $parentAutoId = null) {
         $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
         $view = $viewResponse->getView();
         $cmpJs = '';
@@ -129,11 +129,11 @@ class CM_Frontend {
 
     /**
      * @param CM_ViewResponse             $viewResponse
-     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param CM_ViewFrontendHandler $frontendHandler
      * @param string                      $parentAutoId OPTIONAL
      * @throws CM_Exception_Invalid
      */
-    public function registerComponent(CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler, $parentAutoId = null) {
+    public function registerComponent(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler, $parentAutoId = null) {
         $component = $viewResponse->getView();
         if (!$component instanceof CM_Component_Abstract) {
             throw new CM_Exception_Invalid('Can only register component view responses');

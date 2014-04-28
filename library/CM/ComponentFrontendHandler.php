@@ -1,6 +1,6 @@
 <?php
 
-class CM_ComponentFrontendHandler {
+class CM_ViewFrontendHandler {
 
     /**
      * Javascript operations queue.

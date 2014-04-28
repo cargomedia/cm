@@ -28,10 +28,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     /**
      * @param CM_RenderEnvironment        $environment
      * @param CM_ViewResponse             $viewResponse
-     * @param CM_ComponentFrontendHandler $frontendHandler
+     * @param CM_ViewFrontendHandler $frontendHandler
      * @internal param \CM_Params $params
      */
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ComponentFrontendHandler $frontendHandler) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler) {
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         $environment->getViewer(true);
     }
 
-    public function ajax_reload(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_reload(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->reloadComponent($params->getAll());
     }
 }

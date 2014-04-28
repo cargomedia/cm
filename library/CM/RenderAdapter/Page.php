@@ -23,7 +23,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         return $this->_fetchMetaTemplate('title');
     }
 
-    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ComponentFrontendHandler $frontendHandler) {
+    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ViewFrontendHandler $frontendHandler) {
         $viewResponse = parent::_getPreparedViewResponse($environment, $frontendHandler);
         $viewResponse->set('pageTitle', $this->fetchTitle());
         return $viewResponse;
