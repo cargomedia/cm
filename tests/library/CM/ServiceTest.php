@@ -1,11 +1,11 @@
 <?php
 
 class DummyService {
+
     function getFoo() {
         return 'foo';
     }
 }
-
 
 class CM_ServicesTest extends CMTest_TestCase {
 
@@ -14,7 +14,6 @@ class CM_ServicesTest extends CMTest_TestCase {
     }
 
     public function assertRegisterService() {
-        // service registered in setUp()
         $this->assertNotEmpty('foo', CM_Services::getInstance()->getDummyService());
     }
 
