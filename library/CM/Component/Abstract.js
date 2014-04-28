@@ -6,9 +6,9 @@ var CM_Component_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Component_Abstract',
 
   _ready: function() {
-    cm.dom.setup(this.$());
-
     CM_View_Abstract.prototype._ready.call(this);
+
+    cm.dom.setup(this.$());
   },
 
   /**
