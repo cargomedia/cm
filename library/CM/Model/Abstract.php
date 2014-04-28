@@ -386,6 +386,12 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         return array();
     }
 
+    protected function _changeContainingCacheables(){
+        foreach ($this->_getContainingCacheables() as $cacheable) {
+            $cacheable->_change();
+        }
+    }
+
     /**
      * @return CM_Model_Schema_Definition
      */
