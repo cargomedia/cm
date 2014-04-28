@@ -2,35 +2,34 @@
 
 class CM_PagingSource_MongoDB_Test extends CMTest_TestCase {
 
-    /** @var CM_Service_MongoDB $_mongodb */
+    /** @var CMService_MongoDB $_mongodb */
     private $_mongodb;
     private $_collection = 'unitTest';
 
-    private function _getRecipientData()
-    {
+    private function _getRecipientData() {
         return array(
-            'userId' => rand(0, 1000),
-            'read' => 0,
-            'blocked' => 0,
-            'deleted' => 0,
+            'userId'       => rand(0, 1000),
+            'read'         => 0,
+            'blocked'      => 0,
+            'deleted'      => 0,
             'receiveStamp' => null,
-            'createStamp' => time(),
-            'sendStamp' => null
+            'createStamp'  => time(),
+            'sendStamp'    => null
         );
     }
 
-    private function _getConversationObject()
-    {
+    private function _getConversationObject() {
         $messages = array();
-        for ($i=0; $i<20; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $messages[] = str_repeat(md5(rand()), 4); // 128 char-long message
         }
+
         return array(
-            'id' => md5(rand()),
-            'usedId' => rand(0, 1000),
+            'id'          => md5(rand()),
+            'usedId'      => rand(0, 1000),
             'createStamp' => time(),
-            'recipients' => array($this->_getRecipientData(), $this->_getRecipientData()),
-            'messages' => $messages
+            'recipients'  => array($this->_getRecipientData(), $this->_getRecipientData()),
+            'messages'    => $messages
         );
     }
 

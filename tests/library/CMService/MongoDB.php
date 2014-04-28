@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_MongoDBTest extends CMTest_TestCase {
+class CMService_MongoDBTest extends CMTest_TestCase {
 
     private $_collectionPrefix = 'UnitTest_';
 

@@ -106,7 +106,7 @@ $config->CMService_Newrelic->appName = 'CM Application';
 
 $config->CM_Services->list = array(
     'MongoDB' => array(
-        'class' => 'CM_Service_MongoDB',
+        'class' => 'CMService_MongoDB',
         'args'  => array(
             array(
                 'server'  => 'mongodb://localhost:27017',

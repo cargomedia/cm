@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_MongoDB {
+class CMService_MongoDB {
 
     private $_client = null;
 
