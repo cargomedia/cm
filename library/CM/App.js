@@ -290,7 +290,7 @@ var CM_App = CM_Class_Abstract.extend({
     setup: function($dom) {
       $dom.placeholder();
       $dom.find('.timeago').timeago();
-      $dom.find('textarea.autosize, .autosize textarea').autosize();
+      $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
       $dom.find('.scrollShadow').scrollShadow();
       $dom.find('.showTooltip[title]').tooltip();
