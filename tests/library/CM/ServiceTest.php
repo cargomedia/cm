@@ -22,15 +22,11 @@ class CM_ServicesTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedExceptionMessage Non existing service should fail.
+     * @expectedException CM_Exception_Nonexistent
+     * @expectedExceptionMessage Service NonExistingService is not registered.
      */
     public function testInvalidService() {
-        try {
-            CM_Services::getInstance()->getNonExistingService();
-            $this->fail('Non existing service should fail.');
-        } catch (Exception $e) {
-            $this->assertTrue(true);
-        }
+        CM_Services::getInstance()->getNonExistingService();
     }
 
     public function testMagicGet() {

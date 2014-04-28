@@ -19,13 +19,13 @@ class CM_Services extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
-     * @return array
-     * @throws Exception
+     * @param $serviceName
+     * @return mixed
+     * @throws CM_Exception_Nonexistent
      */
     public function getServiceEntry($serviceName) {
         if (!isset($this->_servicesList[$serviceName])) {
-            throw new Exception("Service {$serviceName} is not registered.");
+            throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
         }
 
         return $this->_servicesList[$serviceName];
@@ -93,7 +93,7 @@ class CM_Services extends CM_Class_Abstract {
             return $this->getServiceInstance($serviceName, $configName);
         }
 
-        throw new Exception('Method doesn\'t exist.');
+        throw new CM_Exception_Nonexistent('Method doesn\'t exist.');
     }
 
     /**
@@ -103,7 +103,6 @@ class CM_Services extends CM_Class_Abstract {
         if (!self::$instance) {
             self::$instance = new self();
         }
-
         return self::$instance;
     }
 }
