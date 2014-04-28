@@ -23,8 +23,8 @@ class CMTest_TH {
     public static function clearEnv() {
         CM_App::getInstance()->setupFilesystem();
         self::clearDb();
-        self::clearCache();
         self::clearMongoDB();
+        self::clearCache();
         self::timeReset();
         self::clearConfig();
     }
