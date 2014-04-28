@@ -4,6 +4,8 @@ class CM_Services extends CM_Class_Abstract {
 
     private $_servicesList = array();
     private $_serviceInstances = array();
+    /** @var CM_Services $instance */
+    protected static $instance;
 
     private function __construct() {
         $this->_servicesList = self::_getConfig()->list;
@@ -98,10 +100,10 @@ class CM_Services extends CM_Class_Abstract {
      * @return CM_Services
      */
     public static function getInstance() {
-        static $instance;
-        if (!$instance) {
-            $instance = new self();
+        if (!self::$instance) {
+            self::$instance = new self();
         }
-        return $instance;
+
+        return self::$instance;
     }
 }
