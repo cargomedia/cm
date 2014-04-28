@@ -285,6 +285,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $expectedExceptionClassList = array(
             'CM_Exception_AuthRequired',
             'CM_Exception_Nonexistent',
+            'CM_Exception_NotAllowed',
         );
         if (null !== $expectedExceptionClass) {
             $expectedExceptionClassList = array($expectedExceptionClass);
