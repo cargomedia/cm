@@ -214,25 +214,25 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Response_View_Ajax $response
+     * @param CM_Response_View_Abstract $response
      * @param array|null            $data
      */
-    public static function assertAjaxResponseSuccess(CM_Response_View_Ajax $response, array $data = null) {
+    public static function assertViewResponseSuccess(CM_Response_View_Abstract $response, array $data = null) {
         $responseContent = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('success', $responseContent, 'AjaxCall not successful');
+        self::assertArrayHasKey('success', $responseContent, 'View response not successful');
         if (null !== $data) {
             self::assertSame($data, $responseContent['success']['data']);
         }
     }
 
     /**
-     * @param CM_Response_View_Ajax $response
+     * @param CM_Response_View_Abstract $response
      * @param string|null           $type
      * @param string|null           $message
      */
-    public static function assertAjaxResponseError(CM_Response_View_Ajax $response, $type = null, $message = null) {
+    public static function assertViewResponseError(CM_Response_View_Abstract $response, $type = null, $message = null) {
         $responseContent = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('error', $responseContent, 'AjaxCall successful');
+        self::assertArrayHasKey('error', $responseContent, 'View response successful');
         if (null !== $type) {
             self::assertSame($type, $responseContent['error']['type']);
         }
