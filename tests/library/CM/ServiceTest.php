@@ -1,12 +1,5 @@
 <?php
 
-class DummyService {
-
-    function getFoo() {
-        return 'foo';
-    }
-}
-
 class CM_ServicesTest extends CMTest_TestCase {
 
     public function setUp() {
@@ -28,6 +21,9 @@ class CM_ServicesTest extends CMTest_TestCase {
         $this->assertSame($instance1, $instance2);
     }
 
+    /**
+     * @expectedExceptionMessage Non existing service should fail.
+     */
     public function testInvalidService() {
         try {
             CM_Services::getInstance()->getNonExistingService();
@@ -42,5 +38,12 @@ class CM_ServicesTest extends CMTest_TestCase {
         $instance2 = CM_Services::getInstance()->getServiceInstance('DummyService');
 
         $this->assertSame($instance1, $instance2);
+    }
+}
+
+class DummyService {
+
+    function getFoo() {
+        return 'foo';
     }
 }
