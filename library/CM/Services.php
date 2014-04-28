@@ -57,14 +57,14 @@ class CM_Services extends CM_Class_Abstract {
      * @param string      $serviceName
      * @param string|null $expectClass
      * @return mixed
-     * @throws Exception
+     * @throws CM_Exception_Invalid
      */
     public function getServiceInstance($serviceName, $expectClass = null) {
         if (!isset($this->_serviceInstances[$serviceName])) {
             $instance = $this->_instantiateService($serviceName);
 
-            if ($expectClass !== null && get_class($instance)) {
-                throw new Exception("Expected to get an instance of {$expectClass}, got " . get_class($instance));
+            if ($expectClass !== null && get_class($instance) !== $expectClass) {
+                throw new CM_Exception_Invalid("Expected to get an instance of {$expectClass}, got " . get_class($instance));
             }
             $this->_serviceInstances[$serviceName] = $instance;
         }
