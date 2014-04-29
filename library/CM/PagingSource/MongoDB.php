@@ -6,18 +6,15 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
     private $_fieldFilter = null;
     private $_processItemCallback = null;
 
-    /** @var array */
-    private $_parameters = array();
-
     /**
      * @param  array|null $fields Array of field which to include/exclude, see http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
      * @param  string     $collection
      * @param  array      $query
      */
-    function __construct($fields, $collection, $query) {
-        $this->_collection = $collection;
-        $this->_query = $query;
-        $this->_fields = $fields;
+    public function __construct($fields, $collection, $query) {
+        $this->_fields = (array)$fields;
+        $this->_collection = (string)$collection;
+        $this->_query = (array)$query;
 
         if ($this->_fields) {
             $this->_fieldFilter = array_flip($this->_fields);
