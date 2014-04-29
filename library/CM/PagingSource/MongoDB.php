@@ -3,7 +3,6 @@
 class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
 
     private $_fields, $_collection, $_query;
-    private $_fieldFilter = null;
     private $_processItemCallback = null;
 
     /**
@@ -12,13 +11,9 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
      * @param  array      $query
      */
     public function __construct($fields, $collection, $query) {
-        $this->_fields = (array)$fields;
-        $this->_collection = (string)$collection;
-        $this->_query = (array)$query;
-
-        if ($this->_fields) {
-            $this->_fieldFilter = array_flip($this->_fields);
-        }
+        $this->_fields = (array) $fields;
+        $this->_collection = (string) $collection;
+        $this->_query = (array) $query;
     }
 
     public function getCount($offset = null, $count = null) {
