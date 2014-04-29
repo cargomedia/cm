@@ -1,9 +1,8 @@
 <?php
 
-class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
+class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
 
     private $_fields, $_collection, $_query;
-    private $_processItemCallback = null;
 
     /**
      * @param  array|null $fields Array of field which to include/exclude, see http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
@@ -16,12 +15,21 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
         $this->_query = (array) $query;
     }
 
+    /**
+     * @param int|null $offset
+     * @param int|null $count
+     * @return int
+     */
     public function getCount($offset = null, $count = null) {
         $mongoDb = CM_Services::getInstance()->getMongoDB();
-
         return $mongoDb->count($this->_collection, $this->_query);
     }
 
+    /**
+     * @param int|null $offset
+     * @param int|null $count
+     * @return array
+     */
     public function getItems($offset = null, $count = null) {
         $mdb = CM_Services::getInstance()->getMongoDB();
         $result = array();
@@ -29,10 +37,6 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
         foreach ($cursor as $item) {
             $item['id'] = $item['_id'];
             $result[] = $item;
-        }
-
-        if ($this->_processItemCallback !== null) {
-            $result = array_map($this->_processItemCallback, $result);
         }
 
         return $result;
