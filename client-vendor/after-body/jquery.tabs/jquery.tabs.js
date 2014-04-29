@@ -24,7 +24,7 @@
     if (!$activeTab.length) {
       $activeTab = $tabs.first();
     }
-    this.showTab($activeTab);
+    this.showTab($activeTab, true);
   };
 
   Tabs.prototype = {
@@ -39,12 +39,21 @@
       this.showTab($tab);
     },
 
-    showTab: function($tab) {
+    /**
+     * @param {jQuery} $tab
+     * @param {Boolean} [skipChangeEvent]
+     */
+    showTab: function($tab, skipChangeEvent) {
       var index = $tab.index();
       $tab.addClass('active').siblings().removeClass('active');
       var $tabContent = this.$contentContainer.find('> *').eq(index);
-      $tabContent.addClass('active').show().find(':focusable:first').focus();
+      $tabContent.addClass('active').show();
       $tabContent.siblings().removeClass('active').hide();
+      if (!skipChangeEvent) {
+        $tab.trigger('tabs.changed', {
+          content: $tabContent
+        });
+      }
     }
   };
 
