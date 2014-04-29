@@ -20,10 +20,10 @@ class CM_Services extends CM_Class_Abstract {
 
     /**
      * @param $serviceName
-     * @return mixed
+     * @return string
      * @throws CM_Exception_Nonexistent
      */
-    public function getServiceEntry($serviceName) {
+    public function getServiceClass($serviceName) {
         if (!isset($this->_servicesList[$serviceName])) {
             throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
         }
@@ -33,14 +33,10 @@ class CM_Services extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
-     * @param array  $config
-     * @throws Exception
+     * @param string $className
      */
-    public function registerService($serviceName, $config) {
-        if (empty($config['class'])) {
-            throw new Exception("Class name missing for service {$serviceName}.");
-        }
-        $this->_servicesList[$serviceName] = $config;
+    public function registerService($serviceName, $className) {
+        $this->_servicesList[$serviceName] = $className;
     }
 
     /**
@@ -48,26 +44,19 @@ class CM_Services extends CM_Class_Abstract {
      * @return object
      */
     protected function _instantiateService($serviceName) {
-        $serviceConfig = $this->getServiceEntry($serviceName);
+        $serviceClass = $this->getServiceClass($serviceName);
+        $instance = new $serviceClass;
 
-        $reflector = new ReflectionClass($serviceConfig['class']);
-        $args = !empty($serviceConfig['args']) ? $serviceConfig['args'] : array();
-        return $reflector->newInstanceArgs($args);
+        return $instance;
     }
 
     /**
-     * @param string      $serviceName
-     * @param string|null $expectClass
+     * @param string $serviceName
      * @return mixed
-     * @throws CM_Exception_Invalid
      */
-    public function getServiceInstance($serviceName, $expectClass = null) {
+    public function getServiceInstance($serviceName) {
         if (!isset($this->_serviceInstances[$serviceName])) {
             $instance = $this->_instantiateService($serviceName);
-
-            if ($expectClass !== null && get_class($instance) !== $expectClass) {
-                throw new CM_Exception_Invalid("Expected to get an instance of {$expectClass}, got " . get_class($instance));
-            }
             $this->_serviceInstances[$serviceName] = $instance;
         }
 
@@ -75,22 +64,18 @@ class CM_Services extends CM_Class_Abstract {
     }
 
     /**
-     * returns a instance of CM_Service_Abstract
+     * Methods in format get[serviceName] returns a instance of a service with given name.
      *
      * @param string $name
-     * @param array  $arguments
+     * @param mixed  $parameters
      * @return mixed
-     * @throws Exception
+     * @throws CM_Exception_Nonexistent
      */
-    public function __call($name, array $arguments) {
+    public function __call($name, $parameters) {
         if (preg_match('/get(.+)/', $name, $matches)) {
             $serviceName = $matches[1];
-            if (!empty($arguments[0])) {
-                $configName = $arguments[0];
-            } else {
-                $configName = null;
-            }
-            return $this->getServiceInstance($serviceName, $configName);
+
+            return $this->getServiceInstance($serviceName);
         }
 
         throw new CM_Exception_Nonexistent('Method doesn\'t exist.');

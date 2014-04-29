@@ -1,21 +1,16 @@
 <?php
 
-class CMService_MongoDB {
+class CMService_MongoDB extends CM_Class_Abstract {
 
     private $_client = null;
-
-    protected $_config;
-
-    public function __construct(array $config) {
-        $this->_config = $config;
-    }
 
     /**
      * @return MongoClient
      */
     protected function getClient() {
         if (empty($this->_client)) {
-            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+            $config = self::_getConfig();
+            $this->_client = new MongoClient($config->server, $config->options);
         }
 
         return $this->_client;
@@ -30,10 +25,8 @@ class CMService_MongoDB {
         $client = $this->getClient();
 
         if ($dbName === null) {
-            if (empty($this->_config['dbName'])) {
-                throw new CM_Exception_Nonexistent('MongoDB service dbName not set.');
-            }
-            $dbName = $this->_config['dbName'];
+            $config = self::_getConfig();
+            $dbName = $config->db;
         }
 
         // add optional prefix to dbName

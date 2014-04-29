@@ -3,7 +3,7 @@
 class CM_ServicesTest extends CMTest_TestCase {
 
     public function setUp() {
-        CM_Services::getInstance()->registerService('DummyService', array('class' => 'DummyService'));
+        CM_Services::getInstance()->registerService('DummyService', 'DummyService');
     }
 
     public function assertRegisterService() {
