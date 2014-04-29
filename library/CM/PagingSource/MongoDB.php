@@ -17,9 +17,9 @@ class CM_PagingSource_MongoDB extends CM_PagingSource_Abstract {
     }
 
     public function getCount($offset = null, $count = null) {
-        $mdb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDB();
 
-        return $mdb->count($this->_collection, $this->_query);
+        return $mongoDb->count($this->_collection, $this->_query);
     }
 
     public function getItems($offset = null, $count = null) {
