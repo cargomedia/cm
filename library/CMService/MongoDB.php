@@ -2,6 +2,7 @@
 
 class CMService_MongoDB extends CM_Class_Abstract {
 
+    /** @var CMService_MongoDB|null $_client */
     private $_client = null;
 
     /**

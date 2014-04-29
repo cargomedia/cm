@@ -58,15 +58,15 @@ class CM_PagingSource_MongoDB_Test extends CMTest_TestCase {
     }
 
     public function testCount() {
-        $source = new CM_PagingSource_MongoDB(array('recipients'), $this->_collection, array('recipients.userId' => 1001));
+        $source = new CM_PagingSource_MongoDb(array('recipients'), $this->_collection, array('recipients.userId' => 1001));
         $this->assertSame(1, $source->getCount());
 
-        $sourceEmpty = new CM_PagingSource_MongoDB(array('recipients'), $this->_collection, array('recipients.userId' => 1002));
+        $sourceEmpty = new CM_PagingSource_MongoDb(array('recipients'), $this->_collection, array('recipients.userId' => 1002));
         $this->assertSame(0, $sourceEmpty->getCount());
     }
 
     public function testSearch() {
-        $source = new CM_PagingSource_MongoDB(array('messages'), $this->_collection, array('recipients.userId' => 1001));
+        $source = new CM_PagingSource_MongoDb(array('messages'), $this->_collection, array('recipients.userId' => 1001));
         $this->assertSame(1, $source->getCount());
         $items = $source->getItems();
         $this->assertContains('testing', $items[0]['messages']);
