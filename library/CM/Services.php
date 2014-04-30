@@ -2,65 +2,49 @@
 
 class CM_Services extends CM_Class_Abstract {
 
-    private $_servicesList = array();
-    private $_serviceInstances = array();
-    /** @var CM_Services $instance */
+    /** @var array */
+    private $_serviceList = array();
+
+    /** @var array */
+    private $_serviceInstanceList = array();
+
+    /** @var CM_Services */
     protected static $instance;
 
     private function __construct() {
-        $this->_servicesList = self::_getConfig()->list;
-    }
-
-    /**
-     * @return CMService_MongoDb
-     */
-    public function getMongoDb() {
-        return $this->getServiceInstance('MongoDb');
-    }
-
-    /**
-     * @param $serviceName
-     * @return string
-     * @throws CM_Exception_Nonexistent
-     */
-    public function getServiceClass($serviceName) {
-        if (!isset($this->_servicesList[$serviceName])) {
-            throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
-        }
-
-        return $this->_servicesList[$serviceName];
+        $this->_serviceList = self::_getConfig()->list;
     }
 
     /**
      * @param string $serviceName
-     * @param string $className
+     * @return bool
      */
-    public function registerService($serviceName, $className) {
-        $this->_servicesList[$serviceName] = $className;
-    }
-
-    /**
-     * @param string $serviceName
-     * @return object
-     */
-    protected function _instantiateService($serviceName) {
-        $serviceClass = $this->getServiceClass($serviceName);
-        $instance = new $serviceClass;
-
-        return $instance;
+    public function has($serviceName) {
+        return array_key_exists($serviceName, $this->_serviceList);
     }
 
     /**
      * @param string $serviceName
      * @return mixed
      */
-    public function getServiceInstance($serviceName) {
-        if (!isset($this->_serviceInstances[$serviceName])) {
-            $instance = $this->_instantiateService($serviceName);
-            $this->_serviceInstances[$serviceName] = $instance;
+    public function get($serviceName) {
+        if (!array_key_exists($serviceName, $this->_serviceInstanceList)) {
+            $this->_serviceInstanceList[$serviceName] = $this->_instantiateService($serviceName);
         }
+        return $this->_serviceInstanceList[$serviceName];
+    }
 
-        return $this->_serviceInstances[$serviceName];
+    /**
+     * @param string     $serviceName
+     * @param string     $className
+     * @param array|null $arguments
+     */
+    public function register($serviceName, $className, array $arguments = null) {
+        $arguments = (array) $arguments;
+        $this->_serviceList[$serviceName] = array(
+            'class'     => $className,
+            'arguments' => $arguments,
+        );
     }
 
     /**
@@ -75,10 +59,39 @@ class CM_Services extends CM_Class_Abstract {
         if (preg_match('/get(.+)/', $name, $matches)) {
             $serviceName = $matches[1];
 
-            return $this->getServiceInstance($serviceName);
+            return $this->get($serviceName);
         }
 
         throw new CM_Exception_Nonexistent('Method doesn\'t exist.');
+    }
+
+    /**
+     * @param string|null $serviceName
+     * @return CM_Service_MongoDb
+     */
+    public function getMongoDb($serviceName = null) {
+        if (null === $serviceName) {
+            $serviceName = 'MongoDB';
+        }
+        return $this->get($serviceName);
+    }
+
+    /**
+     * @param string $serviceName
+     * @throws CM_Exception_Nonexistent
+     * @return mixed
+     */
+    protected function _instantiateService($serviceName) {
+        if (!$this->has($serviceName)) {
+            throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
+        }
+        $config = $this->_serviceList[$serviceName];
+        $arguments = array();
+        if (array_key_exists('arguments', $config)) {
+            $arguments = $config['arguments'];
+        }
+        $reflection = new ReflectionClass($config['class']);
+        return $reflection->newInstanceArgs($arguments);
     }
 
     /**
