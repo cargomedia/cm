@@ -42,7 +42,7 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica_Document(null, array(
+        $doc = new Elastica\Document(null, array(
             'level' => (int) $data['level'],
             'id'    => (int) $data['id'],
             'name'  => $data['name'],

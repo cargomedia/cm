@@ -93,7 +93,7 @@ class CM_Elasticsearch_Type_AbstractMock extends CM_Elasticsearch_Type_Abstract 
     }
 
     protected function _getDocument(array $data) {
-        return new Elastica_Document($data['id'],
+        return new Elastica\Document($data['id'],
             array(
                 'name' => $data['name'],
             )
