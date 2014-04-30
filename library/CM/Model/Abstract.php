@@ -121,7 +121,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (null === $this->_id) {
             throw new CM_Exception_Invalid('Model has no id');
         }
-
         return $this->_id;
     }
 
@@ -140,9 +139,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (empty($model)) {
             return false;
         }
-
         /** @var CM_Model_Abstract $model */
-
         return (get_class($this) == get_class($model) && $this->getIdRaw() === $model->getIdRaw());
     }
 
@@ -170,7 +167,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         $this->_data = null;
         $this->_dataDecoded = array();
         $this->_onChange();
-
         return $this;
     }
 
@@ -188,7 +184,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (!array_key_exists($field, $this->_dataDecoded)) {
             $this->_dataDecoded[$field] = $this->_getSchema()->decodeField($field, $data[$field]);
         }
-
         return $this->_dataDecoded[$field];
     }
 
@@ -272,7 +267,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                 }
             }
         }
-
         return $this->_data;
     }
 
@@ -329,7 +323,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (!$this->_hasIdKey($key)) {
             throw new CM_Exception_Invalid('Id-array has no field `' . $key . '`.');
         }
-
         return $idRaw[$key];
     }
 
@@ -340,7 +333,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     protected function _hasIdKey($key) {
         $key = (string) $key;
         $idRaw = $this->getIdRaw();
-
         return array_key_exists($key, $idRaw);
     }
 
@@ -362,7 +354,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (!$this->_hasAsset($className)) {
             throw new CM_Exception('No such asset `' . $className . '`');
         }
-
         return $this->_assets[$className];
     }
 
@@ -408,7 +399,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if ($schema->isEmpty()) {
             throw new CM_Exception_Invalid('Cannot get schema-data with an empty schema');
         }
-
         return array_intersect_key($data, array_flip($schema->getFieldNames()));
     }
 
@@ -450,7 +440,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $cacheable->_change();
         }
         $model->_onCreate();
-
         return $model;
     }
 
@@ -463,7 +452,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
     final public static function createType($type, array $data = null) {
         /** @var CM_Model_Abstract $className */
         $className = static::_getClassName($type);
-
         return $className::createStatic($data);
     }
 
@@ -520,7 +508,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (!class_exists($className) || !is_subclass_of($className, 'CM_Model_StorageAdapter_AbstractAdapter')) {
             throw new CM_Exception_Invalid('Invalid storage adapter class `' . $className . '`');
         }
-
         return new $className();
     }
 
@@ -544,7 +531,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             $model->_loadAssets(true);
             $cache->save($model->getType(), $model->getIdRaw(), $model->_getData());
         }
-
         return $model;
     }
 
@@ -634,7 +620,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         foreach ($serializedKeyMap as $originalKey => $serializedKey) {
             $resultList[] = $modelList[$serializedKeyMap[$originalKey]];
         }
-
         return $resultList;
     }
 
@@ -643,7 +628,6 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if ($this->hasId()) {
             $array['id'] = $this->getId();
         }
-
         return $array;
     }
 
