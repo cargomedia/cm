@@ -3,7 +3,7 @@
 class CM_ServicesTest extends CMTest_TestCase {
 
     public function setUp() {
-        CM_Services::getInstance()->registerService('DummyService', 'DummyService');
+        CM_Services::getInstance()->register('DummyService', 'DummyService');
     }
 
     public function assertRegisterService() {
@@ -31,7 +31,7 @@ class CM_ServicesTest extends CMTest_TestCase {
 
     public function testMagicGet() {
         $instance1 = CM_Services::getInstance()->getDummyService();
-        $instance2 = CM_Services::getInstance()->getServiceInstance('DummyService');
+        $instance2 = CM_Services::getInstance()->get('DummyService');
 
         $this->assertSame($instance1, $instance2);
     }
