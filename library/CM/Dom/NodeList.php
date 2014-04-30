@@ -113,7 +113,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
      */
     public function getAttributeList() {
         $attributeList = array();
-        if (!isset($this->_elementList[0])) {
+        if (!isset($this->_elementList[0]) || (null === $this->_elementList[0]->attributes)) {
             return $attributeList;
         }
         foreach ($this->_elementList[0]->attributes as $key => $attrNode) {
