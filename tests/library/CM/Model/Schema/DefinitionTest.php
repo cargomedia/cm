@@ -2,12 +2,12 @@
 
 class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
-    public function testIsEmpty() {
+    public function testHasDefinition() {
         $schema = new CM_Model_Schema_Definition(array());
-        $this->assertTrue($schema->isEmpty());
+        $this->assertTrue($schema->hasDefinition());
 
-        $schema = new CM_Model_Schema_Definition(array('foo' => array()));
-        $this->assertFalse($schema->isEmpty());
+        $schema = new CM_Model_Schema_Definition();
+        $this->assertFalse($schema->hasDefinition());
     }
 
     public function testIsFloat() {

@@ -2,14 +2,14 @@
 
 class CM_Elasticsearch_Client extends CM_Class_Abstract {
 
-    /** @var Elastica_Client */
+    /** @var Elastica\Client */
     private $_client;
 
     /** @var CM_Elasticsearch_Client */
     private static $_instance;
 
     public function __construct() {
-        $this->_client = new Elastica_Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10));
+        $this->_client = new Elastica\Client(array('servers' => self::_getConfig()->servers, 'timeout' => 10));
     }
 
     /**
@@ -30,7 +30,7 @@ class CM_Elasticsearch_Client extends CM_Class_Abstract {
         }
         CM_Debug::getInstance()->incStats('search', json_encode($data));
 
-        $search = new Elastica_Search($this->_client);
+        $search = new Elastica\Search($this->_client);
         foreach ($types as $type) {
             $search->addIndex($type->getIndex());
             $search->addType($type->getType());

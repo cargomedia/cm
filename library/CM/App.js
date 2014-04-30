@@ -290,7 +290,7 @@ var CM_App = CM_Class_Abstract.extend({
     setup: function($dom) {
       $dom.placeholder();
       $dom.find('.timeago').timeago();
-      $dom.find('textarea.autosize, .autosize textarea').autosize();
+      $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
       $dom.find('.scrollShadow').scrollShadow();
       $dom.find('.showTooltip[title]').tooltip();
@@ -1136,7 +1136,7 @@ var CM_App = CM_Class_Abstract.extend({
     /**
      * @returns Location
      */
-    _getLocation: function() {
+    getLocation: function() {
       return window.history.location || document.location;
     },
 
@@ -1144,7 +1144,7 @@ var CM_App = CM_Class_Abstract.extend({
      * @returns string
      */
     _getFragment: function() {
-      var location = this._getLocation();
+      var location = this.getLocation();
       return location.pathname + location.search;
     },
 

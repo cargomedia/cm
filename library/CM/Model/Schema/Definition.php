@@ -5,10 +5,17 @@ class CM_Model_Schema_Definition {
     /** @var array */
     private $_schema;
 
+    /** @var bool */
+    private $_hasDefinition;
+
     /**
-     * @param array $schema
+     * @param array|null $schema
      */
-    public function __construct(array $schema) {
+    public function __construct(array $schema = null) {
+        $this->_hasDefinition = (null !== $schema);
+        if (null === $schema) {
+            $schema = array();
+        }
         $this->_schema = $schema;
     }
 
@@ -135,10 +142,10 @@ class CM_Model_Schema_Definition {
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isEmpty() {
-        return empty($this->_schema);
+    public function hasDefinition() {
+        return $this->_hasDefinition;
     }
 
     /**
