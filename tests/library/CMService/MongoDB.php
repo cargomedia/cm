@@ -1,6 +1,6 @@
 <?php
 
-class CMService_MongoDBTest extends CMTest_TestCase {
+class CMService_MongoDbTest extends CMTest_TestCase {
 
     private $_collectionPrefix = 'UnitTest_';
 
@@ -11,7 +11,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      */
     private function getEmptyCollectionName($testName) {
         $collectionName = $this->_collectionPrefix . $testName;
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $mongoDb->getCollection($collectionName)->drop();
 
         return $collectionName;
@@ -21,7 +21,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * Test insert
      */
     public function testInsert() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->getEmptyCollectionName('insert');
         $name = 'Bob';
         $userId = 123;
@@ -34,7 +34,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * Test update
      */
     public function testUpdate() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->getEmptyCollectionName('update');
         $name = 'Bob';
         $userId = 123;
@@ -72,7 +72,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * NOTE: this one actually tests is the returned id isn't empty rather than if it's unique... which would be hard to test.
      */
     public function testGetNewId() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $id1 = $mongoDb->getNewId();
         $id2 = $mongoDb->getNewId();
         $this->assertNotSame($id1, $id2);
@@ -82,7 +82,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * Test find
      */
     public function testFind() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->getEmptyCollectionName('find');
 
         $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice'));
@@ -101,7 +101,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * Test Count
      */
     public function testCount() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->getEmptyCollectionName('count');
         $this->assertSame(0, $mongoDb->getCollection($collectionName)->count());
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
@@ -114,7 +114,7 @@ class CMService_MongoDBTest extends CMTest_TestCase {
      * Test remove
      */
     public function testRemove() {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->getEmptyCollectionName('remove');
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
         $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
@@ -129,15 +129,15 @@ class CMService_MongoDBTest extends CMTest_TestCase {
     /*
         // TODO?
         public function testGetDefaultDatabase() {
-            $mongo = CM_Services::getInstance()->getMongoDB();
+            $mongo = CM_Services::getInstance()->getMongoDb();
             $db = $mongo->getDatabase();
-            $this->assertInstanceOf('MongoDB', $db); // todo: check db name
+            $this->assertInstanceOf('MongoDb', $db); // todo: check db name
         }
 
         public function testGetNonDefaultDatabase() {
-            $mongo = CM_Services::getInstance()->getMongoDB('test');
+            $mongo = CM_Services::getInstance()->getMongoDb('test');
             $db = $mongo->getDatabase();
-            $this->assertInstanceOf('MongoDB', $db); // todo: check db name
+            $this->assertInstanceOf('MongoDb', $db); // todo: check db name
         }
     */
 }
