@@ -68,7 +68,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         return array($this->_fields, $this->_collection, $this->_query);
     }
 
-    function getStalenessChance() {
+    public function getStalenessChance() {
         return 0.01;
     }
 }
