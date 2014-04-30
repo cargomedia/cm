@@ -12,7 +12,7 @@ class CM_Services extends CM_Class_Abstract {
     }
 
     /**
-     * @return CMService_MongoDB
+     * @return CM_Service_MongoDB
      */
     public function getMongoDB() {
         return $this->getServiceInstance('MongoDB');
