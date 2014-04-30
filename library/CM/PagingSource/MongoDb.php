@@ -21,8 +21,13 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
      * @return int
      */
     public function getCount($offset = null, $count = null) {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
-        return $mongoDb->count($this->_collection, $this->_query, $count, $offset);
+        $cacheKey = array('count');
+        if (($count = $this->_cacheGet($cacheKey)) === false) {
+            $mongoDb = CM_Services::getInstance()->getMongoDb();
+            $count = $mongoDb->count($this->_collection, $this->_query, $count, $offset);;
+            $this->_cacheSet($cacheKey, $count);
+        }
+        return $count;
     }
 
     /**
@@ -31,30 +36,35 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
      * @return array
      */
     public function getItems($offset = null, $count = null) {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
-        $result = array();
-        $cursor = $mongoDb->find($this->_collection, $this->_query, $this->_fields);
+        $cacheKey = array('items', $offset, $count);
+        if (($items = $this->_cacheGet($cacheKey)) === false) {
+            $mongoDb = CM_Services::getInstance()->getMongoDb();
 
-        if (null !== $offset) {
-            $cursor->skip($offset);
+            $cursor = $mongoDb->find($this->_collection, $this->_query, $this->_fields);
+
+            if (null !== $offset) {
+                $cursor->skip($offset);
+            }
+
+            if (null !== $count) {
+                $cursor->limit($count);
+            }
+
+            $items = array();
+            foreach ($cursor as $item) {
+                $items[] = $item;
+            }
+            $this->_cacheSet($cacheKey, $items);
         }
 
-        if (null !== $count) {
-            $cursor->limit($count);
-        }
-
-        foreach ($cursor as $item) {
-            $result[] = $item;
-        }
-
-        return $result;
+        return $items;
     }
 
     protected function _cacheKeyBase() {
         return array($this->_fields, $this->_collection, $this->_query);
     }
 
-    public function getStalenessChance() {
+    function getStalenessChance() {
         return 0.01;
     }
 }

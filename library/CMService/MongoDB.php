@@ -63,10 +63,10 @@ class CMService_MongoDB extends CM_Class_Abstract {
      * @param $object
      * @return array|bool
      */
-    public function insert($collection, &$object) {
+    public function insert($collection, $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-
-        return $this->getCollection($collection)->insert($object);
+        $ref = & $object;
+        return $this->getCollection($collection)->insert($ref);
     }
 
     /**

@@ -49,7 +49,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $source = new CM_PagingSource_MongoDb(array('messages'), 'my-collection');
 
         $this->assertSame(7, $source->getCount());
-        $this->assertSame(2, $source->getCount(3, 2));
+        $this->assertSame(4, $source->getCount(3, 2));
         $this->assertSame(5, $source->getCount(2));
     }
 }
