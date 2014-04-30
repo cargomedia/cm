@@ -1,8 +1,8 @@
 <?php
 
-class CM_Service_MongoDb extends CM_Class_Abstract {
+class CMService_MongoDB extends CM_Class_Abstract {
 
-    /** @var CM_Service_MongoDb|null $_client */
+    /** @var CMService_MongoDB|null $_client */
     private $_client = null;
 
     /**
@@ -63,10 +63,10 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
      * @param $object
      * @return array|bool
      */
-    public function insert($collection, $object) {
+    public function insert($collection, &$object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
-        $ref = & $object;
-        return $this->getCollection($collection)->insert($ref);
+
+        return $this->getCollection($collection)->insert($object);
     }
 
     /**

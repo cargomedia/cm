@@ -23,7 +23,7 @@ class CMTest_TH {
     public static function clearEnv() {
         CM_App::getInstance()->setupFilesystem();
         self::clearDb();
-        self::clearMongoDb();
+        self::clearMongoDB();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
@@ -34,8 +34,8 @@ class CMTest_TH {
         CM_Cache_Local::getInstance()->flush();
     }
 
-    public static function clearMongoDb() {
-        $mongoDb = CM_Services::getInstance()->getMongoDb();
+    public static function clearMongoDB() {
+        $mongoDb = CM_Services::getInstance()->getMongoDB();
         foreach ($mongoDb->listCollections() as $collection) {
             $collection->drop();
         }
