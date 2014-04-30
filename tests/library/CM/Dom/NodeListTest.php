@@ -94,6 +94,14 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertEquals(0, $list2->count());
     }
 
+    public function testGetChildrenTextNode() {
+        $list = new CM_Dom_NodeList('<div>text</div>');
+        foreach($list->find('div')->getChildren() as $child) {
+            /** @var CM_Dom_NodeList $child */
+            $this->assertSame(0, $child->getChildren()->count());
+        }
+    }
+
     public function testGetChildrenFilterType() {
         $list = new CM_Dom_NodeList('<div><b>mega</b><i>cool</i>hello</div>');
 
