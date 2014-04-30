@@ -58,10 +58,8 @@ class CM_Services extends CM_Class_Abstract {
     public function __call($name, $parameters) {
         if (preg_match('/get(.+)/', $name, $matches)) {
             $serviceName = $matches[1];
-
             return $this->get($serviceName);
         }
-
         throw new CM_Exception_Nonexistent('Method doesn\'t exist.');
     }
 
