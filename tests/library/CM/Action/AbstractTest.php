@@ -3,6 +3,9 @@
 class CM_Action_AbstractTest extends CMTest_TestCase {
 
     public function setUp() {
+        if (getenv('TRAVIS') && (PHP_MAJOR_VERSION === 5) && (PHP_MINOR_VERSION === 4)) {
+            $this->markTestSkipped('Causes a Segfault on Travis after code coverage (PDO: Broken pipe)');
+        }
         CM_Config::get()->CM_Action_Abstract->verbs['Foo'] = 1;
     }
 
