@@ -9,7 +9,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     public function testCount() {
         $mongodb = CM_Services::getInstance()->getMongoDb();
         for ($i = 0; $i < 7; $i++) {
-            $item = ['foo' => 12, 'bar' => [['sub' => $i], ['sub' => 'something-else']]];
+            $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
             $mongodb->insert('my-collection', $item);
         }
 
@@ -24,7 +24,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $mongodb = CM_Services::getInstance()->getMongoDb();
         $itemsExpected = array();
         for ($i = 0; $i < 7; $i++) {
-            $item = ['foo' => 12, 'bar' => [['sub' => $i], ['sub' => 'something-else']]];
+            $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
             $itemsExpected[] = $item;
             $mongodb->insert('my-collection', $item);
         }
@@ -41,7 +41,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $mongodb = CM_Services::getInstance()->getMongoDb();
         $itemsExpected = array();
         for ($i = 0; $i < 7; $i++) {
-            $item = ['foo' => 12, 'bar' => [['sub' => $i], ['sub' => 'something-else']]];
+            $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
             $itemsExpected[] = $item;
             $mongodb->insert('my-collection', $item);
         }
