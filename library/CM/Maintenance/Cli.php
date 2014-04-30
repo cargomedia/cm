@@ -49,9 +49,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Stream_Video::checkStreams'             => function () {
                     CM_Stream_Video::getInstance()->checkStreams();
                 },
-            'CM_KissTracking::exportEvents'             => function () {
-                    CM_KissTracking::getInstance()->exportEvents();
-                },
             'CM_Stream_Message::synchronize'            => function () {
                     CM_Stream_Message::getInstance()->synchronize();
                 }
