@@ -71,7 +71,7 @@ class CM_Services extends CM_Class_Abstract {
      */
     public function getMongoDb($serviceName = null) {
         if (null === $serviceName) {
-            $serviceName = 'MongoDB';
+            $serviceName = 'MongoDb';
         }
         return $this->get($serviceName);
     }
