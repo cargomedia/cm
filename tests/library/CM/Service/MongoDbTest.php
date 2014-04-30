@@ -5,9 +5,6 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     private $_collectionPrefix = 'UnitTest_';
 
     public function testInsert() {
-
-        CM_Services::getInstance()->getMongoDb()->getC;
-
         $mongoDb = CM_Services::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('insert');
         $name = 'Bob';
