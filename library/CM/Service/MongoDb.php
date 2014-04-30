@@ -2,45 +2,17 @@
 
 class CM_Service_MongoDb extends CM_Class_Abstract {
 
-    /** @var CMService_MongoDB|null $_client */
+    /** @var CM_Service_MongoDB|null $_client */
     private $_client = null;
 
-    /**
-     * @return MongoClient
-     */
-    protected function getClient() {
-        if (empty($this->_client)) {
-            $config = self::_getConfig();
-            $this->_client = new MongoClient($config->server, $config->options);
-        }
-
-        return $this->_client;
-    }
+    /** @var array */
+    private $_config;
 
     /**
-     * @param string|null $dbName
-     * @return MongoDB
-     * @throws CM_Exception_Nonexistent
+     * @param array $config
      */
-    protected function getDatabase($dbName = null) {
-        $client = $this->getClient();
-
-        if ($dbName === null) {
-            $config = self::_getConfig();
-            $dbName = $config->db;
-        }
-
-        // add optional prefix to dbName
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $dbName;
-
-        return $client->{$dbName};
-    }
-
-    /**
-     * @return string
-     */
-    public static function getNewId() {
-        return (string) new MongoId();
+    public function __construct(array $config) {
+        $this->_config = $config;
     }
 
     /**
@@ -48,14 +20,14 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
      * @return MongoCollection
      */
     public function getCollection($collection) {
-        return $this->getDatabase()->{$collection};
+        return $this->_getDatabase()->{$collection};
     }
 
     /**
      * @return array
      */
     public function listCollections() {
-        return $this->getDatabase()->listCollections();
+        return $this->_getDatabase()->listCollections();
     }
 
     /**
@@ -144,5 +116,38 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
         $options = ($options !== null) ? $options : array();
 
         return $this->getCollection($collection)->remove($criteria, $options);
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewId() {
+        return (string) new MongoId();
+    }
+
+    /**
+     * @return MongoClient
+     */
+    protected function _getClient() {
+        if (null === $this->_client) {
+            $this->_client = new MongoClient($this->_config['server'], $this->_config['options']);
+        }
+        return $this->_client;
+    }
+
+    /**
+     * @param string|null $dbName
+     * @return MongoDB
+     * @throws CM_Exception_Nonexistent
+     */
+    protected function _getDatabase($dbName = null) {
+        $client = $this->_getClient();
+
+        if (null === $dbName) {
+            $dbName = $this->_config['db'];
+        }
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $dbName;
+
+        return $client->{$dbName};
     }
 }

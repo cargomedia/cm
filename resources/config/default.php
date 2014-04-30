@@ -104,9 +104,15 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
 
-$config->CM_Service_MongoDB->class = 'CM_Service_MongoDb';
-
-$config->CM_Services->list = array('MongoDb' => 'CM_Service_MongoDb');
-$config->CM_Service_MongoDb->db = 'cm';
-$config->CM_Service_MongoDb->server = 'mongodb://localhost:27017';
-$config->CM_Service_MongoDb->options = array('connect' => true);
+$config->CM_Services->list = array(
+    'MongoDb' => array(
+        'class'     => 'CM_Service_MongoDb',
+        'arguments' => array(
+            array(
+                'db'      => 'cm',
+                'server'  => 'mongodb://localhost:27017',
+                'options' => array('connect' => true),
+            )
+        ),
+    ),
+);
