@@ -21,7 +21,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
      * @return int
      */
     public function getCount($offset = null, $count = null) {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         return $mongoDb->count($this->_collection, $this->_query, $count, $offset);
     }
 
@@ -31,7 +31,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
      * @return array
      */
     public function getItems($offset = null, $count = null) {
-        $mongoDb = CM_Services::getInstance()->getMongoDB();
+        $mongoDb = CM_Services::getInstance()->getMongoDb();
         $result = array();
         $cursor = $mongoDb->find($this->_collection, $this->_query, $this->_fields);
 
