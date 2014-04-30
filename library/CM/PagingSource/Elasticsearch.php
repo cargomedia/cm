@@ -79,7 +79,14 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
                         } else {
                             $idArray = array('id' => $hit['_id']);
                         }
-                        $result['items'][] = array_merge($idArray, $hit['fields']);
+                        $fields = $hit['fields'];
+                        $fields = Functional\map($fields, function($field) {
+                            if (is_array($field) && 1 == count($field)) {
+                                $field = reset($field);
+                            }
+                            return $field;
+                        });
+                        $result['items'][] = array_merge($idArray, $fields);
                     } else {
                         if ($this->_returnType) {
                             $item = array('id' => $hit['_id'], 'type' => $hit['_type']);
