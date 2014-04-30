@@ -26,6 +26,8 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
             $mongoDb = CM_Services::getInstance()->getMongoDb();
             $count = $mongoDb->count($this->_collection, $this->_query, $count, $offset);;
             $this->_cacheSet($cacheKey, $count);
+        } else {
+            CM_Debug::getInstance()->incStats('mongoCacheHit', 'getItems()');
         }
         return $count;
     }
@@ -55,6 +57,8 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
                 $items[] = $item;
             }
             $this->_cacheSet($cacheKey, $items);
+        } else {
+            CM_Debug::getInstance()->incStats('mongoCacheHit', 'count()');
         }
 
         return $items;
