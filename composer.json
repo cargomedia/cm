@@ -4,12 +4,20 @@
   "config": {
     "bin-dir": "bin/"
   },
+  "repositories": [
+    {
+      "packagist": false
+    },
+    {
+      "type": "composer",
+      "url": "http://satis.cargomedia.ch/dist"
+    }
+  ],
   "require": {
     "composer/composer": "1.0.0-alpha8",
     "smarty/smarty": "3.1.16",
     "leafo/lessphp": "0.3.*",
     "easybook/geshi": "1.0.8.11",
-    "amazonwebservices/aws-sdk-for-php": "1.5.*",
     "ruflin/Elastica": "v1.1.1.1",
     "phpmailer/phpmailer": "5.2.6",
     "michelf/php-markdown": "1.4.0",
