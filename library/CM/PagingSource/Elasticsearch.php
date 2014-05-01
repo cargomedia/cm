@@ -1,33 +1,33 @@
 <?php
 
-class CM_PagingSource_Search extends CM_PagingSource_Abstract {
+class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
 
-    /** @var CM_SearchQuery_Abstract */
+    /** @var CM_Elasticsearch_Query */
     private $_query;
 
     /** @var array|null */
     private $_fields;
 
-    /** @var CM_Elastica_Type_Abstract[] */
+    /** @var CM_Elasticsearch_Type_Abstract[] */
     private $_types;
 
     /** @var boolean */
     private $_returnType;
 
     /**
-     * @param CM_Elastica_Type_Abstract|CM_Elastica_Type_Abstract[] $types
-     * @param CM_SearchQuery_Abstract                               $query
+     * @param CM_Elasticsearch_Type_Abstract|CM_Elasticsearch_Type_Abstract[] $types
+     * @param CM_Elasticsearch_Query                               $query
      * @param array|null                                            $fields
      * @param bool|null                                             $returnType
      * @throws CM_Exception_Invalid
      */
-    function __construct($types, CM_SearchQuery_Abstract $query, array $fields = null, $returnType = null) {
+    function __construct($types, CM_Elasticsearch_Query $query, array $fields = null, $returnType = null) {
         if (!is_array($types)) {
             $types = array($types);
         }
         array_walk($types, function ($type) {
-            if (!$type instanceof CM_Elastica_Type_Abstract) {
-                throw new CM_Exception_Invalid("Type is not an instance of CM_Elastica_Type_Abstract");
+            if (!$type instanceof CM_Elasticsearch_Type_Abstract) {
+                throw new CM_Exception_Invalid("Type is not an instance of CM_Elasticsearch_Type_Abstract");
             }
         });
         if (empty($types)) {
@@ -69,7 +69,7 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
             if ($count !== null) {
                 $data['size'] = $count;
             }
-            $searchResult = CM_Search::getInstance()->query($this->_types, $data);
+            $searchResult = CM_Elasticsearch_Client::getInstance()->query($this->_types, $data);
             $result = array('items' => array(), 'total' => 0);
             if (isset($searchResult['hits'])) {
                 foreach ($searchResult['hits']['hits'] as $hit) {
@@ -79,7 +79,14 @@ class CM_PagingSource_Search extends CM_PagingSource_Abstract {
                         } else {
                             $idArray = array('id' => $hit['_id']);
                         }
-                        $result['items'][] = array_merge($idArray, $hit['fields']);
+                        $fields = $hit['fields'];
+                        $fields = Functional\map($fields, function($field) {
+                            if (is_array($field) && 1 == count($field)) {
+                                $field = reset($field);
+                            }
+                            return $field;
+                        });
+                        $result['items'][] = array_merge($idArray, $fields);
                     } else {
                         if ($this->_returnType) {
                             $item = array('id' => $hit['_id'], 'type' => $hit['_type']);

@@ -2,9 +2,10 @@
 require_once 'function.linkUrl.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
+    $isHtmlLabel = isset($params['isHtmlLabel']) ? (bool) $params['isHtmlLabel'] : false;
     $label = '';
     if (isset($params['label'])) {
-        $label = CM_Util::htmlspecialchars($params['label']);
+        $label = ($isHtmlLabel) ? $params['label'] : CM_Util::htmlspecialchars($params['label']);
         unset($params['label']);
     }
 
@@ -96,7 +97,7 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         $html .= $iconMarkup;
     }
     if ($label) {
-        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $html .= '<span class="label">' . $label . '</span>';
     }
 
     if ($icon && $iconPosition == 'right') {

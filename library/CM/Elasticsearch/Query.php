@@ -1,6 +1,6 @@
 <?php
 
-class CM_SearchQuery_Abstract {
+class CM_Elasticsearch_Query {
 
     private $_queries = array();
     private $_filters = array();
@@ -23,7 +23,7 @@ class CM_SearchQuery_Abstract {
     }
 
     public function query($query) {
-        if ($query instanceof CM_SearchQuery_Abstract) {
+        if ($query instanceof CM_Elasticsearch_Query) {
             $query = $query->getQuery();
         }
         $this->_queries[] = $query;
@@ -44,17 +44,17 @@ class CM_SearchQuery_Abstract {
      * @param float|null  $fuzziness 0 - 1
      */
     public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
-        $query = array('multi_match' => array(
+        $data = array(
             'query'  => $value,
             'fields' => $fields,
-        ));
+        );
         if (null !== $operator) {
-            $query['operator'] = (string) $operator;
+            $data['operator'] = (string) $operator;
         }
         if (null !== $fuzziness) {
-            $query['fuzziness'] = (float) $fuzziness;
+            $data['fuzziness'] = (float) $fuzziness;
         }
-        $this->query($query);
+        $this->query(array('multi_match' => $data));
     }
 
     /**

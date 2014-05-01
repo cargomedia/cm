@@ -9,10 +9,10 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
   _skipTriggerChange: false,
 
   events: {
-    'blur input': function() {
+    'blur input, textarea': function() {
       this.trigger('blur');
     },
-    'focus input': function() {
+    'focus input, textarea': function() {
       this.trigger('focus');
     }
   },
@@ -22,24 +22,20 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
    */
   setValue: function(value) {
     this._skipTriggerChange = true;
-    this.$('input').val(value);
+    this.$('input, textarea').val(value);
     this._skipTriggerChange = false;
-  },
-
-  setFocus: function() {
-    this.$('input').focus();
   },
 
   /**
    * @return {Boolean}
    */
   hasFocus: function() {
-    return this.$('input').is(':focus');
+    return this.getInput().is(':focus');
   },
 
   enableTriggerChange: function() {
     var self = this;
-    var $input = this.$('input');
+    var $input = this.getInput();
     var valueLast = $input.val();
     var callback = function() {
       var value = this.value;

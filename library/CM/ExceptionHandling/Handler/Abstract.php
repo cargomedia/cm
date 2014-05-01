@@ -90,7 +90,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     protected function _logException(Exception $exception) {
-        $formatter = new CM_ExceptionHandling_Formatter_Plain();
+        $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
         try {
             if ($exception instanceof CM_Exception) {
                 $log = $exception->getLog();
