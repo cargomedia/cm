@@ -15,6 +15,6 @@
 {/if}
 <div class="uploadButton">
   <input type="file" name="{$name}-file" multiple />
-  {$text}{block name="button-text"}{translate 'Upload Files'}{/block}{/if}
+  {$text}{block name="button-text"}{translate 'Upload Files'}{/block}
 </div>
 <div class="notSupported">*{translate 'Your browser does not support file uploads.'}</div>
