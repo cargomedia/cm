@@ -6,13 +6,13 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
 
     /**
      * @param  string     $collection
-     * @param  array|null $query
-     * @param  array|null $fields Array of field which to include/exclude, see http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
+     * @param  array|null $criteria
+     * @param  array|null $projection http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
      */
-    public function __construct($collection, array $query = null, array $fields = null) {
+    public function __construct($collection, array $criteria = null, array $projection = null) {
         $this->_collection = (string) $collection;
-        $this->_query = (array) $query;
-        $this->_fields = (array) $fields;
+        $this->_query = (array) $criteria;
+        $this->_fields = (array) $projection;
     }
 
     /**

@@ -37,43 +37,43 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $query
-     * @param array|null $fields
+     * @param array      $criteria
+     * @param array|null $projection
      * @return array
      */
-    public function findOne($collection, array $query, array $fields = null) {
-        $fields = (array) $fields;
+    public function findOne($collection, array $criteria, array $projection = null) {
+        $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo',
-            "findOne in {$collection}: " . serialize(array('fields' => $fields) + $query));
+            "findOne in {$collection}: " . serialize(array('projection' => $projection) + $criteria));
 
-        return $this->_getCollection($collection)->findOne($query, $fields);
+        return $this->_getCollection($collection)->findOne($criteria, $projection);
     }
 
     /**
      * @param string     $collection
-     * @param array      $query
-     * @param array|null $fields
+     * @param array      $criteria
+     * @param array|null $projection
      * @return MongoCursor
      */
-    public function find($collection, array $query, array $fields = null) {
-        $fields = (array) $fields;
-        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $fields) + $query));
-        return $this->_getCollection($collection)->find($query);
+    public function find($collection, array $criteria, array $projection = null) {
+        $projection = (array) $projection;
+        CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
+        return $this->_getCollection($collection)->find($criteria, $projection);
     }
 
     /**
      * @param string     $collection
-     * @param array|null $query
+     * @param array|null $criteria
      * @param int|null   $limit
      * @param int|null   $offset
      * @return int
      */
-    public function count($collection, array $query = null, $limit = null, $offset = null) {
-        $query = (array) $query;
+    public function count($collection, array $criteria = null, $limit = null, $offset = null) {
+        $criteria = (array) $criteria;
         $limit = (int) $limit;
         $offset = (int) $offset;
-        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($query));
-        return $this->_getCollection($collection)->count($query, $limit, $offset);
+        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($criteria));
+        return $this->_getCollection($collection)->count($criteria, $limit, $offset);
     }
 
     /**
