@@ -3,29 +3,16 @@
 class CM_Response_View_Form extends CM_Response_View_Abstract {
 
     /**
-     * Added errors.
-     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Added success messages.
-     *
      * @var array
      */
     private $messages = array();
 
     /**
-     * A javascript code to execute.
-     *
-     * @var string
-     */
-    private $_jsCode;
-
-    /**
-     * Adds an error to response.
-     *
      * @param string $err_msg
      * @param string $field_name
      */
@@ -55,19 +42,6 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
         return (bool) count($this->errors);
     }
 
-    public function reset() {
-        $this->exec('this.reset();');
-    }
-
-    /**
-     * Add a javascript to execute.
-     *
-     * @param string $jsCode
-     */
-    public function exec($jsCode) {
-        CM_Frontend::concat_js($jsCode, $this->_jsCode);
-    }
-
     protected function _process() {
         $output = array();
         try {
@@ -88,10 +62,9 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
                 $success['errors'] = $this->errors;
             }
 
-            $this->exec($this->getRender()->getJs()->getJs());
-
-            if (!empty($this->_jsCode)) {
-                $success['exec'] = $this->_jsCode;
+            $jsCode = $this->getRender()->getJs()->getJs();
+            if (!empty($jsCode)) {
+                $success['exec'] = $jsCode;
             }
 
             if (!empty($this->messages)) {
