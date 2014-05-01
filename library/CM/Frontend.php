@@ -23,34 +23,11 @@ class CM_Frontend {
         $this->_render = $render;
     }
 
-    /**
-     * Concatenate a javascript code $line with $var by reference.
-     *
-     * @param string  $line
-     * @param string  &$var    reference
-     * @param boolean $prepend OPTIONAL
-     */
-    public static function concat_js($line, &$var, $prepend = false) {
-        $line = trim($line);
-
-        if ($line) {
-            if (substr($line, -1) != ';') {
-                $line .= ';';
-            }
-            $line .= "\n";
-            if ($prepend) {
-                $var = $line . $var;
-            } else {
-                $var = $var . $line;
-            }
-        }
-    }
-
     public function clear() {
-        $this->_onloadHeaderJs = '';
-        $this->_onloadPrepareJs = '';
-        $this->_onloadJs = '';
-        $this->_onloadReadyJs = '';
+        $this->_onloadHeaderJs->clear();
+        $this->_onloadPrepareJs->clear();
+        $this->_onloadJs->clear();
+        $this->_onloadReadyJs->clear();
     }
 
     /**

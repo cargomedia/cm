@@ -17,11 +17,9 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
     private $messages = array();
 
     /**
-     * A javascript code to execute.
-     *
-     * @var string
+     * @var CM_ViewFrontendHandler
      */
-    private $_jsCode;
+    private $_frontendHandler;
 
     /**
      * Adds an error to response.
@@ -56,16 +54,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
     }
 
     public function reset() {
-        $this->exec('this.reset();');
-    }
-
-    /**
-     * Add a javascript to execute.
-     *
-     * @param string $jsCode
-     */
-    public function exec($jsCode) {
-        CM_Frontend::concat_js($jsCode, $this->_jsCode);
+        $this->_frontendHandler->append('this.reset();');
     }
 
     protected function _process() {
@@ -87,12 +76,8 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
             if (!empty($this->errors)) {
                 $success['errors'] = $this->errors;
             }
-
-            $this->exec($this->getRender()->getFrontend()->getJs());
-
-            if (!empty($this->_jsCode)) {
-                $success['exec'] = $this->_jsCode;
-            }
+            $this->_frontendHandler->append($this->getRender()->getFrontend()->getJs());
+            $success['exec'] = $this->_frontendHandler->compile(null);
 
             if (!empty($this->messages)) {
                 $success['messages'] = $this->messages;

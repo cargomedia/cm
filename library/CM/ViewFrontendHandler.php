@@ -59,4 +59,8 @@ class CM_ViewFrontendHandler {
         }
         $this->_operations[] = 'this.message(' . implode(', ', $varList) . ')';
     }
+
+    public function clear() {
+        $this->_operations = array();
+    }
 }
