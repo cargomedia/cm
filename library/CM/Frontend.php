@@ -2,6 +2,12 @@
 
 class CM_Frontend {
 
+    /** @var Tree\Node\Node|null */
+    protected $_treeRoot;
+
+    /** @var Tree\Node\Node|null */
+    protected $_treeCurrent;
+
     /** @var CM_ViewFrontendHandler */
     protected $_onloadHeaderJs = '';
 
@@ -23,11 +29,56 @@ class CM_Frontend {
         $this->_render = $render;
     }
 
+    /**
+     * @param CM_ViewResponse $viewResponse
+     */
+    public function treeExpand(CM_ViewResponse $viewResponse){
+        $node = new \Tree\Node\Node($viewResponse);
+        if (null === $this->_treeRoot) {
+            $this->_treeRoot = $node;
+        } else {
+            $this->getTreeCurrent()->addChild($node);
+        }
+        $this->_treeCurrent = $node;
+    }
+
+    public function treeCollapse() {
+        if ($this->getTreeCurrent()->isRoot()) {
+            $this->_treeCurrent = null;
+        } else {
+            $this->_treeCurrent = $this->getTreeCurrent()->getParent();
+        }
+    }
+
+    /**
+     * @return \Tree\Node\Node
+     * @throws CM_Exception_Invalid
+     */
+    public function getTreeCurrent() {
+        if (null === $this->_treeCurrent) {
+            throw new CM_Exception_Invalid('No current tree node set');
+        }
+        return $this->_treeCurrent;
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return \Tree\Node\Node
+     */
+    public function getTreeRoot() {
+        if (null === $this->_treeRoot) {
+            throw new CM_Exception_Invalid('No root tree set');
+        }
+        return $this->_treeRoot;
+    }
+
     public function clear() {
         $this->_onloadHeaderJs->clear();
         $this->_onloadPrepareJs->clear();
         $this->_onloadJs->clear();
         $this->_onloadReadyJs->clear();
+        $this->_treeCurrent = null;
+        $this->_treeRoot = null;
     }
 
     /**
