@@ -7,27 +7,36 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $form = CM_Form_Abstract::factory($params['name']);
         $form->setup();
         $form->renderStart($params);
-        $render->pushStack('forms', $form);
-        $render->pushStack('views', $form);
 
-        $class = implode(' ', $form->getClassHierarchy()) . ' ' . $form->getName();
-        $html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
-
-        return $html;
+        $viewResponse = new CM_ViewResponse($form);
+        $render->pushStack('forms', $viewResponse);
+        $render->pushStack('views', $viewResponse);
+        return '';
     } else {
+        $viewResponse = $render->getStackLast('forms');
         /** @var CM_Form_Abstract $form */
-        $form = $render->popStack('forms');
-        $render->popStack('views');
+        $form = $viewResponse->getView();
+
+        $class = implode(' ', $form->getClassHierarchy());
+        $html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+        $html .= $content;
+
 
         foreach ($form->getFields() as $fieldName => $field) {
             if ($field instanceof CM_FormField_Hidden) {
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-                $content .= $renderAdapter->fetch(CM_Params::factory(), $form, $fieldName);
+                $html .= $renderAdapter->fetch(CM_Params::factory(), $form, $fieldName);
             }
         }
+        $frontendHandler = new CM_ViewFrontendHandler();
+        foreach ($form->getActions() as $actionName => $action) {
+            $frontendHandler->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
+        }
+        $render->getJs()->registerViewResponse($viewResponse, $frontendHandler);
+        $html .= '</form>';
 
-        $render->getJs()->registerForm($form, $render->getStackLast('views'));
-        $content .= '</form>';
-        return $content;
+        $render->popStack('forms');
+        $render->popStack('views');
+        return $html;
     }
 }

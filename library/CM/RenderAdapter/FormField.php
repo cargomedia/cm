@@ -25,6 +25,10 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
             $html .= '<span class="messages"></span>';
         }
         $html .= '</div>';
+
+        if ($form) {
+            $form->getJs()->append("this.registerField('{$fieldName}', cm.views[{$viewResponse->getAutoId()});");
+        }
         return $html;
     }
 

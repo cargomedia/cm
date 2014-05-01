@@ -2,11 +2,26 @@
 
 class CM_Frontend {
 
+    /** @var CM_ViewFrontendHandler */
     protected $_onloadHeaderJs = '';
+
+    /** @var CM_ViewFrontendHandler */
     protected $_onloadPrepareJs = '';
+
+    /** @var CM_ViewFrontendHandler */
     protected $_onloadJs = '';
+
+    /** @var CM_ViewFrontendHandler */
     protected $_onloadReadyJs;
+
     private $_tracking;
+
+    /** @var CM_Render */
+    private $_render;
+
+    public function __construct(CM_Render $render) {
+        $this->_render = $render;
+    }
 
     /**
      * Concatenate a javascript code $line with $var by reference.
@@ -49,141 +64,80 @@ class CM_Frontend {
     }
 
     /**
-     * @param string $jsCode
+     * @return CM_ViewFrontendHandler
      */
-    public function onloadHeaderJs($jsCode) {
-        self::concat_js($jsCode, $this->_onloadHeaderJs);
+    public function getOnloadHeaderJs() {
+        return $this->_onloadHeaderJs;
     }
 
     /**
-     * @param string $jsCode
-     * @param bool   $prepend
+     * @return CM_ViewFrontendHandler
      */
-    public function onloadPrepareJs($jsCode, $prepend = false) {
-        self::concat_js($jsCode, $this->_onloadPrepareJs, $prepend);
+    public function getOnloadPrepareJs() {
+        return $this->_onloadPrepareJs;
     }
 
     /**
-     * @param string $jsCode
+     * @return CM_ViewFrontendHandler
      */
-    public function onloadJs($jsCode) {
-        self::concat_js($jsCode, $this->_onloadJs);
+    public function getOnloadJs() {
+        return $this->_onloadJs;
     }
 
     /**
-     * @param string $jsCode
+     * @return CM_ViewFrontendHandler
      */
-    public function onloadReadyJs($jsCode) {
-        self::concat_js($jsCode, $this->_onloadReadyJs);
+    public function getOnloadReadyJs() {
+        return $this->_onloadReadyJs;
     }
 
     /**
      * @param CM_ViewResponse             $viewResponse
-     * @param CM_ViewFrontendHandler $frontendHandler
-     * @param null                        $parentAutoId
+     * @param CM_ViewFrontendHandler|null $frontendHandler
      */
-    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler, $parentAutoId = null) {
+    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler = null) {
         $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
         $view = $viewResponse->getView();
-        $cmpJs = '';
-        $cmpJs .= $reference . ' = new ' . get_class($view) . '({';
-        $cmpJs .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
-        $cmpJs .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
-        if ($parentAutoId) {
-            $cmpJs .= ',parent: cm.views["' . $parentAutoId . '"]';
+        $code = $reference . ' = new ' . get_class($view) . '({';
+        $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
+        $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
+
+        $parentViewResponse = $this->_render->getStackLast('views');
+        if ($parentViewResponse) {
+            $code .= ',parent:cm.views["' . $parentViewResponse->getAutoId() . '"]';
         }
-        $cmpJs .= '});' . PHP_EOL;
+        $code .= '});' . PHP_EOL;
 
-        $this->onloadPrepareJs($cmpJs, true);
-        $this->onloadJs($frontendHandler->compile_js($reference));
-    }
-
-    /**
-     * @param CM_Form_Abstract $form
-     * @param CM_View_Abstract $parentView
-     */
-    public function registerForm(CM_Form_Abstract $form, CM_View_Abstract $parentView) {
-        $className = get_class($form);
-
-        $field_list = array();
-        foreach ($form->getFields() as $field_key => $field) {
-            $field_list[] =
-                '"' . $field_key . '":{"className":"' . get_class($field) . '","options":' . CM_Params::encode($field->getOptions(), true) . ',"params":' . CM_Params::encode($field->getParams()->getAllOriginal(), true) . '}';
+        $this->getOnloadPrepareJs()->prepend($code);
+        if ($frontendHandler) {
+            $this->getOnloadJs()->append($frontendHandler->compile($reference));
         }
-        $action_list = array();
-        foreach ($form->getActions() as $action_name => $action) {
-            $action_list[] = '"' . $action_name . '":' . $action->js_presentation();
-        }
-
-        $auto_var = 'cm.views["' . $form->getAutoId() . '"]';
-        $js = $auto_var . ' = new ' . $className . '({';
-        $js .= 'el:$("#' . $form->getAutoId() . '").get(0),';
-        $js .= 'parent:cm.views["' . $parentView->getAutoId() . '"],';
-        $js .= 'name:"' . $form->getName() . '",';
-        $js .= 'fields:{' . implode(',', $field_list) . '},';
-        $js .= 'actions:{' . implode(',', $action_list) . '}';
-        $js .= '});' . PHP_EOL;
-
-        $this->onloadPrepareJs($js, true);
-    }
-
-    /**
-     * @param CM_ViewResponse             $viewResponse
-     * @param CM_ViewFrontendHandler $frontendHandler
-     * @param string                      $parentAutoId OPTIONAL
-     * @throws CM_Exception_Invalid
-     */
-    public function registerComponent(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler, $parentAutoId = null) {
-        $component = $viewResponse->getView();
-        if (!$component instanceof CM_Component_Abstract) {
-            throw new CM_Exception_Invalid('Can only register component view responses');
-        }
-        $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
-        $cmpJs = '';
-        $cmpJs .= $reference . ' = new ' . get_class($component) . '({';
-        $cmpJs .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
-        $cmpJs .= 'params:' . CM_Params::encode($component->getParams()->getAllOriginal(), true);
-        if ($parentAutoId) {
-            $cmpJs .= ',parent:cm.views["' . $parentAutoId . '"]';
-        }
-        $cmpJs .= '});' . PHP_EOL;
-
-        $this->onloadPrepareJs($cmpJs, true);
-        $this->onloadJs($frontendHandler->compile_js($reference));
-    }
-
-    /**
-     * @param CM_Layout_Abstract $layout
-     */
-    public function registerLayout(CM_Layout_Abstract $layout) {
-        $auto_var = 'cm.views["' . $layout->getAutoId() . '"]';
-        $js = '';
-        $js .= $auto_var . ' = new ' . get_class($layout) . '({';
-        $js .= 'el:$("#' . $layout->getAutoId() . '").get(0)';
-        $js .= '});' . PHP_EOL;
-        $this->onloadHeaderJs($js, true);
     }
 
     /**
      * @return string
      */
     public function getJs() {
-        $return = '';
-        self::concat_js($this->_onloadHeaderJs, $return);
-        self::concat_js($this->_onloadPrepareJs, $return);
-        self::concat_js($this->_onloadJs, $return);
-        self::concat_js($this->_onloadReadyJs, $return);
-        self::concat_js($this->getTracking()->getJs(), $return);
-        return $return;
+        return $this->compile() . PHP_EOL . $this->getTracking()->getJs();
     }
 
     /**
-     * Render a script tags with compiled js code.
-     *
+     * @return string
+     */
+    public function compile() {
+        $operations = array(
+            $this->_onloadHeaderJs->compile(null),
+            $this->_onloadPrepareJs->compile(null),
+            $this->_onloadJs->compile(null),
+            $this->_onloadReadyJs->compile(null),
+        );
+        return implode(PHP_EOL, $operations);
+    }
+
+    /**
      * @return string
      */
     public function renderScripts() {
-        return '<script type="text/javascript">' . PHP_EOL . '$(function() {' . PHP_EOL . $this->_onloadHeaderJs . PHP_EOL . $this->_onloadPrepareJs .
-        PHP_EOL . $this->_onloadJs . PHP_EOL . $this->_onloadReadyJs . PHP_EOL . '});' . PHP_EOL . '</script>' . PHP_EOL;
+        return '<script type="text/javascript">' . PHP_EOL . '$(function() {' . $this->compile() . '});' . PHP_EOL . '</script>' . PHP_EOL;
     }
 }

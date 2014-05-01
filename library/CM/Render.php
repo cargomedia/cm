@@ -77,14 +77,14 @@ class CM_Render extends CM_Class_Abstract {
      */
     public function getJs() {
         if (!$this->_js) {
-            $this->_js = new CM_Frontend();
+            $this->_js = new CM_Frontend($this);
         }
         return $this->_js;
     }
 
     /**
      * @param string $key
-     * @return array Stack
+     * @return CM_ViewResponse[]
      */
     public function getStack($key) {
         if (empty($this->_stack[$key])) {
@@ -95,7 +95,7 @@ class CM_Render extends CM_Class_Abstract {
 
     /**
      * @param string $key
-     * @return mixed|null
+     * @return CM_ViewResponse|null
      */
     public function getStackLast($key) {
         $stack = $this->getStack($key);
@@ -107,7 +107,7 @@ class CM_Render extends CM_Class_Abstract {
 
     /**
      * @param string $key
-     * @return mixed|null
+     * @return CM_ViewResponse|null
      */
     public function popStack($key) {
         if (!isset($this->_stack[$key])) {
@@ -119,10 +119,10 @@ class CM_Render extends CM_Class_Abstract {
 
     /**
      * @param string $key
-     * @param mixed  $value
-     * @return array Stack values
+     * @param CM_ViewResponse $value
+     * @return CM_ViewResponse[]
      */
-    public function pushStack($key, $value) {
+    public function pushStack($key, CM_ViewResponse $value) {
         if (empty($this->_stack[$key])) {
             $this->_stack[$key] = array();
         }

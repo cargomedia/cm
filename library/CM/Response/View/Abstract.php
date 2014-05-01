@@ -53,10 +53,10 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
-        $this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
-        $this->getRender()->getJs()->onloadPrepareJs(
-            'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
-        $this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
+        $this->getRender()->getJs()->getOnloadHeaderJs()->append('cm.window.appendHidden(' . json_encode($html) . ');');
+        $this->getRender()->getJs()->getOnloadPrepareJs()->append('cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' .
+        $component->getAutoId() . '"]);');
+        $this->getRender()->getJs()->getOnloadReadyJs()->append('cm.views["' . $component->getAutoId() . '"]._ready();');
         $componentInfo['id'] = $component->getAutoId();
 
         return $component->getAutoId();
@@ -129,14 +129,14 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
     public function popinComponent() {
         $componentInfo = $this->_getViewInfo();
-        $this->getRender()->getJs()->onloadJs('cm.views["' . $componentInfo['id'] . '"].popIn();');
+        $this->getRender()->getJs()->getOnloadJs()->append('cm.views["' . $componentInfo['id'] . '"].popIn();');
     }
 
     /**
      * Add a reload to the response.
      */
     public function reloadPage() {
-        $this->getRender()->getJs()->onloadJs('window.location.reload(true)');
+        $this->getRender()->getJs()->getOnloadJs()->append('window.location.reload(true)');
     }
 
     /**
@@ -159,12 +159,12 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $url = (string) $url;
         $forceReload = (boolean) $forceReload;
         $js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
-        $this->getRender()->getJs()->onloadPrepareJs($js);
+        $this->getRender()->getJs()->getOnloadPrepareJs()->append($js);
     }
 
     /**
      * @param CM_Menu[] $menuList
-     * @param string $pageName
+     * @param string    $pageName
      * @param CM_Params $pageParams
      * @return string[]
      */

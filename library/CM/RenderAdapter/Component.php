@@ -11,16 +11,12 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontendHandler = new CM_ViewFrontendHandler();
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
+        $viewResponse->set('viewObj', $this->_getComponent());
+        $this->getRender()->getJs()->registerViewResponse($viewResponse, $frontendHandler);
 
-        $parentViewId = null;
-        if (count($this->getRender()->getStack('views'))) {
-            /** @var CM_View_Abstract $parentView */
-            $parentView = $this->getRender()->getStackLast('views');
-            $parentViewId = $parentView->getAutoId();
-        }
+        $this->getRender()->pushStack($this->_getStackKey(), $viewResponse);
+        $this->getRender()->pushStack('views', $viewResponse);
 
-        $this->getRender()->pushStack($this->_getStackKey(), $this->_getComponent());
-        $this->getRender()->pushStack('views', $this->_getComponent());
 
         $cssClass = implode(' ', $this->_getComponent()->getClassHierarchy());
         if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
@@ -28,14 +24,13 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
                 $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
             }
         }
+
+
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
-
-        $viewResponse->set('viewObj', $this->_getComponent());
         $html .=  $this->getRender()->fetchViewResponse($viewResponse);
-
         $html .= '</div>';
 
-        $this->getRender()->getJs()->registerComponent($viewResponse, $frontendHandler, $parentViewId);
+
         $this->getRender()->popStack($this->_getStackKey());
         $this->getRender()->popStack('views');
 

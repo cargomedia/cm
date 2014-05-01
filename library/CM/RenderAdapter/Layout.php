@@ -11,9 +11,24 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $page->checkAccessible($this->getRender()->getEnvironment());
         $js = $this->getRender()->getJs();
 
-        $this->getRender()->pushStack('layouts', $layout);
-        $this->getRender()->pushStack('views', $layout);
-        $this->getRender()->pushStack('pages', $page);
+
+
+        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
+        $pageTitle = $renderAdapterPage->fetchTitle();
+
+        $viewResponse = new CM_ViewResponse($layout);
+        $viewResponse->setTemplateName('default');
+        $viewResponse->setData(array(
+            'viewObj'         => $layout,
+            'title'           => $this->fetchTitle($pageTitle),
+            'page'            => $page,
+            'pageDescription' => $renderAdapterPage->fetchDescription(),
+            'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
+        ));
+        $this->getRender()->getJs()->registerViewResponse($viewResponse);
+
+        $this->getRender()->pushStack('layouts', $viewResponse);
+        $this->getRender()->pushStack('views', $viewResponse);
 
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
@@ -35,34 +50,20 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
             $options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();
         }
-        $js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
+        $js->getOnloadHeaderJs()->append('cm.options = ' . CM_Params::encode($options, true));
 
         if ($viewer = $this->getRender()->getViewer()) {
-            $js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
+            $js->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
         }
 
-        $js->onloadHeaderJs('cm.ready();');
+        $js->getOnloadHeaderJs()->append('cm.ready();');
 
-        $this->getRender()->getJs()->registerLayout($layout);
-        $js->onloadReadyJs('cm.getLayout()._ready();');
-
-        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
-        $pageTitle = $renderAdapterPage->fetchTitle();
-
-        $viewResponse = new CM_ViewResponse($layout);
-        $viewResponse->setTemplateName('default');
-        $viewResponse->setData(array(
-            'viewObj'         => $layout,
-            'title'           => $this->fetchTitle($pageTitle),
-            'page'            => $page,
-            'pageDescription' => $renderAdapterPage->fetchDescription(),
-            'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
-        ));
         $html = $this->getRender()->fetchViewResponse($viewResponse);
+
+        $js->getOnloadReadyJs()->append('cm.getLayout()._ready();');
 
         $this->getRender()->popStack('layouts');
         $this->getRender()->popStack('views');
-        $this->getRender()->popStack('pages');
 
         return $html;
     }

@@ -7,6 +7,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   _fields: {},
 
+  _actions: {},
+
   events: {
     'reset': function() {
       _.each(this._fields, function(field) {
@@ -19,25 +21,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   ready: function() {
   },
 
-  initialize: function() {
-    CM_View_Abstract.prototype.initialize.call(this);
-
-    this._fields = {};
-    _.each(this.options.fields, function(fieldInfo, name) {
-      // Lazy construct
-      var $field = this.$("#" + name);
-      if ($field.length) {
-        var fieldClass = window[fieldInfo.className];
-        this.registerField(name, new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
-      }
-    }, this);
-  },
-
-
   _ready: function() {
     var handler = this;
 
-    _.each(this.options.actions, function(action, name) {
+    _.each(this._actions, function(action, name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -68,6 +55,14 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
     field.on('change', function() {
       this.trigger('change');
     }, this);
+  },
+
+  /**
+   * @param {String} name
+   * @param {Object} presentation
+   */
+  registerAction: function(name, presentation) {
+    this._actions[name] = presentation;
   },
 
   /**
@@ -103,7 +98,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getData: function(actionName) {
     var form_data = this.$().serializeArray();
-    var action = actionName ? this.options.actions[actionName] : null;
+    var action = actionName ? this._actions[actionName] : null;
 
     var data = {};
     var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
@@ -144,9 +139,9 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @return jqXHR|Boolean
    */
   submit: function(actionName) {
-    actionName = actionName || _.first(_.keys(this.options.actions));
+    actionName = actionName || _.first(_.keys(this._actions));
 
-    var action = this.options.actions[actionName];
+    var action = this._actions[actionName];
     if (!action) {
       cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
     }
