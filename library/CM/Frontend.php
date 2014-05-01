@@ -9,13 +9,13 @@ class CM_Frontend {
     protected $_treeCurrent;
 
     /** @var CM_ViewFrontendHandler */
-    protected $_onloadHeaderJs = '';
+    protected $_onloadHeaderJs;
 
     /** @var CM_ViewFrontendHandler */
-    protected $_onloadPrepareJs = '';
+    protected $_onloadPrepareJs;
 
     /** @var CM_ViewFrontendHandler */
-    protected $_onloadJs = '';
+    protected $_onloadJs;
 
     /** @var CM_ViewFrontendHandler */
     protected $_onloadReadyJs;
@@ -27,6 +27,10 @@ class CM_Frontend {
 
     public function __construct(CM_Render $render) {
         $this->_render = $render;
+        $this->_onloadHeaderJs = new CM_ViewFrontendHandler();
+        $this->_onloadPrepareJs = new CM_ViewFrontendHandler();
+        $this->_onloadJs = new CM_ViewFrontendHandler();
+        $this->_onloadReadyJs = new CM_ViewFrontendHandler();
     }
 
     /**
