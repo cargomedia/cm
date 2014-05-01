@@ -15,7 +15,10 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      * @param CM_Params|array|null $params
      */
     public function __construct($params = null) {
-        $this->_params = CM_Params::factory($params);
+        if (!$params instanceof CM_Params) {
+            $params = CM_Params::factory($params);
+        }
+        $this->_params = $params;
     }
 
     /**
@@ -54,9 +57,9 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string          $className
+     * @param string               $className
      * @param CM_Params|array|null $params
-     * @throws CM_Exception
+     * @throws CM_Exception_Invalid
      * @return static
      */
     public static function factory($className, $params = null) {

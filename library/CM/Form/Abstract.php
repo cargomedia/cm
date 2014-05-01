@@ -11,14 +11,16 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /** @var CM_FormAction_Abstract[] */
     private $_actions = array();
 
-    public function __construct() {
+    public function __construct($params = null) {
+        parent::__construct($params);
+
         if (!preg_match('/^\w+_Form_(.+)$/', get_class($this), $matches)) {
             throw new CM_Exception("Cannot detect namespace from forms class-name");
         }
-        $namespace = lcfirst($matches[1]);
-        $namespace = preg_replace('/([A-Z])/', '_\1', $namespace);
-        $namespace = strtolower($namespace);
-        $this->_name = $namespace;
+        $name = lcfirst($matches[1]);
+        $name = preg_replace('/([A-Z])/', '_\1', $name);
+        $name = strtolower($name);
+        $this->_name = $name;
     }
 
     abstract public function setup();

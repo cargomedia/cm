@@ -3,19 +3,6 @@
 abstract class CM_Component_Abstract extends CM_View_Abstract {
 
     /**
-     * @param CM_Params|array|null $params
-     */
-    public function __construct($params = null) {
-        if (is_null($params)) {
-            $params = CM_Params::factory();
-        }
-        if (is_array($params)) {
-            $params = CM_Params::factory($params);
-        }
-        $this->_params = $params;
-    }
-
-    /**
      * Checks if a component can be accessed by the currently set user
      *
      * Access for everyone is default. Should be overloaded by every component
