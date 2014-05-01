@@ -37,7 +37,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
      * @param string $templateName
      * @return string
      */
-    private function _fetchMetaTemplate($templateName) {
+    protected function _fetchMetaTemplate($templateName) {
         return trim(parent::_fetchTemplate($templateName, $this->_getView()->getParams()->getAll()));
     }
 }

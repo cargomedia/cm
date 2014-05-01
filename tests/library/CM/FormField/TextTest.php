@@ -84,7 +84,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
             $this->assertContains('The word `foo` is not allowed', $ex->getMessagePublic($render));
         }
 
-        $field = new CM_FormField_Text(null, null, false);
+        $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => false]);
         try {
             $field->validate('foo', $response);
         } catch (CM_Exception_FormFieldValidation $ex) {

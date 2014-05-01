@@ -9,12 +9,11 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
         /** @var CM_Page_Abstract $page */
 
         $renderAdapter = $this->getMockBuilder('CM_RenderAdapter_Page')
-            ->setMethods(array('_getTplPath'))
+            ->setMethods(array('_fetchMetaTemplate'))
             ->setConstructorArgs(array($render, $page))
             ->getMock();
-        $renderAdapter->expects($this->any())->method('_getTplPath')->will($this->returnCallback(function ($tplName) {
-            $template = "\n \t" . 'test-' . $tplName . "\n";
-            return CM_File::createTmp(null, $template)->getPath();
+        $renderAdapter->expects($this->any())->method('_fetchMetaTemplate')->will($this->returnCallback(function ($tplName) {
+            return 'test-' . $tplName . '.tpl';
         }));
         /** @var CM_RenderAdapter_Page $renderAdapter */
 
