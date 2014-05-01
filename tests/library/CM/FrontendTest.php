@@ -57,16 +57,29 @@ class CM_FrontendTest extends CMTest_TestCase {
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage No current tree node set
      */
-    public function testTreeCollapseNoCurrent() {
+    public function testTreeCollapseCollapsedRoot() {
         $frontend = new CM_Frontend(new CM_Render());
-
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
-        $viewResponse1 = new CM_ViewResponse($view);
-        $frontend->treeExpand($viewResponse1);
+        $frontend->treeExpand(new CM_ViewResponse($view));
 
         $frontend->treeCollapse();
         $frontend->treeCollapse();
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage No current tree node set
+     */
+    public function testTreeExpandCollapsedRoot() {
+        $frontend = new CM_Frontend(new CM_Render());
+        $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
+        /** @var CM_View_Abstract $view */
+
+        $frontend->treeExpand(new CM_ViewResponse($view));
+
+        $frontend->treeCollapse();
+        $frontend->treeExpand(new CM_ViewResponse($view));
     }
 }
