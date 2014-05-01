@@ -103,8 +103,8 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
         return $result;
     }
 
-    public function getCount($offset = null, $limit = null) {
-        $result = $this->_getResult($offset, $limit);
+    public function getCount($offset = null, $count = null) {
+        $result = $this->_getResult($offset, $count);
         return (int) $result['total'];
     }
 

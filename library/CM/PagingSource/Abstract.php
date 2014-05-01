@@ -74,10 +74,10 @@ abstract class CM_PagingSource_Abstract {
 
     /**
      * @param int $offset
-     * @param int $limit
+     * @param int $count
      * @return int
      */
-    abstract public function getCount($offset = null, $limit = null);
+    abstract public function getCount($offset = null, $count = null);
 
     /**
      * @param int $offset

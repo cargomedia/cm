@@ -20,13 +20,13 @@ class CM_PagingSource_Redis_List extends CM_PagingSource_Abstract {
         return array($this->_key);
     }
 
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         $cacheKey = array('count');
-        if (($limit = $this->_cacheGet($cacheKey)) === false) {
-            $limit = $this->_client->lLen($this->_key);
-            $this->_cacheSet($cacheKey, $limit);
+        if (($count = $this->_cacheGet($cacheKey)) === false) {
+            $count = $this->_client->lLen($this->_key);
+            $this->_cacheSet($cacheKey, $count);
         }
-        return $limit;
+        return $count;
     }
 
     public function getItems($offset = null, $count = null) {

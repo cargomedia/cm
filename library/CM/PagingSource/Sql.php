@@ -36,9 +36,9 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
         return array($this->_table, $this->_where, $this->_join, $this->_parameters);
     }
 
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         $cacheKey = array('count');
-        if (($limit = $this->_cacheGet($cacheKey)) === false) {
+        if (($count = $this->_cacheGet($cacheKey)) === false) {
             if ($this->_group) {
                 $select = '1';
             } else {
@@ -60,13 +60,13 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             }
             $result = CM_Db_Db::exec($query, $this->_parameters, $this->_dbSlave);
             if ($this->_group) {
-                $limit = (int) count($result->fetchAll());
+                $count = (int) count($result->fetchAll());
             } else {
-                $limit = (int) $result->fetchColumn();
+                $count = (int) $result->fetchColumn();
             }
-            $this->_cacheSet($cacheKey, $limit);
+            $this->_cacheSet($cacheKey, $count);
         }
-        return $limit;
+        return $count;
     }
 
     public function getItems($offset = null, $count = null) {

@@ -55,7 +55,7 @@ class CM_PagingSource_Array extends CM_PagingSource_Abstract {
         }
     }
 
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         return count($this->getItems());
     }
 

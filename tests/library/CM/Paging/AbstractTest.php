@@ -42,7 +42,7 @@ class CM_PagingSource_Mock extends CM_PagingSource_Abstract {
         $this->_items = range($min, $max);
     }
 
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         return count($this->_items);
     }
 

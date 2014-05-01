@@ -24,19 +24,19 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
 
     /**
      * @param int|null $offset
-     * @param int|null $limit
+     * @param int|null $count
      * @return int
      */
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         $cacheKey = array('count');
-        if (($limit = $this->_cacheGet($cacheKey)) === false) {
+        if (($count = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
-            $limit = $mongoDb->count($this->_collection, $this->_criteria, $limit, $offset);
-            $this->_cacheSet($cacheKey, $limit);
+            $count = $mongoDb->count($this->_collection, $this->_criteria, $count, $offset);
+            $this->_cacheSet($cacheKey, $count);
         } else {
             CM_Debug::getInstance()->incStats('mongoCacheHit', 'getItems()');
         }
-        return $limit;
+        return $count;
     }
 
     /**

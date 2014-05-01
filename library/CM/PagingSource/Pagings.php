@@ -27,7 +27,7 @@ class CM_PagingSource_Pagings extends CM_PagingSource_Abstract {
         $this->_distinct = (boolean) $distinct;
     }
 
-    public function getCount($offset = null, $limit = null) {
+    public function getCount($offset = null, $count = null) {
         $items = $this->getItems();
         return count($items);
     }
