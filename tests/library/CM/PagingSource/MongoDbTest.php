@@ -13,10 +13,10 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             $mongodb->insert('my-collection', $item);
         }
 
-        $source = new CM_PagingSource_MongoDb(array('recipients'), 'my-collection', array('bar.sub' => 5));
+        $source = new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 5));
         $this->assertSame(1, $source->getCount());
 
-        $sourceEmpty = new CM_PagingSource_MongoDb(array('recipients'), 'my-collection', array('bar.sub' => 99));
+        $sourceEmpty = new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 99));
         $this->assertSame(0, $sourceEmpty->getCount());
     }
 
@@ -29,7 +29,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             $mongodb->insert('my-collection', $item);
         }
 
-        $source = new CM_PagingSource_MongoDb(array('recipients'), 'my-collection', array('bar.sub' => 5));
+        $source = new CM_PagingSource_MongoDb('my-collection', array('bar.sub' => 5));
         $itemsActual = $source->getItems();
         $this->assertCount(1, $itemsActual);
         $itemActual = $itemsActual[0];
@@ -46,7 +46,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
             $mongodb->insert('my-collection', $item);
         }
 
-        $source = new CM_PagingSource_MongoDb(array('messages'), 'my-collection');
+        $source = new CM_PagingSource_MongoDb('my-collection');
 
         $this->assertSame(7, $source->getCount());
         $this->assertSame(4, $source->getCount(3, 2));
@@ -58,7 +58,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $itemExpected = array('foo' => 1);
         $mongodb->insert('my-collection', $itemExpected);
 
-        $source = new CM_PagingSource_MongoDb(null, 'my-collection');
+        $source = new CM_PagingSource_MongoDb('my-collection');
         $source->enableCache(600);
 
         $this->assertSame(1, $source->getCount());
