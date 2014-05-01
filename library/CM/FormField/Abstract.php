@@ -2,10 +2,11 @@
 
 abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $_value;
+
+    /** @var string */
+    protected $_name;
 
     /**
      * @var array
@@ -16,6 +17,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
     public function __construct($params = null) {
         parent::__construct($params);
+        $this->_name = $this->_params->getString('name');
         $this->_setup();
     }
 
@@ -80,8 +82,6 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     }
 
     public function ajax_validate(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
-        $formName = $params->getString('form');
-        $fieldName = $params->getString('fieldName');
         $userInput = $params->get('userInput');
 
         $form = CM_Form_Abstract::factory($formName);
