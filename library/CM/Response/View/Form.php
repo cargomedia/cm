@@ -13,29 +13,25 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
     private $messages = array();
 
     /**
-     * @param string $err_msg
-     * @param string $field_name
+     * @param string $message
+     * @param string $fieldName
      */
-    public function addError($err_msg, $field_name = null) {
-        if (isset($field_name)) {
-            $this->errors[] = array($err_msg, $field_name);
+    public function addError($message, $fieldName = null) {
+        if (isset($fieldName)) {
+            $this->errors[] = array($message, $fieldName);
         } else {
-            $this->errors[] = $err_msg;
+            $this->errors[] = $message;
         }
     }
 
     /**
-     * Add a success message to response.
-     *
-     * @param string $msg_text
+     * @param string $message
      */
-    public function addMessage($msg_text) {
-        $this->messages[] = $msg_text;
+    public function addMessage($message) {
+        $this->messages[] = $message;
     }
 
     /**
-     * Check the response for having an errors.
-     *
      * @return bool
      */
     public function hasErrors() {
