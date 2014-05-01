@@ -16,29 +16,23 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
     }
 
     /**
-     * @param $collection
-     * @return MongoCollection
+     * @return string[]
      */
-    public function getCollection($collection) {
-        return $this->_getDatabase()->{$collection};
+    public function listCollectionNames() {
+        return array_map(function (MongoCollection $collection) {
+            return $collection->getName();
+        }, $this->_getDatabase()->listCollections());
     }
 
     /**
-     * @return array
-     */
-    public function listCollections() {
-        return $this->_getDatabase()->listCollections();
-    }
-
-    /**
-     * @param $collection
-     * @param $object
+     * @param string $collection
+     * @param array  $object
      * @return array|bool
      */
-    public function insert($collection, $object) {
+    public function insert($collection, array $object) {
         CM_Debug::getInstance()->incStats('mongo', "insert to {$collection}");
         $ref = & $object;
-        return $this->getCollection($collection)->insert($ref);
+        return $this->_getCollection($collection)->insert($ref);
     }
 
     /**
@@ -47,12 +41,12 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
      * @param array|null $fields
      * @return array
      */
-    public function findOne($collection, $query, $fields = null) {
-        $fields = ($fields !== null) ? $fields : array();
+    public function findOne($collection, array $query, array $fields = null) {
+        $fields = (array) $fields;
         CM_Debug::getInstance()->incStats('mongo',
             "findOne in {$collection}: " . serialize(array('fields' => $fields) + $query));
 
-        return $this->getCollection($collection)->findOne($query, $fields);
+        return $this->_getCollection($collection)->findOne($query, $fields);
     }
 
     /**
@@ -61,48 +55,47 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
      * @param array|null $fields
      * @return MongoCursor
      */
-    public function find($collection, $query, $fields = null) {
-        $fields = ($fields !== null) ? $fields : array();
+    public function find($collection, array $query, array $fields = null) {
+        $fields = (array) $fields;
         CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $fields) + $query));
+        return $this->_getCollection($collection)->find($query);
+    }
 
-        return $this->getCollection($collection)->find($query);
+    /**
+     * @param string     $collection
+     * @param array|null $query
+     * @param int|null   $limit
+     * @param int|null   $offset
+     * @return int
+     */
+    public function count($collection, array $query = null, $limit = null, $offset = null) {
+        $query = (array) $query;
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($query));
+        return $this->_getCollection($collection)->count($query, $limit, $offset);
     }
 
     /**
      * @param string $collection
-     * @param array  $query
-     * @param int    $limit
-     * @param int    $skip
-     * @return int
-     */
-    public function count($collection, $query, $limit = 0, $skip = 0) {
-        CM_Debug::getInstance()->incStats('mongo', "count in {$collection}: " . serialize($query));
-
-        return $this->getCollection($collection)->count($query, $limit, $skip);
-    }
-
-    /**
-     * @param $collection
      * @return array
      */
     public function drop($collection) {
         CM_Debug::getInstance()->incStats('mongo', "drop {$collection}: ");
-
-        return $this->getCollection($collection)->drop();
+        return $this->_getCollection($collection)->drop();
     }
 
     /**
      * @param string     $collection
      * @param array      $criteria
-     * @param array      $newObject
+     * @param array      $values
      * @param array|null $options
      * @return MongoCursor
      */
-    public function update($collection, $criteria, $newObject, $options = null) {
+    public function update($collection, array $criteria, array $values, array $options = null) {
+        $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
-        $options = ($options !== null) ? $options : array();
-
-        return $this->getCollection($collection)->update($criteria, $newObject, $options);
+        return $this->_getCollection($collection)->update($criteria, $values, $options);
     }
 
     /**
@@ -111,11 +104,10 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
      * @param array|null $options
      * @return mixed
      */
-    public function remove($collection, $criteria, $options = null) {
+    public function remove($collection, array $criteria, array $options = null) {
+        $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "remove from {$collection}");
-        $options = ($options !== null) ? $options : array();
-
-        return $this->getCollection($collection)->remove($criteria, $options);
+        return $this->_getCollection($collection)->remove($criteria, $options);
     }
 
     /**
@@ -136,18 +128,19 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|null $dbName
      * @return MongoDB
      * @throws CM_Exception_Nonexistent
      */
-    protected function _getDatabase($dbName = null) {
-        $client = $this->_getClient();
+    protected function _getDatabase() {
+        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $this->_config['db'];
+        return $this->_getClient()->selectDB($dbName);
+    }
 
-        if (null === $dbName) {
-            $dbName = $this->_config['db'];
-        }
-        $dbName = CM_Bootloader::getInstance()->getDataPrefix() . $dbName;
-
-        return $client->{$dbName};
+    /**
+     * @param string $collection
+     * @return MongoCollection
+     */
+    protected function _getCollection($collection) {
+        return $this->_getDatabase()->selectCollection($collection);
     }
 }

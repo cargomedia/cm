@@ -36,8 +36,8 @@ class CMTest_TH {
 
     public static function clearMongoDb() {
         $mongoDb = CM_Services::getInstance()->getMongoDb();
-        foreach ($mongoDb->listCollections() as $collection) {
-            $collection->drop();
+        foreach ($mongoDb->listCollectionNames() as $collectionName) {
+            $mongoDb->drop($collectionName);
         }
     }
 
