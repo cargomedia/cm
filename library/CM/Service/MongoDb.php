@@ -37,11 +37,12 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $projection
      * @return array
      */
-    public function findOne($collection, array $criteria, array $projection = null) {
+    public function findOne($collection, array $criteria = null, array $projection = null) {
+        $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo',
             "findOne in {$collection}: " . serialize(array('projection' => $projection) + $criteria));
@@ -51,11 +52,12 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
 
     /**
      * @param string     $collection
-     * @param array      $criteria
+     * @param array|null $criteria
      * @param array|null $projection
      * @return MongoCursor
      */
-    public function find($collection, array $criteria, array $projection = null) {
+    public function find($collection, array $criteria = null, array $projection = null) {
+        $criteria = (array) $criteria;
         $projection = (array) $projection;
         CM_Debug::getInstance()->incStats('mongo', "find in {$collection}: " . serialize(array('fields' => $projection) + $criteria));
         return $this->_getCollection($collection)->find($criteria, $projection);
