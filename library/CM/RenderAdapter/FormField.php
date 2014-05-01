@@ -2,9 +2,10 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(CM_Params $renderParams, CM_Form_Abstract $form, $fieldName) {
+    public function fetch(CM_Params $renderParams, $fieldName) {
         $fieldName = (string) $fieldName;
         $field = $this->_getFormField();
+        $form = $this->getRender()->getStackLast('forms');
 
         $viewResponse = new CM_ViewResponse($field);
         $viewResponse->setTemplateName('default');
@@ -19,11 +20,11 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
+        $this->getRender()->getJs()->registerViewResponse($viewResponse);
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
         $html .= '</div>';
-
         return $html;
     }
 
