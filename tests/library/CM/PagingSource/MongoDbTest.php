@@ -7,7 +7,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testCount() {
-        $mongodb = CM_Services::getInstance()->getMongoDb();
+        $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         for ($i = 0; $i < 7; $i++) {
             $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
             $mongodb->insert('my-collection', $item);
@@ -21,7 +21,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testGetItems() {
-        $mongodb = CM_Services::getInstance()->getMongoDb();
+        $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         $itemsExpected = array();
         for ($i = 0; $i < 7; $i++) {
             $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
@@ -38,7 +38,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testGetItemsOffsetCount() {
-        $mongodb = CM_Services::getInstance()->getMongoDb();
+        $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         $itemsExpected = array();
         for ($i = 0; $i < 7; $i++) {
             $item = array('foo' => 12, 'bar' => array(array('sub' => $i), array('sub' => 'something-else')));
@@ -54,7 +54,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testCaching() {
-        $mongodb = CM_Services::getInstance()->getMongoDb();
+        $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         $itemExpected = array('foo' => 1);
         $mongodb->insert('my-collection', $itemExpected);
 
@@ -80,7 +80,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testProjection() {
-        $mongodb = CM_Services::getInstance()->getMongoDb();
+        $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         $mongodb->insert('foo', array('firstname' => 'John', 'lastname' => 'Doe'));
 
         $source = new CM_PagingSource_MongoDb('foo', null, array('firstname' => true));

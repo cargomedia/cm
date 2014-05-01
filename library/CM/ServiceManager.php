@@ -1,6 +1,6 @@
 <?php
 
-class CM_Services extends CM_Class_Abstract {
+class CM_ServiceManager extends CM_Class_Abstract {
 
     /** @var array */
     private $_serviceList = array();
@@ -8,7 +8,7 @@ class CM_Services extends CM_Class_Abstract {
     /** @var array */
     private $_serviceInstanceList = array();
 
-    /** @var CM_Services */
+    /** @var CM_ServiceManager */
     protected static $instance;
 
     private function __construct() {
@@ -93,10 +93,10 @@ class CM_Services extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Services
+     * @return CM_ServiceManager
      */
     public static function getInstance() {
-        if (!self::$instance) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
         return self::$instance;

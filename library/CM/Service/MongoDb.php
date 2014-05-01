@@ -90,14 +90,14 @@ class CM_Service_MongoDb extends CM_Class_Abstract {
     /**
      * @param string     $collection
      * @param array      $criteria
-     * @param array      $values
+     * @param array      $newObject
      * @param array|null $options
      * @return MongoCursor
      */
-    public function update($collection, array $criteria, array $values, array $options = null) {
+    public function update($collection, array $criteria, array $newObject, array $options = null) {
         $options = (array) $options;
         CM_Debug::getInstance()->incStats('mongo', "Update {$collection}");
-        return $this->_getCollection($collection)->update($criteria, $values, $options);
+        return $this->_getCollection($collection)->update($criteria, $newObject, $options);
     }
 
     /**
