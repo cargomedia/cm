@@ -33,8 +33,9 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
             $data = $view->$ajaxMethodName($params, $componentHandler, $this);
             $success['data'] = CM_Params::encode($data);
 
-            $jsCode = $componentHandler->compile('this');
-            CM_Frontend::concat_js($this->getRender()->getJs()->getJs(), $jsCode);
+            $frontend = $this->getRender()->getJs();
+            $frontend->getOnloadReadyJs()->append($componentHandler->compile('this'));
+            $jsCode = $frontend->getJs();
 
             if (strlen($jsCode)) {
                 $success['exec'] = $jsCode;
