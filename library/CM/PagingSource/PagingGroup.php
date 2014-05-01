@@ -17,8 +17,8 @@ class CM_PagingSource_PagingGroup extends CM_PagingSource_Abstract {
         $this->_getGroupKey = $getGroupKey;
     }
 
-    public function getCount($offset = null, $count = null) {
-        $this->_setPage($offset, $count);
+    public function getCount($offset = null, $limit = null) {
+        $this->_setPage($offset, $limit);
         return $this->_paging->getCount();
     }
 
