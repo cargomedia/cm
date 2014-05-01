@@ -343,6 +343,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return bool
      */
     protected function _hasIdKey($key) {
+        if (null === $this->_id) {
+            return false;
+        }
         $key = (string) $key;
         $idRaw = $this->getIdRaw();
         return array_key_exists($key, $idRaw);
