@@ -118,26 +118,28 @@ class CM_Frontend {
      * @return string
      */
     public function getJs() {
-        return $this->compile() . PHP_EOL . $this->getTracking()->getJs();
+        $jsCode = '';
+        $jsCode .= $this->_onloadHeaderJs->compile(null) . PHP_EOL;
+        $jsCode .= $this->_onloadPrepareJs->compile(null) . PHP_EOL;
+        $jsCode .= $this->_onloadJs->compile(null) . PHP_EOL;
+        $jsCode .= $this->_onloadReadyJs->compile(null) . PHP_EOL;
+        $jsCode .= $this->getTracking()->getJs();
+        return $jsCode;
     }
 
     /**
      * @return string
      */
-    public function compile() {
-        $operations = array(
-            $this->_onloadHeaderJs->compile(null),
-            $this->_onloadPrepareJs->compile(null),
-            $this->_onloadJs->compile(null),
-            $this->_onloadReadyJs->compile(null),
-        );
-        return implode(PHP_EOL, $operations);
-    }
-
-    /**
-     * @return string
-     */
-    public function renderScripts() {
-        return '<script type="text/javascript">' . PHP_EOL . '$(function() {' . $this->compile() . '});' . PHP_EOL . '</script>' . PHP_EOL;
+    public function getHtml() {
+        $html = '<script type="text/javascript">' . PHP_EOL;
+        $html .= '$(function() {' . PHP_EOL;
+        $html .= $this->_onloadHeaderJs->compile(null) . PHP_EOL;
+        $html .= $this->_onloadPrepareJs->compile(null) . PHP_EOL;
+        $html .= $this->_onloadJs->compile(null) . PHP_EOL;
+        $html .= $this->_onloadReadyJs->compile(null) . PHP_EOL;
+        $html .= '});' . PHP_EOL;
+        $html .= '</script>' . PHP_EOL;
+        $html .= $this->getTracking()->getHtml();
+        return $html;
     }
 }
