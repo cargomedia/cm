@@ -2,10 +2,10 @@
 
 class CM_Frontend {
 
-    /** @var Tree\Node\Node|null */
+    /** @var CM_Frontend_TreeNode|null */
     protected $_treeRoot;
 
-    /** @var Tree\Node\Node|null */
+    /** @var CM_Frontend_TreeNode|null */
     protected $_treeCurrent;
 
     /** @var CM_ViewFrontendHandler */
@@ -32,8 +32,8 @@ class CM_Frontend {
     /**
      * @param CM_ViewResponse $viewResponse
      */
-    public function treeExpand(CM_ViewResponse $viewResponse){
-        $node = new \Tree\Node\Node($viewResponse);
+    public function treeExpand(CM_ViewResponse $viewResponse) {
+        $node = new CM_Frontend_TreeNode($viewResponse);
         if (null === $this->_treeRoot) {
             $this->_treeRoot = $node;
         } else {
@@ -51,7 +51,7 @@ class CM_Frontend {
     }
 
     /**
-     * @return \Tree\Node\Node
+     * @return \CM_Frontend_TreeNode
      * @throws CM_Exception_Invalid
      */
     public function getTreeCurrent() {
@@ -63,7 +63,7 @@ class CM_Frontend {
 
     /**
      * @throws CM_Exception_Invalid
-     * @return \Tree\Node\Node
+     * @return \CM_Frontend_TreeNode
      */
     public function getTreeRoot() {
         if (null === $this->_treeRoot) {
