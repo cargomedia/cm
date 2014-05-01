@@ -2,7 +2,14 @@
 
 class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
 
-    private $_fields, $_collection, $_query;
+    /** @var string */
+    private $_collection;
+
+    /** @var array */
+    private $_criteria;
+
+    /** @var array */
+    private $_projection;
 
     /**
      * @param  string     $collection
@@ -11,8 +18,8 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
      */
     public function __construct($collection, array $criteria = null, array $projection = null) {
         $this->_collection = (string) $collection;
-        $this->_query = (array) $criteria;
-        $this->_fields = (array) $projection;
+        $this->_criteria = (array) $criteria;
+        $this->_projection = (array) $projection;
     }
 
     /**
@@ -24,7 +31,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('count');
         if (($count = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Services::getInstance()->getMongoDb();
-            $count = $mongoDb->count($this->_collection, $this->_query, $count, $offset);;
+            $count = $mongoDb->count($this->_collection, $this->_criteria, $count, $offset);;
             $this->_cacheSet($cacheKey, $count);
         } else {
             CM_Debug::getInstance()->incStats('mongoCacheHit', 'getItems()');
@@ -41,17 +48,14 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         $cacheKey = array('items', $offset, $count);
         if (($items = $this->_cacheGet($cacheKey)) === false) {
             $mongoDb = CM_Services::getInstance()->getMongoDb();
-
-            $cursor = $mongoDb->find($this->_collection, $this->_query, $this->_fields);
+            $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection);
 
             if (null !== $offset) {
                 $cursor->skip($offset);
             }
-
             if (null !== $count) {
                 $cursor->limit($count);
             }
-
             $items = array();
             foreach ($cursor as $item) {
                 $items[] = $item;
@@ -60,12 +64,11 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
         } else {
             CM_Debug::getInstance()->incStats('mongoCacheHit', 'count()');
         }
-
         return $items;
     }
 
     protected function _cacheKeyBase() {
-        return array($this->_collection, $this->_query, $this->_fields);
+        return array($this->_collection, $this->_criteria, $this->_projection);
     }
 
     public function getStalenessChance() {
