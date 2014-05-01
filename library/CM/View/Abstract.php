@@ -8,9 +8,6 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
 
     private $_autoId;
 
-    /** @var array */
-    protected $_tplParams = array();
-
     /** @var CM_Params */
     protected $_params;
 
@@ -19,23 +16,6 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      */
     public function __construct($params = null) {
         $this->_params = CM_Params::factory($params);
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     * @return CM_Component_Abstract
-     */
-    public function setTplParam($key, $value) {
-        $this->_tplParams[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTplParams() {
-        return $this->_tplParams;
     }
 
     /**
@@ -55,11 +35,11 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
         return $this->_autoId;
     }
 
-    public function ajax_loadComponent(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadComponent(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->loadComponent($params);
     }
 
-    public function ajax_loadPage(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_loadPage(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
         return $response->loadPage($params, $response);
     }
 
