@@ -12,7 +12,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $frontendHandler = new CM_ViewFrontendHandler();
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
         $viewResponse->set('viewObj', $this->_getComponent());
-        $this->getRender()->getJs()->registerViewResponse($viewResponse, $frontendHandler);
+        $this->getRender()->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
 
         $this->getRender()->pushStack($this->_getStackKey(), $viewResponse);
         $this->getRender()->pushStack('views', $viewResponse);

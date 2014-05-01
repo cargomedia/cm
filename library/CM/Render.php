@@ -75,7 +75,7 @@ class CM_Render extends CM_Class_Abstract {
     /**
      * @return CM_Frontend
      */
-    public function getJs() {
+    public function getFrontend() {
         if (!$this->_js) {
             $this->_js = new CM_Frontend($this);
         }

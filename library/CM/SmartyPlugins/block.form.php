@@ -32,7 +32,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         foreach ($form->getActions() as $actionName => $action) {
             $frontendHandler->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
         }
-        $render->getJs()->registerViewResponse($viewResponse, $frontendHandler);
+        $render->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
         $html .= '</form>';
 
         $render->popStack('forms');

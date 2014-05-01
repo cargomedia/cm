@@ -9,7 +9,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     public function fetch(CM_Page_Abstract $page) {
         $layout = $this->_getLayout();
         $page->checkAccessible($this->getRender()->getEnvironment());
-        $js = $this->getRender()->getJs();
+        $js = $this->getRender()->getFrontend();
 
 
 
@@ -25,7 +25,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             'pageDescription' => $renderAdapterPage->fetchDescription(),
             'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
         ));
-        $this->getRender()->getJs()->registerViewResponse($viewResponse);
+        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
         $this->getRender()->pushStack('layouts', $viewResponse);
         $this->getRender()->pushStack('views', $viewResponse);

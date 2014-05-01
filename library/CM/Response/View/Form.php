@@ -88,7 +88,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
                 $success['errors'] = $this->errors;
             }
 
-            $this->exec($this->getRender()->getJs()->getJs());
+            $this->exec($this->getRender()->getFrontend()->getJs());
 
             if (!empty($this->_jsCode)) {
                 $success['exec'] = $this->_jsCode;
