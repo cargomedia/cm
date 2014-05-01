@@ -12,7 +12,7 @@
 <div class="tabs-content">
   {block name="tabs-content"}
     <div>
-      {viewTemplate file='tabs/example.tpl' foo=$foo now=$now}
+      {viewTemplate file='tabs/example' foo=$foo now=$now}
     </div>
     <div>
       {code language="html5"}{load file='Component/Example/tabs/menus.tpl' namespace='CM' parse=false}{/code}
