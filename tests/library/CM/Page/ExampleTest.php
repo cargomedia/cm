@@ -4,13 +4,12 @@ class CM_Page_ExampleTest extends CMTest_TestCase {
 
     public function testAccessible() {
         $debugBackup = CM_Bootloader::getInstance()->isDebug();
+        $page = new CM_Page_Example();
 
         CM_Bootloader::getInstance()->setDebug(true);
-        $page = $this->_createPage('CM_Page_Example');
         $this->_renderPage($page);
 
         CM_Bootloader::getInstance()->setDebug(false);
-        $page = $this->_createPage('CM_Page_Example');
         $this->assertPageNotRenderable($page);
 
         CM_Bootloader::getInstance()->setDebug($debugBackup);
