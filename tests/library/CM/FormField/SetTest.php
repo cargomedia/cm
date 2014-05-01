@@ -3,12 +3,12 @@
 class CM_FormField_SetTest extends CMTest_TestCase {
 
     public function testConstructor() {
-        $field = new CM_FormField_Set();
+        $field = new CM_FormField_Set(['name' => 'foo']);
         $this->assertInstanceOf('CM_FormField_Set', $field);
     }
 
     public function testSetGetValue() {
-        $field = new CM_FormField_Set();
+        $field = new CM_FormField_Set(['name' => 'foo']);
 
         $values = array(32 => 'apples');
         $field->setValue($values);
@@ -21,7 +21,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
 
     public function testValidate() {
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
-        $field = new CM_FormField_Set(['values' => $data, 'labelsInValues' => true]);
+        $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
 
         $userInputGood = array(32, 64, 128);
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
@@ -37,10 +37,10 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $name = 'foo';
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $form = $this->getMockForm();
-        $field = new CM_FormField_Set(['values' => $data, 'labelsInValues' => true]);
+        $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
         $values = array(64, 128);
         $field->setValue($values);
-        $doc = $this->_renderFormField($form, $field, $name);
+        $doc = $this->_renderFormField($field, $name);
         $this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
         $this->assertSame(count($data), $doc->getCount('label'));
         $this->assertSame(count($data), $doc->getCount('input'));

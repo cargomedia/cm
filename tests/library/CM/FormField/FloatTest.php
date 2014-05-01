@@ -2,17 +2,16 @@
 
 class CM_FormField_FloatTest extends CMTest_TestCase {
 
+    /**
+     * @expectedException CM_Exception_FormFieldValidation
+     */
     public function testValidate() {
-        $field = new CM_FormField_Float();
+        $field = new CM_FormField_Float(['name' => 'foo']);
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
+        /** @var CM_Response_Abstract $response */
 
         $validationResult = $field->validate(1.3, $response);
         $this->assertSame(1.3, $validationResult);
-        try {
-            $field->validate('foo', $response);
-            $this->fail('Could insert text in float formfield');
-        } catch (CM_Exception_FormFieldValidation $e) {
-            $this->assertTrue(true);
-        }
+        $field->validate('foo', $response);
     }
 }

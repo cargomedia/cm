@@ -8,9 +8,9 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testRender() {
         $form = $this->getMockForm();
-        $field = new CM_FormField_Text();
+        $field = new CM_FormField_Text(['name' => 'foo']);
         $fieldName = 'foo';
-        $doc = $this->_renderFormField($form, $field, $fieldName);
+        $doc = $this->_renderFormField($field, $fieldName);
         $this->assertSame(1, $doc->getCount('input'));
         $this->assertSame(
             '<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
@@ -20,10 +20,10 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testRenderValue() {
         $form = $this->getMockForm();
-        $field = new CM_FormField_Text();
+        $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
         $fieldName = 'foo';
-        $doc = $this->_renderFormField($form, $field, $fieldName);
+        $doc = $this->_renderFormField($field, $fieldName);
         $this->assertSame('bar', $doc->getAttr('input', 'value'));
         $this->assertSame(
             '<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
@@ -32,7 +32,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testValidateMinLength() {
-        $field = new CM_FormField_Text(['lengthMin' => 3]);
+        $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
@@ -56,7 +56,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testValidateMaxLength() {
-        $field = new CM_FormField_Text(['lengthMax' => 3]);
+        $field = new CM_FormField_Text(['name' => 'foo', 'lengthMax' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
@@ -80,7 +80,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     public function testValidateBadwords() {
         $badwordsList = new CM_Paging_ContentList_Badwords();
-        $field = new CM_FormField_Text(['forbidBadwords' => true]);
+        $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => true]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Render();
         try {
@@ -106,7 +106,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
 
     function testArrayInputInvalidCharsRemoval() {
         $invalidInputs = array(chr(240), chr(192), chr(200) . chr(210), 'something' . chr(244));
-        $field = new CM_FormField_Text();
+        $field = new CM_FormField_Text(['name' => 'foo']);
         foreach ($invalidInputs as $input) {
             $filtered = $field->filterInput($input);
             $this->assertNotSame($filtered, $input);
