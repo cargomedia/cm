@@ -12,11 +12,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $frontendHandler = new CM_ViewFrontendHandler();
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
         $viewResponse->set('viewObj', $this->_getComponent());
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
 
         $this->getRender()->pushStack($this->_getStackKey(), $viewResponse);
         $this->getRender()->pushStack('views', $viewResponse);
-
 
         $cssClass = implode(' ', $this->_getComponent()->getClassHierarchy());
         if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
@@ -24,16 +22,13 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
                 $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
             }
         }
-
-
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
         $html .=  $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
-
+        $this->getRender()->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
         $this->getRender()->popStack($this->_getStackKey());
         $this->getRender()->popStack('views');
-
         return $html;
     }
 
