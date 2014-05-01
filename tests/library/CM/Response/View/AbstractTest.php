@@ -20,6 +20,19 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
         $response = $this->getResponseAjax('loadPage', 'CM_Page_View_Ajax_Test_MockRedirect', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
         $this->assertAjaxResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
     }
+
+    public function testLoadComponent() {
+        $response = $this->getResponseAjax('loadComponent', 'CM_Component_Graph', array('className' => 'CM_Component_Graph', 'series' => []));
+        $this->assertAjaxResponseSuccess($response);
+        $successContent = CM_Params::decode($response->getContent(), true)['success'];
+
+        $autoId = $successContent['data']['autoId'];
+        $this->assertNotEmpty($autoId);
+        $html = (new CM_Dom_NodeList($successContent['data']['html']))->find('.CM_Component_Abstract');
+        $this->assertSame($autoId, $html->getAttribute('id'));
+        $this->assertArrayNotHasKey('exec', $successContent);
+        $this->assertContains('new CM_Component_Graph', $successContent['data']['js']);
+    }
 }
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {

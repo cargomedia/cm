@@ -55,7 +55,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
         $this->getRender()->getFrontend()->getOnloadHeaderJs()->append('cm.window.appendHidden(' . json_encode($html) . ');');
         $this->getRender()->getFrontend()->getOnloadPrepareJs()->append('cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' .
-        $component->getAutoId() . '"]);');
+            $component->getAutoId() . '"]);');
         $this->getRender()->getFrontend()->getOnloadReadyJs()->append('cm.views["' . $component->getAutoId() . '"]._ready();');
         $componentInfo['id'] = $component->getAutoId();
 
@@ -68,13 +68,17 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
      */
     public function loadComponent(CM_Params $params) {
         $component = CM_Component_Abstract::factory($params->getString('className'), $params);
-
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
-        $js = $this->getRender()->getFrontend()->getJs();
 
-        $this->getRender()->getFrontend()->clear();
-        return array('autoId' => $component->getAutoId(), 'html' => $html, 'js' => $js);
+        $frontend = $this->getRender()->getFrontend();
+        $data = array(
+            'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
+            'html'   => $html,
+            'js'     => $frontend->getJs()
+        );
+        $frontend->clear();
+        return $data;
     }
 
     /**

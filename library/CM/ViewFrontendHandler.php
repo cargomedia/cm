@@ -28,11 +28,18 @@ class CM_ViewFrontendHandler {
     }
 
     /**
-     * @param string $scope
+     * @param string|null $scope
      * @return string
      */
-    public function compile($scope) {
-        $code = implode(";\n", $this->_operations);
+    public function compile($scope = null) {
+        if (!$this->_operations) {
+            return '';
+        }
+        $operations = array_filter($this->_operations);
+        $code = implode(";\n", $operations);
+        if (null === $scope) {
+            return $code;
+        }
         return '(function () { ' . $code . ' }).call(' . $scope . ');';
     }
 
