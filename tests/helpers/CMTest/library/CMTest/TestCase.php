@@ -149,13 +149,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string             $pageClass
-     * @param CM_Model_User|null $viewer OPTIONAL
-     * @param array              $params OPTIONAL
+     * @param string $pageClass
+     * @param array  $params OPTIONAL
      * @return CM_Page_Abstract
      */
-    protected function _createPage($pageClass, CM_Model_User $viewer = null, $params = array()) {
-        return new $pageClass(CM_Params::factory($params), $viewer);
+    protected function _createPage($pageClass, $params = array()) {
+        return new $pageClass(CM_Params::factory($params));
     }
 
     /**
@@ -174,20 +173,16 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Form_Abstract      $form
+     * @param CM_Render             $render
      * @param CM_FormField_Abstract $formField
      * @param string                $fieldName
      * @param CM_Params|array|null  $params
-     * @param CM_Model_User|null    $viewer
-     * @param CM_Site_Abstract|null $site
-     * @return CMTest_TH_Html
+     * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_Form_Abstract $form, CM_FormField_Abstract $formField, $fieldName, $params = null, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $params = CM_Params::factory($params);
-        $render = new CM_Render($site, $viewer);
+    protected function _renderFormField(CM_Render $render, CM_FormField_Abstract $formField, $fieldName, $params = null) {
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch($params, $form, $fieldName);
-        return new CMTest_TH_Html($html);
+        $html = $renderAdapter->fetch(CM_Params::factory($params), $fieldName);
+        return new CM_Dom_NodeList($html);
     }
 
     /**
