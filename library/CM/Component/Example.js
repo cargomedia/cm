@@ -44,6 +44,13 @@ var CM_Component_Example = CM_Component_Abstract.extend({
     this.message("Component ready, uname: " + this.uname);
   },
 
+  /**
+   * @param {String} name
+   */
+  showTab: function(name) {
+    this.$('.example-navigation.tabs').tabs(name);
+  },
+
   reloadChinese: function() {
     this.reload({foo: 'some chinese.. 百度一下，你就知道 繁體字!'});
   },

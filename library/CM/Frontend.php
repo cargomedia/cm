@@ -173,7 +173,7 @@ class CM_Frontend {
         $html .= $this->_onloadReadyJs->compile(null) . PHP_EOL;
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        $html .= $this->getTracking()->getHtml();
+        $html .= $this->getTracking()->getHtml($this->_render->getEnvironment()->getSite());
         return $html;
     }
 }

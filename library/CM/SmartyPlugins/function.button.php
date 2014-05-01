@@ -11,6 +11,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     $action = $form->getAction($params['action']);
     $title = isset($params['title']) ? (string) $params['title'] : null;
     $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+    $isHtmlLabel = isset($params['isHtmlLabel']) ? (bool) $params['isHtmlLabel'] : false;
 
     $class = 'button ' . 'button-' . $theme;
     if (isset($params['class'])) {
@@ -40,7 +41,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 
     $label = '';
     if (isset($params['label'])) {
-        $label = $params['label'];
+        $label = ($isHtmlLabel) ? $params['label'] : CM_Util::htmlspecialchars($params['label']);
     }
 
     if ($label) {
@@ -75,7 +76,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
         }
     }
     if ($label) {
-        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $html .= '<span class="label">' . $label . '</span>';
     }
     $html .= '</button>';
     return $html;

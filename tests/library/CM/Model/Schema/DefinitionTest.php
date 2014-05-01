@@ -2,12 +2,12 @@
 
 class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
 
-    public function testIsEmpty() {
+    public function testHasDefinition() {
         $schema = new CM_Model_Schema_Definition(array());
-        $this->assertTrue($schema->isEmpty());
+        $this->assertTrue($schema->hasDefinition());
 
-        $schema = new CM_Model_Schema_Definition(array('foo' => array()));
-        $this->assertFalse($schema->isEmpty());
+        $schema = new CM_Model_Schema_Definition();
+        $this->assertFalse($schema->hasDefinition());
     }
 
     public function testIsFloat() {
@@ -610,7 +610,7 @@ class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
      * @return string
      */
     public function getId() {
-        return (string) $this->_getId('id');
+        return (string) $this->_getIdKey('id');
     }
 
     public static function getTypeStatic() {

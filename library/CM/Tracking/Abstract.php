@@ -8,9 +8,10 @@ abstract class CM_Tracking_Abstract extends CM_Class_Abstract {
     abstract public function getJs();
 
     /**
+     * @param CM_Site_Abstract $site
      * @return string
      */
-    abstract public function getHtml();
+    abstract public function getHtml(CM_Site_Abstract $site);
 
     /**
      * @return boolean

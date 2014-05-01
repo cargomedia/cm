@@ -20,4 +20,16 @@ class CM_ExceptionHandling_Formatter_Plain extends CM_ExceptionHandling_Formatte
         }
         return $traceString;
     }
+
+    public function getMetaInfo(CM_ExceptionHandling_SerializableException $exception) {
+        if (empty($exception->metaInfo)) {
+            return '';
+        }
+
+        $metaInfoString = '';
+        foreach ($exception->metaInfo as $key => $value) {
+            $metaInfoString .= $key . ': ' . $value . PHP_EOL;
+        }
+        return $metaInfoString;
+    }
 }

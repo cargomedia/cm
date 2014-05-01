@@ -2,17 +2,14 @@
 
 class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
 
-    public static function setUpBeforeClass() {
-        CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
-    }
-
     public function setup() {
+        CM_Config::get()->CM_Model_Abstract->types[CM_Model_StreamChannel_Mock::getTypeStatic()] = 'CM_Model_StreamChannel_Mock';
         if (!class_exists('CM_Model_StreamChannel_Mock')) {
             $this->getMockForAbstractClass('CM_Model_StreamChannel_Abstract', array(), 'CM_Model_StreamChannel_Mock', false);
         }
     }
 
-    public static function tearDownAfterClass() {
+    public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
@@ -209,6 +206,69 @@ class CM_Model_StreamChannel_AbstractTest extends CMTest_TestCase {
         $decryptMethod->setAccessible(true);
         $decryptedData = $decryptMethod->invoke($streamChannel, $encryptionKey);
         $this->assertSame($data, $decryptedData);
+    }
+
+    public function testIsSubscriber() {
+        /** @var CM_Model_StreamChannel_Mock $streamChannel */
+        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(
+            array('key' => 'foo', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
+        $user1 = CMTest_TH::createUser();
+        $subscribe1 = CM_Model_Stream_Subscribe::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '1'));
+        $subscribe2 = CM_Model_Stream_Subscribe::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '2'));
+
+        $this->assertTrue($streamChannel->isSubscriber($user1));
+        $this->assertTrue($streamChannel->isSubscriber($user1, $subscribe1));
+
+        $subscribe2->delete();
+        $this->assertTrue($streamChannel->isSubscriber($user1));
+        $this->assertFalse($streamChannel->isSubscriber($user1, $subscribe1));
+
+        $subscribe1->delete();
+        $this->assertFalse($streamChannel->isSubscriber($user1));
+    }
+
+    public function testIsPublisher() {
+        /** @var CM_Model_StreamChannel_Mock $streamChannel */
+        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(
+            array('key' => 'foo', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
+        $user1 = CMTest_TH::createUser();
+        $publish1 = CM_Model_Stream_Publish::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '1'));
+        $publish2 = CM_Model_Stream_Publish::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '2'));
+
+        $this->assertTrue($streamChannel->isPublisher($user1));
+        $this->assertTrue($streamChannel->isPublisher($user1, $publish1));
+
+        $publish2->delete();
+        $this->assertTrue($streamChannel->isPublisher($user1));
+        $this->assertFalse($streamChannel->isPublisher($user1, $publish1));
+
+        $publish1->delete();
+        $this->assertFalse($streamChannel->isPublisher($user1));
+    }
+
+    public function testIsSubscriberOrPublisher() {
+        /** @var CM_Model_StreamChannel_Mock $streamChannel */
+        $streamChannel = CM_Model_StreamChannel_Mock::createStatic(
+            array('key' => 'foo', 'adapterType' => CM_Stream_Adapter_Message_SocketRedis::getTypeStatic()));
+        $user1 = CMTest_TH::createUser();
+        $publish1 = CM_Model_Stream_Publish::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '1'));
+        $subscribe1 = CM_Model_Stream_Subscribe::createStatic(
+            array('streamChannel' => $streamChannel, 'user' => $user1, 'start' => 123123, 'key' => '2'));
+
+        $this->assertTrue($streamChannel->isSubscriberOrPublisher($user1));
+        $this->assertTrue($streamChannel->isSubscriberOrPublisher($user1, $publish1));
+
+        $subscribe1->delete();
+        $this->assertTrue($streamChannel->isSubscriberOrPublisher($user1));
+        $this->assertFalse($streamChannel->isSubscriberOrPublisher($user1, $publish1));
+
+        $publish1->delete();
+        $this->assertFalse($streamChannel->isSubscriberOrPublisher($user1));
     }
 }
 
