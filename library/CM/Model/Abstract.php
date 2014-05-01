@@ -108,7 +108,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return bool
      */
     public function hasId() {
-        return $this->_hasIdKey('id');
+        return $this->hasIdRaw() && $this->_hasIdKey('id');
     }
 
     /**
