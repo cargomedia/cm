@@ -7,28 +7,16 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $form = $this->getMockForm();
-        $field = new CM_FormField_Text(['name' => 'foo']);
-        $fieldName = 'foo';
-        $doc = $this->_renderFormField($field, $fieldName);
-        $this->assertSame(1, $doc->getCount('input'));
-        $this->assertSame(
-            '<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
-            $form->getTagAutoId($fieldName . '-input') .
-            '" type="text" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
-    }
-
-    public function testRenderValue() {
-        $form = $this->getMockForm();
+        $render = new CM_Render();
         $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
-        $fieldName = 'foo';
-        $doc = $this->_renderFormField($field, $fieldName);
-        $this->assertSame('bar', $doc->getAttr('input', 'value'));
-        $this->assertSame(
-            '<div class="CM_FormField_Text CM_FormField_Abstract CM_View_Abstract" id="' . $form->getAutoId() . '-foo"><input name="foo" id="' .
-            $form->getTagAutoId($fieldName . '-input') .
-            '" type="text" value="bar" class="textinput " /><span class="messages"></span></div>', $doc->getHtml());
+
+        $doc = $this->_renderFormField($render, $field, 'foo');
+        $autoId = $render->getFrontend()->getTreeRoot()->getValue()->getAutoId();
+
+        $this->assertSame($autoId, $doc->find('.CM_FormField_Text')->getAttribute('id'));
+        $this->assertSame(1, $doc->find('input[name="foo"]')->count());
+        $this->assertSame('bar', $doc->find('input[name="foo"]')->getAttribute('value'));
     }
 
     public function testValidateMinLength() {

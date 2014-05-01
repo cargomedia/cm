@@ -5,15 +5,16 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
     public function fetch(CM_Params $renderParams, $fieldName) {
         $fieldName = (string) $fieldName;
         $field = $this->_getFormField();
-        $form = $this->getRender()->getStackLast('forms');
+        $frontend = $this->getRender()->getFrontend();
 
         $viewResponse = new CM_ViewResponse($field);
+        $frontend->treeExpand($viewResponse);
+
         $viewResponse->setTemplateName('default');
         $field->prepare($renderParams, $viewResponse);
 
-
         $viewResponse->set('field', $field);
-        $viewResponse->set('id', $form->getTagAutoId($fieldName . '-input'));
+        $viewResponse->set('id', $viewResponse->getAutoId());
         $viewResponse->set('name', $fieldName);
         $viewResponse->set('value', $field->getValue());
         $viewResponse->set('options', $field->getOptions());
@@ -26,9 +27,12 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $html .= '</div>';
         $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
+        $form = null;
         if ($form) {
             $form->getJs()->append("this.registerField('{$fieldName}', cm.views[{$viewResponse->getAutoId()});");
         }
+
+        $frontend->treeCollapse();
         return $html;
     }
 

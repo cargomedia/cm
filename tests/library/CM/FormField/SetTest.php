@@ -34,24 +34,25 @@ class CM_FormField_SetTest extends CMTest_TestCase {
     }
 
     public function testRender() {
+        $render = new CM_Render();
         $name = 'foo';
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
-        $form = $this->getMockForm();
-        $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
+        $field = new CM_FormField_Set(['name' => $name, 'values' => $data, 'labelsInValues' => true]);
         $values = array(64, 128);
         $field->setValue($values);
-        $doc = $this->_renderFormField($field, $name);
-        $this->assertTrue($doc->exists('ul[id="' . $form->getAutoId() . '-' . $name . '-input"]'));
-        $this->assertSame(count($data), $doc->getCount('label'));
-        $this->assertSame(count($data), $doc->getCount('input'));
+
+        $doc = $this->_renderFormField($render, $field, 'foo');
+
+        $this->assertSame(count($data), $doc->find('label')->count());
+        $this->assertSame(count($data), $doc->find('input')->count());
         foreach ($data as $value => $label) {
-            $this->assertTrue($doc->exists('li.' . $name . '-value-' . $value));
+            $this->assertTrue($doc->has('li.' . $name . '-value-' . $value));
             $spanQuery = 'label[class="' . $name . '-label-' . $value . '"]';
-            $this->assertTrue($doc->exists($spanQuery));
-            $this->assertSame($label, trim($doc->getText($spanQuery)));
-            $this->assertTrue($doc->exists('input[value="' . $value . '"]'));
+            $this->assertTrue($doc->has($spanQuery));
+            $this->assertSame($label, trim($doc->find($spanQuery)->getText()));
+            $this->assertTrue($doc->has('input[value="' . $value . '"]'));
             if (in_array($value, $values)) {
-                $this->assertSame('checked', $doc->getAttr('input[value="' . $value . '"]', 'checked'));
+                $this->assertSame('checked', $doc->find('input[value="' . $value . '"]')->getAttribute('checked'));
             }
         }
     }
