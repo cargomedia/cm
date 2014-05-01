@@ -37,7 +37,7 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $this->assertEquals($itemActual, $itemsExpected[5]);
     }
 
-    public function testGetItemsOffsetCount() {
+    public function testGetCountOffsetCount() {
         $mongodb = CM_ServiceManager::getInstance()->getMongoDb();
         $itemsExpected = array();
         for ($i = 0; $i < 7; $i++) {
