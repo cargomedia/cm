@@ -19,7 +19,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
      * @return string
      */
     public function fetchKeywords() {
-        return trim($this->_fetchTpl('meta-keywords.tpl'), true);
+        return trim($this->_fetchTpl('meta-keywords.tpl', true));
     }
 
     /**
