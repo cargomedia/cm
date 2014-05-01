@@ -18,13 +18,13 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $viewResponse->set('value', $field->getValue());
         $viewResponse->set('options', $field->getOptions());
 
-        $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
+        $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $viewResponse->getAutoId() . '">';
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
         $html .= '</div>';
+        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
         if ($form) {
             $form->getJs()->append("this.registerField('{$fieldName}', cm.views[{$viewResponse->getAutoId()});");
