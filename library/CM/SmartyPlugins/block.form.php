@@ -3,17 +3,17 @@
 function smarty_block_form($params, $content, Smarty_Internal_Template $template, $open) {
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $frontend = $render->getFrontend();
     if ($open) {
         $form = CM_Form_Abstract::factory($params['name']);
         $form->setup();
         $form->renderStart($params);
 
         $viewResponse = new CM_ViewResponse($form);
-        $render->pushStack('forms', $viewResponse);
-        $render->pushStack('views', $viewResponse);
+        $frontend->treeExpand($viewResponse);
         return '';
     } else {
-        $viewResponse = $render->getStackLast('forms');
+        $viewResponse = $frontend->getTreeCurrent()->getValue();
         /** @var CM_Form_Abstract $form */
         $form = $viewResponse->getView();
 
@@ -35,8 +35,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $render->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
         $html .= '</form>';
 
-        $render->popStack('forms');
-        $render->popStack('views');
+        $frontend->treeCollapse();
         return $html;
     }
 }

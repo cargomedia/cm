@@ -6,6 +6,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      * @return string
      */
     public function fetch() {
+        $frontend = $this->getRender()->getFrontend();
         $renderEnvironment = $this->getRender()->getEnvironment();
         $this->_getComponent()->checkAccessible($renderEnvironment);
 
@@ -13,9 +14,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
         $viewResponse->set('viewObj', $this->_getComponent());
 
-        $this->getRender()->getFrontend()->treeExpand($viewResponse);
-        $this->getRender()->pushStack($this->_getStackKey(), $viewResponse);
-        $this->getRender()->pushStack('views', $viewResponse);
+        $frontend->treeExpand($viewResponse);
 
         $cssClass = implode(' ', $this->_getComponent()->getClassHierarchy());
         if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
@@ -27,11 +26,9 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $html .=  $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
+        $frontend->registerViewResponse($viewResponse, $frontendHandler);
 
-        $this->getRender()->getFrontend()->treeCollapse();
-        $this->getRender()->popStack($this->_getStackKey());
-        $this->getRender()->popStack('views');
+        $frontend->treeCollapse();
         return $html;
     }
 

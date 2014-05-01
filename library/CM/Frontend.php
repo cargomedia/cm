@@ -134,9 +134,9 @@ class CM_Frontend {
         $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
         $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
 
-        $parentViewResponse = $this->_render->getStackLast('views');
-        if ($parentViewResponse) {
-            $code .= ',parent:cm.views["' . $parentViewResponse->getAutoId() . '"]';
+        $parentNode  = $this->_render->getFrontend()->getTreeCurrent()->getParent();
+        if ($parentNode) {
+            $code .= ',parent:cm.views["' . $parentNode->getValue()->getAutoId() . '"]';
         }
         $code .= '});' . PHP_EOL;
 

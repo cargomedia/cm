@@ -23,9 +23,6 @@ class CM_Render extends CM_Class_Abstract {
     /** @var CM_Model_User|null */
     private $_viewer;
 
-    /** @var array */
-    protected $_stack = array();
-
     /** @var CM_Menu[] */
     private $_menuList = array();
 
@@ -77,55 +74,6 @@ class CM_Render extends CM_Class_Abstract {
             $this->_js = new CM_Frontend($this);
         }
         return $this->_js;
-    }
-
-    /**
-     * @param string $key
-     * @return CM_ViewResponse[]
-     */
-    public function getStack($key) {
-        if (empty($this->_stack[$key])) {
-            return array();
-        }
-        return $this->_stack[$key];
-    }
-
-    /**
-     * @param string $key
-     * @return CM_ViewResponse|null
-     */
-    public function getStackLast($key) {
-        $stack = $this->getStack($key);
-        if (empty($stack)) {
-            return null;
-        }
-        return $stack[count($stack) - 1];
-    }
-
-    /**
-     * @param string $key
-     * @return CM_ViewResponse|null
-     */
-    public function popStack($key) {
-        if (!isset($this->_stack[$key])) {
-            return null;
-        }
-        $last = array_pop($this->_stack[$key]);
-        return $last;
-    }
-
-    /**
-     * @param string $key
-     * @param CM_ViewResponse $value
-     * @return CM_ViewResponse[]
-     */
-    public function pushStack($key, CM_ViewResponse $value) {
-        if (empty($this->_stack[$key])) {
-            $this->_stack[$key] = array();
-        }
-
-        array_push($this->_stack[$key], $value);
-        return $this->getStack($key);
     }
 
     /**

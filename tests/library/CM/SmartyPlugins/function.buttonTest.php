@@ -17,7 +17,6 @@ class smarty_function_buttonTest extends CMTest_TestCase {
         $actionMock = $this->getMockForAbstractClass('CM_FormAction_Abstract', array($formMock), '', true, true, true, array('getName'));
         $actionMock->expects($this->any())->method('getName')->will($this->returnValue('Create'));
         $formMock->expects($this->any())->method('getAction')->will($this->returnValue($actionMock));
-        $render->pushStack('forms', $formMock);
 
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);

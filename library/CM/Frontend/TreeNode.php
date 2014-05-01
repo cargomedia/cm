@@ -45,7 +45,7 @@ class CM_Frontend_TreeNode implements Tree\Node\NodeInterface {
         if ($this->_viewResponse->getView() instanceof $className) {
             return $this;
         }
-        if ($this->getParent()) {
+        if (!$this->isRoot()) {
             return $this->getParent()->getClosest($className);
         }
         return null;

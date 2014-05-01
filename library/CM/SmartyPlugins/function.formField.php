@@ -4,7 +4,7 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms')->getView();
+    $form = $render->getFrontend()->getTreeCurrent()->getClosest('CM_Form_Abstract')->getValue()->getView();
 
     $class = null;
     if (isset($params['class'])) {

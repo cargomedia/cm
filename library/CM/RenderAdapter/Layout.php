@@ -9,9 +9,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     public function fetch(CM_Page_Abstract $page) {
         $layout = $this->_getLayout();
         $page->checkAccessible($this->getRender()->getEnvironment());
-        $js = $this->getRender()->getFrontend();
-
-
+        $frontend = $this->getRender()->getFrontend();
 
         $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
         $pageTitle = $renderAdapterPage->fetchTitle();
@@ -25,10 +23,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             'pageDescription' => $renderAdapterPage->fetchDescription(),
             'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
         ));
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
-        $this->getRender()->pushStack('layouts', $viewResponse);
-        $this->getRender()->pushStack('views', $viewResponse);
+        $frontend->treeExpand($viewResponse);
 
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
@@ -50,20 +46,18 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
             $options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();
         }
-        $js->getOnloadHeaderJs()->append('cm.options = ' . CM_Params::encode($options, true));
+        $frontend->getOnloadHeaderJs()->append('cm.options = ' . CM_Params::encode($options, true));
 
         if ($viewer = $this->getRender()->getViewer()) {
-            $js->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
+            $frontend->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
         }
 
-        $js->getOnloadHeaderJs()->append('cm.ready();');
+        $frontend->getOnloadHeaderJs()->append('cm.ready();');
 
         $html = $this->getRender()->fetchViewResponse($viewResponse);
-
-        $js->getOnloadReadyJs()->append('cm.getLayout()._ready();');
-
-        $this->getRender()->popStack('layouts');
-        $this->getRender()->popStack('views');
+        $frontend->registerViewResponse($viewResponse);
+        $frontend->getOnloadReadyJs()->append('cm.getLayout()._ready();');
+        $frontend->treeCollapse();
 
         return $html;
     }
