@@ -84,15 +84,15 @@ class CM_PagingSource_MongoDbTest extends CMTest_TestCase {
         $mongodb->insert('foo', array('firstname' => 'John', 'lastname' => 'Doe'));
 
         $source = new CM_PagingSource_MongoDb('foo', null, array('firstname' => true));
-        $item = $source->getItems()[0];
-        $this->assertSame(array('_id', 'firstname'), array_keys($item));
+        $items = $source->getItems();
+        $this->assertSame(array('_id', 'firstname'), array_keys($items[0]));
 
         $source = new CM_PagingSource_MongoDb('foo', null, array('firstname' => false));
-        $item = $source->getItems()[0];
-        $this->assertSame(array('_id', 'lastname'), array_keys($item));
+        $items = $source->getItems();
+        $this->assertSame(array('_id', 'lastname'), array_keys($items[0]));
 
         $source = new CM_PagingSource_MongoDb('foo', null, array('firstname' => true, '_id' => false));
-        $item = $source->getItems()[0];
-        $this->assertSame(array('firstname'), array_keys($item));
+        $items = $source->getItems();
+        $this->assertSame(array('firstname'), array_keys($items[0]));
     }
 }
