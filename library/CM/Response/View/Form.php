@@ -3,58 +3,39 @@
 class CM_Response_View_Form extends CM_Response_View_Abstract {
 
     /**
-     * Added errors.
-     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Added success messages.
-     *
      * @var array
      */
     private $messages = array();
 
     /**
-     * @var CM_ViewFrontendHandler
+     * @param string $message
+     * @param string $fieldName
      */
-    private $_frontendHandler;
-
-    /**
-     * Adds an error to response.
-     *
-     * @param string $err_msg
-     * @param string $field_name
-     */
-    public function addError($err_msg, $field_name = null) {
-        if (isset($field_name)) {
-            $this->errors[] = array($err_msg, $field_name);
+    public function addError($message, $fieldName = null) {
+        if (isset($fieldName)) {
+            $this->errors[] = array($message, $fieldName);
         } else {
-            $this->errors[] = $err_msg;
+            $this->errors[] = $message;
         }
     }
 
     /**
-     * Add a success message to response.
-     *
-     * @param string $msg_text
+     * @param string $message
      */
-    public function addMessage($msg_text) {
-        $this->messages[] = $msg_text;
+    public function addMessage($message) {
+        $this->messages[] = $message;
     }
 
     /**
-     * Check the response for having an errors.
-     *
      * @return bool
      */
     public function hasErrors() {
         return (bool) count($this->errors);
-    }
-
-    public function reset() {
-        $this->_frontendHandler->append('this.reset();');
     }
 
     protected function _process() {
@@ -76,8 +57,11 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
             if (!empty($this->errors)) {
                 $success['errors'] = $this->errors;
             }
-            $this->_frontendHandler->append($this->getRender()->getFrontend()->getJs());
-            $success['exec'] = $this->_frontendHandler->compile(null);
+
+            $jsCode = $this->getRender()->getFrontend()->getJs();
+            if (!empty($jsCode)) {
+                $success['exec'] = $jsCode;
+            }
 
             if (!empty($this->messages)) {
                 $success['messages'] = $this->messages;
