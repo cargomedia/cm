@@ -23,11 +23,11 @@ class CM_ViewResponse extends CM_DataResponse {
     }
 
     /**
-     * @param string $id_value
+     * @param string $tagName
      * @return string
      */
-    public function getTagAutoId($id_value) {
-        return $this->getAutoId() . '-' . $id_value;
+    public function getAutoIdTagged($tagName) {
+        return $this->getAutoId() . '-' . $tagName;
     }
 
     /**

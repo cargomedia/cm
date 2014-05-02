@@ -22,11 +22,13 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     if (isset($params['prepend'])) {
         $input .= (string) $params['prepend'];
     }
+    /** @var CM_ViewResponse|null $viewResponse */
+    $viewResponse = null;
     if (isset($params['name'])) {
         $inputName = (string) $params['name'];
         $field = $form->getField($inputName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-        $input .= $renderAdapter->fetch(CM_Params::factory($params), $inputName);
+        $input .= $renderAdapter->fetch(CM_Params::factory($params), $inputName, $viewResponse);
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];
@@ -35,8 +37,8 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     $html = '<div class="formField clearfix ' . $inputName . ' ' . $class . '">';
     if ($label) {
         $html .= '<label';
-        if ($inputName) {
-            $html .= ' for="' . $form->getAutoId() . '-' . $inputName . '-input"';
+        if ($viewResponse) {
+            $html .= ' for="' . $viewResponse->getAutoIdTagged('input') . '"';
         }
         $html .= '>' . $label . '</label>';
     }
