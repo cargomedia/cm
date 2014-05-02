@@ -34,7 +34,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
             $count = $mongoDb->count($this->_collection, $this->_criteria, $count, $offset);
             $this->_cacheSet($cacheKey, $count);
         } else {
-            CM_Debug::getInstance()->incStats('mongoCacheHit', 'getItems()');
+            CM_Debug::getInstance()->incStats('mongoCacheHit', 'count()');
         }
         return $count;
     }
@@ -62,7 +62,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
             }
             $this->_cacheSet($cacheKey, $items);
         } else {
-            CM_Debug::getInstance()->incStats('mongoCacheHit', 'count()');
+            CM_Debug::getInstance()->incStats('mongoCacheHit', 'getItems()');
         }
         return $items;
     }
