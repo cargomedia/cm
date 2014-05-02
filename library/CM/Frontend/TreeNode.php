@@ -38,20 +38,6 @@ class CM_Frontend_TreeNode implements Tree\Node\NodeInterface {
     }
 
     /**
-     * @param string $className
-     * @return self|null
-     */
-    public function getClosest($className) {
-        if ($this->_viewResponse->getView() instanceof $className) {
-            return $this;
-        }
-        if (!$this->isRoot()) {
-            return $this->getParent()->getClosest($className);
-        }
-        return null;
-    }
-
-    /**
      * @param CM_ViewResponse $viewResponse
      */
     private function _setViewResponse(CM_ViewResponse $viewResponse) {
