@@ -29,7 +29,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $form = null;
         if ($form) {
-            $form->getJs()->append("this.registerField('{$fieldName}', cm.views[{$viewResponse->getAutoId()});");
+            $form->getJs()->append("this.registerField(cm.views[{$viewResponse->getAutoId()});");
         }
 
         $frontend->treeCollapse();

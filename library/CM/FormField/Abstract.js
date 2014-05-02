@@ -57,7 +57,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @return String
    */
   getName: function() {
-    return this.options.name;
+    return this.options.params.name;
   },
 
   /**

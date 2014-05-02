@@ -51,8 +51,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @param {String} name
    * @param {CM_FormField_Abstract} field
    */
-  registerField: function(name, field) {
-    this._fields[name] = field;
+  registerField: function(field) {
+    this._fields[field.getName()] = field;
 
     field.on('change', function() {
       this.trigger('change');
