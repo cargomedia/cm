@@ -3,8 +3,6 @@
 function smarty_function_formField(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    /** @var CM_Form_Abstract $form */
-    $form = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract')->getView();
 
     $class = null;
     if (isset($params['class'])) {
@@ -26,8 +24,10 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     $viewResponse = null;
     if (isset($params['name'])) {
         $fieldName = (string) $params['name'];
-        $field = $form->getField($fieldName);
-        $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
+        /** @var CM_Form_Abstract $form */
+        $form = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract')->getView();
+        $formField = $form->getField($fieldName);
+        $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);
     }
     if (isset($params['append'])) {
