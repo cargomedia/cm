@@ -28,7 +28,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
 
-        $formViewResponse = $this->getRender()->getFrontend()->getClosestViewResponse('CM_Form_Abstract');
+        $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         if ($formViewResponse) {
             $formViewResponse->getJs()->append("this.registerField(cm.views[{$viewResponse->getAutoId()});");
         }
