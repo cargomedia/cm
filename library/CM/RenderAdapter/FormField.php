@@ -2,8 +2,7 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(CM_Params $renderParams, $fieldName, CM_ViewResponse &$viewResponse = null) {
-        $fieldName = (string) $fieldName;
+    public function fetch(CM_Params $renderParams, CM_ViewResponse &$viewResponse = null) {
         $field = $this->_getFormField();
         $frontend = $this->getRender()->getFrontend();
 
@@ -15,7 +14,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
         $viewResponse->set('field', $field);
         $viewResponse->set('inputId', $viewResponse->getAutoIdTagged('input'));
-        $viewResponse->set('name', $fieldName);
+        $viewResponse->set('name', $field->getName());
         $viewResponse->set('value', $field->getValue());
         $viewResponse->set('options', $field->getOptions());
 
@@ -26,7 +25,6 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         }
         $html .= '</div>';
         $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
-
 
         $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         if ($formViewResponse) {

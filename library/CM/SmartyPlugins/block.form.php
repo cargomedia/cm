@@ -25,7 +25,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         foreach ($form->getFields() as $fieldName => $field) {
             if ($field instanceof CM_FormField_Hidden) {
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-                $html .= $renderAdapter->fetch(CM_Params::factory(), $form, $fieldName);
+                $html .= $renderAdapter->fetch(CM_Params::factory());
             }
         }
         $frontendHandler = new CM_ViewFrontendHandler();

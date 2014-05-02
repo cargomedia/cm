@@ -18,23 +18,23 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     }
 
     $input = null;
-    $inputName = null;
+    $fieldName = null;
     if (isset($params['prepend'])) {
         $input .= (string) $params['prepend'];
     }
     /** @var CM_ViewResponse|null $viewResponse */
     $viewResponse = null;
     if (isset($params['name'])) {
-        $inputName = (string) $params['name'];
-        $field = $form->getField($inputName);
+        $fieldName = (string) $params['name'];
+        $field = $form->getField($fieldName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
-        $input .= $renderAdapter->fetch(CM_Params::factory($params), $inputName, $viewResponse);
+        $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];
     }
 
-    $html = '<div class="formField clearfix ' . $inputName . ' ' . $class . '">';
+    $html = '<div class="formField clearfix ' . $fieldName . ' ' . $class . '">';
     if ($label) {
         $html .= '<label';
         if ($viewResponse) {
