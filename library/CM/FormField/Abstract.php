@@ -22,6 +22,13 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     }
 
     /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+
+    /**
      * @return mixed|null Internal value
      */
     public function getValue() {

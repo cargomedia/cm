@@ -65,10 +65,10 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
 class CM_Form_MockForm extends CM_Form_Abstract {
 
     public function setup() {
-        $this->registerField('must_check', new CM_FormField_Boolean(['name' => 'must_check']));
-        $this->registerField('color', new CM_FormField_Color(['name' => 'color']));
-        $this->registerField('text', new CM_FormField_Text(['name' => 'text']));
-        $this->registerField('array', new CM_FormField_Text(['name' => 'array']));
+        $this->registerField(new CM_FormField_Boolean(['name' => 'must_check']));
+        $this->registerField(new CM_FormField_Color(['name' => 'color']));
+        $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Text(['name' => 'array']));
         $this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
     }
 }
