@@ -32,14 +32,14 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
     }
 
     function testProcessInvalidCharsRequired() {
-        foreach (array(chr(192), chr(214), chr(255), chr(140)) as $inputChar) {
-            $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array('/form/null'))->setMethods(array('getQuery'))->getMock();
-            $data = array('must_check' => 'checked', 'text' => $inputChar);
-            $query = array('data' => $data, 'actionName' => 'TestExampleAction',
-                           'form' => array('className' => 'CM_Form_MockForm', 'params' => array(), 'id' => 'mockFormId'));
-            $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-            /** @var CM_Request_Post $request */
+        $invalidChars = array(chr(192), chr(214), chr(255), chr(140));
+        foreach ($invalidChars as $inputChar) {
 
+            $form = new CM_Form_MockForm();
+            $formAction = new CM_FormAction_MockForm_TestExampleAction($form);
+
+            $data = array('must_check' => 'checked', 'text' => $inputChar);
+            $request = $this->createRequestFormAction($formAction, $data);
             $response = new CM_Response_View_Form($request);
             $response->process();
 

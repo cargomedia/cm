@@ -149,6 +149,38 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param string $url
+     * @param array  $query
+     * @return CM_Request_Post
+     */
+    public function createRequest($url, array $query = null) {
+        $url = (string) $url;
+        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery'))->getMock();
+        $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
+        return $request;
+    }
+
+    /**
+     * @param CM_FormAction_Abstract $action
+     * @param array|null             $data
+     * @return CM_Request_Post
+     */
+    public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null) {
+        $actionName = $action->getName();
+        $form = $action->getForm();
+        $query = array(
+            'data'       => (array) $data,
+            'actionName' => $actionName,
+            'form'       => array(
+                'className' => get_class($form),
+                'params'    => $form->getParams()->getAll(),
+                'id'        => 'uniqueId'
+            )
+        );
+        return $this->createRequest('/form/null', $query);
+    }
+
+    /**
      * @param string $pageClass
      * @param array  $params OPTIONAL
      * @return CM_Page_Abstract
@@ -207,7 +239,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Response_View_Abstract $response
-     * @param array|null            $data
+     * @param array|null                $data
      */
     public static function assertViewResponseSuccess(CM_Response_View_Abstract $response, array $data = null) {
         $responseContent = json_decode($response->getContent(), true);
@@ -219,8 +251,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Response_View_Abstract $response
-     * @param string|null           $type
-     * @param string|null           $message
+     * @param string|null               $type
+     * @param string|null               $message
      */
     public static function assertViewResponseError(CM_Response_View_Abstract $response, $type = null, $message = null) {
         $responseContent = json_decode($response->getContent(), true);
