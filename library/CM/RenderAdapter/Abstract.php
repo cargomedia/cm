@@ -37,7 +37,7 @@ abstract class CM_RenderAdapter_Abstract {
     /**
      * @param string|null  $tplName
      * @param array|null   $variables
-     * @param bool|null    $isolated
+     * @param boolean|null $isolated
      * @param boolean|null $searchAllNamespaces
      * @return string
      */
