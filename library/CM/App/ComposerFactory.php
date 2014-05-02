@@ -20,7 +20,7 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
 
         $this->createDefaultInstallers($im, $composer, $io);
 
-        $dispatcher = new \Composer\Script\EventDispatcher($composer, $io);
+        $dispatcher = new \Composer\EventDispatcher\EventDispatcher($composer, $io);
         $composer->setEventDispatcher($dispatcher);
 
         $generator = new \Composer\Autoload\AutoloadGenerator($dispatcher);
@@ -64,7 +64,7 @@ class CM_App_ComposerFactory extends CM_Class_Abstract {
     public function createDefaultInstallers(Composer\Installer\InstallationManager $im, Composer\Composer $composer, \Composer\IO\IOInterface $io) {
         $im->addInstaller(new \Composer\Installer\LibraryInstaller($io, $composer, null));
         $im->addInstaller(new \Composer\Installer\PearInstaller($io, $composer, 'pear-library'));
-        //		$im->addInstaller(new \Composer\Installer\InstallerInstaller($io, $composer));
+        $im->addInstaller(new \Composer\Installer\PluginInstaller($io, $composer));
         $im->addInstaller(new \Composer\Installer\MetapackageInstaller($io));
     }
 
