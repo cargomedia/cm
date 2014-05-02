@@ -13,7 +13,7 @@ class smarty_function_buttonTest extends CMTest_TestCase {
         $smarty = new Smarty();
         $render = new CM_Render();
 
-        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', array(), '', true, true, true, array('getAction', 'getTagAutoId'));
+        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', array(), '', true, true, true, array('getAction'));
         $actionMock = $this->getMockForAbstractClass('CM_FormAction_Abstract', array($formMock), '', true, true, true, array('getName'));
         $actionMock->expects($this->any())->method('getName')->will($this->returnValue('Create'));
         $formMock->expects($this->any())->method('getAction')->will($this->returnValue($actionMock));

@@ -110,14 +110,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param string $id_value
-     * @return string
-     */
-    final public function getTagAutoId($id_value) {
-        return $this->getAutoId() . '-' . $id_value;
-    }
-
-    /**
      * @param array                 $data
      * @param string                $actionName
      * @param CM_Response_View_Form $response
