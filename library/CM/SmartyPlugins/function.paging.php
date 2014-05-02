@@ -3,7 +3,7 @@
 function smarty_function_paging(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    $component= $render->getFrontend()->getTreeCurrent()->getClosest('CM_Component_Abstract')->getValue();
+    $component= $render->getFrontend()->getClosestViewResponse('CM_Component_Abstract');
 
     if (!isset($params['paging'])) {
         trigger_error('Parameter `paging` missing');

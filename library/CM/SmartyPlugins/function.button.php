@@ -4,7 +4,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Form_Abstract $form */
-    $form = $render->getFrontend()->getTreeCurrent()->getClosest('CM_Form_Abstract')->getValue()->getView();
+    $form = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract')->getView();
     if (empty($params['action'])) {
         trigger_error('Param `action` missing.');
     }

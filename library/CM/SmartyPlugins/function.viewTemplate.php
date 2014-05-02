@@ -3,7 +3,7 @@
 function smarty_function_viewTemplate(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    $viewResponse = $render->getFrontend()->getTreeCurrent()->getClosest('CM_View_Abstract')->getValue();
+    $viewResponse = $render->getFrontend()->getClosestViewResponse('CM_View_Abstract');
 
     $tplName = (string) $params['file'];
     unset($params['file']);
