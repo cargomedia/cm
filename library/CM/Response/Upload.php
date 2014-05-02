@@ -49,7 +49,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
             $query = $this->_request->getQuery();
             $preview = null;
             if (isset($query['field'])) {
-                $field = CM_FormField_File::factory($query['field']);
+                $field = CM_FormField_File::factory($query['field'], ['name' => 'file']);
                 $field->validateFile($file);
                 $preview = $this->getRender()->fetchViewTemplate($field, 'preview', array('file' => $file));
             }
