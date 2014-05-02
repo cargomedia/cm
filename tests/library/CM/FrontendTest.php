@@ -82,4 +82,33 @@ class CM_FrontendTest extends CMTest_TestCase {
         $frontend->treeCollapse();
         $frontend->treeExpand(new CM_ViewResponse($view));
     }
+
+    public function testGetClosest() {
+        $layout = $this->getMockBuilder('CM_Layout_Abstract')->getMockForAbstractClass();
+        /** @var CM_Layout_Abstract $layout */
+        $page = $this->getMockBuilder('CM_Page_Abstract')->getMockForAbstractClass();
+        /** @var CM_Page_Abstract $page */
+        $component = $this->getMockBuilder('CM_Component_Abstract')->getMockForAbstractClass();
+        /** @var CM_Component_Abstract $component */
+
+        $frontend = new CM_Frontend(new CM_Render());
+
+        $viewResponse1 = new CM_ViewResponse($layout);
+        $frontend->treeExpand($viewResponse1);
+
+        $viewResponse2 = new CM_ViewResponse($page);
+        $frontend->treeExpand($viewResponse2);
+
+        $viewResponse3 = new CM_ViewResponse($component);
+        $frontend->treeExpand($viewResponse3);
+
+        $viewResponse4 = new CM_ViewResponse($component);
+        $frontend->treeExpand($viewResponse4);
+
+        $this->assertSame($viewResponse4, $frontend->getClosestViewResponse('CM_View_Abstract'));
+        $this->assertSame($viewResponse4, $frontend->getClosestViewResponse('CM_Component_Abstract'));
+        $this->assertSame($viewResponse2, $frontend->getClosestViewResponse('CM_Page_Abstract'));
+        $this->assertSame($viewResponse1, $frontend->getClosestViewResponse('CM_Layout_Abstract'));
+        $this->assertSame(null, $frontend->getClosestViewResponse('CM_Form_Abstract'));
+    }
 }

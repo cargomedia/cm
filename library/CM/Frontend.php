@@ -76,6 +76,21 @@ class CM_Frontend {
         return $this->_treeRoot;
     }
 
+    /**
+     * @param string $viewClassName
+     * @return CM_ViewResponse|null
+     */
+    public function getClosestViewResponse($viewClassName) {
+        $node = $this->getTreeCurrent();
+        while (!$node->getValue()->getView() instanceof $viewClassName) {
+            if ($node->isRoot()) {
+                return null;
+            }
+            $node = $node->getParent();
+        };
+        return $node->getValue();
+    }
+
     public function clear() {
         $this->_onloadHeaderJs->clear();
         $this->_onloadPrepareJs->clear();
