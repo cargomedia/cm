@@ -45,7 +45,7 @@ class CM_File extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public function getSize() {
-        $size = filesize($this->getPath());
+        $size = @filesize($this->getPath());
         if (false === $size) {
             throw new CM_Exception('Cannot detect filesize of `' . $this->getPath() . '`');
         }
