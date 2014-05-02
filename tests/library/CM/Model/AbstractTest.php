@@ -347,8 +347,11 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         /** @var CM_Model_Abstract $model */
 
         $_construct = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_construct');
-        $_construct->invoke($model, array('id' => 12), array('foobar' => 12));
 
+        $_construct->invoke($model);
+        $this->assertFalse($model->hasId());
+
+        $_construct->invoke($model, array('id' => 12), array('foobar' => 12));
         $this->assertTrue($model->hasId());
 
         $_construct->invoke($model, array('foo' => 12, 'bar' => 13), array('foobar' => 12));

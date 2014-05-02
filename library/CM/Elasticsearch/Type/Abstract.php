@@ -15,13 +15,13 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     /** @var bool */
     protected $_source = false;
 
-    /** @var Elastica_Client */
+    /** @var Elastica\Client */
     protected $_client = null;
 
-    /** @var Elastica_Index */
+    /** @var Elastica\Index */
     protected $_index = null;
 
-    /** @var Elastica_Type */
+    /** @var Elastica\Type */
     protected $_type = null;
 
     /**
@@ -47,21 +47,21 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
             $host = $server['host'];
             $port = $server['port'];
         }
-        $this->_client = new Elastica_Client(array('host' => $host, 'port' => $port));
+        $this->_client = new Elastica\Client(array('host' => $host, 'port' => $port));
 
-        $this->_index = new Elastica_Index($this->_client, $indexName);
-        $this->_type = new Elastica_Type($this->_index, $typeName);
+        $this->_index = new Elastica\Index($this->_client, $indexName);
+        $this->_type = new Elastica\Type($this->_index, $typeName);
     }
 
     /**
-     * @return Elastica_Index
+     * @return Elastica\Index
      */
     public function getIndex() {
         return $this->_index;
     }
 
     /**
-     * @return Elastica_Type
+     * @return Elastica\Type
      */
     public function getType() {
         return $this->_type;
@@ -72,7 +72,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * @return string
      */
     public function convertDate($date) {
-        return Elastica_Util::convertDate($date);
+        return Elastica\Util::convertDate($date);
     }
 
     /**
@@ -81,8 +81,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     public function create($recreate = null) {
         $this->getIndex()->create($this->_indexParams, $recreate);
 
-        $mapping = new Elastica_Type_Mapping($this->getType());
-        $mapping->setProperties($this->_mapping);
+        $mapping = new Elastica\Type\Mapping($this->getType(), $this->_mapping);
         $mapping->setSource(array('enabled' => $this->_source));
         $mapping->send();
     }
@@ -90,20 +89,19 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
     public function createVersioned() {
         // Remove old unfinished indices
         foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName() . '.tmp') as $index) {
-            /** @var Elastica_Index $index */
+            /** @var Elastica\Index $index */
             $index->delete();
         }
 
         // Set current index to read-only
         foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
-            /** @var Elastica_Index $index */
             $index->getSettings()->setBlocksWrite(true);
         }
 
         // Create new index and switch alias
         $version = time();
         /** @var $indexNew CM_Elasticsearch_Type_Abstract */
-        $indexNew = new static($this->_client->getHost(), $this->_client->getPort(), $version);
+        $indexNew = new static($this->_client->getConfig('host'), $this->_client->getConfig('port'), $version);
         $indexNew->create(true);
         $indexNew->getIndex()->addAlias($this->getIndex()->getName() . '.tmp');
 
@@ -124,7 +122,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
         // Remove old index
         foreach ($this->_client->getStatus()->getIndicesWithAlias($this->getIndex()->getName()) as $index) {
-            /** @var Elastica_Index $index */
+            /** @var Elastica\Index $index */
             if ($index->getName() != $indexNew->getIndex()->getName()) {
                 $index->delete();
             }
@@ -186,7 +184,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
     /**
      * @param array $data
-     * @return Elastica_Document Document with data
+     * @return Elastica\Document Document with data
      */
     abstract protected function _getDocument(array $data);
 

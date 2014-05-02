@@ -3,69 +3,39 @@
 class CM_Response_View_Form extends CM_Response_View_Abstract {
 
     /**
-     * Added errors.
-     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Added success messages.
-     *
      * @var array
      */
     private $messages = array();
 
     /**
-     * A javascript code to execute.
-     *
-     * @var string
+     * @param string $message
+     * @param string $fieldName
      */
-    private $_jsCode;
-
-    /**
-     * Adds an error to response.
-     *
-     * @param string $err_msg
-     * @param string $field_name
-     */
-    public function addError($err_msg, $field_name = null) {
-        if (isset($field_name)) {
-            $this->errors[] = array($err_msg, $field_name);
+    public function addError($message, $fieldName = null) {
+        if (isset($fieldName)) {
+            $this->errors[] = array($message, $fieldName);
         } else {
-            $this->errors[] = $err_msg;
+            $this->errors[] = $message;
         }
     }
 
     /**
-     * Add a success message to response.
-     *
-     * @param string $msg_text
+     * @param string $message
      */
-    public function addMessage($msg_text) {
-        $this->messages[] = $msg_text;
+    public function addMessage($message) {
+        $this->messages[] = $message;
     }
 
     /**
-     * Check the response for having an errors.
-     *
      * @return bool
      */
     public function hasErrors() {
         return (bool) count($this->errors);
-    }
-
-    public function reset() {
-        $this->exec('this.reset();');
-    }
-
-    /**
-     * Add a javascript to execute.
-     *
-     * @param string $jsCode
-     */
-    public function exec($jsCode) {
-        CM_Frontend::concat_js($jsCode, $this->_jsCode);
     }
 
     protected function _process() {
@@ -88,10 +58,9 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
                 $success['errors'] = $this->errors;
             }
 
-            $this->exec($this->getRender()->getJs()->getJs());
-
-            if (!empty($this->_jsCode)) {
-                $success['exec'] = $this->_jsCode;
+            $jsCode = $this->getRender()->getJs()->getJs();
+            if (!empty($jsCode)) {
+                $success['exec'] = $jsCode;
             }
 
             if (!empty($this->messages)) {

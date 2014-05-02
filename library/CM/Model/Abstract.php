@@ -108,7 +108,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @return bool
      */
     public function hasId() {
-        return $this->_hasIdKey('id');
+        return $this->hasIdRaw() && $this->_hasIdKey('id');
     }
 
     /**
@@ -127,6 +127,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      */
     public function hasIdRaw() {
         return (null !== $this->_id);
+    }
+
+    /**
+     * @return CM_ModelAsset_Abstract[]
+     */
+    public function getAssets() {
+        return $this->_assets;
     }
 
     /**

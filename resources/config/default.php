@@ -84,10 +84,6 @@ $config->CM_Stream_Video->servers = array(
 $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
 $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
 
-$config->CM_KissTracking->enabled = false;
-$config->CM_KissTracking->awsBucketName = '';
-$config->CM_KissTracking->awsFilePrefix = '';
-
 $config->CM_Adprovider->enabled = true;
 $config->CM_Adprovider->zones = array();
 
@@ -104,3 +100,16 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
+
+$config->CM_ServiceManager->list = array(
+    'MongoDb' => array(
+        'class'     => 'CM_Service_MongoDb',
+        'arguments' => array(
+            array(
+                'db'      => 'cm',
+                'server'  => 'mongodb://localhost:27017',
+                'options' => array('connect' => true),
+            )
+        ),
+    ),
+);

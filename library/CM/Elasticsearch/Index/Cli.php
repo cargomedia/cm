@@ -50,11 +50,6 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
                     }
                 }
                 $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
-                if ($e instanceof Elastica_Exception_BulkResponse) {
-                    foreach ($e->getFailures() as $i => $error) {
-                        $message .= 'Error ' . $i . ': ' . CM_Util::var_line($error) . PHP_EOL;
-                    }
-                }
                 throw new CM_Exception_Invalid($message);
             }
         }
@@ -63,7 +58,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
     public function optimize() {
         $servers = CM_Config::get()->CM_Elasticsearch_Client->servers;
         foreach ($servers as $server) {
-            $client = new Elastica_Client($server);
+            $client = new Elastica\Client($server);
             $client->optimizeAll();
         }
     }
