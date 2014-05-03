@@ -5,14 +5,23 @@ class CM_File extends CM_Class_Abstract {
     /** @var string */
     private $_path;
 
+    /** @var CM_File_Filesystem */
+    protected $_filesystem;
+
     /**
-     * @param string|CM_File $file Path to file
+     * @param string|CM_File          $file Path to file
+     * @param CM_File_Filesystem|null $filesystem
      * @throws CM_Exception_Invalid
      */
-    public function __construct($file) {
+    public function __construct($file, CM_File_Filesystem $filesystem = null) {
         if ($file instanceof CM_File) {
             $file = $file->getPath();
         }
+        if (null === $filesystem) {
+            $filesystem = self::getFilesystemDefault();
+        }
+
+        $this->_filesystem = $filesystem;
         $this->_path = (string) $file;
         if (!$this->getExists()) {
             throw new CM_Exception_Invalid('File path `' . $file . '` does not exist or is not a file.');
@@ -41,15 +50,10 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
-     * @return int File size in bytes
-     * @throws CM_Exception
+     * @return int
      */
     public function getSize() {
-        $size = filesize($this->getPath());
-        if (false === $size) {
-            throw new CM_Exception('Cannot detect filesize of `' . $this->getPath() . '`');
-        }
-        return $size;
+        return $this->_filesystem->getSize($this->getPath());
     }
 
     /**
@@ -80,43 +84,30 @@ class CM_File extends CM_Class_Abstract {
 
     /**
      * @return string MD5-hash of file contents
-     * @throws CM_Exception
      */
     public function getHash() {
-        $md5 = md5_file($this->getPath());
-        if (false === $md5) {
-            throw new CM_Exception('Cannot detect md5-sum of `' . $this->getPath() . '`');
-        }
-        return $md5;
+        return $this->_filesystem->getChecksum($this->getPath());
     }
 
     /**
      * @return bool
      */
     public function getExists() {
-        return static::exists($this->getPath());
+        return $this->_filesystem->exists($this->getPath());
     }
 
     /**
      * @return string
-     * @throws CM_Exception
      */
     public function read() {
-        @$contents = file_get_contents($this->getPath());
-        if ($contents === false) {
-            throw new CM_Exception('Cannot read contents of `' . $this->getPath() . '`.');
-        }
-        return $contents;
+        return $this->_filesystem->read($this->getPath());
     }
 
     /**
      * @param string $content
-     * @throws CM_Exception
      */
     public function write($content) {
-        if (false === file_put_contents($this->getPath(), $content)) {
-            throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to `' . $this->getPath() . '`');
-        }
+        $this->_filesystem->write($this->getPath(), $content);
     }
 
     /**
@@ -136,38 +127,23 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $path New file path
-     * @throws CM_Exception
+     * @param string $path
      */
     public function copy($path) {
-        $path = (string) $path;
-        if (!@copy($this->getPath(), $path)) {
-            throw new CM_Exception('Cannot copy `' . $this->getPath() . '` to `' . $path . '`.');
-        }
+        $this->_filesystem->copy($this->getPath(), $path);
     }
 
     /**
      * @param string $path
-     * @throws CM_Exception
      */
     public function move($path) {
         $path = (string) $path;
-        if (!@rename($this->getPath(), $path)) {
-            throw new CM_Exception('Cannot move `' . $this->getPath() . '` to `' . $path . '`.');
-        }
+        $this->_filesystem->rename($this->getPath(), $path);
         $this->_path = $path;
     }
 
-    /**
-     * @throws CM_Exception
-     */
     public function delete() {
-        if (!$this->getExists()) {
-            return;
-        }
-        if (!@unlink($this->getPath())) {
-            throw new CM_Exception_Invalid('Could not delete file `' . $this->getPath() . '`');
-        }
+        $this->_filesystem->delete($this->getPath());
     }
 
     /**
@@ -212,31 +188,32 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
-     * @param string      $path
-     * @param string|null $content
-     * @return CM_File
-     * @throws CM_Exception
+     * @param string                  $path
+     * @param string|null             $content
+     * @param CM_File_Filesystem|null $filesystem
+     * @return static
      */
-    public static function create($path, $content = null) {
+    public static function create($path, $content = null, CM_File_Filesystem $filesystem = null) {
         $content = (string) $content;
-        if (false === @file_put_contents($path, $content)) {
-            throw new CM_Exception('Cannot write to `' . $path . '`.');
+        if (null === $filesystem) {
+            $filesystem = self::getFilesystemDefault();
         }
-        $file = new static($path);
-        return $file;
+        $filesystem->write($path, $content);
+        return new static($path, $filesystem);
     }
 
     /**
      * @param string|null $content
      * @param string|null $extension
-     * @return CM_File
+     * @return static
      */
     public static function createTmp($extension = null, $content = null) {
         if (null !== $extension) {
             $extension = '.' . $extension;
         }
         $extension = (string) $extension;
-        return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content);
+        $filesystem = self::getFilesystemDefault();
+        return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content, $filesystem);
     }
 
     /**
@@ -296,5 +273,17 @@ class CM_File extends CM_Class_Abstract {
             default:
                 return new CM_File($path);
         }
+    }
+
+    /**
+     * @return CM_File_Filesystem
+     */
+    public static function getFilesystemDefault() {
+        global $filesystem;
+        if (null === $filesystem) {
+            $adapter = new CM_File_Filesystem_Adapter_Local();
+            $filesystem = new CM_File_Filesystem($adapter);
+        }
+        return $filesystem;
     }
 }

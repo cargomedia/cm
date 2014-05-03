@@ -21,11 +21,12 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
     }
 
     /**
-     * @param string      $filename
-     * @param string|null $content
+     * @param string                  $filename
+     * @param string|null             $content
+     * @param CM_File_Filesystem|null $filesystem
      * @return CM_File_UserContent_Temp
      */
-    public static function create($filename, $content = null) {
+    public static function create($filename, $content = null, CM_File_Filesystem $filesystem = null) {
         $filename = (string) $filename;
         if (strlen($filename) > 100) {
             $filename = substr($filename, -100, 100);
@@ -33,7 +34,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         $uniqid = md5(rand() . uniqid());
         CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
-        $file = new self($uniqid);
+        $file = new self($uniqid, $filesystem);
         $file->mkDir();
         if (null !== $content) {
             $file->write($content);

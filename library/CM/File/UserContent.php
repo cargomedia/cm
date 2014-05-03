@@ -30,6 +30,7 @@ class CM_File_UserContent extends CM_File {
         if (null !== $sequence) {
             $this->_sequence = (int) $sequence;
         }
+        $this->_filesystem = self::getFilesystemDefault();
     }
 
     /**

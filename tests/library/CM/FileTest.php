@@ -88,7 +88,7 @@ class CM_FileTest extends CMTest_TestCase {
             CM_File::create(DIR_TEST_DATA);
             $this->fail('Could create file with invalid path');
         } catch (CM_Exception $e) {
-            $this->assertContains('Cannot write to', $e->getMessage());
+            $this->assertContains('Cannot write', $e->getMessage());
         }
     }
 
@@ -148,7 +148,7 @@ class CM_FileTest extends CMTest_TestCase {
             $this->fail('Should not be able to copy');
         } catch (Exception $e) {
             $this->assertFileExists($newPath);
-            $this->assertContains('Cannot move', $e->getMessage());
+            $this->assertContains('Cannot rename', $e->getMessage());
         }
         $file->delete();
     }
