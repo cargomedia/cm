@@ -36,6 +36,14 @@ class CM_File_Filesystem {
     }
 
     /**
+     * @param string $sourcePath
+     * @param string $targetPath
+     */
+    public function copy($sourcePath, $targetPath) {
+        $this->_adapter->copy($sourcePath, $targetPath);
+    }
+
+    /**
      * @param string $path
      * @return string
      */

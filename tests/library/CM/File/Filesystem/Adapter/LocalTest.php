@@ -127,6 +127,25 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $adapter->rename($this->_path . 'foo', $this->_path . 'bar');
     }
 
+    public function testCopy() {
+        $adapter = new CM_File_Filesystem_Adapter_Local();
+        $adapter->write($this->_path . 'foo', 'hello');
+
+        $adapter->copy($this->_path . 'foo', $this->_path . 'bar');
+        $this->assertTrue($adapter->exists($this->_path . 'foo'));
+        $this->assertTrue($adapter->exists($this->_path . 'bar'));
+        $this->assertSame('hello', $adapter->read($this->_path . 'bar'));
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot copy
+     */
+    public function testCopyInvalidPath() {
+        $adapter = new CM_File_Filesystem_Adapter_Local();
+        $adapter->copy($this->_path . 'foo', $this->_path . 'bar');
+    }
+
     public function testGetSize() {
         $adapter = new CM_File_Filesystem_Adapter_Local();
         $adapter->write($this->_path . 'foo', 'hello');

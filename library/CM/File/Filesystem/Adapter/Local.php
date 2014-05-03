@@ -64,6 +64,12 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
         }
     }
 
+    public function copy($sourcePath, $targetPath) {
+        if (false === @copy($sourcePath, $targetPath)) {
+            throw new CM_Exception('Cannot copy `' . $sourcePath . '` to `' . $targetPath . '`.');
+        }
+    }
+
     public function isDirectory($path) {
         return is_dir($path);
     }

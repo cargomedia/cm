@@ -44,6 +44,13 @@ interface CM_File_Filesystem_Adapter {
     public function rename($sourcePath, $targetPath);
 
     /**
+     * @param string $sourcePath
+     * @param string $targetPath
+     * @throws CM_Exception
+     */
+    public function copy($sourcePath, $targetPath);
+
+    /**
      * @param string $path
      * @return boolean
      * @throws CM_Exception
