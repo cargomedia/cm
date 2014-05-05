@@ -51,7 +51,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
         $lat = $this->getLat();
         $lon = $this->getLon();
         if (null !== $lat && null !== $lon) {
-            return array('lat' => (float) $lat, 'lon' => (float) $lon);
+            return array('lat' => $lat, 'lon' => $lon);
         }
         return $this->getCity()->getCoordinates();
     }
@@ -67,15 +67,9 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
         $level = (int) $level;
         switch ($level) {
             case CM_Model_Location::LEVEL_COUNTRY:
-                if ($city = $this->getCity()) {
-                    return $city->getCountry();
-                }
-                break;
+                return $this->getCity()->getCountry();
             case CM_Model_Location::LEVEL_STATE:
-                if ($city = $this->getCity()) {
-                    return $city->getState();
-                }
-                break;
+                return $this->getCity()->getState();
             case CM_Model_Location::LEVEL_CITY:
                 return $this->getCity();
             case CM_Model_Location::LEVEL_ZIP:

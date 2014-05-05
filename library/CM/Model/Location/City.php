@@ -79,7 +79,7 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
         $lat = $this->getLat();
         $lon = $this->getLon();
         if (null !== $lat && null !== $lon) {
-            return array('lat' => (float) $lat, 'lon' => (float) $lon);
+            return array('lat' => $lat, 'lon' => $lon);
         }
         return null;
     }

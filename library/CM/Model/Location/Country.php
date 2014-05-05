@@ -13,7 +13,7 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
      * @param string $abbreviation
      */
     public function setAbbreviation($abbreviation) {
-        return $this->_set('abbreviation', $abbreviation);
+        $this->_set('abbreviation', $abbreviation);
     }
 
     public function getLevel() {
