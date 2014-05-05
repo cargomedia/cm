@@ -111,7 +111,7 @@ class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica_Document($data['id'],
+        $doc = new Elastica\Document($data['id'],
             array(
                 'name' => $data['name'],
             )
@@ -152,7 +152,7 @@ class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica_Document($data['id'],
+        $doc = new Elastica\Document($data['id'],
             array(
                 'price' => $data['price'],
             )
@@ -193,7 +193,7 @@ class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
     }
 
     protected function _getDocument(array $data) {
-        $doc = new Elastica_Document($data['id'],
+        $doc = new Elastica\Document($data['id'],
             array(
                 'price' => $data['price'],
             )

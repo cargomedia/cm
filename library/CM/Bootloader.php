@@ -190,7 +190,7 @@ class CM_Bootloader {
         $apcCache = new CM_Cache_Storage_Apc();
         if (false === ($namespacePaths = $apcCache->get($cacheKey))) {
             $fileCache = new CM_Cache_Storage_File();
-            $installation = new CM_App_Installation();
+            $installation = new CM_App_Installation(DIR_ROOT);
             if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($namespacePaths = $fileCache->get($cacheKey))) {
                 $namespacePaths = $installation->getModulePaths();
                 $fileCache->set($cacheKey, $namespacePaths);

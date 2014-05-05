@@ -23,6 +23,7 @@ class CMTest_TH {
     public static function clearEnv() {
         CM_App::getInstance()->setupFilesystem();
         self::clearDb();
+        self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
@@ -31,6 +32,13 @@ class CMTest_TH {
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
+    }
+
+    public static function clearMongoDb() {
+        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        foreach ($mongoDb->listCollectionNames() as $collectionName) {
+            $mongoDb->drop($collectionName);
+        }
     }
 
     public static function clearDb() {
@@ -147,7 +155,6 @@ class CMTest_TH {
             $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
         }
-
         return CM_Model_StreamChannel_Abstract::createType($type, $data);
     }
 

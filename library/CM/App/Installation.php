@@ -5,13 +5,25 @@ class CM_App_Installation {
     /** @var \Composer\Composer */
     private $_composer;
 
+    /** @var string */
+    protected $_dirRoot;
+
     /**
+     * @param string                  $dirRoot
      * @param \Composer\Composer|null $composer
      */
-    public function __construct(\Composer\Composer $composer = null) {
+    public function __construct($dirRoot, \Composer\Composer $composer = null) {
+        $this->_dirRoot = (string) $dirRoot;
         if (null !== $composer) {
             $this->_composer = $composer;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirRoot() {
+        return $this->_dirRoot;
     }
 
     /**
@@ -74,8 +86,8 @@ class CM_App_Installation {
      * @return integer
      */
     public function getUpdateStamp() {
-        $composerJsonStamp = CM_File::getModified(DIR_ROOT . 'composer.json');
-        $installedJsonPath = DIR_ROOT . $this->_getComposerVendorDir() . 'composer/installed.json';
+        $composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
+        $installedJsonPath = $this->_dirRoot . $this->_getComposerVendorDir() . 'composer/installed.json';
         $installedJsonStamp = CM_File::getModified($installedJsonPath);
         return max($composerJsonStamp, $installedJsonStamp);
     }
@@ -94,7 +106,7 @@ class CM_App_Installation {
      * @return string
      */
     protected function _getComposerVendorDir() {
-        $composerJsonStamp = CM_File::getModified(DIR_ROOT . 'composer.json');
+        $composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
         $cacheKey = CM_CacheConst::ComposerVendorDir;
         $fileCache = new CM_Cache_Storage_File();
         if (false === ($vendorDir = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
@@ -117,18 +129,19 @@ class CM_App_Installation {
         }
 
         $extra = $package->getExtra();
-        if (!array_key_exists('cm-modules', $extra)) {
-            throw new CM_Exception_Invalid('Missing `cm-modules` in `' . $package->getName() . '` package composer extra');
+        $modules = array();
+        if (array_key_exists('cm-modules', $extra)) {
+            $modules = $extra['cm-modules'];
         }
-        return new CM_App_Package($package->getName(), $pathRelative, $extra['cm-modules']);
+        return new CM_App_Package($package->getName(), $pathRelative, $modules);
     }
 
     /**
      * @return \Composer\Composer
      */
-    private function _getComposer() {
+    protected function _getComposer() {
         if (null === $this->_composer) {
-            $this->_composer = self::composerFactory();
+            $this->_composer = $this->_createComposerDefault();
         }
         return $this->_composer;
     }
@@ -136,46 +149,19 @@ class CM_App_Installation {
     /**
      * @return \Composer\Composer
      */
-    public static function composerFactory() {
-        $io = new \Composer\IO\NullIO();
-
-        $composerPath = DIR_ROOT . 'composer.json';
+    private function _createComposerDefault() {
+        $composerPath = $this->_dirRoot . 'composer.json';
         $composerFile = new Composer\Json\JsonFile($composerPath);
         $composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
         $localConfig = $composerFile->read();
 
-        // Configuration defaults
-        $config = new Composer\Config();
-        $config->merge(array('config' => array('home' => CM_Bootloader::getInstance()->getDirTmp() . 'composer/')));
-        $config->merge($localConfig);
+        $composerFactory = new CM_App_ComposerFactory();
+        $composer = $composerFactory->createComposer($localConfig);
 
-        $vendorDir = DIR_ROOT . $config->get('vendor-dir');
-
-        // initialize repository manager
-        $rm = new Composer\Repository\RepositoryManager($io, $config);
-        $rm->setRepositoryClass('composer', 'Composer\Repository\ComposerRepository');
-        $rm->setRepositoryClass('vcs', 'Composer\Repository\VcsRepository');
-        $rm->setRepositoryClass('package', 'Composer\Repository\PackageRepository');
-        $rm->setRepositoryClass('pear', 'Composer\Repository\PearRepository');
-        $rm->setRepositoryClass('git', 'Composer\Repository\VcsRepository');
-        $rm->setRepositoryClass('svn', 'Composer\Repository\VcsRepository');
-        $rm->setRepositoryClass('hg', 'Composer\Repository\VcsRepository');
-        $rm->setRepositoryClass('artifact', 'Composer\Repository\ArtifactRepository');
-
-        // load local repository
-        $rm->setLocalRepository(new Composer\Repository\InstalledFilesystemRepository(new Composer\Json\JsonFile($vendorDir .
-            '/composer/installed.json')));
-
-        // load package
-        $loader = new Composer\Package\Loader\RootPackageLoader($rm, $config);
-        $package = $loader->load($localConfig);
-
-        // initialize composer
-        $composer = new Composer\Composer();
-        $composer->setConfig($config);
-        $composer->setPackage($package);
-        $composer->setRepositoryManager($rm);
-
+        $vendorDir = $this->_dirRoot . $composer->getConfig()->get('vendor-dir');
+        $vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
+        $vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
+        $composer->getRepositoryManager()->setLocalRepository($vendorRepository);
         return $composer;
     }
 }

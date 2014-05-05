@@ -9,6 +9,18 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     'click .detectLocation': 'detectLocation'
   },
 
+  ready: function() {
+    CM_FormField_SuggestOne.prototype.ready.call(this);
+
+    this.on('change', function() {
+      this.updateDistanceField();
+    }, this);
+    this.updateDistanceField();
+  },
+
+  /**
+   * @returns {CM_FormField_Integer|Null}
+   */
   getDistanceField: function() {
     if (!this.getOption("distanceName")) {
       return null;
@@ -16,9 +28,10 @@ var CM_FormField_Location = CM_FormField_SuggestOne.extend({
     return this.getForm().getField(this.getOption("distanceName"));
   },
 
-  onChange: function(items) {
+  updateDistanceField: function() {
     if (this.getDistanceField()) {
       var distanceEnabled = false;
+      var items = this.getValue();
       if (items.length > 0) {
         distanceEnabled = items[0].id.split(".")[0] >= this.getOption("distanceLevelMin");
       }
