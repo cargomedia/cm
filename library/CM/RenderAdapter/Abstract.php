@@ -60,7 +60,7 @@ abstract class CM_RenderAdapter_Abstract {
      */
     protected function _getTplPath($tplName, $searchAllNamespaces = null) {
         $tplName = (string) $tplName;
-        $searchAllNamespaces = null !== $searchAllNamespaces ? (boolean) $searchAllNamespaces : false;
+        $searchAllNamespaces = (boolean) $searchAllNamespaces;
         foreach ($this->_getView()->getClassHierarchy() as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
                 throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
