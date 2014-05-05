@@ -86,10 +86,9 @@ class CM_App_Installation {
      * @return integer
      */
     public function getUpdateStamp() {
-        $composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
-        $installedJsonPath = $this->_dirRoot . $this->_getComposerVendorDir() . 'composer/installed.json';
-        $installedJsonStamp = CM_File::getModified($installedJsonPath);
-        return max($composerJsonStamp, $installedJsonStamp);
+        $fileComposerJson = new CM_File($this->_dirRoot . 'composer.json');
+        $fileInstalledJson = new CM_File($this->_dirRoot . $this->_getComposerVendorDir() . 'composer/installed.json');
+        return max($fileComposerJson->getModified(), $fileInstalledJson->getModified());
     }
 
     /**
@@ -106,10 +105,10 @@ class CM_App_Installation {
      * @return string
      */
     protected function _getComposerVendorDir() {
-        $composerJsonStamp = CM_File::getModified($this->_dirRoot . 'composer.json');
+        $fileComposerJson = new CM_File($this->_dirRoot . 'composer.json');
         $cacheKey = CM_CacheConst::ComposerVendorDir;
         $fileCache = new CM_Cache_Storage_File();
-        if (false === ($vendorDir = $fileCache->get($cacheKey)) || $composerJsonStamp > $fileCache->getCreateStamp($cacheKey)) {
+        if (false === ($vendorDir = $fileCache->get($cacheKey)) || $fileComposerJson->getModified() > $fileCache->getCreateStamp($cacheKey)) {
             $vendorDir = rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
             $fileCache->set($cacheKey, $vendorDir);
         }

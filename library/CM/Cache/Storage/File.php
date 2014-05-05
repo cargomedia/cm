@@ -12,7 +12,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
         if (!$file->getExists()) {
             return null;
         }
-        return CM_File::getModified($file->getPath());
+        return $file->getModified();
     }
 
     protected function _getName() {

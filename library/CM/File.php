@@ -80,6 +80,13 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
+     * @return int
+     */
+    public function getModified() {
+        return $this->_filesystem->getModified($this->getPath());
+    }
+
+    /**
      * @return string MD5-hash of file contents
      */
     public function getHash() {
@@ -176,19 +183,6 @@ class CM_File extends CM_Class_Abstract {
         $extension = (string) $extension;
         $filesystem = self::getFilesystemDefault();
         return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content, $filesystem);
-    }
-
-    /**
-     * @param string $path
-     * @throws CM_Exception_Invalid
-     * @return int
-     */
-    public static function getModified($path) {
-        $createStamp = filemtime($path);
-        if (false === $createStamp) {
-            throw new CM_Exception_Invalid('Can\'t get modified time of `' . $path . '`');
-        }
-        return $createStamp;
     }
 
     /**
