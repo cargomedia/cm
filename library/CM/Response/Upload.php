@@ -43,6 +43,7 @@ class CM_Response_Upload extends CM_Response_Abstract {
             }
 
             $file = CM_File_UserContent_Temp::create($fileInfo['name'], $fileTmp->read());
+            $fileTmp->delete();
 
             $query = $this->_request->getQuery();
             $preview = null;
