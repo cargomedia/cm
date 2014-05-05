@@ -29,12 +29,8 @@ class CM_FileTest extends CMTest_TestCase {
     }
 
     public function testConstructNonExistent() {
-        try {
-            new CM_File(DIR_TEST_DATA . '/nonexistent-file');
-            $this->fail('Could instantiate non-existing file');
-        } catch (Exception $e) {
-            $this->assertContains('does not exist or is not a file', $e->getMessage());
-        }
+        $file = new CM_File(DIR_TEST_DATA . '/nonexistent-file');
+        $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
     }
 
     public function testDelete() {

@@ -23,9 +23,6 @@ class CM_File extends CM_Class_Abstract {
 
         $this->_filesystem = $filesystem;
         $this->_path = (string) $file;
-        if (!$this->getExists()) {
-            throw new CM_Exception_Invalid('File path `' . $file . '` does not exist or is not a file.');
-        }
     }
 
     /**
