@@ -2,7 +2,7 @@
 
 class CM_Component_Example extends CM_Component_Abstract {
 
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse) {
         $foo = $this->_params->getString('foo', 'value1');
         $colorStyles = $this->_getColorStyles();
         $icons = $this->_getIcons();
@@ -14,7 +14,7 @@ class CM_Component_Example extends CM_Component_Abstract {
             'icons'       => $icons,
         ));
 
-        $frontendHandler->setParam('uname', 'uname');
+        $viewResponse->getJs()->setParam('uname', 'uname');
     }
 
     public function checkAccessible(CM_RenderEnvironment $environment) {

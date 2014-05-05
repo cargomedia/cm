@@ -8,13 +8,13 @@ class CM_Component_Debug extends CM_Component_Abstract {
         }
     }
 
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);
         $viewResponse->set('stats', $stats);
         $cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
-        $frontendHandler->setParam('cacheNames', $cacheNames);
+        $viewResponse->getJs()->setParam('cacheNames', $cacheNames);
         $viewResponse->set('cacheNames', $cacheNames);
     }
 

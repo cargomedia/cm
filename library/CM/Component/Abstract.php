@@ -8,11 +8,10 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
     abstract public function checkAccessible(CM_RenderEnvironment $environment);
 
     /**
-     * @param CM_RenderEnvironment        $environment
-     * @param CM_ViewResponse             $viewResponse
-     * @param CM_ViewFrontendHandler $frontendHandler
+     * @param CM_RenderEnvironment $environment
+     * @param CM_ViewResponse      $viewResponse
      */
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler) {
+    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse) {
     }
 
     /**

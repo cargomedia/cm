@@ -10,8 +10,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $renderEnvironment = $this->getRender()->getEnvironment();
         $this->_getComponent()->checkAccessible($renderEnvironment);
 
-        $frontendHandler = new CM_ViewFrontendHandler();
-        $viewResponse = $this->_getPreparedViewResponse($renderEnvironment, $frontendHandler);
+        $viewResponse = $this->_getPreparedViewResponse($renderEnvironment);
         $viewResponse->set('viewObj', $this->_getComponent());
 
         $frontend->treeExpand($viewResponse);
@@ -23,10 +22,10 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
             }
         }
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
-        $html .=  $this->getRender()->fetchViewResponse($viewResponse);
+        $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
-        $frontend->registerViewResponse($viewResponse, $frontendHandler);
+        $frontend->registerViewResponse($viewResponse);
 
         $frontend->treeCollapse();
         return $html;
@@ -40,15 +39,14 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_RenderEnvironment        $environment
-     * @param CM_ViewFrontendHandler $frontendHandler
+     * @param CM_RenderEnvironment $environment
      * @return CM_ViewResponse
      */
-    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment, CM_ViewFrontendHandler $frontendHandler) {
+    protected function _getPreparedViewResponse(CM_RenderEnvironment $environment) {
         $component = $this->_getComponent();
         $viewResponse = new CM_ViewResponse($component);
         $viewResponse->setTemplateName('default');
-        $component->prepare($environment, $viewResponse, $frontendHandler);
+        $component->prepare($environment, $viewResponse);
         return $viewResponse;
     }
 

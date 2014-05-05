@@ -28,11 +28,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
                 $html .= $renderAdapter->fetch(CM_Params::factory());
             }
         }
-        $frontendHandler = new CM_ViewFrontendHandler();
         foreach ($form->getActions() as $actionName => $action) {
-            $frontendHandler->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
+            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
         }
-        $render->getFrontend()->registerViewResponse($viewResponse, $frontendHandler);
+        $render->getFrontend()->registerViewResponse($viewResponse);
         $html .= '</form>';
 
         $frontend->treeCollapse();

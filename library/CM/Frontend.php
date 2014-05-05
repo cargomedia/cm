@@ -139,26 +139,23 @@ class CM_Frontend {
     }
 
     /**
-     * @param CM_ViewResponse             $viewResponse
-     * @param CM_ViewFrontendHandler|null $frontendHandler
+     * @param CM_ViewResponse $viewResponse
      */
-    public function registerViewResponse(CM_ViewResponse $viewResponse, CM_ViewFrontendHandler $frontendHandler = null) {
+    public function registerViewResponse(CM_ViewResponse $viewResponse) {
         $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
         $view = $viewResponse->getView();
         $code = $reference . ' = new ' . get_class($view) . '({';
         $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
         $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
 
-        $parentNode  = $this->_render->getFrontend()->getTreeCurrent()->getParent();
+        $parentNode = $this->_render->getFrontend()->getTreeCurrent()->getParent();
         if ($parentNode) {
             $code .= ',parent:cm.views["' . $parentNode->getValue()->getAutoId() . '"]';
         }
         $code .= '});' . PHP_EOL;
 
         $this->getOnloadPrepareJs()->prepend($code);
-        if ($frontendHandler) {
-            $this->getOnloadJs()->append($frontendHandler->compile($reference));
-        }
+        $this->getOnloadJs()->append($viewResponse->getJs()->compile($reference));
     }
 
     /**
