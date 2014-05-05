@@ -111,22 +111,21 @@ class CM_Cli_Command {
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
-    private function _getPidFilePath() {
-        return CM_Bootloader::getInstance()->getDirData() . 'locks/' . $this->_class->getName() . ':' . $this->_method->getName();
+    private function _getPidFile() {
+        return new CM_File(CM_Bootloader::getInstance()->getDirData() . 'locks/' . $this->_class->getName() . ':' . $this->_method->getName());
     }
 
     /**
      * @return boolean
      */
     private function _isRunning() {
-        $path = $this->_getPidFilePath();
-        if (!CM_File::exists($path)) {
+        $pidFile = $this->_getPidFile();
+        if (!$pidFile->getExists()) {
             return false;
         }
-        $file = new CM_File($path);
-        $pid = $file->read();
+        $pid = $pidFile->read();
         if (!ctype_digit($pid) || posix_getsid($pid) === false) {
             return false;
         }
@@ -138,8 +137,9 @@ class CM_Cli_Command {
      */
     private function _createPidFile() {
         $pid = posix_getpid();
-        $pidFilePath = $this->_getPidFilePath();
-        CM_Util::mkDir(dirname($pidFilePath));
-        return CM_File::create($pidFilePath, $pid);
+        $pidFile = $this->_getPidFile();
+        CM_Util::mkDir(dirname($pidFile->getPath()));
+        $pidFile->write($pid);
+        return $pidFile;
     }
 }

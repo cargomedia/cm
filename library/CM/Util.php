@@ -370,8 +370,9 @@ class CM_Util {
 
         $files = array();
         foreach (array_unique($paths) as $path) {
-            if (CM_File::exists($path)) {
-                $files[] = new CM_File($path);
+            $file = new CM_File($path);
+            if ($file->getExists()) {
+                $files[] = $file;
             }
         }
         return $files;

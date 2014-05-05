@@ -180,14 +180,6 @@ class CM_File extends CM_Class_Abstract {
 
     /**
      * @param string $path
-     * @return bool
-     */
-    public static function exists($path) {
-        return is_file($path);
-    }
-
-    /**
-     * @param string $path
      * @throws CM_Exception_Invalid
      * @return int
      */

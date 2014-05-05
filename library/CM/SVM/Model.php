@@ -20,10 +20,11 @@ class CM_SVM_Model {
             throw new CM_Exception('Extension `svm` not loaded.');
         }
         $this->_id = (int) $id;
-        if (!CM_File::exists($this->_getPath())) {
+        $file = $this->_getFile();
+        if (!$file->getExists()) {
             $this->train();
         }
-        $this->_model = new SVMModel($this->_getPath());
+        $this->_model = new SVMModel($file->getPath());
     }
 
     /**
@@ -85,25 +86,25 @@ class CM_SVM_Model {
         }
 
         $this->_model = $svm->train($problem, $weights);
-        $this->_model->save($this->_getPath());
+        $this->_model->save($this->_getFile()->getPath());
         CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 0));
     }
 
     public function flush() {
         CM_Db_Db::delete('cm_svmtraining', array('svmId' => $this->getId()));
         CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 1));
-        $file = new CM_File($this->_getPath());
+        $file = $this->_getFile();
         $file->delete();
         $this->__construct($this->_id);
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
-    private function _getPath() {
+    private function _getFile() {
         $dirDataSvm = CM_Bootloader::getInstance()->getDirData() . 'svm/';
         CM_Util::mkDir($dirDataSvm);
-        return $dirDataSvm . $this->getId() . '.svm';
+        return new CM_File($dirDataSvm . $this->getId() . '.svm');
     }
 
     /**
