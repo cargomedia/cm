@@ -6,28 +6,32 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
      * @return CM_Model_Location_Country
      */
     public function getCountry() {
-        return $this->_get('countryId');
+        return new CM_Model_Location_Country($this->_get('countryId'));
     }
 
     /**
      * @param CM_Model_Location_Country $country
      */
     public function setCountry($country) {
-        $this->_set('countryId', $country);
+        $this->_set('countryId', $country->getId());
     }
 
     /**
      * @return CM_Model_Location_State|null
      */
     public function getState() {
-        return $this->_get('stateId');
+        $stateId = $this->_get('stateId');
+        if (null === $stateId) {
+            return null;
+        }
+        return new CM_Model_Location_State($stateId);
     }
 
     /**
      * @param CM_Model_Location_State|null $state
      */
     public function setState($state) {
-        $this->_set('stateId', $state);
+        $this->_set('stateId', $state ? $state->getId() : null);
     }
 
     /**
@@ -111,8 +115,8 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
 
     public function _getSchema() {
         return new CM_Model_Schema_Definition(array(
-            'countryId' => array('type' => 'CM_Model_Location_Country'),
-            'stateId'   => array('type' => 'CM_Model_Location_State', 'optional' => true),
+            'countryId' => array('type' => 'int'),
+            'stateId'   => array('type' => 'int', 'optional' => true),
             'name'      => array('type' => 'string'),
             'lat'       => array('type' => 'float', 'optional' => true),
             'lon'       => array('type' => 'float', 'optional' => true),
@@ -132,8 +136,8 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
     public static function create(CM_Model_Location_Country $country, CM_Model_Location_State $state = null, $name, $lat = null, $lon = null, $maxMind = null) {
         $city = new self();
         $city->_set(array(
-            'countryId' => $country,
-            'stateId'   => $state,
+            'countryId' => $country->getId(),
+            'stateId'   => $state ? $state->getId() : null,
             'name'      => $name,
             'lat'       => $lat,
             'lon'       => $lon,

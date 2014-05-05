@@ -6,14 +6,14 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
      * @return CM_Model_Location_City
      */
     public function getCity() {
-        return $this->_get('cityId');
+        return new CM_Model_Location_City($this->_get('cityId'));
     }
 
     /**
      * @param CM_Model_Location_City $city
      */
     public function setCity($city) {
-        $this->_set('cityId', $city);
+        $this->_set('cityId', $city->getId());
     }
 
     /**
@@ -80,7 +80,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
 
     public function _getSchema() {
         return new CM_Model_Schema_Definition(array(
-            'cityId' => array('type' => 'CM_Model_Location_City'),
+            'cityId' => array('type' => 'int'),
             'name'   => array('type' => 'string'),
             'lat'    => array('type' => 'float', 'optional' => true),
             'lon'    => array('type' => 'float', 'optional' => true),
@@ -97,7 +97,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
     public static function create(CM_Model_Location_City $city, $name, $lat = null, $lon = null) {
         $zip = new self();
         $zip->_set(array(
-            'cityId' => $city,
+            'cityId' => $city->getId(),
             'name'   => $name,
             'lat'    => $lat,
             'lon'    => $lon,
