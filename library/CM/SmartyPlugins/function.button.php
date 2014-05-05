@@ -3,8 +3,9 @@
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $viewResponse = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract');
     /** @var CM_Form_Abstract $form */
-    $form = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract')->getView();
+    $form = $viewResponse->getView();
     if (empty($params['action'])) {
         trigger_error('Param `action` missing.');
     }
@@ -54,7 +55,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
         $class .= ' showTooltip';
     }
 
-    $id = $form->getAutoId() . '-' . $action->getName() . '-button';
+    $id = $viewResponse->getAutoId() . '-' . $action->getName() . '-button';
 
     $html = '';
     $html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '" data-click-spinner="true"';

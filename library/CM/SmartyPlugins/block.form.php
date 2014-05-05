@@ -18,11 +18,11 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $form = $viewResponse->getView();
 
         $class = implode(' ', $form->getClassHierarchy());
-        $html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+        $html = '<form id="' . $viewResponse->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
         $html .= $content;
 
 
-        foreach ($form->getFields() as $fieldName => $field) {
+        foreach ($form->getFields() as $field) {
             if ($field instanceof CM_FormField_Hidden) {
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
                 $html .= $renderAdapter->fetch(CM_Params::factory());

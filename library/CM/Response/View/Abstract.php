@@ -114,21 +114,25 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         foreach ($responsePage->getCookies() as $name => $cookieParameters) {
             $response->setCookie($name, $cookieParameters['value'], $cookieParameters['expire'], $cookieParameters['path']);
         }
-
         $page = $responsePage->getPage();
 
         $this->_setStringRepresentation(get_class($page));
 
+        $frontend = $responsePage->getRender()->getFrontend();
         $html = $responsePage->getContent();
-        $js = $responsePage->getRender()->getFrontend()->getJs();
-        $responsePage->getRender()->getFrontend()->clear();
+        $js = $frontend->getJs();
+        $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
+
+        $frontend->clear();
 
         $title = $responsePage->getTitle();
         $layoutClass = get_class($page->getLayout($this->getSite()));
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
 
-        return array('autoId'            => $page->getAutoId(), 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
+
+
+        return array('autoId'            => $autoId, 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
                      'layoutClass'       => $layoutClass,
                      'menuEntryHashList' => $menuEntryHashList);
     }

@@ -6,8 +6,6 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
     const CONTEXT_JAVASCRIPT = 2;
     const CONTEXT_CSS = 3;
 
-    private $_autoId;
-
     /** @var CM_Params */
     protected $_params;
 
@@ -26,16 +24,6 @@ abstract class CM_View_Abstract extends CM_Class_Abstract {
      */
     public function getParams() {
         return $this->_params;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAutoId() {
-        if (!$this->_autoId) {
-            $this->_autoId = uniqid();
-        }
-        return $this->_autoId;
     }
 
     public function ajax_loadComponent(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
