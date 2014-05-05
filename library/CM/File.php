@@ -149,6 +149,11 @@ class CM_File extends CM_Class_Abstract {
         $this->_filesystem->delete($this->getPath());
     }
 
+    public function ensureParentDirectory() {
+        $parentDirectory = dirname($this->getPath());
+        $this->_filesystem->ensureDirectory($parentDirectory);
+    }
+
     /**
      * @return string
      */

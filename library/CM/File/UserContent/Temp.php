@@ -35,7 +35,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
         $file = new self($uniqid, $filesystem);
-        $file->mkDir();
+        $file->ensureParentDirectory();
         if (null !== $content) {
             $file->write($content);
         }

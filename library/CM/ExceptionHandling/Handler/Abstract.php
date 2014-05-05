@@ -106,17 +106,17 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $logEntry .= $formatter->formatException($loggerException);
             $logEntry .= '### Original Exception: ' . PHP_EOL;
             $logEntry .= $formatter->formatException($exception) . PHP_EOL;
-            $logPath = $this->_getLogPath();
-            CM_Util::mkDir(dirname($logPath));
-            error_log($logEntry, 3, $logPath);
+            $logFile = $this->_getLogFile();
+            $logFile->ensureParentDirectory();
+            error_log($logEntry, 3, $logFile->getPath());
         }
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
-    protected function _getLogPath() {
-        return CM_Bootloader::getInstance()->getDirData() . 'logs/error.log';
+    protected function _getLogFile() {
+        return new CM_File(CM_Bootloader::getInstance()->getDirData() . 'logs/error.log');
     }
 
     /**

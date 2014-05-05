@@ -73,6 +73,16 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $this->assertTrue($adapter->isDirectory($this->_path . 'foo'));
     }
 
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Path exists but is not a directory
+     */
+    public function testEnsureDirectoryExistsFile() {
+        $adapter = new CM_File_Filesystem_Adapter_Local();
+        $adapter->write($this->_path . 'foo', 'hello');
+        $adapter->ensureDirectory($this->_path . 'foo');
+    }
+
     public function testGetModified() {
         $adapter = new CM_File_Filesystem_Adapter_Local();
         $adapter->write($this->_path . 'foo', 'hello');

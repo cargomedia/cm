@@ -138,7 +138,7 @@ class CM_Cli_Command {
     private function _createPidFile() {
         $pid = posix_getpid();
         $pidFile = $this->_getPidFile();
-        CM_Util::mkDir(dirname($pidFile->getPath()));
+        $pidFile->ensureParentDirectory();
         $pidFile->write($pid);
         return $pidFile;
     }

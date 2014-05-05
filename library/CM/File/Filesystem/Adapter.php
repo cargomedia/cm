@@ -56,4 +56,6 @@ interface CM_File_Filesystem_Adapter {
      * @throws CM_Exception
      */
     public function isDirectory($path);
+
+    public function ensureDirectory($path);
 }

@@ -92,9 +92,13 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
 
     public function ensureDirectory($path) {
         if (!$this->isDirectory($path)) {
-            if (false === @mkdir($path, $this->_mode, true)) {
-                if (!$this->isDirectory($path)) { // Might have been created in the meantime
-                    throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+            if ($this->exists($path)) {
+                throw new CM_Exception('Path exists but is not a directory: `' . $path . '`.');
+            } else {
+                if (false === @mkdir($path, $this->_mode, true)) {
+                    if (!$this->isDirectory($path)) { // Might have been created in the meantime
+                        throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+                    }
                 }
             }
         }

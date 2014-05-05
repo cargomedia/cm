@@ -76,6 +76,13 @@ class CM_File_Filesystem {
 
     /**
      * @param string $path
+     */
+    public function ensureDirectory($path) {
+        $this->_adapter->ensureDirectory($path);
+    }
+
+    /**
+     * @param string $path
      * @return string A MD5 hash
      */
     public function getChecksum($path) {
