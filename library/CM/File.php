@@ -62,7 +62,7 @@ class CM_File extends CM_Class_Abstract {
      */
     public function getMimeType() {
         $info = new finfo(FILEINFO_MIME);
-        $infoFile = $info->file($this->getPath());
+        $infoFile = $info->buffer($this->read());
         if (false === $infoFile) {
             throw new CM_Exception('Cannot detect FILEINFO_MIME of `' . $this->getPath() . '`');
         }

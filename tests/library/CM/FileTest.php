@@ -152,4 +152,9 @@ class CM_FileTest extends CMTest_TestCase {
         }
         $file->delete();
     }
+
+    public function testGetMimeType() {
+        $file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $this->assertSame('image/jpeg', $file->getMimeType());
+    }
 }
