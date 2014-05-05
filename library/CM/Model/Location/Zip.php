@@ -75,7 +75,7 @@ class CM_Model_Location_Zip extends CM_Model_Location_Abstract {
             case CM_Model_Location::LEVEL_ZIP:
                 return $this;
         }
-        return null;
+        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
     }
 
     public function _getSchema() {

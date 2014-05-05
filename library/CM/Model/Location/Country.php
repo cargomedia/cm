@@ -25,10 +25,15 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
             return null;
         }
         $level = (int) $level;
-        if ($level === CM_Model_Location::LEVEL_COUNTRY) {
-            return $this;
+        switch ($level) {
+            case CM_Model_Location::LEVEL_COUNTRY:
+                return $this;
+            case CM_Model_Location::LEVEL_STATE:
+            case CM_Model_Location::LEVEL_CITY:
+            case CM_Model_Location::LEVEL_ZIP:
+                throw new CM_Exception_Invalid('Invalid parent location level for a state');
         }
-        return null;
+        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
     }
 
     public function _getSchema() {

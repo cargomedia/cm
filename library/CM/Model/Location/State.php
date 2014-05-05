@@ -58,8 +58,11 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
                 return $this->getCountry();
             case CM_Model_Location::LEVEL_STATE:
                 return $this;
+            case CM_Model_Location::LEVEL_CITY:
+            case CM_Model_Location::LEVEL_ZIP:
+                throw new CM_Exception_Invalid('Invalid parent location level for a state');
         }
-        return null;
+        throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
     }
 
     public function _getSchema() {
