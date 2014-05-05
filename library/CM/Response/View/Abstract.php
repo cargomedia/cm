@@ -49,19 +49,19 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $componentParams = CM_Params::factory($componentParams);
 
         $component = CM_Component_Abstract::factory($componentInfo['className'], $componentParams);
-
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
-        $jsComponentOld = 'cm.views["' . $componentInfo['id'] . '"]';
-        $jsComponentNew = 'cm.views["' . $component->getAutoId() . '"]';
-        $this->getRender()->getFrontend()->getOnloadHeaderJs()->append('cm.window.appendHidden(' . json_encode($html) . ');');
-        $this->getRender()->getFrontend()->getOnloadPrepareJs()->append($jsComponentOld . '.getParent().registerChild(' . $jsComponentNew . ');');
-        $this->getRender()->getFrontend()->getOnloadPrepareJs()->append($jsComponentOld . '.replaceWithHtml(' . $jsComponentNew . '.$el);');
-        $this->getRender()->getFrontend()->getOnloadReadyJs()->append('cm.views["' . $component->getAutoId() . '"]._ready();');
-        $componentInfo['id'] = $component->getAutoId();
+        $frontend = $this->getRender()->getFrontend();
+        $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
-        return $component->getAutoId();
+        $componentReferenceOld = 'cm.views["' . $componentInfo['id'] . '"]';
+        $componentReferenceNew = 'cm.views["' . $autoId . '"]';
+        $frontend->getOnloadHeaderJs()->append('cm.window.appendHidden(' . json_encode($html) . ');');
+        $frontend->getOnloadPrepareJs()->append($componentReferenceOld . '.getParent().registerChild(' . $componentReferenceNew . ');');
+        $frontend->getOnloadPrepareJs()->append($componentReferenceOld . '.replaceWithHtml(' . $componentReferenceNew . '.$el);');
+        $frontend->getOnloadReadyJs()->append('cm.views["' . $autoId . '"]._ready();');
+        return $autoId;
     }
 
     /**
