@@ -112,4 +112,20 @@ $config->CM_ServiceManager->list = array(
             )
         ),
     ),
+    'filesystemUserfiles' => array(
+        'class'     => 'CM_File_Filesystem_Adapter_AwsS3',
+        'arguments' => array(
+            array(
+                'bucket' => 'foo',
+            )
+        ),
+    ),
+    'filesystemUserfiles' => array(
+        'class'     => 'CM_File_Filesystem_Adapter_Local',
+        'arguments' => array(
+            array(
+                'path' => DIR_PUBLIC . 'userfiles/',
+            )
+        ),
+    )
 );
