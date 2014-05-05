@@ -2,10 +2,11 @@
 
 class CM_File_UserContent_Temp extends CM_File_UserContent {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_uniqid;
+
+    /** @var string */
+    private $_filenameLabel;
 
     /**
      * @param string $uniqid
@@ -17,7 +18,14 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
             throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
         }
         $this->_uniqid = $data['uniqid'];
-        parent::__construct('tmp', $data['filename']);
+        $this->_filenameLabel = $data['filename'];
+
+        $filenameParts = array($this->getUniqid());
+        if (false !== strpos($this->getFilenameLabel(), '.')) {
+            $filenameParts[] = strtolower(pathinfo($this->getFilenameLabel(), PATHINFO_EXTENSION));
+        }
+
+        parent::__construct('tmp', implode('.', $filenameParts));
     }
 
     /**
@@ -52,8 +60,8 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
     /**
      * @return string
      */
-    public function getPathRelative() {
-        return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getUniqid() . '.' . $this->getExtension();
+    public function getFilenameLabel() {
+        return $this->_filenameLabel;
     }
 
     public function delete() {

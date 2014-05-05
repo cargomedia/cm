@@ -184,6 +184,10 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
             $file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
             $files[] = $file;
         }
+        if ($archive->getThumbnailCount() > 0) {
+            $thumbnailDir = dirname($archive->getThumbnails()->getItem(0)->getPath());
+            $files[] = new CM_File($thumbnailDir);
+        }
         $files[] = CM_File::create($archive->getVideo()->getPath());
         return $files;
     }

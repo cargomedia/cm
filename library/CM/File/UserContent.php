@@ -4,20 +4,8 @@ class CM_File_UserContent extends CM_File {
 
     const BUCKETS_COUNT = 10000;
 
-    /**
-     * @var string
-     */
-    private $_namespace;
-
-    /**
-     * @var string
-     */
-    private $_filename;
-
-    /**
-     * @var int
-     */
-    private $_sequence;
+    /** @var string */
+    private $_pathRelative;
 
     /**
      * @param string   $namespace
@@ -25,60 +13,37 @@ class CM_File_UserContent extends CM_File {
      * @param int|null $sequence
      */
     public function __construct($namespace, $filename, $sequence = null) {
-        $this->_namespace = (string) $namespace;
-        $this->_filename = (string) $filename;
+        $namespace = (string) $namespace;
+        $filename = (string) $filename;
         if (null !== $sequence) {
-            $this->_sequence = (int) $sequence;
+            $sequence = (int) $sequence;
         }
-        $this->_filesystem = self::getFilesystemDefault();
-    }
 
-    /**
-     * @return string
-     */
-    public function getFileName() {
-        return $this->_filename;
-    }
+        $this->_pathRelative = $this->_calculateRelativeDir($namespace, $filename, $sequence);
 
-    /**
-     * @return string
-     */
-    public function getPath() {
-        return CM_Bootloader::getInstance()->getDirUserfiles() . $this->getPathRelative();
+        parent::__construct(CM_Bootloader::getInstance()->getDirUserfiles() . $this->getPathRelative());
     }
 
     /**
      * @return string
      */
     public function getPathRelative() {
-        return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
-    }
-
-    public function mkDir() {
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles() . $this->_getDir());
-    }
-
-    public function delete() {
-        if (is_dir($this->getPath())) {
-            CM_Util::rmDir($this->getPath());
-        } else {
-            parent::delete();
-        }
+        return $this->_pathRelative;
     }
 
     /**
+     * @param string   $namespace
+     * @param string   $filename
+     * @param int|null $sequence
      * @return string
      */
-    protected function _getDir() {
+    private function _calculateRelativeDir($namespace, $filename, $sequence = null) {
         $dirs = array();
-        $dirs[] = $this->_namespace;
-        if (null !== $this->_sequence) {
-            $dirs[] = $this->_sequence % self::BUCKETS_COUNT;
+        $dirs[] = $namespace;
+        if (null !== $sequence) {
+            $dirs[] = $sequence % self::BUCKETS_COUNT;
         }
-        return implode(DIRECTORY_SEPARATOR, $dirs);
-    }
-
-    public static function exists($path) {
-        return file_exists($path);
+        $dirs[] = $filename;
+        return implode('/', $dirs);
     }
 }
