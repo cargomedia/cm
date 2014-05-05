@@ -7,6 +7,9 @@ class CM_Model_Location extends CM_Model_Abstract {
     const LEVEL_CITY = 3;
     const LEVEL_ZIP = 4;
 
+    /** @var CM_Model_Location_Abstract[] */
+    protected $_locationList = array();
+
     /**
      * @param int $level A LEVEL_*-const
      * @param int $id
@@ -116,19 +119,34 @@ class CM_Model_Location extends CM_Model_Abstract {
 
     /**
      * @param int|null $level
+     * @throws CM_Exception_Invalid
      * @return CM_Model_Location_Abstract|null
      */
     protected function _getLocation($level = null) {
-        /** @var CM_Model_Location_Abstract[] $locationList */
-        $locationList = $this->_get('locationList');
         if (null === $level) {
             $level = $this->getLevel();
         }
         $level = (int) $level;
-        if (!isset($locationList[$level])) {
-            return null;
+        $typeList = array(
+            self::LEVEL_COUNTRY => CM_Model_Location_Country::getTypeStatic(),
+            self::LEVEL_STATE   => CM_Model_Location_State::getTypeStatic(),
+            self::LEVEL_CITY    => CM_Model_Location_City::getTypeStatic(),
+            self::LEVEL_ZIP     => CM_Model_Location_Zip::getTypeStatic(),
+        );
+        if (!isset($typeList[$level])) {
+            throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
         }
-        return $locationList[$level];
+        if (!array_key_exists($level, $this->_locationList)) {
+            /** @var array[] $locationDataList */
+            $locationDataList = $this->_get('locationDataList');
+            if (!isset($locationDataList[$level])) {
+                $this->_locationList[$level] = null;
+            } else {
+                $locationData = $locationDataList[$level];
+                $this->_locationList[$level] = self::factoryGeneric($typeList[$level], $locationData['id'], $locationData['data']);
+            }
+        }
+        return $this->_locationList[$level];
     }
 
     protected function _loadData() {
@@ -150,11 +168,13 @@ class CM_Model_Location extends CM_Model_Abstract {
             default:
                 throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
         }
-        $locationList = array();
+        $this->_locationList = array();
+        $locationDataList = array();
         do {
-            $locationList[$location->getLevel()] = $location;
+            $this->_locationList[$location->getLevel()] = $location;
+            $locationDataList[$location->getLevel()] = array('id' => $location->getIdRaw(), 'data' => $location->_getData());
         } while ($location = $location->getParent());
-        return array('locationList' => $locationList);
+        return array('locationDataList' => $locationDataList);
     }
 
     /**
