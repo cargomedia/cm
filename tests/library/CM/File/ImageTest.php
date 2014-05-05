@@ -2,64 +2,65 @@
 
 class CM_File_ImageTest extends CMTest_TestCase {
 
-    public function testConstruct() {
+    public function testValidateImage() {
         $path = DIR_TEST_DATA . 'img/test.jpg';
         $image = new CM_File_Image($path);
-
-        $this->assertEquals($path, $image->getPath());
-        $this->assertEquals('image/jpeg', $image->getMimeType());
+        $image->validateImage();
+        $this->assertTrue(true);
     }
 
-    public function testConstructCorruptContent() {
+    public function testValidateImageCorruptContent() {
         $path = DIR_TEST_DATA . 'img/corrupt-content.jpg';
         $image = new CM_File_Image($path);
-
-        $this->assertEquals('image/jpeg', $image->getMimeType());
+        $image->validateImage();
+        $this->assertTrue(true);
     }
 
-    public function testConstructJpgNoExtension() {
+    public function testValidateImageJpgNoExtension() {
         $path = DIR_TEST_DATA . 'img/jpg-no-extension';
         $image = new CM_File_Image($path);
-
-        $this->assertEquals('image/jpeg', $image->getMimeType());
+        $image->validateImage();
+        $this->assertTrue(true);
     }
 
-    public function testConstructUnsupportedFormat() {
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Unsupported format
+     */
+    public function testValidateImageUnsupportedFormat() {
         $path = DIR_TEST_DATA . 'img/test.tiff';
-
-        try {
-            new CM_File_Image($path);
-            $this->fail('Could instantiate a image with an unsupported format');
-        } catch (CM_Exception $e) {
-            $this->assertSame('Unsupported format `TIFF`.', $e->getMessage());
-        }
+        $file = new CM_File_Image($path);
+        $file->validateImage();
     }
 
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testConstructCorruptHeader() {
+    public function testValidateImageCorruptHeader() {
         $path = DIR_TEST_DATA . 'img/corrupt-header.jpg';
         $image = new CM_File_Image($path);
+        $image->validateImage();
     }
 
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testConstructorEmptyFile() {
+    public function testValidateImageEmptyFile() {
         $path = DIR_TEST_DATA . 'img/empty.jpg';
         $image = new CM_File_Image($path);
+        $image->validateImage();
     }
 
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Cannot load Imagick instance
      */
-    public function testConstructNoImage() {
+    public function testValidateImageNoImage() {
         $path = DIR_TEST_DATA . 'test.jpg.zip';
         $image = new CM_File_Image($path);
+        $image->validateImage();
     }
 
     public function testDimensions() {
@@ -352,12 +353,4 @@ class CM_File_ImageTest extends CMTest_TestCase {
         $image->delete();
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot load Imagick instance
-     */
-    public function testCreateFailure() {
-        $rawImageData = 'false image data';
-        CM_File_Image::create(CM_Bootloader::getInstance()->getDirTmp() . 'test.jpg', $rawImageData);
-    }
 }
