@@ -153,19 +153,6 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $mode
-     * @return resource
-     * @throws CM_Exception
-     */
-    private function _openFileHandle($mode) {
-        $resource = fopen($this->getPath(), $mode);
-        if (false === $resource) {
-            throw new CM_Exception('Could not open file in `' . $mode . '` mode. Path: `' . $this->getPath() . '`');
-        }
-        return $resource;
-    }
-
-    /**
      * @param string                  $path
      * @param string|null             $content
      * @param CM_File_Filesystem|null $filesystem
