@@ -17,7 +17,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse = new CM_ViewResponse($layout);
         $viewResponse->setTemplateName('default');
         $viewResponse->setData(array(
-            'viewObj'         => $layout,
+            'autoId'          => $viewResponse->getAutoId(),
+            'layout'          => $layout,
             'title'           => $this->fetchTitle($pageTitle),
             'page'            => $page,
             'pageDescription' => $renderAdapterPage->fetchDescription(),
