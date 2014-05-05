@@ -33,6 +33,21 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
     }
 
+    public function testGetSize() {
+        $file = CM_File::createTmp(null, 'hello');
+        $this->assertSame(5, $file->getSize());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot detect filesize
+     */
+    public function testGetSizeInvalid() {
+        $file = CM_File::createTmp(null, 'hello');
+        $file->delete();
+        $file->getSize();
+    }
+
     public function testDelete() {
         $file = new CM_File($this->_testFilePath);
 
