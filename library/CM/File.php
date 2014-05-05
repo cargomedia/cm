@@ -100,12 +100,7 @@ class CM_File extends CM_Class_Abstract {
      * @return string
      */
     public function read() {
-        $cache = CM_Cache_Storage_Runtime::getInstance();
-        if (false === ($content = $cache->get($this->_getCacheKeyContent()))) {
-            $content = $this->_filesystem->read($this->getPath());
-            $cache->set($this->_getCacheKeyContent(), $content, 1);
-        }
-        return $content;
+        return $this->_filesystem->read($this->getPath());
     }
 
     /**
@@ -124,8 +119,6 @@ class CM_File extends CM_Class_Abstract {
      */
     public function write($content) {
         $this->_filesystem->write($this->getPath(), $content);
-        $cache = CM_Cache_Storage_Runtime::getInstance();
-        $cache->set($this->_getCacheKeyContent(), $content, 1);
     }
 
     public function truncate() {
@@ -178,13 +171,6 @@ class CM_File extends CM_Class_Abstract {
             throw new CM_Exception('Could not open file in `' . $mode . '` mode. Path: `' . $this->getPath() . '`');
         }
         return $resource;
-    }
-
-    /**
-     * @return string
-     */
-    private function _getCacheKeyContent() {
-        return __CLASS__ . '_content_filesystem:' . get_class($this->_filesystem->getAdapter()) . '_path:' . $this->getPath();
     }
 
     /**

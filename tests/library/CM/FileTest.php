@@ -165,8 +165,8 @@ class CM_FileTest extends CMTest_TestCase {
         $file->write('foo');
         $this->assertSame('foo', $file->read());
 
-        file_put_contents($file->getPath(), 'bar'); // Circumvent read-cache
-        $this->assertSame('foo', $file->read());
+        file_put_contents($file->getPath(), 'bar');
+        $this->assertSame('bar', $file->read());
     }
 
     public function testReadFirstLine() {
