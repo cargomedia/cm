@@ -6,7 +6,7 @@ class CM_File_Csv extends CM_File {
      * @return string[]
      */
     public function getHeader() {
-        return $this->_convertStringToRow($this->_readFirstLine());
+        return $this->_convertStringToRow($this->readFirstLine());
     }
 
     /**

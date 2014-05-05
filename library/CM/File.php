@@ -109,6 +109,17 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
+     * @return string
+     */
+    public function readFirstLine() {
+        $content = $this->read();
+        if (false !== ($firstLineEnd = strpos($content, "\n"))) {
+            $content = substr($content, 0, $firstLineEnd + 1);
+        }
+        return $content;
+    }
+
+    /**
      * @param string $content
      */
     public function write($content) {
@@ -154,19 +165,6 @@ class CM_File extends CM_Class_Abstract {
      */
     public function __toString() {
         return $this->read();
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function _readFirstLine() {
-        $resource = $this->_openFileHandle('r');
-        $firstLine = fgets($resource);
-        fclose($resource);
-        if (false === $firstLine) {
-            return null;
-        }
-        return $firstLine;
     }
 
     /**
