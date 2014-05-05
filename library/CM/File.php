@@ -117,18 +117,6 @@ class CM_File extends CM_Class_Abstract {
         $cache->set($this->_getCacheKeyContent(), $content, 1);
     }
 
-    /**
-     * @param string $content
-     * @throws CM_Exception
-     */
-    public function append($content) {
-        $resource = $this->_openFileHandle('a');
-        if (false === fputs($resource, $content)) {
-            throw new CM_Exception('Could not write ' . strlen($content) . ' bytes to `' . $this->getPath() . '`');
-        }
-        fclose($resource);
-    }
-
     public function truncate() {
         $this->write('');
     }

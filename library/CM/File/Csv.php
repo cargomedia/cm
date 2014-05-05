@@ -22,7 +22,7 @@ class CM_File_Csv extends CM_File {
      */
     public function appendRow(array $row) {
         $line = $this->_convertRowToString($row);
-        $this->append($line);
+        $this->write($this->read() . $line);
     }
 
     /**
