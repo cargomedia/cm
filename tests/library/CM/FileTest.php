@@ -40,7 +40,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot detect filesize
+     * @expectedExceptionMessage Cannot get size
      */
     public function testGetSizeInvalid() {
         $file = CM_File::createTmp(null, 'hello');
