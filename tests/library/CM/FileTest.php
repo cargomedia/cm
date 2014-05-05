@@ -157,4 +157,15 @@ class CM_FileTest extends CMTest_TestCase {
         $file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $this->assertSame('image/jpeg', $file->getMimeType());
     }
+
+    public function testRead() {
+        $file = CM_File::createTmp(null, 'hello');
+        $this->assertSame('hello', $file->read());
+
+        $file->write('foo');
+        $this->assertSame('foo', $file->read());
+
+        file_put_contents($file->getPath(), 'bar'); // Circumvent read-cache
+        $this->assertSame('foo', $file->read());
+    }
 }
