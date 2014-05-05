@@ -6,11 +6,11 @@ class CM_ViewFrontendHandler {
     protected $_operations = array();
 
     /**
-     * @param string $property
+     * @param string $name
      * @param mixed  $value
      */
-    public function setParam($property, $value) {
-        $this->append("this.${property} = " . CM_Params::encode($value, true));
+    public function setProperty($name, $value) {
+        $this->append("this.${name} = " . CM_Params::encode($value, true));
     }
 
     /**

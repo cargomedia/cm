@@ -14,7 +14,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         ksort($stats);
         $viewResponse->set('stats', $stats);
         $cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
-        $viewResponse->getJs()->setParam('cacheNames', $cacheNames);
+        $viewResponse->getJs()->setProperty('cacheNames', $cacheNames);
         $viewResponse->set('cacheNames', $cacheNames);
     }
 
