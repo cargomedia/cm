@@ -15,12 +15,6 @@ class CM_File_Image extends CM_File {
     /** @var bool */
     private $_animated = false;
 
-    public function __construct($file) {
-        parent::__construct($file);
-
-        $this->_validateImagick();
-    }
-
     /**
      * @param int         $format
      * @param string|null $pathNew
@@ -170,6 +164,11 @@ class CM_File_Image extends CM_File {
         }
     }
 
+
+    public function validateImage() {
+        $this->getFormat();
+    }
+
     /**
      * @return bool
      */
@@ -299,10 +298,6 @@ class CM_File_Image extends CM_File {
                 $callback($imagick);
             }
         }
-    }
-
-    private function _validateImagick() {
-        $this->getFormat();
     }
 
     /**
