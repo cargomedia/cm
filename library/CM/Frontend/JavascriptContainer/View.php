@@ -1,9 +1,6 @@
 <?php
 
-class CM_Frontend_JavascriptContainer_View {
-
-    /** @var string[] */
-    protected $_operations = array();
+class CM_Frontend_JavascriptContainer_View  extends CM_Frontend_JavascriptContainer {
 
     /**
      * @param string $name
@@ -11,36 +8,6 @@ class CM_Frontend_JavascriptContainer_View {
      */
     public function setProperty($name, $value) {
         $this->append("this.${name} = " . CM_Params::encode($value, true));
-    }
-
-    /**
-     * @param string $code
-     */
-    public function append($code) {
-        array_push($this->_operations, $code);
-    }
-
-    /**
-     * @param string $code
-     */
-    public function prepend($code) {
-        array_unshift($this->_operations, $code);
-    }
-
-    /**
-     * @param string|null $scope
-     * @return string
-     */
-    public function compile($scope = null) {
-        if (!$this->_operations) {
-            return '';
-        }
-        $operations = array_filter($this->_operations);
-        $code = implode(";\n", $operations);
-        if (null === $scope) {
-            return $code;
-        }
-        return '(function () { ' . $code . ' }).call(' . $scope . ');';
     }
 
     /**
@@ -65,9 +32,5 @@ class CM_Frontend_JavascriptContainer_View {
             $var = CM_Params::encode($var, true);
         }
         $this->_operations[] = 'this.message(' . implode(', ', $varList) . ')';
-    }
-
-    public function clear() {
-        $this->_operations = array();
     }
 }
