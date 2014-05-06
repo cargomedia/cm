@@ -2,7 +2,7 @@
 
 require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.location.php';
 
-class smarty_function_linkTest extends CMTest_TestCase {
+class smarty_function_locationTest extends CMTest_TestCase {
 
     /** @var CM_Model_Location */
     protected $_location;
