@@ -146,7 +146,7 @@ class CM_File extends CM_Class_Abstract {
     /**
      * @param string $path
      */
-    public function move($path) {
+    public function rename($path) {
         $path = (string) $path;
         $this->_filesystem->rename($this->getPath(), $path);
         $this->_path = $path;

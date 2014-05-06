@@ -35,7 +35,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
 
         foreach (glob($dirBuild . 'icon-webfont.*') as $fontPath) {
             $fontFile = new CM_File($fontPath);
-            $fontFile->move(DIR_PUBLIC . 'static/font/' . $fontFile->getFileName());
+            $fontFile->rename(DIR_PUBLIC . 'static/font/' . $fontFile->getFileName());
         }
 
         CM_Util::rmDir($dirWork);
