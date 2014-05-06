@@ -43,5 +43,7 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         foreach ($fileList as $file) {
             $this->assertFalse($file->getExists());
         }
+        $dirBase = new CM_File($this->_path);
+        $this->assertTrue($dirBase->getExists());
     }
 }
