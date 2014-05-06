@@ -58,6 +58,14 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
         }
     }
 
+    public function listByPrefix($pathPrefix) {
+        $fileList = array();
+        $dirList = array();
+        $this->_listByPrefixRecursive($pathPrefix, $fileList, $dirList);
+
+        return array('files' => $fileList, 'dirs' => $dirList);
+    }
+
     public function rename($sourcePath, $targetPath) {
         if (false === @rename($sourcePath, $targetPath)) {
             throw new CM_Exception('Cannot rename `' . $sourcePath . '` to `' . $targetPath . '`.');
@@ -100,6 +108,32 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
                         throw new CM_Exception('Cannot mkdir `' . $path . '`.');
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * @param string   $pathPrefix
+     * @param string[] $fileList
+     * @param string[] $dirList
+     * @throws CM_Exception
+     */
+    private function _listByPrefixRecursive($pathPrefix, array &$fileList, array &$dirList) {
+        if ('/' !== substr($pathPrefix, -1, 1)) {
+            $pathPrefix .= '/';
+        }
+        $filenameList = @scandir($pathPrefix);
+        if (false === $filenameList) {
+            throw new CM_Exception('Cannot scan directory `' . $pathPrefix . '`.');
+        }
+        $filenameList = array_diff($filenameList, array('.', '..'));
+        foreach ($filenameList as $filename) {
+            $path = $pathPrefix . $filename;
+            if ($this->isDirectory($path)) {
+                $dirList[] = $path;
+                $this->_listByPrefixRecursive($path, $fileList, $dirList);
+            } else {
+                $fileList[] = $path;
             }
         }
     }

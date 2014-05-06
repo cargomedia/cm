@@ -185,4 +185,41 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $adapter = new CM_File_Filesystem_Adapter_Local();
         $adapter->getChecksum($this->_path . 'foo');
     }
+
+    public function testListByPrefix() {
+        $adapter = new CM_File_Filesystem_Adapter_Local();
+        $filesystem = new CM_File_Filesystem($adapter);
+
+        $pathList = array(
+            'foo/foobar/bar',
+            'foo/bar2',
+            'foo/bar',
+        );
+        foreach ($pathList as $path) {
+            $file = new CM_File($this->_path . $path, $filesystem);
+            $file->ensureParentDirectory();
+            $file->write('hello');
+        }
+
+        $this->assertSame(array(
+            'files' => array(
+                $this->_path . 'foo/bar',
+                $this->_path . 'foo/bar2',
+                $this->_path . 'foo/foobar/bar',
+            ),
+            'dirs'  => array(
+                $this->_path . 'foo',
+                $this->_path . 'foo/foobar',
+            ),
+        ), $adapter->listByPrefix($this->_path));
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot scan directory
+     */
+    public function testListByPrefixInvalid() {
+        $adapter = new CM_File_Filesystem_Adapter_Local();
+        $adapter->listByPrefix('nonexistent');
+    }
 }

@@ -37,6 +37,13 @@ interface CM_File_Filesystem_Adapter {
     public function delete($path);
 
     /**
+     * @param string $pathPrefix
+     * @return array [files => string[], dirs => string[]]
+     * @throws CM_Exception
+     */
+    public function listByPrefix($pathPrefix);
+
+    /**
      * @param string $sourcePath
      * @param string $targetPath
      * @throws CM_Exception
