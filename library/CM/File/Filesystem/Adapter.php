@@ -79,6 +79,8 @@ abstract class CM_File_Filesystem_Adapter {
 
     abstract public function ensureDirectory($path);
 
+    abstract public function setup();
+
     /**
      * @return string
      */

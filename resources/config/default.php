@@ -112,20 +112,31 @@ $config->CM_ServiceManager->list = array(
             )
         ),
     ),
-    'filesystemUserfiles' => array(
-        'class'     => 'CM_File_Filesystem_Adapter_AwsS3',
-        'arguments' => array(
-            array(
-                'bucket' => 'foo',
-            )
+);
+$config->CM_ServiceManager->list['filesystemUserfiles'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'userfiles/',
         ),
     ),
-    'filesystemUserfiles' => array(
-        'class'     => 'CM_File_Filesystem_Adapter_Local',
-        'arguments' => array(
-            array(
-                'path' => DIR_PUBLIC . 'userfiles/',
-            )
+);
+$config->CM_ServiceManager->list['filesystemTmp'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'tmp/',
         ),
-    )
+    ),
+);
+$config->CM_ServiceManager->list['filesystemData'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'data/',
+        ),
+    ),
 );

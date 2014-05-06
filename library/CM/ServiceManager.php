@@ -76,6 +76,14 @@ class CM_ServiceManager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
+     * @return CM_Service_Filesystem
+     */
+    public function getFilesystem($serviceName) {
+        return $this->get($serviceName);
+    }
+
+    /**
+     * @param string $serviceName
      * @throws CM_Exception_Nonexistent
      * @return mixed
      */

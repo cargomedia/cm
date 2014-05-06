@@ -18,15 +18,9 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        $filesystemData = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
-        $filesystemData->ensureDirectory(CM_Bootloader::getInstance()->getDirData());
-
-        $filesystemUserfiles = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
-        $filesystemUserfiles->ensureDirectory(CM_Bootloader::getInstance()->getDirUserfiles());
-
-        $filesystemTmp = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
-        $filesystemTmp->deleteByPrefix(CM_Bootloader::getInstance()->getDirTmp());
-        $filesystemTmp->ensureDirectory(CM_Bootloader::getInstance()->getDirTmp());
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->setup(true);
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->setup();
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->setup();
     }
 
     /**

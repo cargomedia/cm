@@ -127,6 +127,10 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         }
     }
 
+    public function setup() {
+        $this->ensureDirectory('/');
+    }
+
     /**
      * @param string   $pathPrefix
      * @param string[] $fileList
