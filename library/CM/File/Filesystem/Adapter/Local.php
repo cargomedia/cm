@@ -127,14 +127,18 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
             throw new CM_Exception('Cannot scan directory `' . $pathPrefix . '`.');
         }
         $filenameList = array_diff($filenameList, array('.', '..'));
+        $fileListLocal = array();
         foreach ($filenameList as $filename) {
             $path = $pathPrefix . $filename;
             if ($this->isDirectory($path)) {
-                $dirList[] = $path;
                 $this->_listByPrefixRecursive($path, $fileList, $dirList);
+                $dirList[] = $path;
             } else {
-                $fileList[] = $path;
+                $fileListLocal[] = $path;
             }
+        }
+        foreach ($fileListLocal as $filePath) {
+            $fileList[] = $filePath;
         }
     }
 }

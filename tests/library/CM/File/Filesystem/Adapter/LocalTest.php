@@ -203,13 +203,13 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
 
         $this->assertSame(array(
             'files' => array(
+                $this->_path . 'foo/foobar/bar',
                 $this->_path . 'foo/bar',
                 $this->_path . 'foo/bar2',
-                $this->_path . 'foo/foobar/bar',
             ),
             'dirs'  => array(
-                $this->_path . 'foo',
                 $this->_path . 'foo/foobar',
+                $this->_path . 'foo',
             ),
         ), $adapter->listByPrefix($this->_path));
     }
