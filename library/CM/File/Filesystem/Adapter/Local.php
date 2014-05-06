@@ -1,6 +1,6 @@
 <?php
 
-class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
+class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implements
     CM_File_Filesystem_Adapter_ChecksumCalculatorInterface,
     CM_File_Filesystem_Adapter_SizeCalculatorInterface {
 
@@ -8,13 +8,15 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
     private $_mode;
 
     /**
-     * @param int|null $mode
+     * @param string|null $directory
+     * @param int|null    $mode
      */
-    public function __construct($mode = null) {
+    public function __construct($directory = null, $mode = null) {
+        parent::__construct($directory);
         if (null === $mode) {
             $mode = 0777;
         }
-        $this->_mode = $mode;
+        $this->_mode = (int) $mode;
     }
 
     public function read($path) {
