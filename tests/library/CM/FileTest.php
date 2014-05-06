@@ -33,34 +33,6 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
     }
 
-    public function testGetSize() {
-        $file = CM_File::createTmp(null, 'hello');
-        $this->assertSame(5, $file->getSize());
-    }
-
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot get size
-     */
-    public function testGetSizeInvalid() {
-        $file = CM_File::createTmp(null, 'hello');
-        $file->delete();
-        $file->getSize();
-    }
-
-    public function testDelete() {
-        $file = new CM_File($this->_testFilePath);
-
-        $this->assertFileExists($this->_testFilePath);
-
-        $file->delete();
-
-        $this->assertFileNotExists($this->_testFilePath);
-
-        // Should do nothing if already deleted
-        $file->delete();
-    }
-
     public function testSanitizeFilename() {
         $filename = "~foo@! <}\   b\0a=r.tar.(gz";
         $this->assertSame("foo-bar.tar.gz", CM_File::sanitizeFilename($filename));
@@ -70,14 +42,6 @@ class CM_FileTest extends CMTest_TestCase {
         } catch (CM_Exception_Invalid $ex) {
             $this->assertContains('Invalid filename.', $ex->getMessage());
         }
-    }
-
-    public function testWrite() {
-        $file = new CM_File($this->_testFilePath);
-        $this->assertNotEquals('foo', $file->read());
-
-        $file->write('foo');
-        $this->assertEquals('foo', $file->read());
     }
 
     public function testCreate() {
@@ -126,42 +90,6 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertNotSame('', $file->read());
         $file->truncate();
         $this->assertSame('', $file->read());
-    }
-
-    public function testCopy() {
-        $path = CM_Bootloader::getInstance()->getDirTmp() . 'filecopytest.txt';
-        $file = new CM_File($this->_testFilePath);
-        $this->assertFileNotExists($path);
-        $file->copy($path);
-        $copiedFile = new CM_File($path);
-        $this->assertTrue($copiedFile->getExists());
-        $copiedFile->delete();
-
-        try {
-            $file->copy('/non-existent-path/not-existent-file');
-            $this->fail('Should not be able to copy');
-        } catch (Exception $e) {
-            $this->assertContains('Cannot copy', $e->getMessage());
-        }
-    }
-
-    public function testMove() {
-        $newPath = CM_Bootloader::getInstance()->getDirTmp() . 'filemovetest.txt';
-        $file = new CM_File($this->_testFilePath);
-        $oldPath = $file->getPath();
-
-        $file->move($newPath);
-        $this->assertFileNotExists($oldPath);
-        $this->assertFileExists($newPath);
-        $this->assertSame($newPath, $file->getPath());
-        try {
-            $file->move('/non-existent-path/not-existent-file');
-            $this->fail('Should not be able to copy');
-        } catch (Exception $e) {
-            $this->assertFileExists($newPath);
-            $this->assertContains('Cannot rename', $e->getMessage());
-        }
-        $file->delete();
     }
 
     public function testGetMimeType() {
