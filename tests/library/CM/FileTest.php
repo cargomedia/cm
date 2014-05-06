@@ -85,6 +85,32 @@ class CM_FileTest extends CMTest_TestCase {
         $file->delete();
     }
 
+    public function testDeleteRecursive() {
+        $dir = CM_File::createTmpDir();
+        $file = new CM_File($dir->getPath() . '/foo');
+        $file->write('hello');
+        $this->assertTrue($dir->getExists());
+        $this->assertTrue($file->getExists());
+
+        $dir->delete(true);
+        $this->assertFalse($dir->getExists());
+        $this->assertFalse($file->getExists());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot delete directory
+     */
+    public function testDeleteNonRecursive() {
+        $dir = CM_File::createTmpDir();
+        $file = new CM_File($dir->getPath() . '/foo');
+        $file->write('hello');
+        $this->assertTrue($dir->getExists());
+        $this->assertTrue($file->getExists());
+
+        $dir->delete();
+    }
+
     public function testTruncate() {
         $file = new CM_File($this->_testFilePath);
         $file->write('foo');

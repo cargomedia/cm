@@ -6,7 +6,8 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
     private $_path;
 
     protected function setUp() {
-        $this->_path = CM_Bootloader::getInstance()->getDirTmp();
+        $dir = CM_File::createTmpDir();
+        $this->_path = $dir->getPath() . '/';
     }
 
     protected function tearDown() {

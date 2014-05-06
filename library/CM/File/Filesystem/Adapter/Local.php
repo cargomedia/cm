@@ -49,7 +49,7 @@ class CM_File_Filesystem_Adapter_Local implements CM_File_Filesystem_Adapter,
         }
         if ($this->isDirectory($path)) {
             if (false === @rmdir($path)) {
-                throw new CM_Exception('Cannot not delete directory `' . $path . '`');
+                throw new CM_Exception('Cannot delete directory `' . $path . '`');
             }
         } else {
             if (false === @unlink($path)) {

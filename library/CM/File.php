@@ -159,7 +159,13 @@ class CM_File extends CM_Class_Abstract {
         $this->_path = $path;
     }
 
-    public function delete() {
+    /**
+     * @param bool|null $recursive
+     */
+    public function delete($recursive = null) {
+        if ($recursive) {
+            $this->_filesystem->deleteByPrefix($this->getPath());
+        }
         $this->_filesystem->delete($this->getPath());
         $cache = CM_Cache_Storage_Runtime::getInstance();
         $cache->delete($this->_getCacheKeyContent());
