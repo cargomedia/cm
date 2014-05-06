@@ -18,13 +18,15 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystemData = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
+        $filesystemData->ensureDirectory(CM_Bootloader::getInstance()->getDirData());
+
+        $filesystemUserfiles = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
+        $filesystemUserfiles->ensureDirectory(CM_Bootloader::getInstance()->getDirUserfiles());
 
         $filesystemTmp = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
-        $filesystemTmp->deleteByPrefix($dirTmp);
-        $filesystemTmp->ensureDirectory($dirTmp);
+        $filesystemTmp->deleteByPrefix(CM_Bootloader::getInstance()->getDirTmp());
+        $filesystemTmp->ensureDirectory(CM_Bootloader::getInstance()->getDirTmp());
     }
 
     /**
