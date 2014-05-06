@@ -195,31 +195,6 @@ class CM_Util {
 
     /**
      * @param string $path
-     * @return string
-     * @throws CM_Exception
-     */
-    public static function mkDir($path) {
-        $path = (string) $path;
-        if (!is_dir($path)) {
-            if (false === @mkdir($path, 0777, true)) {
-                if (!is_dir($path)) { // Might have been created in the meantime
-                    throw new CM_Exception('Cannot mkdir `' . $path . '`.');
-                }
-            }
-        }
-        return $path;
-    }
-
-    /**
-     * @return string
-     */
-    public static function mkDirTmp() {
-        $path = CM_Bootloader::getInstance()->getDirTmp() . uniqid() . DIRECTORY_SEPARATOR;
-        return self::mkDir($path);
-    }
-
-    /**
-     * @param string $path
      * @param array  $params Query parameters
      * @return string
      */

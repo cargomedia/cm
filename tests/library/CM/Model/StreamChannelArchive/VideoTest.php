@@ -175,19 +175,18 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
      * @return CM_File[]
      */
     private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
-        $thumbPath =
-            CM_Bootloader::getInstance()->getDirUserfiles() . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR .
-            $archive->getId() . '-' . $archive->getHash() . '-thumbs';
-        CM_Util::mkDir($thumbPath);
         $files = array();
+        if ($archive->getThumbnailCount() > 0) {
+            /** @var CM_File_UserContent $thumbnailFirst */
+            $thumbnailFirst = $archive->getThumbnails()->getItem(0);
+            $thumbnailFirst->ensureParentDirectory();
+            $files[] = $thumbnailFirst->getParentDirectory();
+        }
         for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
             $file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
             $files[] = $file;
         }
-        if ($archive->getThumbnailCount() > 0) {
-            $thumbnailDir = dirname($archive->getThumbnails()->getItem(0)->getPath());
-            $files[] = new CM_File($thumbnailDir);
-        }
+        $archive->getVideo()->ensureParentDirectory();
         $files[] = CM_File::create($archive->getVideo()->getPath());
         return $files;
     }
