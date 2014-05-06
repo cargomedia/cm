@@ -177,7 +177,7 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('foo', $file->read());
 
         file_put_contents($file->getPath(), 'bar');
-        $this->assertSame('bar', $file->read());
+        $this->assertSame('foo', $file->read());
     }
 
     public function testReadFirstLine() {
