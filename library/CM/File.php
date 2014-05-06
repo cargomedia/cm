@@ -158,9 +158,16 @@ class CM_File extends CM_Class_Abstract {
         $cache->delete($this->_getCacheKeyContent());
     }
 
+    /**
+     * @return CM_File
+     */
+    public function getParentDirectory() {
+        return new CM_File(dirname($this->getPath()), $this->_filesystem);
+    }
+
     public function ensureParentDirectory() {
-        $parentDirectory = dirname($this->getPath());
-        $this->_filesystem->ensureDirectory($parentDirectory);
+        $parentDirectory = $this->getParentDirectory();
+        $this->_filesystem->ensureDirectory($parentDirectory->getPath());
     }
 
     /**

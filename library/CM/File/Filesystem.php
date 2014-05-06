@@ -104,4 +104,17 @@ class CM_File_Filesystem {
 
         return mb_strlen($this->read($path), '8bit');
     }
+
+    /**
+     * @param string $pathPrefix
+     */
+    public function deleteByPrefix($pathPrefix) {
+        $pathList = $this->_adapter->listByPrefix($pathPrefix);
+        foreach ($pathList['files'] as $pathFile) {
+            $this->delete($pathFile);
+        }
+        foreach ($pathList['dirs'] as $pathDir) {
+            $this->delete($pathDir);
+        }
+    }
 }
