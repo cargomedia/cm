@@ -8,11 +8,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
     private $_mode;
 
     /**
-     * @param string|null $directory
+     * @param string|null $pathPrefix
      * @param int|null    $mode
      */
-    public function __construct($directory = null, $mode = null) {
-        parent::__construct($directory);
+    public function __construct($pathPrefix = null, $mode = null) {
+        parent::__construct($pathPrefix);
         if (null === $mode) {
             $mode = 0777;
         }
@@ -20,42 +20,47 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
     }
 
     public function read($path) {
-        $content = @file_get_contents($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $content = @file_get_contents($pathAbsolute);
         if ($content === false) {
-            throw new CM_Exception('Cannot read contents of `' . $path . '`.');
+            throw new CM_Exception('Cannot read contents of `' . $pathAbsolute . '`.');
         }
         return $content;
     }
 
     public function write($path, $content) {
-        if (false === @file_put_contents($path, $content)) {
-            throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $path . '`');
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        if (false === @file_put_contents($pathAbsolute, $content)) {
+            throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
         }
     }
 
     public function exists($path) {
-        return file_exists($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        return file_exists($pathAbsolute);
     }
 
     public function getModified($path) {
-        $modified = @filemtime($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $modified = @filemtime($pathAbsolute);
         if (false === $modified) {
-            throw new CM_Exception_Invalid('Cannot get modified time of `' . $path . '`');
+            throw new CM_Exception_Invalid('Cannot get modified time of `' . $pathAbsolute . '`');
         }
         return $modified;
     }
 
     public function delete($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
         if (!$this->exists($path)) {
             return;
         }
         if ($this->isDirectory($path)) {
-            if (false === @rmdir($path)) {
-                throw new CM_Exception('Cannot delete directory `' . $path . '`');
+            if (false === @rmdir($pathAbsolute)) {
+                throw new CM_Exception('Cannot delete directory `' . $pathAbsolute . '`');
             }
         } else {
-            if (false === @unlink($path)) {
-                throw new CM_Exception_Invalid('Cannot delete file `' . $path . '`');
+            if (false === @unlink($pathAbsolute)) {
+                throw new CM_Exception_Invalid('Cannot delete file `' . $pathAbsolute . '`');
             }
         }
     }
@@ -69,45 +74,53 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
     }
 
     public function rename($sourcePath, $targetPath) {
-        if (false === @rename($sourcePath, $targetPath)) {
-            throw new CM_Exception('Cannot rename `' . $sourcePath . '` to `' . $targetPath . '`.');
+        $sourcePathAbsolute = $this->_getAbsolutePath($sourcePath);
+        $targetPathAbsolute = $this->_getAbsolutePath($targetPath);
+        if (false === @rename($sourcePathAbsolute, $targetPathAbsolute)) {
+            throw new CM_Exception('Cannot rename `' . $sourcePathAbsolute . '` to `' . $targetPathAbsolute . '`.');
         }
     }
 
     public function copy($sourcePath, $targetPath) {
-        if (false === @copy($sourcePath, $targetPath)) {
-            throw new CM_Exception('Cannot copy `' . $sourcePath . '` to `' . $targetPath . '`.');
+        $sourcePathAbsolute = $this->_getAbsolutePath($sourcePath);
+        $targetPathAbsolute = $this->_getAbsolutePath($targetPath);
+        if (false === @copy($sourcePathAbsolute, $targetPathAbsolute)) {
+            throw new CM_Exception('Cannot copy `' . $sourcePathAbsolute . '` to `' . $targetPathAbsolute . '`.');
         }
     }
 
     public function isDirectory($path) {
-        return is_dir($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        return is_dir($pathAbsolute);
     }
 
     public function getChecksum($path) {
-        $md5 = @md5_file($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $md5 = @md5_file($pathAbsolute);
         if (false === $md5) {
-            throw new CM_Exception('Cannot get md5 for `' . $path . '`.');
+            throw new CM_Exception('Cannot get md5 for `' . $pathAbsolute . '`.');
         }
         return $md5;
     }
 
     public function getSize($path) {
-        $filesize = @filesize($path);
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        $filesize = @filesize($pathAbsolute);
         if (false === $filesize) {
-            throw new CM_Exception('Cannot get size for `' . $path . '`.');
+            throw new CM_Exception('Cannot get size for `' . $pathAbsolute . '`.');
         }
         return $filesize;
     }
 
     public function ensureDirectory($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
         if (!$this->isDirectory($path)) {
             if ($this->exists($path)) {
-                throw new CM_Exception('Path exists but is not a directory: `' . $path . '`.');
+                throw new CM_Exception('Path exists but is not a directory: `' . $pathAbsolute . '`.');
             } else {
-                if (false === @mkdir($path, $this->_mode, true)) {
+                if (false === @mkdir($pathAbsolute, $this->_mode, true)) {
                     if (!$this->isDirectory($path)) { // Might have been created in the meantime
-                        throw new CM_Exception('Cannot mkdir `' . $path . '`.');
+                        throw new CM_Exception('Cannot mkdir `' . $pathAbsolute . '`.');
                     }
                 }
             }
@@ -121,17 +134,15 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
      * @throws CM_Exception
      */
     private function _listByPrefixRecursive($pathPrefix, array &$fileList, array &$dirList) {
-        if ('/' !== substr($pathPrefix, -1, 1)) {
-            $pathPrefix .= '/';
-        }
-        $filenameList = @scandir($pathPrefix);
+        $pathPrefixAbsolute = $this->_getAbsolutePath($pathPrefix);
+        $filenameList = @scandir($pathPrefixAbsolute);
         if (false === $filenameList) {
-            throw new CM_Exception('Cannot scan directory `' . $pathPrefix . '`.');
+            throw new CM_Exception('Cannot scan directory `' . $pathPrefixAbsolute . '`.');
         }
         $filenameList = array_diff($filenameList, array('.', '..'));
         $fileListLocal = array();
         foreach ($filenameList as $filename) {
-            $path = $pathPrefix . $filename;
+            $path = ltrim($pathPrefix . '/' . $filename, '/');
             if ($this->isDirectory($path)) {
                 $this->_listByPrefixRecursive($path, $fileList, $dirList);
                 $dirList[] = $path;

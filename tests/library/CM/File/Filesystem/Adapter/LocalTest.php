@@ -2,22 +2,29 @@
 
 class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
 
-    /** @var string */
-    private $_path;
+    /** @var CM_File_Filesystem_Adapter_Local */
+    private $_adapter;
 
     protected function setUp() {
         $dir = CM_File::createTmpDir();
-        $this->_path = $dir->getPath() . '/';
+        $this->_adapter = new CM_File_Filesystem_Adapter_Local($dir->getPath());
     }
 
     protected function tearDown() {
         CMTest_TH::clearEnv();
     }
 
-    public function testRead() {
+    public function testConstructDefaultPrefix() {
+        $file = CM_File::createTmp(null, 'hello');
         $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertSame('hello', $adapter->read($this->_path . 'foo'));
+
+        $this->assertSame('/', $adapter->getPathPrefix());
+        $this->assertSame('hello', $adapter->read($file->getPath()));
+    }
+
+    public function testRead() {
+        $this->_adapter->write('foo', 'hello');
+        $this->assertSame('hello', $this->_adapter->read('foo'));
     }
 
     /**
@@ -25,15 +32,13 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot read
      */
     public function testReadInvalidpath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->read($this->_path . 'foo');
+        $this->_adapter->read('foo');
     }
 
     public function testWrite() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertTrue($adapter->exists($this->_path . 'foo'));
-        $this->assertSame('hello', $adapter->read($this->_path . 'foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertTrue($this->_adapter->exists('foo'));
+        $this->assertSame('hello', $this->_adapter->read('foo'));
     }
 
     /**
@@ -41,8 +46,7 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot write
      */
     public function testWriteInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write('/doesnotexist', 'hello');
+        $this->_adapter->write('/doesnotexist/foo', 'hello');
     }
 
     /**
@@ -50,28 +54,25 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot write
      */
     public function testWriteDirectory() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->ensureDirectory($this->_path . 'foo');
-        $adapter->write($this->_path . 'foo', 'hello');
+        $this->_adapter->ensureDirectory('foo');
+        $this->_adapter->write('foo', 'hello');
     }
 
     public function testExists() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $this->assertFalse($adapter->exists($this->_path . 'foo'));
+        $this->assertFalse($this->_adapter->exists('foo'));
 
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertTrue($adapter->exists($this->_path . 'foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertTrue($this->_adapter->exists('foo'));
     }
 
     public function testEnsureDirectory() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $this->assertFalse($adapter->isDirectory($this->_path . 'foo'));
+        $this->assertFalse($this->_adapter->isDirectory('foo'));
 
-        $adapter->ensureDirectory($this->_path . 'foo');
-        $this->assertTrue($adapter->isDirectory($this->_path . 'foo'));
+        $this->_adapter->ensureDirectory('foo');
+        $this->assertTrue($this->_adapter->isDirectory('foo'));
 
-        $adapter->ensureDirectory($this->_path . 'foo');
-        $this->assertTrue($adapter->isDirectory($this->_path . 'foo'));
+        $this->_adapter->ensureDirectory('foo');
+        $this->assertTrue($this->_adapter->isDirectory('foo'));
     }
 
     /**
@@ -79,15 +80,13 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Path exists but is not a directory
      */
     public function testEnsureDirectoryExistsFile() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $adapter->ensureDirectory($this->_path . 'foo');
+        $this->_adapter->write('foo', 'hello');
+        $this->_adapter->ensureDirectory('foo');
     }
 
     public function testGetModified() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertSameTime(filemtime($this->_path . 'foo'), $adapter->getModified($this->_path . 'foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertSameTime(filemtime($this->_adapter->getPathPrefix() . '/foo'), $this->_adapter->getModified('foo'));
     }
 
     /**
@@ -95,38 +94,34 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot get modified time
      */
     public function testGetModifiedInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->getModified($this->_path . 'foo');
+        $this->_adapter->getModified('foo');
     }
 
     public function testDeleteFile() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->delete($this->_path . 'my-file');
-        $adapter->write($this->_path . 'my-file', 'hello');
-        $this->assertTrue($adapter->exists($this->_path . 'my-file'));
+        $this->_adapter->delete('my-file');
+        $this->_adapter->write('my-file', 'hello');
+        $this->assertTrue($this->_adapter->exists('my-file'));
 
-        $adapter->delete($this->_path . 'my-file');
-        $this->assertFalse($adapter->exists($this->_path . 'my-file'));
+        $this->_adapter->delete('my-file');
+        $this->assertFalse($this->_adapter->exists('my-file'));
     }
 
     public function testDeleteDirectory() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->delete($this->_path . 'my-dir');
-        $adapter->ensureDirectory($this->_path . 'my-dir');
-        $this->assertTrue($adapter->exists($this->_path . 'my-dir'));
+        $this->_adapter->delete('my-dir');
+        $this->_adapter->ensureDirectory('my-dir');
+        $this->assertTrue($this->_adapter->exists('my-dir'));
 
-        $adapter->delete($this->_path . 'my-dir');
-        $this->assertFalse($adapter->exists($this->_path . 'my-dir'));
+        $this->_adapter->delete('my-dir');
+        $this->assertFalse($this->_adapter->exists('my-dir'));
     }
 
     public function testRename() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
+        $this->_adapter->write('foo', 'hello');
 
-        $adapter->rename($this->_path . 'foo', $this->_path . 'bar');
-        $this->assertFalse($adapter->exists($this->_path . 'foo'));
-        $this->assertTrue($adapter->exists($this->_path . 'bar'));
-        $this->assertSame('hello', $adapter->read($this->_path . 'bar'));
+        $this->_adapter->rename('foo', 'bar');
+        $this->assertFalse($this->_adapter->exists('foo'));
+        $this->assertTrue($this->_adapter->exists('bar'));
+        $this->assertSame('hello', $this->_adapter->read('bar'));
     }
 
     /**
@@ -134,18 +129,16 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot rename
      */
     public function testRenameInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->rename($this->_path . 'foo', $this->_path . 'bar');
+        $this->_adapter->rename('foo', 'bar');
     }
 
     public function testCopy() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
+        $this->_adapter->write('foo', 'hello');
 
-        $adapter->copy($this->_path . 'foo', $this->_path . 'bar');
-        $this->assertTrue($adapter->exists($this->_path . 'foo'));
-        $this->assertTrue($adapter->exists($this->_path . 'bar'));
-        $this->assertSame('hello', $adapter->read($this->_path . 'bar'));
+        $this->_adapter->copy('foo', 'bar');
+        $this->assertTrue($this->_adapter->exists('foo'));
+        $this->assertTrue($this->_adapter->exists('bar'));
+        $this->assertSame('hello', $this->_adapter->read('bar'));
     }
 
     /**
@@ -153,14 +146,12 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot copy
      */
     public function testCopyInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->copy($this->_path . 'foo', $this->_path . 'bar');
+        $this->_adapter->copy('foo', 'bar');
     }
 
     public function testGetSize() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertSame(5, $adapter->getSize($this->_path . 'foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertSame(5, $this->_adapter->getSize('foo'));
     }
 
     /**
@@ -168,14 +159,12 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot get size
      */
     public function testGetSizeInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->getSize($this->_path . 'foo');
+        $this->_adapter->getSize('foo');
     }
 
     public function testGetChecksum() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertSame(md5('hello'), $adapter->getChecksum($this->_path . 'foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertSame(md5('hello'), $this->_adapter->getChecksum('foo'));
     }
 
     /**
@@ -183,13 +172,11 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot get md5
      */
     public function testGetChecksumInvalidPath() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->getChecksum($this->_path . 'foo');
+        $this->_adapter->getChecksum('foo');
     }
 
     public function testListByPrefix() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $filesystem = new CM_File_Filesystem($adapter);
+        $filesystem = new CM_File_Filesystem($this->_adapter);
 
         $pathList = array(
             'foo/foobar/bar',
@@ -197,22 +184,33 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
             'foo/bar',
         );
         foreach ($pathList as $path) {
-            $file = new CM_File($this->_path . $path, $filesystem);
+            $file = new CM_File($path, $filesystem);
             $file->ensureParentDirectory();
             $file->write('hello');
         }
 
         $this->assertSame(array(
             'files' => array(
-                $this->_path . 'foo/foobar/bar',
-                $this->_path . 'foo/bar',
-                $this->_path . 'foo/bar2',
+                'foo/foobar/bar',
+                'foo/bar',
+                'foo/bar2',
             ),
             'dirs'  => array(
-                $this->_path . 'foo/foobar',
-                $this->_path . 'foo',
+                'foo/foobar',
+                'foo',
             ),
-        ), $adapter->listByPrefix($this->_path));
+        ), $this->_adapter->listByPrefix(''));
+
+        $this->assertSame(array(
+            'files' => array(
+                'foo/foobar/bar',
+                'foo/bar',
+                'foo/bar2',
+            ),
+            'dirs'  => array(
+                'foo/foobar',
+            ),
+        ), $this->_adapter->listByPrefix('/foo'));
     }
 
     /**
@@ -220,7 +218,6 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
      * @expectedExceptionMessage Cannot scan directory
      */
     public function testListByPrefixInvalid() {
-        $adapter = new CM_File_Filesystem_Adapter_Local();
-        $adapter->listByPrefix('nonexistent');
+        $this->_adapter->listByPrefix('nonexistent');
     }
 }

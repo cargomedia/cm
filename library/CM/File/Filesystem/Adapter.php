@@ -3,16 +3,16 @@
 abstract class CM_File_Filesystem_Adapter {
 
     /** @var string */
-    protected $_directory;
+    protected $_pathPrefix;
 
     /**
-     * @param string|null $directory
+     * @param string|null $pathPrefix
      */
-    public function __construct($directory = null) {
-        if (null === $directory) {
-            $directory = '';
+    public function __construct($pathPrefix = null) {
+        if (null === $pathPrefix) {
+            $pathPrefix = '';
         }
-        $this->_directory = $this->_normalizePath($directory);
+        $this->_pathPrefix = $this->_normalizePath($pathPrefix);
     }
 
     /**
@@ -80,14 +80,21 @@ abstract class CM_File_Filesystem_Adapter {
     abstract public function ensureDirectory($path);
 
     /**
+     * @return string
+     */
+    public function getPathPrefix() {
+        return $this->_pathPrefix;
+    }
+
+    /**
      * @param string $pathRelative
      * @return string
      * @throws CM_Exception
      */
     protected function _getAbsolutePath($pathRelative) {
         $pathRelative = (string) $pathRelative;
-        $path = $this->_normalizePath($this->_directory . '/' . $pathRelative);
-        if (0 !== strpos($path, $this->_directory)) {
+        $path = $this->_normalizePath($this->_pathPrefix . '/' . $pathRelative);
+        if (0 !== strpos($path, $this->_pathPrefix)) {
             throw new CM_Exception('Path is out of filesystem directory: `' . $path . '`.');
         }
         return $path;
@@ -100,13 +107,13 @@ abstract class CM_File_Filesystem_Adapter {
      */
     protected function _getRelativePath($pathAbsolute) {
         $pathAbsolute = $this->_normalizePath($pathAbsolute);
-        if (0 !== strpos($pathAbsolute, $this->_directory)) {
+        if (0 !== strpos($pathAbsolute, $this->_pathPrefix)) {
             throw new CM_Exception('Path is out of filesystem directory: `' . $pathAbsolute . '`.');
         }
-        if ($pathAbsolute === $this->_directory) {
+        if ($pathAbsolute === $this->_pathPrefix) {
             return '';
         }
-        return ltrim(substr($pathAbsolute, strlen($this->_directory)), '/');
+        return ltrim(substr($pathAbsolute, strlen($this->_pathPrefix)), '/');
     }
 
     /**
