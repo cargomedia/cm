@@ -23,8 +23,9 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
         if (null !== $lifeTime) {
             throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
         }
-        CM_Util::mkDir($this->_getDirStorage());
-        $this->_getFile($key)->write(serialize($value));
+        $file = $this->_getFile($key);
+        $file->ensureParentDirectory();
+        $file->write(serialize($value));
     }
 
     protected function _get($key) {
