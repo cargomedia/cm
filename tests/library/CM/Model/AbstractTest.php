@@ -637,6 +637,43 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->delete();
     }
 
+    public function testPersistenceWithEmptySchema() {
+        $id = array('id' => 55);
+        $type = 12;
+        $data = array();
+        $schema = new CM_Model_Schema_Definition(array());
+
+        $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+        $persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($id));
+        /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType', '_getSchema'))->getMockForAbstractClass();
+        $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->any())->method('getType')->will($this->returnValue($type));
+        $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+        /** @var CM_Model_Abstract $model */
+
+        $model->commit();
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Cannot get schema-data without a schema
+     */
+    public function testPersistenceWithoutSchema() {
+        $type = 12;
+
+        $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->getMockForAbstractClass();
+        /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType'))->getMockForAbstractClass();
+        $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->any())->method('getType')->will($this->returnValue($type));
+        /** @var CM_Model_Abstract $model */
+
+        $model->commit();
+    }
+
     public function testGet() {
         $modelMock = CM_ModelMock::createStatic(array('foo' => 'bar1'));
         $modelMock = new CM_ModelMock($modelMock->getId());
