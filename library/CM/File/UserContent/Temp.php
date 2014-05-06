@@ -64,7 +64,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         return $this->_filenameLabel;
     }
 
-    public function delete() {
+    public function delete($recursive = null) {
         CM_Db_Db::delete('cm_tmp_userfile', array('uniqid' => $this->getUniqid()));
         parent::delete();
     }
