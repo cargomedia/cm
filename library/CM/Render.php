@@ -287,13 +287,6 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @return DateTimeZone
-     */
-    public function getTimeZone() {
-        return $this->getEnvironment()->getTimezone();
-    }
-
-    /**
      * @param string     $key
      * @param array|null $params
      * @return string
@@ -319,7 +312,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return IntlDateFormatter
      */
     public function getFormatterDate($dateType, $timeType, $pattern = null) {
-        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getTimeZone()->getName(), null, $pattern);
+        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getEnvironment()->getTimeZone()->getName(), null, $pattern);
     }
 
     /**
