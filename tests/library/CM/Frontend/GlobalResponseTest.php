@@ -1,6 +1,6 @@
 <?php
 
-class CM_FrontendTest extends CMTest_TestCase {
+class CM_Frontend_GlobalResponseTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
