@@ -101,6 +101,13 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function isDirectory() {
+        return $this->_filesystem->isDirectory($this->getPath());
+    }
+
+    /**
      * @return string
      */
     public function read() {
@@ -211,6 +218,16 @@ class CM_File extends CM_Class_Abstract {
         $extension = (string) $extension;
         $filesystem = self::getFilesystemDefault();
         return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content, $filesystem);
+    }
+
+    /**
+     * @return CM_File
+     */
+    public static function createTmpDir() {
+        $filesystem = self::getFilesystemDefault();
+        $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . uniqid(), $filesystem);
+        $filesystem->ensureDirectory($dir->getPath());
+        return $dir;
     }
 
     /**

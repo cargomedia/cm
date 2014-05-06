@@ -13,6 +13,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function tearDown() {
         file_put_contents($this->_testFilePath, self::$_backupContent);
+        CMTest_TH::clearEnv();
     }
 
     public function testConstruct() {
@@ -127,5 +128,12 @@ class CM_FileTest extends CMTest_TestCase {
         $file->ensureParentDirectory();
         $this->assertTrue($dir->getExists());
         $this->assertFalse($file->getExists());
+    }
+
+    public function createTmpDir() {
+        $dir = CM_File::createTmpDir();
+
+        $this->assertTrue($dir->getPath());
+        $this->assertTrue($dir->isDirectory());
     }
 }

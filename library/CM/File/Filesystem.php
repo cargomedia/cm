@@ -28,6 +28,14 @@ class CM_File_Filesystem {
     }
 
     /**
+     * @param string $path
+     * @return boolean
+     */
+    public function isDirectory($path) {
+        return $this->_adapter->isDirectory($path);
+    }
+
+    /**
      * @param string $sourcePath
      * @param string $targetPath
      */
