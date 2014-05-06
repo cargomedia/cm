@@ -12,11 +12,4 @@ class CM_Bootloader_Testing extends CM_Bootloader {
     public function getDirTmp() {
         return DIR_ROOT . 'tests/tmp/tmp/';
     }
-
-    /**
-     * @return string
-     */
-    public function getDirUserfiles() {
-        return DIR_ROOT . 'tests/tmp/userfiles/';
-    }
 }

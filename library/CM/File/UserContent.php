@@ -20,8 +20,8 @@ class CM_File_UserContent extends CM_File {
         }
 
         $this->_pathRelative = $this->_calculateRelativeDir($namespace, $filename, $sequence);
-
-        parent::__construct(CM_Bootloader::getInstance()->getDirUserfiles() . $this->getPathRelative());
+        $filesystem = CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->getFilesystem();
+        parent::__construct($this->getPathRelative(), $filesystem);
     }
 
     /**

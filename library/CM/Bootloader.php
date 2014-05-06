@@ -121,13 +121,6 @@ class CM_Bootloader {
     /**
      * @return string
      */
-    public function getDirUserfiles() {
-        return DIR_PUBLIC . 'userfiles/';
-    }
-
-    /**
-     * @return string
-     */
     public function getDirTmp() {
         return DIR_ROOT . 'tmp/';
     }
