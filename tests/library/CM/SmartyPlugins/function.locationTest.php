@@ -22,24 +22,14 @@ class smarty_function_locationTest extends CMTest_TestCase {
     }
 
     public function testCaching() {
-        $city = $this->_location->get(CM_Model_Location::LEVEL_CITY);
-        $state = $this->_location->get(CM_Model_Location::LEVEL_STATE);
-        $country = $this->_location->get(CM_Model_Location::LEVEL_COUNTRY);
         $debug = CM_Debug::getInstance();
         $debug->setEnabled(true);
-        CM_Cache_Storage_Runtime::getInstance()->flush();
 
         $urlFlag = $this->_render->getUrlResource('layout', 'img/flags/fo.png');
         $this->_assertSame('cityFoo, countryFoo <img class="flag" src="' . $urlFlag . '" />', array('location' => $this->_location));
 
         $debug->setEnabled(false);
-        $stats = $debug->getStats();
-        $type = CM_Model_Location::getTypeStatic();
-        $this->assertEquals(array(
-            'CM_Model_StorageAdapter_Cache_type:' . $type . '_id:' . serialize($city->getIdRaw()),
-            'CM_Model_StorageAdapter_Cache_type:' . $type . '_id:' . serialize($state->getIdRaw()),
-            'CM_Model_StorageAdapter_Cache_type:' . $type . '_id:' . serialize($country->getIdRaw()),
-        ), $stats['apc-get']);
+        $this->assertEmpty($debug->getStats());
     }
 
     /**
