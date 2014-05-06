@@ -17,9 +17,6 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /** @var bool */
     private $_languageRewrite;
 
-    /** @var CM_Model_User|null */
-    private $_viewer;
-
     /** @var CM_Menu[] */
     private $_menuList = array();
 
@@ -39,7 +36,6 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
-        $this->_viewer = $viewer;
         $this->_environment = new CM_RenderEnvironment($site, $viewer);
         $this->_language = $language;
         $this->_languageRewrite = (bool) $languageRewrite;
@@ -287,7 +283,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return CM_Model_User|null
      */
     public function getViewer() {
-        return $this->_viewer;
+        return $this->getEnvironment()->getViewer();
     }
 
     /**
