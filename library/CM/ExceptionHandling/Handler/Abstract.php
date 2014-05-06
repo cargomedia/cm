@@ -63,9 +63,18 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
-        $this->_logException($exception);
+        $printException = false;
+        if ($exception instanceof CM_Exception) {
+            $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
+        }
 
-        if (!$exception instanceof CM_Exception || $exception->getSeverity() >= $this->_getPrintSeverityMin()) {
+        try {
+            $this->_logException($exception);
+        } catch (Exception $e) {
+            $printException = true;
+        }
+
+        if ($printException) {
             $this->_printException($exception);
         }
 
