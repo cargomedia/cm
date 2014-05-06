@@ -2,7 +2,8 @@
 
 class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implements
     CM_File_Filesystem_Adapter_ChecksumCalculatorInterface,
-    CM_File_Filesystem_Adapter_SizeCalculatorInterface {
+    CM_File_Filesystem_Adapter_SizeCalculatorInterface,
+    CM_File_Filesystem_Adapter_AppendInterface {
 
     /** @var int */
     private $_mode;
@@ -110,6 +111,13 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
             throw new CM_Exception('Cannot get size for `' . $pathAbsolute . '`.');
         }
         return $filesize;
+    }
+
+    public function append($path, $content) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        if (false === @file_put_contents($pathAbsolute, $content, FILE_APPEND | LOCK_EX)) {
+            throw new CM_Exception('Cannot append ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
+        }
     }
 
     public function ensureDirectory($path) {

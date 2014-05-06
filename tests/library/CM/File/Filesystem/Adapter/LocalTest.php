@@ -58,6 +58,20 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $this->_adapter->write('foo', 'hello');
     }
 
+    public function testAppend() {
+        $this->_adapter->append('foo', 'hello');
+        $this->_adapter->append('foo', 'world');
+        $this->assertSame('helloworld', $this->_adapter->read('foo'));
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot append
+     */
+    public function testAppendInvalidPath() {
+        $this->_adapter->append('/doesnotexist/foo', 'hello');
+    }
+
     public function testExists() {
         $this->assertFalse($this->_adapter->exists('foo'));
 

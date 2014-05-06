@@ -139,6 +139,15 @@ class CM_File extends CM_Class_Abstract {
         $cache->set($this->_getCacheKeyContent(), $content, 1);
     }
 
+    /**
+     * @param string $content
+     */
+    public function append($content) {
+        $this->_filesystem->append($this->getPath(), $content);
+        $cache = CM_Cache_Storage_Runtime::getInstance();
+        $cache->delete($this->_getCacheKeyContent());
+    }
+
     public function truncate() {
         $this->write('');
     }

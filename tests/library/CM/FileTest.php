@@ -119,6 +119,14 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('', $file->read());
     }
 
+    public function testAppend() {
+        $file = CM_File::createTmp();
+        $file->append('foo');
+        $this->assertSame('foo', $file->read());
+        $file->append('bar');
+        $this->assertSame('foobar', $file->read());
+    }
+
     public function testGetMimeType() {
         $file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
         $this->assertSame('image/jpeg', $file->getMimeType());

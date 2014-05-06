@@ -96,9 +96,9 @@ class CM_File_Filesystem {
     public function getChecksum($path) {
         if ($this->_adapter instanceof CM_File_Filesystem_Adapter_ChecksumCalculatorInterface) {
             return $this->_adapter->getChecksum($path);
+        } else {
+            return md5($this->read($path));
         }
-
-        return md5($this->read($path));
     }
 
     /**
@@ -108,9 +108,21 @@ class CM_File_Filesystem {
     public function getSize($path) {
         if ($this->_adapter instanceof CM_File_Filesystem_Adapter_SizeCalculatorInterface) {
             return $this->_adapter->getSize($path);
+        } else {
+            return mb_strlen($this->read($path), '8bit');
         }
+    }
 
-        return mb_strlen($this->read($path), '8bit');
+    /**
+     * @param string $path
+     * @param string $content
+     */
+    public function append($path, $content) {
+        if ($this->_adapter instanceof CM_File_Filesystem_Adapter_AppendInterface) {
+            $this->_adapter->append($path, $content);
+        } else {
+            $this->_adapter->write($path, $this->_adapter->read($path) . $content);
+        }
     }
 
     /**
