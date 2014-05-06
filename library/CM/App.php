@@ -21,8 +21,10 @@ class CM_App {
         CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
         CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
         $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-        CM_Util::rmDirContents($dirTmp);
-        CM_Util::mkdir($dirTmp);
+
+        $filesystemTmp = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
+        $filesystemTmp->deleteByPrefix($dirTmp);
+        $filesystemTmp->ensureDirectory($dirTmp);
     }
 
     /**
