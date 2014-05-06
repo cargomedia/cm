@@ -28,6 +28,7 @@ class CM_File_Filesystem_AdapterTest extends CMTest_TestCase {
 
         $method = CMTest_TH::getProtectedMethod('CM_File_Filesystem_Adapter', '_getAbsolutePath');
         $this->assertSame('/base/base2/bar', $method->invoke($adapter, 'bar'));
+        $this->assertSame('/base/base2/bar', $method->invoke($adapter, 'bar/'));
         $this->assertSame('/base/base2/foo', $method->invoke($adapter, '/bar/../foo'));
         $this->assertSame('/base/base2/foo', $method->invoke($adapter, 'bar/../foo'));
         $this->assertSame('/base/base2', $method->invoke($adapter, '/'));
