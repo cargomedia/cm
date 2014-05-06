@@ -102,9 +102,9 @@ class CM_SVM_Model {
      * @return CM_File
      */
     private function _getFile() {
-        $dirDataSvm = CM_Bootloader::getInstance()->getDirData() . 'svm/';
-        CM_Util::mkDir($dirDataSvm);
-        return new CM_File($dirDataSvm . $this->getId() . '.svm');
+        $file = new CM_File(CM_Bootloader::getInstance()->getDirData() . 'svm/' . $this->getId() . '.svm');
+        $file->ensureParentDirectory();
+        return $file;
     }
 
     /**
