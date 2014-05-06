@@ -86,7 +86,7 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
     public function testGetModified() {
         $adapter = new CM_File_Filesystem_Adapter_Local();
         $adapter->write($this->_path . 'foo', 'hello');
-        $this->assertSameTime((new DateTime())->getTimestamp(), $adapter->getModified($this->_path . 'foo'));
+        $this->assertSameTime(filemtime($this->_path . 'foo'), $adapter->getModified($this->_path . 'foo'));
     }
 
     /**
