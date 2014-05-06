@@ -8,16 +8,16 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_TreeNode|null */
     protected $_treeCurrent;
 
-    /** @var CM_Frontend_JavascriptContainer */
+    /** @var CM_Frontend_JavascriptContainer_View */
     protected $_onloadHeaderJs;
 
-    /** @var CM_Frontend_JavascriptContainer */
+    /** @var CM_Frontend_JavascriptContainer_View */
     protected $_onloadPrepareJs;
 
-    /** @var CM_Frontend_JavascriptContainer */
+    /** @var CM_Frontend_JavascriptContainer_View */
     protected $_onloadJs;
 
-    /** @var CM_Frontend_JavascriptContainer */
+    /** @var CM_Frontend_JavascriptContainer_View */
     protected $_onloadReadyJs;
 
     private $_tracking;
@@ -27,10 +27,10 @@ class CM_Frontend_GlobalResponse {
 
     public function __construct(CM_Frontend_Render $render) {
         $this->_render = $render;
-        $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer();
-        $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer();
-        $this->_onloadJs = new CM_Frontend_JavascriptContainer();
-        $this->_onloadReadyJs = new CM_Frontend_JavascriptContainer();
+        $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer_View();
+        $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer_View();
+        $this->_onloadJs = new CM_Frontend_JavascriptContainer_View();
+        $this->_onloadReadyJs = new CM_Frontend_JavascriptContainer_View();
     }
 
     /**
@@ -111,28 +111,28 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @return CM_Frontend_JavascriptContainer
+     * @return CM_Frontend_JavascriptContainer_View
      */
     public function getOnloadHeaderJs() {
         return $this->_onloadHeaderJs;
     }
 
     /**
-     * @return CM_Frontend_JavascriptContainer
+     * @return CM_Frontend_JavascriptContainer_View
      */
     public function getOnloadPrepareJs() {
         return $this->_onloadPrepareJs;
     }
 
     /**
-     * @return CM_Frontend_JavascriptContainer
+     * @return CM_Frontend_JavascriptContainer_View
      */
     public function getOnloadJs() {
         return $this->_onloadJs;
     }
 
     /**
-     * @return CM_Frontend_JavascriptContainer
+     * @return CM_Frontend_JavascriptContainer_View
      */
     public function getOnloadReadyJs() {
         return $this->_onloadReadyJs;

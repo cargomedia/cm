@@ -21,7 +21,7 @@ abstract class CM_Component_Abstract extends CM_View_Abstract {
         $environment->getViewer(true);
     }
 
-    public function ajax_reload(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
+    public function ajax_reload(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         return $response->reloadComponent($params->getAll());
     }
 }

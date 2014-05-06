@@ -1,6 +1,6 @@
 <?php
 
-class CM_Frontend_JavascriptContainer {
+class CM_Frontend_JavascriptContainer_View {
 
     /** @var string[] */
     protected $_operations = array();
