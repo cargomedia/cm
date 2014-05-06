@@ -12,7 +12,7 @@ abstract class CM_File_Filesystem_Adapter {
         if (null === $pathPrefix) {
             $pathPrefix = '';
         }
-        $this->_pathPrefix = $this->_normalizePath($pathPrefix);
+        $this->_pathPrefix = CM_File_Filesystem::normalizePath($pathPrefix);
     }
 
     /**
@@ -95,7 +95,7 @@ abstract class CM_File_Filesystem_Adapter {
      */
     protected function _getAbsolutePath($pathRelative) {
         $pathRelative = (string) $pathRelative;
-        $path = $this->_normalizePath($this->_pathPrefix . '/' . $pathRelative);
+        $path = CM_File_Filesystem::normalizePath($this->_pathPrefix . '/' . $pathRelative);
         if (0 !== strpos($path, $this->_pathPrefix)) {
             throw new CM_Exception('Path is out of filesystem directory: `' . $path . '`.');
         }
@@ -108,7 +108,7 @@ abstract class CM_File_Filesystem_Adapter {
      * @throws CM_Exception
      */
     protected function _getRelativePath($pathAbsolute) {
-        $pathAbsolute = $this->_normalizePath($pathAbsolute);
+        $pathAbsolute = CM_File_Filesystem::normalizePath($pathAbsolute);
         if (0 !== strpos($pathAbsolute, $this->_pathPrefix)) {
             throw new CM_Exception('Path is out of filesystem directory: `' . $pathAbsolute . '`.');
         }
@@ -116,33 +116,5 @@ abstract class CM_File_Filesystem_Adapter {
             return '';
         }
         return ltrim(substr($pathAbsolute, strlen($this->_pathPrefix)), '/');
-    }
-
-    /**
-     * @param string $path
-     * @return string
-     * @throws CM_Exception
-     */
-    protected function _normalizePath($path) {
-        $path = (string) $path;
-        $path = ltrim($path, '/');
-        $parts = array_filter(explode('/', $path), 'strlen');
-        $tokens = array();
-
-        foreach ($parts as $part) {
-            switch ($part) {
-                case '.':
-                    continue;
-                case '..':
-                    if (0 !== count($tokens)) {
-                        array_pop($tokens);
-                    }
-                    continue;
-                default:
-                    $tokens[] = $part;
-            }
-        }
-
-        return '/' . implode('/', $tokens);
     }
 }

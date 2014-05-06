@@ -46,4 +46,18 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         $dirBase = new CM_File($this->_path);
         $this->assertTrue($dirBase->getExists());
     }
+
+    public function testNormalizePath() {
+        $this->assertSame('/foo', CM_File_Filesystem::normalizePath('/foo'));
+        $this->assertSame('/foo', CM_File_Filesystem::normalizePath('/foo/'));
+        $this->assertSame('/', CM_File_Filesystem::normalizePath('/'));
+        $this->assertSame('/', CM_File_Filesystem::normalizePath(''));
+        $this->assertSame('/', CM_File_Filesystem::normalizePath('//'));
+        $this->assertSame('/foo/mega', CM_File_Filesystem::normalizePath('/foo/bar/../mega'));
+        $this->assertSame('/', CM_File_Filesystem::normalizePath('/../..'));
+        $this->assertSame('/foo/bar', CM_File_Filesystem::normalizePath('/foo/./bar'));
+        $this->assertSame('/foo/bar', CM_File_Filesystem::normalizePath('/foo/./bar///'));
+        $this->assertSame('/foo', CM_File_Filesystem::normalizePath('../foo'));
+        $this->assertSame('/foo', CM_File_Filesystem::normalizePath('foo'));
+    }
 }

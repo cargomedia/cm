@@ -2,25 +2,6 @@
 
 class CM_File_Filesystem_AdapterTest extends CMTest_TestCase {
 
-    public function testNormalizePath() {
-        $adapter = $this->getMockBuilder('CM_File_Filesystem_Adapter')
-            ->setConstructorArgs(array('/base/base2/'))->getMockForAbstractClass();
-        /** @var CM_File_Filesystem_Adapter $adapter */
-
-        $method = CMTest_TH::getProtectedMethod('CM_File_Filesystem_Adapter', '_normalizePath');
-        $this->assertSame('/foo', $method->invoke($adapter, '/foo'));
-        $this->assertSame('/foo', $method->invoke($adapter, '/foo/'));
-        $this->assertSame('/', $method->invoke($adapter, '/'));
-        $this->assertSame('/', $method->invoke($adapter, ''));
-        $this->assertSame('/', $method->invoke($adapter, '//'));
-        $this->assertSame('/foo/mega', $method->invoke($adapter, '/foo/bar/../mega'));
-        $this->assertSame('/', $method->invoke($adapter, '/../..'));
-        $this->assertSame('/foo/bar', $method->invoke($adapter, '/foo/./bar'));
-        $this->assertSame('/foo/bar', $method->invoke($adapter, '/foo/./bar///'));
-        $this->assertSame('/foo', $method->invoke($adapter, '../foo'));
-        $this->assertSame('/foo', $method->invoke($adapter, 'foo'));
-    }
-
     public function testGetAbsolutePath() {
         $adapter = $this->getMockBuilder('CM_File_Filesystem_Adapter')
             ->setConstructorArgs(array('/base/base2'))->getMockForAbstractClass();

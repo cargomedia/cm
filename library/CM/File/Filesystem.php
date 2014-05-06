@@ -137,4 +137,32 @@ class CM_File_Filesystem {
             $this->delete($pathDir);
         }
     }
+
+    /**
+     * @param string $path
+     * @return string
+     * @throws CM_Exception
+     */
+    public static function normalizePath($path) {
+        $path = (string) $path;
+        $path = ltrim($path, '/');
+        $parts = array_filter(explode('/', $path), 'strlen');
+        $tokens = array();
+
+        foreach ($parts as $part) {
+            switch ($part) {
+                case '.':
+                    continue;
+                case '..':
+                    if (0 !== count($tokens)) {
+                        array_pop($tokens);
+                    }
+                    continue;
+                default:
+                    $tokens[] = $part;
+            }
+        }
+
+        return '/' . implode('/', $tokens);
+    }
 }
