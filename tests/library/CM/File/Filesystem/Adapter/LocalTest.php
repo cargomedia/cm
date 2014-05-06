@@ -6,8 +6,9 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
     private $_adapter;
 
     protected function setUp() {
-        $dir = CM_File::createTmpDir();
-        $this->_adapter = new CM_File_Filesystem_Adapter_Local($dir->getPath());
+        $dir = CM_Bootloader::getInstance()->getDirTmp() . 'my-dir';
+        $this->_adapter = new CM_File_Filesystem_Adapter_Local($dir);
+        $this->_adapter->setup();
     }
 
     protected function tearDown() {
@@ -15,11 +16,14 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
     }
 
     public function testConstructDefaultPrefix() {
-        $file = CM_File::createTmp(null, 'hello');
+        $pathFile = CM_Bootloader::getInstance()->getDirTmp() . 'foo';
         $adapter = new CM_File_Filesystem_Adapter_Local();
+        $filesystem = new CM_File_Filesystem($adapter);
+        $file = new CM_File($pathFile, $filesystem);
+        $file->write('hello');
 
         $this->assertSame('/', $adapter->getPathPrefix());
-        $this->assertSame('hello', $adapter->read($file->getPath()));
+        $this->assertSame('hello', $adapter->read($pathFile));
     }
 
     public function testRead() {

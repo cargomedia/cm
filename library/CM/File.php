@@ -199,7 +199,7 @@ class CM_File extends CM_Class_Abstract {
     public function joinPath($path) {
         $path = implode('/', func_get_args());
         $pathNew = CM_File_Filesystem::normalizePath($this->getPath() . '/' . $path);
-        return new static($pathNew);
+        return new static($pathNew, $this->_filesystem);
     }
 
     /**
@@ -241,7 +241,8 @@ class CM_File extends CM_Class_Abstract {
             $extension = '.' . $extension;
         }
         $extension = (string) $extension;
-        $filesystem = CM_Bootloader::getInstance()->getFilesystemTmp();
+        $filesystemService = CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp');
+        $filesystem = $filesystemService->getFilesystem();
         return static::create(uniqid() . $extension, $content, $filesystem);
     }
 
@@ -249,7 +250,8 @@ class CM_File extends CM_Class_Abstract {
      * @return CM_File
      */
     public static function createTmpDir() {
-        $filesystem = CM_Bootloader::getInstance()->getFilesystemTmp();
+        $filesystemService = CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp');
+        $filesystem = $filesystemService->getFilesystem();
         $dir = new CM_File(uniqid(), $filesystem);
         $filesystem->ensureDirectory($dir->getPath());
         return $dir;

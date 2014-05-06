@@ -11,10 +11,6 @@ class CM_ServiceManager extends CM_Class_Abstract {
     /** @var CM_ServiceManager */
     protected static $instance;
 
-    private function __construct() {
-        $this->_serviceList = self::_getConfig()->list;
-    }
-
     /**
      * @param string $serviceName
      * @return bool

@@ -29,15 +29,6 @@ class CM_Service_Filesystem extends CM_Class_Abstract {
         }
         return $this->_filesystem;
     }
-
-    /**
-     * @param string $path
-     * @return CM_File
-     */
-    public function getFile($path) {
-        return new CM_File($path, $this->getFilesystem());
-    }
-
     /**
      * @param bool|null $flush
      */

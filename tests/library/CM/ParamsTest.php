@@ -121,7 +121,7 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetFile() {
-        $file = CM_File::createTmp();
+        $file = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo');
         $params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
         $this->assertEquals($file, $params->getFile('file'));
         $this->assertEquals($file, $params->getFile('filename'));

@@ -39,6 +39,7 @@ class CM_Bootloader {
         $this->_constants();
         $this->_exceptionHandler();
         $this->_errorHandler();
+        $this->_registerServices();
         $this->_defaults();
     }
 
@@ -125,29 +126,10 @@ class CM_Bootloader {
     }
 
     /**
-     * @return CM_File_Filesystem
-     */
-    public function getFilesystemData() {
-        return CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->getFilesystem();
-    }
-
-    /**
-     * @return CM_File_Filesystem
-     */
-    public function getFilesystemTmp() {
-        return CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->getFilesystem();
-    }
-
-    /**
-     * @throws CM_Exception_Invalid
      * @return string
      */
     public function getDirTmp() {
-        $filesystemAdapter = $this->getFilesystemTmp()->getAdapter();
-        if (!$filesystemAdapter instanceof CM_File_Filesystem_Adapter_Local) {
-            throw new CM_Exception_Invalid('Temp filesystem adapter should be local');
-        }
-        return $filesystemAdapter->getPathPrefix();
+        return DIR_ROOT . 'tmp/';
     }
 
     /**
@@ -187,6 +169,21 @@ class CM_Bootloader {
             $errorHandler->handleException($exception);
             exit(1);
         });
+    }
+
+    protected function _registerServices() {
+        $serviceManager = CM_ServiceManager::getInstance();
+
+        $serviceManager->register('filesystemTmp', 'CM_Service_Filesystem', array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => $this->getDirTmp(),
+            ),
+        ));
+
+        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
+            $serviceManager->register($serviceKey, $serviceDefinition['class'], $serviceDefinition['arguments']);
+        }
     }
 
     protected function _defaults() {

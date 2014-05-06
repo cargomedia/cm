@@ -250,7 +250,7 @@ class CM_File_Image extends CM_File {
 
         $file = $this;
         if ($path !== $this->getPath()) {
-            $file = new CM_File($path);
+            $file = new CM_File($path, $this->_filesystem);
         }
         $file->write($imageBlob);
         if ($file->getPath() === $this->getPath()) {

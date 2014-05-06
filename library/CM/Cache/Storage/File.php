@@ -52,13 +52,14 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      * @return CM_File
      */
     private function _getFile($key) {
-        return new CM_File($this->_getDirStorage()->getPath() . '/' . md5($key));
+        return $this->_getDirStorage()->joinPath(md5($key));
     }
 
     /**
      * @return CM_File
      */
     private function _getDirStorage() {
-        return new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'cache');
+        $filesystemService = CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp');
+        return new CM_File('cache', $filesystemService->getFilesystem());
     }
 }

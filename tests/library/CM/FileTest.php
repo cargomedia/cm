@@ -70,7 +70,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testCreateTmp() {
         $file = CM_File::createTmp();
-        $this->assertFileExists($file->getPath());
+        $this->assertTrue($file->getExists());
         $this->assertNull($file->getExtension());
         $this->assertEmpty($file->read());
         $file->delete();
@@ -87,7 +87,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function testDeleteRecursive() {
         $dir = CM_File::createTmpDir();
-        $file = new CM_File($dir->getPath() . '/foo');
+        $file = $dir->joinPath('foo');
         $file->write('hello');
         $this->assertTrue($dir->getExists());
         $this->assertTrue($file->getExists());
@@ -103,7 +103,7 @@ class CM_FileTest extends CMTest_TestCase {
      */
     public function testDeleteNonRecursive() {
         $dir = CM_File::createTmpDir();
-        $file = new CM_File($dir->getPath() . '/foo');
+        $file = $dir->joinPath('foo');
         $file->write('hello');
         $this->assertTrue($dir->getExists());
         $this->assertTrue($file->getExists());

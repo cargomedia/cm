@@ -102,7 +102,8 @@ class CM_SVM_Model {
      * @throws CM_Exception_Invalid
      */
     private function _getFilesystem() {
-        $filesystem = CM_Bootloader::getInstance()->getFilesystemData();
+        $filesystemService = CM_ServiceManager::getInstance()->getFilesystem('filesystemData');
+        $filesystem = $filesystemService->getFilesystem();
         if (!$filesystem->getAdapter() instanceof CM_File_Filesystem_Adapter_Local) {
             throw new CM_Exception_Invalid('SVM needs a local data filesystem');
         }
