@@ -118,4 +118,14 @@ class CM_FileTest extends CMTest_TestCase {
         $file = CM_File::createTmp(null, '');
         $this->assertSame('', $file->readFirstLine());
     }
+
+    public function testEnsureParentDirectory() {
+        $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo/bar');
+        $file = new CM_File($dir->getPath() . '/mega.txt');
+        $this->assertFalse($dir->getExists());
+
+        $file->ensureParentDirectory();
+        $this->assertTrue($dir->getExists());
+        $this->assertFalse($file->getExists());
+    }
 }
