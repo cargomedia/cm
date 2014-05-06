@@ -29,14 +29,19 @@ class CM_Service_Filesystem extends CM_Class_Abstract {
         }
         return $this->_filesystem;
     }
+
     /**
      * @param bool|null $flush
      */
     public function setup($flush = null) {
         $this->getFilesystem()->getAdapter()->setup();
         if ($flush) {
-            $this->getFilesystem()->deleteByPrefix('/');
+            $this->flush();
         }
+    }
+
+    public function flush() {
+        $this->getFilesystem()->deleteByPrefix('/');
     }
 
     /**
