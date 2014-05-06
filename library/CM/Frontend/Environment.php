@@ -11,6 +11,9 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Language|null */
     protected $_language;
 
+    /** @var DateTimeZone|null */
+    private $_timeZone;
+
     /**
      * @param CM_Site_Abstract|null  $site
      * @param CM_Model_User|null     $viewer
@@ -52,5 +55,26 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      */
     public function getLanguage() {
         return $this->_language;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocale() {
+        $locale = 'en';
+        if ($this->getLanguage()) {
+            $locale = $this->getLanguage()->getAbbreviation();
+        }
+        return $locale;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        if (!$this->_timeZone) {
+            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        return $this->_timeZone;
     }
 }

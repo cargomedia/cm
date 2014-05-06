@@ -5,9 +5,6 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /** @var CM_Frontend_GlobalResponse */
     protected $_js = null;
 
-    /** @var DateTimeZone|null */
-    private $_timeZone;
-
     /** @var NumberFormatter */
     private $_formatterCurrency;
 
@@ -293,10 +290,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return DateTimeZone
      */
     public function getTimeZone() {
-        if (!$this->_timeZone) {
-            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
-        }
-        return $this->_timeZone;
+        return $this->getEnvironment()->getTimezone();
     }
 
     /**
@@ -342,11 +336,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return string
      */
     public function getLocale() {
-        $locale = 'en';
-        if ($this->getLanguage()) {
-            $locale = $this->getLanguage()->getAbbreviation();
-        }
-        return $locale;
+        return $this->getEnvironment()->getLocale();
     }
 
     /**
