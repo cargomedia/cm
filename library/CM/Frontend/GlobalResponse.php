@@ -20,13 +20,10 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_JavascriptContainer */
     protected $_onloadReadyJs;
 
+    /** @var CM_Tracking_Abstract */
     private $_tracking;
 
-    /** @var CM_Frontend_Render */
-    private $_render;
-
-    public function __construct(CM_Frontend_Render $render) {
-        $this->_render = $render;
+    public function __construct() {
         $this->_onloadHeaderJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadPrepareJs = new CM_Frontend_JavascriptContainer();
         $this->_onloadJs = new CM_Frontend_JavascriptContainer();
@@ -101,7 +98,7 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @return CM_Tracking
+     * @return CM_Tracking_Abstract
      */
     public function getTracking() {
         if (!$this->_tracking) {
@@ -174,9 +171,10 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
+     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function getHtml() {
+    public function getHtml(CM_Frontend_Render $render) {
         $html = '<script type="text/javascript">' . PHP_EOL;
         $html .= '$(function() {' . PHP_EOL;
         $html .= $this->_onloadHeaderJs->compile(null) . PHP_EOL;
@@ -185,7 +183,7 @@ class CM_Frontend_GlobalResponse {
         $html .= $this->_onloadReadyJs->compile(null) . PHP_EOL;
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
-        $html .= $this->getTracking()->getHtml($this->_render->getEnvironment()->getSite());
+        $html .= $this->getTracking()->getHtml($render->getEnvironment()->getSite());
         return $html;
     }
 }
