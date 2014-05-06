@@ -125,10 +125,10 @@ class CM_Bootloader {
     }
 
     /**
-     * @return string
+     * @return CM_File_Filesystem
      */
-    public function getDirData() {
-        return DIR_ROOT . 'data/';
+    public function getFilesystemData() {
+        return CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->getFilesystem();
     }
 
     /**

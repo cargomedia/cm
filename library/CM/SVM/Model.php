@@ -20,11 +20,10 @@ class CM_SVM_Model {
             throw new CM_Exception('Extension `svm` not loaded.');
         }
         $this->_id = (int) $id;
-        $file = $this->_getFile();
-        if (!$file->getExists()) {
+        if (!$this->_getFile()->getExists()) {
             $this->train();
         }
-        $this->_model = new SVMModel($file->getPath());
+        $this->_model = new SVMModel($this->_getFilePath());
     }
 
     /**
@@ -86,7 +85,7 @@ class CM_SVM_Model {
         }
 
         $this->_model = $svm->train($problem, $weights);
-        $this->_model->save($this->_getFile()->getPath());
+        $this->_model->save($this->_getFilePath());
         CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 0));
     }
 
@@ -99,12 +98,34 @@ class CM_SVM_Model {
     }
 
     /**
+     * @return CM_File_Filesystem
+     * @throws CM_Exception_Invalid
+     */
+    private function _getFilesystem() {
+        $filesystem = CM_Bootloader::getInstance()->getFilesystemData();
+        if (!$filesystem->getAdapter() instanceof CM_File_Filesystem_Adapter_Local) {
+            throw new CM_Exception_Invalid('SVM needs a local data filesystem');
+        }
+        return $filesystem;
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
      * @return CM_File
      */
     private function _getFile() {
-        $file = new CM_File(CM_Bootloader::getInstance()->getDirData() . 'svm/' . $this->getId() . '.svm');
+        $file = new CM_File('svm/' . $this->getId() . '.svm', $this->_getFilesystem());
         $file->ensureParentDirectory();
         return $file;
+    }
+
+    /**
+     * @return string
+     */
+    private function _getFilePath() {
+        $file = $this->_getFile();
+        $filesystem = $this->_getFilesystem();
+        return $filesystem->getAdapter()->getPathPrefix() . '/' . $file->getPath();
     }
 
     /**

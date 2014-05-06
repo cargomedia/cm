@@ -108,7 +108,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $logEntry .= $formatter->formatException($exception) . PHP_EOL;
             $logFile = $this->_getLogFile();
             $logFile->ensureParentDirectory();
-            error_log($logEntry, 3, $logFile->getPath());
+            $logFile->append($logEntry);
         }
     }
 
@@ -116,7 +116,8 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @return CM_File
      */
     protected function _getLogFile() {
-        return new CM_File(CM_Bootloader::getInstance()->getDirData() . 'logs/error.log');
+        $filesystem = CM_Bootloader::getInstance()->getFilesystemData();
+        return new CM_File('logs/error.log', $filesystem);
     }
 
     /**

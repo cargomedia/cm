@@ -16,9 +16,7 @@ class CMTest_TestSuite {
 
     public function cleanup() {
         CMTest_TH::clearEnv();
-        $dirData = new CM_File(CM_Bootloader::getInstance()->getDirData());
-        $dirData->delete(true);
-        $dirUserfiles = new CM_File(CM_Bootloader::getInstance()->getDirUserfiles());
-        $dirUserfiles->delete(true);
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->setup(true);
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->setup(true);
     }
 }
