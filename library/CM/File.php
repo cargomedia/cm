@@ -9,20 +9,22 @@ class CM_File extends CM_Class_Abstract {
     protected $_filesystem;
 
     /**
-     * @param string|CM_File          $file Path to file
+     * @param string|CM_File          $path Path to file
      * @param CM_File_Filesystem|null $filesystem
      * @throws CM_Exception_Invalid
      */
-    public function __construct($file, CM_File_Filesystem $filesystem = null) {
-        if ($file instanceof CM_File) {
-            $file = $file->getPath();
+    public function __construct($path, CM_File_Filesystem $filesystem = null) {
+        if ($path instanceof CM_File) {
+            /** @var CM_File $path */
+            $path = $path->getPath();
+            $filesystem = $path->_filesystem;
         }
         if (null === $filesystem) {
             $filesystem = self::getFilesystemDefault();
         }
 
         $this->_filesystem = $filesystem;
-        $this->_path = (string) $file;
+        $this->_path = (string) $path;
     }
 
     /**
