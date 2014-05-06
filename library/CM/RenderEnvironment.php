@@ -9,10 +9,10 @@ class CM_RenderEnvironment extends CM_Class_Abstract {
     protected $_site;
 
     /**
-     * @param CM_Site_Abstract   $site
-     * @param CM_Model_User|null $viewer
+     * @param CM_Site_Abstract|null $site
+     * @param CM_Model_User|null    $viewer
      */
-    public function __construct(CM_Site_Abstract $site, CM_Model_User $viewer = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null) {
         if (!$site) {
             $site = CM_Site_Abstract::factory();
         }
