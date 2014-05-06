@@ -3,7 +3,7 @@
 class CM_RenderAdapter_PageTest extends CMTest_TestCase {
 
     public function testFetchDescriptionKeywordsTitle() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
 
         $page = $this->getMockBuilder('CM_Page_Abstract')->getMockForAbstractClass();
         /** @var CM_Page_Abstract $page */

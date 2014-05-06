@@ -11,7 +11,7 @@ class smarty_function_buttonTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
 
         $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', array(), '', true, true, true, array('getAction'));
         $actionMock = $this->getMockForAbstractClass('CM_FormAction_Abstract', array($formMock), '', true, true, true, array('getName'));

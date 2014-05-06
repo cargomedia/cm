@@ -394,7 +394,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     protected function _render($language) {
-        $render = new CM_Render($this->_site, $this->_recipient, $language);
+        $render = new CM_Frontend_Render($this->_site, $this->_recipient, $language);
         $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
         return $renderAdapter->fetch();
     }

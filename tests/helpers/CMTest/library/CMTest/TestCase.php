@@ -197,7 +197,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @return CMTest_TH_Html
      */
     protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
-        $render = new CM_Render($site, $viewer);
+        $render = new CM_Frontend_Render($site, $viewer);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
         $html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $componentHtml . '</body></html>';
@@ -205,12 +205,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Render             $render
+     * @param CM_Frontend_Render             $render
      * @param CM_FormField_Abstract $formField
      * @param CM_Params|array|null  $params
      * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_Render $render, CM_FormField_Abstract $formField, $params = null) {
+    protected function _renderFormField(CM_Frontend_Render $render, CM_FormField_Abstract $formField, $params = null) {
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $html = $renderAdapter->fetch(CM_Params::factory($params));
         return new CM_Dom_NodeList($html);
@@ -229,7 +229,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $host = parse_url($site->getUrl(), PHP_URL_HOST);
         $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
-        $render = new CM_Render($site, $viewer);
+        $render = new CM_Frontend_Render($site, $viewer);
         $page->prepareResponse($response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();

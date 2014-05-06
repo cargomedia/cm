@@ -14,7 +14,7 @@ class CM_Usertext_Filter_NewlineToLinebreak implements CM_Usertext_Filter_Interf
         }
     }
 
-    public function transform($text, CM_Render $render) {
+    public function transform($text, CM_Frontend_Render $render) {
         $text = (string) $text;
         $text = str_replace("\r", '', $text);
         if (null !== $this->_breaksMax) {

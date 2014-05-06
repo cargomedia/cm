@@ -2,11 +2,11 @@
 
 class CM_Asset_CssTest extends CMTest_TestCase {
 
-    /** @var CM_Render */
+    /** @var CM_Frontend_Render */
     private $_render;
 
     public function testAdd() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, 'font-size: 12;', '#foo');
         $css1 = <<<'EOD'
 .test:visible {
@@ -31,7 +31,7 @@ EOD;
     }
 
     public function testImage() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, "background: image('icon/mailbox_read.png') no-repeat 66px 7px;");
         $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
@@ -41,7 +41,7 @@ EOD;
     }
 
     public function testBackgroundImage() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, "background-image: image('icon/mailbox_read.png');");
         $url = $render->getUrlResource('layout', 'img/icon/mailbox_read.png');
         $expected = <<<EOD
@@ -51,7 +51,7 @@ EOD;
     }
 
     public function testUrlFont() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = new CM_Asset_Css($render, "src: url(urlFont('file.eot'));");
         $url = $render->getUrlStatic('/font/file.eot');
         $expected = <<<EOD
@@ -61,7 +61,7 @@ EOD;
     }
 
     public function testMixin() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .mixin() {
 	font-size:5;
@@ -91,7 +91,7 @@ EOD;
     }
 
     public function testLinearGradient() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         //horizontal
         $css = <<<'EOD'
 .foo {
@@ -147,7 +147,7 @@ EOD;
     }
 
     public function testBoxSizing() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
 	.box-sizing(border-box);
@@ -166,7 +166,7 @@ EOD;
     }
 
     public function testUserSelect() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
 	.user-select(none);
@@ -186,7 +186,7 @@ EOD;
     }
 
     public function testTransform() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
 	.transform(matrix(0.866,0.5,-0.5,0.866,0,0));
@@ -207,7 +207,7 @@ EOD;
     }
 
     public function testTransition() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
 	.transition(width 2s ease-in 2s);
@@ -226,7 +226,7 @@ EOD;
     }
 
     public function testMedia() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $css = <<<'EOD'
 .foo {
 	color: blue;

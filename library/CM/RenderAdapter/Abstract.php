@@ -3,7 +3,7 @@
 abstract class CM_RenderAdapter_Abstract {
 
     /**
-     * @var CM_Render
+     * @var CM_Frontend_Render
      */
     private $_render;
 
@@ -13,16 +13,16 @@ abstract class CM_RenderAdapter_Abstract {
     private $_view;
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @param           $view
      */
-    public function __construct(CM_Render $render, CM_View_Abstract $view) {
+    public function __construct(CM_Frontend_Render $render, CM_View_Abstract $view) {
         $this->_render = $render;
         $this->_view = $view;
     }
 
     /**
-     * @return CM_Render
+     * @return CM_Frontend_Render
      */
     public function getRender() {
         return $this->_render;

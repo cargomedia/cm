@@ -2,7 +2,7 @@
 
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
-    public function getSuggestion($location, CM_Render $render) {
+    public function getSuggestion($location, CM_Frontend_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
@@ -58,7 +58,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         return CM_Model_Location::findByIp($ip);
     }
 
-    protected function _getSuggestions($term, array $options, CM_Render $render) {
+    protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
         $ip = CM_Request_Abstract::getInstance()->getIp();
         $locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], CM_Model_Location::findByIp($ip));
         $locations->setPage(1, 15);

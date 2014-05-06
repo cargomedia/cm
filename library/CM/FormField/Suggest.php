@@ -5,20 +5,20 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
     /**
      * @param string    $term
      * @param array     $options
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @throws CM_Exception_NotImplemented
      * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string]))
      */
-    protected function _getSuggestions($term, array $options, CM_Render $render) {
+    protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
         throw new CM_Exception_NotImplemented();
     }
 
     /**
      * @param mixed     $item
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
      */
-    abstract public function getSuggestion($item, CM_Render $render);
+    abstract public function getSuggestion($item, CM_Frontend_Render $render);
 
     public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);

@@ -1,8 +1,8 @@
 <?php
 
-class CM_Render extends CM_Class_Abstract {
+class CM_Frontend_Render extends CM_Class_Abstract {
 
-    /** @var CM_Frontend */
+    /** @var CM_Frontend_GlobalResponse */
     protected $_js = null;
 
     /** @var CM_Site_Abstract */
@@ -67,11 +67,11 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Frontend
+     * @return CM_Frontend_GlobalResponse
      */
     public function getFrontend() {
         if (!$this->_js) {
-            $this->_js = new CM_Frontend($this);
+            $this->_js = new CM_Frontend_GlobalResponse($this);
         }
         return $this->_js;
     }

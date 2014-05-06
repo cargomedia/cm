@@ -1,7 +1,7 @@
 <?php
 
 function smarty_block_form($params, $content, Smarty_Internal_Template $template, $open) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $frontend = $render->getFrontend();
     if ($open) {

@@ -5,7 +5,7 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
         trigger_error('Param `name` missing.');
     }
     $name = $params['name'];
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     unset($params['name']);
 

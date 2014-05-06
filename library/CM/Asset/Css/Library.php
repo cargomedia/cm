@@ -3,10 +3,10 @@
 class CM_Asset_Css_Library extends CM_Asset_Css {
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @throws CM_Exception
      */
-    public function __construct(CM_Render $render) {
+    public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
 
         foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {

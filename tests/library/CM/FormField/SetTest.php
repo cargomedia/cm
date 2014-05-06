@@ -34,7 +34,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $name = 'foo';
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => $name, 'values' => $data, 'labelsInValues' => true]);

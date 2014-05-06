@@ -7,7 +7,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
 
@@ -22,7 +22,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateMinLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         try {
             $field->validate('foo', $response);
         } catch (CM_Exception_FormFieldValidation $ex) {
@@ -46,7 +46,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateMaxLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMax' => 3]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         try {
             $field->validate('foo', $response);
         } catch (CM_Exception_FormFieldValidation $ex) {
@@ -70,7 +70,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
         $badwordsList = new CM_Paging_ContentList_Badwords();
         $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => true]);
         $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         try {
             $field->validate('foo', $response);
         } catch (CM_Exception_FormFieldValidation $ex) {

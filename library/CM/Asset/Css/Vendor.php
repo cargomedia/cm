@@ -2,7 +2,7 @@
 
 class CM_Asset_Css_Vendor extends CM_Asset_Css {
 
-    public function __construct(CM_Render $render) {
+    public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
         $extensions = array('css', 'less');
         foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {

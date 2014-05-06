@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Page_Abstract $page */
     $page = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract')->getView();
