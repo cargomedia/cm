@@ -39,7 +39,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
         return (array) $files;
     }
 
-    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('text', $renderParams->getString('text', ''));
         $viewResponse->set('skipDropZone', $renderParams->getBoolean('skipDropZone', false));
     }

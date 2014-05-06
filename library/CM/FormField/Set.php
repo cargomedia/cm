@@ -17,7 +17,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(CM_Params $renderParams, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('optionList', $this->_getOptionList());
         $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));

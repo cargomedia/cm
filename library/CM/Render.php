@@ -395,10 +395,10 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_ViewResponse $viewResponse
+     * @param CM_Frontend_ViewResponse $viewResponse
      * @return string
      */
-    public function fetchViewResponse(CM_ViewResponse $viewResponse) {
+    public function fetchViewResponse(CM_Frontend_ViewResponse $viewResponse) {
         return $this->fetchViewTemplate($viewResponse->getView(), $viewResponse->getTemplateName(), $viewResponse->getData());
     }
 

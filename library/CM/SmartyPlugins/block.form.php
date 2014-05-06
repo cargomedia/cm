@@ -9,7 +9,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $form->setup();
         $form->renderStart($params);
 
-        $viewResponse = new CM_ViewResponse($form);
+        $viewResponse = new CM_Frontend_ViewResponse($form);
         $frontend->treeExpand($viewResponse);
         return '';
     } else {

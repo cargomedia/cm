@@ -20,7 +20,7 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     if (isset($params['prepend'])) {
         $input .= (string) $params['prepend'];
     }
-    /** @var CM_ViewResponse|null $viewResponse */
+    /** @var CM_Frontend_ViewResponse|null $viewResponse */
     $viewResponse = null;
     if (isset($params['name'])) {
         $fieldName = (string) $params['name'];

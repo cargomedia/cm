@@ -24,17 +24,17 @@ class CM_FrontendTest extends CMTest_TestCase {
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
-        $viewResponse1 = new CM_ViewResponse($view);
+        $viewResponse1 = new CM_Frontend_ViewResponse($view);
         $frontend->treeExpand($viewResponse1);
         $this->assertSame($viewResponse1, $frontend->getTreeCurrent()->getValue());
         $this->assertSame($viewResponse1, $frontend->getTreeRoot()->getValue());
 
-        $viewResponse2 = new CM_ViewResponse($view);
+        $viewResponse2 = new CM_Frontend_ViewResponse($view);
         $frontend->treeExpand($viewResponse2);
         $this->assertSame($viewResponse2, $frontend->getTreeCurrent()->getValue());
         $this->assertSame($viewResponse1, $frontend->getTreeRoot()->getValue());
 
-        $viewResponse3 = new CM_ViewResponse($view);
+        $viewResponse3 = new CM_Frontend_ViewResponse($view);
         $frontend->treeExpand($viewResponse3);
         $this->assertSame($viewResponse3, $frontend->getTreeCurrent()->getValue());
         $this->assertSame($viewResponse1, $frontend->getTreeRoot()->getValue());
@@ -47,7 +47,7 @@ class CM_FrontendTest extends CMTest_TestCase {
         $this->assertSame($viewResponse1, $frontend->getTreeCurrent()->getValue());
         $this->assertSame($viewResponse1, $frontend->getTreeRoot()->getValue());
 
-        $viewResponse4 = new CM_ViewResponse($view);
+        $viewResponse4 = new CM_Frontend_ViewResponse($view);
         $frontend->treeExpand($viewResponse4);
         $this->assertSame($viewResponse4, $frontend->getTreeCurrent()->getValue());
         $this->assertSame($viewResponse1, $frontend->getTreeRoot()->getValue());
@@ -62,7 +62,7 @@ class CM_FrontendTest extends CMTest_TestCase {
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
-        $frontend->treeExpand(new CM_ViewResponse($view));
+        $frontend->treeExpand(new CM_Frontend_ViewResponse($view));
 
         $frontend->treeCollapse();
         $frontend->treeCollapse();
@@ -77,10 +77,10 @@ class CM_FrontendTest extends CMTest_TestCase {
         $view = $this->getMockBuilder('CM_View_Abstract')->getMockForAbstractClass();
         /** @var CM_View_Abstract $view */
 
-        $frontend->treeExpand(new CM_ViewResponse($view));
+        $frontend->treeExpand(new CM_Frontend_ViewResponse($view));
 
         $frontend->treeCollapse();
-        $frontend->treeExpand(new CM_ViewResponse($view));
+        $frontend->treeExpand(new CM_Frontend_ViewResponse($view));
     }
 
     public function testGetClosest() {
@@ -93,16 +93,16 @@ class CM_FrontendTest extends CMTest_TestCase {
 
         $frontend = new CM_Frontend_GlobalResponse(new CM_Frontend_Render());
 
-        $viewResponse1 = new CM_ViewResponse($layout);
+        $viewResponse1 = new CM_Frontend_ViewResponse($layout);
         $frontend->treeExpand($viewResponse1);
 
-        $viewResponse2 = new CM_ViewResponse($page);
+        $viewResponse2 = new CM_Frontend_ViewResponse($page);
         $frontend->treeExpand($viewResponse2);
 
-        $viewResponse3 = new CM_ViewResponse($component);
+        $viewResponse3 = new CM_Frontend_ViewResponse($component);
         $frontend->treeExpand($viewResponse3);
 
-        $viewResponse4 = new CM_ViewResponse($component);
+        $viewResponse4 = new CM_Frontend_ViewResponse($component);
         $frontend->treeExpand($viewResponse4);
 
         $this->assertSame($viewResponse4, $frontend->getClosestViewResponse('CM_View_Abstract'));

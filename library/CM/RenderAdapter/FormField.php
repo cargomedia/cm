@@ -2,11 +2,11 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(CM_Params $renderParams, CM_ViewResponse &$viewResponse = null) {
+    public function fetch(CM_Params $renderParams, CM_Frontend_ViewResponse &$viewResponse = null) {
         $field = $this->_getFormField();
         $frontend = $this->getRender()->getFrontend();
 
-        $viewResponse = new CM_ViewResponse($field);
+        $viewResponse = new CM_Frontend_ViewResponse($field);
         $frontend->treeExpand($viewResponse);
 
         $viewResponse->setTemplateName('default');

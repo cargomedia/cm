@@ -34,9 +34,9 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @param CM_ViewResponse $viewResponse
+     * @param CM_Frontend_ViewResponse $viewResponse
      */
-    public function treeExpand(CM_ViewResponse $viewResponse) {
+    public function treeExpand(CM_Frontend_ViewResponse $viewResponse) {
         $node = new CM_Frontend_TreeNode($viewResponse);
         if (null === $this->_treeRoot) {
             $this->_treeRoot = $node;
@@ -78,7 +78,7 @@ class CM_Frontend_GlobalResponse {
 
     /**
      * @param string $viewClassName
-     * @return CM_ViewResponse|null
+     * @return CM_Frontend_ViewResponse|null
      */
     public function getClosestViewResponse($viewClassName) {
         $node = $this->getTreeCurrent();
@@ -139,9 +139,9 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @param CM_ViewResponse $viewResponse
+     * @param CM_Frontend_ViewResponse $viewResponse
      */
-    public function registerViewResponse(CM_ViewResponse $viewResponse) {
+    public function registerViewResponse(CM_Frontend_ViewResponse $viewResponse) {
         $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
         $view = $viewResponse->getView();
         $code = $reference . ' = new ' . get_class($view) . '({';

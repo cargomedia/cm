@@ -1,6 +1,6 @@
 <?php
 
-class CM_ViewResponse extends CM_DataResponse {
+class CM_Frontend_ViewResponse extends CM_DataResponse {
 
     /** @var string */
     private $_autoId;
