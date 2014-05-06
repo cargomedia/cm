@@ -16,6 +16,11 @@ class CM_RenderAdapter_AbstractTest extends CMTest_TestCase {
 
         $render->expects($this->at(0))->method('getLayoutPath')->with($tplPath, 'CM', false, false)->will($this->returnValue($tplPath));
         $_getTplPath->invoke($renderAdapter, $tplName, false);
+
+        $render->expects($this->at(0))->method('getLayoutPath')->with($tplPath, 'CM', false, false)->will($this->returnValue(null));
+        $tplPath = 'View' . DIRECTORY_SEPARATOR . 'Abstract' . DIRECTORY_SEPARATOR . $tplName;
+        $render->expects($this->at(1))->method('getLayoutPath')->with($tplPath, 'CM', false, false)->will($this->returnValue($tplPath));
+        $_getTplPath->invoke($renderAdapter, $tplName, false);
     }
 
 }
