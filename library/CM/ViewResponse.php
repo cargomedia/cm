@@ -11,7 +11,7 @@ class CM_ViewResponse extends CM_DataResponse {
     /** @var CM_View_Abstract */
     protected $_view;
 
-    /** @var CM_ViewFrontendHandler */
+    /** @var CM_Frontend_JavascriptContainer */
     protected $_js;
 
     /**
@@ -19,7 +19,7 @@ class CM_ViewResponse extends CM_DataResponse {
      */
     public function __construct(CM_View_Abstract $view) {
         $this->_view = $view;
-        $this->_js = new CM_ViewFrontendHandler();
+        $this->_js = new CM_Frontend_JavascriptContainer();
     }
 
     /**

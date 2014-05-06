@@ -1,6 +1,6 @@
 <?php
 
-class CM_ViewFrontendHandler {
+class CM_Frontend_JavascriptContainer {
 
     /** @var string[] */
     protected $_operations = array();

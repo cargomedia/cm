@@ -18,7 +18,7 @@ class CM_Component_Debug extends CM_Component_Abstract {
         $viewResponse->set('cacheNames', $cacheNames);
     }
 
-    public function ajax_clearCache(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }

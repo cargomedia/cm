@@ -89,7 +89,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         return $location;
     }
 
-    public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_ViewFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
         $lat = $params->getFloat('lat');
         $lon = $params->getFloat('lon');
         $levelMin = $params->getInt('levelMin');
