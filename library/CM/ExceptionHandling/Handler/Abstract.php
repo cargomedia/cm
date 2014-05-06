@@ -63,7 +63,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
-        $printException = false;
+        $printException = true;
         if ($exception instanceof CM_Exception) {
             $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
         }
