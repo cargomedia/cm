@@ -193,6 +193,16 @@ class CM_File extends CM_Class_Abstract {
     }
 
     /**
+     * @param string $path
+     * @return static
+     */
+    public function joinPath($path) {
+        $path = implode('/', func_get_args());
+        $pathNew = CM_File_Filesystem::normalizePath($this->getPath() . '/' . $path);
+        return new static($pathNew);
+    }
+
+    /**
      * @return string
      */
     public function __toString() {
@@ -231,16 +241,16 @@ class CM_File extends CM_Class_Abstract {
             $extension = '.' . $extension;
         }
         $extension = (string) $extension;
-        $filesystem = self::getFilesystemDefault();
-        return static::create(CM_Bootloader::getInstance()->getDirTmp() . uniqid() . $extension, $content, $filesystem);
+        $filesystem = CM_Bootloader::getInstance()->getFilesystemTmp();
+        return static::create(uniqid() . $extension, $content, $filesystem);
     }
 
     /**
      * @return CM_File
      */
     public static function createTmpDir() {
-        $filesystem = self::getFilesystemDefault();
-        $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . uniqid(), $filesystem);
+        $filesystem = CM_Bootloader::getInstance()->getFilesystemTmp();
+        $dir = new CM_File(uniqid(), $filesystem);
         $filesystem->ensureDirectory($dir->getPath());
         return $dir;
     }

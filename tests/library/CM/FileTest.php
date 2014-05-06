@@ -170,4 +170,11 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertTrue($dir->getPath());
         $this->assertTrue($dir->isDirectory());
     }
+
+    public function testJoinPath() {
+        $dir = CM_File::createTmpDir();
+        $fileJoined = $dir->joinPath('foo', 'bar', '//mega//', 'jo', '..', 'nei');
+        $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
+        $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
+    }
 }

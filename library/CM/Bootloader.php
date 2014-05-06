@@ -132,10 +132,22 @@ class CM_Bootloader {
     }
 
     /**
+     * @return CM_File_Filesystem
+     */
+    public function getFilesystemTmp() {
+        return CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->getFilesystem();
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
      * @return string
      */
     public function getDirTmp() {
-        return DIR_ROOT . 'tmp/';
+        $filesystemAdapter = $this->getFilesystemTmp()->getAdapter();
+        if (!$filesystemAdapter instanceof CM_File_Filesystem_Adapter_Local) {
+            throw new CM_Exception_Invalid('Temp filesystem adapter should be local');
+        }
+        return $filesystemAdapter->getPathPrefix();
     }
 
     /**
