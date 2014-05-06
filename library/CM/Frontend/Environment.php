@@ -1,6 +1,6 @@
 <?php
 
-class CM_RenderEnvironment extends CM_Class_Abstract {
+class CM_Frontend_Environment extends CM_Class_Abstract {
 
     /** @var CM_Site_Abstract */
     protected $_site;

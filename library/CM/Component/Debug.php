@@ -2,13 +2,13 @@
 
 class CM_Component_Debug extends CM_Component_Abstract {
 
-    public function checkAccessible(CM_RenderEnvironment $environment) {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
     }
 
-    public function prepare(CM_RenderEnvironment $environment, CM_ViewResponse $viewResponse) {
+    public function prepare(CM_Frontend_Environment $environment, CM_ViewResponse $viewResponse) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);

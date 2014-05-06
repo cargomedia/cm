@@ -2,7 +2,7 @@
 
 abstract class CM_Page_Abstract extends CM_Component_Abstract {
 
-    public function checkAccessible(CM_RenderEnvironment $environment) {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
     }
 
     /**

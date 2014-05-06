@@ -17,7 +17,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /** @var CM_Menu[] */
     private $_menuList = array();
 
-    /** @var CM_RenderEnvironment */
+    /** @var CM_Frontend_Environment */
     private $_environment;
 
     /** @var Smarty */
@@ -33,7 +33,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
-        $this->_environment = new CM_RenderEnvironment($site, $viewer, $language);
+        $this->_environment = new CM_Frontend_Environment($site, $viewer, $language);
         $this->_languageRewrite = (bool) $languageRewrite;
     }
 
@@ -45,7 +45,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_RenderEnvironment
+     * @return CM_Frontend_Environment
      */
     public function getEnvironment() {
         return $this->_environment;
