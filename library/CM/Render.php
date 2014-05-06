@@ -5,9 +5,6 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /** @var CM_Frontend_GlobalResponse */
     protected $_js = null;
 
-    /** @var CM_Site_Abstract */
-    protected $_site = null;
-
     /** @var CM_Model_Language|null */
     private $_language;
 
@@ -39,13 +36,9 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @param boolean|null           $languageRewrite
      */
     public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null) {
-        if (!$site) {
-            $site = CM_Site_Abstract::factory();
-        }
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
-        $this->_site = $site;
         $this->_viewer = $viewer;
         $this->_environment = new CM_RenderEnvironment($site, $viewer);
         $this->_language = $language;
@@ -56,7 +49,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return CM_Site_Abstract
      */
     public function getSite() {
-        return $this->_site;
+        return $this->getEnvironment()->getSite();
     }
 
     /**
