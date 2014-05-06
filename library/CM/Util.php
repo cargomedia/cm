@@ -220,41 +220,6 @@ class CM_Util {
 
     /**
      * @param string $path
-     * @throws CM_Exception
-     */
-    public static function rmDir($path) {
-        $path = (string) $path;
-        self::rmDirContents($path);
-        if (!@rmdir($path)) {
-            throw new CM_Exception('Could not delete directory `' . $path . '`');
-        }
-    }
-
-    /**
-     * @param string $path
-     * @throws CM_Exception
-     */
-    public static function rmDirContents($path) {
-        $path = (string) $path . '/';
-        if (!is_dir($path)) {
-            return;
-        }
-        $systemFileList = scandir($path);
-        $userFileList = array_diff($systemFileList, array('.', '..'));
-        foreach ($userFileList as $filename) {
-            $fullpath = $path . $filename;
-            if (is_dir($fullpath)) {
-                self::rmDir($fullpath . '/');
-            } else {
-                if (!@unlink($fullpath)) {
-                    throw new CM_Exception('Could not delete file `' . $fullpath . '`');
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string $path
      * @param array  $params Query parameters
      * @return string
      */
