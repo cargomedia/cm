@@ -11,21 +11,26 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Language|null */
     protected $_language;
 
-    /** @var DateTimeZone|null */
+    /** @var DateTimeZone */
     private $_timeZone;
 
     /**
      * @param CM_Site_Abstract|null  $site
      * @param CM_Model_User|null     $viewer
      * @param CM_Model_Language|null $language
+     * @param DateTimeZone|null      $timeZone
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null) {
         if (!$site) {
             $site = CM_Site_Abstract::factory();
+        }
+        if (!$timeZone) {
+            $timeZone = CM_Bootloader::getInstance()->getTimeZone();
         }
         $this->_site = $site;
         $this->_viewer = $viewer;
         $this->_language = $language;
+        $this->_timeZone = $timeZone;
     }
 
     /**
@@ -72,9 +77,6 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @return DateTimeZone
      */
     public function getTimeZone() {
-        if (!$this->_timeZone) {
-            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
-        }
         return $this->_timeZone;
     }
 }
