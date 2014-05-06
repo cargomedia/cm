@@ -44,7 +44,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
     }
 
     protected function _flush() {
-        CM_Util::rmDirContents($this->_getDirStorage());
+        $this->_getDirStorage()->delete(true);
     }
 
     /**
@@ -52,13 +52,13 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      * @return CM_File
      */
     private function _getFile($key) {
-        return new CM_File(self::_getDirStorage() . md5($key));
+        return new CM_File($this->_getDirStorage()->getPath() . '/' . md5($key));
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
     private function _getDirStorage() {
-        return CM_Bootloader::getInstance()->getDirTmp() . 'cache/';
+        return new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'cache');
     }
 }
