@@ -191,4 +191,24 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem3)));
         $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem3)));
     }
+
+    public function testCopyToFile() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp . 'subdir'));
+        $filesystem3->getAdapter()->setup();
+
+        $file1 = new CM_File('foo', $filesystem1);
+        $file2 = new CM_File('bar', $filesystem2);
+        $file3 = new CM_File('zoo', $filesystem3);
+
+        $file1->write('hello');
+
+        $file1->copyToFile($file2);
+        $this->assertSame($file1->read(), $file2->read());
+
+        $file1->copyToFile($file3);
+        $this->assertSame($file1->read(), $file3->read());
+    }
 }

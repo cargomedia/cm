@@ -162,6 +162,18 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
     }
 
     /**
+     * @param CM_File $file
+     */
+    public function copyToFile(CM_File $file) {
+        $sameFilesystemAdapter = $this->_filesystem->equals($file->_filesystem);
+        if ($sameFilesystemAdapter) {
+            $this->copy($file->getPath());
+        } else {
+            $file->write($this->read());
+        }
+    }
+
+    /**
      * @param string $path
      */
     public function rename($path) {
