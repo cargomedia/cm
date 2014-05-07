@@ -253,12 +253,7 @@ class CMTest_TH {
      * @return CM_Db_Client
      */
     public static function getDbClient() {
-        if (null !== self::$_dbClient) {
-            return self::$_dbClient;
-        }
-        $config = CM_Config::get()->CM_Db_Db;
-        self::$_dbClient = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
-        return self::$_dbClient;
+        return CM_Db_Db::getClient(false);
     }
 
     public static function randomizeAutoincrement() {
