@@ -16,8 +16,8 @@ class CM_File extends CM_Class_Abstract {
     public function __construct($path, CM_File_Filesystem $filesystem = null) {
         if ($path instanceof CM_File) {
             /** @var CM_File $path */
-            $path = $path->getPath();
             $filesystem = $path->_filesystem;
+            $path = $path->getPath();
         }
         if (null === $filesystem) {
             $filesystem = self::getFilesystemDefault();
