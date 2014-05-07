@@ -177,4 +177,18 @@ class CM_FileTest extends CMTest_TestCase {
         $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
         $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
     }
+
+    public function testEquals() {
+        $filesystem1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/'));
+        $filesystem2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/'));
+        $filesystem3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/tmp'));
+
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(null));
+        $this->assertTrue((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem1)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem1)));
+        $this->assertTrue((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem2)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem2)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem3)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem3)));
+    }
 }

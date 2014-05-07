@@ -1,6 +1,6 @@
 <?php
 
-abstract class CM_File_Filesystem_Adapter {
+abstract class CM_File_Filesystem_Adapter implements CM_Comparable {
 
     /** @var string */
     protected $_pathPrefix;

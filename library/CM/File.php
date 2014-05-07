@@ -1,6 +1,6 @@
 <?php
 
-class CM_File extends CM_Class_Abstract {
+class CM_File extends CM_Class_Abstract implements CM_Comparable {
 
     /** @var string */
     private $_path;
@@ -307,5 +307,19 @@ class CM_File extends CM_Class_Abstract {
             $filesystem = new CM_File_Filesystem($adapter);
         }
         return $filesystem;
+    }
+
+    /**
+     * @param CM_Comparable $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        if (empty($other)) {
+            return false;
+        }
+        /** @var CM_File $other */
+        $samePath = $this->getPath() === $other->getPath();
+        $sameFilesystemAdapter = $this->_filesystem->getAdapter()->equals($other->_filesystem->getAdapter());
+        return ($samePath && $sameFilesystemAdapter);
     }
 }

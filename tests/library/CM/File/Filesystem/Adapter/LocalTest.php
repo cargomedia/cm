@@ -238,4 +238,15 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
     public function testListByPrefixInvalid() {
         $this->_adapter->listByPrefix('nonexistent');
     }
+
+    public function testEquals() {
+        $adapter1 = new CM_File_Filesystem_Adapter_Local('/');
+        $adapter2 = new CM_File_Filesystem_Adapter_Local('/');
+        $adapter3 = new CM_File_Filesystem_Adapter_Local('/tmp');
+
+        $this->assertFalse($adapter1->equals(null));
+        $this->assertTrue($adapter1->equals($adapter1));
+        $this->assertTrue($adapter1->equals($adapter2));
+        $this->assertFalse($adapter1->equals($adapter3));
+    }
 }

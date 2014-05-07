@@ -166,4 +166,19 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
             $fileList[] = $filePath;
         }
     }
+
+    /**
+     * @param CM_Comparable $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        if (empty($other)) {
+            return false;
+        }
+        if (get_class($this) !== get_class($other)) {
+            return false;
+        }
+        /** @var CM_File_Filesystem_Adapter_Local $other */
+        return $this->getPathPrefix() === $other->getPathPrefix();
+    }
 }
