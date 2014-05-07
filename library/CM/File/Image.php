@@ -16,38 +16,35 @@ class CM_File_Image extends CM_File {
     private $_animated;
 
     /**
-     * @param int         $format
-     * @param string|null $pathNew
-     * @throws CM_Exception
+     * @param int          $format
+     * @param CM_File|null $fileNew
      */
-    public function convert($format, $pathNew = null) {
+    public function convert($format, CM_File $fileNew = null) {
         $format = (int) $format;
-        $pathNew = isset($pathNew) ? (string) $pathNew : $this->getPath();
 
         if ($format === $this->getFormat()) {
             // Copy image if no conversion necessary
-            if ($this->getPath() !== $pathNew) {
-                $this->copy($pathNew);
+            if ($fileNew && !$this->equals($fileNew)) {
+                $this->copyToFile($fileNew);
             }
             return;
         }
 
         $imagick = $this->_getImagickClone();
-        $this->_writeImagick($imagick, $pathNew, $format);
+        $this->_writeImagick($imagick, $format, $fileNew);
     }
 
     /**
-     * @param int         $widthMax
-     * @param int         $heightMax
-     * @param bool|null   $square
-     * @param string|null $pathNew
-     * @param int|null    $formatNew
+     * @param int          $widthMax
+     * @param int          $heightMax
+     * @param bool|null    $square
+     * @param int|null     $formatNew
+     * @param CM_File|null $fileNew
      * @throws CM_Exception
      */
-    public function resize($widthMax, $heightMax, $square = null, $pathNew = null, $formatNew = null) {
+    public function resize($widthMax, $heightMax, $square = null, $formatNew = null, CM_File $fileNew = null) {
         $square = isset($square) ? (bool) $square : false;
-        $pathNew = isset($pathNew) ? (string) $pathNew : $this->getPath();
-        $formatNew = isset($formatNew) ? (int) $formatNew : $this->getFormat();
+        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
 
         $width = $this->getWidth();
         $height = $this->getHeight();
@@ -88,24 +85,22 @@ class CM_File_Image extends CM_File {
                     $imagick->cropImage($width, $height, $offsetX, $offsetY);
                 }
                 $imagick->thumbnailImage($widthResize, $heightResize);
-            }, $formatNew);
+            }, $format);
         } catch (ImagickException $e) {
             throw new CM_Exception('Error when resizing image: ' . $e->getMessage());
         }
 
-        $this->_writeImagick($imagick, $pathNew, $formatNew);
+        $this->_writeImagick($imagick, $format, $fileNew);
     }
 
     /**
-     * @param int         $angle
-     * @param string|null $pathNew
-     * @param int|null    $formatNew
-     * @throws CM_Exception
+     * @param int          $angle
+     * @param int|null     $formatNew
+     * @param CM_File|null $fileNew
      */
-    public function rotate($angle, $pathNew = null, $formatNew = null) {
+    public function rotate($angle, $formatNew = null, CM_File $fileNew = null) {
         $angle = (int) $angle;
-        $pathNew = isset($pathNew) ? (string) $pathNew : $this->getPath();
-        $formatNew = isset($formatNew) ? (int) $formatNew : $this->getFormat();
+        $format = isset($formatNew) ? (int) $formatNew : $this->getFormat();
 
         $imagick = $this->_getImagickClone();
 
@@ -113,9 +108,9 @@ class CM_File_Image extends CM_File {
             if (true !== $imagick->rotateImage(new ImagickPixel('#00000000'), $angle)) {
                 throw new CM_Exception('Cannot rotate image by `' . $angle . '` degrees');
             }
-        }, $formatNew);
+        }, $format);
 
-        $this->_writeImagick($imagick, $pathNew, $formatNew);
+        $this->_writeImagick($imagick, $format, $fileNew);
     }
 
     /**
@@ -221,12 +216,12 @@ class CM_File_Image extends CM_File {
     }
 
     /**
-     * @param Imagick $imagick
-     * @param string  $path
-     * @param int     $format
+     * @param Imagick      $imagick
+     * @param int          $format
+     * @param CM_File|null $fileNew
      * @throws CM_Exception
      */
-    private function _writeImagick(Imagick $imagick, $path, $format) {
+    private function _writeImagick(Imagick $imagick, $format, CM_File $fileNew = null) {
         if (true !== $imagick->setFormat($this->_getImagickFormat($format))) {
             throw new CM_Exception('Cannot set image format `' . $format . '`');
         }
@@ -248,12 +243,9 @@ class CM_File_Image extends CM_File {
             }
         }
 
-        $file = $this;
-        if ($path !== $this->getPath()) {
-            $file = new CM_File($path, $this->_filesystem);
-        }
+        $file = $fileNew ? $fileNew : $this;
         $file->write($imageBlob);
-        if ($file->getPath() === $this->getPath()) {
+        if ($this->equals($file)) {
             $this->_imagick = $imagick;
             $this->_animated = $this->_getAnimationRequired($format);
         }
