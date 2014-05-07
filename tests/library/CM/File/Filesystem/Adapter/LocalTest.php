@@ -62,6 +62,13 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $this->_adapter->write('foo', 'hello');
     }
 
+    public function testWriteClearStatCache() {
+        $this->_adapter->write('foo', '');
+        $this->assertSame(0, $this->_adapter->getSize('foo'));
+        $this->_adapter->write('foo', 'hello');
+        $this->assertSame(5, $this->_adapter->getSize('foo'));
+    }
+
     public function testAppend() {
         $this->_adapter->append('foo', 'hello');
         $this->_adapter->append('foo', 'world');

@@ -34,6 +34,7 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         if (false === @file_put_contents($pathAbsolute, $content)) {
             throw new CM_Exception('Cannot write ' . strlen($content) . ' bytes to `' . $pathAbsolute . '`');
         }
+        clearstatcache(false, $pathAbsolute);
     }
 
     public function exists($path) {
