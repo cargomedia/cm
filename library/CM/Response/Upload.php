@@ -42,9 +42,8 @@ class CM_Response_Upload extends CM_Response_Abstract {
                 throw new CM_Exception_FormFieldValidation('File too big');
             }
 
-            $file = CM_File_UserContent_Temp::create($fileInfo['name']);
-            $fileTmp->move($file->getPath());
-            $fileTmp->setPermissions(0666);
+            $file = CM_File_UserContent_Temp::create($fileInfo['name'], $fileTmp->read());
+            $fileTmp->delete();
 
             $query = $this->_request->getQuery();
             $preview = null;

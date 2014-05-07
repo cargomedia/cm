@@ -11,15 +11,14 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
 
         foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {
             foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
-                $path = $render->getThemeDir(true, $theme, $namespace) . 'variables.less';
-                if (CM_File::exists($path)) {
-                    $file = new CM_File($path);
+                $file = new CM_File($render->getThemeDir(true, $theme, $namespace) . 'variables.less');
+                if ($file->getExists()) {
                     $this->add($file->read());
                 }
             }
         }
-        if (CM_File::exists($path = DIR_PUBLIC . 'static/css/library/icon.less')) {
-            $file = new CM_File($path);
+        $file = new CM_File(DIR_PUBLIC . 'static/css/library/icon.less');
+        if ($file->getExists()) {
             $this->add($file->read());
         }
         foreach (array_reverse($render->getSite()->getNamespaces()) as $namespace) {

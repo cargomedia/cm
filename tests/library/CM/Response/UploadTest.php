@@ -2,11 +2,22 @@
 
 class CM_Response_UploadTest extends CMTest_TestCase {
 
+    /** @var string */
+    private $_dir;
+
+    protected function setUp() {
+        $this->_dir = CM_Bootloader::getInstance()->getDirTmp();
+    }
+
+    protected function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testUpload() {
         $filename = 'test.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null');
@@ -26,7 +37,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'test.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
@@ -43,7 +54,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'test.jpg.zip';
         $content = file_get_contents(DIR_TEST_DATA . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
@@ -58,7 +69,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'test.jpg.zip';
         $content = file_get_contents(DIR_TEST_DATA . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=CM_FormField_File');
@@ -73,7 +84,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'corrupt-header.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=CM_FormField_FileImage');
@@ -88,7 +99,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'corrupt-header.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=CM_FormField_File');
@@ -103,7 +114,7 @@ class CM_Response_UploadTest extends CMTest_TestCase {
         $filename = 'test.jpg';
         $content = file_get_contents(DIR_TEST_DATA . 'img/' . $filename);
 
-        $fileTmp = CM_File::createTmp(null, $content);
+        $fileTmp = CM_File::create($this->_dir . 'test1', $content);
         $_FILES = array('file' => array('name' => $filename, 'tmp_name' => $fileTmp->getPath()));
 
         $request = new CM_Request_Post('/upload/null?field=nonexistent');

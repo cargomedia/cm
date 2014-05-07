@@ -86,12 +86,12 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         $archive = CMTest_TH::createStreamChannelVideoArchive($streamChannel);
         $files = $this->_createArchiveFiles($archive);
         foreach ($files as $file) {
-            $this->assertFileExists($file->getPath());
+            $this->assertTrue($file->getExists());
         }
 
         $archive->delete();
         foreach ($files as $file) {
-            $this->assertFileNotExists($file->getPath());
+            $this->assertFalse($file->getExists());
         }
         try {
             new CM_Model_StreamChannelArchive_Video($archive->getId());
@@ -140,17 +140,17 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         }
 
         foreach ($filesNotDeleted as $file) {
-            $this->assertFileExists($file->getPath());
+            $this->assertTrue($file->getExists());
         }
         foreach ($filesDeleted as $file) {
-            $this->assertFileExists($file->getPath());
+            $this->assertTrue($file->getExists());
         }
         CM_Model_StreamChannelArchive_Video::deleteOlder(10, CM_Model_StreamChannel_Video::getTypeStatic());
         foreach ($filesNotDeleted as $file) {
-            $this->assertFileExists($file->getPath());
+            $this->assertTrue($file->getExists());
         }
         foreach ($filesDeleted as $file) {
-            $this->assertFileNotExists($file->getPath());
+            $this->assertFalse($file->getExists());
         }
         foreach ($archivesNotDeleted as $archive) {
             try {
@@ -175,16 +175,23 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
      * @return CM_File[]
      */
     private function _createArchiveFiles(CM_Model_StreamChannelArchive_Video $archive) {
-        $thumbPath =
-            CM_Bootloader::getInstance()->getDirUserfiles() . 'streamChannels' . DIRECTORY_SEPARATOR . $archive->getId() . DIRECTORY_SEPARATOR .
-            $archive->getId() . '-' . $archive->getHash() . '-thumbs';
-        CM_Util::mkDir($thumbPath);
         $files = array();
+        if ($archive->getThumbnailCount() > 0) {
+            /** @var CM_File_UserContent $thumbnailFirst */
+            $thumbnailFirst = $archive->getThumbnails()->getItem(0);
+            $thumbnailFirst->ensureParentDirectory();
+            $files[] = $thumbnailFirst->getParentDirectory();
+        }
         for ($i = 0; $i < $archive->getThumbnailCount(); $i++) {
-            $file = CM_File::create($archive->getThumbnails()->getItem($i)->getPath());
+            /** @var CM_File_UserContent $file */
+            $file = $archive->getThumbnails()->getItem($i);
+            $file->write('');
             $files[] = $file;
         }
-        $files[] = CM_File::create($archive->getVideo()->getPath());
+        $video = $archive->getVideo();
+        $video->ensureParentDirectory();
+        $video->write('');
+        $files[] = $video;
         return $files;
     }
 }

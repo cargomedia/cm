@@ -11,10 +11,6 @@ class CM_ServiceManager extends CM_Class_Abstract {
     /** @var CM_ServiceManager */
     protected static $instance;
 
-    private function __construct() {
-        $this->_serviceList = self::_getConfig()->list;
-    }
-
     /**
      * @param string $serviceName
      * @return bool
@@ -71,6 +67,14 @@ class CM_ServiceManager extends CM_Class_Abstract {
         if (null === $serviceName) {
             $serviceName = 'MongoDb';
         }
+        return $this->get($serviceName);
+    }
+
+    /**
+     * @param string $serviceName
+     * @return CM_Service_Filesystem
+     */
+    public function getFilesystem($serviceName) {
         return $this->get($serviceName);
     }
 
