@@ -94,6 +94,35 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
 
+$config->services = array();
+
+$config->services['MongoDb'] = array(
+    'class'     => 'CM_Service_MongoDb',
+    'arguments' => array(
+        array(
+            'db'      => 'cm',
+            'server'  => 'mongodb://localhost:27017',
+            'options' => array('connect' => true),
+        )
+    ),
+);
+
+$config->services['filesystemData'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'data/',
+        ),
+    ),
+);
+
+$config->services['filesystemUserfiles'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_PUBLIC . 'userfiles/',
 $config->CM_ServiceManager->list = array(
     'MongoDb'       => array(
         'class'     => 'CM_Service_MongoDb',

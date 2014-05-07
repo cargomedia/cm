@@ -195,66 +195,6 @@ class CM_Util {
 
     /**
      * @param string $path
-     * @return string
-     * @throws CM_Exception
-     */
-    public static function mkDir($path) {
-        $path = (string) $path;
-        if (!is_dir($path)) {
-            if (false === @mkdir($path, 0777, true)) {
-                if (!is_dir($path)) { // Might have been created in the meantime
-                    throw new CM_Exception('Cannot mkdir `' . $path . '`.');
-                }
-            }
-        }
-        return $path;
-    }
-
-    /**
-     * @return string
-     */
-    public static function mkDirTmp() {
-        $path = CM_Bootloader::getInstance()->getDirTmp() . uniqid() . DIRECTORY_SEPARATOR;
-        return self::mkDir($path);
-    }
-
-    /**
-     * @param string $path
-     * @throws CM_Exception
-     */
-    public static function rmDir($path) {
-        $path = (string) $path;
-        self::rmDirContents($path);
-        if (!@rmdir($path)) {
-            throw new CM_Exception('Could not delete directory `' . $path . '`');
-        }
-    }
-
-    /**
-     * @param string $path
-     * @throws CM_Exception
-     */
-    public static function rmDirContents($path) {
-        $path = (string) $path . '/';
-        if (!is_dir($path)) {
-            return;
-        }
-        $systemFileList = scandir($path);
-        $userFileList = array_diff($systemFileList, array('.', '..'));
-        foreach ($userFileList as $filename) {
-            $fullpath = $path . $filename;
-            if (is_dir($fullpath)) {
-                self::rmDir($fullpath . '/');
-            } else {
-                if (!@unlink($fullpath)) {
-                    throw new CM_Exception('Could not delete file `' . $fullpath . '`');
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string $path
      * @param array  $params Query parameters
      * @return string
      */
@@ -370,8 +310,9 @@ class CM_Util {
 
         $files = array();
         foreach (array_unique($paths) as $path) {
-            if (CM_File::exists($path)) {
-                $files[] = new CM_File($path);
+            $file = new CM_File($path);
+            if ($file->getExists()) {
+                $files[] = $file;
             }
         }
         return $files;
