@@ -319,7 +319,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         }
         /** @var CM_File $other */
         $samePath = $this->getPath() === $other->getPath();
-        $sameFilesystemAdapter = $this->_filesystem->getAdapter()->equals($other->_filesystem->getAdapter());
+        $sameFilesystemAdapter = $this->_filesystem->equals($other->_filesystem);
         return ($samePath && $sameFilesystemAdapter);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class CM_File_Filesystem {
+class CM_File_Filesystem implements CM_Comparable {
 
     /** @var CM_File_Filesystem_Adapter */
     protected $_adapter;
@@ -136,6 +136,18 @@ class CM_File_Filesystem {
         foreach ($pathList['dirs'] as $pathDir) {
             $this->delete($pathDir);
         }
+    }
+
+    /**
+     * @param CM_Comparable $other
+     * @return boolean
+     */
+    public function equals(CM_Comparable $other = null) {
+        if (empty($other)) {
+            return false;
+        }
+        /** @var CM_File_Filesystem $other */
+        return $this->getAdapter()->equals($other->getAdapter());
     }
 
     /**
