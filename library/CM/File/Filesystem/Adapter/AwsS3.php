@@ -135,13 +135,47 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
     }
 
     public function setup() {
-        if (!$this->_client->doesBucketExist($this->_bucket)) {
-            $options = array('Bucket' => $this->_bucket);
-            $region = $this->_client->getRegion();
-            if ($region != 'us-east-1') {
-                $options['LocationConstraint'] = $region;
+        $this->_ensureBucket(3);
+    }
+
+    /**
+     * @return bool
+     * @throws CM_Exception
+     */
+    protected function _getBucketExists() {
+        return $this->_client->doesBucketExist($this->_bucket);
+    }
+
+    /**
+     * @throws \Aws\S3\Exception\BucketAlreadyOwnedByYouException
+     * @throws \Aws\S3\Exception\OperationAbortedException
+     */
+    protected function _createBucket() {
+        $options = array('Bucket' => $this->_bucket);
+        $region = $this->_client->getRegion();
+        if ($region != 'us-east-1') {
+            $options['LocationConstraint'] = $region;
+        }
+        $this->_client->createBucket($options);
+    }
+
+    /**
+     * @param int $retryCount
+     * @throws CM_Exception
+     */
+    protected function _ensureBucket($retryCount) {
+        if (!$this->_getBucketExists()) {
+            try {
+                $this->_createBucket();
+            } catch (\Aws\S3\Exception\BucketAlreadyOwnedByYouException $e) {
+                // Probably created in parallel?
+            } catch (\Aws\S3\Exception\OperationAbortedException $e) {
+                if ($retryCount > 0) {
+                    $this->_ensureBucket($retryCount - 1);
+                } else {
+                    throw new CM_Exception('Cannot create bucket: ' . $e->getMessage());
+                }
             }
-            $this->_client->createBucket($options);
         }
     }
 
