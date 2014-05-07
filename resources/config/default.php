@@ -41,14 +41,7 @@ $config->CM_Stream_Adapter_Message_SocketRedis->servers = array(
     )),
 );
 
-$config->CM_Db_Db->db = 'cm';
-$config->CM_Db_Db->username = 'root';
-$config->CM_Db_Db->password = '';
-$config->CM_Db_Db->server = array('host' => 'localhost', 'port' => 3306);
-$config->CM_Db_Db->serversRead = array();
-$config->CM_Db_Db->serversReadEnabled = true;
 $config->CM_Db_Db->delayedEnabled = true;
-$config->CM_Db_Db->reconnectTimeout = 300;
 
 $config->CM_Model_User->class = 'CM_Model_User';
 
@@ -102,7 +95,7 @@ $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
 
 $config->CM_ServiceManager->list = array(
-    'MongoDb' => array(
+    'MongoDb'       => array(
         'class'     => 'CM_Service_MongoDb',
         'arguments' => array(
             array(
@@ -111,5 +104,29 @@ $config->CM_ServiceManager->list = array(
                 'options' => array('connect' => true),
             )
         ),
+    ),
+    'MySql'         => array(
+        'class'     => 'CM_Db_Client',
+        'arguments' => array(
+            'localhost',
+            3306,
+            'root',
+            '',
+            'cm',
+            300
+        )
+    ),
+    'MySqlReadOnly' => array(
+        'class'     => 'CM_Db_LoadBalancer',
+        'arguments' => array(
+            array(
+                'host'             => 'localhost',
+                'port'             => 3306,
+                'username'         => 'root',
+                'password'         => '',
+                'db'               => 'cm',
+                'reconnectTimeout' => 300,
+            ),
+        )
     ),
 );

@@ -273,6 +273,33 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @param string|null $key
+     * @throws CM_Exception_Invalid
+     * @return array|mixed
+     */
+    public static function getConfigDefault($key = null) {
+        $config = CM_Config::get();
+        if (!isset($config->CM_ServiceManager) || !isset($config->CM_ServiceManager->list) ||
+            !isset($config->CM_ServiceManager->list['MySql']['arguments'])
+        ) {
+            throw new CM_Exception_Invalid('Default database configuration not found');
+        }
+        $arguments = $config->CM_ServiceManager->list['MySql']['arguments'];
+        $configDefault = array(
+            'host'             => (string) $arguments[0],
+            'port'             => (int) $arguments[1],
+            'username'         => (string) $arguments[2],
+            'password'         => (string) $arguments[3],
+            'db'               => isset($arguments[4]) ? (string) $arguments[4] : null,
+            'reconnectTimeout' => isset($arguments[5]) ? (int) $arguments[5] : null,
+        );
+        if (null !== $key) {
+            return $configDefault[$key];
+        }
+        return $configDefault;
+    }
+
+    /**
      * @param array|null  $tables
      * @param bool|null   $skipData
      * @param bool|null   $skipStructure
@@ -280,9 +307,9 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return string
      */
     public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
-        $config = self::_getConfig();
+        $config = self::getConfigDefault();
         if (null === $dbName) {
-            $dbName = $config->db;
+            $dbName = $config['db'];
         }
         $args = array();
         $args[] = '--compact';
@@ -294,10 +321,10 @@ class CM_Db_Db extends CM_Class_Abstract {
         if ($skipStructure) {
             $args[] = '--no-create-info';
         }
-        $args[] = '--host=' . $config->server['host'];
-        $args[] = '--port=' . $config->server['port'];
-        $args[] = '--user=' . $config->username;
-        $args[] = '--password=' . $config->password;
+        $args[] = '--host=' . $config['host'];
+        $args[] = '--port=' . $config['port'];
+        $args[] = '--user=' . $config['username'];
+        $args[] = '--password=' . $config['password'];
         $args[] = $dbName;
         if ($tables) {
             foreach ($tables as $table) {
@@ -322,12 +349,12 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param CM_File $dump
      */
     public static function runDump($dbName, CM_File $dump) {
-        $config = self::_getConfig();
+        $config = self::getConfigDefault();
         $args = array();
-        $args[] = '--host=' . $config->server['host'];
-        $args[] = '--port=' . $config->server['port'];
-        $args[] = '--user=' . $config->username;
-        $args[] = '--password=' . $config->password;
+        $args[] = '--host=' . $config['host'];
+        $args[] = '--port=' . $config['port'];
+        $args[] = '--user=' . $config['username'];
+        $args[] = '--password=' . $config['password'];
         $args[] = $dbName;
         CM_Util::exec('mysql', $args, null, $dump->getPath());
     }
@@ -371,12 +398,14 @@ class CM_Db_Db extends CM_Class_Abstract {
             $client = & self::$_client;
         }
         if (!$client) {
-            $config = self::_getConfig();
-            $server = $config->server;
             if ($readOnly) {
-                $server = $config->serversRead[array_rand($config->serversRead)];
+                $client = CM_ServiceManager::getInstance()->getMySqlReadOnly();
+                if ($client instanceof CM_Db_LoadBalancer) {
+                    $client = $client->getClient();
+                }
+            } else {
+                $client = CM_ServiceManager::getInstance()->getMySql();
             }
-            $client = new CM_Db_Client($server['host'], $server['port'], $config->username, $config->password, $config->db, $config->reconnectTimeout);
         }
         return $client;
     }
@@ -387,7 +416,7 @@ class CM_Db_Db extends CM_Class_Abstract {
     private static function _getReadOnlyAvailable() {
         if (null === self::$_readOnlyAvailable) {
             $config = self::_getConfig();
-            self::$_readOnlyAvailable = $config->serversReadEnabled && !empty($config->serversRead);
+            self::$_readOnlyAvailable = $config->serversReadEnabled;
         }
         return self::$_readOnlyAvailable;
     }
