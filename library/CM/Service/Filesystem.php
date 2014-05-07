@@ -55,6 +55,19 @@ class CM_Service_Filesystem extends CM_Class_Abstract {
             case 'CM_File_Filesystem_Adapter_Local':
                 return new CM_File_Filesystem_Adapter_Local($options['pathPrefix']);
                 break;
+            case 'CM_File_Filesystem_Adapter_AwsS3':
+                $acl = isset($options['acl']) ? $options['acl'] : null;
+                $pathPrefix = isset($options['pathPrefix']) ? $options['pathPrefix'] : null;
+                $clientParams = array(
+                    'key'    => $options['key'],
+                    'secret' => $options['secret'],
+                );
+                if (isset($options['region'])) {
+                    $clientParams['region'] = $options['region'];
+                }
+                $client = \Aws\S3\S3Client::factory($clientParams);
+                return new CM_File_Filesystem_Adapter_AwsS3($client, $options['bucket'], $acl, $pathPrefix);
+                break;
             default:
                 throw new CM_Exception('Unsupported adapter class `' . $className . '`.');
         }
