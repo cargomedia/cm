@@ -5,17 +5,10 @@ class CM_Model_Schema_Definition {
     /** @var array */
     private $_schema;
 
-    /** @var bool */
-    private $_hasDefinition;
-
     /**
-     * @param array|null $schema
+     * @param array $schema
      */
-    public function __construct(array $schema = null) {
-        $this->_hasDefinition = (null !== $schema);
-        if (null === $schema) {
-            $schema = array();
-        }
+    public function __construct(array $schema) {
         $this->_schema = $schema;
     }
 
@@ -46,7 +39,7 @@ class CM_Model_Schema_Definition {
                             break;
                         case 'boolean':
                         case 'bool':
-                            $value = (boolean) $value;
+                            $value = (bool) $value;
                             break;
                         case 'array':
                             break;
@@ -103,7 +96,7 @@ class CM_Model_Schema_Definition {
                             break;
                         case 'boolean':
                         case 'bool':
-                            $value = (boolean) $value;
+                            $value = (bool) $value;
                             break;
                         case 'array':
                             break;
@@ -144,8 +137,8 @@ class CM_Model_Schema_Definition {
     /**
      * @return bool
      */
-    public function hasDefinition() {
-        return $this->_hasDefinition;
+    public function isEmpty() {
+        return empty($this->_schema);
     }
 
     /**
@@ -218,7 +211,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isArray($value) {
         return is_array($value);
@@ -226,7 +219,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isBoolean($value) {
         return is_bool($value) || (is_string($value) && ('0' === $value || '1' === $value));
@@ -234,7 +227,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isFloat($value) {
         return is_numeric($value);
@@ -242,7 +235,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isInt($value) {
         return is_int($value) || (is_string($value) && $value === (string) (int) $value);
@@ -250,7 +243,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isModel($value) {
         $value = CM_Params::decode($value, true);
@@ -268,7 +261,7 @@ class CM_Model_Schema_Definition {
 
     /**
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     protected function _isString($value) {
         return is_string($value);
