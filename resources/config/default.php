@@ -96,6 +96,32 @@ $config->CMService_Newrelic->appName = 'CM Application';
 
 $config->services = array();
 
+$config->services['MySql'] = array(
+    'class'     => 'CM_Db_Client',
+    'arguments' => array(
+        'localhost',
+        3306,
+        'root',
+        '',
+        'cm',
+        300
+    )
+);
+
+$config->services['MySqlReadOnly'] = array(
+    'class'     => 'CM_Db_LoadBalancer',
+    'arguments' => array(
+        array(
+            'host'             => 'localhost',
+            'port'             => 3306,
+            'username'         => 'root',
+            'password'         => '',
+            'db'               => 'cm',
+            'reconnectTimeout' => 300,
+        ),
+    )
+);
+
 $config->services['MongoDb'] = array(
     'class'     => 'CM_Service_MongoDb',
     'arguments' => array(
@@ -123,39 +149,6 @@ $config->services['filesystemUserfiles'] = array(
         'CM_File_Filesystem_Adapter_Local',
         array(
             'pathPrefix' => DIR_PUBLIC . 'userfiles/',
-$config->CM_ServiceManager->list = array(
-    'MongoDb'       => array(
-        'class'     => 'CM_Service_MongoDb',
-        'arguments' => array(
-            array(
-                'db'      => 'cm',
-                'server'  => 'mongodb://localhost:27017',
-                'options' => array('connect' => true),
-            )
-        ),
-    ),
-    'MySql'         => array(
-        'class'     => 'CM_Db_Client',
-        'arguments' => array(
-            'localhost',
-            3306,
-            'root',
-            '',
-            'cm',
-            300
-        )
-    ),
-    'MySqlReadOnly' => array(
-        'class'     => 'CM_Db_LoadBalancer',
-        'arguments' => array(
-            array(
-                'host'             => 'localhost',
-                'port'             => 3306,
-                'username'         => 'root',
-                'password'         => '',
-                'db'               => 'cm',
-                'reconnectTimeout' => 300,
-            ),
         )
     ),
 );

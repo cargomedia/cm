@@ -15,6 +15,18 @@ $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
+$config->services['MySql'] = array(
+    'class'     => 'CM_Db_Client',
+    'arguments' => array(
+        'localhost',
+        3306,
+        'root',
+        '',
+        'cm_test',
+        300
+    )
+);
+
 $config->services['filesystemData'] = array(
     'class'     => 'CM_Service_Filesystem',
     'arguments' => array(
@@ -33,21 +45,4 @@ $config->services['filesystemUserfiles'] = array(
             'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
         ),
     ),
-);
-
-$config->CM_ServiceManager->list = array_merge(
-    $config->CM_ServiceManager->list,
-    array(
-        'MySql' => array(
-            'class'     => 'CM_Db_Client',
-            'arguments' => array(
-                'localhost',
-                3306,
-                'root',
-                '',
-                'cm_test',
-                300
-            )
-        ),
-    )
 );
