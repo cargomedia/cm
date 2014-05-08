@@ -5,6 +5,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     /** CM_Clockwork_Manager */
     protected $_clockworkManager;
 
+    /**
+     * @synchronized
+     */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
         $this->_registerCallbacks();
@@ -17,9 +20,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_clockworkManager->start();
     }
 
-    /**
-     * @synchronized
-     */
     protected function _registerCallbacks() {
         $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
             'CM_Model_User::offlineOld'                 => function () {
@@ -69,9 +69,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         ));
     }
 
-    /**
-     * @synchronized
-     */
     protected function _registerCallbacksLocal() {
         $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
             'CM_SVM_Model::trainChanged' => function () {
