@@ -425,9 +425,8 @@ DROP TABLE IF EXISTS `cm_svm`;
 
 CREATE TABLE `cm_svm` (
   `id` int(11) NOT NULL,
-  `trainingChanges` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `trainingChanges` (`trainingChanges`)
+  `updateStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_svmtraining`;
