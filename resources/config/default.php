@@ -147,6 +147,6 @@ $config->services['filesystemUserfiles'] = array(
         'CM_File_Filesystem_Adapter_Local',
         array(
             'pathPrefix' => DIR_PUBLIC . 'userfiles/',
-        )
+        ),
     ),
 );
