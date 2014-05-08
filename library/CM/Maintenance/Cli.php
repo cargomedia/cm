@@ -11,6 +11,12 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
         $this->_clockworkManager->start();
     }
 
+    public function startLocal() {
+        $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_registerCallbacksLocal();
+        $this->_clockworkManager->start();
+    }
+
     /**
      * @synchronized
      */
@@ -30,9 +36,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 },
             'CM_SVM_Model::deleteOldTrainings'          => function () {
                     CM_SVM_Model::deleteOldTrainings(3000);
-                },
-            'CM_SVM_Model::trainChanged'                => function () {
-                    CM_SVM_Model::trainChanged();
                 },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
                     CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
@@ -63,6 +66,17 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Paging_Log_Abstract::deleteOlder' => function () {
                     CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
                 }
+        ));
+    }
+
+    /**
+     * @synchronized
+     */
+    protected function _registerCallbacksLocal() {
+        $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
+            'CM_SVM_Model::trainChanged' => function () {
+                    CM_SVM_Model::trainChanged();
+                },
         ));
     }
 
