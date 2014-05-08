@@ -96,7 +96,7 @@ $config->CMService_Newrelic->appName = 'CM Application';
 
 $config->services = array();
 
-$config->services['MySql'] = array(
+$config->services['Db'] = array(
     'class'     => 'CM_Db_Client',
     'arguments' => array(
         'localhost',
@@ -108,17 +108,15 @@ $config->services['MySql'] = array(
     )
 );
 
-$config->services['MySqlReadOnly'] = array(
-    'class'     => 'CM_Db_LoadBalancer',
+$config->services['DbReadOnly'] = array(
+    'class'     => 'CM_Db_Client',
     'arguments' => array(
-        array(
-            'host'             => 'localhost',
-            'port'             => 3306,
-            'username'         => 'root',
-            'password'         => '',
-            'db'               => 'cm',
-            'reconnectTimeout' => 300,
-        ),
+        'localhost',
+        3306,
+        'root',
+        '',
+        'cm',
+        300
     )
 );
 

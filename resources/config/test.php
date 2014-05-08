@@ -15,7 +15,7 @@ $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
-$config->services['MySql'] = array(
+$config->services['Db'] = array(
     'class'     => 'CM_Db_Client',
     'arguments' => array(
         'localhost',

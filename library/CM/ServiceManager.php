@@ -74,20 +74,20 @@ class CM_ServiceManager extends CM_Class_Abstract {
      * @param string|null $serviceName
      * @return CM_Db_Client
      */
-    public function getMySql($serviceName = null) {
+    public function getDb($serviceName = null) {
         if (null === $serviceName) {
-            $serviceName = 'MySql';
+            $serviceName = 'Db';
         }
         return $this->get($serviceName);
     }
 
     /**
      * @param string|null $serviceName
-     * @return CM_Db_Client|CM_Db_LoadBalancer
+     * @return CM_Db_Client
      */
-    public function getMySqlReadOnly($serviceName = null) {
+    public function getDbReadOnly($serviceName = null) {
         if (null === $serviceName) {
-            $serviceName = 'MySqlReadOnly';
+            $serviceName = 'DbReadOnly';
         }
         return $this->get($serviceName);
     }

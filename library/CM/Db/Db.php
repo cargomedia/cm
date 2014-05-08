@@ -279,10 +279,10 @@ class CM_Db_Db extends CM_Class_Abstract {
      */
     public static function getConfigDefault($key = null) {
         $config = CM_Config::get();
-        if (!isset($config->services['MySql']['arguments'])) {
+        if (!isset($config->services['Db']['arguments'])) {
             throw new CM_Exception_Invalid('Default database configuration not found');
         }
-        $arguments = $config->services['MySql']['arguments'];
+        $arguments = $config->services['Db']['arguments'];
         $configDefault = array(
             'host'             => (string) $arguments[0],
             'port'             => (int) $arguments[1],
@@ -396,14 +396,7 @@ class CM_Db_Db extends CM_Class_Abstract {
             $client = & self::$_client;
         }
         if (!$client) {
-            if ($readOnly) {
-                $client = CM_ServiceManager::getInstance()->getMySqlReadOnly();
-                if ($client instanceof CM_Db_LoadBalancer) {
-                    $client = $client->getClient();
-                }
-            } else {
-                $client = CM_ServiceManager::getInstance()->getMySql();
-            }
+            $client = $readOnly ? CM_ServiceManager::getInstance()->getDbReadOnly() : CM_ServiceManager::getInstance()->getDb();
         }
         return $client;
     }
