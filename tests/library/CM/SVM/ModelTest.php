@@ -17,7 +17,6 @@ class CM_SVM_ModelTest extends CMTest_TestCase {
     public function tearDown() {
         if ($this->_svm) {
             $this->_svm->flush();
-            CMTest_TH::timeForward(1);
         }
     }
 
@@ -88,7 +87,8 @@ class CM_SVM_ModelTest extends CMTest_TestCase {
 
     public function testTrainChanged() {
         $svm = new CM_SVM_Model(1);
-        CMTest_TH::timeForward(1);
+        CMTest_TH::timeInit();
+        CMTest_TH::timeForward(10);
         $svm->addTraining(-1, array(1 => 1.0, 2 => 0.0));
         $svm->addTraining(1, array(1 => 0.0, 2 => 1.0));
         $this->assertNotSame(1, $svm->predict(array(1 => 0.0, 2 => 1.0)));

@@ -58,8 +58,12 @@ class CMTest_TH {
     }
 
     public static function timeInit() {
-        self::$_timeStart = time();
-        runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        if (!isset(self::$_timeStart)) {
+            runkit_function_copy('time', 'time_original');
+            runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        }
+        self::$_timeStart = time_original();
+        self::$timeDelta = 0;
     }
 
     public static function time() {
