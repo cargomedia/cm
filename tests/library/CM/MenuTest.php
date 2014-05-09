@@ -25,10 +25,11 @@ class CM_MenuTest extends CMTest_TestCase {
 
     public function testGetInstance() {
         $menu = $this->_getMenu();
+        $environment = new CM_Frontend_Environment();
 
         $this->assertInstanceOf('CM_Menu', $menu);
 
-        $this->assertCount(2, $menu->getEntries());
+        $this->assertCount(2, $menu->getEntries($environment));
         $this->assertCount(2, $menu->getAllEntries());
     }
 

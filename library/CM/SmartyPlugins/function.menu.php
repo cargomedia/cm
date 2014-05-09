@@ -5,8 +5,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Page_Abstract $page */
     $page = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract')->getView();
-    /** @var CM_Model_User $viewer */
-    $viewer = $render->getViewer();
+    $environment = $render->getEnvironment();
     $activePath = $page ? $page::getPath() : '/';
     /** @var CM_Params $activeParams */
     $activeParams = $page ? $page->getParams() : CM_Params::factory();
@@ -43,7 +42,7 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
         $entry = $menu->findEntry($page, $depth, $depth);
         if ($entry && $entry->hasChildren()) {
             $menu = $entry->getChildren();
-            $menuEntries = $menu->getEntries($viewer);
+            $menuEntries = $menu->getEntries($environment);
         }
     } elseif (!is_null($depth)) {
         if ($entry = $menu->findEntry($page, $depth)) {
@@ -51,10 +50,10 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
             $parents[] = $entry;
             /** @var CM_MenuEntry $menuEntry */
             $menuEntry = $parents[$depth];
-            $menuEntries = $menuEntry->getSiblings()->getEntries($viewer);
+            $menuEntries = $menuEntry->getSiblings()->getEntries($environment);
         }
     } else {
-        $menuEntries = $menu->getEntries($viewer);
+        $menuEntries = $menu->getEntries($environment);
     }
 
     if (empty($menuEntries)) {

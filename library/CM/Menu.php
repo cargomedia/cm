@@ -86,12 +86,12 @@ class CM_Menu {
     }
 
     /**
-     * @param CM_Model_User|null $viewer
+     * @param CM_Frontend_Environment $environment
      * @return CM_MenuEntry[]
      */
-    public final function getEntries(CM_Model_User $viewer = null) {
-        return array_filter($this->_entries, function (CM_MenuEntry $entry) use ($viewer) {
-            return $entry->isViewable();
+    public final function getEntries(CM_Frontend_Environment $environment) {
+        return array_filter($this->_entries, function (CM_MenuEntry $entry) use ($environment) {
+            return $entry->isViewable($environment);
         });
     }
 }
