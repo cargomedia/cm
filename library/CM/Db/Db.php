@@ -73,6 +73,15 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @param string     $sqlTemplate
+     * @param array|null $parameters
+     * @return CM_Db_Result
+     */
+    public static function execMaintenance($sqlTemplate, array $parameters = null) {
+        return self::exec($sqlTemplate, $parameters, self::getClientMaintenance());
+    }
+
+    /**
      * @param string $table
      * @param string $column
      * @return bool
