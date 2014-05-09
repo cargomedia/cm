@@ -120,6 +120,18 @@ $config->services['DbRead'] = array(
     )
 );
 
+$config->services['DbMaintenance'] = array(
+    'class'     => 'CM_Db_Client',
+    'arguments' => array(
+        'localhost',
+        3306,
+        'root',
+        '',
+        'cm',
+        300
+    )
+);
+
 $config->services['MongoDb'] = array(
     'class'     => 'CM_Service_MongoDb',
     'arguments' => array(

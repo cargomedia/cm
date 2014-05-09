@@ -93,6 +93,17 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
+     * @param string|null $serviceName
+     * @return CM_Db_Client
+     */
+    public function getDbMaintenance($serviceName = null) {
+        if (null === $serviceName) {
+            $serviceName = 'DbMaintenance';
+        }
+        return $this->get($serviceName);
+    }
+
+    /**
      * @param string $serviceName
      * @return CM_Service_Filesystem
      */
