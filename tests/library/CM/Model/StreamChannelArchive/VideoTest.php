@@ -79,6 +79,15 @@ class CM_Model_StreamChannelArchive_VideoTest extends CMTest_TestCase {
         $this->assertEquals(array($thumb1, $thumb2), $archive->getThumbnails()->getItems());
     }
 
+    public function testGetThumbnail() {
+        $archive = CMTest_TH::createStreamChannelVideoArchive();
+        $thumbnail = $archive->getThumbnail(3);
+        $this->assertInstanceOf('CM_File_UserContent', $thumbnail);
+        $this->assertSame(
+            'streamChannels/' . $archive->getId() . '/' . $archive->getId() . '-' . $archive->getHash() . '-thumbs/3.png',
+            $thumbnail->getPathRelative());
+    }
+
     public function testOnDelete() {
         /** @var CM_Model_StreamChannel_Video $streamChannel */
         $streamChannel = CMTest_TH::createStreamChannel();
