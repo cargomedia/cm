@@ -206,12 +206,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $component
-     * @param CM_Params             $params
      * @param CM_Model_User|null    $viewer
      * @param CM_Site_Abstract|null $site
      * @return CMTest_TH_Html
      */
-    protected function _renderComponent(CM_Component_Abstract $component, CM_Params $params, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
+    protected function _renderComponent(CM_Component_Abstract $component, CM_Model_User $viewer = null, CM_Site_Abstract $site = null) {
         $render = new CM_Frontend_Render($site, $viewer);
         $renderAdapter = new CM_RenderAdapter_Component($render, $component);
         $componentHtml = $renderAdapter->fetch();
@@ -331,16 +330,15 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     /**
      * @param CM_Component_Abstract $component
-     * @param CM_Params             $params
      * @param string|null           $expectedExceptionClass
      * @param CM_Model_User|null    $viewer
      */
-    public function assertComponentNotRenderable(CM_Component_Abstract $component, CM_Params $params, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
+    public function assertComponentNotRenderable(CM_Component_Abstract $component, $expectedExceptionClass = null, CM_Model_User $viewer = null) {
         if (null === $expectedExceptionClass) {
             $expectedExceptionClass = 'CM_Exception';
         }
         try {
-            $this->_renderComponent($component, $params, $viewer);
+            $this->_renderComponent($component, $viewer);
             $this->fail('Rendering page `' . get_class($component) . '` did not throw an exception');
         } catch (Exception $e) {
             $this->assertInstanceOf($expectedExceptionClass, $e);
