@@ -181,6 +181,21 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @param string        $uri
+     * @param CM_Model_User $viewer
+     * @return CM_Response_Abstract
+     */
+    public function processRequest($uri, CM_Model_User $viewer = null) {
+        $request = CM_Request_Abstract::factory('GET', $uri);
+        if ($viewer) {
+            $request->getSession()->setUser($viewer);
+        }
+        $response = CM_Response_Abstract::factory($request);
+        $response->process();
+        return $response;
+    }
+
+    /**
      * @param string $pageClass
      * @param array  $params OPTIONAL
      * @return CM_Page_Abstract
@@ -205,7 +220,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Frontend_Render             $render
+     * @param CM_Frontend_Render    $render
      * @param CM_FormField_Abstract $formField
      * @param CM_Params|array|null  $params
      * @return CM_Dom_NodeList
@@ -279,8 +294,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract $cmp
-     * @param CM_Frontend_Environment  $environment
+     * @param CM_Component_Abstract   $cmp
+     * @param CM_Frontend_Environment $environment
      */
     public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment) {
         try {
@@ -294,8 +309,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract $cmp
-     * @param CM_Frontend_Environment  $environment
+     * @param CM_Component_Abstract   $cmp
+     * @param CM_Frontend_Environment $environment
      */
     public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment, $expectedExceptionClass = null) {
         $expectedExceptionClassList = array(
