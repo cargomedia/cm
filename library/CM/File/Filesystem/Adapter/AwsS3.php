@@ -143,7 +143,7 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
      * @throws CM_Exception
      */
     protected function _getBucketExists() {
-        return $this->_client->doesBucketExist($this->_bucket);
+        return $this->_client->doesBucketExist($this->_bucket, false);
     }
 
     /**

@@ -204,8 +204,8 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $filesystem = new CM_File_Filesystem($this->_adapter);
 
         $pathList = array(
-            'foo/foobar/bar',
             'foo/bar2',
+            'foo/foobar/bar',
             'foo/bar',
         );
         foreach ($pathList as $path) {
@@ -238,12 +238,19 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         ), $this->_adapter->listByPrefix('/foo'));
     }
 
-    /**
-     * @expectedException CM_Exception
-     * @expectedExceptionMessage Cannot scan directory
-     */
-    public function testListByPrefixInvalid() {
-        $this->_adapter->listByPrefix('nonexistent');
+    public function testListByPrefixNonexistent() {
+        $this->assertSame(array(
+            'files' => array(),
+            'dirs'  => array(),
+        ), $this->_adapter->listByPrefix('nonexistent'));
+    }
+
+    public function testListByPrefixFile() {
+        $this->_adapter->write('/foo', 'hello');
+        $this->assertSame(array(
+            'files' => array(),
+            'dirs'  => array(),
+        ), $this->_adapter->listByPrefix('/foo'));
     }
 
     public function testEquals() {
