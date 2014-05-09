@@ -56,6 +56,13 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @return bool
+     */
+    public function hasViewer() {
+        return null !== $this->_viewer
+    }
+
+    /**
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
