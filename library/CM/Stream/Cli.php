@@ -10,15 +10,12 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string  $streamName
+     * @param int     $streamChannelId
      * @param CM_File $thumbnailSource
      * @throws CM_Exception_Invalid
      */
-    public function wowzaImportThumbnail($streamName, CM_File $thumbnailSource) {
-        $streamChannel = CM_Model_StreamChannel_Video::findByKey($streamName);
-        if (!$streamChannel) {
-            throw new CM_Exception_Invalid('Cannot find streamChannel with key `' . $streamName . '`.');
-        }
+    public function importVideoThumbnail($streamChannelId, CM_File $thumbnailSource) {
+        $streamChannel = CM_Model_StreamChannel_Video::factory($streamChannelId);
         $thumbnailCount = $streamChannel->getThumbnailCount();
         $thumbnailDest = $streamChannel->getThumbnail($thumbnailCount + 1);
         if (0 == $thumbnailCount) {
@@ -26,6 +23,18 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
         }
         $thumbnailSource->copyToFile($thumbnailDest);
         $streamChannel->setThumbnailCount($thumbnailCount + 1);
+    }
+
+    /**
+     * @param int     $streamChannelId
+     * @param CM_File $archiveSource
+     * @throws CM_Exception_Invalid
+     */
+    public function importVideoArchive($streamChannelId, CM_File $archiveSource) {
+        $streamChannelArchive = new CM_Model_StreamChannelArchive_Video($streamChannelId);
+        $archiveDest = $streamChannelArchive->getVideo();
+        $archiveDest->ensureParentDirectory();
+        $archiveSource->copyToFile($archiveDest);
     }
 
     public static function getPackageName() {
