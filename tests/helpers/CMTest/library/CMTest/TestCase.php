@@ -196,11 +196,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string $pageClass
-     * @param array  $params OPTIONAL
+     * @param string     $pageClass
+     * @param array|null $params
      * @return CM_Page_Abstract
      */
-    protected function _createPage($pageClass, $params = array()) {
+    protected function _createPage($pageClass, array $params = null) {
         return new $pageClass(CM_Params::factory($params));
     }
 
