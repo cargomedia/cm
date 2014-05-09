@@ -12,7 +12,6 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param int     $streamChannelId
      * @param CM_File $thumbnailSource
-     * @throws CM_Exception_Invalid
      */
     public function importVideoThumbnail($streamChannelId, CM_File $thumbnailSource) {
         $streamChannel = CM_Model_StreamChannel_Video::factory($streamChannelId);
@@ -28,7 +27,6 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param int     $streamChannelId
      * @param CM_File $archiveSource
-     * @throws CM_Exception_Invalid
      */
     public function importVideoArchive($streamChannelId, CM_File $archiveSource) {
         $streamChannelArchive = new CM_Model_StreamChannelArchive_Video($streamChannelId);
