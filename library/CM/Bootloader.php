@@ -39,6 +39,7 @@ class CM_Bootloader {
         $this->_constants();
         $this->_exceptionHandler();
         $this->_errorHandler();
+        $this->_registerServices();
         $this->_defaults();
     }
 
@@ -120,20 +121,6 @@ class CM_Bootloader {
     /**
      * @return string
      */
-    public function getDirUserfiles() {
-        return DIR_PUBLIC . 'userfiles/';
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirData() {
-        return DIR_ROOT . 'data/';
-    }
-
-    /**
-     * @return string
-     */
     public function getDirTmp() {
         return DIR_ROOT . 'tmp/';
     }
@@ -175,6 +162,21 @@ class CM_Bootloader {
             $errorHandler->handleException($exception);
             exit(1);
         });
+    }
+
+    protected function _registerServices() {
+        $serviceManager = CM_ServiceManager::getInstance();
+
+        $serviceManager->register('filesystemTmp', 'CM_Service_Filesystem', array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => $this->getDirTmp(),
+            ),
+        ));
+
+        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
+            $serviceManager->register($serviceKey, $serviceDefinition['class'], $serviceDefinition['arguments']);
+        }
     }
 
     protected function _defaults() {

@@ -2,10 +2,11 @@
 
 class CM_File_UserContent_Temp extends CM_File_UserContent {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_uniqid;
+
+    /** @var string */
+    private $_filenameLabel;
 
     /**
      * @param string $uniqid
@@ -17,15 +18,23 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
             throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
         }
         $this->_uniqid = $data['uniqid'];
-        parent::__construct('tmp', $data['filename']);
+        $this->_filenameLabel = $data['filename'];
+
+        $filenameParts = array($this->getUniqid());
+        if (false !== strpos($this->getFilenameLabel(), '.')) {
+            $filenameParts[] = strtolower(pathinfo($this->getFilenameLabel(), PATHINFO_EXTENSION));
+        }
+
+        parent::__construct('tmp', implode('.', $filenameParts));
     }
 
     /**
-     * @param string      $filename
-     * @param string|null $content
+     * @param string                  $filename
+     * @param string|null             $content
+     * @param CM_File_Filesystem|null $filesystem
      * @return CM_File_UserContent_Temp
      */
-    public static function create($filename, $content = null) {
+    public static function create($filename, $content = null, CM_File_Filesystem $filesystem = null) {
         $filename = (string) $filename;
         if (strlen($filename) > 100) {
             $filename = substr($filename, -100, 100);
@@ -33,8 +42,8 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         $uniqid = md5(rand() . uniqid());
         CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
-        $file = new self($uniqid);
-        $file->mkDir();
+        $file = new self($uniqid, $filesystem);
+        $file->ensureParentDirectory();
         if (null !== $content) {
             $file->write($content);
         }
@@ -51,11 +60,11 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
     /**
      * @return string
      */
-    public function getPathRelative() {
-        return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getUniqid() . '.' . $this->getExtension();
+    public function getFilenameLabel() {
+        return $this->_filenameLabel;
     }
 
-    public function delete() {
+    public function delete($recursive = null) {
         CM_Db_Db::delete('cm_tmp_userfile', array('uniqid' => $this->getUniqid()));
         parent::delete();
     }

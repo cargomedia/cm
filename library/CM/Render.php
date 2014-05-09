@@ -197,11 +197,10 @@ class CM_Render extends CM_Class_Abstract {
         }
         foreach ($namespaceList as $namespace) {
             foreach ($this->getSite()->getThemes() as $theme) {
-                $file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
-
-                if (CM_File::exists($file)) {
+                $file = new CM_File($this->getThemeDir(true, $theme, $namespace) . $tpl);
+                if ($file->getExists()) {
                     if ($absolute) {
-                        return $file;
+                        return $file->getPath();
                     } else {
                         return $this->getThemeDir(false, $theme, $namespace) . $tpl;
                     }

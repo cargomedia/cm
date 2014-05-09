@@ -101,8 +101,9 @@ class CM_Model_StreamChannelArchive_Video extends CM_Model_StreamChannelArchive_
 
     protected function _onDeleteBefore() {
         $this->getVideo()->delete();
-        $thumbDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
-        $thumbDir->delete();
+
+        $thumbnailDir = new CM_File_UserContent('streamChannels', $this->getId() . '-' . $this->getHash() . '-thumbs/', $this->getId());
+        $thumbnailDir->delete(true);
     }
 
     protected function _onDelete() {
