@@ -108,7 +108,7 @@ $config->services['Db'] = array(
     )
 );
 
-$config->services['DbReadOnly'] = array(
+$config->services['DbRead'] = array(
     'class'     => 'CM_Db_Client',
     'arguments' => array(
         'localhost',

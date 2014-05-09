@@ -85,9 +85,9 @@ class CM_ServiceManager extends CM_Class_Abstract {
      * @param string|null $serviceName
      * @return CM_Db_Client
      */
-    public function getDbReadOnly($serviceName = null) {
+    public function getDbRead($serviceName = null) {
         if (null === $serviceName) {
-            $serviceName = 'DbReadOnly';
+            $serviceName = 'DbRead';
         }
         return $this->get($serviceName);
     }

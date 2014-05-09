@@ -396,7 +396,7 @@ class CM_Db_Db extends CM_Class_Abstract {
             $client = & self::$_client;
         }
         if (!$client) {
-            $client = $readOnly ? CM_ServiceManager::getInstance()->getDbReadOnly() : CM_ServiceManager::getInstance()->getDb();
+            $client = $readOnly ? CM_ServiceManager::getInstance()->getDbRead() : CM_ServiceManager::getInstance()->getDb();
         }
         return $client;
     }
