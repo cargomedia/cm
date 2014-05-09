@@ -398,6 +398,15 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
+     * @throws CM_Db_Exception
+     * @return CM_Db_Client
+     */
+    public static function getClientWithoutDatabase() {
+        $config = self::getConfigDefault();
+        return new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password']);
+    }
+
+    /**
      * @param string      $table
      * @param string      $column
      * @param string|null $where

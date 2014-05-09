@@ -27,23 +27,23 @@ class CM_App {
      * @param boolean|null $forceReload
      */
     public function setupDatabase($forceReload = null) {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password']);
+        $client = CM_Db_Db::getClientWithoutDatabase();
+        $db = CM_Db_Db::getConfigDefault('db');
 
         if ($forceReload) {
-            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($config['db']))->execute();
+            $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($config['db']))->fetch();
+        $databaseExists = (bool) $client->createStatement('SHOW DATABASES LIKE ?')->execute(array($db))->fetch();
         if (!$databaseExists) {
-            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($config['db']))->execute();
+            $client->createStatement('CREATE DATABASE ' . $client->quoteIdentifier($db))->execute();
         }
 
-        $client->setDb($config['db']);
+        $client->setDb($db);
         $tables = $client->createStatement('SHOW TABLES')->execute()->fetchAll();
         if (0 === count($tables)) {
             foreach (CM_Util::getResourceFiles('db/structure.sql') as $dump) {
-                CM_Db_Db::runDump($config['db'], $dump);
+                CM_Db_Db::runDump($db, $dump);
             }
             $app = CM_App::getInstance();
             foreach ($this->_getUpdateScriptPaths() as $namespace => $path) {
@@ -152,8 +152,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $config = CM_Db_Db::getConfigDefault();
-            $db = $config['db'];
+            $db = CM_Db_Db::getConfigDefault('db');
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;

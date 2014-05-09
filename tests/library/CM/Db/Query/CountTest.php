@@ -6,8 +6,7 @@ class CM_Db_Query_CountTest extends CMTest_TestCase {
     private static $_client;
 
     public static function setUpBeforeClass() {
-        $config = CM_Db_Db::getConfigDefault();
-        self::$_client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password'], $config['db']);
+        self::$_client = CM_Db_Db::getClient();
     }
 
     public function testAll() {

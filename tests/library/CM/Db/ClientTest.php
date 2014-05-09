@@ -22,8 +22,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testConnectDisconnect() {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password']);
+        $client = CM_Db_Db::getClientWithoutDatabase();
         $this->assertTrue($client->isConnected());
 
         $client->disconnect();
@@ -38,8 +37,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testGetLastInsertId() {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password'], $config['db']);
+        $client = CM_Db_Db::getClient();
         $client->createStatement('CREATE TABLE `test` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
         $this->assertSame(null, $client->getLastInsertId());
 
