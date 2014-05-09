@@ -17,11 +17,11 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
     public function importVideoThumbnail($streamChannelId, CM_File $thumbnailSource) {
         $streamChannel = CM_Model_StreamChannel_Video::factory($streamChannelId);
         $thumbnailCount = $streamChannel->getThumbnailCount();
-        $thumbnailDest = $streamChannel->getThumbnail($thumbnailCount + 1);
+        $thumbnailDestination = $streamChannel->getThumbnail($thumbnailCount + 1);
         if (0 == $thumbnailCount) {
-            $thumbnailDest->ensureParentDirectory();
+            $thumbnailDestination->ensureParentDirectory();
         }
-        $thumbnailSource->copyToFile($thumbnailDest);
+        $thumbnailSource->copyToFile($thumbnailDestination);
         $streamChannel->setThumbnailCount($thumbnailCount + 1);
     }
 
@@ -32,9 +32,9 @@ class CM_Stream_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function importVideoArchive($streamChannelId, CM_File $archiveSource) {
         $streamChannelArchive = new CM_Model_StreamChannelArchive_Video($streamChannelId);
-        $archiveDest = $streamChannelArchive->getVideo();
-        $archiveDest->ensureParentDirectory();
-        $archiveSource->copyToFile($archiveDest);
+        $archiveDestination = $streamChannelArchive->getVideo();
+        $archiveDestination->ensureParentDirectory();
+        $archiveSource->copyToFile($archiveDestination);
     }
 
     public static function getPackageName() {
