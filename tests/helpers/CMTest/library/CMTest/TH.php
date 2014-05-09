@@ -253,7 +253,7 @@ class CMTest_TH {
      * @return CM_Db_Client
      */
     public static function getDbClient() {
-        return CM_Db_Db::getClient(false);
+        return CM_Db_Db::getClient();
     }
 
     public static function randomizeAutoincrement() {

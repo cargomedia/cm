@@ -58,7 +58,7 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($this->_group) {
                 $query .= ' GROUP BY ' . $this->_group;
             }
-            $result = CM_Db_Db::exec($query, $this->_parameters, $this->_dbSlave);
+            $result = $this->_dbSlave ? CM_Db_Db::execRead($query, $this->_parameters) : CM_Db_Db::exec($query, $this->_parameters);
             if ($this->_group) {
                 $count = (int) count($result->fetchAll());
             } else {
@@ -88,7 +88,7 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($offset !== null && $count !== null) {
                 $query .= ' LIMIT ' . $offset . ',' . $count;
             }
-            $result = CM_Db_Db::exec($query, $this->_parameters, $this->_dbSlave);
+            $result = $this->_dbSlave ? CM_Db_Db::execRead($query, $this->_parameters) : CM_Db_Db::exec($query, $this->_parameters);
             $items = $result->fetchAll();
             $this->_cacheSet($cacheKey, $items);
         }

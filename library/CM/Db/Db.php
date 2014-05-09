@@ -2,22 +2,13 @@
 
 class CM_Db_Db extends CM_Class_Abstract {
 
-    /** @var CM_Db_Client */
-    private static $_client;
-
-    /** @var CM_Db_Client */
-    private static $_clientReadOnly;
-
-    /** @var bool|null */
-    private static $_readOnlyAvailable;
-
     /**
      * @param string            $table
      * @param string|array|null $where Associative array field=>value OR string
      * @return int
      */
     public static function count($table, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Count($client, $table, $where);
         return (int) $query->execute()->fetchColumn();
     }
@@ -28,7 +19,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return int
      */
     public static function delete($table, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Delete($client, $table, $where);
         return $query->execute()->getAffectedRows();
     }
@@ -56,18 +47,19 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Schema_Column
      */
     public static function describeColumn($table, $column) {
-        return new CM_Db_Schema_Column(self::getClient(false), $table, $column);
+        return new CM_Db_Schema_Column(self::getClient(), $table, $column);
     }
 
     /**
-     * @param string     $sqlTemplate
-     * @param array|null $parameters
-     * @param bool|null  $readOnly
+     * @param string            $sqlTemplate
+     * @param array|null        $parameters
+     * @param CM_Db_Client|null $client
      * @return CM_Db_Result
      */
-    public static function exec($sqlTemplate, array $parameters = null, $readOnly = null) {
-        $readOnly = (bool) $readOnly;
-        $client = self::getClient($readOnly);
+    public static function exec($sqlTemplate, array $parameters = null, CM_Db_Client $client = null) {
+        if (!$client) {
+            $client = self::getClient();
+        }
         return $client->createStatement($sqlTemplate)->execute($parameters);
     }
 
@@ -77,7 +69,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Result
      */
     public static function execRead($sqlTemplate, array $parameters = null) {
-        return self::exec($sqlTemplate, $parameters, true);
+        return self::exec($sqlTemplate, $parameters, self::getClientRead());
     }
 
     /**
@@ -86,7 +78,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return bool
      */
     public static function existsColumn($table, $column) {
-        $client = self::getClient(true);
+        $client = self::getClientRead();
         return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetch();
     }
 
@@ -96,7 +88,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return bool
      */
     public static function existsIndex($table, $index) {
-        $client = self::getClient(true);
+        $client = self::getClientRead();
         return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetch();
     }
 
@@ -120,7 +112,7 @@ class CM_Db_Db extends CM_Class_Abstract {
         if (null === $statement) {
             $statement = 'INSERT';
         }
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Insert($client, $table, $fields, $values, $onDuplicateKeyValues, $statement);
         $query->execute();
         return $client->getLastInsertId();
@@ -177,7 +169,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Result
      */
     public static function select($table, $fields, $where = null, $order = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Select($client, $table, $fields, $where, $order);
         return $query->execute();
     }
@@ -190,7 +182,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Result
      */
     public static function selectMultiple($table, $fields, array $whereList, $order = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_SelectMultiple($client, $table, $fields, $whereList, $order);
         return $query->execute();
     }
@@ -199,7 +191,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param string $table
      */
     public static function truncate($table) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Truncate($client, $table);
         $query->execute();
     }
@@ -211,7 +203,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return int
      */
     public static function update($table, array $values, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Update($client, $table, $values, $where);
         return $query->execute()->getAffectedRows();
     }
@@ -223,7 +215,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return int
      */
     public static function updateIgnore($table, array $values, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_Update($client, $table, $values, $where, 'UPDATE IGNORE');
         return $query->execute()->getAffectedRows();
     }
@@ -265,7 +257,7 @@ class CM_Db_Db extends CM_Class_Abstract {
             $direction = 1;
         }
 
-        $client = self::getClient(false);
+        $client = self::getClient();
         $query = new CM_Db_Query_UpdateSequence($client, $table, $column, $direction, $where, $lowerBound, $upperBound);
         $query->execute();
 
@@ -365,7 +357,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @throws CM_DB_Exception
      */
     public static function getRandId($table, $column, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $idGuess = self::_getRandIdGuess($table, $column, $where);
         $columnQuoted = $client->quoteIdentifier($column);
         $whereGuessId = (null === $where ? '' : $where . ' AND ') . $columnQuoted . " <= $idGuess";
@@ -382,34 +374,27 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
-     * @param bool $readOnly
      * @throws CM_Db_Exception
      * @return CM_Db_Client
      */
-    public static function getClient($readOnly) {
-        if ($readOnly && !self::_getReadOnlyAvailable()) {
-            $readOnly = false;
-        }
-        if ($readOnly) {
-            $client = & self::$_clientReadOnly;
-        } else {
-            $client = & self::$_client;
-        }
-        if (!$client) {
-            $client = $readOnly ? CM_ServiceManager::getInstance()->getDbRead() : CM_ServiceManager::getInstance()->getDb();
-        }
-        return $client;
+    public static function getClient() {
+        return CM_ServiceManager::getInstance()->getDb();
     }
 
     /**
-     * @return bool
+     * @throws CM_Db_Exception
+     * @return CM_Db_Client
      */
-    private static function _getReadOnlyAvailable() {
-        if (null === self::$_readOnlyAvailable) {
-            $config = self::_getConfig();
-            self::$_readOnlyAvailable = $config->serversReadEnabled;
-        }
-        return self::$_readOnlyAvailable;
+    public static function getClientRead() {
+        return CM_ServiceManager::getInstance()->getDbRead();
+    }
+
+    /**
+     * @throws CM_Db_Exception
+     * @return CM_Db_Client
+     */
+    public static function getClientMaintenance() {
+        return CM_ServiceManager::getInstance()->getDbMaintenance();
     }
 
     /**
@@ -419,7 +404,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return int
      */
     private static function _getRandIdGuess($table, $column, $where = null) {
-        $client = self::getClient(false);
+        $client = self::getClient();
         $columnQuoted = $client->quoteIdentifier($column);
         $sql = 'SELECT MIN(' . $columnQuoted . ') AS min, MAX(' . $columnQuoted . ') AS max FROM ' . $client->quoteIdentifier($table);
         if (null !== $where) {
