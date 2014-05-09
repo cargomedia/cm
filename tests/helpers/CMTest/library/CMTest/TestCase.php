@@ -244,7 +244,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $request = new CM_Request_Get('?' . http_build_query($page->getParams()->getAllOriginal()), array('host' => $host), null, $viewer);
         $response = new CM_Response_Page($request);
         $render = new CM_Frontend_Render($site, $viewer);
-        $page->prepareResponse($response);
+        $page->prepareResponse($render->getEnvironment(), $response);
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
         $html = $renderAdapter->fetch();
         return new CMTest_TH_Html($html);

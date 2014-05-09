@@ -115,7 +115,6 @@ class CM_Response_Page extends CM_Response_Abstract {
         try {
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery());
-            $viewer = $request->getViewer();
 
             try {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
@@ -128,7 +127,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             if ($this->getViewer() && $request->getLanguageUrl()) {
                 $this->redirect($page);
             }
-            $page->prepareResponse($this);
+            $page->prepareResponse($this->getRender()->getEnvironment(), $this);
             if ($this->getRedirectUrl()) {
                 $request->setUri($this->getRedirectUrl());
                 return null;
