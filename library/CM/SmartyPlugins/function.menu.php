@@ -3,12 +3,18 @@
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    /** @var CM_Page_Abstract $page */
-    $page = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract')->getView();
+
+    $page = null;
+    $activePath = '/';
+    $activeParams = CM_Params::factory();
+    $pageViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract');
+    if ($pageViewResponse) {
+        /** @var CM_Page_Abstract $page */
+        $page = $pageViewResponse->getView();
+        $activePath = $page::getPath();
+        $activeParams = $page->getParams();
+    }
     $environment = $render->getEnvironment();
-    $activePath = $page ? $page::getPath() : '/';
-    /** @var CM_Params $activeParams */
-    $activeParams = $page ? $page->getParams() : CM_Params::factory();
 
     $menu = null;
     $name = null;
