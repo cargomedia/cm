@@ -309,14 +309,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract        $cmp
-     * @param CM_Frontend_Environment|null $environment
-     * @param string|null                  $expectedExceptionClass
+     * @param CM_Component_Abstract $cmp
+     * @param CM_Model_User|null    $viewer
+     * @param string|null           $expectedExceptionClass
      */
-    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment = null, $expectedExceptionClass = null) {
-        if (null === $environment) {
-            $environment = new CM_Frontend_Environment();
-        }
+    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Model_User $viewer = null, $expectedExceptionClass = null) {
+        $environment = new CM_Frontend_Environment(null, $viewer);
         $expectedExceptionClassList = array(
             'CM_Exception_AuthRequired',
             'CM_Exception_Nonexistent',
