@@ -20,14 +20,14 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
      * @return CM_Model_Location_Country
      */
     public function getCountry() {
-        return new CM_Model_Location_Country($this->_get('countryId'));
+        return $this->_get('countryId');
     }
 
     /**
      * @param CM_Model_Location_Country $country
      */
     public function setCountry($country) {
-        $this->_set('countryId', $country->getId());
+        $this->_set('countryId', $country);
     }
 
     /**
@@ -67,7 +67,7 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
 
     public function _getSchema() {
         return new CM_Model_Schema_Definition(array(
-            'countryId'    => array('type' => 'int'),
+            'countryId'    => array('type' => 'CM_Model_Location_Country'),
             'name'         => array('type' => 'string'),
             'abbreviation' => array('type' => 'string', 'optional' => true),
             '_maxmind'     => array('type' => 'string', 'optional' => true),
@@ -86,7 +86,7 @@ class CM_Model_Location_State extends CM_Model_Location_Abstract {
         $state->_set(array(
             'name'         => $name,
             'abbreviation' => $abbreviation,
-            'countryId'    => $country->getId(),
+            'countryId'    => $country,
             '_maxmind'     => $maxMind,
         ));
         $state->commit();
