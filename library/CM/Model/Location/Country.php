@@ -31,7 +31,7 @@ class CM_Model_Location_Country extends CM_Model_Location_Abstract {
             case CM_Model_Location::LEVEL_STATE:
             case CM_Model_Location::LEVEL_CITY:
             case CM_Model_Location::LEVEL_ZIP:
-                throw new CM_Exception_Invalid('Invalid parent location level for a state');
+                throw new CM_Exception_Invalid('Invalid parent location level `' . $level . '` for a country');
         }
         throw new CM_Exception_Invalid('Invalid location level `' . $level . '`');
     }
