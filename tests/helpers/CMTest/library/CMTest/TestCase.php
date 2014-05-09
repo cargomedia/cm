@@ -296,7 +296,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
      * @param CM_Component_Abstract   $cmp
      * @param CM_Frontend_Environment $environment
      */
-    public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment) {
+    public static function assertComponentAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment = null) {
+        if (null === $environment) {
+            $environment = new CM_Frontend_Environment();
+        }
         try {
             $cmp->checkAccessible($environment);
             self::assertTrue(true);
@@ -308,10 +311,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Component_Abstract   $cmp
-     * @param CM_Frontend_Environment $environment
+     * @param CM_Component_Abstract        $cmp
+     * @param CM_Frontend_Environment|null $environment
+     * @param string|null                  $expectedExceptionClass
      */
-    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment, $expectedExceptionClass = null) {
+    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Frontend_Environment $environment = null, $expectedExceptionClass = null) {
+        if (null === $environment) {
+            $environment = new CM_Frontend_Environment();
+        }
         $expectedExceptionClassList = array(
             'CM_Exception_AuthRequired',
             'CM_Exception_Nonexistent',
