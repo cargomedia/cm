@@ -477,13 +477,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param CM_Page_Abstract $page
      */
-    public static function assertPageViewable(CM_Page_Abstract $page) {
-        self::assertTrue($page->isViewable());
-    }
-
-    /**
-     * @param CM_Page_Abstract $page
-     */
     public static function assertPageNotViewable(CM_Page_Abstract $page) {
         self::assertFalse($page->isViewable());
     }
