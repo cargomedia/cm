@@ -19,8 +19,8 @@ class CM_RenderAdapter_AbstractTest extends CMTest_TestCase {
         $this->assertSame($tplPathMock, $_getTplPath->invoke($renderAdapter, $tplName, false));
 
         $render->expects($this->at(0))->method('getLayoutPath')->with($tplPathMock, 'CM', false, false)->will($this->returnValue(null));
-        $render->expects($this->at(1))->method('getLayoutPath')->with($tplPathAbstract, 'CM', false, false)->will($this->returnValue($tplPathMock));
-        $this->assertSame($tplPathMock, $_getTplPath->invoke($renderAdapter, $tplName, false));
+        $render->expects($this->at(1))->method('getLayoutPath')->with($tplPathAbstract, 'CM', false, false)->will($this->returnValue($tplPathAbstract));
+        $this->assertSame($tplPathAbstract, $_getTplPath->invoke($renderAdapter, $tplName, false));
 
         $render->expects($this->at(0))->method('getLayoutPath')->with($tplPathMock, 'CM', false, false)->will($this->returnValue(null));
         $render->expects($this->at(1))->method('getLayoutPath')->with($tplPathAbstract, 'CM', false, false)->will($this->returnValue(null));
