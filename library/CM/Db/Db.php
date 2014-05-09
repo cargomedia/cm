@@ -78,7 +78,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return bool
      */
     public static function existsColumn($table, $column) {
-        $client = self::getClientRead();
+        $client = self::getClient();
         return (bool) self::exec('SHOW COLUMNS FROM ' . $client->quoteIdentifier($table) . ' LIKE ?', array($column))->fetch();
     }
 
@@ -88,7 +88,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return bool
      */
     public static function existsIndex($table, $index) {
-        $client = self::getClientRead();
+        $client = self::getClient();
         return (bool) self::exec('SHOW INDEX FROM ' . $client->quoteIdentifier($table) . ' WHERE Key_name = ?', array($index))->fetch();
     }
 
