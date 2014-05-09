@@ -5,20 +5,20 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     private static $_fields;
 
     public static function setUpBeforeClass() {
-        $switzerland = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'CH', 'name' => 'Switzerland'));
-        $germany = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'DE', 'name' => 'Germany'));
+        $switzerland = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'CH', 'name' => 'Switzerland'));
+        $germany = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'DE', 'name' => 'Germany'));
 
-        $baselStadt = CM_Db_Db::insert('cm_locationState', array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
-        $zuerich = CM_Db_Db::insert('cm_locationState', array('countryId' => $switzerland, 'name' => 'Zürich'));
+        $baselStadt = CM_Db_Db::insert('cm_model_location_state', array('countryId' => $switzerland, 'name' => 'Basel-Stadt'));
+        $zuerich = CM_Db_Db::insert('cm_model_location_state', array('countryId' => $switzerland, 'name' => 'Zürich'));
 
-        $basel = CM_Db_Db::insert('cm_locationCity', array(
+        $basel = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => $baselStadt,
             'countryId' => $switzerland,
             'name'      => 'Basel',
             'lat'       => 47.569535,
             'lon'       => 7.574063,
         ));
-        $winterthur = CM_Db_Db::insert('cm_locationCity', array(
+        $winterthur = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => $zuerich,
             'countryId' => $switzerland,
             'name'      => 'Winterthur',
@@ -26,17 +26,17 @@ class CM_Model_LocationTest extends CMTest_TestCase {
             'lon'       => 8.724947,
         ));
 
-        CM_Db_Db::insert('cm_locationZip', array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
-        CM_Db_Db::insert('cm_locationZip', array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
+        CM_Db_Db::insert('cm_model_location_zip', array('cityId' => $basel, 'name' => '4057', 'lat' => 47.574155, 'lon' => 7.592993));
+        CM_Db_Db::insert('cm_model_location_zip', array('cityId' => $basel, 'name' => '4056', 'lat' => 47.569535, 'lon' => 7.574063));
 
         $location = CM_Db_Db::exec('SELECT `1`.`id` `1.id`, `1`.`name` `1.name`,
 				`2`.`id` `2.id`, `2`.`name` `2.name`,
 				`3`.`id` `3.id`, `3`.`name` `3.name`, `3`.`lat` `3.lat`, `3`.`lon` `3.lon`,
 				`4`.`id` `4.id`, `4`.`name` `4.name`, `4`.`lat` `4.lat`, `4`.`lon` `4.lon`
-			FROM `cm_locationZip` AS `4`
-			JOIN `cm_locationCity` AS `3` ON(`4`.`cityId`=`3`.`id`)
-			JOIN `cm_locationState` AS `2` ON(`3`.`stateId`=`2`.`id`)
-			JOIN `cm_locationCountry` AS `1` ON(`3`.`countryId`=`1`.`id`)
+			FROM `cm_model_location_zip` AS `4`
+			JOIN `cm_model_location_city` AS `3` ON(`4`.`cityId`=`3`.`id`)
+			JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)
+			JOIN `cm_model_location_country` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			LIMIT 1')->fetch();
 
         self::$_fields[CM_Model_Location::LEVEL_COUNTRY] = array('id' => (int) $location['1.id'], 'name' => $location['1.name']);
@@ -53,7 +53,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
             try {
                 $location = new CM_Model_Location($level, -1);
                 $this->fail('Can instantiate invalid cityId');
-            } catch (CM_Exception_Invalid $e) {
+            } catch (CM_Exception_Nonexistent $e) {
                 $this->assertTrue(true);
             }
         }
@@ -134,8 +134,8 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     }
 
     public function testGetDistance() {
-        $winterthur = (int) CM_Db_Db::select('cm_locationCity', 'id', array('name' => 'Winterthur'))->fetchColumn();
-        $basel = (int) CM_Db_Db::select('cm_locationCity', 'id', array('name' => 'Basel'))->fetchColumn();
+        $winterthur = (int) CM_Db_Db::select('cm_model_location_city', 'id', array('name' => 'Winterthur'))->fetchColumn();
+        $basel = (int) CM_Db_Db::select('cm_model_location_city', 'id', array('name' => 'Basel'))->fetchColumn();
         $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $basel);
         $locationAgainst = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $winterthur);
 
@@ -143,13 +143,13 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     }
 
     public function testFindByCoordinates() {
-        CM_Db_Db::insert('cm_locationCity', array(
+        CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
             'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
             'name'      => 'test',
             'lat'       => 20, 'lon' => 20));
 
-        $expectedId = CM_Db_Db::insert('cm_locationCity', array(
+        $expectedId = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
             'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
             'name'      => 'test',
@@ -163,14 +163,14 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     }
 
     public function testFindByIp() {
-        $cityId1 = CM_Db_Db::getRandId('cm_locationCity', 'id');
-        CM_Db_Db::insert('cm_locationCityIp', array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
-        $cityId2 = CM_Db_Db::getRandId('cm_locationCity', 'id');
-        CM_Db_Db::insert('cm_locationCityIp', array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
-        $countryId1 = CM_Db_Db::getRandId('cm_locationCountry', 'id');
-        CM_Db_Db::insert('cm_locationCountryIp', array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
-        $countryId2 = CM_Db_Db::getRandId('cm_locationCountry', 'id');
-        CM_Db_Db::insert('cm_locationCountryIp', array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
+        $cityId1 = CM_Db_Db::getRandId('cm_model_location_city', 'id');
+        CM_Db_Db::insert('cm_model_location_city_ip', array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
+        $cityId2 = CM_Db_Db::getRandId('cm_model_location_city', 'id');
+        CM_Db_Db::insert('cm_model_location_city_ip', array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
+        $countryId1 = CM_Db_Db::getRandId('cm_model_location_country', 'id');
+        CM_Db_Db::insert('cm_model_location_country_ip', array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
+        $countryId2 = CM_Db_Db::getRandId('cm_model_location_country', 'id');
+        CM_Db_Db::insert('cm_model_location_country_ip', array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
 
         $this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId1), CM_Model_Location::findByIp(3));
         $this->assertNull(CM_Model_Location::findByIp(6));
@@ -186,7 +186,7 @@ class CM_Model_LocationTest extends CMTest_TestCase {
     public function testCreateCountry() {
         $country = CM_Model_Location::createCountry('Example Country', 'EC');
         $this->assertSame(CM_Model_Location::LEVEL_COUNTRY, $country->getLevel());
-        $this->assertSame(1, CM_Db_Db::count('cm_locationCountry', array('abbreviation' => 'EC')));
+        $this->assertSame(1, CM_Db_Db::count('cm_model_location_country', array('abbreviation' => 'EC')));
         $this->assertSame('Example Country', $country->getName());
         $this->assertSame('EC', $country->getAbbreviation());
     }
