@@ -38,6 +38,18 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.date.timeago.months', '{$count} Monaten');
     $language->setTranslation('.date.timeago.year', 'etwa einem Jahr');
     $language->setTranslation('.date.timeago.years', '{$count} Jahren');
+    $language->setTranslation('.date.period.minute', '1 Minute');
+    $language->setTranslation('.date.period.minutes', '{$count} Minuten', array('count'));
+    $language->setTranslation('.date.period.hour', '1 Stunde');
+    $language->setTranslation('.date.period.hours', '{$count} Stunden', array('count'));
+    $language->setTranslation('.date.period.day', '1 Tag');
+    $language->setTranslation('.date.period.days', '{$count} Tage', array('count'));
+    $language->setTranslation('.date.period.week', '1 Woche');
+    $language->setTranslation('.date.period.weeks', '{$count} Wochen', array('count'));
+    $language->setTranslation('.date.period.month', '1 Monat');
+    $language->setTranslation('.date.period.months', '{$count} Monate', array('count'));
+    $language->setTranslation('.date.period.year', '1 Jahr');
+    $language->setTranslation('.date.period.years', '{$count} Jahre', array('count'));
     $language->setTranslation('The content you tried to interact with has been deleted.', 'Dieser Inhalt wurde gelöscht.');
     $language->setTranslation('Your browser is no longer supported. Click here to upgrade…', 'Dein Browser wird nicht mehr unterstützt. Klicke hier um ihn zu aktualisieren…');
     $language->setTranslation('You can only select {$cardinality} items.', 'Maximal {$cardinality} Element.', array('cardinality'));
