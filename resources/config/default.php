@@ -133,7 +133,3 @@ $config->services['filesystemUserfiles'] = array(
         ),
     ),
 );
-
-//$filesystemService = CM_ServiceManager::getInstance()->getFilesystem();
-//$filesystemService->get('foo');
-//$filesystemService->getUserfiles();
