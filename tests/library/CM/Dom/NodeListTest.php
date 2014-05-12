@@ -56,6 +56,14 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $list->find('div')->getAttributeList());
     }
 
+    public function testGetAttributeListTextNode() {
+        $list = new CM_Dom_NodeList('<div>text</div>');
+        foreach($list->find('div')->getChildren() as $child) {
+            /** @var CM_Dom_NodeList $child */
+            $this->assertSame(array(), $child->getAttributeList());
+        }
+    }
+
     public function testFind() {
         $list = new CM_Dom_NodeList('<div foo="bar">lorem ipsum dolor <p foo="foo">lorem ipsum</p></div><p foo="foo">lorem</p>');
         $this->assertSame('lorem ipsumlorem', $list->find('p')->getText());
@@ -84,6 +92,14 @@ class CM_Dom_NodeListTest extends CMTest_TestCase {
         $list2 = $list->find('foo')->getChildren();
 
         $this->assertEquals(0, $list2->count());
+    }
+
+    public function testGetChildrenTextNode() {
+        $list = new CM_Dom_NodeList('<div>text</div>');
+        foreach($list->find('div')->getChildren() as $child) {
+            /** @var CM_Dom_NodeList $child */
+            $this->assertSame(0, $child->getChildren()->count());
+        }
     }
 
     public function testGetChildrenFilterType() {

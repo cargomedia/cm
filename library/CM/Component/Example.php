@@ -58,12 +58,11 @@ class CM_Component_Example extends CM_Component_Abstract {
      * @return string[]
      */
     private function _getIcons() {
-        $path = DIR_PUBLIC . '/static/css/library/icon.less';
-        if (!CM_File::exists($path)) {
+        $file = new CM_File(DIR_PUBLIC . '/static/css/library/icon.less');
+        if (!$file->getExists()) {
             return array();
         }
 
-        $file = new CM_File($path);
         preg_match_all('#\.icon-(.+?):before { content:#', $file->read(), $icons);
         return $icons[1];
     }
@@ -75,10 +74,9 @@ class CM_Component_Example extends CM_Component_Abstract {
         $site = $this->getParams()->getSite('site');
         $style = '';
         foreach (array_reverse($site->getNamespaces()) as $namespace) {
-            $path = CM_Util::getNamespacePath($namespace) . 'layout/default/variables.less';
-            if (CM_File::exists($path)) {
-                $file = new CM_File($path);
-                $style .= $file . PHP_EOL;
+            $file = new CM_File(CM_Util::getNamespacePath($namespace) . 'layout/default/variables.less');
+            if ($file->getExists()) {
+                $style .= $file->read() . PHP_EOL;
             }
         }
         preg_match_all('#@(color\w+)#', $style, $matches);

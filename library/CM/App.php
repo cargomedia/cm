@@ -18,11 +18,9 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-        CM_Util::rmDirContents($dirTmp);
-        CM_Util::mkdir($dirTmp);
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->setup(true);
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->setup();
+        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->setup();
     }
 
     /**
@@ -215,10 +213,10 @@ class CM_App {
         if ($namespace) {
             $path = CM_Util::getNamespacePath($namespace);
         }
-        $updateScript = $path . 'resources/db/update/' . $version . '.php';
-        if (!CM_File::exists($updateScript)) {
+        $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
+        if (!$file->getExists()) {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
         }
-        return $updateScript;
+        return $file->getPath();
     }
 }

@@ -21,6 +21,9 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     public function prepareResponse(CM_Frontend_Environment $environment, CM_Response_Page $response) {
     }
 
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
+    }
+
     /**
      * @param CM_Site_Abstract $site
      * @param string           $path

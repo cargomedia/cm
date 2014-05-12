@@ -56,7 +56,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             throw new CM_Exception_Invalid('Cannot create model without persistence');
         }
         if ($this->hasIdRaw()) {
-            $persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
+            $dataSchema = $this->_getSchemaData();
+            if (!empty($dataSchema)) {
+                $persistence->save($this->getType(), $this->getIdRaw(), $dataSchema);
+            }
 
             if ($cache = $this->_getCache()) {
                 $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
@@ -194,7 +197,11 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
             throw new CM_Exception('Model has no field `' . $field . '`');
         }
         if (!array_key_exists($field, $this->_dataDecoded)) {
-            $this->_dataDecoded[$field] = $this->_getSchema()->decodeField($field, $data[$field]);
+            if ($schema = $this->_getSchema()) {
+                $this->_dataDecoded[$field] = $schema->decodeField($field, $data[$field]);
+            } else {
+                $this->_dataDecoded[$field] = $data[$field];
+            }
         }
         return $this->_dataDecoded[$field];
     }
@@ -221,7 +228,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         $schema = $this->_getSchema();
 
         foreach ($data as $key => $value) {
-            $data[$key] = $schema->encodeField($key, $value);
+            $data[$key] = $schema ? $schema->encodeField($key, $value) : $value;
         }
         $this->_validateFields($data);
         foreach ($data as $key => $value) {
@@ -234,8 +241,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
                 $cache->save($this->getType(), $this->getIdRaw(), $this->_getData());
             }
             if ($persistence = $this->_getPersistence()) {
-                if (!$schema->hasDefinition()) {
-                    throw new CM_Exception_Invalid('Cannot save to persistence with an empty schema');
+                if (!$schema) {
+                    throw new CM_Exception_Invalid('Cannot save to persistence without a schema');
                 }
                 if ($schema->hasField(array_keys($data))) {
                     $persistence->save($this->getType(), $this->getIdRaw(), $this->_getSchemaData());
@@ -391,17 +398,17 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         return array();
     }
 
-    protected function _changeContainingCacheables(){
+    protected function _changeContainingCacheables() {
         foreach ($this->_getContainingCacheables() as $cacheable) {
             $cacheable->_change();
         }
     }
 
     /**
-     * @return CM_Model_Schema_Definition
+     * @return CM_Model_Schema_Definition|null
      */
     protected function _getSchema() {
-        return new CM_Model_Schema_Definition();
+        return null;
     }
 
     /**
@@ -413,9 +420,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
         if (null === $data) {
             $data = $this->_getData();
         }
-        $schema = $this->_getSchema();
-        if (!$schema->hasDefinition()) {
-            throw new CM_Exception_Invalid('Cannot get schema-data with an empty schema');
+        if (!$schema = $this->_getSchema()) {
+            throw new CM_Exception_Invalid('Cannot get schema-data without a schema');
         }
         return array_intersect_key($data, array_flip($schema->getFieldNames()));
     }
@@ -424,9 +430,10 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract implements CM_Compara
      * @param array $data
      */
     protected function _validateFields(array $data) {
-        $schema = $this->_getSchema();
-        foreach ($data as $key => $value) {
-            $schema->validateField($key, $value);
+        if ($schema = $this->_getSchema()) {
+            foreach ($data as $key => $value) {
+                $schema->validateField($key, $value);
+            }
         }
     }
 

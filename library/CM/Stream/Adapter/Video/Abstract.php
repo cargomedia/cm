@@ -70,20 +70,18 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
      * @param int    $width
      * @param int    $height
      * @param int    $serverId
-     * @param int    $thumbnailCount
      * @param string $data
      * @throws CM_Exception
      * @throws CM_Exception_NotAllowed
      * @return int
      */
-    public function publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data) {
+    public function publish($streamName, $clientKey, $start, $width, $height, $serverId, $data) {
         $streamName = (string) $streamName;
         $clientKey = (string) $clientKey;
         $start = (int) $start;
         $width = (int) $width;
         $height = (int) $height;
         $serverId = (int) $serverId;
-        $thumbnailCount = (int) $thumbnailCount;
         $data = (string) $data;
         $params = CM_Params::factory(CM_Params::decode($data, true));
         $streamChannelType = $params->getInt('streamChannelType');
@@ -97,7 +95,7 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
             'width'          => $width,
             'height'         => $height,
             'serverId'       => $serverId,
-            'thumbnailCount' => $thumbnailCount,
+            'thumbnailCount' => 0,
         ));
         try {
             CM_Model_Stream_Publish::createStatic(array(
@@ -115,22 +113,16 @@ abstract class CM_Stream_Adapter_Video_Abstract extends CM_Stream_Adapter_Abstra
 
     /**
      * @param string   $streamName
-     * @param int|null $thumbnailCount
      * @return null
      */
-    public function unpublish($streamName, $thumbnailCount = null) {
+    public function unpublish($streamName) {
         $streamName = (string) $streamName;
-        $thumbnailCount = (int) $thumbnailCount;
         /** @var CM_Model_StreamChannel_Abstract $streamChannel */
         $streamChannel = CM_Model_StreamChannel_Abstract::findByKeyAndAdapter($streamName, $this->getType());
         if (!$streamChannel) {
             return;
         }
 
-        if (null !== $thumbnailCount && $streamChannel instanceof CM_Model_StreamChannel_Video) {
-            /** @var CM_Model_StreamChannel_Video $streamChannel */
-            $streamChannel->setThumbnailCount($thumbnailCount);
-        }
         $streamChannel->getStreamPublish()->delete();
         if (!$streamChannel->hasStreams()) {
             $streamChannel->delete();

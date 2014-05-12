@@ -15,3 +15,23 @@ $config->CM_Model_Splittest->withoutPersistence = true;
 $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
+
+$config->services['filesystemData'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'tests/tmp/data/',
+        ),
+    ),
+);
+
+$config->services['filesystemUserfiles'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
+        ),
+    ),
+);
