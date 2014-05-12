@@ -18,6 +18,7 @@ class CM_FormField_Site extends CM_FormField_Set_Select {
             $valuesSet[$site->getType()] = $site->getName();
         }
         $this->_params->set('values', $valuesSet);
+        $this->_params->set('labelsInValues', true);
         parent::_setup();
     }
 }
