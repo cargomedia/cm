@@ -150,9 +150,10 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
 
         $query = $this->_getQuery($ids, $limit);
         if ($useSlave) {
-            CM_Db_Db::getClientRead()->setBuffered(false);
+            $client = CM_ServiceManager::getInstance()->getDbRead();
+            $client->setBuffered(false);
             $result = CM_Db_Db::execRead($query);
-            CM_Db_Db::getClientRead()->setBuffered(true);
+            $client->setBuffered(true);
         } else {
             $result = CM_Db_Db::exec($query);
         }
