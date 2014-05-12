@@ -109,8 +109,8 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     protected function _setup() {
-        $this->_options['levelMin'] = $this->_params->getInt('minLevel', CM_Model_Location::LEVEL_COUNTRY);
-        $this->_options['levelMax'] = $this->_params->getInt('maxLevel', CM_Model_Location::LEVEL_ZIP);
+        $this->_options['levelMin'] = $this->_params->getInt('levelMin', CM_Model_Location::LEVEL_COUNTRY);
+        $this->_options['levelMax'] = $this->_params->getInt('levelMax', CM_Model_Location::LEVEL_ZIP);
         if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
             $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
             $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
