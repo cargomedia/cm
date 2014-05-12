@@ -22,9 +22,9 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
 
         $viewResponse->set('placeholder', $renderParams->getBoolean('placeholder', false));
         $viewResponse->set('optionList', $this->_getOptionList());
-        $viewResponse->set('labelPrefix', $renderParams->has('') ? $renderParams->getString('labelPrefix') : null);
+        $viewResponse->set('labelPrefix', $renderParams->has('labelPrefix') ? $renderParams->getString('labelPrefix') : null);
 
         $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
-        $viewResponse->set('translatePrefix', $renderParams->has('') ? $renderParams->getString('translatePrefix') : null);
+        $viewResponse->set('translatePrefix', $renderParams->getString('translatePrefix', ''));
     }
 }
