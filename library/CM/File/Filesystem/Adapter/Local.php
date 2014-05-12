@@ -70,7 +70,9 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
     public function listByPrefix($pathPrefix) {
         $fileList = array();
         $dirList = array();
-        $this->_listByPrefixRecursive($pathPrefix, $fileList, $dirList);
+        if ($this->isDirectory($pathPrefix)) {
+            $this->_listByPrefixRecursive($pathPrefix, $fileList, $dirList);
+        }
 
         return array('files' => $fileList, 'dirs' => $dirList);
     }

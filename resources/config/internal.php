@@ -24,6 +24,10 @@ $config->CM_Model_Abstract->types[15] = 'CM_Model_StreamChannel_Message';
 $config->CM_Model_Abstract->types[16] = 'CM_Model_StreamChannel_Video';
 $config->CM_Model_Abstract->types[17] = 'CM_Model_StreamChannel_Message_User';
 $config->CM_Model_Abstract->types[18] = 'CM_Model_StreamChannelArchive_Video';
+$config->CM_Model_Abstract->types[27] = 'CM_Model_Location_City';
+$config->CM_Model_Abstract->types[28] = 'CM_Model_Location_Country';
+$config->CM_Model_Abstract->types[29] = 'CM_Model_Location_State';
+$config->CM_Model_Abstract->types[30] = 'CM_Model_Location_Zip';
 
 $config->CM_Paging_ContentList_Abstract->types = array();
 $config->CM_Paging_ContentList_Abstract->types[19] = 'CM_Paging_ContentList_Badwords';
@@ -67,8 +71,12 @@ $config->CM_Paging_Log_Mail->type = 23;
 $config->CM_Paging_Log_Warn->type = 24;
 $config->CM_Stream_Adapter_Message_SocketRedis->type = 25;
 $config->CM_Stream_Adapter_Video_Wowza->type = 26;
+$config->CM_Model_Location_City->type = 27;
+$config->CM_Model_Location_Country->type = 28;
+$config->CM_Model_Location_State->type = 29;
+$config->CM_Model_Location_Zip->type = 30;
 
-$config->CM_Class_Abstract->typesMaxValue = 26;
+$config->CM_Class_Abstract->typesMaxValue = 30;
 
 
 $config->CM_Action_Abstract->verbs = array();
