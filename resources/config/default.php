@@ -96,9 +96,7 @@ $config->CMService_Newrelic->appName = 'CM Application';
 
 $config->services = array();
 
-$config->services['Db'] =
-$config->services['DbRead'] =
-$config->services['DbMaintenance'] = array(
+$config->services['Db'] = array(
     'class'     => 'CM_Db_Client',
     'arguments' => array(
         'localhost',
