@@ -17,16 +17,7 @@ class CM_Paging_FileUserContent_StreamChannelArchiveVideoThumbnails extends CM_P
         parent::__construct($source);
     }
 
-    protected function _getFilename($item) {
-        return
-            $this->_streamChannelArchive->getId() . '-' . $this->_streamChannelArchive->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $item . '.png';
-    }
-
-    protected function _getFileNamespace($item) {
-        return 'streamChannels';
-    }
-
-    protected function _getSequence($item) {
-        return (int) $this->_streamChannelArchive->getId();
+    protected function _processItem($item) {
+        return $this->_streamChannelArchive->getThumbnail($item);
     }
 }
