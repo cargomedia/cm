@@ -84,7 +84,7 @@ class CM_Response_Page extends CM_Response_Abstract {
      */
     protected function _renderPage(CM_Page_Abstract $page) {
         $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page);
-        return $renderAdapterLayout->fetch($this->getSite());
+        return $renderAdapterLayout->fetch();
     }
 
     protected function _process() {

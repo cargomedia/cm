@@ -15,10 +15,10 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param CM_Site_Abstract $site
      * @return string
      */
-    public function fetch(CM_Site_Abstract $site) {
+    public function fetch() {
+        $site = $this->getRender()->getSite();
         $page = $this->_getPage();
         $layout = $page->getLayout($site);
 
