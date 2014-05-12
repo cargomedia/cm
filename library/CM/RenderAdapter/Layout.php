@@ -2,27 +2,38 @@
 
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
+    /** @var CM_RenderAdapter_Page */
+    private $_renderAdapterPage;
+
     /**
-     * @param CM_Page_Abstract $page
+     * @param CM_Frontend_Render $render
+     * @param CM_Page_Abstract   $page
+     */
+    public function __construct(CM_Frontend_Render $render, CM_Page_Abstract $page) {
+        $this->_renderAdapterPage = new CM_RenderAdapter_Page($render, $page);
+        parent::__construct($render, $page);
+    }
+
+    /**
+     * @param CM_Site_Abstract $site
      * @return string
      */
-    public function fetch(CM_Page_Abstract $page) {
-        $layout = $this->_getLayout();
+    public function fetch(CM_Site_Abstract $site) {
+        $page = $this->_getPage();
+        $layout = $page->getLayout($site);
+
         $page->checkAccessible($this->getRender()->getEnvironment());
         $frontend = $this->getRender()->getFrontend();
-
-        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $page);
-        $pageTitle = $renderAdapterPage->fetchTitle();
 
         $viewResponse = new CM_Frontend_ViewResponse($layout);
         $viewResponse->setTemplateName('default');
         $viewResponse->setData(array(
             'autoId'          => $viewResponse->getAutoId(),
             'layout'          => $layout,
-            'title'           => $this->fetchTitle($pageTitle),
-            'page'            => $page,
-            'pageDescription' => $renderAdapterPage->fetchDescription(),
-            'pageKeywords'    => $renderAdapterPage->fetchKeywords(),
+            'pageTitle'       => $this->fetchTitle(),
+            'pageDescription' => $this->fetchDescription(),
+            'pageKeywords'    => $this->fetchKeywords(),
+            'renderAdapter'   => $this,
         ));
 
         $frontend->treeExpand($viewResponse);
@@ -64,17 +75,38 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @param string $pageTitle
      * @return string
      */
-    public function fetchTitle($pageTitle) {
+    public function fetchPage() {
+        return $this->_renderAdapterPage->fetch();
+    }
+
+    /**
+     * @return string
+     */
+    public function fetchTitle() {
+        $pageTitle = $this->_renderAdapterPage->fetchTitle();
         return $this->_fetchTemplate('title', array('pageTitle' => $pageTitle));
     }
 
     /**
-     * @return CM_Layout_Abstract
+     * @return string
      */
-    private function _getLayout() {
+    public function fetchDescription() {
+        return $this->_renderAdapterPage->fetchDescription();
+    }
+
+    /**
+     * @return string
+     */
+    public function fetchKeywords() {
+        return $this->_renderAdapterPage->fetchKeywords();
+    }
+
+    /**
+     * @return CM_Page_Abstract
+     */
+    private function _getPage() {
         return $this->_getView();
     }
 }

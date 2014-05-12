@@ -29,7 +29,7 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
     <link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}">
-    <title>{$title|escape}</title>
+    <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
@@ -48,7 +48,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-        {component name=$page}
+		{$renderAdapter->fetchPage()}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
