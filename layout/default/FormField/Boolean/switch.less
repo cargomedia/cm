@@ -1,0 +1,70 @@
+&.switch input[type=checkbox] {
+@sizeSwitch = @sizeCheckbox + 4px;
+
+  + label {
+    margin-left: 0;
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 2 * @sizeSwitch + 5px;
+      height: @sizeSwitch;
+      margin-right: 5px;
+      vertical-align: middle;
+      border: 1px solid @colorFgBorderEmphasize3;
+      border-radius: .5 * @sizeSwitch;
+      background-color: @colorBgEmphasize1;
+      box-shadow: 0 .1em .1em rgba(0, 0, 0, 0.02) inset;
+
+      &:before, &:after {
+        position: absolute;
+        top: 0;
+      }
+
+      &:before {
+        right: 0;
+        margin: 0 5px;
+        content: 'OFF';
+        font-weight: bold;
+        line-height: @sizeSwitch - 2px;
+        font-size: @fontSizeTiny;
+        text-transform: uppercase;
+        color: lighten(@colorFgSubtle, 10);
+      }
+
+      &:after {
+        left: 0;
+        content: '';
+        width: @sizeSwitch - 6px;
+        height: @sizeSwitch - 6px;
+        margin: 2px;
+        border: 1px solid @colorBg;
+        border-radius: 50%;
+        background-color: lighten(@colorFgSubtle, 10);
+        .transform(translateX(0));
+        .transition(200ms);
+      }
+    }
+
+    &:before {
+      display: none;
+    }
+  }
+
+  &:checked + label .switch {
+    background-color: lighten(@colorNotice, 15);
+    border-color: lighten(@colorNotice, 5);
+
+    &:before {
+      right: 0;
+      left: 0;
+      content: 'ON';
+      color: @colorFgTheme;
+    }
+
+    &:after {
+      .transform(translateX(@sizeSwitch + 4px));
+      background-color: lighten(@colorNotice, 30);
+    }
+  }
+}
