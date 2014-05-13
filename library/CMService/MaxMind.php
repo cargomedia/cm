@@ -64,8 +64,8 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_upgradeIpBlocks();
         $this->_writeln('Updating search index…');
         CM_Model_Location::createAggregation();
-        $type = new CM_Elastica_Type_Location();
-        $searchIndexCli = new CM_Search_Index_Cli();
+        $type = new CM_Elasticsearch_Type_Location();
+        $searchIndexCli = new CM_Elasticsearch_Index_Cli();
         $searchIndexCli->create($type->getIndex()->getName());
     }
 
@@ -858,7 +858,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_writeln('Reading old country listing…');
         $this->_countryListOld = array();
         $this->_countryIdList = array();
-        $result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_locationCountry`');
+        $result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_model_location_country`');
         while (false !== ($row = $result->fetch())) {
             list($countryId, $countryCode, $countryName) = array_values($row);
             $this->_countryListOld[$countryCode] = $countryName;
@@ -869,7 +869,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected function _readRegionListOld() {
         $this->_writeln('Reading old region listing…');
         $this->_regionListByCountryOld = array();
-        $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_locationState` `state` LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `state`.`countryId`');
+        $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_model_location_state` `state` LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `state`.`countryId`');
         while (false !== ($row = $result->fetch())) {
             list($regionId, $countryCode, $maxMind, $regionAbbreviation, $regionName) = array_values($row);
             $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
@@ -897,9 +897,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`state`.`name` AS `regionName`,
 				`country`.`abbreviation` AS `countryCode`,
 				`country`.`name` AS `countryName`
-			FROM `cm_locationCity` `city`
-			LEFT JOIN `cm_locationState` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `city`.`countryId`');
+			FROM `cm_model_location_city` `city`
+			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
         while (false !== ($row = $result->fetch())) {
             list($cityId, $cityCode, $cityName, $latitude, $longitude, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode, $countryName) = array_values($row);
             if (null === $cityCode) {
@@ -936,10 +936,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
 				`state`.`abbreviation` AS `regionAbbreviation`,
 				`state`.`name` AS `regionName`,
 				`country`.`abbreviation` AS `countryCode`
-			FROM `cm_locationZip` `zip`
-			LEFT JOIN `cm_locationCity` `city` ON `city`.`id` = `zip`.`cityId`
-			LEFT JOIN `cm_locationState` `state` ON `state`.`id` = `city`.`stateId`
-			LEFT JOIN `cm_locationCountry` `country` ON `country`.`id` = `city`.`countryId`');
+			FROM `cm_model_location_zip` `zip`
+			LEFT JOIN `cm_model_location_city` `city` ON `city`.`id` = `zip`.`cityId`
+			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
+			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
         while (false !== ($row = $result->fetch())) {
             list($zipId, $zipCode, $cityId, $latitude, $longitude, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
             if (null === $cityId) {
@@ -1147,7 +1147,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $item = 0;
         foreach ($this->_countryListRenamed as $countryCode => $countryNames) {
             $countryName = $countryNames['name'];
-            CM_Db_Db::update('cm_locationCountry', array('name' => $countryName), array('abbreviation' => $countryCode));
+            CM_Db_Db::update('cm_model_location_country', array('name' => $countryName), array('abbreviation' => $countryCode));
             $this->_printProgressCounter(++$item, $count);
         }
         foreach ($this->_countryListAdded as $countryCode => $countryName) {
@@ -1167,10 +1167,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($regionListRenamed as $regionCode => $regionNames) {
                 $regionName = $regionNames['name'];
                 $maxMindRegion = $countryCode . $regionCode;
-                if (!CM_Db_Db::update('cm_locationState', array('name' => $regionName), array('_maxmind' => $maxMindRegion))) {
+                if (!CM_Db_Db::update('cm_model_location_state', array('name' => $regionName), array('_maxmind' => $maxMindRegion))) {
                     // For the USA, where the old numeric region codes in _maxmind have been removed from MaxMind's newer region databases
                     $countryId = $this->_countryIdList[$countryCode];
-                    CM_Db_Db::update('cm_locationState', array('name' => $regionName), array(
+                    CM_Db_Db::update('cm_model_location_state', array('name' => $regionName), array(
                         'countryId'    => $countryId,
                         'abbreviation' => $regionCode
                     ));
@@ -1183,7 +1183,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
                 $maxMindRegion = $countryCode . $regionCode;
                 $abbreviationRegion = ('US' === $countryCode) ? $regionCode : null;
-                CM_Db_Db::update('cm_locationState',
+                CM_Db_Db::update('cm_model_location_state',
                     array('_maxmind' => $maxMindRegion, 'abbreviation' => $abbreviationRegion),
                     array('id' => $regionId));
                 $this->_printProgressCounter(++$item, $count);
@@ -1203,9 +1203,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         foreach ($this->_regionListByCountryRemovedCodeInUse as $countryCode => $regionListRemovedCodeInUse) {
             foreach ($regionListRemovedCodeInUse as $regionIdOld => $regionCode) {
-                CM_Db_Db::delete('cm_locationState', array('id' => $regionIdOld));
+                CM_Db_Db::delete('cm_model_location_state', array('id' => $regionIdOld));
                 $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
-                CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId), array('stateId' => $regionIdOld));
+                CM_Db_Db::update('cm_model_location_city', array('stateId' => $regionId), array('stateId' => $regionIdOld));
                 $this->_printProgressCounter(++$item, $count);
             }
         }
@@ -1220,7 +1220,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($cityListByRegionRenamed as $cityListRenamed) {
                 foreach ($cityListRenamed as $cityCode => $cityNames) {
                     $cityName = $cityNames['name'];
-                    CM_Db_Db::update('cm_locationCity', array('name' => $cityName), array('_maxmind' => $cityCode));
+                    CM_Db_Db::update('cm_model_location_city', array('name' => $cityName), array('_maxmind' => $cityCode));
                     $this->_printProgressCounter(++$item, $count);
                 }
             }
@@ -1229,7 +1229,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             foreach ($cityListByRegionUpdatedCode as $cityListUpdatedCode) {
                 foreach ($cityListUpdatedCode as $cityCode) {
                     $cityId = $this->_cityIdList[$cityCode];
-                    CM_Db_Db::update('cm_locationCity', array('_maxmind' => $cityCode), array('id' => $cityId));
+                    CM_Db_Db::update('cm_model_location_city', array('_maxmind' => $cityCode), array('id' => $cityId));
                     $this->_printProgressCounter(++$item, $count);
                 }
             }
@@ -1241,10 +1241,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $regionName = $this->_getRegionName($countryCode, $regionCode);
                 $cityName = $this->_cityListByRegion[$countryCode][$regionCode][$cityCode];
                 if ($regionName === 'Unknown region') {
-                    CM_Db_Db::update('cm_locationCity', array('stateId' => null, 'name' => $cityName), array('id' => $cityId));
+                    CM_Db_Db::update('cm_model_location_city', array('stateId' => null, 'name' => $cityName), array('id' => $cityId));
                 } else {
                     $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
-                    CM_Db_Db::update('cm_locationCity', array('stateId' => $regionId, 'name' => $cityName), array('id' => $cityId));
+                    CM_Db_Db::update('cm_model_location_city', array('stateId' => $regionId, 'name' => $cityName), array('id' => $cityId));
                 }
                 $this->_printProgressCounter(++$item, $count);
             }
@@ -1295,17 +1295,17 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_writeln('Updating IP blocks database…');
         $count = $this->_count(array($this->_ipBlockListByCountry, $this->_ipBlockListByCity), 3);
         $item = 0;
-        CM_Db_Db::truncate('cm_locationCountryIp');
+        CM_Db_Db::truncate('cm_model_location_country_ip');
         foreach ($this->_ipBlockListByCountry as $countryId => $ipBlockList) {
             foreach ($ipBlockList as $ipEnd => $ipStart) {
-                CM_Db_Db::insertIgnore('cm_locationCountryIp', array('countryId' => $countryId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
+                CM_Db_Db::insertIgnore('cm_model_location_country_ip', array('countryId' => $countryId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
                 $this->_printProgressCounter(++$item, $count);
             }
         }
-        CM_Db_Db::truncate('cm_locationCityIp');
+        CM_Db_Db::truncate('cm_model_location_city_ip');
         foreach ($this->_ipBlockListByCity as $cityId => $ipBlockList) {
             foreach ($ipBlockList as $ipEnd => $ipStart) {
-                CM_Db_Db::insertIgnore('cm_locationCityIp', array('cityId' => $cityId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
+                CM_Db_Db::insertIgnore('cm_model_location_city_ip', array('cityId' => $cityId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
                 $this->_printProgressCounter(++$item, $count);
             }
         }

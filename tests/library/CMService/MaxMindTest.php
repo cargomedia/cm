@@ -3,12 +3,12 @@
 class CMService_MaxMindTest extends CMTest_TestCase {
 
     public function setUp() {
-        CM_Db_Db::exec('ALTER TABLE cm_locationCityIp AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_locationCountryIp AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_locationZip AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_locationCity AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_locationState AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_locationCountry AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_city_ip AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_country_ip AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_zip AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_city AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_state AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_country AUTO_INCREMENT = 1');
     }
 
     public function tearDown() {
@@ -1050,7 +1050,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array()
         );
-        CM_Db_Db::update('cm_locationState', array('_maxmind' => 'US06'));
+        CM_Db_Db::update('cm_model_location_state', array('_maxmind' => 'US06'));
         $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
@@ -1104,7 +1104,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array()
         );
-        CM_Db_Db::update('cm_locationState', array('_maxmind' => 'US06'));
+        CM_Db_Db::update('cm_model_location_state', array('_maxmind' => 'US06'));
         $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
@@ -2915,17 +2915,17 @@ class CMService_MaxMindTest extends CMTest_TestCase {
     }
 
     protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataCountryExpected, $ipDataCityExpected) {
-        $countryDataActual = CM_Db_Db::select('cm_locationCountry', '*')->fetchAll();
+        $countryDataActual = CM_Db_Db::select('cm_model_location_country', '*')->fetchAll();
         $this->assertEquals($countryDataExpected, $countryDataActual);
-        $regionDataActual = CM_Db_Db::select('cm_locationState', '*')->fetchAll();
+        $regionDataActual = CM_Db_Db::select('cm_model_location_state', '*')->fetchAll();
         $this->assertEquals($regionDataExpected, $regionDataActual);
-        $cityDataActual = CM_Db_Db::select('cm_locationCity', '*')->fetchAll();
+        $cityDataActual = CM_Db_Db::select('cm_model_location_city', '*')->fetchAll();
         $this->assertEquals($cityDataExpected, $cityDataActual);
-        $zipCodeDataActual = CM_Db_Db::select('cm_locationZip', '*')->fetchAll();
+        $zipCodeDataActual = CM_Db_Db::select('cm_model_location_zip', '*')->fetchAll();
         $this->assertEquals($zipCodeDataExpected, $zipCodeDataActual);
-        $ipDataCountryActual = CM_Db_Db::select('cm_locationCountryIp', '*')->fetchAll();
+        $ipDataCountryActual = CM_Db_Db::select('cm_model_location_country_ip', '*')->fetchAll();
         $this->assertEquals($ipDataCountryExpected, $ipDataCountryActual);
-        $ipDataCityActual = CM_Db_Db::select('cm_locationCityIp', '*')->fetchAll();
+        $ipDataCityActual = CM_Db_Db::select('cm_model_location_city_ip', '*')->fetchAll();
         $this->assertEquals($ipDataCityExpected, $ipDataCityActual);
     }
 }

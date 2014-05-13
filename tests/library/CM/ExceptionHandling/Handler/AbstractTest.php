@@ -25,8 +25,8 @@ class CM_ExceptionHandling_Handler_AbstractTest extends CMTest_TestCase {
         $exception->expects($this->any())->method('getMetaInfo')->will($this->returnValue(array()));
 
         $method = CMTest_TH::getProtectedMethod('CM_ExceptionHandling_Handler_Abstract', '_logException');
-        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->setMethods(array('_getLogPath'))->getMockForAbstractClass();
-        $exceptionHandler->expects($this->any())->method('_getLogPath')->will($this->returnValue($errorLog));
+        $exceptionHandler = $this->getMockBuilder('CM_ExceptionHandling_Handler_Abstract')->setMethods(array('_getLogFile'))->getMockForAbstractClass();
+        $exceptionHandler->expects($this->any())->method('_getLogFile')->will($this->returnValue(new CM_File($errorLog)));
 
         $this->assertFileNotExists($errorLog);
         $method->invoke($exceptionHandler, $exception);

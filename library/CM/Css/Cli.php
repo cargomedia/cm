@@ -21,24 +21,25 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         }
         $this->_getOutput()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
 
-        $dirWork = CM_Util::mkDirTmp();
+        $dirWork = CM_File::createTmpDir();
         foreach ($svgFileList as $fontFile) {
-            $fontFile->copy($dirWork . $fontFile->getFileName());
+            $fontFile->copy($dirWork->getPath() . '/' . $fontFile->getFileName());
         }
 
-        $dirBuild = $dirWork . 'build/';
-        CM_Util::exec('fontcustom', array('compile', $dirWork, '--no-hash', '--font-name=icon-webfont', '--output=' . $dirBuild));
+        $dirBuild = new CM_File($dirWork->getPath() . '/build');
+        CM_Util::exec('fontcustom',
+            array('compile', $dirWork->getPath(), '--no-hash', '--font-name=icon-webfont', '--output=' . $dirBuild->getPath()));
 
-        $cssFile = new CM_File($dirBuild . '/icon-webfont.css');
+        $cssFile = new CM_File($dirBuild->getPath() . '/icon-webfont.css');
         $less = preg_replace('/url\("(?:.*?\/)(.+?)(\??#.+?)?"\)/', 'url(urlFont("\1") + "\2")', $cssFile->read());
         CM_File::create(DIR_PUBLIC . 'static/css/library/icon.less', $less);
 
-        foreach (glob($dirBuild . 'icon-webfont.*') as $fontPath) {
+        foreach (glob($dirBuild->getPath() . '/icon-webfont.*') as $fontPath) {
             $fontFile = new CM_File($fontPath);
-            $fontFile->move(DIR_PUBLIC . 'static/font/' . $fontFile->getFileName());
+            $fontFile->rename(DIR_PUBLIC . 'static/font/' . $fontFile->getFileName());
         }
 
-        CM_Util::rmDir($dirWork);
+        $dirWork->delete(true);
         $this->_getOutput()->writeln('Created web-font and stylesheet.');
     }
 

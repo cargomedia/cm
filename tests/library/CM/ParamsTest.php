@@ -121,19 +121,16 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetFile() {
-        $file = CM_File::createTmp();
+        $file = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo');
         $params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
         $this->assertEquals($file, $params->getFile('file'));
         $this->assertEquals($file, $params->getFile('filename'));
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage does not exist or is not a file
-     */
-    public function testGetFileException() {
-        $params = new CM_Params(array('nonexistent' => 'foo/bar'));
-        $params->getFile('nonexistent');
+    public function testGetFileNonexistent() {
+        $fileNonexistent = new CM_File('foo/bar');
+        $params = new CM_Params(array('nonexistent' => $fileNonexistent->getPath()));
+        $this->assertEquals($fileNonexistent, $params->getFile('nonexistent'));
     }
 
     public function testGetFileGeoPoint() {

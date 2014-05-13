@@ -56,9 +56,11 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
         $html = $this->getRender()->render($component);
 
+        $jsComponentOld = 'cm.views["' . $componentInfo['id'] . '"]';
+        $jsComponentNew = 'cm.views["' . $component->getAutoId() . '"]';
         $this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
-        $this->getRender()->getJs()->onloadPrepareJs(
-            'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
+        $this->getRender()->getJs()->onloadPrepareJs($jsComponentOld . '.getParent().registerChild(' . $jsComponentNew . ');');
+        $this->getRender()->getJs()->onloadPrepareJs($jsComponentOld . '.replaceWithHtml(' . $jsComponentNew . '.$el);');
         $this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
         $componentInfo['id'] = $component->getAutoId();
 

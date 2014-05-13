@@ -23,7 +23,15 @@
     },
 
     scrollBottom: function() {
-      this.scrollTop(this.prop("scrollHeight"));
+      this.each(function() {
+        var scrollHeight;
+        if (this === document) {
+          scrollHeight = $(document.body).prop('scrollHeight');
+        } else {
+          scrollHeight = $(this).prop('scrollHeight');
+        }
+        $(this).scrollTop(scrollHeight);
+      });
     },
 
     scrollTo: function(target) {

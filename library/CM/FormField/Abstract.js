@@ -91,6 +91,17 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
   },
 
   /**
+   * @returns {jQuery}
+   */
+  getInput: function() {
+    return this.$('input:first, select:first, textarea:first')
+  },
+
+  setFocus: function() {
+    this.getInput().focus();
+  },
+
+  /**
    * @param {String|Null} message
    */
   error: function(message) {
@@ -110,7 +121,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
           $errorMessage.html(message);
           $errorMessage.slideDown('fast');
         }
-        this.$('input:first, select:first, textarea:first').focus();
+        this.setFocus();
 
       } else {
         cm.error.trigger('FormField `' + this.getName() + '`: ' + message);

@@ -13,8 +13,8 @@ $config->CM_Tracking_Abstract->code = '';
 
 $config->CM_Splittesting_Abstract->enabled = false;
 
-$config->CM_Search->enabled = true;
-$config->CM_Search->servers = array(
+$config->CM_Elasticsearch_Client->enabled = true;
+$config->CM_Elasticsearch_Client->servers = array(
     array('host' => 'localhost', 'port' => 9200),
 );
 
@@ -64,10 +64,11 @@ $config->CM_Response_Page->catch = array(
 );
 
 $config->CM_Response_View_Abstract->catch = array(
+    'CM_Exception_Nonexistent',
     'CM_Exception_AuthRequired',
+    'CM_Exception_NotAllowed',
     'CM_Exception_Blocked',
     'CM_Exception_ActionLimit',
-    'CM_Exception_Nonexistent',
 );
 
 $config->CM_Response_RPC->catch = array(
@@ -82,10 +83,6 @@ $config->CM_Stream_Video->servers = array(
 
 $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
 $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
-
-$config->CM_KissTracking->enabled = false;
-$config->CM_KissTracking->awsBucketName = '';
-$config->CM_KissTracking->awsFilePrefix = '';
 
 $config->CM_Adprovider->enabled = true;
 $config->CM_Adprovider->zones = array();
@@ -103,3 +100,36 @@ $config->CMService_Amazon_Abstract->secretKey = '';
 
 $config->CMService_Newrelic->enabled = false;
 $config->CMService_Newrelic->appName = 'CM Application';
+
+$config->services = array();
+
+$config->services['MongoDb'] = array(
+    'class'     => 'CM_Service_MongoDb',
+    'arguments' => array(
+        array(
+            'db'      => 'cm',
+            'server'  => 'mongodb://localhost:27017',
+            'options' => array('connect' => true),
+        )
+    ),
+);
+
+$config->services['filesystemData'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_ROOT . 'data/',
+        ),
+    ),
+);
+
+$config->services['filesystemUserfiles'] = array(
+    'class'     => 'CM_Service_Filesystem',
+    'arguments' => array(
+        'CM_File_Filesystem_Adapter_Local',
+        array(
+            'pathPrefix' => DIR_PUBLIC . 'userfiles/',
+        ),
+    ),
+);

@@ -7,6 +7,8 @@
 	"feature-detects": [
 		"test/history",
 		"test/svg",
-		"test/forms/fileinput"
+		"test/forms/fileinput",
+		"test/dom/classlist",
+		"test/requestanimationframe"
 	]
 }

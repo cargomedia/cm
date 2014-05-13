@@ -65,9 +65,11 @@ class CM_Dom_NodeList implements Iterator, Countable {
     public function getChildren($filterType = null) {
         $childNodeList = array();
         foreach ($this->_elementList as $element) {
-            foreach ($element->childNodes as $childNode) {
-                if (null === $filterType || $childNode->nodeType === $filterType) {
-                    $childNodeList[] = $childNode;
+            if ($element->hasChildNodes()) {
+                foreach ($element->childNodes as $childNode) {
+                    if (null === $filterType || $childNode->nodeType === $filterType) {
+                        $childNodeList[] = $childNode;
+                    }
                 }
             }
         }
@@ -114,6 +116,9 @@ class CM_Dom_NodeList implements Iterator, Countable {
     public function getAttributeList() {
         $attributeList = array();
         if (!isset($this->_elementList[0])) {
+            return $attributeList;
+        }
+        if (!$this->_elementList[0]->hasAttributes()) {
             return $attributeList;
         }
         foreach ($this->_elementList[0]->attributes as $key => $attrNode) {
