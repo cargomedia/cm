@@ -12,22 +12,37 @@ class CM_ServiceManager extends CM_Class_Abstract {
     protected static $instance;
 
     /**
-     * @param string $serviceName
+     * @param string $serviceName,...
      * @return bool
      */
     public function has($serviceName) {
-        return array_key_exists($serviceName, $this->_serviceList);
+        $serviceNameList = func_get_args();
+        foreach ($serviceNameList as $serviceName) {
+            $serviceName = (string) $serviceName;
+            if (array_key_exists($serviceName, $this->_serviceList)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * @param string $serviceName
+     * @param string $serviceName,...
+     * @throws CM_Exception_Nonexistent
      * @return mixed
      */
     public function get($serviceName) {
-        if (!array_key_exists($serviceName, $this->_serviceInstanceList)) {
-            $this->_serviceInstanceList[$serviceName] = $this->_instantiateService($serviceName);
+        $serviceNameList = func_get_args();
+        foreach ($serviceNameList as $serviceName) {
+            $serviceName = (string) $serviceName;
+            if ($this->has($serviceName)) {
+                if (!array_key_exists($serviceName, $this->_serviceInstanceList)) {
+                    $this->_serviceInstanceList[$serviceName] = $this->_instantiateService($serviceName);
+                }
+                return $this->_serviceInstanceList[$serviceName];
+            }
         }
-        return $this->_serviceInstanceList[$serviceName];
+        throw new CM_Exception_Nonexistent('Service `' . implode('`, `', $serviceNameList) . '` is not registered.');
     }
 
     /**
@@ -60,25 +75,23 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|null $serviceName
+     * @param string $serviceName,...
      * @return CM_Service_MongoDb
      */
     public function getMongoDb($serviceName = null) {
-        if (null === $serviceName) {
-            $serviceName = 'MongoDb';
-        }
-        return $this->get($serviceName);
+        $serviceNameList = func_get_args();
+        $serviceNameList[] = 'MongoDb';
+        return call_user_func_array(array($this, 'get'), $serviceNameList);
     }
 
     /**
-     * @param string|null $serviceName
+     * @param string $serviceName,...
      * @return CM_Db_Client
      */
     public function getDb($serviceName = null) {
-        if (null === $serviceName) {
-            $serviceName = 'Db';
-        }
-        return $this->get($serviceName);
+        $serviceNameList = func_get_args();
+        $serviceNameList[] = 'Db';
+        return call_user_func_array(array($this, 'get'), $serviceNameList);
     }
 
     /**
@@ -91,18 +104,11 @@ class CM_ServiceManager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
-     * @throws CM_Exception_Nonexistent
      * @return mixed
      */
     protected function _instantiateService($serviceName) {
-        if (!$this->has($serviceName)) {
-            throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
-        }
         $config = $this->_serviceList[$serviceName];
-        $arguments = array();
-        if (array_key_exists('arguments', $config)) {
-            $arguments = $config['arguments'];
-        }
+        $arguments = isset($config['arguments']) ? $config['arguments'] : array();
         $reflection = new ReflectionClass($config['class']);
         return $reflection->newInstanceArgs($arguments);
     }

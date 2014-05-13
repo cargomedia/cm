@@ -30,7 +30,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Nonexistent
-     * @expectedExceptionMessage Service InvalidService is not registered.
+     * @expectedExceptionMessage Service `InvalidService` is not registered.
      */
     public function testInvalidService() {
         CM_ServiceManager::getInstance()->get('InvalidService');
