@@ -11,6 +11,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
         $viewResponse = new CM_Frontend_ViewResponse($form);
         $frontend->treeExpand($viewResponse);
+        $frontend->registerViewResponse($viewResponse);
         return '';
     } else {
         $viewResponse = $frontend->getTreeCurrent()->getValue();
@@ -32,7 +33,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         foreach ($form->getActions() as $actionName => $action) {
             $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
         }
-        $render->getFrontend()->registerViewResponse($viewResponse);
         $html .= '</form>';
 
         $frontend->treeCollapse();

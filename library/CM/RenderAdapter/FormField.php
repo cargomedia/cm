@@ -7,16 +7,16 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $frontend = $this->getRender()->getFrontend();
 
         $viewResponse = new CM_Frontend_ViewResponse($field);
-        $frontend->treeExpand($viewResponse);
-
         $viewResponse->setTemplateName('default');
         $field->prepare($renderParams, $viewResponse);
-
         $viewResponse->set('field', $field);
         $viewResponse->set('inputId', $viewResponse->getAutoIdTagged('input'));
         $viewResponse->set('name', $field->getName());
         $viewResponse->set('value', $field->getValue());
         $viewResponse->set('options', $field->getOptions());
+
+        $frontend->treeExpand($viewResponse);
+        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $viewResponse->getAutoId() . '">';
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
@@ -24,11 +24,10 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
             $html .= '<span class="messages"></span>';
         }
         $html .= '</div>';
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
         $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         if ($formViewResponse) {
-            $formViewResponse->getJs()->append("this.registerField(cm.views[{$viewResponse->getAutoId()});");
+            $formViewResponse->getJs()->append("this.registerField(cm.views['{$viewResponse->getAutoId()}']);");
         }
 
         $frontend->treeCollapse();

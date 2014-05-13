@@ -18,6 +18,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $this->_prepareViewResponse($viewResponse);
 
         $frontend->treeExpand($viewResponse);
+        $frontend->registerViewResponse($viewResponse);
 
         $cssClass = implode(' ', $component->getClassHierarchy());
         if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
@@ -28,8 +29,6 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
         $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
         $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
-
-        $frontend->registerViewResponse($viewResponse);
 
         $frontend->treeCollapse();
         return $html;

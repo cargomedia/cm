@@ -24,15 +24,22 @@ class CM_Frontend_JavascriptContainer {
      * @return string
      */
     public function compile($scope = null) {
+        $code = '';
         if (!$this->_operations) {
-            return '';
-        }
-        $operations = array_filter($this->_operations);
-        $code = implode(";\n", $operations);
-        if (null === $scope) {
             return $code;
         }
-        return '(function () { ' . $code . ' }).call(' . $scope . ');';
+        $operations = array_filter($this->_operations);
+        if (null !== $scope) {
+            $operations = array_map(function ($operation) {
+                return '  ' . $operation;
+            }, $operations);
+        }
+        $code = implode(";\n", $operations);
+        $code = preg_replace("/[;\n]+/", ";\n", $code);
+        if (null !== $scope) {
+            $code = "(function () { \n{$code}}).call({$scope});";
+        }
+        return $code;
     }
 
     public function clear() {

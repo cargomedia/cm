@@ -149,9 +149,9 @@ class CM_Frontend_GlobalResponse {
         if ($parentNode) {
             $code .= ',parent:cm.views["' . $parentNode->getValue()->getAutoId() . '"]';
         }
-        $code .= '});' . PHP_EOL;
+        $code .= '});';
 
-        $this->getOnloadPrepareJs()->prepend($code);
+        $this->getOnloadPrepareJs()->append($code);
         $this->getOnloadJs()->append($viewResponse->getJs()->compile($reference));
     }
 

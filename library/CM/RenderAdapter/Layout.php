@@ -36,8 +36,6 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             'renderAdapter'   => $this,
         ));
 
-        $frontend->treeExpand($viewResponse);
-
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
@@ -64,13 +62,14 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             $frontend->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
         }
 
-        $frontend->getOnloadHeaderJs()->append('cm.ready();');
+        $frontend->treeExpand($viewResponse);
 
-        $html = $this->getRender()->fetchViewResponse($viewResponse);
-        $frontend->registerViewResponse($viewResponse);
         $frontend->getOnloadReadyJs()->append('cm.getLayout()._ready();');
-        $frontend->treeCollapse();
+        $frontend->registerViewResponse($viewResponse);
+        $frontend->getOnloadHeaderJs()->append('cm.ready();');
+        $html = $this->getRender()->fetchViewResponse($viewResponse);
 
+        $frontend->treeCollapse();
         return $html;
     }
 
