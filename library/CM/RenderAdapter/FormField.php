@@ -16,7 +16,6 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $viewResponse->set('options', $field->getOptions());
 
         $frontend->treeExpand($viewResponse);
-        $this->getRender()->getFrontend()->registerViewResponse($viewResponse);
 
         $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $viewResponse->getAutoId() . '">';
         $html .= trim($this->getRender()->fetchViewResponse($viewResponse));

@@ -136,38 +136,10 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @param CM_Frontend_ViewResponse $viewResponse
-     */
-    public function registerViewResponse(CM_Frontend_ViewResponse $viewResponse) {
-        $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
-        $view = $viewResponse->getView();
-        $code = $reference . ' = new ' . get_class($view) . '({';
-        $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
-        $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
-
-        $parentNode = $this->getTreeCurrent()->getParent();
-        if ($parentNode) {
-            $code .= ',parent:cm.views["' . $parentNode->getValue()->getAutoId() . '"]';
-        }
-        $code .= '});';
-
-        $this->getOnloadPrepareJs()->append($code);
-        $this->getOnloadJs()->append($viewResponse->getJs()->compile($reference));
-    }
-
-    /**
      * @return string
      */
     public function getJs() {
-        $operations = array(
-            $this->_onloadHeaderJs->compile(null),
-            $this->_onloadPrepareJs->compile(null),
-            $this->_onloadJs->compile(null),
-            $this->_onloadReadyJs->compile(null),
-            $this->getTracking()->getJs(),
-        );
-        $operations = array_filter($operations);
-        return implode(PHP_EOL, $operations);
+        return $this->_getJs() . PHP_EOL . $this->getTracking()->getJs();
     }
 
     /**
@@ -177,13 +149,74 @@ class CM_Frontend_GlobalResponse {
     public function getHtml(CM_Frontend_Render $render) {
         $html = '<script type="text/javascript">' . PHP_EOL;
         $html .= '$(function() {' . PHP_EOL;
-        $html .= $this->_onloadHeaderJs->compile(null) . PHP_EOL;
-        $html .= $this->_onloadPrepareJs->compile(null) . PHP_EOL;
-        $html .= $this->_onloadJs->compile(null) . PHP_EOL;
-        $html .= $this->_onloadReadyJs->compile(null) . PHP_EOL;
+        $html .= $this->_getJs();
         $html .= '});' . PHP_EOL;
         $html .= '</script>' . PHP_EOL;
         $html .= $this->getTracking()->getHtml($render->getEnvironment()->getSite());
         return $html;
+    }
+
+    /**
+     * @return string
+     */
+    private function _getJs() {
+        $treeInitJs = new CM_Frontend_JavascriptContainer();
+        $treeStoredJs = new CM_Frontend_JavascriptContainer();
+        foreach ($this->_getTreeNodes() as $node) {
+            $treeInitJs->append($this->_getTreeNodeInitJs($node));
+            $treeStoredJs->append($this->_getTreeNodeStoredJs($node));
+        }
+        $operations = array(
+            $this->_onloadHeaderJs->compile(),
+            $treeInitJs->compile(),
+            $this->_onloadPrepareJs->compile(),
+            $treeStoredJs->compile(),
+            $this->_onloadJs->compile(),
+            $this->_onloadReadyJs->compile(),
+        );
+        $operations = array_filter($operations);
+        $code = implode(PHP_EOL, $operations);
+        return $code;
+    }
+
+    /**
+     * @return CM_Frontend_TreeNode[]
+     */
+    private function _getTreeNodes() {
+        $gather = function (CM_Frontend_TreeNode $node) use (&$gather) {
+            $nodes = array($node);
+            foreach ($node->getChildren() as $child) {
+                $nodes = array_merge($nodes, $gather($child));
+            }
+            return $nodes;
+        };
+        return $gather($this->getTreeRoot());
+    }
+
+    /**
+     * @param CM_Frontend_TreeNode $node
+     * @return string
+     */
+    private function _getTreeNodeInitJs(CM_Frontend_TreeNode $node) {
+        $viewResponse = $node->getValue();
+        $reference = 'cm.views["' . $viewResponse->getAutoId() . '"]';
+        $view = $viewResponse->getView();
+        $code = $reference . ' = new ' . get_class($view) . '({';
+        $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
+        $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
+        if (!$node->isRoot()) {
+            $code .= ',parent:  cm.views["' . $node->getParent()->getValue()->getAutoId() . '"]';
+        }
+        $code .= '});';
+        return $code;
+    }
+
+    /**
+     * @param CM_Frontend_TreeNode $node
+     * @return string
+     */
+    private function _getTreeNodeStoredJs(CM_Frontend_TreeNode $node) {
+        $viewResponse = $node->getValue();
+        return $viewResponse->getJs()->compile("cm.views['{$viewResponse->getAutoId()}']");
     }
 }

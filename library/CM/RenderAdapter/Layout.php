@@ -65,11 +65,11 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $frontend->treeExpand($viewResponse);
 
         $frontend->getOnloadReadyJs()->append('cm.getLayout()._ready();');
-        $frontend->registerViewResponse($viewResponse);
         $frontend->getOnloadHeaderJs()->append('cm.ready();');
         $html = $this->getRender()->fetchViewResponse($viewResponse);
 
         $frontend->treeCollapse();
+
         return $html;
     }
 

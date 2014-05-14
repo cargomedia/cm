@@ -11,10 +11,9 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
 
         $viewResponse = new CM_Frontend_ViewResponse($form);
         $frontend->treeExpand($viewResponse);
-        $frontend->registerViewResponse($viewResponse);
         return '';
     } else {
-        $viewResponse = $frontend->getTreeCurrent()->getValue();
+        $viewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
         /** @var CM_Form_Abstract $form */
         $form = $viewResponse->getView();
 
@@ -23,7 +22,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         $html = '<form id="' . $viewResponse->getAutoId() . '" class="' . implode(' ', $classes) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
         $html .= $content;
 
-
         foreach ($form->getFields() as $field) {
             if ($field instanceof CM_FormField_Hidden) {
                 $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
@@ -31,7 +29,7 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
             }
         }
         foreach ($form->getActions() as $actionName => $action) {
-            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()})");
+            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()});");
         }
         $html .= '</form>';
 
