@@ -3,18 +3,20 @@
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $environment = $render->getEnvironment();
+    $pageViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract');
 
     $page = null;
+    $pageClassName = null;
     $activePath = '/';
     $activeParams = CM_Params::factory();
-    $pageViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract');
     if ($pageViewResponse) {
         /** @var CM_Page_Abstract $page */
         $page = $pageViewResponse->getView();
+        $pageClassName = get_class($page);
         $activePath = $page::getPath();
         $activeParams = $page->getParams();
     }
-    $environment = $render->getEnvironment();
 
     $menu = null;
     $name = null;
@@ -38,20 +40,20 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 
     if (!empty($params['breadcrumb'])) {
         /** @var CM_MenuEntry $entry */
-        $entry = $menu->findEntry($page, $depth, $depth);
+        $entry = $menu->findEntry($pageClassName, $activeParams, $depth, $depth);
         if ($entry) {
             $menuEntries = $entry->getParents();
             // Also add current entry
             $menuEntries[] = $entry;
         }
     } elseif (!empty($params['submenu'])) {
-        $entry = $menu->findEntry($page, $depth, $depth);
+        $entry = $menu->findEntry($pageClassName, $activeParams, $depth, $depth);
         if ($entry && $entry->hasChildren()) {
             $menu = $entry->getChildren();
             $menuEntries = $menu->getEntries($environment);
         }
     } elseif (!is_null($depth)) {
-        if ($entry = $menu->findEntry($page, $depth)) {
+        if ($entry = $menu->findEntry($pageClassName, $activeParams, $depth)) {
             $parents = $entry->getParents();
             $parents[] = $entry;
             /** @var CM_MenuEntry $menuEntry */
