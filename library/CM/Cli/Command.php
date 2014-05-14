@@ -142,8 +142,8 @@ class CM_Cli_Command {
         $processId = self::_getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         try {
-            CM_Db_Db::insert('cm_process', array('name'         => $processName, 'hostId' => $hostId, 'processId' => $processId,
-                                                 'timeoutStamp' => $timeoutStamp));
+            CM_Db_Db::insert('cm_process',
+                array('name' => $processName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
         } catch (CM_Db_Exception $e) {
             return false;
         }
