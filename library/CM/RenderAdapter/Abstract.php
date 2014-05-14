@@ -38,11 +38,10 @@ abstract class CM_RenderAdapter_Abstract {
      * @param string|null  $tplName
      * @param array|null   $variables
      * @param boolean|null $isolated
-     * @param boolean|null $searchAllNamespaces
      * @return string
      */
-    protected function _renderTemplate($tplName = null, array $variables = null, $isolated = null, $searchAllNamespaces = null) {
-        $tplPath = $this->_getTplPath($tplName, $searchAllNamespaces);
+    protected function _renderTemplate($tplName = null, array $variables = null, $isolated = null) {
+        $tplPath = $this->_getTplPath($tplName);
         return $this->getRender()->renderTemplate($tplPath, $variables, $isolated);
     }
 
@@ -54,23 +53,17 @@ abstract class CM_RenderAdapter_Abstract {
      * Then try parents -> for all themes again
      *
      * @param string       $tplName
-     * @param boolean|null $searchAllNamespaces
      * @return string
      * @throws CM_Exception
      */
-    protected function _getTplPath($tplName, $searchAllNamespaces = null) {
+    protected function _getTplPath($tplName) {
         $tplName = (string) $tplName;
-        $searchAllNamespaces = (boolean) $searchAllNamespaces;
         foreach ($this->_getView()->getClassHierarchy() as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
                 throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
             }
             $tpl = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $tplName;
-            $namespace = null;
-            if (!$searchAllNamespaces) {
-                $namespace = $matches[1];
-            }
-            if ($tplPath = $this->getRender()->getLayoutPath($tpl, $namespace, false, false)) {
+            if ($tplPath = $this->getRender()->getLayoutPath($tpl, null, false, false)) {
                 return $tplPath;
             }
         }
