@@ -139,7 +139,9 @@ class CM_Frontend_GlobalResponse {
      * @return string
      */
     public function getJs() {
-        return $this->_getJs() . PHP_EOL . $this->getTracking()->getJs();
+        $operations = array_filter([$this->_getJs(), $this->getTracking()->getJs()]);
+        $code = implode(PHP_EOL, $operations);
+        return $code;
     }
 
     /**
