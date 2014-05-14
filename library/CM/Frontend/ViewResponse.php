@@ -6,7 +6,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     private $_autoId;
 
     /** @var string */
-    protected $_templateName = 'default';
+    protected $_templateName;
 
     /** @var CM_View_Abstract */
     protected $_view;
@@ -18,6 +18,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      * @param CM_View_Abstract $view
      */
     public function __construct(CM_View_Abstract $view) {
+        $this->_templateName = 'default';
         $this->_view = $view;
         $this->_js = new CM_Frontend_JavascriptContainer_View();
     }

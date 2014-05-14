@@ -13,6 +13,14 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
      */
     protected $_options = array();
 
+    /**
+     * @param string|array         $userInput
+     * @param CM_Response_Abstract $response
+     * @return mixed
+     * @throws CM_Exception_FormFieldValidation
+     */
+    abstract public function validate($userInput, CM_Response_Abstract $response);
+
     abstract protected function _setup();
 
     public function __construct($params = null) {
@@ -74,15 +82,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param string|array         $userInput
-     * @param CM_Response_Abstract $response
-     * @return mixed Internal value
-     * @throws CM_Exception_FormFieldValidation
-     */
-    abstract public function validate($userInput, CM_Response_Abstract $response);
-
-    /**
-     * @param CM_Params       $renderParams
+     * @param CM_Params                $renderParams
      * @param CM_Frontend_ViewResponse $viewResponse
      */
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
@@ -93,4 +93,3 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
         $this->validate($userInput, $response);
     }
 }
-

@@ -282,7 +282,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
-        return $this->_environment->getLanguage();
+        return $this->getEnvironment()->getLanguage();
     }
 
     /**

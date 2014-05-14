@@ -22,22 +22,22 @@ class CM_Component_LogList extends CM_Component_Abstract {
         $logList = CM_Paging_Log_Abstract::factory($type, (bool) $aggregationPeriod, $aggregationPeriod);
         $logList->setPage($this->_params->getPage(), $this->_params->getInt('count', 50));
 
-        $viewResponse->set('type', $type);
-        $viewResponse->set('logList', $logList);
-        $viewResponse->set('aggregate', $aggregate);
-        $viewResponse->set('aggregationPeriod', $aggregationPeriod);
-        $viewResponse->set('aggregationPeriodList', array(3600, 86400, 7 * 86400, 31 * 86400));
-        $viewResponse->set('urlPage', $urlPage);
-        $viewResponse->set('urlParams', $urlParams);
-
+        $viewResponse->setData([
+            'type'                  => $type,
+            'logList'               => $logList,
+            'aggregate'             => $aggregate,
+            'aggregationPeriod'     => $aggregationPeriod,
+            'aggregationPeriodList' => array(3600, 86400, 7 * 86400, 31 * 86400),
+            'urlPage'               => $urlPage,
+            'urlParams'             => $urlParams
+        ]);
         $viewResponse->getJs()->setProperty('type', $type);
     }
 
-    public static function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
-        if (!static::_getAllowedFlush($response->getRender())) {
+    public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
+        if (!$this->_getAllowedFlush($response->getRender()->getEnvironment())) {
             throw new CM_Exception_NotAllowed();
         }
-
         $type = $params->getInt('type');
         $logList = CM_Paging_Log_Abstract::factory($type);
         $logList->flush();
@@ -46,10 +46,10 @@ class CM_Component_LogList extends CM_Component_Abstract {
     }
 
     /**
-     * @param CM_Frontend_Render $render
+     * @param CM_Frontend_Environment $environment
      * @return bool
      */
-    protected static function _getAllowedFlush(CM_Frontend_Render $render) {
+    protected function _getAllowedFlush(CM_Frontend_Environment $environment) {
         return CM_Bootloader::getInstance()->isDebug();
     }
 }

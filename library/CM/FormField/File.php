@@ -3,13 +3,6 @@
 class CM_FormField_File extends CM_FormField_Abstract {
 
     /**
-     * @return array List of allowed extension (empty = all)
-     */
-    protected function _getAllowedExtensions() {
-        return array();
-    }
-
-    /**
      * @param CM_File $file Uploaded file
      * @throws CM_Exception If invalid file
      */
@@ -47,5 +40,12 @@ class CM_FormField_File extends CM_FormField_Abstract {
     protected function _setup() {
         $this->_options['cardinality'] = $this->_params->getInt('cardinality', 1);
         $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
+    }
+
+    /**
+     * @return array List of allowed extension (empty = all)
+     */
+    protected function _getAllowedExtensions() {
+        return array();
     }
 }

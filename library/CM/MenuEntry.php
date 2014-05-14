@@ -44,9 +44,9 @@ class CM_MenuEntry {
      * @return bool True if path/queries match
      */
     public final function compare($path, array $params = array()) {
-        /** @var CM_Page_Abstract $pageClass */
-        $pageClass = $this->getPageName();
-        if ($path == $pageClass::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
+        /** @var CM_Page_Abstract $pageClassName */
+        $pageClassName = $this->getPageName();
+        if ($path == $pageClassName::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
             return true;
         }
         return false;
@@ -106,7 +106,7 @@ class CM_MenuEntry {
     }
 
     /**
-     * @return string Returns page class name
+     * @return string
      */
     public final function getPageName() {
         return $this->_data['page'];

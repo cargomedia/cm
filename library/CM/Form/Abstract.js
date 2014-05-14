@@ -5,10 +5,13 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type Object **/
   _fields: {},
 
+  /** @type Object **/
   _actions: {},
 
+  /** @type Boolean **/
   _stopErrorPropagation: false,
 
   initialize: function() {
@@ -55,7 +58,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} name
    * @param {CM_FormField_Abstract} field
    */
   registerField: function(field) {

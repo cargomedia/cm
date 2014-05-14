@@ -2,6 +2,9 @@
 
 class CM_Component_Graph extends CM_Component_Abstract {
 
+    public function checkAccessible(CM_Frontend_Environment $environment) {
+    }
+
     public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $xmode = $this->_params->has('xmode') ? $this->_params->get('xmode') : 'time';
         $stack = $this->_params->has('stack') ? $this->_params->get('stack') : false;
@@ -39,8 +42,5 @@ class CM_Component_Graph extends CM_Component_Abstract {
 
         $viewResponse->getJs()->setProperty('series', $series);
         $viewResponse->getJs()->setProperty('flotOptions', $flotOptions);
-    }
-
-    public function checkAccessible(CM_Frontend_Environment $environment) {
     }
 }

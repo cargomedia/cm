@@ -7,7 +7,7 @@ class CM_Frontend_JavascriptContainer_View  extends CM_Frontend_JavascriptContai
      * @param mixed  $value
      */
     public function setProperty($name, $value) {
-        $this->append("this.${name} = " . CM_Params::encode($value, true) . ';');
+        $this->append("this.{$name} = " . CM_Params::encode($value, true) . ';');
     }
 
     /**

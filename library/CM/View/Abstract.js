@@ -5,6 +5,7 @@
 var CM_View_Abstract = Backbone.View.extend({
   _class: 'CM_View_Abstract',
 
+  /** @type CM_View_Abstract[] **/
   _children: [],
 
   initialize: function() {

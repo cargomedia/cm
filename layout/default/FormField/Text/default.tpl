@@ -1,1 +1,1 @@
-{tag el="input" name=$name type="text" value=$value class="textinput {$class}" maxlength=$options.lengthMax tabindex=$tabindex placeholder=$placeholder autocorrect=$autocorrect autocapitalize=$autocapitalize}
+{tag el="input" name=$name id=$inputId type="text" value=$value class="textinput {$class}" maxlength=$options.lengthMax tabindex=$tabindex placeholder=$placeholder autocorrect=$autocorrect autocapitalize=$autocapitalize}

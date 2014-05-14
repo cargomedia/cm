@@ -3,17 +3,6 @@
 abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
     /**
-     * @param string    $term
-     * @param array     $options
-     * @param CM_Frontend_Render $render
-     * @throws CM_Exception_NotImplemented
-     * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string]))
-     */
-    protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
-        throw new CM_Exception_NotImplemented();
-    }
-
-    /**
      * @param mixed     $item
      * @param CM_Frontend_Render $render
      * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
@@ -41,5 +30,16 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
     protected function _setup() {
         $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
         $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
+    }
+
+    /**
+     * @param string    $term
+     * @param array     $options
+     * @param CM_Frontend_Render $render
+     * @throws CM_Exception_NotImplemented
+     * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string]))
+     */
+    protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
+        throw new CM_Exception_NotImplemented();
     }
 }

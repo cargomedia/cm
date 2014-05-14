@@ -45,6 +45,25 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
     }
 
+    public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+        $lat = $params->getFloat('lat');
+        $lon = $params->getFloat('lon');
+        $levelMin = $params->getInt('levelMin');
+        $levelMax = $params->getInt('levelMax');
+
+        /** @var CM_FormField_Location $field */
+        $field = new static($levelMin, $levelMax);
+
+        $location = CM_Model_Location::findByCoordinates($lat, $lon);
+        $location = $field->_squashLocationInConstraints($location);
+
+        if (!$location) {
+            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
+        }
+
+        return $field->getSuggestion($location, $response->getRender());
+    }
+
     /**
      * @param CM_Request_Abstract $request
      * @return CM_Model_Location|null
@@ -69,6 +88,16 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         return $out;
     }
 
+    protected function _setup() {
+        $this->_options['levelMin'] = $this->_params->getInt('levelMin', CM_Model_Location::LEVEL_COUNTRY);
+        $this->_options['levelMax'] = $this->_params->getInt('levelMax', CM_Model_Location::LEVEL_ZIP);
+        if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
+            $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
+            $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
+        }
+        parent::_setup();
+    }
+
     /**
      * @param CM_Model_Location $location
      * @return CM_Model_Location|null
@@ -87,34 +116,5 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
 
         return $location;
-    }
-
-    public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
-        $lat = $params->getFloat('lat');
-        $lon = $params->getFloat('lon');
-        $levelMin = $params->getInt('levelMin');
-        $levelMax = $params->getInt('levelMax');
-
-        /** @var CM_FormField_Location $field */
-        $field = new static($levelMin, $levelMax);
-
-        $location = CM_Model_Location::findByCoordinates($lat, $lon);
-        $location = $field->_squashLocationInConstraints($location);
-
-        if (!$location) {
-            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
-        }
-
-        return $field->getSuggestion($location, $response->getRender());
-    }
-
-    protected function _setup() {
-        $this->_options['levelMin'] = $this->_params->getInt('levelMin', CM_Model_Location::LEVEL_COUNTRY);
-        $this->_options['levelMax'] = $this->_params->getInt('levelMax', CM_Model_Location::LEVEL_ZIP);
-        if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
-            $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
-            $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
-        }
-        parent::_setup();
     }
 }

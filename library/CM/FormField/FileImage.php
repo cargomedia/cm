@@ -2,10 +2,6 @@
 
 class CM_FormField_FileImage extends CM_FormField_File {
 
-    protected function _getAllowedExtensions() {
-        return array('jpg', 'jpeg', 'gif', 'png');
-    }
-
     public function validateFile(CM_File $file) {
         parent::validateFile($file);
 
@@ -15,5 +11,9 @@ class CM_FormField_FileImage extends CM_FormField_File {
         } catch (CM_Exception $e) {
             throw new CM_Exception_FormFieldValidation('Invalid image');
         }
+    }
+
+    protected function _getAllowedExtensions() {
+        return array('jpg', 'jpeg', 'gif', 'png');
     }
 }

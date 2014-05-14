@@ -52,7 +52,7 @@ class CM_Frontend_GlobalResponse {
     }
 
     /**
-     * @return \CM_Frontend_TreeNode
+     * @return CM_Frontend_TreeNode
      * @throws CM_Exception_Invalid
      */
     public function getTreeCurrent() {
@@ -64,7 +64,7 @@ class CM_Frontend_GlobalResponse {
 
     /**
      * @throws CM_Exception_Invalid
-     * @return \CM_Frontend_TreeNode
+     * @return CM_Frontend_TreeNode
      */
     public function getTreeRoot() {
         if (null === $this->_treeRoot) {
