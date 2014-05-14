@@ -220,8 +220,6 @@ class CM_Frontend_GlobalResponse {
      */
     private function _getTreeNodeStoredJs(CM_Frontend_TreeNode $node) {
         $viewResponse = $node->getValue();
-        $code = $viewResponse->getJs()->compile("cm.views['{$viewResponse->getAutoId()}']");
-        $code = '// ' . get_class($viewResponse->getView()) . PHP_EOL . $code;
-        return $code;
+        return $viewResponse->getJs()->compile("cm.views['{$viewResponse->getAutoId()}']");
     }
 }
