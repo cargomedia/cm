@@ -14,6 +14,7 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $viewResponse->set('name', $field->getName());
         $viewResponse->set('value', $field->getValue());
         $viewResponse->set('options', $field->getOptions());
+        $viewResponse->getJs()->setProperty('fieldOptions', $field->getOptions());
 
         $frontend->treeExpand($viewResponse);
 

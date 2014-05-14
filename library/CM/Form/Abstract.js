@@ -7,9 +7,16 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
 
   _fields: {},
 
+  _actions: {},
+
   _stopErrorPropagation: false,
 
-  _actions: {},
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
+
+    this._fields = {};
+    this._actions = {};
+  },
 
   events: {
     'reset': function() {

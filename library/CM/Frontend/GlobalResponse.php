@@ -183,6 +183,9 @@ class CM_Frontend_GlobalResponse {
      * @return CM_Frontend_TreeNode[]
      */
     private function _getTreeNodes() {
+        if (!$this->_treeRoot) {
+            return [];
+        }
         $gather = function (CM_Frontend_TreeNode $node) use (&$gather) {
             $nodes = array($node);
             foreach ($node->getChildren() as $child) {
@@ -205,7 +208,7 @@ class CM_Frontend_GlobalResponse {
         $code .= 'el:$("#' . $viewResponse->getAutoId() . '").get(0),';
         $code .= 'params:' . CM_Params::encode($view->getParams()->getAllOriginal(), true);
         if (!$node->isRoot()) {
-            $code .= ',parent:  cm.views["' . $node->getParent()->getValue()->getAutoId() . '"]';
+            $code .= ',parent: cm.views["' . $node->getParent()->getValue()->getAutoId() . '"]';
         }
         $code .= '});';
         return $code;
@@ -217,6 +220,8 @@ class CM_Frontend_GlobalResponse {
      */
     private function _getTreeNodeStoredJs(CM_Frontend_TreeNode $node) {
         $viewResponse = $node->getValue();
-        return $viewResponse->getJs()->compile("cm.views['{$viewResponse->getAutoId()}']");
+        $code = $viewResponse->getJs()->compile("cm.views['{$viewResponse->getAutoId()}']");
+        $code = '// ' . get_class($viewResponse->getView()) . PHP_EOL . $code;
+        return $code;
     }
 }

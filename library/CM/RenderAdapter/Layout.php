@@ -18,9 +18,8 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      * @return string
      */
     public function fetch() {
-        $site = $this->getRender()->getSite();
         $page = $this->_getPage();
-        $layout = $page->getLayout($site);
+        $layout = $this->_getLayout();
 
         $page->checkAccessible($this->getRender()->getEnvironment());
         $frontend = $this->getRender()->getFrontend();
@@ -85,7 +84,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      */
     public function fetchTitle() {
         $pageTitle = $this->_renderAdapterPage->fetchTitle();
-        return $this->_fetchTemplate('title', array('pageTitle' => $pageTitle));
+        return $this->getRender()->fetchViewTemplate($this->_getLayout(), 'title', array('pageTitle' => $pageTitle));
     }
 
     /**
@@ -107,5 +106,13 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      */
     private function _getPage() {
         return $this->_getView();
+    }
+
+    /**
+     * @return CM_Layout_Abstract
+     */
+    private function _getLayout() {
+        $site = $this->getRender()->getSite();
+        return $this->_getPage()->getLayout($site);
     }
 }
