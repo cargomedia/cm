@@ -2,23 +2,21 @@
  * Author: CM
  */
 (function($) {
-  var ieMobile = /IEMobile/.test(navigator.userAgent);
-
   var defaults = {
     closable: true,
-    fullscreen: false,
-    ieMobile: ieMobile
+    fullscreen: false
   };
 
   $.floatbox = function(options) {
     this.options = $.extend({}, defaults, options || {});
   };
 
+  var $document = $(document), $html = $('html'), $body = $('body');
   var $viewport = null;
-  var backupScrollTop = null;
+  var scrollBackup = null;
   var lastFocusedElement = null;
 
-  $(document).on('keydown.floatbox', function(e) {
+  $document.on('keydown.floatbox', function(e) {
     if (e.which == 27) { // Escape
       if ($viewport && $viewport.children().length) {
         $viewport.children('.floatbox-layer:last').floatIn();
@@ -40,23 +38,20 @@
 
       this.$parent = $element.parent();
       if (!$viewport) {
-        if (this.options.ieMobile) {
-          backupScrollTop = $(document).scrollTop();
-          $('html').addClass('ieMobile');
-        }
-
+        scrollBackup = {top: $document.scrollTop(), left: $document.scrollLeft()};
         $viewport = $('<div id="floatbox-viewport" tabindex="-1"/>');
-        $viewport.appendTo($('body'));
-        $('html').addClass('floatbox-active');
+        $body.append($viewport);
+        $html.addClass('floatbox-active');
+        $body.css({top: -scrollBackup.top, left: -scrollBackup.left});
       }
       this.$layer = $('<div class="floatbox-layer active"/>');
-      var $overlay = $('<div class="floatbox-overlay"/>');
-      var $container = $('<div class="floatbox-container"/>');
-      var $controls = $('<div class="floatbox-controls"/>');
-      var $body = $('<div class="floatbox-body"/>');
+      var $floatboxOverlay = $('<div class="floatbox-overlay"/>');
+      var $floatboxContainer = $('<div class="floatbox-container"/>');
+      var $floatboxControls = $('<div class="floatbox-controls"/>');
+      var $floatboxBody = $('<div class="floatbox-body"/>');
       lastFocusedElement = document.activeElement;
       if (this.options.closable) {
-        $controls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
+        $floatboxControls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
       }
       this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" />');
 
@@ -66,9 +61,9 @@
 
       $viewport.children('.floatbox-layer.active').removeClass('active');
 
-      $body.append($element.get(0));
-      this.$floatbox.append($body, $controls);
-      $viewport.append(this.$layer.append($overlay, $container.append(this.$floatbox)));
+      $floatboxBody.append($element.get(0));
+      this.$floatbox.append($floatboxBody, $floatboxControls);
+      $viewport.append(this.$layer.append($floatboxOverlay, $floatboxContainer.append(this.$floatbox)));
 
       var self = this;
       this.windowResizeCallback = function() {
@@ -78,12 +73,12 @@
       this.repaint();
 
       self.$floatbox.addClass('fadeIn');
-      $container.add($overlay).addClass('fadeIn').on('click.floatbox', function(e) {
+      $floatboxContainer.add($floatboxOverlay).addClass('fadeIn').on('click.floatbox', function(e) {
         if (this === e.target) {
           self.close.apply(self);
         }
       });
-      $controls.on('click.floatbox', '.closeFloatbox', function() {
+      $floatboxControls.on('click.floatbox', '.closeFloatbox', function() {
         self.close.apply(self);
       });
 
@@ -109,10 +104,9 @@
         $viewport.remove();
         $viewport = null;
 
-        $('html').removeClass('floatbox-active ieMobile');
-        if (null !== backupScrollTop) {
-          $(document).scrollTop(backupScrollTop);
-        }
+        $html.removeClass('floatbox-active');
+        window.scrollTo(scrollBackup.left, scrollBackup.top);
+        $body.css({top: 0, left: 0});
       }
       $(window).off('resize.floatbox', this.windowResizeCallback);
       $element.trigger('floatbox-close');
