@@ -12,14 +12,14 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
      * @return string
      */
     public function fetchDescription() {
-        return trim($this->_fetchTpl('meta-description.tpl', true));
+        return trim($this->_fetchTpl('meta-description.tpl'));
     }
 
     /**
      * @return string
      */
     public function fetchKeywords() {
-        return trim($this->_fetchTpl('meta-keywords.tpl', true));
+        return trim($this->_fetchTpl('meta-keywords.tpl'));
     }
 
     /**
@@ -35,10 +35,9 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
     /**
      * @param string       $tplName
-     * @param boolean|null $searchAllNamespaces
      * @return string
      */
-    private function _fetchTpl($tplName, $searchAllNamespaces = null) {
-        return $this->_renderTemplate($tplName, $this->_getView()->getTplParams(), null, $searchAllNamespaces);
+    private function _fetchTpl($tplName) {
+        return $this->_renderTemplate($tplName, $this->_getView()->getTplParams(), null);
     }
 }
