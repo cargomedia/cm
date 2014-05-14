@@ -275,32 +275,6 @@ class CM_Model_Location extends CM_Model_Abstract {
         return 'CM_Model_StorageAdapter_CacheLocal';
     }
 
-    public static function createUSStatesAbbreviation() {
-        $idUS = CM_Db_Db::select('cm_model_location_country', 'id', array('abbreviation' => 'US'))->fetchColumn();
-        if (false === $idUS) {
-            throw new CM_Exception_Invalid('No country with abbreviation `US` found');
-        }
-        $idUS = (int) $idUS;
-
-        $stateMilitaryId = CM_Db_Db::select('cm_model_location_state', 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
-                                                                                   'countryId' => $idUS))->fetchColumn();
-        if (false === $stateMilitaryId) {
-            $stateMilitaryId = CM_Db_Db::insert('cm_model_location_state', array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
-                                                                                 'abbreviation' => 'AE'));
-        }
-        $stateMilitaryId = (int) $stateMilitaryId;
-
-        foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
-            CM_Db_Db::update('cm_model_location_city', array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
-        }
-
-        foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
-            CM_Db_Db::update('cm_model_location_state', array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
-        }
-
-        self::createAggregation();
-    }
-
     public static function createAggregation() {
         CM_Db_Db::truncate('cm_tmp_location');
         CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
@@ -396,71 +370,5 @@ class CM_Model_Location extends CM_Model_Abstract {
         }
         $zip = CM_Model_Location_Zip::create($city->_getLocation(), $name, $latitude, $longitude);
         return self::fromLocation($zip);
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function _getUSStateAbbreviationList() {
-        return array(
-            'Alabama'              => 'AL',
-            'Alaska'               => 'AK',
-            'Arizona'              => 'AZ',
-            'Arkansas'             => 'AR',
-            'California'           => 'CA',
-            'Colorado'             => 'CO',
-            'Connecticut'          => 'CT',
-            'Delaware'             => 'DE',
-            'District of Columbia' => 'DC',
-            'Florida'              => 'FL',
-            'Georgia'              => 'GA',
-            'Hawaii'               => 'HI',
-            'Idaho'                => 'ID',
-            'Illinois'             => 'IL',
-            'Indiana'              => 'IN',
-            'Iowa'                 => 'IA',
-            'Kansas'               => 'KS',
-            'Kentucky'             => 'KY',
-            'Louisiana'            => 'LA',
-            'Maine'                => 'ME',
-            'Maryland'             => 'MD',
-            'Massachusetts'        => 'MA',
-            'Michigan'             => 'MI',
-            'Minnesota'            => 'MN',
-            'Mississippi'          => 'MS',
-            'Missouri'             => 'MO',
-            'Montana'              => 'MT',
-            'Nebraska'             => 'NE',
-            'Nevada'               => 'NV',
-            'New Hampshire'        => 'NH',
-            'New Jersey'           => 'NJ',
-            'New Mexico'           => 'NM',
-            'New York'             => 'NY',
-            'North Carolina'       => 'NC',
-            'North Dakota'         => 'ND',
-            'Ohio'                 => 'OH',
-            'Oklahoma'             => 'OK',
-            'Oregon'               => 'OR',
-            'Pennsylvania'         => 'PA',
-            'Rhode Island'         => 'RI',
-            'South Carolina'       => 'SC',
-            'South Dakota'         => 'SD',
-            'Tennessee'            => 'TN',
-            'Texas'                => 'TX',
-            'Utah'                 => 'UT',
-            'Vermont'              => 'VT',
-            'Virginia'             => 'VA',
-            'Washington'           => 'WA',
-            'West Virginia'        => 'WV',
-            'Wisconsin'            => 'WI',
-            'Wyoming'              => 'WY'
-        );
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function _getUSCityMilitrayBasisList() {
-        return array('T3 R1 Nbpp', 'Apo', 'Fpo');
     }
 }
