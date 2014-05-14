@@ -8,7 +8,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     const CACHE_LIFETIME = 604800; // Keep downloaded files for one week (MaxMind update period)
 
-    /** @var string|null */
+    /** @var CM_File|null */
     protected $_geoIpFile;
 
     /** @var CM_OutputStream_Interface|null */
@@ -30,12 +30,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_ipBlockListByCountry, $_ipBlockListByCity;
 
     /**
-     * @param string|null                    $geoIpFile
+     * @param CM_File|null                   $geoIpFile
      * @param CM_OutputStream_Interface|null $outputStream
      * @param bool|null                      $withoutIpBlocks
      * @param bool|null                      $verbose
      */
-    public function __construct($geoIpFile = null, CM_OutputStream_Interface $outputStream = null, $withoutIpBlocks = null, $verbose = null) {
+    public function __construct(CM_File $geoIpFile = null, CM_OutputStream_Interface $outputStream = null, $withoutIpBlocks = null, $verbose = null) {
         $this->_setGeoIpFile($geoIpFile);
         $this->_outputStream = $outputStream;
         $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
@@ -709,34 +709,30 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param string      $path
+     * @param CM_File     $file
      * @param string|null $url
      * @return string
      * @throws CM_Exception
      * @codeCoverageIgnore
      */
-    protected function _download($path, $url = null) {
-        if (CM_File::exists($path)) {
-            $modificationTime = filemtime($path);
+    protected function _download(CM_File $file, $url = null) {
+        if ($file->getExists()) {
+            $modificationTime = $file->getModified();
             if (time() - $modificationTime > self::CACHE_LIFETIME) {
-                $file = new CM_File($path);
                 $file->delete();
             }
         }
-        if (CM_File::exists($path)) {
-            $file = new CM_File($path);
+        if ($file->getExists()) {
             $contents = $file->read();
         } else {
             if (null === $url) {
-                throw new CM_Exception('File not found: `' . $path . '`');
+                throw new CM_Exception('File not found: `' . $file->getPath() . '`');
             }
             $contents = @file_get_contents($url);
             if (false === $contents) {
                 throw new CM_Exception('Download of `' . $url . '` failed');
             }
-            if (false === @file_put_contents($path, $contents)) {
-                throw new CM_Exception('Could not write to file `' . $path . '`');
-            }
+            $file->write($contents);
         }
         return $contents;
     }
@@ -749,12 +745,14 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getCountryData() {
         $this->_writeln('Downloading new country listing…');
-        $countriesFileContents = $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv', self::COUNTRY_URL);
+        $countriesPath = CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv';
+        $countriesFile = new CM_File($countriesPath);
+        $countriesContents = $this->_download($countriesFile, self::COUNTRY_URL);
 
         $this->_writeln('Reading new country listing…');
         $countryData = array();
         $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
-        $rows = preg_split('#[\r\n]++#', $countriesFileContents);
+        $rows = preg_split('#[\r\n]++#', $countriesContents);
         foreach ($rows as $i => $row) {
             if ($i === 0) {
                 continue; // Skip column names
@@ -783,8 +781,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $blocksFileContents = $this->_readBlocksData($this->_geoIpFile);
         } else {
             $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
-            $blocksFileContents = $this->_readBlocksData($geoLiteCityPath);
+            $geoLiteCityFile = new CM_File($geoLiteCityPath);
+            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
+            $blocksFileContents = $this->_readBlocksData($geoLiteCityFile);
         }
         $ipData = array();
         $rows = preg_split('#[\r\n]++#', $blocksFileContents);
@@ -813,8 +812,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $citiesFileContents = $this->_readLocationData($this->_geoIpFile);
         } else {
             $geoLiteCityPath = CM_Bootloader::getInstance()->getDirTmp() . 'GeoLiteCity.zip';
-            $this->_download($geoLiteCityPath, self::GEO_LITE_CITY_URL);
-            $citiesFileContents = $this->_readLocationData($geoLiteCityPath);
+            $geoLiteCityFile = new CM_File($geoLiteCityPath);
+            $this->_download($geoLiteCityFile, self::GEO_LITE_CITY_URL);
+            $citiesFileContents = $this->_readLocationData($geoLiteCityFile);
         }
         $locationData = array();
         $rows = preg_split('#[\r\n]++#', $citiesFileContents);
@@ -839,11 +839,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
      */
     protected function _getRegionData() {
         $this->_writeln('Downloading new region listing…');
-        $regionsFileContents = $this->_download(CM_Bootloader::getInstance()->getDirTmp() . 'region.csv', self::REGION_URL);
+        $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
+        $regionsFile = new CM_File($regionsPath);
+        $regionsContents = $this->_download($regionsFile, self::REGION_URL);
 
         $this->_writeln('Reading new region listing…');
         $regionData = array();
-        $rows = preg_split('#[\r\n]++#', $regionsFileContents);
+        $rows = preg_split('#[\r\n]++#', $regionsContents);
         foreach ($rows as $row) {
             $csv = str_getcsv(trim($row));
             if (count($csv) <= 1) {
@@ -1539,21 +1541,21 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $geoIpZipFile
+     * @param CM_File $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
     private function _readBlocksData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile);
+        $zip = zip_open($geoIpZipFile->getPath());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Blocks\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpZipFile . '`');
+            throw new CM_Exception_Invalid('Could not find blocks file in `' . $geoIpZipFile->getPath() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
@@ -1562,21 +1564,21 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $geoIpZipFile
+     * @param CM_File $geoIpZipFile
      * @return string
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
     private function _readLocationData($geoIpZipFile) {
-        $zip = zip_open($geoIpZipFile);
+        $zip = zip_open($geoIpZipFile->getPath());
         if (!is_resource($zip)) {
-            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile . '`');
+            throw new CM_Exception_Invalid('Could not read zip file `' . $geoIpZipFile->getPath() . '`');
         }
         do {
             $entry = zip_read($zip);
         } while ($entry && !preg_match('#Location\\.csv\\z#', zip_entry_name($entry)));
         if (!$entry) {
-            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpZipFile . '`');
+            throw new CM_Exception_Invalid('Could not find location file in `' . $geoIpZipFile->getPath() . '`');
         }
         zip_entry_open($zip, $entry, 'r');
         $contents = zip_entry_read($entry, zip_entry_filesize($entry));
@@ -1586,15 +1588,14 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|null $geoIpFile
+     * @param CM_File|null $geoIpFile
      * @throws CM_Exception_Invalid
      * @codeCoverageIgnore
      */
-    private function _setGeoIpFile($geoIpFile = null) {
+    private function _setGeoIpFile(CM_File $geoIpFile = null) {
         if (null !== $geoIpFile) {
-            $geoIpFile = (string) $geoIpFile;
-            if (!CM_File::exists($geoIpFile)) {
-                throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile);
+            if (!$geoIpFile->getExists()) {
+                throw new CM_Exception_Invalid('GeoIP file not found: ' . $geoIpFile->getPath());
             }
         }
         $this->_geoIpFile = $geoIpFile;

@@ -3,22 +3,22 @@
 class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
-     * @param string|null $geoIpFile
-     * @param string|null $verbose
+     * @param CM_File|null $geoIpFile
+     * @param bool|null $verbose
      * @synchronized
      */
-    public function update($geoIpFile = null, $verbose = null) {
+    public function update(CM_File $geoIpFile = null, $verbose = null) {
         $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), null, $verbose);
         $maxMind->update();
     }
 
     /**
-     * @param string|null $geoIpFile
-     * @param string|null $withoutIpBlocks
-     * @param string|null $verbose
+     * @param CM_File|null $geoIpFile
+     * @param bool|null $withoutIpBlocks
+     * @param bool|null $verbose
      * @synchronized
      */
-    public function upgrade($geoIpFile = null, $withoutIpBlocks = null, $verbose = null) {
+    public function upgrade(CM_File $geoIpFile = null, $withoutIpBlocks = null, $verbose = null) {
         $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), $withoutIpBlocks, $verbose);
         $maxMind->upgrade();
     }
