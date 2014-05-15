@@ -235,15 +235,15 @@ CREATE TABLE `cm_option` (
   PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_process`;
+DROP TABLE IF EXISTS `cm_command_manager_process`;
 
 
-CREATE TABLE `cm_process` (
-  `name` varchar(100) NOT NULL,
+CREATE TABLE `cm_command_manager_process` (
+  `commandName` varchar(100) NOT NULL,
   `hostId` int(10) unsigned NOT NULL,
   `processId` int(10) unsigned DEFAULT NULL,
   `timeoutStamp` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`name`),
+  PRIMARY KEY (`commandName`),
   KEY `hostId` (`hostId`),
   KEY `timeoutStamp` (`timeoutStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

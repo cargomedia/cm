@@ -2,6 +2,8 @@
 
 class CM_Cli_CommandManager {
 
+    const TIMEOUT = 120;
+
     /** @var CM_Cli_Command[]|null */
     private $_commands = null;
 
@@ -25,22 +27,6 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @return CM_Cli_Command[]
-     */
-    public function getCommands() {
-        $commands = $this->_commands;
-        ksort($commands);
-        return $commands;
-    }
-
-    public function autoloadCommands() {
-        $classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
-        foreach ($classes as $className) {
-            $this->addRunnable($className);
-        }
-    }
-
-    /**
      * @param string $className
      * @throws CM_Exception_Invalid
      */
@@ -58,6 +44,44 @@ class CM_Cli_CommandManager {
                 $this->_commands[$command->getName()] = $command;
             }
         }
+    }
+
+    public function autoloadCommands() {
+        $classes = CM_Util::getClassChildren('CM_Cli_Runnable_Abstract', false);
+        foreach ($classes as $className) {
+            $this->addRunnable($className);
+        }
+    }
+
+    /**
+     * @param boolean|null $quiet
+     * @param boolean|null $quietWarnings
+     * @param boolean|null $nonInteractive
+     * @param int|null     $forks
+     */
+    public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
+        $forks = (int) $forks;
+        if ($quiet) {
+            $this->_setStreamOutput(new CM_OutputStream_Null());
+        }
+        if ($quietWarnings) {
+            CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
+        }
+        if ($nonInteractive) {
+            $this->_setStreamInput(new CM_InputStream_Null());
+        }
+        if ($forks > 1) {
+            $this->_forks = $forks;
+        }
+    }
+
+    /**
+     * @return CM_Cli_Command[]
+     */
+    public function getCommands() {
+        $commands = $this->_commands;
+        ksort($commands);
+        return $commands;
     }
 
     /**
@@ -112,15 +136,32 @@ class CM_Cli_CommandManager {
             }
             $command = $this->_getCommand($packageName, $methodName);
 
+            if ($command->getSynchronized()) {
+                if (self::_isLocked($command)) {
+                    throw new CM_Exception('Command `' . $command->getName() . '` still running.');
+                }
+                if (!self::_lockCommand($command)) {
+                    return 0;
+                }
+                $callbackUnlockCommand = function () use ($command) {
+                    CM_Cli_CommandManager::unlockCommand($command);
+                };
+            } else {
+                $callbackUnlockCommand = null;
+            }
+
             $keepAlive = $command->getKeepalive();
             $forks = max($this->_forks, (int) $keepAlive);
             if ($forks) {
                 $process = CM_Process::getInstance();
-                $process->fork($forks, $keepAlive);
+                $process->fork($forks, $keepAlive, $callbackUnlockCommand);
             }
 
             CMService_Newrelic::getInstance()->startTransaction('cm ' . $packageName . ' ' . $methodName);
             $command->run($arguments, $this->_streamInput, $this->_streamOutput);
+            if (!$forks && null !== $callbackUnlockCommand) {
+                $callbackUnlockCommand();
+            }
             return 0;
         } catch (CM_Cli_Exception_InvalidArguments $e) {
             $this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
@@ -137,25 +178,18 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @param boolean|null $quiet
-     * @param boolean|null $quietWarnings
-     * @param boolean|null $nonInteractive
-     * @param int|null     $forks
+     * @param CM_Cli_Command $command
      */
-    public function configure($quiet = null, $quietWarnings = null, $nonInteractive = null, $forks = null) {
-        $forks = (int) $forks;
-        if ($quiet) {
-            $this->_setStreamOutput(new CM_OutputStream_Null());
-        }
-        if ($quietWarnings) {
-            CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
-        }
-        if ($nonInteractive) {
-            $this->_setStreamInput(new CM_InputStream_Null());
-        }
-        if ($forks > 1) {
-            $this->_forks = $forks;
-        }
+    public static function unlockCommand(CM_Cli_Command $command) {
+        $commandName = $command->getName();
+        $hostId = self::_getHostId();
+        $processId = self::_getProcessId();
+        CM_Db_Db::delete('cm_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
+    }
+
+    public static function monitorSynchronizedProcesses() {
+        self::_lockRunningCommands();
+        self::_unlockTerminatedCommands();
     }
 
     /**
@@ -164,13 +198,72 @@ class CM_Cli_CommandManager {
      * @throws CM_Cli_Exception_InvalidArguments
      * @return CM_Cli_Command
      */
-    private function _getCommand($packageName, $methodName) {
+    protected function _getCommand($packageName, $methodName) {
         foreach ($this->getCommands() as $command) {
             if ($command->match($packageName, $methodName)) {
                 return $command;
             }
         }
         throw new CM_Cli_Exception_InvalidArguments('Command `' . $packageName . ' ' . $methodName . '` not found');
+    }
+
+    /**
+     * @return int
+     */
+    protected static function _getHostId() {
+        return (int) hexdec(exec('hostid'));
+    }
+
+    /**
+     * @return int
+     */
+    protected static function _getProcessId() {
+        return posix_getpid();
+    }
+
+    /**
+     * @param CM_Cli_Command $command
+     * @return bool
+     */
+    protected static function _isLocked(CM_Cli_Command $command) {
+        $commandName = $command->getName();
+        return (bool) CM_Db_Db::count('cm_command_manager_process', array('commandName' => $commandName));
+    }
+
+    /**
+     * @param CM_Cli_Command $command
+     * @return bool
+     */
+    protected static function _lockCommand(CM_Cli_Command $command) {
+        $commandName = $command->getName();
+        $hostId = self::_getHostId();
+        $processId = self::_getProcessId();
+        $timeoutStamp = time() + self::TIMEOUT;
+        try {
+            CM_Db_Db::insert('cm_command_manager_process',
+                array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
+        } catch (CM_Db_Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    protected static function _lockRunningCommands() {
+        $timeoutStamp = time() + self::TIMEOUT;
+        $hostId = self::_getHostId();
+        $result = CM_Db_Db::select('cm_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
+        foreach ($result->fetchAll() as $row) {
+            $commandName = $row['commandName'];
+            $processId = (int) $row['processId'];
+            if (false !== posix_getsid($processId)) {
+                CM_Db_Db::update('cm_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
+            }
+        }
+    }
+
+    protected static function _unlockTerminatedCommands() {
+        $time = time();
+        CM_Db_Db::delete('cm_command_manager_process', '`timeoutStamp` < ' . $time);
     }
 
     /**
