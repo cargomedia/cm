@@ -22,7 +22,6 @@ class CM_Cli_Command {
      * @param CM_InputStream_Interface  $input
      * @param CM_OutputStream_Interface $output
      * @throws CM_Cli_Exception_InvalidArguments
-     * @throws CM_Exception
      */
     public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output) {
         $parameters = $arguments->extractMethodParameters($this->_method);

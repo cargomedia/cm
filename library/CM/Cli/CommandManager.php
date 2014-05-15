@@ -116,6 +116,7 @@ class CM_Cli_CommandManager {
 
     /**
      * @param CM_Cli_Arguments $arguments
+     * @throws CM_Exception
      * @return int
      */
     public function run(CM_Cli_Arguments $arguments) {
