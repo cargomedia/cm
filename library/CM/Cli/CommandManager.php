@@ -154,7 +154,7 @@ class CM_Cli_CommandManager {
             $keepAlive = $command->getKeepalive();
             $forks = max($this->_forks, (int) $keepAlive);
             if ($forks) {
-                $process = CM_Process::getInstance();
+                $process = static::_getProcess();
                 $process->fork($forks, $keepAlive, $callbackUnlockCommand);
             }
 
@@ -229,6 +229,13 @@ class CM_Cli_CommandManager {
     protected static function _isLocked(CM_Cli_Command $command) {
         $commandName = $command->getName();
         return (bool) CM_Db_Db::count('cm_cli_command_manager_process', array('commandName' => $commandName));
+    }
+
+    /**
+     * @return CM_Process
+     */
+    protected static function  _getProcess() {
+        return CM_Process::getInstance();
     }
 
     /**
