@@ -48,6 +48,20 @@ class CM_Process {
     }
 
     /**
+     * @return int
+     */
+    public function getHostId() {
+        return (int) hexdec(exec('hostid'));
+    }
+
+    /**
+     * @return int
+     */
+    public function getProcessId() {
+        return posix_getpid();
+    }
+
+    /**
      * @param int $signal
      */
     public function killChildren($signal) {

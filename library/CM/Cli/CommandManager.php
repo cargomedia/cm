@@ -183,8 +183,8 @@ class CM_Cli_CommandManager {
      */
     public static function unlockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $hostId = self::_getHostId();
-        $processId = self::_getProcessId();
+        $hostId = static::_getProcess()->getHostId();
+        $processId = static::_getProcess()->getProcessId();
         CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
     }
 
@@ -209,17 +209,10 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @return int
+     * @return CM_Process
      */
-    protected static function _getHostId() {
-        return (int) hexdec(exec('hostid'));
-    }
-
-    /**
-     * @return int
-     */
-    protected static function _getProcessId() {
-        return posix_getpid();
+    protected static function  _getProcess() {
+        return CM_Process::getInstance();
     }
 
     /**
@@ -232,20 +225,13 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @return CM_Process
-     */
-    protected static function  _getProcess() {
-        return CM_Process::getInstance();
-    }
-
-    /**
      * @param CM_Cli_Command $command
      * @return bool
      */
     protected static function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $hostId = self::_getHostId();
-        $processId = self::_getProcessId();
+        $hostId = static::_getProcess()->getHostId();
+        $processId = static::_getProcess()->getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         try {
             CM_Db_Db::insert('cm_cli_command_manager_process',
@@ -258,7 +244,7 @@ class CM_Cli_CommandManager {
 
     protected static function _lockRunningCommands() {
         $timeoutStamp = time() + self::TIMEOUT;
-        $hostId = self::_getHostId();
+        $hostId = static::_getProcess()->getHostId();
         $result = CM_Db_Db::select('cm_cli_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
