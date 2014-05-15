@@ -395,10 +395,13 @@ class CM_Params extends CM_Class_Abstract {
         if (is_float($param)) {
             return $param;
         }
-        if (!preg_match('/^[\d]*?(\.[\d]*)?$/', $param)) {
-            throw new CM_Exception_InvalidParam('Not a float');
+        if (!is_array($param) && !is_object($param)) {
+            $param = (string) $param;
+            if (preg_match('/^-?\\d*+\\.?\d*+$/', $param)) {
+                return (float) $param;
+            }
         }
-        return (float) $param;
+        throw new CM_Exception_InvalidParam('Not a float');
     }
 
     /**

@@ -89,21 +89,55 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetFloat() {
-        $params = new CM_Params(array('1' => 34.20, '2' => '6543.123', '3' => '1.2.3', '4' => 0.0, 5 => '0.0', '5' => 4));
-        $params->getFloat('1');
-        $params->getFloat('2');
-        try {
-            $params->getFloat('3');
-            $this->fail('Is no float');
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->assertTrue(true);
+        $testDataList = array(
+            array(34.28, 34.28),
+            array(-34.28, -34.28),
+            array(0., 0.),
+            array(-34., -34),
+            array(34., 34),
+            array(0., 0),
+            array(34.28, '34.28'),
+            array(-34.28, '-34.28'),
+            array(34.2, '34.2'),
+            array(-34.2, '-34.2'),
+            array(34., '34.'),
+            array(-34., '-34.'),
+            array(4.28, '4.28'),
+            array(-4.28, '-4.28'),
+            array(.28, '.28'),
+            array(-.28, '-.28'),
+            array(.28, '0.28'),
+            array(-.28, '-0.28'),
+            array(0., '0.'),
+            array(0., '-0.'),
+            array(0., '.0'),
+            array(0., '-.0'),
+            array(34., '34'),
+            array(-34., '-34'),
+            array(0., '0'),
+            array(0., '-0'),
+            array(0., ''),
+            array(0., '-'),
+            array(0., '.'),
+            array(0., '-.'),
+            array(0., false),
+            array(1., true),
+        );
+        foreach ($testDataList as $testData) {
+            $expected = $testData[0];
+            $userInput = $testData[1];
+            $params = new CM_Params(array('userInput' => $userInput));
+            $this->assertSame($expected, $params->getFloat('userInput'));
         }
-        $params->getFloat('4');
-        try {
-            $params->getFloat('5');
-            $this->assertTrue(true);
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->fail('Is float');
+        $userInputInvalidList = array('1.2.3', '12 ', ' 12', '12,345', array('1'), new stdClass(), fopen(__FILE__, 'r'));
+        foreach ($userInputInvalidList as $userInputInvalid) {
+            $params = new CM_Params(array('userInput' => $userInputInvalid));
+            try {
+                $params->getFloat('userInput');
+                $this->fail('User input is not a float');
+            } catch (CM_Exception_InvalidParam $e) {
+                $this->assertTrue(true);
+            }
         }
     }
 
