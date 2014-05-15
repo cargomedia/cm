@@ -188,9 +188,9 @@ class CM_Cli_CommandManager {
         CM_Db_Db::delete('cm_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
     }
 
-    public static function monitorSynchronizedProcesses() {
+    public static function monitorSynchronizedCommands() {
         self::_lockRunningCommands();
-        self::_unlockTerminatedCommands();
+        self::_unlockDeadCommands();
     }
 
     /**
@@ -262,7 +262,7 @@ class CM_Cli_CommandManager {
         }
     }
 
-    protected static function _unlockTerminatedCommands() {
+    protected static function _unlockDeadCommands() {
         $time = time();
         CM_Db_Db::delete('cm_command_manager_process', '`timeoutStamp` < ' . $time);
     }

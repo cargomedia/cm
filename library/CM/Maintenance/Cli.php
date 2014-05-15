@@ -71,10 +71,10 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
 
     protected function _registerCallbacksLocal() {
         $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
-            'CM_Cli_Command::monitorSynchronizedProcesses' => function () {
-                    CM_Cli_Command::monitorSynchronizedProcesses();
+            'CM_Cli_CommandManager::monitorSynchronizedCommands' => function () {
+                    CM_Cli_CommandManager::monitorSynchronizedCommands();
                 },
-            'CM_SVM_Model::trainChanged'                   => function () {
+            'CM_SVM_Model::trainChanged'                         => function () {
                     CM_SVM_Model::trainChanged();
                 },
         ));
