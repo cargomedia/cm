@@ -16,9 +16,12 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -38,9 +41,12 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->once())->method('fork')->with(1, true, null);
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -60,9 +66,12 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->once())->method('fork')->with(5, false, null);
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
@@ -82,9 +91,12 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->once())->method('fork')->with(5, true, null);
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
@@ -109,7 +121,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(true));
         $commandManagerMock::staticExpects($this->once())->method('unlockCommand')->with($commandMock);
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
@@ -134,10 +146,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -157,11 +172,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked', '_lockCommand'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -186,7 +203,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(true));
         $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
@@ -211,10 +228,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -234,11 +254,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked', '_lockCommand'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock')));
@@ -263,7 +285,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(true));
         $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
@@ -288,10 +310,13 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
@@ -311,11 +336,94 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
         $processMock->expects($this->never())->method('fork');
 
-        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('getCommands', '_getProcess', '_isLocked', '_lockCommand'));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
         $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
         $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->any())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+
+        /** @var CM_Cli_CommandManager $commandManagerMock */
+        $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
+    }
+
+    public function testForkAndKeepAliveSynchronized() {
+        $commandMock = $this->getMock('CM_Cli_Command',
+            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run'),
+            array(), '', false);
+        $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
+        $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
+        $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
+        $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue(true));
+        $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue(true));
+        $commandMock->expects($this->once())->method('run');
+
+        $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
+        $processMock->expects($this->once())->method('fork')->with(5, true, $this->isInstanceOf('Closure'));
+
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_lockCommand', 'unlockCommand'));
+        $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
+        $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+
+        /** @var CM_Cli_CommandManager $commandManagerMock */
+        $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Command `package-mock command-mock` still running.
+     */
+    public function testForkAndKeepAliveSynchronizedLocked() {
+        $commandMock = $this->getMock('CM_Cli_Command',
+            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run'),
+            array(), '', false);
+        $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
+        $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
+        $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
+        $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue(true));
+        $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue(true));
+        $commandMock->expects($this->never())->method('run');
+
+        $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
+        $processMock->expects($this->never())->method('fork');
+
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
+        $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
+        $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(true));
+        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+
+        /** @var CM_Cli_CommandManager $commandManagerMock */
+        $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
+    }
+
+    public function testForkAndKeepAliveSynchronizedRaceCondition() {
+        $commandMock = $this->getMock('CM_Cli_Command',
+            array('getPackageName', '_getMethodName', 'isAbstract', 'getSynchronized', 'getKeepalive', 'run'),
+            array(), '', false);
+        $commandMock->expects($this->any())->method('getPackageName')->will($this->returnValue('package-mock'));
+        $commandMock->expects($this->any())->method('_getMethodName')->will($this->returnValue('command-mock'));
+        $commandMock->expects($this->any())->method('isAbstract')->will($this->returnValue(false));
+        $commandMock->expects($this->any())->method('getSynchronized')->will($this->returnValue(true));
+        $commandMock->expects($this->any())->method('getKeepalive')->will($this->returnValue(true));
+        $commandMock->expects($this->never())->method('run');
+
+        $processMock = $this->getMock('CM_Process', array('fork'), array(), '', false);
+        $processMock->expects($this->never())->method('fork');
+
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager',
+            array('getCommands', '_getProcess', '_isLocked', '_lockCommand', 'unlockCommand'));
+        $commandManagerMock->expects($this->any())->method('getCommands')->will($this->returnValue(array($commandMock)));
+        $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock::staticExpects($this->any())->method('_isLocked')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->will($this->returnValue(false));
+        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
 
         /** @var CM_Cli_CommandManager $commandManagerMock */
         $commandManagerMock->run(new CM_Cli_Arguments(array('', 'package-mock', 'command-mock', '--forks=5')));
