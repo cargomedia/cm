@@ -185,7 +185,7 @@ class CM_Cli_CommandManager {
         $commandName = $command->getName();
         $hostId = self::_getHostId();
         $processId = self::_getProcessId();
-        CM_Db_Db::delete('cm_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
+        CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
     }
 
     public static function monitorSynchronizedCommands() {
@@ -228,7 +228,7 @@ class CM_Cli_CommandManager {
      */
     protected static function _isLocked(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        return (bool) CM_Db_Db::count('cm_command_manager_process', array('commandName' => $commandName));
+        return (bool) CM_Db_Db::count('cm_cli_command_manager_process', array('commandName' => $commandName));
     }
 
     /**
@@ -241,7 +241,7 @@ class CM_Cli_CommandManager {
         $processId = self::_getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         try {
-            CM_Db_Db::insert('cm_command_manager_process',
+            CM_Db_Db::insert('cm_cli_command_manager_process',
                 array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
         } catch (CM_Db_Exception $e) {
             return false;
@@ -252,19 +252,19 @@ class CM_Cli_CommandManager {
     protected static function _lockRunningCommands() {
         $timeoutStamp = time() + self::TIMEOUT;
         $hostId = self::_getHostId();
-        $result = CM_Db_Db::select('cm_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
+        $result = CM_Db_Db::select('cm_cli_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
             if (false !== posix_getsid($processId)) {
-                CM_Db_Db::update('cm_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
+                CM_Db_Db::update('cm_cli_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
             }
         }
     }
 
     protected static function _unlockDeadCommands() {
         $time = time();
-        CM_Db_Db::delete('cm_command_manager_process', '`timeoutStamp` < ' . $time);
+        CM_Db_Db::delete('cm_cli_command_manager_process', '`timeoutStamp` < ' . $time);
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 
-if (!CM_Db_Db::existsTable('cm_command_manager_process')) {
+if (!CM_Db_Db::existsTable('cm_cli_command_manager_process')) {
     CM_Db_Db::exec('
-        CREATE TABLE `cm_command_manager_process` (
+        CREATE TABLE `cm_cli_command_manager_process` (
             `commandName` varchar(100) NOT NULL,
             `hostId` int(10) unsigned NOT NULL,
             `processId` int(10) unsigned DEFAULT NULL,
