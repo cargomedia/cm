@@ -11,12 +11,12 @@ class CM_Process {
     }
 
     /**
-     * @param int           $amount
-     * @param boolean|null  $keepAlive
-     * @param callable|null $callbackTerminated
+     * @param int          $amount
+     * @param boolean|null $keepAlive
+     * @param Closure|null $callbackTerminated
      * @throws CM_Exception
      */
-    public function fork($amount, $keepAlive = null, callable $callbackTerminated = null) {
+    public function fork($amount, $keepAlive = null, Closure $callbackTerminated = null) {
         $this->_installSignalHandlers();
         for ($i = 0; $i < $amount; $i++) {
             $pid = $this->_spawnChild();
