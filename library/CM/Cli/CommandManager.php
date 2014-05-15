@@ -138,14 +138,14 @@ class CM_Cli_CommandManager {
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
-                if (self::_isLocked($command)) {
+                if (static::_isLocked($command)) {
                     throw new CM_Exception('Command `' . $command->getName() . '` still running.');
                 }
-                if (!self::_lockCommand($command)) {
+                if (!static::_lockCommand($command)) {
                     return 0;
                 }
                 $callbackUnlockCommand = function () use ($command) {
-                    CM_Cli_CommandManager::unlockCommand($command);
+                    static::unlockCommand($command);
                 };
             } else {
                 $callbackUnlockCommand = null;
