@@ -37,7 +37,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException CM_Exception_Nonexistent
+     * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage Service InvalidService is not registered.
      */
     public function testInvalidService() {

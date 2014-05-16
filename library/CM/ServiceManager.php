@@ -53,14 +53,14 @@ class CM_ServiceManager extends CM_Class_Abstract {
      * @param string $name
      * @param mixed  $parameters
      * @return mixed
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_Invalid
      */
     public function __call($name, $parameters) {
         if (preg_match('/get(.+)/', $name, $matches)) {
             $serviceName = $matches[1];
             return $this->get($serviceName);
         }
-        throw new CM_Exception_Nonexistent('Method doesn\'t exist.');
+        throw new CM_Exception_Invalid('Cannot extract service name from `' . $name . '`.');
     }
 
     /**
@@ -84,12 +84,12 @@ class CM_ServiceManager extends CM_Class_Abstract {
 
     /**
      * @param string $serviceName
-     * @throws CM_Exception_Nonexistent
+     * @throws CM_Exception_Invalid
      * @return mixed
      */
     protected function _instantiateService($serviceName) {
         if (!$this->has($serviceName)) {
-            throw new CM_Exception_Nonexistent("Service {$serviceName} is not registered.");
+            throw new CM_Exception_Invalid("Service {$serviceName} is not registered.");
         }
         $config = $this->_serviceList[$serviceName];
         $arguments = array();
