@@ -102,7 +102,9 @@
       this.$layer.removeData('floatbox');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
-      lastFocusedElement.focus();
+      if (lastFocusedElement) {
+        lastFocusedElement.focus();
+      }
       if (!$viewport.children().length) {
         $viewport.remove();
         $viewport = null;
