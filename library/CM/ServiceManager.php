@@ -20,14 +20,20 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
+     * @param string      $serviceName
+     * @param string|null $assertInstanceOf
+     * @throws CM_Exception_Invalid
      * @return mixed
      */
-    public function get($serviceName) {
+    public function get($serviceName, $assertInstanceOf = null) {
         if (!array_key_exists($serviceName, $this->_serviceInstanceList)) {
             $this->_serviceInstanceList[$serviceName] = $this->_instantiateService($serviceName);
         }
-        return $this->_serviceInstanceList[$serviceName];
+        $service = $this->_serviceInstanceList[$serviceName];
+        if (null !== $assertInstanceOf && !is_a($service, $assertInstanceOf, true)) {
+            throw new CM_Exception_Invalid('Service `' . $serviceName . '` is a `' . get_class($service) . '`, but not `' . $assertInstanceOf . '`.');
+        }
+        return $service;
     }
 
     /**
@@ -71,7 +77,7 @@ class CM_ServiceManager extends CM_Class_Abstract {
         if (null === $serviceName) {
             $serviceName = 'MongoDb';
         }
-        return $this->get($serviceName);
+        return $this->get($serviceName, 'CM_Service_MongoDb');
     }
 
     /**

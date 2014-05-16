@@ -18,6 +18,26 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
         $this->assertInstanceOf('DummyService', $service);
     }
 
+    public function testGetAssertInstanceOf() {
+        $serviceManager = new CM_ServiceManager();
+        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+
+        /** @var DummyService $service */
+        $service = $serviceManager->get('DummyService', 'DummyService');
+        $this->assertInstanceOf('DummyService', $service);
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Service `DummyService` is a `DummyService`, but not `SomethingElse`.
+     */
+    public function testGetAssertInstanceOfInvalid() {
+        $serviceManager = new CM_ServiceManager();
+        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+
+        $serviceManager->get('DummyService', 'SomethingElse');
+    }
+
     public function testServiceMethod() {
         $serviceManager = new CM_ServiceManager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
