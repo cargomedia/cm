@@ -37,19 +37,41 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string     $serviceName
-     * @param string     $className
-     * @param array|null $arguments
+     * @param string      $serviceName
+     * @param string      $className
+     * @param array|null  $arguments
+     * @param string|null $method
+     * @param array|null  $methodArguments
      * @throws CM_Exception_Invalid
      */
-    public function register($serviceName, $className, array $arguments = null) {
-        $arguments = (array) $arguments;
+    public function register($serviceName, $className, array $arguments = null, $method = null, array $methodArguments = null) {
+        $this->registerWithArray($serviceName, array(
+            'class'           => $className,
+            'arguments'       => $arguments,
+            'method'          => $method,
+            'methodArguments' => $methodArguments,
+        ));
+    }
+
+    /**
+     * @param string $serviceName
+     * @param array  $config
+     * @throws CM_Exception_Invalid
+     */
+    public function registerWithArray($serviceName, array $config) {
         if ($this->has($serviceName)) {
             throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
         }
+        $class = (string) $config['class'];
+        $arguments = isset($config['arguments']) ? (array) $config['arguments'] : array();
+        $method = isset($config['method']) ? (string) $config['method'] : null;
+        $methodArguments = isset($config['methodArguments']) ? (array) $config['methodArguments'] : array();
+
         $this->_serviceList[$serviceName] = array(
-            'class'     => $className,
-            'arguments' => $arguments,
+            'class'           => $class,
+            'arguments'       => $arguments,
+            'method'          => $method,
+            'methodArguments' => $methodArguments,
         );
     }
 
@@ -81,11 +103,10 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
-     * @return CM_Service_Filesystem
+     * @return CM_Service_Filesystems
      */
-    public function getFilesystem($serviceName) {
-        return $this->get($serviceName);
+    public function getFilesystems() {
+        return $this->get('filesystems', 'CM_Service_Filesystems');
     }
 
     /**
@@ -98,12 +119,12 @@ class CM_ServiceManager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid("Service {$serviceName} is not registered.");
         }
         $config = $this->_serviceList[$serviceName];
-        $arguments = array();
-        if (array_key_exists('arguments', $config)) {
-            $arguments = $config['arguments'];
-        }
         $reflection = new ReflectionClass($config['class']);
-        return $reflection->newInstanceArgs($arguments);
+        $instance = $reflection->newInstanceArgs($config['arguments']);
+        if (null !== $config['method']) {
+            $instance = call_user_func_array(array($instance, $config['method']), $config['methodArguments']);
+        }
+        return $instance;
     }
 
     /**

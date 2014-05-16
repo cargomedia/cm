@@ -27,6 +27,15 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
         $this->assertInstanceOf('DummyService', $service);
     }
 
+    public function testGetWithMethod() {
+        $serviceManager = new CM_ServiceManager();
+        $serviceManager->register('DummyService', 'DummyService', array('bar'), 'getArray', array('foo', 1234));
+
+        /** @var DummyService $service */
+        $service = $serviceManager->get('DummyService');
+        $this->assertSame(array('foo' => 1234), $serviceManager->get('DummyService'));
+    }
+
     /**
      * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage Service `DummyService` is a `DummyService`, but not `SomethingElse`.
@@ -96,5 +105,9 @@ class DummyService {
 
     public function getFoo() {
         return $this->_foo;
+    }
+
+    public function getArray($key, $value) {
+        return array($key => $value);
     }
 }
