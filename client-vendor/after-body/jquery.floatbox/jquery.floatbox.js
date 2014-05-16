@@ -39,7 +39,7 @@
       this.$parent = $element.parent();
       if (!$viewport) {
         scrollBackup = {top: $document.scrollTop(), left: $document.scrollLeft()};
-        $viewport = $('<div id="floatbox-viewport" tabindex="-1"/>');
+        $viewport = $('<div id="floatbox-viewport"/>');
         $body.append($viewport);
         $html.addClass('floatbox-active');
         $body.css({top: -scrollBackup.top, left: -scrollBackup.left});
@@ -53,7 +53,7 @@
       if (this.options.closable) {
         $floatboxControls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
       }
-      this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" />');
+      this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" tabindex="0" />');
 
       if (this.options.fullscreen) {
         this.$floatbox.addClass('fullscreen');
@@ -82,8 +82,11 @@
         self.close.apply(self);
       });
 
-      this.$floatbox.find(':focusable:first').focus();
-      this.$floatbox.trap();
+      _.delay(function() {
+        // FF Mobile moves floatbox out of viewport, if no delay here
+        self.$floatbox.focus();
+        self.$floatbox.trap();
+      }, 50);
 
       this.$layer.data('floatbox', this);
       $element.trigger('floatbox-open');
