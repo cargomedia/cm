@@ -34,9 +34,13 @@ class CM_ServiceManager extends CM_Class_Abstract {
      * @param string     $serviceName
      * @param string     $className
      * @param array|null $arguments
+     * @throws CM_Exception_Invalid
      */
     public function register($serviceName, $className, array $arguments = null) {
         $arguments = (array) $arguments;
+        if ($this->has($serviceName)) {
+            throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
+        }
         $this->_serviceList[$serviceName] = array(
             'class'     => $className,
             'arguments' => $arguments,

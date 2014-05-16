@@ -54,6 +54,16 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
         $service2 = $serviceManager->get('DummyService');
         $this->assertSame($service1, $service2);
     }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Service `DummyService` already registered
+     */
+    public function testRegisterTwice() {
+        $serviceManager = new CM_ServiceManager();
+        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+    }
 }
 
 class DummyService {
