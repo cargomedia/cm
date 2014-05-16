@@ -156,10 +156,8 @@
   appearance: @value;
 }
 
-.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0, @iteration-count: 1, @direction: normal, @fill-mode: none) {
+.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0s, @iteration-count: 1, @direction: normal, @fill-mode: none) {
   -webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
-  -moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
-  -ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
   animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }
 
