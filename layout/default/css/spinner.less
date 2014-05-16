@@ -1,11 +1,19 @@
+@spinnerSize: 16px;
 .spinner {
+  position: relative;
   display: inline-block;
-  min-height: 16px;
-  min-width: 16px;
-  background: image('spinner.svg') center no-repeat;
+  min-height: @spinnerSize;
+  min-width: @spinnerSize;
 
-  html.no-svg & {
-    background: image('spinner.gif') center no-repeat;
+  &:before {
+    content: '';
+    position: absolute;
+    width: @spinnerSize;
+    height: @spinnerSize;
+    border: 2px solid @colorFgSubtle;
+    border-left-color: transparent;
+    border-radius: 50%;
+    .animation(spinner, 1s, linear, 0s, infinite);
   }
 }
 
@@ -15,6 +23,13 @@
   right: 0;
   bottom: 0;
   left: 0;
+
+  &:before {
+    top: 50%;
+    left: 50%;
+    margin-top: -@spinnerSize/2;
+    margin-left: -@spinnerSize/2;
+  }
 }
 
 [data-click-spinner] {
