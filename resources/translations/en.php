@@ -47,7 +47,7 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.date.period.year', '1 year');
     $language->setTranslation('.date.period.years', '{$count} years', array('count'));
     $language->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
-    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.', array('file',
-        'extensions'));
+    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.',
+        array('file', 'extensions'));
     $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred');
 };
