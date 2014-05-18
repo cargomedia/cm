@@ -5,8 +5,8 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('Cancel', 'Cancel');
     $language->setTranslation('Close', 'Close');
     $language->setTranslation('{$label} is required.', '{$label} is required.', array('label'));
-    $language->setTranslation('Required', 'Required');
     $language->setTranslation('Confirmation', 'Confirmation');
+    $language->setTranslation('Required', 'Required');
     $language->setTranslation('.date.month.1', 'January');
     $language->setTranslation('.date.month.2', 'February');
     $language->setTranslation('.date.month.3', 'March');
@@ -49,5 +49,5 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
     $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.',
         array('file', 'extensions'));
-    $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred');
+    $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred.');
 };
