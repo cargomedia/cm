@@ -5,7 +5,7 @@
 var CM_FormField_Abstract = CM_View_Abstract.extend({
   _class: 'CM_FormField_Abstract',
 
-  _fieldOptions: [],
+  fieldOptions: [],
 
   ready: function() {
   },
@@ -77,7 +77,7 @@ var CM_FormField_Abstract = CM_View_Abstract.extend({
    * @return Object
    */
   getOptions: function() {
-    return this._fieldOptions;
+    return this.fieldOptions;
   },
 
   /**
