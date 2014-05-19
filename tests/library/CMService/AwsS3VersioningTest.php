@@ -1,6 +1,6 @@
 <?php
 
-class CMService_S3VersionRestoreTest extends CMTest_TestCase {
+class CMService_AwsS3VersioningTest extends CMTest_TestCase {
 
     /** @var \Aws\S3\S3Client */
     private $_client;
@@ -11,20 +11,21 @@ class CMService_S3VersionRestoreTest extends CMTest_TestCase {
     /** @var CM_File_Filesystem */
     private $_filesystem;
 
-    /** @var CMService_S3VersionRestore */
+    /** @var CMService_AwsS3Versioning */
     private $_restore;
 
     public function setUp() {
         $config = CM_Config::get();
-        if (!isset($config->CMService_S3VersionRestoreTest)) {
+        $className = __CLASS__;
+        if (!isset($config->$className)) {
             $this->markTestSkipped('Missing config');
         }
-        $clientParams = $config->CMService_S3VersionRestoreTest->clientParams;
+        $clientParams = $config->$className->clientParams;
 
         $this->_client = \Aws\S3\S3Client::factory($clientParams);
-        $this->_bucket = 'test-CMService_S3VersionRestoreTest';
+        $this->_bucket = 'test-CMService_AwsS3VersioningTest';
         $this->_filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($this->_client, $this->_bucket));
-        $this->_restore = new CMService_S3VersionRestore($this->_client, $this->_bucket);
+        $this->_restore = new CMService_AwsS3Versioning($this->_client, $this->_bucket);
 
         $this->_client->createBucket(array('Bucket' => $this->_bucket));
         $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Enabled'));
@@ -41,5 +42,14 @@ class CMService_S3VersionRestoreTest extends CMTest_TestCase {
         $this->assertSame(true, $this->_restore->getVersioningEnabled());
         $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Suspended'));
         $this->assertSame(false, $this->_restore->getVersioningEnabled());
+    }
+
+    public function testGetVersions() {
+        $this->_filesystem->write('bar', 'mega1');
+        $this->_filesystem->write('bar', 'mega2');
+        $this->_filesystem->delete('bar');
+
+        $versions = $this->_restore->getVersions('bar');
+        $this->assertCount(3, $versions);
     }
 }

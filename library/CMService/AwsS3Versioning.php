@@ -1,6 +1,6 @@
 <?php
 
-class CMService_S3VersionRestore {
+class CMService_AwsS3Versioning {
 
     /** @var Aws\S3\S3Client */
     private $_client;
@@ -29,11 +29,14 @@ class CMService_S3VersionRestore {
      * @return string[]
      */
     public function getVersions($key) {
-        $key = (string) $key;
-        $result = $this->_client->listObjectVersions(array(
+        $options = array(
             'Bucket' => $this->_bucket,
-            'Prefix' => $key,
-        ));
-        print_r($result);
+            'Prefix' => (string) $key,
+        );
+        $versionList = array();
+        foreach ($this->_client->getListObjectVersionsIterator($options) as $version) {
+            $versionList[] = $version;
+        }
+        return $versionList;
     }
 }
