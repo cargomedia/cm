@@ -128,52 +128,52 @@ class CM_Cli_CommandManager {
             $methodName = $arguments->getNumeric()->shift();
 
             if (!$packageName) {
-                $this->_streamError->writeln($this->getHelp());
+                $this->_outputError($this->getHelp());
                 return 1;
             }
             if (!$methodName) {
-                $this->_streamError->writeln($this->getHelp($packageName));
+                $this->_outputError($this->getHelp($packageName));
                 return 1;
             }
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
                 if (static::_isLocked($command)) {
-                    throw new CM_Exception('Command `' . $command->getName() . '` still running.');
+                    throw new CM_Cli_Exception_Internal('Command `' . $command->getName() . '` still running.');
                 }
-                if (!static::_lockCommand($command)) {
-                    return 0;
-                }
-                $callbackUnlockCommand = function () use ($command) {
+                static::_lockCommand($command);
+                $terminationCallback = function () use ($command) {
                     static::unlockCommand($command);
                 };
             } else {
-                $callbackUnlockCommand = null;
+                $terminationCallback = null;
             }
 
-            $keepAlive = $command->getKeepalive();
-            $forks = max($this->_forks, (int) $keepAlive);
-            if ($forks) {
-                $process = static::_getProcess();
-                $process->fork($forks, $keepAlive, $callbackUnlockCommand);
-            }
+            $transactionName = 'cm ' . $packageName . ' ' . $methodName;
+            $streamInput = $this->_streamInput;
+            $streamOutput = $this->_streamOutput;
+            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput) {
+                CMService_Newrelic::getInstance()->startTransaction($transactionName);
+                $command->run($arguments, $streamInput, $streamOutput);
+            };
 
-            CMService_Newrelic::getInstance()->startTransaction('cm ' . $packageName . ' ' . $methodName);
-            $command->run($arguments, $this->_streamInput, $this->_streamOutput);
-            if (!$forks && null !== $callbackUnlockCommand) {
-                $callbackUnlockCommand();
+            $forks = max($this->_forks, 1);
+            $process = static::_getProcess();
+            for ($i = 0; $i < $forks; $i++) {
+                $process->fork($workload);
             }
+            $process->waitForChildren($command->getKeepalive(), $terminationCallback);
             return 0;
         } catch (CM_Cli_Exception_InvalidArguments $e) {
-            $this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+            $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
             if (isset($command)) {
-                $this->_streamError->writeln('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
+                $this->_outputError('Usage: ' . $arguments->getScriptName() . ' ' . $command->getHelp());
             } else {
-                $this->_streamError->writeln($this->getHelp());
+                $this->_outputError($this->getHelp());
             }
             return 1;
         } catch (CM_Cli_Exception_Internal $e) {
-            $this->_streamError->writeln('ERROR: ' . $e->getMessage() . PHP_EOL);
+            $this->_outputError('ERROR: ' . $e->getMessage() . PHP_EOL);
             return 1;
         }
     }
@@ -219,6 +219,13 @@ class CM_Cli_CommandManager {
     }
 
     /**
+     * @param string $message
+     */
+    protected function _outputError($message) {
+        $this->_outputError($message);
+    }
+
+    /**
      * @return CM_Process
      */
     protected static function  _getProcess() {
@@ -236,20 +243,14 @@ class CM_Cli_CommandManager {
 
     /**
      * @param CM_Cli_Command $command
-     * @return bool
      */
     protected static function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
         $hostId = static::_getProcess()->getHostId();
         $processId = static::_getProcess()->getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
-        try {
-            CM_Db_Db::insert('cm_cli_command_manager_process',
-                array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
-        } catch (CM_Db_Exception $e) {
-            return false;
-        }
-        return true;
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
     }
 
     /**
