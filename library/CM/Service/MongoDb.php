@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_MongoDb extends CM_Class_Abstract {
+class CM_Service_MongoDb extends CM_Service_Abstract {
 
     /** @var CM_Service_MongoDB|null $_client */
     private $_client = null;

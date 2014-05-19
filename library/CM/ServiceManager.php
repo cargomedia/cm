@@ -124,6 +124,9 @@ class CM_ServiceManager extends CM_Class_Abstract {
         if (null !== $config['method']) {
             $instance = call_user_func_array(array($instance, $config['method']), $config['methodArguments']);
         }
+        if ($instance instanceof CM_Service_Abstract) {
+            $instance->setServiceManager($this);
+        }
         return $instance;
     }
 
