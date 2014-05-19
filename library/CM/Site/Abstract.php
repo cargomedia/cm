@@ -209,11 +209,4 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
         $type = (int) $array['type'];
         return self::factory($type);
     }
-
-    /**
-     * @return string
-     */
-    public static function getInstallationName() {
-        return CM_Config::get()->installationName;
-    }
 }

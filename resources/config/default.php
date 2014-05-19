@@ -1,7 +1,6 @@
 <?php
 
 $config->timeZone = 'US/Central';
-$config->installationName = '';
 
 $config->CM_Mail->send = true;
 $config->CM_Mail->mailDeliveryAgent = null;

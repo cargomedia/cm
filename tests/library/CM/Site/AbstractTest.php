@@ -28,12 +28,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('Foo', $site->getName());
     }
 
-    public function testGetInstallationName() {
-        /** @var CM_Site_Abstract $site */
-        $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('Bar', CM_Site_Abstract::getInstallationName());
-    }
-
     public function testGetUrl() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
