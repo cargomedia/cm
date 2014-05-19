@@ -26,7 +26,7 @@ class CM_Process {
      * @return int
      */
     public function getHostId() {
-        return (int) hexdec(exec('hostid'));
+        return (int) hexdec(CM_Util::exec('hostid'));
     }
 
     /**
