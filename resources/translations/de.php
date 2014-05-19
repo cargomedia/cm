@@ -3,7 +3,7 @@
 return function (CM_Model_Language $language) {
     $language->setTranslation('Ok', 'Ok');
     $language->setTranslation('Cancel', 'Abbrechen');
-    $language->setTranslation('Close', 'Schliessen');
+    $language->setTranslation('Close', 'Schließen');
     $language->setTranslation('{$label} is required.', '{$label} wird benötigt.', array('label'));
     $language->setTranslation('Confirmation', 'Rückfrage');
     $language->setTranslation('Required', 'Benötigt');
