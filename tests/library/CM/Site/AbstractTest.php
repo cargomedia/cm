@@ -3,7 +3,6 @@
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
-        CM_Config::get()->installationName = 'Bar';
         CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
         CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
         CM_Config::get()->CM_Site_Abstract->name = 'Foo';
