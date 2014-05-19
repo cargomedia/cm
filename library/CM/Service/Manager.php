@@ -40,17 +40,22 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @param string      $serviceName
      * @param string      $className
      * @param array|null  $arguments
-     * @param string|null $method
+     * @param string|null $methodName
      * @param array|null  $methodArguments
      * @throws CM_Exception_Invalid
      */
-    public function register($serviceName, $className, array $arguments = null, $method = null, array $methodArguments = null) {
-        $this->registerWithArray($serviceName, array(
-            'class'           => $className,
-            'arguments'       => $arguments,
-            'method'          => $method,
-            'methodArguments' => $methodArguments,
-        ));
+    public function register($serviceName, $className, array $arguments = null, $methodName = null, array $methodArguments = null) {
+        $config = array(
+            'class'     => $className,
+            'arguments' => $arguments,
+        );
+        if (null !== $methodName) {
+            $config['method'] = array(
+                'name'      => $methodName,
+                'arguments' => $methodArguments
+            );
+        }
+        $this->registerWithArray($serviceName, $config);
     }
 
     /**
@@ -63,15 +68,24 @@ class CM_Service_Manager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
         }
         $class = (string) $config['class'];
-        $arguments = isset($config['arguments']) ? (array) $config['arguments'] : array();
-        $method = isset($config['method']) ? (string) $config['method'] : null;
-        $methodArguments = isset($config['methodArguments']) ? (array) $config['methodArguments'] : array();
+        $arguments = array();
+        if (isset($config['arguments'])) {
+            $arguments = (array) $config['arguments'];
+        }
+        $method = null;
+        if (isset($config['method'])) {
+            $methodName = (string) $config['method']['name'];
+            $methodArguments = array();
+            if (isset($config['method']['arguments'])) {
+                $methodArguments = (array) $config['method']['arguments'];
+            }
+            $method = array('name' => $methodName, 'arguments' => $methodArguments);
+        }
 
         $this->_serviceList[$serviceName] = array(
-            'class'           => $class,
-            'arguments'       => $arguments,
-            'method'          => $method,
-            'methodArguments' => $methodArguments,
+            'class'     => $class,
+            'arguments' => $arguments,
+            'method'    => $method,
         );
     }
 
@@ -122,7 +136,7 @@ class CM_Service_Manager extends CM_Class_Abstract {
         $reflection = new ReflectionClass($config['class']);
         $instance = $reflection->newInstanceArgs($config['arguments']);
         if (null !== $config['method']) {
-            $instance = call_user_func_array(array($instance, $config['method']), $config['methodArguments']);
+            $instance = call_user_func_array(array($instance, $config['method']['name']), $config['method']['arguments']);
         }
         if ($instance instanceof CM_Service_ManagerAwareInterface) {
             $instance->setServiceManager($this);

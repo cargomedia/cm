@@ -17,21 +17,25 @@ $config->CM_Model_Splitfeature->withoutPersistence = true;
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
 $config->services['filesystem-data'] = array(
-    'class'           => 'CM_File_Filesystem_Factory',
-    'method'          => 'createFilesystem',
-    'methodArguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_ROOT . 'tests/tmp/data/',
-        )
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_ROOT . 'tests/tmp/data/',
+            )
+        ),
     ));
 
 $config->services['filesystem-userfiles'] = array(
-    'class'           => 'CM_File_Filesystem_Factory',
-    'method'          => 'createFilesystem',
-    'methodArguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
-        )
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/',
+            )
+        ),
     ));

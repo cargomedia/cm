@@ -115,21 +115,25 @@ $config->services['MongoDb'] = array(
 );
 
 $config->services['filesystem-data'] = array(
-    'class'           => 'CM_File_Filesystem_Factory',
-    'method'          => 'createFilesystem',
-    'methodArguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_ROOT . 'data/',
-        )
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_ROOT . 'data/',
+            )
+        ),
     ));
 
 $config->services['filesystem-userfiles'] = array(
-    'class'           => 'CM_File_Filesystem_Factory',
-    'method'          => 'createFilesystem',
-    'methodArguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_PUBLIC . 'userfiles/',
-        )
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_PUBLIC . 'userfiles/',
+            )
+        ),
     ));
