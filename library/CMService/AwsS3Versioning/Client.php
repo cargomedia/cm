@@ -17,6 +17,9 @@ class CMService_AwsS3Versioning_Client {
         $this->_bucket = (string) $bucket;
     }
 
+    /**
+     * @return bool
+     */
     public function getVersioningEnabled() {
         $result = $this->_client->getBucketVersioning(array(
             'Bucket' => $this->_bucket,
