@@ -19,13 +19,12 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $cssClass = implode(' ', $component->getClassHierarchy());
-        if (preg_match('#([^/]+)\.tpl$#', $viewResponse->getTemplateName(), $match)) {
-            if ($match[1] != 'default') {
-                $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
-            }
+        $cssClasses = $component->getClassHierarchy();
+        $templateName = $viewResponse->getTemplateName();
+        if ('default' !== $templateName) {
+            $cssClasses[] = $templateName;
         }
-        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . $cssClass . '">';
+        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $cssClasses) . '">';
         $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
