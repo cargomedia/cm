@@ -1,6 +1,6 @@
 <?php
 
-class CMService_AwsS3Versioning {
+class CMService_AwsS3Versioning_Bucket {
 
     /** @var Aws\S3\S3Client */
     private $_client;
