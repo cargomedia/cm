@@ -3,11 +3,11 @@
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public static function setUpBeforeClass() {
+        CM_Config::get()->installationName = 'Bar';
         CM_Config::get()->CM_Site_Abstract->url = 'http://www.foo.com';
         CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://www.cdn.com';
         CM_Config::get()->CM_Site_Abstract->name = 'Foo';
         CM_Config::get()->CM_Site_Abstract->emailAddress = 'foo@foo.com';
-        CM_Config::get()->CM_Site_Abstract->applicationName = 'Bar';
     }
 
     public function testGetAll() {
@@ -28,10 +28,10 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals('Foo', $site->getName());
     }
 
-    public function testGetApplicationName() {
+    public function testGetInstallationName() {
         /** @var CM_Site_Abstract $site */
         $site = $this->getMockForAbstractClass('CM_Site_Abstract');
-        $this->assertEquals('Bar', $site->getApplicationName());
+        $this->assertEquals('Bar', CM_Site_Abstract::getInstallationName());
     }
 
     public function testGetUrl() {

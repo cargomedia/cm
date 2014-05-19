@@ -80,13 +80,6 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     }
 
     /**
-     * @return string
-     */
-    public function getApplicationName() {
-        return $this->_getConfig()->applicationName;
-    }
-
-    /**
      * @return string Theme
      */
     public function getTheme() {
@@ -215,5 +208,12 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     public static function fromArray(array $array) {
         $type = (int) $array['type'];
         return self::factory($type);
+    }
+
+    /**
+     * @return string
+     */
+    public static function getInstallationName() {
+        return CM_Config::get()->installationName;
     }
 }
