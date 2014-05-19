@@ -39,3 +39,15 @@ $config->services['filesystem-userfiles'] = array(
             )
         ),
     ));
+
+$config->services['filesystem-userfiles-tmp'] = array(
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_ROOT . 'tests/tmp/userfiles/tmp/',
+            )
+        ),
+    ));
