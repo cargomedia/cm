@@ -199,11 +199,10 @@ class CM_MenuEntry {
      * @return bool
      */
     public final function isViewable(CM_Frontend_Environment $environment) {
-        $params = $this->getParams();
-        if (!isset($params['viewable'])) {
+        if (!isset($this->_data['viewable'])) {
             return true;
         }
-        $isViewable = $params['viewable'];
+        $isViewable = $this->_data['viewable'];
         if (is_callable($isViewable)) {
             return $isViewable($environment);
         }
