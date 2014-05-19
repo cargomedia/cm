@@ -1,6 +1,6 @@
 <?php
 
-class CMService_AwsS3Versioning_BucketTest extends CMTest_TestCase {
+class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
 
     /** @var \Aws\S3\S3Client */
     private $_client;
@@ -11,7 +11,7 @@ class CMService_AwsS3Versioning_BucketTest extends CMTest_TestCase {
     /** @var CM_File_Filesystem */
     private $_filesystem;
 
-    /** @var CMService_AwsS3Versioning_Bucket */
+    /** @var CMService_AwsS3Versioning_Client */
     private $_restore;
 
     public function setUp() {
@@ -23,9 +23,9 @@ class CMService_AwsS3Versioning_BucketTest extends CMTest_TestCase {
         $clientParams = $config->$className->clientParams;
 
         $this->_client = \Aws\S3\S3Client::factory($clientParams);
-        $this->_bucket = 'test-CMService_AwsS3Versioning_BucketTest';
+        $this->_bucket = 'test-CMService_AwsS3Versioning_ClientTest';
         $this->_filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($this->_client, $this->_bucket));
-        $this->_restore = new CMService_AwsS3Versioning_Bucket($this->_client, $this->_bucket);
+        $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket);
 
         $this->_client->createBucket(array('Bucket' => $this->_bucket));
         $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Enabled'));
