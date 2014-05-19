@@ -1,6 +1,6 @@
 <?php
 
-class CM_Service_Filesystems extends CM_Service_Abstract {
+class CM_Service_Filesystems extends CM_Service_ManagerAware {
 
     /**
      * @return CM_File_Filesystem

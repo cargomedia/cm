@@ -59,7 +59,7 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      * @return CM_File
      */
     private function _getDirStorage() {
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystems()->getTmp();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
         return new CM_File('cache', $filesystem);
     }
 }

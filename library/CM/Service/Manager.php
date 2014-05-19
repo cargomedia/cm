@@ -1,6 +1,6 @@
 <?php
 
-class CM_ServiceManager extends CM_Class_Abstract {
+class CM_Service_Manager extends CM_Class_Abstract {
 
     /** @var array */
     private $_serviceList = array();
@@ -8,7 +8,7 @@ class CM_ServiceManager extends CM_Class_Abstract {
     /** @var array */
     private $_serviceInstanceList = array();
 
-    /** @var CM_ServiceManager */
+    /** @var CM_Service_Manager */
     protected static $instance;
 
     /**
@@ -124,14 +124,14 @@ class CM_ServiceManager extends CM_Class_Abstract {
         if (null !== $config['method']) {
             $instance = call_user_func_array(array($instance, $config['method']), $config['methodArguments']);
         }
-        if ($instance instanceof CM_Service_Abstract) {
+        if ($instance instanceof CM_Service_ManagerAwareInterface) {
             $instance->setServiceManager($this);
         }
         return $instance;
     }
 
     /**
-     * @return CM_ServiceManager
+     * @return CM_Service_Manager
      */
     public static function getInstance() {
         if (null === self::$instance) {

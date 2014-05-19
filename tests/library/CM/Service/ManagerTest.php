@@ -1,16 +1,16 @@
 <?php
 
-class CM_ServiceManagerTest extends CMTest_TestCase {
+class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testHas() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         $this->assertTrue($serviceManager->has('DummyService'));
     }
 
     public function testGet() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         /** @var DummyService $service */
@@ -19,7 +19,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
     }
 
     public function testGetAssertInstanceOf() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         /** @var DummyService $service */
@@ -28,7 +28,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
     }
 
     public function testGetWithMethod() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'), 'getArray', array('foo', 1234));
 
         /** @var DummyService $service */
@@ -41,14 +41,14 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
      * @expectedExceptionMessage Service `DummyService` is a `DummyService`, but not `SomethingElse`.
      */
     public function testGetAssertInstanceOfInvalid() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         $serviceManager->get('DummyService', 'SomethingElse');
     }
 
     public function testServiceMethod() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         /** @var DummyService $service */
@@ -57,7 +57,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
     }
 
     public function testInstanceCaching() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         $service1 = $serviceManager->get('DummyService');
@@ -70,13 +70,13 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
      * @expectedExceptionMessage Service InvalidService is not registered.
      */
     public function testInvalidService() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
 
         $serviceManager->get('InvalidService');
     }
 
     public function testMagicGet() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
 
         $service1 = $serviceManager->getDummyService();
@@ -89,7 +89,7 @@ class CM_ServiceManagerTest extends CMTest_TestCase {
      * @expectedExceptionMessage Service `DummyService` already registered
      */
     public function testRegisterTwice() {
-        $serviceManager = new CM_ServiceManager();
+        $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
     }

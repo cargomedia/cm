@@ -18,7 +18,7 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        $filesystems = CM_ServiceManager::getInstance()->getFilesystems();
+        $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
         $filesystems->getData()->getAdapter()->setup();
         $filesystems->getUserfiles()->getAdapter()->setup();
         $filesystems->getTmp()->getAdapter()->setup();

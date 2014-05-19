@@ -125,7 +125,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @return CM_File
      */
     protected function _getLogFile() {
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystems()->getData();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
         return new CM_File('logs/error.log', $filesystem);
     }
 

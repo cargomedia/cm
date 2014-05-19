@@ -255,7 +255,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
             $extension = '.' . $extension;
         }
         $extension = (string) $extension;
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystems()->getTmp();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
         return static::create(uniqid() . $extension, $content, $filesystem);
     }
 
@@ -263,7 +263,7 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
      * @return CM_File
      */
     public static function createTmpDir() {
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystems()->getTmp();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
         $dir = new CM_File(uniqid(), $filesystem);
         $filesystem->ensureDirectory($dir->getPath());
         return $dir;

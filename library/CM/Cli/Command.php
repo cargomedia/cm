@@ -114,7 +114,7 @@ class CM_Cli_Command {
      * @return CM_File
      */
     private function _getPidFile() {
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystems()->getData();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
         return new CM_File('locks/' . $this->_class->getName() . ':' . $this->_method->getName(), $filesystem);
     }
 

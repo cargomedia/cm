@@ -165,7 +165,7 @@ class CM_Bootloader {
     }
 
     protected function _registerServices() {
-        $serviceManager = CM_ServiceManager::getInstance();
+        $serviceManager = CM_Service_Manager::getInstance();
 
         $serviceManager->register('filesystems', 'CM_Service_Filesystems');
         $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
