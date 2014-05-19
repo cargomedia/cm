@@ -29,6 +29,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $viewResponse->setData(array(
             'autoId'          => $viewResponse->getAutoId(),
             'layout'          => $layout,
+            'page'            => $page,
             'pageTitle'       => $this->fetchTitle(),
             'pageDescription' => $this->fetchDescription(),
             'pageKeywords'    => $this->fetchKeywords(),

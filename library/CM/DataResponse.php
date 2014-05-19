@@ -26,4 +26,16 @@ class CM_DataResponse extends CM_Class_Abstract {
     public function getData() {
         return $this->_data;
     }
+
+    /**
+     * @param string $key
+     * @return mixed
+     * @throws CM_Exception_Invalid
+     */
+    public function get($key) {
+        if (!array_key_exists($key, $this->_data)) {
+            throw new CM_Exception_Invalid('Key `' . $key . '` not found');
+        }
+        return $this->_data[$key];
+    }
 }
