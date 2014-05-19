@@ -2,7 +2,7 @@
 
 class CM_Cli_CommandManager {
 
-    const TIMEOUT = 120;
+    const TIMEOUT = 600;
 
     /** @var CM_Cli_Command[]|null */
     private $_commands = null;
