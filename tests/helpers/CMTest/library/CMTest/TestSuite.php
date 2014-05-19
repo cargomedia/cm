@@ -16,7 +16,8 @@ class CMTest_TestSuite {
 
     public function cleanup() {
         CMTest_TH::clearEnv();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->flush();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->flush();
+        $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
+        $filesystems->getData()->deleteByPrefix('/');
+        $filesystems->getUserfiles()->deleteByPrefix('/');
     }
 }

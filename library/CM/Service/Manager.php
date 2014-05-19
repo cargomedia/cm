@@ -1,6 +1,6 @@
 <?php
 
-class CM_ServiceManager extends CM_Class_Abstract {
+class CM_Service_Manager extends CM_Class_Abstract {
 
     /** @var array */
     private $_serviceList = array();
@@ -8,7 +8,7 @@ class CM_ServiceManager extends CM_Class_Abstract {
     /** @var array */
     private $_serviceInstanceList = array();
 
-    /** @var CM_ServiceManager */
+    /** @var CM_Service_Manager */
     protected static $instance;
 
     /**
@@ -37,19 +37,55 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string     $serviceName
-     * @param string     $className
-     * @param array|null $arguments
+     * @param string      $serviceName
+     * @param string      $className
+     * @param array|null  $arguments
+     * @param string|null $methodName
+     * @param array|null  $methodArguments
      * @throws CM_Exception_Invalid
      */
-    public function register($serviceName, $className, array $arguments = null) {
-        $arguments = (array) $arguments;
+    public function register($serviceName, $className, array $arguments = null, $methodName = null, array $methodArguments = null) {
+        $config = array(
+            'class'     => $className,
+            'arguments' => $arguments,
+        );
+        if (null !== $methodName) {
+            $config['method'] = array(
+                'name'      => $methodName,
+                'arguments' => $methodArguments
+            );
+        }
+        $this->registerWithArray($serviceName, $config);
+    }
+
+    /**
+     * @param string $serviceName
+     * @param array  $config
+     * @throws CM_Exception_Invalid
+     */
+    public function registerWithArray($serviceName, array $config) {
         if ($this->has($serviceName)) {
             throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
         }
+        $class = (string) $config['class'];
+        $arguments = array();
+        if (isset($config['arguments'])) {
+            $arguments = (array) $config['arguments'];
+        }
+        $method = null;
+        if (isset($config['method'])) {
+            $methodName = (string) $config['method']['name'];
+            $methodArguments = array();
+            if (isset($config['method']['arguments'])) {
+                $methodArguments = (array) $config['method']['arguments'];
+            }
+            $method = array('name' => $methodName, 'arguments' => $methodArguments);
+        }
+
         $this->_serviceList[$serviceName] = array(
-            'class'     => $className,
+            'class'     => $class,
             'arguments' => $arguments,
+            'method'    => $method,
         );
     }
 
@@ -81,11 +117,10 @@ class CM_ServiceManager extends CM_Class_Abstract {
     }
 
     /**
-     * @param string $serviceName
-     * @return CM_Service_Filesystem
+     * @return CM_Service_Filesystems
      */
-    public function getFilesystem($serviceName) {
-        return $this->get($serviceName);
+    public function getFilesystems() {
+        return $this->get('filesystems', 'CM_Service_Filesystems');
     }
 
     /**
@@ -98,16 +133,19 @@ class CM_ServiceManager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid("Service {$serviceName} is not registered.");
         }
         $config = $this->_serviceList[$serviceName];
-        $arguments = array();
-        if (array_key_exists('arguments', $config)) {
-            $arguments = $config['arguments'];
-        }
         $reflection = new ReflectionClass($config['class']);
-        return $reflection->newInstanceArgs($arguments);
+        $instance = $reflection->newInstanceArgs($config['arguments']);
+        if (null !== $config['method']) {
+            $instance = call_user_func_array(array($instance, $config['method']['name']), $config['method']['arguments']);
+        }
+        if ($instance instanceof CM_Service_ManagerAwareInterface) {
+            $instance->setServiceManager($this);
+        }
+        return $instance;
     }
 
     /**
-     * @return CM_ServiceManager
+     * @return CM_Service_Manager
      */
     public static function getInstance() {
         if (null === self::$instance) {
