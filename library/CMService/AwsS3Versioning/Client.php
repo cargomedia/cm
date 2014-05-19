@@ -26,7 +26,7 @@ class CMService_AwsS3Versioning_Client {
 
     /**
      * @param string $key
-     * @return string[]
+     * @return CMService_AwsS3Versioning_Response_Version[]
      */
     public function getVersions($key) {
         $options = array(

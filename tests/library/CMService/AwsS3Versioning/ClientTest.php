@@ -51,5 +51,9 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
 
         $versions = $this->_restore->getVersions('bar');
         $this->assertCount(3, $versions);
+        foreach ($versions as $version) {
+            $this->assertInstanceOf('CMService_AwsS3Versioning_Response_Version', $version);
+            $this->assertSame('bar', $version->getKey());
+        }
     }
 }
