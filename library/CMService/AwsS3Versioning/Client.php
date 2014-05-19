@@ -34,8 +34,8 @@ class CMService_AwsS3Versioning_Client {
             'Prefix' => (string) $key,
         );
         $versionList = array();
-        foreach ($this->_client->getListObjectVersionsIterator($options) as $version) {
-            $versionList[] = $version;
+        foreach ($this->_client->getListObjectVersionsIterator($options) as $data) {
+            $versionList[] = new CMService_AwsS3Versioning_Response_Version($data);
         }
         return $versionList;
     }
