@@ -59,12 +59,10 @@ class CMService_AwsS3Versioning_Client {
     }
 
     /**
-     * Restore an object by deleting all versions of it that are newer than the provided date.
-     *
      * @param string   $key
      * @param DateTime $date
      */
-    public function restore($key, DateTime $date) {
+    public function restoreByDeletingNewerVersions($key, DateTime $date) {
         $versions = $this->getVersions($key);
         $versionsToDelete = Functional\select($versions, function (CMService_AwsS3Versioning_Response_Version $version) use ($key, $date) {
             $isExactKeyMatch = ($key === $version->getKey());
@@ -79,6 +77,34 @@ class CMService_AwsS3Versioning_Client {
             'Bucket'  => $this->_bucket,
             'Objects' => $objectsData,
         ));
+    }
+
+    /**
+     * @param string   $key
+     * @param DateTime $date
+     */
+    public function restoreByCopyingOldVersion($key, DateTime $date) {
+        $versions = $this->getVersions($key);
+        /** @var CMService_AwsS3Versioning_Response_Version $versionToRestore */
+        $versionToRestore = Functional\first($versions, function (CMService_AwsS3Versioning_Response_Version $version) use ($key, $date) {
+            $isExactKeyMatch = ($key === $version->getKey());
+            $isModifiedBeforeOrAt = ($date >= $version->getLastModified());
+            return $isExactKeyMatch && $isModifiedBeforeOrAt;
+        });
+        $hasNoPriorVersion = (!$versionToRestore);
+        $restoreVersionIsDeleteMarker = ($versionToRestore && null === $versionToRestore->getETag() && null === $versionToRestore->getSize());
+        if ($hasNoPriorVersion || $restoreVersionIsDeleteMarker) {
+            $this->_client->deleteObject(array(
+                'Bucket' => $this->_bucket,
+                'Key'    => $key,
+            ));
+        } else {
+            $this->_client->copyObject(array(
+                'Bucket'     => $this->_bucket,
+                'CopySource' => urlencode($this->_bucket . '/' . $key) . '?versionId=' . $versionToRestore->getId(),
+                'Key'        => $key,
+            ));
+        }
     }
 
     private function _assertVersioningEnabled() {

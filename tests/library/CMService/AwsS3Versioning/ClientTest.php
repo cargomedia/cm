@@ -67,7 +67,7 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
         }
     }
 
-    public function testRestore() {
+    public function testRestoreByDeletingNewerVersions() {
         $this->_filesystem->write('bar', 'mega1');
         sleep(1);
         $this->_filesystem->write('bar', 'mega2');
@@ -84,20 +84,54 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
             return $version->getLastModified();
         });
 
-        $this->_restore->restore('bar', $lastModifiedList[1]);
+        $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[1]);
         $this->assertCount(4, $this->_restore->getVersions('bar'));
         $this->assertSame('mega3', $this->_filesystem->read('bar'));
 
-        $this->_restore->restore('bar', $lastModifiedList[2]);
+        $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[2]);
         $this->assertCount(3, $this->_restore->getVersions('bar'));
         $this->assertSame(false, $this->_filesystem->exists('bar'));
 
-        $this->_restore->restore('bar', $lastModifiedList[4]);
+        $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[4]);
         $this->assertCount(1, $this->_restore->getVersions('bar'));
         $this->assertSame('mega1', $this->_filesystem->read('bar'));
 
-        $this->_restore->restore('bar', $lastModifiedList[4]->sub(new DateInterval('PT1S')));
+        $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[4]->sub(new DateInterval('PT1S')));
         $this->assertCount(0, $this->_restore->getVersions('bar'));
+        $this->assertSame(false, $this->_filesystem->exists('bar'));
+    }
+
+    public function testRestoreByCopyingOldVersion() {
+        $this->_filesystem->write('bar', 'mega1');
+        sleep(1);
+        $this->_filesystem->write('bar', 'mega2');
+        sleep(1);
+        $this->_filesystem->delete('bar');
+        sleep(1);
+        $this->_filesystem->write('bar', 'mega3');
+        sleep(1);
+        $this->_filesystem->write('bar', 'mega4');
+
+        $versionList = $this->_restore->getVersions('bar');
+        /** @var DateTime[] $lastModifiedList */
+        $lastModifiedList = Functional\map($versionList, function (CMService_AwsS3Versioning_Response_Version $version) {
+            return $version->getLastModified();
+        });
+
+        $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[1]);
+        $this->assertCount(6, $this->_restore->getVersions('bar'));
+        $this->assertSame('mega3', $this->_filesystem->read('bar'));
+
+        $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[2]);
+        $this->assertCount(7, $this->_restore->getVersions('bar'));
+        $this->assertSame(false, $this->_filesystem->exists('bar'));
+
+        $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[4]);
+        $this->assertCount(8, $this->_restore->getVersions('bar'));
+        $this->assertSame('mega1', $this->_filesystem->read('bar'));
+
+        $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[4]->sub(new DateInterval('PT1S')));
+        $this->assertCount(9, $this->_restore->getVersions('bar'));
         $this->assertSame(false, $this->_filesystem->exists('bar'));
     }
 }
