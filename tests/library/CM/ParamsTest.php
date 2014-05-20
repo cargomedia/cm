@@ -116,12 +116,6 @@ class CM_ParamsTest extends CMTest_TestCase {
             array(-34., '-34'),
             array(0., '0'),
             array(0., '-0'),
-            array(0., ''),
-            array(0., '-'),
-            array(0., '.'),
-            array(0., '-.'),
-            array(0., false),
-            array(1., true),
         );
         foreach ($testDataList as $testData) {
             $expected = $testData[0];
@@ -129,7 +123,7 @@ class CM_ParamsTest extends CMTest_TestCase {
             $params = new CM_Params(array('userInput' => $userInput));
             $this->assertSame($expected, $params->getFloat('userInput'));
         }
-        $userInputInvalidList = array('1.2.3', '12 ', ' 12', '12,345', array('1'), new stdClass(), fopen(__FILE__, 'r'));
+        $userInputInvalidList = array('', '-', '.', '-.', '1.2.3', '12 ', ' 12', '12,345', false, true, array('1'), new stdClass(), fopen(__FILE__, 'r'));
         foreach ($userInputInvalidList as $userInputInvalid) {
             $params = new CM_Params(array('userInput' => $userInputInvalid));
             try {

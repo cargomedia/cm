@@ -392,12 +392,11 @@ class CM_Params extends CM_Class_Abstract {
      * @throws CM_Exception_InvalidParam
      */
     private function _getFloat($param) {
-        if (is_float($param)) {
-            return $param;
+        if (is_float($param) || is_int($param)) {
+            return (float) $param;
         }
-        if (!is_array($param) && !is_object($param)) {
-            $param = (string) $param;
-            if (preg_match('/^-?\\d*+\\.?\d*+$/', $param)) {
+        if (is_string($param)) {
+            if (preg_match('/^-?(?:\\d++\\.?+\\d*+|\\.\\d++)$/', $param)) {
                 return (float) $param;
             }
         }
