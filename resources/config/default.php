@@ -140,9 +140,9 @@ $config->services['filesystem-usercontent'] = array(
 
 $config->services['usercontent'] = array(
     'class'     => 'CM_Service_UserContent',
-    'arguments' => array(
+    'arguments' => array(array(
         'default' => array(
             'filesystem' => 'filesystem-usercontent',
             'url'        => 'http://localhost/userfiles',
         ),
-    ));
+    )));

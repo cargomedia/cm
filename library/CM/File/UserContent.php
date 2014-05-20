@@ -1,6 +1,8 @@
 <?php
 
-class CM_File_UserContent extends CM_File {
+class CM_File_UserContent extends CM_File implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const BUCKETS_COUNT = 10000;
 
@@ -11,21 +13,26 @@ class CM_File_UserContent extends CM_File {
     private $_namespace;
 
     /**
-     * @param string   $namespace
-     * @param string   $filename
-     * @param int|null $sequence
+     * @param string                  $namespace
+     * @param string                  $filename
+     * @param int|null                $sequence
+     * @param CM_Service_Manager|null $serviceManager
      */
-    public function __construct($namespace, $filename, $sequence = null) {
+    public function __construct($namespace, $filename, $sequence = null, CM_Service_Manager $serviceManager = null) {
         $namespace = (string) $namespace;
         $filename = (string) $filename;
         if (null !== $sequence) {
             $sequence = (int) $sequence;
         }
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
 
         $this->_pathRelative = $this->_calculateRelativeDir($namespace, $filename, $sequence);
         $this->_namespace = $namespace;
+        $this->setServiceManager($serviceManager);
+        $filesystem = $serviceManager->getUserContent()->getFilesystem($this->getNamespace());
 
-        $filesystem = self::getFilesystemByNamespace($this->getNamespace());
         parent::__construct($this->getPathRelative(), $filesystem);
     }
 
@@ -47,7 +54,8 @@ class CM_File_UserContent extends CM_File {
      * @return string
      */
     public function getUrl() {
-        return self::getUrlByNamespace($this->getNamespace()) . '/' . $this->getPathRelative();
+        $baseUrl = $this->getServiceManager()->getUserContent()->getUrl($this->getNamespace());
+        return $baseUrl . '/' . $this->getPathRelative();
     }
 
     /**
@@ -64,65 +72,5 @@ class CM_File_UserContent extends CM_File {
         }
         $dirs[] = $filename;
         return implode('/', $dirs);
-    }
-
-    /**
-     * @param string $namespace
-     * @return CM_File_Filesystem
-     */
-    public static function getFilesystemByNamespace($namespace) {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $filesystemKey = self::_getNamespaceConfig($namespace)['filesystem'];
-        return $serviceManager->get($filesystemKey, 'CM_File_Filesystem');
-    }
-
-    /**
-     * @param string $namespace
-     * @return string
-     */
-    public static function getUrlByNamespace($namespace) {
-        return (string) self::_getNamespaceConfig($namespace)['url'];
-    }
-
-    /**
-     * @return CM_File_Filesystem[]
-     */
-    public static function getFilesystemList() {
-        $serviceManager = CM_Service_Manager::getInstance();
-        $filesystemList = array();
-        foreach (self::_getNamespaceConfigList() as $namespace => $config) {
-            $filesystemList[$namespace] = $serviceManager->get($config['filesystem'], 'CM_File_Filesystem');
-        }
-        return $filesystemList;
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getUrlList() {
-        $urlList = array();
-        foreach (self::_getNamespaceConfigList() as $namespace => $config) {
-            $urlList[$namespace] = (string) $config['url'];
-        }
-        return $urlList;
-    }
-
-    /**
-     * @return array
-     */
-    private static function _getNamespaceConfigList() {
-        return self::_getConfig()->namespaces;
-    }
-
-    /**
-     * @param string $namespace
-     * @return array
-     */
-    private static function _getNamespaceConfig($namespace) {
-        $configList = self::_getNamespaceConfigList();
-        if (isset($configList[$namespace])) {
-            return $configList[$namespace];
-        }
-        return $configList['default'];
     }
 }
