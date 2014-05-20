@@ -42,7 +42,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_verbose = (bool) $verbose;
     }
 
-    public function update() {
+    public function outdated() {
         $this->_writeln('Updating locations database…');
         $this->_readCountryListOld();
         $this->_updateCountryList();
@@ -56,7 +56,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     public function upgrade() {
-        $this->update();
+        $this->outdated();
         $this->_upgradeCountryList();
         $this->_upgradeRegionList();
         $this->_upgradeCityList();
