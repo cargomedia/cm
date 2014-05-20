@@ -25,18 +25,20 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
             $filenameParts[] = strtolower(pathinfo($this->getFilenameLabel(), PATHINFO_EXTENSION));
         }
 
-        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getUserfilesTmp();
-
-        parent::__construct('tmp', implode('.', $filenameParts), null, $filesystem);
+        parent::__construct('tmp', implode('.', $filenameParts));
     }
 
     /**
      * @param string                  $filename
      * @param string|null             $content
      * @param CM_File_Filesystem|null $filesystem
+     * @throws CM_Exception_Invalid
      * @return CM_File_UserContent_Temp
      */
     public static function create($filename, $content = null, CM_File_Filesystem $filesystem = null) {
+        if ($filesystem) {
+            throw new CM_Exception_Invalid('Temporary user-content file cannot handle filesystem');
+        }
         $filename = (string) $filename;
         if (strlen($filename) > 100) {
             $filename = substr($filename, -100, 100);
@@ -44,7 +46,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         $uniqid = md5(rand() . uniqid());
         CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
-        $file = new self($uniqid, $filesystem);
+        $file = new self($uniqid);
         $file->ensureParentDirectory();
         if (null !== $content) {
             $file->write($content);
