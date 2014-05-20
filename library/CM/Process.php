@@ -85,7 +85,7 @@ class CM_Process {
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
                 $this->fork($workload);
             }
-        } while (!empty($this->_childProcessIdList) || $keepAlive);
+        } while (!empty($this->_workloadList) || $keepAlive);
         $this->executeTerminationCallback();
     }
 
