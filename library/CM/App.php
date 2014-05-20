@@ -21,6 +21,7 @@ class CM_App {
         $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
         $filesystems->getData()->getAdapter()->setup();
         $filesystems->getUserfiles()->getAdapter()->setup();
+        $filesystems->getUserfilesTmp()->getAdapter()->setup();
         $filesystems->getTmp()->getAdapter()->setup();
         $filesystems->getTmp()->deleteByPrefix('/');
     }

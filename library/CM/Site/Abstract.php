@@ -96,15 +96,37 @@ abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayCon
     /**
      * @return string
      */
-    public function getUrlCdn() {
-        return self::_getConfig()->urlCdn;
+    public function getUrl() {
+        return (string) self::_getConfig()->url;
     }
 
     /**
      * @return string
      */
-    public function getUrl() {
-        return self::_getConfig()->url;
+    public function getUrlCdn() {
+        return (string) self::_getConfig()->urlCdn;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlUserContent() {
+        $config = self::_getConfig();
+        if (!isset($config->urlUserContent)) {
+            return $this->getUrlCdn() . '/userfiles';
+        }
+        return (string) $config->urlUserContent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlUserContentTmp() {
+        $config = self::_getConfig();
+        if (!isset($config->urlUserContentTmp)) {
+            return $this->getUrlUserContent();
+        }
+        return (string) $config->urlUserContentTmp;
     }
 
     /**
