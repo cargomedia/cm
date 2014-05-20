@@ -18,7 +18,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $options['site'] = CM_Params::encode($this->getRender()->getSite());
         $options['url'] = $this->getRender()->getUrl();
         $options['urlStatic'] = $this->getRender()->getUrlStatic();
-        $options['urlUserContent'] = $this->getRender()->getUrlUserContent();
+        $options['urlUserContentList'] = CM_File_UserContent::getUrlList();
         $options['urlResource'] = $this->getRender()->getUrlResource();
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
