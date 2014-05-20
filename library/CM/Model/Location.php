@@ -212,7 +212,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 
         $pi180 = M_PI / 180;
         $metersPerDegreeEquator = self::EARTH_RADIUS * $pi180;
-        $metersPerDegree = $metersPerDegreeEquator / cos($lat * $pi180);
+        $metersPerDegree = $metersPerDegreeEquator * cos($lat * $pi180);
 
         $latMin = $lat - $searchRadius / $metersPerDegreeEquator;
         $latMax = $lat + $searchRadius / $metersPerDegreeEquator;
