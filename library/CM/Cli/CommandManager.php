@@ -138,8 +138,11 @@ class CM_Cli_CommandManager {
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
-                if ($this->_isLocked($command)) {
-                    throw new CM_Cli_Exception_Internal('Command `' . $command->getName() . '` still running.');
+                if ($lock = $this->_findLock($command)) {
+                    $commandName = $command->getName();
+                    $hostId = $lock['hostId'];
+                    $processId = (int) $lock['processId'];
+                    throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
                 }
                 $this->_lockCommand($command);
                 $commandManager = $this;
@@ -205,6 +208,20 @@ class CM_Cli_CommandManager {
     }
 
     /**
+     * @param CM_Cli_Command $command
+     * @return array|null
+     * @throws CM_Cli_Exception_Internal
+     */
+    protected function _findLock(CM_Cli_Command $command) {
+        $commandName = $command->getName();
+        $result = CM_Db_Db::select('cm_cli_command_manager_process', array('hostId', 'processId'), array('commandName' => $commandName));
+        foreach ($result->fetchAll() as $row) {
+            return $row;
+        }
+        return null;
+    }
+
+    /**
      * @param string $packageName
      * @param string $methodName
      * @throws CM_Cli_Exception_InvalidArguments
@@ -224,15 +241,6 @@ class CM_Cli_CommandManager {
      */
     protected function  _getProcess() {
         return CM_Process::getInstance();
-    }
-
-    /**
-     * @param CM_Cli_Command $command
-     * @return bool
-     */
-    protected function _isLocked(CM_Cli_Command $command) {
-        $commandName = $command->getName();
-        return (bool) CM_Db_Db::count('cm_cli_command_manager_process', array('commandName' => $commandName));
     }
 
     /**

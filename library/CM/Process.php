@@ -63,7 +63,13 @@ class CM_Process {
         }
     }
 
-    public function waitForChildren($keepAlive, Closure $terminationCallback = null) {
+    /**
+     * @param bool|null    $keepAlive
+     * @param Closure|null $terminationCallback
+     * @throws CM_Exception
+     */
+    public function waitForChildren($keepAlive = null, Closure $terminationCallback = null) {
+        $keepAlive = (bool) $keepAlive;
         $this->_terminationCallback = $terminationCallback;
         do {
             $pid = pcntl_wait($status);
