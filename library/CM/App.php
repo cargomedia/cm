@@ -18,9 +18,11 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->setup(true);
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->setup();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->setup();
+        $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
+        $filesystems->getData()->getAdapter()->setup();
+        $filesystems->getUserfiles()->getAdapter()->setup();
+        $filesystems->getTmp()->getAdapter()->setup();
+        $filesystems->getTmp()->deleteByPrefix('/');
     }
 
     /**
