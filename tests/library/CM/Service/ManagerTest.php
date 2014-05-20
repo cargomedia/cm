@@ -99,8 +99,15 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testRegisterInstance() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->registerInstance('foo', 12.3);
-        $this->assertSame(12.3, $serviceManager->get('foo'));
+
+        $serviceFoo = 12.3;
+        $serviceManager->registerInstance('foo', $serviceFoo);
+        $this->assertSame($serviceFoo, $serviceManager->get('foo'));
+
+        $serviceBar = new DummyService('hello');
+        $serviceManager->registerInstance('bar', $serviceBar);
+        $this->assertSame($serviceBar, $serviceManager->get('bar'));
+        $this->assertSame($serviceManager, $serviceBar->getServiceManager());
     }
 
     public function testUnregister() {
@@ -113,7 +120,9 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
     }
 }
 
-class DummyService {
+class DummyService implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     private $_foo;
 

@@ -101,6 +101,9 @@ class CM_Service_Manager extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
         }
         $serviceName = (string) $serviceName;
+        if ($instance instanceof CM_Service_ManagerAwareInterface) {
+            $instance->setServiceManager($this);
+        }
         $this->_serviceInstanceList[$serviceName] = $instance;
     }
 
@@ -144,6 +147,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
      */
     public function getFilesystems() {
         return $this->get('filesystems', 'CM_Service_Filesystems');
+    }
+
+    /**
+     * @return CM_Service_UserContent
+     */
+    public function getUserContent() {
+        return $this->get('usercontent', 'CM_Service_UserContent');
     }
 
     /**
