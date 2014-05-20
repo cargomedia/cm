@@ -138,9 +138,11 @@ $config->services['filesystem-usercontent'] = array(
         ),
     ));
 
-$config->CM_File_UserContent->namespaces = array(
-    'default' => array(
-        'filesystem' => 'filesystem-usercontent',
-        'url'        => 'http://localhost/userfiles',
-    ),
-);
+$config->services['usercontent'] = array(
+    'class'     => 'CM_Service_UserContent',
+    'arguments' => array(
+        'default' => array(
+            'filesystem' => 'filesystem-usercontent',
+            'url'        => 'http://localhost/userfiles',
+        ),
+    ));
