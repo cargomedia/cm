@@ -28,7 +28,7 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
         $this->_client->getConfig()->set('curl.options', array('body_as_string' => true)); // https://github.com/aws/aws-sdk-php/issues/140#issuecomment-25117635
         $this->_bucket = strtolower(str_replace('_', '-', 'test-' . __CLASS__ . uniqid()));
         $this->_filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($this->_client, $this->_bucket));
-        $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket);
+        $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket, new CM_OutputStream_Null());
 
         $this->_client->createBucket(array('Bucket' => $this->_bucket, 'LocationConstraint' => $region));
         $this->_client->waitUntilBucketExists(array('Bucket' => $this->_bucket));
@@ -66,7 +66,7 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
         }
     }
 
-    public function testRestoreByDate() {
+    public function testRestore() {
         $this->_filesystem->write('bar', 'mega1');
         sleep(1);
         $this->_filesystem->write('bar', 'mega2');
@@ -83,19 +83,19 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
             return $version->getLastModified();
         });
 
-        $this->_restore->restoreByDate('bar', $lastModifiedList[1]);
+        $this->_restore->restore('bar', $lastModifiedList[1]);
         $this->assertCount(4, $this->_restore->getVersions('bar'));
         $this->assertSame('mega3', $this->_filesystem->read('bar'));
 
-        $this->_restore->restoreByDate('bar', $lastModifiedList[2]);
+        $this->_restore->restore('bar', $lastModifiedList[2]);
         $this->assertCount(3, $this->_restore->getVersions('bar'));
         $this->assertSame(false, $this->_filesystem->exists('bar'));
 
-        $this->_restore->restoreByDate('bar', $lastModifiedList[4]);
+        $this->_restore->restore('bar', $lastModifiedList[4]);
         $this->assertCount(1, $this->_restore->getVersions('bar'));
         $this->assertSame('mega1', $this->_filesystem->read('bar'));
 
-        $this->_restore->restoreByDate('bar', $lastModifiedList[4]->sub(new DateInterval('PT1S')));
+        $this->_restore->restore('bar', $lastModifiedList[4]->sub(new DateInterval('PT1S')));
         $this->assertCount(0, $this->_restore->getVersions('bar'));
         $this->assertSame(false, $this->_filesystem->exists('bar'));
     }

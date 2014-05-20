@@ -8,13 +8,21 @@ class CMService_AwsS3Versioning_Client {
     /** @var string */
     private $_bucket;
 
+    /** @var CM_OutputStream_Interface */
+    private $_output;
+
     /**
-     * @param Aws\S3\S3Client $client
-     * @param string          $bucket
+     * @param Aws\S3\S3Client                $client
+     * @param string                         $bucket
+     * @param CM_OutputStream_Interface|null $output
      */
-    public function __construct(Aws\S3\S3Client $client, $bucket) {
+    public function __construct(Aws\S3\S3Client $client, $bucket, CM_OutputStream_Interface $output = null) {
+        if (null === $output) {
+            $output = new CM_OutputStream_Stream_StandardOutput();
+        }
         $this->_client = $client;
         $this->_bucket = (string) $bucket;
+        $this->_output = $output;
     }
 
     /**
@@ -53,13 +61,14 @@ class CMService_AwsS3Versioning_Client {
      * @param string   $key
      * @param DateTime $date
      */
-    public function restoreByDate($key, DateTime $date) {
+    public function restore($key, DateTime $date) {
         $versions = $this->getVersions($key);
         $versionsToDelete = Functional\select($versions, function (CMService_AwsS3Versioning_Response_Version $version) use ($key, $date) {
             $isExactKeyMatch = ($key === $version->getKey());
             $isModifiedAfter = ($date < $version->getLastModified());
             return $isExactKeyMatch && $isModifiedAfter;
         });
+        $this->_output->writeln('Restoring `' . $key . '` - deleting ' . count($versionsToDelete) . ' versions...');
         $objectsData = Functional\map($versionsToDelete, function (CMService_AwsS3Versioning_Response_Version $version) {
             return array('Key' => $version->getKey(), 'VersionId' => $version->getId());
         });
