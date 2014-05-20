@@ -59,6 +59,8 @@ class CMService_AwsS3Versioning_Client {
     }
 
     /**
+     * Restore an object by deleting all versions of it that are newer than the provided date.
+     *
      * @param string   $key
      * @param DateTime $date
      */
