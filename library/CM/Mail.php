@@ -74,6 +74,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
         $this->_site = $site;
 
         $this->setTplParam('siteName', $this->_site->getName());
+        $this->setTplParam('site', $this->_site);
         $this->setSender($this->_site->getEmailAddress(), $this->_site->getName());
     }
 
