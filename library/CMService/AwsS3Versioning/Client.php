@@ -48,4 +48,24 @@ class CMService_AwsS3Versioning_Client {
         });
         return $versionList;
     }
+
+    /**
+     * @param string   $key
+     * @param DateTime $date
+     */
+    public function restoreByDate($key, DateTime $date) {
+        $versions = $this->getVersions($key);
+        $versionsToDelete = Functional\select($versions, function (CMService_AwsS3Versioning_Response_Version $version) use ($key, $date) {
+            $isExactKeyMatch = ($key === $version->getKey());
+            $isModifiedAfter = ($date < $version->getLastModified());
+            return $isExactKeyMatch && $isModifiedAfter;
+        });
+        $objectsData = Functional\map($versionsToDelete, function (CMService_AwsS3Versioning_Response_Version $version) {
+            return array('Key' => $version->getKey(), 'VersionId' => $version->getId());
+        });
+        $this->_client->deleteObjects(array(
+            'Bucket'  => $this->_bucket,
+            'Objects' => $objectsData,
+        ));
+    }
 }
