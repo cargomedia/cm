@@ -23,6 +23,7 @@ class CMService_AwsS3Versioning_Client {
         $this->_client = $client;
         $this->_bucket = (string) $bucket;
         $this->_output = $output;
+        $this->_assertVersioningEnabled();
     }
 
     /**
@@ -76,5 +77,11 @@ class CMService_AwsS3Versioning_Client {
             'Bucket'  => $this->_bucket,
             'Objects' => $objectsData,
         ));
+    }
+
+    private function _assertVersioningEnabled() {
+        if (!$this->getVersioningEnabled()) {
+            throw new CM_Exception_Invalid('Versioning is not enabled on bucket `' . $this->_bucket . '`.');
+        }
     }
 }

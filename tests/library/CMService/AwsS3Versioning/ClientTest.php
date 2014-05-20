@@ -28,11 +28,12 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
         $this->_client->getConfig()->set('curl.options', array('body_as_string' => true)); // https://github.com/aws/aws-sdk-php/issues/140#issuecomment-25117635
         $this->_bucket = strtolower(str_replace('_', '-', 'test-' . __CLASS__ . uniqid()));
         $this->_filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($this->_client, $this->_bucket));
-        $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket, new CM_OutputStream_Null());
 
         $this->_client->createBucket(array('Bucket' => $this->_bucket, 'LocationConstraint' => $region));
         $this->_client->waitUntilBucketExists(array('Bucket' => $this->_bucket));
         $this->_client->putBucketVersioning(array('Bucket' => $this->_bucket, 'Status' => 'Enabled'));
+
+        $this->_restore = new CMService_AwsS3Versioning_Client($this->_client, $this->_bucket, new CM_OutputStream_Null());
     }
 
     public function tearDown() {
