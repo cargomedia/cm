@@ -140,7 +140,7 @@ class CM_Cli_CommandManager {
             if ($command->getSynchronized()) {
                 if ($lock = $this->_findLock($command)) {
                     $commandName = $command->getName();
-                    $hostId = $lock['hostId'];
+                    $hostId = dechex($lock['hostId']);
                     $processId = (int) $lock['processId'];
                     throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
                 }
