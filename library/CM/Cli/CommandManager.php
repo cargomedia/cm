@@ -138,12 +138,7 @@ class CM_Cli_CommandManager {
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
-                if ($lock = $this->_findLock($command)) {
-                    $commandName = $command->getName();
-                    $hostId = dechex($lock['hostId']);
-                    $processId = (int) $lock['processId'];
-                    throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
-                }
+                $this->_checkLock($command);
                 $this->_lockCommand($command);
                 $commandManager = $this;
                 $terminationCallback = function () use ($commandManager, $command) {
@@ -209,17 +204,30 @@ class CM_Cli_CommandManager {
 
     /**
      * @param CM_Cli_Command $command
-     * @return array|null
      * @throws CM_Cli_Exception_Internal
+     */
+    protected function _checkLock(CM_Cli_Command $command) {
+        $lock = $this->_findLock($command);
+        if (null === $lock) {
+            return;
+        }
+        $commandName = $command->getName();
+        $hostId = dechex($lock['hostId']);
+        $processId = (int) $lock['processId'];
+        throw new CM_Cli_Exception_Internal("Command `$commandName` still running (process `$processId` on host `$hostId`)");
+    }
+
+    /**
+     * @param CM_Cli_Command $command
+     * @return array|null
      */
     protected function _findLock(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $result = CM_Db_Db::select('cm_cli_command_manager_process', array('hostId', 'processId'), array('commandName' => $commandName));
-        $row = $result->fetch();
-        if (false === $row) {
+        $lock = CM_Db_Db::select('cm_cli_command_manager_process', array('hostId', 'processId'), array('commandName' => $commandName))->fetch();
+        if (false === $lock) {
             return null;
         }
-        return $row;
+        return $lock;
     }
 
     /**
