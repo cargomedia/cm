@@ -215,10 +215,11 @@ class CM_Cli_CommandManager {
     protected function _findLock(CM_Cli_Command $command) {
         $commandName = $command->getName();
         $result = CM_Db_Db::select('cm_cli_command_manager_process', array('hostId', 'processId'), array('commandName' => $commandName));
-        foreach ($result->fetchAll() as $row) {
-            return $row;
+        $row = $result->fetch();
+        if (false === $row) {
+            return null;
         }
-        return null;
+        return $row;
     }
 
     /**
