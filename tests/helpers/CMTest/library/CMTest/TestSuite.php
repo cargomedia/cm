@@ -18,6 +18,8 @@ class CMTest_TestSuite {
         CMTest_TH::clearEnv();
         $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
         $filesystems->getData()->deleteByPrefix('/');
-        $filesystems->getUserfiles()->deleteByPrefix('/');
+        foreach (CM_File_UserContent::getFilesystemList() as $filesystem) {
+            $filesystem->deleteByPrefix('/');
+        }
     }
 }

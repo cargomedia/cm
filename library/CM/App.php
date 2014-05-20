@@ -20,10 +20,11 @@ class CM_App {
     public function setupFilesystem() {
         $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
         $filesystems->getData()->getAdapter()->setup();
-        $filesystems->getUserfiles()->getAdapter()->setup();
-        $filesystems->getUserfilesTmp()->getAdapter()->setup();
         $filesystems->getTmp()->getAdapter()->setup();
         $filesystems->getTmp()->deleteByPrefix('/');
+        foreach (CM_File_UserContent::getFilesystemList() as $filesystem) {
+            $filesystem->getAdapter()->setup();
+        }
     }
 
     /**

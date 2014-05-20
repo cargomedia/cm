@@ -123,27 +123,6 @@ class CM_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
     }
 
-    public function testGetUrlUserContent() {
-        $render = new CM_Render();
-        $userFile = $this->getMock('CM_File_UserContent', array('getPathRelative'), array(), '', false);
-        $userFile->expects($this->any())->method('getPathRelative')->will($this->returnValue('foo/bar.jpg'));
-        $this->assertSame('http://cdn.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
-    }
-
-    public function testGetUrlUserContentOverride() {
-        $render = new CM_Render();
-        $userFile = new CM_File_UserContent('photo', 'foo.jpg');
-        $userFileTemp = CM_File_UserContent_Temp::create('bar.jpg');
-
-        CM_Config::get()->CM_Site_Abstract->urlUserContent = 'http://user-content.default.dev';
-        $this->assertSame('http://user-content.default.dev/photo/foo.jpg', $render->getUrlUserContent($userFile));
-        $this->assertSame('http://user-content.default.dev/tmp/' . $userFileTemp->getUniqid() . '.jpg', $render->getUrlUserContent($userFileTemp));
-
-        CM_Config::get()->CM_Site_Abstract->urlUserContentTmp = 'http://user-tmp.default.dev';
-        $this->assertSame('http://user-content.default.dev/photo/foo.jpg', $render->getUrlUserContent($userFile));
-        $this->assertSame('http://user-tmp.default.dev/tmp/' . $userFileTemp->getUniqid() . '.jpg', $render->getUrlUserContent($userFileTemp));
-    }
-
     public function testGetTranslation() {
         $render = new CM_Render();
         $this->assertSame('abc', $render->getTranslation('abc'));

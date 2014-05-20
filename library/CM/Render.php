@@ -333,19 +333,11 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_File_UserContent|null $file
+     * @param CM_File_UserContent $file
      * @return string
      */
-    public function getUrlUserContent(CM_File_UserContent $file = null) {
-        if ($file instanceof CM_File_UserContent_Temp) {
-            $url = $this->getSite()->getUrlUserContentTmp();
-        } else {
-            $url = $this->getSite()->getUrlUserContent();
-        }
-        if (!is_null($file)) {
-            $url .= '/' . $file->getPathRelative();
-        }
-        return $url;
+    public function getUrlUserContent(CM_File_UserContent $file) {
+        return $file->getUrl();
     }
 
     /**

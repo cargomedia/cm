@@ -126,7 +126,7 @@ $config->services['filesystem-data'] = array(
         ),
     ));
 
-$config->services['filesystem-userfiles'] = array(
+$config->services['filesystem-usercontent'] = array(
     'class'  => 'CM_File_Filesystem_Factory',
     'method' => array(
         'name'      => 'createFilesystem',
@@ -138,14 +138,9 @@ $config->services['filesystem-userfiles'] = array(
         ),
     ));
 
-$config->services['filesystem-userfiles-tmp'] = array(
-    'class'  => 'CM_File_Filesystem_Factory',
-    'method' => array(
-        'name'      => 'createFilesystem',
-        'arguments' => array(
-            'CM_File_Filesystem_Adapter_Local',
-            array(
-                'pathPrefix' => DIR_PUBLIC . 'userfiles/tmp/',
-            )
-        ),
-    ));
+$config->CM_File_UserContent->namespaces = array(
+    'default' => array(
+        'filesystem' => 'filesystem-usercontent',
+        'url'        => 'http://localhost/userfiles',
+    ),
+);
