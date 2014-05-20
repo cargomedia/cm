@@ -5,108 +5,108 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
     public function testSingleThread() {
         $commandMock = $this->_getCommandMock(false, false, 1);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->never())->method('_isLocked');
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->never())->method('_isLocked');
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testKeepAlive() {
         $commandMock = $this->_getCommandMock(false, true, 1);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->never())->method('_isLocked');
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->never())->method('_isLocked');
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testFork() {
         $commandMock = $this->_getCommandMock(false, false, 5);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->never())->method('_isLocked');
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->never())->method('_isLocked');
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
     public function testForkAndKeepAlive() {
         $commandMock = $this->_getCommandMock(false, true, 5);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->never())->method('_isLocked');
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->never())->method('_isLocked');
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
     public function testSingleThreadSynchronized() {
         $commandMock = $this->_getCommandMock(true, false, 1);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->with($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('unlockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
+        $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testSingleThreadSynchronizedLocked() {
         $commandMock = $this->_getCommandMock(true, false, 0);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock, "ERROR: Command `package-mock command-mock` still running.\n");
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testKeepAliveSynchronized() {
         $commandMock = $this->_getCommandMock(true, true, 1);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->with($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('unlockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
+        $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testKeepAliveSynchronizedLocked() {
         $commandMock = $this->_getCommandMock(true, true, 0);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock, "ERROR: Command `package-mock command-mock` still running.\n");
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock);
     }
 
     public function testForkSynchronized() {
         $commandMock = $this->_getCommandMock(true, false, 5);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->with($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('unlockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
+        $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
     public function testForkSynchronizedLocked() {
         $commandMock = $this->_getCommandMock(true, false, 0);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock, "ERROR: Command `package-mock command-mock` still running.\n");
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
     public function testForkAndKeepAliveSynchronized() {
         $commandMock = $this->_getCommandMock(true, true, 5);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
-        $commandManagerMock::staticExpects($this->once())->method('_lockCommand')->with($commandMock);
-        $commandManagerMock::staticExpects($this->once())->method('unlockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(false));
+        $commandManagerMock->expects($this->once())->method('_lockCommand')->with($commandMock);
+        $commandManagerMock->expects($this->once())->method('unlockCommand')->with($commandMock);
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
     public function testForkAndKeepAliveSynchronizedLocked() {
         $commandMock = $this->_getCommandMock(true, false, 0);
         $commandManagerMock = $this->_getCommandManagerMock($commandMock, "ERROR: Command `package-mock command-mock` still running.\n");
-        $commandManagerMock::staticExpects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
-        $commandManagerMock::staticExpects($this->never())->method('_lockCommand');
-        $commandManagerMock::staticExpects($this->never())->method('unlockCommand');
+        $commandManagerMock->expects($this->once())->method('_isLocked')->with($commandMock)->will($this->returnValue(true));
+        $commandManagerMock->expects($this->never())->method('_lockCommand');
+        $commandManagerMock->expects($this->never())->method('unlockCommand');
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
@@ -126,7 +126,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         } else {
             $commandManagerMock->expects($this->once())->method('_outputError')->with($errorMessageExpected);
         }
-        $commandManagerMock::staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         return $commandManagerMock;
     }
 

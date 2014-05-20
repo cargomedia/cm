@@ -14,12 +14,30 @@ class CM_Process {
         $this->_installSignalHandlers();
     }
 
+    public function executeTerminationCallback() {
+        $terminationCallback = $this->_terminationCallback;
+        if (null !== $terminationCallback) {
+            $terminationCallback();
+            $this->_terminationCallback = null;
+        }
+    }
+
     /**
      * @param Closure $workload
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
-        $this->_spawnChild($workload);
+        $pid = pcntl_fork();
+        if ($pid === -1) {
+            throw new CM_Exception('Could not spawn child process');
+        }
+        if ($pid) {
+            $this->_workloadList[$pid] = $workload;
+        } else {
+            $this->_reset();
+            $workload();
+            exit;
+        }
     }
 
     /**
@@ -34,26 +52,6 @@ class CM_Process {
      */
     public function getProcessId() {
         return posix_getpid();
-    }
-
-    /**
-     * @return Closure|null
-     */
-    public function executeTerminationCallback() {
-        $terminationCallback = $this->_terminationCallback;
-        if (null !== $terminationCallback) {
-            $terminationCallback();
-            $this->_terminationCallback = null;
-        }
-    }
-
-    /**
-     * @param int $processId
-     * @return bool
-     */
-    public function isRunning($processId) {
-        $processId = (int) $processId;
-        return (false !== posix_getsid($processId));
     }
 
     /**
@@ -79,27 +77,30 @@ class CM_Process {
                 $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
-                $this->_spawnChild($workload);
+                $this->fork($workload);
             }
         } while (!empty($this->_childProcessIdList) || $keepAlive);
         $this->executeTerminationCallback();
     }
 
     /**
-     * @throws CM_Exception
+     * @return CM_Process
      */
-    private function _spawnChild(Closure $workload) {
-        $pid = pcntl_fork();
-        if ($pid === -1) {
-            throw new CM_Exception('Could not spawn child process');
+    public static function getInstance() {
+        static $instance;
+        if (!$instance) {
+            $instance = new self();
         }
-        if ($pid) {
-            $this->_workloadList[$pid] = $workload;
-        } else {
-            $this->_reset();
-            $workload();
-            exit;
-        }
+        return $instance;
+    }
+
+    /**
+     * @param int $processId
+     * @return bool
+     */
+    public static function isRunning($processId) {
+        $processId = (int) $processId;
+        return (false !== posix_getsid($processId));
     }
 
     private function _installSignalHandlers() {
@@ -118,16 +119,5 @@ class CM_Process {
         $this->_workloadList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
-    }
-
-    /**
-     * @return CM_Process
-     */
-    public static function getInstance() {
-        static $instance;
-        if (!$instance) {
-            $instance = new self();
-        }
-        return $instance;
     }
 }
