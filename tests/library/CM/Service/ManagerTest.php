@@ -4,9 +4,12 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     public function testHas() {
         $serviceManager = new CM_Service_Manager();
-        $serviceManager->register('DummyService', 'DummyService', array('bar'));
+        $serviceManager->register('foo', 'DummyService', array('bar'));
+        $serviceManager->registerInstance('bar', 'my-service');
 
-        $this->assertTrue($serviceManager->has('DummyService'));
+        $this->assertTrue($serviceManager->has('foo'));
+        $this->assertTrue($serviceManager->has('bar'));
+        $this->assertFalse($serviceManager->has('foobar'));
     }
 
     public function testGet() {
@@ -67,7 +70,7 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
 
     /**
      * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage Service InvalidService is not registered.
+     * @expectedExceptionMessage Service InvalidService has no config.
      */
     public function testInvalidService() {
         $serviceManager = new CM_Service_Manager();
@@ -92,6 +95,21 @@ class CM_Service_ManagerTest extends CMTest_TestCase {
         $serviceManager = new CM_Service_Manager();
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
         $serviceManager->register('DummyService', 'DummyService', array('bar'));
+    }
+
+    public function testRegisterInstance() {
+        $serviceManager = new CM_Service_Manager();
+        $serviceManager->registerInstance('foo', 12.3);
+        $this->assertSame(12.3, $serviceManager->get('foo'));
+    }
+
+    public function testUnregister() {
+        $serviceManager = new CM_Service_Manager();
+        $serviceManager->registerInstance('foo', 12.3);
+        $this->assertSame(true, $serviceManager->has('foo'));
+
+        $serviceManager->unregister('foo');
+        $this->assertSame(false, $serviceManager->has('foo'));
     }
 }
 
