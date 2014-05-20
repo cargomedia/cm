@@ -28,18 +28,24 @@ class CMService_AwsS3Versioning_Client {
     }
 
     /**
-     * @param string $key
+     * @param string $prefix
      * @return CMService_AwsS3Versioning_Response_Version[]
      */
-    public function getVersions($key) {
+    public function getVersions($prefix) {
         $options = array(
             'Bucket' => $this->_bucket,
-            'Prefix' => (string) $key,
+            'Prefix' => (string) $prefix,
         );
         $versionList = array();
         foreach ($this->_client->getListObjectVersionsIterator($options) as $data) {
             $versionList[] = new CMService_AwsS3Versioning_Response_Version($data);
         }
+        usort($versionList, function (CMService_AwsS3Versioning_Response_Version $a, CMService_AwsS3Versioning_Response_Version $b) {
+            if ($a->getLastModified() == $b->getLastModified()) {
+                return 0;
+            }
+            return $a->getLastModified() < $b->getLastModified() ? 1 : -1;
+        });
         return $versionList;
     }
 }
