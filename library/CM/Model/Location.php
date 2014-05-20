@@ -7,6 +7,8 @@ class CM_Model_Location extends CM_Model_Abstract {
     const LEVEL_CITY = 3;
     const LEVEL_ZIP = 4;
 
+    const EARTH_RADIUS = 6371009;
+
     /** @var CM_Model_Location_Abstract[] */
     protected $_locationList = array();
 
@@ -108,13 +110,12 @@ class CM_Model_Location extends CM_Model_Abstract {
         $againstCoordinates['lat'] *= $pi180;
         $againstCoordinates['lon'] *= $pi180;
 
-        $earthRadius = 6371009;
         $arcCosine = acos(
             sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
             + cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
         );
 
-        return (int) round($earthRadius * $arcCosine);
+        return (int) round(self::EARTH_RADIUS * $arcCosine);
     }
 
     /**
@@ -208,26 +209,22 @@ class CM_Model_Location extends CM_Model_Abstract {
         $lat = (float) $lat;
         $lon = (float) $lon;
         $searchRadius = 100000;
-        $metersPerDegree = 111100;
 
-        $result = CM_Db_Db::execRead("
-			SELECT `id`, `level`
-			FROM `cm_tmp_location_coordinates`
-			WHERE
-				MBRContains(
-					GeomFromText(
-						'LineString(
-							" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
-							" . ($lon + $searchRadius / $metersPerDegree) . ",
-							" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
-							" . ($lon - $searchRadius / $metersPerDegree) . "
-						)'
-					), coordinates
-				)
-			ORDER BY
-				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
-			LIMIT 1"
-        )->fetch();
+        $pi180 = M_PI / 180;
+        $metersPerDegreeEquator = self::EARTH_RADIUS * $pi180;
+        $metersPerDegree = $metersPerDegreeEquator / cos($lat * $pi180);
+
+        $latMin = $lat - $searchRadius / $metersPerDegreeEquator;
+        $latMax = $lat + $searchRadius / $metersPerDegreeEquator;
+        $lonMin = $lon - $searchRadius / $metersPerDegree;
+        $lonMax = $lon + $searchRadius / $metersPerDegree;
+        $query = "SELECT `id`, `level` FROM `cm_tmp_location_coordinates`
+            WHERE
+                MBRContains(LineString(Point($latMax, $lonMax), Point($latMin, $lonMin)), coordinates)
+            ORDER BY
+                ((POW($lat - X(coordinates), 2)) + (POW($lon - Y(coordinates), 2))) ASC
+            LIMIT 1";
+        $result = CM_Db_Db::execRead($query)->fetch();
 
         if (!$result) {
             return null;
