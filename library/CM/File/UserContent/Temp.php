@@ -25,7 +25,9 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
             $filenameParts[] = strtolower(pathinfo($this->getFilenameLabel(), PATHINFO_EXTENSION));
         }
 
-        parent::__construct('tmp', implode('.', $filenameParts));
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getUserfilesTmp();
+
+        parent::__construct('tmp', implode('.', $filenameParts), null, $filesystem);
     }
 
     /**
