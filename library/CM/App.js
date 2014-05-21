@@ -163,8 +163,14 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlUserContent: function(path) {
-    path = path || '';
-    return cm.options.urlUserContent + '/' + path;
+    var matches = path.match(new RegExp('^([^/]+)/'));
+    if (null === matches) {
+      cm.error.triggerThrow('Cannot detect namespace for user-content file `' + path + '`.');
+    }
+    var namespace = matches[1];
+    var urlList = cm.options.urlUserContentList;
+    var url = _.has(urlList, namespace) ? urlList[namespace] : urlList['default'];
+    return url + '/' + path;
   },
 
   /**

@@ -18,12 +18,13 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        $filesystems = CM_Service_Manager::getInstance()->getFilesystems();
-        $filesystems->getData()->getAdapter()->setup();
-        $filesystems->getUserfiles()->getAdapter()->setup();
-        $filesystems->getUserfilesTmp()->getAdapter()->setup();
-        $filesystems->getTmp()->getAdapter()->setup();
-        $filesystems->getTmp()->deleteByPrefix('/');
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->getAdapter()->setup();
+        }
     }
 
     /**
