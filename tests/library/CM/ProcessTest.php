@@ -24,7 +24,7 @@ class CM_ProcessTest extends CMTest_TestCase {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
                 CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
-                ob_end_clean();
+                posix_kill(posix_getpid(), SIGTERM);
             });
         }
         CM_ProcessTest::writeln('Parent waiting for 250 ms...');
