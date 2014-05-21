@@ -832,7 +832,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
+     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind and append to legacy codes
      *
      * @return array List of array($countryCode, $regionCode, $regionName)
      * @codeCoverageIgnore
@@ -842,9 +842,22 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
         $regionsFile = new CM_File($regionsPath);
         $regionsContents = $this->_download($regionsFile, self::REGION_URL);
+        $regionData = array();
+
+        $this->_writeln('Reading legacy region listing…');
+        $regionsPathLegacy = __DIR__ . '/MaxMind/region_codes_legacy.csv';
+        $regionsFileLegacy = new CM_File($regionsPathLegacy);
+        $regionsContentsLegacy = $regionsFileLegacy->read();
+        $rows = preg_split('#[\r\n]++#', $regionsContentsLegacy);
+        foreach ($rows as $row) {
+            $csv = str_getcsv(trim($row));
+            if (count($csv) <= 1) {
+                continue; // Skip empty lines
+            }
+            $regionData[] = $csv;
+        }
 
         $this->_writeln('Reading new region listing…');
-        $regionData = array();
         $rows = preg_split('#[\r\n]++#', $regionsContents);
         foreach ($rows as $row) {
             $csv = str_getcsv(trim($row));
@@ -853,6 +866,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $regionData[] = $csv;
         }
+
         return $regionData;
     }
 
