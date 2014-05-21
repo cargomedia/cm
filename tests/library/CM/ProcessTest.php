@@ -10,11 +10,6 @@ class CM_ProcessTest extends CMTest_TestCase {
         parent::runBare();
     }
 
-    public function run(PHPUnit_Framework_TestResult $result = null) {
-        $this->setPreserveGlobalState(false);
-        return parent::run($result);
-    }
-
     public static function setupBeforeClass() {
         parent::setUpBeforeClass();
         self::$_file = tmpfile();
@@ -27,7 +22,7 @@ class CM_ProcessTest extends CMTest_TestCase {
 
     /**
      * @runInSeparateProcess
-     * @see http://matthewturland.com/2010/08/19/process-isolation-in-phpunit/
+     * @preserveGlobalState disabled
      */
     public function testForkAndWaitForChildren() {
         $process = CM_Process::getInstance();
