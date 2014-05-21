@@ -5,11 +5,6 @@ class CM_ProcessTest extends CMTest_TestCase {
     /** @var resource */
     protected static $_file;
 
-    public function runBare() {
-        include dirname(dirname(__DIR__)) . '/bootstrap.php';
-        parent::runBare();
-    }
-
     public static function setupBeforeClass() {
         parent::setUpBeforeClass();
         self::$_file = tmpfile();
@@ -18,6 +13,11 @@ class CM_ProcessTest extends CMTest_TestCase {
     public static function tearDownAfterClass() {
         fclose(self::$_file);
         parent::tearDownAfterClass();
+    }
+
+    public function runBare() {
+        require_once dirname(dirname(__DIR__)) . '/bootstrap.php'; // Bootstrap the test explicitly when running in a separate process
+        parent::runBare();
     }
 
     /**
