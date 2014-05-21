@@ -5,6 +5,16 @@ class CM_ProcessTest extends CMTest_TestCase {
     /** @var resource */
     protected static $_file;
 
+    public function runBare() {
+        include dirname(dirname(__DIR__)) . '/bootstrap.php';
+        parent::runBare();
+    }
+
+    public function run(PHPUnit_Framework_TestResult $result = null) {
+        $this->setPreserveGlobalState(false);
+        return parent::run($result);
+    }
+
     public static function setupBeforeClass() {
         parent::setUpBeforeClass();
         self::$_file = tmpfile();
@@ -15,8 +25,11 @@ class CM_ProcessTest extends CMTest_TestCase {
         parent::tearDownAfterClass();
     }
 
+    /**
+     * @runInSeparateProcess
+     * @see http://matthewturland.com/2010/08/19/process-isolation-in-phpunit/
+     */
     public function testForkAndWaitForChildren() {
-        ob_start();
         $process = CM_Process::getInstance();
         for ($i = 1; $i <= 4; $i++) {
             CM_ProcessTest::writeln("Child $i forked.");
@@ -24,7 +37,7 @@ class CM_ProcessTest extends CMTest_TestCase {
                 $ms = 100 * $i;
                 usleep($ms * 1000);
                 CM_ProcessTest::writeln("Child $i terminated after $ms ms.");
-                posix_kill(posix_getpid(), SIGTERM);
+                ob_clean(); // Remove any test output buffered by phpUnit, which uses STDOUT itself to return test results from isolated processes
             });
         }
         CM_ProcessTest::writeln('Parent waiting for 250 ms...');
@@ -34,9 +47,8 @@ class CM_ProcessTest extends CMTest_TestCase {
             CM_ProcessTest::writeln('All children terminated.');
         });
         CM_ProcessTest::writeln('Parent terminated.');
-        $outputParentActual = ob_get_clean();
 
-        $this->assertSame('Child 1 forked.
+        $this->expectOutputString('Child 1 forked.
 Child 2 forked.
 Child 3 forked.
 Child 4 forked.
@@ -44,7 +56,7 @@ Parent waiting for 250 ms...
 Parent listening to children...
 All children terminated.
 Parent terminated.
-', $outputParentActual);
+');
 
         $outputFileExpected = 'Child 1 forked.
 Child 2 forked.
