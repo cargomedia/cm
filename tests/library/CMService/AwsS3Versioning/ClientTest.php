@@ -84,6 +84,10 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
             return $version->getLastModified();
         });
 
+        $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[0]->add(new DateInterval('PT1S')));
+        $this->assertCount(5, $this->_restore->getVersions('bar'));
+        $this->assertSame('mega4', $this->_filesystem->read('bar'));
+
         $this->_restore->restoreByDeletingNewerVersions('bar', $lastModifiedList[1]);
         $this->assertCount(4, $this->_restore->getVersions('bar'));
         $this->assertSame('mega3', $this->_filesystem->read('bar'));
@@ -117,6 +121,10 @@ class CMService_AwsS3Versioning_ClientTest extends CMTest_TestCase {
         $lastModifiedList = Functional\map($versionList, function (CMService_AwsS3Versioning_Response_Version $version) {
             return $version->getLastModified();
         });
+
+        $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[0]->add(new DateInterval('PT1S')));
+        $this->assertCount(5, $this->_restore->getVersions('bar'));
+        $this->assertSame('mega4', $this->_filesystem->read('bar'));
 
         $this->_restore->restoreByCopyingOldVersion('bar', $lastModifiedList[1]);
         $this->assertCount(6, $this->_restore->getVersions('bar'));
