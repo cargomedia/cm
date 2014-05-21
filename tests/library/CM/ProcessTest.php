@@ -34,7 +34,7 @@ class CM_ProcessTest extends CMTest_TestCase {
             CM_ProcessTest::writeln('All children terminated.');
         });
         CM_ProcessTest::writeln('Parent terminated.');
-        $outputActual = ob_get_clean();
+        $outputParentActual = ob_get_clean();
 
         $this->assertSame('Child 1 forked.
 Child 2 forked.
@@ -44,7 +44,7 @@ Parent waiting for 250 ms...
 Parent listening to children...
 All children terminated.
 Parent terminated.
-', $outputActual);
+', $outputParentActual);
 
         $outputFileExpected = 'Child 1 forked.
 Child 2 forked.
