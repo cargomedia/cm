@@ -2,20 +2,27 @@
 
 class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
 {
+    protected $usercontentUrl = 'http://example.com/default/usercontent/';
+
+    /** @var  CM_Service_Manager */
+    private $_serviceManager;
+
     protected function setUp()
     {
-//        $serviceManager = new CM_Service_Manager();
-//        $filesystemDefault = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
-//        $serviceManager->registerInstance('usercontent', $filesystemDefault);
-//
-//        $config = array(
-//            'default' => array(
-//                'url' => 'http://example.com/default',
-//                'filesystem' => 'usercontent',
-//            ),
-//        );
-//        $this->_service = new CM_Service_UserContent($config);
-//        $this->_service->setServiceManager($serviceManager);
+        $this->_serviceManager = new CM_Service_Manager();
+
+        $filesystemDefault = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
+        $this->_serviceManager->registerInstance('filesystem-usercontent-default', $filesystemDefault);
+
+        $config = array(
+            'default' => array(
+                'url' => 'http://example.com/default',
+                'filesystem' => 'filesystem-usercontent-default',
+            ),
+        );
+        $service = new CM_Service_UserContent($config);
+        $this->_serviceManager->registerInstance('usercontent', $service);
+        $service->setServiceManager($this->_serviceManager);
     }
 
     public function tearDown()
@@ -27,9 +34,11 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
     {
         $text = 'test ![usercontent](formatter/1.jpg) test' . PHP_EOL . '![usercontent](formatter/2.jpg)![usercontent](formatter/3.jpg)nospace![usercontent](formatter/4.jpg)';
 
-        $usercontentPrefix = 'http://localhost/userfiles/usercontent/';
-        $expected = 'test <img src="' . $usercontentPrefix . 'formatter/1.jpg" alt="image"/> test' . PHP_EOL . '<img src="' . $usercontentPrefix . 'formatter/2.jpg" alt="image"/><img src="' . $usercontentPrefix . 'formatter/3.jpg" alt="image"/>nospace<img src="' . $usercontentPrefix . 'formatter/4.jpg" alt="image"/>';
-        $filter = new CM_Usertext_Filter_Markdown_UserContent();
+        $expected = 'test <img src="' . $this->usercontentUrl . 'formatter/1.jpg" alt="image"/> test'
+            . PHP_EOL . '<img src="' . $this->usercontentUrl . 'formatter/2.jpg" alt="image"/><img src="'
+            . $this->usercontentUrl . 'formatter/3.jpg" alt="image"/>nospace<img src="' . $this->usercontentUrl
+            . 'formatter/4.jpg" alt="image"/>';
+        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
 
         $this->assertSame($expected, $actual);
@@ -39,7 +48,7 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
     {
         $text = 'test ![usercontent](formatter/1.jpg';
         $expected = $text;
-        $filter = new CM_Usertext_Filter_Markdown_UserContent();
+        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
 
         $this->assertSame($expected, $actual);
