@@ -4,6 +4,9 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
 {
     use CM_Service_ManagerAwareTrait;
 
+    /**
+     * @param CM_Service_Manager $serviceManager
+     */
     public function __construct(CM_Service_Manager $serviceManager = null)
     {
         if (null === $serviceManager) {
@@ -13,6 +16,11 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
 
     }
 
+    /**
+     * @param string $text
+     * @param CM_Render $render
+     * @return mixed|string
+     */
     public function transform($text, CM_Render $render)
     {
         $text = (string)$text;

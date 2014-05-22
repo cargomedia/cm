@@ -2,7 +2,7 @@
 
 class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
 {
-    protected $usercontentUrl = 'http://example.com/default/usercontent/';
+    protected $_usercontentUrl = 'http://example.com/default/usercontent/';
 
     /** @var  CM_Service_Manager */
     private $_serviceManager;
@@ -34,9 +34,9 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
     {
         $text = 'test ![usercontent](formatter/1.jpg) test' . PHP_EOL . '![usercontent](formatter/2.jpg)![usercontent](formatter/3.jpg)nospace![usercontent](formatter/4.jpg)';
 
-        $expected = 'test <img src="' . $this->usercontentUrl . 'formatter/1.jpg" alt="image"/> test'
-            . PHP_EOL . '<img src="' . $this->usercontentUrl . 'formatter/2.jpg" alt="image"/><img src="'
-            . $this->usercontentUrl . 'formatter/3.jpg" alt="image"/>nospace<img src="' . $this->usercontentUrl
+        $expected = 'test <img src="' . $this->_usercontentUrl . 'formatter/1.jpg" alt="image"/> test'
+            . PHP_EOL . '<img src="' . $this->_usercontentUrl . 'formatter/2.jpg" alt="image"/><img src="'
+            . $this->_usercontentUrl . 'formatter/3.jpg" alt="image"/>nospace<img src="' . $this->_usercontentUrl
             . 'formatter/4.jpg" alt="image"/>';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
