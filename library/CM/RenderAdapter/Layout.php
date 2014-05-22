@@ -26,15 +26,14 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
         $viewResponse = new CM_Frontend_ViewResponse($layout);
         $viewResponse->setTemplateName('default');
-        $viewResponse->setData(array(
-            'autoId'          => $viewResponse->getAutoId(),
-            'layout'          => $layout,
-            'page'            => $page,
-            'pageTitle'       => $this->fetchTitle(),
-            'pageDescription' => $this->fetchDescription(),
-            'pageKeywords'    => $this->fetchKeywords(),
-            'renderAdapter'   => $this,
-        ));
+        $layout->prepare($this->getRender()->getEnvironment(), $viewResponse);
+        $viewResponse->set('autoId', $viewResponse->getAutoId());
+        $viewResponse->set('layout', $layout);
+        $viewResponse->set('page', $page);
+        $viewResponse->set('pageTitle', $this->fetchTitle());
+        $viewResponse->set('pageDescription', $this->fetchDescription());
+        $viewResponse->set('pageKeywords', $this->fetchKeywords());
+        $viewResponse->set('renderAdapter', $this);
 
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
