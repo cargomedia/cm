@@ -2,9 +2,10 @@
 
 class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
 
+    /** @var string */
     protected $_usercontentUrl = 'http://example.com/default/usercontent/';
 
-    /** @var  CM_Service_Manager */
+    /** @var CM_Service_Manager */
     private $_serviceManager;
 
     protected function setUp() {

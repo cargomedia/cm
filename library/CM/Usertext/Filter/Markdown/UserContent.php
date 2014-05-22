@@ -14,11 +14,6 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
         $this->setServiceManager($serviceManager);
     }
 
-    /**
-     * @param string $text
-     * @param CM_Render $render
-     * @return mixed|string
-     */
     public function transform($text, CM_Render $render) {
         $text = (string) $text;
         $text = preg_replace_callback('#!\[usercontent\]\(([^\]]+)\)#m', function ($matches) {
