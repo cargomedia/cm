@@ -21,12 +21,12 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_App::getInstance()->setupFilesystem();
         self::clearDb();
         self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
+        CM_App::getInstance()->setupFilesystem();
     }
 
     public static function clearCache() {
@@ -233,7 +233,7 @@ class CMTest_TH {
         $country = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
         $state = CM_Db_Db::insert('cm_model_location_state', array('countryId' => $country, 'name' => 'stateFoo'));
         $city = CM_Db_Db::insert('cm_model_location_city', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
-                                                          'lon'     => 15));
+                                                                 'lon'     => 15));
         $zip = CM_Db_Db::insert('cm_model_location_zip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
 
         CM_Model_Location::createAggregation();

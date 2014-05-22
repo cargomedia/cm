@@ -3,7 +3,7 @@
 class CM_Service_Manager extends CM_Class_Abstract {
 
     /** @var array */
-    private $_serviceList = array();
+    private $_serviceConfigList = array();
 
     /** @var array */
     private $_serviceInstanceList = array();
@@ -16,7 +16,9 @@ class CM_Service_Manager extends CM_Class_Abstract {
      * @return bool
      */
     public function has($serviceName) {
-        return array_key_exists($serviceName, $this->_serviceList);
+        $hasConfig = array_key_exists($serviceName, $this->_serviceConfigList);
+        $hasInstance = array_key_exists($serviceName, $this->_serviceInstanceList);
+        return $hasConfig || $hasInstance;
     }
 
     /**
@@ -82,11 +84,35 @@ class CM_Service_Manager extends CM_Class_Abstract {
             $method = array('name' => $methodName, 'arguments' => $methodArguments);
         }
 
-        $this->_serviceList[$serviceName] = array(
+        $this->_serviceConfigList[$serviceName] = array(
             'class'     => $class,
             'arguments' => $arguments,
             'method'    => $method,
         );
+    }
+
+    /**
+     * @param string $serviceName
+     * @param mixed  $instance
+     * @throws CM_Exception_Invalid
+     */
+    public function registerInstance($serviceName, $instance) {
+        if ($this->has($serviceName)) {
+            throw new CM_Exception_Invalid('Service `' . $serviceName . '` already registered.');
+        }
+        $serviceName = (string) $serviceName;
+        if ($instance instanceof CM_Service_ManagerAwareInterface) {
+            $instance->setServiceManager($this);
+        }
+        $this->_serviceInstanceList[$serviceName] = $instance;
+    }
+
+    /**
+     * @param string $serviceName
+     */
+    public function unregister($serviceName) {
+        unset($this->_serviceConfigList[$serviceName]);
+        unset($this->_serviceInstanceList[$serviceName]);
     }
 
     /**
@@ -124,15 +150,22 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Service_UserContent
+     */
+    public function getUserContent() {
+        return $this->get('usercontent', 'CM_Service_UserContent');
+    }
+
+    /**
      * @param string $serviceName
      * @throws CM_Exception_Invalid
      * @return mixed
      */
     protected function _instantiateService($serviceName) {
-        if (!$this->has($serviceName)) {
-            throw new CM_Exception_Invalid("Service {$serviceName} is not registered.");
+        if (!array_key_exists($serviceName, $this->_serviceConfigList)) {
+            throw new CM_Exception_Invalid("Service {$serviceName} has no config.");
         }
-        $config = $this->_serviceList[$serviceName];
+        $config = $this->_serviceConfigList[$serviceName];
         $reflection = new ReflectionClass($config['class']);
         $instance = $reflection->newInstanceArgs($config['arguments']);
         if (null !== $config['method']) {

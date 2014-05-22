@@ -9,7 +9,6 @@ interface CM_Service_ManagerAwareInterface {
 
     /**
      * @return CM_Service_Manager
-     * @throws CM_Exception_Invalid
      */
     public function getServiceManager();
 }
