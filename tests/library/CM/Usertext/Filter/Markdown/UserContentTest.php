@@ -1,14 +1,13 @@
 <?php
 
-class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
-{
+class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
+
     protected $_usercontentUrl = 'http://example.com/default/usercontent/';
 
     /** @var  CM_Service_Manager */
     private $_serviceManager;
 
-    protected function setUp()
-    {
+    protected function setUp() {
         $this->_serviceManager = new CM_Service_Manager();
 
         $filesystemDefault = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local());
@@ -25,14 +24,13 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
         $service->setServiceManager($this->_serviceManager);
     }
 
-    public function tearDown()
-    {
+    public function tearDown() {
         CMTest_TH::clearEnv();
     }
 
-    public function testProcess()
-    {
-        $text = 'test ![usercontent](formatter/1.jpg) test' . PHP_EOL . '![usercontent](formatter/2.jpg)![usercontent](formatter/3.jpg)nospace![usercontent](formatter/4.jpg)';
+    public function testProcess() {
+        $text = 'test ![usercontent](formatter/1.jpg) test' .
+            PHP_EOL . '![usercontent](formatter/2.jpg)![usercontent](formatter/3.jpg)nospace![usercontent](formatter/4.jpg)';
 
         $expected = 'test <img src="' . $this->_usercontentUrl . 'formatter/1.jpg" alt="image"/> test'
             . PHP_EOL . '<img src="' . $this->_usercontentUrl . 'formatter/2.jpg" alt="image"/><img src="'
@@ -44,8 +42,7 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testInvalid()
-    {
+    public function testInvalid() {
         $text = 'test ![usercontent](formatter/1.jpg';
         $expected = $text;
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
