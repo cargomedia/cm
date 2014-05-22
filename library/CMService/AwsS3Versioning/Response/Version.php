@@ -17,6 +17,9 @@ class CMService_AwsS3Versioning_Response_Version {
     /** @var string|null */
     private $_eTag;
 
+    /** @var bool */
+    private $_isLatest;
+
     /**
      * @param array $data
      */
@@ -26,6 +29,7 @@ class CMService_AwsS3Versioning_Response_Version {
         $this->_lastModified = new DateTime($data['LastModified']);
         $this->_size = isset($data['Size']) ? (int) $data['Size'] : null;
         $this->_eTag = isset($data['ETag']) ? (string) $data['ETag'] : null;
+        $this->_isLatest = (bool) $data['IsLatest'];
     }
 
     /**
@@ -61,5 +65,12 @@ class CMService_AwsS3Versioning_Response_Version {
      */
     public function getSize() {
         return $this->_size;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsLatest() {
+        return $this->_isLatest;
     }
 }

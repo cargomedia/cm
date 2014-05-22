@@ -70,13 +70,15 @@ class CMService_AwsS3Versioning_Client {
             return $isExactKeyMatch && $isModifiedAfter;
         });
         $this->_output->writeln('Restoring `' . $key . '` - deleting ' . count($versionsToDelete) . ' versions...');
-        $objectsData = Functional\map($versionsToDelete, function (CMService_AwsS3Versioning_Response_Version $version) {
-            return array('Key' => $version->getKey(), 'VersionId' => $version->getId());
-        });
-        $this->_client->deleteObjects(array(
-            'Bucket'  => $this->_bucket,
-            'Objects' => $objectsData,
-        ));
+        if (count($versionsToDelete) > 0) {
+            $objectsData = Functional\map($versionsToDelete, function (CMService_AwsS3Versioning_Response_Version $version) {
+                return array('Key' => $version->getKey(), 'VersionId' => $version->getId());
+            });
+            $this->_client->deleteObjects(array(
+                'Bucket'  => $this->_bucket,
+                'Objects' => $objectsData,
+            ));
+        }
     }
 
     /**
@@ -91,19 +93,22 @@ class CMService_AwsS3Versioning_Client {
             $isModifiedBeforeOrAt = ($date >= $version->getLastModified());
             return $isExactKeyMatch && $isModifiedBeforeOrAt;
         });
-        $hasNoPriorVersion = (!$versionToRestore);
-        $restoreVersionIsDeleteMarker = ($versionToRestore && null === $versionToRestore->getETag() && null === $versionToRestore->getSize());
-        if ($hasNoPriorVersion || $restoreVersionIsDeleteMarker) {
-            $this->_client->deleteObject(array(
-                'Bucket' => $this->_bucket,
-                'Key'    => $key,
-            ));
-        } else {
-            $this->_client->copyObject(array(
-                'Bucket'     => $this->_bucket,
-                'CopySource' => urlencode($this->_bucket . '/' . $key) . '?versionId=' . $versionToRestore->getId(),
-                'Key'        => $key,
-            ));
+        $keepCurrentVersion = ($versionToRestore && $versionToRestore->getIsLatest());
+        if (!$keepCurrentVersion) {
+            $hasNoPriorVersion = (!$versionToRestore);
+            $restoreVersionIsDeleteMarker = ($versionToRestore && null === $versionToRestore->getETag() && null === $versionToRestore->getSize());
+            if ($hasNoPriorVersion || $restoreVersionIsDeleteMarker) {
+                $this->_client->deleteObject(array(
+                    'Bucket' => $this->_bucket,
+                    'Key'    => $key,
+                ));
+            } else {
+                $this->_client->copyObject(array(
+                    'Bucket'     => $this->_bucket,
+                    'CopySource' => urlencode($this->_bucket . '/' . $key) . '?versionId=' . $versionToRestore->getId(),
+                    'Key'        => $key,
+                ));
+            }
         }
     }
 
