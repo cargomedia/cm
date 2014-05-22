@@ -44,10 +44,13 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
 
     public function testInvalid() {
         $text = 'test ![usercontent](formatter/1.jpg';
-        $expected = $text;
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
+        $this->assertSame($text, $actual);
 
-        $this->assertSame($expected, $actual);
+        $text = '![usercontent]()';
+        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
+        $actual = $filter->transform($text, new CM_Render());
+        $this->assertSame($text, $actual);
     }
 }
