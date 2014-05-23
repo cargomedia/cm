@@ -842,9 +842,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
         $regionsFile = new CM_File($regionsPath);
         $regionsContents = $this->_download($regionsFile, self::REGION_URL);
-        $regionData = array();
 
         $this->_writeln('Reading new region listing…');
+        $regionData = array();
         $rows = preg_split('#[\r\n]++#', $regionsContents);
         foreach ($rows as $row) {
             $csv = str_getcsv(trim($row));
@@ -853,7 +853,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $regionData[] = $csv;
         }
-
         return $regionData;
     }
 
