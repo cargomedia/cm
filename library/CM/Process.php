@@ -87,7 +87,7 @@ class CM_Process {
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
                 $this->fork($forkHandler->getWorkload());
             }
-        } while (!empty($this->_forkHandlerList) || $keepAlive);
+        } while (!empty($this->_forkHandlerList));
         $this->executeTerminationCallback();
     }
 
