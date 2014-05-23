@@ -158,7 +158,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
-                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('436884', 'FR', 'ZZ', '', '', '49.4333', '1.0833'),
             ),
             array()
         );
@@ -169,6 +169,127 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_legacy() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_keepMissing() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'ZZ', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'ZZ', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'ZZ', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'ZZ', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRZZ', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'ZZ', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'ZZ', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'ZZ', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRZZ', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_addLegacy() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
             array(),
             array()
         );
@@ -266,8 +387,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
-                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
-                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('436884', 'FR', 'ZZ', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'ZZ', 'Le Havre', '', '49.5', '0.1333'),
             ),
             array()
         );
@@ -278,6 +399,35 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testCity_legacyRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
             array(),
             array(),
@@ -319,7 +469,39 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testAddZipCode_unknownRegion() {
+    public function testZipCode_unknownRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('50221', 'FR', 'ZZ', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'ZZ', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('385175', 'FR', 'YY', 'Marseille', '13000', '43.3', '5.4'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(),
+            array(
+                array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id' => 2, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 2, 'name' => '13000', 'cityId' => 2, 'lat' => 43.3, 'lon' => 5.4),
+            ),
+            array(),
+            array()
+        );
+    }
+
+    public function testZipCode_legacyRegion() {
         $this->_import(
             array(
                 array('France', 'FR'),
@@ -337,10 +519,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
-            array(),
             array(
-                array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
-                array('id' => 2, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Provence-Alpes-Cote d\'Azur', '_maxmind' => 'FRB8', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
             ),
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),

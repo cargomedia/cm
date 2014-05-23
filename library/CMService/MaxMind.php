@@ -49,9 +49,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_compareCountryLists();
         $this->_readRegionListOld();
         $this->_updateRegionList();
-        $this->_compareRegionLists();
         $this->_readLocationTreeOld();
         $this->_updateLocationTree();
+        $this->_compareRegionLists();
         $this->_compareLocationTrees();
     }
 
@@ -844,19 +844,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $regionsContents = $this->_download($regionsFile, self::REGION_URL);
         $regionData = array();
 
-        $this->_writeln('Reading legacy region listing…');
-        $regionsPathLegacy = __DIR__ . '/MaxMind/region_codes_legacy.csv';
-        $regionsFileLegacy = new CM_File($regionsPathLegacy);
-        $regionsContentsLegacy = $regionsFileLegacy->read();
-        $rows = preg_split('#[\r\n]++#', $regionsContentsLegacy);
-        foreach ($rows as $row) {
-            $csv = str_getcsv(trim($row));
-            if (count($csv) <= 1) {
-                continue; // Skip empty lines
-            }
-            $regionData[] = $csv;
-        }
-
         $this->_writeln('Reading new region listing…');
         $rows = preg_split('#[\r\n]++#', $regionsContents);
         foreach ($rows as $row) {
@@ -1002,6 +989,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _updateLocationTree() {
         $locationData = $this->_getLocationData();
+        $regionListByCountryLegacy = include __DIR__ . '/MaxMind/region_codes_legacy.php';
         $this->_locationTree = array();
         $this->_countryCodeListByMaxMind = array();
         $infoListWarning = array();
@@ -1012,6 +1000,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $maxMind = (int) $maxMind;
             $latitude = (float) $latitude;
             $longitude = (float) $longitude;
+            if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) { // Keep missing regions
+                if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) {
+                    $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
+                } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) {
+                    $this->_regionListByCountry[$countryCode][$regionCode] = $regionListByCountryLegacy[$countryCode][$regionCode];
+                }
+            }
             if (strlen($zipCode)) { // ZIP code record
                 if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
                     $regionCode = null;
