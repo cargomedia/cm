@@ -285,9 +285,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
-                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
-                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
             array(),
             array(
