@@ -289,12 +289,18 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $countryName = $countryCode;
             }
             if (!isset($countryData['regions'])) {
-                $infoListWarning['Countries without regions'][] = $countryName;
+                $infoListWarning['Countries without locations'][] = $countryName;
             } else {
+                $regionCount = count($countryData['regions']);
                 if (!isset($countryData['location'])) {
-                    $regionCount = count($countryData['regions']);
                     $s = $regionCount > 1 ? 's' : '';
                     $infoListWarning['Countries without location data'][] = $countryName . ' (' . $regionCount . ' region' . $s . ')';
+                }
+                if (1 === $regionCount) {
+                    $regionCode = array_keys($countryData['regions']);
+                    if ('' === reset($regionCode)) {
+                        $infoListWarning['Countries without regions'][] = $countryName;
+                    }
                 }
                 foreach ($countryData['regions'] as $regionCode => $regionData) {
                     $regionName = $this->_getRegionName($countryCode, $regionCode);
