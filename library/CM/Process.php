@@ -7,8 +7,8 @@ class CM_Process {
     /** @var Closure|null */
     private $_terminationCallback = null;
 
-    /** @var Closure[] */
-    private $_workloadList = array();
+    /** @var CM_Process_ForkHandler[] */
+    private $_forkHandlerList = array();
 
     private function __construct() {
         $this->_installSignalHandlers();
@@ -32,8 +32,10 @@ class CM_Process {
             throw new CM_Exception('Could not spawn child process');
         }
         if ($pid) {
-            $this->_workloadList[$pid] = $workload;
+            // parent
+            $this->_forkHandlerList[$pid] = new CM_Process_ForkHandler($workload);
         } else {
+            // child
             $this->_reset();
             $workload();
             exit;
@@ -58,7 +60,7 @@ class CM_Process {
      * @param int $signal
      */
     public function killChildren($signal) {
-        foreach ($this->_workloadList as $processId => $workload) {
+        foreach ($this->_forkHandlerList as $processId => $workload) {
             posix_kill($processId, $signal);
         }
     }
@@ -77,15 +79,15 @@ class CM_Process {
             if (-1 === $pid) {
                 throw new CM_Exception('Waiting on child processes failed');
             }
-            $workload = $this->_workloadList[$pid];
-            unset($this->_workloadList[$pid]);
+            $forkHandler = $this->_forkHandlerList[$pid];
+            unset($this->_forkHandlerList[$pid]);
             if ($keepAlive) {
                 $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
-                $this->fork($workload);
+                $this->fork($forkHandler->getWorkload());
             }
-        } while (!empty($this->_workloadList) || $keepAlive);
+        } while (!empty($this->_forkHandlerList) || $keepAlive);
         $this->executeTerminationCallback();
     }
 
@@ -122,7 +124,7 @@ class CM_Process {
 
     private function _reset() {
         $this->_terminationCallback = null;
-        $this->_workloadList = array();
+        $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
     }
