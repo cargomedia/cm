@@ -862,6 +862,17 @@ class CMService_MaxMind extends CM_Class_Abstract {
         return $regionData;
     }
 
+    /**
+     * Returns an old version of MaxMind's region listing, containing entries for
+     * regions without FIPS 10-4 and ISO-3166-2 codes, which are missing in newer versions.
+     *
+     * @return array $countryCode => $regionCode => $regionName
+     * @codeCoverageIgnore
+     */
+    protected function _getRegionListLegacy() {
+        return include __DIR__ . '/MaxMind/region_codes_legacy.php';
+    }
+
     protected function _readCountryListOld() {
         $this->_writeln('Reading old country listing…');
         $this->_countryListOld = array();
@@ -994,7 +1005,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _updateLocationTree() {
         $locationData = $this->_getLocationData();
-        $regionListByCountryLegacy = include __DIR__ . '/MaxMind/region_codes_legacy.php';
+        $regionListByCountryLegacy = $this->_getRegionListLegacy();
         $this->_locationTree = array();
         $this->_countryCodeListByMaxMind = array();
         $infoListWarning = array();
