@@ -999,10 +999,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $maxMind = (int) $maxMind;
             $latitude = (float) $latitude;
             $longitude = (float) $longitude;
-            if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) { // Keep missing regions
-                if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) {
+            if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) { // Keep missing regions
                     $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
-                } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) {
+                } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) { // Use legacy data for missing regions
                     $this->_regionListByCountry[$countryCode][$regionCode] = $regionListByCountryLegacy[$countryCode][$regionCode];
                 }
             }
