@@ -832,7 +832,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     /**
-     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind and append to legacy codes
+     * Download mixed FIPS 10-4 / ISO-3166-2 / proprietary region listing from MaxMind
      *
      * @return array List of array($countryCode, $regionCode, $regionName)
      * @codeCoverageIgnore
