@@ -17,6 +17,11 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
     public static function tearDownAfterClass() {
         CMTest_TH::clearEnv();
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->deleteByPrefix('/');
+        }
     }
 
     /**
