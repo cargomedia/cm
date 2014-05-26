@@ -20,6 +20,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
+            array(),
             array()
         );
         $this->_verify(
@@ -41,6 +42,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -60,6 +62,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('France', 'FR'),
             ),
+            array(),
             array(),
             array(),
             array()
@@ -83,6 +86,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -107,6 +111,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -134,6 +139,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -160,6 +166,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -169,6 +176,139 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_legacy() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
+            array(),
+            array(
+                'FR' => array(
+                    'A7' => 'Haute-Normandie',
+                ),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_keepMissing() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(
+                array('FR', 'A7', 'Haute-Normandie'),
+            ),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+            ),
+            array(),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
+            array(),
+            array()
+        );
+    }
+
+    public function testRegion_addLegacy() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+            ),
+            array(),
+            array(
+                'FR' => array(
+                    'A7' => 'Haute-Normandie',
+                ),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+            ),
             array(),
             array()
         );
@@ -185,6 +325,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -214,6 +355,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -242,6 +384,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('50221', 'FR', '', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -269,6 +412,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -278,6 +422,40 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+            ),
+            array(),
+            array(),
+            array()
+        );
+    }
+
+    public function testCity_legacyRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+            ),
+            array(),
+            array(
+                'FR' => array(
+                    'A7' => 'Haute-Normandie',
+                ),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
             array(),
             array(),
@@ -299,6 +477,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -319,7 +498,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testAddZipCode_unknownRegion() {
+    public function testZipCode_unknownRegion() {
         $this->_import(
             array(
                 array('France', 'FR'),
@@ -331,6 +510,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
                 array('385175', 'FR', 'B8', 'Marseille', '13000', '43.3', '5.4'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -341,6 +521,47 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
                 array('id' => 2, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
+            ),
+            array(
+                array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
+                array('id' => 2, 'name' => '13000', 'cityId' => 2, 'lat' => 43.3, 'lon' => 5.4),
+            ),
+            array(),
+            array()
+        );
+    }
+
+    public function testZipCode_legacyRegion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
+                array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
+                array('385175', 'FR', 'B8', 'Marseille', '13000', '43.3', '5.4'),
+            ),
+            array(),
+            array(
+                'FR' => array(
+                    'A7' => 'Haute-Normandie',
+                    'B8' => 'Provence-Alpes-Cote d\'Azur',
+                ),
+            )
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+            ),
+            array(
+                array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
+                array('id' => 2, 'countryId' => 1, 'name' => 'Provence-Alpes-Cote d\'Azur', '_maxmind' => 'FRB8', 'abbreviation' => null),
+            ),
+            array(
+                array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
+                array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.3, 'lon' => 5.4, '_maxmind' => 385175),
             ),
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
@@ -364,6 +585,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -395,7 +617,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('33555968', '33556223', '75'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -426,7 +649,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('87097600', '87097855', '50221'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -476,7 +700,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('266586368', '266586623', '223'),
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -521,6 +746,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -533,6 +759,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('223', 'US', '', '', '', '38', '-97'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -568,7 +795,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('33555968', '33556223', '75'),
                 array('87097600', '87097855', '50221'),
                 array('33818880', '33819135', '49739'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -599,6 +827,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('223', 'US', '', '', '', '38', '-97'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -628,6 +857,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -638,6 +868,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -666,6 +897,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -685,6 +917,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -721,6 +954,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -743,6 +977,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('2221', 'US', 'CB', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -785,6 +1020,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -801,6 +1037,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -854,6 +1091,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
                 array('412930', 'VN', '51', '', '', '21.033', '105.85'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -909,6 +1147,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
                 array('412930', 'VN', '44', '', '', '21.033', '105.85'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -957,6 +1196,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -975,6 +1215,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CF', '', '', '34.0522', '-118.243'),
                 array('11532', 'US', 'CF', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1007,6 +1248,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -1020,6 +1262,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1036,7 +1279,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testUpdateRegion_legacy() {
+    public function testUpdateRegion_numericMaxMindCodeUS() {
         $this->_import(
             array(
                 array('United States', 'US'),
@@ -1048,6 +1291,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         CM_Db_Db::update('cm_model_location_state', array('_maxmind' => 'US06'));
@@ -1074,6 +1318,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1090,7 +1335,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    public function testUpdateRegionName_legacy() {
+    public function testUpdateRegionName_numericMaxMindCodeUS() {
         $this->_import(
             array(
                 array('United States', 'US'),
@@ -1102,6 +1347,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         CM_Db_Db::update('cm_model_location_state', array('_maxmind' => 'US06'));
@@ -1128,6 +1374,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1157,6 +1404,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -1172,6 +1420,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -1188,6 +1437,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11532', 'US', 'CA', 'Los Angeles', '', '34.0522', '-118.2437'),
                 array('23653', 'US', 'CA', 'Long Beach', '', '33.767', '-118.1892'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1226,7 +1476,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('69089280', '69090303', '11532'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1240,6 +1491,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1281,7 +1533,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('69089280', '69090303', '11532'),
                 array('81910016', '81910271', '5718'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1322,7 +1575,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('70988544', '70988799', '11111'),
                 array('81910016', '81910271', '5555'),
                 array('202915072', '202915327', '5555'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1367,7 +1621,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('68444672', '68444735', '11101'),
                 array('69089280', '69090303', '11532'),
                 array('71797504', '71797759', '23653'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1414,7 +1669,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('70988544', '70988799', '11101'),
                 array('71797504', '71797759', '11532'),
                 array('201805824', '201806079', '11532'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1463,7 +1719,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('69089280', '69090303', '11532'),
                 array('81910016', '81910271', '5718'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1504,7 +1761,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('70988544', '70988799', '5718'),
                 array('81910016', '81910271', '11532'),
                 array('202915072', '202915327', '11532'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1545,7 +1803,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1562,7 +1821,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11102'),
                 array('68444800', '68444927', '11102'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1602,7 +1862,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1616,7 +1877,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11102'),
                 array('68444800', '68444927', '11102'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1653,6 +1915,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -1667,6 +1930,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Marseille', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -1701,7 +1965,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1715,7 +1980,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1755,7 +2021,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1774,7 +2041,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1813,7 +2081,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1830,7 +2099,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1868,7 +2138,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1885,7 +2156,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1923,7 +2195,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1942,7 +2215,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -1981,7 +2255,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -1998,7 +2273,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2039,7 +2315,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -2058,7 +2335,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2099,7 +2377,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -2118,7 +2397,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2159,7 +2439,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -2178,7 +2459,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2219,7 +2501,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_import(
             array(
@@ -2238,7 +2521,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2286,7 +2570,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('69089280', '69090303', '5718'),
                 array('70988544', '70988799', '5718'),
                 array('70989000', '70989100', '5719'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2334,7 +2619,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
                 array('70989000', '70989100', '5719'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2380,7 +2666,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
                 array('68445000', '68445100', '11102'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2418,7 +2705,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2460,7 +2748,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
                 array('68445000', '68445100', '11102'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2498,7 +2787,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('68444672', '68444735', '11102'),
                 array('68444800', '68444927', '11102'),
-            )
+            ),
+            array()
         );
         $this->_verify(
             array(
@@ -2539,6 +2829,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -2561,6 +2852,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CB', '', '', '34.0522', '-118.243'),
                 array('11101', 'US', 'CB', 'San Francisco', '', '37.7749', '-122.4194'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -2597,6 +2889,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -2612,6 +2905,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -2645,6 +2939,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -2686,6 +2981,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('485389', 'FR', 'A7', 'Le Havre', '76640', '49.5213', '0.1581'),
                 array('484603', 'FR', 'A7', 'Le Havre', '76650', '49.4938', '0.1077'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -2705,6 +3001,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('484564', 'FR', 'A7', 'Le Havre', '76630', '49.4938', '0.1077'),
                 array('485389', 'FR', 'A7', 'Le Havre', '76640', '49.5213', '0.1581'),
             ),
+            array(),
             array()
         );
         $this->_import(
@@ -2719,6 +3016,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -2755,6 +3053,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(),
+            array(),
             array()
         );
     }
@@ -2772,6 +3071,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(),
+            array(),
             array()
         );
         $this->_import(
@@ -2779,6 +3079,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('FR', 'AA', 'Haute-Normandie'),
             ),
+            array(),
             array(),
             array()
         );
@@ -2797,6 +3098,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('FR', 'A7', 'Haute-Normandie'),
             ),
             array(),
+            array(),
             array()
         );
         $this->_import(
@@ -2804,6 +3106,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('FR', 'A7', 'Normandie'),
             ),
+            array(),
             array(),
             array()
         );
@@ -2819,6 +3122,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('Saint Martin (French part)', 'MF'),
                 array('Congo, The Democratic Republic of the', 'CD'),
             ),
+            array(),
             array(),
             array(),
             array()
@@ -2850,6 +3154,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('GB', 'H9', 'London, City of'),
                 array('US', 'AE', 'Armed Forces Europe, Middle East, & Canada'),
             ),
+            array(),
             array(),
             array()
         );
@@ -2886,6 +3191,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('298375', 'TW', '4', 'Erhchiehtsun (1)', '12345', '24.7833', '121.6667'),
                 array('300421', 'TW', '4', 'Chihtan (2)', '12345', '24.9333', '121.65'),
             ),
+            array(),
             array()
         );
         $this->_verify(
@@ -2904,12 +3210,14 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
-    protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock) {
-        $maxMind = $this->getMock('CMService_MaxMind', array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData'));
+    protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
+        $maxMind = $this->getMock('CMService_MaxMind',
+            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
         $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
         $maxMind->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
+        $maxMind->expects($this->any())->method('_getRegionListLegacy')->will($this->returnValue($regionListLegacyMock));
         /** @var CMService_MaxMind $maxMind */
         $maxMind->upgrade();
     }
