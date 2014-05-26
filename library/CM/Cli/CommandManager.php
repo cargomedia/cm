@@ -157,7 +157,7 @@ class CM_Cli_CommandManager {
             };
 
             $forks = max($this->_forks, 1);
-            $process = static::_getProcess();
+            $process = $this->_getProcess();
             for ($i = 0; $i < $forks; $i++) {
                 $process->fork($workload);
             }
@@ -180,7 +180,7 @@ class CM_Cli_CommandManager {
     public static function monitorSynchronizedCommands() {
         $time = time();
         $timeoutStamp = $time + self::TIMEOUT;
-        $hostId = static::_getProcess()->getHostId();
+        $hostId = CM_Process::getInstance()->getHostId();
         $result = CM_Db_Db::select('cm_cli_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
