@@ -39,6 +39,13 @@ class CM_File_Filesystem_Adapter_AwsS3 extends CM_File_Filesystem_Adapter implem
 
     public function write($path, $content) {
         $options = $this->_getOptions($path, array('Body' => $content));
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($content);
+        if (false !== $mimeType) {
+            $options['ContentType'] = $mimeType;
+        }
+
         try {
             $this->_client->putObject($options);
         } catch (\Exception $e) {
