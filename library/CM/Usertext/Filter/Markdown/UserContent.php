@@ -5,7 +5,7 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
     use CM_Service_ManagerAwareTrait;
 
     /**
-     * @param CM_Service_Manager $serviceManager
+     * @param CM_Service_Manager|null $serviceManager
      */
     public function __construct(CM_Service_Manager $serviceManager = null) {
         if (null === $serviceManager) {
