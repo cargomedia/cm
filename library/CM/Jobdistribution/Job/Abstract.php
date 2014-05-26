@@ -27,24 +27,15 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @throws CM_Exception
      * @return mixed
+     * @throws CM_Exception
      */
     public function run(array $params = null) {
         if (null === $params) {
             $params = array();
         }
-        if (!$this->_getGearmanEnabled()) {
-            return $this->_executeJob(CM_Params::factory($params));
-        }
-
-        $workload = CM_Params::encode($params, true);
-        $gearmanClient = $this->_getGearmanClient();
-        $result = $gearmanClient->doNormal($this->_getJobName(), $workload);
-        if ($gearmanClient->returnCode() === GEARMAN_WORK_FAIL) {
-            throw new CM_Exception('Job `' . $this->_getJobName() . '` failed.');
-        }
-        return CM_Params::decode($result, true);
+        $resultList = $this->runMultiple(array($params));
+        return reset($resultList);
     }
 
     /**
@@ -63,7 +54,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
         $resultList = array();
         $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
-            $resultList[] = $task->data();
+            $resultList[] = CM_Params::decode($task->data(), true);
         });
 
         $failureList = array();
