@@ -3,7 +3,7 @@
 class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
 
     /** @var string */
-    protected $_usercontentUrl = 'http://example.com/default/usercontent/';
+    protected $_usercontentUrl = 'http://example.com/usercontent/formatter/';
 
     /** @var CM_Service_Manager */
     private $_serviceManager;
@@ -16,7 +16,7 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
 
         $config = array(
             'default' => array(
-                'url' => 'http://example.com/default',
+                'url' => 'http://example.com/usercontent',
                 'filesystem' => 'filesystem-usercontent-default',
             ),
         );
@@ -30,13 +30,13 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
     }
 
     public function testProcess() {
-        $text = 'test ![usercontent](formatter/1.jpg) test' .
-            PHP_EOL . '![usercontent](formatter/2.jpg)![usercontent](formatter/3.jpg)nospace![usercontent](formatter/4.jpg)';
+        $text = 'test ![formatter](1.jpg) test' .
+            PHP_EOL . '![formatter](2.jpg)![formatter](3.jpg)nospace![formatter](4.jpg)';
 
-        $expected = 'test <img src="' . $this->_usercontentUrl . 'formatter/1.jpg" alt="image"/> test'
-            . PHP_EOL . '<img src="' . $this->_usercontentUrl . 'formatter/2.jpg" alt="image"/><img src="'
-            . $this->_usercontentUrl . 'formatter/3.jpg" alt="image"/>nospace<img src="' . $this->_usercontentUrl
-            . 'formatter/4.jpg" alt="image"/>';
+        $expected = 'test <img src="' . $this->_usercontentUrl . '1.jpg" alt="image"/> test'
+            . PHP_EOL . '<img src="' . $this->_usercontentUrl . '2.jpg" alt="image"/><img src="'
+            . $this->_usercontentUrl . '3.jpg" alt="image"/>nospace<img src="' . $this->_usercontentUrl
+            . '4.jpg" alt="image"/>';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
 
@@ -44,12 +44,12 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
     }
 
     public function testInvalid() {
-        $text = 'test ![usercontent](formatter/1.jpg';
+        $text = 'test ![formatter](1.jpg';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
         $this->assertSame($text, $actual);
 
-        $text = '![usercontent]()';
+        $text = '![formatter]()';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
         $this->assertSame($text, $actual);
