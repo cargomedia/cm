@@ -30,7 +30,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      * @return mixed
      */
-    final public function run(array $params = null) {
+    public function run(array $params = null) {
         if (null === $params) {
             $params = array();
         }
@@ -89,7 +89,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     /**
      * @param array|null $params
      */
-    final public function queue(array $params = null) {
+    public function queue(array $params = null) {
         if (null === $params) {
             $params = array();
         }
@@ -108,7 +108,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @return string|null
      * @throws CM_Exception_Nonexistent
      */
-    final public function __executeGearman(GearmanJob $job) {
+    public function __executeGearman(GearmanJob $job) {
         $workload = $job->workload();
         try {
             $params = CM_Params::factory(CM_Params::decode($workload, true));
@@ -123,14 +123,14 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     /**
      * @return string
      */
-    final protected function _getJobName() {
+    protected function _getJobName() {
         return get_class($this);
     }
 
     /**
      * @return boolean
      */
-    final private function _getGearmanEnabled() {
+    private function _getGearmanEnabled() {
         return (boolean) self::_getConfig()->gearmanEnabled;
     }
 
