@@ -44,15 +44,16 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public function runMultiple(array $paramsList) {
+        $resultList = array();
         if (!$this->_getGearmanEnabled()) {
             foreach ($paramsList as $params) {
-                $this->_executeJob(CM_Params::factory($params));
+                $resultList[] = $this->_executeJob(CM_Params::factory($params));
             }
+            return $resultList;
         }
 
         $gearmanClient = $this->_getGearmanClient();
 
-        $resultList = array();
         $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
             $resultList[] = CM_Params::decode($task->data(), true);
         });
