@@ -47,6 +47,44 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
         return CM_Params::decode($result, true);
     }
 
+    /**
+     * @param array[] $paramsList
+     * @return mixed[]
+     * @throws CM_Exception
+     */
+    public function runMultiple(array $paramsList) {
+        if (!$this->_getGearmanEnabled()) {
+            foreach ($paramsList as $params) {
+                $this->_executeJob(CM_Params::factory($params));
+            }
+        }
+
+        $gearmanClient = $this->_getGearmanClient();
+
+        $resultList = array();
+        $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
+            $resultList[] = $task->data();
+        });
+
+        $failureList = array();
+        $gearmanClient->setFailCallback(function (GearmanTask $task) use (&$failureList) {
+            $failureList[] = $task;
+        });
+
+        foreach ($paramsList as $params) {
+            $workload = CM_Params::encode($params, true);
+            $task = $gearmanClient->addTask($this->_getJobName(), $workload);
+            if (false === $task) {
+                throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
+            }
+        }
+        $gearmanClient->runTasks();
+
+        if (count($resultList) != count($paramsList)) {
+            throw new CM_Exception('Job `' . $this->_getJobName() . '` failed (' . count($resultList) . '/' . count($paramsList) . ' results).');
+        }
+        return $resultList;
+    }
 
     /**
      * @param array|null $params
