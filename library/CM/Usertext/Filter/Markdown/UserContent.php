@@ -19,7 +19,7 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
         $text = preg_replace_callback('#!\[formatter\]\(([^\)]+)\)#m', function ($matches) {
             $filename = trim($matches[1]);
             $file = new CM_File_UserContent('formatter', $filename, null, $this->getServiceManager());
-            return '<img src="' . $file->getUrl() . '" alt="image"/>';
+            return '![image](' . $file->getUrl() . ')';
         }, $text);
 
         return $text;

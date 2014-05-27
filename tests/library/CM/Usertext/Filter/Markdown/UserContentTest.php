@@ -33,10 +33,10 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
         $text = 'test ![formatter](1.jpg) test' .
             PHP_EOL . '![formatter](2.jpg)![formatter](3.jpg)nospace![formatter](4.jpg)';
 
-        $expected = 'test <img src="' . $this->_usercontentUrl . '1.jpg" alt="image"/> test'
-            . PHP_EOL . '<img src="' . $this->_usercontentUrl . '2.jpg" alt="image"/><img src="'
-            . $this->_usercontentUrl . '3.jpg" alt="image"/>nospace<img src="' . $this->_usercontentUrl
-            . '4.jpg" alt="image"/>';
+        $expected = 'test ![image](' . $this->_usercontentUrl . '1.jpg) test'
+            . PHP_EOL . '![image](' . $this->_usercontentUrl . '2.jpg)![image]('
+            . $this->_usercontentUrl . '3.jpg)nospace![image](' . $this->_usercontentUrl
+            . '4.jpg)';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
 
