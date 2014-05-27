@@ -3,11 +3,11 @@
 class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
     protected $_emoticonData = array(
-        ':smiley:'     => array('codeAdditional' => ':),:-)', 'file' => '1.png'),
-        ':imp:'        => array('codeAdditional' => '3),3-)', 'file' => 'imp.png'),
-        ':sunglasses:' => array('codeAdditional' => 'B-),B),8-),8)', 'file' => 'sunglasses.png'),
-        ':dizzy_face:' => array('codeAdditional' => '%-),%),O.o,o.O', 'file' => 'dizzy_face.png'),
-        ':innocent:'   => array('codeAdditional' => 'O),o-)', 'file' => 'innocent.png'),
+        ':smiley:'     => array('codeAdditional' => '[":)",":-)"]', 'file' => '1.png'),
+        ':imp:'        => array('codeAdditional' => '["3)","3-)"]', 'file' => 'imp.png'),
+        ':sunglasses:' => array('codeAdditional' => '["B-)","B)","8-)","8)"]', 'file' => 'sunglasses.png'),
+        ':dizzy_face:' => array('codeAdditional' => '["%-)","%)","O.o","o.O"]', 'file' => 'dizzy_face.png'),
+        ':innocent:'   => array('codeAdditional' => '["O)","o-)"]', 'file' => 'innocent.png'),
     );
 
     /** @var  array */

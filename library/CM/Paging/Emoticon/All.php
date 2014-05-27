@@ -72,7 +72,7 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
         if (null === $codeAdditional) {
             return array();
         }
-        return explode(',', $codeAdditional);
+        return CM_Params::decode($codeAdditional, true);
     }
 
     /**
@@ -83,6 +83,6 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
         if (!count($aliases)) {
             return null;
         }
-        return implode(',', $aliases);
+        return CM_Params::encode($aliases, true);
     }
 }
