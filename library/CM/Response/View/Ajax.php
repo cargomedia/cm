@@ -19,8 +19,8 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
 
             $viewInfo = $this->_getViewInfo();
             $className = $viewInfo['className'];
-            $view = CM_View_Abstract::factory($viewInfo['className'], $viewInfo['params']);
-            if ($view instanceof CM_Component_Abstract) {
+            $view = CM_View_Abstract::factory($className, $viewInfo['params']);
+            if ($view instanceof CM_View_CheckAccessibleInterface) {
                 $view->checkAccessible($this->getRender()->getEnvironment());
             }
 

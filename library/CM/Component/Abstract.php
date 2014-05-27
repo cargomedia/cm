@@ -1,13 +1,6 @@
 <?php
 
-abstract class CM_Component_Abstract extends CM_View_Abstract {
-
-    /**
-     * @param CM_Frontend_Environment $environment
-     * @throws CM_Exception_NotAllowed
-     * @throws CM_Exception_AuthRequired
-     */
-    abstract public function checkAccessible(CM_Frontend_Environment $environment);
+abstract class CM_Component_Abstract extends CM_View_Abstract implements CM_View_CheckAccessibleInterface {
 
     /**
      * @param CM_Frontend_Environment  $environment
