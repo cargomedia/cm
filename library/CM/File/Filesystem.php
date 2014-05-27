@@ -197,16 +197,16 @@ class CM_File_Filesystem implements CM_Comparable {
             return false;
         }
 
-        $thisSecondaryList = $this->getSecondaryList();
-        $otherSecondaryList = $other->getSecondaryList();
-        if (count($thisSecondaryList) != count($otherSecondaryList)) {
-            return false;
-        }
-        /** @var CM_File_Filesystem $thisSecondary */
-        /** @var CM_File_Filesystem $otherSecondary */
-        while ((list(, $thisSecondary) = each($thisSecondaryList)) && (list(, $otherSecondary) = each($otherSecondaryList))) {
-            if (!$thisSecondary->equals($otherSecondary)) {
-                return false;
+        /** @var CM_File_Filesystem[] $bothSecondaryList */
+        $bothSecondaryList = array_merge($this->getSecondaryList(), $other->getSecondaryList());
+        foreach ($bothSecondaryList as $secondary) {
+            foreach (array($this->getSecondaryList(), $other->getSecondaryList()) as $secondaryList) {
+                $secondaryFound = Functional\first($secondaryList, function (CM_File_Filesystem $secondaryCompare) use ($secondary) {
+                    return $secondaryCompare->equals($secondary);
+                });
+                if (!$secondaryFound) {
+                    return false;
+                }
             }
         }
         return true;
