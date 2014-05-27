@@ -35,12 +35,22 @@ class CM_File_Filesystem_Factory {
     }
 
     /**
-     * @param string $adapterClassName
-     * @param array  $options
+     * @param string      $adapterClassName
+     * @param array       $options
+     * @param string|null $secondaryClassName
+     * @param array|null  $secondaryOptions
      * @return CM_File_Filesystem
      */
-    public function createFilesystem($adapterClassName, array $options) {
+    public function createFilesystem($adapterClassName, array $options, $secondaryClassName = null, array $secondaryOptions = null) {
         $adapter = $this->createAdapter($adapterClassName, $options);
-        return new CM_File_Filesystem($adapter);
+        $filesystem = new CM_File_Filesystem($adapter);
+
+        if (null !== $secondaryClassName && null !== $secondaryOptions) {
+            $secondaryAdapter = $this->createAdapter($secondaryClassName, $secondaryOptions);
+            $secondaryFilesystem = new CM_File_Filesystem($secondaryAdapter);
+            $filesystem->addSecondary($secondaryFilesystem);
+        }
+
+        return $filesystem;
     }
 }
