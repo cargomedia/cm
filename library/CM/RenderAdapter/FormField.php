@@ -15,8 +15,15 @@ class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
         $field->setTplParam('value', $field->getValue());
         $field->setTplParam('options', $field->getOptions());
 
-        $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
-        $html .= trim($this->_renderTemplate('default.tpl', $field->getTplParams(), true));
+        $cssClass = implode(' ', $field->getClassHierarchy());
+        if (preg_match('#([^/]+)\.tpl$#', $field->getTplName(), $match)) {
+            if ($match[1] != 'default') {
+                $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
+            }
+        }
+
+        $html = '<div class="' . $cssClass . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
+        $html .= trim($this->_renderTemplate($field->getTplName(), $field->getTplParams(), true));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
