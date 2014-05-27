@@ -63,6 +63,10 @@ class CM_File_Filesystem implements CM_Comparable {
      */
     public function copy($sourcePath, $targetPath) {
         $this->_adapter->copy($sourcePath, $targetPath);
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->copy($sourcePath, $targetPath);
+        }
     }
 
     /**

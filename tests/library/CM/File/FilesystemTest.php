@@ -58,6 +58,7 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
             'write',
             'read',
             'rename',
+            'copy',
             'append',
             'delete',
             'ensureDirectory',
@@ -67,6 +68,7 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         $filesystemSecondary->expects($this->never())->method('read');
         $filesystemSecondary->expects($this->once())->method('append')->with('/foo', 'world');
         $filesystemSecondary->expects($this->once())->method('rename')->with('/foo', '/bar');
+        $filesystemSecondary->expects($this->once())->method('copy')->with('/bar', '/foo');
         $filesystemSecondary->expects($this->once())->method('delete')->with('/bar');
         $filesystemSecondary->expects($this->once())->method('ensureDirectory')->with('/my-dir');
         $filesystemSecondary->expects($this->once())->method('deleteByPrefix')->with('/my-dir');
@@ -77,6 +79,7 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         $filesystem->read('/foo');
         $filesystem->append('/foo', 'world');
         $filesystem->rename('/foo', '/bar');
+        $filesystem->copy('/bar', '/foo');
         $filesystem->delete('/bar');
         $filesystem->ensureDirectory('/my-dir');
         $filesystem->deleteByPrefix('/my-dir');
