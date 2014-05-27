@@ -44,14 +44,11 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     public function runMultiple(array $paramsList) {
-        $resultList = array();
         if (!$this->_getGearmanEnabled()) {
-            foreach ($paramsList as $params) {
-                $resultList[] = $this->_executeJob(CM_Params::factory($params));
-            }
-            return $resultList;
+            return $this->_runMultipleWithoutGearman($paramsList);
         }
 
+        $resultList = array();
         $gearmanClient = $this->_getGearmanClient();
 
         $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
@@ -86,7 +83,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
             $params = array();
         }
         if (!$this->_getGearmanEnabled()) {
-            $this->_executeJob(CM_Params::factory($params));
+            $this->_runMultipleWithoutGearman(array($params));
             return;
         }
 
@@ -117,6 +114,18 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      */
     protected function _getJobName() {
         return get_class($this);
+    }
+
+    /**
+     * @param array[] $paramsList
+     * @return mixed[]
+     */
+    protected function _runMultipleWithoutGearman(array $paramsList) {
+        $resultList = array();
+        foreach ($paramsList as $params) {
+            $resultList[] = $this->_executeJob(CM_Params::factory($params));
+        }
+        return $resultList;
     }
 
     /**
