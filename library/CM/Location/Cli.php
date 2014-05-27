@@ -7,9 +7,9 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @param bool|null $verbose
      * @synchronized
      */
-    public function update(CM_File $geoIpFile = null, $verbose = null) {
+    public function outdated(CM_File $geoIpFile = null, $verbose = null) {
         $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), null, $verbose);
-        $maxMind->update();
+        $maxMind->outdated();
     }
 
     /**

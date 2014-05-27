@@ -11,12 +11,5 @@ class CMTest_TestSuite {
 
     public function bootstrap() {
         CMTest_TH::init();
-        register_shutdown_function(array($this, 'cleanup'));
-    }
-
-    public function cleanup() {
-        CMTest_TH::clearEnv();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->flush();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->flush();
     }
 }

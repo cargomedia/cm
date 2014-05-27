@@ -5,7 +5,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     private $_collectionPrefix = 'UnitTest_';
 
     public function testInsert() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('insert');
         $name = 'Bob';
         $userId = 123;
@@ -15,7 +15,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testUpdate() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('update');
         $name = 'Bob';
         $userId = 123;
@@ -51,14 +51,14 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
      * NOTE: this one actually tests if the returned id isn't empty rather than if it's unique... which would be hard to test.
      */
     public function testGetNewId() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $id1 = $mongoDb->getNewId();
         $id2 = $mongoDb->getNewId();
         $this->assertNotSame($id1, $id2);
     }
 
     public function testFind() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('find');
 
         $mongoDb->insert($collectionName, array('userId' => 1, 'groupId' => 1, 'name' => 'alice'));
@@ -74,7 +74,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testCount() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('count');
         $this->assertSame(0, $mongoDb->count($collectionName));
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
@@ -84,7 +84,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testRemove() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionName = $this->_getEmptyCollectionName('remove');
         $mongoDb->insert($collectionName, array('userId' => 1, 'name' => 'alice'));
         $mongoDb->insert($collectionName, array('userId' => 2, 'name' => 'steve'));
@@ -104,7 +104,7 @@ class CM_Service_MongoDbTest extends CMTest_TestCase {
      */
     private function _getEmptyCollectionName($testName) {
         $collectionName = $this->_collectionPrefix . $testName;
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         $mongoDb->drop($collectionName);
         return $collectionName;
     }

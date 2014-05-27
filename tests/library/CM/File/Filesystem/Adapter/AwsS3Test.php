@@ -21,10 +21,11 @@ class CM_File_Filesystem_Adapter_AwsS3Test extends CMTest_TestCase {
         $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()->
             setMethods(array('putObject'))->getMock();
         $clientMock->expects($this->once())->method('putObject')->with(array(
-            'Body'   => 'hello',
-            'ACL'    => 'public-read',
-            'Bucket' => 'bucket',
-            'Key'    => 'bar/foo',
+            'Body'        => 'hello',
+            'ACL'         => 'public-read',
+            'Bucket'      => 'bucket',
+            'Key'         => 'bar/foo',
+            'ContentType' => 'text/plain',
         ));
         /** @var Aws\S3\S3Client $clientMock */
         $adapter = new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket', 'public-read', '/bar////');

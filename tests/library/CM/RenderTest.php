@@ -2,6 +2,11 @@
 
 class CM_RenderTest extends CMTest_TestCase {
 
+    protected function setUp() {
+        CM_Config::get()->CM_Site_Abstract->url = 'http://www.default.dev';
+        CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://cdn.default.dev';
+    }
+
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
@@ -14,11 +19,8 @@ class CM_RenderTest extends CMTest_TestCase {
     public function testGetUrl() {
         $render = new CM_Render();
         $this->assertSame('http://www.default.dev', $render->getUrl());
-        $this->assertSame('http://cdn.default.dev', $render->getUrl(null, true));
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
-        $this->assertSame('http://cdn.default.dev/foo/bar', $render->getUrl('/foo/bar', true));
         $this->assertSame('http://www.default.dev/0', $render->getUrl('/0'));
-        $this->assertSame('http://cdn.default.dev/0', $render->getUrl('/0', true));
     }
 
     public function testGetUrlPage() {
@@ -119,13 +121,6 @@ class CM_RenderTest extends CMTest_TestCase {
         $this->assertSame('http://cdn.default.dev/static', $render->getUrlStatic());
         $this->assertSame('http://cdn.default.dev/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg'));
         $this->assertSame('http://cdn.default.dev/static/0?' . $deployVersion, $render->getUrlStatic('/0'));
-    }
-
-    public function testGetUrlUserContent() {
-        $render = new CM_Render();
-        $userFile = $this->getMock('CM_File_UserContent', array('getPathRelative'), array(), '', false);
-        $userFile->expects($this->any())->method('getPathRelative')->will($this->returnValue('foo/bar.jpg'));
-        $this->assertSame('http://cdn.default.dev/userfiles/foo/bar.jpg', $render->getUrlUserContent($userFile));
     }
 
     public function testGetTranslation() {
