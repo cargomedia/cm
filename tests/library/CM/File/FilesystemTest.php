@@ -50,4 +50,35 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         $this->assertSame('/foo', CM_File_Filesystem::normalizePath('../foo'));
         $this->assertSame('/foo', CM_File_Filesystem::normalizePath('foo'));
     }
+
+    public function testSecondary() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystemSecondary = $this->getMockBuilder('CM_File_Filesystem')->disableOriginalConstructor()->setMethods(array(
+            'write',
+            'read',
+            'rename',
+            'append',
+            'delete',
+            'ensureDirectory',
+            'deleteByPrefix',
+        ))->getMock();
+        $filesystemSecondary->expects($this->once())->method('write')->with('/foo', 'hello');
+        $filesystemSecondary->expects($this->never())->method('read');
+        $filesystemSecondary->expects($this->once())->method('append')->with('/foo', 'world');
+        $filesystemSecondary->expects($this->once())->method('rename')->with('/foo', '/bar');
+        $filesystemSecondary->expects($this->once())->method('delete')->with('/bar');
+        $filesystemSecondary->expects($this->once())->method('ensureDirectory')->with('/my-dir');
+        $filesystemSecondary->expects($this->once())->method('deleteByPrefix')->with('/my-dir');
+        /** @var CM_File_Filesystem $filesystemSecondary */
+        $filesystem->addSecondary($filesystemSecondary);
+
+        $filesystem->write('/foo', 'hello');
+        $filesystem->read('/foo');
+        $filesystem->append('/foo', 'world');
+        $filesystem->rename('/foo', '/bar');
+        $filesystem->delete('/bar');
+        $filesystem->ensureDirectory('/my-dir');
+        $filesystem->deleteByPrefix('/my-dir');
+    }
 }

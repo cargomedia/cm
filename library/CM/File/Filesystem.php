@@ -5,11 +5,21 @@ class CM_File_Filesystem implements CM_Comparable {
     /** @var CM_File_Filesystem_Adapter */
     protected $_adapter;
 
+    /** @var CM_File_Filesystem[] */
+    protected $_secondaryList = array();
+
     /**
      * @param CM_File_Filesystem_Adapter $adapter
      */
     public function __construct(CM_File_Filesystem_Adapter $adapter) {
         $this->_adapter = $adapter;
+    }
+
+    /**
+     * @param CM_File_Filesystem $secondary
+     */
+    public function addSecondary(CM_File_Filesystem $secondary) {
+        $this->_secondaryList[] = $secondary;
     }
 
     /**
@@ -41,6 +51,10 @@ class CM_File_Filesystem implements CM_Comparable {
      */
     public function rename($sourcePath, $targetPath) {
         $this->_adapter->rename($sourcePath, $targetPath);
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->rename($sourcePath, $targetPath);
+        }
     }
 
     /**
@@ -65,6 +79,10 @@ class CM_File_Filesystem implements CM_Comparable {
      */
     public function write($path, $content) {
         $this->_adapter->write($path, $content);
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->write($path, $content);
+        }
     }
 
     /**
@@ -72,6 +90,10 @@ class CM_File_Filesystem implements CM_Comparable {
      */
     public function delete($path) {
         $this->_adapter->delete($path);
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->delete($path);
+        }
     }
 
     /**
@@ -87,6 +109,10 @@ class CM_File_Filesystem implements CM_Comparable {
      */
     public function ensureDirectory($path) {
         $this->_adapter->ensureDirectory($path);
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->ensureDirectory($path);
+        }
     }
 
     /**
@@ -123,6 +149,10 @@ class CM_File_Filesystem implements CM_Comparable {
         } else {
             $this->_adapter->write($path, $this->_adapter->read($path) . $content);
         }
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->append($path, $content);
+        }
     }
 
     /**
@@ -135,6 +165,10 @@ class CM_File_Filesystem implements CM_Comparable {
         }
         foreach ($pathList['dirs'] as $pathDir) {
             $this->delete($pathDir);
+        }
+
+        foreach ($this->_secondaryList as $secondary) {
+            $secondary->deleteByPrefix($pathPrefix);
         }
     }
 
