@@ -116,10 +116,10 @@ CREATE TABLE `cm_languageValue` (
   PRIMARY KEY (`languageKeyId`,`languageId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCity`;
+DROP TABLE IF EXISTS `cm_model_location_city`;
 
 
-CREATE TABLE `cm_locationCity` (
+CREATE TABLE `cm_model_location_city` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `stateId` int(10) unsigned DEFAULT NULL,
   `countryId` int(10) unsigned NOT NULL,
@@ -134,10 +134,10 @@ CREATE TABLE `cm_locationCity` (
   KEY `countryId` (`countryId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCityIp`;
+DROP TABLE IF EXISTS `cm_model_location_city_ip`;
 
 
-CREATE TABLE `cm_locationCityIp` (
+CREATE TABLE `cm_model_location_city_ip` (
   `cityId` int(10) unsigned NOT NULL,
   `ipStart` int(10) unsigned NOT NULL,
   `ipEnd` int(10) unsigned NOT NULL,
@@ -145,30 +145,30 @@ CREATE TABLE `cm_locationCityIp` (
   KEY `ipEnd` (`ipEnd`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCountry`;
+DROP TABLE IF EXISTS `cm_model_location_country`;
 
 
-CREATE TABLE `cm_locationCountry` (
+CREATE TABLE `cm_model_location_country` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `abbreviation` char(2) NOT NULL,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationCountryIp`;
+DROP TABLE IF EXISTS `cm_model_location_country_ip`;
 
 
-CREATE TABLE `cm_locationCountryIp` (
+CREATE TABLE `cm_model_location_country_ip` (
   `countryId` int(10) unsigned NOT NULL,
   `ipStart` int(10) unsigned NOT NULL,
   `ipEnd` int(10) unsigned NOT NULL,
   KEY `ipEnd` (`ipEnd`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationState`;
+DROP TABLE IF EXISTS `cm_model_location_state`;
 
 
-CREATE TABLE `cm_locationState` (
+CREATE TABLE `cm_model_location_state` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `countryId` int(10) unsigned NOT NULL,
   `name` varchar(120) NOT NULL,
@@ -180,10 +180,10 @@ CREATE TABLE `cm_locationState` (
   KEY `countryId` (`countryId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cm_locationZip`;
+DROP TABLE IF EXISTS `cm_model_location_zip`;
 
 
-CREATE TABLE `cm_locationZip` (
+CREATE TABLE `cm_model_location_zip` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(10) NOT NULL,
   `cityId` int(10) unsigned NOT NULL,
@@ -233,6 +233,19 @@ CREATE TABLE `cm_option` (
   `key` varchar(100) NOT NULL,
   `value` blob NOT NULL,
   PRIMARY KEY (`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cm_cli_command_manager_process`;
+
+
+CREATE TABLE `cm_cli_command_manager_process` (
+  `commandName` varchar(100) NOT NULL,
+  `hostId` int(10) unsigned NOT NULL,
+  `processId` int(10) unsigned DEFAULT NULL,
+  `timeoutStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`commandName`),
+  KEY `hostId` (`hostId`),
+  KEY `timeoutStamp` (`timeoutStamp`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_requestClient`;
@@ -425,9 +438,8 @@ DROP TABLE IF EXISTS `cm_svm`;
 
 CREATE TABLE `cm_svm` (
   `id` int(11) NOT NULL,
-  `trainingChanges` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `trainingChanges` (`trainingChanges`)
+  `updateStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_svmtraining`;

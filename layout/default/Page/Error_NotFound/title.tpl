@@ -1,0 +1,1 @@
+{translate 'Page Not Found'}

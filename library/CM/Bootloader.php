@@ -39,6 +39,7 @@ class CM_Bootloader {
         $this->_constants();
         $this->_exceptionHandler();
         $this->_errorHandler();
+        $this->_registerServices();
         $this->_defaults();
     }
 
@@ -84,6 +85,13 @@ class CM_Bootloader {
     }
 
     /**
+     * @param bool $state
+     */
+    public function setDebug($state) {
+        $this->_debug = $state;
+    }
+
+    /**
      * @return bool
      */
     public function isCli() {
@@ -113,20 +121,6 @@ class CM_Bootloader {
     /**
      * @return string
      */
-    public function getDirUserfiles() {
-        return DIR_PUBLIC . 'userfiles/';
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirData() {
-        return DIR_ROOT . 'data/';
-    }
-
-    /**
-     * @return string
-     */
     public function getDirTmp() {
         return DIR_ROOT . 'tmp/';
     }
@@ -142,6 +136,13 @@ class CM_Bootloader {
             throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
         }
         return $namespacePaths[$namespace];
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        return new DateTimeZone(CM_Config::get()->timeZone);
     }
 
     protected function _constants() {
@@ -163,8 +164,21 @@ class CM_Bootloader {
         });
     }
 
+    protected function _registerServices() {
+        $serviceManager = CM_Service_Manager::getInstance();
+
+        $serviceManager->register('filesystems', 'CM_Service_Filesystems');
+        $serviceManager->register('filesystem-tmp', 'CM_File_Filesystem', array(
+            new CM_File_Filesystem_Adapter_Local($this->getDirTmp()),
+        ));
+
+        foreach (CM_Config::get()->services as $serviceKey => $serviceDefinition) {
+            $serviceManager->registerWithArray($serviceKey, $serviceDefinition);
+        }
+    }
+
     protected function _defaults() {
-        date_default_timezone_set(CM_Config::get()->timeZone);
+        date_default_timezone_set($this->getTimeZone()->getName());
         CMService_Newrelic::getInstance()->setConfig();
     }
 
@@ -176,7 +190,7 @@ class CM_Bootloader {
         $apcCache = new CM_Cache_Storage_Apc();
         if (false === ($namespacePaths = $apcCache->get($cacheKey))) {
             $fileCache = new CM_Cache_Storage_File();
-            $installation = new CM_App_Installation();
+            $installation = new CM_App_Installation(DIR_ROOT);
             if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($namespacePaths = $fileCache->get($cacheKey))) {
                 $namespacePaths = $installation->getModulePaths();
                 $fileCache->set($cacheKey, $namespacePaths);

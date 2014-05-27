@@ -73,15 +73,18 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string     $key
-     * @param string     $value
-     * @param array|null $variables
+     * @param string      $key
+     * @param string|null $value
+     * @param array|null  $variables
      */
-    public function setTranslation($key, $value, array $variables = null) {
-        $languageKeyId = static::_setKey($key, $variables);
+    public function setTranslation($key, $value = null, array $variables = null) {
+        if (null === $value) {
+            $value = $key;
+        }
 
-        CM_Db_Db::insert('cm_languageValue', array('value'      => $value, 'languageKeyId' => $languageKeyId,
-                                                   'languageId' => $this->getId()), null, array('value' => $value));
+        $languageKeyId = static::_setKey($key, $variables);
+        CM_Db_Db::insert('cm_languageValue',
+            array('value' => $value, 'languageKeyId' => $languageKeyId, 'languageId' => $this->getId()), null, array('value' => $value));
         $this->_change();
     }
 

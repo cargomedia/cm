@@ -22,11 +22,6 @@ class CM_Stream_Adapter_Video_Wowza extends CM_Stream_Adapter_Video_Abstract {
                 $this->_stopClient($publish['clientId'], $publish['serverHost']);
             }
 
-            if ($streamChannel instanceof CM_Model_StreamChannel_Video) {
-                /** @var CM_Model_StreamChannel_Video $streamChannel */
-                $streamChannel->setThumbnailCount($publish['thumbnailCount']);
-            }
-
             foreach ($publish['subscribers'] as $clientId => $subscribe) {
                 if (!$streamChannel || !$streamChannel->getStreamSubscribes()->findKey($clientId)) {
                     $this->_stopClient($clientId, $publish['serverHost']);

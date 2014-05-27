@@ -1,83 +1,76 @@
 <?php
 
-class CM_File_UserContent extends CM_File {
+class CM_File_UserContent extends CM_File implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const BUCKETS_COUNT = 10000;
 
-    /**
-     * @var string
-     */
+    /** @var string */
+    private $_pathRelative;
+
+    /** @var string */
     private $_namespace;
 
     /**
-     * @var string
+     * @param string                  $namespace
+     * @param string                  $filename
+     * @param int|null                $sequence
+     * @param CM_Service_Manager|null $serviceManager
      */
-    private $_filename;
-
-    /**
-     * @var int
-     */
-    private $_sequence;
-
-    /**
-     * @param string   $namespace
-     * @param string   $filename
-     * @param int|null $sequence
-     */
-    public function __construct($namespace, $filename, $sequence = null) {
-        $this->_namespace = (string) $namespace;
-        $this->_filename = (string) $filename;
+    public function __construct($namespace, $filename, $sequence = null, CM_Service_Manager $serviceManager = null) {
+        $namespace = (string) $namespace;
+        $filename = (string) $filename;
         if (null !== $sequence) {
-            $this->_sequence = (int) $sequence;
+            $sequence = (int) $sequence;
         }
-    }
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
 
-    /**
-     * @return string
-     */
-    public function getFileName() {
-        return $this->_filename;
-    }
+        $this->_pathRelative = $this->_calculateRelativeDir($namespace, $filename, $sequence);
+        $this->_namespace = $namespace;
+        $this->setServiceManager($serviceManager);
+        $filesystem = $serviceManager->getUserContent()->getFilesystem($this->getNamespace());
 
-    /**
-     * @return string
-     */
-    public function getPath() {
-        return CM_Bootloader::getInstance()->getDirUserfiles() . $this->getPathRelative();
+        parent::__construct($this->getPathRelative(), $filesystem);
     }
 
     /**
      * @return string
      */
     public function getPathRelative() {
-        return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getFileName();
-    }
-
-    public function mkDir() {
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles() . $this->_getDir());
-    }
-
-    public function delete() {
-        if (is_dir($this->getPath())) {
-            CM_Util::rmDir($this->getPath());
-        } else {
-            parent::delete();
-        }
+        return $this->_pathRelative;
     }
 
     /**
      * @return string
      */
-    protected function _getDir() {
-        $dirs = array();
-        $dirs[] = $this->_namespace;
-        if (null !== $this->_sequence) {
-            $dirs[] = $this->_sequence % self::BUCKETS_COUNT;
-        }
-        return implode(DIRECTORY_SEPARATOR, $dirs);
+    public function getNamespace() {
+        return $this->_namespace;
     }
 
-    public static function exists($path) {
-        return file_exists($path);
+    /**
+     * @return string
+     */
+    public function getUrl() {
+        $baseUrl = $this->getServiceManager()->getUserContent()->getUrl($this->getNamespace());
+        return $baseUrl . '/' . $this->getPathRelative();
+    }
+
+    /**
+     * @param string   $namespace
+     * @param string   $filename
+     * @param int|null $sequence
+     * @return string
+     */
+    private function _calculateRelativeDir($namespace, $filename, $sequence = null) {
+        $dirs = array();
+        $dirs[] = $namespace;
+        if (null !== $sequence) {
+            $dirs[] = $sequence % self::BUCKETS_COUNT;
+        }
+        $dirs[] = $filename;
+        return implode('/', $dirs);
     }
 }

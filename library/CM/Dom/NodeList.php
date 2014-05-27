@@ -8,7 +8,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
     /** @var DOMDocument */
     private $_doc;
 
-    /** @var DOMElement[] */
+    /** @var DOMNode[] */
     private $_elementList = array();
 
     /** @var DOMXPath */
@@ -16,13 +16,14 @@ class CM_Dom_NodeList implements Iterator, Countable {
 
     /**
      * @param string|DOMElement[] $html
+     * @param bool|null           $ignoreErrors
      * @throws CM_Exception_Invalid
      */
-    public function __construct($html) {
+    public function __construct($html, $ignoreErrors = null) {
         if (is_array($html)) {
             foreach ($html as $element) {
-                if (!$element instanceof DOMElement) {
-                    throw new CM_Exception_Invalid('Not all elements are DOMElement');
+                if (!$element instanceof DOMNode) {
+                    throw new CM_Exception_Invalid('Not all elements are DOMNode');
                 }
                 $this->_elementList[] = $element;
                 if (!$this->_doc) {
@@ -38,23 +39,38 @@ class CM_Dom_NodeList implements Iterator, Countable {
 
             $this->_doc = new DOMDocument();
             $html = '<?xml version="1.0" encoding="UTF-8"?>' . $html;
-            try {
-                $this->_doc->loadHTML($html);
-            } catch (ErrorException $e) {
-                throw new CM_Exception_Invalid('Cannot load html');
+
+            $libxmlUseErrorsBackup = libxml_use_internal_errors(true);
+            $this->_doc->loadHTML($html);
+            $errors = libxml_get_errors();
+            if (!empty($errors)) {
+                libxml_clear_errors();
+                if (!$ignoreErrors) {
+                    $errorMessages = array_map(function (libXMLError $error) {
+                        return trim($error->message);
+                    }, $errors);
+                    throw new CM_Exception_Invalid('Cannot load html: ' . implode(', ', $errorMessages));
+                }
             }
+            libxml_use_internal_errors($libxmlUseErrorsBackup);
+
             $this->_elementList[] = $this->_doc->documentElement;
         }
     }
 
     /**
+     * @param int|null $filterType
      * @return CM_Dom_NodeList
      */
-    public function getChildren() {
+    public function getChildren($filterType = null) {
         $childNodeList = array();
         foreach ($this->_elementList as $element) {
-            foreach ($element->childNodes as $childNode) {
-                $childNodeList[] = $childNode;
+            if ($element->hasChildNodes()) {
+                foreach ($element->childNodes as $childNode) {
+                    if (null === $filterType || $childNode->nodeType === $filterType) {
+                        $childNodeList[] = $childNode;
+                    }
+                }
             }
         }
         return new self($childNodeList);
@@ -69,6 +85,17 @@ class CM_Dom_NodeList implements Iterator, Countable {
             $text .= $element->textContent;
         }
         return $text;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHtml() {
+        $html = '';
+        foreach ($this->_elementList as $element) {
+            $html .= $this->_doc->saveHTML($element);
+        }
+        return $html;
     }
 
     /**
@@ -89,6 +116,9 @@ class CM_Dom_NodeList implements Iterator, Countable {
     public function getAttributeList() {
         $attributeList = array();
         if (!isset($this->_elementList[0])) {
+            return $attributeList;
+        }
+        if (!$this->_elementList[0]->hasAttributes()) {
             return $attributeList;
         }
         foreach ($this->_elementList[0]->attributes as $key => $attrNode) {
@@ -145,7 +175,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
         $xpath = preg_replace('-\/\[-', '/*[', $xpath);
         $nodes = array();
         foreach ($this->_elementList as $element) {
-            foreach ($this->_getXPath()->query($xpath, $element) as $resultElement) {
+            foreach ($this->_getXPath()->query('.' . $xpath, $element) as $resultElement) {
                 if (!$resultElement instanceof DOMElement) {
                     throw new CM_Exception_Invalid('Xpath query does not return DOMElement');
                 }

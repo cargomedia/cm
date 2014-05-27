@@ -214,14 +214,30 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Response_View_Ajax $response
+     * @param CM_Response_View_Abstract $response
      * @param array|null            $data
      */
-    public static function assertAjaxResponseSuccess(CM_Response_View_Ajax $response, array $data = null) {
+    public static function assertViewResponseSuccess(CM_Response_View_Abstract $response, array $data = null) {
         $responseContent = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('success', $responseContent, 'AjaxCall not successful');
+        self::assertArrayHasKey('success', $responseContent, 'View response not successful');
         if (null !== $data) {
             self::assertSame($data, $responseContent['success']['data']);
+        }
+    }
+
+    /**
+     * @param CM_Response_View_Abstract $response
+     * @param string|null           $type
+     * @param string|null           $message
+     */
+    public static function assertViewResponseError(CM_Response_View_Abstract $response, $type = null, $message = null) {
+        $responseContent = json_decode($response->getContent(), true);
+        self::assertArrayHasKey('error', $responseContent, 'View response successful');
+        if (null !== $type) {
+            self::assertSame($type, $responseContent['error']['type']);
+        }
+        if (null !== $message) {
+            self::assertSame($message, $responseContent['error']['msg']);
         }
     }
 
@@ -260,18 +276,25 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param CM_Component_Abstract $cmp
      * @param CM_Render|null        $render
+     * @param string|null           $expectedExceptionClass
      */
-    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null) {
+    public static function assertComponentNotAccessible(CM_Component_Abstract $cmp, CM_Render $render = null, $expectedExceptionClass = null) {
         if (null === $render) {
             $render = new CM_Render();
+        }
+        $expectedExceptionClassList = array(
+            'CM_Exception_AuthRequired',
+            'CM_Exception_Nonexistent',
+            'CM_Exception_NotAllowed',
+        );
+        if (null !== $expectedExceptionClass) {
+            $expectedExceptionClassList = array($expectedExceptionClass);
         }
         try {
             $cmp->checkAccessible($render);
             self::fail('checkAccessible should throw exception');
-        } catch (CM_Exception_AuthRequired $e) {
-            self::assertTrue(true);
-        } catch (CM_Exception_Nonexistent $e) {
-            self::assertTrue(true);
+        } catch (Exception $e) {
+            self::assertTrue(in_array(get_class($e), $expectedExceptionClassList));
         }
     }
 
