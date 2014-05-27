@@ -6,6 +6,7 @@
     <li data-tab="forms"><a href="{linkUrl page='CM_Page_Example' tab='forms'}">Forms</a></li>
     <li data-tab="variables"><a href="{linkUrl page='CM_Page_Example' tab='variables'}">Variables</a></li>
     <li data-tab="icons"><a href="{linkUrl page='CM_Page_Example' tab='icons'}">Icons</a></li>
+    <li data-tab="styleguide"><a href="{linkUrl page='CM_Page_Example' tab='styleguide'}">Styleguide</a></li>
   {/block}
 </ul>
 
@@ -31,6 +32,9 @@
     </div>
     <div>
       {componentTemplate file='tabs/icons.tpl' icons=$icons}
+    </div>
+    <div>
+      {componentTemplate file='tabs/styleguide.tpl'}
     </div>
   {/block}
 </div>
