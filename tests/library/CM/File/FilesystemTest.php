@@ -84,4 +84,33 @@ class CM_File_FilesystemTest extends CMTest_TestCase {
         $filesystem->ensureDirectory('/my-dir');
         $filesystem->deleteByPrefix('/my-dir');
     }
+
+    public function testEquals() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystemSecondary1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp . 'sec1'));
+        $filesystemSecondary2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp . 'sec2'));
+        $filesystemSecondary3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp . 'sec1'));
+
+        $this->assertTrue($filesystem1->equals($filesystem2));
+
+        $filesystem1->addSecondary($filesystemSecondary1);
+        $this->assertFalse($filesystem1->equals($filesystem2));
+
+        $filesystem2->addSecondary($filesystemSecondary1);
+        $this->assertTrue($filesystem1->equals($filesystem2));
+
+        $filesystem3->addSecondary($filesystemSecondary2);
+        $this->assertFalse($filesystem1->equals($filesystem3));
+
+        $filesystem1->addSecondary($filesystemSecondary1);
+        $filesystem2->addSecondary($filesystemSecondary3);
+        $this->assertTrue($filesystem1->equals($filesystem2));
+
+        $filesystem1->addSecondary($filesystemSecondary1);
+        $filesystem2->addSecondary($filesystemSecondary2);
+        $this->assertFalse($filesystem1->equals($filesystem2));
+    }
 }
