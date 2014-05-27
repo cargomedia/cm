@@ -4,6 +4,9 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $viewResponse = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract');
+    if (null === $viewResponse) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {button} can be only rendered within form view.');
+    }
     /** @var CM_Form_Abstract $form */
     $form = $viewResponse->getView();
     if (empty($params['action'])) {

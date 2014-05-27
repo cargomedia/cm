@@ -26,6 +26,9 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
         $fieldName = (string) $params['name'];
         /** @var CM_Form_Abstract $form */
         $form = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract')->getView();
+        if (null === $form) {
+            throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. Named {formField} can be only rendered within form view.');
+        }
         $formField = $form->getField($fieldName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);

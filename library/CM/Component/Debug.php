@@ -3,7 +3,7 @@
 class CM_Component_Debug extends CM_Component_Abstract {
 
     public function checkAccessible(CM_Frontend_Environment $environment) {
-        if (!CM_Bootloader::getInstance()->isDebug()) {
+        if (!$environment->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
     }
@@ -19,9 +19,6 @@ class CM_Component_Debug extends CM_Component_Abstract {
     }
 
     public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
-        if (!CM_Bootloader::getInstance()->isDebug()) {
-            throw new CM_Exception_NotAllowed();
-        }
         $cachesCleared = array();
         if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
             $cache = new CM_Cache_Storage_Memcache();

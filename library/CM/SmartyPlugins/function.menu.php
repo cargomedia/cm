@@ -18,6 +18,9 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     }
 
     if ($activePage) {
+        if (!$activePage instanceof CM_Page_Abstract) {
+            throw new CM_Exception_Invalid('`$activePage` must be an instance of `CM_Page_Abstract`');
+        }
         $pageClassName = get_class($activePage);
         $activePath = $activePage::getPath();
         $activeParams = $activePage->getParams();

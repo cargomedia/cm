@@ -14,12 +14,16 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         return '';
     } else {
         $viewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
+        if (null === $viewResponse) {
+            throw new CM_Exception_Invalid('Cannot find `CM_Form_Abstract` within frontend tree.');
+        }
         /** @var CM_Form_Abstract $form */
         $form = $viewResponse->getView();
 
         $classes = $form->getClassHierarchy();
         $classes[] = $form->getName();
-        $html = '<form id="' . $viewResponse->getAutoId() . '" class="' . implode(' ', $classes) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+        $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
+            implode(' ', $classes) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
         $html .= $content;
 
         foreach ($form->getFields() as $field) {

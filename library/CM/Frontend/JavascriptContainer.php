@@ -9,6 +9,7 @@ class CM_Frontend_JavascriptContainer {
      * @param string $code
      */
     public function append($code) {
+        $code = (string) $code;
         array_push($this->_operations, $code);
     }
 
@@ -16,6 +17,7 @@ class CM_Frontend_JavascriptContainer {
      * @param string $code
      */
     public function prepend($code) {
+        $code = (string) $code;
         array_unshift($this->_operations, $code);
     }
 

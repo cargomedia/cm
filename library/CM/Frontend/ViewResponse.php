@@ -2,8 +2,8 @@
 
 class CM_Frontend_ViewResponse extends CM_DataResponse {
 
-    /** @var string */
-    private $_autoId;
+    /** @var string|null */
+    protected $_autoId;
 
     /** @var string */
     protected $_templateName;
@@ -66,6 +66,9 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
         $this->_templateName = $name;
     }
 
+    /**
+     * @return CM_Frontend_JavascriptContainer_View
+     */
     public function getJs() {
         return $this->_js;
     }

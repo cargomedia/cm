@@ -5,7 +5,7 @@ class CM_Response_Page extends CM_Response_Abstract {
     /** @var CM_Page_Abstract|null */
     private $_page;
 
-    /** @var CM_Params */
+    /** @var CM_Params|null */
     private $_pageParams;
 
     /** @var string|null */
@@ -18,16 +18,24 @@ class CM_Response_Page extends CM_Response_Abstract {
     }
 
     /**
-     * @return CM_Page_Abstract|null
+     * @throws CM_Exception_Invalid
+     * @return CM_Page_Abstract
      */
     public function getPage() {
+        if (null === $this->_page) {
+            throw new CM_Exception_Invalid('Page not set');
+        }
         return $this->_page;
     }
 
     /**
+     * @throws CM_Exception_Invalid
      * @return CM_Params
      */
     public function getPageParams() {
+        if (null == $this->_pageParams) {
+            throw new CM_Exception_Invalid('Page params not set');
+        }
         return $this->_pageParams;
     }
 

@@ -20,7 +20,7 @@ class CM_Frontend_GlobalResponse {
     /** @var CM_Frontend_JavascriptContainer */
     protected $_onloadReadyJs;
 
-    /** @var CM_Tracking_Abstract */
+    /** @var CM_Tracking_Abstract|null */
     private $_tracking;
 
     public function __construct() {
@@ -101,7 +101,7 @@ class CM_Frontend_GlobalResponse {
      * @return CM_Tracking_Abstract
      */
     public function getTracking() {
-        if (!$this->_tracking) {
+        if (null === $this->_tracking) {
             $this->_tracking = CM_Tracking_Abstract::factory();
         }
         return $this->_tracking;

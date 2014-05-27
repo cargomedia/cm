@@ -12,25 +12,33 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     protected $_language;
 
     /** @var DateTimeZone */
-    private $_timeZone;
+    protected $_timeZone;
+
+    /** @var boolean */
+    protected $_debug;
 
     /**
      * @param CM_Site_Abstract|null  $site
      * @param CM_Model_User|null     $viewer
      * @param CM_Model_Language|null $language
      * @param DateTimeZone|null      $timeZone
+     * @param bool|null              $debug
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null) {
-        if (!$site) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null) {
+        if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
-        if (!$timeZone) {
+        if (null === $timeZone) {
             $timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        if (null === $debug) {
+            $debug = CM_Bootloader::getInstance()->isDebug();
         }
         $this->_site = $site;
         $this->_viewer = $viewer;
         $this->_language = $language;
         $this->_timeZone = $timeZone;
+        $this->_debug = (bool) $debug;
     }
 
     /**
@@ -85,5 +93,12 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      */
     public function getTimeZone() {
         return $this->_timeZone;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug() {
+        return $this->_debug;
     }
 }

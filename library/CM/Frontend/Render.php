@@ -2,8 +2,8 @@
 
 class CM_Frontend_Render extends CM_Class_Abstract {
 
-    /** @var CM_Frontend_GlobalResponse */
-    protected $_js = null;
+    /** @var CM_Frontend_GlobalResponse|null */
+    private $_js;
 
     /** @var NumberFormatter */
     private $_formatterCurrency;
@@ -17,8 +17,8 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /** @var CM_Frontend_Environment */
     private $_environment;
 
-    /** @var Smarty */
-    private static $_smarty = null;
+    /** @var Smarty|null */
+    private static $_smarty;
 
     /**
      * @param CM_Site_Abstract|null  $site
@@ -52,7 +52,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return CM_Frontend_GlobalResponse
      */
     public function getFrontend() {
-        if (!$this->_js) {
+        if (null === $this->_js) {
             $this->_js = new CM_Frontend_GlobalResponse();
         }
         return $this->_js;

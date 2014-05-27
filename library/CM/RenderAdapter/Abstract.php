@@ -2,19 +2,15 @@
 
 abstract class CM_RenderAdapter_Abstract {
 
-    /**
-     * @var CM_Frontend_Render
-     */
+    /** @var CM_Frontend_Render */
     private $_render;
 
-    /**
-     * @var CM_View_Abstract
-     */
+    /** @var CM_View_Abstract */
     private $_view;
 
     /**
      * @param CM_Frontend_Render $render
-     * @param           $view
+     * @param CM_View_Abstract   $view
      */
     public function __construct(CM_Frontend_Render $render, CM_View_Abstract $view) {
         $this->_render = $render;

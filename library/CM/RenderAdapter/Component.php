@@ -33,15 +33,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     }
 
     /**
-     * @return string
-     */
-    protected function _getStackKey() {
-        return 'components';
-    }
-
-    /**
      * @param CM_Frontend_ViewResponse $viewResponse
-     * @return CM_Frontend_ViewResponse
      */
     protected function _prepareViewResponse(CM_Frontend_ViewResponse $viewResponse) {
     }

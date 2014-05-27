@@ -5,7 +5,14 @@
 var CM_FormField_Abstract = CM_View_Abstract.extend({
   _class: 'CM_FormField_Abstract',
 
-  fieldOptions: [],
+  /** Object **/
+  fieldOptions: {},
+
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
+
+    this.fieldOptions = {};
+  },
 
   ready: function() {
   },
