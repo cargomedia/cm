@@ -15,6 +15,7 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         CM_Db_Db::exec("DROP TABLE `indexTest_1`");
         CM_Db_Db::exec("DROP TABLE `indexTest_2`");
         CM_Db_Db::exec("DROP TABLE `indexTest_3`");
+        parent::tearDownAfterClass();
     }
 
     public function tearDown() {
