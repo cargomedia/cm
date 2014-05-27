@@ -44,19 +44,19 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
     }
 
     public function testInvalid() {
-        $text = 'test ![formatter](1.jpg';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
+
+        $text = 'test ![formatter](1.jpg';
         $actual = $filter->transform($text, new CM_Render());
         $this->assertSame($text, $actual);
 
         $text = '![formatter]()';
-        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
         $this->assertSame($text, $actual);
 
         $text = '![formatter](]1.jpg)';
-        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
+        $expected = '![image](' . $this->_usercontentUrl . ']1.jpg)';
         $actual = $filter->transform($text, new CM_Render());
-        $this->assertSame($text, $actual);
+        $this->assertSame($expected, $actual);
     }
 }
