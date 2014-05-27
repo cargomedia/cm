@@ -12,6 +12,7 @@ class CM_Elasticsearch_Type_AbstractTest extends CMTest_TestCase {
 
     public static function tearDownAfterClass() {
         CM_Db_Db::exec("DROP TABLE `index_mock`");
+        parent::tearDownAfterClass();
     }
 
     public function setUp() {
