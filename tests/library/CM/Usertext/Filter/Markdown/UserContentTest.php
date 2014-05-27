@@ -53,5 +53,10 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
         $actual = $filter->transform($text, new CM_Render());
         $this->assertSame($text, $actual);
+
+        $text = '![formatter](]1.jpg)';
+        $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
+        $actual = $filter->transform($text, new CM_Render());
+        $this->assertSame($text, $actual);
     }
 }
