@@ -27,7 +27,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
         $_locationTree, $_locationTreeOld,
         $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved,
-        $_ipBlockListByCountry, $_ipBlockListByCity;
+        $_ipBlockListByLocation;
 
     /**
      * @param CM_File|null                   $geoIpFile
@@ -1145,8 +1145,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _updateIpBlocks() {
         $ipData = $this->_getIpData();
-        $this->_ipBlockListByCity = array();
-        $this->_ipBlockListByCountry = array();
+        $this->_ipBlockListByLocation = array();
         $count = count($ipData);
         $item = 0;
         foreach ($ipData as $row) {
@@ -1156,12 +1155,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $maxMind = (int) $maxMind;
             if (isset($this->_cityIdList[$maxMind])) {
                 $cityId = $this->_cityIdList[$maxMind];
-                $this->_ipBlockListByCity[$cityId][$ipEnd] = $ipStart;
+                $this->_ipBlockListByLocation[CM_Model_Location::LEVEL_CITY][$cityId][$ipEnd] = $ipStart;
             } elseif (isset($this->_countryCodeListByMaxMind[$maxMind])) {
                 $countryCode = $this->_countryCodeListByMaxMind[$maxMind];
                 if (isset($this->_countryIdList[$countryCode])) {
                     $countryId = $this->_countryIdList[$countryCode];
-                    $this->_ipBlockListByCountry[$countryId][$ipEnd] = $ipStart;
+                    $this->_ipBlockListByLocation[CM_Model_Location::LEVEL_COUNTRY][$countryId][$ipEnd] = $ipStart;
                 }
             }
             $this->_printProgressCounter(++$item, $count);
@@ -1320,20 +1319,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         $this->_updateIpBlocks();
         $this->_writeln('Updating IP blocks database…');
-        $count = $this->_count(array($this->_ipBlockListByCountry, $this->_ipBlockListByCity), 3);
+        $count = $this->_count($this->_ipBlockListByLocation, 3);
         $item = 0;
-        CM_Db_Db::truncate('cm_model_location_country_ip');
-        foreach ($this->_ipBlockListByCountry as $countryId => $ipBlockList) {
-            foreach ($ipBlockList as $ipEnd => $ipStart) {
-                CM_Db_Db::insertIgnore('cm_model_location_country_ip', array('countryId' => $countryId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
-                $this->_printProgressCounter(++$item, $count);
-            }
-        }
-        CM_Db_Db::truncate('cm_model_location_city_ip');
-        foreach ($this->_ipBlockListByCity as $cityId => $ipBlockList) {
-            foreach ($ipBlockList as $ipEnd => $ipStart) {
-                CM_Db_Db::insertIgnore('cm_model_location_city_ip', array('cityId' => $cityId, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
-                $this->_printProgressCounter(++$item, $count);
+        CM_Db_Db::truncate('cm_model_location_ip');
+        foreach ($this->_ipBlockListByLocation as $level => $ipBlockListByLocation) {
+            foreach ($ipBlockListByLocation as $id => $ipBlockList) {
+                foreach ($ipBlockList as $ipEnd => $ipStart) {
+                    CM_Db_Db::insertIgnore('cm_model_location_ip', array('id' => $id, 'level' => $level, 'ipStart' => $ipStart, 'ipEnd' => $ipEnd));
+                    $this->_printProgressCounter(++$item, $count);
+                }
             }
         }
     }
