@@ -18,19 +18,13 @@
 }
 
 .floatbox-overlay {
-  .transition(200ms);
+  .transition(opacity 200ms);
 }
 
 .floatbox {
-  .transform(scale(.5, .5));
-  transition: transform 200ms;
-  -webkit-transition: -webkit-transform 200ms;
+  .transition(opacity 200ms);
 
   &:focus {
     outline: none;
-  }
-
-  &.fadeIn {
-    .transform(scale(1, 1));
   }
 }
