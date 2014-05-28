@@ -673,10 +673,15 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('33555968', '33556223', '75'),
                 array('87097600', '87097855', '50221'),
+                array('522357760', '522358015', '384603'),
+                array('1304630016', '1304630271', '384603'),
                 array('266578176', '266578431', '223'),
                 array('266586368', '266586623', '223'),
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
+                array('201948163', '201948415', '999999'),
             ),
             array()
         );
@@ -708,6 +713,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 87097600, 'ipEnd' => 87097855),
                 array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
                 array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 522357760, 'ipEnd' => 522358015),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 1304630016, 'ipEnd' => 1304630271),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
             )
         );
     }

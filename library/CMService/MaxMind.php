@@ -21,12 +21,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected
         $_countryList, $_countryListOld, $_countryIdList, $_countryCodeListByMaxMind,
         $_countryListAdded, $_countryListRemoved, $_countryListRenamed,
-        $_regionListByCountry, $_regionListByCountryOld, $_regionIdListByCountry,
+        $_regionListByCountry, $_regionListByCountryOld, $_regionIdListByCountry, $_regionIdListByMaxMind,
         $_regionListByCountryAdded, $_regionListByCountryRemoved, $_regionListByCountryRenamed, $_regionListByCountryUpdatedCode, $_regionListByCountryRemovedCodeInUse,
         $_cityListByRegion, $_cityListByRegionOld, $_cityIdList,
         $_cityListByRegionAdded, $_cityListByRegionRemoved, $_cityListByRegionRenamed, $_cityListByRegionUpdatedCode, $_cityListUpdatedRegion,
         $_locationTree, $_locationTreeOld,
-        $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved,
+        $_zipCodeListByCityAdded, $_zipCodeListByCityRemoved, $_zipCodeIdListByMaxMind,
         $_ipBlockListByLocation;
 
     /**
@@ -543,6 +543,16 @@ class CMService_MaxMind extends CM_Class_Abstract {
                         $this->_zipCodeListByCityRemoved[$countryCode][$regionCode][$cityCode] = $zipCodeListRemoved;
                     }
 
+                    // Store ID of kept zip codes
+                    $zipCodeListKept = array_intersect_key($zipCodeListOld, $zipCodeList);
+                    foreach ($zipCodeListOld as $zipCode => $zipCodeData) {
+                        if (isset($zipCodeList[$zipCode])) {
+                            $zipCodeId = $zipCodeData['id'];
+                            $maxMind = $zipCodeList[$zipCode]['maxMind'];
+                            $this->_zipCodeIdListByMaxMind[$maxMind] = $zipCodeId;
+                        }
+                    }
+
                     // Info
                     $zipCodeCountOld = count($zipCodeListOld);
                     $zipCodeCountAdded = count($zipCodeListAdded);
@@ -894,6 +904,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
             $this->_regionListByCountryOld[$countryCode][$regionCode] = $regionName;
             $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
+            $this->_regionIdListByMaxMind[$maxMind] = $regionId;
         }
     }
 
@@ -944,7 +955,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         $result = CM_Db_Db::exec('
 			SELECT
-				`zip`.`id` AS `zipId`,
+				`zip`.`id` AS `zipCodeId`,
 				`zip`.`name` AS `zipCode`,
 				`zip`.`cityId` AS `cityId`,
 				`zip`.`lat` AS `lat`,
@@ -960,7 +971,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 			LEFT JOIN `cm_model_location_state` `state` ON `state`.`id` = `city`.`stateId`
 			LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `city`.`countryId`');
         while (false !== ($row = $result->fetch())) {
-            list($zipId, $zipCode, $cityId, $latitude, $longitude, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
+            list($zipCodeId, $zipCode, $cityId, $latitude, $longitude, $cityName, $regionId, $maxMindRegion, $regionAbbreviation, $regionName, $countryCode) = array_values($row);
             if (null === $cityId) {
                 throw new CM_Exception('Zip code `' . $zipCode . '` is not associated with any city');
             }
@@ -980,7 +991,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 'name'      => (string) $zipCode,
                 'latitude'  => (float) $latitude,
                 'longitude' => (float) $longitude,
-                'id'        => (int) $zipId,
+                'id'        => (int) $zipCodeId,
             );
         }
     }
@@ -1146,6 +1157,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected function _updateIpBlocks() {
         $ipData = $this->_getIpData();
         $this->_ipBlockListByLocation = array();
+        $infoListWarning = array();
         $count = count($ipData);
         $item = 0;
         foreach ($ipData as $row) {
@@ -1153,18 +1165,33 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $ipStart = (int) $ipStart;
             $ipEnd = (int) $ipEnd;
             $maxMind = (int) $maxMind;
-            if (isset($this->_cityIdList[$maxMind])) {
-                $cityId = $this->_cityIdList[$maxMind];
-                $this->_ipBlockListByLocation[CM_Model_Location::LEVEL_CITY][$cityId][$ipEnd] = $ipStart;
+            $level = null;
+            $id = null;
+            if (isset($this->_zipCodeIdListByMaxMind[$maxMind])) {
+                $level = CM_Model_Location::LEVEL_ZIP;
+                $id = $this->_zipCodeIdListByMaxMind[$maxMind];
+            } elseif (isset($this->_cityIdList[$maxMind])) {
+                $level = CM_Model_Location::LEVEL_CITY;
+                $id = $this->_cityIdList[$maxMind];
+            } elseif (isset($this->_regionIdListByMaxMind[$maxMind])) {
+                $level = CM_Model_Location::LEVEL_STATE;
+                $id = $this->_regionIdListByMaxMind[$maxMind];
             } elseif (isset($this->_countryCodeListByMaxMind[$maxMind])) {
+                $level = CM_Model_Location::LEVEL_COUNTRY;
                 $countryCode = $this->_countryCodeListByMaxMind[$maxMind];
                 if (isset($this->_countryIdList[$countryCode])) {
-                    $countryId = $this->_countryIdList[$countryCode];
-                    $this->_ipBlockListByLocation[CM_Model_Location::LEVEL_COUNTRY][$countryId][$ipEnd] = $ipStart;
+                    $id = $this->_countryIdList[$countryCode];
                 }
+            }
+            if ($level && $id) {
+                $this->_ipBlockListByLocation[$level][$id][$ipEnd] = $ipStart;
+            } else {
+                $infoListWarning['Ignoring unknown locations'][] = $maxMind;
             }
             $this->_printProgressCounter(++$item, $count);
         }
+
+        $this->_printInfoList($infoListWarning, '!');
     }
 
     protected function _upgradeCountryList() {
@@ -1224,6 +1251,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $region = CM_Model_Location::createState($country, $regionName, $abbreviationRegion, $maxMindRegion);
                 $regionId = $region->getId();
                 $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
+                if (isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'])) {
+                    $maxMind = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'];
+                    $this->_regionIdListByMaxMind[$maxMind] = $regionId;
+                }
                 $this->_printProgressCounter(++$item, $count);
             }
         }
@@ -1305,7 +1336,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     $cityId = $this->_cityIdList[$cityCode];
                     $city = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId);
                     foreach ($zipCodeListAdded as $zipCode => $zipCodeData) {
-                        CM_Model_Location::createZip($city, $zipCodeData['name'], $zipCodeData['latitude'], $zipCodeData['longitude']);
+                        $zip = CM_Model_Location::createZip($city, $zipCodeData['name'], $zipCodeData['latitude'], $zipCodeData['longitude']);
+                        $zipCodeId = $zip->getId();
+                        $maxMind = $zipCodeData['maxMind'];
+                        $this->_zipCodeIdListByMaxMind[$maxMind] = $zipCodeId;
                         $this->_printProgressCounter(++$item, $count);
                     }
                 }
