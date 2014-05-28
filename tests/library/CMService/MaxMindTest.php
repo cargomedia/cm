@@ -896,7 +896,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
             ),
-            array(),
+            array(
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
+            ),
             array()
         );
         $this->_verify(
@@ -911,7 +914,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+            )
         );
     }
 
@@ -2878,7 +2884,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
-            array(),
+            array(
+                array('522357760', '522358015', '384603'),
+                array('1304630016', '1304630271', '384603'),
+            ),
             array()
         );
         $this->_verify(
@@ -2896,7 +2905,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'name' => '76600', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
                 array('id' => 3, 'name' => '76610', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
             ),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 522357760, 'ipEnd' => 522358015),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 1304630016, 'ipEnd' => 1304630271),
+            )
         );
     }
 

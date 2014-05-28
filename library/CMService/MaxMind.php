@@ -544,7 +544,6 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     }
 
                     // Store ID of kept zip codes
-                    $zipCodeListKept = array_intersect_key($zipCodeListOld, $zipCodeList);
                     foreach ($zipCodeListOld as $zipCode => $zipCodeData) {
                         if (isset($zipCodeList[$zipCode])) {
                             $zipCodeId = $zipCodeData['id'];
@@ -586,6 +585,15 @@ class CMService_MaxMind extends CM_Class_Abstract {
                             }
                         }
                     }
+                }
+
+                // Store ID of kept regions
+                if (isset($this->_regionIdListByCountry[$countryCode][$regionCode]) &&
+                    isset($this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'])
+                ) {
+                    $regionId = $this->_regionIdListByCountry[$countryCode][$regionCode];
+                    $maxMind = $this->_locationTree[$countryCode]['regions'][$regionCode]['location']['maxMind'];
+                    $this->_regionIdListByMaxMind[$maxMind] = $regionId;
                 }
             }
 
@@ -900,11 +908,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_regionListByCountryOld = array();
         $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_model_location_state` `state` LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `state`.`countryId`');
         while (false !== ($row = $result->fetch())) {
-            list($regionId, $countryCode, $maxMind, $regionAbbreviation, $regionName) = array_values($row);
-            $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMind, $countryCode, $regionId, $regionName);
+            list($regionId, $countryCode, $maxMindRegion, $regionAbbreviation, $regionName) = array_values($row);
+            $regionCode = $this->_getRegionCode($regionAbbreviation, $maxMindRegion, $countryCode, $regionId, $regionName);
             $this->_regionListByCountryOld[$countryCode][$regionCode] = $regionName;
             $this->_regionIdListByCountry[$countryCode][$regionCode] = $regionId;
-            $this->_regionIdListByMaxMind[$maxMind] = $regionId;
         }
     }
 
