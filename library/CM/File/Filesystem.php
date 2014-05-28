@@ -23,6 +23,13 @@ class CM_File_Filesystem implements CM_Comparable {
     }
 
     /**
+     * @return CM_File_Filesystem[]
+     */
+    public function getSecondaryList() {
+        return $this->_secondaryList;
+    }
+
+    /**
      * @return CM_File_Filesystem_Adapter
      */
     public function getAdapter() {
@@ -185,7 +192,24 @@ class CM_File_Filesystem implements CM_Comparable {
             return false;
         }
         /** @var CM_File_Filesystem $other */
-        return $this->getAdapter()->equals($other->getAdapter());
+
+        if (!$this->getAdapter()->equals($other->getAdapter())) {
+            return false;
+        }
+
+        /** @var CM_File_Filesystem[] $bothSecondaryList */
+        $bothSecondaryList = array_merge($this->getSecondaryList(), $other->getSecondaryList());
+        foreach ($bothSecondaryList as $secondary) {
+            foreach (array($this->getSecondaryList(), $other->getSecondaryList()) as $secondaryList) {
+                $secondaryFound = Functional\first($secondaryList, function (CM_File_Filesystem $secondaryCompare) use ($secondary) {
+                    return $secondaryCompare->equals($secondary);
+                });
+                if (!$secondaryFound) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
