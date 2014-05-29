@@ -49,9 +49,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_compareCountryLists();
         $this->_readRegionListOld();
         $this->_updateRegionList();
-        $this->_compareRegionLists();
         $this->_readLocationTreeOld();
         $this->_updateLocationTree();
+        $this->_compareRegionLists();
         $this->_compareLocationTrees();
     }
 
@@ -289,12 +289,18 @@ class CMService_MaxMind extends CM_Class_Abstract {
                 $countryName = $countryCode;
             }
             if (!isset($countryData['regions'])) {
-                $infoListWarning['Countries without regions'][] = $countryName;
+                $infoListWarning['Countries without locations'][] = $countryName;
             } else {
+                $regionCount = count($countryData['regions']);
                 if (!isset($countryData['location'])) {
-                    $regionCount = count($countryData['regions']);
                     $s = $regionCount > 1 ? 's' : '';
                     $infoListWarning['Countries without location data'][] = $countryName . ' (' . $regionCount . ' region' . $s . ')';
+                }
+                if (1 === $regionCount) {
+                    $regionCode = array_keys($countryData['regions']);
+                    if ('' === reset($regionCode)) {
+                        $infoListWarning['Countries without regions'][] = $countryName;
+                    }
                 }
                 foreach ($countryData['regions'] as $regionCode => $regionData) {
                     $regionName = $this->_getRegionName($countryCode, $regionCode);
@@ -856,6 +862,17 @@ class CMService_MaxMind extends CM_Class_Abstract {
         return $regionData;
     }
 
+    /**
+     * Returns an old version of MaxMind's region listing, containing entries for
+     * regions without FIPS 10-4 and ISO-3166-2 codes, which are missing in newer versions.
+     *
+     * @return array $countryCode => $regionCode => $regionName
+     * @codeCoverageIgnore
+     */
+    protected function _getRegionListLegacy() {
+        return include __DIR__ . '/MaxMind/region_codes_legacy.php';
+    }
+
     protected function _readCountryListOld() {
         $this->_writeln('Reading old country listing…');
         $this->_countryListOld = array();
@@ -988,6 +1005,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _updateLocationTree() {
         $locationData = $this->_getLocationData();
+        $regionListByCountryLegacy = $this->_getRegionListLegacy();
         $this->_locationTree = array();
         $this->_countryCodeListByMaxMind = array();
         $infoListWarning = array();
@@ -998,6 +1016,13 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $maxMind = (int) $maxMind;
             $latitude = (float) $latitude;
             $longitude = (float) $longitude;
+            if (strlen($regionCode) && !isset($this->_regionListByCountry[$countryCode][$regionCode])) {
+                if (isset($this->_regionListByCountryOld[$countryCode][$regionCode])) { // Keep missing regions
+                    $this->_regionListByCountry[$countryCode][$regionCode] = $this->_regionListByCountryOld[$countryCode][$regionCode];
+                } elseif (isset($regionListByCountryLegacy[$countryCode][$regionCode])) { // Use legacy data for missing regions
+                    $this->_regionListByCountry[$countryCode][$regionCode] = $regionListByCountryLegacy[$countryCode][$regionCode];
+                }
+            }
             if (strlen($zipCode)) { // ZIP code record
                 if (!isset($this->_regionListByCountry[$countryCode][$regionCode])) {
                     $regionCode = null;

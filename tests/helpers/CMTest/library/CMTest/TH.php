@@ -26,6 +26,15 @@ class CMTest_TH {
         self::clearCache();
         self::timeReset();
         self::clearConfig();
+        self::clearFilesystem();
+    }
+
+    public static function clearFilesystem() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->deleteByPrefix('/');
+        }
         CM_App::getInstance()->setupFilesystem();
     }
 
