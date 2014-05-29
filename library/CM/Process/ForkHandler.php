@@ -65,7 +65,6 @@ class CM_Process_ForkHandler {
         if (false === $ipcData) {
             throw new CM_Exception('Received no data from IPC stream.');
         }
-        /** @var CM_Process_WorkloadResult $workloadResult */
         $workloadResult = unserialize($ipcData);
         if (!$workloadResult instanceof CM_Process_WorkloadResult) {
             throw new CM_Exception('Received unexpected data over IPC stream.');
