@@ -123,7 +123,8 @@ class CM_ParamsTest extends CMTest_TestCase {
             $params = new CM_Params(array('userInput' => $userInput));
             $this->assertSame($expected, $params->getFloat('userInput'));
         }
-        $userInputInvalidList = array('', '-', '.', '-.', '1.2.3', '12 ', ' 12', '12,345', false, true, array('1'), new stdClass(), fopen(__FILE__, 'r'));
+        $userInputInvalidList = array('', '-', '.', '-.', '1.2.3', '12 ', ' 12', '12,345', false, true, array('1'), new stdClass(),
+            fopen(__FILE__, 'r'));
         foreach ($userInputInvalidList as $userInputInvalid) {
             $params = new CM_Params(array('userInput' => $userInputInvalid));
             try {
@@ -202,5 +203,45 @@ class CM_ParamsTest extends CMTest_TestCase {
 
             $this->assertEquals($params->getDateTime('date'), $dateTime);
         }
+    }
+
+    public function testGetParams() {
+        $params = new CM_Params(array(
+            'foo1' => new CM_Params(),
+            'foo2' => new CM_Params(array('bar' => 12)),
+            'foo3' => array('bar' => 13),
+            'foo4' => json_encode(array('bar' => 14)),
+        ));
+
+        $this->assertSame(array(), $params->getParams('foo1')->getAll());
+        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getAll());
+        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getAll());
+        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getAll());
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     */
+    public function testGetParamsInvalidObject() {
+        $params = new CM_Params(array('foo' => new stdClass()));
+        $params->getParams('foo');
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Unexpected input of type `integer`
+     */
+    public function testGetParamsInvalidInt() {
+        $params = new CM_Params(array('foo' => 12));
+        $params->getParams('foo');
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Cannot decode input
+     */
+    public function testGetParamsInvalidString() {
+        $params = new CM_Params(array('foo' => 'hello'));
+        $params->getParams('foo');
     }
 }
