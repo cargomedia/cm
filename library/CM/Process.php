@@ -69,7 +69,7 @@ class CM_Process {
      * @param int $signal
      */
     public function killChildren($signal) {
-        foreach ($this->_forkHandlerList as $processId => $workload) {
+        foreach ($this->_forkHandlerList as $processId => $forkHandler) {
             posix_kill($processId, $signal);
         }
     }
