@@ -10,6 +10,9 @@ class CM_Process {
     /** @var CM_Process_ForkHandler[] */
     private $_forkHandlerList = array();
 
+    /** @var int */
+    private $_forkHandlerCounter = 0;
+
     private function __construct() {
         $this->_installSignalHandlers();
     }
@@ -27,28 +30,8 @@ class CM_Process {
      * @throws CM_Exception
      */
     public function fork(Closure $workload) {
-        $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
-        if (false === $sockets) {
-            throw new CM_Exception('Cannot open stream socket pair');
-        }
-
-        $pid = pcntl_fork();
-        if ($pid === -1) {
-            throw new CM_Exception('Could not spawn child process');
-        }
-        if ($pid) {
-            // parent
-            fclose($sockets[0]);
-            $this->_forkHandlerList[$pid] = new CM_Process_ForkHandler($workload, $sockets[1]);
-        } else {
-            // child
-            fclose($sockets[1]);
-            $this->_reset();
-            $forkHandler = new CM_Process_ForkHandler($workload, $sockets[0]);
-            $forkHandler->runAndSendWorkload();
-            $forkHandler->closeIpcStream();
-            exit;
-        }
+        $sequence = ++$this->_forkHandlerCounter;
+        $this->_fork($workload, $sequence);
     }
 
     /**
@@ -69,8 +52,8 @@ class CM_Process {
      * @param int $signal
      */
     public function killChildren($signal) {
-        foreach ($this->_forkHandlerList as $processId => $forkHandler) {
-            posix_kill($processId, $signal);
+        foreach ($this->_forkHandlerList as $forkHandler) {
+            posix_kill($forkHandler->getPid(), $signal);
         }
     }
 
@@ -90,18 +73,21 @@ class CM_Process {
             if (-1 === $pid) {
                 throw new CM_Exception('Waiting on child processes failed');
             }
-            $forkHandler = $this->_forkHandlerList[$pid];
+            $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
+            $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
             $workloadResultList[] = $forkHandler->receiveWorkloadResult();
             $forkHandler->closeIpcStream();
-            unset($this->_forkHandlerList[$pid]);
+            unset($this->_forkHandlerList[$forkHandlerSequence]);
             if ($keepAlive) {
                 $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                 CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                 usleep(self::RESPAWN_TIMEOUT * 1000000);
-                $this->fork($forkHandler->getWorkload());
+                $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
             }
         } while (!empty($this->_forkHandlerList));
         $this->executeTerminationCallback();
+
+        ksort($workloadResultList);
         return $workloadResultList;
     }
 
@@ -125,6 +111,36 @@ class CM_Process {
         return (false !== posix_getsid($processId));
     }
 
+    /**
+     * @param Closure $workload
+     * @param int     $sequence
+     * @throws CM_Exception
+     */
+    private function _fork(Closure $workload, $sequence) {
+        $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+        if (false === $sockets) {
+            throw new CM_Exception('Cannot open stream socket pair');
+        }
+
+        $pid = pcntl_fork();
+        if ($pid === -1) {
+            throw new CM_Exception('Could not spawn child process');
+        }
+        if ($pid) {
+            // parent
+            fclose($sockets[0]);
+            $this->_forkHandlerList[$sequence] = new CM_Process_ForkHandler($pid, $workload, $sockets[1]);
+        } else {
+            // child
+            fclose($sockets[1]);
+            $this->_reset();
+            $forkHandler = new CM_Process_ForkHandler($this->getProcessId(), $workload, $sockets[0]);
+            $forkHandler->runAndSendWorkload();
+            $forkHandler->closeIpcStream();
+            exit;
+        }
+    }
+
     private function _installSignalHandlers() {
         $process = $this;
         $handler = function ($signal) use ($process) {
@@ -141,5 +157,19 @@ class CM_Process {
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
+    }
+
+    /**
+     * @param int $pid
+     * @return int
+     * @throws CM_Exception
+     */
+    private function _getForkHandlerSequenceByPid($pid) {
+        foreach ($this->_forkHandlerList as $sequence => $forkHandler) {
+            if ($pid === $forkHandler->getPid()) {
+                return $sequence;
+            }
+        }
+        throw new CM_Exception('Cannot find reference to fork-handler with PID `' . $pid . '`.');
     }
 }

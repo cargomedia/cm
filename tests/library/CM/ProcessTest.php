@@ -93,10 +93,10 @@ Parent terminated.
 
         $workloadResultList = $process->waitForChildren();
         $this->assertCount(3, $workloadResultList);
-        $this->assertSame('Child 1 finished', $workloadResultList[1]->getResult());
-        $this->assertSame(null, $workloadResultList[1]->getException());
-        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[0]->getResult());
+        $this->assertSame('Child 1 finished', $workloadResultList[0]->getResult());
         $this->assertSame(null, $workloadResultList[0]->getException());
+        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[1]->getResult());
+        $this->assertSame(null, $workloadResultList[1]->getException());
         $this->assertSame(null, $workloadResultList[2]->getResult());
         $this->assertSame('Child 3 finished', $workloadResultList[2]->getException()->getMessage());
     }

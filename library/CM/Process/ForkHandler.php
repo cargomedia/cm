@@ -2,6 +2,9 @@
 
 class CM_Process_ForkHandler {
 
+    /** @var int */
+    private $_pid;
+
     /** @var Closure */
     private $_workload;
 
@@ -9,12 +12,21 @@ class CM_Process_ForkHandler {
     private $_ipcStream;
 
     /**
+     * @param int      $pid
      * @param Closure  $workload
      * @param resource $ipcStream
      */
-    public function __construct(Closure $workload, $ipcStream) {
+    public function __construct($pid, Closure $workload, $ipcStream) {
+        $this->_pid = (int) $pid;
         $this->_workload = $workload;
         $this->_ipcStream = $ipcStream;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPid() {
+        return $this->_pid;
     }
 
     /**
