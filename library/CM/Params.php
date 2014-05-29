@@ -275,6 +275,34 @@ class CM_Params extends CM_Class_Abstract {
     }
 
     /**
+     * @param string         $key
+     * @param CM_Params|null $default
+     * @return CM_Params
+     * @throws CM_Exception_Invalid
+     */
+    public function getParams($key, CM_Params $default = null) {
+        $param = $this->_getObject($key, 'CM_Params', $default, function ($className, $param) {
+            if (is_string($param)) {
+                $json = (string) $param;
+                try {
+                    $array = CM_Params::decode($json, true);
+                } catch (CM_Exception_Invalid $e) {
+                    throw new CM_Exception_InvalidParam('Cannot decode input: ' . $e->getMessage());
+                }
+            } elseif (is_array($param)) {
+                $array = $param;
+            } else {
+                throw new CM_Exception_InvalidParam('Unexpected input of type `' . gettype($param) . '` to create CM_Params');
+            }
+            return CM_Params::factory($array);
+        });
+        if (!($param instanceof CM_Params)) {
+            throw new CM_Exception_Invalid('Not a CM_Params');
+        }
+        return $param;
+    }
+
+    /**
      * @param string $key
      * @return CM_Model_Location
      */
