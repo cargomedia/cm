@@ -7,7 +7,7 @@ class CM_ExceptionTest extends CMTest_TestCase {
         $exception = new CM_Exception('foo',
             array('meta' => 'foo', 'user' => $user),
             array('messagePublic' => 'foo {$bar}', 'messagePublicVariables' => array('bar' => 'foo'), 'severity' => CM_Exception::ERROR));
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
 
         $this->assertSame('foo', $exception->getMessage());
         $this->assertSame('foo foo', $exception->getMessagePublic($render));

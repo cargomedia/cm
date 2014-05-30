@@ -1,1 +1,1 @@
-{tag el="input" name=$name id=$id type="hidden" value=$value}
+{tag el="input" name=$name id=$inputId type="hidden" value=$value}

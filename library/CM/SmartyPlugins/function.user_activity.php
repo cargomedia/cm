@@ -2,7 +2,7 @@
 require_once 'function.date_timeago.php';
 
 function smarty_function_user_activity(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $forceDisplay = isset($params['force_display']);
     /** @var CM_Model_User $user */

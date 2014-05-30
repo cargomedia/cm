@@ -1,1 +1,1 @@
-<input type="color" name="{$name}" id="{$id}" value="{$value}" />
+<input type="color" name="{$name}" id="{$inputId}" value="{$value}" />

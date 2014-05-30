@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_resourceJs(array $params, Smarty_Internal_Template $template) {
-    /** @var $render CM_Render */
+    /** @var $render CM_Frontend_Render */
     $render = $template->smarty->getTemplateVars('render');
     $type = (string) $params['type'];
     $file = (string) $params['file'];
@@ -11,7 +11,7 @@ function smarty_function_resourceJs(array $params, Smarty_Internal_Template $tem
 /**
  * @param string    $type
  * @param string    $file
- * @param CM_Render $render
+ * @param CM_Frontend_Render $render
  * @return string
  * @throws CM_Exception_Invalid
  */
@@ -27,10 +27,10 @@ function smarty_helper_resourceJs($type, $file, $render) {
 }
 
 /**
- * @param CM_Render $render
+ * @param CM_Frontend_Render $render
  * @return string
  */
-function smarty_helper_resourceJs_libraryDebug(CM_Render $render) {
+function smarty_helper_resourceJs_libraryDebug(CM_Frontend_Render $render) {
     $paths = CM_Asset_Javascript_Library::getIncludedPaths($render->getSite());
     $content = '';
     foreach ($paths as $path) {

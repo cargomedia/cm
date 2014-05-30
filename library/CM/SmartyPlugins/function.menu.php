@@ -1,15 +1,31 @@
 <?php
 
 function smarty_function_menu(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    /** @var CM_Page_Abstract $page */
-    $page = $render->getStackLast('pages');
-    /** @var CM_Model_User $viewer */
-    $viewer = $render->getViewer();
-    $activePath = $page ? $page::getPath() : '/';
-    /** @var CM_Params $activeParams */
-    $activeParams = $page ? $page->getParams() : CM_Params::factory();
+    $environment = $render->getEnvironment();
+
+    $activePage = null;
+    if (isset($params['activePage'])) {
+        $activePage = $params['activePage'];
+    } elseif ($pageViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Page_Abstract')) {
+        $activePage = $pageViewResponse->getView();
+    } elseif ($layoutViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Layout_Abstract')) {
+        $activePage = $layoutViewResponse->get('page');
+    }
+
+    if ($activePage) {
+        if (!$activePage instanceof CM_Page_Abstract) {
+            throw new CM_Exception_Invalid('`$activePage` must be an instance of `CM_Page_Abstract`');
+        }
+        $pageClassName = get_class($activePage);
+        $activePath = $activePage::getPath();
+        $activeParams = $activePage->getParams();
+    } else {
+        $pageClassName = null;
+        $activePath = '/';
+        $activeParams = CM_Params::factory();
+    }
 
     $menu = null;
     $name = null;
@@ -33,28 +49,28 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
 
     if (!empty($params['breadcrumb'])) {
         /** @var CM_MenuEntry $entry */
-        $entry = $menu->findEntry($page, $depth, $depth);
+        $entry = $menu->findEntry($pageClassName, $activeParams, $depth, $depth);
         if ($entry) {
             $menuEntries = $entry->getParents();
             // Also add current entry
             $menuEntries[] = $entry;
         }
     } elseif (!empty($params['submenu'])) {
-        $entry = $menu->findEntry($page, $depth, $depth);
+        $entry = $menu->findEntry($pageClassName, $activeParams, $depth, $depth);
         if ($entry && $entry->hasChildren()) {
             $menu = $entry->getChildren();
-            $menuEntries = $menu->getEntries($viewer);
+            $menuEntries = $menu->getEntries($environment);
         }
     } elseif (!is_null($depth)) {
-        if ($entry = $menu->findEntry($page, $depth)) {
+        if ($entry = $menu->findEntry($pageClassName, $activeParams, $depth)) {
             $parents = $entry->getParents();
             $parents[] = $entry;
             /** @var CM_MenuEntry $menuEntry */
             $menuEntry = $parents[$depth];
-            $menuEntries = $menuEntry->getSiblings()->getEntries($viewer);
+            $menuEntries = $menuEntry->getSiblings()->getEntries($environment);
         }
     } else {
-        $menuEntries = $menu->getEntries($viewer);
+        $menuEntries = $menu->getEntries($environment);
     }
 
     if (empty($menuEntries)) {
@@ -77,5 +93,5 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $tplPath = $render->getLayoutPath('menu/' . $tplName . '.tpl');
     $assign = array('menu_entries' => $menuEntries, 'menu_class' => $class, 'activePath' => $activePath, 'activeParams' => $activeParams,
                     'name'         => $name);
-    return $render->renderTemplate($tplPath, $assign, true);
+    return $render->fetchTemplate($tplPath, $assign);
 }

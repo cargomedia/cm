@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_resourceCss(array $params, Smarty_Internal_Template $template) {
-    /** @var $render CM_Render */
+    /** @var $render CM_Frontend_Render */
     $render = $template->smarty->getTemplateVars('render');
     $type = (string) $params['type'];
     $file = (string) $params['file'];

@@ -2,22 +2,11 @@
 
 class CM_FormField_Integer extends CM_FormField_Abstract {
 
-    /**
-     * @param int $min  OPTIONAL
-     * @param int $max  OPTIONAL
-     * @param int $step OPTIONAL
-     */
-    public function __construct($min = 0, $max = 100, $step = 1) {
-        $this->_options['min'] = (int) $min;
-        $this->_options['max'] = (int) $max;
-        $this->_options['step'] = (int) $step;
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', isset($params['class']) ? (string) $params['class'] : null);
-    }
-
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
             throw new CM_Exception_FormFieldValidation('Invalid number');
         }
@@ -26,5 +15,12 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
             throw new CM_Exception_FormFieldValidation('Value not in range.');
         }
         return $value;
+    }
+
+    protected function _initialize() {
+        $this->_options['min'] = $this->_params->getInt('min', 0);
+        $this->_options['max'] = $this->_params->getInt('max', 100);
+        $this->_options['step'] = $this->_params->getInt('step', 1);
+        parent::_initialize();
     }
 }

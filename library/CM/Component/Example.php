@@ -2,32 +2,34 @@
 
 class CM_Component_Example extends CM_Component_Abstract {
 
-    public function prepare() {
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $foo = $this->_params->getString('foo', 'value1');
         $colorStyles = $this->_getColorStyles();
         $icons = $this->_getIcons();
 
-        $this->setTplParam('now', time());
-        $this->setTplParam('foo', $foo);
-        $this->setTplParam('colorStyles', $colorStyles);
-        $this->setTplParam('icons', $icons);
+        $viewResponse->setData(array(
+            'now'         => time(),
+            'foo'         => $foo,
+            'colorStyles' => $colorStyles,
+            'icons'       => $icons,
+        ));
 
-        $this->_setJsParam('uname', 'uname');
+        $viewResponse->getJs()->setProperty('uname', 'uname');
     }
 
-    public function checkAccessible(CM_Render $render) {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
     }
 
-    public static function ajax_test(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_test(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $x = $params->getString('x');
         sleep(2);
         return 'x=' . $x;
     }
 
-    public static function ajax_error(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_error(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $status = $params->getInt('status', 200);
         $message = $params->has('text') ? $params->getString('text') : null;
         $messagePublic = $params->getBoolean('public', false) ? $message : null;
@@ -43,7 +45,7 @@ class CM_Component_Example extends CM_Component_Abstract {
         throw new $exception($message, $messagePublic);
     }
 
-    public static function ajax_ping(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_ping(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $number = $params->getInt('number');
         self::stream($response->getViewer(true), 'ping', array("number" => $number, "message" => 'pong'));
     }

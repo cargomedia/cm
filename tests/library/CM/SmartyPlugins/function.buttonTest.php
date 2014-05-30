@@ -11,13 +11,14 @@ class smarty_function_buttonTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
 
-        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', array(), '', true, true, true, array('getAction', 'getTagAutoId'));
+        $formMock = $this->getMockForAbstractClass('CM_Form_Abstract', array(), '', true, true, true, array('getAction'));
         $actionMock = $this->getMockForAbstractClass('CM_FormAction_Abstract', array($formMock), '', true, true, true, array('getName'));
         $actionMock->expects($this->any())->method('getName')->will($this->returnValue('Create'));
         $formMock->expects($this->any())->method('getAction')->will($this->returnValue($actionMock));
-        $render->pushStack('forms', $formMock);
+        /** @var CM_Form_Abstract $formMock */
+        $render->getGlobalResponse()->treeExpand(new CM_Frontend_ViewResponse($formMock));
 
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);
@@ -25,10 +26,10 @@ class smarty_function_buttonTest extends CMTest_TestCase {
 
     public function testRender() {
         $params = array(
-            'action'      => 'Create',
-            'label'       => 'Some text <br /> with html tags',
-            'theme'       => 'highlight',
-            'class'       => 'button-large',
+            'action' => 'Create',
+            'label'  => 'Some text <br /> with html tags',
+            'theme'  => 'highlight',
+            'class'  => 'button-large',
         );
 
         $this->_assertContains('value="Some text <br /> with html tags"', array_merge($params, array('isHtmlLabel' => true)));

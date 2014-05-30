@@ -3,11 +3,11 @@
 class CM_Asset_Css_View extends CM_Asset_Css {
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @param string    $className
      * @throws CM_Exception
      */
-    public function __construct(CM_Render $render, $className) {
+    public function __construct(CM_Frontend_Render $render, $className) {
         parent::__construct($render);
         if (!preg_match('#^([^_]+)_([^_]+)_?(.*)$#', $className, $matches)) {
             throw new CM_Exception('Cannot detect all className parts from view\'s classNname `' . $className . '`');

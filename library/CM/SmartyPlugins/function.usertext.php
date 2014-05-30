@@ -10,7 +10,7 @@
  * markdownPlain = escape, remove badwords, create html markdown, strip all tags, add emoticons
  */
 function smarty_function_usertext($params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $text = (string) $params['text'];
     $mode = (string) $params['mode'];

@@ -2,21 +2,23 @@
 
 class CM_FormField_Site extends CM_FormField_Set_Select {
 
-    public function __construct() {
+    protected function _initialize() {
         $valuesSet = array();
         foreach (CM_Site_Abstract::getAll() as $site) {
             $valuesSet[$site->getType()] = $site->getName();
         }
-        parent::__construct($valuesSet, true);
+        $this->_params->set('values', $valuesSet);
+        $this->_params->set('labelsInValues', true);
+        parent::_initialize();
     }
 
     /**
-     * @param int                  $userInput
-     * @param CM_Response_Abstract $response
+     * @param CM_Frontend_Environment $environment
+     * @param int                     $userInput
      * @return CM_Site_Abstract
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
-        $userInput = parent::validate($userInput, $response);
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        $userInput = parent::validate($environment, $userInput);
         return CM_Site_Abstract::factory($userInput);
     }
 }

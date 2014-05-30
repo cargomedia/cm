@@ -2,56 +2,63 @@
 
 class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params = array()) {
-        $parentViewId = null;
-        if (count($this->getRender()->getStack('views'))) {
-            /** @var CM_View_Abstract $parentView */
-            $parentView = $this->getRender()->getStackLast('views');
-            $parentViewId = $parentView->getAutoId();
+    /** @var CM_Frontend_ViewResponse */
+    protected $_viewResponse;
+
+    /**
+     * @return string
+     */
+    public function fetch() {
+        $component = $this->_getComponent();
+        $frontend = $this->getRender()->getGlobalResponse();
+        $environment = $this->getRender()->getEnvironment();
+
+        $component->checkAccessible($environment);
+        $viewResponse = $this->_getViewResponse();
+        $this->_prepareViewResponse($viewResponse);
+
+        $frontend->treeExpand($viewResponse);
+
+        $cssClasses = $component->getClassHierarchy();
+        $templateName = $viewResponse->getTemplateName();
+        if ('default' !== $templateName) {
+            $cssClasses[] = $templateName;
         }
-
-        /** @var CM_Component_Abstract $component */
-        $component = $this->_getView();
-
-        $this->getRender()->pushStack($this->_getStackKey(), $component);
-        $this->getRender()->pushStack('views', $component);
-
-        $cssClass = implode(' ', $component->getClassHierarchy());
-        if (preg_match('#([^/]+)\.tpl$#', $component->getTplName(), $match)) {
-            if ($match[1] != 'default') {
-                $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
-            }
-        }
-        $html = '<div id="' . $component->getAutoId() . '" class="' . $cssClass . '">';
-
-        $assign = $component->getTplParams();
-        $assign['viewObj'] = $component;
-        $html .= $this->_renderTemplate($component->getTplName(), $assign, true);
-
+        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $cssClasses) . '">';
+        $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
-        $this->getRender()->getJs()->registerComponent($component, $parentViewId);
-        $this->getRender()->popStack($this->_getStackKey());
-        $this->getRender()->popStack('views');
-
+        $frontend->treeCollapse();
         return $html;
     }
 
     /**
-     * @param string $tplName
-     * @param array  $params
-     * @return string
+     * @param CM_Frontend_ViewResponse $viewResponse
      */
-    public function fetchTemplate($tplName, array $params) {
-        /** @var CM_Component_Abstract $component */
-        $component = $this->_getView();
-        return $this->_renderTemplate($tplName, $params, true);
+    protected function _prepareViewResponse(CM_Frontend_ViewResponse $viewResponse) {
     }
 
     /**
-     * @return string
+     * @return CM_Frontend_ViewResponse
      */
-    protected function _getStackKey() {
-        return 'components';
+    protected function _getViewResponse() {
+        if (null === $this->_viewResponse) {
+            $component = $this->_getComponent();
+            $environment = $this->getRender()->getEnvironment();
+
+            $viewResponse = new CM_Frontend_ViewResponse($component);
+            $viewResponse->setTemplateName('default');
+            $component->prepare($environment, $viewResponse);
+            $viewResponse->set('viewObj', $component);
+            $this->_viewResponse = $viewResponse;
+        }
+        return $this->_viewResponse;
+    }
+
+    /**
+     * @return CM_Component_Abstract
+     */
+    private function _getComponent() {
+        return $this->_getView();
     }
 }

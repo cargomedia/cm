@@ -14,7 +14,7 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
         $this->setServiceManager($serviceManager);
     }
 
-    public function transform($text, CM_Render $render) {
+    public function transform($text, CM_Frontend_Render $render) {
         $text = (string) $text;
         $text = preg_replace_callback('#!\[formatter\]\(([^\)]+)\)#m', function ($matches) {
             $filename = trim($matches[1]);
