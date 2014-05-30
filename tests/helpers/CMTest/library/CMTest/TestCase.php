@@ -100,7 +100,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         unset($session); // Make sure session is stored persistently
 
         $viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
-        $body = CM_Params::encode(array('view' => $viewArray, 'method' => $methodName, 'params' => $params), true);
+        $body = CM_Params::encode(array('viewInfoList' => array('view' => $viewArray), 'method' => $methodName, 'params' => $params), true);
         $request = new CM_Request_Post('/ajax/' . $siteId, $headers, null, $body);
 
         $response = new CM_Response_View_Ajax($request);
@@ -138,9 +138,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $server = array('remote_addr' => '1.2.3.4');
         unset($session); // Make sure session is stored persistently
 
-        $formArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
-        $viewArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-        $body = CM_Params::encode(array('view' => $viewArray, 'form' => $formArray, 'actionName' => $actionName, 'data' => $data), true);
+        $viewArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
+        $componentArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
+        $body = CM_Params::encode(array('viewInfoList' => array('component' => $componentArray, 'view' => $viewArray), 'actionName' => $actionName,
+                                        'data'         => $data), true);
         $request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
 
         $response = new CM_Response_View_Form($request);
@@ -171,10 +172,12 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $query = array(
             'data'       => (array) $data,
             'actionName' => $actionName,
-            'form'       => array(
-                'className' => get_class($form),
-                'params'    => $form->getParams()->getAll(),
-                'id'        => 'uniqueId'
+            'viewInfoList' => array(
+                'view' => array(
+                    'className' => get_class($form),
+                    'params'    => $form->getParams()->getAll(),
+                    'id'        => 'uniqueId'
+                )
             )
         );
         return $this->createRequest('/form/null', $query);
