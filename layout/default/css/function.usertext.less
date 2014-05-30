@@ -8,8 +8,6 @@
 .usertext {
   .word_wrap;
   .hyphens(auto);
-  font-size: @usertextFontSize;
-  line-height: 1.5;
 
   &.oneline {
     display: inline-block;
@@ -77,6 +75,8 @@
   }
 
   p {
+    font-size: @usertextFontSize;
+    line-height: 1.5;
     margin: 8px 0;
   }
 
@@ -95,6 +95,7 @@
 
   li {
     margin: 5px 0;
+    font-size: @usertextFontSize;
     line-height: 1.6;
   }
 

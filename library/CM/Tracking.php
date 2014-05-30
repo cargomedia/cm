@@ -84,10 +84,7 @@ class CM_Tracking extends CM_Tracking_Abstract {
         return $js;
     }
 
-    /**
-     * @return string
-     */
-    public function getHtml() {
+    public function getHtml(CM_Site_Abstract $site) {
         if (!$this->enabled()) {
             return '';
         }
@@ -95,6 +92,8 @@ class CM_Tracking extends CM_Tracking_Abstract {
         $html = '<script type="text/javascript">';
         $html .= 'var _gaq = _gaq || [];';
         $html .= "_gaq.push(['_setAccount', '" . $this->getCode() . "']);";
+
+        $html .= "_gaq.push(['_setDomainName', '" . $site->getHost() . "']);";
 
         $html .= $this->getJs();
 

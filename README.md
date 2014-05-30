@@ -130,7 +130,7 @@ The following methods will be called for different events in the lifetime of a m
 ### Paging
 A paging is an ordered collection with pagination-capabilities.
 
-The data source for a paging is a PagingSource (`CM_PagingSource_Sql`, `CM_PagingSource_Search` etc.).
+The data source for a paging is a PagingSource (`CM_PagingSource_Sql`, `CM_PagingSource_Elasticsearch` etc.).
 Caching can be enabled optionally with `enableCache()`.
 
 Items within a paging can be post-processed before being returned. For example one can instantiate an object for the id returned from the database.

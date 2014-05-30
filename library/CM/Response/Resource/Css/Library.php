@@ -8,7 +8,7 @@ class CM_Response_Resource_Css_Library extends CM_Response_Resource_Css_Abstract
                 $this->_setAsset(new CM_Asset_Css_Library($this->getRender()));
                 break;
             default:
-                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, null, CM_Exception::WARN);
+                throw new CM_Exception_Invalid('Invalid path `' . $this->getRequest()->getPath() . '` provided', null, array('severity' => CM_Exception::WARN));
         }
     }
 

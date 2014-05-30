@@ -13,23 +13,23 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         }
         $query = $this->_request->getQuery();
         if (!isset($query[$key])) {
-            throw new CM_Exception_Invalid('View `' . $key . '` not set.', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
         $viewInfo = $query[$key];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $key . '` is not an array', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View `' . $key . '` is not an array', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) ||
             !('CM_View_Abstract' == $viewInfo['className'] || is_subclass_of($viewInfo['className'], 'CM_View_Abstract'))
         ) {
             throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] .
-                '`.', null, null, CM_Exception::WARN);
+                '`.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $key . '` not set.', null, null, CM_Exception::WARN);
+            throw new CM_Exception_Invalid('View params `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;
@@ -56,9 +56,11 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
         $html = $this->getRender()->render($component);
 
+        $jsComponentOld = 'cm.views["' . $componentInfo['id'] . '"]';
+        $jsComponentNew = 'cm.views["' . $component->getAutoId() . '"]';
         $this->getRender()->getJs()->onloadHeaderJs('cm.window.appendHidden(' . json_encode($html) . ');');
-        $this->getRender()->getJs()->onloadPrepareJs(
-            'cm.views["' . $componentInfo['id'] . '"].replaceWith(cm.views["' . $component->getAutoId() . '"]);');
+        $this->getRender()->getJs()->onloadPrepareJs($jsComponentOld . '.getParent().registerChild(' . $jsComponentNew . ');');
+        $this->getRender()->getJs()->onloadPrepareJs($jsComponentOld . '.replaceWithHtml(' . $jsComponentNew . '.$el);');
         $this->getRender()->getJs()->onloadReadyJs('cm.views["' . $component->getAutoId() . '"]._ready();');
         $componentInfo['id'] = $component->getAutoId();
 

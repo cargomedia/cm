@@ -1,2 +1,2 @@
-{block name="file"}{$file->getFileName()|escape}{/block}
+{block name="file"}{$file->getFileNameLabel()|escape}{/block}
 {button_link class="deleteButton deleteFile" icon="delete"}

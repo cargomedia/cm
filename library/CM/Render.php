@@ -2,37 +2,34 @@
 
 class CM_Render extends CM_Class_Abstract {
 
-    /* @var CM_Frontend */
+    /** @var CM_Frontend */
     protected $_js = null;
 
-    /* @var CM_Site_Abstract */
+    /** @var CM_Site_Abstract */
     protected $_site = null;
 
-    /* @var CM_Model_Language|null */
+    /** @var CM_Model_Language|null */
     private $_language;
 
-    /* @var IntlDateFormatter */
-    private $_formatterDate;
-
-    /* @var IntlDateFormatter */
-    private $_formatterDateTime;
+    /** @var DateTimeZone|null */
+    private $_timeZone;
 
     /** @var NumberFormatter */
     private $_formatterCurrency;
 
-    /* @var bool */
+    /** @var bool */
     private $_languageRewrite;
 
-    /* @var CM_Model_User|null */
+    /** @var CM_Model_User|null */
     private $_viewer;
 
-    /* @var array */
+    /** @var array */
     protected $_stack = array();
 
     /** @var CM_Menu[] */
     private $_menuList = array();
 
-    /* @var Smarty */
+    /** @var Smarty */
     private static $_smarty = null;
 
     /**
@@ -200,11 +197,10 @@ class CM_Render extends CM_Class_Abstract {
         }
         foreach ($namespaceList as $namespace) {
             foreach ($this->getSite()->getThemes() as $theme) {
-                $file = $this->getThemeDir(true, $theme, $namespace) . $tpl;
-
-                if (CM_File::exists($file)) {
+                $file = new CM_File($this->getThemeDir(true, $theme, $namespace) . $tpl);
+                if ($file->getExists()) {
                     if ($absolute) {
-                        return $file;
+                        return $file->getPath();
                     } else {
                         return $this->getThemeDir(false, $theme, $namespace) . $tpl;
                     }
@@ -238,23 +234,18 @@ class CM_Render extends CM_Class_Abstract {
 
     /**
      * @param string|null           $path
-     * @param boolean|null          $cdn
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null) {
+    public function getUrl($path = null, CM_Site_Abstract $site = null) {
         if (null === $path) {
             $path = '';
-        }
-        if (null === $cdn) {
-            $cdn = false;
         }
         if (null === $site) {
             $site = $this->getSite();
         }
         $path = (string) $path;
-        $urlBase = $cdn ? $site->getUrlCdn() : $site->getUrl();
-        return $urlBase . $path;
+        return $site->getUrl() . $path;
     }
 
     /**
@@ -294,7 +285,7 @@ class CM_Render extends CM_Class_Abstract {
         if ($languageRewrite && $language) {
             $path = '/' . $language->getAbbreviation() . $path;
         }
-        return $this->getUrl($path, false, $site);
+        return $this->getUrl($path, $site);
     }
 
     /**
@@ -313,7 +304,7 @@ class CM_Render extends CM_Class_Abstract {
             }
             $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
@@ -338,18 +329,15 @@ class CM_Render extends CM_Class_Abstract {
         if (null !== $path) {
             $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
-     * @param CM_File_UserContent|null $file
+     * @param CM_File_UserContent $file
      * @return string
      */
-    public function getUrlUserContent(CM_File_UserContent $file = null) {
-        if (is_null($file)) {
-            return $this->getUrl('/userfiles', true);
-        }
-        return $this->getUrl('/userfiles/' . $file->getPathRelative(), true);
+    public function getUrlUserContent(CM_File_UserContent $file) {
+        return $file->getUrl();
     }
 
     /**
@@ -364,6 +352,16 @@ class CM_Render extends CM_Class_Abstract {
      */
     public function getLanguage() {
         return $this->_language;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getTimeZone() {
+        if (!$this->_timeZone) {
+            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        return $this->_timeZone;
     }
 
     /**
@@ -386,23 +384,13 @@ class CM_Render extends CM_Class_Abstract {
     }
 
     /**
+     * @param int         $dateType
+     * @param int         $timeType
+     * @param string|null $pattern
      * @return IntlDateFormatter
      */
-    public function getFormatterDate() {
-        if (!$this->_formatterDate) {
-            $this->_formatterDate = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
-        }
-        return $this->_formatterDate;
-    }
-
-    /**
-     * @return IntlDateFormatter
-     */
-    public function getFormatterDateTime() {
-        if (!$this->_formatterDateTime) {
-            $this->_formatterDateTime = new IntlDateFormatter($this->getLocale(), IntlDateFormatter::SHORT, IntlDateFormatter::SHORT);
-        }
-        return $this->_formatterDateTime;
+    public function getFormatterDate($dateType, $timeType, $pattern = null) {
+        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getTimeZone()->getName(), null, $pattern);
     }
 
     /**
