@@ -34,9 +34,10 @@ abstract class CM_RenderAdapter_Abstract {
     /**
      * @param string     $templateName
      * @param array|null $data
+     * @param bool|null  $searchAllNamespaces
      * @return string
      */
-    protected function _fetchTemplate($templateName, array $data = null) {
-        return $this->getRender()->fetchViewTemplate($this->_getView(), $templateName, $data);
+    protected function _fetchTemplate($templateName, array $data = null, $searchAllNamespaces = null) {
+        return $this->getRender()->fetchViewTemplate($this->_getView(), $templateName, $data, $searchAllNamespaces);
     }
 }
