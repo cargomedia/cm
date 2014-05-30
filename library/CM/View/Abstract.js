@@ -110,6 +110,16 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
+   * @return CM_View_Abstract|null
+   */
+  getComponent: function() {
+    if (this.hasClass('CM_Component_Abstract')) {
+      return this;
+    }
+    return this.findParent('CM_Component_Abstract');
+  },
+
+  /**
    * @return String
    */
   getAutoId: function() {
@@ -225,7 +235,15 @@ var CM_View_Abstract = Backbone.View.extend({
       this.disable();
     }
 
-    var xhr = cm.ajax('ajax', {view: options.view._getArray(), method: functionName, params: params}, {
+    var viewInfoList = {
+      component: null,
+      view: options.view._getArray()
+    };
+    var component = this.getComponent();
+    if (component) {
+      viewInfoList.component = component._getArray();
+    }
+    var xhr = cm.ajax('ajax', {viewInfoList: viewInfoList, method: functionName, params: params}, {
       success: function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);

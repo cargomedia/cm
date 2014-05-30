@@ -3,59 +3,27 @@
 abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
     /**
-     * @param string|null $key
-     * @return array
-     * @throws CM_Exception_Invalid
+     * @param array|null $additionalParams
+     * @return string
      */
-    protected function _getViewInfo($key = null) {
-        if (null === $key) {
-            $key = 'view';
-        }
-        $query = $this->_request->getQuery();
-        if (!isset($query[$key])) {
-            throw new CM_Exception_Invalid('View `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
-        }
-        $viewInfo = $query[$key];
-        if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $key . '` is not an array', null, array('severity' => CM_Exception::WARN));
-        }
-        if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
-        }
-        if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $key . '` is illegal: `' . $viewInfo['className'] .
-                '`.', null, array('severity' => CM_Exception::WARN));
-        }
-        if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $key . '` not set.', null, array('severity' => CM_Exception::WARN));
-        }
-        if (!isset($viewInfo['parentId'])) {
-            $viewInfo['parentId'] = null;
-        }
-        return array('id'       => (string) $viewInfo['id'], 'className' => (string) $viewInfo['className'], 'params' => (array) $viewInfo['params'],
-                     'parentId' => (string) $viewInfo['parentId']);
-    }
-
-    /**
-     * @param array $params OPTIONAL
-     * @return string Auto-id
-     */
-    public function reloadComponent($params = null) {
-        $componentInfo = $this->_getViewInfo();
+    public function reloadComponent(array $additionalParams = null) {
+        $componentInfo = $this->_getViewInfo('component');
+        $componentId = $componentInfo['id'];
+        $componentClassName = $componentInfo['className'];
         $componentParams = $componentInfo['params'];
-        if ($params) {
-            $componentParams = array_merge($componentParams, $params);
-        }
-        $componentParams = CM_Params::factory($componentParams);
 
-        $component = CM_Component_Abstract::factory($componentInfo['className'], $componentParams);
+        if ($additionalParams) {
+            $componentParams = array_merge($componentParams, $additionalParams);
+        }
+        $component = CM_Component_Abstract::factory($componentClassName, CM_Params::factory($componentParams));
+
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
         $frontend = $this->getRender()->getFrontend();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
-        $componentReferenceOld = 'cm.views["' . $componentInfo['id'] . '"]';
+        $componentReferenceOld = 'cm.views["' . $componentId . '"]';
         $componentReferenceNew = 'cm.views["' . $autoId . '"]';
         $frontend->getOnloadHeaderJs()->append('cm.window.appendHidden(' . json_encode($html) . ');');
         $frontend->getOnloadPrepareJs()->append($componentReferenceOld . '.getParent().registerChild(' . $componentReferenceNew . ');');
@@ -136,7 +104,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
     }
 
     public function popinComponent() {
-        $componentInfo = $this->_getViewInfo();
+        $componentInfo = $this->_getViewInfo('component');
         $this->getRender()->getFrontend()->getOnloadJs()->append('cm.views["' . $componentInfo['id'] . '"].popIn();');
     }
 
@@ -168,6 +136,56 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $forceReload = (boolean) $forceReload;
         $js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
         $this->getRender()->getFrontend()->getOnloadPrepareJs()->append($js);
+    }
+
+    /**
+     * @param string|null $type
+     * @return static
+     */
+    protected function _getView($type = null) {
+        $viewInfo = $this->_getViewInfo($type);
+        $className = $viewInfo['className'];
+        $params = $viewInfo['params'];
+        return CM_View_Abstract::factory($className, $params);
+    }
+
+    /**
+     * @param string|null $type
+     * @return array
+     * @throws CM_Exception_Invalid
+     */
+    protected function _getViewInfo($type = null) {
+        if (null === $type) {
+            $type = 'view';
+        }
+        $query = $this->_request->getQuery();
+        $viewInfoList = $query['viewInfoList'];
+        if (!array_key_exists($type, $viewInfoList)) {
+            throw new CM_Exception_Invalid('View `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+        }
+        $viewInfo = $viewInfoList[$type];
+        if (!is_array($viewInfo)) {
+            throw new CM_Exception_Invalid('View `' . $type . '` is not an array', null, array('severity' => CM_Exception::WARN));
+        }
+        if (!isset($viewInfo['id'])) {
+            throw new CM_Exception_Invalid('View id `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+        }
+        if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
+            throw new CM_Exception_Invalid('View className `' . $type . '` is illegal: `' . $viewInfo['className'] .
+                '`.', null, array('severity' => CM_Exception::WARN));
+        }
+        if (!isset($viewInfo['params'])) {
+            throw new CM_Exception_Invalid('View params `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+        }
+        if (!isset($viewInfo['parentId'])) {
+            $viewInfo['parentId'] = null;
+        }
+        return array(
+            'id'        => (string) $viewInfo['id'],
+            'className' => (string) $viewInfo['className'],
+            'params'    => (array) $viewInfo['params'],
+            'parentId'  => (string) $viewInfo['parentId']
+        );
     }
 
     /**

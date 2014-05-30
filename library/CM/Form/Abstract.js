@@ -77,13 +77,6 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return CM_Component_Abstract
-   */
-  getComponent: function() {
-    return this.getParent();
-  },
-
-  /**
    * @return CM_FormField_Abstract|null
    */
   getField: function(name) {
@@ -181,7 +174,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: action.name, data: data}, {
+      var viewInfoList = {
+        component: this.getComponent()._getArray(),
+        view: this._getArray()
+      };
+      cm.ajax('form', {viewInfoList: viewInfoList, actionName: action.name, data: data}, {
         success: function(response) {
           if (response.errors) {
             if (options.handleErrors) {

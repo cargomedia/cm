@@ -42,16 +42,18 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
         $output = array();
         try {
             $success = array();
-            $query = $this->_request->getQuery();
-            $formInfo = $this->_getViewInfo('form');
+            $form = $this->_getView();
+            $className = get_class($form);
+            if (!$form instanceof CM_Form_Abstract) {
+                throw new CM_Exception_Invalid('`' . $className . '`is not `CM_Form_Abstract` instance');
+            }
+            $form->initialize();
 
-            $className = (string) $formInfo['className'];
+            $query = $this->_request->getQuery();
             $actionName = (string) $query['actionName'];
             $data = (array) $query['data'];
-            $this->_setStringRepresentation($className . '::' . $actionName);
 
-            $form = CM_Form_Abstract::factory($className);
-            $form->initialize();
+            $this->_setStringRepresentation($className . '::' . $actionName);
             $success['data'] = CM_Params::encode($form->process($data, $actionName, $this));
 
             if (!empty($this->errors)) {
