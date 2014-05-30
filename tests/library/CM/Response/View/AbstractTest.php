@@ -25,6 +25,25 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
     }
 
+    public function testReloadComponent() {
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Notfound([]));
+        $response = $this->getResponseAjax('reload', array('foo' => 'bar'), $scopeView, $scopeView);
+        $this->assertViewResponseSuccess($response);
+
+        $frontend = $response->getRender()->getFrontend();
+        $oldAutoId = $scopeView->getAutoId();
+        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
+
+        $expected = <<<EOL
+cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
+cm.views["$newAutoId"] = new CM_Component_Notfound({el:$("#$newAutoId").get(0),params:{"foo":"bar"}});
+cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
+cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
+cm.views["$newAutoId"]._ready();
+EOL;
+        $this->assertSame($expected, $frontend->getJs());
+    }
+
     public function testLoadComponent() {
         $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Graph());
         $response = $this->getResponseAjax('loadComponent', ['className' => 'CM_Component_Graph', 'series' => []], $scopeView);
