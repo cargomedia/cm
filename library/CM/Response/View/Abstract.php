@@ -4,7 +4,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
     /**
      * @param array|null $additionalParams
-     * @return string
      */
     public function reloadComponent(array $additionalParams = null) {
         $componentInfo = $this->_getViewInfo('component');
@@ -29,7 +28,6 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $frontend->getOnloadPrepareJs()->append($componentReferenceOld . '.getParent().registerChild(' . $componentReferenceNew . ');');
         $frontend->getOnloadPrepareJs()->append($componentReferenceOld . '.replaceWithHtml(' . $componentReferenceNew . '.$el);');
         $frontend->getOnloadReadyJs()->append('cm.views["' . $autoId . '"]._ready();');
-        return $autoId;
     }
 
     /**

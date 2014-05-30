@@ -17,6 +17,6 @@ abstract class CM_Component_Abstract extends CM_View_Abstract implements CM_View
     }
 
     public function ajax_reload(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
-        return $response->reloadComponent($params->getAll());
+        $response->reloadComponent($params->getAll());
     }
 }
