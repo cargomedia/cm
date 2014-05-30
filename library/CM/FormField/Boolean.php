@@ -12,7 +12,4 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
         $viewResponse->set('checked', $this->getValue() ? 'checked' : null);
         $viewResponse->set('text', $renderParams->has('text') ? $renderParams->getString('text') : null);
     }
-
-    protected function _setup() {
-    }
 }

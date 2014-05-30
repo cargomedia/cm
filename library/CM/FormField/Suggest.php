@@ -3,11 +3,17 @@
 abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
     /**
-     * @param mixed     $item
+     * @param mixed              $item
      * @param CM_Frontend_Render $render
      * @return array list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string])
      */
     abstract public function getSuggestion($item, CM_Frontend_Render $render);
+
+    public function initialize() {
+        $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
+        $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
+        parent::initialize();
+    }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
@@ -27,14 +33,9 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
         return $this->_getSuggestions($params->getString('term'), $params->getArray('options'), $response->getRender());
     }
 
-    protected function _setup() {
-        $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
-        $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
-    }
-
     /**
-     * @param string    $term
-     * @param array     $options
+     * @param string             $term
+     * @param array              $options
      * @param CM_Frontend_Render $render
      * @throws CM_Exception_NotImplemented
      * @return array list(list('id' => $id, 'name' => $name[, 'description' => $description, 'img' => $img, 'class' => string]))

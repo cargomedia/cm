@@ -2,6 +2,13 @@
 
 class CM_FormField_Text extends CM_FormField_Abstract {
 
+    public function initialize() {
+        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->get('lengthMin') : null;
+        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->get('lengthMax') : null;
+        $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords', false);
+        parent::initialize();
+    }
+
     public function filterInput($userInput) {
         $userInput = (string) $userInput;
         return mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
@@ -29,11 +36,5 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
-    }
-
-    protected function _setup() {
-        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->get('lengthMin') : null;
-        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->get('lengthMax') : null;
-        $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords', false);
     }
 }
