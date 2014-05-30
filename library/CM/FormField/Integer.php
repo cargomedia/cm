@@ -6,7 +6,7 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
     }
 
-    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
             throw new CM_Exception_FormFieldValidation('Invalid number');
         }

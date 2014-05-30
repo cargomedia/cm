@@ -83,7 +83,6 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
      * @param CM_Frontend_Environment $environment
      * @param string|null             $layoutName
      * @throws CM_Exception_Invalid
-     * @internal param \CM_Site_Abstract $site
      * @return CM_Layout_Abstract
      */
     public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {

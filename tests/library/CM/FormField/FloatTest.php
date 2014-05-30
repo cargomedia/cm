@@ -11,8 +11,8 @@ class CM_FormField_FloatTest extends CMTest_TestCase {
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
         /** @var CM_Response_Abstract $response */
 
-        $validationResult = $field->validate($environment, 1.3, $response);
+        $validationResult = $field->validate($environment, 1.3);
         $this->assertSame(1.3, $validationResult);
-        $field->validate($environment, 'foo', $response);
+        $field->validate($environment, 'foo');
     }
 }

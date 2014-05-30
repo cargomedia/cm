@@ -16,10 +16,9 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     /**
      * @param CM_Frontend_Environment $environment
      * @param string|array            $userInput
-     * @param CM_Response_Abstract    $response
      * @return mixed
      */
-    abstract public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response);
+    abstract public function validate(CM_Frontend_Environment $environment, $userInput);
 
     public function __construct($params = null) {
         parent::__construct($params);
@@ -92,6 +91,6 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $environment = $response->getRender()->getEnvironment();
         $userInput = $params->get('userInput');
-        $this->validate($environment, $userInput, $response);
+        $this->validate($environment, $userInput);
     }
 }

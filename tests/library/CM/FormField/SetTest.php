@@ -26,11 +26,11 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $environment = new CM_Frontend_Environment();
         $userInputGood = array(32, 64, 128);
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
-        $validationResult = $field->validate($environment, $userInputGood, $response);
+        $validationResult = $field->validate($environment, $userInputGood);
         $this->assertSame($userInputGood, $validationResult);
 
         $userInputTainted = array(32, 23, 132);
-        $validationResult = $field->validate($environment, $userInputTainted, $response);
+        $validationResult = $field->validate($environment, $userInputTainted);
         $this->assertSame(array(32), $validationResult);
     }
 

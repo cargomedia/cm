@@ -15,12 +15,10 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
     /**
      * @param CM_Frontend_Environment $environment
      * @param string                  $userInput
-     * @param CM_Response_Abstract    $response
-     * @internal param \CM_Frontend_Environment $envrionment
      * @return string|null
      */
-    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
-        $values = parent::validate($environment, $userInput, $response);
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        $values = parent::validate($environment, $userInput);
         return $values ? reset($values) : null;
     }
 }
