@@ -185,19 +185,21 @@ class CM_Model_Location extends CM_Model_Abstract {
     public static function findByIp($ip) {
         $cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
         $cache = CM_Cache_Local::getInstance();
+        $location = null;
         if ((list($level, $id) = $cache->get($cacheKey)) === false) {
-            $level = $id = null;
-            if ($id = self::_getLocationIdByIp('cm_model_location_city_ip', 'cityId', $ip)) {
-                $level = self::LEVEL_CITY;
-            } elseif ($id = self::_getLocationIdByIp('cm_model_location_country_ip', 'countryId', $ip)) {
-                $level = self::LEVEL_COUNTRY;
+            if ($location = self::_findByIp($ip)) {
+                $level = $location->getLevel();
+                $id = $location->getId();
             }
             $cache->set($cacheKey, array($level, $id));
         }
-        if (!$level && !$id) {
+        if (!$level || !$id) {
             return null;
         }
-        return new self($level, $id);
+        if (!$location) {
+            $location = new self($level, $id);
+        }
+        return $location;
     }
 
     /**
@@ -234,22 +236,20 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $db_table
-     * @param string $db_column
-     * @param int    $ip
-     * @return int|false
+     * @param int $ip
+     * @return CM_Model_Location|null
      */
-    private static function _getLocationIdByIp($db_table, $db_column, $ip) {
-        $result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
+    private static function _findByIp($ip) {
+        $result = CM_Db_Db::execRead("SELECT `id`, `level`, `ipStart` FROM `cm_model_location_ip`
 			WHERE `ipEnd` >= ?
 			ORDER BY `ipEnd` ASC
 			LIMIT 1", array($ip))->fetch();
         if ($result) {
             if ($result['ipStart'] <= $ip) {
-                return (int) $result[$db_column];
+                return new CM_Model_Location($result['level'], $result['id']);
             }
         }
-        return false;
+        return null;
     }
 
     public function toArray() {

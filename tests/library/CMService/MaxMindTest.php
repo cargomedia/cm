@@ -3,8 +3,7 @@
 class CMService_MaxMindTest extends CMTest_TestCase {
 
     public function setUp() {
-        CM_Db_Db::exec('ALTER TABLE cm_model_location_city_ip AUTO_INCREMENT = 1');
-        CM_Db_Db::exec('ALTER TABLE cm_model_location_country_ip AUTO_INCREMENT = 1');
+        CM_Db_Db::exec('ALTER TABLE cm_model_location_ip AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_zip AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_city AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_state AUTO_INCREMENT = 1');
@@ -24,7 +23,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array()
         );
         $this->_verify(
-            array(),
             array(),
             array(),
             array(),
@@ -52,7 +50,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
-            array(),
             array()
         );
     }
@@ -71,7 +68,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
-            array(),
             array(),
             array(),
             array(),
@@ -94,7 +90,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
-            array(),
             array()
         );
     }
@@ -111,7 +106,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -123,8 +121,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -139,7 +139,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -149,7 +152,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'countryId' => 1, 'name' => 'Haute-Normandie', '_maxmind' => 'FRA7', 'abbreviation' => null),
             ),
-            array(),
             array(),
             array(),
             array()
@@ -166,14 +168,16 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
-            array(),
             array(),
             array(),
             array(),
@@ -191,7 +195,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array(
                 'FR' => array(
                     'A7' => 'Haute-Normandie',
@@ -207,8 +214,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -242,7 +251,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
             array()
         );
         $this->_import(
@@ -256,7 +264,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -272,8 +283,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -289,7 +302,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('50221', 'FR', 'A7', 'Le Havre', '', '49.5', '0.1333'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array(
                 'FR' => array(
                     'A7' => 'Haute-Normandie',
@@ -309,8 +325,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -325,7 +343,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -337,8 +358,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -369,7 +392,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
             array(),
-            array(),
             array()
         );
     }
@@ -395,7 +417,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -423,7 +444,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -457,7 +477,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -493,7 +512,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
             array()
         );
     }
@@ -526,7 +544,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
                 array('id' => 2, 'name' => '13000', 'cityId' => 2, 'lat' => 43.3, 'lon' => 5.4),
             ),
-            array(),
             array()
         );
     }
@@ -567,7 +584,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
                 array('id' => 2, 'name' => '13000', 'cityId' => 2, 'lat' => 43.3, 'lon' => 5.4),
             ),
-            array(),
             array()
         );
     }
@@ -601,7 +617,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
             array()
         );
     }
@@ -628,9 +643,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(
-                array('countryId' => 1, 'ipStart' => 33555968, 'ipEnd' => 33556223),
-            ),
-            array()
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+            )
         );
     }
 
@@ -663,9 +677,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 87097600, 'ipEnd' => 87097855),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 87097600, 'ipEnd' => 87097855),
             )
         );
     }
@@ -695,11 +708,18 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(
                 array('33555968', '33556223', '75'),
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
                 array('87097600', '87097855', '50221'),
+                array('522357760', '522358015', '384603'),
+                array('1304630016', '1304630271', '384603'),
                 array('266578176', '266578431', '223'),
                 array('266586368', '266586623', '223'),
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
                 array('68444672', '68444735', '11101'),
                 array('68444800', '68444927', '11101'),
+                array('201948163', '201948415', '999999'),
             ),
             array()
         );
@@ -725,14 +745,18 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 3, 'name' => '94124', 'cityId' => 3, 'lat' => 37.7312, 'lon' => -122.383),
             ),
             array(
-                array('countryId' => 1, 'ipStart' => 33555968, 'ipEnd' => 33556223),
-                array('countryId' => 2, 'ipStart' => 266578176, 'ipEnd' => 266578431),
-                array('countryId' => 2, 'ipStart' => 266586368, 'ipEnd' => 266586623),
-            ),
-            array(
-                array('cityId' => 1, 'ipStart' => 87097600, 'ipEnd' => 87097855),
-                array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 3, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 87097600, 'ipEnd' => 87097855),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 522357760, 'ipEnd' => 522358015),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 1304630016, 'ipEnd' => 1304630271),
             )
         );
     }
@@ -767,7 +791,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'abbreviation' => 'US', 'name' => 'United States'),
                 array('id' => 2, 'abbreviation' => 'FR', 'name' => 'France'),
             ),
-            array(),
             array(),
             array(),
             array(),
@@ -812,11 +835,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(
-                array('countryId' => 1, 'ipStart' => 33555968, 'ipEnd' => 33556223),
-            ),
-            array(
-                array('cityId' => 2, 'ipStart' => 87097600, 'ipEnd' => 87097855),
-                array('cityId' => 1, 'ipStart' => 33818880, 'ipEnd' => 33819135),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 87097600, 'ipEnd' => 87097855),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 33818880, 'ipEnd' => 33819135),
             )
         );
         $this->_import(
@@ -842,7 +863,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 43.2854, 'lon' => 5.3761, '_maxmind' => 49739),
                 array('id' => 2, 'stateId' => 1, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -875,7 +895,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'abbreviation' => 'FR', 'name' => 'République Française'),
             ),
-            array(),
             array(),
             array(),
             array(),
@@ -917,7 +936,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
                 array('14550', 'US', 'HI', '', '', '21.3629', '-157.8727'),
             ),
-            array(),
+            array(
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
+            ),
             array()
         );
         $this->_verify(
@@ -932,8 +954,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+            )
         );
     }
 
@@ -977,7 +1001,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('11101', 'US', 'CA', 'San Francisco', '', '37.7749', '-122.4194'),
                 array('2221', 'US', 'CB', '', '', '34.0522', '-118.243'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -996,8 +1023,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -1053,7 +1082,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => null, 'countryId' => 1, 'name' => 'Le Havre', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -1118,7 +1146,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 6, 'stateId' => 5, 'countryId' => 3, 'name' => 'Hanoi', 'lat' => 21.033, 'lon' => 105.85, '_maxmind' => 46418),
             ),
             array(),
-            array(),
             array()
         );
         $this->_import(
@@ -1147,7 +1174,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('46418', 'VN', '44', 'Hanoi', '', '21.033', '105.85'),
                 array('412930', 'VN', '44', '', '', '21.033', '105.85'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '412930'),
+                array('1412935616', '1412935679', '412930'),
+            ),
             array()
         );
         $this->_verify(
@@ -1174,8 +1204,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 6, 'stateId' => 6, 'countryId' => 3, 'name' => 'Hanoi', 'lat' => 21.033, 'lon' => 105.85, '_maxmind' => 46418),
             ),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 6, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 6, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -1215,7 +1247,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('2221', 'US', 'CF', '', '', '34.0522', '-118.243'),
                 array('11532', 'US', 'CF', 'Los Angeles', '', '34.0522', '-118.2437'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -1231,8 +1266,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 1, 'stateId' => 2, 'countryId' => 2, 'name' => 'Los Angeles', 'lat' => 34.0522, 'lon' => -118.244, '_maxmind' => 11532),
             ),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -1262,7 +1299,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('75', 'FR', '', '', '', '48.86', '2.35'),
                 array('436884', 'FR', 'A7', '', '', '49.4333', '1.0833'),
             ),
-            array(),
+            array(
+                array('1412935424', '1412935551', '436884'),
+                array('1412935616', '1412935679', '436884'),
+            ),
             array()
         );
         $this->_verify(
@@ -1274,8 +1314,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935424, 'ipEnd' => 1412935551),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 1412935616, 'ipEnd' => 1412935679),
+            )
         );
     }
 
@@ -1304,7 +1346,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
             array()
         );
         $this->_import(
@@ -1318,7 +1359,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
-            array(),
+            array(
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
+            ),
             array()
         );
         $this->_verify(
@@ -1330,8 +1374,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+            )
         );
     }
 
@@ -1360,7 +1406,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
             array()
         );
         $this->_import(
@@ -1374,7 +1419,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('223', 'US', '', '', '', '38', '-97'),
                 array('2221', 'US', 'CA', '', '', '34.0522', '-118.243'),
             ),
-            array(),
+            array(
+                array('68866048', '68866303', '2221'),
+                array('135422208', '135422463', '2221'),
+            ),
             array()
         );
         $this->_verify(
@@ -1386,8 +1434,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 68866048, 'ipEnd' => 68866303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_STATE, 'ipStart' => 135422208, 'ipEnd' => 135422463),
+            )
         );
     }
 
@@ -1454,7 +1504,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 3, 'stateId' => 1, 'countryId' => 1, 'name' => 'Long Beach', 'lat' => 33.767, 'lon' => -118.189, '_maxmind' => 23653),
             ),
             array(),
-            array(),
             array()
         );
     }
@@ -1509,7 +1558,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '90015', 'cityId' => 1, 'lat' => 34.0396, 'lon' => -118.266),
             ),
-            array(),
             array()
         );
     }
@@ -1549,10 +1597,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5718),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 81910016, 'ipEnd' => 81910271),
             )
         );
         $this->_import(
@@ -1591,12 +1638,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5555),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
-                array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 202915072, 'ipEnd' => 202915327),
             )
         );
     }
@@ -1640,11 +1686,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '94124', 'cityId' => 3, 'lat' => 37.7312, 'lon' => -122.383),
             ),
-            array(),
             array(
-                array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 71797504, 'ipEnd' => 71797759),
             )
         );
         $this->_import(
@@ -1688,14 +1733,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '94124', 'cityId' => 3, 'lat' => 37.7312, 'lon' => -122.383),
             ),
-            array(),
             array(
-                array('cityId' => 3, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 3, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 2, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 2, 'ipStart' => 70988544, 'ipEnd' => 70988799),
-                array('cityId' => 1, 'ipStart' => 71797504, 'ipEnd' => 71797759),
-                array('cityId' => 1, 'ipStart' => 201805824, 'ipEnd' => 201806079),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 71797504, 'ipEnd' => 71797759),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 201805824, 'ipEnd' => 201806079),
             )
         );
     }
@@ -1735,10 +1779,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 5718),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 81910016, 'ipEnd' => 81910271),
             )
         );
         $this->_import(
@@ -1777,12 +1820,11 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'stateId' => 2, 'countryId' => 1, 'name' => 'Las Vegas', 'lat' => 36.175, 'lon' => -115.137, '_maxmind' => 11532),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
-                array('cityId' => 2, 'ipStart' => 81910016, 'ipEnd' => 81910271),
-                array('cityId' => 2, 'ipStart' => 202915072, 'ipEnd' => 202915327),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 81910016, 'ipEnd' => 81910271),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 202915072, 'ipEnd' => 202915327),
             )
         );
     }
@@ -1838,10 +1880,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11102),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -1894,10 +1935,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11102),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -1943,7 +1983,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'stateId' => 1, 'countryId' => 1, 'name' => 'Marseille', 'lat' => 49.5, 'lon' => 0.1333, '_maxmind' => 50221),
             ),
-            array(),
             array(),
             array()
         );
@@ -1995,10 +2034,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2057,10 +2095,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2114,10 +2151,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2171,10 +2207,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2231,10 +2266,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2289,10 +2323,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2351,10 +2384,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2413,10 +2445,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2475,10 +2506,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2537,10 +2567,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2590,14 +2619,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11102),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 4, 'ipStart' => 68445000, 'ipEnd' => 68445100),
-                array('cityId' => 1, 'ipStart' => 69089280, 'ipEnd' => 69090303),
-                array('cityId' => 1, 'ipStart' => 70988544, 'ipEnd' => 70988799),
-                array('cityId' => 3, 'ipStart' => 70989000, 'ipEnd' => 70989100),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 4, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68445000, 'ipEnd' => 68445100),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 69089280, 'ipEnd' => 69090303),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70988544, 'ipEnd' => 70988799),
+                array('id' => 3, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70989000, 'ipEnd' => 70989100),
             )
         );
         $this->_import(
@@ -2639,11 +2667,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 4, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 4, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 1, 'ipStart' => 70989000, 'ipEnd' => 70989100),
+                array('id' => 4, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 4, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 70989000, 'ipEnd' => 70989100),
             )
         );
     }
@@ -2683,11 +2710,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 1, 'ipStart' => 68445000, 'ipEnd' => 68445100),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68445000, 'ipEnd' => 68445100),
             )
         );
         $this->_import(
@@ -2722,10 +2748,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 1, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 1, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2765,11 +2790,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
-                array('cityId' => 1, 'ipStart' => 68445000, 'ipEnd' => 68445100),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68445000, 'ipEnd' => 68445100),
             )
         );
         $this->_import(
@@ -2804,10 +2828,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11102),
             ),
             array(),
-            array(),
             array(
-                array('cityId' => 2, 'ipStart' => 68444672, 'ipEnd' => 68444735),
-                array('cityId' => 2, 'ipStart' => 68444800, 'ipEnd' => 68444927),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444672, 'ipEnd' => 68444735),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_CITY, 'ipStart' => 68444800, 'ipEnd' => 68444927),
             )
         );
     }
@@ -2871,7 +2894,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                       '_maxmind' => 11101),
             ),
             array(),
-            array(),
             array()
         );
     }
@@ -2921,7 +2943,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(
                 array('id' => 1, 'name' => '76620', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
             array()
         );
         $this->_import(
@@ -2939,7 +2960,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('385389', 'FR', 'A7', 'Le Havre', '76610', '49.5213', '0.1581'),
                 array('384603', 'FR', 'A7', 'Le Havre', '76620', '49.4938', '0.1077'),
             ),
-            array(),
+            array(
+                array('522357760', '522358015', '384603'),
+                array('1304630016', '1304630271', '384603'),
+            ),
             array()
         );
         $this->_verify(
@@ -2957,8 +2981,10 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'name' => '76600', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
                 array('id' => 3, 'name' => '76610', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
             ),
-            array(),
-            array()
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 522357760, 'ipEnd' => 522358015),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_ZIP, 'ipStart' => 1304630016, 'ipEnd' => 1304630271),
+            )
         );
     }
 
@@ -3037,9 +3063,154 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 5, 'name' => '76640', 'cityId' => 1, 'lat' => 49.5213, 'lon' => 0.1581),
                 array('id' => 6, 'name' => '76650', 'cityId' => 1, 'lat' => 49.4938, 'lon' => 0.1077),
             ),
-            array(),
             array()
         );
+    }
+
+    public function testOverlappingIpBlocks_noOverlapping() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('266578176', '266578431', '223'),
+                array('266586368', '266586623', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Updating IP blocks database…#');
+    }
+
+    public function testOverlappingIpBlocks_sameIpStart() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33555968', '33556243', '75'),
+                array('266578176', '266578431', '223'),
+                array('266586368', '266586623', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556243),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 33555968-33556223 and 33555968-33556243\\s++\\*#');
+    }
+
+    public function testOverlappingIpBlocks_inclusion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33556000', '33556200', '75'),
+                array('266578200', '266578400', '223'),
+                array('266578176', '266578431', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33556000, 'ipEnd' => 33556200),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578200, 'ipEnd' => 266578400),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578400\\s++! 33555968-33556223 and 33556000-33556200\\s++\\*#');
+    }
+
+    public function testOverlappingIpBlocks_overlapping() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33556000', '33557000', '75'),
+                array('266578200', '266578500', '223'),
+                array('266578176', '266578431', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33556000, 'ipEnd' => 33557000),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578200, 'ipEnd' => 266578500),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578500\\s++! 33555968-33556223 and 33556000-33557000\\s++\\*#');
     }
 
     /**
@@ -3139,7 +3310,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             array(),
             array(),
             array(),
-            array(),
             array()
         );
     }
@@ -3168,7 +3338,6 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id'           => 2, 'countryId' => 2, 'name' => 'Armed Forces Europe, Middle East, & Canada', '_maxmind' => 'USAE',
                       'abbreviation' => 'AE'),
             ),
-            array(),
             array(),
             array(),
             array()
@@ -3205,14 +3374,14 @@ class CMService_MaxMindTest extends CMTest_TestCase {
             ),
             array(),
             array(),
-            array(),
             array()
         );
     }
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $maxMind = $this->getMock('CMService_MaxMind',
-            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'));
+            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
+            array(null, new CM_OutputStream_Stream_Output(), null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
         $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
@@ -3222,7 +3391,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         $maxMind->upgrade();
     }
 
-    protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataCountryExpected, $ipDataCityExpected) {
+    protected function _verify($countryDataExpected, $regionDataExpected, $cityDataExpected, $zipCodeDataExpected, $ipDataExpected) {
         $countryDataActual = CM_Db_Db::select('cm_model_location_country', '*')->fetchAll();
         $this->assertEquals($countryDataExpected, $countryDataActual);
         $regionDataActual = CM_Db_Db::select('cm_model_location_state', '*')->fetchAll();
@@ -3231,9 +3400,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         $this->assertEquals($cityDataExpected, $cityDataActual);
         $zipCodeDataActual = CM_Db_Db::select('cm_model_location_zip', '*')->fetchAll();
         $this->assertEquals($zipCodeDataExpected, $zipCodeDataActual);
-        $ipDataCountryActual = CM_Db_Db::select('cm_model_location_country_ip', '*')->fetchAll();
-        $this->assertEquals($ipDataCountryExpected, $ipDataCountryActual);
-        $ipDataCityActual = CM_Db_Db::select('cm_model_location_city_ip', '*')->fetchAll();
-        $this->assertEquals($ipDataCityExpected, $ipDataCityActual);
+        $ipDataActual = CM_Db_Db::select('cm_model_location_ip', '*')->fetchAll();
+        $this->assertEquals($ipDataExpected, $ipDataActual);
     }
 }
