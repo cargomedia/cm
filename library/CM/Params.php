@@ -176,7 +176,7 @@ class CM_Params extends CM_Class_Abstract {
             }
             return $datetime;
         }
-        return $this->_getObject($key, 'DateTime');
+        return $this->getObject($key, 'DateTime');
     }
 
     /**
@@ -202,7 +202,7 @@ class CM_Params extends CM_Class_Abstract {
      * @throws CM_Exception_InvalidParam
      * @return object
      */
-    protected function _getObject($key, $className, $default = null, Closure $getter = null) {
+    public function getObject($key, $className, $default = null, Closure $getter = null) {
         if (!$getter) {
             $getter = function ($className, $param) {
                 return new $className($param);
@@ -281,7 +281,7 @@ class CM_Params extends CM_Class_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function getParams($key, CM_Params $default = null) {
-        $param = $this->_getObject($key, 'CM_Params', $default, function ($className, $param) {
+        $param = $this->getObject($key, 'CM_Params', $default, function ($className, $param) {
             if (is_string($param)) {
                 $json = (string) $param;
                 try {
@@ -307,7 +307,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Location
      */
     public function getLocation($key) {
-        return $this->_getObject($key, 'CM_Model_Location');
+        return $this->getObject($key, 'CM_Model_Location');
     }
 
     /**
@@ -315,7 +315,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_ActionLimit_Abstract
      */
     public function getActionLimit($key) {
-        return $this->_getObject($key, 'CM_Model_ActionLimit_Abstract');
+        return $this->getObject($key, 'CM_Model_ActionLimit_Abstract');
     }
 
     /**
@@ -324,7 +324,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Language
      */
     public function getLanguage($key, $default = null) {
-        return $this->_getObject($key, 'CM_Model_Language', $default);
+        return $this->getObject($key, 'CM_Model_Language', $default);
     }
 
     /**
@@ -349,7 +349,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Stream_Publish
      */
     public function getStreamPublish($key) {
-        return $this->_getObject($key, 'CM_Model_Stream_Publish');
+        return $this->getObject($key, 'CM_Model_Stream_Publish');
     }
 
     /**
@@ -357,7 +357,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Stream_Subscribe
      */
     public function getStreamSubscribe($key) {
-        return $this->_getObject($key, 'CM_Model_Stream_Subscribe');
+        return $this->getObject($key, 'CM_Model_Stream_Subscribe');
     }
 
     /**
@@ -365,7 +365,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_StreamChannel_Video
      */
     public function getStreamChannelVideo($key) {
-        return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
+        return $this->getObject($key, 'CM_Model_StreamChannel_Video');
     }
 
     /**
@@ -373,7 +373,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_File
      */
     public function getFile($key) {
-        return $this->_getObject($key, 'CM_File');
+        return $this->getObject($key, 'CM_File');
     }
 
     /**
@@ -381,7 +381,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Geo_Point
      */
     public function getGeoPoint($key) {
-        return $this->_getObject($key, 'CM_Geo_Point');
+        return $this->getObject($key, 'CM_Geo_Point');
     }
 
     /**

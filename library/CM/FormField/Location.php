@@ -58,20 +58,14 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $lat = $params->getFloat('lat');
         $lon = $params->getFloat('lon');
-        $levelMin = $params->getInt('levelMin');
-        $levelMax = $params->getInt('levelMax');
-
-        /** @var CM_FormField_Location $field */
-        $field = new static($levelMin, $levelMax);
-
         $location = CM_Model_Location::findByCoordinates($lat, $lon);
-        $location = $field->_squashLocationInConstraints($location);
+        $location = $this->_squashLocationInConstraints($location);
 
         if (!$location) {
             throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
         }
 
-        return $field->getSuggestion($location, $response->getRender());
+        return $this->getSuggestion($location, $response->getRender());
     }
 
     /**
