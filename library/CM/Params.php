@@ -13,9 +13,12 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool       $decode OPTIONAL
+     * @param bool|null  $decode Defaults to true
      */
-    public function __construct(array $params = null, $decode = true) {
+    public function __construct(array $params = null, $decode = null) {
+        if (null === $decode) {
+            $decode = true;
+        }
         $this->_decode = (bool) $decode;
         $this->_paramsOriginal = (array) $params;
         $this->_params = (array) $params;
@@ -510,10 +513,10 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool       $decode
+     * @param bool|null  $decode
      * @return static
      */
-    public static function factory(array $params = null, $decode = true) {
+    public static function factory(array $params = null, $decode = null) {
         $params = (array) $params;
         $className = self::_getClassName();
         return new $className($params, $decode);
