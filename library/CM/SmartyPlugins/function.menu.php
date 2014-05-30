@@ -93,5 +93,5 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $tplPath = $render->getLayoutPath('menu/' . $tplName . '.tpl');
     $assign = array('menu_entries' => $menuEntries, 'menu_class' => $class, 'activePath' => $activePath, 'activeParams' => $activeParams,
                     'name'         => $name);
-    return $render->fetchTemplate($tplPath, $assign, true);
+    return $render->fetchTemplate($tplPath, $assign);
 }

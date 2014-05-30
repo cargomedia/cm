@@ -36,7 +36,7 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
         if (null === $templatePath) {
             return null;
         }
-        return trim($this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData(), true));
+        return trim($this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData()));
     }
 
     /**

@@ -61,30 +61,21 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /**
      * @param string     $path
      * @param array|null $variables
-     * @param bool|null  $isolated
      * @return string
      */
-    public function fetchTemplate($path, $variables = null, $isolated = null) {
+    public function fetchTemplate($path, $variables = null) {
         $compileId = $this->getSite()->getId();
         if ($this->getLanguage()) {
             $compileId .= '_' . $this->getLanguage()->getAbbreviation();
         }
         /** @var Smarty_Internal_TemplateBase $template */
-        if ($isolated) {
-            $template = $this->_getSmarty()->createTemplate($path, null, $compileId);
-        } else {
-            $template = $this->_getSmarty();
-        }
+        $template = $this->_getSmarty()->createTemplate($path, null, $compileId);
         $template->assignGlobal('render', $this);
         $template->assignGlobal('viewer', $this->getViewer());
         if ($variables) {
             $template->assign($variables);
         }
-        if ($isolated) {
-            return $template->fetch();
-        } else {
-            return $template->fetch($path, null, $compileId);
-        }
+        return $template->fetch();
     }
 
     /**
@@ -370,7 +361,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         if (null === $templatePath) {
             throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');
         }
-        return $this->fetchTemplate($templatePath, $data, true);
+        return $this->fetchTemplate($templatePath, $data);
     }
 
     /**
