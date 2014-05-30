@@ -74,34 +74,37 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param string             $methodName
-     * @param string             $viewClassName
-     * @param array|null         $params
-     * @param CM_Model_User|null $viewer
-     * @param array|null         $viewParams
-     * @param int|null           $siteId
+     * @param string                        $methodName
+     * @param array                         $params
+     * @param CM_Frontend_ViewResponse      $scopeView
+     * @param CM_Frontend_ViewResponse|null $scopeComponent
+     * @param CM_Frontend_Environment|null  $environment
      * @return CM_Response_View_Ajax
      */
-    public function getResponseAjax($methodName, $viewClassName, array $params = null, CM_Model_User $viewer = null, array $viewParams = null, $siteId = null) {
-        if (null === $viewParams) {
-            $viewParams = array();
+    public function getResponseAjax($methodName, array $params, CM_Frontend_ViewResponse $scopeView, CM_Frontend_ViewResponse $scopeComponent = null, CM_Frontend_Environment $environment = null) {
+        $methodName = (string) $methodName;
+        $getViewInfo = function (CM_Frontend_ViewResponse $viewResponse) {
+            return array(
+                'id'        => $viewResponse->getAutoId(),
+                'className' => get_class($viewResponse->getView()),
+                'params'    => $viewResponse->getView()->getParams()->getAllOriginal()
+            );
+        };
+        $viewInfoList = array_map($getViewInfo,
+            array_filter([
+                'view'      => $scopeView,
+                'component' => $scopeComponent,
+            ])
+        );
+        $body = array(
+            'method'       => $methodName,
+            'params'       => $params,
+            'viewInfoList' => $viewInfoList,
+        );
+        $request = new CM_Request_Post('/ajax/null', null, null, CM_Params::encode($body, true));
+        if ($environment && $environment->hasViewer()) {
+            $request->getSession()->setUser($environment->getViewer());
         }
-        if (null === $params) {
-            $params = array();
-        }
-        if (null === $siteId) {
-            $siteId = 'null';
-        }
-        $session = new CM_Session();
-        if ($viewer) {
-            $session->setUser($viewer);
-        }
-        $headers = array('Cookie' => 'sessionId=' . $session->getId());
-        unset($session); // Make sure session is stored persistently
-
-        $viewArray = array('className' => $viewClassName, 'id' => 'mockViewId', 'params' => $viewParams);
-        $body = CM_Params::encode(array('viewInfoList' => array('view' => $viewArray), 'method' => $methodName, 'params' => $params), true);
-        $request = new CM_Request_Post('/ajax/' . $siteId, $headers, null, $body);
 
         $response = new CM_Response_View_Ajax($request);
         $response->process();

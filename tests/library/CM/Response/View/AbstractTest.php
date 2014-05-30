@@ -4,7 +4,10 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
-        $response = $this->getResponseAjax('loadPage', 'CM_Page_View_Ajax_Test_Mock', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()), $viewer);
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
+        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $scopeView, null, $environment);
+
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
         $this->assertArrayHasKey('js', $responseContent['success']['data']);
@@ -17,12 +20,14 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectExternal() {
-        $response = $this->getResponseAjax('loadPage', 'CM_Page_View_Ajax_Test_Mock', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
+        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()], $scopeView);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
     }
 
     public function testLoadComponent() {
-        $response = $this->getResponseAjax('loadComponent', 'CM_Component_Graph', array('className' => 'CM_Component_Graph', 'series' => []));
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Graph());
+        $response = $this->getResponseAjax('loadComponent', ['className' => 'CM_Component_Graph', 'series' => []], $scopeView);
         $this->assertViewResponseSuccess($response);
         $successContent = CM_Params::decode($response->getContent(), true)['success'];
 
