@@ -21,12 +21,21 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_App::getInstance()->setupFilesystem();
         self::clearDb();
         self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
+        self::clearFilesystem();
+    }
+
+    public static function clearFilesystem() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->deleteByPrefix('/');
+        }
+        CM_App::getInstance()->setupFilesystem();
     }
 
     public static function clearCache() {
@@ -35,7 +44,7 @@ class CMTest_TH {
     }
 
     public static function clearMongoDb() {
-        $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
         foreach ($mongoDb->listCollectionNames() as $collectionName) {
             $mongoDb->drop($collectionName);
         }
@@ -58,8 +67,12 @@ class CMTest_TH {
     }
 
     public static function timeInit() {
-        self::$_timeStart = time();
-        runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        if (!isset(self::$_timeStart)) {
+            runkit_function_copy('time', 'time_original');
+            runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        }
+        self::$_timeStart = time_original();
+        self::$timeDelta = 0;
     }
 
     public static function time() {
@@ -229,7 +242,7 @@ class CMTest_TH {
         $country = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
         $state = CM_Db_Db::insert('cm_model_location_state', array('countryId' => $country, 'name' => 'stateFoo'));
         $city = CM_Db_Db::insert('cm_model_location_city', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
-                                                          'lon'     => 15));
+                                                                 'lon'     => 15));
         $zip = CM_Db_Db::insert('cm_model_location_zip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
 
         CM_Model_Location::createAggregation();

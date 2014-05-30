@@ -99,7 +99,7 @@ class CM_Response_Page extends CM_Response_Abstract {
         $this->_site->preprocessPageResponse($this);
         if ($this->_site->getHost() !== $this->_request->getHost()) {
             $path = CM_Util::link($this->_request->getPath(), $this->_request->getQuery());
-            $this->redirectUrl($this->getRender()->getUrl($path, null, $this->_site));
+            $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
             $this->getRender()->getFrontend()->getTracking()->trackPageview($this->getRequest());

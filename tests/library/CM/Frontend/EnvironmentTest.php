@@ -6,7 +6,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $site = CM_Site_Abstract::factory();
         $user = CM_Model_User::createStatic();
         $language = CM_Model_Language::create('English', 'en', true);
-        $timezone = new DateTimeZone('US/West');
+        $timezone = new DateTimeZone('Europe/London');
         $debug = true;
         $environment = new CM_Frontend_Environment($site, $user, $language, $timezone, $debug);
 

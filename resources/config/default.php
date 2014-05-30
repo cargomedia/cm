@@ -114,22 +114,35 @@ $config->services['MongoDb'] = array(
     ),
 );
 
-$config->services['filesystemData'] = array(
-    'class'     => 'CM_Service_Filesystem',
-    'arguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_ROOT . 'data/',
+$config->services['filesystem-data'] = array(
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_ROOT . 'data/',
+            )
         ),
-    ),
-);
+    ));
 
-$config->services['filesystemUserfiles'] = array(
-    'class'     => 'CM_Service_Filesystem',
-    'arguments' => array(
-        'CM_File_Filesystem_Adapter_Local',
-        array(
-            'pathPrefix' => DIR_PUBLIC . 'userfiles/',
+$config->services['filesystem-usercontent'] = array(
+    'class'  => 'CM_File_Filesystem_Factory',
+    'method' => array(
+        'name'      => 'createFilesystem',
+        'arguments' => array(
+            'CM_File_Filesystem_Adapter_Local',
+            array(
+                'pathPrefix' => DIR_PUBLIC . 'userfiles/',
+            )
         ),
-    ),
-);
+    ));
+
+$config->services['usercontent'] = array(
+    'class'     => 'CM_Service_UserContent',
+    'arguments' => array(array(
+        'default' => array(
+            'filesystem' => 'filesystem-usercontent',
+            'url'        => 'http://localhost/userfiles',
+        ),
+    )));

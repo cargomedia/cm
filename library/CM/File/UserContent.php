@@ -1,26 +1,38 @@
 <?php
 
-class CM_File_UserContent extends CM_File {
+class CM_File_UserContent extends CM_File implements CM_Service_ManagerAwareInterface {
+
+    use CM_Service_ManagerAwareTrait;
 
     const BUCKETS_COUNT = 10000;
 
     /** @var string */
     private $_pathRelative;
 
+    /** @var string */
+    private $_namespace;
+
     /**
-     * @param string   $namespace
-     * @param string   $filename
-     * @param int|null $sequence
+     * @param string                  $namespace
+     * @param string                  $filename
+     * @param int|null                $sequence
+     * @param CM_Service_Manager|null $serviceManager
      */
-    public function __construct($namespace, $filename, $sequence = null) {
+    public function __construct($namespace, $filename, $sequence = null, CM_Service_Manager $serviceManager = null) {
         $namespace = (string) $namespace;
         $filename = (string) $filename;
         if (null !== $sequence) {
             $sequence = (int) $sequence;
         }
+        if (null === $serviceManager) {
+            $serviceManager = CM_Service_Manager::getInstance();
+        }
 
         $this->_pathRelative = $this->_calculateRelativeDir($namespace, $filename, $sequence);
-        $filesystem = CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->getFilesystem();
+        $this->_namespace = $namespace;
+        $this->setServiceManager($serviceManager);
+        $filesystem = $serviceManager->getUserContent()->getFilesystem($this->getNamespace());
+
         parent::__construct($this->getPathRelative(), $filesystem);
     }
 
@@ -29,6 +41,21 @@ class CM_File_UserContent extends CM_File {
      */
     public function getPathRelative() {
         return $this->_pathRelative;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace() {
+        return $this->_namespace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl() {
+        $baseUrl = $this->getServiceManager()->getUserContent()->getUrl($this->getNamespace());
+        return $baseUrl . '/' . $this->getPathRelative();
     }
 
     /**

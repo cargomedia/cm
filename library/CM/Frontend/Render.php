@@ -157,23 +157,18 @@ class CM_Frontend_Render extends CM_Class_Abstract {
 
     /**
      * @param string|null           $path
-     * @param boolean|null          $cdn
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null) {
+    public function getUrl($path = null, CM_Site_Abstract $site = null) {
         if (null === $path) {
             $path = '';
-        }
-        if (null === $cdn) {
-            $cdn = false;
         }
         if (null === $site) {
             $site = $this->getSite();
         }
         $path = (string) $path;
-        $urlBase = $cdn ? $site->getUrlCdn() : $site->getUrl();
-        return $urlBase . $path;
+        return $site->getUrl() . $path;
     }
 
     /**
@@ -213,7 +208,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         if ($languageRewrite && $language) {
             $path = '/' . $language->getAbbreviation() . $path;
         }
-        return $this->getUrl($path, false, $site);
+        return $this->getUrl($path, $site);
     }
 
     /**
@@ -232,7 +227,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             }
             $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
@@ -257,18 +252,15 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         if (null !== $path) {
             $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
-     * @param CM_File_UserContent|null $file
+     * @param CM_File_UserContent $file
      * @return string
      */
-    public function getUrlUserContent(CM_File_UserContent $file = null) {
-        if (is_null($file)) {
-            return $this->getUrl('/userfiles', true);
-        }
-        return $this->getUrl('/userfiles/' . $file->getPathRelative(), true);
+    public function getUrlUserContent(CM_File_UserContent $file) {
+        return $file->getUrl();
     }
 
     /**

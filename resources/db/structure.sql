@@ -235,6 +235,19 @@ CREATE TABLE `cm_option` (
   PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `cm_cli_command_manager_process`;
+
+
+CREATE TABLE `cm_cli_command_manager_process` (
+  `commandName` varchar(100) NOT NULL,
+  `hostId` int(10) unsigned NOT NULL,
+  `processId` int(10) unsigned DEFAULT NULL,
+  `timeoutStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`commandName`),
+  KEY `hostId` (`hostId`),
+  KEY `timeoutStamp` (`timeoutStamp`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `cm_requestClient`;
 
 
@@ -425,9 +438,8 @@ DROP TABLE IF EXISTS `cm_svm`;
 
 CREATE TABLE `cm_svm` (
   `id` int(11) NOT NULL,
-  `trainingChanges` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `trainingChanges` (`trainingChanges`)
+  `updateStamp` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_svmtraining`;

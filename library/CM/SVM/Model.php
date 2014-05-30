@@ -14,6 +14,7 @@ class CM_SVM_Model {
 
     /**
      * @param int $id
+     * @throws CM_Exception
      */
     public function __construct($id) {
         if (!extension_loaded('svm')) {
@@ -40,9 +41,10 @@ class CM_SVM_Model {
     public function addTraining($class, array $values) {
         $class = (int) $class;
         $values = $this->_parseValues($values);
+        $time = time();
         CM_Db_Db::insert('cm_svmtraining',
-            array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => time()));
-        CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 1));
+            array('svmId' => $this->getId(), 'class' => $class, 'values' => serialize($values), 'createStamp' => $time));
+        CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'updateStamp' => $time));
     }
 
     /**
@@ -86,12 +88,11 @@ class CM_SVM_Model {
 
         $this->_model = $svm->train($problem, $weights);
         $this->_model->save($this->_getFilePath());
-        CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 0));
     }
 
     public function flush() {
         CM_Db_Db::delete('cm_svmtraining', array('svmId' => $this->getId()));
-        CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'trainingChanges' => 1));
+        CM_Db_Db::replace('cm_svm', array('id' => $this->getId(), 'updateStamp' => time()));
         $file = $this->_getFile();
         $file->delete();
         $this->__construct($this->_id);
@@ -102,8 +103,7 @@ class CM_SVM_Model {
      * @throws CM_Exception_Invalid
      */
     private function _getFilesystem() {
-        $filesystemService = CM_ServiceManager::getInstance()->getFilesystem('filesystemData');
-        $filesystem = $filesystemService->getFilesystem();
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
         if (!$filesystem->getAdapter() instanceof CM_File_Filesystem_Adapter_Local) {
             throw new CM_Exception_Invalid('SVM needs a local data filesystem');
         }
@@ -162,17 +162,22 @@ class CM_SVM_Model {
                 $deletedCount = CM_Db_Db::exec(
                     'DELETE FROM `cm_svmtraining` WHERE `svmId` = ? ORDER BY `createStamp` LIMIT ' . $limit, array($id))->getAffectedRows();
                 if ($deletedCount > 0) {
-                    CM_Db_Db::replace('cm_svm', array('id' => $id, 'trainingChanges' => 1));
+                    CM_Db_Db::replace('cm_svm', array('id' => $id, 'updateStamp' => time()));
                 }
             }
         }
     }
 
     public static function trainChanged() {
-        $ids = CM_Db_Db::select('cm_svm', 'id', array('trainingChanges' => 1))->fetchAllColumn();
-        foreach ($ids as $id) {
+        $svmDataList = CM_Db_Db::select('cm_svm', array('id', 'updateStamp'))->fetchAll();
+        foreach ($svmDataList as $svmData) {
+            $id = (int) $svmData['id'];
+            $updateStamp = (int) $svmData['updateStamp'];
             $svm = new self($id);
-            $svm->train();
+            $file = $svm->_getFile();
+            if ($file->getModified() < $updateStamp) {
+                $svm->train();
+            }
         }
     }
 }
