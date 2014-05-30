@@ -340,11 +340,10 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /**
      * @param CM_View_Abstract $view
      * @param string           $templateName
-     * @param bool|null        $searchAllNamespaces
      * @throws CM_Exception
-     * @return string
+     * @return string|null
      */
-    public function getTemplatePath(CM_View_Abstract $view, $templateName, $searchAllNamespaces = null) {
+    public function getTemplatePath(CM_View_Abstract $view, $templateName) {
         $templateName = (string) $templateName;
         foreach ($view->getClassHierarchy() as $className) {
             if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
@@ -352,25 +351,25 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             }
             $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
             $namespace = $matches[1];
-            if ($searchAllNamespaces) {
-                $namespace = null;
-            }
             if ($templatePath = $this->getLayoutPath($templatePathRelative, $namespace, false, false)) {
                 return $templatePath;
             }
         }
-        throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');
+        return null;
     }
 
     /**
      * @param CM_View_Abstract $view
      * @param string           $templateName
      * @param array|null       $data
-     * @param bool|null        $searchAllNamespaces
+     * @throws CM_Exception
      * @return string
      */
-    public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null, $searchAllNamespaces = null) {
-        $templatePath = $this->getTemplatePath($view, $templateName, $searchAllNamespaces);
+    public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
+        $templatePath = $this->getTemplatePath($view, $templateName);
+        if (null === $templatePath) {
+            throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');
+        }
         return $this->fetchTemplate($templatePath, $data, true);
     }
 
