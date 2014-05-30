@@ -3067,6 +3067,152 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         );
     }
 
+    public function testOverlappingIpBlocks_noOverlapping() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('266578176', '266578431', '223'),
+                array('266586368', '266586623', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Updating IP blocks database…#');
+    }
+
+    public function testOverlappingIpBlocks_sameIpStart() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33555968', '33556243', '75'),
+                array('266578176', '266578431', '223'),
+                array('266586368', '266586623', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556243),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 33555968-33556223 and 33555968-33556243\\s++\\*#');
+    }
+
+    public function testOverlappingIpBlocks_inclusion() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33556000', '33556200', '75'),
+                array('266578200', '266578400', '223'),
+                array('266578176', '266578431', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33556000, 'ipEnd' => 33556200),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578200, 'ipEnd' => 266578400),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578400\\s++! 33555968-33556223 and 33556000-33556200\\s++\\*#');
+    }
+
+    public function testOverlappingIpBlocks_overlapping() {
+        $this->_import(
+            array(
+                array('France', 'FR'),
+                array('United States', 'US'),
+            ),
+            array(),
+            array(
+                array('75', 'FR', '', '', '', '48.86', '2.35'),
+                array('223', 'US', '', '', '', '38', '-97'),
+            ),
+            array(
+                array('33555968', '33556223', '75'),
+                array('33556000', '33557000', '75'),
+                array('266578200', '266578500', '223'),
+                array('266578176', '266578431', '223'),
+            ),
+            array()
+        );
+        $this->_verify(
+            array(
+                array('id' => 1, 'abbreviation' => 'FR', 'name' => 'France'),
+                array('id' => 2, 'abbreviation' => 'US', 'name' => 'United States'),
+            ),
+            array(),
+            array(),
+            array(),
+            array(
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33555968, 'ipEnd' => 33556223),
+                array('id' => 1, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 33556000, 'ipEnd' => 33557000),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578200, 'ipEnd' => 266578500),
+                array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
+            )
+        );
+        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578500\\s++! 33555968-33556223 and 33556000-33557000\\s++\\*#');
+    }
+
     /**
      * @expectedException CM_Exception
      * @expectedExceptionMessage Unknown country code
@@ -3234,7 +3380,8 @@ class CMService_MaxMindTest extends CMTest_TestCase {
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $maxMind = $this->getMock('CMService_MaxMind',
-            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'));
+            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
+            array(null, new CM_OutputStream_Stream_Output(), null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
         $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));

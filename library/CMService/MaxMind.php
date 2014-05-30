@@ -1163,6 +1163,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
 
     protected function _updateIpBlocks() {
         $ipData = $this->_getIpData();
+        $ipBlockList = array();
         $this->_ipBlockListByLocation = array();
         $infoListWarning = array();
         $count = count($ipData);
@@ -1172,6 +1173,10 @@ class CMService_MaxMind extends CM_Class_Abstract {
             $ipStart = (int) $ipStart;
             $ipEnd = (int) $ipEnd;
             $maxMind = (int) $maxMind;
+            if (isset($ipBlockList[$ipStart])) {
+                $infoListWarning['Overlapping IP blocks'][] = "$ipStart-{$ipBlockList[$ipStart]} and $ipStart-$ipEnd";
+            }
+            $ipBlockList[$ipStart] = $ipEnd;
             $level = null;
             $id = null;
             if (isset($this->_zipCodeIdListByMaxMind[$maxMind])) {
@@ -1195,6 +1200,19 @@ class CMService_MaxMind extends CM_Class_Abstract {
             } else {
                 $infoListWarning['Ignoring unknown locations'][] = $maxMind;
             }
+            $this->_printProgressCounter(++$item, $count);
+        }
+        $this->_writeln('Checking overlapping of IP blocks…');
+        ksort($ipBlockList);
+        $ipStartPrevious = $ipEndPrevious = 0;
+        $count = count($ipBlockList);
+        $item = 0;
+        foreach ($ipBlockList as $ipStart => $ipEnd) {
+            if ($ipStart <= $ipEndPrevious) {
+                $infoListWarning['Overlapping IP blocks'][] = "$ipStartPrevious-$ipEndPrevious and $ipStart-$ipEnd";
+            }
+            $ipStartPrevious = $ipStart;
+            $ipEndPrevious = $ipEnd;
             $this->_printProgressCounter(++$item, $count);
         }
 
