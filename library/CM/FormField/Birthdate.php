@@ -8,13 +8,13 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
     /** @var integer */
     protected $_maxAge;
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_minAge = $this->_params->getInt('minAge');
         $this->_maxAge = $this->_params->getInt('maxAge');
 
         $this->_params->set('yearFirst', date('Y') - $this->_minAge);
         $this->_params->set('yearLast', date('Y') - $this->_maxAge);
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

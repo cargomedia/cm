@@ -23,10 +23,10 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     public function __construct($params = null) {
         parent::__construct($params);
         $this->_name = $this->_params->getString('name', uniqid());
-        $this->initialize();
+        $this->_initialize();
     }
 
-    public function initialize() {
+    protected function _initialize() {
     }
 
     /**

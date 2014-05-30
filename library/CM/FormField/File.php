@@ -2,10 +2,10 @@
 
 class CM_FormField_File extends CM_FormField_Abstract {
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_options['cardinality'] = $this->_params->getInt('cardinality', 1);
         $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
-        parent::initialize();
+        parent::_initialize();
     }
 
     /**

@@ -8,10 +8,10 @@ class CM_FormField_Set extends CM_FormField_Abstract {
     /** @var bool */
     private $_labelsInValues = false;
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_values = $this->_params->getArray('values', array());
         $this->_labelsInValues = $this->_params->getBoolean('labelsInValues', false);
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

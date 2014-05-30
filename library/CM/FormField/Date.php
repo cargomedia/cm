@@ -8,10 +8,10 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     /** @var int */
     protected $_yearLast;
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
         $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

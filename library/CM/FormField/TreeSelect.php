@@ -5,9 +5,9 @@ class CM_FormField_TreeSelect extends CM_FormField_Abstract {
     /** @var CM_Tree_Abstract */
     protected $_tree;
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_tree = $this->_params->getObject('tree', 'CM_Tree_Abstract');
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

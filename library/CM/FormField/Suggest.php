@@ -9,10 +9,10 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
      */
     abstract public function getSuggestion($item, CM_Frontend_Render $render);
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_options['cardinality'] = $this->_params->has('cardinality') ? $this->_params->getInt('cardinality') : null;
         $this->_options['enableChoiceCreate'] = $this->_params->getBoolean('enableChoiceCreate', false);
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

@@ -11,7 +11,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /** @var CM_FormAction_Abstract[] */
     private $_actions = array();
 
-    abstract public function initialize();
+    abstract protected function _initialize();
 
     public function __construct($params = null) {
         parent::__construct($params);
@@ -23,6 +23,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $name = preg_replace('/([A-Z])/', '_\1', $name);
         $name = strtolower($name);
         $this->_name = $name;
+        $this->_initialize();
     }
 
     /**

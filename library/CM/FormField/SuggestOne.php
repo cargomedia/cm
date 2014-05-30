@@ -2,9 +2,9 @@
 
 abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_params->set('cardinality', 1);
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function setValue($value) {

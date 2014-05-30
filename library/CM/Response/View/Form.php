@@ -47,7 +47,6 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
             if (!$form instanceof CM_Form_Abstract) {
                 throw new CM_Exception_Invalid('`' . $className . '`is not `CM_Form_Abstract` instance');
             }
-            $form->initialize();
 
             $query = $this->_request->getQuery();
             $actionName = (string) $query['actionName'];

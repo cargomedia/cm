@@ -2,11 +2,11 @@
 
 class CM_FormField_Text extends CM_FormField_Abstract {
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->getInt('lengthMin') : null;
         $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->getInt('lengthMax') : null;
         $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords', false);
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function filterInput($userInput) {

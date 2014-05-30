@@ -2,14 +2,14 @@
 
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
-    public function initialize() {
+    protected function _initialize() {
         $this->_options['levelMin'] = $this->_params->getInt('levelMin', CM_Model_Location::LEVEL_COUNTRY);
         $this->_options['levelMax'] = $this->_params->getInt('levelMax', CM_Model_Location::LEVEL_ZIP);
         if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
             $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
             $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
         }
-        parent::initialize();
+        parent::_initialize();
     }
 
     public function getSuggestion($location, CM_Frontend_Render $render) {
