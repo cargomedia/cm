@@ -43,7 +43,7 @@ class CM_RenderAdapter_PageTest extends CMTest_TestCase {
         /** @var CM_Page_Abstract $page */
 
         $renderAdapter = new CM_RenderAdapter_Page($render, $page);
-        $this->assertSame('test-Page/Abstract/meta-description', $renderAdapter->fetchDescription());
-        $this->assertSame('test-Page/Abstract/meta-keywords', $renderAdapter->fetchKeywords());
+        $this->assertSame('test-Page/Abstract/meta-description.tpl', $renderAdapter->fetchDescription());
+        $this->assertSame('test-Page/Abstract/meta-keywords.tpl', $renderAdapter->fetchKeywords());
     }
 }
