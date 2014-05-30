@@ -28,7 +28,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /**
      * @param CM_Params $renderParams
      */
-    protected function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Params $renderParams) {
     }
 
     /**
