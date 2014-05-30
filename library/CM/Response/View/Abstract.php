@@ -126,11 +126,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $frontend->clear();
 
         $title = $responsePage->getTitle();
-        $layoutClass = get_class($page->getLayout($this->getSite()));
+        $layoutClass = get_class($page->getLayout($this->getRender()->getEnvironment()));
         $menuList = array_merge($this->getSite()->getMenus(), $responsePage->getRender()->getMenuList());
         $menuEntryHashList = $this->_getMenuEntryHashList($menuList, get_class($page), $responsePage->getPageParams());
-
-
 
         return array('autoId'            => $autoId, 'html' => $html, 'js' => $js, 'title' => $title, 'url' => $url,
                      'layoutClass'       => $layoutClass,

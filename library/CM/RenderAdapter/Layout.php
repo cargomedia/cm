@@ -112,7 +112,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
      * @return CM_Layout_Abstract
      */
     private function _getLayout() {
-        $site = $this->getRender()->getSite();
-        return $this->_getPage()->getLayout($site);
+        $environment = $this->getRender()->getEnvironment();
+        return $this->_getPage()->getLayout($environment);
     }
 }

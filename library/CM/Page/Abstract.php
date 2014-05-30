@@ -80,18 +80,19 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     }
 
     /**
-     * @param CM_Site_Abstract $site
-     * @param string|null      $layoutName
+     * @param CM_Frontend_Environment $environment
+     * @param string|null             $layoutName
      * @throws CM_Exception_Invalid
+     * @internal param \CM_Site_Abstract $site
      * @return CM_Layout_Abstract
      */
-    public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
         if (null === $layoutName) {
             $layoutName = 'Default';
         }
         $layoutName = (string) $layoutName;
 
-        foreach ($site->getNamespaces() as $namespace) {
+        foreach ($environment->getSite()->getNamespaces() as $namespace) {
             $classname = $namespace . '_Layout_' . $layoutName;
             if (class_exists($classname)) {
                 return new $classname();
