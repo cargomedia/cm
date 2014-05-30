@@ -2,8 +2,8 @@
 
 class CM_FormField_Distance extends CM_FormField_Integer {
 
-    public function validate($userInput, CM_Response_Abstract $response) {
-        return parent::validate($userInput, $response) * 1609;
+    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
+        return parent::validate($environment, $userInput, $response) * 1609;
     }
 
     /**

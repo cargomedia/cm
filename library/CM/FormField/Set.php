@@ -14,7 +14,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         parent::initialize();
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
         foreach ($userInput as $key => $value) {
             if (!in_array($value, $this->_getValues())) {
                 unset($userInput[$key]);

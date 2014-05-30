@@ -3,12 +3,13 @@
 class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 
     /**
-     * @param array                $userInput
-     * @param CM_Response_Abstract $response
-     * @return CM_Geo_Point
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @param CM_Response_Abstract    $response
      * @throws CM_Exception_FormFieldValidation
+     * @return CM_Geo_Point
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
         if (!isset($userInput['latitude']) || !is_numeric($userInput['latitude'])) {
             throw new CM_Exception_FormFieldValidation('Latitude needs to be numeric');
         }

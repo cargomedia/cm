@@ -23,13 +23,14 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $data = array(32 => 'apples', 64 => 'oranges', 128 => 'bananas');
         $field = new CM_FormField_Set(['name' => 'foo', 'values' => $data, 'labelsInValues' => true]);
 
+        $environment = new CM_Frontend_Environment();
         $userInputGood = array(32, 64, 128);
         $response = $this->getMockForAbstractClass('CM_Response_Abstract', array(), '', false);
-        $validationResult = $field->validate($userInputGood, $response);
+        $validationResult = $field->validate($environment, $userInputGood, $response);
         $this->assertSame($userInputGood, $validationResult);
 
         $userInputTainted = array(32, 23, 132);
-        $validationResult = $field->validate($userInputTainted, $response);
+        $validationResult = $field->validate($environment, $userInputTainted, $response);
         $this->assertSame(array(32), $validationResult);
     }
 

@@ -14,7 +14,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         parent::initialize();
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput, CM_Response_Abstract $response) {
         $dd = (int) trim($userInput['day']);
         $mm = (int) trim($userInput['month']);
         $yy = (int) trim($userInput['year']);
