@@ -27,7 +27,7 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function testReloadComponent() {
         $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Notfound([]));
-        $response = $this->getResponseAjax('reload', array('foo' => 'bar'), $scopeView, $scopeView);
+        $response = $this->getResponseAjax('reloadComponent', array('foo' => 'bar'), $scopeView, $scopeView);
         $this->assertViewResponseSuccess($response);
 
         $frontend = $response->getRender()->getFrontend();
