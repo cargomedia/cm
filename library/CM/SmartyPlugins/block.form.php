@@ -3,7 +3,7 @@
 function smarty_block_form($params, $content, Smarty_Internal_Template $template, $open) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    $frontend = $render->getFrontend();
+    $frontend = $render->getGlobalResponse();
     if ($open) {
         $form = CM_Form_Abstract::factory($params['name']);
         $form->prepare(CM_Params::factory($params));

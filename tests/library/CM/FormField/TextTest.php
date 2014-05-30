@@ -12,7 +12,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
         $field->setValue('bar');
 
         $doc = $this->_renderFormField($render, $field);
-        $autoId = $render->getFrontend()->getTreeRoot()->getValue()->getAutoId();
+        $autoId = $render->getGlobalResponse()->getTreeRoot()->getValue()->getAutoId();
 
         $this->assertSame($autoId, $doc->find('.CM_FormField_Text')->getAttribute('id'));
         $this->assertSame(1, $doc->find('input[name="foo"]')->count());

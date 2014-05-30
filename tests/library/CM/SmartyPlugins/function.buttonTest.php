@@ -18,7 +18,7 @@ class smarty_function_buttonTest extends CMTest_TestCase {
         $actionMock->expects($this->any())->method('getName')->will($this->returnValue('Create'));
         $formMock->expects($this->any())->method('getAction')->will($this->returnValue($actionMock));
         /** @var CM_Form_Abstract $formMock */
-        $render->getFrontend()->treeExpand(new CM_Frontend_ViewResponse($formMock));
+        $render->getGlobalResponse()->treeExpand(new CM_Frontend_ViewResponse($formMock));
 
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $render);
@@ -26,10 +26,10 @@ class smarty_function_buttonTest extends CMTest_TestCase {
 
     public function testRender() {
         $params = array(
-            'action'      => 'Create',
-            'label'       => 'Some text <br /> with html tags',
-            'theme'       => 'highlight',
-            'class'       => 'button-large',
+            'action' => 'Create',
+            'label'  => 'Some text <br /> with html tags',
+            'theme'  => 'highlight',
+            'class'  => 'button-large',
         );
 
         $this->_assertContains('value="Some text <br /> with html tags"', array_merge($params, array('isHtmlLabel' => true)));

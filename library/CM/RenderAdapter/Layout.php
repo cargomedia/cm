@@ -22,7 +22,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $layout = $this->_getLayout();
 
         $page->checkAccessible($this->getRender()->getEnvironment());
-        $frontend = $this->getRender()->getFrontend();
+        $frontend = $this->getRender()->getGlobalResponse();
 
         $viewResponse = new CM_Frontend_ViewResponse($layout);
         $viewResponse->setTemplateName('default');

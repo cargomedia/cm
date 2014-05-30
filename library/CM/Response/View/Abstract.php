@@ -19,7 +19,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
-        $frontend = $this->getRender()->getFrontend();
+        $frontend = $this->getRender()->getGlobalResponse();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
         $componentReferenceOld = 'cm.views["' . $componentId . '"]';
@@ -39,7 +39,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
-        $frontend = $this->getRender()->getFrontend();
+        $frontend = $this->getRender()->getGlobalResponse();
         $data = array(
             'autoId' => $frontend->getTreeRoot()->getValue()->getAutoId(),
             'html'   => $html,
@@ -84,7 +84,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
         $this->_setStringRepresentation(get_class($page));
 
-        $frontend = $responsePage->getRender()->getFrontend();
+        $frontend = $responsePage->getRender()->getGlobalResponse();
         $html = $responsePage->getContent();
         $js = $frontend->getJs();
         $autoId = $frontend->getTreeRoot()->getValue()->getAutoId();
@@ -103,14 +103,14 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
 
     public function popinComponent() {
         $componentInfo = $this->_getViewInfo('component');
-        $this->getRender()->getFrontend()->getOnloadJs()->append('cm.views["' . $componentInfo['id'] . '"].popIn();');
+        $this->getRender()->getGlobalResponse()->getOnloadJs()->append('cm.views["' . $componentInfo['id'] . '"].popIn();');
     }
 
     /**
      * Add a reload to the response.
      */
     public function reloadPage() {
-        $this->getRender()->getFrontend()->getOnloadJs()->append('window.location.reload(true)');
+        $this->getRender()->getGlobalResponse()->getOnloadJs()->append('window.location.reload(true)');
     }
 
     /**
@@ -133,7 +133,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
         $url = (string) $url;
         $forceReload = (boolean) $forceReload;
         $js = 'cm.router.route(' . json_encode($url) . ', ' . json_encode($forceReload) . ');';
-        $this->getRender()->getFrontend()->getOnloadPrepareJs()->append($js);
+        $this->getRender()->getGlobalResponse()->getOnloadPrepareJs()->append($js);
     }
 
     /**

@@ -51,7 +51,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     /**
      * @return CM_Frontend_GlobalResponse
      */
-    public function getFrontend() {
+    public function getGlobalResponse() {
         if (null === $this->_js) {
             $this->_js = new CM_Frontend_GlobalResponse();
         }

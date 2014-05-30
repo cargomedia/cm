@@ -10,7 +10,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
      */
     public function fetch() {
         $component = $this->_getComponent();
-        $frontend = $this->getRender()->getFrontend();
+        $frontend = $this->getRender()->getGlobalResponse();
         $environment = $this->getRender()->getEnvironment();
 
         $component->checkAccessible($environment);

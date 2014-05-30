@@ -3,7 +3,7 @@
 function smarty_function_label(array $params, Smarty_Internal_Template $template) {
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    $formViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Form_Abstract');
+    $formViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract');
     if (null === $formViewResponse) {
         throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {label} can be only rendered within form view.');
     }

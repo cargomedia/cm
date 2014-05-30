@@ -102,7 +102,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
-            $this->getRender()->getFrontend()->getTracking()->trackPageview($this->getRequest());
+            $this->getRender()->getGlobalResponse()->getTracking()->trackPageview($this->getRequest());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
@@ -147,7 +147,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
                 throw $e;
             }
-            $this->getRender()->getFrontend()->clear();
+            $this->getRender()->getGlobalResponse()->clear();
             $path = $this->_getConfig()->catch[get_class($e)];
             $request->setPath($path);
             $request->setQuery(array());

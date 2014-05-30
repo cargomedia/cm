@@ -8,9 +8,9 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $activePage = null;
     if (isset($params['activePage'])) {
         $activePage = $params['activePage'];
-    } elseif ($pageViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract')) {
+    } elseif ($pageViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Page_Abstract')) {
         $activePage = $pageViewResponse->getView();
-    } elseif ($layoutViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Layout_Abstract')) {
+    } elseif ($layoutViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Layout_Abstract')) {
         $activePage = $layoutViewResponse->get('page');
     }
 

@@ -30,7 +30,7 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
         $response = $this->getResponseAjax('reloadComponent', array('foo' => 'bar'), $scopeView, $scopeView);
         $this->assertViewResponseSuccess($response);
 
-        $frontend = $response->getRender()->getFrontend();
+        $frontend = $response->getRender()->getGlobalResponse();
         $oldAutoId = $scopeView->getAutoId();
         $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
