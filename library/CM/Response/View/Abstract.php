@@ -6,7 +6,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
      * @param array|null $additionalParams
      */
     public function reloadComponent(array $additionalParams = null) {
-        $componentInfo = $this->_getViewInfo('component');
+        $componentInfo = $this->_getViewInfo('CM_Component_Abstract');
         $componentId = $componentInfo['id'];
         $componentClassName = $componentInfo['className'];
         $componentParams = $componentInfo['params'];
@@ -102,7 +102,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
     }
 
     public function popinComponent() {
-        $componentInfo = $this->_getViewInfo('component');
+        $componentInfo = $this->_getViewInfo('CM_Component_Abstract');
         $this->getRender()->getGlobalResponse()->getOnloadJs()->append('cm.views["' . $componentInfo['id'] . '"].popIn();');
     }
 
@@ -137,43 +137,45 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
     }
 
     /**
-     * @param string|null $type
-     * @return static
+     * @param string|null $className
+     * @return CM_View_Abstract
      */
-    protected function _getView($type = null) {
-        $viewInfo = $this->_getViewInfo($type);
-        $className = $viewInfo['className'];
-        $params = $viewInfo['params'];
-        return CM_View_Abstract::factory($className, $params);
+    protected function _getView($className = null) {
+        if (null === $className) {
+            $className = 'CM_View_Abstract';
+        }
+        $viewInfo = $this->_getViewInfo($className);
+        /** @var CM_View_Abstract $className */
+        return $className::factory($viewInfo['className'], $viewInfo['params']);
     }
 
     /**
-     * @param string|null $type
+     * @param string|null $className
      * @return array
      * @throws CM_Exception_Invalid
      */
-    protected function _getViewInfo($type = null) {
-        if (null === $type) {
-            $type = 'view';
+    protected function _getViewInfo($className = null) {
+        if (null === $className) {
+            $className = 'CM_View_Abstract';
         }
         $query = $this->_request->getQuery();
         $viewInfoList = $query['viewInfoList'];
-        if (!array_key_exists($type, $viewInfoList)) {
-            throw new CM_Exception_Invalid('View `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+        if (!array_key_exists($className, $viewInfoList)) {
+            throw new CM_Exception_Invalid('View `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
-        $viewInfo = $viewInfoList[$type];
+        $viewInfo = $viewInfoList[$className];
         if (!is_array($viewInfo)) {
-            throw new CM_Exception_Invalid('View `' . $type . '` is not an array', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View `' . $className . '` is not an array', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['id'])) {
-            throw new CM_Exception_Invalid('View id `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View id `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['className']) || !class_exists($viewInfo['className']) || !is_a($viewInfo['className'], 'CM_View_Abstract', true)) {
-            throw new CM_Exception_Invalid('View className `' . $type . '` is illegal: `' . $viewInfo['className'] .
+            throw new CM_Exception_Invalid('View className `' . $className . '` is illegal: `' . $viewInfo['className'] .
                 '`.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['params'])) {
-            throw new CM_Exception_Invalid('View params `' . $type . '` not set.', null, array('severity' => CM_Exception::WARN));
+            throw new CM_Exception_Invalid('View params `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
         }
         if (!isset($viewInfo['parentId'])) {
             $viewInfo['parentId'] = null;

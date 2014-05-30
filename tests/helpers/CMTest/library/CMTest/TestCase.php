@@ -92,8 +92,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         };
         $viewInfoList = array_map($getViewInfo,
             array_filter([
-                'view'      => $scopeView,
-                'component' => $scopeComponent,
+                'CM_View_Abstract'      => $scopeView,
+                'CM_Component_Abstract' => $scopeComponent,
             ])
         );
         $body = array(
@@ -143,8 +143,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
         $viewArray = array('className' => $formClassName, 'params' => array(), 'id' => 'mockFormId');
         $componentArray = array('className' => $componentClassName, 'params' => $componentParams, 'id' => 'mockFormComponentId');
-        $body = CM_Params::encode(array('viewInfoList' => array('component' => $componentArray, 'view' => $viewArray), 'actionName' => $actionName,
-                                        'data'         => $data), true);
+        $body = CM_Params::encode(array(
+            'viewInfoList' => array(
+                'CM_Component_Abstract' => $componentArray,
+                'CM_View_Abstract'      => $viewArray,
+            ),
+            'actionName'   => $actionName,
+            'data'         => $data,
+        ), true);
         $request = new CM_Request_Post('/form/' . $languageAbbreviation . $siteId, $headers, $server, $body);
 
         $response = new CM_Response_View_Form($request);
@@ -173,10 +179,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         $actionName = $action->getName();
         $form = $action->getForm();
         $query = array(
-            'data'       => (array) $data,
-            'actionName' => $actionName,
+            'data'         => (array) $data,
+            'actionName'   => $actionName,
             'viewInfoList' => array(
-                'view' => array(
+                'CM_View_Abstract' => array(
                     'className' => get_class($form),
                     'params'    => $form->getParams()->getAll(),
                     'id'        => 'uniqueId'

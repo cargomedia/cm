@@ -174,11 +174,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      var viewInfoList = {
-        component: this.getComponent()._getArray(),
-        view: this._getArray()
-      };
-      cm.ajax('form', {viewInfoList: viewInfoList, actionName: action.name, data: data}, {
+      cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data}, {
         success: function(response) {
           if (response.errors) {
             if (options.handleErrors) {
