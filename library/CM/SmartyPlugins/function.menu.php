@@ -8,9 +8,6 @@ function smarty_function_menu(array $params, Smarty_Internal_Template $template)
     $activePage = null;
     if (isset($params['activePage'])) {
         $activePage = $params['activePage'];
-        if (!$activePage instanceof CM_Page_Abstract) {
-            throw new CM_Exception_Invalid('`activePage` needs to be instance of `CM_Page_Abstract`');
-        }
     } elseif ($pageViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Page_Abstract')) {
         $activePage = $pageViewResponse->getView();
     } elseif ($layoutViewResponse = $render->getFrontend()->getClosestViewResponse('CM_Layout_Abstract')) {

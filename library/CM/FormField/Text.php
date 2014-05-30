@@ -3,8 +3,8 @@
 class CM_FormField_Text extends CM_FormField_Abstract {
 
     public function initialize() {
-        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->get('lengthMin') : null;
-        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->get('lengthMax') : null;
+        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->getInt('lengthMin') : null;
+        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->getInt('lengthMax') : null;
         $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords', false);
         parent::initialize();
     }
