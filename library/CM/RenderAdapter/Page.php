@@ -7,21 +7,21 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchDescription() {
         return $this->_fetchMetaTemplate('meta-description');
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchKeywords() {
         return $this->_fetchMetaTemplate('meta-keywords');
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchTitle() {
         return $this->_fetchMetaTemplate('title');
@@ -29,25 +29,24 @@ class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
     /**
      * @param string $templateName
-     * @return string
+     * @return string|null
      */
     protected function _fetchMetaTemplate($templateName) {
         $templatePath = $this->_getMetaTemplatePath($templateName);
+        if (null === $templatePath) {
+            return null;
+        }
         return trim($this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData(), true));
     }
 
     /**
      * @param string $templateName
-     * @throws CM_Exception_Invalid
-     * @return string
+     * @return string|null
      */
     protected function _getMetaTemplatePath($templateName) {
         $templatePath = $this->getRender()->getTemplatePath($this->_getView(), $templateName);
         if (null === $templatePath) {
-            $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName, null, null, false);
-        }
-        if (null === $templatePath) {
-            throw new CM_Exception_Invalid('Cannot find page-meta template `' . $templateName . '` for `' . get_class($this->_getView()) . '`');
+            $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName . '.tpl', null, null, false);
         }
         return $templatePath;
     }
