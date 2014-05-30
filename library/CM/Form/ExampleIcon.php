@@ -2,7 +2,7 @@
 
 class CM_Form_ExampleIcon extends CM_Form_Abstract {
 
-    public function setup() {
+    public function initialize() {
         $this->registerField(new CM_FormField_Integer(['name' => 'sizeSlider', 'min' => 6, 'max' => 120]));
         $this->registerField(new CM_FormField_Color(['name' => 'colorBackground']));
         $this->registerField(new CM_FormField_Color(['name' => 'color']));

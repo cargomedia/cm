@@ -23,7 +23,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $this->_name = $name;
     }
 
-    abstract public function setup();
+    abstract public function initialize();
 
     /**
      * @param array|null $params

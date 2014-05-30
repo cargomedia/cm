@@ -51,7 +51,7 @@ class CM_Response_View_Form extends CM_Response_View_Abstract {
             $this->_setStringRepresentation($className . '::' . $actionName);
 
             $form = CM_Form_Abstract::factory($className);
-            $form->setup();
+            $form->initialize();
             $success['data'] = CM_Params::encode($form->process($data, $actionName, $this));
 
             if (!empty($this->errors)) {
