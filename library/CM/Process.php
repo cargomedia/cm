@@ -75,7 +75,7 @@ class CM_Process {
             }
             $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
             $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
-            $workloadResultList[] = $forkHandler->receiveWorkloadResult();
+            $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
             $forkHandler->closeIpcStream();
             unset($this->_forkHandlerList[$forkHandlerSequence]);
             if ($keepAlive) {
