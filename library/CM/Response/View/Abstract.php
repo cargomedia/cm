@@ -159,6 +159,9 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
             $className = 'CM_View_Abstract';
         }
         $query = $this->_request->getQuery();
+        if (!array_key_exists('viewInfoList', $query)) {
+            throw new CM_Exception_Invalid('viewInfoList param not found.', null, array('severity' => CM_Exception::WARN));
+        }
         $viewInfoList = $query['viewInfoList'];
         if (!array_key_exists($className, $viewInfoList)) {
             throw new CM_Exception_Invalid('View `' . $className . '` not set.', null, array('severity' => CM_Exception::WARN));
