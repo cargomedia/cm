@@ -3099,7 +3099,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Updating IP blocks database…#');
+        $this->assertFalse(strpos($this->getActualOutput(), 'Overlapping IP blocks:'));
     }
 
     public function testOverlappingIpBlocks_sameIpStart() {
@@ -3136,7 +3136,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/3 \\(33%\\)\\s++2/3 \\(67%\\)\\s++3/3 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 33555968-33556223 and 33555968-33556243\\s++\\*#');
+        $this->expectOutputRegex("#Overlapping IP blocks:\n ! 33555968-33556223 and 33555968-33556243\n\n \\*#");
     }
 
     public function testOverlappingIpBlocks_inclusion() {
@@ -3173,7 +3173,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578400\\s++! 33555968-33556223 and 33556000-33556200\\s++\\*#');
+        $this->expectOutputRegex("#Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578400\n ! 33555968-33556223 and 33556000-33556200\n\n \\*#");
     }
 
     public function testOverlappingIpBlocks_overlapping() {
@@ -3210,7 +3210,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->expectOutputRegex('#Checking overlapping of IP blocks…\\s++1/4 \\(25%\\)\\s++2/4 \\(50%\\)\\s++3/4 \\(75%\\)\\s++4/4 \\(100%\\)\\s++Overlapping IP blocks:\\s++! 266578176-266578431 and 266578200-266578500\\s++! 33555968-33556223 and 33556000-33557000\\s++\\*#');
+        $this->expectOutputRegex("#Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578500\n ! 33555968-33556223 and 33556000-33557000\n\n \\*#");
     }
 
     /**
@@ -3380,7 +3380,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $maxMind = $this->getMock('CMService_MaxMind',
-            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
+            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy', '_writeError'),
             array(null, new CM_OutputStream_Stream_Output(), null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));

@@ -12,7 +12,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     protected $_geoIpFile;
 
     /** @var CM_OutputStream_Interface|null */
-    protected $_outputStream;
+    protected $_outputStream, $_errorStream;
 
     /** @var bool */
     protected $_withoutIpBlocks, $_verbose;
@@ -40,10 +40,11 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_outputStream = $outputStream;
         $this->_withoutIpBlocks = (bool) $withoutIpBlocks;
         $this->_verbose = (bool) $verbose;
+        $this->_errorStream = new CM_OutputStream_Stream_StandardError();
     }
 
     public function outdated() {
-        $this->_writeln('Updating locations database…');
+        $this->_writeErrorLine('Updating locations database…');
         $this->_readCountryListOld();
         $this->_updateCountryList();
         $this->_compareCountryLists();
@@ -62,7 +63,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_upgradeCityList();
         $this->_upgradeZipCodeList();
         $this->_upgradeIpBlocks();
-        $this->_writeln('Updating search index…');
+        $this->_writeErrorLine('Updating search index…');
         CM_Model_Location::createAggregation();
         $type = new CM_Elasticsearch_Type_Location();
         $searchIndexCli = new CM_Elasticsearch_Index_Cli();
@@ -70,7 +71,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _compareCountryLists() {
-        $this->_writeln('Comparing both country listings…');
+        $this->_writeErrorLine('Comparing both country listings…');
 
         $infoListAdded = array();
         $infoListUpdated = array();
@@ -113,7 +114,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _compareRegionLists() {
-        $this->_writeln('Comparing both region listings…');
+        $this->_writeErrorLine('Comparing both region listings…');
 
         $this->_regionListByCountryUpdatedCode = array();
         $this->_regionListByCountryRemovedCodeInUse = array();
@@ -272,7 +273,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _compareLocationTrees() {
-        $this->_writeln('Comparing both location trees…');
+        $this->_writeErrorLine('Comparing both location trees…');
 
         $infoListWarning = array();
         $infoListAdded = array();
@@ -768,12 +769,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _getCountryData() {
-        $this->_writeln('Downloading new country listing…');
+        $this->_writeErrorLine('Downloading new country listing…');
         $countriesPath = CM_Bootloader::getInstance()->getDirTmp() . 'countries.csv';
         $countriesFile = new CM_File($countriesPath);
         $countriesContents = $this->_download($countriesFile, self::COUNTRY_URL);
 
-        $this->_writeln('Reading new country listing…');
+        $this->_writeErrorLine('Reading new country listing…');
         $countryData = array();
         $countryData[] = array('Netherlands Antilles', 'AN'); // Adding missing records
         $rows = preg_split('#[\r\n]++#', $countriesContents);
@@ -800,7 +801,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _getIpData() {
-        $this->_writeln('Reading new IP blocks…');
+        $this->_writeErrorLine('Reading new IP blocks…');
         if (null !== $this->_geoIpFile) {
             $blocksFileContents = $this->_readBlocksData($this->_geoIpFile);
         } else {
@@ -831,7 +832,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _getLocationData() {
-        $this->_writeln('Reading new location tree…');
+        $this->_writeErrorLine('Reading new location tree…');
         if (null !== $this->_geoIpFile) {
             $citiesFileContents = $this->_readLocationData($this->_geoIpFile);
         } else {
@@ -862,12 +863,12 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     protected function _getRegionData() {
-        $this->_writeln('Downloading new region listing…');
+        $this->_writeErrorLine('Downloading new region listing…');
         $regionsPath = CM_Bootloader::getInstance()->getDirTmp() . 'region.csv';
         $regionsFile = new CM_File($regionsPath);
         $regionsContents = $this->_download($regionsFile, self::REGION_URL);
 
-        $this->_writeln('Reading new region listing…');
+        $this->_writeErrorLine('Reading new region listing…');
         $regionData = array();
         $rows = preg_split('#[\r\n]++#', $regionsContents);
         foreach ($rows as $row) {
@@ -892,7 +893,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _readCountryListOld() {
-        $this->_writeln('Reading old country listing…');
+        $this->_writeErrorLine('Reading old country listing…');
         $this->_countryListOld = array();
         $this->_countryIdList = array();
         $result = CM_Db_Db::exec('SELECT `id`, `abbreviation`, `name` FROM `cm_model_location_country`');
@@ -904,7 +905,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _readRegionListOld() {
-        $this->_writeln('Reading old region listing…');
+        $this->_writeErrorLine('Reading old region listing…');
         $this->_regionListByCountryOld = array();
         $result = CM_Db_Db::exec('SELECT `state`.`id`, `country`.`abbreviation` AS `countryCode`, `state`.`_maxmind`, `state`.`abbreviation`, `state`.`name` FROM `cm_model_location_state` `state` LEFT JOIN `cm_model_location_country` `country` ON `country`.`id` = `state`.`countryId`');
         while (false !== ($row = $result->fetch())) {
@@ -919,7 +920,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _readLocationTreeOld() {
-        $this->_writeln('Reading old location tree…');
+        $this->_writeErrorLine('Reading old location tree…');
         $this->_locationTreeOld = array();
         $result = CM_Db_Db::exec('
 			SELECT
@@ -1202,7 +1203,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             $this->_printProgressCounter(++$item, $count);
         }
-        $this->_writeln('Checking overlapping of IP blocks…');
+        $this->_writeErrorLine('Checking overlapping of IP blocks…');
         ksort($ipBlockList);
         $ipStartPrevious = $ipEndPrevious = 0;
         $count = count($ipBlockList);
@@ -1220,7 +1221,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _upgradeCountryList() {
-        $this->_writeln('Updating countries database…');
+        $this->_writeErrorLine('Updating countries database…');
         $count = $this->_count(array($this->_countryListRenamed, $this->_countryListAdded), 2);
         $item = 0;
         foreach ($this->_countryListRenamed as $countryCode => $countryNames) {
@@ -1237,7 +1238,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _upgradeRegionList() {
-        $this->_writeln('Updating regions database…');
+        $this->_writeErrorLine('Updating regions database…');
         $count = $this->_count(array($this->_regionListByCountryRenamed, $this->_regionListByCountryUpdatedCode,
             $this->_regionListByCountryAdded, $this->_regionListByCountryRemovedCodeInUse), 3);
         $item = 0;
@@ -1294,7 +1295,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _upgradeCityList() {
-        $this->_writeln('Updating cities database…');
+        $this->_writeErrorLine('Updating cities database…');
         $count = $this->_count(array($this->_cityListByRegionRenamed, $this->_cityListByRegionUpdatedCode,
                 $this->_cityListByRegionAdded), 4) + $this->_count($this->_cityListUpdatedRegion, 2);
         $item = 0;
@@ -1352,7 +1353,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
     }
 
     protected function _upgradeZipCodeList() {
-        $this->_writeln('Updating zip codes database…');
+        $this->_writeErrorLine('Updating zip codes database…');
         $count = $this->_count($this->_zipCodeListByCityAdded, 4);
         $item = 0;
         foreach ($this->_zipCodeListByCityAdded as $countryCode => $zipCodeListByRegionAdded) {
@@ -1377,7 +1378,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             return;
         }
         $this->_updateIpBlocks();
-        $this->_writeln('Updating IP blocks database…');
+        $this->_writeErrorLine('Updating IP blocks database…');
         $count = $this->_count($this->_ipBlockListByLocation, 3);
         $item = 0;
         CM_Db_Db::truncate('cm_model_location_ip');
@@ -1388,6 +1389,32 @@ class CMService_MaxMind extends CM_Class_Abstract {
                     $this->_printProgressCounter(++$item, $count);
                 }
             }
+        }
+    }
+
+    /**
+     * @param string $message
+     * @codeCoverageIgnore
+     */
+    protected function _writeError($message) {
+        $this->_errorStream->write($message);
+    }
+
+    /**
+     * @param string $message
+     * @codeCoverageIgnore
+     */
+    protected function _writeErrorLine($message) {
+        $this->_writeError($message . "\n");
+    }
+
+    /**
+     * @param string $message
+     * @codeCoverageIgnore
+     */
+    protected function _writeOutputLine($message) {
+        if ($this->_outputStream) {
+            $this->_outputStream->writeln($message);
         }
     }
 
@@ -1576,7 +1603,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
         }
         ksort($infoList);
         foreach ($infoList as $info => $items) {
-            $this->_writeln($info . ':');
+            $this->_writeOutputLine($info . ':');
             foreach ($items as $key => $item) {
                 if (is_array($item)) {
                     if (count($item) <= 10) {
@@ -1589,7 +1616,7 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
             asort($items);
             foreach ($items as $item) {
-                $this->_writeln(' ' . $symbol . ' ' . $item);
+                $this->_writeOutputLine(' ' . $symbol . ' ' . $item);
             }
             $this->_printSeparator();
         }
@@ -1603,9 +1630,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
     private function _printProgressCounter($item, $count) {
         $item = (int) $item;
         $count = (int) $count;
-        $this->_write("\r$item/$count (" . round($item / $count * 100) . "%)");
+        $this->_writeError("\r$item/$count (" . round($item / $count * 100) . "%)");
         if ($item == $count) {
-            $this->_writeln('');
+            $this->_writeErrorLine('');
         }
     }
 
@@ -1613,9 +1640,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
      * @codeCoverageIgnore
      */
     private function _printSeparator() {
-        $this->_writeln('');
-        $this->_writeln(str_repeat(' *', 10));
-        $this->_writeln('');
+        $this->_writeOutputLine('');
+        $this->_writeOutputLine(str_repeat(' *', 10));
+        $this->_writeOutputLine('');
     }
 
     /**
@@ -1677,25 +1704,5 @@ class CMService_MaxMind extends CM_Class_Abstract {
             }
         }
         $this->_geoIpFile = $geoIpFile;
-    }
-
-    /**
-     * @param string $message
-     * @codeCoverageIgnore
-     */
-    private function _write($message) {
-        if ($this->_outputStream) {
-            $this->_outputStream->write($message);
-        }
-    }
-
-    /**
-     * @param string $message
-     * @codeCoverageIgnore
-     */
-    private function _writeln($message) {
-        if ($this->_outputStream) {
-            $this->_outputStream->writeln($message);
-        }
     }
 }
