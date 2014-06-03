@@ -47,7 +47,8 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
             $environment = $this->getRender()->getEnvironment();
 
             $viewResponse = new CM_Frontend_ViewResponse($component);
-            $viewResponse->setTemplateName('default');
+            $templateName = $component->getParams()->getString('template', 'default');
+            $viewResponse->setTemplateName($templateName);
             $component->prepare($environment, $viewResponse);
             $viewResponse->set('viewObj', $component);
             $this->_viewResponse = $viewResponse;
