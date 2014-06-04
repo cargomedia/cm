@@ -5,8 +5,8 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
     $render = $template->smarty->getTemplateVars('render');
     $frontend = $render->getGlobalResponse();
     if ($open) {
-        $form = CM_Form_Abstract::factory($params['name']);
-        $form->prepare(CM_Params::factory($params));
+        $form = CM_Form_Abstract::factory($params['name'], CM_Params::factory($params));
+        $form->prepare();
 
         $viewResponse = new CM_Frontend_ViewResponse($form);
         $frontend->treeExpand($viewResponse);
