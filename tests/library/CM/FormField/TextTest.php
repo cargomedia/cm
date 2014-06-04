@@ -23,7 +23,6 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateMinLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
         $environment = new CM_Frontend_Environment();
-        $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Frontend_Render();
         try {
             $field->validate($environment, 'foo');
