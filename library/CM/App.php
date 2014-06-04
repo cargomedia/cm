@@ -18,11 +18,13 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirData());
-        CM_Util::mkDir(CM_Bootloader::getInstance()->getDirUserfiles());
-        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
-        CM_Util::rmDirContents($dirTmp);
-        CM_Util::mkdir($dirTmp);
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->getAdapter()->setup();
+        }
     }
 
     /**
@@ -90,7 +92,7 @@ class CM_App {
             $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
             foreach ($languageList as $language) {
-                $render = new CM_Render($site, null, $language);
+                $render = new CM_Frontend_Render($site, null, $language);
                 $assetList[] = new CM_Asset_Css_Vendor($render);
                 $assetList[] = new CM_Asset_Css_Library($render);
             }
@@ -215,10 +217,10 @@ class CM_App {
         if ($namespace) {
             $path = CM_Util::getNamespacePath($namespace);
         }
-        $updateScript = $path . 'resources/db/update/' . $version . '.php';
-        if (!CM_File::exists($updateScript)) {
+        $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
+        if (!$file->getExists()) {
             throw new CM_Exception_Invalid('Update script `' . $version . '` does not exist for `' . $namespace . '` namespace.');
         }
-        return $updateScript;
+        return $file->getPath();
     }
 }

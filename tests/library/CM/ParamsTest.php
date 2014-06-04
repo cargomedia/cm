@@ -89,21 +89,50 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetFloat() {
-        $params = new CM_Params(array('1' => 34.20, '2' => '6543.123', '3' => '1.2.3', '4' => 0.0, 5 => '0.0', '5' => 4));
-        $params->getFloat('1');
-        $params->getFloat('2');
-        try {
-            $params->getFloat('3');
-            $this->fail('Is no float');
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->assertTrue(true);
+        $testDataList = array(
+            array(34.28, 34.28),
+            array(-34.28, -34.28),
+            array(0., 0.),
+            array(-34., -34),
+            array(34., 34),
+            array(0., 0),
+            array(34.28, '34.28'),
+            array(-34.28, '-34.28'),
+            array(34.2, '34.2'),
+            array(-34.2, '-34.2'),
+            array(34., '34.'),
+            array(-34., '-34.'),
+            array(4.28, '4.28'),
+            array(-4.28, '-4.28'),
+            array(.28, '.28'),
+            array(-.28, '-.28'),
+            array(.28, '0.28'),
+            array(-.28, '-0.28'),
+            array(0., '0.'),
+            array(0., '-0.'),
+            array(0., '.0'),
+            array(0., '-.0'),
+            array(34., '34'),
+            array(-34., '-34'),
+            array(0., '0'),
+            array(0., '-0'),
+        );
+        foreach ($testDataList as $testData) {
+            $expected = $testData[0];
+            $userInput = $testData[1];
+            $params = new CM_Params(array('userInput' => $userInput));
+            $this->assertSame($expected, $params->getFloat('userInput'));
         }
-        $params->getFloat('4');
-        try {
-            $params->getFloat('5');
-            $this->assertTrue(true);
-        } catch (CM_Exception_InvalidParam $ex) {
-            $this->fail('Is float');
+        $userInputInvalidList = array('', '-', '.', '-.', '1.2.3', '12 ', ' 12', '12,345', false, true, array('1'), new stdClass(),
+            fopen(__FILE__, 'r'));
+        foreach ($userInputInvalidList as $userInputInvalid) {
+            $params = new CM_Params(array('userInput' => $userInputInvalid));
+            try {
+                $params->getFloat('userInput');
+                $this->fail('User input is not a float');
+            } catch (CM_Exception_InvalidParam $e) {
+                $this->assertTrue(true);
+            }
         }
     }
 
@@ -121,19 +150,16 @@ class CM_ParamsTest extends CMTest_TestCase {
     }
 
     public function testGetFile() {
-        $file = CM_File::createTmp();
+        $file = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo');
         $params = new CM_Params(array('file' => $file, 'filename' => $file->getPath()));
         $this->assertEquals($file, $params->getFile('file'));
         $this->assertEquals($file, $params->getFile('filename'));
     }
 
-    /**
-     * @expectedException CM_Exception_Invalid
-     * @expectedExceptionMessage does not exist or is not a file
-     */
-    public function testGetFileException() {
-        $params = new CM_Params(array('nonexistent' => 'foo/bar'));
-        $params->getFile('nonexistent');
+    public function testGetFileNonexistent() {
+        $fileNonexistent = new CM_File('foo/bar');
+        $params = new CM_Params(array('nonexistent' => $fileNonexistent->getPath()));
+        $this->assertEquals($fileNonexistent, $params->getFile('nonexistent'));
     }
 
     public function testGetFileGeoPoint() {
@@ -177,5 +203,45 @@ class CM_ParamsTest extends CMTest_TestCase {
 
             $this->assertEquals($params->getDateTime('date'), $dateTime);
         }
+    }
+
+    public function testGetParams() {
+        $params = new CM_Params(array(
+            'foo1' => new CM_Params(),
+            'foo2' => new CM_Params(array('bar' => 12)),
+            'foo3' => array('bar' => 13),
+            'foo4' => json_encode(array('bar' => 14)),
+        ));
+
+        $this->assertSame(array(), $params->getParams('foo1')->getAll());
+        $this->assertSame(array('bar' => 12), $params->getParams('foo2')->getAll());
+        $this->assertSame(array('bar' => 13), $params->getParams('foo3')->getAll());
+        $this->assertSame(array('bar' => 14), $params->getParams('foo4')->getAll());
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     */
+    public function testGetParamsInvalidObject() {
+        $params = new CM_Params(array('foo' => new stdClass()));
+        $params->getParams('foo');
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Unexpected input of type `integer`
+     */
+    public function testGetParamsInvalidInt() {
+        $params = new CM_Params(array('foo' => 12));
+        $params->getParams('foo');
+    }
+
+    /**
+     * @expectedException CM_Exception_InvalidParam
+     * @expectedExceptionMessage Cannot decode input
+     */
+    public function testGetParamsInvalidString() {
+        $params = new CM_Params(array('foo' => 'hello'));
+        $params->getParams('foo');
     }
 }

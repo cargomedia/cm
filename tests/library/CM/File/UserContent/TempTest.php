@@ -14,19 +14,24 @@ class CM_File_UserContent_TempTest extends CMTest_TestCase {
     public function testCreate() {
         $file = CM_File_UserContent_Temp::create('foo.txt');
         $this->assertInstanceOf('CM_File_UserContent_Temp', $file);
-        $this->assertSame('foo.txt', $file->getFileName());
+        $this->assertSame('foo.txt', $file->getFilenameLabel());
         $this->assertSame('txt', $file->getExtension());
         $this->assertInternalType('string', $file->getUniqid());
     }
 
     public function testCreateLongName() {
         $file = CM_File_UserContent_Temp::create(str_repeat('a', 500) . '.txt');
-        $this->assertSame(str_repeat('a', 96) . '.txt', $file->getFileName());
+        $this->assertSame(str_repeat('a', 96) . '.txt', $file->getFilenameLabel());
     }
 
     public function testCreateNoExtension() {
         $file = CM_File_UserContent_Temp::create('foo');
         $this->assertNull($file->getExtension());
+    }
+
+    public function testGetPathRelative() {
+        $file = CM_File_UserContent_Temp::create('foo.txt', 'hello');
+        $this->assertStringEndsWith('/' . $file->getUniqid() . '.txt', $file->getPathRelative());
     }
 
     public function testCreateContent() {

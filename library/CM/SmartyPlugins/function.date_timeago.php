@@ -8,7 +8,7 @@
  * @return string
  */
 function smarty_function_date_timeago($params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $stamp = (int) $params['time'];
     $distance = time() - $stamp;

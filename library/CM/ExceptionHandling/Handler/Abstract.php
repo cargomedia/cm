@@ -63,9 +63,18 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     public function handleException(Exception $exception) {
-        $this->_logException($exception);
+        $printException = true;
+        if ($exception instanceof CM_Exception) {
+            $printException = $exception->getSeverity() >= $this->_getPrintSeverityMin();
+        }
 
-        if (!$exception instanceof CM_Exception || $exception->getSeverity() >= $this->_getPrintSeverityMin()) {
+        try {
+            $this->_logException($exception);
+        } catch (Exception $e) {
+            $printException = true;
+        }
+
+        if ($printException) {
             $this->_printException($exception);
         }
 
@@ -90,7 +99,7 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
      * @param Exception $exception
      */
     protected function _logException(Exception $exception) {
-        $formatter = new CM_ExceptionHandling_Formatter_Plain();
+        $formatter = new CM_ExceptionHandling_Formatter_Plain_Log();
         try {
             if ($exception instanceof CM_Exception) {
                 $log = $exception->getLog();
@@ -106,17 +115,18 @@ abstract class CM_ExceptionHandling_Handler_Abstract {
             $logEntry .= $formatter->formatException($loggerException);
             $logEntry .= '### Original Exception: ' . PHP_EOL;
             $logEntry .= $formatter->formatException($exception) . PHP_EOL;
-            $logPath = $this->_getLogPath();
-            CM_Util::mkDir(dirname($logPath));
-            error_log($logEntry, 3, $logPath);
+            $logFile = $this->_getLogFile();
+            $logFile->ensureParentDirectory();
+            $logFile->append($logEntry);
         }
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
-    protected function _getLogPath() {
-        return CM_Bootloader::getInstance()->getDirData() . 'logs/error.log';
+    protected function _getLogFile() {
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getData();
+        return new CM_File('logs/error.log', $filesystem);
     }
 
     /**

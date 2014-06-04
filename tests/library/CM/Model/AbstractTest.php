@@ -347,8 +347,11 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         /** @var CM_Model_Abstract $model */
 
         $_construct = CMTest_TH::getProtectedMethod('CM_Model_Abstract', '_construct');
-        $_construct->invoke($model, array('id' => 12), array('foobar' => 12));
 
+        $_construct->invoke($model);
+        $this->assertFalse($model->hasId());
+
+        $_construct->invoke($model, array('id' => 12), array('foobar' => 12));
         $this->assertTrue($model->hasId());
 
         $_construct->invoke($model, array('foo' => 12, 'bar' => 13), array('foobar' => 12));
@@ -632,6 +635,66 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         /** @var CM_Model_Abstract $model */
 
         $model->delete();
+    }
+
+    public function testPersistenceCreateWithEmptySchema() {
+        $id = array('id' => 55);
+        $type = 12;
+        $data = array();
+        $schema = new CM_Model_Schema_Definition(array());
+
+        $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create'))->getMockForAbstractClass();
+        $persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($id));
+        /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType', '_getSchema'))->getMockForAbstractClass();
+        $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->any())->method('getType')->will($this->returnValue($type));
+        $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+        /** @var CM_Model_Abstract $model */
+
+        $model->commit();
+    }
+
+    public function testPersistenceUpdateWithEmptySchema() {
+        $id = array('id' => 55);
+        $type = 12;
+        $data = array();
+        $schema = new CM_Model_Schema_Definition(array());
+
+        $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->setMethods(array('create',
+            'save'))->getMockForAbstractClass();
+        $persistence->expects($this->once())->method('create')->with($type, $data)->will($this->returnValue($id));
+        $persistence->expects($this->never())->method('save');
+        /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType', '_getSchema'))->getMockForAbstractClass();
+        $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->any())->method('getType')->will($this->returnValue($type));
+        $model->expects($this->any())->method('_getSchema')->will($this->returnValue($schema));
+        /** @var CM_Model_Abstract $model */
+
+        $model->commit();
+        $model->commit();
+        $model->_set(array());
+    }
+
+    /**
+     * @expectedException CM_Exception_Invalid
+     * @expectedExceptionMessage Cannot get schema-data without a schema
+     */
+    public function testPersistenceWithoutSchema() {
+        $type = 12;
+
+        $persistence = $this->getMockBuilder('CM_Model_StorageAdapter_AbstractAdapter')->getMockForAbstractClass();
+        /** @var CM_Model_StorageAdapter_AbstractAdapter $persistence */
+
+        $model = $this->getMockBuilder('CM_Model_Abstract')->setMethods(array('_getPersistence', 'getType'))->getMockForAbstractClass();
+        $model->expects($this->any())->method('_getPersistence')->will($this->returnValue($persistence));
+        $model->expects($this->any())->method('getType')->will($this->returnValue($type));
+        /** @var CM_Model_Abstract $model */
+
+        $model->commit();
     }
 
     public function testGet() {

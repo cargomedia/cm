@@ -98,6 +98,16 @@ class CM_Model_StreamChannel_Video extends CM_Model_StreamChannel_Abstract {
     }
 
     /**
+     * @param int $index
+     * @return CM_File_UserContent
+     */
+    public function getThumbnail($index) {
+        $index = (int) $index;
+        $filename = $this->getId() . '-' . $this->getHash() . '-thumbs' . DIRECTORY_SEPARATOR . $index . '.png';
+        return new CM_File_UserContent('streamChannels', $filename, $this->getId());
+    }
+
+    /**
      * @return CM_Paging_FileUserContent_StreamChannelVideoThumbnails
      */
     public function getThumbnails() {

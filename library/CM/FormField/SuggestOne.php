@@ -2,11 +2,9 @@
 
 abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
 
-    /**
-     * @param boolean|null $enableChoiceCreate
-     */
-    public function __construct($enableChoiceCreate = null) {
-        parent::__construct(1, $enableChoiceCreate);
+    protected function _initialize() {
+        $this->_params->set('cardinality', 1);
+        parent::_initialize();
     }
 
     public function setValue($value) {
@@ -15,12 +13,12 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
     }
 
     /**
-     * @param string               $userInput
-     * @param CM_Response_Abstract $response
+     * @param CM_Frontend_Environment $environment
+     * @param string                  $userInput
      * @return string|null
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
-        $values = parent::validate($userInput, $response);
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        $values = parent::validate($environment, $userInput);
         return $values ? reset($values) : null;
     }
 }

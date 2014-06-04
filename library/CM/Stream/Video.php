@@ -59,27 +59,25 @@ class CM_Stream_Video extends CM_Stream_Abstract {
      * @param int    $start
      * @param int    $width
      * @param int    $height
-     * @param int    $thumbnailCount
      * @param string $data
      * @return int
      */
-    public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $thumbnailCount, $data) {
+    public static function rpc_publish($streamName, $clientKey, $start, $width, $height, $data) {
         $request = CM_Request_Abstract::getInstance();
         $serverId = self::getInstance()->getAdapter()->getServerId($request);
 
-        $channelId = self::getInstance()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $thumbnailCount, $data);
+        $channelId = self::getInstance()->getAdapter()->publish($streamName, $clientKey, $start, $width, $height, $serverId, $data);
         return $channelId;
     }
 
     /**
      * @param string $streamName
-     * @param int    $thumbnailCount
      * @return bool
      */
-    public static function rpc_unpublish($streamName, $thumbnailCount) {
+    public static function rpc_unpublish($streamName) {
         $adapter = self::getInstance()->getAdapter();
         $adapter->getServerId(CM_Request_Abstract::getInstance());
-        $adapter->unpublish($streamName, $thumbnailCount);
+        $adapter->unpublish($streamName);
         return true;
     }
 

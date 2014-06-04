@@ -5,7 +5,7 @@
   </div>
   <div class="captcha-input">
     <label for="{$name}">{translate 'Enter Code'}</label>
-    <input type="text" name="{$name}[value]" id="{$id}" class="textinput" maxlength="6" />
+    <input type="text" name="{$name}[value]" id="{$inputId}" class="textinput" maxlength="6" />
   </div>
   <input type="hidden" name="{$name}[id]" value="{$imageId}" />
 </div>

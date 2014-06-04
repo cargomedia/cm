@@ -2,15 +2,38 @@
 
 class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params = array()) {
-        /** @var CM_Layout_Abstract $layout */
-        $layout = $this->_getView();
+    /** @var CM_RenderAdapter_Page */
+    private $_renderAdapterPage;
 
-        $js = $this->getRender()->getJs();
+    /**
+     * @param CM_Frontend_Render $render
+     * @param CM_Page_Abstract   $page
+     */
+    public function __construct(CM_Frontend_Render $render, CM_Page_Abstract $page) {
+        $this->_renderAdapterPage = new CM_RenderAdapter_Page($render, $page);
+        parent::__construct($render, $page);
+    }
 
-        $this->getRender()->pushStack('layouts', $layout);
-        $this->getRender()->pushStack('views', $layout);
-        $this->getRender()->pushStack('pages', $layout->getPage());
+    /**
+     * @return string
+     */
+    public function fetch() {
+        $page = $this->_getPage();
+        $layout = $this->_getLayout();
+
+        $page->checkAccessible($this->getRender()->getEnvironment());
+        $frontend = $this->getRender()->getGlobalResponse();
+
+        $viewResponse = new CM_Frontend_ViewResponse($layout);
+        $viewResponse->setTemplateName('default');
+        $layout->prepare($this->getRender()->getEnvironment(), $viewResponse);
+        $viewResponse->set('autoId', $viewResponse->getAutoId());
+        $viewResponse->set('layout', $layout);
+        $viewResponse->set('page', $page);
+        $viewResponse->set('pageTitle', $this->fetchTitle());
+        $viewResponse->set('pageDescription', $this->fetchDescription());
+        $viewResponse->set('pageKeywords', $this->fetchKeywords());
+        $viewResponse->set('renderAdapter', $this);
 
         $options = array();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
@@ -18,7 +41,7 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
         $options['site'] = CM_Params::encode($this->getRender()->getSite());
         $options['url'] = $this->getRender()->getUrl();
         $options['urlStatic'] = $this->getRender()->getUrlStatic();
-        $options['urlUserContent'] = $this->getRender()->getUrlUserContent();
+        $options['urlUserContentList'] = CM_Service_Manager::getInstance()->getUserContent()->getUrlList();
         $options['urlResource'] = $this->getRender()->getUrlResource();
         $options['language'] = $this->getRender()->getLanguage();
         $options['debug'] = CM_Bootloader::getInstance()->isDebug();
@@ -32,40 +55,64 @@ class CM_RenderAdapter_Layout extends CM_RenderAdapter_Abstract {
             $options['stream']['channel']['key'] = CM_Model_StreamChannel_Message_User::getKeyByUser($viewer);
             $options['stream']['channel']['type'] = CM_Model_StreamChannel_Message_User::getTypeStatic();
         }
-        $js->onloadHeaderJs('cm.options = ' . CM_Params::encode($options, true));
+        $frontend->getOnloadHeaderJs()->append('cm.options = ' . CM_Params::encode($options, true));
 
         if ($viewer = $this->getRender()->getViewer()) {
-            $js->onloadHeaderJs('cm.viewer = ' . CM_Params::encode($viewer, true));
+            $frontend->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
         }
 
-        $js->onloadHeaderJs('cm.ready();');
+        $frontend->treeExpand($viewResponse);
 
-        $this->getRender()->getJs()->registerLayout($layout);
-        $js->onloadReadyJs('cm.getLayout()._ready();');
+        $frontend->getOnloadReadyJs()->append('cm.getLayout()._ready();');
+        $frontend->getOnloadHeaderJs()->append('cm.ready();');
+        $html = $this->getRender()->fetchViewResponse($viewResponse);
 
-        $renderAdapterPage = new CM_RenderAdapter_Page($this->getRender(), $layout->getPage());
-        $pageTitle = $renderAdapterPage->fetchTitle();
-        $layout->setTplParam('pageDescription', $renderAdapterPage->fetchDescription());
-        $layout->setTplParam('pageKeywords', $renderAdapterPage->fetchKeywords());
-
-        $layout->setTplParam('title', $this->fetchTitle($pageTitle));
-
-        $assign = $layout->getTplParams();
-        $assign['viewObj'] = $layout;
-        $html = $this->_renderTemplate('default.tpl', $assign);
-
-        $this->getRender()->popStack('layouts');
-        $this->getRender()->popStack('views');
-        $this->getRender()->popStack('pages');
+        $frontend->treeCollapse();
 
         return $html;
     }
 
     /**
-     * @param string $pageTitle
      * @return string
      */
-    public function fetchTitle($pageTitle) {
-        return trim($this->_renderTemplate('title.tpl', array('pageTitle' => $pageTitle)));
+    public function fetchPage() {
+        return $this->_renderAdapterPage->fetch();
+    }
+
+    /**
+     * @return string
+     */
+    public function fetchTitle() {
+        $pageTitle = $this->_renderAdapterPage->fetchTitle();
+        return $this->getRender()->fetchViewTemplate($this->_getLayout(), 'title', array('pageTitle' => $pageTitle));
+    }
+
+    /**
+     * @return string
+     */
+    public function fetchDescription() {
+        return $this->_renderAdapterPage->fetchDescription();
+    }
+
+    /**
+     * @return string
+     */
+    public function fetchKeywords() {
+        return $this->_renderAdapterPage->fetchKeywords();
+    }
+
+    /**
+     * @return CM_Page_Abstract
+     */
+    private function _getPage() {
+        return $this->_getView();
+    }
+
+    /**
+     * @return CM_Layout_Abstract
+     */
+    private function _getLayout() {
+        $environment = $this->getRender()->getEnvironment();
+        return $this->_getPage()->getLayout($environment);
     }
 }

@@ -2,42 +2,52 @@
 
 class CM_RenderAdapter_Page extends CM_RenderAdapter_Component {
 
-    public function fetch(array $params = array()) {
-        $this->_getView()->setTplParam('pageTitle', $this->fetchTitle());
-
-        return parent::fetch($params);
+    protected function _prepareViewResponse(CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('pageTitle', $this->fetchTitle());
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchDescription() {
-        return $this->_fetchTpl('meta-description.tpl');
+        return $this->_fetchMetaTemplate('meta-description');
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchKeywords() {
-        return $this->_fetchTpl('meta-keywords.tpl');
+        return $this->_fetchMetaTemplate('meta-keywords');
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function fetchTitle() {
-        return trim($this->_fetchTpl('title.tpl'));
-    }
-
-    protected function _getStackKey() {
-        return 'pages';
+        return $this->_fetchMetaTemplate('title');
     }
 
     /**
-     * @param string $tplName
-     * @return string
+     * @param string $templateName
+     * @return string|null
      */
-    private function _fetchTpl($tplName) {
-        return $this->_renderTemplate($tplName, $this->_getView()->getTplParams());
+    protected function _fetchMetaTemplate($templateName) {
+        $templatePath = $this->_getMetaTemplatePath($templateName);
+        if (null === $templatePath) {
+            return null;
+        }
+        return trim($this->getRender()->fetchTemplate($templatePath, $this->_getViewResponse()->getData()));
+    }
+
+    /**
+     * @param string $templateName
+     * @return string|null
+     */
+    protected function _getMetaTemplatePath($templateName) {
+        $templatePath = $this->getRender()->getTemplatePath($this->_getView(), $templateName);
+        if (null === $templatePath) {
+            $templatePath = $this->getRender()->getLayoutPath('Page/Abstract/' . $templateName . '.tpl', null, null, false);
+        }
+        return $templatePath;
     }
 }

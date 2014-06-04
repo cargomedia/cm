@@ -1,0 +1,26 @@
+.dataTable {
+  width: 100%;
+
+  > li, th, td {
+    padding: 4px;
+    text-align: left;
+  }
+
+  > li:nth-child(2n), > tbody > tr:nth-child(2n) > td {
+    background-color: darken(@colorBg, 4);
+  }
+
+  .timeago {
+    float: none;
+  }
+
+  tfoot {
+    tr {
+      border-top: 1px solid @colorFgBorderEmphasize2;
+    }
+
+    td {
+      font-weight: bold;
+    }
+  }
+}

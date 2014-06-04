@@ -2,19 +2,10 @@
 
 class CM_FormField_File extends CM_FormField_Abstract {
 
-    /**
-     * @param int $cardinality
-     */
-    public function __construct($cardinality = 1) {
-        $this->_options['cardinality'] = (int) $cardinality;
+    protected function _initialize() {
+        $this->_options['cardinality'] = $this->_params->getInt('cardinality', 1);
         $this->_options['allowedExtensions'] = $this->_getAllowedExtensions();
-    }
-
-    /**
-     * @return array List of allowed extension (empty = all)
-     */
-    protected function _getAllowedExtensions() {
-        return array();
+        parent::_initialize();
     }
 
     /**
@@ -25,12 +16,12 @@ class CM_FormField_File extends CM_FormField_Abstract {
     }
 
     /**
-     * @param array                $userInput
-     * @param CM_Response_Abstract $response
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
      * @throws CM_Exception_Invalid
      * @return array
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         $userInput = array_filter($userInput, function ($value) {
             return !empty($value);
         });
@@ -47,11 +38,18 @@ class CM_FormField_File extends CM_FormField_Abstract {
         return (array) $files;
     }
 
-    public function prepare(array $params) {
-        $text = isset($params['text']) ? (string) $params['text'] : null;
-        $skipDropZone = !empty($params['skipDropZone']);
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $text = $this->getParams()->has('text') ? $renderParams->getString('text') : null;
+        $skipDropZone = $renderParams->getBoolean('skipDropZone', false);
 
-        $this->setTplParam('text', $text);
-        $this->setTplParam('skipDropZone', $skipDropZone);
+        $viewResponse->set('text', $text);
+        $viewResponse->set('skipDropZone', $skipDropZone);
+    }
+
+    /**
+     * @return array List of allowed extension (empty = all)
+     */
+    protected function _getAllowedExtensions() {
+        return array();
     }
 }
