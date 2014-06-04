@@ -72,6 +72,36 @@ Parent terminated.
     }
 
     /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testForkAndWaitForChildrenWithResults() {
+        $process = CM_Process::getInstance();
+        $process->fork(function () {
+            usleep(100 * 1000);
+            return 'Child 1 finished';
+        });
+        $process->fork(function () {
+            usleep(50 * 1000);
+            return array('msg' => 'Child 2 finished');
+        });
+        $process->fork(function () {
+            usleep(150 * 1000);
+            $this->setExpectedException('Exception');
+            throw new Exception('Child 3 finished');
+        });
+
+        $workloadResultList = $process->waitForChildren();
+        $this->assertCount(3, $workloadResultList);
+        $this->assertSame('Child 1 finished', $workloadResultList[0]->getResult());
+        $this->assertSame(null, $workloadResultList[0]->getException());
+        $this->assertSame(array('msg' => 'Child 2 finished'), $workloadResultList[1]->getResult());
+        $this->assertSame(null, $workloadResultList[1]->getException());
+        $this->assertSame(null, $workloadResultList[2]->getResult());
+        $this->assertSame('Child 3 finished', $workloadResultList[2]->getException()->getMessage());
+    }
+
+    /**
      * @param string $message
      */
     public static function writeln($message) {
