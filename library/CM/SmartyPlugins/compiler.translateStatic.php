@@ -1,7 +1,7 @@
 <?php
 
 function smarty_compiler_translateStatic($params, Smarty $smarty) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $smarty->getTemplateVars('render');
     $key = eval('return ' . $params['key'] . ';');
 

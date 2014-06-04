@@ -610,7 +610,7 @@ class CM_Model_Mock_Validation2 extends CM_Model_Mock_Validation {
      * @return string
      */
     public function getId() {
-        return (string) $this->_getId('id');
+        return (string) $this->_getIdKey('id');
     }
 
     public static function getTypeStatic() {

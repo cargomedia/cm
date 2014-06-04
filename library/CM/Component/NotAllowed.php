@@ -2,9 +2,9 @@
 
 class CM_Component_NotAllowed extends CM_Component_Abstract {
 
-    public function prepare() {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
     }
 
-    public function checkAccessible(CM_Render $render) {
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
     }
 }

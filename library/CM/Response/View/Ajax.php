@@ -8,28 +8,35 @@ class CM_Response_View_Ajax extends CM_Response_View_Abstract {
             $success = array();
             $query = $this->_request->getQuery();
             if (!isset($query['method'])) {
-                throw new CM_Exception_Invalid('No method specified', null, null, CM_Exception::WARN);
+                throw new CM_Exception_Invalid('No method specified', null, array('severity' => CM_Exception::WARN));
             }
             if (!preg_match('/^[\w_]+$/i', $query['method'])) {
-                throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, null, CM_Exception::WARN);
+                throw new CM_Exception_Invalid('Illegal method: `' . $query['method'] . '`', null, array('severity' => CM_Exception::WARN));
             }
             if (!isset($query['params']) || !is_array($query['params'])) {
-                throw new CM_Exception_Invalid('Illegal params', null, null, CM_Exception::WARN);
+                throw new CM_Exception_Invalid('Illegal params', null, array('severity' => CM_Exception::WARN));
             }
-            $view = $this->_getViewInfo();
-            $className = $view['className'];
-            $functionName = 'ajax_' . $query['method'];
+
+            $view = $this->_getView();
+            if ($view instanceof CM_View_CheckAccessibleInterface) {
+                $view->checkAccessible($this->getRender()->getEnvironment());
+            }
+
+            $ajaxMethodName = 'ajax_' . $query['method'];
             $params = CM_Params::factory($query['params']);
-            $this->_setStringRepresentation($className . '::' . $functionName);
 
-            $componentHandler = new CM_ComponentFrontendHandler();
-            $success['data'] = CM_Params::encode(call_user_func(array($className, $functionName), $params, $componentHandler, $this));
+            $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
-            $exec = $componentHandler->compile_js('this');
+            $this->_setStringRepresentation(get_class($view) . '::' . $ajaxMethodName);
+            $data = $view->$ajaxMethodName($params, $componentHandler, $this);
+            $success['data'] = CM_Params::encode($data);
 
-            CM_Frontend::concat_js($this->getRender()->getJs()->getJs(), $exec);
-            if (strlen($exec)) {
-                $success['exec'] = $exec;
+            $frontend = $this->getRender()->getGlobalResponse();
+            $frontend->getOnloadReadyJs()->append($componentHandler->compile('this'));
+            $jsCode = $frontend->getJs();
+
+            if (strlen($jsCode)) {
+                $success['exec'] = $jsCode;
             }
             $output['success'] = $success;
         } catch (CM_Exception $e) {

@@ -44,8 +44,9 @@ class CM_MenuEntry {
      * @return bool True if path/queries match
      */
     public final function compare($path, array $params = array()) {
-        $page = $this->getPage();
-        if ($path == $page::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
+        /** @var CM_Page_Abstract $pageClassName */
+        $pageClassName = $this->getPageName();
+        if ($path == $pageClassName::getPath() && array_intersect_assoc($this->getParams(), $params) == $this->getParams()) {
             return true;
         }
         return false;
@@ -105,24 +106,7 @@ class CM_MenuEntry {
     }
 
     /**
-     * @param CM_Model_User|null $viewer
-     * @return CM_Page_Abstract Page object
-     */
-    public final function getPage(CM_Model_User $viewer = null) {
-        $viewerId = $viewer ? $viewer->getId() : 0;
-        $className = $this->getPageName();
-
-        $cacheKey = CM_CacheConst::Page . '_class:' . $className . '_userId:' . $viewerId;
-        if (($page = CM_Cache_Storage_Runtime::getInstance()->get($cacheKey)) === false) {
-            $page = new $className($this->getParams(), $viewer);
-            CM_Cache_Storage_Runtime::getInstance()->set($cacheKey, $page);
-        }
-
-        return $page;
-    }
-
-    /**
-     * @return string Returns page class name
+     * @return string
      */
     public final function getPageName() {
         return $this->_data['page'];
@@ -211,10 +195,17 @@ class CM_MenuEntry {
     }
 
     /**
-     * @param CM_Model_User|null $viewer
+     * @param CM_Frontend_Environment $environment
      * @return bool
      */
-    public final function isViewable(CM_Model_User $viewer = null) {
-        return $this->getPage($viewer)->isViewable();
+    public final function isViewable(CM_Frontend_Environment $environment) {
+        if (!isset($this->_data['viewable'])) {
+            return true;
+        }
+        $isViewable = $this->_data['viewable'];
+        if (is_callable($isViewable)) {
+            return $isViewable($environment);
+        }
+        return (bool) $isViewable;
     }
 }

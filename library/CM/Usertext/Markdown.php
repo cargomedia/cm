@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Markdown extends Michelf\Markdown {
+class CM_Usertext_Markdown extends Michelf\MarkdownExtra {
 
     /** @var bool $_skipAnchors */
     private $_skipAnchors;

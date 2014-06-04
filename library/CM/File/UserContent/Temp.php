@@ -2,30 +2,44 @@
 
 class CM_File_UserContent_Temp extends CM_File_UserContent {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_uniqid;
 
+    /** @var string */
+    private $_filenameLabel;
+
     /**
-     * @param string $uniqid
+     * @param string                  $uniqid
+     * @param CM_Service_Manager|null $serviceManager
      * @throws CM_Exception_Nonexistent
      */
-    public function __construct($uniqid) {
+    public function __construct($uniqid, CM_Service_Manager $serviceManager = null) {
         $data = CM_Db_Db::select('cm_tmp_userfile', '*', array('uniqid' => $uniqid))->fetch();
         if (!$data) {
             throw new CM_Exception_Nonexistent('Uniqid for file does not exists: `' . $uniqid . '`');
         }
         $this->_uniqid = $data['uniqid'];
-        parent::__construct('tmp', $data['filename']);
+        $this->_filenameLabel = $data['filename'];
+
+        $filenameParts = array($this->getUniqid());
+        if (false !== strpos($this->getFilenameLabel(), '.')) {
+            $filenameParts[] = strtolower(pathinfo($this->getFilenameLabel(), PATHINFO_EXTENSION));
+        }
+
+        parent::__construct('tmp', implode('.', $filenameParts), null, $serviceManager);
     }
 
     /**
-     * @param string      $filename
-     * @param string|null $content
+     * @param string                  $filename
+     * @param string|null             $content
+     * @param CM_File_Filesystem|null $filesystem
+     * @throws CM_Exception_Invalid
      * @return CM_File_UserContent_Temp
      */
-    public static function create($filename, $content = null) {
+    public static function create($filename, $content = null, CM_File_Filesystem $filesystem = null) {
+        if ($filesystem) {
+            throw new CM_Exception_Invalid('Temporary user-content file cannot handle filesystem');
+        }
         $filename = (string) $filename;
         if (strlen($filename) > 100) {
             $filename = substr($filename, -100, 100);
@@ -34,7 +48,7 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
         CM_Db_Db::insert('cm_tmp_userfile', array('uniqid' => $uniqid, 'filename' => $filename, 'createStamp' => time()));
 
         $file = new self($uniqid);
-        $file->mkDir();
+        $file->ensureParentDirectory();
         if (null !== $content) {
             $file->write($content);
         }
@@ -51,11 +65,11 @@ class CM_File_UserContent_Temp extends CM_File_UserContent {
     /**
      * @return string
      */
-    public function getPathRelative() {
-        return $this->_getDir() . DIRECTORY_SEPARATOR . $this->getUniqid() . '.' . $this->getExtension();
+    public function getFilenameLabel() {
+        return $this->_filenameLabel;
     }
 
-    public function delete() {
+    public function delete($recursive = null) {
         CM_Db_Db::delete('cm_tmp_userfile', array('uniqid' => $this->getUniqid()));
         parent::delete();
     }

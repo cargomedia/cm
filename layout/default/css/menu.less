@@ -1,0 +1,112 @@
+.menu-tabs {
+  padding: 0 10px;
+  text-align: right;
+
+  > li {
+    display: inline-block;
+    vertical-align: bottom;
+
+    > a {
+      display: block;
+      .nowrap;
+      padding: 7px 10px;
+      color: @colorFgLinkSubtle;
+      opacity: .8;
+
+      &:hover {
+        opacity: 1;
+
+        .icon {
+          color: @colorFgHeading;
+        }
+      }
+    }
+    &.hasIcon.hasLabel > a > .label {
+      margin-left: 4px;
+    }
+
+    &.active a, &.active a:hover {
+      opacity: 1;
+
+      .icon {
+        color: @colorFgHeading;
+      }
+    }
+  }
+}
+
+.menu-pills {
+  margin-bottom: 5px;
+  line-height: 0;
+
+  &.select {
+    > li {
+      margin: 0 5px 5px 0;
+
+      > a {
+        box-shadow: 1px 1px lighten(@colorFg, 20);
+        background-color: @colorBg;
+      }
+
+      &.active > a {
+        .transform(translate(1px, 1px));
+        background-color: @colorBgEmphasize3;
+      }
+    }
+  }
+
+  > li {
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+
+    > a {
+      position: relative;
+      display: block;
+      max-width: 150px;
+      .nowrap;
+      padding: 0 15px;
+      z-index: 1;
+      line-height: 38px;
+      border: 1px solid @colorFgBorderEmphasize3;
+      background-color: @colorBgEmphasize1;
+      text-decoration: none;
+      color: @colorFg;
+
+      &:hover {
+        background-color: @colorBgEmphasize2;
+      }
+
+      .icon, .label {
+        vertical-align: top;
+      }
+
+      .icon {
+        display: inline-block;
+        font-size: 1.2em;
+        color: @colorFgSubtle;
+      }
+    }
+
+    &.hasIcon.hasLabel .label {
+      margin-left: 7px;
+    }
+
+    &.active {
+      > a {
+        border: 1px solid darken(@colorFgBorderEmphasize3, 5);
+        background-color: @colorBg;
+        box-shadow: none;
+        z-index: auto;
+
+        .icon {
+          color: @colorFgHeading;
+        }
+      }
+    }
+  }
+}

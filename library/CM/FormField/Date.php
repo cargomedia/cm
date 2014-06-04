@@ -8,23 +8,13 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     /** @var int */
     protected $_yearLast;
 
-    /**
-     * @param int|null $yearFirst
-     * @param int|null $yearLast
-     */
-    public function __construct($yearFirst = null, $yearLast = null) {
-        if (null === $yearFirst) {
-            $yearFirst = date('Y') - 100;
-        }
-        $this->_yearFirst = (int) $yearFirst;
-
-        if (null === $yearLast) {
-            $yearLast = date('Y');
-        }
-        $this->_yearLast = (int) $yearLast;
+    protected function _initialize() {
+        $this->_yearFirst = $this->_params->getInt('yearFirst', date('Y') - 100);
+        $this->_yearLast = $this->_params->getInt('yearLast', date('Y'));
+        parent::_initialize();
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         $dd = (int) trim($userInput['day']);
         $mm = (int) trim($userInput['month']);
         $yy = (int) trim($userInput['year']);
@@ -32,21 +22,21 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         return new DateTime($yy . '-' . $mm . '-' . $dd);
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
 
         $years = range($this->_yearFirst, $this->_yearLast);
         $months = range(1, 12);
         $days = range(1, 31);
 
-        $this->setTplParam('years', array_combine($years, $years));
-        $this->setTplParam('months', array_combine($months, $months));
-        $this->setTplParam('days', array_combine($days, $days));
+        $viewResponse->set('years', array_combine($years, $years));
+        $viewResponse->set('months', array_combine($months, $months));
+        $viewResponse->set('days', array_combine($days, $days));
 
         $value = $this->getValue();
-        $this->setTplParam('yy', $value ? $value->format('Y') : null);
-        $this->setTplParam('mm', $value ? $value->format('n') : null);
-        $this->setTplParam('dd', $value ? $value->format('j') : null);
+        $viewResponse->set('yy', $value ? $value->format('Y') : null);
+        $viewResponse->set('mm', $value ? $value->format('n') : null);
+        $viewResponse->set('dd', $value ? $value->format('j') : null);
     }
 
     public function isEmpty($userInput) {

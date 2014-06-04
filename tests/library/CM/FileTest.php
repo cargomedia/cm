@@ -13,6 +13,7 @@ class CM_FileTest extends CMTest_TestCase {
 
     public function tearDown() {
         file_put_contents($this->_testFilePath, self::$_backupContent);
+        CMTest_TH::clearEnv();
     }
 
     public function testConstruct() {
@@ -29,25 +30,8 @@ class CM_FileTest extends CMTest_TestCase {
     }
 
     public function testConstructNonExistent() {
-        try {
-            new CM_File(DIR_TEST_DATA . '/nonexistent-file');
-            $this->fail('Could instantiate non-existing file');
-        } catch (Exception $e) {
-            $this->assertContains('does not exist or is not a file', $e->getMessage());
-        }
-    }
-
-    public function testDelete() {
-        $file = new CM_File($this->_testFilePath);
-
-        $this->assertTrue(CM_File::exists($this->_testFilePath));
-
-        $file->delete();
-
-        $this->assertFalse(CM_File::exists($this->_testFilePath));
-
-        // Should do nothing if already deleted
-        $file->delete();
+        $file = new CM_File(DIR_TEST_DATA . '/nonexistent-file');
+        $this->assertEquals(DIR_TEST_DATA . '/nonexistent-file', $file->getPath());
     }
 
     public function testSanitizeFilename() {
@@ -61,20 +45,12 @@ class CM_FileTest extends CMTest_TestCase {
         }
     }
 
-    public function testWrite() {
-        $file = new CM_File($this->_testFilePath);
-        $this->assertNotEquals('foo', $file->read());
-
-        $file->write('foo');
-        $this->assertEquals('foo', $file->read());
-    }
-
     public function testCreate() {
         $path = DIR_TEST_DATA . 'foo';
-        $this->assertFalse(CM_File::exists($path));
+        $this->assertFileNotExists($path);
 
         $file = CM_File::create($path);
-        $this->assertTrue(CM_File::exists($path));
+        $this->assertFileExists($path);
         $this->assertInstanceOf('CM_File', $file);
         $this->assertEquals($path, $file->getPath());
         $this->assertEquals('', $file->read());
@@ -88,13 +64,13 @@ class CM_FileTest extends CMTest_TestCase {
             CM_File::create(DIR_TEST_DATA);
             $this->fail('Could create file with invalid path');
         } catch (CM_Exception $e) {
-            $this->assertContains('Cannot write to', $e->getMessage());
+            $this->assertContains('Cannot write', $e->getMessage());
         }
     }
 
     public function testCreateTmp() {
         $file = CM_File::createTmp();
-        $this->assertTrue(CM_File::exists($file->getPath()));
+        $this->assertTrue($file->getExists());
         $this->assertNull($file->getExtension());
         $this->assertEmpty($file->read());
         $file->delete();
@@ -109,6 +85,32 @@ class CM_FileTest extends CMTest_TestCase {
         $file->delete();
     }
 
+    public function testDeleteRecursive() {
+        $dir = CM_File::createTmpDir();
+        $file = $dir->joinPath('foo');
+        $file->write('hello');
+        $this->assertTrue($dir->getExists());
+        $this->assertTrue($file->getExists());
+
+        $dir->delete(true);
+        $this->assertFalse($dir->getExists());
+        $this->assertFalse($file->getExists());
+    }
+
+    /**
+     * @expectedException CM_Exception
+     * @expectedExceptionMessage Cannot delete directory
+     */
+    public function testDeleteNonRecursive() {
+        $dir = CM_File::createTmpDir();
+        $file = $dir->joinPath('foo');
+        $file->write('hello');
+        $this->assertTrue($dir->getExists());
+        $this->assertTrue($file->getExists());
+
+        $dir->delete();
+    }
+
     public function testTruncate() {
         $file = new CM_File($this->_testFilePath);
         $file->write('foo');
@@ -117,39 +119,96 @@ class CM_FileTest extends CMTest_TestCase {
         $this->assertSame('', $file->read());
     }
 
-    public function testCopy() {
-        $path = CM_Bootloader::getInstance()->getDirTmp() . 'filecopytest.txt';
-        $file = new CM_File($this->_testFilePath);
-        $this->assertFileNotExists($path);
-        $file->copy($path);
-        $copiedFile = new CM_File($path);
-        $this->assertTrue($copiedFile->getExists());
-        $copiedFile->delete();
-
-        try {
-            $file->copy('/non-existent-path/not-existent-file');
-            $this->fail('Should not be able to copy');
-        } catch (Exception $e) {
-            $this->assertContains('Cannot copy', $e->getMessage());
-        }
+    public function testAppend() {
+        $file = CM_File::createTmp();
+        $file->append('foo');
+        $this->assertSame('foo', $file->read());
+        $file->append('bar');
+        $this->assertSame('foobar', $file->read());
     }
 
-    public function testMove() {
-        $newPath = CM_Bootloader::getInstance()->getDirTmp() . 'filemovetest.txt';
-        $file = new CM_File($this->_testFilePath);
-        $oldPath = $file->getPath();
+    public function testGetMimeType() {
+        $file = new CM_File(DIR_TEST_DATA . 'img/test.jpg');
+        $this->assertSame('image/jpeg', $file->getMimeType());
+    }
 
-        $file->move($newPath);
-        $this->assertFileNotExists($oldPath);
-        $this->assertFileExists($newPath);
-        $this->assertSame($newPath, $file->getPath());
-        try {
-            $file->move('/non-existent-path/not-existent-file');
-            $this->fail('Should not be able to copy');
-        } catch (Exception $e) {
-            $this->assertFileExists($newPath);
-            $this->assertContains('Cannot move', $e->getMessage());
-        }
-        $file->delete();
+    public function testRead() {
+        $file = CM_File::createTmp(null, 'hello');
+        $this->assertSame('hello', $file->read());
+
+        $file->write('foo');
+        $this->assertSame('foo', $file->read());
+
+        file_put_contents($file->getPath(), 'bar');
+        $this->assertSame('foo', $file->read());
+    }
+
+    public function testReadFirstLine() {
+        $file = CM_File::createTmp(null, 'hello');
+        $this->assertSame('hello', $file->readFirstLine());
+
+        $file = CM_File::createTmp(null, "hello\r\nworld\r\nfoo");
+        $this->assertSame("hello\r\n", $file->readFirstLine());
+
+        $file = CM_File::createTmp(null, '');
+        $this->assertSame('', $file->readFirstLine());
+    }
+
+    public function testEnsureParentDirectory() {
+        $dir = new CM_File(CM_Bootloader::getInstance()->getDirTmp() . 'foo/bar');
+        $file = new CM_File($dir->getPath() . '/mega.txt');
+        $this->assertFalse($dir->getExists());
+
+        $file->ensureParentDirectory();
+        $this->assertTrue($dir->getExists());
+        $this->assertFalse($file->getExists());
+    }
+
+    public function createTmpDir() {
+        $dir = CM_File::createTmpDir();
+
+        $this->assertTrue($dir->getPath());
+        $this->assertTrue($dir->isDirectory());
+    }
+
+    public function testJoinPath() {
+        $dir = CM_File::createTmpDir();
+        $fileJoined = $dir->joinPath('foo', 'bar', '//mega//', 'jo', '..', 'nei');
+        $fileJoinedPathRelative = substr($fileJoined->getPath(), strlen($dir->getPath()) + 1);
+        $this->assertSame('/foo/bar/mega/nei', $fileJoinedPathRelative);
+    }
+
+    public function testEquals() {
+        $filesystem1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/'));
+        $filesystem2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/'));
+        $filesystem3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local('/tmp'));
+
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(null));
+        $this->assertTrue((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem1)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem1)));
+        $this->assertTrue((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem2)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem2)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/foo', $filesystem3)));
+        $this->assertFalse((new CM_File('/foo', $filesystem1))->equals(new CM_File('/bar', $filesystem3)));
+    }
+
+    public function testCopyToFile() {
+        $dirTmp = CM_Bootloader::getInstance()->getDirTmp();
+        $filesystem1 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem2 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp));
+        $filesystem3 = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_Local($dirTmp . 'subdir'));
+        $filesystem3->getAdapter()->setup();
+
+        $file1 = new CM_File('foo', $filesystem1);
+        $file2 = new CM_File('bar', $filesystem2);
+        $file3 = new CM_File('zoo', $filesystem3);
+
+        $file1->write('hello');
+
+        $file1->copyToFile($file2);
+        $this->assertSame($file1->read(), $file2->read());
+
+        $file1->copyToFile($file3);
+        $this->assertSame($file1->read(), $file3->read());
     }
 }

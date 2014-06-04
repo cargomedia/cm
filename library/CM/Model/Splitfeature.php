@@ -23,7 +23,7 @@ class CM_Model_Splitfeature extends CM_Model_Abstract {
      * @return string
      */
     public function getName() {
-        return $this->_getId('name');
+        return $this->_getIdKey('name');
     }
 
     public function getId() {

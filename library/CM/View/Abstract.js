@@ -5,6 +5,7 @@
 var CM_View_Abstract = Backbone.View.extend({
   _class: 'CM_View_Abstract',
 
+  /** @type CM_View_Abstract[] **/
   _children: [],
 
   initialize: function() {
@@ -109,6 +110,31 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
+   * @return CM_View_Abstract|null
+   */
+  getComponent: function() {
+    if (this.hasClass('CM_Component_Abstract')) {
+      return this;
+    }
+    return this.findParent('CM_Component_Abstract');
+  },
+
+  /**
+   * @returns {{CM_Component_Abstract: Object|null, CM_View_Abstract: Object}}
+   */
+  getViewInfoList: function() {
+    var viewInfoList = {
+      CM_Component_Abstract: null,
+      CM_View_Abstract: this._getArray()
+    };
+    var component = this.getComponent();
+    if (component) {
+      viewInfoList.CM_Component_Abstract = component._getArray();
+    }
+    return viewInfoList;
+  },
+
+  /**
    * @return String
    */
   getAutoId: function() {
@@ -152,12 +178,17 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {Boolean} [skipDomRemoval]
-   * @param {Boolean} [skipTriggerRemove]
+   * @param {Boolean} [skipDomRemoval]  Internal use only
    */
-  remove: function(skipDomRemoval, skipTriggerRemove) {
+  remove: function(skipDomRemoval) {
+    this.trigger('destruct');
+
+    if (!skipDomRemoval) {
+      this.$el.detach();  // Detach from DOM to prevent reflows when removing children
+    }
+
     _.each(_.clone(this.getChildren()), function(child) {
-      child.remove(skipDomRemoval, skipTriggerRemove);
+      child.remove(skipDomRemoval);
     });
 
     if (this.getParent()) {
@@ -171,14 +202,7 @@ var CM_View_Abstract = Backbone.View.extend({
 
     delete cm.views[this.getAutoId()];
 
-    this.trigger('destruct');
-    if (!skipTriggerRemove) {
-      this.trigger('remove');
-    }
-
-    if (skipDomRemoval) {
-      this.undelegateEvents();
-    } else {
+    if (!skipDomRemoval) {
       this.$el.remove();
     }
 
@@ -186,12 +210,11 @@ var CM_View_Abstract = Backbone.View.extend({
   },
 
   /**
-   * @param {CM_View_Abstract} view
+   * @param {jQuery} $html
    */
-  replaceWith: function(view) {
-    this.getParent().registerChild(view);
-    this.$el.replaceWith(view.$el);
-    this.remove(true, true);
+  replaceWithHtml: function($html) {
+    this.remove(true);
+    this.$el.replaceWith($html);
   },
 
   disable: function() {
@@ -227,7 +250,7 @@ var CM_View_Abstract = Backbone.View.extend({
       this.disable();
     }
 
-    var xhr = cm.ajax('ajax', {view: options.view._getArray(), method: functionName, params: params}, {
+    var xhr = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
       success: function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);

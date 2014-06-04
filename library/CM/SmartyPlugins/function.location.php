@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_location(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
     /** @var CM_Model_Location $location */
@@ -9,20 +9,24 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
     $distanceFrom = isset($params['distanceFrom']) ? $location->getDistance($params['distanceFrom']) : null;
 
     $parts = array();
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
-    if ($city = $location->get(CM_Model_Location::LEVEL_CITY)) {
-        $parts[] = $city->getName();
+    $cityName = $location->getName(CM_Model_Location::LEVEL_CITY);
+    if (strlen($cityName)) {
+        $parts[] = $cityName;
     }
-    if ($state = $location->get(CM_Model_Location::LEVEL_STATE)) {
-        $parts[] = $state->getName();
+    $stateName = $location->getName(CM_Model_Location::LEVEL_STATE);
+    if (strlen($stateName)) {
+        $parts[] = $stateName;
     }
-    if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
-        $parts[] = $country->getName();
+    $countryName = $location->getName(CM_Model_Location::LEVEL_COUNTRY);
+    if ($countryName) {
+        $parts[] = $countryName;
     }
+    $countryAbbreviation = $location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY);
     if (3 == count($parts)) {
-        if ('US' == $location->getAbbreviation(CM_Model_Location::LEVEL_COUNTRY)) {
+        if ('US' === $countryAbbreviation) {
             unset($parts[2]);
         } else {
             unset($parts[1]);
@@ -30,9 +34,8 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
     }
     $html = implode(', ', $parts);
 
-    if ($country = $location->get(CM_Model_Location::LEVEL_COUNTRY)) {
-        $html .= ' <img class="flag" src="' . $render->getUrlResource('layout', 'img/flags/' . strtolower($country->getAbbreviation()) . '.png') .
-            '" />';
+    if (strlen($countryAbbreviation)) {
+        $html .= ' <img class="flag" src="' . $render->getUrlResource('layout', 'img/flags/' . strtolower($countryAbbreviation) . '.png') . '" />';
     }
 
     if (null !== $distanceFrom && $distanceFrom < 100 * 1000) {

@@ -17,7 +17,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @return string
      */
     public function getName() {
-        return $this->_getId('name');
+        return $this->_getIdKey('name');
     }
 
     public function getId() {
@@ -125,11 +125,17 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     protected function _onDeleteBefore() {
+        if ($this->_withoutPersistence) {
+            return;
+        }
         CM_Db_Db::delete('cm_splittestVariation', array('splittestId' => $this->getId()));
         CM_Db_Db::delete('cm_splittestVariation_fixture', array('splittestId' => $this->getId()));
     }
 
     protected function _onDelete() {
+        if ($this->_withoutPersistence) {
+            return;
+        }
         CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
     }
 

@@ -1,7 +1,6 @@
 Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
-  config.vm.box = 'debian-7-amd64-cm'
-  config.vm.box_url = 'http://vagrant-boxes.cargomedia.ch/virtualbox/debian-7-amd64-cm.box'
+  config.vm.box = 'cargomedia/debian-7-amd64-cm'
 
   config.vm.hostname = 'www.cm.dev'
 

@@ -5,7 +5,21 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type Object **/
   _fields: {},
+
+  /** @type Object **/
+  _actions: {},
+
+  /** @type Boolean **/
+  _stopErrorPropagation: false,
+
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
+
+    this._fields = {};
+    this._actions = {};
+  },
 
   events: {
     'reset': function() {
@@ -19,25 +33,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   ready: function() {
   },
 
-  initialize: function() {
-    CM_View_Abstract.prototype.initialize.call(this);
-
-    this._fields = {};
-    _.each(this.options.fields, function(fieldInfo, name) {
-      // Lazy construct
-      var $field = this.$("#" + name);
-      if ($field.length) {
-        var fieldClass = window[fieldInfo.className];
-        this.registerField(name, new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
-      }
-    }, this);
-  },
-
-
   _ready: function() {
     var handler = this;
 
-    _.each(this.options.actions, function(action, name) {
+    _.each(this._actions, function(action, name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -59,11 +58,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} name
    * @param {CM_FormField_Abstract} field
    */
-  registerField: function(name, field) {
-    this._fields[name] = field;
+  registerField: function(field) {
+    this._fields[field.getName()] = field;
 
     field.on('change', function() {
       this.trigger('change');
@@ -71,10 +69,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return CM_Component_Abstract
+   * @param {String} name
+   * @param {Object} presentation
    */
-  getComponent: function() {
-    return this.getParent();
+  registerAction: function(name, presentation) {
+    this._actions[name] = presentation;
   },
 
   /**
@@ -103,7 +102,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getData: function(actionName) {
     var form_data = this.$().serializeArray();
-    var action = actionName ? this.options.actions[actionName] : null;
+    var action = actionName ? this._actions[actionName] : null;
 
     var data = {};
     var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
@@ -140,87 +139,94 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param actionName
-   * @return jqXHR|Boolean
+   * @param {String} [actionName]
+   * @param {Object} [options]
+   * @return Promise
    */
-  submit: function(actionName) {
-    actionName = actionName || _.first(_.keys(this.options.actions));
-
-    var action = this.options.actions[actionName];
-    if (!action) {
-      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
-    }
-    var data = this.getData(actionName);
-
-    var errorList = {};
-    _.each(this._fields, function(field, fieldName) {
-      errorList[fieldName] = null;
+  submit: function(actionName, options) {
+    options = _.defaults(options || {}, {
+      handleErrors: true,
+      disableUI: true
     });
+    var action = this._getAction(actionName);
+    var data = this.getData(action.name);
+    var deferred = $.Deferred();
 
-    var hasErrors = false;
-    _.each(_.keys(action.fields).reverse(), function(fieldName) {
-      var required = action.fields[fieldName];
-      var field = this.getField(fieldName);
-      if (required && field.isEmpty(data[fieldName])) {
-        var label;
-        var $textInput = field.$('input, textarea');
-        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
-        if ($labels.length) {
-          label = $labels.first().text();
-        } else if ($textInput.attr('placeholder')) {
-          label = $textInput.attr('placeholder');
-        }
-        if (label) {
-          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+    var errorList = this._getErrorList(action.name);
+
+    if (options.handleErrors) {
+      _.each(this._fields, function(field, fieldName) {
+        if (errorList[fieldName]) {
+          field.error(errorList[fieldName]);
         } else {
-          errorList[fieldName] = cm.language.get('Required');
+          field.error(null);
         }
-        hasErrors = true;
-      }
-    }, this);
-
-    this.setErrors(errorList);
-
-    if (hasErrors) {
-      return false;
+      }, this);
     }
 
-    var handler = this;
-    this.disable();
-    this.trigger('submit', [data]);
-    return cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: actionName, data: data}, {
-      success: function(response) {
-        if (response.errors) {
-          for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
-            if (_.isArray(error)) {
-              handler.getField(error[1]).error(error[0]);
-            } else {
-              handler.error(error);
+    if (_.size(errorList)) {
+      deferred.reject();
+
+    } else {
+      if (options.disableUI) {
+        this.disable();
+      }
+      this.trigger('submit', [data]);
+
+      var handler = this;
+      cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data}, {
+        success: function(response) {
+          if (response.errors) {
+            if (options.handleErrors) {
+              for (var i = response.errors.length - 1, error; error = response.errors[i]; i--) {
+                if (_.isArray(error)) {
+                  handler.getField(error[1]).error(error[0]);
+                } else {
+                  handler.error(error);
+                }
+              }
+            }
+
+            handler.trigger('error error.' + action.name);
+            deferred.reject();
+          }
+
+          if (response.exec) {
+            handler.evaluation = new Function(response.exec);
+            handler.evaluation();
+          }
+
+          if (response.messages) {
+            for (var i = 0, msg; msg = response.messages[i]; i++) {
+              handler.message(msg);
             }
           }
-          handler.trigger('error');
-        }
 
-        if (response.exec) {
-          handler.evaluation = new Function(response.exec);
-          handler.evaluation();
-        }
-
-        if (response.messages) {
-          for (var i = 0, msg; msg = response.messages[i]; i++) {
-            handler.message(msg);
+          if (!response.errors) {
+            handler.trigger('success success.' + action.name, response.data);
+            deferred.resolve(response.data);
           }
+        },
+        error: function(msg, type, isPublic) {
+          handler._stopErrorPropagation = false;
+          handler.trigger('error error.' + action.name, msg, type, isPublic);
+          deferred.reject();
+          return !handler._stopErrorPropagation;
+        },
+        complete: function() {
+          if (options.disableUI) {
+            handler.enable();
+          }
+          handler.trigger('complete');
         }
+      });
+    }
 
-        if (!response.errors) {
-          handler.trigger('success success.' + actionName, response.data);
-        }
-      },
-      complete: function() {
-        handler.enable();
-        handler.trigger('complete');
-      }
-    });
+    return deferred.promise();
+  },
+
+  stopErrorPropagation: function() {
+    this._stopErrorPropagation = true;
   },
 
   reset: function() {
@@ -256,11 +262,49 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {Object} errorList
+   * @param {String} [actionName]
+   * @returns {Object}
    */
-  setErrors: function(errorList) {
-    _.each(errorList, function(error, fieldName) {
-      this.getField(fieldName).error(error);
+  _getAction: function(actionName) {
+    actionName = actionName || _.first(_.keys(this._actions));
+    var action = this._actions[actionName];
+    if (!action) {
+      cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
+    }
+    action.name = actionName;
+    return action;
+  },
+
+  /**
+   * @param {String} [actionName]
+   * @returns {Object}
+   */
+  _getErrorList: function(actionName) {
+    var action = this._getAction(actionName);
+    var data = this.getData(action.name);
+
+    var errorList = {};
+
+    _.each(_.keys(action.fields).reverse(), function(fieldName) {
+      var required = action.fields[fieldName];
+      var field = this.getField(fieldName);
+      if (required && field.isEmpty(data[fieldName])) {
+        var label;
+        var $textInput = field.$('input, textarea');
+        var $labels = $('label[for="' + field.getAutoId() + '-input"]');
+        if ($labels.length) {
+          label = $labels.first().text();
+        } else if ($textInput.attr('placeholder')) {
+          label = $textInput.attr('placeholder');
+        }
+        if (label) {
+          errorList[fieldName] = cm.language.get('{$label} is required.', {label: label});
+        } else {
+          errorList[fieldName] = cm.language.get('Required');
+        }
+      }
     }, this);
+
+    return errorList;
   }
 });
