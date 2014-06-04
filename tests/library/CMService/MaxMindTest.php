@@ -5,7 +5,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
     /** @var CM_OutputStream_Abstract */
     protected $_errorStream;
 
-    /** @var CM_OutputStream_Stream_File */
+    /** @var CM_OutputStream_File */
     protected $_outputStream;
 
     public function setUp() {
@@ -15,7 +15,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         CM_Db_Db::exec('ALTER TABLE cm_model_location_state AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_country AUTO_INCREMENT = 1');
         $this->_errorStream = new CM_OutputStream_Null();
-        $this->_outputStream = new CM_OutputStream_Stream_File();
+        $this->_outputStream = new CM_OutputStream_File();
     }
 
     public function tearDown() {
