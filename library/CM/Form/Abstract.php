@@ -26,7 +26,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $this->_initialize();
     }
 
-    public function prepare() {
+    public function prepare(CM_Frontend_Environment $environment) {
     }
 
     /**
