@@ -21,9 +21,9 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
     }
 
     /**
-     * @param string $code
-     * @param string $file
-     * @param array|null  $aliases
+     * @param string     $code
+     * @param string     $file
+     * @param array|null $aliases
      */
     public function add($code, $file, array $aliases = null) {
         $aliases = (array) $aliases;
@@ -61,6 +61,7 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
                 return $this->_decodeCodeAdditional($itemRaw['codeAdditional']);
             }
         }
+        return array();
     }
 
     /**
@@ -78,7 +79,7 @@ class CM_Paging_Emoticon_All extends CM_Paging_Abstract {
      * @param array $aliases
      * @return null|string
      */
-    protected function _encodeCodeAdditional(array $aliases){
+    protected function _encodeCodeAdditional(array $aliases) {
         if (!count($aliases)) {
             return null;
         }
