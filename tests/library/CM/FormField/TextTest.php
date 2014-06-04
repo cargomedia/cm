@@ -11,7 +11,7 @@ class CM_FormField_TextTest extends CMTest_TestCase {
         $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
 
-        $doc = $this->_renderFormField($render, $field);
+        $doc = $this->_renderFormField($field);
         $autoId = $render->getGlobalResponse()->getTreeRoot()->getValue()->getAutoId();
 
         $this->assertSame($autoId, $doc->find('.CM_FormField_Text')->getAttribute('id'));

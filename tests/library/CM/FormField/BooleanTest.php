@@ -2,26 +2,26 @@
 
 class CM_FormField_BooleanTest extends CMTest_TestCase {
 
-    public function testConstructor() {
-        $field = new CM_FormField_BooleanTest();
-        $this->assertInstanceOf('CM_FormField_BooleanTest', $field);
-    }
+    public function testRenderCheckbox() {
+        $field = new CM_FormField_Boolean(['name' => 'checkbox']);
+        $doc = $this->_renderFormField($field);
 
-    public function testRender() {
-        $form = $this->getMockForm();
-        $field = new CM_FormField_Boolean();
-        $doc = $this->_renderFormField($form, $field, 'foo');
-
-        $this->assertFalse($doc->exists('.switch'));
-        $this->assertTrue($doc->exists('input[name="foo"][value="0"]'));
-        $this->assertTrue($doc->exists('input[name="foo"][value="1"]'));
+        $this->assertCount(0, $doc->find('.switch'));
+        $this->assertCount(1, $doc->find('.checkbox'));
+        $this->assertCount(2, $doc->find('input[name="checkbox"]'));
+        $this->assertSame('0', $doc->find('input[name="checkbox"][type="hidden"]')->getAttribute('value'));
+        $this->assertSame('1', $doc->find('input[name="checkbox"][type="checkbox"]')->getAttribute('value'));
     }
 
     public function testRenderSwitch() {
-        $form = $this->getMockForm();
-        $field = new CM_FormField_Boolean();
-        $doc = $this->_renderFormField($form, $field, 'foo', array('template' => 'switch'));
+        $field = new CM_FormField_Boolean(['name' => 'switch']);
+        $doc = $this->_renderFormField($field, array('display' => CM_FormField_Boolean::DISPLAY_SWITCH));
 
-        $this->assertTrue($doc->exists('.switch'));
+        $this->assertCount(1, $doc->find('.switch'));
+        $this->assertCount(1, $doc->find('.handle'));
+        $this->assertCount(0, $doc->find('.checkbox'));
+        $this->assertCount(2, $doc->find('input[name="switch"]'));
+        $this->assertSame('0', $doc->find('input[name="switch"][type="hidden"]')->getAttribute('value'));
+        $this->assertSame('1', $doc->find('input[name="switch"][type="checkbox"]')->getAttribute('value'));
     }
 }

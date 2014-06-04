@@ -4,9 +4,9 @@ input[type=checkbox] {
   + label {
     margin-left: 0;
 
-    .switch {
-      position: relative;
-      display: inline-block;
+	  .handle {
+		  position: relative;
+		  display: inline-block;
       width: 2 * @sizeSwitch + 5px;
       height: @sizeSwitch;
       margin-right: 5px;
@@ -51,9 +51,9 @@ input[type=checkbox] {
     }
   }
 
-  &:checked + label .switch {
-    background-color: lighten(@colorNotice, 15);
-    border-color: lighten(@colorNotice, 5);
+	&:checked + label .handle {
+		background-color: lighten(@colorNotice, 15);
+		border-color: lighten(@colorNotice, 5);
 
     &:before {
       right: 0;

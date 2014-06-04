@@ -231,14 +231,14 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @param CM_Frontend_Render    $render
      * @param CM_FormField_Abstract $formField
-     * @param CM_Params|array|null  $params
+     * @param CM_Params|array|null  $renderParams
      * @return CM_Dom_NodeList
      */
-    protected function _renderFormField(CM_Frontend_Render $render, CM_FormField_Abstract $formField, $params = null) {
+    protected function _renderFormField(CM_FormField_Abstract $formField, $renderParams = null) {
+        $render = new CM_Frontend_Render();
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
-        $html = $renderAdapter->fetch(CM_Params::factory($params));
+        $html = $renderAdapter->fetch(CM_Params::factory($renderParams));
         return new CM_Dom_NodeList($html);
     }
 
