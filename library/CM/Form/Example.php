@@ -20,7 +20,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerAction(new CM_FormAction_Example_Go($this));
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Frontend_Environment $environment) {
         $ip = CM_Request_Abstract::getInstance()->getIp();
         if ($locationGuess = CM_Model_Location::findByIp($ip)) {
             $this->getField('location')->setValue($locationGuess);
