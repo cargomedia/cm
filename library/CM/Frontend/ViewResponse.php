@@ -42,6 +42,18 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     }
 
     /**
+     * @return string[]
+     */
+    public function getCssClasses() {
+        $cssClasses = $this->getView()->getClassHierarchy();
+        $templateName = $this->getTemplateName();
+        if ('default' !== $templateName) {
+            $cssClasses[] = $templateName;
+        }
+        return $cssClasses;
+    }
+
+    /**
      * @return string
      */
     public function getTemplateName() {

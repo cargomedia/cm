@@ -19,12 +19,7 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
 
         $frontend->treeExpand($viewResponse);
 
-        $cssClasses = $component->getClassHierarchy();
-        $templateName = $viewResponse->getTemplateName();
-        if ('default' !== $templateName) {
-            $cssClasses[] = $templateName;
-        }
-        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $cssClasses) . '">';
+        $html = '<div id="' . $viewResponse->getAutoId() . '" class="' . join(' ', $viewResponse->getCssClasses()) . '">';
         $html .= $this->getRender()->fetchViewResponse($viewResponse);
         $html .= '</div>';
 
