@@ -5,8 +5,8 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('Cancel', 'Cancel');
     $language->setTranslation('Close', 'Close');
     $language->setTranslation('{$label} is required.', '{$label} is required.', array('label'));
-    $language->setTranslation('Required', 'Required');
     $language->setTranslation('Confirmation', 'Confirmation');
+    $language->setTranslation('Required', 'Required');
     $language->setTranslation('.date.month.1', 'January');
     $language->setTranslation('.date.month.2', 'February');
     $language->setTranslation('.date.month.3', 'March');
@@ -34,8 +34,20 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.date.timeago.months', '{$count} months', array('count'));
     $language->setTranslation('.date.timeago.year', 'about a year');
     $language->setTranslation('.date.timeago.years', '{$count} years', array('count'));
+    $language->setTranslation('.date.period.minute', '1 minute');
+    $language->setTranslation('.date.period.minutes', '{$count} minutes', array('count'));
+    $language->setTranslation('.date.period.hour', '1 hour');
+    $language->setTranslation('.date.period.hours', '{$count} hours', array('count'));
+    $language->setTranslation('.date.period.day', '1 day');
+    $language->setTranslation('.date.period.days', '{$count} days', array('count'));
+    $language->setTranslation('.date.period.week', '1 week');
+    $language->setTranslation('.date.period.weeks', '{$count} weeks', array('count'));
+    $language->setTranslation('.date.period.month', '1 month');
+    $language->setTranslation('.date.period.months', '{$count} months', array('count'));
+    $language->setTranslation('.date.period.year', '1 year');
+    $language->setTranslation('.date.period.years', '{$count} years', array('count'));
     $language->setTranslation('You can only select {$cardinality} items.', 'You can only select {$cardinality} items.', array('cardinality'));
-    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.', array('file',
-        'extensions'));
-    $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred');
+    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} has an invalid extension. Only {$extensions} are allowed.',
+        array('file', 'extensions'));
+    $language->setTranslation('An unexpected connection problem occurred.', 'An unexpected connection problem occurred.');
 };

@@ -1,184 +1,181 @@
 .clearfix {
-	&:after {
-		content: "";
-		display: table;
-		clear: both;
-	}
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 }
 
 .nowrap {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .word_wrap {
-	word-break: break-all;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .triangle(@colorDirectionBottom: transparent, @colorDirectionLeft: transparent, @colorDirectionTop: transparent, @colorDirectionRight: transparent, @size: 5px) {
-	position: absolute;
-	width: 0;
-	height: 0;
-	content: "";
-	border: @size solid transparent;
-	border-top-color: @colorDirectionBottom;
-	border-right-color: @colorDirectionLeft;
-	border-bottom-color: @colorDirectionTop;
-	border-left-color: @colorDirectionRight;
-	top: 50%;
-	margin-top: -@size;
-	left: -8px;
+  position: absolute;
+  width: 0;
+  height: 0;
+  content: "";
+  border: @size solid transparent;
+  border-top-color: @colorDirectionBottom;
+  border-right-color: @colorDirectionLeft;
+  border-bottom-color: @colorDirectionTop;
+  border-left-color: @colorDirectionRight;
+  top: 50%;
+  margin-top: -@size;
+  left: -8px;
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = top) {
-	&:after, &:before {
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-		bottom: 100%;
-		left: 50%;
-	}
+  &:after, &:before {
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    bottom: 100%;
+    left: 50%;
+  }
 
-	&:after {
-		border-color: transparent;
-		border-width: @size;
-		margin-left: -@size;
-		border-bottom-color: @colorInner;
-	}
+  &:after {
+    border-color: transparent;
+    border-width: @size;
+    margin-left: -@size;
+    border-bottom-color: @colorInner;
+  }
 
-	&:before {
-		border-width: @size + @borderSize;
-		margin-left: -(@size + @borderSize);
-		border-bottom-color: @colorBorder;
-	}
+  &:before {
+    border-width: @size + @borderSize;
+    margin-left: -(@size + @borderSize);
+    border-bottom-color: @colorBorder;
+  }
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = bottom) {
-	&:after, &:before {
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-		left: 50%;
-		top: 100%;
-	}
+  &:after, &:before {
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    left: 50%;
+    top: 100%;
+  }
 
-	&:after {
-		border-color: transparent;
-		border-width: @size;
-		margin-left: -@size;
-		border-top-color: @colorInner;
-	}
+  &:after {
+    border-color: transparent;
+    border-width: @size;
+    margin-left: -@size;
+    border-top-color: @colorInner;
+  }
 
-	&:before {
-		border-width: @size + @borderSize;
-		margin-left: -(@size + @borderSize);
-		border-top-color: @colorBorder;
-	}
+  &:before {
+    border-width: @size + @borderSize;
+    margin-left: -(@size + @borderSize);
+    border-top-color: @colorBorder;
+  }
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = left) {
-	&:after, &:before {
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-		top: 50%;
-		right: 100%;
-	}
+  &:after, &:before {
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    top: 50%;
+    right: 100%;
+  }
 
-	&:after {
-		border-color: transparent;
-		border-width: @size;
-		margin-top: -@size;
-		border-right-color: @colorInner;
-	}
+  &:after {
+    border-color: transparent;
+    border-width: @size;
+    margin-top: -@size;
+    border-right-color: @colorInner;
+  }
 
-	&:before {
-		border-width: @size + @borderSize;
-		margin-top: -(@size + @borderSize);
-		border-right-color: @colorBorder;
-	}
+  &:before {
+    border-width: @size + @borderSize;
+    margin-top: -(@size + @borderSize);
+    border-right-color: @colorBorder;
+  }
 }
 
 .triangleBorder(@position, @colorBorder: @colorFgBorder, @colorInner: @colorBg, @size: 9px, @borderSize: 1px) when (@position = right) {
-	&:after, &:before {
-		border: solid transparent;
-		content: " ";
-		height: 0;
-		width: 0;
-		position: absolute;
-		pointer-events: none;
-		top: 50%;
-		left: 100%;
-	}
+  &:after, &:before {
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    top: 50%;
+    left: 100%;
+  }
 
-	&:after {
-		border-width: @size;
-		border-color: transparent;
-		margin-top: -@size;
-		border-left-color: @colorInner;
-	}
+  &:after {
+    border-width: @size;
+    border-color: transparent;
+    margin-top: -@size;
+    border-left-color: @colorInner;
+  }
 
-	&:before {
-		border-width: @size + @borderSize;
-		margin-top: -(@size + @borderSize);
-		border-left-color: @colorBorder;
-	}
+  &:before {
+    border-width: @size + @borderSize;
+    margin-top: -(@size + @borderSize);
+    border-left-color: @colorBorder;
+  }
 }
 
 .clipper(@height: 20px, @colorBg: @colorBg) {
-	&:after {
-		pointer-events: none;
-		position: absolute;
-		content: "";
-		width: 100%;
-		height: @height;
-		bottom: 0;
-		left: 0;
-		.gradient(vertical, fadeout(@colorBg, 100), @colorBg, 0, 80%);
-	}
+  &:after {
+    pointer-events: none;
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: @height;
+    bottom: 0;
+    left: 0;
+    .gradient(vertical, fadeout(@colorBg, 100), @colorBg, 0, 80%);
+  }
 }
 
 // Vendor prefixing
 .appearance(@value) {
-	-webkit-appearance: @value;
-	-moz-appearance: @value;
-	appearance: @value;
+  -webkit-appearance: @value;
+  -moz-appearance: @value;
+  appearance: @value;
 }
 
-.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0, @iteration-count: 1, @direction: normal, @fill-mode: none) {
-	-webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
-	-moz-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
-	-ms-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
-	animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+.animation(@name, @duration: 300ms, @timing-function: ease, @delay: 0s, @iteration-count: 1, @direction: normal, @fill-mode: none) {
+  -webkit-animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
+  animation: @name @duration @timing-function @delay @iteration-count @direction @fill-mode;
 }
 
 .background-size(@value) {
-	-webkit-background-size: @value;
-	background-size: @value;
+  -webkit-background-size: @value;
+  background-size: @value;
 }
 
 .hyphens(@arg) {
-	-webkit-hyphens: @arg;
-	-moz-hyphens: @arg;
-	hyphens: @arg;
+  -webkit-hyphens: @arg;
+  -moz-hyphens: @arg;
+  hyphens: @arg;
 }
 
 .transform-origin (@x:center, @y:center) {
-	-webkit-transform-origin: @x @y;
-	-moz-transform-origin: @x @y;
-	-ms-transform-origin: @x @y;
-	-o-transform-origin: @x @y;
-	transform-origin: @x @y;
+  -webkit-transform-origin: @x @y;
+  -moz-transform-origin: @x @y;
+  -ms-transform-origin: @x @y;
+  -o-transform-origin: @x @y;
+  transform-origin: @x @y;
 }

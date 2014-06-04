@@ -8,16 +8,13 @@ class CM_FormField_Set extends CM_FormField_Abstract {
     /** @var bool */
     private $_labelsInValues = false;
 
-    /**
-     * @param array|null $values
-     * @param bool|null  $labelsInValues
-     */
-    public function __construct(array $values = null, $labelsInValues = null) {
-        $this->_values = (array) $values;
-        $this->_labelsInValues = (bool) $labelsInValues;
+    protected function _initialize() {
+        $this->_values = $this->_params->getArray('values', array());
+        $this->_labelsInValues = $this->_params->getBoolean('labelsInValues', false);
+        parent::_initialize();
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         foreach ($userInput as $key => $value) {
             if (!in_array($value, $this->_getValues())) {
                 unset($userInput[$key]);
@@ -26,11 +23,11 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('class', !empty($params['class']) ? $params['class'] : null);
-        $this->setTplParam('optionList', $this->_getOptionList());
-        $this->setTplParam('translate', !empty($params['translate']) || !empty($params['translatePrefix']));
-        $this->setTplParam('translatePrefix', !empty($params['translatePrefix']) ? $params['translatePrefix'] : '');
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
+        $viewResponse->set('optionList', $this->_getOptionList());
+        $viewResponse->set('translate', $renderParams->getBoolean('translate', false) || $renderParams->has('translatePrefix'));
+        $viewResponse->set('translatePrefix', $renderParams->has('translatePrefix') ? $renderParams->getString('translatePrefix') : null);
     }
 
     /**

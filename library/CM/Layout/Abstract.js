@@ -14,6 +14,24 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
   _pageRequest: null,
 
   /**
+   * @returns {CM_View_Abstract|null}
+   */
+  findPage: function() {
+    return this.findChild('CM_Page_Abstract');
+  },
+
+  /**
+   * @returns {CM_View_Abstract}
+   */
+  getPage: function() {
+    var page = this.findPage();
+    if (!page) {
+      cm.error.triggerThrow('Layout doesn\'t have a page');
+    }
+    return page;
+  },
+
+  /**
    * @param {String} path
    */
   loadPage: function(path) {
@@ -21,9 +39,7 @@ var CM_Layout_Abstract = CM_View_Abstract.extend({
 
     if (!this._$pagePlaceholder) {
       this._$pagePlaceholder = $('<div class="router-placeholder" />');
-      var page = this.findChild('CM_Page_Abstract');
-      page.$el.replaceWith(this._$pagePlaceholder);
-      page.remove(true);
+      this.getPage().replaceWithHtml(this._$pagePlaceholder);
       this._onPageTeardown();
     } else {
       this._$pagePlaceholder.removeClass('error').html('');

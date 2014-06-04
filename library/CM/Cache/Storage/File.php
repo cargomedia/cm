@@ -8,11 +8,11 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
      * @return int
      */
     public function getCreateStamp($key) {
-        $path = $this->_getPath($this->_getKeyArmored($key));
-        if (!CM_File::exists($path)) {
+        $file = $this->_getFile($this->_getKeyArmored($key));
+        if (!$file->getExists()) {
             return null;
         }
-        return CM_File::getModified($path);
+        return $file->getModified();
     }
 
     protected function _getName() {
@@ -23,43 +23,43 @@ class CM_Cache_Storage_File extends CM_Cache_Storage_Abstract {
         if (null !== $lifeTime) {
             throw new CM_Exception_NotImplemented('Can\'t use lifetime for `CM_Cache_File`');
         }
-        CM_Util::mkDir($this->_getDirStorage());
-        CM_File::create($this->_getPath($key), serialize($value));
+        $file = $this->_getFile($key);
+        $file->ensureParentDirectory();
+        $file->write(serialize($value));
     }
 
     protected function _get($key) {
-        $path = $this->_getPath($key);
-        if (!CM_File::exists($path)) {
+        $file = $this->_getFile($key);
+        if (!$file->getExists()) {
             return false;
         }
-        $file = new CM_File($path);
         return unserialize($file->read());
     }
 
     protected function _delete($key) {
-        $path = $this->_getPath($key);
-        if (CM_File::exists($path)) {
-            $file = new CM_File($path);
+        $file = $this->_getFile($key);
+        if ($file->getExists()) {
             $file->delete();
         }
     }
 
     protected function _flush() {
-        CM_Util::rmDirContents($this->_getDirStorage());
+        $this->_getDirStorage()->delete(true);
     }
 
     /**
      * @param string $key
-     * @return string
+     * @return CM_File
      */
-    private function _getPath($key) {
-        return self::_getDirStorage() . md5($key);
+    private function _getFile($key) {
+        return $this->_getDirStorage()->joinPath(md5($key));
     }
 
     /**
-     * @return string
+     * @return CM_File
      */
     private function _getDirStorage() {
-        return CM_Bootloader::getInstance()->getDirTmp() . 'cache/';
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
+        return new CM_File('cache', $filesystem);
     }
 }

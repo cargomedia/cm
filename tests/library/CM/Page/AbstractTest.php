@@ -35,13 +35,14 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
         $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
         /** @var CM_Page_Abstract $page */
+        $environment = new CM_Frontend_Environment($site);
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
 
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Bar_Layout_Default', false);
-        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($site)));
+        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($environment)));
 
         $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'Foo_Layout_Default', false);
-        $this->assertEquals('Foo_Layout_Default', get_class($page->getLayout($site)));
+        $this->assertEquals('Foo_Layout_Default', get_class($page->getLayout($environment)));
     }
 
     /**
@@ -51,9 +52,10 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
     public function testGetLayoutNotExists() {
         $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
         $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('FooBar')));
+        $environment = new CM_Frontend_Environment($site);
         /** @var CM_Page_Abstract $page */
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
 
-        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($site)));
+        $this->assertEquals('Bar_Layout_Default', get_class($page->getLayout($environment)));
     }
 }

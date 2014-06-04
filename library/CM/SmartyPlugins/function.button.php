@@ -1,16 +1,21 @@
 <?php
 
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $viewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract');
+    if (null === $viewResponse) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {button} can be only rendered within form view.');
+    }
     /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms');
+    $form = $viewResponse->getView();
     if (empty($params['action'])) {
         trigger_error('Param `action` missing.');
     }
     $action = $form->getAction($params['action']);
     $title = isset($params['title']) ? (string) $params['title'] : null;
     $theme = isset($params['theme']) ? (string) $params['theme'] : 'default';
+    $isHtmlLabel = isset($params['isHtmlLabel']) ? (bool) $params['isHtmlLabel'] : false;
 
     $class = 'button ' . 'button-' . $theme;
     if (isset($params['class'])) {
@@ -40,7 +45,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
 
     $label = '';
     if (isset($params['label'])) {
-        $label = $params['label'];
+        $label = ($isHtmlLabel) ? $params['label'] : CM_Util::htmlspecialchars($params['label']);
     }
 
     if ($label) {
@@ -53,7 +58,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
         $class .= ' showTooltip';
     }
 
-    $id = $form->getAutoId() . '-' . $action->getName() . '-button';
+    $id = $viewResponse->getAutoId() . '-' . $action->getName() . '-button';
 
     $html = '';
     $html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '" data-click-spinner="true"';
@@ -75,7 +80,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
         }
     }
     if ($label) {
-        $html .= '<span class="label">' . CM_Util::htmlspecialchars($label) . '</span>';
+        $html .= '<span class="label">' . $label . '</span>';
     }
     $html .= '</button>';
     return $html;

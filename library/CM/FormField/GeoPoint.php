@@ -3,12 +3,12 @@
 class CM_FormField_GeoPoint extends CM_FormField_Abstract {
 
     /**
-     * @param array                $userInput
-     * @param CM_Response_Abstract $response
-     * @return CM_Geo_Point
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
      * @throws CM_Exception_FormFieldValidation
+     * @return CM_Geo_Point
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!isset($userInput['latitude']) || !is_numeric($userInput['latitude'])) {
             throw new CM_Exception_FormFieldValidation('Latitude needs to be numeric');
         }
@@ -25,14 +25,14 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
         return $point;
     }
 
-    public function prepare(array $params) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
         /** @var CM_Geo_Point $value */
         $value = $this->getValue();
         $latitude = $value ? $value->getLatitude() : null;
         $longitude = $value ? $value->getLongitude() : null;
 
-        $this->setTplParam('latitude', $latitude);
-        $this->setTplParam('longitude', $longitude);
+        $viewResponse->set('latitude', $latitude);
+        $viewResponse->set('longitude', $longitude);
     }
 
     public function isEmpty($userInput) {

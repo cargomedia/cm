@@ -10,8 +10,7 @@ class CMTest_TH {
     private static $_dbClient = null;
 
     public static function init() {
-        $forceReload = CM_Config::get()->CMTest_TH->dropDatabase;
-        CM_App::getInstance()->setupDatabase($forceReload);
+        CM_App::getInstance()->setupDatabase(true);
 
         self::$_configBackup = serialize(CM_Config::get());
 
@@ -22,16 +21,33 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_App::getInstance()->setupFilesystem();
         self::clearDb();
+        self::clearMongoDb();
         self::clearCache();
         self::timeReset();
         self::clearConfig();
+        self::clearFilesystem();
+    }
+
+    public static function clearFilesystem() {
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->deleteByPrefix('/');
+        }
+        CM_App::getInstance()->setupFilesystem();
     }
 
     public static function clearCache() {
         CM_Cache_Shared::getInstance()->flush();
         CM_Cache_Local::getInstance()->flush();
+    }
+
+    public static function clearMongoDb() {
+        $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
+        foreach ($mongoDb->listCollectionNames() as $collectionName) {
+            $mongoDb->drop($collectionName);
+        }
     }
 
     public static function clearDb() {
@@ -41,8 +57,8 @@ class CMTest_TH {
             CM_Db_Db::delete($table);
         }
         CM_Db_Db::exec('SET foreign_key_checks = 1;');
-        if (CM_File::exists(DIR_TEST_DATA . 'db/data.sql')) {
-            CM_Db_Db::runDump(CM_Config::get()->CM_Db_Db->db, new CM_File(DIR_TEST_DATA . 'db/data.sql'));
+        foreach (CM_Util::getResourceFiles('db/setup.php') as $setupScript) {
+            require $setupScript->getPath();
         }
     }
 
@@ -51,8 +67,12 @@ class CMTest_TH {
     }
 
     public static function timeInit() {
-        self::$_timeStart = time();
-        runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        if (!isset(self::$_timeStart)) {
+            runkit_function_copy('time', 'time_original');
+            runkit_function_redefine('time', '', 'return CMTest_TH::time();');
+        }
+        self::$_timeStart = time_original();
+        self::$timeDelta = 0;
     }
 
     public static function time() {
@@ -148,7 +168,6 @@ class CMTest_TH {
             $data['thumbnailCount'] = 0;
             $data['adapterType'] = $adapterType;
         }
-
         return CM_Model_StreamChannel_Abstract::createType($type, $data);
     }
 
@@ -220,11 +239,11 @@ class CMTest_TH {
      * @return CM_Model_Location
      */
     public static function createLocation($level = null) {
-        $country = CM_Db_Db::insert('cm_locationCountry', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
-        $state = CM_Db_Db::insert('cm_locationState', array('countryId' => $country, 'name' => 'stateFoo'));
-        $city = CM_Db_Db::insert('cm_locationCity', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
-                                                          'lon'     => 15));
-        $zip = CM_Db_Db::insert('cm_locationZip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
+        $country = CM_Db_Db::insert('cm_model_location_country', array('abbreviation' => 'FOO', 'name' => 'countryFoo'));
+        $state = CM_Db_Db::insert('cm_model_location_state', array('countryId' => $country, 'name' => 'stateFoo'));
+        $city = CM_Db_Db::insert('cm_model_location_city', array('stateId' => $state, 'countryId' => $country, 'name' => 'cityFoo', 'lat' => 10,
+                                                                 'lon'     => 15));
+        $zip = CM_Db_Db::insert('cm_model_location_zip', array('cityId' => $city, 'name' => '1000', 'lat' => 10, 'lon' => 15));
 
         CM_Model_Location::createAggregation();
 

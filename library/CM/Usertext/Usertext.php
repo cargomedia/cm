@@ -2,13 +2,13 @@
 
 class CM_Usertext_Usertext extends CM_Class_Abstract {
 
-    /** @var CM_Render */
+    /** @var CM_Frontend_Render */
     private $_render;
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      */
-    function __construct(CM_Render $render) {
+    function __construct(CM_Frontend_Render $render) {
         $this->_render = $render;
     }
 
@@ -58,6 +58,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 if (null !== $maxLength) {
                     throw new CM_Exception_Invalid('MaxLength is not allowed in mode markdown.');
                 }
+                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown_UnescapeBlockquote());
                 $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
@@ -65,6 +66,7 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
                 $this->addFilter(new CM_Usertext_Filter_Emoticon($emoticonFixedHeight));
                 break;
             case 'markdownPlain':
+                $this->addFilter(new CM_Usertext_Filter_Markdown_UserContent());
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_EscapeMarkdown());
                 $this->addFilter(new CM_Usertext_Filter_Markdown($skipAnchors));
                 $this->addFilter(new CM_Usertext_Filter_Emoticon_UnescapeMarkdown());
@@ -111,10 +113,10 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
     }
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @return CM_Usertext_Usertext
      */
-    public static function factory(CM_Render $render) {
+    public static function factory(CM_Frontend_Render $render) {
         $className = self::_getClassName();
         return new $className($render);
     }

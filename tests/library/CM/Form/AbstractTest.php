@@ -28,17 +28,18 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         unset($data['data']['color']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
         $this->assertFormResponseSuccess($response);
+        $this->assertFalse(self::$formActionData->has('color'));
     }
 
     function testProcessInvalidCharsRequired() {
-        foreach (array(chr(192), chr(214), chr(255), chr(140)) as $inputChar) {
-            $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array('/form/null'))->setMethods(array('getQuery'))->getMock();
-            $data = array('must_check' => 'checked', 'text' => $inputChar);
-            $query = array('data' => $data, 'actionName' => 'TestExampleAction',
-                           'form' => array('className' => 'CM_Form_MockForm', 'params' => array(), 'id' => 'mockFormId'));
-            $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-            /** @var CM_Request_Post $request */
+        $invalidChars = array(chr(192), chr(214), chr(255), chr(140));
+        foreach ($invalidChars as $inputChar) {
 
+            $form = new CM_Form_MockForm();
+            $formAction = new CM_FormAction_MockForm_TestExampleAction($form);
+
+            $data = array('must_check' => 'checked', 'text' => $inputChar);
+            $request = $this->createRequestFormAction($formAction, $data);
             $response = new CM_Response_View_Form($request);
             $response->process();
 
@@ -63,11 +64,11 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
 
 class CM_Form_MockForm extends CM_Form_Abstract {
 
-    public function setup() {
-        $this->registerField('must_check', new CM_FormField_Boolean());
-        $this->registerField('color', new CM_FormField_Color());
-        $this->registerField('text', new CM_FormField_Text());
-        $this->registerField('array', new CM_FormField_Text());
+    protected function _initialize() {
+        $this->registerField(new CM_FormField_Boolean(['name' => 'must_check']));
+        $this->registerField(new CM_FormField_Color(['name' => 'color']));
+        $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Text(['name' => 'array']));
         $this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
     }
 }

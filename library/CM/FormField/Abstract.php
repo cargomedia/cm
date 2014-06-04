@@ -2,10 +2,11 @@
 
 abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $_value;
+
+    /** @var string */
+    protected $_name;
 
     /**
      * @var array
@@ -13,9 +14,27 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     protected $_options = array();
 
     /**
-     * @var array
+     * @param CM_Frontend_Environment $environment
+     * @param string|array            $userInput
+     * @return mixed
      */
-    protected $_tplParams = array();
+    abstract public function validate(CM_Frontend_Environment $environment, $userInput);
+
+    public function __construct($params = null) {
+        parent::__construct($params);
+        $this->_name = $this->_params->getString('name', uniqid());
+        $this->_initialize();
+    }
+
+    protected function _initialize() {
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
 
     /**
      * @return mixed|null Internal value
@@ -63,60 +82,15 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param string|array         $userInput
-     * @param CM_Response_Abstract $response
-     * @return mixed Internal value
-     * @throws CM_Exception_FormFieldValidation
+     * @param CM_Params                $renderParams
+     * @param CM_Frontend_ViewResponse $viewResponse
      */
-    abstract public function validate($userInput, CM_Response_Abstract $response);
-
-    /**
-     * @param array $params
-     */
-    public function prepare(array $params) {
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     * @return CM_FormField_Abstract
-     */
-    public function setTplParam($key, $value) {
-        $this->_tplParams[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTplParams() {
-        return $this->_tplParams;
-    }
-
-    /**
-     * @param string $className
-     * @return CM_FormField_Abstract
-     * @throws CM_Exception
-     */
-    public static function factory($className) {
-        $className = (string) $className;
-        if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-            throw new CM_Exception_Invalid('Illegal field name `' . $className . '`.');
-        }
-        $field = new $className();
-        return $field;
-    }
-
-    public static function ajax_validate(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
-        $formName = $params->getString('form');
-        $fieldName = $params->getString('fieldName');
+    public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+        $environment = $response->getRender()->getEnvironment();
         $userInput = $params->get('userInput');
-
-        $form = CM_Form_Abstract::factory($formName);
-        $form->setup();
-        $field = $form->getField($fieldName);
-
-        $field->validate($userInput, $response);
+        $this->validate($environment, $userInput);
     }
 }
-

@@ -27,12 +27,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /** @var array */
     protected $_ignoreLogging = array();
 
-    /** @var array */
-    private $_trackingProperties = array();
-
-    /** @var bool */
-    private $_trackingEnabled = true;
-
     /**
      * @param string            $verbName
      * @param CM_Model_User|int $actor
@@ -49,8 +43,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if (method_exists($this, $methodName)) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
-
-        $this->_track();
     }
 
     /**
@@ -90,7 +82,7 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     public function prepare() {
         $arguments = func_get_args();
         if (!call_user_func_array(array($this, '_isAllowed'), $arguments)) {
-            throw new CM_Exception_NotAllowed('Action not allowed', 'The content you tried to interact with has become private.');
+            throw new CM_Exception_NotAllowed('Action not allowed', null, array('messagePublic' => 'The content you tried to interact with has become private.'));
         }
         $role = null;
         $actionLimitList = $this->getActionLimitsTransgressed();
@@ -358,23 +350,6 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function getLabel() {
         return $this->getName() . ' ' . $this->getVerbName();
-    }
-
-    protected function _track() {
-        if ($this->_trackingEnabled && $this->getActor()) {
-            CM_KissTracking::getInstance()->trackUser($this->getLabel(), $this->getActor(), null, $this->_trackingProperties);
-        }
-    }
-
-    /**
-     * @param array $properties
-     */
-    protected function _setTrackingProperties(array $properties) {
-        $this->_trackingProperties = $properties;
-    }
-
-    protected function _disableTracking() {
-        $this->_trackingEnabled = false;
     }
 
     /**

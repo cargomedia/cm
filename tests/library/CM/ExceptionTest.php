@@ -2,6 +2,19 @@
 
 class CM_ExceptionTest extends CMTest_TestCase {
 
+    public function testConstructor() {
+        $user = CMTest_TH::createUser();
+        $exception = new CM_Exception('foo',
+            array('meta' => 'foo', 'user' => $user),
+            array('messagePublic' => 'foo {$bar}', 'messagePublicVariables' => array('bar' => 'foo'), 'severity' => CM_Exception::ERROR));
+        $render = new CM_Frontend_Render();
+
+        $this->assertSame('foo', $exception->getMessage());
+        $this->assertSame('foo foo', $exception->getMessagePublic($render));
+        $this->assertSame(CM_Exception::ERROR, $exception->getSeverity());
+        $this->assertSame(array('meta' => CM_Util::varDump('foo'), 'user' => CM_Util::varDump($user)), $exception->getMetaInfo());
+    }
+
     public function testGetSetSeverity() {
         $exception = new CM_Exception();
         $this->assertSame(CM_Exception::ERROR, $exception->getSeverity());

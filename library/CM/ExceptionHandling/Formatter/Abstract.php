@@ -21,7 +21,8 @@ abstract class CM_ExceptionHandling_Formatter_Abstract {
         } else {
             $trace = $exception->getTraceAsString();
         }
-        return $header . $trace;
+        $meta = $this->getMetaInfo($exception);
+        return $header . $trace . $meta;
     }
 
     /**
@@ -35,4 +36,10 @@ abstract class CM_ExceptionHandling_Formatter_Abstract {
      * @return string
      */
     abstract public function getTrace(CM_ExceptionHandling_SerializableException $exception);
+
+    /**
+     * @param CM_ExceptionHandling_SerializableException $exception
+     * @return string
+     */
+    abstract public function getMetaInfo(CM_ExceptionHandling_SerializableException $exception);
 }

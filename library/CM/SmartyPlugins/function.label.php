@@ -1,10 +1,12 @@
 <?php
 
 function smarty_function_label(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms');
+    $formViewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract');
+    if (null === $formViewResponse) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {label} can be only rendered within form view.');
+    }
 
     if (empty($params['for'])) {
         trigger_error('Param `for` missing');
@@ -15,5 +17,5 @@ function smarty_function_label(array $params, Smarty_Internal_Template $template
     }
     $text = (string) $params['text'];
 
-    return '<label for="' . $form->getAutoId() . '-' . $for . '-input">' . $text . '</label>';
+    return '<label for="' . $formViewResponse->getAutoId() . '-' . $for . '-input">' . $text . '</label>';
 }

@@ -9,36 +9,39 @@ class CM_Exception extends Exception {
     /** @var string|null */
     private $_messagePublic;
 
-    /** @var array */
-    private $_variables;
+    /** @var array|null */
+    private $_messagePublicVariables;
 
     /** @var int */
     protected $_severity = self::ERROR;
 
+    /** @var array */
+    private $_metaInfo;
+
     /**
      * @param string|null $message
-     * @param string|null $messagePublic
-     * @param array|null  $variables
-     * @param int|null    $severity
+     * @param array|null  $metaInfo
+     * @param array|null  $options
      */
-    public function __construct($message = null, $messagePublic = null, array $variables = null, $severity = null) {
-        $this->_messagePublic = $messagePublic;
-        $this->_variables = (array) $variables;
-        if (null !== $severity) {
-            $this->setSeverity($severity);
+    public function __construct($message = null, array $metaInfo = null, array $options = null) {
+        $this->_metaInfo = null !== $metaInfo ? $metaInfo : array();
+        $this->_messagePublic = isset($options['messagePublic']) ? (string) $options['messagePublic'] : null;
+        $this->_messagePublicVariables = isset($options['messagePublicVariables']) ? (array) $options['messagePublicVariables'] : null;
+        if (isset($options['severity'])) {
+            $this->setSeverity($options['severity']);
         }
         parent::__construct($message);
     }
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function getMessagePublic(CM_Render $render) {
+    public function getMessagePublic(CM_Frontend_Render $render) {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }
-        return $render->getTranslation($this->_messagePublic, $this->_variables);
+        return $render->getTranslation($this->_messagePublic, $this->_messagePublicVariables);
     }
 
     /**
@@ -64,6 +67,15 @@ class CM_Exception extends Exception {
             throw new CM_Exception_Invalid('Invalid severity `' . $severity . '`');
         }
         $this->_severity = $severity;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMetaInfo() {
+        return Functional\map($this->_metaInfo, function ($value) {
+            return CM_Util::varDump($value);
+        });
     }
 
     /**

@@ -3,95 +3,65 @@
 class CM_Response_View_Form extends CM_Response_View_Abstract {
 
     /**
-     * Added errors.
-     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Added success messages.
-     *
      * @var array
      */
     private $messages = array();
 
     /**
-     * A javascript code to execute.
-     *
-     * @var string
+     * @param string $message
+     * @param string $fieldName
      */
-    private $_jsCode;
-
-    /**
-     * Adds an error to response.
-     *
-     * @param string $err_msg
-     * @param string $field_name
-     */
-    public function addError($err_msg, $field_name = null) {
-        if (isset($field_name)) {
-            $this->errors[] = array($err_msg, $field_name);
+    public function addError($message, $fieldName = null) {
+        if (isset($fieldName)) {
+            $this->errors[] = array($message, $fieldName);
         } else {
-            $this->errors[] = $err_msg;
+            $this->errors[] = $message;
         }
     }
 
     /**
-     * Add a success message to response.
-     *
-     * @param string $msg_text
+     * @param string $message
      */
-    public function addMessage($msg_text) {
-        $this->messages[] = $msg_text;
+    public function addMessage($message) {
+        $this->messages[] = $message;
     }
 
     /**
-     * Check the response for having an errors.
-     *
      * @return bool
      */
     public function hasErrors() {
         return (bool) count($this->errors);
     }
 
-    public function reset() {
-        $this->exec('this.reset();');
-    }
-
-    /**
-     * Add a javascript to execute.
-     *
-     * @param string $jsCode
-     */
-    public function exec($jsCode) {
-        CM_Frontend::concat_js($jsCode, $this->_jsCode);
-    }
-
     protected function _process() {
         $output = array();
         try {
             $success = array();
-            $query = $this->_request->getQuery();
-            $formInfo = $this->_getViewInfo('form');
+            $form = $this->_getView();
+            $className = get_class($form);
+            if (!$form instanceof CM_Form_Abstract) {
+                throw new CM_Exception_Invalid('`' . $className . '`is not `CM_Form_Abstract` instance');
+            }
 
-            $className = (string) $formInfo['className'];
+            $query = $this->_request->getQuery();
             $actionName = (string) $query['actionName'];
             $data = (array) $query['data'];
-            $this->_setStringRepresentation($className . '::' . $actionName);
 
-            $form = CM_Form_Abstract::factory($className);
-            $form->setup();
+            $this->_setStringRepresentation($className . '::' . $actionName);
             $success['data'] = CM_Params::encode($form->process($data, $actionName, $this));
 
             if (!empty($this->errors)) {
                 $success['errors'] = $this->errors;
             }
 
-            $this->exec($this->getRender()->getJs()->getJs());
-
-            if (!empty($this->_jsCode)) {
-                $success['exec'] = $this->_jsCode;
+            $jsCode = $this->getRender()->getGlobalResponse()->getJs();
+            if (!empty($jsCode)) {
+                $success['exec'] = $jsCode;
             }
 
             if (!empty($this->messages)) {

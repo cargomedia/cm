@@ -1,7 +1,6 @@
 <?php
 
 return function (CM_Config_Node $config) {
-
     $config->timeZone = 'US/Central';
 
     $config->CM_Mail->send = true;
@@ -15,8 +14,8 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Splittesting_Abstract->enabled = false;
 
-    $config->CM_Search->enabled = true;
-    $config->CM_Search->servers = array(
+    $config->CM_Elasticsearch_Client->enabled = true;
+    $config->CM_Elasticsearch_Client->servers = array(
         array('host' => 'localhost', 'port' => 9200),
     );
 
@@ -66,10 +65,11 @@ return function (CM_Config_Node $config) {
     );
 
     $config->CM_Response_View_Abstract->catch = array(
+        'CM_Exception_Nonexistent',
         'CM_Exception_AuthRequired',
+        'CM_Exception_NotAllowed',
         'CM_Exception_Blocked',
         'CM_Exception_ActionLimit',
-        'CM_Exception_Nonexistent',
     );
 
     $config->CM_Response_RPC->catch = array(
@@ -84,10 +84,6 @@ return function (CM_Config_Node $config) {
 
     $config->CM_Stream_Adapter_Video_Wowza->httpPort = '8086';
     $config->CM_Stream_Adapter_Video_Wowza->wowzaPort = '1935';
-
-    $config->CM_KissTracking->enabled = false;
-    $config->CM_KissTracking->awsBucketName = '';
-    $config->CM_KissTracking->awsFilePrefix = '';
 
     $config->CM_Adprovider->enabled = true;
     $config->CM_Adprovider->zones = array();
@@ -105,4 +101,53 @@ return function (CM_Config_Node $config) {
 
     $config->CMService_Newrelic->enabled = false;
     $config->CMService_Newrelic->appName = 'CM Application';
+
+    $config->services = array();
+
+    $config->services['MongoDb'] = array(
+        'class'     => 'CM_Service_MongoDb',
+        'arguments' => array(
+            array(
+                'db'      => 'cm',
+                'server'  => 'mongodb://localhost:27017',
+                'options' => array('connect' => true),
+            )
+        ),
+    );
+
+    $config->services['filesystem-data'] = array(
+        'class'  => 'CM_File_Filesystem_Factory',
+        'method' => array(
+            'name'      => 'createFilesystem',
+            'arguments' => array(
+                'CM_File_Filesystem_Adapter_Local',
+                array(
+                    'pathPrefix' => DIR_ROOT . 'data/',
+                )
+            ),
+        )
+    );
+
+    $config->services['filesystem-usercontent'] = array(
+        'class'  => 'CM_File_Filesystem_Factory',
+        'method' => array(
+            'name'      => 'createFilesystem',
+            'arguments' => array(
+                'CM_File_Filesystem_Adapter_Local',
+                array(
+                    'pathPrefix' => DIR_PUBLIC . 'userfiles/',
+                )
+            ),
+        )
+    );
+
+    $config->services['usercontent'] = array(
+        'class'     => 'CM_Service_UserContent',
+        'arguments' => array(array(
+            'default' => array(
+                'filesystem' => 'filesystem-usercontent',
+                'url'        => 'http://localhost/userfiles',
+            ),
+        ))
+    );
 };
