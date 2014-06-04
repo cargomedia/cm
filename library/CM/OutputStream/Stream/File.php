@@ -2,13 +2,22 @@
 
 class CM_OutputStream_Stream_File extends CM_OutputStream_Stream_Abstract {
 
-    /** @var CM_File */
+    /** @var CM_File|null */
     protected $_file;
 
-    public function __construct() {
-        parent::__construct('/output-' . uniqid() . '.txt');
+    /**
+     * @param CM_File|null $file
+     */
+    public function __construct(CM_File $file = null) {
+        if (!$file) {
+            parent::__construct('/output-' . uniqid() . '.txt');
+        }
+        $this->_file = $file;
     }
 
+    /**
+     * @return CM_File
+     */
     public function getFile() {
         if (!$this->_file) {
             $this->_file = new CM_File($this->_stream, CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
