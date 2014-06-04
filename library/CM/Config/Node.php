@@ -20,4 +20,18 @@ class CM_Config_Node {
         }
         return $object;
     }
+
+    /**
+     * @param string $filenameRelative
+     * @throws CM_Exception_Invalid
+     */
+    public function extend($filenameRelative) {
+        foreach (CM_Util::getResourceFiles('config/' . $filenameRelative) as $configFile) {
+            $configSetter = require $configFile->getPath();
+            if (!$configSetter instanceof Closure) {
+                throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
+            }
+            $configSetter($this);
+        }
+    }
 }
