@@ -3,27 +3,26 @@
 class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
 
     /**
-     * @param array $params
      * @return array array($subject, $html, $text)
      * @throws CM_Exception_Invalid
      */
-    public function fetch(array $params = array()) {
+    public function fetch() {
         /** @var CM_Mail $mail */
         $mail = $this->_getView();
+        $viewParams = $mail->getTplParams();
         if (!($subject = $mail->getSubject())) {
             if (!$mail->hasTemplate()) {
                 throw new CM_Exception_Invalid('Trying to render mail with neither subject nor template');
             }
-            $subject = $this->_renderTemplate('subject.tpl', $mail->getTplParams());
-            $subject = trim($subject);
+            $subject = trim($this->_fetchTemplate('subject', $viewParams));
         }
         if (!($htmlBody = $mail->getHtml()) && $mail->hasTemplate()) {
-            $htmlBody = $this->_renderTemplate('body.tpl', $mail->getTplParams());
+            $htmlBody = trim($this->_fetchTemplate('body', $viewParams));
         }
         if ($mail->getRenderLayout()) {
             $tplPath = $this->_getTplPathLayout('mailHtml.tpl');
             $assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $htmlBody));
-            $html = $this->getRender()->renderTemplate($tplPath, $assign);
+            $html = $this->getRender()->fetchTemplate($tplPath, $assign);
         } else {
             $html = $htmlBody;
         }
@@ -51,7 +50,7 @@ class CM_RenderAdapter_Mail extends CM_RenderAdapter_Abstract {
         if ($mail->getRenderLayout()) {
             $tplPath = $this->_getTplPathLayout('mailText.tpl');
             $assign = array_merge($mail->getTplParams(), array('subject' => $subject, 'body' => $text));
-            $text = $this->getRender()->renderTemplate($tplPath, $assign);
+            $text = $this->getRender()->fetchTemplate($tplPath, $assign);
         }
         return array($subject, $html, $text);
     }

@@ -2,42 +2,42 @@
 
 class CM_RenderAdapter_FormField extends CM_RenderAdapter_Abstract {
 
-    public function fetch(array $params = array()) {
-        /** @var CM_Form_Abstract $form */
-        $form = $params['form'];
-        $fieldName = $params['fieldName'];
-        /** @var CM_FormField_Abstract $field */
-        $field = $this->_getView();
+    public function fetch(CM_Params $renderParams, CM_Frontend_ViewResponse &$viewResponse = null) {
+        $field = $this->_getFormField();
+        $frontend = $this->getRender()->getGlobalResponse();
 
-        $field->setTplParam('field', $field);
-        $field->setTplParam('id', $form->getTagAutoId($fieldName . '-input'));
-        $field->setTplParam('name', $fieldName);
-        $field->setTplParam('value', $field->getValue());
-        $field->setTplParam('options', $field->getOptions());
+        $viewResponse = new CM_Frontend_ViewResponse($field);
+        $viewResponse->setTemplateName('default');
+        $field->prepare($renderParams, $viewResponse);
+        $viewResponse->set('field', $field);
+        $viewResponse->set('inputId', $viewResponse->getAutoIdTagged('input'));
+        $viewResponse->set('name', $field->getName());
+        $viewResponse->set('value', $field->getValue());
+        $viewResponse->set('options', $field->getOptions());
+        $viewResponse->getJs()->setProperty('fieldOptions', $field->getOptions());
 
-        $cssClass = implode(' ', $field->getClassHierarchy());
-        if (preg_match('#([^/]+)\.tpl$#', $field->getTplName(), $match)) {
-            if ($match[1] != 'default') {
-                $cssClass .= ' ' . $match[1]; // Include special-tpl name in class (e.g. 'mini')
-            }
-        }
+        $frontend->treeExpand($viewResponse);
 
-        $html = '<div class="' . $cssClass . '" id="' . $form->getAutoId() . '-' . $fieldName . '">';
-        $html .= trim($this->_renderTemplate($field->getTplName(), $field->getTplParams(), true));
+        $html = '<div class="' . implode(' ', $field->getClassHierarchy()) . '" id="' . $viewResponse->getAutoId() . '">';
+        $html .= trim($this->getRender()->fetchViewResponse($viewResponse));
         if (!$field instanceof CM_FormField_Hidden) {
             $html .= '<span class="messages"></span>';
         }
         $html .= '</div>';
 
+        $formViewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
+        if ($formViewResponse) {
+            $formViewResponse->getJs()->append("this.registerField(cm.views['{$viewResponse->getAutoId()}']);");
+        }
+
+        $frontend->treeCollapse();
         return $html;
     }
 
     /**
-     * @param string $tplName
-     * @param array  $params
-     * @return string
+     * @return CM_FormField_Abstract
      */
-    public function fetchTemplate($tplName, array $params) {
-        return $this->_renderTemplate($tplName, $params, true);
+    private function _getFormField() {
+        return $this->_getView();
     }
 }

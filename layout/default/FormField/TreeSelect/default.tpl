@@ -13,7 +13,7 @@
   </li>
 {/function}
 
-{tag el="input" name=$name id=$id type="hidden" value=$value}
+{tag el="input" name=$name id=$inputId type="hidden" value=$value}
 {button_link icon="arrow-down" iconPosition='right' label={translate 'Select...'} class='selector toggleWindow'}
 <ul class="options">
   <li class="unselect unselectNode">{translate 'None'}</li>

@@ -147,30 +147,62 @@ class CM_Model_LocationTest extends CMTest_TestCase {
             'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
             'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
             'name'      => 'test',
-            'lat'       => 20, 'lon' => 20));
+            'lat'       => 20,
+            'lon'       => 20));
 
-        $expectedId = CM_Db_Db::insert('cm_model_location_city', array(
+        $idExpected1 = CM_Db_Db::insert('cm_model_location_city', array(
             'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
             'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
             'name'      => 'test',
-            'lat'       => 20.1, 'lon' => 20.2));
+            'lat'       => 20.1,
+            'lon'       => 20.2));
 
-        $expected = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $expectedId);
+        $idExpected2 = CM_Db_Db::insert('cm_model_location_city', array(
+            'stateId'   => self::$_fields[CM_Model_Location::LEVEL_STATE]['id'],
+            'countryId' => self::$_fields[CM_Model_Location::LEVEL_COUNTRY]['id'],
+            'name'      => 'Waite Park',
+            'lat'       => 45.53,
+            'lon'       => -94.233,
+        ));
+
+        $locationExpected1 = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $idExpected1);
+        $locationExpected2 = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $idExpected2);
 
         CM_Model_Location::createAggregation();
-        $this->assertEquals($expected, CM_Model_Location::findByCoordinates(20, 20.3));
         $this->assertNull(CM_Model_Location::findByCoordinates(100, 100));
+        $this->assertEquals($locationExpected1, CM_Model_Location::findByCoordinates(20, 20.3));
+        $this->assertEquals($locationExpected2, CM_Model_Location::findByCoordinates(45.552222998855, -94.214516300796));
     }
 
     public function testFindByIp() {
         $cityId1 = CM_Db_Db::getRandId('cm_model_location_city', 'id');
-        CM_Db_Db::insert('cm_model_location_city_ip', array('ipStart' => 1, 'ipEnd' => 5, 'cityId' => $cityId1));
+        CM_Db_Db::insert('cm_model_location_ip', array(
+            'id'      => $cityId1,
+            'level'   => CM_Model_Location::LEVEL_CITY,
+            'ipStart' => 1,
+            'ipEnd'   => 5,
+        ));
         $cityId2 = CM_Db_Db::getRandId('cm_model_location_city', 'id');
-        CM_Db_Db::insert('cm_model_location_city_ip', array('ipStart' => 123456789, 'ipEnd' => 223456789, 'cityId' => $cityId2));
+        CM_Db_Db::insert('cm_model_location_ip', array(
+            'id'      => $cityId2,
+            'level'   => CM_Model_Location::LEVEL_CITY,
+            'ipStart' => 123456789,
+            'ipEnd'   => 223456789,
+        ));
         $countryId1 = CM_Db_Db::getRandId('cm_model_location_country', 'id');
-        CM_Db_Db::insert('cm_model_location_country_ip', array('ipStart' => 10, 'ipEnd' => 15, 'countryId' => $countryId1));
+        CM_Db_Db::insert('cm_model_location_ip', array(
+            'id'      => $countryId1,
+            'level'   => CM_Model_Location::LEVEL_COUNTRY,
+            'ipStart' => 10,
+            'ipEnd'   => 15,
+        ));
         $countryId2 = CM_Db_Db::getRandId('cm_model_location_country', 'id');
-        CM_Db_Db::insert('cm_model_location_country_ip', array('ipStart' => 1234567890, 'ipEnd' => 2234567890, 'countryId' => $countryId2));
+        CM_Db_Db::insert('cm_model_location_ip', array(
+            'id'      => $countryId2,
+            'level'   => CM_Model_Location::LEVEL_COUNTRY,
+            'ipStart' => 1234567890,
+            'ipEnd'   => 2234567890,
+        ));
 
         $this->assertEquals(new CM_Model_Location(CM_Model_Location::LEVEL_CITY, $cityId1), CM_Model_Location::findByIp(3));
         $this->assertNull(CM_Model_Location::findByIp(6));

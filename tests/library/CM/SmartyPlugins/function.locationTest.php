@@ -7,7 +7,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
     /** @var CM_Model_Location */
     protected $_location;
 
-    /** @var CM_Render */
+    /** @var CM_Frontend_Render */
     protected $_render;
 
     /** @var Smarty_Internal_Template */
@@ -15,7 +15,7 @@ class smarty_function_locationTest extends CMTest_TestCase {
 
     public function setUp() {
         $smarty = new Smarty();
-        $this->_render = new CM_Render();
+        $this->_render = new CM_Frontend_Render();
         $this->_template = $smarty->createTemplate('string:');
         $this->_template->assignGlobal('render', $this->_render);
         $this->_location = CMTest_TH::createLocation();

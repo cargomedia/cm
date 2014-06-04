@@ -6,9 +6,9 @@ class CM_Usertext_Filter_StriptagsTest extends CMTest_TestCase {
         $text = "<p>foo<br><br/></p>";
 
         $filter = new CM_Usertext_Filter_Striptags();
-        $this->assertSame('foo', $filter->transform($text, new CM_Render()));
+        $this->assertSame('foo', $filter->transform($text, new CM_Frontend_Render()));
 
         $filter = new CM_Usertext_Filter_Striptags(array('p'));
-        $this->assertSame('<p>foo</p>', $filter->transform($text, new CM_Render()));
+        $this->assertSame('<p>foo</p>', $filter->transform($text, new CM_Frontend_Render()));
     }
 }

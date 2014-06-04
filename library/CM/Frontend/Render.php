@@ -1,18 +1,9 @@
 <?php
 
-class CM_Render extends CM_Class_Abstract {
+class CM_Frontend_Render extends CM_Class_Abstract {
 
-    /** @var CM_Frontend */
-    protected $_js = null;
-
-    /** @var CM_Site_Abstract */
-    protected $_site = null;
-
-    /** @var CM_Model_Language|null */
-    private $_language;
-
-    /** @var DateTimeZone|null */
-    private $_timeZone;
+    /** @var CM_Frontend_GlobalResponse|null */
+    private $_js;
 
     /** @var NumberFormatter */
     private $_formatterCurrency;
@@ -20,17 +11,14 @@ class CM_Render extends CM_Class_Abstract {
     /** @var bool */
     private $_languageRewrite;
 
-    /** @var CM_Model_User|null */
-    private $_viewer;
-
-    /** @var array */
-    protected $_stack = array();
-
     /** @var CM_Menu[] */
     private $_menuList = array();
 
-    /** @var Smarty */
-    private static $_smarty = null;
+    /** @var CM_Frontend_Environment */
+    private $_environment;
+
+    /** @var Smarty|null */
+    private static $_smarty;
 
     /**
      * @param CM_Site_Abstract|null  $site
@@ -39,15 +27,10 @@ class CM_Render extends CM_Class_Abstract {
      * @param boolean|null           $languageRewrite
      */
     public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null) {
-        if (!$site) {
-            $site = CM_Site_Abstract::factory();
-        }
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
-        $this->_site = $site;
-        $this->_viewer = $viewer;
-        $this->_language = $language;
+        $this->_environment = new CM_Frontend_Environment($site, $viewer, $language);
         $this->_languageRewrite = (bool) $languageRewrite;
     }
 
@@ -55,113 +38,44 @@ class CM_Render extends CM_Class_Abstract {
      * @return CM_Site_Abstract
      */
     public function getSite() {
-        return $this->_site;
+        return $this->getEnvironment()->getSite();
     }
 
     /**
-     * @return CM_Frontend
+     * @return CM_Frontend_Environment
      */
-    public function getJs() {
-        if (!$this->_js) {
-            $this->_js = new CM_Frontend();
+    public function getEnvironment() {
+        return $this->_environment;
+    }
+
+    /**
+     * @return CM_Frontend_GlobalResponse
+     */
+    public function getGlobalResponse() {
+        if (null === $this->_js) {
+            $this->_js = new CM_Frontend_GlobalResponse();
         }
         return $this->_js;
     }
 
     /**
-     * @param string $key
-     * @return array Stack
-     */
-    public function getStack($key) {
-        if (empty($this->_stack[$key])) {
-            return array();
-        }
-        return $this->_stack[$key];
-    }
-
-    /**
-     * @param string $key
-     * @return mixed|null
-     */
-    public function getStackLast($key) {
-        $stack = $this->getStack($key);
-        if (empty($stack)) {
-            return null;
-        }
-        return $stack[count($stack) - 1];
-    }
-
-    /**
-     * @param string $key
-     * @return mixed|null
-     */
-    public function popStack($key) {
-        if (!isset($this->_stack[$key])) {
-            return null;
-        }
-        $last = array_pop($this->_stack[$key]);
-        return $last;
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     * @return array Stack values
-     */
-    public function pushStack($key, $value) {
-        if (empty($this->_stack[$key])) {
-            $this->_stack[$key] = array();
-        }
-
-        array_push($this->_stack[$key], $value);
-        return $this->getStack($key);
-    }
-
-    /**
-     * @param CM_View_Abstract $view Object to render
-     * @param array            $params
-     * @return string Output
-     * @throws CM_Exception
-     */
-    public function render(CM_View_Abstract $view, array $params = array()) {
-        if (!preg_match('/^[a-zA-Z]+_([a-zA-Z]+)(_\w+)?$/', get_class($view), $matches)) {
-            throw new CM_Exception("Cannot detect namespace from object's class-name `" . get_class($view) . "`");
-        }
-        $renderClass = 'CM_RenderAdapter_' . $matches[1];
-
-        /** @var CM_RenderAdapter_Abstract $renderAdapter */
-        $renderAdapter = new $renderClass($this, $view);
-
-        return $renderAdapter->fetch($params);
-    }
-
-    /**
-     * @param string     $tplPath
+     * @param string     $path
      * @param array|null $variables
-     * @param bool|null  $isolated
      * @return string
      */
-    public function renderTemplate($tplPath, $variables = null, $isolated = null) {
+    public function fetchTemplate($path, $variables = null) {
         $compileId = $this->getSite()->getId();
         if ($this->getLanguage()) {
             $compileId .= '_' . $this->getLanguage()->getAbbreviation();
         }
         /** @var Smarty_Internal_TemplateBase $template */
-        if ($isolated) {
-            $template = $this->_getSmarty()->createTemplate($tplPath, null, $compileId);
-        } else {
-            $template = $this->_getSmarty();
-        }
+        $template = $this->_getSmarty()->createTemplate($path, null, $compileId);
         $template->assignGlobal('render', $this);
         $template->assignGlobal('viewer', $this->getViewer());
         if ($variables) {
             $template->assign($variables);
         }
-        if ($isolated) {
-            return $template->fetch();
-        } else {
-            return $template->fetch($tplPath, null, $compileId);
-        }
+        return $template->fetch();
     }
 
     /**
@@ -234,23 +148,18 @@ class CM_Render extends CM_Class_Abstract {
 
     /**
      * @param string|null           $path
-     * @param boolean|null          $cdn
      * @param CM_Site_Abstract|null $site
      * @return string
      */
-    public function getUrl($path = null, $cdn = null, CM_Site_Abstract $site = null) {
+    public function getUrl($path = null, CM_Site_Abstract $site = null) {
         if (null === $path) {
             $path = '';
-        }
-        if (null === $cdn) {
-            $cdn = false;
         }
         if (null === $site) {
             $site = $this->getSite();
         }
         $path = (string) $path;
-        $urlBase = $cdn ? $site->getUrlCdn() : $site->getUrl();
-        return $urlBase . $path;
+        return $site->getUrl() . $path;
     }
 
     /**
@@ -290,7 +199,7 @@ class CM_Render extends CM_Class_Abstract {
         if ($languageRewrite && $language) {
             $path = '/' . $language->getAbbreviation() . $path;
         }
-        return $this->getUrl($path, false, $site);
+        return $this->getUrl($path, $site);
     }
 
     /**
@@ -309,7 +218,7 @@ class CM_Render extends CM_Class_Abstract {
             }
             $urlPath .= '/' . $this->getSite()->getId() . '/' . CM_App::getInstance()->getDeployVersion() . '/' . $path;
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
@@ -334,42 +243,29 @@ class CM_Render extends CM_Class_Abstract {
         if (null !== $path) {
             $urlPath .= $path . '?' . CM_App::getInstance()->getDeployVersion();
         }
-        return $this->getUrl($urlPath, true);
+        return $this->getSite()->getUrlCdn() . $urlPath;
     }
 
     /**
-     * @param CM_File_UserContent|null $file
+     * @param CM_File_UserContent $file
      * @return string
      */
-    public function getUrlUserContent(CM_File_UserContent $file = null) {
-        if (is_null($file)) {
-            return $this->getUrl('/userfiles', true);
-        }
-        return $this->getUrl('/userfiles/' . $file->getPathRelative(), true);
+    public function getUrlUserContent(CM_File_UserContent $file) {
+        return $file->getUrl();
     }
 
     /**
      * @return CM_Model_User|null
      */
     public function getViewer() {
-        return $this->_viewer;
+        return $this->getEnvironment()->getViewer();
     }
 
     /**
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
-        return $this->_language;
-    }
-
-    /**
-     * @return DateTimeZone
-     */
-    public function getTimeZone() {
-        if (!$this->_timeZone) {
-            $this->_timeZone = CM_Bootloader::getInstance()->getTimeZone();
-        }
-        return $this->_timeZone;
+        return $this->getEnvironment()->getLanguage();
     }
 
     /**
@@ -398,7 +294,7 @@ class CM_Render extends CM_Class_Abstract {
      * @return IntlDateFormatter
      */
     public function getFormatterDate($dateType, $timeType, $pattern = null) {
-        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getTimeZone()->getName(), null, $pattern);
+        return new IntlDateFormatter($this->getLocale(), $dateType, $timeType, $this->getEnvironment()->getTimeZone()->getName(), null, $pattern);
     }
 
     /**
@@ -415,11 +311,7 @@ class CM_Render extends CM_Class_Abstract {
      * @return string
      */
     public function getLocale() {
-        $locale = 'en';
-        if ($this->getLanguage()) {
-            $locale = $this->getLanguage()->getAbbreviation();
-        }
-        return $locale;
+        return $this->getEnvironment()->getLocale();
     }
 
     /**
@@ -434,6 +326,50 @@ class CM_Render extends CM_Class_Abstract {
      */
     public function getMenuList() {
         return $this->_menuList;
+    }
+
+    /**
+     * @param CM_View_Abstract $view
+     * @param string           $templateName
+     * @throws CM_Exception
+     * @return string|null
+     */
+    public function getTemplatePath(CM_View_Abstract $view, $templateName) {
+        $templateName = (string) $templateName;
+        foreach ($view->getClassHierarchy() as $className) {
+            if (!preg_match('/^([a-zA-Z]+)_([a-zA-Z]+)_(.+)$/', $className, $matches)) {
+                throw new CM_Exception('Cannot detect namespace/view-class/view-name for `' . $className . '`.');
+            }
+            $templatePathRelative = $matches[2] . DIRECTORY_SEPARATOR . $matches[3] . DIRECTORY_SEPARATOR . $templateName . '.tpl';
+            $namespace = $matches[1];
+            if ($templatePath = $this->getLayoutPath($templatePathRelative, $namespace, false, false)) {
+                return $templatePath;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param CM_View_Abstract $view
+     * @param string           $templateName
+     * @param array|null       $data
+     * @throws CM_Exception
+     * @return string
+     */
+    public function fetchViewTemplate(CM_View_Abstract $view, $templateName, array $data = null) {
+        $templatePath = $this->getTemplatePath($view, $templateName);
+        if (null === $templatePath) {
+            throw new CM_Exception('Cannot find template `' . $templateName . '` for `' . get_class($view) . '`.');
+        }
+        return $this->fetchTemplate($templatePath, $data);
+    }
+
+    /**
+     * @param CM_Frontend_ViewResponse $viewResponse
+     * @return string
+     */
+    public function fetchViewResponse(CM_Frontend_ViewResponse $viewResponse) {
+        return $this->fetchViewTemplate($viewResponse->getView(), $viewResponse->getTemplateName(), $viewResponse->getData());
     }
 
     /**

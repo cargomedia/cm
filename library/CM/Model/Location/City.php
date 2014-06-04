@@ -116,7 +116,7 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
             'name'      => array('type' => 'string'),
             'lat'       => array('type' => 'float', 'optional' => true),
             'lon'       => array('type' => 'float', 'optional' => true),
-            '_maxmind'  => array('type' => 'string', 'optional' => true),
+            '_maxmind'  => array('type' => 'int', 'optional' => true),
         ));
     }
 

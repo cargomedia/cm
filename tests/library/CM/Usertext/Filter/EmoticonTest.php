@@ -35,7 +35,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
         $text = 'foo :) bar :smiley:';
         $expected = 'foo ' . $this->_getEmoticonImg(':smiley:') . ' bar ' . $this->_getEmoticonImg(':smiley:');
         $filter = new CM_Usertext_Filter_Emoticon();
-        $actual = $filter->transform($text, new CM_Render($this->_mockSite));
+        $actual = $filter->transform($text, new CM_Frontend_Render($this->_mockSite));
 
         $this->assertSame($expected, $actual);
     }
@@ -44,7 +44,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
         $text = 'foo :) bar :smiley:';
         $expected = 'foo ' . $this->_getEmoticonImg(':smiley:', 16) . ' bar ' . $this->_getEmoticonImg(':smiley:', 16);
         $filter = new CM_Usertext_Filter_Emoticon(16);
-        $actual = $filter->transform($text, new CM_Render($this->_mockSite));
+        $actual = $filter->transform($text, new CM_Frontend_Render($this->_mockSite));
 
         $this->assertSame($expected, $actual);
     }
@@ -60,7 +60,7 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
             $this->_getEmoticonImg(':innocent:') . ' foo!' .
             $this->_getEmoticonImg(':sunglasses:') . 'bar';
         $filter = new CM_Usertext_Filter_Emoticon();
-        $actual = $filter->transform($text, new CM_Render($this->_mockSite));
+        $actual = $filter->transform($text, new CM_Frontend_Render($this->_mockSite));
 
         $this->assertSame($expected, $actual);
     }

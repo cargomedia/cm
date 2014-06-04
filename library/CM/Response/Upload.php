@@ -48,12 +48,9 @@ class CM_Response_Upload extends CM_Response_Abstract {
             $query = $this->_request->getQuery();
             $preview = null;
             if (isset($query['field'])) {
-                /** @var $field CM_FormField_File */
-                $field = CM_FormField_File::factory($query['field']);
+                $field = CM_FormField_File::factory($query['field'], ['name' => 'file']);
                 $field->validateFile($file);
-
-                $renderAdapter = new CM_RenderAdapter_FormField($this->getRender(), $field);
-                $preview = $renderAdapter->fetchTemplate('preview.tpl', array('file' => $file));
+                $preview = $this->getRender()->fetchViewTemplate($field, 'preview', array('file' => $file));
             }
             $return['success'] = array('id' => $file->getUniqid(), 'preview' => $preview);
         } catch (CM_Exception_FormFieldValidation $ex) {

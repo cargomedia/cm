@@ -34,10 +34,10 @@ class CM_Exception extends Exception {
     }
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @return string
      */
-    public function getMessagePublic(CM_Render $render) {
+    public function getMessagePublic(CM_Frontend_Render $render) {
         if (!$this->isPublic()) {
             return 'Internal server error';
         }

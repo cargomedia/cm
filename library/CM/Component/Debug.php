@@ -2,26 +2,23 @@
 
 class CM_Component_Debug extends CM_Component_Abstract {
 
-    public function checkAccessible(CM_Render $render) {
-        if (!CM_Bootloader::getInstance()->isDebug()) {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
+        if (!$environment->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
     }
 
-    public function prepare() {
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $debug = CM_Debug::getInstance();
         $stats = $debug->getStats();
         ksort($stats);
-        $this->setTplParam('stats', $stats);
+        $viewResponse->set('stats', $stats);
         $cacheNames = array('CM_Cache_Storage_Memcache', 'CM_Cache_Storage_Apc', 'CM_Cache_Storage_File');
-        $this->_setJsParam('cacheNames', $cacheNames);
-        $this->setTplParam('cacheNames', $cacheNames);
+        $viewResponse->getJs()->setProperty('cacheNames', $cacheNames);
+        $viewResponse->set('cacheNames', $cacheNames);
     }
 
-    public static function ajax_clearCache(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
-        if (!CM_Bootloader::getInstance()->isDebug()) {
-            throw new CM_Exception_NotAllowed();
-        }
+    public function ajax_clearCache(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $cachesCleared = array();
         if ($params->getBoolean('CM_Cache_Storage_Memcache', false)) {
             $cache = new CM_Cache_Storage_Memcache();

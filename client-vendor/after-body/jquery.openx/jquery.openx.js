@@ -45,6 +45,9 @@
         src += "&mmm_fo=1";
       }
 
+      variables['window-width'] = $(window).width();
+      variables['window-height'] = $(window).height();
+
       var variablesQuery = encodeUrlQuery(variables);
       if ('' !== variablesQuery) {
         src += '&' + variablesQuery;

@@ -18,9 +18,13 @@ class CM_App {
     }
 
     public function setupFilesystem() {
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemTmp')->setup(true);
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemData')->setup();
-        CM_ServiceManager::getInstance()->getFilesystem('filesystemUserfiles')->setup();
+        $serviceManager = CM_Service_Manager::getInstance();
+        $serviceManager->getFilesystems()->getData()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->getAdapter()->setup();
+        $serviceManager->getFilesystems()->getTmp()->deleteByPrefix('/');
+        foreach ($serviceManager->getUserContent()->getFilesystemList() as $filesystem) {
+            $filesystem->getAdapter()->setup();
+        }
     }
 
     /**
@@ -88,7 +92,7 @@ class CM_App {
             $assetList[] = new CM_Asset_Javascript_VendorAfterBody($site);
             $assetList[] = new CM_Asset_Javascript_VendorBeforeBody($site);
             foreach ($languageList as $language) {
-                $render = new CM_Render($site, null, $language);
+                $render = new CM_Frontend_Render($site, null, $language);
                 $assetList[] = new CM_Asset_Css_Vendor($render);
                 $assetList[] = new CM_Asset_Css_Library($render);
             }

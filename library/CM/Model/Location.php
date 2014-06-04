@@ -7,6 +7,8 @@ class CM_Model_Location extends CM_Model_Abstract {
     const LEVEL_CITY = 3;
     const LEVEL_ZIP = 4;
 
+    const EARTH_RADIUS = 6371009;
+
     /** @var CM_Model_Location_Abstract[] */
     protected $_locationList = array();
 
@@ -108,13 +110,12 @@ class CM_Model_Location extends CM_Model_Abstract {
         $againstCoordinates['lat'] *= $pi180;
         $againstCoordinates['lon'] *= $pi180;
 
-        $earthRadius = 6371009;
         $arcCosine = acos(
             sin($currentCoordinates['lat']) * sin($againstCoordinates['lat'])
             + cos($currentCoordinates['lat']) * cos($againstCoordinates['lat']) * cos($currentCoordinates['lon'] - $againstCoordinates['lon'])
         );
 
-        return (int) round($earthRadius * $arcCosine);
+        return (int) round(self::EARTH_RADIUS * $arcCosine);
     }
 
     /**
@@ -184,19 +185,21 @@ class CM_Model_Location extends CM_Model_Abstract {
     public static function findByIp($ip) {
         $cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
         $cache = CM_Cache_Local::getInstance();
+        $location = null;
         if ((list($level, $id) = $cache->get($cacheKey)) === false) {
-            $level = $id = null;
-            if ($id = self::_getLocationIdByIp('cm_model_location_city_ip', 'cityId', $ip)) {
-                $level = self::LEVEL_CITY;
-            } elseif ($id = self::_getLocationIdByIp('cm_model_location_country_ip', 'countryId', $ip)) {
-                $level = self::LEVEL_COUNTRY;
+            if ($location = self::_findByIp($ip)) {
+                $level = $location->getLevel();
+                $id = $location->getId();
             }
             $cache->set($cacheKey, array($level, $id));
         }
-        if (!$level && !$id) {
+        if (!$level || !$id) {
             return null;
         }
-        return new self($level, $id);
+        if (!$location) {
+            $location = new self($level, $id);
+        }
+        return $location;
     }
 
     /**
@@ -208,26 +211,22 @@ class CM_Model_Location extends CM_Model_Abstract {
         $lat = (float) $lat;
         $lon = (float) $lon;
         $searchRadius = 100000;
-        $metersPerDegree = 111100;
 
-        $result = CM_Db_Db::execRead("
-			SELECT `id`, `level`
-			FROM `cm_tmp_location_coordinates`
-			WHERE
-				MBRContains(
-					GeomFromText(
-						'LineString(
-							" . ($lat + $searchRadius / ($metersPerDegree / cos($lat))) . "
-							" . ($lon + $searchRadius / $metersPerDegree) . ",
-							" . ($lat - $searchRadius / ($metersPerDegree / cos($lat))) . "
-							" . ($lon - $searchRadius / $metersPerDegree) . "
-						)'
-					), coordinates
-				)
-			ORDER BY
-				((POW(" . $lat . " - X(coordinates), 2)) + (POW(" . $lon . " - Y(coordinates), 2))) ASC
-			LIMIT 1"
-        )->fetch();
+        $pi180 = M_PI / 180;
+        $metersPerDegreeEquator = self::EARTH_RADIUS * $pi180;
+        $metersPerDegree = $metersPerDegreeEquator * cos($lat * $pi180);
+
+        $latMin = $lat - $searchRadius / $metersPerDegreeEquator;
+        $latMax = $lat + $searchRadius / $metersPerDegreeEquator;
+        $lonMin = $lon - $searchRadius / $metersPerDegree;
+        $lonMax = $lon + $searchRadius / $metersPerDegree;
+        $query = "SELECT `id`, `level` FROM `cm_tmp_location_coordinates`
+            WHERE
+                MBRContains(LineString(Point($latMax, $lonMax), Point($latMin, $lonMin)), coordinates)
+            ORDER BY
+                ((POW($lat - X(coordinates), 2)) + (POW($lon - Y(coordinates), 2))) ASC
+            LIMIT 1";
+        $result = CM_Db_Db::execRead($query)->fetch();
 
         if (!$result) {
             return null;
@@ -237,22 +236,20 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $db_table
-     * @param string $db_column
-     * @param int    $ip
-     * @return int|false
+     * @param int $ip
+     * @return CM_Model_Location|null
      */
-    private static function _getLocationIdByIp($db_table, $db_column, $ip) {
-        $result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
+    private static function _findByIp($ip) {
+        $result = CM_Db_Db::execRead("SELECT `id`, `level`, `ipStart` FROM `cm_model_location_ip`
 			WHERE `ipEnd` >= ?
 			ORDER BY `ipEnd` ASC
 			LIMIT 1", array($ip))->fetch();
         if ($result) {
             if ($result['ipStart'] <= $ip) {
-                return (int) $result[$db_column];
+                return new CM_Model_Location($result['level'], $result['id']);
             }
         }
-        return false;
+        return null;
     }
 
     public function toArray() {
@@ -273,32 +270,6 @@ class CM_Model_Location extends CM_Model_Abstract {
 
     public static function getCacheClass() {
         return 'CM_Model_StorageAdapter_CacheLocal';
-    }
-
-    public static function createUSStatesAbbreviation() {
-        $idUS = CM_Db_Db::select('cm_model_location_country', 'id', array('abbreviation' => 'US'))->fetchColumn();
-        if (false === $idUS) {
-            throw new CM_Exception_Invalid('No country with abbreviation `US` found');
-        }
-        $idUS = (int) $idUS;
-
-        $stateMilitaryId = CM_Db_Db::select('cm_model_location_state', 'id', array('name'      => 'U.S. Armed Forces', 'abbreviation' => 'AE',
-                                                                                   'countryId' => $idUS))->fetchColumn();
-        if (false === $stateMilitaryId) {
-            $stateMilitaryId = CM_Db_Db::insert('cm_model_location_state', array('countryId'    => $idUS, 'name' => 'U.S. Armed Forces',
-                                                                                 'abbreviation' => 'AE'));
-        }
-        $stateMilitaryId = (int) $stateMilitaryId;
-
-        foreach (self::_getUSCityMilitrayBasisList() as $militaryBasis) {
-            CM_Db_Db::update('cm_model_location_city', array('stateId' => $stateMilitaryId), array('name' => $militaryBasis, 'countryId' => $idUS));
-        }
-
-        foreach (self::_getUSStateAbbreviationList() as $stateName => $abbreviation) {
-            CM_Db_Db::update('cm_model_location_state', array('abbreviation' => $abbreviation), array('name' => $stateName, 'countryId' => $idUS));
-        }
-
-        self::createAggregation();
     }
 
     public static function createAggregation() {
@@ -396,71 +367,5 @@ class CM_Model_Location extends CM_Model_Abstract {
         }
         $zip = CM_Model_Location_Zip::create($city->_getLocation(), $name, $latitude, $longitude);
         return self::fromLocation($zip);
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function _getUSStateAbbreviationList() {
-        return array(
-            'Alabama'              => 'AL',
-            'Alaska'               => 'AK',
-            'Arizona'              => 'AZ',
-            'Arkansas'             => 'AR',
-            'California'           => 'CA',
-            'Colorado'             => 'CO',
-            'Connecticut'          => 'CT',
-            'Delaware'             => 'DE',
-            'District of Columbia' => 'DC',
-            'Florida'              => 'FL',
-            'Georgia'              => 'GA',
-            'Hawaii'               => 'HI',
-            'Idaho'                => 'ID',
-            'Illinois'             => 'IL',
-            'Indiana'              => 'IN',
-            'Iowa'                 => 'IA',
-            'Kansas'               => 'KS',
-            'Kentucky'             => 'KY',
-            'Louisiana'            => 'LA',
-            'Maine'                => 'ME',
-            'Maryland'             => 'MD',
-            'Massachusetts'        => 'MA',
-            'Michigan'             => 'MI',
-            'Minnesota'            => 'MN',
-            'Mississippi'          => 'MS',
-            'Missouri'             => 'MO',
-            'Montana'              => 'MT',
-            'Nebraska'             => 'NE',
-            'Nevada'               => 'NV',
-            'New Hampshire'        => 'NH',
-            'New Jersey'           => 'NJ',
-            'New Mexico'           => 'NM',
-            'New York'             => 'NY',
-            'North Carolina'       => 'NC',
-            'North Dakota'         => 'ND',
-            'Ohio'                 => 'OH',
-            'Oklahoma'             => 'OK',
-            'Oregon'               => 'OR',
-            'Pennsylvania'         => 'PA',
-            'Rhode Island'         => 'RI',
-            'South Carolina'       => 'SC',
-            'South Dakota'         => 'SD',
-            'Tennessee'            => 'TN',
-            'Texas'                => 'TX',
-            'Utah'                 => 'UT',
-            'Vermont'              => 'VT',
-            'Virginia'             => 'VA',
-            'Washington'           => 'WA',
-            'West Virginia'        => 'WV',
-            'Wisconsin'            => 'WI',
-            'Wyoming'              => 'WY'
-        );
-    }
-
-    /**
-     * @return string[]
-     */
-    private static function _getUSCityMilitrayBasisList() {
-        return array('T3 R1 Nbpp', 'Apo', 'Fpo');
     }
 }

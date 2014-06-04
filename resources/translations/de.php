@@ -1,16 +1,12 @@
 <?php
 
 return function (CM_Model_Language $language) {
-    $language->setTranslation('You', 'Du');
     $language->setTranslation('Ok', 'Ok');
     $language->setTranslation('Cancel', 'Abbrechen');
-    $language->setTranslation('Confirmation', 'Rückfrage');
+    $language->setTranslation('Close', 'Schließen');
     $language->setTranslation('{$label} is required.', '{$label} wird benötigt.', array('label'));
+    $language->setTranslation('Confirmation', 'Rückfrage');
     $language->setTranslation('Required', 'Benötigt');
-    $language->setTranslation('Please Confirm', 'Bitte bestätigen');
-    $language->setTranslation('Year', 'Jahr');
-    $language->setTranslation('Month', 'Monat');
-    $language->setTranslation('Day', 'Tag');
     $language->setTranslation('.date.month.1', 'Januar');
     $language->setTranslation('.date.month.2', 'Februar');
     $language->setTranslation('.date.month.3', 'März');
@@ -50,12 +46,17 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('.date.period.months', '{$count} Monate', array('count'));
     $language->setTranslation('.date.period.year', '1 Jahr');
     $language->setTranslation('.date.period.years', '{$count} Jahre', array('count'));
-    $language->setTranslation('The content you tried to interact with has been deleted.', 'Dieser Inhalt wurde gelöscht.');
-    $language->setTranslation('Your browser is no longer supported. Click here to upgrade…', 'Dein Browser wird nicht mehr unterstützt. Klicke hier um ihn zu aktualisieren…');
     $language->setTranslation('You can only select {$cardinality} items.', 'Maximal {$cardinality} Element.', array('cardinality'));
-    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} hat eine ungültige Dateiendung. Nur {$extensions} werden unterstützt.', array('file',
-        'extensions'));
+    $language->setTranslation('{$file} has an invalid extension. Only {$extensions} are allowed.', '{$file} hat eine ungültige Dateiendung. Nur {$extensions} werden unterstützt.',
+        array('file', 'extensions'));
+    $language->setTranslation('An unexpected connection problem occurred.', 'Ein unerwarteter Verbindungsfehler ist aufgetreten.');
+
+    $language->setTranslation('The content you tried to interact with has been deleted.', 'Dieser Inhalt wurde gelöscht.');
     $language->setTranslation('Drag files here', 'Ziehe deine Datein hierhin');
     $language->setTranslation('or', 'oder');
-    $language->setTranslation('Upload Files', 'Datein hochladen');
+    $language->setTranslation('Upload Files', 'Dateien hochladen');
+    $language->setTranslation('You', 'Du');
+    $language->setTranslation('Year', 'Jahr');
+    $language->setTranslation('Month', 'Monat');
+    $language->setTranslation('Day', 'Tag');
 };

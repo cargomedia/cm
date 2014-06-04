@@ -2,29 +2,17 @@
 
 class CM_FormField_Location extends CM_FormField_SuggestOne {
 
-    /**
-     * @param int|null    $minLevel
-     * @param int|null    $maxLevel
-     * @param string|null $fieldNameDistance
-     */
-    public function __construct($minLevel = null, $maxLevel = null, $fieldNameDistance = null) {
-        parent::__construct();
-
-        if (is_null($minLevel)) {
-            $minLevel = CM_Model_Location::LEVEL_COUNTRY;
-        }
-        if (is_null($maxLevel)) {
-            $maxLevel = CM_Model_Location::LEVEL_ZIP;
-        }
-        $this->_options['levelMin'] = (int) $minLevel;
-        $this->_options['levelMax'] = (int) $maxLevel;
-        if ($fieldNameDistance) {
-            $this->_options['distanceName'] = $fieldNameDistance;
+    protected function _initialize() {
+        $this->_options['levelMin'] = $this->_params->getInt('levelMin', CM_Model_Location::LEVEL_COUNTRY);
+        $this->_options['levelMax'] = $this->_params->getInt('levelMax', CM_Model_Location::LEVEL_ZIP);
+        if ($this->_params->has('fieldNameDistance') && $this->_params->get('fieldNameDistance')) {
+            $this->_options['distanceName'] = $this->_params->getString('fieldNameDistance');
             $this->_options['distanceLevelMin'] = CM_Model_Location::LEVEL_CITY;
         }
+        parent::_initialize();
     }
 
-    public function getSuggestion($location, CM_Render $render) {
+    public function getSuggestion($location, CM_Frontend_Render $render) {
         $names = array();
         for ($level = $location->getLevel(); $level >= CM_Model_Location::LEVEL_COUNTRY; $level--) {
             $names[] = $location->getName($level);
@@ -38,13 +26,13 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     /**
-     * @param string               $userInput
-     * @param CM_Response_Abstract $response
+     * @param CM_Frontend_Environment $environment
+     * @param string                  $userInput
      * @throws CM_Exception_FormFieldValidation
      * @return CM_Model_Location
      */
-    public function validate($userInput, CM_Response_Abstract $response) {
-        $value = parent::validate($userInput, $response);
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        $value = parent::validate($environment, $userInput);
         if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
             throw new CM_Exception_FormFieldValidation('Invalid input format');
         }
@@ -67,6 +55,19 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
     }
 
+    public function ajax_getSuggestionByCoordinates(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
+        $lat = $params->getFloat('lat');
+        $lon = $params->getFloat('lon');
+        $location = CM_Model_Location::findByCoordinates($lat, $lon);
+        $location = $this->_squashLocationInConstraints($location);
+
+        if (!$location) {
+            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
+        }
+
+        return $this->getSuggestion($location, $response->getRender());
+    }
+
     /**
      * @param CM_Request_Abstract $request
      * @return CM_Model_Location|null
@@ -80,7 +81,7 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         return CM_Model_Location::findByIp($ip);
     }
 
-    protected function _getSuggestions($term, array $options, CM_Render $render) {
+    protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {
         $ip = CM_Request_Abstract::getInstance()->getIp();
         $locations = new CM_Paging_Location_Suggestions($term, $options['levelMin'], $options['levelMax'], CM_Model_Location::findByIp($ip));
         $locations->setPage(1, 15);
@@ -109,24 +110,5 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
 
         return $location;
-    }
-
-    public static function ajax_getSuggestionByCoordinates(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
-        $lat = $params->getFloat('lat');
-        $lon = $params->getFloat('lon');
-        $levelMin = $params->getInt('levelMin');
-        $levelMax = $params->getInt('levelMax');
-
-        /** @var CM_FormField_Location $field */
-        $field = new static($levelMin, $levelMax);
-
-        $location = CM_Model_Location::findByCoordinates($lat, $lon);
-        $location = $field->_squashLocationInConstraints($location);
-
-        if (!$location) {
-            throw new CM_Exception('Cannot find a location by coordinates `' . $lat . '` / `' . $lon . '`.');
-        }
-
-        return $field->getSuggestion($location, $response->getRender());
     }
 }
