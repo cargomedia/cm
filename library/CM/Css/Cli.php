@@ -44,26 +44,19 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function emoticonRefresh() {
-        $emoticonList = array();
-
+        $updated = 0;
+        $emoticonList = new CM_Paging_Emoticon_All();
         foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
             $emoticonPath = CM_Util::getNamespacePath($namespace) . 'layout/default/resource/img/emoticon/';
             $paths = glob($emoticonPath . '*');
             foreach ($paths as $path) {
                 $file = new CM_File($path);
-                $name = strtolower($file->getFileNameWithoutExtension());
-                $emoticonList[$name] = array('name' => $name, 'fileName' => $file->getFileName());
+                $code = ':' . strtolower($file->getFileNameWithoutExtension()) . ':';
+                $emoticonList->add($code, $file->getFileName());
+                $updated++;
             }
         }
-
-        $insertList = array();
-        foreach ($emoticonList as $emoticon) {
-            $insertList[] = array(':' . $emoticon['name'] . ':', $emoticon['fileName']);
-        }
-
-        CM_Db_Db::insertIgnore('cm_emoticon', array('code', 'file'), $insertList);
-        $this->_getOutput()->writeln('Updated ' . count($insertList) . ' emoticons.');
-
+        $this->_getOutput()->writeln('Updated ' . $updated . ' emoticons.');
         $this->_checkEmoticonValidity();
     }
 
