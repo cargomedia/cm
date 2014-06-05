@@ -69,7 +69,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Result
      */
     public static function execRead($sqlTemplate, array $parameters = null) {
-        $client = CM_ServiceManager::getInstance()->getDb('DbRead');
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
         return self::exec($sqlTemplate, $parameters, $client);
     }
 
@@ -79,7 +79,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Result
      */
     public static function execMaintenance($sqlTemplate, array $parameters = null) {
-        $client = CM_ServiceManager::getInstance()->getDb('DbMaintenance', 'DbRead');
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaintenance();
         return self::exec($sqlTemplate, $parameters, $client);
     }
 
@@ -389,7 +389,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return CM_Db_Client
      */
     public static function getClient() {
-        return CM_ServiceManager::getInstance()->getDb();
+        return CM_Service_Manager::getInstance()->getDatabases()->getMaster();
     }
 
     /**
