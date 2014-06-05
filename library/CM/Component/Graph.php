@@ -2,7 +2,10 @@
 
 class CM_Component_Graph extends CM_Component_Abstract {
 
-    public function prepare() {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
+    }
+
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $xmode = $this->_params->has('xmode') ? $this->_params->get('xmode') : 'time';
         $stack = $this->_params->has('stack') ? $this->_params->get('stack') : false;
         $legend = $this->_params->has('legend') ? $this->_params->get('legend') : true;
@@ -37,10 +40,7 @@ class CM_Component_Graph extends CM_Component_Abstract {
             $flotOptions['points']['show'] = false;
         }
 
-        $this->_setJsParam('series', $series);
-        $this->_setJsParam('flotOptions', $flotOptions);
-    }
-
-    public function checkAccessible(CM_Render $render) {
+        $viewResponse->getJs()->setProperty('series', $series);
+        $viewResponse->getJs()->setProperty('flotOptions', $flotOptions);
     }
 }

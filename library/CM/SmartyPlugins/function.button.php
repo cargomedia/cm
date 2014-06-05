@@ -1,10 +1,14 @@
 <?php
 
 function smarty_function_button(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $viewResponse = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract');
+    if (null === $viewResponse) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {button} can be only rendered within form view.');
+    }
     /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms');
+    $form = $viewResponse->getView();
     if (empty($params['action'])) {
         trigger_error('Param `action` missing.');
     }
@@ -54,7 +58,7 @@ function smarty_function_button(array $params, Smarty_Internal_Template $templat
         $class .= ' showTooltip';
     }
 
-    $id = $form->getAutoId() . '-' . $action->getName() . '-button';
+    $id = $viewResponse->getAutoId() . '-' . $action->getName() . '-button';
 
     $html = '';
     $html .= '<button class="' . $class . '" id="' . $id . '" type="submit" value="' . $label . '" data-click-spinner="true"';

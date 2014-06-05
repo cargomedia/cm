@@ -1,9 +1,12 @@
 <?php
 
 function smarty_function_paging(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    $component = $render->getStackLast('components');
+    $component = $render->getGlobalResponse()->getClosestViewResponse('CM_Component_Abstract');
+    if (null === $component) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Component_Abstract` view response. {paging} can be only used within component view.');
+    }
 
     if (!isset($params['paging'])) {
         trigger_error('Parameter `paging` missing');
@@ -55,17 +58,17 @@ function smarty_function_paging(array $params, Smarty_Internal_Template $templat
 }
 
 /**
- * @param CM_Render             $render
- * @param string|null           $urlPage
- * @param array                 $urlParams
- * @param CM_Component_Abstract $component
- * @param int                   $page
- * @param string                $text
- * @param bool                  $ajax
- * @param string|null           $class
+ * @param CM_Frontend_Render       $render
+ * @param string|null              $urlPage
+ * @param array                    $urlParams
+ * @param CM_Frontend_ViewResponse $component
+ * @param int                      $page
+ * @param string                   $text
+ * @param bool                     $ajax
+ * @param string|null              $class
  * @return string
  */
-function _smarty_function_paging_link(CM_Render $render, $urlPage, array $urlParams, CM_Component_Abstract $component, $page, $text, $ajax, $class = null) {
+function _smarty_function_paging_link(CM_Frontend_Render $render, $urlPage, array $urlParams, CM_Frontend_ViewResponse $component, $page, $text, $ajax, $class = null) {
     if ($ajax) {
         $href = 'javascript:;';
         $onClick = 'cm.views["' . $component->getAutoId() . '"].reload(' . json_encode(array('page' => $page)) . ')';

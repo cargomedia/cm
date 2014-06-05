@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_location(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
     /** @var CM_Model_Location $location */
@@ -9,7 +9,7 @@ function smarty_function_location(array $params, Smarty_Internal_Template $templ
     $distanceFrom = isset($params['distanceFrom']) ? $location->getDistance($params['distanceFrom']) : null;
 
     $parts = array();
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
     $cityName = $location->getName(CM_Model_Location::LEVEL_CITY);

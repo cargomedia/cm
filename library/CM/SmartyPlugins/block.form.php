@@ -1,34 +1,42 @@
 <?php
 
 function smarty_block_form($params, $content, Smarty_Internal_Template $template, $open) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
+    $frontend = $render->getGlobalResponse();
     if ($open) {
-        $form = CM_Form_Abstract::factory($params['name']);
-        $form->setup();
-        $form->renderStart($params);
-        $render->pushStack('forms', $form);
-        $render->pushStack('views', $form);
+        $form = CM_Form_Abstract::factory($params['name'], $params);
+        $form->prepare($render->getEnvironment());
 
-        $class = implode(' ', $form->getClassHierarchy()) . ' ' . $form->getName();
-        $html = '<form id="' . $form->getAutoId() . '" class="' . $class . ' clearfix" method="post" onsubmit="return false;" novalidate >';
-
-        return $html;
+        $viewResponse = new CM_Frontend_ViewResponse($form);
+        $frontend->treeExpand($viewResponse);
+        return '';
     } else {
+        $viewResponse = $frontend->getClosestViewResponse('CM_Form_Abstract');
+        if (null === $viewResponse) {
+            throw new CM_Exception_Invalid('Cannot find `CM_Form_Abstract` within frontend tree.');
+        }
         /** @var CM_Form_Abstract $form */
-        $form = $render->popStack('forms');
-        $render->popStack('views');
+        $form = $viewResponse->getView();
 
-        /** @var CM_FormField_Abstract $field */
-        foreach ($form->getFields() as $fieldName => $field) {
+        $classes = $form->getClassHierarchy();
+        $classes[] = $form->getName();
+        $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
+            implode(' ', $classes) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+        $html .= $content;
+
+        foreach ($form->getFields() as $field) {
             if ($field instanceof CM_FormField_Hidden) {
-                $field->prepare(array());
-                $content .= $render->render($field, array('form' => $form, 'fieldName' => $fieldName));
+                $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
+                $html .= $renderAdapter->fetch(CM_Params::factory());
             }
         }
+        foreach ($form->getActions() as $actionName => $action) {
+            $viewResponse->getJs()->append("this.registerAction('{$actionName}', {$action->js_presentation()});");
+        }
+        $html .= '</form>';
 
-        $render->getJs()->registerForm($form, $render->getStackLast('views'));
-        $content .= '</form>';
-        return $content;
+        $frontend->treeCollapse();
+        return $html;
     }
 }

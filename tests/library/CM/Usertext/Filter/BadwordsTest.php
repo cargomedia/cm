@@ -6,7 +6,7 @@ class CM_Usertext_Filter_BadwordsTest extends CMTest_TestCase {
         $replace = '…';
         $badwords = new CM_Paging_ContentList_Badwords();
         $filter = new CM_Usertext_Filter_Badwords();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
 
         $actual = $filter->transform("hello foo there", $render);
         $this->assertSame("hello foo there", $actual);

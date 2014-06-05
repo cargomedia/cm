@@ -1,16 +1,19 @@
 <?php
 
 function smarty_function_input(array $params, Smarty_Internal_Template $template) {
-    if (!isset($params['name'])) {
-        trigger_error('Param `name` missing.');
+    $params = CM_Params::factory($params);
+    if (!$params->has('name')) {
+        throw new CM_Exception_Invalid('Param `name` missing');
     }
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms');
-    /** @var CM_FormField_Abstract $field */
-    $field = $form->getField($params['name']);
-
-    $field->prepare($params);
-    return $render->render($field, array('form' => $form, 'fieldName' => $params['name']));
+    $form = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract')->getView();
+    if (null === $form) {
+        throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. {input} can be only rendered within form view.');
+    }
+    $fieldName = $params->getString('name');
+    $field = $form->getField($fieldName);
+    $renderAdapter = new CM_RenderAdapter_FormField($render, $field);
+    return $renderAdapter->fetch($params);
 }

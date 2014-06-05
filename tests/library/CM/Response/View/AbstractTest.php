@@ -4,7 +4,10 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function testLoadPage() {
         $viewer = CMTest_TH::createUser();
-        $response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_Mock::getPath()), $viewer);
+        $environment = new CM_Frontend_Environment(null, $viewer);
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
+        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_Mock::getPath()], $scopeView, null, $environment);
+
         $this->assertViewResponseSuccess($response);
         $responseContent = CM_Params::decode($response->getContent(), true);
         $this->assertArrayHasKey('js', $responseContent['success']['data']);
@@ -17,24 +20,58 @@ class CM_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageRedirectExternal() {
-        $response = $this->getResponseAjax('loadPage', 'CM_View_Abstract', array('path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()));
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Page_View_Ajax_Test_Mock());
+        $response = $this->getResponseAjax('loadPage', ['path' => CM_Page_View_Ajax_Test_MockRedirect::getPath()], $scopeView);
         $this->assertViewResponseSuccess($response, array('redirectExternal' => 'http://www.foo.bar'));
+    }
+
+    public function testReloadComponent() {
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Notfound([]));
+        $response = $this->getResponseAjax('reloadComponent', array('foo' => 'bar'), $scopeView, $scopeView);
+        $this->assertViewResponseSuccess($response);
+
+        $frontend = $response->getRender()->getGlobalResponse();
+        $oldAutoId = $scopeView->getAutoId();
+        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
+
+        $expected = <<<EOL
+cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
+cm.views["$newAutoId"] = new CM_Component_Notfound({el:$("#$newAutoId").get(0),params:{"foo":"bar"}});
+cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
+cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
+cm.views["$newAutoId"]._ready();
+EOL;
+        $this->assertSame($expected, $frontend->getJs());
+    }
+
+    public function testLoadComponent() {
+        $scopeView = new CM_Frontend_ViewResponse(new CM_Component_Graph());
+        $response = $this->getResponseAjax('loadComponent', ['className' => 'CM_Component_Graph', 'series' => []], $scopeView);
+        $this->assertViewResponseSuccess($response);
+        $successContent = CM_Params::decode($response->getContent(), true)['success'];
+
+        $autoId = $successContent['data']['autoId'];
+        $this->assertNotEmpty($autoId);
+        $html = (new CM_Dom_NodeList($successContent['data']['html']))->find('.CM_Component_Abstract');
+        $this->assertSame($autoId, $html->getAttribute('id'));
+        $this->assertArrayNotHasKey('exec', $successContent);
+        $this->assertContains('new CM_Component_Graph', $successContent['data']['js']);
     }
 }
 
 class CM_Page_View_Ajax_Test_MockRedirect extends CM_Page_Abstract {
 
-    public function prepareResponse(CM_Response_Page $response) {
+    public function prepareResponse(CM_Frontend_Environment $environment, CM_Response_Page $response) {
         $response->redirectUrl('http://www.foo.bar');
     }
 }
 
 class CM_Page_View_Ajax_Test_Mock extends CM_Page_Abstract {
 
-    public function getLayout(CM_Site_Abstract $site, $layoutName = null) {
+    public function getLayout(CM_Frontend_Environment $environment, $layoutName = null) {
         $layoutname = 'Mock1';
         $classname = self::_getClassNamespace() . '_Layout_' . $layoutname;
-        return new $classname($this);
+        return new $classname();
     }
 }
 

@@ -8,7 +8,7 @@ class CM_MenuEntryTest extends CMTest_TestCase {
 
         $entry = new CM_MenuEntry(array('label' => $label, 'page' => $pageName), $this->_getMenu());
 
-        $this->assertInstanceOf($pageName, $entry->getPage());
+        $this->assertSame($pageName, $entry->getPageName());
         $this->assertEquals($label, $entry->getLabel());
     }
 

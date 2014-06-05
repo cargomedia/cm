@@ -5,6 +5,7 @@
 var CM_View_Abstract = Backbone.View.extend({
   _class: 'CM_View_Abstract',
 
+  /** @type CM_View_Abstract[] **/
   _children: [],
 
   initialize: function() {
@@ -106,6 +107,31 @@ var CM_View_Abstract = Backbone.View.extend({
       return parent;
     }
     return parent.findParent(className);
+  },
+
+  /**
+   * @return CM_View_Abstract|null
+   */
+  getComponent: function() {
+    if (this.hasClass('CM_Component_Abstract')) {
+      return this;
+    }
+    return this.findParent('CM_Component_Abstract');
+  },
+
+  /**
+   * @returns {{CM_Component_Abstract: Object|null, CM_View_Abstract: Object}}
+   */
+  getViewInfoList: function() {
+    var viewInfoList = {
+      CM_Component_Abstract: null,
+      CM_View_Abstract: this._getArray()
+    };
+    var component = this.getComponent();
+    if (component) {
+      viewInfoList.CM_Component_Abstract = component._getArray();
+    }
+    return viewInfoList;
   },
 
   /**
@@ -224,7 +250,7 @@ var CM_View_Abstract = Backbone.View.extend({
       this.disable();
     }
 
-    var xhr = cm.ajax('ajax', {view: options.view._getArray(), method: functionName, params: params}, {
+    var xhr = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params}, {
       success: function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);
