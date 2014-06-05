@@ -30,7 +30,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
     public function getCount($offset = null, $count = null) {
         $cacheKey = array('count');
         if (($count = $this->_cacheGet($cacheKey)) === false) {
-            $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+            $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
             $count = $mongoDb->count($this->_collection, $this->_criteria, $count, $offset);
             $this->_cacheSet($cacheKey, $count);
         } else {
@@ -47,7 +47,7 @@ class CM_PagingSource_MongoDb extends CM_PagingSource_Abstract {
     public function getItems($offset = null, $count = null) {
         $cacheKey = array('items', $offset, $count);
         if (($items = $this->_cacheGet($cacheKey)) === false) {
-            $mongoDb = CM_ServiceManager::getInstance()->getMongoDb();
+            $mongoDb = CM_Service_Manager::getInstance()->getMongoDb();
             $cursor = $mongoDb->find($this->_collection, $this->_criteria, $this->_projection);
 
             if (null !== $offset) {

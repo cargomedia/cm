@@ -8,33 +8,30 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     /** @var CM_Elasticsearch_Index_Cli */
     protected static $_searchIndexCli;
 
-    public static function setUpBeforeClass() {
-        $cities = array(
-            array('id'       => '1', 'stateId' => '670', 'countryId' => '9', 'name' => 'Canillo', 'lat' => '42.567', 'lon' => '1.6',
-                  '_maxmind' => '146765'),
-            array('id'       => '2', 'stateId' => '670', 'countryId' => '9', 'name' => 'El Tarter', 'lat' => '42.583', 'lon' => '1.65',
-                  '_maxmind' => '211022'),
-            array('id'       => '3', 'stateId' => '670', 'countryId' => '9', 'name' => 'Meritxell', 'lat' => '42.55', 'lon' => '1.6',
-                  '_maxmind' => '230839'),
-            array('id'       => '4', 'stateId' => '670', 'countryId' => '9', 'name' => 'Pas De La Casa', 'lat' => '42.55', 'lon' => '1.733',
-                  '_maxmind' => '177897'),
-            array('id'       => '5', 'stateId' => '670', 'countryId' => '9', 'name' => 'Soldeu', 'lat' => '42.583', 'lon' => '1.667',
-                  '_maxmind' => '177181'),
-            array('id'       => '6', 'stateId' => '1110', 'countryId' => '9', 'name' => 'Encamp', 'lat' => '42.533', 'lon' => '1.583',
-                  '_maxmind' => '58282'),
-            array('id'       => '7', 'stateId' => '1941', 'countryId' => '9', 'name' => 'Arinsal', 'lat' => '42.567', 'lon' => '1.483',
-                  '_maxmind' => '209956'),
-            array('id'       => '8', 'stateId' => '1941', 'countryId' => '9', 'name' => 'El Serrat', 'lat' => '42.617', 'lon' => '1.55',
-                  '_maxmind' => '209961')
-        );
+    /** @var int */
+    protected static $_cityId, $_cityIdNext;
 
-        CM_Db_Db::insert('cm_locationCity', array('id', 'stateId', 'countryId', 'name', 'lat', 'lon', '_maxmind'), $cities);
+    public static function setUpBeforeClass() {
+        $country = CM_Model_Location_Country::create('Andorra', 'AD');
+        $state1 = CM_Model_Location_State::create($country, 'Canillo', null, 'AD02');
+        $state2 = CM_Model_Location_State::create($country, 'Encamp', null, 'AD03');
+        $state3 = CM_Model_Location_State::create($country, 'La Massana', null, 'AD04');
+        $city = CM_Model_Location_City::create($country, $state1, 'Canillo', '42.567', '1.6', '146765');
+        $cityNext = CM_Model_Location_City::create($country, $state1, 'El Tarter', '42.583', '1.65', '211022');
+        CM_Model_Location_City::create($country, $state1, 'Meritxell', '42.55', '1.6', '230839');
+        CM_Model_Location_City::create($country, $state1, 'Pas De La Casa', '42.55', '1.733', '177897');
+        CM_Model_Location_City::create($country, $state1, 'Soldeu', '42.583', '1.667', '177181');
+        CM_Model_Location_City::create($country, $state2, 'Encamp', '42.533', '1.583', '58282');
+        CM_Model_Location_City::create($country, $state3, 'Arinsal', '42.567', '1.483', '209956');
+        CM_Model_Location_City::create($country, $state3, 'El Serrat', '42.617', '1.55', '209961');
         CM_Model_Location::createAggregation();
         CM_Config::get()->CM_Elasticsearch_Client->enabled = true;
 
         self::$_type = new CM_Elasticsearch_Type_Location();
         self::$_searchIndexCli = new CM_Elasticsearch_Index_Cli();
         self::$_searchIndexCli->create(self::$_type->getIndex()->getName());
+        self::$_cityId = $city->getId();
+        self::$_cityIdNext = $cityNext->getId();
     }
 
     public static function tearDownAfterClass() {
@@ -51,20 +48,21 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public function testSearchDistance() {
-        $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 1);
+        $location = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, self::$_cityId);
         $source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY, $location);
         $locationList = $source->getItems();
-        $locationNext = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, 2);
+        $locationNext = new CM_Model_Location(CM_Model_Location::LEVEL_CITY, self::$_cityIdNext);
         $this->assertEquals($locationNext, reset($locationList));
     }
 
     public function testSearchWithoutSearchEnabled() {
         CM_Config::get()->CM_Elasticsearch_Client->enabled = false;
+        CM_Cache_Local::getInstance()->flush();
 
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(8, $source->getCount());
+        $this->assertEquals(0, $source->getCount());
 
         $source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(3, $source->getCount());
+        $this->assertEquals(0, $source->getCount());
     }
 }

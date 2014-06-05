@@ -130,5 +130,16 @@ class CM_Model_StreamChannel_VideoTest extends CMTest_TestCase {
             $streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/2.png', $streamChannel->getId());
         $this->assertEquals(array($thumb1, $thumb2), $streamChannel->getThumbnails()->getItems());
     }
+
+    public function testGetThumbnail() {
+        /** @var CM_Model_StreamChannel_Video $streamChannel */
+        $streamChannel = CMTest_TH::createStreamChannel();
+        CMTest_TH::createStreamPublish(null, $streamChannel);
+        $thumbnail = $streamChannel->getThumbnail(3);
+        $this->assertInstanceOf('CM_File_UserContent', $thumbnail);
+        $this->assertSame(
+            'streamChannels/' . $streamChannel->getId() . '/' . $streamChannel->getId() . '-' . $streamChannel->getHash() . '-thumbs/3.png',
+            $thumbnail->getPathRelative());
+    }
 }
 

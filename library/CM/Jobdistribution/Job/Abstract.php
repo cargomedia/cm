@@ -2,9 +2,6 @@
 
 abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
 
-    /** @var GearmanClient|null */
-    private $_gearmanClient = null;
-
     /**
      * @param CM_Params $params
      * @return mixed
@@ -31,29 +28,68 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     /**
      * @param array|null $params
      * @return mixed
+     * @throws CM_Exception
      */
-    final public function run(array $params = null) {
+    public function run(array $params = null) {
         if (null === $params) {
             $params = array();
         }
+        $resultList = $this->runMultiple(array($params));
+        return reset($resultList);
+    }
+
+    /**
+     * @param array[] $paramsList
+     * @return mixed[]
+     * @throws CM_Exception
+     */
+    public function runMultiple(array $paramsList) {
         if (!$this->_getGearmanEnabled()) {
-            return $this->_executeJob(CM_Params::factory($params));
+            return $this->_runMultipleWithoutGearman($paramsList);
         }
-        return $this->_dispatch($params);
+
+        $resultList = array();
+        $gearmanClient = $this->_getGearmanClient();
+
+        $gearmanClient->setCompleteCallback(function (GearmanTask $task) use (&$resultList) {
+            $resultList[] = CM_Params::decode($task->data(), true);
+        });
+
+        $failureList = array();
+        $gearmanClient->setFailCallback(function (GearmanTask $task) use (&$failureList) {
+            $failureList[] = $task;
+        });
+
+        foreach ($paramsList as $params) {
+            $workload = CM_Params::encode($params, true);
+            $task = $gearmanClient->addTask($this->_getJobName(), $workload);
+            if (false === $task) {
+                throw new CM_Exception('Cannot add task `' . $this->_getJobName() . '`.');
+            }
+        }
+        $gearmanClient->runTasks();
+
+        if (count($resultList) != count($paramsList)) {
+            throw new CM_Exception('Job `' . $this->_getJobName() . '` failed (' . count($resultList) . '/' . count($paramsList) . ' results).');
+        }
+        return $resultList;
     }
 
     /**
      * @param array|null $params
      */
-    final public function queue(array $params = null) {
+    public function queue(array $params = null) {
         if (null === $params) {
             $params = array();
         }
         if (!$this->_getGearmanEnabled()) {
-            $this->_executeJob(CM_Params::factory($params));
+            $this->_runMultipleWithoutGearman(array($params));
             return;
         }
-        $this->_dispatch($params, true);
+
+        $workload = CM_Params::encode($params, true);
+        $gearmanClient = $this->_getGearmanClient();
+        $gearmanClient->doBackground($this->_getJobName(), $workload);
     }
 
     /**
@@ -61,7 +97,7 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @return string|null
      * @throws CM_Exception_Nonexistent
      */
-    final public function __executeGearman(GearmanJob $job) {
+    public function __executeGearman(GearmanJob $job) {
         $workload = $job->workload();
         try {
             $params = CM_Params::factory(CM_Params::decode($workload, true));
@@ -76,35 +112,26 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
     /**
      * @return string
      */
-    final protected function _getJobName() {
+    protected function _getJobName() {
         return get_class($this);
     }
 
     /**
-     * @param array        $params
-     * @param boolean|null $asynchronous
-     * @throws CM_Exception
-     * @return mixed|null
+     * @param array[] $paramsList
+     * @return mixed[]
      */
-    final private function _dispatch(array $params, $asynchronous = false) {
-        $workload = CM_Params::encode($params, true);
-        $gearmanClient = $this->_getGearmanClient();
-        if ($asynchronous) {
-            $gearmanClient->doBackground($this->_getJobName(), $workload);
-            return null;
-        } else {
-            $result = $gearmanClient->doNormal($this->_getJobName(), $workload);
-            if ($gearmanClient->returnCode() === GEARMAN_WORK_FAIL) {
-                throw new CM_Exception('Job `' . $this->_getJobName() . '` failed.');
-            }
-            return CM_Params::decode($result, true);
+    protected function _runMultipleWithoutGearman(array $paramsList) {
+        $resultList = array();
+        foreach ($paramsList as $params) {
+            $resultList[] = $this->_executeJob(CM_Params::factory($params));
         }
+        return $resultList;
     }
 
     /**
      * @return boolean
      */
-    final private function _getGearmanEnabled() {
+    private function _getGearmanEnabled() {
         return (boolean) self::_getConfig()->gearmanEnabled;
     }
 
@@ -113,16 +140,14 @@ abstract class CM_Jobdistribution_Job_Abstract extends CM_Class_Abstract {
      * @throws CM_Exception
      */
     protected function _getGearmanClient() {
-        if (!$this->_gearmanClient) {
-            if (!extension_loaded('gearman')) {
-                throw new CM_Exception('Missing `gearman` extension');
-            }
-            $config = static::_getConfig();
-            $this->_gearmanClient = new GearmanClient();
-            foreach ($config->servers as $server) {
-                $this->_gearmanClient->addServer($server['host'], $server['port']);
-            }
+        if (!extension_loaded('gearman')) {
+            throw new CM_Exception('Missing `gearman` extension');
         }
-        return $this->_gearmanClient;
+        $config = static::_getConfig();
+        $gearmanClient = new GearmanClient();
+        foreach ($config->servers as $server) {
+            $gearmanClient->addServer($server['host'], $server['port']);
+        }
+        return $gearmanClient;
     }
 }

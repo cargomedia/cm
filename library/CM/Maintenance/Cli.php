@@ -5,15 +5,21 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     /** CM_Clockwork_Manager */
     protected $_clockworkManager;
 
+    /**
+     * @synchronized
+     */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
-    /**
-     * @synchronized
-     */
+    public function startLocal() {
+        $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_registerCallbacksLocal();
+        $this->_clockworkManager->start();
+    }
+
     protected function _registerCallbacks() {
         $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
             'CM_Model_User::offlineOld'                 => function () {
@@ -30,9 +36,6 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 },
             'CM_SVM_Model::deleteOldTrainings'          => function () {
                     CM_SVM_Model::deleteOldTrainings(3000);
-                },
-            'CM_SVM_Model::trainChanged'                => function () {
-                    CM_SVM_Model::trainChanged();
                 },
             'CM_Paging_Ip_Blocked::deleteOlder'         => function () {
                     CM_Paging_Ip_Blocked::deleteOlder(7 * 86400);
@@ -63,6 +66,17 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
             'CM_Paging_Log_Abstract::deleteOlder' => function () {
                     CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
                 }
+        ));
+    }
+
+    protected function _registerCallbacksLocal() {
+        $this->_registerClockworkCallbacks(new DateInterval('PT1M'), array(
+            'CM_Cli_CommandManager::monitorSynchronizedCommands' => function () {
+                    CM_Cli_CommandManager::monitorSynchronizedCommands();
+                },
+            'CM_SVM_Model::trainChanged'                         => function () {
+                    CM_SVM_Model::trainChanged();
+                },
         ));
     }
 

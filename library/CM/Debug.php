@@ -19,6 +19,14 @@ class CM_Debug {
     }
 
     /**
+     * @return array[]
+     */
+
+    public function getStats() {
+        return $this->_stats;
+    }
+
+    /**
      * @param string          $key
      * @param string|string[] $value
      */
@@ -33,11 +41,17 @@ class CM_Debug {
     }
 
     /**
-     * @return array[]
+     * @return bool
      */
+    public function isEnabled() {
+        return $this->_enabled;
+    }
 
-    public function getStats() {
-        return $this->_stats;
+    /**
+     * @param bool $state
+     */
+    public function setEnabled($state) {
+        $this->_enabled = $state;
     }
 
     /**

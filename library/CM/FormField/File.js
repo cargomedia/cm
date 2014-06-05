@@ -54,7 +54,7 @@ var CM_FormField_File = CM_FormField_Abstract.extend({
           data.skipFailMessage = true;
           return false;
         }
-        data.$preview = $('<li class="preview"><div class="template"><span class="spinner"></span></div></li>');
+        data.$preview = $('<li class="preview"><div class="template"><span class="spinner spinner-expanded"></span></div></li>');
         field.$('.previews').append(data.$preview);
       },
       done: function(e, data) {

@@ -1,0 +1,1 @@
+{translate 'Authentication required'}
