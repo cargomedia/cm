@@ -32,7 +32,19 @@ abstract class CM_Paging_Log_Abstract extends CM_Paging_Abstract implements CM_T
      */
     public static function deleteOlder($age) {
         $age = (int) $age;
-        CM_Db_Db::delete('cm_log', '`timeStamp` < ' . (time() - $age));
+        CM_Db_Db::delete('cm_log', array('`timeStamp` < ' . (time() - $age), '`type` = ' . self::getTypeStatic()));
+    }
+
+    public static function deleteOld() {
+        self::deleteOlder(7 * 86400);
+    }
+
+    public static function cleanUpOld() {
+        foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
+            /** @var CM_Paging_Log_Abstract $log */
+            $log = new $logClass();
+            $log->deleteOld();
+        }
     }
 
     /**

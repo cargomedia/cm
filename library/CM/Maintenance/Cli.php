@@ -64,7 +64,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     CM_Action_Abstract::aggregate();
                 },
             'CM_Paging_Log_Abstract::deleteOlder' => function () {
-                    CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
+                    CM_Paging_Log_Abstract::cleanUpOld();
                 }
         ));
     }
