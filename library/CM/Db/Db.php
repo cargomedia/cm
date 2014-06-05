@@ -282,10 +282,10 @@ class CM_Db_Db extends CM_Class_Abstract {
      */
     public static function getConfigDefault($key = null) {
         $config = CM_Config::get();
-        if (!isset($config->services['Db']['arguments'])) {
+        if (!isset($config->services['database-master']['arguments'])) {
             throw new CM_Exception_Invalid('Default database configuration not found');
         }
-        $arguments = $config->services['Db']['arguments'];
+        $arguments = $config->services['database-master']['arguments'];
         $configDefault = array(
             'host'             => (string) $arguments[0],
             'port'             => (int) $arguments[1],

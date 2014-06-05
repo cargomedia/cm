@@ -15,9 +15,9 @@ $config->CM_Model_Splitfeature->withoutPersistence = true;
 
 $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
 
-$config->services['Db'] =
-$config->services['DbRead'] =
-$config->services['DbMaintenance'] = array(
+$config->services['database-master'] =
+$config->services['database-read'] =
+$config->services['database-maintenance'] = array(
     'class'     => 'CM_Db_Client',
     'arguments' => array(
         'localhost',
