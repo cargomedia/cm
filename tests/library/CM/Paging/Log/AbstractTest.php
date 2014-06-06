@@ -44,4 +44,23 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $this->assertSame('foo', $items[0]['msg']);
         $this->assertSame(null, $items[0]['metaInfo']);
     }
+
+    public function testDeleteOlder() {
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType', 'getTypeStatic'))
+            ->disableOriginalConstructor()->getMockForAbstractClass();
+        $paging->expects($this->any())->method('getType')->will($this->returnValue(14));
+        /** @var CM_Paging_Log_Abstract $paging */
+        $paging->__construct();
+
+        $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
+        $this->assertSame(0, $paging->count());
+        $add->invoke($paging, 'foo', array());
+        $this->assertSame(1, count($paging->getItems()));
+
+        $age = 7 * 24 * 60 * 60;
+        CMTest_TH::timeForward($age + 10);
+        $paging->deleteOlder($age, $paging->getType());
+        $paging->_change();
+        $this->assertSame(0, count($paging->getItems()));
+    }
 }
