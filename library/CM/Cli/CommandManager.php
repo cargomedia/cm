@@ -158,7 +158,7 @@ class CM_Cli_CommandManager {
             };
 
             $forks = max($this->_forks, 1);
-            $process = $this->_getProcess();
+            $process = static::_getProcess();
             for ($i = 0; $i < $forks; $i++) {
                 $process->fork($workload);
             }
@@ -178,31 +178,32 @@ class CM_Cli_CommandManager {
         }
     }
 
+    /**
+     * @param CM_Cli_Command $command
+     */
+    public function unlockCommand(CM_Cli_Command $command) {
+        $commandName = $command->getName();
+        $hostId = static::_getProcess()->getHostId();
+        $processId = static::_getProcess()->getProcessId();
+        CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
+    }
+
     public static function monitorSynchronizedCommands() {
         $time = time();
         $timeoutStamp = $time + self::TIMEOUT;
-        $hostId = CM_Process::getInstance()->getHostId();
+        $process = static::_getProcess();
+        $hostId = $process->getHostId();
         $result = CM_Db_Db::select('cm_cli_command_manager_process', array('commandName', 'processId'), array('hostId' => $hostId));
         foreach ($result->fetchAll() as $row) {
             $commandName = $row['commandName'];
             $processId = (int) $row['processId'];
-            if (CM_Process::isRunning($processId)) {
+            if ($process->isRunning($processId)) {
                 CM_Db_Db::update('cm_cli_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
             } else {
                 CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName));
             }
         }
         CM_Db_Db::delete('cm_cli_command_manager_process', '`timeoutStamp` < ' . $time);
-    }
-
-    /**
-     * @param CM_Cli_Command $command
-     */
-    public function unlockCommand(CM_Cli_Command $command) {
-        $commandName = $command->getName();
-        $hostId = $this->_getProcess()->getHostId();
-        $processId = $this->_getProcess()->getProcessId();
-        CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId));
     }
 
     /**
@@ -249,19 +250,12 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @return CM_Process
-     */
-    protected function  _getProcess() {
-        return CM_Process::getInstance();
-    }
-
-    /**
      * @param CM_Cli_Command $command
      */
     protected function _lockCommand(CM_Cli_Command $command) {
         $commandName = $command->getName();
-        $hostId = $this->_getProcess()->getHostId();
-        $processId = $this->_getProcess()->getProcessId();
+        $hostId = static::_getProcess()->getHostId();
+        $processId = static::_getProcess()->getProcessId();
         $timeoutStamp = time() + self::TIMEOUT;
         CM_Db_Db::insert('cm_cli_command_manager_process',
             array('commandName' => $commandName, 'hostId' => $hostId, 'processId' => $processId, 'timeoutStamp' => $timeoutStamp));
@@ -272,6 +266,13 @@ class CM_Cli_CommandManager {
      */
     protected function _outputError($message) {
         $this->_streamError->writeln($message);
+    }
+
+    /**
+     * @return CM_Process
+     */
+    protected static function  _getProcess() {
+        return CM_Process::getInstance();
     }
 
     /**
