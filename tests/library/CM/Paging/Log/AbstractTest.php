@@ -53,14 +53,15 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $paging->__construct();
 
         $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
-        $this->assertSame(0, $paging->count());
+        $this->assertSame(0, $paging->getCount());
         $add->invoke($paging, 'foo', array());
-        $this->assertSame(1, count($paging->getItems()));
+        $paging->_change();
+        $this->assertSame(1, $paging->getCount());
 
         $age = 7 * 24 * 60 * 60;
         CMTest_TH::timeForward($age + 10);
         $paging->deleteOlder($age, $paging->getType());
         $paging->_change();
-        $this->assertSame(0, count($paging->getItems()));
+        $this->assertSame(0, $paging->getCount());
     }
 }
