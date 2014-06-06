@@ -138,6 +138,7 @@ class CM_Cli_CommandManager {
             $command = $this->_getCommand($packageName, $methodName);
 
             if ($command->getSynchronized()) {
+                $this->monitorSynchronizedCommands();
                 $this->_checkLock($command);
                 $this->_lockCommand($command);
                 $commandManager = $this;
@@ -187,6 +188,8 @@ class CM_Cli_CommandManager {
             $processId = (int) $row['processId'];
             if (CM_Process::isRunning($processId)) {
                 CM_Db_Db::update('cm_cli_command_manager_process', array('timeoutStamp' => $timeoutStamp), array('commandName' => $commandName));
+            } else {
+                CM_Db_Db::delete('cm_cli_command_manager_process', array('commandName' => $commandName));
             }
         }
         CM_Db_Db::delete('cm_cli_command_manager_process', '`timeoutStamp` < ' . $time);
