@@ -114,6 +114,35 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         $this->_runCommandManagerMock($commandManagerMock, 5);
     }
 
+    public function testMonitorSynchronizedCommands() {
+        $processMock = $this->getMock('CM_Process', array('getHostId', 'isRunning'), array(), '', false);
+        $processMock->expects($this->any())->method('getHostId')->will($this->returnValue(1));
+        $processMock->staticExpects($this->any())->method('isRunning')->will($this->returnCallback(function ($processId) {
+            return $processId !== 3;
+        }));
+        $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'));
+        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => 'command-mock1', 'hostId' => 1, 'processId' => 1, 'timeoutStamp' => time() + 60));
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => 'command-mock2', 'hostId' => 1, 'processId' => 2, 'timeoutStamp' => time() - 60));
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => 'command-mock3', 'hostId' => 1, 'processId' => 3, 'timeoutStamp' => time() + 60));
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => 'command-mock4', 'hostId' => 2, 'processId' => 4, 'timeoutStamp' => time() + 60));
+        CM_Db_Db::insert('cm_cli_command_manager_process',
+            array('commandName' => 'command-mock5', 'hostId' => 2, 'processId' => 5, 'timeoutStamp' => time() - 60));
+        /** @var CM_Cli_CommandManager $commandManagerMock */
+        $commandManagerMock->monitorSynchronizedCommands();
+        $timeoutStampExpected = time() + CM_Cli_CommandManager::TIMEOUT;
+        $this->assertRow('cm_cli_command_manager_process', array('commandName' => 'command-mock1', 'timeoutStamp' => $timeoutStampExpected));
+        $this->assertRow('cm_cli_command_manager_process', array('commandName' => 'command-mock2', 'timeoutStamp' => $timeoutStampExpected));
+        $this->assertNotRow('cm_cli_command_manager_process', array('commandName' => 'command-mock3'));
+        $this->assertRow('cm_cli_command_manager_process', array('commandName' => 'command-mock4', 'timeoutStamp' => time() + 60));
+        $this->assertNotRow('cm_cli_command_manager_process', array('commandName' => 'command-mock5'));
+        CM_Db_Db::truncate('cm_cli_command_manager_process');
+    }
+
     /**
      * @param CM_Cli_Command $commandMock
      * @param string|null    $errorMessageExpected
