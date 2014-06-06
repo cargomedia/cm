@@ -83,8 +83,8 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param bool|null  $disableQueryBuffering
      * @return CM_Db_Result
      */
-    public static function execMaintenance($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
-        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaintenance();
+    public static function execReadMaintenance($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getReadMaintenance();
         return self::exec($sqlTemplate, $parameters, $client, $disableQueryBuffering);
     }
 

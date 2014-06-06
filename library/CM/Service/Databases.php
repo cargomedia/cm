@@ -23,10 +23,10 @@ class CM_Service_Databases extends CM_Service_ManagerAware {
     /**
      * @return CM_Db_Client
      */
-    public function getMaintenance() {
+    public function getReadMaintenance() {
         $serviceManager = $this->getServiceManager();
-        if ($serviceManager->has('database-maintenance')) {
-            return $serviceManager->get('database-maintenance', 'CM_Db_Client');
+        if ($serviceManager->has('database-read-maintenance')) {
+            return $serviceManager->get('database-read-maintenance', 'CM_Db_Client');
         }
         return $this->getRead();
     }
