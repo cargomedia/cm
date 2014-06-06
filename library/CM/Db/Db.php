@@ -54,33 +54,38 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param string            $sqlTemplate
      * @param array|null        $parameters
      * @param CM_Db_Client|null $client
+     * @param bool|null         $disableQueryBuffering
      * @return CM_Db_Result
      */
-    public static function exec($sqlTemplate, array $parameters = null, CM_Db_Client $client = null) {
+    public static function exec($sqlTemplate, array $parameters = null, CM_Db_Client $client = null, $disableQueryBuffering = null) {
         if (!$client) {
             $client = self::getClient();
         }
-        return $client->createStatement($sqlTemplate)->execute($parameters);
+        $disableQueryBuffering = (bool) $disableQueryBuffering;
+        $result = $client->createStatement($sqlTemplate)->execute($parameters, $disableQueryBuffering);
+        return $result;
     }
 
     /**
      * @param string     $sqlTemplate
      * @param array|null $parameters
+     * @param bool|null  $disableQueryBuffering
      * @return CM_Db_Result
      */
-    public static function execRead($sqlTemplate, array $parameters = null) {
+    public static function execRead($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
-        return self::exec($sqlTemplate, $parameters, $client);
+        return self::exec($sqlTemplate, $parameters, $client, $disableQueryBuffering);
     }
 
     /**
      * @param string     $sqlTemplate
      * @param array|null $parameters
+     * @param bool|null  $disableQueryBuffering
      * @return CM_Db_Result
      */
-    public static function execMaintenance($sqlTemplate, array $parameters = null) {
+    public static function execMaintenance($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getMaintenance();
-        return self::exec($sqlTemplate, $parameters, $client);
+        return self::exec($sqlTemplate, $parameters, $client, $disableQueryBuffering);
     }
 
     /**
