@@ -121,7 +121,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
             return $processId !== 3;
         }));
         $commandManagerMock = $this->getMock('CM_Cli_CommandManager', array('_getProcess'));
-        $commandManagerMock->staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         CM_Db_Db::insert('cm_cli_command_manager_process',
             array('commandName' => 'command-mock1', 'hostId' => 1, 'processId' => 1, 'timeoutStamp' => time() + 60));
         CM_Db_Db::insert('cm_cli_command_manager_process',
@@ -159,7 +159,7 @@ class CM_Cli_CommandManagerTest extends CMTest_TestCase {
         } else {
             $commandManagerMock->expects($this->once())->method('_outputError')->with($errorMessageExpected);
         }
-        $commandManagerMock->staticExpects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
+        $commandManagerMock->expects($this->any())->method('_getProcess')->will($this->returnValue($processMock));
         return $commandManagerMock;
     }
 
