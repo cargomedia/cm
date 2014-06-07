@@ -43,7 +43,7 @@ class CM_Elasticsearch_Query {
      * @param string|null $operator  'or' / 'and'
      * @param float|null  $fuzziness 0 - 1
      */
-    public function queryMatch($fields, $value, $operator = null, $fuzziness = null) {
+    public function queryMatchMulti($fields, $value, $operator = null, $fuzziness = null) {
         $data = array(
             'query'  => $value,
             'fields' => $fields,
