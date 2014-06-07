@@ -161,19 +161,21 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
     /**
      * @param string $url
      * @param array  $query
-     * @return CM_Request_Post
+     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
      */
     public function createRequest($url, array $query = null) {
         $url = (string) $url;
-        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery'))->getMock();
+        $ip = '16909060';
+        $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array($url))->setMethods(array('getQuery', 'getIp'))->getMock();
         $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
+        $request->expects($this->any())->method('getIp')->will($this->returnValue($ip));
         return $request;
     }
 
     /**
      * @param CM_FormAction_Abstract $action
      * @param array|null             $data
-     * @return CM_Request_Post
+     * @return CM_Request_Post|PHPUnit_Framework_MockObject_MockObject
      */
     public function createRequestFormAction(CM_FormAction_Abstract $action, array $data = null) {
         $actionName = $action->getName();
