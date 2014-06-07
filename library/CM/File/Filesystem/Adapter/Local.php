@@ -53,14 +53,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
 
     public function delete($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
-        if (!$this->exists($path)) {
-            return;
-        }
         if ($this->isDirectory($path) && !$this->_isLink($path)) {
             if (false === @rmdir($pathAbsolute)) {
                 throw new CM_Exception('Cannot delete directory `' . $pathAbsolute . '`');
             }
-        } else {
+        } elseif ($this->_isLink($path) || $this->exists($path)) {
             if (false === @unlink($pathAbsolute)) {
                 throw new CM_Exception_Invalid('Cannot delete file `' . $pathAbsolute . '`');
             }
