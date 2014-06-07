@@ -1,2 +1,2 @@
 <?php
-$config->deployVersion = 1402143984;
+$config->deployVersion = 1;
