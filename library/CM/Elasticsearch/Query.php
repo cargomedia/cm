@@ -38,6 +38,29 @@ class CM_Elasticsearch_Query {
     }
 
     /**
+     * @param string     $field
+     * @param string     $query
+     * @param array|null $options
+     */
+    public function queryMatch($field, $query, array $options = null) {
+        $field = (string) $field;
+        $query = (string) $query;
+        $data = array(
+            'query' => $query,
+        );
+        if (isset($options['operator'])) {
+            $data['operator'] = (string) $options['operator'];
+        }
+        if (isset($options['fuzziness'])) {
+            $data['fuzziness'] = (string) $options['fuzziness'];
+        }
+        if (isset($options['analyzer'])) {
+            $data['analyzer'] = (string) $options['analyzer'];
+        }
+        $this->query(array('match' => array($field => $data)));
+    }
+
+    /**
      * @param string[]    $fields
      * @param string      $value
      * @param string|null $operator  'or' / 'and'
