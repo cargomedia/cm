@@ -51,12 +51,33 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         }
     }
 
-    public function testPrefillValues() {
-        $prefilledValues = array(
+    public function testValidateValues() {
+        $userInputList = array(
+            'date'  => array(
+                'year'  => 1984,
+                'month' => 12,
+                'day'   => 29,
+            ),
+            'color' => 'invalid-color',
+        );
+        $expected = array(
+            'date' => new DateTime('1984-12-29'),
+        );
+        $form = new CM_Form_MockForm();
+        $method = new ReflectionMethod($form, '_validateValues');
+        $method->setAccessible(true);
+        $validValues = $method->invoke($form, $userInputList, new CM_Frontend_Environment());
+        $this->assertEquals($expected, $validValues);
+    }
+
+    public function testSetValues() {
+        $values = array(
             'text' => 'foo',
         );
-        $form = new CM_Form_MockForm(['values' => $prefilledValues]);
-        $form->prefillValues(new CM_Frontend_Environment());
+        $form = new CM_Form_MockForm();
+        $method = new ReflectionMethod($form, '_setValues');
+        $method->setAccessible(true);
+        $method->invoke($form, $values);
         $this->assertSame('foo', $form->getField('text')->getValue());
         $this->assertNull($form->getField('color')->getValue());
     }
@@ -79,6 +100,7 @@ class CM_Form_MockForm extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Color(['name' => 'color']));
         $this->registerField(new CM_FormField_Text(['name' => 'text']));
         $this->registerField(new CM_FormField_Text(['name' => 'array']));
+        $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
     }
 }

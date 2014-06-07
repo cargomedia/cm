@@ -6,7 +6,6 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
     $frontend = $render->getGlobalResponse();
     if ($open) {
         $form = CM_Form_Abstract::factory($params['name'], $params);
-        $form->prefillValues($render->getEnvironment());
         $form->prepare($render->getEnvironment());
 
         $viewResponse = new CM_Frontend_ViewResponse($form);
