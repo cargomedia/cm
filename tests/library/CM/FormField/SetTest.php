@@ -42,7 +42,7 @@ class CM_FormField_SetTest extends CMTest_TestCase {
         $values = array(64, 128);
         $field->setValue($values);
 
-        $doc = $this->_renderFormField($render, $field);
+        $doc = $this->_renderFormField($field);
 
         $this->assertSame(count($data), $doc->find('label')->count());
         $this->assertSame(count($data), $doc->find('input')->count());

@@ -7,11 +7,12 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $render = new CM_Frontend_Render();
         $field = new CM_FormField_Text(['name' => 'foo']);
         $field->setValue('bar');
 
-        $doc = $this->_renderFormField($render, $field);
+        $render = new CM_Frontend_Render();
+        $doc = $this->_renderFormField($field, null, $render);
+        /** @var CM_Frontend_Render $render */
         $autoId = $render->getGlobalResponse()->getTreeRoot()->getValue()->getAutoId();
 
         $this->assertSame($autoId, $doc->find('.CM_FormField_Text')->getAttribute('id'));
@@ -22,7 +23,6 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateMinLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMin' => 3]);
         $environment = new CM_Frontend_Environment();
-        $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Frontend_Render();
         try {
             $field->validate($environment, 'foo');
@@ -47,7 +47,6 @@ class CM_FormField_TextTest extends CMTest_TestCase {
     public function testValidateMaxLength() {
         $field = new CM_FormField_Text(['name' => 'foo', 'lengthMax' => 3]);
         $environment = new CM_Frontend_Environment();
-        $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Frontend_Render();
         try {
             $field->validate($environment, 'foo');
@@ -72,7 +71,6 @@ class CM_FormField_TextTest extends CMTest_TestCase {
         $badwordsList = new CM_Paging_ContentList_Badwords();
         $field = new CM_FormField_Text(['name' => 'foo', 'forbidBadwords' => true]);
         $environment = new CM_Frontend_Environment();
-        $response = $this->getMockBuilder('CM_Response_View_Form')->disableOriginalConstructor()->getMockForAbstractClass();
         $render = new CM_Frontend_Render();
         try {
             $field->validate($environment, 'foo');
