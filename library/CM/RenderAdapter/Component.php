@@ -62,4 +62,16 @@ class CM_RenderAdapter_Component extends CM_RenderAdapter_Abstract {
     private function _getComponent() {
         return $this->_getView();
     }
+
+    /**
+     * @param CM_Frontend_Render    $render
+     * @param CM_Component_Abstract $view
+     * @return CM_RenderAdapter_Component
+     */
+    public static function factory(CM_Frontend_Render $render, CM_Component_Abstract $view) {
+        if ($view instanceof CM_Page_Abstract) {
+            return new CM_RenderAdapter_Page($render, $view);
+        }
+        return new CM_RenderAdapter_Component($render, $view);
+    }
 }
