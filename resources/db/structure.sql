@@ -455,6 +455,7 @@ CREATE TABLE `cm_tmp_location` (
   `3Id` int(10) unsigned DEFAULT NULL,
   `4Id` int(10) unsigned DEFAULT NULL,
   `name` varchar(120) DEFAULT NULL,
+  `nameFull` varchar(480) DEFAULT NULL,
   `abbreviation` char(2) DEFAULT NULL,
   `lat` float DEFAULT NULL,
   `lon` float DEFAULT NULL,
