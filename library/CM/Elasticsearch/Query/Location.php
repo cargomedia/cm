@@ -11,13 +11,6 @@ class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query {
         $this->filterRange('level', (int) $levelMin, $levelMax);
     }
 
-    /**
-     * @param string $value
-     */
-    public function filterNamePrefix($value) {
-        $this->filterPrefix('name', mb_strtolower($value));
-    }
-
     public function sortLevel() {
         $this->_sort(array('level' => 'asc'));
     }
