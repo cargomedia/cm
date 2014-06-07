@@ -8,7 +8,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
     /** @var CM_Params|null */
     public static $formActionData = null;
 
-    function testForm() {
+    public function testForm() {
         $data = $this->_getData();
         self::$formActionProcessCount = 0;
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
@@ -16,14 +16,14 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         $this->assertFormResponseSuccess($response);
     }
 
-    function testMissingField() {
+    public function testMissingField() {
         $data = $this->_getData();
         unset($data['data']['must_check']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
         $this->assertFormResponseError($response);
     }
 
-    function testAllowedMissingField() {
+    public function testAllowedMissingField() {
         $data = $this->_getData();
         unset($data['data']['color']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
@@ -31,7 +31,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         $this->assertFalse(self::$formActionData->has('color'));
     }
 
-    function testProcessInvalidCharsRequired() {
+    public function testProcessInvalidCharsRequired() {
         $invalidChars = array(chr(192), chr(214), chr(255), chr(140));
         foreach ($invalidChars as $inputChar) {
 
