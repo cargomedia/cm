@@ -291,7 +291,7 @@ class CM_Model_Location extends CM_Model_Abstract {
 			LEFT JOIN `cm_model_location_country` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`,
-					`4`.`name`, NULL, CONCAT_WS(" ", `4`.`name`, `3`.`name`, `2`.`name`, `1`.`name`), `4`.`lat`, `4`.`lon`
+					`4`.`name`, NULL, CONCAT_WS(" ", `4`.`name`, `3`.`name`, `2`.`name`, `2`.`abbreviation`, `1`.`name`, `1`.`abbreviation`), `4`.`lat`, `4`.`lon`
 			FROM `cm_model_location_zip` AS `4`
 			LEFT JOIN `cm_model_location_city` AS `3` ON(`4`.`cityId`=`3`.`id`)
 			LEFT JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)
