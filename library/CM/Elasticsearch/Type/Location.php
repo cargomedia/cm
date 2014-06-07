@@ -13,7 +13,8 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
             '3' => array('type' => 'integer'),
             '4' => array('type' => 'integer'),
         )),
-        'name'        => array('type' => 'string', 'analyzer' => 'lw'),
+        'name'        => array('type' => 'string'),
+        'nameFull'    => array('type' => 'string'),
         'coordinates' => array('type' => 'geo_point'),
     );
 
@@ -43,15 +44,16 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
 
     protected function _getDocument(array $data) {
         $doc = new Elastica\Document(null, array(
-            'level' => (int) $data['level'],
-            'id'    => (int) $data['id'],
-            'name'  => $data['name'],
-            'ids'   => array(
+            'level'    => (int) $data['level'],
+            'id'       => (int) $data['id'],
+            'ids'      => array(
                 '1' => $data['1Id'],
                 '2' => $data['2Id'],
                 '3' => $data['3Id'],
                 '4' => $data['4Id'],
             ),
+            'name'     => $data['name'],
+            'nameFull' => $data['nameFull'],
         ));
 
         if (isset($data['lat']) && isset($data['lon'])) {
