@@ -26,6 +26,25 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         $this->_initialize();
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     */
+    public function prefillValues(CM_Frontend_Environment $environment) {
+        if (!$this->getParams()->has('values')) {
+            return;
+        }
+        $values = $this->getParams()->getArray('values');
+        foreach ($values as $name => $value) {
+            $field = $this->getField($name);
+            try {
+                $validValue = $field->validate($environment, $value);
+            } catch (CM_Exception_FormFieldValidation $e) {
+                continue;
+            }
+            $field->setValue($validValue);
+        }
+    }
+
     public function prepare(CM_Frontend_Environment $environment) {
     }
 

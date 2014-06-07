@@ -51,6 +51,16 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         }
     }
 
+    public function testPrefillValues() {
+        $prefilledValues = array(
+            'text' => 'foo',
+        );
+        $form = new CM_Form_MockForm(['values' => $prefilledValues]);
+        $form->prefillValues(new CM_Frontend_Environment());
+        $this->assertSame('foo', $form->getField('text')->getValue());
+        $this->assertNull($form->getField('color')->getValue());
+    }
+
     /**
      * @return array
      */
