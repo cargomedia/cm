@@ -40,74 +40,14 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public function testSearch() {
-
-        $expected = array(
-            'Arinsal'           => array(
-                'Arinsal',
-            ),
-            'Arins'             => array(
-                'Arinsal',
-            ),
-            'ARI'               => array(
-                'Arinsal',
-            ),
-            'el serrat'         => array(
-                'El Serrat',
-            ),
-            'ENCAMP'            => array(
-                'Encamp',
-                'Encamp',
-            ),
-            'Soldeu Andorra'    => array(
-                'Soldeu',
-            ),
-            'Andorra Soldeu'    => array(
-                'Soldeu',
-            ),
-            'El serrat Andorra' => array(
-                'El Serrat',
-            ),
-            'Andorra El serrat' => array(
-                'El Serrat',
-            ),
-            'El Andorra serrat' => array(
-                'El Serrat',
-            ),
-            'El Andor ser'      => array(
-                'El Serrat',
-            ),
-            'El Andorra' => array(
-                'El Tarter',
-                'El Serrat',
-            ),
-            'serrat Andorra' => array(
-                'El Serrat',
-            ),
-            'Merit ad'          => array(
-                'Meritxell',
-            ),
-        );
-
-        foreach ($expected as $term => $expectedList) {
-            $source = new CM_Paging_Location_Suggestions($term, CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
-            $actualNameList = Functional\map($source->getItems(), function (CM_Model_Location $location) {
-                return $location->getName();
-            });
-            $this->assertSame(count($expectedList), $source->getCount(),
-                'Unexpected count for `' . $term . '`. Actual items: ' . implode(',', $actualNameList) . '.');
-            $this->assertSame($expectedList, $actualNameList);
-        }
+        $source = new CM_Paging_Location_Suggestions('Merit ad', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals(1, $source->getCount());
+        $this->assertEquals('Meritxell', $source->getItem(0)->getName());
     }
 
     public function testSearchEmpty() {
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
         $this->assertEquals(8, $source->getCount());
-    }
-
-    public function testSearchWithLevel() {
-        $source = new CM_Paging_Location_Suggestions('Encamp', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(1, $source->getCount());
-        $this->assertEquals('Encamp', $source->getItem(0)->getName());
     }
 
     public function testSearchDistance() {

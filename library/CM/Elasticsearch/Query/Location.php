@@ -11,6 +11,22 @@ class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query {
         $this->filterRange('level', (int) $levelMin, $levelMax);
     }
 
+    /**
+     * @param string $term
+     */
+    public function queryTermSuggestion($term) {
+        $subquery = new CM_Elasticsearch_Query_Location();
+        $subquery->queryMatch('name', $term, array(
+            'operator' => 'or',
+            'analyzer' => 'standard',
+        ));
+        $subquery->queryMatch('nameFull', $term, array(
+            'operator' => 'and',
+            'analyzer' => 'standard',
+        ));
+        $this->query($subquery);
+    }
+
     public function sortLevel() {
         $this->_sort(array('level' => 'asc'));
     }

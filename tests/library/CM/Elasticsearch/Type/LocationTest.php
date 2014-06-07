@@ -52,4 +52,69 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         $locationList = $source->getItems();
         $this->assertEquals(array('id' => self::$_cityId, 'level' => CM_Model_Location::LEVEL_CITY), reset($locationList));
     }
+
+    public function testQueryTermSuggestion() {
+        $expected = array(
+            'Arinsal'           => array(
+                'Arinsal',
+            ),
+            'Arins'             => array(
+                'Arinsal',
+            ),
+            'ARI'               => array(
+                'Arinsal',
+            ),
+            'el serrat'         => array(
+                'El Serrat',
+            ),
+            'ENCAMP'            => array(
+                'Encamp',
+                'Encamp',
+            ),
+            'Soldeu Andorra'    => array(
+                'Soldeu',
+            ),
+            'Andorra Soldeu'    => array(
+                'Soldeu',
+            ),
+            'El serrat Andorra' => array(
+                'El Serrat',
+            ),
+            'Andorra El serrat' => array(
+                'El Serrat',
+            ),
+            'El Andorra serrat' => array(
+                'El Serrat',
+            ),
+            'El Andor ser'      => array(
+                'El Serrat',
+            ),
+            'El Andorra' => array(
+                'El Tarter',
+                'El Serrat',
+            ),
+            'serrat Andorra' => array(
+                'El Serrat',
+            ),
+            'Merit ad'          => array(
+                'Meritxell',
+            ),
+        );
+
+        foreach ($expected as $term => $expectedList) {
+            $source = new CM_Paging_Location_Suggestions($term, CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
+            $actualNameList = Functional\map($source->getItems(), function (CM_Model_Location $location) {
+                return $location->getName();
+            });
+            $this->assertSame(count($expectedList), $source->getCount(),
+                'Unexpected count for `' . $term . '`. Actual items: ' . implode(',', $actualNameList) . '.');
+            $this->assertSame($expectedList, $actualNameList);
+        }
+    }
+
+    public function testQueryTermSuggestionWithLevel() {
+        $source = new CM_Paging_Location_Suggestions('Encamp', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals(1, $source->getCount());
+        $this->assertEquals('Encamp', $source->getItem(0)->getName());
+    }
 }
