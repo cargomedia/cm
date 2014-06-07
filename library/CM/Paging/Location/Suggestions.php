@@ -15,7 +15,7 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
         $query = new CM_Elasticsearch_Query_Location();
         $query->filterLevel($minLevel, $maxLevel);
         if (strlen($term) > 0) {
-            $query->queryTermSuggestion($term);
+            $query->queryNameSuggestion($term);
         }
         $query->sortLevel();
         if ($location) {

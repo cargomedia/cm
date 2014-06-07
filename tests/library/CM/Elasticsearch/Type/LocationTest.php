@@ -53,7 +53,7 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         $this->assertEquals(array('id' => self::$_cityId, 'level' => CM_Model_Location::LEVEL_CITY), reset($locationList));
     }
 
-    public function testQueryTermSuggestion() {
+    public function testQueryNameSuggestion() {
         $expected = array(
             'Arinsal'           => array(
                 'Arinsal',
@@ -89,11 +89,11 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
             'El Andor ser'      => array(
                 'El Serrat',
             ),
-            'El Andorra' => array(
+            'El Andorra'        => array(
                 'El Tarter',
                 'El Serrat',
             ),
-            'serrat Andorra' => array(
+            'serrat Andorra'    => array(
                 'El Serrat',
             ),
             'Merit ad'          => array(
@@ -102,19 +102,64 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         );
 
         foreach ($expected as $term => $expectedList) {
-            $source = new CM_Paging_Location_Suggestions($term, CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
-            $actualNameList = Functional\map($source->getItems(), function (CM_Model_Location $location) {
-                return $location->getName();
-            });
-            $this->assertSame(count($expectedList), $source->getCount(),
-                'Unexpected count for `' . $term . '`. Actual items: ' . implode(',', $actualNameList) . '.');
-            $this->assertSame($expectedList, $actualNameList);
+            $searchQuery = new CM_Elasticsearch_Query_Location();
+            $searchQuery->queryNameSuggestion($term);
+            $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
+
+            $this->_assertItemsByName($expectedList, $source->getItems(), 'Wrong items for term `' . $term . '`.');
         }
     }
 
-    public function testQueryTermSuggestionWithLevel() {
-        $source = new CM_Paging_Location_Suggestions('Encamp', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(1, $source->getCount());
-        $this->assertEquals('Encamp', $source->getItem(0)->getName());
+    public function testQueryName() {
+        $expected = array(
+            'Arinsal'           => array(
+                'Arinsal',
+            ),
+            'ARINSAL'           => array(
+                'Arinsal',
+            ),
+            'Arins'             => array(),
+            'el serrat'         => array(
+                'El Serrat',
+            ),
+            'Soldeu Andorra'    => array(
+                'Soldeu',
+            ),
+            'Andorra Soldeu'    => array(
+                'Soldeu',
+            ),
+            'El serrat Andorra' => array(
+                'El Serrat',
+            ),
+            'El Andor ser'      => array(),
+            'El Andorra'        => array(
+                'El Tarter',
+                'El Serrat',
+            ),
+            'serrat Andorra'    => array(
+                'El Serrat',
+            ),
+        );
+
+        foreach ($expected as $term => $expectedList) {
+            $searchQuery = new CM_Elasticsearch_Query_Location();
+            $searchQuery->queryName($term);
+            $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
+
+            $this->_assertItemsByName($expectedList, $source->getItems(), 'Wrong items for term `' . $term . '`.');
+        }
+    }
+
+    /**
+     * @param string[]    $expectedNameList
+     * @param array[]     $actualItemList
+     * @param string|null $message
+     */
+    private function _assertItemsByName($expectedNameList, $actualItemList, $message = null) {
+        $actualNameList = Functional\map($actualItemList, function (array $actualItem) {
+            $actualLocation = new CM_Model_Location($actualItem['level'], $actualItem['id']);
+            return $actualLocation->getName();
+        });
+        $this->assertSame($expectedNameList, $actualNameList, $message);
     }
 }

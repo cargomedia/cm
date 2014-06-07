@@ -5,17 +5,23 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
     const INDEX_NAME = 'location';
 
     protected $_mapping = array(
-        'level'        => array('type' => 'integer', 'store' => 'yes'),
-        'id'           => array('type' => 'integer', 'store' => 'yes'),
-        'ids'          => array('type' => 'object', 'properties' => array(
+        'level'       => array('type' => 'integer', 'store' => 'yes'),
+        'id'          => array('type' => 'integer', 'store' => 'yes'),
+        'ids'         => array('type' => 'object', 'properties' => array(
             '1' => array('type' => 'integer'),
             '2' => array('type' => 'integer'),
             '3' => array('type' => 'integer'),
             '4' => array('type' => 'integer'),
         )),
-        'name'         => array('type' => 'string', 'analyzer' => 'ngram_words'),
-        'nameFull'     => array('type' => 'string', 'analyzer' => 'ngram_words'),
-        'coordinates'  => array('type' => 'geo_point'),
+        'name'        => array('type' => 'multi_field', 'fields' => array(
+            'name'   => array('type' => 'string', 'analyzer' => 'lowercase'),
+            'prefix' => array('type' => 'string', 'analyzer' => 'ngram_words'),
+        )),
+        'nameFull'    => array('type' => 'multi_field', 'fields' => array(
+            'nameFull' => array('type' => 'string', 'analyzer' => 'lowercase'),
+            'prefix'   => array('type' => 'string', 'analyzer' => 'ngram_words'),
+        )),
+        'coordinates' => array('type' => 'geo_point'),
     );
 
     protected $_indexParams = array(
@@ -25,14 +31,16 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
         ),
         'analysis' => array(
             'analyzer' => array(
-                'ngram_words'   => array(
+                'ngram_words' => array(
                     'type'      => 'custom',
                     'tokenizer' => 'standard',
-                    'filter'    => [
-                        'lowercase',
-                        'ngram_edge'
-                    ]
+                    'filter'    => ['lowercase', 'ngram_edge'],
                 ),
+                'lowercase'   => array(
+                    'type'      => 'custom',
+                    'tokenizer' => 'standard',
+                    'filter'    => ['lowercase'],
+                )
             ),
             'filter'   => array(
                 'ngram_edge' => array(
@@ -54,16 +62,16 @@ class CM_Elasticsearch_Type_Location extends CM_Elasticsearch_Type_Abstract {
 
     protected function _getDocument(array $data) {
         $doc = new Elastica\Document(null, array(
-            'level'        => (int) $data['level'],
-            'id'           => (int) $data['id'],
-            'ids'          => array(
+            'level'    => (int) $data['level'],
+            'id'       => (int) $data['id'],
+            'ids'      => array(
                 '1' => $data['1Id'],
                 '2' => $data['2Id'],
                 '3' => $data['3Id'],
                 '4' => $data['4Id'],
             ),
-            'name'         => $data['name'],
-            'nameFull'     => $data['nameFull'],
+            'name'     => $data['name'],
+            'nameFull' => $data['nameFull'],
         ));
 
         if (isset($data['lat']) && isset($data['lon'])) {

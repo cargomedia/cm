@@ -14,13 +14,29 @@ class CM_Elasticsearch_Query_Location extends CM_Elasticsearch_Query {
     /**
      * @param string $term
      */
-    public function queryTermSuggestion($term) {
+    public function queryName($term) {
         $subquery = new CM_Elasticsearch_Query_Location();
         $subquery->queryMatch('name', $term, array(
             'operator' => 'or',
             'analyzer' => 'standard',
         ));
         $subquery->queryMatch('nameFull', $term, array(
+            'operator' => 'and',
+            'analyzer' => 'standard',
+        ));
+        $this->query($subquery);
+    }
+
+    /**
+     * @param string $term
+     */
+    public function queryNameSuggestion($term) {
+        $subquery = new CM_Elasticsearch_Query_Location();
+        $subquery->queryMatch('name.prefix', $term, array(
+            'operator' => 'or',
+            'analyzer' => 'standard',
+        ));
+        $subquery->queryMatch('nameFull.prefix', $term, array(
             'operator' => 'and',
             'analyzer' => 'standard',
         ));
