@@ -150,6 +150,13 @@ class CM_File extends CM_Class_Abstract implements CM_Comparable {
         $cache->delete($this->_getCacheKeyContent());
     }
 
+    /**
+     * @param string|null $content
+     */
+    public function appendLine($content = null) {
+        $this->append($content . PHP_EOL);
+    }
+
     public function truncate() {
         $this->write('');
     }
