@@ -7,8 +7,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
     }
 
     public function testAddGet() {
-        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))
-            ->disableOriginalConstructor()->getMockForAbstractClass();
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))->disableOriginalConstructor()->getMockForAbstractClass();
         $paging->expects($this->any())->method('getType')->will($this->returnValue(14));
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
@@ -45,23 +44,23 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $this->assertSame(null, $items[0]['metaInfo']);
     }
 
-    public function testDeleteOlder() {
-        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType', 'getTypeStatic'))
-            ->disableOriginalConstructor()->getMockForAbstractClass();
-        $paging->expects($this->any())->method('getType')->will($this->returnValue(14));
+    public function testCleanUp() {
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getType'))
+            ->getMockForAbstractClass();
+        $paging->expects($this->any())->method('getType')->will($this->returnValue(1));
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
 
-        $add = CMTest_TH::getProtectedMethod('CM_Paging_Log_Abstract', '_add');
         $this->assertSame(0, $paging->getCount());
-        $add->invoke($paging, 'foo', array());
+        CMTest_TH::invokeMethod($paging, '_add', ['foo']);
         $paging->_change();
         $this->assertSame(1, $paging->getCount());
 
-        $age = 7 * 24 * 60 * 60;
-        CMTest_TH::timeForward($age + 10);
-        $paging->deleteOlder($age, $paging->getType());
-        $paging->_change();
+        $age = 7 * 86400;
+        CMTest_TH::timeForward($age);
+        $paging->cleanUp();
         $this->assertSame(0, $paging->getCount());
     }
 }
