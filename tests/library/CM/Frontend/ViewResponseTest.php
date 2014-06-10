@@ -30,5 +30,8 @@ class CM_Frontend_ViewResponseTest extends CMTest_TestCase {
         $viewResponse->setTemplateName('zoo');
         $classNames[] = 'zoo';
         $this->assertSame($classNames, $viewResponse->getCssClasses());
+
+        $viewResponse->addCssClass('zoo');
+        $this->assertSame($classNames, $viewResponse->getCssClasses());
     }
 }

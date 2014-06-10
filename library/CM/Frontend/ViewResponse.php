@@ -79,6 +79,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
         if ('default' !== $templateName) {
             $cssClasses[] = $templateName;
         }
+        $cssClasses = array_unique($cssClasses);
         return $cssClasses;
     }
 
