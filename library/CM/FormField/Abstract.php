@@ -94,7 +94,9 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
     public function ajax_validate(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         $environment = $response->getRender()->getEnvironment();
-        $userInput = $params->get('userInput');
-        $this->validate($environment, $userInput);
+        $rawInput = $params->get('userInput');
+        $filteredInput = $this->filterInput($rawInput);
+        $parsedInput = $this->parseUserInput($filteredInput);
+        $this->validate($environment, $parsedInput);
     }
 }
