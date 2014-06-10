@@ -64,7 +64,7 @@ class CM_Db_Client {
             $time = microtime(true) * 1000;
             $this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
             CMService_Newrelic::getInstance()->setCustomMetric('DB connect', (microtime(true) * 1000) - $time);
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->_getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
         }
@@ -89,14 +89,14 @@ class CM_Db_Client {
      * @param string $db
      */
     public function setDb($db) {
-        $this->_pdo->exec('USE ' . $db);
+        $this->_getPdo()->exec('USE ' . $db);
     }
 
     /**
      * @param bool $enabled
      */
     public function setBuffered($enabled) {
-        $this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
+        $this->_getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
     }
 
     /**
@@ -124,7 +124,7 @@ class CM_Db_Client {
         $retryCount = 1;
         for ($try = 0; true; $try++) {
             try {
-                return @$this->_pdo->prepare($sqlTemplate);
+                return @$this->_getPdo()->prepare($sqlTemplate);
             } catch (PDOException $e) {
                 if ($try < $retryCount && $this->isConnectionLossError($e)) {
                     $this->disconnect();
@@ -141,7 +141,7 @@ class CM_Db_Client {
      * @return string|null
      */
     public function getLastInsertId() {
-        $lastInsertId = $this->_pdo->lastInsertId();
+        $lastInsertId = $this->_getPdo()->lastInsertId();
         if (!$lastInsertId) {
             return null;
         }
@@ -186,6 +186,11 @@ class CM_Db_Client {
      */
     public function quoteIdentifier($name) {
         return '`' . str_replace('`', '``', $name) . '`';
+    }
+
+    protected function _getPdo() {
+        $this->connect();
+        return $this->_pdo;
     }
 
     /**
