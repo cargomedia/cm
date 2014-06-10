@@ -15,7 +15,7 @@ class CM_Usertext_Filter_NewlineToLinebreak extends CM_Usertext_Filter_Abstract 
     }
 
     public function getCacheKey() {
-        return array_merge(parent::getCacheKey(), array('_breaksMax' => $this->_breaksMax));
+        return parent::getCacheKey() + array('_breaksMax' => $this->_breaksMax);
     }
 
     public function transform($text, CM_Frontend_Render $render) {

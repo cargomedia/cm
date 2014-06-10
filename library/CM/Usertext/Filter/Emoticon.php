@@ -17,7 +17,7 @@ class CM_Usertext_Filter_Emoticon extends CM_Usertext_Filter_Abstract {
     }
 
     public function getCacheKey() {
-        return array_merge(parent::getCacheKey(), array('_fixedHeight' => $this->_fixedHeight));
+        return parent::getCacheKey() + array('_fixedHeight' => $this->_fixedHeight);
     }
 
     public function transform($text, CM_Frontend_Render $render) {

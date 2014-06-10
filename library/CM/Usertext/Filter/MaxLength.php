@@ -15,7 +15,7 @@ class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
     }
 
     public function getCacheKey() {
-        return array_merge(parent::getCacheKey(), array('_lengthMax' => $this->_lengthMax));
+        return parent::getCacheKey() + array('_lengthMax' => $this->_lengthMax);
     }
 
     public function transform($text, CM_Frontend_Render $render) {
