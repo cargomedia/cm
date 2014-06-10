@@ -17,7 +17,8 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
         if (!in_array($display, array(self::DISPLAY_SELECT, self::DISPLAY_RADIOS))) {
             throw new CM_Exception_InvalidParam('Display needs to be either `select` or `radios`');
         }
-        $viewResponse->setTemplateName($display);
+        $viewResponse->addCssClass($display);
+        $viewResponse->set('display', $display);
 
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
         $viewResponse->set('placeholder', $renderParams->getBoolean('placeholder', false));
