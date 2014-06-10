@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_NewlineToLinebreak implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_NewlineToLinebreak extends CM_Usertext_Filter_Abstract {
 
     /** @var int|null */
     private $_breaksMax = null;
@@ -12,6 +12,10 @@ class CM_Usertext_Filter_NewlineToLinebreak implements CM_Usertext_Filter_Interf
         if (null !== $breaksMax) {
             $this->_breaksMax = (int) $breaksMax;
         }
+    }
+
+    public function getCacheKey() {
+        return array_merge(parent::getCacheKey(), array('_breaksMax' => $this->_breaksMax));
     }
 
     public function transform($text, CM_Frontend_Render $render) {

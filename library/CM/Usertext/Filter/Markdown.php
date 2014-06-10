@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Markdown implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_Markdown extends CM_Usertext_Filter_Abstract {
 
     /** @var bool $_skipAnchors */
     private $_skipAnchors;
@@ -10,6 +10,10 @@ class CM_Usertext_Filter_Markdown implements CM_Usertext_Filter_Interface {
      */
     function __construct($skipAnchors = null) {
         $this->_skipAnchors = (boolean) $skipAnchors;
+    }
+
+    public function getCacheKey() {
+        return array_merge(parent::getCacheKey(), array('_skipAnchors' => $this->_skipAnchors));
     }
 
     public function transform($text, CM_Frontend_Render $render) {

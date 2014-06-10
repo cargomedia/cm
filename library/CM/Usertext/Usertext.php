@@ -12,13 +12,13 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         $this->_render = $render;
     }
 
-    /** @var CM_Usertext_Filter_Interface[] */
+    /** @var CM_Usertext_Filter_Abstract[] */
     private $_filterList = array();
 
     /**
-     * @param CM_Usertext_Filter_Interface $filter
+     * @param CM_Usertext_Filter_Abstract $filter
      */
-    public function addFilter(CM_Usertext_Filter_Interface $filter) {
+    public function addFilter(CM_Usertext_Filter_Abstract $filter) {
         $this->_filterList[] = $filter;
     }
 
@@ -86,11 +86,8 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
      * @return string
      */
     public function transform($text) {
-        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+        $cacheKey = $this->_getCacheKey($text);
         $cache = CM_Cache_Local::getInstance();
-        if (0 !== count($this->_getFilters())) {
-            $cacheKey .= '_filter:' . call_user_func_array(array($cache, 'key'), $this->_getFilters());
-        }
         if (($result = $cache->get($cacheKey)) === false) {
             $result = $text;
             foreach ($this->_getFilters() as $filter) {
@@ -101,12 +98,29 @@ class CM_Usertext_Usertext extends CM_Class_Abstract {
         return $result;
     }
 
+    /**
+     * @param string $text
+     * @return string
+     */
+    protected function _getCacheKey($text) {
+        $cacheKey = CM_CacheConst::Usertext . '_text:' . md5($text);
+        if (0 !== count($this->_getFilters())) {
+            $cacheKeyListFilter = array();
+            foreach ($this->_getFilters() as $filter) {
+                $cacheKeyListFilter[] = $filter->getCacheKey();
+            }
+            $cache = CM_Cache_Local::getInstance();
+            $cacheKey .= '_filter:' . $cache->key($cacheKeyListFilter);
+        }
+        return $cacheKey;
+    }
+
     private function _clearFilters() {
         $this->_filterList = array();
     }
 
     /**
-     * @return CM_Usertext_Filter_Interface[]
+     * @return CM_Usertext_Filter_Abstract[]
      */
     private function _getFilters() {
         return $this->_filterList;

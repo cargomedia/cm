@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Interface, CM_Service_ManagerAwareInterface {
+class CM_Usertext_Filter_Markdown_UserContent extends CM_Usertext_Filter_Abstract implements CM_Service_ManagerAwareInterface {
 
     use CM_Service_ManagerAwareTrait;
 
@@ -14,14 +14,8 @@ class CM_Usertext_Filter_Markdown_UserContent implements CM_Usertext_Filter_Inte
         $this->setServiceManager($serviceManager);
     }
 
-    public function __sleep() {
-        $propertyList = get_object_vars($this);
-        unset($propertyList['_serviceManager']);
-        return array_keys($propertyList);
-    }
-
-    public function __wakeup() {
-        $this->setServiceManager(CM_Service_Manager::getInstance());
+    public function getCacheKey() {
+        return array_merge(parent::getCacheKey(), array('_urlList' => $this->getServiceManager()->getUserContent()->getUrlList()));
     }
 
     public function transform($text, CM_Frontend_Render $render) {
