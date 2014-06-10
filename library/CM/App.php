@@ -31,8 +31,9 @@ class CM_App {
      * @param boolean|null $forceReload
      */
     public function setupDatabase($forceReload = null) {
-        $client = CM_Db_Db::getClientWithoutDatabase();
-        $db = CM_Db_Db::getConfigDefault('db');
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+        $db = $client->getDb();
+        $client->setDb(null);
 
         if ($forceReload) {
             $client->createStatement('DROP DATABASE IF EXISTS ' . $client->quoteIdentifier($db))->execute();
@@ -156,7 +157,7 @@ class CM_App {
             $versionBumps += ($version - $versionStart);
         }
         if ($versionBumps > 0) {
-            $db = CM_Db_Db::getConfigDefault('db');
+            $db = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getDb();
             CM_Db_Db::exec('DROP DATABASE IF EXISTS `' . $db . '_test`');
         }
         return $versionBumps;

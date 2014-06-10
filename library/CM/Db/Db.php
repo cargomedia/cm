@@ -281,31 +281,6 @@ class CM_Db_Db extends CM_Class_Abstract {
     }
 
     /**
-     * @param string|null $key
-     * @throws CM_Exception_Invalid
-     * @return array|mixed
-     */
-    public static function getConfigDefault($key = null) {
-        $config = CM_Config::get();
-        if (!isset($config->services['database-master']['arguments'])) {
-            throw new CM_Exception_Invalid('Default database configuration not found');
-        }
-        $arguments = $config->services['database-master']['arguments'];
-        $configDefault = array(
-            'host'             => (string) $arguments[0],
-            'port'             => (int) $arguments[1],
-            'username'         => (string) $arguments[2],
-            'password'         => (string) $arguments[3],
-            'db'               => isset($arguments[4]) ? (string) $arguments[4] : null,
-            'reconnectTimeout' => isset($arguments[5]) ? (int) $arguments[5] : null,
-        );
-        if (null !== $key) {
-            return $configDefault[$key];
-        }
-        return $configDefault;
-    }
-
-    /**
      * @param array|null  $tables
      * @param bool|null   $skipData
      * @param bool|null   $skipStructure
@@ -313,9 +288,9 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @return string
      */
     public static function getDump(array $tables = null, $skipData = null, $skipStructure = null, $dbName = null) {
-        $config = self::getConfigDefault();
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         if (null === $dbName) {
-            $dbName = $config['db'];
+            $dbName = $client->getDb();
         }
         $args = array();
         $args[] = '--compact';
@@ -327,10 +302,10 @@ class CM_Db_Db extends CM_Class_Abstract {
         if ($skipStructure) {
             $args[] = '--no-create-info';
         }
-        $args[] = '--host=' . $config['host'];
-        $args[] = '--port=' . $config['port'];
-        $args[] = '--user=' . $config['username'];
-        $args[] = '--password=' . $config['password'];
+        $args[] = '--host=' . $client->getHost();
+        $args[] = '--port=' . $client->getPort();
+        $args[] = '--user=' . $client->getUserName();
+        $args[] = '--password=' . $client->getPassword();
         $args[] = $dbName;
         if ($tables) {
             foreach ($tables as $table) {
@@ -355,12 +330,12 @@ class CM_Db_Db extends CM_Class_Abstract {
      * @param CM_File $dump
      */
     public static function runDump($dbName, CM_File $dump) {
-        $config = self::getConfigDefault();
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         $args = array();
-        $args[] = '--host=' . $config['host'];
-        $args[] = '--port=' . $config['port'];
-        $args[] = '--user=' . $config['username'];
-        $args[] = '--password=' . $config['password'];
+        $args[] = '--host=' . $client->getHost();
+        $args[] = '--port=' . $client->getPort();
+        $args[] = '--user=' . $client->getUserName();
+        $args[] = '--password=' . $client->getPassword();
         $args[] = $dbName;
         CM_Util::exec('mysql', $args, null, $dump->getPath());
     }
@@ -395,15 +370,6 @@ class CM_Db_Db extends CM_Class_Abstract {
      */
     public static function getClient() {
         return CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-    }
-
-    /**
-     * @throws CM_Db_Exception
-     * @return CM_Db_Client
-     */
-    public static function getClientWithoutDatabase() {
-        $config = self::getConfigDefault();
-        return new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password']);
     }
 
     /**

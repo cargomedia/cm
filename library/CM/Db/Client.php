@@ -45,7 +45,6 @@ class CM_Db_Client {
         if (null !== $reconnectTimeout) {
             $this->_reconnectTimeout = (int) $reconnectTimeout;
         }
-        $this->connect();
     }
 
     /**
@@ -86,10 +85,22 @@ class CM_Db_Client {
     }
 
     /**
-     * @param string $db
+     * @return string|null
+     */
+    public function getDb() {
+        return $this->_db;
+    }
+
+    /**
+     * @param string|null $db
      */
     public function setDb($db) {
-        $this->_getPdo()->exec('USE ' . $db);
+        if (null !== $db) {
+            $db = (string) $db;
+            $this->_db = null;
+            $this->_getPdo()->exec('USE ' . $db);
+        }
+        $this->_db = $db;
     }
 
     /**
@@ -97,6 +108,41 @@ class CM_Db_Client {
      */
     public function setBuffered($enabled) {
         $this->_getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost() {
+        return $this->_host;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword() {
+        return $this->_password;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPort() {
+        return $this->_port;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getReconnectTimeout() {
+        return $this->_reconnectTimeout;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserName() {
+        return $this->_username;
     }
 
     /**

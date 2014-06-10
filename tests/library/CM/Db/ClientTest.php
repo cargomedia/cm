@@ -3,18 +3,22 @@
 class CM_Db_ClientTest extends CMTest_TestCase {
 
     public function testConstruct() {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password']);
+        $client = CMTest_TH::getDbClient();
+        $client->setDb(null);
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
     }
 
     public function testConstructSelectDb() {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password'], $config['db']);
+        $client = CMTest_TH::getDbClient();
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
 
+        $client = new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUserName(), $client->getPassword(), 'nonexistent');
         try {
-            new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password'], 'nonexistent');
+            $client->connect();
             $this->fail('Could select nonexistent DB');
         } catch (CM_Db_Exception $e) {
             $this->assertContains('nonexistent', $e->getMessage());
@@ -22,7 +26,10 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testConnectDisconnect() {
-        $client = CM_Db_Db::getClientWithoutDatabase();
+        $client = CMTest_TH::getDbClient();
+        $client->setDb(null);
+        $this->assertFalse($client->isConnected());
+        $client->connect();
         $this->assertTrue($client->isConnected());
 
         $client->disconnect();
@@ -48,8 +55,9 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testReconnectTimeout() {
-        $config = CM_Db_Db::getConfigDefault();
-        $client = new CM_Db_Client($config['host'], $config['port'], $config['username'], $config['password'], $config['db'], 5);
+        $client = CMTest_TH::getDbClient();
+        $client = new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUserName(), $client->getPassword(), $client->getDb(), 5);
+        $client->connect();
         $firstTime = $client->getLastConnect();
         $timeForward = 100;
         CMTest_TH::timeForward($timeForward);
