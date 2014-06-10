@@ -65,8 +65,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 },
             'CM_Paging_Log_Abstract::cleanup' => function () {
                     foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
-                        /** @var CM_Paging_Log_Abstract $logClass */
-                        $logClass->cleanUp();
+                        /** @var CM_Paging_Log_Abstract $log */
+                        $log = new $logClass();
+                        $log->cleanUp();
                     }
                 }
         ));

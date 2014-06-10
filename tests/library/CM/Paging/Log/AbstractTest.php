@@ -54,7 +54,8 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
         $paging->__construct();
 
         $this->assertSame(0, $paging->getCount());
-        CMTest_TH::invokeMethod($paging, '_add', ['foo']);
+
+        CMTest_TH::getProtectedMethod($paging, '_add')->invoke($paging, 'foo');
         $paging->_change();
         $this->assertSame(1, $paging->getCount());
 

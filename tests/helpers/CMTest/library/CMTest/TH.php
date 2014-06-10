@@ -303,23 +303,6 @@ class CMTest_TH {
     }
 
     /**
-     * @param string|object $objectOrClassName
-     * @param string        $method
-     * @param array|null    $arguments
-     * @return callable
-     */
-    public static function invokeMethod($objectOrClassName, $method, array $arguments = null) {
-        $arguments = (array) $arguments;
-        $reflectionMethod = new ReflectionMethod($objectOrClassName, $method);
-        $reflectionMethod->setAccessible(true);
-        $context = null;
-        if (is_object($objectOrClassName)) {
-            $context = $objectOrClassName;
-        }
-        return $reflectionMethod->invokeArgs($context, $arguments);
-    }
-
-    /**
      * @param int    $length
      * @param string $charset
      * @return string
