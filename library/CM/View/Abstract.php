@@ -2,10 +2,6 @@
 
 abstract class CM_View_Abstract extends CM_Class_Abstract {
 
-    const CONTEXT_ALL = 1;
-    const CONTEXT_JAVASCRIPT = 2;
-    const CONTEXT_CSS = 3;
-
     /** @var CM_Params */
     protected $_params;
 

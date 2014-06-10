@@ -144,4 +144,30 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         }
         return $action->process($formData, $response, $this);
     }
+
+    /**
+     * @param array                   $userInputList
+     * @param CM_Frontend_Environment $environment
+     * @return array
+     */
+    protected function _validateValues(array $userInputList, CM_Frontend_Environment $environment) {
+        $validValues = array();
+        foreach ($userInputList as $name => $userInput) {
+            $field = $this->getField($name);
+            try {
+                $validValues[$name] = $field->validate($environment, $userInput);
+            } catch (CM_Exception_FormFieldValidation $e) {
+            }
+        }
+        return $validValues;
+    }
+
+    /**
+     * @param array $values
+     */
+    protected function _setValues(array $values) {
+        foreach ($values as $name => $value) {
+            $this->getField($name)->setValue($value);
+        }
+    }
 }

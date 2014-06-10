@@ -2,6 +2,10 @@
 
 class CM_Config_Node {
 
+    /**
+     * @param string $name
+     * @return CM_Config_Node
+     */
     public function __get($name) {
         return $this->$name = new self();
     }
@@ -19,5 +23,19 @@ class CM_Config_Node {
             }
         }
         return $object;
+    }
+
+    /**
+     * @param string $configBasename
+     * @throws CM_Exception_Invalid
+     */
+    public function extend($configBasename) {
+        foreach (CM_Util::getResourceFiles('config/' . $configBasename) as $configFile) {
+            $configSetter = require $configFile->getPath();
+            if (!$configSetter instanceof Closure) {
+                throw new CM_Exception_Invalid('Invalid config file. `' . $configFile->getPath() . '` must return closure');
+            }
+            $configSetter($this);
+        }
     }
 }

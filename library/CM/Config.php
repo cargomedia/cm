@@ -12,30 +12,20 @@ class CM_Config {
         $cacheKey = CM_CacheConst::Config;
         if (false === ($config = $cache->get($cacheKey))) {
             $node = new CM_Config_Node();
-            $this->_extendConfigNodeWithFile($node, 'internal.php');
-            $this->_extendConfigNodeWithFile($node, 'default.php');
-            $this->_extendConfigNodeWithFile($node, 'local.php');
-            $this->_extendConfigNodeWithFile($node, 'deploy.php');
+            $node->extend('internal.php');
+            $node->extend('default.php');
+            $node->extend('local.php');
+            $node->extend('deploy.php');
             if (CM_Bootloader::getInstance()->isCli()) {
-                $this->_extendConfigNodeWithFile($node, 'cli.php');
+                $node->extend('cli.php');
             }
             if (CM_Bootloader::getInstance() instanceof CM_Bootloader_Testing) {
-                $this->_extendConfigNodeWithFile($node, 'test.php');
+                $node->extend('test.php');
             }
             $config = $node->export();
             $cache->set($cacheKey, $config);
         }
         $this->_config = $config;
-    }
-
-    /**
-     * @param CM_Config_Node $config
-     * @param string         $filenameRelative
-     */
-    private function _extendConfigNodeWithFile(CM_Config_Node $config, $filenameRelative) {
-        foreach (CM_Util::getResourceFiles('config/' . $filenameRelative) as $file) {
-            require $file->getPath();
-        }
     }
 
     /**

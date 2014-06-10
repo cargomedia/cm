@@ -4,9 +4,9 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
 
-    $class = null;
+    $cssClasses = array();
     if (isset($params['class'])) {
-        $class = (string) $params['class'];
+        $cssClasses[] = (string) $params['class'];
         unset($params['class']);
     }
 
@@ -24,6 +24,7 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     $viewResponse = null;
     if (isset($params['name'])) {
         $fieldName = (string) $params['name'];
+        $cssClasses[] = $fieldName;
         /** @var CM_Form_Abstract $form */
         $form = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract')->getView();
         if (null === $form) {
@@ -32,12 +33,15 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
         $formField = $form->getField($fieldName);
         $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
         $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);
+
+        if (null !== $formField->getValue()) {
+            $cssClasses[] = 'prefilled';
+        }
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];
     }
-
-    $html = '<div class="formField clearfix ' . $fieldName . ' ' . $class . '">';
+    $html = '<div class="formField clearfix ' . join(' ', $cssClasses) . '">';
     if ($label) {
         $html .= '<label';
         if ($viewResponse) {
