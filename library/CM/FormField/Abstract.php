@@ -15,7 +15,7 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
 
     /**
      * @param CM_Frontend_Environment $environment
-     * @param string|array            $userInput
+     * @param mixed                   $userInput
      * @return mixed
      */
     abstract public function validate(CM_Frontend_Environment $environment, $userInput);
@@ -78,6 +78,10 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
      * @return mixed
      */
     public function filterInput($userInput) {
+        return $userInput;
+    }
+
+    public function parseUserInput($userInput) {
         return $userInput;
     }
 

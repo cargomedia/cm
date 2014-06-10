@@ -14,12 +14,22 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         parent::_initialize();
     }
 
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
+    public function parseUserInput($userInput) {
         $dd = (int) trim($userInput['day']);
         $mm = (int) trim($userInput['month']);
         $yy = (int) trim($userInput['year']);
 
         return new DateTime($yy . '-' . $mm . '-' . $dd);
+    }
+
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        if (!($userInput instanceof DateTime)) {
+            throw new CM_Exception_FormFieldValidation('Expected a DateTime instance.');
+        }
+        if ($userInput->format('Y') < $this->_yearFirst) {
+            throw new CM_Exception_FormFieldValidation('Year should be at least ' . $this->_yearFirst);
+        }
+        return $userInput;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

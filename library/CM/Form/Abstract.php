@@ -120,7 +120,8 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
                     $isEmpty = false;
                     $environment = $response->getRender()->getEnvironment();
                     try {
-                        $formData[$fieldName] = $field->validate($environment, $fieldValue);
+                        $parsedValue = $field->parseUserInput($fieldValue);
+                        $formData[$fieldName] = $field->validate($environment, $parsedValue);
                     } catch (CM_Exception_FormFieldValidation $e) {
                         $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
                     }
