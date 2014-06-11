@@ -17,7 +17,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     private $_namespaceTypes = array();
 
     /**
-     * @return string[]
+     * @return array[]
      */
     public function getNamespaceTypes() {
         $this->_checkTypesGenerated();
@@ -54,7 +54,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
             $this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
         }
         $typedClasses = CM_Util::getClassChildren('CM_Typed', true);
-        /** @var CM_Class_Abstract[] $namespaceClassList */
+        /** @var CM_Class_Abstract[]|string[] $namespaceClassList */
         $namespaceClassList = array();
         // fetch type-namespaces
         foreach ($typedClasses as $class) {
