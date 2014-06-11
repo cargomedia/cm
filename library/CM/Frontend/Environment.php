@@ -29,21 +29,18 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @param CM_Model_Location|null $location
      */
     public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null) {
-        if (null !== $debug) {
-            $debug = (bool) $debug;
-        }
         $this->_site = $site;
         $this->_viewer = $viewer;
         $this->_language = $language;
         $this->_timeZone = $timeZone;
-        $this->_debug = (bool) $debug;
+        $this->setDebug($debug);
         $this->_location = $location;
     }
 
     /**
-     * @param \CM_Site_Abstract $site
+     * @param CM_Site_Abstract $site
      */
-    public function setSite($site) {
+    public function setSite(CM_Site_Abstract $site) {
         $this->_site = $site;
     }
 
@@ -59,9 +56,9 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param \CM_Model_User|null $viewer
+     * @param CM_Model_User $viewer
      */
-    public function setViewer($viewer) {
+    public function setViewer(CM_Model_User $viewer) {
         $this->_viewer = $viewer;
     }
 
@@ -90,7 +87,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /**
      * @param \CM_Model_Language|null $language
      */
-    public function setLanguage($language) {
+    public function setLanguage(CM_Model_Language $language) {
         $this->_language = $language;
     }
 
@@ -113,9 +110,9 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param \DateTimeZone $timeZone
+     * @param DateTimeZone $timeZone
      */
-    public function setTimeZone($timeZone) {
+    public function setTimeZone(DateTimeZone $timeZone) {
         $this->_timeZone = $timeZone;
     }
 
@@ -131,9 +128,12 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param boolean $debug
+     * @param bool $debug
      */
     public function setDebug($debug) {
+        if (null !== $debug) {
+            $debug = (bool) $debug;
+        }
         $this->_debug = $debug;
     }
 
@@ -149,9 +149,9 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param \CM_Model_Location|null $location
+     * @param CM_Model_Location $location
      */
-    public function setLocation($location) {
+    public function setLocation(CM_Model_Location $location) {
         $this->_location = $location;
     }
 
