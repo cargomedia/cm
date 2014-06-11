@@ -16,7 +16,9 @@ class CM_Db_ClientTest extends CMTest_TestCase {
         $client->connect();
         $this->assertTrue($client->isConnected());
 
-        $client = new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUsername(), $client->getPassword(), 'nonexistent');
+        $config = $client->getConfig();
+        $config['db'] = 'nonexistent';
+        $client = new CM_Db_Client($config);
         try {
             $client->connect();
             $this->fail('Could select nonexistent DB');
@@ -56,7 +58,9 @@ class CM_Db_ClientTest extends CMTest_TestCase {
 
     public function testReconnectTimeout() {
         $client = CMTest_TH::getDbClient();
-        $client = new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUsername(), $client->getPassword(), $client->getDb(), 5);
+        $config = $client->getConfig();
+        $config['reconnectTimeout'] = 5;
+        $client = new CM_Db_Client($config);
         $client->connect();
         $firstTime = $client->getLastConnect();
         $timeForward = 100;

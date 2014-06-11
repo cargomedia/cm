@@ -21,12 +21,14 @@ return function (CM_Config_Node $config) {
     $config->services['database-read-maintenance'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
-            'localhost',
-            3306,
-            'root',
-            '',
-            'cm_test',
-            300
+            array(
+                'host'             => 'localhost',
+                'port'             => 3306,
+                'username'         => 'root',
+                'password'         => '',
+                'db'               => 'cm_test',
+                'reconnectTimeout' => 300
+            )
         )
     );
 

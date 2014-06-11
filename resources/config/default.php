@@ -104,12 +104,14 @@ return function (CM_Config_Node $config) {
     $config->services['database-master'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
-            'localhost',
-            3306,
-            'root',
-            '',
-            'cm',
-            300
+            array(
+                'host'             => 'localhost',
+                'port'             => 3306,
+                'username'         => 'root',
+                'password'         => '',
+                'db'               => 'cm',
+                'reconnectTimeout' => 300
+            )
         )
     );
 

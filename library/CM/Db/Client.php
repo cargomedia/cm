@@ -27,23 +27,25 @@ class CM_Db_Client {
     private $_reconnectTimeout;
 
     /**
-     * @param string      $host
-     * @param int         $port
-     * @param string      $username
-     * @param string      $password
-     * @param string|null $db
-     * @param int|null    $reconnectTimeout
+     * @param mixed[]    $config {
+     * @type string      $host
+     * @type int         $port
+     * @type string      $username
+     * @type string      $password
+     * @type string|null $db
+     * @type int|null    $reconnectTimeout
+     *                           }
      */
-    public function __construct($host, $port, $username, $password, $db = null, $reconnectTimeout = null) {
-        $this->_host = (string) $host;
-        $this->_port = (int) $port;
-        $this->_username = (string) $username;
-        $this->_password = (string) $password;
-        if (null !== $db) {
-            $this->_db = (string) $db;
+    public function __construct(array $config) {
+        $this->_host = (string) $config['host'];
+        $this->_port = (int) $config['port'];
+        $this->_username = (string) $config['username'];
+        $this->_password = (string) $config['password'];
+        if (isset($config['db'])) {
+            $this->_db = (string) $config['db'];
         }
-        if (null !== $reconnectTimeout) {
-            $this->_reconnectTimeout = (int) $reconnectTimeout;
+        if (isset($config['reconnectTimeout'])) {
+            $this->_reconnectTimeout = (int) $config['reconnectTimeout'];
         }
     }
 
@@ -82,6 +84,27 @@ class CM_Db_Client {
      */
     public function isConnected() {
         return isset($this->_pdo);
+    }
+
+    /**
+     * @return mixed[] {
+     * @type string      $host
+     * @type int         $port
+     * @type string      $username
+     * @type string      $password
+     * @type string|null $db
+     * @type int|null    $reconnectTimeout
+     *                 }
+     */
+    public function getConfig() {
+        return array(
+            'host'             => $this->getHost(),
+            'port'             => $this->getPort(),
+            'username'         => $this->getUsername(),
+            'password'         => $this->getPassword(),
+            'db'               => $this->getDb(),
+            'reconnectTimeout' => $this->getReconnectTimeout(),
+        );
     }
 
     /**
