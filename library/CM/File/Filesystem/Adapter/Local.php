@@ -170,6 +170,10 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         }
     }
 
+    /**
+     * @param string $path
+     * @return bool
+     */
     private function _isLink($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
         return is_link($pathAbsolute);
