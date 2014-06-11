@@ -29,14 +29,8 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @param CM_Model_Location|null $location
      */
     public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null) {
-        if (null === $site) {
-            $site = CM_Site_Abstract::factory();
-        }
-        if (null === $timeZone) {
-            $timeZone = CM_Bootloader::getInstance()->getTimeZone();
-        }
-        if (null === $debug) {
-            $debug = CM_Bootloader::getInstance()->isDebug();
+        if (null !== $debug) {
+            $debug = (bool) $debug;
         }
         $this->_site = $site;
         $this->_viewer = $viewer;
@@ -57,7 +51,11 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @return CM_Site_Abstract
      */
     public function getSite() {
-        return $this->_site;
+        $site = $this->_site;
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        return $site;
     }
 
     /**
@@ -125,7 +123,11 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @return DateTimeZone
      */
     public function getTimeZone() {
-        return $this->_timeZone;
+        $timeZone = $this->_timeZone;
+        if (null === $timeZone) {
+            $timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        return $timeZone;
     }
 
     /**
@@ -139,7 +141,11 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @return bool
      */
     public function isDebug() {
-        return $this->_debug;
+        $debug = $this->_debug;
+        if (null === $debug) {
+            $debug = CM_Bootloader::getInstance()->isDebug();
+        }
+        return $debug;
     }
 
     /**
