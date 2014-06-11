@@ -10,5 +10,6 @@ function smarty_function_viewTemplate(array $params, Smarty_Internal_Template $t
 
     $tplName = (string) $params['file'];
     unset($params['file']);
-    return $render->fetchViewTemplate($viewResponse->getView(), $tplName, $params);
+    $variables = array_merge($template->getTemplateVars(), $params);
+    return $render->fetchViewTemplate($viewResponse->getView(), $tplName, $variables);
 }

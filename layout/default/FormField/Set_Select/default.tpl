@@ -5,4 +5,4 @@
   {$optionList[$itemValue] = $itemHtml}
 {/foreach}
 
-{block name='content'}{/block}
+{viewTemplate file=$display}
