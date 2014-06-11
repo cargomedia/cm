@@ -47,10 +47,24 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param \CM_Site_Abstract $site
+     */
+    public function setSite($site) {
+        $this->_site = $site;
+    }
+
+    /**
      * @return CM_Site_Abstract
      */
     public function getSite() {
         return $this->_site;
+    }
+
+    /**
+     * @param \CM_Model_User|null $viewer
+     */
+    public function setViewer($viewer) {
+        $this->_viewer = $viewer;
     }
 
     /**
@@ -76,6 +90,13 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param \CM_Model_Language|null $language
+     */
+    public function setLanguage($language) {
+        $this->_language = $language;
+    }
+
+    /**
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
@@ -94,6 +115,13 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param \DateTimeZone $timeZone
+     */
+    public function setTimeZone($timeZone) {
+        $this->_timeZone = $timeZone;
+    }
+
+    /**
      * @return DateTimeZone
      */
     public function getTimeZone() {
@@ -101,10 +129,24 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param boolean $debug
+     */
+    public function setDebug($debug) {
+        $this->_debug = $debug;
+    }
+
+    /**
      * @return bool
      */
     public function isDebug() {
         return $this->_debug;
+    }
+
+    /**
+     * @param \CM_Model_Location|null $location
+     */
+    public function setLocation($location) {
+        $this->_location = $location;
     }
 
     /**
