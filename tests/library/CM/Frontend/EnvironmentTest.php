@@ -8,7 +8,8 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $language = CM_Model_Language::create('English', 'en', true);
         $timezone = new DateTimeZone('Europe/London');
         $debug = true;
-        $environment = new CM_Frontend_Environment($site, $user, $language, $timezone, $debug);
+        $location = CM_Model_Location::createCountry('United Kingdom', 'UK');
+        $environment = new CM_Frontend_Environment($site, $user, $language, $timezone, $debug, $location);
 
         $this->assertSame($site, $environment->getSite());
         $this->assertSame($user, $environment->getViewer(true));
@@ -16,6 +17,7 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $this->assertSame($language->getAbbreviation(), $environment->getLocale());
         $this->assertSame($timezone, $environment->getTimeZone());
         $this->assertSame($debug, $environment->isDebug());
+        $this->assertSame($location, $environment->getLocation());
     }
 
     public function testHasViewer() {
