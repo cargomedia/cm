@@ -260,13 +260,13 @@ class CM_Model_Language extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $phrase
-     * @param string|null $nameNew
+     * @param string      $phrase
+     * @param string|null $phraseNew
      * @param array|null  $variableNamesNew
      * @throws CM_Exception_Nonexistent
      * @throws CM_Exception_Duplicate
      */
-    public static function updateKey($phrase, $nameNew = null, array $variableNamesNew = null) {
+    public static function updateKey($phrase, $phraseNew = null, array $variableNamesNew = null) {
         $phrase = (string) $phrase;
         if (!CM_Db_Db::count('cm_languageKey', array('name' => $phrase))) {
             throw new CM_Exception_Nonexistent('LanguageKey `' . $phrase . '` does not exist');
@@ -276,13 +276,13 @@ class CM_Model_Language extends CM_Model_Abstract {
             $variableNamesNew = json_encode($variableNamesNew);
         }
 
-        if (null !== $nameNew) {
-            $nameNew = (string) $nameNew;
-            if (CM_Db_Db::count('cm_languageKey', array('name' => $nameNew))) {
-                throw new CM_Exception_Duplicate('LanguageKey `' . $nameNew . '` already exists');
+        if (null !== $phraseNew) {
+            $phraseNew = (string) $phraseNew;
+            if (CM_Db_Db::count('cm_languageKey', array('name' => $phraseNew))) {
+                throw new CM_Exception_Duplicate('LanguageKey `' . $phraseNew . '` already exists');
             }
 
-            CM_Db_Db::update('cm_languageKey', array('name' => $nameNew, 'variables' => $variableNamesNew), array('name' => $phrase));
+            CM_Db_Db::update('cm_languageKey', array('name' => $phraseNew, 'variables' => $variableNamesNew), array('name' => $phrase));
         } else {
             CM_Db_Db::update('cm_languageKey', array('variables' => $variableNamesNew), array('name' => $phrase));
         }
