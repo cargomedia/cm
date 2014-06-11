@@ -32,11 +32,18 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $language = CM_Model_Language::findDefault();
         }
         $environment = new CM_Frontend_Environment();
-        $environment->setSite($site);
-        $environment->setViewer($viewer);
-        $environment->setLanguage($language);
-        $environment->setLocation($location);
-
+        if ($site) {
+            $environment->setSite($site);
+        }
+        if ($viewer) {
+            $environment->setViewer($viewer);
+        }
+        if ($language) {
+            $environment->setLanguage($language);
+        }
+        if ($location) {
+            $environment->setLocation($location);
+        }
         $this->_environment = $environment;
         $this->_languageRewrite = (bool) $languageRewrite;
     }
