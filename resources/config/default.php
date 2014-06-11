@@ -97,6 +97,10 @@ return function (CM_Config_Node $config) {
 
     $config->services = array();
 
+    $config->services['databases'] = array(
+        'class' => 'CM_Service_Databases',
+    );
+
     $config->services['database-master'] = array(
         'class'     => 'CM_Db_Client',
         'arguments' => array(
