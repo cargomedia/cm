@@ -17,7 +17,7 @@ class CM_Db_Client {
     /** @var string|null */
     private $_db;
 
-    /** @var PDO */
+    /** @var PDO|null */
     private $_pdo;
 
     /** @var int */
@@ -63,7 +63,7 @@ class CM_Db_Client {
             $time = microtime(true) * 1000;
             $this->_pdo = new PDO($dsn, $this->_username, $this->_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES "UTF8"'));
             CMService_Newrelic::getInstance()->setCustomMetric('DB connect', (microtime(true) * 1000) - $time);
-            $this->_getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new CM_Db_Exception('Database connection failed: ' . $e->getMessage());
         }
@@ -234,6 +234,9 @@ class CM_Db_Client {
         return '`' . str_replace('`', '``', $name) . '`';
     }
 
+    /**
+     * @return PDO
+     */
     protected function _getPdo() {
         $this->connect();
         return $this->_pdo;
