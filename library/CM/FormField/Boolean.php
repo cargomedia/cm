@@ -14,7 +14,8 @@ class CM_FormField_Boolean extends CM_FormField_Abstract {
         if (!in_array($display, array(self::DISPLAY_CHECKBOX, self::DISPLAY_SWITCH))) {
             throw new CM_Exception_InvalidParam('Display needs to be either `checkbox` or `switch`');
         }
-        $viewResponse->setTemplateName($display);
+        $viewResponse->addCssClass($display);
+        $viewResponse->set('display', $display);
 
         $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);

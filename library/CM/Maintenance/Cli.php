@@ -57,14 +57,18 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                 }
         ));
         $this->_registerClockworkCallbacks(new DateInterval('PT15M'), array(
-            'CM_Mail::processQueue'               => function () {
+            'CM_Mail::processQueue'           => function () {
                     CM_Mail::processQueue(500);
                 },
-            'CM_Action_Abstract::aggregate'       => function () {
+            'CM_Action_Abstract::aggregate'   => function () {
                     CM_Action_Abstract::aggregate();
                 },
-            'CM_Paging_Log_Abstract::deleteOlder' => function () {
-                    CM_Paging_Log_Abstract::deleteOlder(7 * 86400);
+            'CM_Paging_Log_Abstract::cleanup' => function () {
+                    foreach (CM_Paging_Log_Abstract::getClassChildren() as $logClass) {
+                        /** @var CM_Paging_Log_Abstract $log */
+                        $log = new $logClass();
+                        $log->cleanUp();
+                    }
                 }
         ));
     }
