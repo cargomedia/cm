@@ -15,7 +15,7 @@ class CM_Usertext_Filter_Markdown_UserContent extends CM_Usertext_Filter_Abstrac
     }
 
     public function getCacheKey() {
-        return parent::getCacheKey() + array('_urlList' => $this->getServiceManager()->getUserContent()->getUrlList());
+        return parent::getCacheKey() + array('_url' => $this->getServiceManager()->getUserContent()->getUrl('formatter'));
     }
 
     public function transform($text, CM_Frontend_Render $render) {
