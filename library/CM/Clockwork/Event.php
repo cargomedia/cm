@@ -5,6 +5,9 @@ class CM_Clockwork_Event {
     /** @var DateInterval */
     private $_interval;
 
+    /** @var string */
+    private $_name;
+
     /** @var DateTime */
     private $_nextRun;
 
@@ -12,11 +15,20 @@ class CM_Clockwork_Event {
     private $_callbacks;
 
     /**
+     * @param string       $name
      * @param DateInterval $interval
      */
-    public function __construct(DateInterval $interval) {
+    public function __construct($name, DateInterval $interval) {
+        $this->_name = (string) $name;
         $this->_interval = $interval;
         $this->_callbacks = array();
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
     }
 
     /**

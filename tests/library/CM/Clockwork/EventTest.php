@@ -4,7 +4,7 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
 
     public function testShouldRun() {
         $currently = new DateTime();
-        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array(new DateInterval('PT2S')))->getMock();
+        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array('event', new DateInterval('PT2S')))->getMock();
         $event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($currently) {
             return clone $currently;
         }));
@@ -23,7 +23,7 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
             'foo' => 0,
             'bar' => 0,
         );
-        $event = new CM_Clockwork_Event(new DateInterval('PT1S'));
+        $event = new CM_Clockwork_Event('event', new DateInterval('PT1S'));
         $event->registerCallback(function () use (&$counter) {
             $counter['foo']++;
         });

@@ -39,7 +39,7 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             $key = $interval->s;
             $counter[$key]++;
         };
-        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array($interval))->getMock();
+        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array('event', $interval))->getMock();
         $event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($timeReference) {
             return clone $timeReference;
         }));
