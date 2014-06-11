@@ -1,6 +1,6 @@
 <?php
 
-class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
+class CM_Paging_Location_SearchText extends CM_Paging_Location_Abstract {
 
     /**
      * @param string                 $term
@@ -15,7 +15,7 @@ class CM_Paging_Location_Suggestions extends CM_Paging_Location_Abstract {
         $query = new CM_Elasticsearch_Query_Location();
         $query->filterLevel($minLevel, $maxLevel);
         if (strlen($term) > 0) {
-            $query->queryNameSuggestion($term);
+            $query->queryName($term);
         }
         $query->sortLevel();
         if ($location) {

@@ -15,8 +15,7 @@ abstract class CM_Response_View_Abstract extends CM_Response_Abstract {
             $componentParams = array_merge($componentParams, $additionalParams);
         }
         $component = CM_Component_Abstract::factory($componentClassName, CM_Params::factory($componentParams));
-
-        $renderAdapter = new CM_RenderAdapter_Component($this->getRender(), $component);
+        $renderAdapter = CM_RenderAdapter_Component::factory($this->getRender(), $component);
         $html = $renderAdapter->fetch();
 
         $frontend = $this->getRender()->getGlobalResponse();

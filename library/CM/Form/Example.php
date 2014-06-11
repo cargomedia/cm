@@ -13,6 +13,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerField(new CM_FormField_Set(['name' => 'set', 'values' => array(1 => 'Eins', 2 => 'Zwei'), 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Boolean(['name' => 'boolean']));
+        $this->registerField(new CM_FormField_Boolean(['name' => 'booleanSwitch']));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect1', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect2', 'values' => [1 => 'Eins', 2 => 'Zwei'], 'labelsInValues' => true]));
         $this->registerField(new CM_FormField_Set_Select(['name' => 'setSelect3', 'values' => [1 => 'Foo', 2 => 'Bar'], 'labelsInValues' => true]));
@@ -20,7 +21,7 @@ class CM_Form_Example extends CM_Form_Abstract {
         $this->registerAction(new CM_FormAction_Example_Go($this));
     }
 
-    public function prepare(CM_Params $renderParams) {
+    public function prepare(CM_Frontend_Environment $environment) {
         $ip = CM_Request_Abstract::getInstance()->getIp();
         if ($locationGuess = CM_Model_Location::findByIp($ip)) {
             $this->getField('location')->setValue($locationGuess);

@@ -40,11 +40,20 @@ class CM_Paging_Location_SuggestionsTest extends CMTest_TestCase {
     }
 
     public function testSearch() {
+        $source = new CM_Paging_Location_Suggestions('Merit ad', CM_Model_Location::LEVEL_COUNTRY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals(1, $source->getCount());
+        $this->assertEquals('Meritxell', $source->getItem(0)->getName());
+    }
+
+    public function testSearchWithLevel() {
+        $source = new CM_Paging_Location_Suggestions('Encamp', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
+        $this->assertEquals(1, $source->getCount());
+        $this->assertEquals('Encamp', $source->getItem(0)->getName());
+    }
+
+    public function testSearchEmpty() {
         $source = new CM_Paging_Location_Suggestions('', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
         $this->assertEquals(8, $source->getCount());
-
-        $source = new CM_Paging_Location_Suggestions('el', CM_Model_Location::LEVEL_CITY, CM_Model_Location::LEVEL_CITY);
-        $this->assertEquals(2, $source->getCount());
     }
 
     public function testSearchDistance() {

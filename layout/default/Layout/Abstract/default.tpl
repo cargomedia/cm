@@ -36,7 +36,7 @@
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
   </head>
-  <body id="{$autoId}" class="{$layout->getClassHierarchy()|implode:' '}">
+  <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
 
     {if CM_Request_Abstract::hasInstance() && !CM_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">

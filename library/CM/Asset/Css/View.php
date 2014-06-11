@@ -4,7 +4,7 @@ class CM_Asset_Css_View extends CM_Asset_Css {
 
     /**
      * @param CM_Frontend_Render $render
-     * @param string    $className
+     * @param string             $className
      * @throws CM_Exception
      */
     public function __construct(CM_Frontend_Render $render, $className) {
@@ -27,10 +27,8 @@ class CM_Asset_Css_View extends CM_Asset_Css {
         }
         foreach (array_unique($relativePaths) as $path) {
             $prefix = '.' . $className;
-            if (is_subclass_of($className, 'CM_Component_Abstract') && !is_subclass_of($className, 'CM_Page_Abstract')) {
-                if ($path !== 'default.less' && strpos($path, '/') === false) {
-                    $prefix .= '.' . preg_replace('#.less$#', '', $path);
-                }
+            if ($path !== 'default.less' && strpos($path, '/') === false) {
+                $prefix .= '.' . preg_replace('#.less$#', '', $path);
             }
             $file = $render->getLayoutFile($viewPath . $path, $namespace);
             $this->add($file->read(), $prefix);

@@ -5,8 +5,8 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
     $render = $template->smarty->getTemplateVars('render');
     $frontend = $render->getGlobalResponse();
     if ($open) {
-        $form = CM_Form_Abstract::factory($params['name']);
-        $form->prepare(CM_Params::factory($params));
+        $form = CM_Form_Abstract::factory($params['name'], $params);
+        $form->prepare($render->getEnvironment());
 
         $viewResponse = new CM_Frontend_ViewResponse($form);
         $frontend->treeExpand($viewResponse);
@@ -19,10 +19,10 @@ function smarty_block_form($params, $content, Smarty_Internal_Template $template
         /** @var CM_Form_Abstract $form */
         $form = $viewResponse->getView();
 
-        $classes = $form->getClassHierarchy();
-        $classes[] = $form->getName();
+        $cssClasses = $viewResponse->getCssClasses();
+        $cssClasses[] = $form->getName();
         $html = '<form id="' . $viewResponse->getAutoId() . '" class="' .
-            implode(' ', $classes) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
+            implode(' ', $cssClasses) . ' clearfix" method="post" onsubmit="return false;" novalidate >';
         $html .= $content;
 
         foreach ($form->getFields() as $field) {

@@ -218,6 +218,7 @@ input[type=checkbox], input[type=radio] {
       left: -(@sizeCheckbox+4px);
       margin-top: -@sizeCheckbox/2;
       border: 1px solid @colorFgBorderEmphasize3;
+      .transition(100ms);
     }
   }
 
@@ -229,7 +230,7 @@ input[type=checkbox], input[type=radio] {
 
   &:checked + label:before {
     background-color: lighten(@colorNotice, 15);
-    border-color: lighten(@colorNotice, 15);
+    border-color: lighten(@colorNotice, 5);
   }
 
   &:disabled + label {

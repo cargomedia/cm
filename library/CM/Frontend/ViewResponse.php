@@ -8,6 +8,9 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     /** @var string */
     protected $_templateName;
 
+    /** @var string[] */
+    protected $_cssClasses;
+
     /** @var CM_View_Abstract */
     protected $_view;
 
@@ -19,6 +22,7 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
      */
     public function __construct(CM_View_Abstract $view) {
         $this->_templateName = 'default';
+        $this->_cssClasses = array();
         $this->_view = $view;
         $this->_js = new CM_Frontend_JavascriptContainer_View();
     }
@@ -42,20 +46,6 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
     }
 
     /**
-     * @return string
-     */
-    public function getTemplateName() {
-        return $this->_templateName;
-    }
-
-    /**
-     * @return CM_View_Abstract
-     */
-    public function getView() {
-        return $this->_view;
-    }
-
-    /**
      * @param string $name
      * @throws CM_Exception_Invalid
      */
@@ -64,6 +54,40 @@ class CM_Frontend_ViewResponse extends CM_DataResponse {
             throw new CM_Exception_Invalid('Invalid tpl-name `' . $name . '`');
         }
         $this->_templateName = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateName() {
+        return $this->_templateName;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function addCssClass($name) {
+        $this->_cssClasses[] = (string) $name;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getCssClasses() {
+        $cssClasses = array_merge($this->getView()->getClassHierarchy(), $this->_cssClasses);
+        $templateName = $this->getTemplateName();
+        if ('default' !== $templateName) {
+            $cssClasses[] = $templateName;
+        }
+        $cssClasses = array_unique($cssClasses);
+        return $cssClasses;
+    }
+
+    /**
+     * @return CM_View_Abstract
+     */
+    public function getView() {
+        return $this->_view;
     }
 
     /**
