@@ -141,7 +141,7 @@ class CM_Db_Client {
     /**
      * @return string
      */
-    public function getUserName() {
+    public function getUsername() {
         return $this->_username;
     }
 

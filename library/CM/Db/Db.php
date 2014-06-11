@@ -304,7 +304,7 @@ class CM_Db_Db extends CM_Class_Abstract {
         }
         $args[] = '--host=' . $client->getHost();
         $args[] = '--port=' . $client->getPort();
-        $args[] = '--user=' . $client->getUserName();
+        $args[] = '--user=' . $client->getUsername();
         $args[] = '--password=' . $client->getPassword();
         $args[] = $dbName;
         if ($tables) {
@@ -334,7 +334,7 @@ class CM_Db_Db extends CM_Class_Abstract {
         $args = array();
         $args[] = '--host=' . $client->getHost();
         $args[] = '--port=' . $client->getPort();
-        $args[] = '--user=' . $client->getUserName();
+        $args[] = '--user=' . $client->getUsername();
         $args[] = '--password=' . $client->getPassword();
         $args[] = $dbName;
         CM_Util::exec('mysql', $args, null, $dump->getPath());

@@ -267,7 +267,7 @@ class CMTest_TH {
      */
     public static function getDbClient() {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-        return new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUserName(), $client->getPassword(), $client->getDb(), $client->getReconnectTimeout());
+        return new CM_Db_Client($client->getHost(), $client->getPort(), $client->getUsername(), $client->getPassword(), $client->getDb(), $client->getReconnectTimeout());
     }
 
     public static function randomizeAutoincrement() {
