@@ -53,11 +53,11 @@ class CM_Db_Db extends CM_Class_Abstract {
     /**
      * @param string            $sqlTemplate
      * @param array|null        $parameters
-     * @param CM_Db_Client|null $client
      * @param bool|null         $disableQueryBuffering
+     * @param CM_Db_Client|null $client
      * @return CM_Db_Result
      */
-    public static function exec($sqlTemplate, array $parameters = null, CM_Db_Client $client = null, $disableQueryBuffering = null) {
+    public static function exec($sqlTemplate, array $parameters = null, $disableQueryBuffering = null, CM_Db_Client $client = null) {
         if (!$client) {
             $client = self::getClient();
         }
@@ -74,7 +74,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      */
     public static function execRead($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
-        return self::exec($sqlTemplate, $parameters, $client, $disableQueryBuffering);
+        return self::exec($sqlTemplate, $parameters, $disableQueryBuffering, $client);
     }
 
     /**
@@ -85,7 +85,7 @@ class CM_Db_Db extends CM_Class_Abstract {
      */
     public static function execReadMaintenance($sqlTemplate, array $parameters = null, $disableQueryBuffering = null) {
         $client = CM_Service_Manager::getInstance()->getDatabases()->getReadMaintenance();
-        return self::exec($sqlTemplate, $parameters, $client, $disableQueryBuffering);
+        return self::exec($sqlTemplate, $parameters, $disableQueryBuffering, $client);
     }
 
     /**
