@@ -17,14 +17,18 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var boolean */
     protected $_debug;
 
+    /** @var CM_Model_Location|null */
+    protected $_location;
+
     /**
      * @param CM_Site_Abstract|null  $site
      * @param CM_Model_User|null     $viewer
      * @param CM_Model_Language|null $language
      * @param DateTimeZone|null      $timeZone
      * @param bool|null              $debug
+     * @param CM_Model_Location|null $location
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null) {
         if (null === $site) {
             $site = CM_Site_Abstract::factory();
         }
@@ -39,6 +43,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
         $this->_language = $language;
         $this->_timeZone = $timeZone;
         $this->_debug = (bool) $debug;
+        $this->_location = $location;
     }
 
     /**
@@ -100,5 +105,12 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      */
     public function isDebug() {
         return $this->_debug;
+    }
+
+    /**
+     * @return CM_Model_Location|null
+     */
+    public function getLocation() {
+        return $this->_location;
     }
 }
