@@ -117,7 +117,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
         ksort($classTypes);
         $output .= PHP_EOL;
         foreach ($classTypes as $type => $class) {
-            $output .= '$config->' . $class . '->type = ' . $type . ';';
+            $output .= '$config->' . $class . '->type = ' . $type . ';' . PHP_EOL;
         }
         $output .= PHP_EOL . '$config->CM_Class_Abstract->typesMaxValue = ' . $this->_typesMaxValue . ';' . PHP_EOL;
         return $output;
