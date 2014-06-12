@@ -5,10 +5,10 @@ return function (CM_Config_Node $config) {
     $config->CM_Mail->types = array();
     $config->CM_Mail->types[1] = 'CM_Mail';
     $config->CM_Mail->types[2] = 'CM_Mail_Welcome';
-
+    
     $config->CM_Action_Abstract->types = array();
     $config->CM_Action_Abstract->types[3] = 'CM_Action_Email';
-
+    
     $config->CM_Model_Abstract->types = array();
     $config->CM_Model_Abstract->types[5] = 'CM_Model_Language';
     $config->CM_Model_Abstract->types[6] = 'CM_Model_Location';
@@ -28,23 +28,24 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Abstract->types[28] = 'CM_Model_Location_Country';
     $config->CM_Model_Abstract->types[29] = 'CM_Model_Location_State';
     $config->CM_Model_Abstract->types[30] = 'CM_Model_Location_Zip';
-
+    
     $config->CM_Paging_ContentList_Abstract->types = array();
     $config->CM_Paging_ContentList_Abstract->types[19] = 'CM_Paging_ContentList_Badwords';
-
+    
     $config->CM_Paging_Log_Abstract->types = array();
     $config->CM_Paging_Log_Abstract->types[20] = 'CM_Paging_Log_Error';
     $config->CM_Paging_Log_Abstract->types[21] = 'CM_Paging_Log_Fatal';
     $config->CM_Paging_Log_Abstract->types[22] = 'CM_Paging_Log_JsError';
     $config->CM_Paging_Log_Abstract->types[23] = 'CM_Paging_Log_Mail';
     $config->CM_Paging_Log_Abstract->types[24] = 'CM_Paging_Log_Warn';
-
+    
     $config->CM_Site_Abstract->types = array();
-
+    
     $config->CM_Stream_Adapter_Abstract->types = array();
     $config->CM_Stream_Adapter_Abstract->types[25] = 'CM_Stream_Adapter_Message_SocketRedis';
     $config->CM_Stream_Adapter_Abstract->types[26] = 'CM_Stream_Adapter_Video_Wowza';
-
+    
+    
     $config->CM_Mail->type = 1;
     $config->CM_Mail_Welcome->type = 2;
     $config->CM_Action_Email->type = 3;
@@ -74,9 +75,9 @@ return function (CM_Config_Node $config) {
     $config->CM_Model_Location_Country->type = 28;
     $config->CM_Model_Location_State->type = 29;
     $config->CM_Model_Location_Zip->type = 30;
-
+    
     $config->CM_Class_Abstract->typesMaxValue = 30;
-
+    
     $config->CM_Action_Abstract->verbs = array();
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
     $config->CM_Action_Abstract->verbs[CM_Action_Abstract::UPDATE] = 2;
