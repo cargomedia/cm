@@ -2,37 +2,27 @@
 
 class CM_Model_SplittestTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
+    public function tearDown() {
+        CMTest_TH::clearEnv();
     }
 
     public function testCreate() {
-        $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-        $this->assertInstanceOf('CM_Model_Splittest', $test);
-
-        try {
-            $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
-            $this->fail('Could create duplicate splittest');
-        } catch (CM_Exception $e) {
-            $this->assertTrue(true);
-        }
-
-        $test->delete();
+        $name = 'foo';
+        $variations = ['v1', 'v2'];
+        $splittest = CM_Model_Splittest::create($name, $variations);
+        $this->assertInstanceOf('CM_Model_Splittest', $splittest);
+        $this->assertSame($name, $splittest->getName());
     }
 
     public function testConstruct() {
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
         $test2 = new CM_Model_Splittest('foo');
         $this->assertEquals($test, $test2);
-
-        $test->delete();
     }
 
     public function testGetId() {
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
         $this->assertGreaterThanOrEqual(1, $test->getId());
-
-        $test->delete();
     }
 
     public function testGetCreated() {
@@ -40,16 +30,12 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
         $this->assertGreaterThanOrEqual($time, $test->getCreated());
-
-        $test->delete();
     }
 
     public function testGetVariations() {
         /** @var CM_Model_Splittest $test */
         $test = CM_Model_Splittest::createStatic(array('name' => 'foo', 'variations' => array('v1', 'v2')));
         $this->assertInstanceOf('CM_Paging_SplittestVariation_Splittest', $test->getVariations());
-
-        $test->delete();
     }
 
     public function testIsVariationFixtureDisabledVariation() {
@@ -65,8 +51,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
             $user = CMTest_TH::createUser();
             $this->assertTrue($test->isVariationFixture(new CM_Splittest_Fixture($user), $variation2->getName()));
         }
-
-        $test->delete();
     }
 
     public function testDelete() {
@@ -91,9 +75,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
 
         $this->assertContains($test1->getVariationFixture($fixture), array('v1', 'v2'));
         $this->assertContains($test2->getVariationFixture($fixture), array('w1', 'w2'));
-
-        $test1->delete();
-        $test2->delete();
     }
 
     public function testIsVariationFixture() {
