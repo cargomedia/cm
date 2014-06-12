@@ -220,7 +220,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     protected static function _getVariationFixtureEnabled($splittestName, $fixture, $variationName) {
         $splittest = static::_getSplittest($splittestName);
         if (!$splittest) {
-            return null;
+            return false;
         }
         return $splittest->isVariationFixture($fixture, $variationName);
     }

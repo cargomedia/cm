@@ -3,13 +3,13 @@
 class CM_Model_Splittest_RequestClient extends CM_Model_Splittest {
 
     /**
-     * @param string        $splittestName
-     * @param CM_Model_User $fixture
-     * @param string        $variationName
+     * @param string              $splittestName
+     * @param CM_Request_Abstract $request
+     * @param string              $variationName
      * @return bool
      */
-    public static function getVariationFixtureEnabled($splittestName, CM_Model_User $fixture, $variationName) {
-        return static::_getVariationFixtureEnabled($splittestName, $fixture, $variationName);
+    public static function getVariationFixtureEnabled($splittestName, CM_Request_Abstract $request, $variationName) {
+        return static::_getVariationFixtureEnabled($splittestName, $request, $variationName);
     }
 
     /**
