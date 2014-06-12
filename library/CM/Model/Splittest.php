@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class CM_Model_Splittest
+ * @method bool isVariationFixture()
+ */
 class CM_Model_Splittest extends CM_Model_Abstract {
 
     /** @var bool */
@@ -196,5 +200,48 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         return $variationFixtureList[$this->getId()];
+    }
+
+    public static function create($name, array $variations = null) {
+    }
+
+    /**
+     * @param string $splittestName
+     * @param mixed  $fixture
+     * @param string $variationName
+     * @return bool
+     */
+    protected static function _getVariationFixtureEnabled($splittestName, $fixture, $variationName) {
+        $splittest = static::_getSplittest($splittestName);
+        if (!$splittest) {
+            return null;
+        }
+        return $splittest->isVariationFixture($fixture, $variationName);
+    }
+
+    /**
+     * @param $name
+     * @return CM_Model_Splittest|null
+     */
+    protected static function _getSplittest($name) {
+        if (!self::_exists($name)) {
+            return null;
+        }
+        $className = get_called_class();
+        return new $className($name);
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    protected static function _exists($name) {
+        $cache = CM_Cache_Local::getInstance();
+        $cacheKey = CM_CacheConst::Splittest_Exists . '_name' . $name;
+        if (false === ($exists = $cache->get($cacheKey))) {
+            $exists = CM_Db_Db::count('cm_splittest');
+            $cache->set($cacheKey, $exists);
+        }
+        return $exists;
     }
 }

@@ -3,6 +3,16 @@
 class CM_Model_Splittest_User extends CM_Model_Splittest {
 
     /**
+     * @param string        $name
+     * @param CM_Model_User $user
+     * @param string        $variationName
+     * @return bool
+     */
+    public static function getVariationFixtureEnabled($name, CM_Model_User $user, $variationName) {
+        return static::_getVariationFixtureEnabled($name, $user, $variationName);
+    }
+
+    /**
      * @param CM_Model_User $user
      * @param string        $variationName
      * @return bool
