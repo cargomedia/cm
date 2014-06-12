@@ -202,7 +202,13 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         return $variationFixtureList[$this->getId()];
     }
 
+    /**
+     * @param string   $name
+     * @param string[] $variations
+     * @return static
+     */
     public static function create($name, array $variations = null) {
+        return static::createStatic(['name' => (string) $name, (array) $variations]);
     }
 
     /**
