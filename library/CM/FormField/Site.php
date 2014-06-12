@@ -15,13 +15,4 @@ class CM_FormField_Site extends CM_FormField_Set_Select {
     public function parseUserInput($userInput) {
         return CM_Site_Abstract::factory($userInput);
     }
-
-    /**
-     * @param CM_Frontend_Environment $environment
-     * @param int                     $userInput
-     * @return CM_Site_Abstract
-     */
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
-        parent::validate($environment, $userInput);
-    }
 }
