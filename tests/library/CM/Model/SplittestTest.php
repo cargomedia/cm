@@ -105,28 +105,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         $this->assertTrue($test->isVariationFixture($fixture, $test->getVariationFixture($fixture)));
         $this->assertFalse($test->isVariationFixture($fixture, 'noVariation'));
     }
-
-    public function testWithoutPersistence() {
-        $user = CMTest_TH::createUser();
-        $fixture = new CM_Splittest_Fixture($user);
-
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('notExisting');
-
-        $this->assertFalse($test->isVariationFixture($fixture, 'bar'));
-        $this->assertSame('', $test->getVariationFixture($fixture));
-        $test->setConversion($fixture);
-
-        CMTest_TH::clearConfig();
-    }
-
-    public function testWithoutPersistenceDelete() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('foo');
-        $test->delete();
-
-        CMTest_TH::clearConfig();
-    }
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
@@ -149,7 +127,7 @@ class CM_Model_Splittest_Mock extends CM_Model_Splittest {
     }
 
     /**
-     * @param CM_Splittest_Fixture $fixtureId
+     * @param CM_Splittest_Fixture $fixture
      */
     public function setConversion(CM_Splittest_Fixture $fixture) {
         $this->_setConversion($fixture);
