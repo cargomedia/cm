@@ -79,15 +79,31 @@ class CM_Model_Splittest extends CM_Model_Abstract {
 
     /**
      * @param array $variationWeightList
+     * @throws CM_Exception_Invalid
+     * @throws CM_Exception_Nonexistent
      */
     public function setVariationWeightList(array $variationWeightList) {
+        if (empty($variationWeightList)) {
+            throw new CM_Exception_Invalid('Empty variation weight list');
+        }
+        $variationList = $this->getVariations();
         $this->_variationWeightList = array();
         foreach ($variationWeightList as $variationName => $variationWeight) {
             $variationName = (string) $variationName;
             $variationWeight = (float) $variationWeight;
-            if ($variationWeight > 0) {
+            $variation = $variationList->findByName($variationName);
+            if (!$variation) {
+                throw new CM_Exception_Nonexistent('There is no variation `' . $variationName . '` in split test `' . $this->getName() . '`');
+            }
+            if ($variationWeight < 0) {
+                throw new CM_Exception_Invalid('Split test variation weight `' . $variationWeight . '` should be positive');
+            }
+            if ($variation->getEnabled() && ($variationWeight > 0)) {
                 $this->_variationWeightList[$variationName] = $variationWeight;
             }
+        }
+        if (empty($this->_variationWeightList)) {
+            throw new CM_Exception_Invalid('At least one enabled split test variation should have a positive weight');
         }
     }
 
