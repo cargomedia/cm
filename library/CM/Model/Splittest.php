@@ -5,6 +5,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     /** @var bool */
     private $_withoutPersistence;
 
+    /** @var array|null */
+    private $_variationWeightList;
+
     /**
      * @param string $name
      */
@@ -72,6 +75,20 @@ class CM_Model_Splittest extends CM_Model_Abstract {
             throw new CM_Exception('Splittest `' . $this->getId() . '` has no variations');
         }
         return $variationBest;
+    }
+
+    /**
+     * @param array $variationWeightList
+     */
+    public function setVariationWeightList(array $variationWeightList) {
+        $this->_variationWeightList = array();
+        foreach ($variationWeightList as $variationName => $variationWeight) {
+            $variationName = (string) $variationName;
+            $variationWeight = (float) $variationWeight;
+            if ($variationWeight > 0) {
+                $this->_variationWeightList[$variationName] = $variationWeight;
+            }
+        }
     }
 
     public function flush() {
@@ -200,7 +217,26 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         if (!array_key_exists($this->getId(), $variationFixtureList)) {
-            $variation = $this->getVariationsEnabled()->getItemRand();
+            if (!isset($this->_variationWeightList)) {
+                $variation = $this->getVariationsEnabled()->getItemRand();
+            } else {
+                $variationList = array();
+                $variationWeightList = array();
+                foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+                    /** @var CM_Model_SplittestVariation $variation */
+                    $variationName = $variation->getName();
+                    if (isset($this->_variationWeightList[$variationName])) {
+                        $variationList[] = $variation;
+                        $variationWeightList[] = $this->_variationWeightList[$variationName];
+                    }
+                }
+                if (empty($variationList)) {
+                    $variation = false;
+                } else {
+                    $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+                    $variation = $weightedRandom->lookup();
+                }
+            }
             if (!$variation) {
                 throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
             }
