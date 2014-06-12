@@ -38,6 +38,18 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     /**
+     * @param CM_Frontend_Environment $environment
+     * @param CM_Model_Location       $userInput
+     * @return null|string|void
+     * @throws CM_Exception_FormFieldValidation
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        if (!($userInput instanceof CM_Model_Location)) {
+            throw new CM_Exception_FormFieldValidation('Expected a CM_Model_Location instance.');
+        }
+    }
+
+    /**
      * @param CM_Request_Abstract $request
      */
     public function setValueByRequest(CM_Request_Abstract $request) {
