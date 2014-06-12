@@ -5,6 +5,10 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
     const DISPLAY_SELECT = 'select';
     const DISPLAY_RADIOS = 'radios';
 
+    public function parseUserInput($userInput) {
+        return $userInput;
+    }
+
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!in_array($userInput, $this->_getValues())) {
             throw new CM_Exception_FormFieldValidation('Invalid value');
