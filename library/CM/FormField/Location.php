@@ -34,7 +34,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
             throw new CM_Exception_FormFieldValidation('Invalid location level.');
         }
-        return new CM_Model_Location($level, $id);
+
+        try {
+            return new CM_Model_Location($level, $id);
+        } catch (Exception $e) {
+            throw new CM_Exception_FormFieldValidation($e->getMessage());
+        }
     }
 
     /**
