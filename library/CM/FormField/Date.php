@@ -26,9 +26,6 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         if (!($userInput instanceof DateTime)) {
             throw new CM_Exception_FormFieldValidation('Expected a DateTime instance.');
         }
-        if ($userInput->format('Y') < $this->_yearFirst) {
-            throw new CM_Exception_FormFieldValidation('Year should be at least ' . $this->_yearFirst);
-        }
         return $userInput;
     }
 

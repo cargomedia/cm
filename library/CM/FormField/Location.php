@@ -25,15 +25,8 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         );
     }
 
-    /**
-     * @param CM_Frontend_Environment $environment
-     * @param string                  $userInput
-     * @throws CM_Exception_FormFieldValidation
-     * @return CM_Model_Location
-     */
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $value = parent::validate($environment, $userInput);
-        if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
+    public function parseUserInput($userInput) {
+        if (!preg_match('/^(\d+)\.(\d+)$/', $userInput, $matches)) {
             throw new CM_Exception_FormFieldValidation('Invalid input format');
         }
         $level = $matches[1];
@@ -42,6 +35,16 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
             throw new CM_Exception_FormFieldValidation('Invalid location level.');
         }
         return new CM_Model_Location($level, $id);
+    }
+
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param string                  $userInput
+     * @throws CM_Exception_FormFieldValidation
+     * @return CM_Model_Location
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+        return $userInput;
     }
 
     /**
