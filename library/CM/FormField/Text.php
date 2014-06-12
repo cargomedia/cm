@@ -27,7 +27,6 @@ class CM_FormField_Text extends CM_FormField_Abstract {
                 throw new CM_Exception_FormFieldValidation('The word `{$badword}` is not allowed', array('badword' => $badword));
             }
         }
-        return $userInput;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

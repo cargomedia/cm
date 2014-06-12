@@ -9,7 +9,6 @@ class CM_FormField_Set_Select extends CM_FormField_Set {
         if (!in_array($userInput, $this->_getValues())) {
             throw new CM_Exception_FormFieldValidation('Invalid value');
         }
-        return $userInput;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

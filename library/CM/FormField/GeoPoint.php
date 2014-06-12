@@ -28,8 +28,6 @@ class CM_FormField_GeoPoint extends CM_FormField_Abstract {
         if (!($userInput instanceof CM_Geo_Point)) {
             throw new CM_Exception_FormFieldValidation('Expected a CM_Geo_Point instance.');
         }
-
-        return $userInput;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

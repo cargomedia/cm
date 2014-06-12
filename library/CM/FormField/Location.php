@@ -38,16 +38,6 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     /**
-     * @param CM_Frontend_Environment $environment
-     * @param string                  $userInput
-     * @throws CM_Exception_FormFieldValidation
-     * @return CM_Model_Location
-     */
-    public function validate(CM_Frontend_Environment $environment, $userInput) {
-        return $userInput;
-    }
-
-    /**
      * @param CM_Request_Abstract $request
      */
     public function setValueByRequest(CM_Request_Abstract $request) {

@@ -26,7 +26,6 @@ class CM_FormField_Date extends CM_FormField_Abstract {
         if (!($userInput instanceof DateTime)) {
             throw new CM_Exception_FormFieldValidation('Expected a DateTime instance.');
         }
-        return $userInput;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

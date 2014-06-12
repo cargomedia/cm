@@ -16,9 +16,11 @@ abstract class CM_FormField_Abstract extends CM_View_Abstract {
     /**
      * @param CM_Frontend_Environment $environment
      * @param mixed                   $userInput
-     * @return mixed
      */
-    abstract public function validate(CM_Frontend_Environment $environment, $userInput);
+    public function validate(CM_Frontend_Environment $environment, $userInput)
+    {
+
+    }
 
     public function __construct($params = null) {
         parent::__construct($params);

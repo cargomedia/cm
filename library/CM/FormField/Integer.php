@@ -6,6 +6,10 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
     }
 
+    public function parseUserInput($userInput) {
+        return (int)$userInput;
+    }
+
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
             throw new CM_Exception_FormFieldValidation('Invalid number');
@@ -14,7 +18,6 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         if ($value < $this->_options['min'] || $value > $this->_options['max']) {
             throw new CM_Exception_FormFieldValidation('Value not in range.');
         }
-        return $value;
     }
 
     protected function _initialize() {

@@ -15,6 +15,10 @@ class CM_FormField_File extends CM_FormField_Abstract {
     public function validateFile(CM_File $file) {
     }
 
+    public function parseUserInput($userInput) {
+        return (array)$userInput;
+    }
+
     /**
      * @param CM_Frontend_Environment $environment
      * @param array                   $userInput
@@ -34,8 +38,6 @@ class CM_FormField_File extends CM_FormField_Abstract {
         foreach ($userInput as $file) {
             $files[] = new CM_File_UserContent_Temp($file);
         }
-
-        return (array) $files;
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {

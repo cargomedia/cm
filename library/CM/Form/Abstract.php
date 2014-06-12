@@ -121,7 +121,8 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
                     $environment = $response->getRender()->getEnvironment();
                     try {
                         $parsedValue = $field->parseUserInput($fieldValue);
-                        $formData[$fieldName] = $field->validate($environment, $parsedValue);
+                        $field->validate($environment, $parsedValue);
+                        $formData[$fieldName] = $parsedValue;
                     } catch (CM_Exception_FormFieldValidation $e) {
                         $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
                     }
@@ -156,7 +157,10 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
         foreach ($userInputList as $name => $userInput) {
             $field = $this->getField($name);
             try {
-                $validValues[$name] = $field->validate($environment, $userInput);
+                $filteredInput = $field->filterInput($userInput);
+                $parsedInput = $field->parseUserInput($filteredInput);
+                $field->validate($environment, $parsedInput);
+                $validValues[$name] = $parsedInput;
             } catch (CM_Exception_FormFieldValidation $e) {
             }
         }

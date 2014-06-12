@@ -18,11 +18,10 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $userInput = parent::validate($environment, $userInput);
+        parent::validate($environment, $userInput);
         $age = $userInput->diff(new DateTime())->y;
         if ($age < $this->_minAge || $age > $this->_maxAge) {
             throw new CM_Exception_FormFieldValidation('Invalid birthdate');
         }
-        return $userInput;
     }
 }

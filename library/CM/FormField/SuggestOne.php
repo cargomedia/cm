@@ -12,13 +12,17 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
         parent::setValue($value);
     }
 
+    public function parseUserInput($userInput) {
+        $values = parent::parseUserInput($userInput);
+        return $values ? reset($values) : null;
+    }
+
     /**
      * @param CM_Frontend_Environment $environment
      * @param string                  $userInput
      * @return string|null
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $values = parent::validate($environment, $userInput);
-        return $values ? reset($values) : null;
+        parent::validate($environment, $userInput);
     }
 }
