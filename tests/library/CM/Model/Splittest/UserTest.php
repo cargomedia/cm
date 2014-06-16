@@ -40,6 +40,7 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
         $user = CMTest_TH::createUser();
         $this->assertFalse(CM_Model_Splittest_User::getVariationFixtureEnabled('foo', $user, 'bar'));
         CM_Model_Splittest_User::create('foo', ['bar']);
-        $this->assertFalse(CM_Model_Splittest_User::getVariationFixtureEnabled('foo', $user, 'bar'));
+        CM_Cache_Local::getInstance()->flush();
+        $this->assertTrue(CM_Model_Splittest_User::getVariationFixtureEnabled('foo', $user, 'bar'));
     }
 }

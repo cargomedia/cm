@@ -46,6 +46,7 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         $request = $this->createRequest('/');
         $this->assertFalse(CM_Model_Splittest_RequestClient::getVariationFixtureEnabled('foo', $request, 'bar'));
         CM_Model_Splittest_RequestClient::create('foo', ['bar']);
-        $this->assertFalse(CM_Model_Splittest_RequestClient::getVariationFixtureEnabled('foo', $request, 'bar'));
+        CM_Cache_Local::getInstance()->flush();
+        $this->assertTrue(CM_Model_Splittest_RequestClient::getVariationFixtureEnabled('foo', $request, 'bar'));
     }
 }
