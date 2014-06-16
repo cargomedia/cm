@@ -128,7 +128,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
     }
 
     /**
-     * @param string $selector
+     * @param string|array $selector
      * @return CM_Dom_NodeList
      */
     public function find($selector) {
@@ -137,7 +137,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
     }
 
     /**
-     * @param string $selector
+     * @param string|array $selector
      * @return bool
      */
     public function has($selector) {
@@ -155,12 +155,7 @@ class CM_Dom_NodeList implements Iterator, Countable {
         return $this->_xpath;
     }
 
-    /**
-     * @param string $selector
-     * @throws CM_Exception_Invalid
-     * @return DOMElement[]
-     */
-    private function _findAll($selector) {
+    private function convertCSSToXPathSelector($selector) {
         $xpath = '//' . preg_replace('-([^>\s])\s+([^>\s])-', '$1//$2', trim($selector));
         $xpath = preg_replace('/([^\s]+)\s*\>\s*([^\s]+)/', '$1/$2', $xpath);
         $xpath = preg_replace('/\[([^~=\[\]]+)~="([^~=\[\]]+)"\]/', '[contains(concat(" ",@$1," "),concat(" ","$2"," "))]', $xpath);
@@ -173,6 +168,29 @@ class CM_Dom_NodeList implements Iterator, Countable {
         $xpath = preg_replace('/\.([\w-]*)/', '[contains(concat(" ",@class," "),concat(" ","$1"," "))]', $xpath);
         $xpath = preg_replace('/#([\w-]*)/', '[@id="$1"]', $xpath);
         $xpath = preg_replace('-\/\[-', '/*[', $xpath);
+        return $xpath;
+    }
+
+    /**
+     * @param string|array $selector If string passed then it should contain a CSS selector. Optionally, it's possible
+     *                               to pass an array('xpath' => ...) for XPath query or array('css' => ...) for CSS.
+     * @throws CM_Exception_Invalid
+     * @return DOMElement[]
+     */
+    private function _findAll($selector) {
+
+        if (is_array($selector)) {
+            if (!empty($selector['xpath'])) {
+                $xpath = $selector['xpath'];
+            } else if (!empty($selector['css'])) {
+                $xpath = $this->convertCSSToXPathSelector($selector['css']);
+            } else {
+                throw new CM_Exception_Invalid('No selector passed.');
+            }
+        } else {
+            $xpath = $this->convertCSSToXPathSelector($selector);
+        }
+
         $nodes = array();
         foreach ($this->_elementList as $element) {
             foreach ($this->_getXPath()->query('.' . $xpath, $element) as $resultElement) {

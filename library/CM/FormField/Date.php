@@ -15,11 +15,15 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        $dd = (int) trim($userInput['day']);
-        $mm = (int) trim($userInput['month']);
-        $yy = (int) trim($userInput['year']);
+        try {
+            $dd = (int) $userInput['day'];
+            $mm = (int) $userInput['month'];
+            $yy = (int) $userInput['year'];
 
-        return new DateTime($yy . '-' . $mm . '-' . $dd);
+            return new DateTime($yy . '-' . $mm . '-' . $dd);
+        } catch (Exception $e) {
+            throw new CM_Exception_FormFieldValidation('Invalid date.');
+        }
     }
 
     /**
@@ -30,6 +34,14 @@ class CM_FormField_Date extends CM_FormField_Abstract {
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!($userInput instanceof DateTime)) {
             throw new CM_Exception_FormFieldValidation('Expected a DateTime instance.');
+        }
+
+        if ($userInput->format('Y') < $this->_yearFirst) {
+            throw new CM_Exception_FormFieldValidation('Year should be at least ' . $this->_yearFirst);
+        }
+
+        if ($userInput->format('Y') > $this->_yearLast) {
+            throw new CM_Exception_FormFieldValidation('Year should be not more than ' . $this->_yearLast);
         }
     }
 

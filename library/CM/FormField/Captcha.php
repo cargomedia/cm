@@ -6,6 +6,13 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         $viewResponse->set('imageId', CM_Captcha::create()->getId());
     }
 
+    public function parseUserInput($userInput) {
+        return array(
+            (int)$userInput['id'],
+            (string)$userInput['value']
+        );
+    }
+
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $id = (int) $userInput['id'];
         $text = (string) $userInput['value'];
@@ -18,8 +25,6 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         if (!$captcha->check($text)) {
             throw new CM_Exception_FormFieldValidation('Number doesn\'t match captcha');
         }
-
-        return $userInput;
     }
 
     public function ajax_createNumber(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {

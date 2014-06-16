@@ -16,7 +16,16 @@ class CM_FormField_File extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        return (array)$userInput;
+        $userInput = array_filter($userInput, function ($value) {
+            return !empty($value);
+        });
+
+        $files = array();
+        foreach ($userInput as $file) {
+            $files[] = new CM_File_UserContent_Temp($file);
+        }
+
+        return (array) $files;
     }
 
     /**
@@ -26,17 +35,8 @@ class CM_FormField_File extends CM_FormField_Abstract {
      * @return array
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        $userInput = array_filter($userInput, function ($value) {
-            return !empty($value);
-        });
-
         if ($this->_options['cardinality'] > 0 && sizeof($userInput) > $this->_options['cardinality']) {
             throw new CM_Exception_Invalid('Too many files uploaded');
-        }
-
-        $files = array();
-        foreach ($userInput as $file) {
-            $files[] = new CM_File_UserContent_Temp($file);
         }
     }
 
