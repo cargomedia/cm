@@ -63,7 +63,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @param array|null $variables
      * @return string
      */
-    public function fetchTemplate($path, $variables = null) {
+    public function fetchTemplate($path, array $variables = null) {
         $compileId = $this->getSite()->getId();
         if ($this->getLanguage()) {
             $compileId .= '_' . $this->getLanguage()->getAbbreviation();
@@ -76,6 +76,19 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $template->assign($variables);
         }
         return $template->fetch();
+    }
+
+    /**
+     * @param string     $content
+     * @param array|null $variables
+     * @return string
+     */
+    public function parseTemplateContent($content, array $variables = null) {
+        $content = (string) $content;
+        $variables = (array) $variables;
+        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
+        $file = CM_File::create(uniqid() . '.tpl', $content, $filesystem);
+        return $this->fetchTemplate($filesystem->getAdapter()->getPathPrefix() . '/' . $file->getPath(), $variables);
     }
 
     /**
