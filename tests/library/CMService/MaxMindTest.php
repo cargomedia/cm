@@ -3388,14 +3388,13 @@ class CMService_MaxMindTest extends CMTest_TestCase {
 
     protected function _import($countryDataMock, $regionDataMock, $locationDataMock, $ipDataMock, $regionListLegacyMock) {
         $maxMind = $this->getMock('CMService_MaxMind',
-            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy', '_getErrorStream'),
-            array(null, $this->_outputStream, null, true));
+            array('_getCountryData', '_getRegionData', '_getLocationData', '_getIpData', '_getRegionListLegacy'),
+            array(null, $this->_outputStream, $this->_errorStream, null, true));
         $maxMind->expects($this->any())->method('_getCountryData')->will($this->returnValue($countryDataMock));
         $maxMind->expects($this->any())->method('_getRegionData')->will($this->returnValue($regionDataMock));
         $maxMind->expects($this->any())->method('_getLocationData')->will($this->returnValue($locationDataMock));
         $maxMind->expects($this->any())->method('_getIpData')->will($this->returnValue($ipDataMock));
         $maxMind->expects($this->any())->method('_getRegionListLegacy')->will($this->returnValue($regionListLegacyMock));
-        $maxMind->expects($this->any())->method('_getErrorStream')->will($this->returnValue($this->_errorStream));
         /** @var CMService_MaxMind $maxMind */
         $maxMind->upgrade();
     }
