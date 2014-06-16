@@ -10,14 +10,11 @@ class CM_Cli_CommandManager {
     /** @var int */
     private $_forks = null;
 
-    /** @var CM_OutputStream_Interface */
-    private $_streamError;
-
     /** @var CM_InputStream_Interface */
     private $_streamInput;
 
     /** @var CM_OutputStream_Interface */
-    private $_streamOutput;
+    private $_streamOutput, $_streamError;
 
     public function __construct() {
         $this->_commands = array();
