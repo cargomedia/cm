@@ -53,14 +53,11 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
 
     public function delete($path) {
         $pathAbsolute = $this->_getAbsolutePath($path);
-        if (!$this->exists($path)) {
-            return;
-        }
-        if ($this->isDirectory($path)) {
+        if ($this->isDirectory($path) && !$this->_isLink($path)) {
             if (false === @rmdir($pathAbsolute)) {
                 throw new CM_Exception('Cannot delete directory `' . $pathAbsolute . '`');
             }
-        } else {
+        } elseif ($this->_isLink($path) || $this->exists($path)) {
             if (false === @unlink($pathAbsolute)) {
                 throw new CM_Exception_Invalid('Cannot delete file `' . $pathAbsolute . '`');
             }
@@ -149,6 +146,9 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
      * @throws CM_Exception
      */
     private function _listByPrefixRecursive($pathPrefix, array &$fileList, array &$dirList) {
+        if ($this->_isLink($pathPrefix)) {
+            return;
+        }
         $pathPrefixAbsolute = $this->_getAbsolutePath($pathPrefix);
         $filenameList = @scandir($pathPrefixAbsolute);
         if (false === $filenameList) {
@@ -168,6 +168,15 @@ class CM_File_Filesystem_Adapter_Local extends CM_File_Filesystem_Adapter implem
         foreach ($fileListLocal as $filePath) {
             $fileList[] = $filePath;
         }
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    private function _isLink($path) {
+        $pathAbsolute = $this->_getAbsolutePath($path);
+        return is_link($pathAbsolute);
     }
 
     /**

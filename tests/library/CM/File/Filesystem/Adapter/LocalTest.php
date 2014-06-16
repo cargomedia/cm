@@ -90,6 +90,18 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
         $this->assertTrue($this->_adapter->exists('foo'));
     }
 
+    public function testExistsSymlink() {
+        $this->_adapter->ensureDirectory('foo');
+        symlink($this->_adapter->getPathPrefix() . '/foo', $this->_adapter->getPathPrefix() . '/link');
+        $this->assertTrue($this->_adapter->exists('link'));
+
+        $this->_adapter->delete('foo');
+        $this->assertFalse($this->_adapter->exists('link'));
+
+        $this->_adapter->ensureDirectory('foo');
+        $this->assertTrue($this->_adapter->exists('link'));
+    }
+
     public function testEnsureDirectory() {
         $this->assertFalse($this->_adapter->isDirectory('foo'));
 
@@ -138,6 +150,16 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
 
         $this->_adapter->delete('my-dir');
         $this->assertFalse($this->_adapter->exists('my-dir'));
+    }
+
+    public function testDeleteLink() {
+        $this->_adapter->ensureDirectory('foo');
+        symlink($this->_adapter->getPathPrefix() . '/foo', $this->_adapter->getPathPrefix() . '/link');
+        $this->assertTrue($this->_adapter->exists('link'));
+
+        $this->_adapter->delete('link');
+        $this->assertFalse($this->_adapter->exists('link'));
+        $this->assertTrue($this->_adapter->exists('foo'));
     }
 
     public function testRename() {
@@ -236,6 +258,25 @@ class CM_File_Filesystem_Adapter_LocalTest extends CMTest_TestCase {
                 'foo/foobar',
             ),
         ), $this->_adapter->listByPrefix('/foo'));
+    }
+
+    public function testListByPrefixDoNotFollowSymlinks() {
+        $filesystem = new CM_File_Filesystem($this->_adapter);
+        $file = new CM_File('foo/bar/foo', $filesystem);
+        $file->ensureParentDirectory();
+        $file->write('hello');
+        symlink($filesystem->getAdapter()->getPathPrefix() . '/foo', $filesystem->getAdapter()->getPathPrefix() . '/link');
+
+        $this->assertSame(array(
+            'files' => array(
+                'foo/bar/foo',
+            ),
+            'dirs'  => array(
+                'foo/bar',
+                'foo',
+                'link',
+            ),
+        ), $this->_adapter->listByPrefix(''));
     }
 
     public function testListByPrefixNonexistent() {
