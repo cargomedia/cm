@@ -27,16 +27,6 @@ abstract class CM_Cli_Runnable_Abstract {
     protected function _initialize() {
     }
 
-    public function info() {
-        $details = array(
-            'Package name' => static::getPackageName(),
-            'Class name'   => get_class($this),
-        );
-        foreach ($details as $name => $value) {
-            $this->_getOutput()->writeln(str_pad($name . ':', 20) . $value);
-        }
-    }
-
     /**
      * @return CM_OutputStream_Interface
      */
