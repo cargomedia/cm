@@ -2,11 +2,13 @@
 
 abstract class CM_Site_Abstract extends CM_Class_Abstract implements CM_ArrayConvertible, CM_Typed {
 
+    /** @var string[] */
     protected $_themes = array();
+
+    /** @var string[] */
     protected $_modules = array();
-    /**
-     * @var CM_EventHandler_EventHandler
-     */
+
+    /** @var CM_EventHandler_EventHandler */
     protected $_eventHandler = null;
 
     /**
