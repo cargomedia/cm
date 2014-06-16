@@ -15,7 +15,9 @@ class CMService_MaxMindTest extends CMTest_TestCase {
         CM_Db_Db::exec('ALTER TABLE cm_model_location_state AUTO_INCREMENT = 1');
         CM_Db_Db::exec('ALTER TABLE cm_model_location_country AUTO_INCREMENT = 1');
         $this->_errorStream = new CM_OutputStream_Null();
-        $this->_outputStream = new CM_OutputStream_File();
+        $file = new CM_File('/CM_OutputStream_File-' . uniqid(), CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
+        $file->truncate();
+        $this->_outputStream = new CM_OutputStream_File($file);
     }
 
     public function tearDown() {
@@ -3107,7 +3109,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->assertSame(false, strpos($this->_outputStream->getFile()->read(), 'Overlapping IP blocks:'));
+        $this->assertSame(false, strpos($this->_outputStream->read(), 'Overlapping IP blocks:'));
     }
 
     public function testOverlappingIpBlocks_sameIpStart() {
@@ -3144,7 +3146,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266586368, 'ipEnd' => 266586623),
             )
         );
-        $this->assertNotSame(false, strpos($this->_outputStream->getFile()->read(), "Overlapping IP blocks:\n ! 33555968-33556223 and 33555968-33556243\n\n *"));
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 33555968-33556223 and 33555968-33556243\n\n *"));
     }
 
     public function testOverlappingIpBlocks_inclusion() {
@@ -3181,7 +3183,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->assertNotSame(false, strpos($this->_outputStream->getFile()->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578400\n ! 33555968-33556223 and 33556000-33556200\n\n *"));
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578400\n ! 33555968-33556223 and 33556000-33556200\n\n *"));
     }
 
     public function testOverlappingIpBlocks_overlapping() {
@@ -3218,7 +3220,7 @@ class CMService_MaxMindTest extends CMTest_TestCase {
                 array('id' => 2, 'level' => CM_Model_Location::LEVEL_COUNTRY, 'ipStart' => 266578176, 'ipEnd' => 266578431),
             )
         );
-        $this->assertNotSame(false, strpos($this->_outputStream->getFile()->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578500\n ! 33555968-33556223 and 33556000-33557000\n\n *"));
+        $this->assertNotSame(false, strpos($this->_outputStream->read(), "Overlapping IP blocks:\n ! 266578176-266578431 and 266578200-266578500\n ! 33555968-33556223 and 33556000-33557000\n\n *"));
     }
 
     /**

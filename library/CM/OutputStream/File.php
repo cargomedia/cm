@@ -6,21 +6,17 @@ class CM_OutputStream_File extends CM_OutputStream_Abstract {
     protected $_file;
 
     /**
-     * @param CM_File|null $file
+     * @param CM_File $file
      */
-    public function __construct(CM_File $file = null) {
-        if (!$file) {
-            $file = new CM_File('/CM_OutputStream_File-' . uniqid(), CM_Service_Manager::getInstance()->getFilesystems()->getTmp());
-            $file->truncate();
-        }
+    public function __construct(CM_File $file) {
         $this->_file = $file;
     }
 
     /**
-     * @return CM_File
+     * @return string
      */
-    public function getFile() {
-        return $this->_file;
+    public function read() {
+        return $this->_file->read();
     }
 
     public function write($message) {
