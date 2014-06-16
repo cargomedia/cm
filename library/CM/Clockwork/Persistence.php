@@ -24,7 +24,7 @@ class CM_Clockwork_Persistence {
         if (empty($this->_data[$event->getName()])) {
             return null;
         }
-        return $this->_data[$event->getName()];
+        return clone $this->_data[$event->getName()];
     }
 
     /**
@@ -33,7 +33,7 @@ class CM_Clockwork_Persistence {
      */
     public function setRuntime(CM_Clockwork_Event $event, DateTime $runTime) {
         $this->_load();
-        $this->_data[$event->getName()] = $runTime;
+        $this->_data[$event->getName()] = clone $runTime;
         $this->_adapter->save($this->_data);
     }
 

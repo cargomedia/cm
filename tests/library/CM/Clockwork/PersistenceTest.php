@@ -16,8 +16,8 @@ class CM_Clockwork_PersistenceTest extends CMTest_TestCase {
         $adapter->expects($this->any())->method('load')->will($this->returnValue(array($event1->getName() => $runTime1, $event2->getName() => $runTime2)));
         $persistence = new CM_Clockwork_Persistence($adapter);
 
-        $this->assertSame($runTime1, $persistence->getLastRunTime($event1));
-        $this->assertSame($runTime2, $persistence->getLastRunTime($event2));
+        $this->assertEquals($runTime1, $persistence->getLastRunTime($event1));
+        $this->assertEquals($runTime2, $persistence->getLastRunTime($event2));
         $this->assertNull($persistence->getLastRunTime($event3));
     }
 
