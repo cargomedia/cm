@@ -246,7 +246,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
                     }
                 }
                 if (empty($variationList)) {
-                    $variation = false;
+                    $variation = null;
                 } else {
                     $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
                     $variation = $weightedRandom->lookup();
