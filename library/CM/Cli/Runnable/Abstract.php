@@ -21,14 +21,10 @@ abstract class CM_Cli_Runnable_Abstract {
             $output = new CM_OutputStream_Null();
         }
         $this->_output = $output;
+        $this->_initialize();
     }
 
-    /**
-     * @throws CM_Exception_NotImplemented
-     * @return string
-     */
-    public static function getPackageName() {
-        throw new CM_Exception_NotImplemented('Package `' . get_called_class() . '` has no `getPackageName` implemented.');
+    protected function _initialize() {
     }
 
     public function info() {
@@ -53,5 +49,13 @@ abstract class CM_Cli_Runnable_Abstract {
      */
     protected function _getInput() {
         return $this->_input;
+    }
+
+    /**
+     * @throws CM_Exception_NotImplemented
+     * @return string
+     */
+    public static function getPackageName() {
+        throw new CM_Exception_NotImplemented('Package `' . get_called_class() . '` has no `getPackageName` implemented.');
     }
 }
