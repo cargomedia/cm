@@ -103,7 +103,7 @@ class CM_App {
         foreach ($assetList as $asset) {
             $asset->get(true);
         }
-        CM_Bootloader::getInstance()->getNamespaces();
+        CM_Bootloader::getInstance()->getModules();
     }
 
     /**
@@ -194,8 +194,8 @@ class CM_App {
      */
     private function _getUpdateScriptPaths() {
         $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[$namespace] = CM_Util::getNamespacePath($namespace) . 'resources/db/update/';
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[$moduleName] = CM_Util::getModulePath($moduleName) . 'resources/db/update/';
         }
 
         $rootPath = DIR_ROOT . 'resources/db/update/';
@@ -215,7 +215,7 @@ class CM_App {
     private function _getUpdateScriptPath($version, $namespace = null) {
         $path = DIR_ROOT;
         if ($namespace) {
-            $path = CM_Util::getNamespacePath($namespace);
+            $path = CM_Util::getModulePath($namespace);
         }
         $file = new CM_File($path . 'resources/db/update/' . $version . '.php');
         if (!$file->getExists()) {

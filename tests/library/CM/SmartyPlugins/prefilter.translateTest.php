@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/prefilter.translate.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/prefilter.translate.php';
 
 class smarty_prefilter_translateTest extends CMTest_TestCase {
 

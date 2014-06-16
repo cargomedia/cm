@@ -108,8 +108,8 @@ class CM_Bootloader {
     /**
      * @return string[]
      */
-    public function getNamespaces() {
-        return array_keys($this->_getNamespacePaths());
+    public function getModules() {
+        return array_keys($this->_getModulePaths());
     }
 
     public function reloadNamespacePaths() {
@@ -126,16 +126,16 @@ class CM_Bootloader {
     }
 
     /**
-     * @param string $namespace
+     * @param string $name
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public function getNamespacePath($namespace) {
-        $namespacePaths = $this->_getNamespacePaths();
-        if (!array_key_exists($namespace, $namespacePaths)) {
-            throw new CM_Exception_Invalid('`' . $namespace . '`, not found within namespace paths');
+    public function getModulePath($name) {
+        $namespacePaths = $this->_getModulePaths();
+        if (!array_key_exists($name, $namespacePaths)) {
+            throw new CM_Exception_Invalid('`' . $name . '`, not found within module paths');
         }
-        return $namespacePaths[$namespace];
+        return $namespacePaths[$name];
     }
 
     /**
@@ -185,7 +185,7 @@ class CM_Bootloader {
     /**
      * @return array
      */
-    private function _getNamespacePaths() {
+    private function _getModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
         $apcCache = new CM_Cache_Storage_Apc();
         if (false === ($namespacePaths = $apcCache->get($cacheKey))) {

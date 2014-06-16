@@ -92,7 +92,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $namespace = $this->getSite()->getNamespace();
         }
 
-        $path = CM_Util::getNamespacePath($namespace, !$absolute);
+        $path = CM_Util::getModulePath($namespace, !$absolute);
         return $path . 'layout/' . $theme . '/';
     }
 
@@ -389,7 +389,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
 
         $pluginDirs = array(SMARTY_PLUGINS_DIR);
         foreach ($this->getSite()->getNamespaces() as $namespace) {
-            $pluginDirs[] = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
+            $pluginDirs[] = CM_Util::getModulePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
         }
         self::$_smarty->setPluginsDir($pluginDirs);
         self::$_smarty->loadFilter('pre', 'translate');

@@ -83,7 +83,7 @@ class CM_Util {
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
         foreach ($site->getNamespaces() as $namespace) {
-            $libraryPath = CM_Util::getNamespacePath($namespace) . 'library/' . $namespace . '/';
+            $libraryPath = CM_Util::getModulePath($namespace) . 'library/' . $namespace . '/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
         return $paths;
@@ -284,12 +284,12 @@ class CM_Util {
     }
 
     /**
-     * @param string    $namespace
+     * @param string $name
      * @param bool|null $relative
      * @return string
      */
-    public static function getNamespacePath($namespace, $relative = null) {
-        $path = CM_Bootloader::getInstance()->getNamespacePath($namespace);
+    public static function getModulePath($name, $relative = null) {
+        $path = CM_Bootloader::getInstance()->getModulePath($name);
         if (!$relative) {
             $path = DIR_ROOT . $path;
         }
@@ -303,8 +303,8 @@ class CM_Util {
     public static function getResourceFiles($pathRelative) {
         $pathRelative = (string) $pathRelative;
         $paths = array();
-        foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-            $paths[] = CM_Util::getNamespacePath($namespace) . 'resources/' . $pathRelative;
+        foreach (CM_Bootloader::getInstance()->getModules() as $moduleName) {
+            $paths[] = CM_Util::getModulePath($moduleName) . 'resources/' . $pathRelative;
         }
         $paths[] = DIR_ROOT . 'resources/' . $pathRelative;
 
@@ -448,8 +448,8 @@ class CM_Util {
         if (false === ($classNames = $cache->get($key))) {
             $pathsFiltered = array();
             $paths = array();
-            foreach (CM_Bootloader::getInstance()->getNamespaces() as $namespace) {
-                $namespacePaths = CM_Util::rglob('*.php', CM_Util::getNamespacePath($namespace) . 'library/');
+            foreach (CM_Bootloader::getInstance()->getModules() as $modulePath) {
+                $namespacePaths = CM_Util::rglob('*.php', CM_Util::getModulePath($modulePath) . 'library/');
                 $paths = array_merge($paths, $namespacePaths);
             }
             $regexp = '#\bclass\s+(?<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\s+#';

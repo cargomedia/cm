@@ -74,7 +74,7 @@ class CM_Component_Example extends CM_Component_Abstract {
         $site = $this->getParams()->getSite('site');
         $style = '';
         foreach (array_reverse($site->getNamespaces()) as $namespace) {
-            $file = new CM_File(CM_Util::getNamespacePath($namespace) . 'layout/default/variables.less');
+            $file = new CM_File(CM_Util::getModulePath($namespace) . 'layout/default/variables.less');
             if ($file->getExists()) {
                 $style .= $file->read() . PHP_EOL;
             }

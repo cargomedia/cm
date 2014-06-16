@@ -1,6 +1,6 @@
 <?php
 
-require_once CM_Util::getNamespacePath('CM') . 'library/CM/SmartyPlugins/function.link.php';
+require_once CM_Util::getModulePath('CM') . 'library/CM/SmartyPlugins/function.link.php';
 
 class smarty_function_linkTest extends CMTest_TestCase {
 
