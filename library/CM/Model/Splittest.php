@@ -237,8 +237,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
             } else {
                 $variationList = array();
                 $variationWeightList = array();
+                /** @var CM_Model_SplittestVariation $variation */
                 foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-                    /** @var CM_Model_SplittestVariation $variation */
                     $variationName = $variation->getName();
                     if (isset($this->_variationWeightList[$variationName])) {
                         $variationList[] = $variation;
