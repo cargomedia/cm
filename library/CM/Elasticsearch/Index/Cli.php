@@ -6,7 +6,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
      * @param string|null $indexName
      */
     public function create($indexName = null) {
-        if ($indexName) {
+        if (null !== $indexName) {
             $indexes = array($this->_getIndex($indexName));
         } else {
             $indexes = $this->_getIndexes();
@@ -20,14 +20,14 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
 
     /**
      * @param string|CM_Elasticsearch_Type_Abstract|null $indexName
-     * @param string|null                           $host Elasticsearch host
-     * @param int|null                              $port Elasticsearch port
+     * @param string|null                                $host Elasticsearch host
+     * @param int|null                                   $port Elasticsearch port
      * @throws CM_Exception_Invalid
      */
     public function update($indexName = null, $host = null, $port = null) {
         if ($indexName instanceof CM_Elasticsearch_Type_Abstract) {
             $indexes = array($indexName);
-        } elseif ($indexName) {
+        } elseif (null !== $indexName) {
             $indexes = array($this->_getIndex($indexName, $host, $port));
         } else {
             $indexes = $this->_getIndexes($host, $port);
@@ -52,6 +52,20 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
                 $message .= 'Reason: ' . $e->getMessage() . PHP_EOL;
                 throw new CM_Exception_Invalid($message);
             }
+        }
+    }
+
+    /**
+     * @param string|null $indexName
+     */
+    public function delete($indexName = null) {
+        if (null !== $indexName) {
+            $indexes = array($this->_getIndex($indexName));
+        } else {
+            $indexes = $this->_getIndexes();
+        }
+        foreach ($indexes as $index) {
+            $index->getIndex()->delete();
         }
     }
 
