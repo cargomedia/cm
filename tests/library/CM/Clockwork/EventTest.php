@@ -19,6 +19,10 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
         $this->assertFalse($event->shouldRun());
         $currently->add(new DateInterval('PT1S'));
         $this->assertTrue($event->shouldRun());
+
+        $future = clone $currently;
+        $future->add(new DateInterval('PT1S'));
+        $this->assertFalse($event->shouldRun($future));
     }
 
     public function testRun() {

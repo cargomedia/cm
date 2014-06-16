@@ -38,9 +38,16 @@ class CM_Clockwork_Event {
     }
 
     /**
+     * @param DateTime $lastRuntime
      * @return bool
      */
-    public function shouldRun() {
+    public function shouldRun(DateTime $lastRuntime = null) {
+        if ($lastRuntime) {
+            $lastRuntime = clone $lastRuntime;
+            if ($lastRuntime->add($this->_interval) > $this->_getCurrentDateTime()) {
+                return false;
+            }
+        }
         return $this->_getCurrentDateTime() >= $this->_nextRun;
     }
 
