@@ -1,14 +1,12 @@
 <?php
 
 function smarty_function_formField(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
-    /** @var CM_Form_Abstract $form */
-    $form = $render->getStackLast('forms');
 
-    $class = null;
+    $cssClasses = array();
     if (isset($params['class'])) {
-        $class = (string) $params['class'];
+        $cssClasses[] = (string) $params['class'];
         unset($params['class']);
     }
 
@@ -18,26 +16,36 @@ function smarty_function_formField(array $params, Smarty_Internal_Template $temp
     }
 
     $input = null;
-    $inputName = null;
+    $fieldName = null;
     if (isset($params['prepend'])) {
         $input .= (string) $params['prepend'];
     }
+    /** @var CM_Frontend_ViewResponse|null $viewResponse */
+    $viewResponse = null;
     if (isset($params['name'])) {
-        $inputName = (string) $params['name'];
-        /** @var CM_FormField_Abstract $field */
-        $field = $form->getField($inputName);
-        $field->prepare($params);
-        $input .= $render->render($field, array('form' => $form, 'fieldName' => $inputName));
+        $fieldName = (string) $params['name'];
+        $cssClasses[] = $fieldName;
+        /** @var CM_Form_Abstract $form */
+        $form = $render->getGlobalResponse()->getClosestViewResponse('CM_Form_Abstract')->getView();
+        if (null === $form) {
+            throw new CM_Exception_Invalid('Cannot find parent `CM_Form_Abstract` view response. Named {formField} can be only rendered within form view.');
+        }
+        $formField = $form->getField($fieldName);
+        $renderAdapter = new CM_RenderAdapter_FormField($render, $formField);
+        $input .= $renderAdapter->fetch(CM_Params::factory($params), $viewResponse);
+
+        if (null !== $formField->getValue()) {
+            $cssClasses[] = 'prefilled';
+        }
     }
     if (isset($params['append'])) {
         $input .= (string) $params['append'];
     }
-
-    $html = '<div class="formField clearfix ' . $inputName . ' ' . $class . '">';
+    $html = '<div class="formField clearfix ' . join(' ', $cssClasses) . '">';
     if ($label) {
         $html .= '<label';
-        if ($inputName) {
-            $html .= ' for="' . $form->getAutoId() . '-' . $inputName . '-input"';
+        if ($viewResponse) {
+            $html .= ' for="' . $viewResponse->getAutoIdTagged('input') . '"';
         }
         $html .= '>' . $label . '</label>';
     }

@@ -11,52 +11,30 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     /** @var CM_FormAction_Abstract[] */
     private $_actions = array();
 
-    public function __construct() {
+    abstract protected function _initialize();
+
+    public function __construct($params = null) {
+        parent::__construct($params);
+
         if (!preg_match('/^\w+_Form_(.+)$/', get_class($this), $matches)) {
             throw new CM_Exception("Cannot detect namespace from forms class-name");
         }
-        $namespace = lcfirst($matches[1]);
-        $namespace = preg_replace('/([A-Z])/', '_\1', $namespace);
-        $namespace = strtolower($namespace);
-        $this->_name = $namespace;
+        $name = lcfirst($matches[1]);
+        $name = preg_replace('/([A-Z])/', '_\1', $name);
+        $name = strtolower($name);
+        $this->_name = $name;
+        $this->_initialize();
+    }
+
+    public function prepare(CM_Frontend_Environment $environment) {
     }
 
     /**
-     * @param string $className
-     * @return CM_Form_Abstract
-     * @throws CM_Exception
-     */
-    public static function factory($className) {
-        $className = (string) $className;
-        if (!class_exists($className) || !is_subclass_of($className, __CLASS__)) {
-            throw new CM_Exception('Illegal form name `' . $className . '`.');
-        }
-        $form = new $className();
-        return $form;
-    }
-
-    abstract public function setup();
-
-    /**
-     * @param array|null $params
-     */
-    final public function renderStart(array $params = null) {
-        $this->_renderStart(CM_Params::factory($params));
-    }
-
-    /**
-     * @param CM_Params $params
-     */
-    protected function _renderStart(CM_Params $params) {
-    }
-
-    /**
-     * @param string                $fieldName
      * @param CM_FormField_Abstract $field
      * @throws CM_Exception_Invalid
      */
-    protected function registerField($fieldName, CM_FormField_Abstract $field) {
-        $fieldName = (string) $fieldName;
+    protected function registerField(CM_FormField_Abstract $field) {
+        $fieldName = $field->getName();
         if (isset($this->_fields[$fieldName])) {
             throw new CM_Exception_Invalid('Form field `' . $fieldName . '` is already registered.');
         }
@@ -122,14 +100,6 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
     }
 
     /**
-     * @param string $id_value
-     * @return string
-     */
-    final public function getTagAutoId($id_value) {
-        return $this->getAutoId() . '-' . $id_value;
-    }
-
-    /**
      * @param array                 $data
      * @param string                $actionName
      * @param CM_Response_View_Form $response
@@ -148,8 +118,9 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
 
                 if (!$field->isEmpty($fieldValue)) {
                     $isEmpty = false;
+                    $environment = $response->getRender()->getEnvironment();
                     try {
-                        $formData[$fieldName] = $field->validate($fieldValue, $response);
+                        $formData[$fieldName] = $field->validate($environment, $fieldValue);
                     } catch (CM_Exception_FormFieldValidation $e) {
                         $response->addError($e->getMessagePublic($response->getRender()), $fieldName);
                     }
@@ -172,5 +143,31 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             return null;
         }
         return $action->process($formData, $response, $this);
+    }
+
+    /**
+     * @param array                   $userInputList
+     * @param CM_Frontend_Environment $environment
+     * @return array
+     */
+    protected function _validateValues(array $userInputList, CM_Frontend_Environment $environment) {
+        $validValues = array();
+        foreach ($userInputList as $name => $userInput) {
+            $field = $this->getField($name);
+            try {
+                $validValues[$name] = $field->validate($environment, $userInput);
+            } catch (CM_Exception_FormFieldValidation $e) {
+            }
+        }
+        return $validValues;
+    }
+
+    /**
+     * @param array $values
+     */
+    protected function _setValues(array $values) {
+        foreach ($values as $name => $value) {
+            $this->getField($name)->setValue($value);
+        }
     }
 }

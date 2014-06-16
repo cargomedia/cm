@@ -8,7 +8,7 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
     /** @var CM_Params|null */
     public static $formActionData = null;
 
-    function testForm() {
+    public function testForm() {
         $data = $this->_getData();
         self::$formActionProcessCount = 0;
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
@@ -16,14 +16,14 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         $this->assertFormResponseSuccess($response);
     }
 
-    function testMissingField() {
+    public function testMissingField() {
         $data = $this->_getData();
         unset($data['data']['must_check']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
         $this->assertFormResponseError($response);
     }
 
-    function testAllowedMissingField() {
+    public function testAllowedMissingField() {
         $data = $this->_getData();
         unset($data['data']['color']);
         $response = $this->getResponseForm($data['classname'], $data['action'], $data['data']);
@@ -31,15 +31,15 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
         $this->assertFalse(self::$formActionData->has('color'));
     }
 
-    function testProcessInvalidCharsRequired() {
-        foreach (array(chr(192), chr(214), chr(255), chr(140)) as $inputChar) {
-            $request = $this->getMockBuilder('CM_Request_Post')->setConstructorArgs(array('/form/null'))->setMethods(array('getQuery'))->getMock();
-            $data = array('must_check' => 'checked', 'text' => $inputChar);
-            $query = array('data' => $data, 'actionName' => 'TestExampleAction',
-                           'form' => array('className' => 'CM_Form_MockForm', 'params' => array(), 'id' => 'mockFormId'));
-            $request->expects($this->any())->method('getQuery')->will($this->returnValue($query));
-            /** @var CM_Request_Post $request */
+    public function testProcessInvalidCharsRequired() {
+        $invalidChars = array(chr(192), chr(214), chr(255), chr(140));
+        foreach ($invalidChars as $inputChar) {
 
+            $form = new CM_Form_MockForm();
+            $formAction = new CM_FormAction_MockForm_TestExampleAction($form);
+
+            $data = array('must_check' => 'checked', 'text' => $inputChar);
+            $request = $this->createRequestFormAction($formAction, $data);
             $response = new CM_Response_View_Form($request);
             $response->process();
 
@@ -49,6 +49,37 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
                 $this->assertNotSame($inputChar, self::$formActionData->getString('text'));
             }
         }
+    }
+
+    public function testValidateValues() {
+        $userInputList = array(
+            'date'  => array(
+                'year'  => 1984,
+                'month' => 12,
+                'day'   => 29,
+            ),
+            'color' => 'invalid-color',
+        );
+        $expected = array(
+            'date' => new DateTime('1984-12-29'),
+        );
+        $form = new CM_Form_MockForm();
+        $method = new ReflectionMethod($form, '_validateValues');
+        $method->setAccessible(true);
+        $validValues = $method->invoke($form, $userInputList, new CM_Frontend_Environment());
+        $this->assertEquals($expected, $validValues);
+    }
+
+    public function testSetValues() {
+        $values = array(
+            'text' => 'foo',
+        );
+        $form = new CM_Form_MockForm();
+        $method = new ReflectionMethod($form, '_setValues');
+        $method->setAccessible(true);
+        $method->invoke($form, $values);
+        $this->assertSame('foo', $form->getField('text')->getValue());
+        $this->assertNull($form->getField('color')->getValue());
     }
 
     /**
@@ -64,11 +95,12 @@ class CM_Form_AbstractTest extends CMTest_TestCase {
 
 class CM_Form_MockForm extends CM_Form_Abstract {
 
-    public function setup() {
-        $this->registerField('must_check', new CM_FormField_Boolean());
-        $this->registerField('color', new CM_FormField_Color());
-        $this->registerField('text', new CM_FormField_Text());
-        $this->registerField('array', new CM_FormField_Text());
+    protected function _initialize() {
+        $this->registerField(new CM_FormField_Boolean(['name' => 'must_check']));
+        $this->registerField(new CM_FormField_Color(['name' => 'color']));
+        $this->registerField(new CM_FormField_Text(['name' => 'text']));
+        $this->registerField(new CM_FormField_Text(['name' => 'array']));
+        $this->registerField(new CM_FormField_Date(['name' => 'date']));
         $this->registerAction(new CM_FormAction_MockForm_TestExampleAction($this));
     }
 }

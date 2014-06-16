@@ -2,13 +2,13 @@
 
 class CM_Component_LogList extends CM_Component_Abstract {
 
-    public function checkAccessible(CM_Render $render) {
+    public function checkAccessible(CM_Frontend_Environment $environment) {
         if (!CM_Bootloader::getInstance()->isDebug()) {
             throw new CM_Exception_NotAllowed();
         }
     }
 
-    public function prepare() {
+    public function prepare(CM_Frontend_Environment $environment, CM_Frontend_ViewResponse $viewResponse) {
         $type = $this->_params->getInt('type');
         $aggregate = $this->_params->has('aggregate') ? $this->_params->getInt('aggregate') : null;
         $urlPage = $this->_params->has('urlPage') ? $this->_params->getString('urlPage') : null;
@@ -22,22 +22,22 @@ class CM_Component_LogList extends CM_Component_Abstract {
         $logList = CM_Paging_Log_Abstract::factory($type, (bool) $aggregationPeriod, $aggregationPeriod);
         $logList->setPage($this->_params->getPage(), $this->_params->getInt('count', 50));
 
-        $this->setTplParam('type', $type);
-        $this->setTplParam('logList', $logList);
-        $this->setTplParam('aggregate', $aggregate);
-        $this->setTplParam('aggregationPeriod', $aggregationPeriod);
-        $this->setTplParam('aggregationPeriodList', array(3600, 86400, 7 * 86400, 31 * 86400));
-        $this->setTplParam('urlPage', $urlPage);
-        $this->setTplParam('urlParams', $urlParams);
-
-        $this->_setJsParam('type', $type);
+        $viewResponse->setData([
+            'type'                  => $type,
+            'logList'               => $logList,
+            'aggregate'             => $aggregate,
+            'aggregationPeriod'     => $aggregationPeriod,
+            'aggregationPeriodList' => array(3600, 86400, 7 * 86400, 31 * 86400),
+            'urlPage'               => $urlPage,
+            'urlParams'             => $urlParams
+        ]);
+        $viewResponse->getJs()->setProperty('type', $type);
     }
 
-    public static function ajax_flushLog(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
-        if (!static::_getAllowedFlush($response->getRender())) {
+    public function ajax_flushLog(CM_Params $params, CM_Frontend_JavascriptContainer $handler, CM_Response_View_Ajax $response) {
+        if (!$this->_getAllowedFlush($response->getRender()->getEnvironment())) {
             throw new CM_Exception_NotAllowed();
         }
-
         $type = $params->getInt('type');
         $logList = CM_Paging_Log_Abstract::factory($type);
         $logList->flush();
@@ -46,10 +46,10 @@ class CM_Component_LogList extends CM_Component_Abstract {
     }
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Environment $environment
      * @return bool
      */
-    protected static function _getAllowedFlush(CM_Render $render) {
+    protected function _getAllowedFlush(CM_Frontend_Environment $environment) {
         return CM_Bootloader::getInstance()->isDebug();
     }
 }

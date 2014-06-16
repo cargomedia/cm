@@ -5,9 +5,21 @@
 var CM_Form_Abstract = CM_View_Abstract.extend({
   _class: 'CM_Form_Abstract',
 
+  /** @type Object **/
   _fields: {},
 
+  /** @type Object **/
+  _actions: {},
+
+  /** @type Boolean **/
   _stopErrorPropagation: false,
+
+  initialize: function() {
+    CM_View_Abstract.prototype.initialize.call(this);
+
+    this._fields = {};
+    this._actions = {};
+  },
 
   events: {
     'reset': function() {
@@ -21,25 +33,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   ready: function() {
   },
 
-  initialize: function() {
-    CM_View_Abstract.prototype.initialize.call(this);
-
-    this._fields = {};
-    _.each(this.options.fields, function(fieldInfo, name) {
-      // Lazy construct
-      var $field = this.$("#" + name);
-      if ($field.length) {
-        var fieldClass = window[fieldInfo.className];
-        this.registerField(name, new fieldClass({"el": $field, "parent": this, "name": name, "options": fieldInfo.options}));
-      }
-    }, this);
-  },
-
-
   _ready: function() {
     var handler = this;
 
-    _.each(this.options.actions, function(action, name) {
+    _.each(this._actions, function(action, name) {
       var $btn = $('#' + this.getAutoId() + '-' + name + '-button');
       var event = $btn.data('event');
       if (!event) {
@@ -61,11 +58,10 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @param {String} name
    * @param {CM_FormField_Abstract} field
    */
-  registerField: function(name, field) {
-    this._fields[name] = field;
+  registerField: function(field) {
+    this._fields[field.getName()] = field;
 
     field.on('change', function() {
       this.trigger('change');
@@ -73,10 +69,11 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
   },
 
   /**
-   * @return CM_Component_Abstract
+   * @param {String} name
+   * @param {Object} presentation
    */
-  getComponent: function() {
-    return this.getParent();
+  registerAction: function(name, presentation) {
+    this._actions[name] = presentation;
   },
 
   /**
@@ -105,7 +102,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    */
   getData: function(actionName) {
     var form_data = this.$().serializeArray();
-    var action = actionName ? this.options.actions[actionName] : null;
+    var action = actionName ? this._actions[actionName] : null;
 
     var data = {};
     var regex = /^([\w\-]+)(\[([^\]]+)?\])?$/;
@@ -177,7 +174,7 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
       this.trigger('submit', [data]);
 
       var handler = this;
-      cm.ajax('form', {view: this.getComponent()._getArray(), form: this._getArray(), actionName: action.name, data: data}, {
+      cm.ajax('form', {viewInfoList: this.getViewInfoList(), actionName: action.name, data: data}, {
         success: function(response) {
           if (response.errors) {
             if (options.handleErrors) {
@@ -269,8 +266,8 @@ var CM_Form_Abstract = CM_View_Abstract.extend({
    * @returns {Object}
    */
   _getAction: function(actionName) {
-    actionName = actionName || _.first(_.keys(this.options.actions));
-    var action = this.options.actions[actionName];
+    actionName = actionName || _.first(_.keys(this._actions));
+    var action = this._actions[actionName];
     if (!action) {
       cm.error.triggerThrow('Form `' + this.getClass() + '` has no action `' + actionName + '`.');
     }

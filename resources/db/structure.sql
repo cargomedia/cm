@@ -87,23 +87,12 @@ DROP TABLE IF EXISTS `cm_languageKey`;
 CREATE TABLE `cm_languageKey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  `variables` text CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `javascript` (`javascript`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cm_languageKey_variable`;
-
-
-CREATE TABLE `cm_languageKey_variable` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `languageKeyId` int(10) unsigned NOT NULL,
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`,`languageKeyId`),
-  KEY `languageKeyId` (`languageKeyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cm_languageValue`;
@@ -455,6 +444,7 @@ CREATE TABLE `cm_tmp_location` (
   `3Id` int(10) unsigned DEFAULT NULL,
   `4Id` int(10) unsigned DEFAULT NULL,
   `name` varchar(120) DEFAULT NULL,
+  `nameFull` varchar(480) DEFAULT NULL,
   `abbreviation` char(2) DEFAULT NULL,
   `lat` float DEFAULT NULL,
   `lon` float DEFAULT NULL,

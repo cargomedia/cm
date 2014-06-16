@@ -26,7 +26,6 @@ $config->CM_Action_Abstract->verbs = array();
 $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 1;
 $config->CM_Action_Abstract->verbs[CM_Action_Abstract::UPDATE] = 2;
 $config->CM_Action_Abstract->verbsMaxValue = 2;
-
 EOD;
         $generator = $this->getMockBuilder('CM_Config_Generator')->setMethods(array('getActionVerbs'))->getMock();
         $generator->expects($this->any())->method('getActionVerbs')->will($this->returnValue($actionVerbs));
@@ -50,7 +49,6 @@ EOD;
 $config->CM_Action_Abstract->verbs = array();
 $config->CM_Action_Abstract->verbs[CM_Action_Abstract::CREATE] = 6;
 $config->CM_Action_Abstract->verbsMaxValue = 6;
-
 EOD;
         $generator = $this->getMockBuilder('CM_Config_Generator')->setMethods(array('getActionVerbs'))->getMock();
         $generator->expects($this->any())->method('getActionVerbs')->will($this->returnValue($actionVerbs));

@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge; requiresActiveX=true">
-    {if strlen($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
-    {if strlen($pageKeywords)}<meta name="keywords" content="{$pageKeywords|escape}">{/if}
+    {if isset($pageDescription)}<meta name="description" content="{$pageDescription|escape}">{/if}
+    {if isset($pageKeywords)}
+      <meta name="keywords" content="{$pageKeywords|escape}">{/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <meta name="msapplication-TileColor" content="{block name='tileColor'}#ffffff{/block}">
     <meta name="msapplication-TileImage" content="{resourceUrl path='img/tileImage.png' type='layout'}">
@@ -29,13 +30,13 @@
     <link rel="apple-touch-startup-image" href="{resourceUrl path='img/apple-touch-startup-image-320x460.png' type='layout'}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)">
 
     <link rel="shortcut icon" href="{resourceUrl path='img/favicon.ico' type='layout'}">
-    <title>{$title|escape}</title>
+    <title>{$pageTitle|escape}</title>
     {resourceCss file='all.css' type="vendor"}
     {resourceCss file='all.css' type="library"}
     {resourceJs file='before-body.js' type="vendor"}
     {block name='head'}{/block}
   </head>
-  <body id="{$viewObj->getAutoId()}" class="{$viewObj->getClassHierarchy()|implode:' '}">
+  <body id="{$viewResponse->getAutoId()}" class="{$viewResponse->getCssClasses()|implode:' '}">
 
     {if CM_Request_Abstract::hasInstance() && !CM_Request_Abstract::getInstance()->isSupported()}
       <div id="browserNotSupported">
@@ -48,7 +49,7 @@
     {block name='body-start'}{/block}
     <div id="body-container">
       {block name='body'}
-        {component name=$viewObj->getPage()}
+	    {$renderAdapter->fetchPage()}
       {/block}
     </div>
     {if CM_Bootloader::getInstance()->isDebug()}{component name='CM_Component_Debug'}{/if}
@@ -57,8 +58,7 @@
     {if $render->getLanguage()}
       {resourceJs file="translations/{CM_Model_Language::getVersionJavascript()}.js" type="library"}
     {/if}
-    {$render->getJs()->renderScripts()}
-    {$render->getJs()->getTracking()->getHtml($render->getSite())}
+    {$render->getGlobalResponse()->getHtml($render)}
     {block name='body-end'}{/block}
   </body>
 </html>

@@ -2,15 +2,11 @@
 
 class CM_FormField_Text extends CM_FormField_Abstract {
 
-    /**
-     * @param int|null     $lengthMin
-     * @param int|null     $lengthMax
-     * @param boolean|null $forbidBadwords
-     */
-    public function __construct($lengthMin = null, $lengthMax = null, $forbidBadwords = null) {
-        $this->_options['lengthMin'] = isset($lengthMin) ? (int) $lengthMin : null;
-        $this->_options['lengthMax'] = isset($lengthMax) ? (int) $lengthMax : null;
-        $this->_options['forbidBadwords'] = (boolean) $forbidBadwords;
+    protected function _initialize() {
+        $this->_options['lengthMin'] = $this->_params->has('lengthMin') ? $this->_params->getInt('lengthMin') : null;
+        $this->_options['lengthMax'] = $this->_params->has('lengthMax') ? $this->_params->getInt('lengthMax') : null;
+        $this->_options['forbidBadwords'] = $this->_params->getBoolean('forbidBadwords', false);
+        parent::_initialize();
     }
 
     public function filterInput($userInput) {
@@ -18,7 +14,7 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         return mb_convert_encoding($userInput, 'UTF-8', 'UTF-8');
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (isset($this->_options['lengthMax']) && mb_strlen($userInput) > $this->_options['lengthMax']) {
             throw new CM_Exception_FormFieldValidation('Too long');
         }
@@ -34,11 +30,11 @@ class CM_FormField_Text extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public function prepare(array $params) {
-        $this->setTplParam('autocorrect', isset($params['autocorrect']) ? $params['autocorrect'] : null);
-        $this->setTplParam('autocapitalize', isset($params['autocapitalize']) ? $params['autocapitalize'] : null);
-        $this->setTplParam('tabindex', isset($params['tabindex']) ? $params['tabindex'] : null);
-        $this->setTplParam('class', isset($params['class']) ? $params['class'] : null);
-        $this->setTplParam('placeholder', isset($params['placeholder']) ? $params['placeholder'] : null);
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('autocorrect', $renderParams->has('autocorrect') ? $renderParams->getString('autocorrect') : null);
+        $viewResponse->set('autocapitalize', $renderParams->has('autocapitalize') ? $renderParams->getString('autocapitalize') : null);
+        $viewResponse->set('tabindex', $renderParams->has('tabindex') ? $renderParams->getInt('tabindex') : null);
+        $viewResponse->set('class', $renderParams->has('class') ? $renderParams->getString('class') : null);
+        $viewResponse->set('placeholder', $renderParams->has('placeholder') ? $renderParams->getString('placeholder') : null);
     }
 }

@@ -38,7 +38,7 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
             . $this->_usercontentUrl . '3.jpg)nospace![image](' . $this->_usercontentUrl
             . '4.jpg)';
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
-        $actual = $filter->transform($text, new CM_Render());
+        $actual = $filter->transform($text, new CM_Frontend_Render());
 
         $this->assertSame($expected, $actual);
     }
@@ -47,16 +47,16 @@ class CM_Usertext_Filter_Markdown_UserContentTest extends CMTest_TestCase {
         $filter = new CM_Usertext_Filter_Markdown_UserContent($this->_serviceManager);
 
         $text = 'test ![formatter](1.jpg';
-        $actual = $filter->transform($text, new CM_Render());
+        $actual = $filter->transform($text, new CM_Frontend_Render());
         $this->assertSame($text, $actual);
 
         $text = '![formatter]()';
-        $actual = $filter->transform($text, new CM_Render());
+        $actual = $filter->transform($text, new CM_Frontend_Render());
         $this->assertSame($text, $actual);
 
         $text = '![formatter](]1.jpg)';
         $expected = '![image](' . $this->_usercontentUrl . ']1.jpg)';
-        $actual = $filter->transform($text, new CM_Render());
+        $actual = $filter->transform($text, new CM_Frontend_Render());
         $this->assertSame($expected, $actual);
     }
 }
