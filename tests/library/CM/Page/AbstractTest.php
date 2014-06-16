@@ -3,8 +3,8 @@
 class CM_Page_AbstractTest extends CMTest_TestCase {
 
     public function testGetClassnameByPath() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
-        $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
+        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
+        $site->expects($this->any())->method('getModules')->will($this->returnValue(array('Foo', 'Bar')));
 
         $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Bar_Page_Test', false);
         $this->assertEquals('Bar_Page_Test', CM_Page_Abstract::getClassnameByPath($site, '/test'));
@@ -18,8 +18,8 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
      * @expectedExceptionMessage page `Test` is not defined in any namespace
      */
     public function testGetClassnameByPathNotExists() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
-        $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('FooBar')));
+        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
+        $site->expects($this->any())->method('getModules')->will($this->returnValue(array('FooBar')));
 
         CM_Page_Abstract::getClassnameByPath($site, '/test');
     }
@@ -32,8 +32,8 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
     }
 
     public function testGetLayout() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
-        $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('Foo', 'Bar')));
+        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
+        $site->expects($this->any())->method('getModules')->will($this->returnValue(array('Foo', 'Bar')));
         /** @var CM_Page_Abstract $page */
         $environment = new CM_Frontend_Environment($site);
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
@@ -50,8 +50,8 @@ class CM_Page_AbstractTest extends CMTest_TestCase {
      * @expectedExceptionMessage layout `Default` is not defined in any namespace
      */
     public function testGetLayoutNotExists() {
-        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getNamespaces'))->getMock();
-        $site->expects($this->any())->method('getNamespaces')->will($this->returnValue(array('FooBar')));
+        $site = $this->getMockBuilder('CM_Site_Abstract')->setMethods(array('getModules'))->getMock();
+        $site->expects($this->any())->method('getModules')->will($this->returnValue(array('FooBar')));
         $environment = new CM_Frontend_Environment($site);
         /** @var CM_Page_Abstract $page */
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'Foo_Page_Test', false);
