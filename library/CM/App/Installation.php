@@ -55,12 +55,9 @@ class CM_App_Installation {
      * @throws CM_Exception_Invalid
      */
     public function getPackages() {
-        $packages = array();
-        /** @var \Composer\Package\CompletePackage[] $composerPackagesFiltered */
-        foreach ($this->getComposerPackagesFiltered() as $package) {
-            $packages[] = $this->_getPackageFromComposerPackage($package);
-        }
-        return $packages;
+        return \Functional\map($this->getComposerPackagesFiltered(), function (\Composer\Package\CompletePackage $package) {
+            return $this->_getPackageFromComposerPackage($package);
+        });
     }
 
     /**
