@@ -3,15 +3,17 @@
 class CM_Db_ClientTest extends CMTest_TestCase {
 
     public function testConstruct() {
-        $client = CMTest_TH::getDbClient();
-        $client->setDb(null);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        unset($config['db']);
+        $client = new CM_Db_Client($config);
         $this->assertFalse($client->isConnected());
         $client->connect();
         $this->assertTrue($client->isConnected());
     }
 
     public function testConstructSelectDb() {
-        $client = CMTest_TH::getDbClient();
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        $client = new CM_Db_Client($config);
         $this->assertFalse($client->isConnected());
         $client->connect();
         $this->assertTrue($client->isConnected());
@@ -28,8 +30,9 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testConnectDisconnect() {
-        $client = CMTest_TH::getDbClient();
-        $client->setDb(null);
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
+        unset($config['db']);
+        $client = new CM_Db_Client($config);
         $this->assertFalse($client->isConnected());
         $client->connect();
         $this->assertTrue($client->isConnected());
@@ -46,7 +49,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testGetLastInsertId() {
-        $client = CM_Db_Db::getClient();
+        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
         $client->createStatement('CREATE TABLE `test` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))')->execute();
         $this->assertSame(null, $client->getLastInsertId());
 
@@ -57,8 +60,7 @@ class CM_Db_ClientTest extends CMTest_TestCase {
     }
 
     public function testReconnectTimeout() {
-        $client = CMTest_TH::getDbClient();
-        $config = $client->getConfig();
+        $config = CM_Service_Manager::getInstance()->getDatabases()->getMaster()->getConfig();
         $config['reconnectTimeout'] = 5;
         $client = new CM_Db_Client($config);
         $client->connect();

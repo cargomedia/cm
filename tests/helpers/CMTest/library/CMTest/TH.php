@@ -262,14 +262,6 @@ class CMTest_TH {
         }
     }
 
-    /**
-     * @return CM_Db_Client
-     */
-    public static function getDbClient() {
-        $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
-        return new CM_Db_Client($client->getConfig());
-    }
-
     public static function randomizeAutoincrement() {
         $tables = CM_Db_Db::exec('SHOW TABLES')->fetchAllColumn();
         foreach ($tables as $table) {
