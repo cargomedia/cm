@@ -121,7 +121,8 @@ class CM_Db_Client {
         if (null !== $db) {
             $db = (string) $db;
             $this->_db = null;
-            $this->_getPdo()->exec('USE ' . $db);
+            $this->connect();
+            $this->_pdo->exec('USE ' . $db);
         }
         $this->_db = $db;
     }
@@ -130,7 +131,8 @@ class CM_Db_Client {
      * @param bool $enabled
      */
     public function setBuffered($enabled) {
-        $this->_getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
+        $this->connect();
+        $this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $enabled);
     }
 
     /**
@@ -186,14 +188,11 @@ class CM_Db_Client {
      * @return PDOStatement
      */
     public function createPdoStatement($sqlTemplate) {
-        if (!$this->isConnected()) {
-            $this->connect();
-        }
-
+        $this->connect();
         $retryCount = 1;
         for ($try = 0; true; $try++) {
             try {
-                return @$this->_getPdo()->prepare($sqlTemplate);
+                return @$this->_pdo->prepare($sqlTemplate);
             } catch (PDOException $e) {
                 if ($try < $retryCount && $this->isConnectionLossError($e)) {
                     $this->disconnect();
@@ -210,7 +209,8 @@ class CM_Db_Client {
      * @return string|null
      */
     public function getLastInsertId() {
-        $lastInsertId = $this->_getPdo()->lastInsertId();
+        $this->connect();
+        $lastInsertId = $this->_pdo->lastInsertId();
         if (!$lastInsertId) {
             return null;
         }
@@ -255,14 +255,6 @@ class CM_Db_Client {
      */
     public function quoteIdentifier($name) {
         return '`' . str_replace('`', '``', $name) . '`';
-    }
-
-    /**
-     * @return PDO
-     */
-    protected function _getPdo() {
-        $this->connect();
-        return $this->_pdo;
     }
 
     /**
