@@ -89,7 +89,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $theme = $this->getSite()->getTheme();
         }
         if (!$namespace) {
-            $namespace = $this->getSite()->getNamespace();
+            $namespace = $this->getSite()->getModule();
         }
 
         $path = CM_Util::getModulePath($namespace, !$absolute);
@@ -97,33 +97,33 @@ class CM_Frontend_Render extends CM_Class_Abstract {
     }
 
     /**
-     * @param string      $tpl Template file name
-     * @param string|null $namespace
+     * @param string      $template Template file name
+     * @param string|null $module
      * @param bool|null   $absolute
      * @param bool|null   $needed
-     * @return string Layout path based on theme
      * @throws CM_Exception_Invalid
+     * @return string Layout path based on theme
      */
-    public function getLayoutPath($tpl, $namespace = null, $absolute = null, $needed = true) {
-        $namespaceList = $this->getSite()->getNamespaces();
-        if ($namespace !== null) {
-            $namespaceList = array((string) $namespace);
+    public function getLayoutPath($template, $module = null, $absolute = null, $needed = true) {
+        $moduleList = $this->getSite()->getModules();
+        if ($module !== null) {
+            $moduleList = array((string) $module);
         }
-        foreach ($namespaceList as $namespace) {
+        foreach ($moduleList as $module) {
             foreach ($this->getSite()->getThemes() as $theme) {
-                $file = new CM_File($this->getThemeDir(true, $theme, $namespace) . $tpl);
+                $file = new CM_File($this->getThemeDir(true, $theme, $module) . $template);
                 if ($file->getExists()) {
                     if ($absolute) {
                         return $file->getPath();
                     } else {
-                        return $this->getThemeDir(false, $theme, $namespace) . $tpl;
+                        return $this->getThemeDir(false, $theme, $module) . $template;
                     }
                 }
             }
         }
 
         if ($needed) {
-            throw new CM_Exception_Invalid('Cannot find `' . $tpl . '` in namespaces `' . implode('`, `', $namespaceList) . '` and themes `' .
+            throw new CM_Exception_Invalid('Cannot find `' . $template . '` in namespaces `' . implode('`, `', $moduleList) . '` and themes `' .
                 implode('`, `', $this->getSite()->getThemes()) . '`');
         }
         return null;
@@ -186,7 +186,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             throw new CM_Exception_Invalid('Cannot find namespace of `' . $pageClassName . '`');
         }
         $namespace = $matches[1];
-        if (!in_array($namespace, $site->getNamespaces())) {
+        if (!in_array($namespace, $site->getModules())) {
             throw new CM_Exception_Invalid('Site `' . get_class($site) . '` does not contain namespace `' . $namespace . '`');
         }
         /** @var CM_Page_Abstract $pageClassName */
@@ -388,7 +388,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         }
 
         $pluginDirs = array(SMARTY_PLUGINS_DIR);
-        foreach ($this->getSite()->getNamespaces() as $namespace) {
+        foreach ($this->getSite()->getModules() as $namespace) {
             $pluginDirs[] = CM_Util::getModulePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
         }
         self::$_smarty->setPluginsDir($pluginDirs);

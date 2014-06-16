@@ -41,7 +41,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
             $pathToken = CM_Util::camelize($pathToken);
         }
 
-        foreach ($site->getNamespaces() as $namespace) {
+        foreach ($site->getModules() as $namespace) {
             $classname = $namespace . '_Page_' . implode('_', $pathTokens);
             if (class_exists($classname)) {
                 return $classname;
@@ -91,7 +91,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
         }
         $layoutName = (string) $layoutName;
 
-        foreach ($environment->getSite()->getNamespaces() as $namespace) {
+        foreach ($environment->getSite()->getModules() as $namespace) {
             $classname = $namespace . '_Layout_' . $layoutName;
             if (class_exists($classname)) {
                 return new $classname();

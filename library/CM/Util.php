@@ -82,7 +82,7 @@ class CM_Util {
      */
     public static function rglobLibraries($pattern, CM_Site_Abstract $site) {
         $paths = array();
-        foreach ($site->getNamespaces() as $namespace) {
+        foreach ($site->getModules() as $namespace) {
             $libraryPath = CM_Util::getModulePath($namespace) . 'library/' . $namespace . '/';
             $paths = array_merge($paths, CM_Util::rglob($pattern, $libraryPath));
         }
