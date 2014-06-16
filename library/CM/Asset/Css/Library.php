@@ -9,9 +9,9 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
     public function __construct(CM_Frontend_Render $render) {
         parent::__construct($render);
 
-        foreach (array_reverse($render->getSite()->getModules()) as $namespace) {
+        foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
             foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
-                $file = new CM_File($render->getThemeDir(true, $theme, $namespace) . 'variables.less');
+                $file = new CM_File($render->getThemeDir(true, $theme, $moduleName) . 'variables.less');
                 if ($file->getExists()) {
                     $this->add($file->read());
                 }
@@ -21,9 +21,9 @@ class CM_Asset_Css_Library extends CM_Asset_Css {
         if ($file->getExists()) {
             $this->add($file->read());
         }
-        foreach (array_reverse($render->getSite()->getModules()) as $namespace) {
+        foreach (array_reverse($render->getSite()->getModules()) as $moduleName) {
             foreach (array_reverse($render->getSite()->getThemes()) as $theme) {
-                foreach (CM_Util::rglob('*.less', $render->getThemeDir(true, $theme, $namespace) . 'css/') as $path) {
+                foreach (CM_Util::rglob('*.less', $render->getThemeDir(true, $theme, $moduleName) . 'css/') as $path) {
                     $file = new CM_File($path);
                     $this->add($file->read());
                 }

@@ -73,8 +73,8 @@ class CM_Component_Example extends CM_Component_Abstract {
     private function _getColorStyles() {
         $site = $this->getParams()->getSite('site');
         $style = '';
-        foreach (array_reverse($site->getModules()) as $namespace) {
-            $file = new CM_File(CM_Util::getModulePath($namespace) . 'layout/default/variables.less');
+        foreach (array_reverse($site->getModules()) as $moduleName) {
+            $file = new CM_File(CM_Util::getModulePath($moduleName) . 'layout/default/variables.less');
             if ($file->getExists()) {
                 $style .= $file->read() . PHP_EOL;
             }

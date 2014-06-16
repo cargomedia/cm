@@ -388,8 +388,8 @@ class CM_Frontend_Render extends CM_Class_Abstract {
         }
 
         $pluginDirs = array(SMARTY_PLUGINS_DIR);
-        foreach ($this->getSite()->getModules() as $namespace) {
-            $pluginDirs[] = CM_Util::getModulePath($namespace) . 'library/' . $namespace . '/SmartyPlugins';
+        foreach ($this->getSite()->getModules() as $moduleName) {
+            $pluginDirs[] = CM_Util::getModulePath($moduleName) . 'library/' . $moduleName . '/SmartyPlugins';
         }
         self::$_smarty->setPluginsDir($pluginDirs);
         self::$_smarty->loadFilter('pre', 'translate');
