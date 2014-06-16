@@ -7,6 +7,10 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
+        if (!isset($userInput['id']) || !isset($userInput['value'])) {
+            throw new CM_Exception_FormFieldValidation('Expected id and value.');
+        }
+
         return array(
             (int)$userInput['id'],
             (string)$userInput['value']
