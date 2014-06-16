@@ -159,7 +159,7 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
     }
 
     /**
-     * @expectedException CM_Exception_Nonexistent
+     * @expectedException CM_Exception_Invalid
      * @expectedExceptionMessage `v3`
      */
     public function testWeightedSplittest_variationNonExistent() {
