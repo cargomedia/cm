@@ -3,11 +3,11 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setup() {
-        $this->_getOutput()->writeln('Setting up filesystem…');
+        $this->_getError()->writeln('Setting up filesystem…');
         $this->setupFilesystem();
-        $this->_getOutput()->writeln('Setting up database…');
+        $this->_getError()->writeln('Setting up database…');
         $this->setupDatabase();
-        $this->_getOutput()->writeln('Setting up translations…');
+        $this->_getError()->writeln('Setting up translations…');
         $this->setupTranslations();
     }
 
@@ -24,7 +24,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fillCaches() {
-        $this->_getOutput()->writeln('Warming up caches…');
+        $this->_getError()->writeln('Warming up caches…');
         CM_App::getInstance()->fillCaches();
     }
 
@@ -32,7 +32,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setup();
         $this->setDeployVersion();
 
-        $dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput());
+        $dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput(), $this->_getError());
         $dbCli->runUpdates();
     }
 

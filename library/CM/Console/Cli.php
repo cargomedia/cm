@@ -14,8 +14,8 @@ class CM_Console_Cli extends CM_Cli_Runnable_Abstract {
                     $this->_getOutput()->writeln($result);
                 }
             } catch (Exception $e) {
-                $this->_getOutput()->writeln($e->getMessage());
-                $this->_getOutput()->writeln($e->getTraceAsString());
+                $this->_getError()->writeln($e->getMessage());
+                $this->_getError()->writeln($e->getTraceAsString());
             }
         }
     }

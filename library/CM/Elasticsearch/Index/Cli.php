@@ -12,7 +12,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes();
         }
         foreach ($indexes as $index) {
-            $this->_getOutput()->writeln('Creating index `' . $index->getIndex()->getName() . '`...');
+            $this->_getError()->writeln('Creating index `' . $index->getIndex()->getName() . '`...');
             $index->createVersioned();
             $index->getIndex()->refresh();
         }
@@ -33,7 +33,7 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
             $indexes = $this->_getIndexes($host, $port);
         }
         foreach ($indexes as $index) {
-            $this->_getOutput()->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
+            $this->_getError()->writeln('Updating index `' . $index->getIndex()->getName() . '`...');
             $indexName = $index->getIndex()->getName();
             $key = 'Search.Updates_' . $index->getType()->getName();
             try {

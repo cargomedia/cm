@@ -19,7 +19,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         if (0 === count($svgFileList)) {
             throw new CM_Exception_Invalid('Cannot process `0` icons');
         }
-        $this->_getOutput()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
+        $this->_getError()->writeln('Processing ' . count($svgFileList) . ' unique icons...');
 
         $dirWork = CM_File::createTmpDir();
         foreach ($svgFileList as $fontFile) {
@@ -72,7 +72,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         $codes = array();
         foreach ($paging as $emoticon) {
             if (false !== array_search('', $emoticon['codes'])) {
-                $this->_getOutput()->writeln('WARNING: Empty emoticon with ID `' . $emoticon['id'] . '`.');
+                $this->_getError()->writeln('WARNING: Empty emoticon with ID `' . $emoticon['id'] . '`.');
                 return;
             }
             $codes = array_merge($codes, $emoticon['codes']);
@@ -80,7 +80,7 @@ class CM_Css_Cli extends CM_Cli_Runnable_Abstract {
         for ($i = 0; $i < count($codes); $i++) {
             for ($j = $i + 1; $j < count($codes); $j++) {
                 if (false !== strpos($codes[$i], $codes[$j]) || false !== strpos($codes[$j], $codes[$i])) {
-                    $this->_getOutput()->writeln('WARNING: Emoticon intersection: `' . $codes[$i] . '` <-> `' . $codes[$j] . '`.');
+                    $this->_getError()->writeln('WARNING: Emoticon intersection: `' . $codes[$i] . '` <-> `' . $codes[$j] . '`.');
                 }
             }
         }
