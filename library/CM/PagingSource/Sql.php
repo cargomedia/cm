@@ -88,7 +88,12 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($offset !== null && $count !== null) {
                 $query .= ' LIMIT ' . $offset . ',' . $count;
             }
-            $result = $this->_dbSlave ? CM_Db_Db::execRead($query, $this->_parameters) : CM_Db_Db::exec($query, $this->_parameters);
+            if ($this->_dbSlave) {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
+            } else {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            }
+            $result = CM_Db_Db::exec($query, $this->_parameters, null, $client);
             $items = $result->fetchAll();
             $this->_cacheSet($cacheKey, $items);
         }
