@@ -3,29 +3,29 @@
 abstract class CM_Cli_Runnable_Abstract {
 
     /** @var CM_InputStream_Interface */
-    private $_input;
+    private $_streamInput;
 
     /** @var CM_OutputStream_Interface */
-    private $_output, $_error;
+    private $_streamOutput, $_streamError;
 
     /**
-     * @param CM_InputStream_Interface|null  $input
-     * @param CM_OutputStream_Interface|null $output
-     * @param CM_OutputStream_Interface|null $error
+     * @param CM_InputStream_Interface|null  $streamInput
+     * @param CM_OutputStream_Interface|null $streamOutput
+     * @param CM_OutputStream_Interface|null $streamError
      */
-    public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null, CM_OutputStream_Interface $error = null) {
-        if (null === $input) {
-            $input = new CM_InputStream_Null();
+    public function __construct(CM_InputStream_Interface $streamInput = null, CM_OutputStream_Interface $streamOutput = null, CM_OutputStream_Interface $streamError = null) {
+        if (null === $streamInput) {
+            $streamInput = new CM_InputStream_Null();
         }
-        $this->_input = $input;
-        if (null === $output) {
-            $output = new CM_OutputStream_Null();
+        $this->_streamInput = $streamInput;
+        if (null === $streamOutput) {
+            $streamOutput = new CM_OutputStream_Null();
         }
-        $this->_output = $output;
-        if (null === $error) {
-            $error = new CM_OutputStream_Null();
+        $this->_streamOutput = $streamOutput;
+        if (null === $streamError) {
+            $streamError = new CM_OutputStream_Null();
         }
-        $this->_error = $error;
+        $this->_streamError = $streamError;
     }
 
     /**
@@ -42,28 +42,28 @@ abstract class CM_Cli_Runnable_Abstract {
             'Class name'   => get_class($this),
         );
         foreach ($details as $name => $value) {
-            $this->_getOutput()->writeln(str_pad($name . ':', 20) . $value);
+            $this->_getStreamOutput()->writeln(str_pad($name . ':', 20) . $value);
         }
     }
 
     /**
      * @return CM_OutputStream_Interface
      */
-    protected function _getError() {
-        return $this->_error;
+    protected function _getStreamError() {
+        return $this->_streamError;
     }
 
     /**
      * @return CM_InputStream_Interface
      */
-    protected function _getInput() {
-        return $this->_input;
+    protected function _getStreamInput() {
+        return $this->_streamInput;
     }
 
     /**
      * @return CM_OutputStream_Interface
      */
-    protected function _getOutput() {
-        return $this->_output;
+    protected function _getStreamOutput() {
+        return $this->_streamOutput;
     }
 }

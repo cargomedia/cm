@@ -3,7 +3,7 @@
 class CM_Console_Cli extends CM_Cli_Runnable_Abstract {
 
     public function interactive() {
-        while ('exit' !== ($code = $this->_getInput()->read('php >'))) {
+        while ('exit' !== ($code = $this->_getStreamInput()->read('php >'))) {
             $result = null;
             try {
                 ob_start();
@@ -11,11 +11,11 @@ class CM_Console_Cli extends CM_Cli_Runnable_Abstract {
                 $result = ob_get_contents();
                 ob_end_clean();
                 if ($result) {
-                    $this->_getOutput()->writeln($result);
+                    $this->_getStreamOutput()->writeln($result);
                 }
             } catch (Exception $e) {
-                $this->_getError()->writeln($e->getMessage());
-                $this->_getError()->writeln($e->getTraceAsString());
+                $this->_getStreamError()->writeln($e->getMessage());
+                $this->_getStreamError()->writeln($e->getTraceAsString());
             }
         }
     }

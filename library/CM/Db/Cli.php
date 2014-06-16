@@ -19,7 +19,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
 
     public function runUpdates() {
         $app = CM_App::getInstance();
-        $output = $this->_getOutput();
+        $output = $this->_getStreamOutput();
         $output->writeln('Running database updates…');
         $app->runUpdateScripts(function ($version) use ($output) {
             $output->writeln('  Running update ' . $version . '…');

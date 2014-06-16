@@ -10,14 +10,14 @@ class CM_Cli_CommandManager {
     /** @var int */
     private $_forks = null;
 
+    /** @var CM_OutputStream_Interface */
+    private $_streamError;
+
     /** @var CM_InputStream_Interface */
     private $_streamInput;
 
     /** @var CM_OutputStream_Interface */
     private $_streamOutput;
-
-    /** @var CM_OutputStream_Interface */
-    private $_streamError;
 
     public function __construct() {
         $this->_commands = array();
@@ -274,23 +274,23 @@ class CM_Cli_CommandManager {
     }
 
     /**
-     * @param CM_InputStream_Interface $input
+     * @param CM_InputStream_Interface $streamInput
      */
-    private function _setStreamInput(CM_InputStream_Interface $input) {
-        $this->_streamInput = $input;
+    private function _setStreamInput(CM_InputStream_Interface $streamInput) {
+        $this->_streamInput = $streamInput;
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
+     * @param CM_OutputStream_Interface $streamOutput
      */
-    private function _setStreamOutput(CM_OutputStream_Interface $output) {
-        $this->_streamOutput = $output;
+    private function _setStreamOutput(CM_OutputStream_Interface $streamOutput) {
+        $this->_streamOutput = $streamOutput;
     }
 
     /**
-     * @param CM_OutputStream_Interface $output
+     * @param CM_OutputStream_Interface $streamError
      */
-    private function _setStreamError(CM_OutputStream_Interface $output) {
-        $this->_streamError = $output;
+    private function _setStreamError(CM_OutputStream_Interface $streamError) {
+        $this->_streamError = $streamError;
     }
 }

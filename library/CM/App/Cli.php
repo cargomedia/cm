@@ -3,11 +3,11 @@
 class CM_App_Cli extends CM_Cli_Runnable_Abstract {
 
     public function setup() {
-        $this->_getError()->writeln('Setting up filesystem…');
+        $this->_getStreamError()->writeln('Setting up filesystem…');
         $this->setupFilesystem();
-        $this->_getError()->writeln('Setting up database…');
+        $this->_getStreamError()->writeln('Setting up database…');
         $this->setupDatabase();
-        $this->_getError()->writeln('Setting up translations…');
+        $this->_getStreamError()->writeln('Setting up translations…');
         $this->setupTranslations();
     }
 
@@ -24,7 +24,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     public function fillCaches() {
-        $this->_getError()->writeln('Warming up caches…');
+        $this->_getStreamError()->writeln('Warming up caches…');
         CM_App::getInstance()->fillCaches();
     }
 
@@ -32,7 +32,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $this->setup();
         $this->setDeployVersion();
 
-        $dbCli = new CM_Db_Cli($this->_getInput(), $this->_getOutput(), $this->_getError());
+        $dbCli = new CM_Db_Cli($this->_getStreamInput(), $this->_getStreamOutput(), $this->_getStreamError());
         $dbCli->runUpdates();
     }
 
@@ -46,13 +46,13 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $classTypesConfig = $generator->generateConfigClassTypes();
         $actionVerbsConfig = $generator->generateConfigActionVerbs();
         foreach ($generator->getClassTypesRemoved() as $classRemoved) {
-            $this->_getOutput()->writeln('Removed `' . $classRemoved . '`');
+            $this->_getStreamOutput()->writeln('Removed `' . $classRemoved . '`');
         }
         foreach ($generator->getClassTypesAdded() as $type => $classAdded) {
-            $this->_getOutput()->writeln('Added `' . $classAdded . '` with type `' . $type . '`');
+            $this->_getStreamOutput()->writeln('Added `' . $classAdded . '` with type `' . $type . '`');
         }
         CM_File::create($path, $fileHeader . PHP_EOL . $classTypesConfig . PHP_EOL . PHP_EOL . $actionVerbsConfig . PHP_EOL);
-        $this->_getOutput()->writeln('Created `' . $path . '`');
+        $this->_getStreamOutput()->writeln('Created `' . $path . '`');
 
         // Create model class types and action verbs config JS
         $path = DIR_ROOT . 'resources/config/js/internal.js';
@@ -60,7 +60,7 @@ class CM_App_Cli extends CM_Cli_Runnable_Abstract {
         $modelTypesConfig = 'cm.model.types = ' . CM_Params::encode(array_flip($classTypes['CM_Model_Abstract']), true) . ';';
         $actionTypesConfig = 'cm.action.types = ' . CM_Params::encode(array_flip($classTypes['CM_Action_Abstract']), true) . ';';
         CM_File::create($path, $modelTypesConfig . PHP_EOL . $actionTypesConfig . PHP_EOL);
-        $this->_getOutput()->writeln('Created `' . $path . '`');
+        $this->_getStreamOutput()->writeln('Created `' . $path . '`');
     }
 
     /**
