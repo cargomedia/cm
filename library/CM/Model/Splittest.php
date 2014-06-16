@@ -232,29 +232,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         if (!array_key_exists($this->getId(), $variationFixtureList)) {
-            if (!isset($this->_variationWeightList)) {
-                $variation = $this->getVariationsEnabled()->getItemRand();
-            } else {
-                $variationList = array();
-                $variationWeightList = array();
-                /** @var CM_Model_SplittestVariation $variation */
-                foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-                    $variationName = $variation->getName();
-                    if (isset($this->_variationWeightList[$variationName])) {
-                        $variationList[] = $variation;
-                        $variationWeightList[] = $this->_variationWeightList[$variationName];
-                    }
-                }
-                if (empty($variationList)) {
-                    $variation = null;
-                } else {
-                    $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
-                    $variation = $weightedRandom->lookup();
-                }
-            }
-            if (!$variation) {
-                throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
-            }
+            $variation = $this->_getVariationRandom();
             CM_Db_Db::replace('cm_splittestVariation_fixture',
                 array('splittestId' => $this->getId(), $columnId => $fixtureId, 'variationId' => $variation->getId(), 'createStamp' => time()));
             $variationFixtureList[$this->getId()] = $variation->getName();
@@ -266,5 +244,36 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         }
 
         return $variationFixtureList[$this->getId()];
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return CM_Model_SplittestVariation
+     */
+    protected function _getVariationRandom() {
+        if (!isset($this->_variationWeightList)) {
+            $variation = $this->getVariationsEnabled()->getItemRand();
+        } else {
+            $variationList = array();
+            $variationWeightList = array();
+            /** @var CM_Model_SplittestVariation $variation */
+            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+                $variationName = $variation->getName();
+                if (isset($this->_variationWeightList[$variationName])) {
+                    $variationList[] = $variation;
+                    $variationWeightList[] = $this->_variationWeightList[$variationName];
+                }
+            }
+            if (empty($variationList)) {
+                $variation = null;
+            } else {
+                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+                $variation = $weightedRandom->lookup();
+            }
+        }
+        if (!$variation) {
+            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+        }
+        return $variation;
     }
 }
