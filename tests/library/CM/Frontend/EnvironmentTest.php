@@ -20,6 +20,25 @@ class CM_Frontend_EnvironmentTest extends CMTest_TestCase {
         $this->assertSame($location, $environment->getLocation());
     }
 
+    public function testSetNull() {
+        $environment = new CM_Frontend_Environment();
+        $this->assertEquals(CM_Site_Abstract::factory(), $environment->getSite());
+        $this->assertNull($environment->getViewer());
+        $this->assertNull($environment->getLanguage());
+        $this->assertSame('en', $environment->getLocale());
+        $this->assertEquals(CM_Bootloader::getInstance()->getTimeZone(), $environment->getTimeZone());
+        $this->assertSame(CM_Bootloader::getInstance()->isDebug(), $environment->isDebug());
+        $this->assertNull($environment->getLocation());
+    }
+
+    /**
+     * @expectedException CM_Exception_AuthRequired
+     */
+    public function testGetViewerNeeded() {
+        $environment = new CM_Frontend_Environment();
+        $environment->getViewer(true);
+    }
+
     public function testHasViewer() {
         $environment = new CM_Frontend_Environment();
         $this->assertFalse($environment->hasViewer());
