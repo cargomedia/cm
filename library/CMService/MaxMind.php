@@ -70,10 +70,9 @@ class CMService_MaxMind extends CM_Class_Abstract {
         $this->_upgradeCityList();
         $this->_upgradeZipCodeList();
         $this->_upgradeIpBlocks();
-        $this->_errorStream->writeln('Updating search index…');
         CM_Model_Location::createAggregation();
         $type = new CM_Elasticsearch_Type_Location();
-        $searchIndexCli = new CM_Elasticsearch_Index_Cli();
+        $searchIndexCli = new CM_Elasticsearch_Index_Cli(null, $this->_outputStream, $this->_errorStream);
         $searchIndexCli->create($type->getIndex()->getName());
     }
 
