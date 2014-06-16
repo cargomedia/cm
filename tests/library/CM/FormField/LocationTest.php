@@ -7,8 +7,7 @@ class CM_FormField_LocationTest extends CMTest_TestCase {
         $location = CMTest_TH::createLocation();
         $locationCity = $location->get(CM_Model_Location::LEVEL_CITY);
 
-        $mocka = new Mocka();
-        $requestMockClass = $mocka->mockClass('CM_Request_Abstract');
+        $requestMockClass = $this->mockClass('CM_Request_Abstract');
         $requestMockClass->mockMethod('getLocation')
             ->at(0, function () {
                 return null;
