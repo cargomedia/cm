@@ -11,10 +11,10 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
             '60' => 0,
         );
         $currently = new DateTime();
-        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), $counter);
-        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), $counter);
-        $this->_createEvent($manager, $currently, new DateInterval('PT5S'), $counter);
-        $this->_createEvent($manager, $currently, new DateInterval('PT60S'), $counter);
+        $this->_createEvent($manager, $currently, new DateInterval('PT1S'), $counter, 'event1');
+        $this->_createEvent($manager, $currently, new DateInterval('PT2S'), $counter, 'event2');
+        $this->_createEvent($manager, $currently, new DateInterval('PT5S'), $counter, 'event3');
+        $this->_createEvent($manager, $currently, new DateInterval('PT60S'), $counter, 'event4');
 
         for ($i = 0; $i < 100; $i++) {
             $currently->add(new DateInterval('PT1S'));
@@ -33,13 +33,14 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
      * @param DateTime             $timeReference
      * @param DateInterval         $interval
      * @param array                $counter
+     * @param string               $name
      */
-    private function _createEvent(CM_Clockwork_Manager $manager, DateTime $timeReference, DateInterval $interval, &$counter) {
+    private function _createEvent(CM_Clockwork_Manager $manager, DateTime $timeReference, DateInterval $interval, &$counter, $name) {
         $callback = function () use (&$counter, $interval) {
             $key = $interval->s;
             $counter[$key]++;
         };
-        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array('event', $interval))->getMock();
+        $event = $this->getMockBuilder('CM_Clockwork_Event')->setMethods(array('_getCurrentDateTime'))->setConstructorArgs(array($name, $interval, new DateTime()))->getMock();
         $event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($timeReference) {
             return clone $timeReference;
         }));

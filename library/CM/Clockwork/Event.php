@@ -15,12 +15,18 @@ class CM_Clockwork_Event {
     private $_callbacks;
 
     /**
-     * @param string       $name
-     * @param DateInterval $interval
+     * @param string        $name
+     * @param DateInterval  $interval
+     * @param DateTime|null $nextRun
      */
-    public function __construct($name, DateInterval $interval) {
+    public function __construct($name, DateInterval $interval, DateTime $nextRun = null) {
         $this->_name = (string) $name;
         $this->_interval = $interval;
+        if (null === $nextRun) {
+            $nextRun = $this->_getCurrentDateTime();
+            $nextRun->add($interval);
+        }
+        $this->_nextRun = $nextRun;
         $this->_callbacks = array();
     }
 
