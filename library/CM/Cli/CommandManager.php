@@ -63,6 +63,7 @@ class CM_Cli_CommandManager {
         $forks = (int) $forks;
         if ($quiet) {
             $this->_setStreamOutput(new CM_OutputStream_Null());
+            $this->_setStreamError(new CM_OutputStream_Null());
         }
         if ($quietWarnings) {
             CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
@@ -151,9 +152,10 @@ class CM_Cli_CommandManager {
             $transactionName = 'cm ' . $packageName . ' ' . $methodName;
             $streamInput = $this->_streamInput;
             $streamOutput = $this->_streamOutput;
-            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput) {
+            $streamError = $this->_streamError;
+            $workload = function () use ($transactionName, $command, $arguments, $streamInput, $streamOutput, $streamError) {
                 CMService_Newrelic::getInstance()->startTransaction($transactionName);
-                $command->run($arguments, $streamInput, $streamOutput);
+                $command->run($arguments, $streamInput, $streamOutput, $streamError);
             };
 
             $forks = max($this->_forks, 1);

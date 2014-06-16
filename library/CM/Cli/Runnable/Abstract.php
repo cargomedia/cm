@@ -6,13 +6,14 @@ abstract class CM_Cli_Runnable_Abstract {
     private $_input;
 
     /** @var CM_OutputStream_Interface */
-    private $_output;
+    private $_output, $_error;
 
     /**
      * @param CM_InputStream_Interface|null  $input
      * @param CM_OutputStream_Interface|null $output
+     * @param CM_OutputStream_Interface|null $error
      */
-    public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null) {
+    public function __construct(CM_InputStream_Interface $input = null, CM_OutputStream_Interface $output = null, CM_OutputStream_Interface $error = null) {
         if (null === $input) {
             $input = new CM_InputStream_Null();
         }
@@ -21,6 +22,10 @@ abstract class CM_Cli_Runnable_Abstract {
             $output = new CM_OutputStream_Null();
         }
         $this->_output = $output;
+        if (null === $error) {
+            $error = new CM_OutputStream_Null();
+        }
+        $this->_error = $error;
     }
 
     /**
@@ -44,8 +49,8 @@ abstract class CM_Cli_Runnable_Abstract {
     /**
      * @return CM_OutputStream_Interface
      */
-    protected function _getOutput() {
-        return $this->_output;
+    protected function _getError() {
+        return $this->_error;
     }
 
     /**
@@ -53,5 +58,12 @@ abstract class CM_Cli_Runnable_Abstract {
      */
     protected function _getInput() {
         return $this->_input;
+    }
+
+    /**
+     * @return CM_OutputStream_Interface
+     */
+    protected function _getOutput() {
+        return $this->_output;
     }
 }

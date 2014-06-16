@@ -8,7 +8,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @synchronized
      */
     public function outdated(CM_File $geoIpFile = null, $verbose = null) {
-        $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), new CM_OutputStream_Stream_StandardError(), null, $verbose);
+        $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), $this->_getError(), null, $verbose);
         $maxMind->outdated();
     }
 
@@ -19,7 +19,7 @@ class CM_Location_Cli extends CM_Cli_Runnable_Abstract {
      * @synchronized
      */
     public function upgrade(CM_File $geoIpFile = null, $withoutIpBlocks = null, $verbose = null) {
-        $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), new CM_OutputStream_Stream_StandardError(), $withoutIpBlocks, $verbose);
+        $maxMind = new CMService_MaxMind($geoIpFile, $this->_getOutput(), $this->_getError(), $withoutIpBlocks, $verbose);
         $maxMind->upgrade();
     }
 

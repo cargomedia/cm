@@ -21,12 +21,12 @@ class CM_Cli_Command {
      * @param CM_Cli_Arguments          $arguments
      * @param CM_InputStream_Interface  $input
      * @param CM_OutputStream_Interface $output
-     * @throws CM_Cli_Exception_InvalidArguments
+     * @param CM_OutputStream_Interface $error
      */
-    public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output) {
+    public function run(CM_Cli_Arguments $arguments, CM_InputStream_Interface $input, CM_OutputStream_Interface $output, CM_OutputStream_Interface $error) {
         $parameters = $arguments->extractMethodParameters($this->_method);
         $arguments->checkUnused();
-        call_user_func_array(array($this->_class->newInstance($input, $output), $this->_method->getName()), $parameters);
+        call_user_func_array(array($this->_class->newInstance($input, $output, $error), $this->_method->getName()), $parameters);
     }
 
     /**
