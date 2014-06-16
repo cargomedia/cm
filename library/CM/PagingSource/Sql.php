@@ -58,7 +58,12 @@ class CM_PagingSource_Sql extends CM_PagingSource_Abstract {
             if ($this->_group) {
                 $query .= ' GROUP BY ' . $this->_group;
             }
-            $result = $this->_dbSlave ? CM_Db_Db::execRead($query, $this->_parameters) : CM_Db_Db::exec($query, $this->_parameters);
+            if ($this->_dbSlave) {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getRead();
+            } else {
+                $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            }
+            $result = CM_Db_Db::exec($query, $this->_parameters, null, $client);
             if ($this->_group) {
                 $count = (int) count($result->fetchAll());
             } else {
