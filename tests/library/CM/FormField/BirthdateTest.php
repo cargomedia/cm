@@ -3,7 +3,7 @@
 class CM_FormField_BirthdateTest extends CMTest_TestCase {
 
     public function testValidate() {
-        $formField = new CM_FormField_Birthdate(['name' => 'foo', 'minAge' => 18, 'maxAge' => 30]);
+        $formField = new CM_FormField_Birthdate(['name' => 'foo', 'minAge' => 18, 'maxAge' => 40]);
         $environment = new CM_Frontend_Environment();
         $parsedValue = $formField->parseUserInput(array('year' => 1984, 'month' => 1, 'day' => 1));
         $formField->validate($environment, $parsedValue);

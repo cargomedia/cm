@@ -12,8 +12,8 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
         $this->_minAge = $this->_params->getInt('minAge');
         $this->_maxAge = $this->_params->getInt('maxAge');
 
-        $this->_params->set('yearFirst', date('Y') - $this->_minAge);
-        $this->_params->set('yearLast', date('Y') - $this->_maxAge);
+        $this->_params->set('yearLast', date('Y') - $this->_minAge);
+        $this->_params->set('yearFirst', date('Y') - $this->_maxAge);
         parent::_initialize();
     }
 

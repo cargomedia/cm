@@ -159,6 +159,7 @@ abstract class CM_Form_Abstract extends CM_View_Abstract {
             try {
                 $filteredInput = $field->filterInput($userInput);
                 $parsedInput = $field->parseUserInput($filteredInput);
+
                 $field->validate($environment, $parsedInput);
                 $validValues[$name] = $parsedInput;
             } catch (CM_Exception_FormFieldValidation $e) {
