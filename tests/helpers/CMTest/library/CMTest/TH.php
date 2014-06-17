@@ -11,6 +11,7 @@ class CMTest_TH {
 
     public static function init() {
         CM_App::getInstance()->setupDatabase(true);
+        CM_Bootloader::getInstance()->getExceptionHandler()->setPrintSeverityMin(CM_Exception::ERROR);
 
         self::$_configBackup = serialize(CM_Config::get());
 
