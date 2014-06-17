@@ -45,10 +45,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Frontend_Environment $environment
      */
-    public function setValueByRequest(CM_Request_Abstract $request) {
-        $location = $request->getLocation();
+    public function setValueByEnvironment(CM_Frontend_Environment $environment) {
+        $location = $environment->getLocation();
         $location = $this->_squashLocationInConstraints($location);
         if (null !== $location) {
             $this->setValue($location);
