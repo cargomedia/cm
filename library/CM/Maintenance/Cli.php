@@ -10,12 +10,14 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
      */
     public function start() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start', new CM_Clockwork_PersistenceAdapter_File()));
         $this->_registerCallbacks();
         $this->_clockworkManager->start();
     }
 
     public function startLocal() {
         $this->_clockworkManager = new CM_Clockwork_Manager();
+        $this->_clockworkManager->setPersistence(new CM_Clockwork_Persistence('maintenance-start-local', new CM_Clockwork_PersistenceAdapter_File()));
         $this->_registerCallbacksLocal();
         $this->_clockworkManager->start();
     }
@@ -92,8 +94,9 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
     /**
      * @param DateInterval $interval
      * @param Closure[]    $callbacks
+     * @param DateTime     $nextRun
      */
-    protected function _registerClockworkCallbacks(DateInterval $interval, $callbacks) {
+    protected function _registerClockworkCallbacks(DateInterval $interval, $callbacks, DateTime $nextRun = null) {
         foreach ($callbacks as $name => $callback) {
             $transactionName = 'cm ' . static::getPackageName() . ' start: ' . $name;
             $this->_clockworkManager->registerCallback($name, $interval, function () use ($transactionName, $callback) {
@@ -104,7 +107,7 @@ class CM_Maintenance_Cli extends CM_Cli_Runnable_Abstract {
                     CM_Bootloader::getInstance()->getExceptionHandler()->handleException($e);
                 }
                 CMService_Newrelic::getInstance()->endTransaction();
-            });
+            }, $nextRun);
         }
     }
 }
