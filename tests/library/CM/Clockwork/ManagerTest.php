@@ -31,7 +31,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
     public function testRunEventsPersistence() {
         $currently = new DateTime();
         $context = 'foo';
-        var_dump($this->_getCurrentDateTime());
         $adapter = $this->getMockBuilder('CM_Clockwork_PersistenceAdapter_Abstract')->disableOriginalConstructor()->setMethods(array('load', 'save'))
             ->getMockForAbstractClass();
         $adapter->expects($this->any())->method('load')->will($this->returnValue(array('event2' => $this->_getCurrentDateTime())));
@@ -56,7 +55,6 @@ class CM_Clockwork_ManagerTest extends CMTest_TestCase {
         $this->_createEvent($manager, $currently, new DateInterval('PT1S'), $counter, 'event1');
         $this->_createEvent($manager, $currently, new DateInterval('PT2S'), $counter, 'event2');
 
-        echo 'Start: ' . $this->_getCurrentDateTime()->format('s') . PHP_EOL;
         for ($i = 0; $i < 6; $i++) {
             $currently->add(new DateInterval('PT1S'));
             $manager->runEvents();
