@@ -47,6 +47,7 @@ class CM_Clockwork_Event {
             if ($lastRuntime->add($this->_interval) > $this->_getCurrentDateTime()) {
                 return false;
             }
+            return true;
         }
         return $this->_getCurrentDateTime() >= $this->_nextRun;
     }

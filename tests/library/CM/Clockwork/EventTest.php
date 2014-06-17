@@ -23,6 +23,22 @@ class CM_Clockwork_EventTest extends CMTest_TestCase {
         $future = clone $currently;
         $future->add(new DateInterval('PT1S'));
         $this->assertFalse($event->shouldRun($future));
+
+        $event->expects($this->any())->method('_getCurrentDateTime')->will($this->returnCallback(function () use ($currently) {
+            return clone $currently;
+        }));
+
+        $future = clone $currently;
+        $future->add(new DateInterval('PT5S'));
+        $event->__construct('event', new DateInterval('PT2S'), $future);
+
+        $currently->add(new DateInterval('PT2S'));
+        $this->assertFalse($event->shouldRun());
+
+        $past = clone $currently;
+        $past->sub(new DateInterval('PT2S'));
+
+        $this->assertTrue($event->shouldRun($past));
     }
 
     public function testRun() {
