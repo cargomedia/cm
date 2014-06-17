@@ -2,7 +2,7 @@
 
 class CM_Frontend_Environment extends CM_Class_Abstract {
 
-    /** @var CM_Site_Abstract */
+    /** @var CM_Site_Abstract|null */
     protected $_site;
 
     /** @var CM_Model_User|null */
@@ -11,10 +11,10 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Language|null */
     protected $_language;
 
-    /** @var DateTimeZone */
+    /** @var DateTimeZone|null */
     protected $_timeZone;
 
-    /** @var boolean */
+    /** @var bool|null */
     protected $_debug;
 
     /** @var CM_Model_Location|null */
@@ -85,7 +85,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param \CM_Model_Language|null $language
+     * @param CM_Model_Language|null $language
      */
     public function setLanguage(CM_Model_Language $language = null) {
         $this->_language = $language;
@@ -128,7 +128,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @param bool $debug
+     * @param bool|null $debug
      */
     public function setDebug($debug = null) {
         if (null !== $debug) {
