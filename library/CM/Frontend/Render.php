@@ -84,11 +84,8 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @return string
      */
     public function parseTemplateContent($content, array $variables = null) {
-        $content = (string) $content;
-        $variables = (array) $variables;
-        $filesystem = CM_Service_Manager::getInstance()->getFilesystems()->getTmp();
-        $file = CM_File::create(uniqid() . '.tpl', $content, $filesystem);
-        return $this->fetchTemplate($filesystem->getAdapter()->getPathPrefix() . '/' . $file->getPath(), $variables);
+        $content = 'string:' . $content;
+        return $this->fetchTemplate($content, $variables);
     }
 
     /**
