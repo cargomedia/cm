@@ -5,13 +5,18 @@ class CM_Clockwork_Persistence {
     /** @var CM_Clockwork_PersistenceAdapter_Abstract */
     private $_adapter;
 
+    /** @var string */
+    private $_context;
+
     /** @var array */
     private $_data = null;
 
     /**
+     * @param string                                   $context
      * @param CM_Clockwork_PersistenceAdapter_Abstract $adapter
      */
-    public function __construct(CM_Clockwork_PersistenceAdapter_Abstract $adapter) {
+    public function __construct($context, CM_Clockwork_PersistenceAdapter_Abstract $adapter) {
+        $this->_context = (string) $context;
         $this->_adapter = $adapter;
     }
 
@@ -34,12 +39,12 @@ class CM_Clockwork_Persistence {
     public function setRuntime(CM_Clockwork_Event $event, DateTime $runTime) {
         $this->_load();
         $this->_data[$event->getName()] = clone $runTime;
-        $this->_adapter->save($this->_data);
+        $this->_adapter->save($this->_context, $this->_data);
     }
 
     protected function _load() {
         if (null === $this->_data) {
-            $this->_data = $this->_adapter->load();
+            $this->_data = $this->_adapter->load($this->_context);
         }
     }
 }

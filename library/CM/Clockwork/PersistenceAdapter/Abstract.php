@@ -2,23 +2,15 @@
 
 abstract class CM_Clockwork_PersistenceAdapter_Abstract {
 
-    /** @var string  */
-    private $_context;
-
     /**
-     * @param $context
-     */
-    public function __construct($context) {
-        $this->_context = (string) $context;
-    }
-
-    /**
+     * @param string $context
      * @return DateTime[]
      */
-    abstract public function load();
+    abstract public function load($context);
 
     /**
+     * @param string     $context
      * @param DateTime[] $data
      */
-    abstract public function save(array $data);
+    abstract public function save($context, array $data);
 }
