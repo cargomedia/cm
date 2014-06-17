@@ -3,6 +3,26 @@
 class CM_App_ComposerFactory extends CM_Class_Abstract {
 
     /**
+     * @param string $rootDir
+     * @return \Composer\Composer
+     */
+    public function createComposerFromRootDir($rootDir) {
+        $composerPath = $rootDir . 'composer.json';
+        $composerFile = new Composer\Json\JsonFile($composerPath);
+        $composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
+        $localConfig = $composerFile->read();
+
+        $composerFactory = new CM_App_ComposerFactory();
+        $composer = $composerFactory->createComposer($localConfig);
+
+        $vendorDir = $rootDir . $composer->getConfig()->get('vendor-dir');
+        $vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
+        $vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
+        $composer->getRepositoryManager()->setLocalRepository($vendorRepository);
+        return $composer;
+    }
+
+    /**
      * @param array $localConfig
      * @return \Composer\Composer
      */

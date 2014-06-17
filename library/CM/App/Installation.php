@@ -55,6 +55,16 @@ class CM_App_Installation {
      * @throws CM_Exception_Invalid
      */
     public function getPackages() {
+        return \Functional\map($this->getComposerPackagesFiltered(), function (\Composer\Package\CompletePackage $package) {
+            return $this->_getPackageFromComposerPackage($package);
+        });
+    }
+
+    /**
+     * @return \Composer\Package\CompletePackage[]
+     * @throws CM_Exception_Invalid
+     */
+    public function getComposerPackagesFiltered() {
         $mainPackageName = 'cargomedia/cm';
         $composerPackages = $this->_getComposerPackages();
         foreach ($composerPackages as $package) {
@@ -73,13 +83,7 @@ class CM_App_Installation {
                 }
             }
         }
-
-        $packages = array();
-        /** @var \Composer\Package\CompletePackage[] $composerPackagesFiltered */
-        foreach ($composerPackagesFiltered as $package) {
-            $packages[] = $this->_getPackageFromComposerPackage($package);
-        }
-        return $packages;
+        return $composerPackagesFiltered;
     }
 
     /**
@@ -95,9 +99,9 @@ class CM_App_Installation {
      * @return \Composer\Package\CompletePackage[]
      */
     protected function _getComposerPackages() {
-        $repo = $this->_getComposer()->getRepositoryManager()->getLocalRepository();
+        $repo = $this->getComposer()->getRepositoryManager()->getLocalRepository();
         $packages = $repo->getPackages();
-        $packages[] = $this->_getComposer()->getPackage();
+        $packages[] = $this->getComposer()->getPackage();
         return $packages;
     }
 
@@ -109,7 +113,7 @@ class CM_App_Installation {
         $cacheKey = CM_CacheConst::ComposerVendorDir;
         $fileCache = new CM_Cache_Storage_File();
         if (false === ($vendorDir = $fileCache->get($cacheKey)) || $fileComposerJson->getModified() > $fileCache->getCreateStamp($cacheKey)) {
-            $vendorDir = rtrim($this->_getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
+            $vendorDir = rtrim($this->getComposer()->getConfig()->get('vendor-dir'), '/') . '/';
             $fileCache->set($cacheKey, $vendorDir);
         }
         return $vendorDir;
@@ -138,29 +142,11 @@ class CM_App_Installation {
     /**
      * @return \Composer\Composer
      */
-    protected function _getComposer() {
+    public function getComposer() {
         if (null === $this->_composer) {
-            $this->_composer = $this->_createComposerDefault();
+            $factory = new CM_App_ComposerFactory();
+            $this->_composer = $factory->createComposerFromRootDir($this->_dirRoot);
         }
         return $this->_composer;
-    }
-
-    /**
-     * @return \Composer\Composer
-     */
-    private function _createComposerDefault() {
-        $composerPath = $this->_dirRoot . 'composer.json';
-        $composerFile = new Composer\Json\JsonFile($composerPath);
-        $composerFile->validateSchema(Composer\Json\JsonFile::LAX_SCHEMA);
-        $localConfig = $composerFile->read();
-
-        $composerFactory = new CM_App_ComposerFactory();
-        $composer = $composerFactory->createComposer($localConfig);
-
-        $vendorDir = $this->_dirRoot . $composer->getConfig()->get('vendor-dir');
-        $vendorConfig = new Composer\Json\JsonFile($vendorDir . '/composer/installed.json');
-        $vendorRepository = new Composer\Repository\InstalledFilesystemRepository($vendorConfig);
-        $composer->getRepositoryManager()->setLocalRepository($vendorRepository);
-        return $composer;
     }
 }
