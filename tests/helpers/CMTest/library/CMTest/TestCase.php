@@ -306,8 +306,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         if (count($haystacks) < count($needles)) {
             self::fail('not enough elements to compare each');
         }
-        for ($i = 0; $i < count($needles); $i++) {
-            self::assertContains($needles[$i], $haystacks[$i]);
+        foreach ($needles as $key => $value) {
+            self::assertContains($value, $haystacks[$key]);
         }
     }
 

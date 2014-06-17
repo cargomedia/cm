@@ -77,7 +77,7 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @param array|null $variables
      * @return string
      */
-    public function fetchTemplate($path, $variables = null) {
+    public function fetchTemplate($path, array $variables = null) {
         $compileId = $this->getSite()->getId();
         if ($this->getLanguage()) {
             $compileId .= '_' . $this->getLanguage()->getAbbreviation();
@@ -90,6 +90,16 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $template->assign($variables);
         }
         return $template->fetch();
+    }
+
+    /**
+     * @param string     $content
+     * @param array|null $variables
+     * @return string
+     */
+    public function parseTemplateContent($content, array $variables = null) {
+        $content = 'string:' . $content;
+        return $this->fetchTemplate($content, $variables);
     }
 
     /**
