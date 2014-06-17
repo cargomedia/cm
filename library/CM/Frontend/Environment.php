@@ -2,7 +2,7 @@
 
 class CM_Frontend_Environment extends CM_Class_Abstract {
 
-    /** @var CM_Site_Abstract */
+    /** @var CM_Site_Abstract|null */
     protected $_site;
 
     /** @var CM_Model_User|null */
@@ -11,11 +11,14 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     /** @var CM_Model_Language|null */
     protected $_language;
 
-    /** @var DateTimeZone */
+    /** @var DateTimeZone|null */
     protected $_timeZone;
 
-    /** @var boolean */
+    /** @var bool|null */
     protected $_debug;
+
+    /** @var CM_Model_Location|null */
+    protected $_location;
 
     /**
      * @param CM_Site_Abstract|null  $site
@@ -23,29 +26,40 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
      * @param CM_Model_Language|null $language
      * @param DateTimeZone|null      $timeZone
      * @param bool|null              $debug
+     * @param CM_Model_Location|null $location
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null) {
-        if (null === $site) {
-            $site = CM_Site_Abstract::factory();
-        }
-        if (null === $timeZone) {
-            $timeZone = CM_Bootloader::getInstance()->getTimeZone();
-        }
-        if (null === $debug) {
-            $debug = CM_Bootloader::getInstance()->isDebug();
-        }
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, DateTimeZone $timeZone = null, $debug = null, CM_Model_Location $location = null) {
+        $this->setSite($site);
+        $this->setViewer($viewer);
+        $this->setLanguage($language);
+        $this->setTimeZone($timeZone);
+        $this->setDebug($debug);
+        $this->setLocation($location);
+    }
+
+    /**
+     * @param CM_Site_Abstract|null $site
+     */
+    public function setSite(CM_Site_Abstract $site = null) {
         $this->_site = $site;
-        $this->_viewer = $viewer;
-        $this->_language = $language;
-        $this->_timeZone = $timeZone;
-        $this->_debug = (bool) $debug;
     }
 
     /**
      * @return CM_Site_Abstract
      */
     public function getSite() {
-        return $this->_site;
+        $site = $this->_site;
+        if (null === $site) {
+            $site = CM_Site_Abstract::factory();
+        }
+        return $site;
+    }
+
+    /**
+     * @param CM_Model_User|null $viewer
+     */
+    public function setViewer(CM_Model_User $viewer = null) {
+        $this->_viewer = $viewer;
     }
 
     /**
@@ -71,6 +85,13 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param CM_Model_Language|null $language
+     */
+    public function setLanguage(CM_Model_Language $language = null) {
+        $this->_language = $language;
+    }
+
+    /**
      * @return CM_Model_Language|null
      */
     public function getLanguage() {
@@ -89,16 +110,55 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
+     * @param DateTimeZone|null $timeZone
+     */
+    public function setTimeZone(DateTimeZone $timeZone = null) {
+        $this->_timeZone = $timeZone;
+    }
+
+    /**
      * @return DateTimeZone
      */
     public function getTimeZone() {
-        return $this->_timeZone;
+        $timeZone = $this->_timeZone;
+        if (null === $timeZone) {
+            $timeZone = CM_Bootloader::getInstance()->getTimeZone();
+        }
+        return $timeZone;
+    }
+
+    /**
+     * @param bool|null $debug
+     */
+    public function setDebug($debug = null) {
+        if (null !== $debug) {
+            $debug = (bool) $debug;
+        }
+        $this->_debug = $debug;
     }
 
     /**
      * @return bool
      */
     public function isDebug() {
-        return $this->_debug;
+        $debug = $this->_debug;
+        if (null === $debug) {
+            $debug = CM_Bootloader::getInstance()->isDebug();
+        }
+        return $debug;
+    }
+
+    /**
+     * @param CM_Model_Location|null $location
+     */
+    public function setLocation(CM_Model_Location $location = null) {
+        $this->_location = $location;
+    }
+
+    /**
+     * @return CM_Model_Location|null
+     */
+    public function getLocation() {
+        return $this->_location;
     }
 }
