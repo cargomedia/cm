@@ -18,7 +18,8 @@
     "kissmetrics/kissmetrics": "dev-master"
   },
   "require-dev": {
-    "phpunit/phpunit": "~3.7.10"
+    "phpunit/phpunit": "~3.7.10",
+    "tomaszdurka/mocka": "~0.4.0"
   },
   "autoload": {
     "psr-0": {

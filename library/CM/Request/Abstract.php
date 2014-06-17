@@ -412,6 +412,17 @@ abstract class CM_Request_Abstract {
     }
 
     /**
+     * @return CM_Model_Location|null
+     */
+    public function getLocation() {
+        $ipAddress = $this->getIp();
+        if (null === $ipAddress) {
+            return null;
+        }
+        return CM_Model_Location::findByIp($ipAddress);
+    }
+
+    /**
      * @return bool
      */
     public function isBotCrawler() {

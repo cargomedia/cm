@@ -25,12 +25,26 @@ class CM_Frontend_Render extends CM_Class_Abstract {
      * @param CM_Model_User|null     $viewer
      * @param CM_Model_Language|null $language
      * @param boolean|null           $languageRewrite
+     * @param CM_Model_Location|null $location
      */
-    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null) {
+    public function __construct(CM_Site_Abstract $site = null, CM_Model_User $viewer = null, CM_Model_Language $language = null, $languageRewrite = null, CM_Model_Location $location = null) {
         if (!$language) {
             $language = CM_Model_Language::findDefault();
         }
-        $this->_environment = new CM_Frontend_Environment($site, $viewer, $language);
+        $environment = new CM_Frontend_Environment();
+        if ($site) {
+            $environment->setSite($site);
+        }
+        if ($viewer) {
+            $environment->setViewer($viewer);
+        }
+        if ($language) {
+            $environment->setLanguage($language);
+        }
+        if ($location) {
+            $environment->setLocation($location);
+        }
+        $this->_environment = $environment;
         $this->_languageRewrite = (bool) $languageRewrite;
     }
 
@@ -78,6 +92,16 @@ class CM_Frontend_Render extends CM_Class_Abstract {
             $template->assign($variables);
         }
         return $template->fetch();
+    }
+
+    /**
+     * @param string     $content
+     * @param array|null $variables
+     * @return string
+     */
+    public function parseTemplateContent($content, array $variables = null) {
+        $content = 'string:' . $content;
+        return $this->fetchTemplate($content, $variables);
     }
 
     /**
