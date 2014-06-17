@@ -151,10 +151,12 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         $query = $this->_getQuery($ids, $limit);
         if ($useMaintenance) {
             $client = CM_Service_Manager::getInstance()->getDatabases()->getReadMaintenance();
+            $disableQueryBuffering = true;
         } else {
             $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            $disableQueryBuffering = false;
         }
-        $result = CM_Db_Db::exec($query, null, $useMaintenance, $client);
+        $result = $client->createStatement($query)->execute(null, $disableQueryBuffering);
 
         $docs = array();
         $i = 0;
