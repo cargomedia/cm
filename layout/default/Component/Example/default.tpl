@@ -34,7 +34,7 @@
       {viewTemplate file='tabs/icons' icons=$icons}
     </div>
     <div>
-      {componentTemplate file='tabs/styleguide.tpl'}
+      {viewTemplate file='tabs/styleguide'}
     </div>
   {/block}
 </div>
