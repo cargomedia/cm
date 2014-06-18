@@ -27,6 +27,11 @@ abstract class CM_FormField_Suggest extends CM_FormField_Abstract {
 
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if ($this->_options['cardinality'] && count($userInput) > $this->_options['cardinality']) {
             throw new CM_Exception_FormFieldValidation('Too many elements.');
