@@ -45,12 +45,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     /**
-     * @param CM_Request_Abstract $request
+     * @param CM_Frontend_Environment $environment
      */
-    public function setValueByRequest(CM_Request_Abstract $request) {
-        $location = $this->_getRequestLocationByRequest($request);
+    public function setValueByEnvironment(CM_Frontend_Environment $environment) {
+        $location = $environment->getLocation();
         $location = $this->_squashLocationInConstraints($location);
-        if ($location) {
+        if (null !== $location) {
             $this->setValue($location);
         }
     }
@@ -66,19 +66,6 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
         }
 
         return $this->getSuggestion($location, $response->getRender());
-    }
-
-    /**
-     * @param CM_Request_Abstract $request
-     * @return CM_Model_Location|null
-     */
-    protected function _getRequestLocationByRequest(CM_Request_Abstract $request) {
-        $ip = $request->getIp();
-        if (null === $ip) {
-            return null;
-        }
-
-        return CM_Model_Location::findByIp($ip);
     }
 
     protected function _getSuggestions($term, array $options, CM_Frontend_Render $render) {

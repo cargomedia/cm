@@ -2,6 +2,8 @@
 
 abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
 
+    use \Mocka\MockaTrait;
+
     public function runBare() {
         if (!isset(CM_Config::get()->CM_Site_Abstract->class)) {
             $siteDefault = $this->getMockSite(null, null, array(
@@ -60,7 +62,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         );
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
-        $site = $this->getMockForAbstractClass($classname, array(), $classname . '_Mock' . $type, true, true, true, $methods);
+        $mockClassname = $classname . '_Mock' . $type . '_' . uniqid();
+        $site = $this->getMockForAbstractClass($classname, array(), $mockClassname, true, true, true, $methods);
         $siteClassName = get_class($site);
         $config->CM_Site_Abstract->types[$type] = $siteClassName;
         $config->$siteClassName = new stdClass;
@@ -304,8 +307,8 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase {
         if (count($haystacks) < count($needles)) {
             self::fail('not enough elements to compare each');
         }
-        for ($i = 0; $i < count($needles); $i++) {
-            self::assertContains($needles[$i], $haystacks[$i]);
+        foreach ($needles as $key => $value) {
+            self::assertContains($value, $haystacks[$key]);
         }
     }
 
