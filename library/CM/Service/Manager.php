@@ -132,6 +132,13 @@ class CM_Service_Manager extends CM_Class_Abstract {
     }
 
     /**
+     * @return CM_Service_Databases
+     */
+    public function getDatabases() {
+        return $this->get('databases', 'CM_Service_Databases');
+    }
+
+    /**
      * @param string|null $serviceName
      * @return CM_Service_MongoDb
      */
