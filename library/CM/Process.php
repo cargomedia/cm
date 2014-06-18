@@ -4,8 +4,8 @@ class CM_Process {
 
     const RESPAWN_TIMEOUT = 10;
 
-    /** @var Closure|null */
-    private $_terminationCallback = null;
+    /** @var Closure[] */
+    private $_terminationCallbackList = array();
 
     /** @var CM_Process_ForkHandler[] */
     private $_forkHandlerList = array();
@@ -17,21 +17,26 @@ class CM_Process {
         $this->_installSignalHandlers();
     }
 
-    public function executeTerminationCallback() {
-        $terminationCallback = $this->_terminationCallback;
-        if (null !== $terminationCallback) {
-            $terminationCallback();
-            $this->_terminationCallback = null;
+    /**
+     * @param int|null $pid
+     */
+    public function executeTerminationCallback($pid = null) {
+        $pid = ($pid !== null) ? (int) $pid : 0;
+        if (isset($this->_terminationCallbackList[$pid])) {
+            $this->_terminationCallbackList[$pid]();
+            unset($this->_terminationCallbackList[$pid]);
         }
     }
 
     /**
-     * @param Closure $workload
+     * @param Closure      $workload
+     * @param Closure|null $terminationCallback
+     * @return int
      * @throws CM_Exception
      */
-    public function fork(Closure $workload) {
+    public function fork(Closure $workload, Closure $terminationCallback = null) {
         $sequence = ++$this->_forkHandlerCounter;
-        $this->_fork($workload, $sequence);
+        return $this->_fork($workload, $sequence, $terminationCallback);
     }
 
     /**
@@ -96,11 +101,13 @@ class CM_Process {
     }
 
     /**
-     * @param Closure $workload
-     * @param int     $sequence
+     * @param Closure      $workload
+     * @param int          $sequence
+     * @param Closure|null $terminationCallback
      * @throws CM_Exception
+     * @return int
      */
-    private function _fork(Closure $workload, $sequence) {
+    private function _fork(Closure $workload, $sequence, Closure $terminationCallback = null) {
         $sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
         if (false === $sockets) {
             throw new CM_Exception('Cannot open stream socket pair');
@@ -114,6 +121,7 @@ class CM_Process {
             // parent
             fclose($sockets[0]);
             $this->_forkHandlerList[$sequence] = new CM_Process_ForkHandler($pid, $workload, $sockets[1]);
+            $this->_terminationCallbackList[$pid] = $terminationCallback;
         } else {
             // child
             fclose($sockets[1]);
@@ -123,6 +131,7 @@ class CM_Process {
             $forkHandler->closeIpcStream();
             exit;
         }
+        return $pid;
     }
 
     private function _installSignalHandlers() {
@@ -136,8 +145,8 @@ class CM_Process {
         pcntl_signal(SIGINT, $handler, false);
     }
 
-    private function _reset() {
-        $this->_terminationCallback = null;
+    public function _reset() {
+        $this->_terminationCallbackList = array();
         $this->_forkHandlerList = array();
         pcntl_signal(SIGTERM, SIG_DFL);
         pcntl_signal(SIGINT, SIG_DFL);
@@ -152,12 +161,11 @@ class CM_Process {
      */
     private function _wait($keepAlive = null, Closure $terminationCallback = null, $nohang = null) {
         $keepAlive = (bool) $keepAlive;
-        $this->_terminationCallback = $terminationCallback;
+        $this->_terminationCallbackList[0] = $terminationCallback;
         $workloadResultList = array();
         $waitOption = $nohang ? WNOHANG : 0;
         do {
             $pid = pcntl_wait($status, $waitOption);
-            var_dump($pid);
             pcntl_signal_dispatch();
             if (-1 === $pid) {
                 throw new CM_Exception('Waiting on child processes failed');
@@ -171,8 +179,10 @@ class CM_Process {
                     $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
                     CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
                     usleep(self::RESPAWN_TIMEOUT * 1000000);
-                    $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
+                    $callback = isset($this->_terminationCallbackList[$pid]) ? $this->_terminationCallbackList[$pid] : null;
+                    $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence, $callback);
                 }
+                $this->executeTerminationCallback($pid);
             }
         } while (!empty($this->_forkHandlerList) && $pid > 0);
         $this->executeTerminationCallback();
