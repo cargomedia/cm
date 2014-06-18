@@ -14,6 +14,13 @@ class CM_FormField_Set extends CM_FormField_Abstract {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param mixed                   $userInput
+     */
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
+    }
+
     public function parseUserInput($userInput) {
         foreach ($userInput as $key => $value) {
             if (!in_array($value, $this->_getValues())) {

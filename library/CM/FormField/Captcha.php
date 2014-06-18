@@ -12,8 +12,8 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         }
 
         return array(
-            (int)$userInput['id'],
-            (string)$userInput['value']
+            'id' => (int) $userInput['id'],
+            'value' => (string) $userInput['value']
         );
     }
 

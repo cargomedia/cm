@@ -7,7 +7,7 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        return (int)$userInput;
+        return (int) $userInput;
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

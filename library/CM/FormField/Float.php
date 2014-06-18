@@ -3,7 +3,7 @@
 class CM_FormField_Float extends CM_FormField_Text {
 
     public function parseUserInput($userInput) {
-        return (float)$userInput;
+        return (float) $userInput;
     }
 
     public function validate(CM_Frontend_Environment $environment, $userInput) {

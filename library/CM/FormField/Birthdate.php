@@ -17,6 +17,11 @@ class CM_FormField_Birthdate extends CM_FormField_Date {
         parent::_initialize();
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param DateTime                $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         parent::validate($environment, $userInput);
         $age = $userInput->diff(new DateTime())->y;
