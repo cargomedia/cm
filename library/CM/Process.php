@@ -174,7 +174,7 @@ class CM_Process {
                     $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence);
                 }
             }
-        } while ((!$nohang && !empty($this->_forkHandlerList)) || ($nohang && $pid > 0));
+        } while (!empty($this->_forkHandlerList) && $pid > 0);
         $this->executeTerminationCallback();
 
         ksort($workloadResultList);
