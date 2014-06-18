@@ -2,10 +2,6 @@
 
 class CM_Model_SplittestTest extends CMTest_TestCase {
 
-    public function setUp() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = false;
-    }
-
     public function tearDown() {
         $splittestList = new CM_Paging_Splittest_All();
         foreach ($splittestList as $splittest) {
