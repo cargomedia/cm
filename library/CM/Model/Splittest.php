@@ -2,7 +2,8 @@
 
 /**
  * Class CM_Model_Splittest
- * @method bool isVariationFixture()
+ * @method bool isVariationFixture($fixtureSource, $variationName)
+ * @method setConversion($fixtureSource, $weight)
  */
 class CM_Model_Splittest extends CM_Model_Abstract {
 
@@ -235,6 +236,37 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     /**
+     * @throws CM_Exception_Invalid
+     * @return CM_Model_SplittestVariation
+     */
+    protected function _getVariationRandom() {
+        if (!isset($this->_variationWeightList)) {
+            $variation = $this->getVariationsEnabled()->getItemRand();
+        } else {
+            $variationList = array();
+            $variationWeightList = array();
+            /** @var CM_Model_SplittestVariation $variation */
+            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
+                $variationName = $variation->getName();
+                if (isset($this->_variationWeightList[$variationName])) {
+                    $variationList[] = $variation;
+                    $variationWeightList[] = $this->_variationWeightList[$variationName];
+                }
+            }
+            if (empty($variationList)) {
+                $variation = null;
+            } else {
+                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
+                $variation = $weightedRandom->lookup();
+            }
+        }
+        if (!$variation) {
+            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
+        }
+        return $variation;
+    }
+
+    /**
      * @param string   $name
      * @param string[] $variations
      * @return static
@@ -244,12 +276,24 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     /**
+     * @param string     $splittestName
+     * @param mixed      $fixtureSource
+     * @param float|null $weight
+     */
+    protected static function _setConversionStatic($splittestName, $fixtureSource, $weight = null) {
+        $splittest = static::_getSplittest($splittestName);
+        if ($splittest) {
+            $splittest->setConversion($fixtureSource, $weight);
+        }
+    }
+
+    /**
      * @param string $splittestName
      * @param mixed  $fixture
      * @param string $variationName
      * @return bool
      */
-    protected static function _getVariationFixtureEnabled($splittestName, $fixture, $variationName) {
+    protected static function _isVariationFixtureStatic($splittestName, $fixture, $variationName) {
         $splittest = static::_getSplittest($splittestName);
         if (!$splittest) {
             return false;
@@ -281,36 +325,5 @@ class CM_Model_Splittest extends CM_Model_Abstract {
             $cache->set($cacheKey, $exists);
         }
         return $exists;
-    }
-
-    /**
-     * @throws CM_Exception_Invalid
-     * @return CM_Model_SplittestVariation
-     */
-    protected function _getVariationRandom() {
-        if (!isset($this->_variationWeightList)) {
-            $variation = $this->getVariationsEnabled()->getItemRand();
-        } else {
-            $variationList = array();
-            $variationWeightList = array();
-            /** @var CM_Model_SplittestVariation $variation */
-            foreach ($this->getVariationsEnabled()->getItems() as $variation) {
-                $variationName = $variation->getName();
-                if (isset($this->_variationWeightList[$variationName])) {
-                    $variationList[] = $variation;
-                    $variationWeightList[] = $this->_variationWeightList[$variationName];
-                }
-            }
-            if (empty($variationList)) {
-                $variation = null;
-            } else {
-                $weightedRandom = new CM_WeightedRandom($variationList, $variationWeightList);
-                $variation = $weightedRandom->lookup();
-            }
-        }
-        if (!$variation) {
-            throw new CM_Exception_Invalid('Splittest `' . $this->getId() . '` has no enabled variations.');
-        }
-        return $variation;
     }
 }

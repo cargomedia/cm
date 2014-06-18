@@ -36,11 +36,31 @@ class CM_Model_Splittest_UserTest extends CMTest_TestCase {
         $this->assertSame(1.75, $variation->getConversionRate(true));
     }
 
-    public function testGetVariationFixtureEnabled() {
+    public function testIsVariationFixtureStatic() {
         $user = CMTest_TH::createUser();
-        $this->assertFalse(CM_Model_Splittest_User::getVariationFixtureEnabled('foo', $user, 'bar'));
+        $this->assertFalse(CM_Model_Splittest_User::isVariationFixtureStatic('foo', $user, 'bar'));
         CM_Model_Splittest_User::create('foo', ['bar']);
         CM_Cache_Local::getInstance()->flush();
-        $this->assertTrue(CM_Model_Splittest_User::getVariationFixtureEnabled('foo', $user, 'bar'));
+        $this->assertTrue(CM_Model_Splittest_User::isVariationFixtureStatic('foo', $user, 'bar'));
+    }
+
+    public function testSetConversionStatic() {
+        $user1 = CMTest_TH::createUser();
+        $user2 = CMTest_TH::createUser();
+
+        CM_Model_Splittest_User::setConversionStatic('foo', $user1);
+        $splittest = CM_Model_Splittest_User::create('foo', ['bar']);
+        CM_Cache_Local::getInstance()->flush();
+
+        /** @var CM_Model_SplittestVariation $variation */
+        $variation = $splittest->getVariations()->getItem(0);
+        $splittest->isVariationFixture($user1, 'bar');
+        $splittest->isVariationFixture($user2, 'bar');
+
+        $this->assertSame(0, $variation->getConversionCount(true));
+        CM_Model_Splittest_User::setConversionStatic('foo', $user1);
+        $this->assertSame(1, $variation->getConversionCount(true));
+        CM_Model_Splittest_User::setConversionStatic('foo', $user2, 2.5);
+        $this->assertSame(1.75, $variation->getConversionRate(true));
     }
 }

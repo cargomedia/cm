@@ -3,16 +3,6 @@
 class CM_Model_Splittest_User extends CM_Model_Splittest {
 
     /**
-     * @param string        $name
-     * @param CM_Model_User $user
-     * @param string        $variationName
-     * @return bool
-     */
-    public static function getVariationFixtureEnabled($name, CM_Model_User $user, $variationName) {
-        return static::_getVariationFixtureEnabled($name, $user, $variationName);
-    }
-
-    /**
      * @param CM_Model_User $user
      * @param string        $variationName
      * @return bool
@@ -27,5 +17,24 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
      */
     public function setConversion(CM_Model_User $user, $weight = null) {
         $this->_setConversion(new CM_Splittest_Fixture($user), $weight);
+    }
+
+    /**
+     * @param string        $name
+     * @param CM_Model_User $user
+     * @param string        $variationName
+     * @return bool
+     */
+    public static function isVariationFixtureStatic($name, CM_Model_User $user, $variationName) {
+        return static::_isVariationFixtureStatic($name, $user, $variationName);
+    }
+
+    /**
+     * @param string        $splittestName
+     * @param CM_Model_User $user
+     * @param float|null    $weight
+     */
+    public static function setConversionStatic($splittestName, CM_Model_User $user, $weight = null) {
+        static::_setConversionStatic($splittestName, $user, $weight);
     }
 }
