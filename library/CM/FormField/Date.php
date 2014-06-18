@@ -20,7 +20,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
             $mm = (int) $userInput['month'];
             $yy = (int) $userInput['year'];
 
-            return new DateTime($yy . '-' . $mm . '-' . $dd);
+            return DateTime::createFromFormat('Y-n-d H:i:s', $yy . '-' . $mm . '-' . $dd . ' 00:00:00');
         } catch (Exception $e) {
             throw new CM_Exception_FormFieldValidation('Invalid date.');
         }
