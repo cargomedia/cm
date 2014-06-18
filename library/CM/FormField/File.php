@@ -16,9 +16,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        $userInput = array_filter($userInput, function ($value) {
-            return !empty($value);
-        });
+        $userInput = array_filter($userInput);
 
         $files = array();
         foreach ($userInput as $file) {
