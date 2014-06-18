@@ -283,7 +283,7 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         $cache = CM_Cache_Local::getInstance();
         $cacheKey = CM_CacheConst::CM_Model_Splittest_exists . '_name' . $name;
         if (false === ($exists = $cache->get($cacheKey))) {
-            $exists = CM_Db_Db::count('cm_splittest', ['name' => $name]);
+            $exists = (bool) CM_Db_Db::count('cm_splittest', ['name' => $name]);
             $cache->set($cacheKey, $exists);
         }
         return $exists;
