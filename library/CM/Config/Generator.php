@@ -17,7 +17,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
     private $_namespaceTypes = array();
 
     /**
-     * @return string[]
+     * @return array[]
      */
     public function getNamespaceTypes() {
         $this->_checkTypesGenerated();
@@ -54,7 +54,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
             $this->_typesMaxValue = CM_Config::get()->CM_Class_Abstract->typesMaxValue;
         }
         $typedClasses = CM_Util::getClassChildren('CM_Typed', true);
-        /** @var CM_Class_Abstract[] $namespaceClassList */
+        /** @var CM_Class_Abstract[]|string[] $namespaceClassList */
         $namespaceClassList = array();
         // fetch type-namespaces
         foreach ($typedClasses as $class) {
@@ -144,7 +144,7 @@ class CM_Config_Generator extends CM_Class_Abstract {
             $id = $currentVerbs[$actionVerb['value']];
             $content .= '$config->CM_Action_Abstract->verbs[' . $key . '] = ' . var_export($id, true) . ';' . PHP_EOL;
         }
-        $content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';' . PHP_EOL;
+        $content .= '$config->CM_Action_Abstract->verbsMaxValue = ' . $maxValue . ';';
         return $content;
     }
 

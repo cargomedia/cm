@@ -2,37 +2,33 @@
 
 class CM_FormField_LocationTest extends CMTest_TestCase {
 
-    public function testSetValueByRequest() {
-        $request = new CM_Request_Get('/fuu/');
+    public function testSetValueByEnvironment() {
         $location = CMTest_TH::createLocation();
         $locationCity = $location->get(CM_Model_Location::LEVEL_CITY);
 
-        $field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array());
-        $field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue(null));
-        /** @var CM_FormField_Location $field */
-        $field->setValueByRequest($request);
+        $environment = new CM_Frontend_Environment();
+        $environment->setLocation(null);
+        $field = new CM_FormField_Location();
+        $field->setValueByEnvironment($environment);
         $this->assertNull($field->getValue());
 
-        $field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array(CM_Model_Location::LEVEL_CITY,
-            CM_Model_Location::LEVEL_CITY));
-        $field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($location->get(CM_Model_Location::LEVEL_COUNTRY)));
-        $field->setValueByRequest($request);
+        $environment->setLocation($location->get(CM_Model_Location::LEVEL_COUNTRY));
+        $field = new CM_FormField_Location(['levelMin' => CM_Model_Location::LEVEL_CITY]);
+        $field->setValueByEnvironment($environment);
         $this->assertNull($field->getValue());
 
-        $field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array(CM_Model_Location::LEVEL_CITY,
-            CM_Model_Location::LEVEL_CITY));
-        $field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($location));
-        $field->setValueByRequest($request);
+        $environment->setLocation($location);
+        $field = new CM_FormField_Location(['levelMin' => CM_Model_Location::LEVEL_CITY, 'levelMax' => CM_Model_Location::LEVEL_CITY]);
+        $field->setValueByEnvironment($environment);
         $value = $field->getValue();
         /** @var CM_Model_Location $locationValue */
         $locationValue = $value[0];
         $this->assertSame($locationCity->getId(), $locationValue->getId());
         $this->assertSame($locationCity->getLevel(), $locationValue->getLevel());
 
-        $field = $this->getMock('CM_FormField_Location', array('_getRequestLocationByRequest'), array(CM_Model_Location::LEVEL_CITY,
-            CM_Model_Location::LEVEL_CITY));
-        $field->expects($this->any())->method('_getRequestLocationByRequest')->will($this->returnValue($locationCity));
-        $field->setValueByRequest($request);
+        $environment->setLocation($locationCity);
+        $field = new CM_FormField_Location(['levelMin' => CM_Model_Location::LEVEL_CITY, 'levelMax' => CM_Model_Location::LEVEL_CITY]);
+        $field->setValueByEnvironment($environment);
         $value = $field->getValue();
         /** @var CM_Model_Location $locationValue */
         $locationValue = $value[0];

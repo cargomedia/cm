@@ -16,7 +16,7 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
         }
     }
 
-    public function transform($text, CM_Render $render) {
+    public function transform($text, CM_Frontend_Render $render) {
         $text = (string) $text;
         $emoticons = $this->_getEmoticonData($render);
         $text = $this->_escapeFalseSmileys($text);
@@ -42,10 +42,10 @@ class CM_Usertext_Filter_Emoticon implements CM_Usertext_Filter_Interface {
     }
 
     /**
-     * @param CM_Render $render
+     * @param CM_Frontend_Render $render
      * @return array
      */
-    private function _getEmoticonData(CM_Render $render) {
+    private function _getEmoticonData(CM_Frontend_Render $render) {
         $cacheKey = CM_CacheConst::Usertext_Filter_EmoticonList . '_fixedHeight:' . (string) $this->_fixedHeight;
         $cache = CM_Cache_Local::getInstance();
         if (($emoticons = $cache->get($cacheKey)) === false) {

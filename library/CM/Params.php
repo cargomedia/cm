@@ -13,9 +13,12 @@ class CM_Params extends CM_Class_Abstract {
 
     /**
      * @param array|null $params
-     * @param bool       $decode OPTIONAL
+     * @param bool|null  $decode Defaults to true
      */
-    public function __construct(array $params = null, $decode = true) {
+    public function __construct(array $params = null, $decode = null) {
+        if (null === $decode) {
+            $decode = true;
+        }
         $this->_decode = (bool) $decode;
         $this->_paramsOriginal = (array) $params;
         $this->_params = (array) $params;
@@ -176,7 +179,7 @@ class CM_Params extends CM_Class_Abstract {
             }
             return $datetime;
         }
-        return $this->_getObject($key, 'DateTime');
+        return $this->getObject($key, 'DateTime');
     }
 
     /**
@@ -202,7 +205,7 @@ class CM_Params extends CM_Class_Abstract {
      * @throws CM_Exception_InvalidParam
      * @return object
      */
-    protected function _getObject($key, $className, $default = null, Closure $getter = null) {
+    public function getObject($key, $className, $default = null, Closure $getter = null) {
         if (!$getter) {
             $getter = function ($className, $param) {
                 return new $className($param);
@@ -275,11 +278,39 @@ class CM_Params extends CM_Class_Abstract {
     }
 
     /**
+     * @param string         $key
+     * @param CM_Params|null $default
+     * @return CM_Params
+     * @throws CM_Exception_Invalid
+     */
+    public function getParams($key, CM_Params $default = null) {
+        $param = $this->getObject($key, 'CM_Params', $default, function ($className, $param) {
+            if (is_string($param)) {
+                $json = (string) $param;
+                try {
+                    $array = CM_Params::decode($json, true);
+                } catch (CM_Exception_Invalid $e) {
+                    throw new CM_Exception_InvalidParam('Cannot decode input: ' . $e->getMessage());
+                }
+            } elseif (is_array($param)) {
+                $array = $param;
+            } else {
+                throw new CM_Exception_InvalidParam('Unexpected input of type `' . gettype($param) . '` to create CM_Params');
+            }
+            return CM_Params::factory($array);
+        });
+        if (!($param instanceof CM_Params)) {
+            throw new CM_Exception_Invalid('Not a CM_Params');
+        }
+        return $param;
+    }
+
+    /**
      * @param string $key
      * @return CM_Model_Location
      */
     public function getLocation($key) {
-        return $this->_getObject($key, 'CM_Model_Location');
+        return $this->getObject($key, 'CM_Model_Location');
     }
 
     /**
@@ -287,7 +318,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_ActionLimit_Abstract
      */
     public function getActionLimit($key) {
-        return $this->_getObject($key, 'CM_Model_ActionLimit_Abstract');
+        return $this->getObject($key, 'CM_Model_ActionLimit_Abstract');
     }
 
     /**
@@ -296,7 +327,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Language
      */
     public function getLanguage($key, $default = null) {
-        return $this->_getObject($key, 'CM_Model_Language', $default);
+        return $this->getObject($key, 'CM_Model_Language', $default);
     }
 
     /**
@@ -321,7 +352,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Stream_Publish
      */
     public function getStreamPublish($key) {
-        return $this->_getObject($key, 'CM_Model_Stream_Publish');
+        return $this->getObject($key, 'CM_Model_Stream_Publish');
     }
 
     /**
@@ -329,7 +360,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_Stream_Subscribe
      */
     public function getStreamSubscribe($key) {
-        return $this->_getObject($key, 'CM_Model_Stream_Subscribe');
+        return $this->getObject($key, 'CM_Model_Stream_Subscribe');
     }
 
     /**
@@ -337,7 +368,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Model_StreamChannel_Video
      */
     public function getStreamChannelVideo($key) {
-        return $this->_getObject($key, 'CM_Model_StreamChannel_Video');
+        return $this->getObject($key, 'CM_Model_StreamChannel_Video');
     }
 
     /**
@@ -345,7 +376,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_File
      */
     public function getFile($key) {
-        return $this->_getObject($key, 'CM_File');
+        return $this->getObject($key, 'CM_File');
     }
 
     /**
@@ -353,7 +384,7 @@ class CM_Params extends CM_Class_Abstract {
      * @return CM_Geo_Point
      */
     public function getGeoPoint($key) {
-        return $this->_getObject($key, 'CM_Geo_Point');
+        return $this->getObject($key, 'CM_Geo_Point');
     }
 
     /**
@@ -481,11 +512,12 @@ class CM_Params extends CM_Class_Abstract {
     }
 
     /**
-     * @param array $params
-     * @param bool  $decode OPTIONAL
+     * @param array|null $params
+     * @param bool|null  $decode
      * @return static
      */
-    public static function factory(array $params = array(), $decode = true) {
+    public static function factory(array $params = null, $decode = null) {
+        $params = (array) $params;
         $className = self::_getClassName();
         return new $className($params, $decode);
     }

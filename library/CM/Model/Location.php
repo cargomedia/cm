@@ -185,19 +185,21 @@ class CM_Model_Location extends CM_Model_Abstract {
     public static function findByIp($ip) {
         $cacheKey = CM_CacheConst::Location_ByIp . '_ip:' . $ip;
         $cache = CM_Cache_Local::getInstance();
+        $location = null;
         if ((list($level, $id) = $cache->get($cacheKey)) === false) {
-            $level = $id = null;
-            if ($id = self::_getLocationIdByIp('cm_model_location_city_ip', 'cityId', $ip)) {
-                $level = self::LEVEL_CITY;
-            } elseif ($id = self::_getLocationIdByIp('cm_model_location_country_ip', 'countryId', $ip)) {
-                $level = self::LEVEL_COUNTRY;
+            if ($location = self::_findByIp($ip)) {
+                $level = $location->getLevel();
+                $id = $location->getId();
             }
             $cache->set($cacheKey, array($level, $id));
         }
-        if (!$level && !$id) {
+        if (!$level || !$id) {
             return null;
         }
-        return new self($level, $id);
+        if (!$location) {
+            $location = new self($level, $id);
+        }
+        return $location;
     }
 
     /**
@@ -234,22 +236,20 @@ class CM_Model_Location extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $db_table
-     * @param string $db_column
-     * @param int    $ip
-     * @return int|false
+     * @param int $ip
+     * @return CM_Model_Location|null
      */
-    private static function _getLocationIdByIp($db_table, $db_column, $ip) {
-        $result = CM_Db_Db::execRead("SELECT `ipStart`, `" . $db_column . "` FROM `" . $db_table . "`
+    private static function _findByIp($ip) {
+        $result = CM_Db_Db::execRead("SELECT `id`, `level`, `ipStart` FROM `cm_model_location_ip`
 			WHERE `ipEnd` >= ?
 			ORDER BY `ipEnd` ASC
 			LIMIT 1", array($ip))->fetch();
         if ($result) {
             if ($result['ipStart'] <= $ip) {
-                return (int) $result[$db_column];
+                return new CM_Model_Location($result['level'], $result['id']);
             }
         }
-        return false;
+        return null;
     }
 
     public function toArray() {
@@ -274,24 +274,24 @@ class CM_Model_Location extends CM_Model_Abstract {
 
     public static function createAggregation() {
         CM_Db_Db::truncate('cm_tmp_location');
-        CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `lat`,`lon`)
+        CM_Db_Db::exec('INSERT INTO `cm_tmp_location` (`level`,`id`,`1Id`,`2Id`,`3Id`,`4Id`,`name`, `abbreviation`, `nameFull`, `lat`,`lon`)
 			SELECT 1, `1`.`id`, `1`.`id`, NULL, NULL, NULL,
-					`1`.`name`, `1`.`abbreviation`, NULL, NULL
+					`1`.`name`, `1`.`abbreviation`, CONCAT_WS(" ", `1`.`name`, `1`.`abbreviation`), NULL, NULL
 			FROM `cm_model_location_country` AS `1`
 			UNION
 			SELECT 2, `2`.`id`, `1`.`id`, `2`.`id`, NULL, NULL,
-					`2`.`name`, `2`.`abbreviation`, NULL, NULL
+					`2`.`name`, `2`.`abbreviation`, CONCAT_WS(" ", `2`.name, `2`.`abbreviation`, `1`.`name`, `1`.`abbreviation`), NULL, NULL
 			FROM `cm_model_location_state` AS `2`
 			LEFT JOIN `cm_model_location_country` AS `1` ON(`2`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 3, `3`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, NULL,
-					`3`.`name`, NULL, `3`.`lat`, `3`.`lon`
+					`3`.`name`, NULL, CONCAT_WS(" ", `3`.`name`, `2`.`name`, `2`.`abbreviation`, `1`.`name`, `1`.`abbreviation`), `3`.`lat`, `3`.`lon`
 			FROM `cm_model_location_city` AS `3`
 			LEFT JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)
 			LEFT JOIN `cm_model_location_country` AS `1` ON(`3`.`countryId`=`1`.`id`)
 			UNION
 			SELECT 4, `4`.`id`, `1`.`id`, `2`.`id`, `3`.`id`, `4`.`id`,
-					`4`.`name`, NULL, `4`.`lat`, `4`.`lon`
+					`4`.`name`, NULL, CONCAT_WS(" ", `4`.`name`, `3`.`name`, `2`.`name`, `2`.`abbreviation`, `1`.`name`, `1`.`abbreviation`), `4`.`lat`, `4`.`lon`
 			FROM `cm_model_location_zip` AS `4`
 			LEFT JOIN `cm_model_location_city` AS `3` ON(`4`.`cityId`=`3`.`id`)
 			LEFT JOIN `cm_model_location_state` AS `2` ON(`3`.`stateId`=`2`.`id`)

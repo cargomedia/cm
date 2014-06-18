@@ -7,8 +7,7 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
     }
 
     public function testAddGet() {
-        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))
-            ->disableOriginalConstructor()->getMockForAbstractClass();
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')->setMethods(array('getType'))->disableOriginalConstructor()->getMockForAbstractClass();
         $paging->expects($this->any())->method('getType')->will($this->returnValue(14));
         /** @var CM_Paging_Log_Abstract $paging */
         $paging->__construct();
@@ -43,5 +42,26 @@ class CM_Paging_Log_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame('foo', $items[0]['msg']);
         $this->assertSame(null, $items[0]['metaInfo']);
+    }
+
+    public function testCleanUp() {
+        $paging = $this->getMockBuilder('CM_Paging_Log_Abstract')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getType'))
+            ->getMockForAbstractClass();
+        $paging->expects($this->any())->method('getType')->will($this->returnValue(1));
+        /** @var CM_Paging_Log_Abstract $paging */
+        $paging->__construct();
+
+        $this->assertSame(0, $paging->getCount());
+
+        CMTest_TH::getProtectedMethod($paging, '_add')->invoke($paging, 'foo');
+        $paging->_change();
+        $this->assertSame(1, $paging->getCount());
+
+        $age = 7 * 86400;
+        CMTest_TH::timeForward($age);
+        $paging->cleanUp();
+        $this->assertSame(0, $paging->getCount());
     }
 }

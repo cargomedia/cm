@@ -2,7 +2,7 @@
 
 class CM_Asset_Css extends CM_Asset_Abstract {
 
-    /** @var CM_Render */
+    /** @var CM_Frontend_Render */
     protected $_render;
 
     /** @var string|null */
@@ -15,11 +15,11 @@ class CM_Asset_Css extends CM_Asset_Abstract {
     private $_children = array();
 
     /**
-     * @param CM_Render   $render
+     * @param CM_Frontend_Render   $render
      * @param string|null $content
      * @param string|null $prefix
      */
-    public function __construct(CM_Render $render, $content = null, $prefix = null) {
+    public function __construct(CM_Frontend_Render $render, $content = null, $prefix = null) {
         $this->_render = $render;
         if (null !== $content) {
             $this->_content = (string) $content;
@@ -79,12 +79,12 @@ class CM_Asset_Css extends CM_Asset_Abstract {
         if (false === ($contentTransformed = $cache->get($cacheKey))) {
             $lessCompiler = new lessc();
             $lessCompiler->registerFunction('image', function ($arg) use ($render) {
-                /** @var CM_Render $render */
+                /** @var CM_Frontend_Render $render */
                 list($type, $delimiter, $values) = $arg;
                 return array('function', 'url', array('string', $delimiter, array($render->getUrlResource('layout', 'img/' . $values[0]))));
             });
             $lessCompiler->registerFunction('urlFont', function ($arg) use ($render) {
-                /** @var CM_Render $render */
+                /** @var CM_Frontend_Render $render */
                 list($type, $delimiter, $values) = $arg;
                 return array($type, $delimiter, array($render->getUrlStatic('/font/' . $values[0])));
             });

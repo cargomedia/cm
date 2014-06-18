@@ -52,4 +52,114 @@ class CM_Elasticsearch_Type_LocationTest extends CMTest_TestCase {
         $locationList = $source->getItems();
         $this->assertEquals(array('id' => self::$_cityId, 'level' => CM_Model_Location::LEVEL_CITY), reset($locationList));
     }
+
+    public function testQueryNameSuggestion() {
+        $expected = array(
+            'Arinsal'           => array(
+                'Arinsal',
+            ),
+            'Arins'             => array(
+                'Arinsal',
+            ),
+            'ARI'               => array(
+                'Arinsal',
+            ),
+            'el serrat'         => array(
+                'El Serrat',
+            ),
+            'ENCAMP'            => array(
+                'Encamp',
+                'Encamp',
+            ),
+            'Soldeu Andorra'    => array(
+                'Soldeu',
+            ),
+            'Andorra Soldeu'    => array(
+                'Soldeu',
+            ),
+            'El serrat Andorra' => array(
+                'El Serrat',
+            ),
+            'Andorra El serrat' => array(
+                'El Serrat',
+            ),
+            'El Andorra serrat' => array(
+                'El Serrat',
+            ),
+            'El Andor ser'      => array(
+                'El Serrat',
+            ),
+            'El Andorra'        => array(
+                'El Tarter',
+                'El Serrat',
+            ),
+            'serrat Andorra'    => array(
+                'El Serrat',
+            ),
+            'Merit ad'          => array(
+                'Meritxell',
+            ),
+        );
+
+        foreach ($expected as $term => $expectedList) {
+            $searchQuery = new CM_Elasticsearch_Query_Location();
+            $searchQuery->queryNameSuggestion($term);
+            $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
+
+            $this->_assertItemsByName($expectedList, $source->getItems(), 'Wrong items for term `' . $term . '`.');
+        }
+    }
+
+    public function testQueryName() {
+        $expected = array(
+            'Arinsal'           => array(
+                'Arinsal',
+            ),
+            'ARINSAL'           => array(
+                'Arinsal',
+            ),
+            'Arins'             => array(),
+            'el serrat'         => array(
+                'El Serrat',
+            ),
+            'Soldeu Andorra'    => array(
+                'Soldeu',
+            ),
+            'Andorra Soldeu'    => array(
+                'Soldeu',
+            ),
+            'El serrat Andorra' => array(
+                'El Serrat',
+            ),
+            'El Andor ser'      => array(),
+            'El Andorra'        => array(
+                'El Tarter',
+                'El Serrat',
+            ),
+            'serrat Andorra'    => array(
+                'El Serrat',
+            ),
+        );
+
+        foreach ($expected as $term => $expectedList) {
+            $searchQuery = new CM_Elasticsearch_Query_Location();
+            $searchQuery->queryName($term);
+            $source = new CM_PagingSource_Elasticsearch_Location($searchQuery);
+
+            $this->_assertItemsByName($expectedList, $source->getItems(), 'Wrong items for term `' . $term . '`.');
+        }
+    }
+
+    /**
+     * @param string[]    $expectedNameList
+     * @param array[]     $actualItemList
+     * @param string|null $message
+     */
+    private function _assertItemsByName($expectedNameList, $actualItemList, $message = null) {
+        $actualNameList = Functional\map($actualItemList, function (array $actualItem) {
+            $actualLocation = new CM_Model_Location($actualItem['level'], $actualItem['id']);
+            return $actualLocation->getName();
+        });
+        $this->assertSame($expectedNameList, $actualNameList, $message);
+    }
 }

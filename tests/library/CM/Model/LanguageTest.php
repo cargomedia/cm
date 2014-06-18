@@ -215,7 +215,7 @@ class CM_Model_LanguageTest extends CMTest_TestCase {
             $this->_language->getTranslation('someKey', array('foo', 'bar', 'foo'));
             $this->fail('Should throw exception on duplicate key add');
         } catch (CM_Exception $e) {
-            $this->assertContains('Duplicate', $e->getMessage());
+            $this->assertContains('Duplicate variable name declaration', $e->getMessage());
         }
     }
 

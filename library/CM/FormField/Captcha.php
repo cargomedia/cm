@@ -2,11 +2,11 @@
 
 class CM_FormField_Captcha extends CM_FormField_Abstract {
 
-    public function prepare(array $params) {
-        $this->setTplParam('imageId', CM_Captcha::create()->getId());
+    public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
+        $viewResponse->set('imageId', CM_Captcha::create()->getId());
     }
 
-    public function validate($userInput, CM_Response_Abstract $response) {
+    public function validate(CM_Frontend_Environment $environment, $userInput) {
         $id = (int) $userInput['id'];
         $text = (string) $userInput['value'];
 
@@ -22,7 +22,7 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         return $userInput;
     }
 
-    public static function ajax_createNumber(CM_Params $params, CM_ComponentFrontendHandler $handler, CM_Response_View_Ajax $response) {
+    public function ajax_createNumber(CM_Params $params, CM_Frontend_JavascriptContainer_View $handler, CM_Response_View_Ajax $response) {
         return CM_Captcha::create()->getId();
     }
 }

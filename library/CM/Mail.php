@@ -38,6 +38,9 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
     /** @var boolean */
     private $_renderLayout = false;
 
+    /** @var array */
+    protected $_tplParams = array();
+
     /**
      * @param CM_Model_User|string|null $recipient
      * @param array|null                $tplParams
@@ -75,6 +78,23 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
 
         $this->setTplParam('siteName', $this->_site->getName());
         $this->setSender($this->_site->getEmailAddress(), $this->_site->getName());
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     * @return CM_Component_Abstract
+     */
+    public function setTplParam($key, $value) {
+        $this->_tplParams[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTplParams() {
+        return $this->_tplParams;
     }
 
     /**
@@ -374,7 +394,7 @@ class CM_Mail extends CM_View_Abstract implements CM_Typed {
      * @return array array($subject, $html, $text)
      */
     protected function _render($language) {
-        $render = new CM_Render($this->_site, $this->_recipient, $language);
+        $render = new CM_Frontend_Render($this->_site, $this->_recipient, $language);
         $renderAdapter = new CM_RenderAdapter_Mail($render, $this);
         return $renderAdapter->fetch();
     }

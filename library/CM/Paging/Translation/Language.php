@@ -33,9 +33,8 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
 
         $orderBy = 'k.name ASC';
         $join = 'LEFT JOIN `cm_languageValue` AS v ON k.id = v.languageKeyId AND v.languageId = ' . $language->getId() . ' ';
-        $join .= 'LEFT JOIN `cm_languageKey_variable` AS kv ON k.id = kv.languageKeyId';
         $groupBy = 'k.name';
-        $source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, GROUP_CONCAT(kv.name SEPARATOR ",") as variables',
+        $source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, k.variables',
             'cm_languageKey` as `k', implode(' AND ', $where), $orderBy, $join, $groupBy, $parameters);
         parent::__construct($source);
     }
@@ -54,7 +53,7 @@ class CM_Paging_Translation_Language extends CM_Paging_Abstract {
     }
 
     protected function _processItem($item) {
-        $item['variables'] = ($item['variables']) ? explode(',', $item['variables']) : array();
+        $item['variables'] = ($item['variables']) ? json_decode($item['variables']) : array();
         sort($item['variables']);
         return $item;
     }

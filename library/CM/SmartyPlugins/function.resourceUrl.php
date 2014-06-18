@@ -1,7 +1,7 @@
 <?php
 
 function smarty_function_resourceUrl(array $params, Smarty_Internal_Template $template) {
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     $path = (string) $params['path'];
     $type = (string) $params['type'];

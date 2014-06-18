@@ -5,6 +5,9 @@ class CM_Response_Page extends CM_Response_Abstract {
     /** @var CM_Page_Abstract|null */
     private $_page;
 
+    /** @var CM_Params|null */
+    private $_pageParams;
+
     /** @var string|null */
     private $_redirectUrl;
 
@@ -15,10 +18,25 @@ class CM_Response_Page extends CM_Response_Abstract {
     }
 
     /**
-     * @return CM_Page_Abstract|null
+     * @throws CM_Exception_Invalid
+     * @return CM_Page_Abstract
      */
     public function getPage() {
+        if (null === $this->_page) {
+            throw new CM_Exception_Invalid('Page not set');
+        }
         return $this->_page;
+    }
+
+    /**
+     * @throws CM_Exception_Invalid
+     * @return CM_Params
+     */
+    public function getPageParams() {
+        if (null == $this->_pageParams) {
+            throw new CM_Exception_Invalid('Page params not set');
+        }
+        return $this->_pageParams;
     }
 
     /**
@@ -73,7 +91,8 @@ class CM_Response_Page extends CM_Response_Abstract {
      * @return string
      */
     protected function _renderPage(CM_Page_Abstract $page) {
-        return $this->getRender()->render($page->getLayout($this->getSite()));
+        $renderAdapterLayout = new CM_RenderAdapter_Layout($this->getRender(), $page);
+        return $renderAdapterLayout->fetch();
     }
 
     protected function _process() {
@@ -83,7 +102,7 @@ class CM_Response_Page extends CM_Response_Abstract {
             $this->redirectUrl($this->getRender()->getUrl($path, $this->_site));
         }
         if (!$this->getRedirectUrl()) {
-            $this->getRender()->getJs()->getTracking()->trackPageview($this->getRequest());
+            $this->getRender()->getGlobalResponse()->getTracking()->trackPageview($this->getRequest());
             $html = $this->_processPageLoop($this->getRequest());
             $this->_setContent($html);
         }
@@ -102,13 +121,11 @@ class CM_Response_Page extends CM_Response_Abstract {
     private function _processPage(CM_Request_Abstract $request) {
         try {
             $this->getSite()->rewrite($request);
-            $query = $request->getQuery();
-            $viewer = $request->getViewer();
+            $pageParams = CM_Params::factory($request->getQuery());
 
             try {
                 $className = CM_Page_Abstract::getClassnameByPath($this->getSite(), $request->getPath());
-                /** @var CM_Page_Abstract $page */
-                $page = CM_Page_Abstract::factory($className, $query, $viewer);
+                $page = CM_Page_Abstract::factory($className, $pageParams);
             } catch (CM_Exception $ex) {
                 throw new CM_Exception_Nonexistent('Cannot load page `' . $request->getPath() . '`: ' . $ex->getMessage());
             }
@@ -117,21 +134,20 @@ class CM_Response_Page extends CM_Response_Abstract {
             if ($this->getViewer() && $request->getLanguageUrl()) {
                 $this->redirect($page);
             }
-            $page->prepareResponse($this);
+            $page->prepareResponse($this->getRender()->getEnvironment(), $this);
             if ($this->getRedirectUrl()) {
                 $request->setUri($this->getRedirectUrl());
                 return null;
             }
-            $page->checkAccessible($this->getRender());
-            $page->prepare();
             $html = $this->_renderPage($page);
             $this->_page = $page;
+            $this->_pageParams = $pageParams;
             return $html;
         } catch (CM_Exception $e) {
             if (!array_key_exists(get_class($e), $this->_getConfig()->catch)) {
                 throw $e;
             }
-            $this->getRender()->getJs()->clear();
+            $this->getRender()->getGlobalResponse()->clear();
             $path = $this->_getConfig()->catch[get_class($e)];
             $request->setPath($path);
             $request->setQuery(array());

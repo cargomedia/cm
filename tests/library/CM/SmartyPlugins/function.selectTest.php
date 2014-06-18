@@ -124,7 +124,7 @@ class smarty_function_selectTest extends CMTest_TestCase {
      */
     private function _createSelect(array $params) {
         $smarty = new Smarty();
-        $render = new CM_Render();
+        $render = new CM_Frontend_Render();
         $template = $smarty->createTemplate('string:');
         $template->assignGlobal('render', $render);
         $html = smarty_function_select($params, $template);

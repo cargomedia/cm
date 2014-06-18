@@ -5,16 +5,11 @@ function smarty_function_component(array $params, Smarty_Internal_Template $temp
         trigger_error('Param `name` missing.');
     }
     $name = $params['name'];
-    /** @var CM_Render $render */
+    /** @var CM_Frontend_Render $render */
     $render = $template->smarty->getTemplateVars('render');
     unset($params['name']);
-    if ($name instanceof CM_Component_Abstract) {
-        $component = $name;
-    } else {
-        $component = CM_Component_Abstract::factory($name, CM_Params::factory($params), $render->getViewer());
-        $component->checkAccessible($render);
-        $component->prepare();
-    }
 
-    return $render->render($component);
+    $component = CM_Component_Abstract::factory($name, $params);
+    $renderAdapter = CM_RenderAdapter_Component::factory($render, $component);
+    return $renderAdapter->fetch();
 }
