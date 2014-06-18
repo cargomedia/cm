@@ -32,7 +32,7 @@ class CM_FormField_Date extends CM_FormField_Abstract {
      * @throws CM_Exception_FormFieldValidation
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        if (!($userInput instanceof DateTime)) {
+        if (!$userInput instanceof DateTime) {
             throw new CM_Exception_FormFieldValidation('Expected a DateTime instance.');
         }
 

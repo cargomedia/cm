@@ -7,8 +7,8 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        if (!isset($userInput['id']) || !isset($userInput['value'])) {
-            throw new CM_Exception_FormFieldValidation('Expected id and value.');
+        if (!is_array($userInput) || !isset($userInput['id']) || !isset($userInput['value'])) {
+            throw new CM_Exception_FormFieldValidation('Expected an array with id and value keys.');
         }
 
         return array(
@@ -17,6 +17,11 @@ class CM_FormField_Captcha extends CM_FormField_Abstract {
         );
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param array                   $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         $id = (int) $userInput['id'];
         $text = (string) $userInput['value'];

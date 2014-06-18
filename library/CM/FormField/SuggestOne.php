@@ -23,6 +23,5 @@ abstract class CM_FormField_SuggestOne extends CM_FormField_Suggest {
      * @return string|null
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        parent::validate($environment, $userInput);
     }
 }
