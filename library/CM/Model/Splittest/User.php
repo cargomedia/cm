@@ -20,13 +20,13 @@ class CM_Model_Splittest_User extends CM_Model_Splittest {
     }
 
     /**
-     * @param string        $name
+     * @param string        $splittestName
      * @param CM_Model_User $user
      * @param string        $variationName
      * @return bool
      */
-    public static function isVariationFixtureStatic($name, CM_Model_User $user, $variationName) {
-        return static::_isVariationFixtureStatic($name, $user, $variationName);
+    public static function isVariationFixtureStatic($splittestName, CM_Model_User $user, $variationName) {
+        return static::_isVariationFixtureStatic($splittestName, $user, $variationName);
     }
 
     /**
