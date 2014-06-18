@@ -82,6 +82,9 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @throws CM_Exception_Invalid
      */
     public function setVariationWeightList(array $variationWeightList) {
+        if ($this->_withoutPersistence) {
+            return;
+        }
         if (empty($variationWeightList)) {
             throw new CM_Exception_Invalid('Empty variation weight list');
         }
