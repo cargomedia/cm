@@ -22,12 +22,7 @@ class CM_FormField_Set extends CM_FormField_Abstract {
     }
 
     public function parseUserInput($userInput) {
-        foreach ($userInput as $key => $value) {
-            if (!in_array($value, $this->_getValues())) {
-                unset($userInput[$key]);
-            }
-        }
-        return $userInput;
+        return array_intersect($userInput, $this->_getValues());
     }
 
     public function prepare(CM_Params $renderParams, CM_Frontend_ViewResponse $viewResponse) {
