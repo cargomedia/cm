@@ -164,27 +164,30 @@ class CM_Process {
         $this->_terminationCallbackList[0] = $terminationCallback;
         $workloadResultList = array();
         $waitOption = $nohang ? WNOHANG : 0;
-        do {
-            $pid = pcntl_wait($status, $waitOption);
-            pcntl_signal_dispatch();
-            if (-1 === $pid) {
-                throw new CM_Exception('Waiting on child processes failed');
-            } elseif ($pid > 0) {
-                $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
-                $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
-                $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
-                $forkHandler->closeIpcStream();
-                unset($this->_forkHandlerList[$forkHandlerSequence]);
-                if ($keepAlive) {
-                    $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
-                    CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
-                    usleep(self::RESPAWN_TIMEOUT * 1000000);
-                    $callback = isset($this->_terminationCallbackList[$pid]) ? $this->_terminationCallbackList[$pid] : null;
-                    $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence, $callback);
+        if (!empty($this->_forkHandlerList)) {
+            do {
+                $pid = pcntl_wait($status, $waitOption);
+                pcntl_signal_dispatch();
+                if (-1 === $pid) {
+                    throw new CM_Exception('Waiting on child processes failed');
+                } elseif ($pid > 0) {
+                    $forkHandlerSequence = $this->_getForkHandlerSequenceByPid($pid);
+                    $forkHandler = $this->_forkHandlerList[$forkHandlerSequence];
+                    $workloadResultList[$forkHandlerSequence] = $forkHandler->receiveWorkloadResult();
+                    $forkHandler->closeIpcStream();
+                    unset($this->_forkHandlerList[$forkHandlerSequence]);
+                    if ($keepAlive) {
+                        $warning = new CM_Exception('Respawning dead child `' . $pid . '`.', null, array('severity' => CM_Exception::WARN));
+                        CM_Bootloader::getInstance()->getExceptionHandler()->handleException($warning);
+                        usleep(self::RESPAWN_TIMEOUT * 1000000);
+                        $callback = isset($this->_terminationCallbackList[$pid]) ? $this->_terminationCallbackList[$pid] : null;
+                        $callback = null;
+                        $this->_fork($forkHandler->getWorkload(), $forkHandlerSequence, $callback);
+                    }
+                    $this->executeTerminationCallback($pid);
                 }
-                $this->executeTerminationCallback($pid);
-            }
-        } while (!empty($this->_forkHandlerList) && $pid > 0);
+            } while (!empty($this->_forkHandlerList) && $pid > 0);
+        }
         $this->executeTerminationCallback();
 
         ksort($workloadResultList);
