@@ -207,28 +207,6 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         }
         $this->assertSame(0, $v1);
     }
-
-    public function testWithoutPersistence() {
-        $user = CMTest_TH::createUser();
-        $fixture = new CM_Splittest_Fixture($user);
-
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('notExisting');
-
-        $this->assertFalse($test->isVariationFixture($fixture, 'bar'));
-        $this->assertSame('', $test->getVariationFixture($fixture));
-        $test->setConversion($fixture);
-
-        CMTest_TH::clearConfig();
-    }
-
-    public function testWithoutPersistenceDelete() {
-        CM_Config::get()->CM_Model_Splittest->withoutPersistence = true;
-        $test = new CM_Model_Splittest_Mock('foo');
-        $test->delete();
-
-        CMTest_TH::clearConfig();
-    }
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
