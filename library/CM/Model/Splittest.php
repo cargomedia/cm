@@ -276,6 +276,20 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public static function exists($name) {
+        $cache = CM_Cache_Local::getInstance();
+        $cacheKey = CM_CacheConst::CM_Model_Splittest_exists . '_name' . $name;
+        if (false === ($exists = $cache->get($cacheKey))) {
+            $exists = CM_Db_Db::count('cm_splittest');
+            $cache->set($cacheKey, $exists);
+        }
+        return $exists;
+    }
+
+    /**
      * @param string     $splittestName
      * @param mixed      $fixtureSource
      * @param float|null $weight
@@ -306,24 +320,10 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @return CM_Model_Splittest|null
      */
     protected static function _getSplittest($name) {
-        if (!self::_exists($name)) {
+        if (!self::exists($name)) {
             return null;
         }
         $className = get_called_class();
         return new $className($name);
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    protected static function _exists($name) {
-        $cache = CM_Cache_Local::getInstance();
-        $cacheKey = CM_CacheConst::CM_Model_Splittest_exists . '_name' . $name;
-        if (false === ($exists = $cache->get($cacheKey))) {
-            $exists = CM_Db_Db::count('cm_splittest');
-            $cache->set($cacheKey, $exists);
-        }
-        return $exists;
     }
 }
