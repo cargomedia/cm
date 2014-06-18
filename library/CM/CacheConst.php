@@ -39,7 +39,7 @@ class CM_CacheConst {
     const SplitFeature_Fixtures = 'SplitFeature_Fixtures';
 
     // _name:X
-    const Splittest_Exists = 'Splittest_Exists';
+    const CM_Model_Splittest_exists = 'CM_Model_Splittest_exists';
 
     // _id:X_type:X
     const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
