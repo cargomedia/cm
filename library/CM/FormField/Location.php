@@ -26,14 +26,12 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     }
 
     public function parseUserInput($userInput) {
+        $userInput = parent::parseUserInput($userInput);
         if (!preg_match('/^(\d+)\.(\d+)$/', $userInput, $matches)) {
             throw new CM_Exception_FormFieldValidation('Invalid input format');
         }
         $level = $matches[1];
         $id = $matches[2];
-        if ($level < $this->_options['levelMin'] || $level > $this->_options['levelMax']) {
-            throw new CM_Exception_FormFieldValidation('Invalid location level.');
-        }
 
         try {
             return new CM_Model_Location($level, $id);
@@ -51,6 +49,10 @@ class CM_FormField_Location extends CM_FormField_SuggestOne {
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!$userInput instanceof CM_Model_Location) {
             throw new CM_Exception_FormFieldValidation('Expected a CM_Model_Location instance.');
+        }
+
+        if ($userInput->getLevel() < $this->_options['levelMin'] || $userInput->getLevel() > $this->_options['levelMax']) {
+            throw new CM_Exception_FormFieldValidation('Invalid location level.');
         }
     }
 

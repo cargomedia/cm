@@ -1,16 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-$autoloadPaths = array_filter(array(__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'), function ($path) {
-    return file_exists($path);
-});
-if (count($autoloadPaths) === 0) {
-    die('ERROR: Please install project dependencies with `composer install`.' . PHP_EOL);
-}
-$autoloadPath = reset($autoloadPaths);
-
-require $autoloadPath;
-$bootloader = new CM_Bootloader(dirname(dirname(realpath($autoloadPath))) . '/');
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+$bootloader = new CM_Bootloader(dirname(__DIR__) . '/');
 $bootloader->load();
 
 $manager = new CM_Cli_CommandManager();
