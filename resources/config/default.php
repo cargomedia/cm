@@ -161,4 +161,9 @@ return function (CM_Config_Node $config) {
             ),
         ))
     );
+
+    $config->services['kissmetrics'] = array(
+        'class'     => 'CM_Service_KissMetrics',
+        'arguments' => array('')
+    );
 };

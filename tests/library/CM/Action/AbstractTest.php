@@ -126,4 +126,11 @@ class CM_Action_AbstractTest extends CMTest_TestCase {
         $this->assertSame(4, $actionList->getCount());
         $this->assertSame(1, $transgressionList->getCount());
     }
+
+    public function testGetTrackingEventName() {
+        $user = CMTest_TH::createUser();
+        $action = new CM_Action_Email(CM_Action_Abstract::VIEW, $user);
+        $method = CMTest_TH::getProtectedMethod('CM_Action_Email', '_getTrackingEventName');
+        $this->assertSame('email view', $method->invoke($action));
+    }
 }

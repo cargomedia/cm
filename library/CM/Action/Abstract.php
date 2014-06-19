@@ -27,6 +27,12 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
     /** @var array */
     protected $_ignoreLogging = array();
 
+    /** @var bool */
+    private $_trackingEnabled = true;
+
+    /** @var array */
+    private $_trackingPropertyList = array();
+
     /**
      * @param string            $verbName
      * @param CM_Model_User|int $actor
@@ -43,6 +49,8 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
         if (method_exists($this, $methodName)) {
             call_user_func_array(array($this, $methodName), $arguments);
         }
+
+        $this->_track();
     }
 
     /**
@@ -350,6 +358,35 @@ abstract class CM_Action_Abstract extends CM_Class_Abstract implements CM_ArrayC
      */
     public function getLabel() {
         return $this->getName() . ' ' . $this->getVerbName();
+    }
+
+    protected function _disableTracking() {
+        $this->_trackingEnabled = false;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _getTrackingEventName() {
+        $actionName = CM_Util::uncamelize(str_replace('_', '', preg_replace('#\\A[^_]++_[^_]++_#', '', get_called_class())), ' ');
+        $verbName = str_replace('_', ' ', $this->getVerbName());
+        return strtolower($actionName . ' ' . $verbName);
+    }
+
+    /**
+     * @param array $trackingPropertyList
+     */
+    protected function _setTrackingPropertyList(array $trackingPropertyList) {
+        $this->_trackingPropertyList = $trackingPropertyList;
+    }
+
+    protected function _track() {
+        if ($this->_trackingEnabled && $this->getActor()) {
+            /** @var CM_Service_KissMetrics $kissMetrics */
+            $kissMetrics = CM_Service_Manager::getInstance()->get('kissmetrics');
+            $kissMetrics->setViewer($this->getActor());
+            $kissMetrics->track($this->_getTrackingEventName(), $this->_trackingPropertyList);
+        }
     }
 
     /**
