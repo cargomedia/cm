@@ -42,4 +42,11 @@ class CM_FormField_LocationTest extends CMTest_TestCase {
         $parsedInput = $field->parseUserInput(CM_Model_Location::LEVEL_CITY . '.' . $location->getId());
         $this->assertInstanceOf('CM_Model_Location', $parsedInput);
     }
+
+    public function testValidate() {
+        $environment = new CM_Frontend_Environment();
+        $location = CMTest_TH::createLocation(CM_Model_Location::LEVEL_CITY);
+        $field = new CM_FormField_Location();
+        $field->validate($environment, $location);
+    }
 }

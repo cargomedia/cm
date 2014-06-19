@@ -15,7 +15,15 @@ class CM_FormField_File extends CM_FormField_Abstract {
     public function validateFile(CM_File $file) {
     }
 
+    /**
+     * @param array $userInput
+     * @return array
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function parseUserInput($userInput) {
+        if (!is_array($userInput)) {
+            throw new CM_Exception_FormFieldValidation('Expected an array.');
+        }
         $userInput = array_filter($userInput);
 
         $files = array();
@@ -23,7 +31,7 @@ class CM_FormField_File extends CM_FormField_Abstract {
             $files[] = new CM_File_UserContent_Temp($file);
         }
 
-        return (array) $files;
+        return $files;
     }
 
     /**

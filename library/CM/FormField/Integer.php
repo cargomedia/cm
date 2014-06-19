@@ -10,6 +10,11 @@ class CM_FormField_Integer extends CM_FormField_Abstract {
         return (int) $userInput;
     }
 
+    /**
+     * @param CM_Frontend_Environment $environment
+     * @param int                     $userInput
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
         if (!is_numeric($userInput)) {
             throw new CM_Exception_FormFieldValidation('Invalid number');

@@ -12,8 +12,17 @@ class CM_FormField_Site extends CM_FormField_Set_Select {
         parent::_initialize();
     }
 
+    /**
+     * @param int $userInput
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_FormFieldValidation
+     */
     public function parseUserInput($userInput) {
-        return CM_Site_Abstract::factory($userInput);
+        try {
+            return CM_Site_Abstract::factory($userInput);
+        } catch (Exception $e) {
+            throw new CM_Exception_FormFieldValidation($e->getMessage());
+        }
     }
 
     /**
@@ -22,10 +31,10 @@ class CM_FormField_Site extends CM_FormField_Set_Select {
      * @throws CM_Exception_FormFieldValidation
      */
     public function validate(CM_Frontend_Environment $environment, $userInput) {
-        parent::validate($environment, $userInput);
-
         if (!$userInput instanceof CM_Site_Abstract) {
             throw new CM_Exception_FormFieldValidation('Expected a CM_Site_Abstract instance.');
         }
+
+        parent::validate($environment, $userInput->getId());
     }
 }

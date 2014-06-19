@@ -1,6 +1,6 @@
 <?php
 
-class CM_FormField_Set extends CM_FormField_Abstract {
+class  CM_FormField_Set extends CM_FormField_Abstract {
 
     /** @var array */
     private $_values = array();
