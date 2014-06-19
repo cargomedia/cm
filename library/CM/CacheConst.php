@@ -38,9 +38,6 @@ class CM_CacheConst {
     // _splitfeatureId:X_userId:X
     const SplitFeature_Fixtures = 'SplitFeature_Fixtures';
 
-    // _name:X
-    const CM_Model_Splittest_exists = 'CM_Model_Splittest_exists';
-
     // _id:X_type:X
     const Splittest_VariationFixtures = 'Splittest_VariationFixtures';
 

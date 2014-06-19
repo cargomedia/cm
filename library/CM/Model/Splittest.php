@@ -158,6 +158,12 @@ class CM_Model_Splittest extends CM_Model_Abstract {
         CM_Db_Db::delete('cm_splittest', array('id' => $this->getId()));
     }
 
+    protected function _getContainingCacheables() {
+        $containingCacheables = parent::_getContainingCacheables();
+        $containingCacheables[] = new CM_Paging_Splittest_All();
+        return $containingCacheables;
+    }
+
     /**
      * @param CM_Splittest_Fixture $fixture
      * @param float|null           $weight
@@ -269,13 +275,8 @@ class CM_Model_Splittest extends CM_Model_Abstract {
      * @return bool
      */
     public static function exists($name) {
-        $cache = CM_Cache_Local::getInstance();
-        $cacheKey = CM_CacheConst::CM_Model_Splittest_exists . '_name' . $name;
-        if (false === ($exists = $cache->get($cacheKey))) {
-            $exists = (bool) CM_Db_Db::count('cm_splittest', ['name' => $name]);
-            $cache->set($cacheKey, $exists);
-        }
-        return $exists;
+        $paging = new CM_Paging_Splittest_All();
+        return $paging->contains($name);
     }
 
     /**
