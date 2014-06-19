@@ -207,6 +207,14 @@ class CM_Model_SplittestTest extends CMTest_TestCase {
         }
         $this->assertSame(0, $v1);
     }
+
+    public function testExists() {
+        $this->assertFalse(CM_Model_Splittest::exists('foo'));
+        $splittest = CM_Model_Splittest::create('foo', ['bar']);
+        $this->assertTrue(CM_Model_Splittest::exists('foo'));
+        $splittest->delete();
+        $this->assertFalse(CM_Model_Splittest::exists('foo'));
+    }
 }
 
 class CM_Model_Splittest_Mock extends CM_Model_Splittest {
