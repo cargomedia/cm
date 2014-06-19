@@ -133,11 +133,11 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
      * Update the complete index
      *
      * @param mixed[]   $ids               Only update given IDs
-     * @param bool|null $useSlave          Read data from one of the slave databases, if any
+     * @param bool|null $useMaintenance    Read data from the maintenance database, if any
      * @param int       $limit             Limit query
      * @param int       $maxDocsPerRequest Number of docs per bulk-request
      */
-    public function update($ids = null, $useSlave = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
+    public function update($ids = null, $useMaintenance = null, $limit = null, $maxDocsPerRequest = self::MAX_DOCS_PER_REQUEST) {
         if (is_array($ids) && empty($ids)) {
             return;
         }
@@ -149,9 +149,14 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract {
         }
 
         $query = $this->_getQuery($ids, $limit);
-        CM_Db_Db::getClient(true)->setBuffered(false);
-        $result = CM_Db_Db::exec($query, null, $useSlave);
-        CM_Db_Db::getClient(true)->setBuffered(true);
+        if ($useMaintenance) {
+            $client = CM_Service_Manager::getInstance()->getDatabases()->getReadMaintenance();
+            $disableQueryBuffering = true;
+        } else {
+            $client = CM_Service_Manager::getInstance()->getDatabases()->getMaster();
+            $disableQueryBuffering = false;
+        }
+        $result = $client->createStatement($query)->execute(null, $disableQueryBuffering);
 
         $docs = array();
         $i = 0;

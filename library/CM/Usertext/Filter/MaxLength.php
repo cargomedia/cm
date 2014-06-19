@@ -1,6 +1,6 @@
 <?php
 
-class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
+class CM_Usertext_Filter_MaxLength extends CM_Usertext_Filter_Abstract {
 
     /** @var int|null */
     private $_lengthMax = null;
@@ -12,6 +12,10 @@ class CM_Usertext_Filter_MaxLength implements CM_Usertext_Filter_Interface {
         if (null !== $lengthMax) {
             $this->_lengthMax = (int) $lengthMax;
         }
+    }
+
+    public function getCacheKey() {
+        return parent::getCacheKey() + array('_lengthMax' => $this->_lengthMax);
     }
 
     public function transform($text, CM_Frontend_Render $render) {

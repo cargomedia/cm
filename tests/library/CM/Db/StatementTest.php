@@ -6,8 +6,7 @@ class CM_Db_StatementTest extends CMTest_TestCase {
     private static $_client;
 
     public static function setUpBeforeClass() {
-        $config = CM_Config::get()->CM_Db_Db;
-        self::$_client = new CM_Db_Client($config->server['host'], $config->server['port'], $config->username, $config->password, $config->db);
+        self::$_client = CM_Db_Db::getClient();
 
         CM_Db_Db::exec('CREATE TABLE `test` (`id` INT(10) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))');
     }
