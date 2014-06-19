@@ -285,18 +285,6 @@ class CM_Model_Splittest extends CM_Model_Abstract {
     }
 
     /**
-     * @param string     $splittestName
-     * @param mixed      $fixtureSource
-     * @param float|null $weight
-     */
-    protected static function _setConversionStatic($splittestName, $fixtureSource, $weight = null) {
-        $splittest = static::_getSplittest($splittestName);
-        if ($splittest) {
-            $splittest->setConversion($fixtureSource, $weight);
-        }
-    }
-
-    /**
      * @param string $name
      * @return static|null
      */
