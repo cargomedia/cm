@@ -188,16 +188,16 @@ class CM_Bootloader {
     private function _getModulePaths() {
         $cacheKey = CM_CacheConst::Modules;
         $apcCache = new CM_Cache_Storage_Apc();
-        if (false === ($namespacePaths = $apcCache->get($cacheKey))) {
+        if (false === ($modulePaths = $apcCache->get($cacheKey))) {
             $fileCache = new CM_Cache_Storage_File();
             $installation = new CM_App_Installation(DIR_ROOT);
-            if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($namespacePaths = $fileCache->get($cacheKey))) {
-                $namespacePaths = $installation->getModulePaths();
-                $fileCache->set($cacheKey, $namespacePaths);
+            if ($installation->getUpdateStamp() > $fileCache->getCreateStamp($cacheKey) || false === ($modulePaths = $fileCache->get($cacheKey))) {
+                $modulePaths = $installation->getModulePaths();
+                $fileCache->set($cacheKey, $modulePaths);
             }
-            $apcCache->set($cacheKey, $namespacePaths);
+            $apcCache->set($cacheKey, $modulePaths);
         }
-        return $namespacePaths;
+        return $modulePaths;
     }
 
     /**
