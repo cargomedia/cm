@@ -46,7 +46,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
         $request = $this->createRequest('/');
         $this->assertFalse(CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'bar'));
         CM_Model_Splittest_RequestClient::create('foo', ['bar']);
-        CM_Cache_Local::getInstance()->flush();
         $this->assertTrue(CM_Model_Splittest_RequestClient::isVariationFixtureStatic('foo', $request, 'bar'));
     }
 
@@ -56,7 +55,6 @@ class CM_Model_Splittest_RequestClientTest extends CMTest_TestCase {
 
         CM_Model_Splittest_RequestClient::setConversionStatic('foo', $request1);
         $splittest = CM_Model_Splittest_RequestClient::create('foo', ['bar']);
-        CM_Cache_Local::getInstance()->flush();
 
         /** @var CM_Model_SplittestVariation $variation */
         $variation = $splittest->getVariations()->getItem(0);
